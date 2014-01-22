@@ -58,6 +58,7 @@ class PlanarFigure_EXPORT PlanarFigure : public BaseData
 {
 public:
   mitkClassMacro( PlanarFigure, BaseData )
+  itkCloneMacro( Self )
 
   struct PolyLineElement
   {
@@ -268,8 +269,12 @@ public:
   virtual void RemoveLastControlPoint();
 
   /** \brief Copies contents and state of a figre provided as parameter to the current object.
-             Requires a matching type of both figures. */
-  void DeepCopy(Self::Pointer oldFigure);
+    *
+    * Requires a matching type of both figures.
+    *
+    * \note Deprecated, use Clone() instead.
+    */
+  DEPRECATED(void DeepCopy(Self::Pointer oldFigure));
 
   /** \brief Allow sub-classes to apply constraints on control points.
   *
@@ -283,6 +288,8 @@ public:
 protected:
   PlanarFigure();
   virtual ~PlanarFigure();
+
+  PlanarFigure(const Self& other);
 
   /** \brief Set the initial number of control points of the planar figure */
   void ResetNumberOfControlPoints( int numberOfControlPoints );
@@ -319,9 +326,10 @@ protected:
    * Must be implemented in sub-classes. */
   virtual void EvaluateFeaturesInternal() = 0;
 
-  /** \brief Initializes the TimeSlicedGeometry describing the (time-resolved)
-   * geometry of this figure. Note that each time step holds one Geometry2D. */
-  virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
+  /** \brief Initializes the TimeGeometry describing the (time-resolved)
+   * geometry of this figure. Note that each time step holds one Geometry2D.
+   */
+  virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 );
 
   /** \brief defines the number of PolyLines that will be available */
   void SetNumberOfPolyLines( unsigned int numberOfPolyLines );
@@ -341,8 +349,6 @@ protected:
 
   /** \brief clears the list of HelperPolyLines. Call before re-calculating a new HelperPolyline. */
   void ClearHelperPolyLines();
-
-
 
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
 
@@ -383,6 +389,8 @@ private:
     bool Active;
     bool Visible;
   };
+
+  virtual itk::LightObject::Pointer InternalClone() const = 0;
 
   Geometry2D *m_Geometry2D;
 

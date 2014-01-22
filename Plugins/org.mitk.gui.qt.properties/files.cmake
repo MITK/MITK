@@ -9,11 +9,13 @@ set(INTERNAL_CPP_FILES
   QmitkPropertyItemModel.cpp
   QmitkPropertyItemSortFilterProxyModel.cpp
   QmitkPropertyTreeView.cpp
+  QmitkAddNewPropertyDialog.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkPropertiesPreferencePage.ui
   src/internal/QmitkPropertyTreeView.ui
+  src/internal/QmitkAddNewPropertyDialog.ui
 )
 
 set(MOC_H_FILES
@@ -23,6 +25,7 @@ set(MOC_H_FILES
   src/internal/QmitkPropertyItemModel.h
   src/internal/QmitkPropertyItemSortFilterProxyModel.h
   src/internal/QmitkPropertyTreeView.h
+  src/internal/QmitkAddNewPropertyDialog.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -31,6 +34,7 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
+  resources/Properties.qrc
 )
 
 set(CPP_FILES

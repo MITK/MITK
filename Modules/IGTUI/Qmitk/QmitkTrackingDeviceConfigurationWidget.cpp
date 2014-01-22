@@ -17,10 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkTrackingDeviceConfigurationWidget.h"
 #include <mitkClaronTrackingDevice.h>
 #include <mitkNDITrackingDevice.h>
+#include <mitkIGTException.h>
 #include <mitkSerialCommunication.h>
 #include <qscrollbar.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
+#include <mitkIGTException.h>
 
 #include <itksys/SystemTools.hxx>
 #include <Poco/Path.h>
@@ -217,24 +219,30 @@ void QmitkTrackingDeviceConfigurationWidget::TestConnection()
 {
 this->setEnabled(false);
 
-//#### Step 1: construct a tracking device:
+//construct a tracking device:
 mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
 
-//#### Step 2: test connection and start tracking, generate output
-AddOutput("<br>testing connection <br>  ...");
-if (testTrackingDevice->OpenConnection())
+try
   {
-  AddOutput(" OK");
+  //test connection and start tracking, generate output
+  AddOutput("<br>testing connection <br>  ...");
+  testTrackingDevice->OpenConnection();
+  AddOutput("OK");
+
+  //try start/stop tracking
   AddOutput("<br>testing tracking <br>  ...");
-  if (testTrackingDevice->StartTracking())
-    {
-    AddOutput(" OK");
-    if (!testTrackingDevice->StopTracking())AddOutput("<br>ERROR while stop tracking<br>");
-    }
-  else AddOutput(" ERROR!");
-  if (!testTrackingDevice->CloseConnection())AddOutput("<br>ERROR while closing connection<br>");
+  testTrackingDevice->StartTracking();
+  testTrackingDevice->StopTracking();
+
+  //try close connection
+  testTrackingDevice->CloseConnection();
+  AddOutput("OK");
   }
-else AddOutput(" ERROR!");
+catch(mitk::IGTException &e)
+  {
+  AddOutput("ERROR!");
+  MITK_WARN << "Error while testing connection / start tracking of the device: " << e.GetDescription();
+  }
 
 this->setEnabled(true);
 }
@@ -477,6 +485,11 @@ mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidget::ScanPort(QStrin
 {
   mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();
   tracker->SetDeviceName(port.toStdString());
-  return tracker->TestConnection();
+  mitk::TrackingDeviceType returnValue = mitk::TrackingSystemInvalid;
+  try
+  {returnValue = tracker->TestConnection();}
+  catch (mitk::IGTException)
+  {}//do nothing: there is simply no device on this port
+  return returnValue;
 }
 

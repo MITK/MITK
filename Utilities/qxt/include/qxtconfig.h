@@ -1,1 +1,0 @@
-#define QXT_SHARED 

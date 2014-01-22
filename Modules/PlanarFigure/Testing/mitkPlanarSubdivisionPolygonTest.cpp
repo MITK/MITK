@@ -97,19 +97,22 @@ static void TestPlanarSubdivisionPolygonPlacement( mitk::PlanarSubdivisionPolygo
   testPoint[1] = 48.243;
   iter = polyLine0.begin();
   advance(iter, 47);
-  if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > mitk::eps ){ correctPoint = false; }
+
+  mitk::ScalarType testEps = 1E-5;
+
+  if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > testEps ){ correctPoint = false; }
 
   testPoint[0] = 39.624;
   testPoint[1] = 19.3268;
   iter = polyLine0.begin();
   advance(iter, 10);
-  if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > mitk::eps ){ correctPoint = false; }
+  if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > testEps ){ correctPoint = false; }
 
   testPoint[0] = 71.2887;
   testPoint[1] = 77.5248;
   iter = polyLine0.begin();
   advance(iter, 67);
-  if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > mitk::eps ){ correctPoint = false; }
+  if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > testEps ){ correctPoint = false; }
 
   MITK_TEST_CONDITION( correctPoint, "Test if subdivision points are calculated correctly" )
 

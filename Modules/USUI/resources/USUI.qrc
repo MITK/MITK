@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/USUI">
+        <file>go-next.png</file>
+        <file>go-previous.png</file>
+        <file>zoom-in.png</file>
+        <file>zoom-out.png</file>
+    </qresource>
+</RCC>

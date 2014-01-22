@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "internal/berryTestRegistry.h"
 
-#include <CppUnit/TestRunner.h>
+#include "cppunit/TestRunner.h"
+#include "cppunit/TestResult.h"
+#include "cppunit/TestResultCollector.h"
 
 namespace berry
 {
@@ -45,7 +47,7 @@ int BlueBerryTestDriver::Run()
     if (descr->IsUITest() == uitests)
     {
       CppUnit::Test* test = descr->CreateTest();
-      runner.addTest(descr->GetId(), test);
+      runner.addTest(test);
       ++testCounter;
     }
   }
@@ -57,6 +59,7 @@ int BlueBerryTestDriver::Run()
     return 0;
   }
 
+  /*
   std::vector<std::string> args;
   args.push_back("BlueBerryTestDriver");
   if (testName.empty())
@@ -67,6 +70,15 @@ int BlueBerryTestDriver::Run()
     args.push_back("-wait");
 
   return runner.run(args) ? 0 : 1;
+  */
+
+  CppUnit::TestResult controller;
+
+  CppUnit::TestResultCollector result;
+  controller.addListener(&result);
+
+  runner.run(controller);
+  return result.wasSuccessful() ? 0 : 1;
 }
 
 int BlueBerryTestDriver::Run(const std::string& pluginId, bool uitests)

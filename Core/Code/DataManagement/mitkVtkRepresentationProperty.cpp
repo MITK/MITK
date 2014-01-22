@@ -92,5 +92,6 @@ bool mitk::VtkRepresentationProperty::AddEnum( const std::string& name, const Id
 itk::LightObject::Pointer mitk::VtkRepresentationProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

@@ -37,9 +37,9 @@ namespace mitk {
     itkNewMacro(Self);
     mitkCloneMacro(BaseDataTestImplementation);
 
-    virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps /* = 1 */ )
+    virtual void InitializeTimeGeometry( unsigned int timeSteps /* = 1 */ )
     {
-      Superclass::InitializeTimeSlicedGeometry(timeSteps);
+      Superclass::InitializeTimeGeometry(timeSteps);
     }
 
   protected:

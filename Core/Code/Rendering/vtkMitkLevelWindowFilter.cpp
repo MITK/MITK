@@ -20,6 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLookupTable.h>
 #include <vtkColorTransferFunction.h>
 #include "vtkObjectFactory.h"
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
+
+#include <vtkStreamingDemandDrivenPipeline.h>
 
 //used for acos etc.
 #include <cmath>
@@ -33,7 +37,7 @@ static const double PI = itk::Math::pi;
 
 vtkStandardNewMacro(vtkMitkLevelWindowFilter);
 
-vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter():m_MinOpacity(0.0),m_MaxOpacity(255.0)
+vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter(): m_LookupTable(NULL), m_MinOpacity(0.0),m_MaxOpacity(255.0)
 {
   //MITK_INFO << "mitk level/window filter uses " << GetNumberOfThreads() << " thread(s)";
 }
@@ -136,7 +140,7 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter* self,
                                vtkImageData* inData,
                                vtkImageData* outData,
                                int outExt[6],
-                               vtkFloatingPointType* clippingBounds,
+                               double* clippingBounds,
                                T*)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
@@ -315,7 +319,7 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
                                   vtkImageData *inData,
                                   vtkImageData *outData,
                                   int outExt[6],
-                                  vtkFloatingPointType* clippingBounds,
+                                  double* clippingBounds,
                                   T *)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
@@ -385,7 +389,7 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
                                   vtkImageData *inData,
                                   vtkImageData *outData,
                                   int outExt[6],
-                                  vtkFloatingPointType* clippingBounds,
+                                  double* clippingBounds,
                                   T *)
 {
   vtkImageIterator<T> inputIt(inData, outExt);
@@ -455,28 +459,19 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
 
 
 
-void vtkMitkLevelWindowFilter::ExecuteInformation()
+int vtkMitkLevelWindowFilter::RequestInformation(vtkInformation* request,
+                                                  vtkInformationVector** inputVector,
+                                                  vtkInformationVector* outputVector)
 {
-  vtkImageData *input = this->GetInput();
-  vtkImageData *output = this->GetOutput();
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  if (!input)
-  {
-    vtkErrorMacro(<< "Input not set.");
-    return;
-  }
-  output->CopyTypeSpecificInformation( input );
+  // do nothing except copy scalar type info
+  this->CopyInputArrayAttributesToOutput(request,inputVector,outputVector);
 
-  // TODO make output RGBA
-  output->SetScalarTypeToUnsignedChar();
-  output->SetNumberOfScalarComponents(4);
+  vtkDataObject::SetPointDataActiveScalarInfo(outInfo, VTK_UNSIGNED_CHAR, 4);
 
-  int extent[6];
-  input->GetWholeExtent(extent);
-  output->SetExtent(extent);
-  output->SetWholeExtent(extent);
-  output->SetUpdateExtent(extent);
-  output->AllocateScalars();
+  return 1;
+
 }
 
 //Method to run the filter in different threads.
@@ -568,10 +563,10 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
   }
 }
 
-void vtkMitkLevelWindowFilter::ExecuteInformation(
-    vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData))
-{
-}
+//void vtkMitkLevelWindowFilter::ExecuteInformation(
+//    vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData))
+//{
+//}
 
 void vtkMitkLevelWindowFilter::SetMinOpacity(double minOpacity)
 {
@@ -593,7 +588,7 @@ inline double vtkMitkLevelWindowFilter::GetMaxOpacity() const
   return m_MaxOpacity;
 }
 
-void vtkMitkLevelWindowFilter::SetClippingBounds(vtkFloatingPointType* bounds) // TODO does vtkFloatingPointType[4] work??
+void vtkMitkLevelWindowFilter::SetClippingBounds(double* bounds) // TODO does double[4] work??
 {
   for (unsigned int i = 0 ; i < 4; ++i)
     m_ClippingBounds[i] = bounds[i];

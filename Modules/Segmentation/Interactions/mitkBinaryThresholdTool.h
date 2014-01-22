@@ -24,7 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImage.h>
 
+namespace us {
 class ModuleResource;
+}
 
 namespace mitk
 {
@@ -49,7 +51,7 @@ namespace mitk
     itkNewMacro(BinaryThresholdTool);
 
     virtual const char** GetXPM() const;
-    ModuleResource GetIconResource() const;
+    us::ModuleResource GetIconResource() const;
     virtual const char* GetName() const;
 
     virtual void Activated();

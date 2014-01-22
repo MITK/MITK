@@ -24,6 +24,7 @@ set(CPP_FILES
   Rendering/mitkConnectomicsRenderingNodeRadiusParameterProperty.cpp
   Rendering/mitkConnectomicsRenderingNodeThresholdParameterProperty.cpp
   Rendering/mitkConnectomicsRenderingEdgeThresholdParameterProperty.cpp
+  Rendering/mitkConnectomicsEnumerationSubclassesSerializer.cpp
 
   # Algorithms Connectomics
   Algorithms/mitkConnectomicsNetworkCreator.cpp
@@ -33,13 +34,14 @@ set(CPP_FILES
   Algorithms/mitkConnectomicsBetweennessHistogram.cpp
   Algorithms/mitkConnectomicsHistogramCache.cpp
   Algorithms/mitkConnectomicsSyntheticNetworkGenerator.cpp
-  #Algorithms/itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingPermutationBase.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingPermutationModularity.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingManager.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionBase.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.cpp
-
+  Algorithms/mitkConnectomicsStatisticsCalculator.cpp
+  Algorithms/mitkConnectomicsNetworkConverter.cpp
+  Algorithms/mitkConnectomicsNetworkThresholder.cpp
 )
 
 set(H_FILES
@@ -81,8 +83,8 @@ set(H_FILES
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionBase.h
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
   Algorithms/itkConnectomicsNetworkToConnectivityMatrixImageFilter.h
-
-
+  Algorithms/mitkConnectomicsStatisticsCalculator.h
+  Algorithms/mitkConnectomicsNetworkConverter.h
 )
 
 

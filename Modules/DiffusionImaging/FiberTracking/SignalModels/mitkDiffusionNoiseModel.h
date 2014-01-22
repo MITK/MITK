@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVariableLengthVector.h>
 #include <itkVector.h>
 #include <vnl/vnl_vector_fixed.h>
+#include <boost/random.hpp>
 
 namespace mitk {
 
@@ -35,19 +36,21 @@ class DiffusionNoiseModel
 public:
 
     DiffusionNoiseModel(){}
-    ~DiffusionNoiseModel(){}
+    virtual ~DiffusionNoiseModel(){}
 
     typedef itk::VariableLengthVector< ScalarType > PixelType;
 
     /** Adds noise according to model to the input pixel. Has to be implemented in subclass. **/
     virtual void AddNoise(PixelType& pixel) = 0;
 
-    void SetNoiseVariance(double var){ m_NoiseVariance = var; }
-    double GetNoiseVariance(){ return m_NoiseVariance; }
+    /** Seed for random generator. Has to be implemented in subclass. **/
+    virtual void SetSeed(int seed) = 0;
+
+    virtual double GetNoiseVariance() = 0;
+    virtual void SetNoiseVariance(double var) = 0;
 
 protected:
 
-    double      m_NoiseVariance;    ///< variance of underlying distribution
 };
 
 }

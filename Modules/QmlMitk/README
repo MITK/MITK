@@ -1,0 +1,4 @@
+This module is meant to provide the functionality of QmitkRenderWindow in QML at some time.
+
+In the current state, this module is just a proof-of-concept and should not be used outside
+experimental code. It is subject to substantial change, so do not rely on the current state.

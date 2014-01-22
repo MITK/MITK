@@ -25,11 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceRegistration.h>
-#include <mitkModuleContext.h>
+#include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <mitkModule.h>
-#include <mitkModuleResource.h>
-#include <mitkModuleResourceStream.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 namespace mitk
 {
@@ -46,42 +46,37 @@ public:
 
   ToFCameraPMDRawDataCamBoardDeviceFactory()
   {
-    this->m_DeviceNumber=0;
   }
 
   /*!
-   \brief Defining the Factorie´s Name, here for the RawDataCamBoardDeviceFactory.
-   */
-   std::string GetFactoryName()
-   {
-       return std::string("PMD Raw Data CamBoard Factory ");
-   }
+  \brief Defining the Factorie´s Name, here for the RawDataCamBoardDeviceFactory.
+  */
+  std::string GetFactoryName()
+  {
+    return std::string("PMD Raw Data CamBoard Factory ");
+  }
 
-   std::string GetCurrentDeviceName()
-   {
-     std::stringstream name;
-     name<<"PMD Raw Data CamBoard Device " << m_DeviceNumber++;
-     return name.str ();
-   }
+  std::string GetDeviceNamePrefix()
+  {
+    return std::string("PMD Raw Data CamBoard Device");
+  }
 
 private:
      /*!
    \brief Create an instance of a RawDataCamBoardDeviceFactory.
    */
-   ToFCameraDevice::Pointer createToFCameraDevice()
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
    {
      ToFCameraPMDRawDataCamBoardDevice::Pointer device = ToFCameraPMDRawDataCamBoardDevice::New();
 
      return device.GetPointer();
    }
 
-   ModuleResource GetIntrinsicsResource()
+   us::ModuleResource GetIntrinsicsResource()
    {
-     Module* module = GetModuleContext()->GetModule();
+     us::Module* module = us::GetModuleContext()->GetModule();
      return module->GetResource("CalibrationFiles/PMDCamBoard_camera.xml");
    }
-
-   int m_DeviceNumber;
 };
 }
 #endif

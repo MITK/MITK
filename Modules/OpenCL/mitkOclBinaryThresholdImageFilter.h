@@ -94,6 +94,8 @@ protected:
     return sizeof(unsigned char);
   }
 
+  virtual us::Module* GetModule();
+
 private:
   /** The OpenCL kernel for the filter */
   cl_kernel m_ckBinaryThreshold;

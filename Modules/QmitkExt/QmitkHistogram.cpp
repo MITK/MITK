@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkHistogram::HistogramData
 {
 public:
-  QwtIntervalData data;
+  QwtIntervalSeriesData data;
   QColor color;
   double reference;
 };
@@ -71,13 +71,13 @@ double QmitkHistogram::baseline() const
   return m_Data->reference;
 }
 
-void QmitkHistogram::setData(const QwtIntervalData &data)
+void QmitkHistogram::setData(const QwtIntervalSeriesData &data)
 {
-  m_Data->data = data;
+  m_Data->data.setSamples(data.samples());
   itemChanged();
 }
 
-const QwtIntervalData &QmitkHistogram::data() const
+const QwtIntervalSeriesData &QmitkHistogram::data() const
 {
   return m_Data->data;
 }
@@ -96,9 +96,9 @@ QColor QmitkHistogram::color() const
   return m_Data->color;
 }
 
-QwtDoubleRect QmitkHistogram::boundingRect() const
+QRectF QmitkHistogram::boundingRect() const
 {
-  QwtDoubleRect rect = m_Data->data.boundingRect();
+  QRectF rect = m_Data->data.boundingRect();
   if ( !rect.isValid() )
     return rect;
 
@@ -111,9 +111,9 @@ QwtDoubleRect QmitkHistogram::boundingRect() const
 }
 
 void QmitkHistogram::draw(QPainter *painter, const QwtScaleMap &xMap,
-                          const QwtScaleMap &yMap, const QRect &) const
+                          const QwtScaleMap &yMap, const QRectF &) const
 {
-  const QwtIntervalData &iData = m_Data->data;
+  const QwtIntervalSeriesData &iData = m_Data->data;
 
   painter->setPen(QPen(m_Data->color));
 
@@ -122,23 +122,23 @@ void QmitkHistogram::draw(QPainter *painter, const QwtScaleMap &xMap,
 
   for ( int i = 0; i < (int)iData.size(); i++ )
   {
-    const int y2 = yMap.transform(iData.value(i));
+    const int y2 = yMap.transform(iData.sample(i).value);
     if ( y2 == y0 )
       continue;
 
-    int x1 = xMap.transform(iData.interval(i).minValue());
-    int x2 = xMap.transform(iData.interval(i).maxValue());
+    int x1 = xMap.transform(iData.sample(i).interval.minValue());
+    int x2 = xMap.transform(iData.sample(i).interval.maxValue());
     if ( x1 > x2 )
       qSwap(x1, x2);
 
     if ( i < (int)iData.size() - 2 )
     {
-      const int xx1 = xMap.transform(iData.interval(i+1).minValue());
-      const int xx2 = xMap.transform(iData.interval(i+1).maxValue());
+      const int xx1 = xMap.transform(iData.sample(i+1).interval.minValue());
+      const int xx2 = xMap.transform(iData.sample(i+1).interval.maxValue());
 
-      if ( x2 == qwtMin(xx1, xx2) )
+      if ( x2 == qMin(xx1, xx2) )
       {
-        const int yy2 = yMap.transform(iData.value(i+1));
+        const int yy2 = yMap.transform(iData.sample(i+1).value);
         if ( yy2 != y0 && ( (yy2 < y0 && y2 < y0) ||
           (yy2 > y0 && y2 > y0) ) )
         {

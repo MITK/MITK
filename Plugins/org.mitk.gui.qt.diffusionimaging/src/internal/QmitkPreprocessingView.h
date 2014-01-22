@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkPreprocessingViewControls.h"
 
+#include "itkDWIVoxelFunctor.h"
+
 #include "mitkDiffusionImage.h"
 
 typedef short DiffusionPixelType;
@@ -81,6 +83,7 @@ protected slots:
   void DoReduceGradientDirections();
   void DoShowGradientDirections();
   void DoHalfSphereGradientDirections();
+  void DoADCAverage();
   void DoADCFit();
   void DoAKCFit();
   void DoBiExpFit();
@@ -108,6 +111,8 @@ protected:
 
   QList<QCheckBox*> m_ReduceGradientCheckboxes;
   QList<QSpinBox*> m_ReduceGradientSpinboxes;
+
+  void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::DiffusionImage<DiffusionPixelType>::Pointer ImPtr, QString imageName);
 };
 
 

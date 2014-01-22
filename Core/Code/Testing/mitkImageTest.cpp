@@ -24,6 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageGenerator.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkException.h"
+#include "mitkPixelTypeMultiplex.h"
+#include "mitkImagePixelReadAccessor.h"
+
+#include "mitkImageSliceSelector.h"
 
 // itk includes
 #include <itkImage.h>
@@ -59,6 +63,57 @@ bool ImageVtkDataReferenceCheck(const char* fname) {
   }
 
   return true;
+}
+
+template <class T>
+void TestRandomPixelAccess( const mitk::PixelType ptype, mitk::Image::Pointer image, mitk::Point3D & point, mitk::ScalarType & value )
+{
+  // generate a random point in world coordinates
+  mitk::Point3D xMax, yMax, zMax, xMaxIndex, yMaxIndex, zMaxIndex;
+  xMaxIndex.Fill(0.0f);
+  yMaxIndex.Fill(0.0f);
+  zMaxIndex.Fill(0.0f);
+  xMaxIndex[0] = image->GetLargestPossibleRegion().GetSize()[0];
+  yMaxIndex[1] = image->GetLargestPossibleRegion().GetSize()[1];
+  zMaxIndex[2] = image->GetLargestPossibleRegion().GetSize()[2];
+  image->GetGeometry()->IndexToWorld(xMaxIndex, xMax);
+  image->GetGeometry()->IndexToWorld(yMaxIndex, yMax);
+  image->GetGeometry()->IndexToWorld(zMaxIndex, zMax);
+  MITK_INFO << "Origin " << image->GetGeometry()->GetOrigin()[0] << " "<< image->GetGeometry()->GetOrigin()[1] << " "<< image->GetGeometry()->GetOrigin()[2] << "";
+  MITK_INFO << "MaxExtend " << xMax[0] << " "<< yMax[1] << " "<< zMax[2] << "";
+
+  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomGenerator = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+  randomGenerator->Initialize( std::rand() );      // initialize with random value, to get sensible random points for the image
+  point[0] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[0], xMax[0]);
+  point[1] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[1], yMax[1]);
+  point[2] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[2], zMax[2]);
+  MITK_INFO << "RandomPoint " << point[0] << " "<< point[1] << " "<< point[2] << "";
+
+  // test values and max/min
+  mitk::ScalarType imageMin = image->GetStatistics()->GetScalarValueMin();
+  mitk::ScalarType imageMax = image->GetStatistics()->GetScalarValueMax();
+
+  // test accessing PixelValue with coordinate leading to a negative index
+  const mitk::Point3D geom_origin = image->GetGeometry()->GetOrigin();
+  const mitk::Point3D geom_center = image->GetGeometry()->GetCenter();
+
+  // shift position from origin outside of the image ( in the opposite direction to [center-origin] vector which points in the inside)
+  mitk::Point3D position = geom_origin + (geom_origin - geom_center);
+
+  MITK_INFO << "Testing access outside of the image";
+  unsigned int dim = image->GetDimension();
+  if(dim == 3 || dim == 4){
+    mitk::ImagePixelReadAccessor<T,3> imAccess3(image,image->GetVolumeData(0));
+    value = static_cast<mitk::ScalarType>(imAccess3.GetPixelByWorldCoordinates(point));
+    mitk::Index3D itkIndex;
+    image->GetGeometry()->WorldToIndex(position, itkIndex);
+    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception)
+    imAccess3.GetPixelByIndexSafe(itkIndex);
+    MITK_TEST_FOR_EXCEPTION_END(mitk::Exception);
+  }
+  MITK_INFO << imageMin << " "<< imageMax << " "<< value << "";
+  MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
+
 }
 
 class mitkImageTestClass
@@ -264,26 +319,21 @@ int mitkImageTest(int argc, char* argv[])
   //-----------------
   // testing origin information and methods
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin), "Testing correctness of origin via GetGeometry()->GetOrigin(): ");
-  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin), "Testing correctness of origin via GetTimeSlicedGeometry()->GetOrigin(): ");
 
   // Setting origin via SetOrigin(origin): ";
-  mitk::FillVector3D(origin, 37.0, 17.92, 27.83);
-  imgMem->SetOrigin(origin);
+  mitk::FillVector3D(origin, 37.0, 17.92, 27.83);  imgMem->SetOrigin(origin);
 
   // Test origin
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin), "Testing correctness of changed origin via GetGeometry()->GetOrigin(): ");
-  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin), "Testing correctness of changed origin via GetTimeSlicedGeometry()->GetOrigin(): ");
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(), origin),  "Testing correctness of changed origin via GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(): ");
 
   //-----------------
-  // testing spacing information and methods
+  // testing spacing information and methodsunsigned int dim[]={100,100,20};
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing), "Testing correct spacing from Geometry3D!");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing), "Testing correctspacing from TimeSlicedGeometry!");
 
   mitk::FillVector3D(spacing, 7.0, 0.92, 1.83);
   imgMem->SetSpacing(spacing);
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing), "Testing correctness of changed spacing via GetGeometry()->GetSpacing(): ");
-  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing), "Testing correctness of changed spacing via GetTimeSlicedGeometry()->GetSpacing(): ");
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(), spacing), "Testing correctness of changed spacing via GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(): ");
 
   mitk::Image::Pointer vecImg = mitk::Image::New();
@@ -323,8 +373,7 @@ int mitkImageTest(int argc, char* argv[])
   mitk::vtk2itk(vtkorigin, vtkoriginAsMitkPoint);
   double vtkspacing[] =  {1.367, 1.367, 2};
   vtkimage->SetSpacing(vtkspacing);
-  vtkimage->SetScalarType( VTK_SHORT );
-  vtkimage->AllocateScalars();
+  vtkimage->AllocateScalars(VTK_SHORT,1);
   std::cout<<"[PASSED]"<<std::endl;
 
   MITK_TEST_OUTPUT(<< " Testing mitk::Image::Initialize(vtkImageData*, ...)");
@@ -345,10 +394,6 @@ int mitkImageTest(int argc, char* argv[])
 
   MITK_TEST_OUTPUT(<< " Testing whether GetGeometry()->GetOrigin() has been correctly initialized from vtkImageData");
   origin2 = mitkByVtkImage->GetGeometry()->GetOrigin();
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
-
-  MITK_TEST_OUTPUT(<< " Testing whether GetTimeSlicedGeometry()->GetOrigin() has been correctly initialized from vtkImageData");
-  origin2 = mitkByVtkImage->GetTimeSlicedGeometry()->GetOrigin();
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
 
   // TODO test the following initializers on channel-incorporation
@@ -377,46 +422,12 @@ int mitkImageTest(int argc, char* argv[])
   }
 
   mitk::Image::Pointer image = imageReader->GetOutput();
-
-  // generate a random point in world coordinates
-  mitk::Point3D xMax, yMax, zMax, xMaxIndex, yMaxIndex, zMaxIndex;
-  xMaxIndex.Fill(0.0f);
-  yMaxIndex.Fill(0.0f);
-  zMaxIndex.Fill(0.0f);
-  xMaxIndex[0] = image->GetLargestPossibleRegion().GetSize()[0];
-  yMaxIndex[1] = image->GetLargestPossibleRegion().GetSize()[1];
-  zMaxIndex[2] = image->GetLargestPossibleRegion().GetSize()[2];
-  image->GetGeometry()->IndexToWorld(xMaxIndex, xMax);
-  image->GetGeometry()->IndexToWorld(yMaxIndex, yMax);
-  image->GetGeometry()->IndexToWorld(zMaxIndex, zMax);
-  MITK_INFO << "Origin " << image->GetGeometry()->GetOrigin()[0] << " "<< image->GetGeometry()->GetOrigin()[1] << " "<< image->GetGeometry()->GetOrigin()[2] << "";
-  MITK_INFO << "MaxExtend " << xMax[0] << " "<< yMax[1] << " "<< zMax[2] << "";
   mitk::Point3D point;
+  mitk::ScalarType value = -1;
 
-  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomGenerator = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
-  randomGenerator->Initialize( std::rand() );      // initialize with random value, to get sensible random points for the image
-  point[0] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[0], xMax[0]);
-  point[1] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[1], yMax[1]);
-  point[2] = randomGenerator->GetUniformVariate( image->GetGeometry()->GetOrigin()[2], zMax[2]);
-  MITK_INFO << "RandomPoint " << point[0] << " "<< point[1] << " "<< point[2] << "";
+  mitkPixelTypeMultiplex3(TestRandomPixelAccess,image->GetImageDescriptor()->GetChannelTypeById(0),image,point,value)
 
-  // test values and max/min
-  mitk::ScalarType imageMin = image->GetStatistics()->GetScalarValueMin();
-  mitk::ScalarType imageMax = image->GetStatistics()->GetScalarValueMax();
-  mitk::ScalarType value = image->GetPixelValueByWorldCoordinate(point);
-  MITK_INFO << imageMin << " "<< imageMax << " "<< value << "";
-  MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
-
-  // test accessing PixelValue with coordinate leading to a negative index
-  const mitk::Point3D geom_origin = image->GetGeometry()->GetOrigin();
-  const mitk::Point3D geom_center = image->GetGeometry()->GetCenter();
-  const unsigned int timestep = 0;
-
-  // shift position from origin outside of the image ( in the opposite direction to [center-origin] vector which points in the inside)
-  mitk::Point3D position = geom_origin + (geom_origin - geom_center);
-  MITK_TEST_CONDITION_REQUIRED( image->GetPixelValueByWorldCoordinate(position, timestep) == 0, "Test access to the outside of the image")
-
-
+  {
     // testing the clone method of mitk::Image
     mitk::Image::Pointer cloneImage = image->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");
@@ -426,14 +437,14 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetGeometry()->GetSpacing() == image->GetGeometry()->GetSpacing(), "Clone (testing spacing)");
   MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetGeometry()->GetIndexToWorldTransform()->GetMatrix(), image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix()),
     "Clone (testing transformation matrix)");
-  MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetTimeSlicedGeometry()->GetGeometry3D(cloneImage->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix(),
-    cloneImage->GetTimeSlicedGeometry()->GetGeometry3D(image->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix()), "Clone(testing time sliced geometry)");
+  MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetTimeGeometry()->GetGeometryForTimeStep(cloneImage->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix(),
+    cloneImage->GetTimeGeometry()->GetGeometryForTimeStep(image->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix()), "Clone(testing time sliced geometry)");
 
   for (unsigned int i = 0u; i < cloneImage->GetDimension(); ++i)
   {
     MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension(i) == image->GetDimension(i), "Clone (testing dimension " << i << ")");
   }
-
+  }
   //access via itk
   if(image->GetDimension()> 3)    // CastToItk only works with 3d images so we need to check for 4d images
   {
@@ -446,11 +457,17 @@ int mitkImageTest(int argc, char* argv[])
 
   if(image->GetDimension()==3)
   {
-    typedef itk::Image<float,3> ItkFloatImage3D;
+    typedef itk::Image<double,3> ItkFloatImage3D;
     ItkFloatImage3D::Pointer itkimage;
+    try
+    {
     mitk::CastToItkImage(image, itkimage);
     MITK_TEST_CONDITION_REQUIRED(itkimage.IsNotNull(), "Test conversion to itk::Image!");
-
+    }
+    catch (std::exception& e)
+    {
+      MITK_INFO << e.what();
+    }
     mitk::Point3D itkPhysicalPoint;
     image->GetGeometry()->WorldToItkPhysicalPoint(point, itkPhysicalPoint);
     MITK_INFO << "ITKPoint " << itkPhysicalPoint[0] << " "<< itkPhysicalPoint[1] << " "<< itkPhysicalPoint[2] << "";

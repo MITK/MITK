@@ -22,10 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConfig.h>
 #include <mitkStandardFileLocations.h>
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include "mitkModuleResourceStream.h"
-#include "mitkModuleRegistry.h"
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+#include "usModule.h"
+#include "usModuleResource.h"
+#include "usModuleResourceStream.h"
 
 /**
  * @brief This class builds up all the necessary structures for a statemachine.
@@ -129,13 +130,13 @@ bool mitk::StateMachineFactory::LoadBehaviorString(std::string xmlString)
 
 bool mitk::StateMachineFactory::LoadStandardBehavior()
 {
-  Module* module = ModuleRegistry::GetModule("Mitk");
-  ModuleResource resource = module->GetResource("Interactions/Legacy/StateMachine.xml");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Interactions/Legacy/StateMachine.xml");
   if (!resource.IsValid())
   {
     mitkThrow()<< ("Resource not valid. State machine pattern not found:Interactions/Legacy/StateMachine.xml" );
   }
-  mitk::ModuleResourceStream stream(resource);
+  us::ModuleResourceStream stream(resource);
   std::string patternString((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
   return this->LoadBehaviorString(patternString);
 }

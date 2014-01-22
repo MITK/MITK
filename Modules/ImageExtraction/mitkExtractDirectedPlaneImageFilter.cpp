@@ -32,9 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 
-#include "pic2vtk.h"
-
-
 
 mitk::ExtractDirectedPlaneImageFilter::ExtractDirectedPlaneImageFilter()
 : m_WorldGeometry(NULL)
@@ -74,9 +71,9 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     return;
   }
 
-  const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+  const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
   if ( ( inputTimeGeometry == NULL )
-    || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+    || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
   {
     itkWarningMacro(<<"Error reading input image geometry.");
     return;
@@ -89,12 +86,12 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     ScalarType time = m_WorldGeometry->GetTimeBounds()[0];
     if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
     {
-      timestep = inputTimeGeometry->MSToTimeStep( time );
+      timestep = inputTimeGeometry->TimePointToTimeStep( time );
     }
   }
   else timestep = m_TargetTimestep;
 
-  if ( inputTimeGeometry->IsValidTime( timestep ) == false )
+  if ( inputTimeGeometry->IsValidTimeStep( timestep ) == false )
   {
     itkWarningMacro(<<"This is not a valid timestep: "<<timestep);
     return;
@@ -122,7 +119,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     return;
   }
 
-  vtkFloatingPointType spacing[3];
+  double spacing[3];
   inputData->GetSpacing( spacing );
 
   // how big the area is in physical coordinates: widthInMM x heightInMM pixels
@@ -133,10 +130,10 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   Vector3D right, bottom, normal;
   Vector3D rightInIndex, bottomInIndex;
 
-  assert( input->GetTimeSlicedGeometry() == inputTimeGeometry );
+  assert( input->GetTimeGeometry() == inputTimeGeometry );
 
   // take transform of input image into account
-  Geometry3D* inputGeometry = inputTimeGeometry->GetGeometry3D( timestep );
+  Geometry3D* inputGeometry = inputTimeGeometry->GetGeometryForTimeStep( timestep );
   if ( inputGeometry == NULL )
   {
     itkWarningMacro(<<"There is no Geometry3D at given timestep "<<timestep);
@@ -147,7 +144,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
   // Bounds information for reslicing (only required if reference geometry
   // is present)
-  vtkFloatingPointType bounds[6];
+  double bounds[6];
   bool boundsInitialized = false;
 
   for ( int i = 0; i < 6; ++i )
@@ -283,12 +280,11 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     return;
   }
 
-  vtkImageChangeInformation * unitSpacingImageFilter = vtkImageChangeInformation::New() ;
+  vtkSmartPointer<vtkImageChangeInformation> unitSpacingImageFilter = vtkImageChangeInformation::New() ;
   unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
-  unitSpacingImageFilter->SetInput( inputData );
+  unitSpacingImageFilter->SetInputData( inputData );
 
-  m_Reslicer->SetInput( unitSpacingImageFilter->GetOutput() );
-  unitSpacingImageFilter->Delete();
+  m_Reslicer->SetInputConnection( unitSpacingImageFilter->GetOutputPort() );
 
   //m_Reslicer->SetInput( inputData );
 
@@ -353,8 +349,6 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   // 1. Check the result
   vtkImageData* reslicedImage = m_Reslicer->GetOutput();
 
-  //mitkIpPicDescriptor *pic = Pic2vtk::convert( reslicedImage );
-
   if((reslicedImage == NULL) || (reslicedImage->GetDataDimension() < 1))
   {
     itkWarningMacro(<<"Reslicer returned empty image");
@@ -368,22 +362,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
   mitk::Image::Pointer resultImage = this->GetOutput();
   resultImage->Initialize(input->GetPixelType(), 2, dimensions );
-  //resultImage->Initialize( pic );
   resultImage->SetSpacing( spacingVector );
-  //resultImage->SetPicVolume( pic );
-
-  //mitkIpPicFree(pic);
-
-  /*unsigned int dimensions[2];
-  dimensions[0] = (unsigned int)extent[0]; dimensions[1] = (unsigned int)extent[1];
-  Vector3D spacingVector;
-  FillVector3D(spacingVector, mmPerPixel[0], mmPerPixel[1], 1.0);
-
-  mitk::Image::Pointer resultImage = this->GetOutput();
-  resultImage->Initialize(m_Reslicer->GetOutput());
-  resultImage->Initialize(inputImage->GetPixelType(), 2, dimensions);
-  resultImage->SetSpacing(spacingVector);
-  resultImage->SetSlice(m_Reslicer->GetOutput());*/
 }
 
 
@@ -395,7 +374,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateOutputInformation()
 
 bool mitk::ExtractDirectedPlaneImageFilter
 ::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
-                const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+                const PlaneGeometry *planeGeometry, double *bounds )
 {
   // Clip the plane with the bounding geometry. To do so, the corner points
   // of the bounding box are transformed by the inverse transformation
@@ -487,10 +466,10 @@ bool mitk::ExtractDirectedPlaneImageFilter
 
 bool mitk::ExtractDirectedPlaneImageFilter
 ::LineIntersectZero( vtkPoints *points, int p1, int p2,
-          vtkFloatingPointType *bounds )
+          double *bounds )
 {
-  vtkFloatingPointType point1[3];
-  vtkFloatingPointType point2[3];
+  double point1[3];
+  double point2[3];
   points->GetPoint( p1, point1 );
   points->GetPoint( p2, point2 );
 

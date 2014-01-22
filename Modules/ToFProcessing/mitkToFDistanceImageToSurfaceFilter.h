@@ -60,8 +60,26 @@ namespace mitk
     itkGetMacro(InterPixelDistance,ToFProcessingCommon::ToFPoint2D);
     itkSetMacro(TextureIndex,int);
 
+    /**
+     * @brief SetTriangulationThreshold Sets a triangulation threshold in order
+     * to remove unusually huge faces from the surface. If this value is set,
+     * the filter will check whether the distance between two neighboring vertices
+     * exceeds the triangulation threshold. If yes, there vertices will not be
+     * triangulated (connected with lines). The vertices will still be added to
+     * the surface, but only as single point (if they have no other neighbors).
+     * @param triangulationThreshold The triangulationThreshold in mm. (not mm*mm!)
+     * @note vtkMath::Distance2BetweenPoints returns the squared distance
+     * between two points and hence we square m_TriangulationThreshold in
+     * order to save run-time.
+     */
+    void SetTriangulationThreshold( double triangulationThreshold );
+    itkGetMacro(TriangulationThreshold, double);
+
     itkSetMacro(VertexIdList, vtkSmartPointer<vtkIdList>);
     itkGetMacro(VertexIdList, vtkSmartPointer<vtkIdList>);
+
+    itkSetMacro(GenerateTriangularMesh,bool);
+    itkGetMacro(GenerateTriangularMesh,bool);
 
 
     /**
@@ -162,10 +180,13 @@ namespace mitk
     ToFProcessingCommon::ToFPoint2D m_InterPixelDistance; ///< distance in mm between two adjacent pixels on the ToF camera chip
 
     int m_TextureIndex; ///< Index of the input used as texture image when no scalar image was set via SetIplScalarImage(). 0 = Distance, 1 = Amplitude, 2 = Intensity
+    bool m_GenerateTriangularMesh;
 
     ReconstructionModeType m_ReconstructionMode; ///< The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units  or interpixeldistances and focal length in mm. The Kinect option defines a special reconstruction mode for the kinect.
 
     vtkSmartPointer<vtkIdList> m_VertexIdList; ///< Make a vtkIdList to save the ID's of the polyData corresponding to the image pixel ID's. This can be accessed after generate data to obtain the mapping.
+
+    double m_TriangulationThreshold;
 
   };
 } //END mitk namespace

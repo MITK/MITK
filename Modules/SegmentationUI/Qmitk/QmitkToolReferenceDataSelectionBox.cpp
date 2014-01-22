@@ -27,13 +27,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRenderingManager.h"
 
+#include "mitkToolManagerProvider.h"
+
 QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
 m_SelfCall(false),
 m_DisplayMode(ListDataIfAnyToolMatches ),
 m_ToolGroupsForFiltering("default")
 {
-  m_ToolManager = mitk::ToolManager::New( storage );
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
   m_Layout = new QVBoxLayout( this );
   this->setLayout( m_Layout );

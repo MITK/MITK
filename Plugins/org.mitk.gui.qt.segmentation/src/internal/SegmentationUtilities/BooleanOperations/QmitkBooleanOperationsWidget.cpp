@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkException.h>
 #include <mitkSliceNavigationController.h>
 #include <cassert>
+#include <QMessageBox>
 
 static const char* const HelpText = "Select two different segmentations above";
 
@@ -126,19 +127,20 @@ void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Ty
   {
     mitk::BooleanOperation booleanOperation(type, segmentation0, segmentation1, timeNavigationController->GetTime()->GetPos());
     result = booleanOperation.GetResult();
+
+    assert(result.IsNotNull());
+
+    QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+
+    AddToDataStorage(
+      dataSelectionWidget->GetDataStorage(),
+      result,
+      GetPrefix(type) + dataSelectionWidget->GetSelection(1)->GetName(),
+      dataSelectionWidget->GetSelection(0));
   }
   catch (const mitk::Exception &exception)
   {
     MITK_ERROR << "Boolean operation failed: " << exception.GetDescription();
+    QMessageBox::information(0, "Boolean operation failed", exception.GetDescription());
   }
-
-  assert(result.IsNotNull());
-
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-
-  AddToDataStorage(
-    dataSelectionWidget->GetDataStorage(),
-    result,
-    GetPrefix(type) + dataSelectionWidget->GetSelection(1)->GetName(),
-    dataSelectionWidget->GetSelection(0));
 }

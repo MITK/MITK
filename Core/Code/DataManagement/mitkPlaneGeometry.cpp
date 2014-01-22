@@ -717,9 +717,9 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
       FillVector3D( defaultVector, 0.0, 0.0, 1.0 );
 
       Vector3D rotationAxis = itk::CrossProduct( orientationVector, defaultVector );
-      //vtkFloatingPointType rotationAngle = acos( orientationVector[2] / orientationVector.GetNorm() );
+      //double rotationAngle = acos( orientationVector[2] / orientationVector.GetNorm() );
 
-      vtkFloatingPointType rotationAngle = atan2( (double) rotationAxis.GetNorm(), (double) (orientationVector * defaultVector) );
+      double rotationAngle = atan2( (double) rotationAxis.GetNorm(), (double) (orientationVector * defaultVector) );
       rotationAngle *= 180.0 / vnl_math::pi;
 
       transform->PostMultiply();

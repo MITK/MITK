@@ -39,7 +39,7 @@ void SetOutputNames( typename WriterType::Pointer writer, const std::string& bas
     else
       finalFileName.insert(pos,".%d");
 
-    std::cout << "Filename: " << finalFileName << std::endl;
+    MITK_DEBUG << "Filename: " << finalFileName;
 
     numericFileNameWriter->SetEndIndex(numberOfImages);
     numericFileNameWriter->SetSeriesFormat(finalFileName.c_str());
@@ -95,39 +95,47 @@ void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const
   rescaler->SetOutputMinimum( 0 );
   rescaler->SetOutputMaximum( 255 );
 
-  //
-  if( inputTypeSize == 1)
+  try
   {
-    UCharWriterType::Pointer writer = UCharWriterType::New();
-    SetOutputNames<UCharWriterType>( writer, fileName, numberOfImages );
-    writer->SetInput( rescaler->GetOutput() );
-    writer->Update();
-  }
-  // 16bit  16bit possible
-  else if ( inputTypeSize == supportedOutputMaxSize && supportedOutputMaxSize == 2 )
-  {
-    ShortWriterType::Pointer writer = ShortWriterType::New();
-    SetOutputNames<ShortWriterType>( writer, fileName, numberOfImages );
-    writer->SetInput( sh_rescaler->GetOutput() );
-    writer->Update();
-  }
-  // rescaling to maximum of supported format
-  else
-  {
-    if( supportedOutputMaxSize == 2)
+    // input is 8 bit
+    if( inputTypeSize == 1)
     {
-      typename ShortWriterType::Pointer writer = ShortWriterType::New();
-      SetOutputNames<ShortWriterType>( writer, fileName, numberOfImages );
-      writer->SetInput(sh_rescaler->GetOutput() );
-      writer->Update();
-    }
-    else
-    {
-      typename UCharWriterType::Pointer writer = UCharWriterType::New();
+      UCharWriterType::Pointer writer = UCharWriterType::New();
       SetOutputNames<UCharWriterType>( writer, fileName, numberOfImages );
       writer->SetInput( rescaler->GetOutput() );
       writer->Update();
     }
+    // input pixel type is 16bit -> writer can handle 16bit images
+    else if ( inputTypeSize == supportedOutputMaxSize && supportedOutputMaxSize == 2 )
+    {
+      ShortWriterType::Pointer writer = ShortWriterType::New();
+      SetOutputNames<ShortWriterType>( writer, fileName, numberOfImages );
+      writer->SetInput( sh_rescaler->GetOutput() );
+      writer->Update();
+    }
+    // rescaling input to maximum of supported format
+    else
+    {
+      if( supportedOutputMaxSize == 2)
+      {
+        typename ShortWriterType::Pointer writer = ShortWriterType::New();
+        SetOutputNames<ShortWriterType>( writer, fileName, numberOfImages );
+        writer->SetInput(sh_rescaler->GetOutput() );
+        writer->Update();
+      }
+      else
+      {
+        typename UCharWriterType::Pointer writer = UCharWriterType::New();
+        SetOutputNames<UCharWriterType>( writer, fileName, numberOfImages );
+        writer->SetInput( rescaler->GetOutput() );
+        writer->Update();
+      }
+    }
+  }
+  catch(const itk::ExceptionObject& e)
+  {
+    MITK_ERROR << "ITK Exception occured: " << e.what();
+    mitkThrow() << "Caught ITK exception while writing image with scalar type \n" << e.what();
   }
 }
 
@@ -135,19 +143,28 @@ template < typename TPixel, unsigned int VImageDimension >
 void _mitkItkPictureWriteComposite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName)
 {
   typedef itk::Image< TPixel, VImageDimension > TImageType;
+  typedef itk::Image< TPixel, 2 > TImageType2D;
 
-  typedef itk::ImageFileWriter< TImageType > WriterType;
-  typename WriterType::Pointer simpleWriter = WriterType::New();
+  typedef itk::ImageSeriesWriter< TImageType, TImageType2D > WriterType;
+  typename WriterType::Pointer writer = WriterType::New();
 
-  simpleWriter->SetFileName( fileName );
-  simpleWriter->SetInput( itkImage );
+  // get the dimension info
+  unsigned int numberOfImages = 1;
+  if( itkImage->GetImageDimension() > 2)
+    numberOfImages = itkImage->GetLargestPossibleRegion().GetSize()[2];
+
+  // create output name(s)
+  SetOutputNames<WriterType>( writer, fileName, numberOfImages );
+
+  writer->SetInput( itkImage );
   try
   {
-    simpleWriter->Update();
+    writer->Update();
   }
-  catch( itk::ExceptionObject &e)
+  catch(const itk::ExceptionObject &e)
   {
-    std::cerr << "Caught exception while writing image with composite type: \n" << e.what();
+    MITK_ERROR << "ITK Exception occured: " << e.what();
+    mitkThrow() << "Caught ITK exception while writing image with composite type \n" << e.what();
   }
 }
 

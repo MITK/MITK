@@ -194,4 +194,4 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
   {
     MITK_ERROR(this->GetClassName()) << err.what();
   }
-  }
+}

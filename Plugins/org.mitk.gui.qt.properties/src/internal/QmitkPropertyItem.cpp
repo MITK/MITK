@@ -33,15 +33,33 @@ void QmitkPropertyItem::AppendChild(QmitkPropertyItem* child)
   if (child == NULL)
     return;
 
-  // If property name doesn't contain full stop(s), append property directly.
+  // If property name doesn't contain period(s), append property directly, but...
   if (!child->GetData(0).toString().contains('.'))
   {
-    m_Children.append(child);
-    child->m_Parent = this;
+    // ... if node already exists without property, just attach it.
+    bool nodeAlreadyExists = false;
+
+    for (int i = 0; i < m_Children.count(); ++i)
+    {
+      if (m_Children[i]->GetData(0).toString() == child->GetData(0).toString())
+      {
+        if (m_Children[i]->GetData(1).isNull() && child->GetData(1).isValid())
+          m_Children[i]->m_Data[1] = child->m_Data[1];
+
+        nodeAlreadyExists = true;
+        break;
+      }
+    }
+
+    if (!nodeAlreadyExists)
+    {
+      m_Children.append(child);
+      child->m_Parent = this;
+    }
   }
   else
   {
-    // Property name contains full stop(s). Split accordingly.
+    // Property name contains period(s). Split accordingly.
     QStringList names = child->GetData(0).toString().split('.');
 
     // Traverse subtree and insert nodes if not already present.

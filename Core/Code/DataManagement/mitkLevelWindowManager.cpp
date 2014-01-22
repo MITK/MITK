@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateNot.h"
 #include "mitkProperties.h"
 #include "mitkMessage.h"
+#include "mitkRenderingModeProperty.h"
 
 
 mitk::LevelWindowManager::LevelWindowManager()
@@ -134,6 +135,21 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
     mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
     if (levelWindowProperty.IsNull())
       continue;
+
+    int nonLvlWinMode1 = mitk::RenderingModeProperty::LOOKUPTABLE_COLOR;
+    int nonLvlWinMode2 = mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR;
+
+    mitk::RenderingModeProperty::Pointer mode = dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty( "Image Rendering.Mode" ));
+
+    if( mode.IsNotNull() )
+    {
+      int currMode = mode->GetRenderingMode();
+      if ( currMode == nonLvlWinMode1 || currMode == nonLvlWinMode2 )
+      {
+        continue;
+      }
+    }
+    else continue;
 
     m_LevelWindowProperty = levelWindowProperty;
     m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
@@ -399,6 +415,15 @@ for( ObserverToPropertyMap::iterator iter = m_PropObserverToNode.begin();
     (*iter).second = 0;
   }
   m_PropObserverToNode2.clear();
+
+  for( ObserverToPropertyMap::iterator iter = m_PropObserverToNode3.begin();
+       iter != m_PropObserverToNode3.end();
+       ++iter )
+  {
+    (*iter).second->RemoveObserver((*iter).first.first);
+    (*iter).second = 0;
+  }
+  m_PropObserverToNode3.clear();
 }
 
 void mitk::LevelWindowManager::CreatePropObserverLists()
@@ -434,6 +459,20 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
     command2->SetCallbackFunction(this, &LevelWindowManager::Update);
     unsigned long idx = it->Value()->GetProperty("layer")->AddObserver( itk::ModifiedEvent(), command2 );
     m_PropObserverToNode2[PropDataPair(idx, it->Value())] = it->Value()->GetProperty("layer");
+  }
+
+  /* add observers for all Image rendering.mode properties*/
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin();
+       it != all->End();
+       ++it)
+  {
+    if ((it->Value().IsNull()) || (it->Value() == m_NodeMarkedToDelete))
+      {continue;}
+    /* register listener for changes in layer property */
+    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command3 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
+    command3->SetCallbackFunction(this, &LevelWindowManager::Update);
+    unsigned long idx = it->Value()->GetProperty("Image Rendering.Mode")->AddObserver( itk::ModifiedEvent(), command3 );
+    m_PropObserverToNode3[PropDataPair(idx, it->Value())] = it->Value()->GetProperty("Image Rendering.Mode");
   }
 
 }

@@ -25,7 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkBinaryThresholdImageFilter.h>
 
+namespace us {
 class ModuleResource;
+}
 
 namespace mitk
 {
@@ -43,20 +45,20 @@ namespace mitk
   {
   public:
 
-    Message2<mitk::ScalarType,mitk::ScalarType> IntervalBordersChanged;
+    Message2<double,double> IntervalBordersChanged;
     Message2<mitk::ScalarType, mitk::ScalarType>     ThresholdingValuesChanged;
 
     mitkClassMacro(BinaryThresholdULTool, AutoSegmentationTool);
     itkNewMacro(BinaryThresholdULTool);
 
     virtual const char** GetXPM() const;
-    ModuleResource GetIconResource() const;
+    us::ModuleResource GetIconResource() const;
     virtual const char* GetName() const;
 
     virtual void Activated();
     virtual void Deactivated();
 
-    virtual void SetThresholdValues(int lower, int upper);
+    virtual void SetThresholdValues(double lower, double upper);
     virtual void AcceptCurrentThresholdValue();
     virtual void CancelThresholding();
 
@@ -72,9 +74,6 @@ namespace mitk
 
     void OnRoiDataChanged();
     void UpdatePreview();
-
-    template <typename TPixel, unsigned int VImageDimension>
-    void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep );
 
     DataNode::Pointer m_ThresholdFeedbackNode;
     DataNode::Pointer m_OriginalImageNode;

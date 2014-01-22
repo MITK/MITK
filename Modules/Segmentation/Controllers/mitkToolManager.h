@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
-#include "mitkServiceReference.h"
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -235,6 +234,9 @@ class Segmentation_EXPORT ToolManager : public itk::Object
       tools when you hide their GUI elements.
      */
     void UnregisterClient();
+
+    /** \brief Initialize all classes derived from mitk::Tool by itkObjectFactoy */
+    void InitializeTools();
 
     void OnOneOfTheReferenceDataDeletedConst(const itk::Object* caller, const itk::EventObject& e);
     void OnOneOfTheReferenceDataDeleted           (itk::Object* caller, const itk::EventObject& e);

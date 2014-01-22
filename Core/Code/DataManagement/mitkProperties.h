@@ -34,6 +34,8 @@ namespace mitk {
 
    mitkDeclareGenericProperty(Vector3DProperty,Vector3D,MITK_CORE_EXPORT);
 
+   mitkDeclareGenericProperty(Point2dProperty,Point2D,MITK_CORE_EXPORT);
+
    mitkDeclareGenericProperty(Point3dProperty,Point3D,MITK_CORE_EXPORT);
 
    mitkDeclareGenericProperty(Point4dProperty,Point4D,MITK_CORE_EXPORT);

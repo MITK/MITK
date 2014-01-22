@@ -25,9 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, FastMarchingTool, "FastMarching2D tool");
@@ -86,23 +87,23 @@ const char** mitk::FastMarchingTool::GetXPM() const
   return NULL;//mitkFastMarchingTool_xpm;
 }
 
-mitk::ModuleResource mitk::FastMarchingTool::GetIconResource() const
+us::ModuleResource mitk::FastMarchingTool::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("FastMarching_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("FastMarching_48x48.png");
   return resource;
 }
 
-mitk::ModuleResource mitk::FastMarchingTool::GetCursorIconResource() const
+us::ModuleResource mitk::FastMarchingTool::GetCursorIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("FastMarching_Cursor_32x32.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("FastMarching_Cursor_32x32.png");
   return resource;
 }
 
 const char* mitk::FastMarchingTool::GetName() const
 {
-  return "FastMarching2D";
+  return "2D Fast Marching";
 }
 
 void mitk::FastMarchingTool::BuildITKPipeline()
@@ -257,13 +258,14 @@ void mitk::FastMarchingTool::Deactivated()
   m_ToolManager->GetDataStorage()->Remove( this->m_SeedsAsPointSetNode );
   this->ClearSeeds();
   m_ResultImageNode = NULL;
+  m_SeedsAsPointSetNode = NULL;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::FastMarchingTool::Initialize()
 {
   m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
-  if(m_ReferenceImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+  if(m_ReferenceImage->GetTimeGeometry()->CountTimeSteps() > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
     timeSelector->SetInput( m_ReferenceImage );
@@ -284,7 +286,7 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
 
     mitk::Image::Pointer workingImageSlice;
     mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
-    if(workingImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+    if(workingImage->GetTimeGeometry()->CountTimeSteps() > 1)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput( workingImage );
@@ -322,6 +324,7 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_ToolManager->ActivateTool(-1);
 }
 
 
@@ -367,6 +370,8 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 
   this->Update();
 
+  m_ReadyMessage.Send();
+
   return true;
 }
 
@@ -395,10 +400,12 @@ bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEve
 
 void mitk::FastMarchingTool::Update()
 {
+  const unsigned int progress_steps = 20;
+
   // update FastMarching pipeline and show result
   if (m_NeedUpdate)
   {
-    m_ProgressCommand->AddStepsToDo(20);
+    m_ProgressCommand->AddStepsToDo(progress_steps);
     CurrentlyBusy.Send(true);
     try
     {
@@ -408,7 +415,8 @@ void mitk::FastMarchingTool::Update()
     {
      MITK_ERROR << "Exception caught: " << excep.GetDescription();
 
-     m_ProgressCommand->SetRemainingProgress(100);
+     // progress by max step count, will force
+     m_ProgressCommand->SetProgress(progress_steps);
      CurrentlyBusy.Send(false);
 
      std::string msg = excep.GetDescription();
@@ -416,7 +424,7 @@ void mitk::FastMarchingTool::Update()
 
      return;
     }
-    m_ProgressCommand->SetRemainingProgress(100);
+    m_ProgressCommand->SetProgress(progress_steps);
     CurrentlyBusy.Send(false);
 
     //make output visible
@@ -438,7 +446,14 @@ void mitk::FastMarchingTool::ClearSeeds()
     this->m_SeedContainer->Initialize();
 
   if(this->m_SeedsAsPointSet.IsNotNull())
-    this->m_SeedsAsPointSet->Clear();
+  {
+    this->m_SeedsAsPointSet = mitk::PointSet::New();
+    this->m_SeedsAsPointSetNode->SetData(this->m_SeedsAsPointSet);
+    m_SeedsAsPointSetNode->SetName("Seeds_Preview");
+    m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
+    m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
+    m_SeedsAsPointSetNode->SetVisibility(true);
+  }
 
   if(this->m_FastMarchingFilter.IsNotNull())
     m_FastMarchingFilter->Modified();

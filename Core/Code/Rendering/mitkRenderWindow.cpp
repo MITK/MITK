@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkRenderWindow.h"
 
 #include "mitkDisplayPositionEvent.h"
@@ -24,13 +23,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkRenderWindowInteractor.h"
 #include "mitkVtkEventProvider.h"
 
-
 mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk::RenderingManager* rm )
 : m_vtkRenderWindow(renWin)
+, m_vtkRenderWindowInteractor(NULL)
+, m_vtkMitkEventProvider(NULL)
 {
-
   if(m_vtkRenderWindow == NULL)
+  {
     m_vtkRenderWindow = vtkRenderWindow::New();
+   //disable Antialiasing by default
+   m_vtkRenderWindow->SetMultiSamples(0);
+  }
 
   if ( m_vtkRenderWindow->GetSize()[0] <= 10
     || m_vtkRenderWindow->GetSize()[0] <= 10 )
@@ -49,7 +52,6 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk
   m_vtkMitkEventProvider->SetInteractor(this->GetVtkRenderWindowInteractor());
   m_vtkMitkEventProvider->SetMitkRenderWindow(this);
   m_vtkMitkEventProvider->SetEnabled(1);
-
 }
 
 mitk::RenderWindow::~RenderWindow()
@@ -70,7 +72,6 @@ vtkRenderWindowInteractor* mitk::RenderWindow::GetVtkRenderWindowInteractor()
   return m_vtkRenderWindowInteractor;
 }
 
-
 void mitk::RenderWindow::SetSize( int width, int height )
 {
   this->GetVtkRenderWindow()->SetSize( width, height );
@@ -85,4 +86,3 @@ void mitk::RenderWindow::ReinitEventProvider()
   m_vtkMitkEventProvider->SetMitkRenderWindow(this);
   m_vtkMitkEventProvider->SetEnabled(1);
 }
-

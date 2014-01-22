@@ -79,6 +79,9 @@
    </item>
    <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox_3">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Statistics</string>
      </property>
@@ -131,7 +134,7 @@
          <enum>Qt::DotLine</enum>
         </property>
         <property name="cornerButtonEnabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -251,6 +254,9 @@
    </item>
    <item row="3" column="0">
     <widget class="QGroupBox" name="groupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="minimumSize">
       <size>
        <width>150</width>
@@ -277,15 +283,6 @@
           </sizepolicy>
          </property>
         </widget>
-        <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-        <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget"/>
        </widget>
       </item>
       <item row="3" column="0">
@@ -453,18 +450,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QmitkVtkHistogramWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkVtkHistogramWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkVtkLineProfileWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkVtkLineProfileWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>QmitkHistogramJSWidget</class>
    <extends>QWidget</extends>

@@ -61,6 +61,7 @@ public:
         else
         {
             pointSetsEqual = false;
+            MITK_INFO<<"Point sets have different size: "<<pointSet1->GetSize()<<" vs. "<<pointSet2->GetSize();
         }
         return pointSetsEqual;
     }

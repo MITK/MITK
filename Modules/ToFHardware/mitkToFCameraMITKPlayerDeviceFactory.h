@@ -32,38 +32,27 @@ namespace mitk
   * @ingroup ToFHardware
   */
 
-class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerDeviceFactory : public AbstractToFDeviceFactory {
 
 public:
 
 
   ToFCameraMITKPlayerDeviceFactory()
   {
-   m_DeviceNumber = 1;
   }
 
-     /*!
-   \brief Defining the Factorie´s Name, here for the ToFPlayer.
-   */
-   std::string GetFactoryName()
-   {
-       return std::string("MITK Player Factory");
-   }
+    /*!
+  \brief Defining the Factorie's Name, here for the ToFPlayer.
+  */
+  std::string GetFactoryName()
+  {
+    return std::string("MITK Player Factory");
+  }
 
-    std::string GetCurrentDeviceName()
-    {
-      std::stringstream name;
-      if(m_DeviceNumber>1)
-      {
-        name << "MITK Player "<< m_DeviceNumber;
-      }
-      else
-      {
-        name << "MITK Player";
-      }
-      m_DeviceNumber++;
-      return name.str();
-    }
+  std::string GetDeviceNamePrefix()
+  {
+    return std::string("MITK Player");
+  }
 
 private:
    /*!
@@ -86,9 +75,6 @@ private:
 
      return device.GetPointer();
    }
-
-   int m_DeviceNumber;
-
 };
 }
 #endif

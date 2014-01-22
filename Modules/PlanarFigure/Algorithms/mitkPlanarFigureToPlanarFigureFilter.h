@@ -43,6 +43,8 @@ public:
     typedef InputType::Pointer InputTypePointer;
     typedef itk::DataObject::Pointer DataObjectPointer;
 
+    using Superclass::SetInput;
+
     virtual void SetInput( const InputType* figure );
 
     virtual void SetInput( unsigned int idx, const InputType* figure );

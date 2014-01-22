@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOtsuTool3D.h"
 #include "mitkToolManager.h"
 #include "mitkRenderingManager.h"
+#include <mitkSliceNavigationController.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkRenderingModeProperty.h>
@@ -32,10 +33,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRegionGrow3DTool.xpm"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
-#include <mitkModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, OtsuTool3D, "Otsu Segmentation");
@@ -58,6 +59,8 @@ void mitk::OtsuTool3D::Activated()
 
     m_BinaryPreviewNode = mitk::DataNode::New();
     m_BinaryPreviewNode->SetName("Binary_Preview");
+    m_BinaryPreviewNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
+    m_BinaryPreviewNode->SetProperty( "opacity", FloatProperty::New(0.3) );
     //m_BinaryPreviewNode->SetBoolProperty("helper object", true);
     //m_BinaryPreviewNode->SetProperty("binary", mitk::BoolProperty::New(true));
     m_ToolManager->GetDataStorage()->Add( this->m_BinaryPreviewNode );
@@ -82,7 +85,8 @@ void mitk::OtsuTool3D::Deactivated()
   m_MultiLabelResultNode = NULL;
   m_ToolManager->GetDataStorage()->Remove( this->m_BinaryPreviewNode );
   m_BinaryPreviewNode = NULL;
-  m_ToolManager->ActivateTool(-1);
+  m_ToolManager->GetDataStorage()->Remove( this->m_MaskedImagePreviewNode);
+  m_MaskedImagePreviewNode = NULL;
 }
 
 const char** mitk::OtsuTool3D::GetXPM() const
@@ -90,10 +94,10 @@ const char** mitk::OtsuTool3D::GetXPM() const
   return NULL;
 }
 
-mitk::ModuleResource mitk::OtsuTool3D::GetIconResource() const
+us::ModuleResource mitk::OtsuTool3D::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Otsu_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Otsu_48x48.png");
   return resource;
 }
 
@@ -103,9 +107,13 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
 
   int numberOfThresholds = regions - 1;
 
+  unsigned int timestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
+
+  mitk::Image::Pointer image3D = Get3DImage(m_OriginalImage, timestep);
+
   mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
   otsuFilter->SetNumberOfThresholds( numberOfThresholds );
-  otsuFilter->SetInput( m_OriginalImage );
+  otsuFilter->SetInput( image3D );
 
   try
   {
@@ -155,6 +163,7 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
 void mitk::OtsuTool3D::ConfirmSegmentation()
 {
   GetTargetSegmentationNode()->SetData(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
+  m_ToolManager->ActivateTool(-1);
 }
 
 void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)
@@ -179,13 +188,14 @@ void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)
   filter->SetInput(itkImage);
   filter->SetLowerThreshold(regionID);
   filter->SetUpperThreshold(regionID);
+  filter->SetInsideValue(1);
+  filter->SetOutsideValue(0);
   filter->Update();
   mitk::Image::Pointer binarySegmentation;
   mitk::CastToMitkImage( filter->GetOutput(), binarySegmentation);
   m_BinaryPreviewNode->SetData(binarySegmentation);
   m_BinaryPreviewNode->SetVisibility(true);
   m_BinaryPreviewNode->SetProperty("outline binary", mitk::BoolProperty::New(false));
-  m_BinaryPreviewNode->SetOpacity(1.0);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

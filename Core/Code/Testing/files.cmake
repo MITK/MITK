@@ -1,4 +1,3 @@
-
 # tests with no extra command line parameter
 set(MODULE_TESTS
   mitkAccessByItkTest.cpp
@@ -10,24 +9,25 @@ set(MODULE_TESTS
   mitkEventTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
+  mitkGeometry2DTest.cpp
   mitkGeometry3DTest.cpp
+  mitkGeometry3DEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
+  mitkImageEqualTest.cpp
   mitkImageDataItemTest.cpp
-  #mitkImageMapper2DTest.cpp
   mitkImageGeneratorTest.cpp
+  mitkIOUtilTest.cpp
   mitkBaseDataTest.cpp
-  #mitkImageToItkTest.cpp
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
-  #mitkITKThreadingTest.cpp
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
-  #mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
+  mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
   mitkPointSetWriterTest.cpp
@@ -35,23 +35,20 @@ set(MODULE_TESTS
   mitkPointSetInteractorTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
-  #mitkRegistrationBaseTest.cpp
-  #mitkSegmentationInterpolationTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
-  ##mitkStateMachineContainerTest.cpp ## rewrite test, indirect since no longer exported Bug 14529
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
+  mitkSurfaceEqualTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
-  mitkTimeSlicedGeometryTest.cpp
+  mitkTimeGeometryTest.cpp
   mitkTransitionTest.cpp
   mitkUndoControllerTest.cpp
   mitkVtkWidgetRenderingTest.cpp
   mitkVerboseLimitedLinearUndoTest.cpp
   mitkWeakPointerTest.cpp
   mitkTransferFunctionTest.cpp
-  #mitkAbstractTransformGeometryTest.cpp
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
   mitkRenderingManagerTest.cpp
@@ -67,6 +64,27 @@ set(MODULE_TESTS
   mitkUIDGeneratorTest.cpp
   mitkShaderRepositoryTest.cpp
   mitkPlanePositionManagerTest.cpp
+  mitkAffineTransformBaseTest.cpp
+  mitkPropertyAliasesTest.cpp
+  mitkPropertyDescriptionsTest.cpp
+  mitkPropertyExtensionsTest.cpp
+  mitkPropertyFiltersTest.cpp
+  mitkTinyXMLTest.cpp
+  mitkRawImageFileReaderTest.cpp
+  mitkInteractionEventTest.cpp
+  mitkLookupTableTest.cpp
+  mitkSTLFileReaderTest.cpp
+
+  ################## DISABLED TESTS #################################################
+  #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more
+  #mitkStateMachineContainerTest.cpp #rewrite test, indirect since no longer exported Bug 14529
+  #mitkRegistrationBaseTest.cpp #tested class  mitkRegistrationBase doesn't exist any more
+  #mitkSegmentationInterpolationTest.cpp #file doesn't exist!
+  #mitkPipelineSmartPointerCorrectnessTest.cpp #file doesn't exist!
+  #mitkITKThreadingTest.cpp #test outdated because itk::Semaphore was removed from ITK
+  #mitkAbstractTransformPlaneGeometryTest.cpp #mitkVtkAbstractTransformPlaneGeometry doesn't exist any more
+  #mitkTestUtilSharedLibrary.cpp #Linker problem with this test...
+  #mitkTextOverlay2DSymbolsRenderingTest.cpp #Implementation of the tested feature is not finished yet. Ask Christoph or see bug 15104 for details.
 )
 
 # test with image filename as an extra command line parameter
@@ -95,8 +113,6 @@ set(MODULE_TESTSURFACES
 )
 
 set(MODULE_CUSTOM_TESTS
-    #mitkLabeledImageToSurfaceFilterTest.cpp
-    #mitkExternalToolsTest.cpp
     mitkDataStorageTest.cpp
     mitkDataNodeTest.cpp
     mitkEventMapperTest.cpp
@@ -113,7 +129,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
     mitkImageVtkMapper2DTransferFunctionTest.cpp
-    mitkIOUtilTest.cpp
+    mitkImageVtkMapper2DLookupTableTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
     mitkSurfaceGLMapper2DColorTest.cpp
@@ -123,6 +139,18 @@ set(MODULE_CUSTOM_TESTS
     mitkPointSetVtkMapper2DTest.cpp
     mitkPointSetVtkMapper2DImageTest.cpp
     mitkPointSetVtkMapper2DGlyphTypeTest.cpp
+    mitkPointSetVtkMapper2DTransformedPointsTest.cpp
+    mitkLabelOverlay3DRendering2DTest.cpp
+    mitkLabelOverlay3DRendering3DTest.cpp
+    mitkTextOverlay2DRenderingTest.cpp
+    mitkTextOverlay2DLayouterRenderingTest.cpp
+    mitkTextOverlay3DRendering2DTest.cpp
+    mitkTextOverlay3DRendering3DTest.cpp
+    mitkTextOverlay3DColorRenderingTest.cpp
+    mitkVTKRenderWindowSizeTest.cpp
+    mitkMultiComponentImageDataComparisonFilterTest.cpp
+    mitkImageToItkTest.cpp
+    mitkImageSliceSelectorTest.cpp
 )
 
 set(MODULE_RESOURCE_FILES
@@ -134,12 +162,9 @@ set(MODULE_RESOURCE_FILES
 
 # Create an artificial module initializing class for
 # the usServiceListenerTest.cpp
-usFunctionGenerateModuleInit(testdriver_init_file
-                             NAME ${MODULE_NAME}TestDriver
-                             DEPENDS "Mitk"
-                             VERSION "0.1.0"
-                             EXECUTABLE
-                            )
+usFunctionGenerateExecutableInit(testdriver_init_file
+                                 IDENTIFIER ${MODULE_NAME}TestDriver
+                                )
 
 # Embed the resources
 set(testdriver_resources )

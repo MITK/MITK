@@ -31,9 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkExtractDirectedPlaneImageFilterNew.h"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, RegionGrowingTool, "Region growing tool");
@@ -72,17 +73,17 @@ const char** mitk::RegionGrowingTool::GetXPM() const
   return mitkRegionGrowingTool_xpm;
 }
 
-mitk::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
+us::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
   return resource;
 }
 
-mitk::ModuleResource mitk::RegionGrowingTool::GetCursorIconResource() const
+us::ModuleResource mitk::RegionGrowingTool::GetCursorIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("RegionGrowing_Cursor_32x32.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("RegionGrowing_Cursor_32x32.png");
   return resource;
 }
 
@@ -239,7 +240,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
       // 3.1.2 copy point from float* to mitk::Contour
       ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
       contourInImageIndexCoordinates->Expand(timestep + 1);
-      contourInImageIndexCoordinates->SetIsClosed(true, timestep);
+      contourInImageIndexCoordinates->SetClosed(true, timestep);
       Point3D newPoint;
       for (int index = 0; index < cutContour.deleteSize; ++index)
       {
@@ -526,7 +527,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
     // copy point from float* to mitk::Contour
     ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Expand(timestep + 1);
-    contourInImageIndexCoordinates->SetIsClosed(true, timestep);
+    contourInImageIndexCoordinates->SetClosed(true, timestep);
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
     {

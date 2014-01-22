@@ -85,7 +85,7 @@ mitk::Geometry3D::Pointer mitk::ConnectomicsSyntheticNetworkGenerator::GenerateD
   geometry->SetOrigin(origin);
 
   // spacing = {1,1,1}
-  float spacing[3];
+  ScalarType spacing[3];
   spacing[0] = one;
   spacing[1] = one;
   spacing[2] = one;
@@ -210,12 +210,8 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCubeNetwork(
 void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCenterToSurfaceNetwork(
   mitk::ConnectomicsNetwork::Pointer network, int numberOfPoints, double radius )
 {
-  //the random number generators
-  unsigned int randomOne = (unsigned int) rand();
-  unsigned int randomTwo = (unsigned int) rand();
 
   vnl_random rng( (unsigned int) rand() );
-  vnl_random rng2( (unsigned int) rand() );
 
   mitk::ConnectomicsNetwork::VertexDescriptorType centerVertex;
   int vertexID(0);
@@ -237,9 +233,6 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticCenterToSurfa
 
   // uniform weight of one
   int edgeWeight(1);
-
-  mitk::ConnectomicsNetwork::VertexDescriptorType source;
-  mitk::ConnectomicsNetwork::VertexDescriptorType target;
 
   //add vertices on sphere surface
   for( int loopID( 1 ); loopID < numberOfPoints; loopID++  )
@@ -280,12 +273,7 @@ void mitk::ConnectomicsSyntheticNetworkGenerator::GenerateSyntheticRandomNetwork
   // as the surface is proportional to the square of the radius the density stays the same
   double radius = 5 * std::sqrt( (float) numberOfPoints );
 
-  //the random number generators
-  unsigned int randomOne = (unsigned int) rand();
-  unsigned int randomTwo = (unsigned int) rand();
-
   vnl_random rng( (unsigned int) rand() );
-  vnl_random rng2( (unsigned int) rand() );
 
   // map for storing the conversion from indices to vertex descriptor
   std::map< int, mitk::ConnectomicsNetwork::VertexDescriptorType > idToVertexMap;

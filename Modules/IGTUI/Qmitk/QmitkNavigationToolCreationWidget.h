@@ -26,14 +26,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorage.h>
 #include <mitkNodePredicateDataType.h>
 
+// Qmitk headers
+#include "QmitkNavigationToolCreationAdvancedWidget.h"
+
 //ui header
 #include "ui_QmitkNavigationToolCreationWidget.h"
 
  /** Documentation:
-  *   \brief An object of this class offers an UI to create new NavigationTools
+  *   \brief An object of this class offers an UI to create or modify NavigationTools.
   *
-  *      Be sure to call the Initialize-methode before you start the widget
-  *      otherwise some errors might occure.
+  *          Be sure to call the initialize method before you start the widget
+  *          otherwise some errors might occure.
   *
   *   \ingroup IGTUI
   */
@@ -48,7 +51,7 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
       * @param dataStorage  The data storage is needed to offer the possibility to choose surfaces from the data storage for tool visualization.
       * @param supposedIdentifier This Identifier is supposed for the user. It is needed because every identifier in a navigation tool storage must be unique and we don't know the others.
       */
-    void Initialize(mitk::DataStorage* dataStorage, std::string supposedIdentifier);
+    void Initialize(mitk::DataStorage* dataStorage, std::string supposedIdentifier, std::string supposedName = "NewTool");
 
     /** @brief Sets the default tracking device type. You may also define if it is changeable or not.*/
     void SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable = true);
@@ -65,10 +68,10 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
 
   signals:
 
-    /** @brief This signal is emited if the user finished the creation of the tool. */
+    /** @brief This signal is emitted if the user finished the creation of the tool. */
     void NavigationToolFinished();
 
-    /** @brief This signal is emited if the user canceld the creation of the tool. */
+    /** @brief This signal is emitted if the user canceled the creation of the tool. */
     void Canceled();
 
   protected slots:
@@ -77,7 +80,10 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
     void OnFinished();
     void OnLoadSurface();
     void OnLoadCalibrationFile();
-
+    void OnShowAdvancedOptions(bool state);
+    void OnProcessDialogCloseRequest();
+    void OnRetrieveDataForManualTooltipManipulation();
+    void OnSurfaceUseOtherToggled(bool checked);
 
   protected:
 
@@ -87,6 +93,8 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
     virtual void CreateQtPartControl(QWidget *parent);
 
     Ui::QmitkNavigationToolCreationWidgetControls* m_Controls;
+
+    QmitkNavigationToolCreationAdvancedWidget* m_AdvancedWidget;
 
     /** @brief holds the DataStorage */
     mitk::DataStorage* m_DataStorage;

@@ -84,12 +84,12 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
 
   if ( m_GenerateNormals )
   {
-    ls->m_VtkPolyDataNormals->SetInput( polydata );
-    ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput() );
+    ls->m_VtkPolyDataNormals->SetInputData( polydata );
+    ls->m_VtkPolyDataMapper->SetInputConnection( ls->m_VtkPolyDataNormals->GetOutputPort() );
   }
   else
   {
-    ls->m_VtkPolyDataMapper->SetInput( polydata );
+    ls->m_VtkPolyDataMapper->SetInputData( polydata );
   }
 
   //
@@ -249,17 +249,12 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
     LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
     // Applying shading properties
-    {
-        Superclass::ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
-        // VTK Properties
-        ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
-        // Shaders
-        IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
-        if (shaderRepo != NULL)
-        {
-            shaderRepo->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
-        }
-    }
+    Superclass::ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
+    // VTK Properties
+    ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
+    // Shaders
+    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+    shaderRepo->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
 
     mitk::LookupTableProperty::Pointer lookupTableProp;
     this->GetDataNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
@@ -325,12 +320,13 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
             sliceselector->SetTimeNr(0);
             sliceselector->SetInput(miktTexture);
             sliceselector->Update();
-            vtkTxture->SetInput(sliceselector->GetOutput()->GetVtkImageData());
+            vtkTxture->SetInputData(sliceselector->GetOutput()->GetVtkImageData());
         }
         else //or just use the 2D image
         {
-            vtkTxture->SetInput(miktTexture->GetVtkImageData());
+            vtkTxture->SetInputData(miktTexture->GetVtkImageData());
         }
+        vtkTxture->Update();
         //pass the texture to the actor
         ls->m_Actor->SetTexture(vtkTxture);
         if(ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == NULL)
@@ -467,11 +463,8 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     }
 
     // Shaders
-    IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
-    if (shaderRepo)
-    {
-        shaderRepo->AddDefaultProperties(node,renderer,overwrite);
-    }
+    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+    shaderRepo->AddDefaultProperties(node,renderer,overwrite);
 }
 
 

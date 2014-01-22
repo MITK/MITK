@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <qtoolbutton.h>
 #include <QList>
-#include <QResizeEvent>
 #include <qtooltip.h>
 #include <qmessagebox.h>
 #include <qlayout.h>
@@ -30,8 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <queue>
 
-#include "mitkModuleResource.h"
-#include "mitkModuleResourceStream.h"
+#include "usModuleResource.h"
+#include "usModuleResourceStream.h"
+
+#include "mitkToolManagerProvider.h"
 
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
@@ -39,7 +40,6 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
  m_DisplayedGroups("default"),
  m_LayoutColumns(2),
  m_ShowNames(true),
- m_AutoShowNamesWidth(0),
  m_GenerateAccelerators(false),
  m_ToolGUIWidget(NULL),
  m_LastToolGUI(NULL),
@@ -51,7 +51,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
   currentFont.setBold(true);
   QWidget::setFont( currentFont );
 
-  m_ToolManager = mitk::ToolManager::New( storage );
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
   // muellerm
   // QButtonGroup
@@ -346,9 +346,8 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 /**
  External enableization...
 */
-void QmitkToolSelectionBox::setEnabled( bool enable )
+void QmitkToolSelectionBox::setEnabled( bool /*enable*/ )
 {
-  QWidget::setEnabled(enable);
   SetGUIEnabledAccordingToToolManagerState();
 }
 
@@ -529,7 +528,7 @@ void QmitkToolSelectionBox::RecreateButtons()
       button->setFont( currentFont );
     }
 
-    mitk::ModuleResource iconResource = tool->GetIconResource();
+    us::ModuleResource iconResource = tool->GetIconResource();
 
     if (!iconResource.IsValid())
     {
@@ -537,7 +536,7 @@ void QmitkToolSelectionBox::RecreateButtons()
     }
     else
     {
-      mitk::ModuleResourceStream resourceStream(iconResource, std::ios::binary);
+      us::ModuleResourceStream resourceStream(iconResource, std::ios::binary);
       resourceStream.seekg(0, std::ios::end);
       std::ios::pos_type length = resourceStream.tellg();
       resourceStream.seekg(0, std::ios::beg);
@@ -643,21 +642,6 @@ void QmitkToolSelectionBox::SetShowNames(bool show)
   }
 }
 
-void QmitkToolSelectionBox::SetAutoShowNamesWidth(int width)
-{
-  width = std::max(0, width);
-
-  if (m_AutoShowNamesWidth != width)
-  {
-    m_AutoShowNamesWidth = width;
-
-    if (width != 0)
-      this->SetShowNames(this->width() >= m_AutoShowNamesWidth);
-    else
-      this->SetShowNames(true);
-  }
-}
-
 void QmitkToolSelectionBox::SetGenerateAccelerators(bool accel)
 {
   if (accel != m_GenerateAccelerators)
@@ -686,12 +670,4 @@ void QmitkToolSelectionBox::hideEvent( QHideEvent* e )
 {
   QWidget::hideEvent(e);
   SetGUIEnabledAccordingToToolManagerState();
-}
-
-void QmitkToolSelectionBox::resizeEvent( QResizeEvent* e )
-{
-  QWidget::resizeEvent(e);
-
-  if (m_AutoShowNamesWidth != 0)
-      this->SetShowNames(e->size().width() >= m_AutoShowNamesWidth);
 }

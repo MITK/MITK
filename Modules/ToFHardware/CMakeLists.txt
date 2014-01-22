@@ -5,7 +5,7 @@ MITK_CREATE_MODULE(mitkToFHardware
   SUBPROJECTS MITK-ToF
   INCLUDE_DIRS ${MITK_BIN_DIR}
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  DEPENDS Mitk MitkExt mitkOpenCVVideoSupport MitkIGT LegacyAdaptors mitkCameraCalibration
+  DEPENDS Mitk mitkOpenCVVideoSupport MitkIGTBase LegacyAdaptors mitkCameraCalibration
   EXPORT_DEFINE MITK_TOFHARDWARE_EXPORT
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
 )
@@ -19,6 +19,7 @@ MITK_CREATE_MODULE(mitkToFHardware
 
 add_subdirectory(Testing)
 add_subdirectory(Kinect)
+add_subdirectory(KinectV2)
 add_subdirectory(PMD)
 add_subdirectory(MesaSR4000)
 

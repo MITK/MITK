@@ -1,6 +1,7 @@
 # Usage: MITK_CHECK_MODULE(RESULT_VAR [dependencies ...] )
 # check if all required modules exist and stores missing module names in RESULT_VAR.
 macro(MITK_CHECK_MODULE RESULT_VAR)
+  message(WARNING "This macro is deprecated since 2014.03. Please use mitk_check_module_dependencies() instead.")
   set(${RESULT_VAR} "")
   set(DEPENDS "")
   set(DEPENDS_BEFORE "not initialized")
@@ -54,7 +55,7 @@ macro(MITK_CHECK_MODULE RESULT_VAR)
     list(SORT PACKAGE_DEPENDS)
   endwhile()
 
-  foreach(_package PACKAGE_DEPENDS)
+  foreach(_package ${PACKAGE_DEPENDS})
     if((DEFINED MITK_USE_${_package}) AND NOT (${MITK_USE_${_package}}))
       list(APPEND ${RESULT_VAR} ${_package})
     endif()

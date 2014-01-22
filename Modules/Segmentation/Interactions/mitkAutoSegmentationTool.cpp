@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAutoSegmentationTool.h"
 #include "mitkToolManager.h"
+#include <mitkImageTimeSelector.h>
 
 mitk::AutoSegmentationTool::AutoSegmentationTool()
 :Tool("dummy"),
@@ -30,6 +31,21 @@ mitk::AutoSegmentationTool::~AutoSegmentationTool()
 const char* mitk::AutoSegmentationTool::GetGroup() const
 {
   return "autoSegmentation";
+}
+
+mitk::Image::Pointer mitk::AutoSegmentationTool::Get3DImage(mitk::Image::Pointer image, unsigned int timestep)
+{
+  if (image->GetDimension() != 4)
+    return image;
+
+  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+
+  imageTimeSelector->SetInput(image);
+  imageTimeSelector->SetTimeNr(static_cast<int>(timestep));
+
+  imageTimeSelector->UpdateLargestPossibleRegion();
+
+  return imageTimeSelector->GetOutput();
 }
 
 void mitk::AutoSegmentationTool::SetOverwriteExistingSegmentation(bool overwrite)

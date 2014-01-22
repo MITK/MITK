@@ -21,7 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkAutoSegmentationTool.h"
 
+namespace us {
 class ModuleResource;
+}
 
 namespace mitk
 {
@@ -70,8 +72,7 @@ class Segmentation_EXPORT WatershedTool : public AutoSegmentationTool
 
     const char** GetXPM() const;
     const char* GetName() const;
-    ModuleResource GetIconResource() const;
-    ModuleResource GetCursorIconResource() const;
+    us::ModuleResource GetIconResource() const;
 
   protected:
 

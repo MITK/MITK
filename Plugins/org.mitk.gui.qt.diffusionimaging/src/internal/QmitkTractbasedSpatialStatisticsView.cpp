@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QInputDialog>
 #include <QClipboard>
 
+#include <qwt_plot_picker.h>
 
 #include <mitkTractAnalyzer.h>
 #include <mitkTbssImporter.h>
@@ -252,8 +253,8 @@ void QmitkTractbasedSpatialStatisticsView::CreateConnections()
     connect( (QObject*)(m_Controls->m_AddGroup), SIGNAL(clicked()), this, SLOT(AddGroup()) );
     connect( (QObject*)(m_Controls->m_RemoveGroup), SIGNAL(clicked()), this, SLOT(RemoveGroup()) );
     connect( (QObject*)(m_Controls->m_Clipboard), SIGNAL(clicked()), this, SLOT(CopyToClipboard()) );
-    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
-    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QwtDoublePoint&)), SLOT(Clicked(const QwtDoublePoint&) ) );
+    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(selected(const QPointF&)), SLOT(Clicked(const QPointF&) ) );
+    connect( m_Controls->m_RoiPlotWidget->m_PlotPicker, SIGNAL(moved(const QPointF&)), SLOT(Clicked(const QPointF&) ) );
     connect( (QObject*)(m_Controls->m_Cut), SIGNAL(clicked()), this, SLOT(Cut()) );
     connect( (QObject*)(m_Controls->m_Average), SIGNAL(stateChanged(int)), this, SLOT(PerformChange()) );
     connect( (QObject*)(m_Controls->m_Segments), SIGNAL(valueChanged(int)), this, SLOT(PerformChange()) );
@@ -479,7 +480,7 @@ void QmitkTractbasedSpatialStatisticsView::AddTbssToDataStorage(mitk::Image* ima
 }
 
 
-void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
+void QmitkTractbasedSpatialStatisticsView::Clicked(const QPointF& pos)
 {
   int index = (int)pos.x();
 
@@ -1044,6 +1045,8 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
   mitk::TractAnalyzer analyzer;
   analyzer.SetInputImage(image);
   analyzer.SetThreshold(threshold);
+
+  m_PointSetNode = this->m_Controls->m_PointWidget->GetPointSet();
 
   // Set Pointset to analyzer
   analyzer.SetPointSet(m_PointSetNode);

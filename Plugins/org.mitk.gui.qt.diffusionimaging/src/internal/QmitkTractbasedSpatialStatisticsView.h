@@ -60,7 +60,10 @@ typedef itk::ImageFileWriter< Float4DImageType > Float4DWriterType;
 /*!
   * \brief This plugin provides an extension for Tract-based spatial statistics (see Smith et al., 2009. http://dx.doi.org/10.1016/j.neuroimage.2006.02.024)
   * TBSS enables analyzing the brain by a pipeline of registration, skeletonization, and projection that results in a white matter skeleton
-  * for all subjects that are analyzed statistically. This plugin provides functionality to select single tracts and analyze them seperately.
+  * for all subjects that are analyzed statistically in a whole-brain manner.
+  * This plugin provides functionality to select single tracts and analyze them separately.
+  *
+  * Prerequisites: the mean_FA_skeleton and all_FA_skeletonised datasets produced by the FSL TBSS pipeline: http://fsl.fmrib.ox.ac.uk/fsl/fsl4.0/tbss/index
 */
 
 class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
@@ -94,7 +97,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     // Creates Roi
     void CreateRoi();
 
-    void Clicked(const QwtDoublePoint& pos);
+    void Clicked(const QPointF& pos);
 
     // Import of FSL TBSS data
     void TbssImport();

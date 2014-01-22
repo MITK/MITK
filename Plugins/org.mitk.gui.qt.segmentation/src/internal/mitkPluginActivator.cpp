@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSegmentationView.h"
 #include "QmitkThresholdAction.h"
-#include "QmitkOtsuAction.h"
 #include "QmitkCreatePolygonModelAction.h"
 #include "QmitkAutocropAction.h"
 #include "QmitkSegmentationPreferencePage.h"
@@ -26,20 +25,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
+ctkPluginContext* PluginActivator::m_context = NULL;
+
 void PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkThresholdAction, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkOtsuAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCreatePolygonModelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDeformableClippingPlaneView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationUtilitiesView, context)
+
+  this->m_context = context;
 }
 
 void PluginActivator::stop(ctkPluginContext *)
 {
+  this->m_context = NULL;
+}
+
+ctkPluginContext*PluginActivator::getContext()
+{
+  return m_context;
 }
 
 Q_EXPORT_PLUGIN2(org_mitk_gui_qt_segmentation, mitk::PluginActivator)

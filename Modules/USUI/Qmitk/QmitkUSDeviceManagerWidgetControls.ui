@@ -20,21 +20,38 @@
    <string>QmitkUSDeviceManagerWidget</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QPushButton" name="m_BtnActivate">
-     <property name="text">
-      <string>Activate Device</string>
-     </property>
-    </widget>
+   <item row="1" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="m_LayoutButtons">
+     <item>
+      <widget class="QPushButton" name="m_BtnActivate">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Activate</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_BtnRemove">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Remove</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_BtnNewDevice">
+       <property name="text">
+        <string>New Video Device</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="m_BtnDisconnect">
-     <property name="text">
-      <string>Disconnect Device</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="2">
+   <item row="0" column="0" colspan="3">
     <widget class="QmitkServiceListWidget" name="m_ConnectedDevices" native="true"/>
    </item>
   </layout>
@@ -44,7 +61,7 @@
   <customwidget>
    <class>QmitkServiceListWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkServiceListWidget.h</header>
+   <header>QmitkServiceListWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

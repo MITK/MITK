@@ -19,16 +19,19 @@
 
 #include <MitkExports.h>
 
-#include "mitkSharedData.h"
+#include "usSharedData.h"
 #include "mitkPropertyList.h"
 
 #include "itkSmartPointer.h"
+
+namespace us {
+class Module;
+}
 
 namespace mitk
 {
 
   class InteractionEvent;
-  class Module;
   struct EventConfigPrivate;
 
   /**
@@ -66,7 +69,7 @@ namespace mitk
      * @param filename The resource name relative to the Interactions resource folder.
      * @param module
      */
-    EventConfig(const std::string& filename, const Module* module = NULL);
+    EventConfig(const std::string& filename, const us::Module* module = NULL);
 
     /**
      * @brief Construct an EventConfig object based on a XML configuration file.
@@ -137,7 +140,7 @@ namespace mitk
      * @param module The module containing the resource. Defaults to the Mitk module.
      * @return \c true if the configuration was successfully added, \c false otherwise.
      */
-    bool AddConfig(const std::string& filename, const Module* module = NULL);
+    bool AddConfig(const std::string& filename, const us::Module* module = NULL);
 
     /**
      * @brief This method \e extends this configuration.
@@ -175,7 +178,7 @@ namespace mitk
 
   private:
 
-    SharedDataPointer<EventConfigPrivate> d;
+    us::SharedDataPointer<EventConfigPrivate> d;
 
   };
 

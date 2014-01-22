@@ -15,6 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <vnl/vnl_cross.h>
 #include <vnl/vnl_quaternion.h>
+#include <mitkStickModel.h>
+
+using namespace mitk;
 
 template< class ScalarType >
 StickModel< ScalarType >::StickModel()
@@ -28,6 +31,30 @@ template< class ScalarType >
 StickModel< ScalarType >::~StickModel()
 {
 
+}
+
+template< class ScalarType >
+ScalarType StickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
+{
+    ScalarType signal = 0;
+
+    if (dir>=this->m_GradientList.size())
+        return signal;
+
+    this->m_FiberDirection.Normalize();
+
+    GradientType g = this->m_GradientList[dir];
+    ScalarType bVal = g.GetNorm(); bVal *= bVal;
+
+    if (bVal>0.0001)
+    {
+        ScalarType dot = this->m_FiberDirection*g;
+        signal = exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
+    }
+    else
+        signal = 1;
+
+    return signal;
 }
 
 template< class ScalarType >

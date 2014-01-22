@@ -15,9 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkCoreExtActivator.h"
-#include "mitkPicFileReader.h"
 
-#include <mitkCoreExtObjectFactory.h>
 #include "mitkCoreExtConstants.h"
 
 #include "mitkInputDeviceRegistry.h"
@@ -33,11 +31,6 @@ namespace mitk
   {
     Q_UNUSED(context)
 
-    // see bug 10816
-    // don't let the linker optimize the dependency away
-    mitk::PicFileReader::New();
-
-    RegisterCoreExtObjectFactory();
     this->StartInputDeviceModules();
   }
 

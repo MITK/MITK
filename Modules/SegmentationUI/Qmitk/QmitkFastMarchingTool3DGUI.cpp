@@ -72,7 +72,6 @@ m_TimeIsConnected(false)
   m_slSigma->setPageStep(0.1);
   m_slSigma->setSingleStep(0.01);
   m_slSigma->setValue(1.0);
-  m_slSigma->setDecimals(2);
   m_slSigma->setTracking(false);
   m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
   connect( m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
@@ -99,7 +98,6 @@ m_TimeIsConnected(false)
   m_slAlpha->setPageStep(0.1);
   m_slAlpha->setSingleStep(0.01);
   m_slAlpha->setValue(-2.5);
-  m_slAlpha->setDecimals(2);
   m_slAlpha->setTracking(false);
   m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
   connect( m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
@@ -126,7 +124,6 @@ m_TimeIsConnected(false)
   m_slBeta->setPageStep(0.1);
   m_slBeta->setSingleStep(0.01);
   m_slBeta->setValue(3.5);
-  m_slBeta->setDecimals(2);
   m_slBeta->setTracking(false);
   m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
   connect( m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
@@ -190,12 +187,19 @@ m_TimeIsConnected(false)
   widgetLayout->addWidget(m_btClearSeeds);
   connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
-  m_btConfirm = new QPushButton("Accept");
+  m_btConfirm = new QPushButton("Confirm Segmentation");
   m_btConfirm->setToolTip("Incorporate current result in your working session.");
+  m_btConfirm->setEnabled(false);
   widgetLayout->addWidget(m_btConfirm);
   connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+
+  this->setEnabled(false);
+
+  m_slSigma->setDecimals(2);
+  m_slBeta->setDecimals(2);
+  m_slAlpha->setDecimals(2);
 }
 
 QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()
@@ -203,6 +207,7 @@ QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
+    m_FastMarchingTool->RemoveReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
   }
 }
 
@@ -211,6 +216,7 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
+    m_FastMarchingTool->RemoveReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
   }
 
   m_FastMarchingTool = dynamic_cast<mitk::FastMarchingTool3D*>( tool );
@@ -218,6 +224,7 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
+    m_FastMarchingTool->AddReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
 
     //listen to timestep change events
     mitk::BaseRenderer::Pointer renderer;
@@ -312,6 +319,7 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
   }
   if (m_FastMarchingTool.IsNotNull())
   {
+    m_btConfirm->setEnabled(false);
     m_FastMarchingTool->ConfirmSegmentation();
   }
 }
@@ -331,6 +339,7 @@ void QmitkFastMarchingTool3DGUI::OnClearSeeds()
 {
   //event from image navigator recieved - timestep has changed
    m_FastMarchingTool->ClearSeeds();
+   m_btConfirm->setEnabled(false);
    this->Update();
 }
 
@@ -340,4 +349,10 @@ void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
       QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
   else
       QApplication::restoreOverrideCursor();
+}
+
+void QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady()
+{
+  this->setEnabled(true);
+  this->m_btConfirm->setEnabled(true);
 }

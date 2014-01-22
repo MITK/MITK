@@ -34,7 +34,7 @@ class vtkMaskPoints;
 class DiffusionCore_EXPORT vtkMaskedProgrammableGlyphFilter : public vtkProgrammableGlyphFilter
 {
 public:
-  vtkTypeRevisionMacro(vtkMaskedProgrammableGlyphFilter,vtkProgrammableGlyphFilter);
+  vtkTypeMacro(vtkMaskedProgrammableGlyphFilter,vtkProgrammableGlyphFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
@@ -98,7 +98,6 @@ protected:
   vtkMaskedProgrammableGlyphFilter();
   ~vtkMaskedProgrammableGlyphFilter();
 
-  virtual void Execute();
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   vtkMaskPoints *MaskPoints;

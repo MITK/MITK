@@ -19,9 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkErasePaintbrushTool.xpm"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, ErasePaintbrushTool, "Paintbrush erasing tool");
@@ -42,17 +43,17 @@ const char** mitk::ErasePaintbrushTool::GetXPM() const
   return mitkErasePaintbrushTool_xpm;
 }
 
-mitk::ModuleResource mitk::ErasePaintbrushTool::GetIconResource() const
+us::ModuleResource mitk::ErasePaintbrushTool::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Wipe_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Wipe_48x48.png");
   return resource;
 }
 
-mitk::ModuleResource mitk::ErasePaintbrushTool::GetCursorIconResource() const
+us::ModuleResource mitk::ErasePaintbrushTool::GetCursorIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Wipe_Cursor_32x32.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Wipe_Cursor_32x32.png");
   return resource;
 }
 

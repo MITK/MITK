@@ -36,7 +36,7 @@ namespace mitk
 
   public:
 
-    typedef itk::Image<char, 3>  ImageType;
+    typedef itk::Image<unsigned char, 3>  ImageType;
     typedef itk::Index<3> IndexType;
     //typedef typename std::vector <Index<3> > RoiType;
 

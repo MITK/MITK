@@ -43,7 +43,7 @@ public:
 
   virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
 
-  void RegisterIOFactories();
+  DEPRECATED(void RegisterIOFactories());
 
 protected:
   PlanarFigureObjectFactory();
@@ -54,6 +54,7 @@ protected:
 private:
 
   itk::ObjectFactoryBase::Pointer m_PlanarFigureIOFactory;
+  itk::ObjectFactoryBase::Pointer m_PlanarFigureWriterFactory;
 };
 
 }

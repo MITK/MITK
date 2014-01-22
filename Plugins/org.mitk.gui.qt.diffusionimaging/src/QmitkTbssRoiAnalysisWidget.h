@@ -21,29 +21,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
-#include "QmitkExtExports.h"
-#include "mitkPlanarFigure.h"
-#include "itkVectorImage.h"
 #include <mitkFiberBundleX.h>
-#include <mitkPlanarCircle.h>
 #include <mitkTbssImage.h>
 
-
-#include <qwt_plot.h>
-#include <qwt_plot_picker.h>
+#include <itkVectorImage.h>
 
 typedef itk::VectorImage<float,3>     VectorImageType;
 typedef std::vector< itk::Index<3> > RoiType;
 
-typedef itk::Point<float,3>               PointType;
+typedef mitk::Point3D                     PointType;
 typedef std::vector< PointType>           TractType;
 typedef std::vector< TractType > TractContainerType;
 
+class QwtPlotPicker;
 
 /**
  * \brief Plot widget for TBSS Data
- * This widget can plot regions of interest on TBSS projection data.
+ * This widget can plot regions of interest on TBSS projection data. The projection data is created by importing FSL TBSS subject data and
+ * completing it with patient data using the QmitkTractbasedSpatialStatisticsView.
+ * The region of interest is a vector of indices from which data for plotting should be obtained.
  */
+
 class DIFFUSIONIMAGING_EXPORT QmitkTbssRoiAnalysisWidget : public QmitkPlotWidget
 {
 
@@ -56,7 +54,7 @@ public:
   virtual ~QmitkTbssRoiAnalysisWidget();
 
 
-  /* \brief Set group information */
+  /* \brief Set group information as a vector of pairs of group name and number of group members */
   void SetGroups(std::vector< std::pair<std::string, int> > groups)
   {
     m_Groups = groups;
@@ -73,7 +71,8 @@ public:
                    int number);
 
 
-  void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, bool avg=false);
+  template <typename T>
+  void PlotFiberBundles(const mitk::PixelType, TractContainerType tracts, mitk::Image* img, bool avg=false);
 
 
   /* \brief Sets the projections of the individual subjects */

@@ -456,9 +456,11 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
     this->m_SurfaceNode->SetData(this->m_Surface);
     this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, m_ToFSurfaceVtkMapper3D);
 
+    this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThreshold->value() );
+
     //we need to initialize (reinit) the surface, to make it fit into the renderwindow
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
-          this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
+          this->m_Surface->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
 
     // correctly place the vtk camera for appropriate surface rendering
     vtkCamera* camera3d = GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
@@ -503,12 +505,14 @@ void QmitkToFUtilView::OnUpdateCamera()
       this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
     }
     //update pipeline
+    this->m_ToFImageGrabber->Modified();
     this->m_Surface->Update();
   }
   //##### End code for surface #####
   else
   {
     // update pipeline
+    this->m_ToFImageGrabber->Modified();
     this->m_MitkDistanceImage->Update();
   }
 
@@ -607,14 +611,6 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if (m_AmplitudeImageNode.IsNotNull())
   {
-    if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("RGB")))
-    {
-      this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
-    }
-    else
-    {
-      this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    }
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
     this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
@@ -622,38 +618,24 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   }
   if (m_IntensityImageNode.IsNotNull())
   {
-    if (m_SelectedCamera.contains("Kinect"))
-    {
-      this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
-    }
-    else
-    {
       this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
       this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
       this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
       this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
       this->m_IntensityImageNode->SetProperty("Image Rendering.Mode", renderingModePropertyForTransferFunction);
-    }
   }
   if ((m_RGBImageNode.IsNotNull()))
   {
-    if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("IR")))
-    {
-      this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
-    }
-    else
-    {
       this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
       this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
       this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
       this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
-    }
   }
   // initialize images
   if (m_MitkDistanceImage.IsNotNull())
   {
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
-          this->m_MitkDistanceImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
+          this->m_MitkDistanceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
   }
   if(this->m_SurfaceNode.IsNotNull())
   {

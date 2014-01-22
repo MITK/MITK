@@ -72,10 +72,10 @@ void mitk::DiffusionImage<TPixelType>
   InitializeByItk( img.GetPointer(), 1, vecLength );
 
   itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
-  itw = itw.Begin();
+  itw.GoToBegin();
 
   itk::ImageRegionConstIterator<ImageType> itr (m_VectorImage, m_VectorImage->GetLargestPossibleRegion() );
-  itr = itr.Begin();
+  itr.GoToBegin();
 
   while(!itr.IsAtEnd())
   {
@@ -105,10 +105,10 @@ void mitk::DiffusionImage<TPixelType>
     CastToItkImage<ImgType>(this, img);
 
     itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
-    itw = itw.Begin();
+    itw.GoToBegin();
 
     itk::ImageRegionConstIterator<ImageType> itr (m_VectorImage, m_VectorImage->GetLargestPossibleRegion() );
-    itr = itr.Begin();
+    itr.GoToBegin();
 
     while(!itr.IsAtEnd())
     {
@@ -267,7 +267,7 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
       // do the averaging
       const unsigned int numavg = dirIndices[i].size();
       unsigned int sum = 0;
-      for(int j=0; j<numavg; j++)
+      for(unsigned int j=0; j<numavg; j++)
       {
         //MITK_INFO << newVec[i] << " << " << oldVec[dirIndices[i].at(j)];
         sum += oldVec[dirIndices[i].at(j)];
@@ -370,7 +370,7 @@ void mitk::DiffusionImage<TPixelType>::UpdateBValueMap()
 }
 
 template<typename TPixelType>
-float mitk::DiffusionImage<TPixelType>::GetB_Value(int i)
+float mitk::DiffusionImage<TPixelType>::GetB_Value(unsigned int i)
 {
   if(i > m_Directions->Size()-1)
     return -1;
@@ -399,7 +399,7 @@ void mitk::DiffusionImage<TPixelType>::SetDirections(const std::vector<itk::Vect
   m_OriginalDirections = GradientDirectionContainerType::New();
   for(unsigned int i=0; i<directions.size(); i++)
   {
-    m_OriginalDirections->InsertElement( i, directions[i].Get_vnl_vector() );
+    m_OriginalDirections->InsertElement( i, directions[i].GetVnlVector() );
   }
   this->ApplyMeasurementFrame();
 }

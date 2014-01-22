@@ -60,6 +60,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageReference.h>
 #include <mitkDataStorageEditorInput.h>
 #include <mitkWorkbenchUtil.h>
+#include <vtkVersionMacros.h>
 
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
@@ -899,7 +900,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
   QRegExp reg("(.*)<title>(\\n)*");
   QRegExp reg2("(\\n)*</title>(.*)");
   QFile file(":/org.mitk.gui.qt.ext/index.html");
-  file.open(QIODevice::ReadOnly | QIODevice::Text); // Als Text-Datei nur zum Lesen öffnen
+  file.open(QIODevice::ReadOnly | QIODevice::Text); //text file only for reading
 
   QString text = QString(file.readAll());
 

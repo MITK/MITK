@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkTrackingTypes.h"
 #include "mitkTrackingTool.h"
-#include "mitkStandardFileLocations.h"
+#include "mitkIGTConfig.h"
 
 /** @brief This test makes general tests of the methods of class NDITrackingDevice. The tracking device need not to be connected to the system to run this tests.
  *         A few methods which needs the tracking device to be connected are not tested here.
@@ -49,10 +49,11 @@ int mitkNDITrackingDeviceTest(int /* argc */, char* /*argv*/[])
   //test method Beep(unsigned char count)
   MITK_TEST_CONDITION( (myNDITrackingDevice->Beep(3)== false), "Testing behavior of method Beep(). No Tracking device initialized!");
 
-  //test method AddTool( const char* toolName, const char* fileName, TrackingPriority p /*= NDIPassiveTool::Dynamic*/ )
-  std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
-  const char *name = file.c_str();
-  MITK_TEST_CONDITION( (myNDITrackingDevice->AddTool("Tool0", name))!=NULL, "Testing AddTool() for tool 0.");
+  std::string file(MITK_IGT_DATA_DIR);
+  file.append("/SROMFile.rom");
+  MITK_INFO << file;
+
+  MITK_TEST_CONDITION( (myNDITrackingDevice->AddTool("Tool0", file.c_str()))!=NULL, "Testing AddTool() for tool 0.");
 
   //test method GetToolCount()
   MITK_TEST_CONDITION( (myNDITrackingDevice->GetToolCount())==1, "Testing GetToolCount() for one tool.");

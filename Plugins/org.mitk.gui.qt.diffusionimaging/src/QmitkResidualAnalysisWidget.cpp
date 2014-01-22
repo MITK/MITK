@@ -16,27 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkResidualAnalysisWidget.h"
 
+#include <QPen>
 
-#include <qlabel.h>
-#include <qpen.h>
-#include <qgroupbox.h>
-
-#include <qwt_text.h>
-#include <qwt_plot_grid.h>
-#include <qwt_painter.h>
 #include <qwt_legend.h>
-#include <qwt_plot_marker.h>
-
-
-#include <iostream>
-#include <fstream>
+#include <qwt_plot_picker.h>
+#include <qwt_picker_machine.h>
 
 
 QmitkResidualAnalysisWidget::QmitkResidualAnalysisWidget( QWidget * parent )
   : QmitkPlotWidget(parent)
 {
   m_PlotPicker = new QwtPlotPicker(m_Plot->canvas());
-  m_PlotPicker->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::ClickSelection | QwtPicker::DragSelection);
+  m_PlotPicker->setStateMachine(new QwtPickerDragPointMachine());
   m_PlotPicker->setTrackerMode(QwtPicker::ActiveOnly);
 }
 
@@ -124,7 +115,3 @@ void QmitkResidualAnalysisWidget::DrawPercentagesOfOutliers()
 
   this->Replot();
 }
-
-
-
-

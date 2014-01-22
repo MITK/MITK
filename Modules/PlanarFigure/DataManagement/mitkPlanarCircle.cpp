@@ -47,12 +47,13 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
   {
     const Point2D &centerPoint = GetControlPoint( 0 );
     Point2D boundaryPoint = GetControlPoint( 1 );
-    vnl_vector<float> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
+    vnl_vector<ScalarType> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
 
     boundaryPoint[0] += vec[0];
     boundaryPoint[1] += vec[1];
     PlanarFigure::SetControlPoint( 0, point );
     PlanarFigure::SetControlPoint( 1, boundaryPoint );
+    return true;
   }
   else if ( index == 1 )
   {

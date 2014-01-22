@@ -32,18 +32,26 @@ if(BUILD_TESTING)
                        DEPENDS mitkProjectTemplateRmSrcTest
                        LABELS "MITK;BlueBerry")
 
+  set(configure_options
+    -DMITK_DIR:PATH=${MITK_BINARY_DIR}
+    -DCMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+    -DCMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+    -DAwesomeProject_BUILD_ALL_PLUGINS:BOOL=ON
+    -DAwesomeProject_BUILD_ALL_APPS:BOOL=ON
+    -G${CMAKE_GENERATOR}
+    )
+  if(MITK_USE_Qt4)
+    list(APPEND configure_options -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE})
+  endif()
+  if(CMAKE_PREFIX_PATH)
+    list(APPEND configure_options -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH})
+  endif()
+
   if(CMAKE_CONFIGURATION_TYPES)
     foreach(config ${CMAKE_CONFIGURATION_TYPES})
       add_test(NAME mitkProjectTemplateConfigureTest-${config} CONFIGURATIONS ${config}
                WORKING_DIRECTORY "${MITK-ProjectTemplate_BINARY_DIR}"
-               COMMAND ${CMAKE_COMMAND} -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-                                        -DMITK_DIR:PATH=${MITK_BINARY_DIR}
-                                        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                                        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                                        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-                                        -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
-                                        -DAwesomeProject_BUILD_ALL_PLUGINS:BOOL=ON
-                                        -DAwesomeProject_BUILD_ALL_APPS:BOOL=ON
+               COMMAND ${CMAKE_COMMAND} ${configure_options}
                                         "${MITK-ProjectTemplate_SOURCE_DIR}")
       set_tests_properties(mitkProjectTemplateConfigureTest-${config} PROPERTIES
                            DEPENDS "mitkProjectTemplateCloneTest;mitkProjectTemplateMakeBinTest"
@@ -58,13 +66,8 @@ if(BUILD_TESTING)
   else()
     add_test(NAME mitkProjectTemplateConfigureTest-${CMAKE_BUILD_TYPE}
              WORKING_DIRECTORY "${MITK-ProjectTemplate_BINARY_DIR}"
-             COMMAND ${CMAKE_COMMAND} -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-                                      -DMITK_DIR:PATH=${MITK_BINARY_DIR}
+             COMMAND ${CMAKE_COMMAND} ${configure_options}
                                       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                                      -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                                      -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-                                      -DAwesomeProject_BUILD_ALL_PLUGINS:BOOL=ON
-                                      -DAwesomeProject_BUILD_ALL_APPS:BOOL=ON
                                       "${MITK-ProjectTemplate_SOURCE_DIR}")
     set_tests_properties(mitkProjectTemplateConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES
                          DEPENDS "mitkProjectTemplateCloneTest;mitkProjectTemplateMakeBinTest"
@@ -92,14 +95,14 @@ if(BUILD_TESTING)
       set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
                            DEPENDS mitkProjectTemplateBuildTest-Release
                            TIMEOUT 6000
-                           LABELS "MITK;BlueBerry")
+                           LABELS "MITK;BlueBerry;PACKAGE_TESTS")
     elseif(CMAKE_BUILD_TYPE)
       add_test(NAME mitkProjectTemplatePackageTest
                COMMAND ${CMAKE_COMMAND} --build ${MITK-ProjectTemplate_BINARY_DIR}/AwesomeProject-build --config ${CMAKE_BUILD_TYPE} --target package)
       set_tests_properties(mitkProjectTemplatePackageTest PROPERTIES
                            DEPENDS mitkProjectTemplateBuildTest-${CMAKE_BUILD_TYPE}
                            TIMEOUT 6000
-                           LABELS "MITK;BlueBerry")
+                           LABELS "MITK;BlueBerry;PACKAGE_TESTS")
     endif()
 
   endif()

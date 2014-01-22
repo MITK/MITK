@@ -404,7 +404,7 @@ void QmitkBoundingObjectWidget::CreateBoundingObject(int type)
     boundingObject->GetGeometry()->SetSpacing( size );
 
     boundingObject->GetGeometry()->Translate(pos.GetVectorFromOrigin());
-    boundingObject->GetTimeSlicedGeometry()->UpdateInformation();
+    boundingObject->GetTimeGeometry()->Update();
 
     //create node
     mitk::DataNode::Pointer node  = mitk::DataNode::New();

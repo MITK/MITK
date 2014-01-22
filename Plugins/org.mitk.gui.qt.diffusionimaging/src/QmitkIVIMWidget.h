@@ -19,21 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPlotWidget.h"
 
-#include "QmitkHistogram.h"
-#include "QmitkExtExports.h"
 #include "mitkImage.h"
-#include "mitkPlanarFigure.h"
-
-#include <qlayout.h>
-#include <qtextedit.h>
-#include <qdialog.h>
-
-#include <itkHistogram.h>
-
-#include <vtkQtChartWidget.h>
-#include <vtkQtBarChart.h>
-
-#include <QStandardItemModel>
 
 #include "itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h"
 
@@ -65,7 +51,7 @@ public:
 
 private:
 
-  std::vector<double> vec(vnl_vector<double> vector);
+  std::vector<double> vec(const vnl_vector<double>& vector);
 
 };
 

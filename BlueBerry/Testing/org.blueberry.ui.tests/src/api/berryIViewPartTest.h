@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIWorkbenchPartTest.h"
 
-#include <CppUnit/TestCaller.h>
+#include <cppunit/TestCaller.h>
 
 namespace berry
 {

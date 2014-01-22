@@ -1,19 +1,40 @@
-file(STRINGS "framework/sofa/helper/vector_device.h" vector_device_h NEWLINE_CONSUME)
-string(REPLACE "#ifndef SOFA_NO_OPENGL\n    GLuint  " "    unsigned int" vector_device_h "${vector_device_h}")
-string(REPLACE "#endif\n    mutable i" "    mutable i" vector_device_h "${vector_device_h}")
-string(REPLACE "        if (MemoryManager::SUPPORT_GL_BUFFER && bufferObject)\n" "#ifndef SOFA_NO_OPENGL\n        if (MemoryManager::SUPPORT_GL_BUFFER && bufferObject)\n" vector_device_h "${vector_device_h}")
-string(REPLACE "//         else {" "#endif\n//         else {" vector_device_h "${vector_device_h}")
-string(REPLACE "P ( GLu" "P ( unsigned " vector_device_h "${vector_device_h}")
-set(CONTENTS ${vector_device_h})
-configure_file(${TEMPLATE_FILE} "framework/sofa/helper/vector_device.h" @ONLY)
+file(STRINGS "framework/sofa/defaulttype/MapMapSparseMatrix.h" mapMapSparseMatrix_h NEWLINE_CONSUME)
+string(REPLACE "_pair< KeyT, T >" "_pair" mapMapSparseMatrix_h "${mapMapSparseMatrix_h}")
+string(REPLACE "r< KeyType, RowType >" "r" mapMapSparseMatrix_h "${mapMapSparseMatrix_h}")
+set(CONTENTS ${mapMapSparseMatrix_h})
+configure_file(${TEMPLATE_FILE} "framework/sofa/defaulttype/MapMapSparseMatrix.h" @ONLY)
 
 file(STRINGS "sofa-dependencies.cmake" sofaDependencies_cmake NEWLINE_CONSUME)
+string(REPLACE "\"tinyxml\"" "\"SofaTinyXml\"" sofaDependencies_cmake "${sofaDependencies_cmake}")
 string(REPLACE "add_subdirectory(\"\${SOFA_A" "#add_subdirectory(\"\${SOFA_A" sofaDependencies_cmake "${sofaDependencies_cmake}")
 file(WRITE "sofa-dependencies.cmake" "${sofaDependencies_cmake}")
+
+file(STRINGS "modules/sofa/component/SofaBaseVisual/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "tinyxml" "SofaTinyXml" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "modules/sofa/component/SofaBaseVisual/CMakeLists.txt" "${CMakeLists_txt}")
+
+file(STRINGS "modules/sofa/component/SofaLoader/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "tinyxml" "SofaTinyXml" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "modules/sofa/component/SofaLoader/CMakeLists.txt" "${CMakeLists_txt}")
+
+file(STRINGS "modules/sofa/simulation/common/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "tinyxml" "SofaTinyXml" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "modules/sofa/simulation/common/CMakeLists.txt" "${CMakeLists_txt}")
 
 file(STRINGS "modules/sofa/component/SofaUserInteraction/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
 string(REPLACE "../collision/AddFramePerformer." "#../collision/AddFramePerformer." CMakeLists_txt "${CMakeLists_txt}")
 file(WRITE "modules/sofa/component/SofaUserInteraction/CMakeLists.txt" "${CMakeLists_txt}")
+
+file(REMOVE "cmake/FindGLEW.cmake")
+
+file(STRINGS "cmake/externals.cmake" externals_cmake NEWLINE_CONSUME)
+string(REPLACE "graph " "" externals_cmake "${externals_cmake}")
+string(REPLACE "set(GLUT_LIBRARIES \"freeglut\")" "find_package(GLUT REQUIRED)" externals_cmake "${externals_cmake}")
+string(REPLACE "set(GLEW_LIBRARIES \"glew32\")" "find_package(GLEW REQUIRED)" externals_cmake "${externals_cmake}")
+string(REPLACE "else()\n\tset(O" "\tlist(APPEND GLOBAL_INCLUDE_DIRECTORIES \"\${GLUT_INCLUDE_DIRS}\" \"\${GLEW_INCLUDE_DIRS}\")\nelse()\n\tset(O" externals_cmake "${externals_cmake}")
+string(REPLACE "GLUT REQUIRED" "GLUT REQUIRED CONFIG" externals_cmake "${externals_cmake}")
+string(REPLACE "GLEW REQUIRED" "GLEW REQUIRED CONFIG" externals_cmake "${externals_cmake}")
+file(WRITE "cmake/externals.cmake" "${externals_cmake}")
 
 file(STRINGS "cmake/preBuildConfig.cmake" preBuildConfig_cmake NEWLINE_CONSUME)
 string(REPLACE "DEBUG \"\${SOFA_BIN_DIR}" "DEBUG \"\${SOFA_BIN_DIR}/Debug" preBuildConfig_cmake "${preBuildConfig_cmake}")
@@ -29,9 +50,9 @@ file(WRITE "cmake/preBuildConfig.cmake" "${preBuildConfig_cmake}")
 file(APPEND "CMakeLists.txt" "\n\nconfigure_file(SOFAConfig.cmake.in SOFAConfig.cmake @ONLY)")
 
 file(WRITE "SOFAConfig.cmake.in"
-"add_definitions(-DSOFA_NO_OPENGL;-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR)
+"add_definitions(-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR;-DSOFA_HAVE_BOOST;-DSOFA_HAVE_FREEGLUT;-DSOFA_HAVE_GLEW)
 
-set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/miniBoost;@SOFA_EXTLIBS_DIR@/miniFlowVR/include;@SOFA_EXTLIBS_DIR@/newmat;@SOFA_EXTLIBS_DIR@/tinyxml;@SOFA_SRC_DIR@/framework;@SOFA_SRC_DIR@/modules\")
+set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/miniFlowVR/include;@SOFA_EXTLIBS_DIR@/newmat;@SOFA_EXTLIBS_DIR@/tinyxml;@SOFA_SRC_DIR@/framework;@SOFA_SRC_DIR@/modules\")
 
 if(WIN32)
   set(SOFA_LIBRARY_DIRS \"@SOFA_LIB_DIR@\")
@@ -80,6 +101,7 @@ set(SOFA_LIBRARIES
   debug SofaMiscTopology\${version}d optimized SofaMiscTopology\${version}
   debug SofaNonUniformFem\${version}d optimized SofaNonUniformFem\${version}
   debug SofaObjectInteraction\${version}d optimized SofaObjectInteraction\${version}
+  debug SofaOpenglVisual\${version}d optimized SofaOpenglVisual\${version}
   debug SofaPreconditioner\${version}d optimized SofaPreconditioner\${version}
   debug SofaRigid\${version}d optimized SofaRigid\${version}
   debug SofaSimpleFem\${version}d optimized SofaSimpleFem\${version}
@@ -90,5 +112,5 @@ set(SOFA_LIBRARIES
   debug SofaUserInteraction\${version}d optimized SofaUserInteraction\${version}
   debug SofaValidation\${version}d optimized SofaValidation\${version}
   debug SofaVolumetricData\${version}d optimized SofaVolumetricData\${version}
-  debug tinyxml\${version}d optimized tinyxml\${version}
+  debug SofaTinyXml\${version}d optimized SofaTinyXml\${version}
 )")

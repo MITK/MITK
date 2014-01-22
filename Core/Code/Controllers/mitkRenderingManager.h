@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPropertyList.h"
 #include "mitkProperties.h"
+#include "mitkTimeGeometry.h"
 
 class vtkRenderWindow;
 class vtkObject;
@@ -155,6 +156,8 @@ public:
    * geometry. PLATFORM SPECIFIC. TODO: HOW IS THIS PLATFORM SPECIFIC? */
   virtual bool InitializeViews( const Geometry3D *geometry,
     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
+  virtual bool InitializeViews( const TimeGeometry *geometry,
+    RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
 
   /** Initializes the windows to the default viewing direction
@@ -164,17 +167,26 @@ public:
 
   /** Initializes the specified window to the geometry of the given
    * DataNode. Set "initializeGlobalTimeSNC" to true in order to use this
-   * geometry as global TimeSlicedGeometry. PLATFORM SPECIFIC. */
+   * geometry as global TimeGeometry. PLATFORM SPECIFIC. */
   //virtual bool InitializeView( vtkRenderWindow *renderWindow, const DataStorage* ds, const DataNode* node = NULL, bool initializeGlobalTimeSNC = false );
 
   /** Initializes the specified window to the given geometry. Set
    * "initializeGlobalTimeSNC" to true in order to use this geometry as
-   * global TimeSlicedGeometry. PLATFORM SPECIFIC. */
+   * global TimeGeometry. PLATFORM SPECIFIC. */
   virtual bool InitializeView( vtkRenderWindow *renderWindow, const Geometry3D *geometry, bool initializeGlobalTimeSNC = false);
+  virtual bool InitializeView( vtkRenderWindow *renderWindow, const TimeGeometry *geometry, bool initializeGlobalTimeSNC = false);
 
   /** Initializes the specified window to the default viewing direction
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
   virtual bool InitializeView( vtkRenderWindow *renderWindow );
+
+  /**
+   * @brief Initializes the renderwindows by the aggregated geometry of
+   *        all objects that are held in the data storage.
+   * This is basically a global reinit
+   * @param The data storage from which the bounding object can be retrieved
+   */
+  virtual void InitializeViewsByBoundingObjects(const DataStorage * );
 
   /** Gets the (global) SliceNavigationController responsible for
    * time-slicing. */
@@ -375,7 +387,7 @@ protected:
 private:
 
   void InternalViewInitialization(
-      mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry,
+      mitk::BaseRenderer *baseRenderer, const mitk::TimeGeometry *geometry,
       bool boundingBoxInitialized, int mapperID );
 
 };

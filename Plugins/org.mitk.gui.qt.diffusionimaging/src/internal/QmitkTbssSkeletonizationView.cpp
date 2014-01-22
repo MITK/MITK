@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageFileReader.h>
 
+// mitk
+#include <mitkImagePixelReadAccessor.h>
+
 // Qt
 #include <QInputDialog>
 #include <QMessageBox>
@@ -36,15 +39,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Boost
 #include <boost/lexical_cast.hpp>
 
+
+
 const std::string QmitkTbssSkeletonizationView::VIEW_ID = "org.mitk.views.tbssskeletonization";
 
 using namespace berry;
 
 
 QmitkTbssSkeletonizationView::QmitkTbssSkeletonizationView()
-: QmitkFunctionality()
-, m_Controls( 0 )
-, m_MultiWidget( NULL )
+  : QmitkFunctionality()
+  , m_Controls( 0 )
+  , m_MultiWidget( NULL )
 {
 
 }
@@ -55,12 +60,22 @@ QmitkTbssSkeletonizationView::~QmitkTbssSkeletonizationView()
 
 void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
+
+
   //datamanager selection changed
   if (!this->IsActivated())
     return;
 
   bool found3dImage = false;
   bool found4dImage = false;
+
+  this->m_Controls->m_TubularName->setText(QString("Tubular Structure Mask: "));
+  this->m_Controls->m_TubularName->setEnabled(false);
+  this->m_Controls->m_MeanLabel->setText(QString("Mean: "));
+  this->m_Controls->m_MeanLabel->setEnabled(false);
+  this->m_Controls->m_PatientDataLabel->setText(QString("Patient Data: "));
+  this->m_Controls->m_PatientDataLabel->setEnabled(false);
+
 
   // iterate selection
   for ( int i=0; i<nodes.size(); i++ )
@@ -69,19 +84,45 @@ void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode
 
     // only look at interesting types from valid nodes
     mitk::BaseData* nodeData = nodes[i]->GetData();
+    std::string name = "";
+    nodes[i]->GetStringProperty("name", name);
+
 
     if(nodeData)
     {
       if(QString("Image").compare(nodeData->GetNameOfClass())==0)
       {
         mitk::Image* img = static_cast<mitk::Image*>(nodeData);
+
         if(img->GetDimension() == 3)
         {
-          found3dImage = true;
+          bool isBinary(false);
+          nodes[i]->GetBoolProperty("binary", isBinary);
+
+
+          if(isBinary)
+          {
+            QString label("Tubular Structure Mask: ");
+            label.append(QString(name.c_str()));
+            this->m_Controls->m_TubularName->setText(label);
+            this->m_Controls->m_TubularName->setEnabled(true);
+          }
+          else
+          {
+            found3dImage = true;
+            QString label("Mean: ");
+            label.append(QString(name.c_str()));
+            this->m_Controls->m_MeanLabel->setText(label);
+            this->m_Controls->m_MeanLabel->setEnabled(true);
+          }
         }
         else if(img->GetDimension() == 4)
         {
           found4dImage = true;
+          QString label("Patient Data: ");
+          label.append(QString(name.c_str()));
+          this->m_Controls->m_PatientDataLabel->setText(label);
+          this->m_Controls->m_PatientDataLabel->setEnabled(true);
         }
       }
     }
@@ -145,6 +186,10 @@ void QmitkTbssSkeletonizationView::StdMultiWidgetNotAvailable()
 
 void QmitkTbssSkeletonizationView::Skeletonize()
 {
+
+
+
+
   typedef itk::SkeletonizationFilter<FloatImageType, FloatImageType> SkeletonisationFilterType;
   SkeletonisationFilterType::Pointer skeletonizer = SkeletonisationFilterType::New();
 
@@ -164,8 +209,12 @@ void QmitkTbssSkeletonizationView::Skeletonize()
     {
       if(QString("Image").compare(nodeData->GetNameOfClass())==0)
       {
+
+        bool isBinary(false);
+        nodes[i]->GetBoolProperty("binary", isBinary);
+
         mitk::Image* img = static_cast<mitk::Image*>(nodeData);
-        if(img->GetDimension() == 3)
+        if(img->GetDimension() == 3 && !isBinary)
         {
           meanImage = img;
           name = nodes[i]->GetName();
@@ -208,6 +257,7 @@ void QmitkTbssSkeletonizationView::Project()
 
   mitk::Image::Pointer meanImage = mitk::Image::New();
   mitk::Image::Pointer subjects = mitk::Image::New();
+  mitk::Image::Pointer tubular = mitk::Image::New();
 
   for ( int i=0; i<nodes.size(); i++ )
   {
@@ -221,8 +271,21 @@ void QmitkTbssSkeletonizationView::Project()
         mitk::Image* img = static_cast<mitk::Image*>(nodeData);
         if(img->GetDimension() == 3)
         {
-          meanImage = img;
+
+          bool isBinary(false);
+          nodes[i]->GetBoolProperty("binary", isBinary);
+
+
+          if(isBinary)
+          {
+            tubular = img;
+          }
+          else
+          {
+            meanImage = img;
+          }
         }
+
         else if(img->GetDimension() == 4)
         {
           subjects = img;
@@ -234,10 +297,7 @@ void QmitkTbssSkeletonizationView::Project()
 
   Float4DImageType::Pointer allFA = ConvertToItk(subjects);
 
-
-
-
-  // Calculate skeleton
+    // Calculate skeleton
   FloatImageType::Pointer itkImg = FloatImageType::New();
   mitk::CastToItkImage(meanImage, itkImg);
   skeletonizer->SetInput(itkImg);
@@ -275,8 +335,8 @@ void QmitkTbssSkeletonizationView::Project()
   while(threshold == -1.0)
   {
     threshold = QInputDialog::getDouble(m_Controls->m_Skeletonize, tr("Specify the FA threshold"),
-                                          tr("Threshold:"), QLineEdit::Normal,
-                                          0.2);
+                                        tr("Threshold:"), QLineEdit::Normal,
+                                        0.2);
 
     if(threshold < 0.0 || threshold > 1.0)
     {
@@ -310,19 +370,16 @@ void QmitkTbssSkeletonizationView::Project()
 
 
 
-  typedef itk::ImageFileReader< CharImageType > CharReaderType;
-  CharReaderType::Pointer reader = CharReaderType::New();
-  reader->SetFileName("/local/testing/LowerCingulum_1mm.nii.gz");
-  reader->Update();
-  CharImageType::Pointer cingulum = reader->GetOutput();
 
+  CharImageType::Pointer itkTubular = CharImageType::New();
+  mitk::CastToItkImage(tubular, itkTubular);
 
 
   ProjectionFilterType::Pointer projectionFilter = ProjectionFilterType::New();
   projectionFilter->SetDistanceMap(distanceMap);
   projectionFilter->SetDirections(directionImg);
   projectionFilter->SetAllFA(allFA);
-  projectionFilter->SetTube(cingulum);
+  projectionFilter->SetTube(itkTubular);
   projectionFilter->SetSkeleton(thresholdedImg);
   projectionFilter->Project();
 
@@ -350,6 +407,7 @@ void QmitkTbssSkeletonizationView::AddToDataStorage(mitk::Image* img, std::strin
 
 Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(mitk::Image::Pointer image)
 {
+
   Float4DImageType::Pointer output = Float4DImageType::New();
 
   mitk::Geometry3D* geo = image->GetGeometry();
@@ -401,31 +459,31 @@ Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(mitk::Image
   {
     int timesteps = image->GetDimension(3);
 
-    // iterate through the subjects and copy data to output
-    for(int t=0; t<timesteps; t++)
-    {
-      for(int x=0; x<image->GetDimension(0); x++)
+    try{
+      // REPLACE THIS METHODE()ConvertToItk) WITH mitk::CastToItk
+
+      // iterate through the subjects and copy data to output
+      for(int t=0; t<timesteps; t++)
       {
-        for(int y=0; y<image->GetDimension(1); y++)
+        for(int x=0; x<image->GetDimension(0); x++)
         {
-          for(int z=0; z<image->GetDimension(2); z++)
+          for(int y=0; y<image->GetDimension(1); y++)
           {
-            itk::Index<4> ix4;
-            ix4[0] = x;
-            ix4[1] = y;
-            ix4[2] = z;
-            ix4[3] = t;
+            for(int z=0; z<image->GetDimension(2); z++)
+            {
+              itk::Index<3> ix = {x, y, z};
+              itk::Index<4> ix4 = {x, y, z, t};
 
-            mitk::Index3D ix;
-            ix[0] = x;
-            ix[1] = y;
-            ix[2] = z;
+              output->SetPixel(ix4, image->GetPixelValueByIndex(ix, t));
 
-            output->SetPixel(ix4, image->GetPixelValueByIndex(ix, t));
-
+            }
           }
         }
       }
+    }
+    catch(std::exception & e)
+    {
+      MITK_INFO << e.what();
     }
 
   }

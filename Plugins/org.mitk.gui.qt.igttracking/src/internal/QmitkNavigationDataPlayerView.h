@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkFunctionality.h>
 #include <QmitkIGTPlayerWidget.h>
 
-#include <mitkLineVtkMapper3D.h>
 #include <mitkSplineVtkMapper3D.h>
 
 // ui

@@ -175,7 +175,7 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
       }
 
       //compare if input == output
-      if(!mitk::Equal(distVal,distanceArray[i]) || !mitk::Equal(amplVal, amplitudeArray[i]) || !mitk::Equal(intenVal, intensityArray[i]))
+      if(!mitk::Equal(distVal,distanceArray[i],0.00001) || !mitk::Equal(amplVal, amplitudeArray[i],0.00001) || !mitk::Equal(intenVal, intensityArray[i],0.00001))
       {
         readingCorrect = false;
       }

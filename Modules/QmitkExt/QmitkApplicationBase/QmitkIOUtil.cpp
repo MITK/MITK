@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //ITK
 #include <itksys/SystemTools.hxx>
-#include <Poco/Path.h>
 
 void mitk::QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string fileName, QWidget* parent)
 {
@@ -97,7 +96,10 @@ void mitk::QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string
               if ( qFileName.isEmpty() )
                 return;
 
-              QString extension = "."+QFileInfo(qFileName).completeSuffix();
+              std::string ext = itksys::SystemTools::GetFilenameLastExtension(qFileName.toStdString());
+              QString extension = QString::fromStdString(ext);
+
+              //QString extension = "."+QFileInfo(qFileName).completeSuffix();
               for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriterCandidates.begin() ;
                    it != fileWriterCandidates.end() ; ++it)
               {
@@ -108,9 +110,27 @@ void mitk::QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string
                   return;
                 }
               }
+
+              // if the image extension consists of two parts (e.g. *.nii.gz) we need to check again
+              // with the two last extensions. This is to allow points within the image name.
+              QString qFileNameCopy(qFileName);
+              qFileNameCopy.remove(QString::fromStdString(ext));
+              std::string ext2 = itksys::SystemTools::GetFilenameLastExtension(qFileNameCopy.toStdString());
+              ext2.append(ext);
+              extension = QString::fromStdString(ext2);
+              for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriterCandidates.begin() ;
+                it != fileWriterCandidates.end() ; ++it)
+              {
+                if ((*it)->IsExtensionValid(extension.toStdString()))
+                {
+                  (*it)->SetFileName( qPrintable(qFileName) );
+                  (*it)->DoWrite( data );
+                  return;
+                }
+              }
+              // returns earlier when successful
             }
 
-            // returnes earlier when successfull
             // no appropriate writer has been found
             QMessageBox::critical(parent,"ERROR","Could not find file writer for this data type");
             return;

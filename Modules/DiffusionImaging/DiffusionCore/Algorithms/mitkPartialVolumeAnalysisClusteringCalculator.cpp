@@ -318,8 +318,8 @@ namespace mitk
     itk::ImageRegionIterator<RGBImageType>
         itrgb(rgb, rgb->GetLargestPossibleRegion());
 
-    itr = itr.Begin();
-    itg = itg.Begin();
+    itr.GoToBegin();
+    itg.GoToBegin();
 
     float maxr = 0;
     float maxg = 0;
@@ -343,9 +343,9 @@ namespace mitk
       ++itg;
     }
 
-    itr = itr.Begin();
-    itg = itg.Begin();
-    itrgb = itrgb.Begin();
+    itr.GoToBegin();
+    itg.GoToBegin();
+    itrgb.GoToBegin();
 
     while( !itr.IsAtEnd() )
     {
@@ -460,7 +460,6 @@ namespace mitk
     totalHist->SetMeasurementVectorSize(1);
     totalHist->Initialize(histogram->GetSize(),min,max);
     MitkHistType::Iterator totalIt = totalHist->Begin();
-    MitkHistType::Iterator totalEnd = totalHist->End();
 
     int i=0;
     while (newIt != newEnd)
@@ -533,8 +532,8 @@ namespace mitk
     itk::ImageRegionIterator<DisplayImageType>
         itdisp(displayimage, displayimage->GetLargestPossibleRegion());
 
-    itimage = itimage.Begin();
-    itprob = itprob.Begin();
+    itimage.GoToBegin();
+    itprob.GoToBegin();
 
     MitkHistType::IndexType index(1);
     float maxp = 0;
@@ -573,8 +572,8 @@ namespace mitk
       ++itprob;
     }
 
-    itprob = itprob.Begin();
-    itdisp = itdisp.Begin();
+    itprob.GoToBegin();
+    itdisp.GoToBegin();
 
     while( !itprob.IsAtEnd() )
     {
@@ -658,9 +657,9 @@ namespace mitk
     itk::ImageRegionConstIterator<MaskImageType>
         itmask(itkmask, itkmask->GetLargestPossibleRegion());
 
-    itimage = itimage.Begin();
-    itprob = itprob.Begin();
-    itmask = itmask.Begin();
+    itimage.GoToBegin();
+    itprob.GoToBegin();
+    itmask.GoToBegin();
 
     double totalProb = 0;
     double measurement = 0;
@@ -717,7 +716,7 @@ namespace mitk
     float maxProb = 0;
     itk::ImageRegionConstIterator<ImageType>
         itprob(probImage, probImage->GetLargestPossibleRegion());
-    itprob = itprob.Begin();
+    itprob.GoToBegin();
     while( !itprob.IsAtEnd() )
     {
       maxProb = itprob.Get() > maxProb ? itprob.Get() : maxProb;
@@ -739,9 +738,9 @@ namespace mitk
     itk::ImageRegionIterator<ImageType>
         it2(comp2Image, comp2Image->GetLargestPossibleRegion());
 
-    it1 = it1.Begin();
-    it2 = it2.Begin();
-    itprob = itprob.Begin();
+    it1.GoToBegin();
+    it2.GoToBegin();
+    itprob.GoToBegin();
 
     while( !itprob.IsAtEnd() )
     {
@@ -777,6 +776,7 @@ namespace mitk
     GeneratorType::HistogramType::ConstIterator iter = histogram->Begin();
     float maxFreq = 0;
     MeasurementVectorType maxValue;
+    maxValue.Fill(0);
     while ( iter != histogram->End() )
     {
       if(iter.GetFrequency() > maxFreq)
@@ -806,9 +806,9 @@ namespace mitk
     itk::ImageRegionIterator<ImageType>
         itout(returnImage, returnImage->GetLargestPossibleRegion());
 
-    cit1 = cit1.Begin();
-    cit2 = cit2.Begin();
-    itout = itout.Begin();
+    cit1.GoToBegin();
+    cit2.GoToBegin();
+    itout.GoToBegin();
 
     vnl_vector<float> v(3);
     v[0] = cos( maxValue[0] ) * sin( maxValue[1] );
@@ -893,8 +893,6 @@ namespace mitk
     retval->hist = new HistType();
     retval->hist->InitByMitkHistogram(histogram);
 
-    double sum = histogram->GetTotalFrequency();
-
     double* q = new double[2];
     q[0] = histogram->Quantile(0, p1);
     q[1] = histogram->Quantile(0, p2);
@@ -954,8 +952,8 @@ namespace mitk
     itk::ImageRegionIterator<DisplayImageType>
         itdisp(displayimage, displayimage->GetLargestPossibleRegion());
 
-    itimage = itimage.Begin();
-    itprob = itprob.Begin();
+    itimage.GoToBegin();
+    itprob.GoToBegin();
 
     while( !itimage.IsAtEnd() )
     {
@@ -968,8 +966,8 @@ namespace mitk
       ++itprob;
     }
 
-    itprob = itprob.Begin();
-    itdisp = itdisp.Begin();
+    itprob.GoToBegin();
+    itdisp.GoToBegin();
 
     while( !itprob.IsAtEnd() )
     {

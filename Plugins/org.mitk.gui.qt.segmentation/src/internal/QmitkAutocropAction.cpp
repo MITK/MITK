@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAutoCropImageFilter.h"
 #include "mitkImageCast.h"
+#include "mitkImageWriteAccessor.h"
 #include "mitkRenderingManager.h"
 #include "mitkProgressBar.h"
 
@@ -77,7 +78,8 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
               mitk::Image::Pointer _cropped3dSlice = this->IncreaseCroppedImageSize(_3dSlice);
 
               // +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++
-              void *_data = _cropped3dSlice->GetData();
+              mitk::ImageWriteAccessor imAccess(_cropped3dSlice);
+              void *_data = imAccess.GetData();
 
               // <ToBeRemoved>
               // We write some stripes into the image
@@ -104,7 +106,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
           }
           // Reinit node
           mitk::RenderingManager::GetInstance()->InitializeViews(
-            node->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            node->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
           mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
         }

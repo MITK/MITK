@@ -28,7 +28,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkImageSource.h>
 
 namespace itk{
-/** \class EvaluateTractogramDirectionsFilter
+/** \brief Calculates the voxel-wise angular error of the input tractogram to a set of voxel-wise directions.
  */
 
 template< class PixelType >
@@ -59,12 +59,13 @@ public:
     typedef Image< unsigned char, 3 >                           UCharImageType;
     typedef Image< double, 3 >                                  DoubleImageType;
 
-    itkSetMacro( Tractogram, FiberBundleType::Pointer)
-    itkSetMacro( ReferenceImageSet , DirectionImageContainerType::Pointer)
-    itkSetMacro( MaskImage , UCharImageType::Pointer)
-    itkSetMacro( IgnoreMissingDirections , bool)
-    itkSetMacro( UseInterpolation , bool)
+    itkSetMacro( Tractogram, FiberBundleType::Pointer)                      ///< Input tractogram
+    itkSetMacro( ReferenceImageSet , DirectionImageContainerType::Pointer)  ///< Input images containing one reference direction per voxel.
+    itkSetMacro( MaskImage , UCharImageType::Pointer)                       ///< Calculation is only performed inside of the mask image.
+    itkSetMacro( IgnoreMissingDirections , bool)                            ///< If in one voxel, the number of directions differs between the input tractogram and the reference, the excess directions are ignored. Otherwise, the error to the next closest direction is calculated.
+    itkSetMacro( UseInterpolation , bool)                                   ///< Use trilinear interpolation.
 
+    /** Output statistics. */
     itkGetMacro( MeanAngularError, float)
     itkGetMacro( MinAngularError, float)
     itkGetMacro( MaxAngularError, float)
@@ -82,16 +83,15 @@ protected:
     vnl_vector_fixed<PixelType, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<PixelType, 3> GetVnlVector(Vector< PixelType, 3 >& vector);
 
-    UCharImageType::Pointer                  m_MaskImage;
-    DirectionImageContainerType::Pointer     m_ReferenceImageSet;
-    bool                                     m_IgnoreMissingDirections;
-    double                                   m_MeanAngularError;
-    double                                   m_MedianAngularError;
-    double                                   m_MaxAngularError;
-    double                                   m_MinAngularError;
-    double                                   m_VarAngularError;
-    std::vector< double >                    m_AngularErrorVector;
-
+    UCharImageType::Pointer                 m_MaskImage;
+    DirectionImageContainerType::Pointer    m_ReferenceImageSet;
+    bool                                    m_IgnoreMissingDirections;
+    double                                  m_MeanAngularError;
+    double                                  m_MedianAngularError;
+    double                                  m_MaxAngularError;
+    double                                  m_MinAngularError;
+    double                                  m_VarAngularError;
+    std::vector< double >                   m_AngularErrorVector;
     double                                  m_Eps;
     FiberBundleType::Pointer                m_Tractogram;
     bool                                    m_UseInterpolation;

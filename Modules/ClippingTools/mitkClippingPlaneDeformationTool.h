@@ -21,9 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
-#include "mitkSurfaceDeformationInteractor3D.h"
+#include "mitkSurfaceDeformationDataInteractor3D.h"
 #include "mitkTool.h"
-#include "mitkVector.h"
 
 namespace mitk
 {
@@ -50,12 +49,8 @@ namespace mitk
     virtual void Activated();
     virtual void Deactivated();
 
-    mitk::DataNode::Pointer                       m_ClippingPlaneNode;
-    mitk::SurfaceDeformationInteractor3D::Pointer m_SurfaceInteractor;
-
-  private:
-
-    void ClippingPlaneChanged();
+    mitk::DataNode::Pointer                           m_ClippingPlaneNode;
+    mitk::SurfaceDeformationDataInteractor3D::Pointer m_SurfaceInteractor;
   };
 
 } //end namespace mitk

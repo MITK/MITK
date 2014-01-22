@@ -28,9 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, FastMarchingTool3D, "FastMarching3D tool");
@@ -59,16 +60,16 @@ const char** mitk::FastMarchingTool3D::GetXPM() const
   return NULL;//mitkFastMarchingTool3D_xpm;
 }
 
-mitk::ModuleResource mitk::FastMarchingTool3D::GetIconResource() const
+us::ModuleResource mitk::FastMarchingTool3D::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("FastMarching_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("FastMarching_48x48.png");
   return resource;
 }
 
 const char* mitk::FastMarchingTool3D::GetName() const
 {
-  return "FastMarching3D";
+  return "Fast Marching 3D";
 }
 
 void mitk::FastMarchingTool3D::SetUpperThreshold(double value)
@@ -99,9 +100,12 @@ void mitk::FastMarchingTool3D::SetSigma(double value)
 {
   if (m_Sigma != value)
   {
+    if(value > 0.0)
+    {
       m_Sigma = value;
       m_GradientMagnitudeFilter->SetSigma( m_Sigma );
       m_NeedUpdate = true;
+    }
   }
 }
 
@@ -223,6 +227,7 @@ void mitk::FastMarchingTool3D::Deactivated()
   }
   mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
   m_ToolManager->GetDataStorage()->Remove(m_SeedsAsPointSetNode);
+  m_SeedsAsPointSetNode = NULL;
   m_SeedsAsPointSet->RemoveObserver(m_PointSetAddObserverTag);
   m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);
 }
@@ -230,7 +235,7 @@ void mitk::FastMarchingTool3D::Deactivated()
 void mitk::FastMarchingTool3D::Initialize()
 {
   m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
-  if(m_ReferenceImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+  if(m_ReferenceImage->GetTimeGeometry()->CountTimeSteps() > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
     timeSelector->SetInput( m_ReferenceImage );
@@ -252,7 +257,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
     OutputImageType::Pointer segmentationImageInITK = OutputImageType::New();
 
     mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(GetTargetSegmentationNode()->GetData());
-    if(workingImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+    if(workingImage->GetTimeGeometry()->CountTimeSteps() > 1)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput( workingImage );
@@ -280,6 +285,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_ToolManager->ActivateTool(-1);
 }
 
 
@@ -307,6 +313,9 @@ void mitk::FastMarchingTool3D::OnAddPoint()
   m_NeedUpdate = true;
 
   this->Update();
+
+  m_ReadyMessage.Send();
+
 }
 
 
@@ -330,9 +339,14 @@ void mitk::FastMarchingTool3D::OnDelete()
 
 void mitk::FastMarchingTool3D::Update()
 {
+  const unsigned int progress_steps = 200;
+
   if (m_NeedUpdate)
   {
-    m_ProgressCommand->AddStepsToDo(200);
+    m_ProgressCommand->AddStepsToDo(progress_steps);
+
+    //remove interaction with poinset while updating
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
     CurrentlyBusy.Send(true);
     try
     {
@@ -342,7 +356,7 @@ void mitk::FastMarchingTool3D::Update()
     {
      MITK_ERROR << "Exception caught: " << excep.GetDescription();
 
-     m_ProgressCommand->SetRemainingProgress(100);
+     m_ProgressCommand->SetProgress(progress_steps);
      CurrentlyBusy.Send(false);
 
      std::string msg = excep.GetDescription();
@@ -350,7 +364,7 @@ void mitk::FastMarchingTool3D::Update()
 
      return;
     }
-    m_ProgressCommand->SetRemainingProgress(100);
+    m_ProgressCommand->SetProgress(progress_steps);
     CurrentlyBusy.Send(false);
 
     //make output visible
@@ -361,6 +375,9 @@ void mitk::FastMarchingTool3D::Update()
     m_ResultImageNode->SetData(result);
     m_ResultImageNode->SetVisibility(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+    //add interaction with poinset again
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointInteractor);
   }
 }
 
@@ -368,10 +385,35 @@ void mitk::FastMarchingTool3D::Update()
 void mitk::FastMarchingTool3D::ClearSeeds()
 {
   // clear seeds for FastMarching as well as the PointSet for visualization
-  this->m_SeedContainer->Initialize();
-  this->m_SeedsAsPointSet->Clear();
+  if(this->m_SeedContainer.IsNotNull())
+    this->m_SeedContainer->Initialize();
 
-  m_FastMarchingFilter->Modified();
+  if(this->m_SeedsAsPointSet.IsNotNull())
+  {
+    //remove observers from current pointset
+    m_SeedsAsPointSet->RemoveObserver(m_PointSetAddObserverTag);
+    m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);
+
+    //renew pointset
+    this->m_SeedsAsPointSet = mitk::PointSet::New();
+    this->m_SeedsAsPointSetNode->SetData(this->m_SeedsAsPointSet);
+    m_SeedsAsPointSetNode->SetName("Seeds_Preview");
+    m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
+    m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
+    m_SeedsAsPointSetNode->SetVisibility(true);
+
+    //add callback function for adding and removing points
+    itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::Pointer pointAddedCommand = itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::New();
+    pointAddedCommand->SetCallbackFunction(this, &mitk::FastMarchingTool3D::OnAddPoint);
+    m_PointSetAddObserverTag = m_SeedsAsPointSet->AddObserver( mitk::PointSetAddEvent(), pointAddedCommand);
+
+    itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::Pointer pointRemovedCommand = itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::New();
+    pointRemovedCommand->SetCallbackFunction(this, &mitk::FastMarchingTool3D::OnDelete);
+    m_PointSetRemoveObserverTag = m_SeedsAsPointSet->AddObserver( mitk::PointSetRemoveEvent(), pointRemovedCommand);
+  }
+
+  if(this->m_FastMarchingFilter.IsNotNull())
+    m_FastMarchingFilter->Modified();
 
   this->m_NeedUpdate = true;
 }

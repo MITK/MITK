@@ -37,8 +37,11 @@ public:
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
 
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
+  /**
+   * Register one factory of this type
+   * \deprecatedSince{2013_09}
+   */
+  DEPRECATED(static void RegisterOneFactory(void))
   {
     static bool IsRegistered = false;
     if ( !IsRegistered )

@@ -139,7 +139,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     mitk::TrackingDevice::Pointer ConstructTrackingDevice();
 
     /** @brief   Scans the given port for a NDI tracking device.
-      * @return  Returns the type of the device if one was found. Returns TrackingSystemNotSpecified if none was found.
+      * @return  Returns the type of the device if one was found. Returns TrackingSystemInvalid if none was found.
       */
     mitk::TrackingDeviceType ScanPort(QString port);
 

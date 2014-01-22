@@ -51,7 +51,7 @@ void UITestCase::failexc(const std::string& message, const std::exception& e,
   //      write(status, 0);
   //    } else
   //      e.printStackTrace();
-  fail(message + ": " + e.what(), lineNumber, fileName);
+  CPPUNIT_FAIL(message + ": " + e.what());
 }
 
 IWorkbenchWindow::Pointer UITestCase::OpenTestWindow()
@@ -70,7 +70,7 @@ IWorkbenchWindow::Pointer UITestCase::OpenTestWindow(
     return window;
   } catch (WorkbenchException& e)
   {
-    failmsg(e.displayText());
+    CPPUNIT_FAIL(e.displayText());
     return IWorkbenchWindow::Pointer(0);
   }
 }
@@ -126,8 +126,8 @@ void UITestCase::Trace(const std::string& msg)
 
 void UITestCase::setUp()
 {
-  Trace("----- " + this->name());
-  Trace(this->name() + ": setUp...");
+  Trace("----- " + this->getName());
+  Trace(this->getName() + ": setUp...");
   AddWindowListener();
   berry::TestCase::setUp();
 }
@@ -139,7 +139,7 @@ void UITestCase::DoSetUp()
 
 void UITestCase::tearDown()
 {
-  Trace(this->name() + ": tearDown...\n");
+  Trace(this->getName() + ": tearDown...\n");
   RemoveWindowListener();
   berry::TestCase::tearDown();
 }

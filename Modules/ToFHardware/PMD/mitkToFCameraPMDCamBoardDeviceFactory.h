@@ -25,11 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceRegistration.h>
-#include <mitkModuleContext.h>
+#include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <mitkModule.h>
-#include <mitkModuleResource.h>
-#include <mitkModuleResourceStream.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 namespace mitk
 {
@@ -45,37 +45,29 @@ class MITK_PMDMODULE_EXPORT ToFCameraPMDCamBoardDeviceFactory : public itk::Ligh
 public:
   ToFCameraPMDCamBoardDeviceFactory()
   {
-    this->m_DeviceNumber=1;
   }
   /*!
    \brief Defining the Factorie´s Name, here for the ToFPMDCamBoard.
    */
    std::string GetFactoryName()
    {
-       return std::string("PMD CamBoard Factory ");
+     return std::string("PMD CamBoard Factory");
    }
 
-    std::string GetCurrentDeviceName()
-    {
-     std::stringstream name;
-     if(m_DeviceNumber>1)
-     {
-       name << "PMD CamBoard "<< m_DeviceNumber;
-     }
-     else
-     {
-       name << "PMD CamBoard";
-     }
-     m_DeviceNumber++;
-     return name.str();
-    }
+   /**
+    * @brief GetDeviceNamePrefix Main part of the device name.
+    */
+   std::string GetDeviceNamePrefix()
+   {
+     return std::string("PMD CamBoard");
+   }
 
 private:
 
      /*!
    \brief Create an instance of a ToFPMDCamBoardDevice.
    */
-   ToFCameraDevice::Pointer createToFCameraDevice()
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
    {
      ToFCameraPMDCamBoardDevice::Pointer device = ToFCameraPMDCamBoardDevice::New();
 
@@ -86,14 +78,11 @@ private:
      return device.GetPointer();
    }
 
-   ModuleResource GetIntrinsicsResource()
+   us::ModuleResource GetIntrinsicsResource()
    {
-     Module* module = GetModuleContext()->GetModule();
+     us::Module* module = us::GetModuleContext()->GetModule();
      return module->GetResource("CalibrationFiles/PMDCamBoard_camera.xml");
    }
-
-
-   int m_DeviceNumber;
 };
 }
 #endif

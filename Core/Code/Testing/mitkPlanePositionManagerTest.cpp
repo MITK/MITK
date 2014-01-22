@@ -28,7 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "vnl/vnl_vector.h"
 #include <itkAffineGeometryFrame.h>
-#include "mitkGetModuleContext.h"
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+#include "usServiceReference.h"
 
 std::vector<mitk::PlaneGeometry::Pointer> m_Geometries;
 std::vector<unsigned int> m_SliceIndices;
@@ -39,8 +41,9 @@ mitk::PlanePositionManagerService* m_Service;
 int SetUpBeforeTest()
 {
     //Getting Service
-    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
-    m_Service = dynamic_cast<mitk::PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    us::ServiceReference<mitk::PlanePositionManagerService> serviceRef =
+        us::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+    m_Service = us::GetModuleContext()->GetService(serviceRef);
 
     if (m_Service == 0)
         return EXIT_FAILURE;
@@ -260,12 +263,14 @@ int testRemoveAll()
 
 int mitkPlanePositionManagerTest(int, char* [])
 {
-    MITK_TEST_OUTPUT(<<"Starting Test PlanePositionManager");
+    MITK_TEST_BEGIN("PlanePositionManager");
+
     SetUpBeforeTest();
     int result;
     MITK_TEST_CONDITION_REQUIRED( (result = testAddPlanePosition()) == EXIT_SUCCESS, "");
     MITK_TEST_CONDITION_REQUIRED( (result = testGetPlanePosition()) == EXIT_SUCCESS, "");
     MITK_TEST_CONDITION_REQUIRED( (result = testRemovePlanePosition()) == EXIT_SUCCESS, "");
     MITK_TEST_CONDITION_REQUIRED( (result = testRemoveAll()) == EXIT_SUCCESS, "");
-    return EXIT_SUCCESS;
+
+    MITK_TEST_END();
 }

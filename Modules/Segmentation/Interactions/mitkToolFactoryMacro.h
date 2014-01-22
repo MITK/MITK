@@ -43,13 +43,6 @@ class EXPORT_SPEC CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
        \
     /* Run-time type information (and related methods). */ \
     itkTypeMacro(CLASS_NAME ## Factory, itkObjectFactoryBase); \
- \
-    /* Register one factory of this type  */ \
-    static void RegisterOneFactory() \
-    { \
-      CLASS_NAME ## Factory::Pointer CLASS_NAME ## Factory = CLASS_NAME ## Factory::New(); \
-      itk::ObjectFactoryBase::RegisterFactory(CLASS_NAME ## Factory); \
-    } \
      \
   protected: \
  \
@@ -170,13 +163,6 @@ class EXPORT_SPEC CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
        \
     /* Run-time type information (and related methods). */ \
     itkTypeMacro(CLASS_NAME ## Factory, itkObjectFactoryBase); \
- \
-    /* Register one factory of this type  */ \
-    static void RegisterOneFactory() \
-    { \
-      CLASS_NAME ## Factory::Pointer CLASS_NAME ## Factory = CLASS_NAME ## Factory::New(); \
-      itk::ObjectFactoryBase::RegisterFactory(CLASS_NAME ## Factory); \
-    } \
      \
   protected: \
  \

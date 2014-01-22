@@ -12,37 +12,39 @@ endif(MITK_USE_MICROBIRD_TRACKER)
 
 MITK_CREATE_MODULE(MitkIGT
   SUBPROJECTS MITK-IGT
-  INCLUDE_DIRS IGTFilters IGTTrackingDevices IGTToolManagement IGTExceptionHandling
+  INCLUDE_DIRS Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  DEPENDS Mitk tinyxml SceneSerialization
+  DEPENDS Mitk ImageStatistics SceneSerialization MitkIGTBase
+  PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
+  WARNINGS_AS_ERRORS
 )
 
 if(MitkIGT_IS_ENABLED)
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/ClaronMicron.stl )
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/IntuitiveDaVinci.stl )
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAurora.stl )
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAurora_Dome.stl )
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraCompactFG_Dome.stl )
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraPlanarFG_Dome.stl )
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraTabletopFG_Dome.stl )
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIAuroraTabletopFG_Prototype_Dome.stl )
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIPolaris.stl )
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/NDIPolarisVicra.stl )
-  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/IGTTrackingDevices/TrackingVolumeData/StandardVolume.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/ClaronMicron.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/IntuitiveDaVinci.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIAurora.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIAurora_Dome.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIAuroraCompactFG_Dome.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIAuroraPlanarFG_Dome.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIAuroraTabletopFG_Dome.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIAuroraTabletopFG_Prototype_Dome.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIPolarisOldModel.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIPolarisSpectra.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIPolarisSpectraExtendedPyramid.stl )
+  MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/NDIPolarisVicra.stl )
 endif()
 
-MITK_CHECK_MODULE(_RESULT MitkIGT)
-if(_RESULT)
+if(NOT MODULE_IS_ENABLED)
   message(STATUS "IGTTutorialStep1 won't be built. Missing: ${_RESULT}")
-else(_RESULT)
+else()
 ## create IGT config
 configure_file(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
 
 # add test programm for serial communication classADD_EXECUTABLE(SerialCommunicationTest IGTTrackingDevices/mitkSerialCommunicationTest.cpp)target_link_libraries(SerialCommunicationTest mitkIGT Mitk tinyxml PocoXML)
 
-add_subdirectory(IGTTutorial)
+add_subdirectory(Tutorial)
 
 add_subdirectory(Testing)
-endif(_RESULT)
+endif()
 

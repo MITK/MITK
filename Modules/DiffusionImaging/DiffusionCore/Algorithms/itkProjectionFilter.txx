@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkProjectionFilter.h"
 
 #include "mitkProgressBar.h"
-#include <itkSignedMaurerDistanceMapImageFilter.h>
+//#include <itkSignedMaurerDistanceMapImageFilter.h>
 
 #define SEARCHSIGMA 10 /* length in linear voxel dimensions */
 #define MAXSEARCHLENGTH (3*SEARCHSIGMA)
@@ -56,16 +56,16 @@ namespace itk
     data_4d_projected->FillBuffer(0.0);
 
     Float4DImageType::SizeType size = m_AllFA->GetRequestedRegion().GetSize();
+    long s0 = size[0], s1 = size[1], s2 = size[2], s3 = size[3];
 
-    for(int t=0; t<size[3]; t++)
+    for(int t=0; t<s3; t++)
     {
-      for(int z=1; z<size[2]-1; z++)
+      for(int z=1; z<s2-1; z++)
       {
-        for(int y=1; y<size[1]-1; y++)
+        for(int y=1; y<s1-1; y++)
         {
 
-          std::cout << "x";
-          for(int x=1; x<size[0]-1; x++)
+          for(int x=1; x<s0-1; x++)
           {
 
             VectorImageType::IndexType ix;
@@ -74,12 +74,12 @@ namespace itk
             if(m_Skeleton->GetPixel(ix) != 0)
             {
               VectorImageType::PixelType dir = m_Directions->GetPixel(ix);
-              short maxvalX=0, maxvalY=0, maxvalZ=0;
 
               Float4DImageType::IndexType ix4d;
               ix4d[0]=x; ix4d[1]=y; ix4d[2]=z; ix4d[3]=t;
-              float maxval = m_AllFA->GetPixel(ix4d), maxval_weighted = maxval,
-                exponentfactor = -0.5 * (dir[0]*dir[0]+dir[1]*dir[1]+dir[2]*dir[2]) / (float)(SEARCHSIGMA*SEARCHSIGMA);
+              float maxval = m_AllFA->GetPixel(ix4d);
+              float maxval_weighted = maxval;
+              float exponentfactor = -0.5 * (dir[0]*dir[0]+dir[1]*dir[1]+dir[2]*dir[2]) / (float)(SEARCHSIGMA*SEARCHSIGMA);
 
 
               // No tubular structure here
@@ -99,7 +99,7 @@ namespace itk
                     ix3d[0] = dx; ix3d[1] = dy; ix3d[2] = dz;
 
                     if(dx<0 || dy<0 || dz<0
-                      || dx>=size[0] && dy<=size[1] && dz<=size[2])
+                      || (dx>=s0 && dy<=s1 && dz<=s2))
                     {
                       d=MAXSEARCHLENGTH;
                     }
@@ -114,9 +114,6 @@ namespace itk
                       {
                         maxval = m_AllFA->GetPixel(ix4d);
                         maxval_weighted =  maxval*distanceweight;
-                        maxvalX = dir[0]*D;
-                        maxvalY = dir[1]*D;
-                        maxvalZ = dir[2]*D;
                       }
                     }
                     else{
@@ -166,9 +163,6 @@ namespace itk
                       {
                         maxval = m_AllFA->GetPixel(ix4d);
                         maxval_weighted = maxval * distanceweight;
-                        maxvalX=dx;
-                        maxvalY=dy;
-                        maxvalZ=0;
                       }
 
 
@@ -179,6 +173,7 @@ namespace itk
               }
 
               ix4d[0]=x; ix4d[1]=y; ix4d[2]=z; ix4d[3]=t;
+
               data_4d_projected->SetPixel(ix4d, maxval);
 
             }

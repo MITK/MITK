@@ -108,7 +108,7 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
 
   float factor = 1.0;
   float distance = 0;
-  if (m_ZoomDirection == "leftright")
+  if (m_ZoomDirection == "updown")
   {
     distance = m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1];
   }
@@ -141,7 +141,7 @@ bool mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* inte
   {
     int delta = 0;
     // Scrolling direction
-    if (m_ScrollDirection == "leftright")
+    if (m_ScrollDirection == "updown")
     {
       delta = static_cast<int>(m_LastDisplayCoordinate[1] - positionEvent->GetPointerPositionOnScreen()[1]);
     }

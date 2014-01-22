@@ -60,8 +60,8 @@ void mitk::PlanarFigureSegmentationController::AddPlanarFigure( mitk::PlanarFigu
     return;
 
   bool newFigure = true;
-  int indexOfFigure = -1;
-  for( int i=0; i<m_PlanarFigureList.size(); i++ )
+  std::size_t indexOfFigure = 0;
+  for( std::size_t i=0; i<m_PlanarFigureList.size(); i++ )
   {
     if( m_PlanarFigureList.at(i) == planarFigure )
     {
@@ -78,7 +78,10 @@ void mitk::PlanarFigureSegmentationController::AddPlanarFigure( mitk::PlanarFigu
     m_PlanarFigureList.push_back( planarFigure );
     figureAsSurface = this->CreateSurfaceFromPlanarFigure( planarFigure );
     m_SurfaceList.push_back( figureAsSurface );
-    indexOfFigure = m_PlanarFigureList.size() -1 ;
+    if (!m_PlanarFigureList.empty())
+    {
+      indexOfFigure = m_PlanarFigureList.size() -1 ;
+    }
   }
   else
   {
@@ -98,8 +101,8 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
     return;
 
   bool figureFound = false;
-  int indexOfFigure = -1;
-  for( int i=0; i<m_PlanarFigureList.size(); i++ )
+  std::size_t indexOfFigure = 0;
+  for( std::size_t i=0; i<m_PlanarFigureList.size(); i++ )
   {
     if( m_PlanarFigureList.at(i) == planarFigure )
     {
@@ -167,7 +170,7 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
   if ( m_PlanarFigureList.size() == 0 )
   {
     m_SegmentationAsImage = mitk::Image::New();
-    m_SegmentationAsImage->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *m_ReferenceImage->GetTimeSlicedGeometry());
+    m_SegmentationAsImage->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *m_ReferenceImage->GetTimeGeometry());
 
     return m_SegmentationAsImage;
   }
@@ -274,7 +277,7 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
 
   // create a polygon with the points of the polyline
   polygon->GetPointIds()->SetNumberOfIds( pointCounter );
-  for(unsigned int i = 0; i < pointCounter; i++)
+  for(int i = 0; i < pointCounter; i++)
   {
     polygon->GetPointIds()->SetId(i,i);
   }
@@ -303,5 +306,3 @@ void mitk::PlanarFigureSegmentationController::InitializeFilters()
   m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
   m_DistanceImageCreator = mitk::CreateDistanceImageFromSurfaceFilter::New();
 }
-
-

@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlaneGeometry.h>
 #include <mitkDisplayGeometry.h>
 #include <mitkSlicedGeometry3D.h>
-#include <mitkTimeSlicedGeometry.h>
 
 #include <vtkLinearTransform.h>
 
@@ -179,15 +178,13 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
     displayGeometry->Map( rotationCenter, point2DWorld );
     displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
 
-    const Geometry3D *geometry3D = rotatedPlaneSNC->GetCreatedWorldGeometry();
-    const TimeSlicedGeometry *timeSlicedGeometry =
-      dynamic_cast<const TimeSlicedGeometry*>( geometry3D );
-    if ( !timeSlicedGeometry )
+    TimeGeometry *timeGeometry= rotatedPlaneSNC->GetCreatedWorldGeometry();
+    if ( !timeGeometry )
     {
       return;
     }
 
-    const_cast< TimeSlicedGeometry * >( timeSlicedGeometry )->ExecuteOperation( &op );
+    timeGeometry->ExecuteOperation( &op );
 
     displayGeometry->Map( rotationCenter, point2DWorld );
     displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
@@ -216,15 +213,13 @@ void SlicesRotator::RotateToPoint( SliceNavigationController *rotationPlaneSNC,
       displayGeometry->Map( rotationCenter, point2DWorld );
       displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
 
-      const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
-      const TimeSlicedGeometry *timeSlicedGeometry =
-        dynamic_cast<const TimeSlicedGeometry*>( geometry3D );
-      if ( !timeSlicedGeometry )
+      TimeGeometry* timeGeometry = (*iter)->GetCreatedWorldGeometry();
+      if ( !timeGeometry )
       {
         continue;
       }
 
-      const_cast< TimeSlicedGeometry * >( timeSlicedGeometry )->ExecuteOperation( &op );
+      timeGeometry->ExecuteOperation( &op );
 
       displayGeometry->Map( rotationCenter, point2DWorld );
       displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPost );
@@ -247,11 +242,10 @@ void SlicesRotator::UpdateRotatableSNCs()
 
   for (SNCVector::iterator iter = m_SliceNavigationControllers.begin(); iter != m_SliceNavigationControllers.end(); ++iter)
   {
-    const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
-    const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>( geometry3D );
-    if (!timeSlicedGeometry) continue;
+    const TimeGeometry* timeGeometry = (*iter)->GetCreatedWorldGeometry();
+    if (!timeGeometry) continue;
 
-    const SlicedGeometry3D* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>( timeSlicedGeometry->GetGeometry3D(0) );
+    const SlicedGeometry3D* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>( timeGeometry->GetGeometryForTimeStep(0).GetPointer() );
     if (!slicedGeometry) continue;
 
     if (slicedGeometry->IsValidSlice(0))
@@ -493,11 +487,10 @@ bool SlicesRotator::DoRotationStep(Action*, const StateEvent* e)
     displayGeometry->Map( m_CenterOfRotation, rotationCenter2DWorld );
     displayGeometry->WorldToDisplay( rotationCenter2DWorld, point2DDisplayPreRotation );
 
-    const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
-    const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
-    if (!timeSlicedGeometry) continue;
+    TimeGeometry* timeGeometry = (*iter)->GetCreatedWorldGeometry();
+    if (!timeGeometry) continue;
 
-    const_cast<TimeSlicedGeometry*>(timeSlicedGeometry)->ExecuteOperation(&rotationOperation);
+    timeGeometry->ExecuteOperation(&rotationOperation);
 
     displayGeometry->Map( m_CenterOfRotation, rotationCenter2DWorld );
     displayGeometry->WorldToDisplay( rotationCenter2DWorld, point2DDisplayPostRotation );

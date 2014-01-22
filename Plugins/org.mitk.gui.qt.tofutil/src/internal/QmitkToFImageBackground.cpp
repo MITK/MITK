@@ -109,7 +109,8 @@ void QmitkToFImageBackground::AddRenderWindow(vtkRenderWindow* renderWindow, int
   for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
   {
-    (*it).videoActor->SetInput((*it).videoImport->GetOutput());
+    (*it).videoImport->Update();
+    (*it).videoActor->SetInputData((*it).videoImport->GetOutput());
     (*it).videoRenderer->AddActor2D((*it).videoActor);
     (*it).videoRenderer->ResetCamera();
     (*it).videoRenderer->InteractiveOff();
@@ -242,7 +243,8 @@ void QmitkToFImageBackground::Modified()
   for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
   {
-    (*it).videoActor->SetInput((*it).videoImport->GetOutput());
+    (*it).videoImport->Update();
+    (*it).videoActor->SetInputData((*it).videoImport->GetOutput());
     (*it).videoRenderer->AddActor2D((*it).videoActor);
     (*it).videoRenderer->ResetCamera();
     (*it).videoRenderer->InteractiveOff();

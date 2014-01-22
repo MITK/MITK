@@ -16,14 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <sstream>
+#include <iomanip>
 
 #include "mitkGeometry3D.h"
 #include "mitkMatrixConvert.h"
 #include "mitkRotationOperation.h"
 #include "mitkRestorePlanePositionOperation.h"
+#include "mitkApplyTransformMatrixOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
-//#include "mitkStatusBar.h"
 
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>
@@ -91,9 +92,6 @@ void mitk::Geometry3D::Initialize()
   float b[6] = {0,1,0,1,0,1};
   SetFloatBounds(b);
 
-  m_IndexToObjectTransform = TransformType::New();
-  m_ObjectToNodeTransform = TransformType::New();
-
   if(m_IndexToWorldTransform.IsNull())
     m_IndexToWorldTransform = TransformType::New();
   else
@@ -145,7 +143,7 @@ void mitk::Geometry3D::SetFloatBounds(const float bounds[6])
   const float *input = bounds;
   int i=0;
   for(mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); i < 6 ;++i) *it++ = (mitk::ScalarType)*input++;
-  SetBoundsArray(b, m_BoundingBox);
+  SetBounds(b);
 }
 
 void mitk::Geometry3D::SetFloatBounds(const double bounds[6])
@@ -154,12 +152,31 @@ void mitk::Geometry3D::SetFloatBounds(const double bounds[6])
   const double *input = bounds;
   int i=0;
   for(mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); i < 6 ;++i) *it++ = (mitk::ScalarType)*input++;
-  SetBoundsArray(b, m_BoundingBox);
+  SetBounds(b);
 }
 
 void mitk::Geometry3D::SetParametricBounds(const BoundingBox::BoundsArrayType& bounds)
 {
-  SetBoundsArray(bounds, m_ParametricBoundingBox);
+  m_ParametricBoundingBox = BoundingBoxType::New();
+
+  BoundingBoxType::PointsContainer::Pointer pointscontainer =
+           BoundingBoxType::PointsContainer::New();
+  BoundingBoxType::PointType p;
+  BoundingBoxType::PointIdentifier pointid;
+
+  for(pointid=0; pointid<2;++pointid)
+    {
+    unsigned int i;
+    for(i=0; i<NDimensions; ++i)
+      {
+      p[i] = bounds[2*i+pointid];
+      }
+    pointscontainer->InsertElement(pointid, p);
+    }
+
+  m_ParametricBoundingBox->SetPoints(pointscontainer);
+  m_ParametricBoundingBox->ComputeBoundingBox();
+  this->Modified();
 }
 
 void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
@@ -200,7 +217,7 @@ void mitk::Geometry3D::SetIndexToWorldTransform(mitk::AffineTransform3D* transfo
 {
   if(m_IndexToWorldTransform.GetPointer() != transform)
   {
-    Superclass::SetIndexToWorldTransform(transform);
+    m_IndexToWorldTransform = transform;
     CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
     vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
     TransferItkToVtkTransform();
@@ -353,7 +370,12 @@ void mitk::Geometry3D::ExecuteOperation(Operation* operation)
       vtktransform->SetMatrix(matrix);
       break;
   }
-
+  case OpAPPLYTRANSFORMMATRIX:
+  {
+    ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast< ApplyTransformMatrixOperation* >( operation );
+    vtktransform->SetMatrix(applyMatrixOp->GetMatrix());
+    break;
+  }
   default:
     vtktransform->Delete();
     return;
@@ -540,7 +562,7 @@ void mitk::Geometry3D::SetIdentity()
   TransferItkToVtkTransform();
 }
 
-void mitk::Geometry3D::Compose( const mitk::AffineGeometryFrame3D::TransformType * other, bool pre )
+void mitk::Geometry3D::Compose( const mitk::Geometry3D::TransformType * other, bool pre )
 {
   m_IndexToWorldTransform->Compose(other, pre);
   CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
@@ -551,7 +573,7 @@ void mitk::Geometry3D::Compose( const mitk::AffineGeometryFrame3D::TransformType
 
 void mitk::Geometry3D::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
 {
-  mitk::AffineGeometryFrame3D::TransformType::Pointer itkTransform = mitk::AffineGeometryFrame3D::TransformType::New();
+  mitk::Geometry3D::TransformType::Pointer itkTransform = mitk::Geometry3D::TransformType::New();
   TransferVtkMatrixToItkTransform(vtkmatrix, itkTransform.GetPointer());
   Compose(itkTransform, pre);
 }
@@ -739,7 +761,6 @@ mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnIma
   this->SetImageGeometry(isAnImageGeometry);
 }
 
-
 bool mitk::Geometry3D::Is2DConvertable()
 {
    bool isConvertableWithoutLoss = true;
@@ -768,4 +789,185 @@ bool mitk::Geometry3D::Is2DConvertable()
    } while (0);
 
    return isConvertableWithoutLoss;
+}
+
+bool mitk::Equal( const mitk::Geometry3D::BoundingBoxType *leftHandSide, const mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose )
+{
+  bool result = true;
+  if( rightHandSide == NULL )
+  {
+    if(verbose)
+      MITK_INFO << "[( Geometry3D::BoundingBoxType )] rightHandSide NULL.";
+    return false;
+  }
+  if( leftHandSide == NULL )
+  {
+    if(verbose)
+      MITK_INFO << "[( Geometry3D::BoundingBoxType )] leftHandSide NULL.";
+    return false;
+  }
+
+  Geometry3D::BoundsArrayType rightBounds = rightHandSide->GetBounds();
+  Geometry3D::BoundsArrayType leftBounds = leftHandSide->GetBounds();
+  Geometry3D::BoundsArrayType::Iterator itLeft = leftBounds.Begin();
+  for( Geometry3D::BoundsArrayType::Iterator itRight = rightBounds.Begin(); itRight != rightBounds.End(); ++itRight)
+  {
+    if(( !mitk::Equal( *itLeft, *itRight, eps )) )
+    {
+      if(verbose)
+      {
+        MITK_INFO << "[( Geometry3D::BoundingBoxType )] bounds are not equal.";
+        MITK_INFO << "rightHandSide is " << setprecision(12) << *itRight << " : leftHandSide is " << *itLeft << " and tolerance is " << eps;
+      }
+      result = false;
+    }
+    itLeft++;
+  }
+  return result;
+}
+
+bool mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType eps, bool verbose)
+{
+  bool result = true;
+
+  if( rightHandSide == NULL )
+  {
+    if(verbose)
+      MITK_INFO << "[( Geometry3D )] rightHandSide NULL.";
+    return false;
+  }
+  if( leftHandSide == NULL)
+  {
+    if(verbose)
+      MITK_INFO << "[( Geometry3D )] leftHandSide NULL.";
+    return false;
+  }
+
+  //Compare spacings
+  if( !mitk::Equal( leftHandSide->GetSpacing(), rightHandSide->GetSpacing(), eps ) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] Spacing differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetSpacing() << " : leftHandSide is " << leftHandSide->GetSpacing() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  //Compare Origins
+  if( !mitk::Equal( leftHandSide->GetOrigin(), rightHandSide->GetOrigin(), eps ) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] Origin differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetOrigin() << " : leftHandSide is " << leftHandSide->GetOrigin() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  //Compare Axis and Extents
+  for( unsigned int i=0; i<3; ++i)
+  {
+    if( !mitk::Equal( leftHandSide->GetAxisVector(i), rightHandSide->GetAxisVector(i), eps))
+    {
+      if(verbose)
+      {
+        MITK_INFO << "[( Geometry3D )] AxisVector #" << i << " differ";
+        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetAxisVector(i) << " : leftHandSide is " << leftHandSide->GetAxisVector(i) << " and tolerance is " << eps;
+      }
+      result =  false;
+    }
+
+    if( !mitk::Equal( leftHandSide->GetExtent(i), rightHandSide->GetExtent(i), eps) )
+    {
+      if(verbose)
+      {
+        MITK_INFO << "[( Geometry3D )] Extent #" << i << " differ";
+        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetExtent(i) << " : leftHandSide is " << leftHandSide->GetExtent(i) << " and tolerance is " << eps;
+      }
+      result = false;
+    }
+  }
+
+  //Compare ImageGeometry Flag
+  if( rightHandSide->GetImageGeometry() != leftHandSide->GetImageGeometry() )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] GetImageGeometry is different.";
+      MITK_INFO << "rightHandSide is " << rightHandSide->GetImageGeometry() << " : leftHandSide is " << leftHandSide->GetImageGeometry();
+    }
+    result = false;
+  }
+
+  //Compare BoundingBoxes
+  if( !mitk::Equal( leftHandSide->GetBoundingBox(), rightHandSide->GetBoundingBox(), eps, verbose) )
+  {
+    result = false;
+  }
+
+  //Compare IndexToWorldTransform Matrix
+  if( !mitk::Equal( leftHandSide->GetIndexToWorldTransform(), rightHandSide->GetIndexToWorldTransform(), eps, verbose) )
+  {
+    result = false;
+  }
+  return result;
+}
+
+bool mitk::Equal(const Geometry3D::TransformType *leftHandSide, const Geometry3D::TransformType *rightHandSide, ScalarType eps, bool verbose )
+{
+  //Compare IndexToWorldTransform Matrix
+  if( !mitk::MatrixEqualElementWise(  leftHandSide->GetMatrix(),
+                                      rightHandSide->GetMatrix() ) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D::TransformType )] Index to World Transformation matrix differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetMatrix() << " : leftHandSide is " << leftHandSide->GetMatrix() << " and tolerance is " << eps;
+    }
+    return false;
+  }
+  return true;
+}
+
+/** Initialize the geometry */
+void
+mitk::Geometry3D::InitializeGeometry(Geometry3D* newGeometry) const
+{
+  newGeometry->SetBounds(m_BoundingBox->GetBounds());
+  // we have to create a new transform!!
+
+  if(m_IndexToWorldTransform)
+  {
+    TransformType::Pointer indexToWorldTransform = TransformType::New();
+    indexToWorldTransform->SetCenter( m_IndexToWorldTransform->GetCenter() );
+    indexToWorldTransform->SetMatrix( m_IndexToWorldTransform->GetMatrix() );
+    indexToWorldTransform->SetOffset( m_IndexToWorldTransform->GetOffset() );
+    newGeometry->SetIndexToWorldTransform(indexToWorldTransform);
+  }
+}
+
+/** Set the bounds */
+void mitk::Geometry3D::SetBounds(const BoundsArrayType& bounds)
+{
+  m_BoundingBox = BoundingBoxType::New();
+
+  BoundingBoxType::PointsContainer::Pointer pointscontainer =
+           BoundingBoxType::PointsContainer::New();
+  BoundingBoxType::PointType p;
+  BoundingBoxType::PointIdentifier pointid;
+
+  for(pointid=0; pointid<2;++pointid)
+    {
+    unsigned int i;
+    for(i=0; i<NDimensions; ++i)
+      {
+      p[i] = bounds[2*i+pointid];
+      }
+    pointscontainer->InsertElement(pointid, p);
+    }
+
+  m_BoundingBox->SetPoints(pointscontainer);
+  m_BoundingBox->ComputeBoundingBox();
+  this->Modified();
 }

@@ -22,10 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGlobalInteraction.h"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
-#include <mitkModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 
 namespace mitk {
@@ -53,13 +53,13 @@ const char** mitk::AdaptiveRegionGrowingTool::GetXPM() const
 
 const char* mitk::AdaptiveRegionGrowingTool::GetName() const
 {
-  return "RegionGrowing";
+  return "Region Growing 3D";
 }
 
-mitk::ModuleResource mitk::AdaptiveRegionGrowingTool::GetIconResource() const
+us::ModuleResource mitk::AdaptiveRegionGrowingTool::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
   return resource;
 }
 

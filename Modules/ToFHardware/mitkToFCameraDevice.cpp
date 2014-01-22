@@ -16,10 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFCameraDevice.h"
 #include <itksys/SystemTools.hxx>
 
-//Microservices
-#include <usGetModuleContext.h>
-#include "mitkModuleContext.h"
-
 namespace mitk
 {
   ToFCameraDevice::ToFCameraDevice():m_BufferSize(1),m_MaxBufferSize(100),m_CurrentPos(-1),m_FreePos(0),
@@ -42,8 +38,8 @@ namespace mitk
     this->m_ImageMutex = itk::FastMutexLock::New();
     this->m_CameraActiveMutex = itk::FastMutexLock::New();
 
-    this->m_RGBImageWidth  = this->m_CaptureWidth;
-    this->m_RGBImageHeight  = this->m_CaptureHeight;
+    this->m_RGBImageWidth = this->m_CaptureWidth;
+    this->m_RGBImageHeight = this->m_CaptureHeight;
     this->m_RGBPixelNumber = this->m_RGBImageWidth* this->m_RGBImageHeight;
   }
 
@@ -177,15 +173,13 @@ namespace mitk
     bool ok = m_CameraActive;
     m_CameraActiveMutex->Unlock();
     return ok;
-}
+  }
+
   bool ToFCameraDevice::ConnectCamera()
   {
-      // Prepare connection, fail if this fails.
-      if (! this->OnConnectCamera()) return false;
-
-      // Get Context and Module
-      mitk::ModuleContext* context = GetModuleContext();
-      return true;
+    // Prepare connection, fail if this fails.
+    if (! this->OnConnectCamera()) return false;
+    return true;
   }
 
   bool ToFCameraDevice::IsCameraConnected()

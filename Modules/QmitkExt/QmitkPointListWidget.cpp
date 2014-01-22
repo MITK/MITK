@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkEditPointDialog.h>
 
+#include <mitkPointSetDataInteractor.h>
+
 #include "btnLoad.xpm"
 #include "btnSave.xpm"
 #include "btnClear.xpm"
@@ -32,6 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "btnSetPointsManually.xpm"
 #include "btnUp.xpm"
 #include "btnDown.xpm"
+
+
+#include <mitkDataInteractor.h>
 
 
 
@@ -42,7 +47,7 @@ QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation):
   m_Snc1(NULL),
   m_Snc2(NULL),
   m_Snc3(NULL),
-  m_Interactor(NULL),
+  m_DataInteractor(NULL),
   m_TimeStep(0),
   m_EditAllowed(true),
   m_NodeObserverTag(0)
@@ -60,9 +65,8 @@ QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation):
 
 QmitkPointListWidget::~QmitkPointListWidget()
 {
-  if (m_Interactor)
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
-  m_Interactor = NULL;
+
+  m_DataInteractor = NULL;
 
   if(m_PointSetNode && m_NodeObserverTag)
   {
@@ -204,6 +208,9 @@ void QmitkPointListWidget::SetPointSet(mitk::PointSet* newPs)
 
 void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
 {
+  if (m_DataInteractor.IsNotNull())
+    m_DataInteractor->SetDataNode(newNode);
+
   ObserveNewNode(newNode);
   dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(newNode);
 }
@@ -338,22 +345,29 @@ void QmitkPointListWidget::MoveSelectedPointUp()
 
 void QmitkPointListWidget::OnBtnAddPoint(bool checked)
 {
-  if (m_PointSetNode)
+  if (m_PointSetNode.IsNotNull())
   {
     if (checked)
     {
-      m_Interactor = dynamic_cast<mitk::PointSetInteractor*>(m_PointSetNode->GetInteractor());
+      m_DataInteractor = m_PointSetNode->GetDataInteractor();
+      // If no data Interactor is present create a new one
+      if (m_DataInteractor.IsNull())
+      {
+        // Create PointSetData Interactor
+        m_DataInteractor = mitk::PointSetDataInteractor::New();
+        // Load the according state machine for regular point set interaction
+        m_DataInteractor->LoadStateMachine("PointSet.xml");
+        // Set the configuration file that defines the triggers for the transitions
+        m_DataInteractor->SetEventConfig("PointSetConfig.xml");
+        // set the DataNode (which already is added to the DataStorage
+        m_DataInteractor->SetDataNode(m_PointSetNode);
+      }
 
-      if (m_Interactor.IsNull())//if not present, instanciate one
-        m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
-
-      //add it to global interaction to activate it
-      mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
     }
-    else if ( m_Interactor )
+    else
     {
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
-      m_Interactor = NULL;
+      m_PointSetNode->SetDataInteractor(NULL);
+      m_DataInteractor=NULL;
     }
     emit EditPointSets(checked);
   }
@@ -396,33 +410,39 @@ void QmitkPointListWidget::EnableEditButton( bool enabled )
 
 void QmitkPointListWidget::ObserveNewNode( mitk::DataNode* node )
 {
+  if (m_DataInteractor.IsNotNull())
+    m_DataInteractor->SetDataNode(node);
+
   // remove old observer
   if ( m_PointSetNode )
   {
-    if (m_Interactor)
+    if (m_DataInteractor)
     {
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
-      m_Interactor = NULL;
+      m_DataInteractor = NULL;
       m_ToggleAddPoint->setChecked( false );
     }
 
-    m_PointSetNode->RemoveObserver( m_NodeObserverTag );
+    m_PointSetNode->RemoveObserver(m_NodeObserverTag);
     m_NodeObserverTag = 0;
   }
 
   m_PointSetNode = node;
-
   // add new observer if necessary
   if ( m_PointSetNode )
   {
     itk::ReceptorMemberCommand<QmitkPointListWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkPointListWidget>::New();
     command->SetCallbackFunction( this, &QmitkPointListWidget::OnNodeDeleted );
     m_NodeObserverTag = m_PointSetNode->AddObserver( itk::DeleteEvent(), command );
+
+
+
   }
   else
   {
     m_NodeObserverTag = 0;
   }
+
+
 
   if (m_EditAllowed == true)
     m_ToggleAddPoint->setEnabled( m_PointSetNode );

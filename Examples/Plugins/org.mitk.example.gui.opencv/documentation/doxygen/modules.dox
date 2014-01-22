@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_example_gui_opencv org.mitk.example.gui.opencv
+  \ingroup MITKExamplePlugins
+
+  \brief An example plug-in showing how to play a video using OpenCV.
+  
+*/
+
+/**
+  \defgroup org_mitk_example_gui_opencv_internal Internal
+  \ingroup org_mitk_example_gui_opencv
+
+  \brief This subcategory includes the internal classes of the org.mitk.example.gui.opencv plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

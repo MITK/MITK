@@ -33,8 +33,10 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
 {
+  typedef mitk::DataNode::Pointer DataNodePtr;
+
   Q_OBJECT
-  Q_PROPERTY(mitk::DataNode::Pointer SelectedNode READ GetSelectedNode WRITE SetSelectedNode)
+  Q_PROPERTY(DataNodePtr SelectedNode READ GetSelectedNode WRITE SetSelectedNode)
   Q_PROPERTY(QString currentValue READ currentValue WRITE setCurrentValue)
 
   public:

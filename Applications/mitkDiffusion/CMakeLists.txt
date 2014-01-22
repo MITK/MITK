@@ -7,9 +7,6 @@ if(MITK_SHOW_CONSOLE_WINDOW)
   list(APPEND _app_options SHOW_CONSOLE)
 endif()
 
-MITK_USE_MODULE(qtsingleapplication)
-include_directories(${ALL_INCLUDE_DIRECTORIES})
-
 # Create a cache entry for the provisioning file which is used to export
 # the file name in the MITKConfig.cmake file. This will keep external projects
 # which rely on this file happy.
@@ -48,6 +45,7 @@ set(_plugins
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.basicimageprocessing
   org.mitk.gui.qt.registration
+  org.mitk.gui.qt.properties
 )
 
 # Plug-ins listed below will not be
@@ -67,9 +65,14 @@ FunctionCreateBlueBerryApplication(
   DESCRIPTION "MITK Diffusion"
   PLUGINS ${_plugins}
   EXCLUDE_PLUGINS ${_exclude_plugins}
-  LINK_LIBRARIES ${ALL_LIBRARIES}
   ${_app_options}
 )
+mitk_use_modules(TARGET ${DIFFUSIONAPP_NAME} MODULES qtsingleapplication)
+
+# Add meta dependencies (e.g. on auto-load modules from depending modules)
+if(ALL_META_DEPENDENCIES)
+  add_dependencies(${DIFFUSIONAPP_NAME} ${ALL_META_DEPENDENCIES})
+endif()
 
 # Add a build time dependency to legacy BlueBerry bundles.
 if(MITK_MODULES_ENABLED_PLUGINS)

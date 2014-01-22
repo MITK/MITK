@@ -51,7 +51,8 @@ AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
     m_Lambda(0.0),
     m_DirectionsDuplicated(false),
     m_Delta1(0.001),
-    m_Delta2(0.001)
+    m_Delta2(0.001),
+    m_UseMrtrixBasis(false)
 {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
@@ -402,7 +403,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
         oit.Set( odf );
         oit2.Set( b0 );
         float sum = 0;
-        for (int k=0; k<odf.Size(); k++)
+        for (unsigned int k=0; k<odf.Size(); k++)
             sum += (float) odf[k];
         oit3.Set( sum-1 );
         oit4.Set(coeffPixel);
@@ -428,9 +429,9 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
     myfile.open (fname.c_str());
     myfile << "A1=[";
-    for(int i=0; i<A.rows(); i++)
+    for(unsigned int i=0; i<A.rows(); i++)
     {
-        for(int j=0; j<A.columns(); j++)
+        for(unsigned int j=0; j<A.columns(); j++)
         {
             myfile << A(i,j) << " ";
             if(j==A.columns()-1 && i!=A.rows()-1)
@@ -467,14 +468,28 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 double AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::Yj(int m, int l, double theta, double phi)
+::Yj(int m, int l, double theta, double phi, bool useMRtrixBasis)
 {
-    if (m<0)
-        return sqrt(2.0)*spherical_harmonic_r(l, -m, theta, phi);
-    else if (m==0)
-        return spherical_harmonic_r(l, m, theta, phi);
+    if (!useMRtrixBasis)
+    {
+        if (m<0)
+            return sqrt(2.0)*spherical_harmonic_r(l, -m, theta, phi);
+        else if (m==0)
+            return spherical_harmonic_r(l, m, theta, phi);
+        else
+            return pow(-1.0,m)*sqrt(2.0)*spherical_harmonic_i(l, m, theta, phi);
+    }
     else
-        return pow(-1.0,m)*sqrt(2.0)*spherical_harmonic_i(l, m, theta, phi);
+    {
+        double plm = legendre_p<double>(l,abs(m),-cos(theta));
+        double mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
+        if (m>0)
+            return mag*cos(m*phi);
+        else if (m==0)
+            return mag;
+        else
+            return mag*sin(-m*phi);
+    }
 
     return 0;
 }
@@ -617,7 +632,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
                 (*lj)[j] = k;
                 double phi = (*Q)(0,i);
                 double th = (*Q)(1,i);
-                (*B)(i,j) = Yj(m,k,th,phi);
+                (*B)(i,j) = Yj(m,k,th,phi, m_UseMrtrixBasis);
             }
         }
     }
@@ -719,7 +734,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
                 int j = (k*k + k + 2)/2 + m - 1;
                 double phi = (*U)(0,i);
                 double th = (*U)(1,i);
-                (*m_SphericalHarmonicBasisMatrix)(i,j) = Yj(m,k,th,phi);
+                (*m_SphericalHarmonicBasisMatrix)(i,j) = Yj(m,k,th,phi,m_UseMrtrixBasis);
                 (*sphericalHarmonicBasisMatrix2)(i,j) = (*m_SphericalHarmonicBasisMatrix)(i,j);
             }
         }
@@ -733,15 +748,15 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 template< class T, class TG, class TO, int L, int NODF>
 void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::SetGradientImage(const GradientDirectionContainerType *gradientDirection,
-                    const GradientImagesType *gradientImage )
+                   const GradientImagesType *gradientImage )
 {
-  // Copy Gradient Direction Container
-  this->m_GradientDirectionContainer = GradientDirectionContainerType::New();
-  for(GradientDirectionContainerType::ConstIterator it = gradientDirection->Begin();
-    it != gradientDirection->End(); it++)
-  {
-    this->m_GradientDirectionContainer->push_back(it.Value());
-  }
+    // Copy Gradient Direction Container
+    this->m_GradientDirectionContainer = GradientDirectionContainerType::New();
+    for(GradientDirectionContainerType::ConstIterator it = gradientDirection->Begin();
+        it != gradientDirection->End(); it++)
+    {
+        this->m_GradientDirectionContainer->push_back(it.Value());
+    }
 
 
     unsigned int numImages = gradientDirection->Size();

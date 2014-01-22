@@ -1,6 +1,7 @@
 if(MITK_USE_ACVD)
   MITK_CREATE_MODULE(Remeshing
-    PACKAGE_DEPENDS ACVD
+    DEPENDS Mitk
+    PACKAGE_DEPENDS ACVD VTK|vtkIOPLY+vtkIOMINC
   )
 
   add_subdirectory(Testing)

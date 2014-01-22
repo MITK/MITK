@@ -43,7 +43,7 @@ namespace mitk {
  * choose between rotation and slice selection.
  *
  * Rotation is achieved by modifying (rotating) the generated
- * TimeSlicedGeometry of the corresponding SliceNavigationController.
+ * TimeGeometry of the corresponding SliceNavigationController.
  *
  * With SlicesSwiveller, slice rotation works as follows: the user clicks onto
  * a 2D view (2D plane) and drags the mouse; the relative direction and angle

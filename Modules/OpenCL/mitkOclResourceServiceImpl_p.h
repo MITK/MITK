@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkFastMutexLock.h>
 
+US_USE_NAMESPACE
+
 //todo add docu!
 
 /** @struct OclContextCollection
@@ -130,7 +132,7 @@ public:
 };
 
 class OclResourceServiceImpl
-    : public US_BASECLASS_NAME, public OclResourceService
+    : public OclResourceService
 {
 
 private:

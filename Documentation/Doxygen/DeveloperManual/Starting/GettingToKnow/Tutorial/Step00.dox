@@ -6,7 +6,7 @@ To build the tutorials follow the \ref BuildInstructionsPage and make sure that 
 
 \image html configureCMake.PNG
 
-The tutorial source files can be found in the Examples\\Tutorial\\ subdirectory of the source tree. The tutorial executables are in the bin\\Release\\ or bin\\Debug\\ subdirectory of the binary tree after compilation.
+The tutorial source files can be found in the Examples\\Tutorial\\ subdirectory of the source tree. The tutorial executables are in the bin\\Release\\ or bin\\Debug\\ subdirectory (Windows) respectively the bin\\ subdirectory (Linux/Mac) of the binary tree after compilation (called StepX, corresponding to the tutorial step).
 
 
 

@@ -131,7 +131,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
       vtkSmartPointer<vtkPolyDataMapper> mapper =
         vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper->SetInput(sphereSource->GetOutput());
+      mapper->SetInputConnection(sphereSource->GetOutputPort());
 
       vtkSmartPointer<vtkActor> actor =
         vtkSmartPointer<vtkActor>::New();
@@ -161,8 +161,6 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
     //////////////////////Create Tubes/////////////////////////
 
-    double maxWeight = (double) this->GetInput()->GetMaximumWeight();
-
     for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
     {
 
@@ -188,7 +186,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
       lineSource->SetPoint2(tempWorldPoint[0], tempWorldPoint[1], tempWorldPoint[2] );
 
       vtkSmartPointer<vtkTubeFilter> tubes = vtkSmartPointer<vtkTubeFilter>::New();
-      tubes->SetInput( lineSource->GetOutput() );
+      tubes->SetInputConnection( lineSource->GetOutputPort() );
       tubes->SetNumberOfSides( 12 );
 
       // determine radius
@@ -203,7 +201,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
       vtkSmartPointer<vtkPolyDataMapper> mapper2 =
         vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper2->SetInput( tubes->GetOutput() );
+      mapper2->SetInputConnection( tubes->GetOutputPort() );
 
       vtkSmartPointer<vtkActor> actor =
         vtkSmartPointer<vtkActor>::New();
@@ -262,7 +260,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
     graph->SetPoints(points);
 
     vtkGraphLayout* layout = vtkGraphLayout::New();
-    layout->SetInput(graph);
+    layout->SetInputData(graph);
     vtkPassThroughLayoutStrategy* ptls = vtkPassThroughLayoutStrategy::New();
     layout->SetLayoutStrategy( ptls );
 
@@ -392,12 +390,6 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
     connectomicsRenderingEdgeRadiusParameter, renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
-}
-
-void mitk::ConnectomicsNetworkMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
-{
-  //TODO: implement
-
 }
 
 void mitk::ConnectomicsNetworkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *mapper)

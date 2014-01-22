@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
-  * \brief Generates direction independent diffusion measurement employing a scalar diffusion constant d: e^(-bd)
+  * \brief Generates constant direction independent signal.
   *
   */
 
@@ -39,6 +39,7 @@ public:
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
+    ScalarType SimulateMeasurement(unsigned int dir);
 
 protected:
 

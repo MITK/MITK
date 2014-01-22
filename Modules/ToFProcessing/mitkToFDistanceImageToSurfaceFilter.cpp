@@ -30,9 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkIdList.h>
 
 #include <math.h>
+#include <vtkMath.h>
 
 mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter() :
-  m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0)
+  m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0),
+  m_GenerateTriangularMesh(true), m_TriangulationThreshold(0.0)
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
@@ -102,6 +104,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->SetDataTypeToDouble();
   vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
+  vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkFloatArray> scalarArray = vtkSmartPointer<vtkFloatArray>::New();
   vtkSmartPointer<vtkFloatArray> textureCoords = vtkSmartPointer<vtkFloatArray>::New();
   textureCoords->SetNumberOfComponents(2);
@@ -114,7 +117,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   //for every vertex and perform a copy which is expensive.
   m_VertexIdList->Allocate(size);
   m_VertexIdList->SetNumberOfIds(size);
-  for(int i = 0; i < size; ++i)
+  for(unsigned int i = 0; i < size; ++i)
   {
     m_VertexIdList->SetId(i, 0);
   }
@@ -152,6 +155,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
 
   mitk::Point3D origin = input->GetGeometry()->GetOrigin();
+  mitk::Vector3D spacing = input->GetGeometry()->GetSpacing();
 
   for (int j=0; j<yDimension; j++)
   {
@@ -161,22 +165,28 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
       mitk::ToFProcessingCommon::ToFScalarType distance = (double)inputFloatData[pixelID];
 
+      /** Here we have to incorporate spacing and origin to allow processing of cropped/resampled images
+      * Usually origin will be [0, 0, 0] and spacing will be [1, 1, 1], but just in case the image is moved
+      * due to cropping or the spacing differes due to up- or downsampling.*/
+      unsigned int completeIndexX = i*spacing[0]+origin[0];
+      unsigned int completeIndexY = j*spacing[1]+origin[1];
+
       mitk::ToFProcessingCommon::ToFPoint3D cartesianCoordinates;
       switch (m_ReconstructionMode)
       {
       case WithOutInterPixelDistance:
       {
-        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i+origin[0],j+origin[1],distance,focalLengthInPixelUnits,principalPoint);
+        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(completeIndexX,completeIndexY,distance,focalLengthInPixelUnits,principalPoint);
         break;
       }
       case WithInterPixelDistance:
       {
-        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i+origin[0],j+origin[1],distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
+        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(completeIndexX,completeIndexY,distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
         break;
       }
       case Kinect:
       {
-        cartesianCoordinates = mitk::ToFProcessingCommon::KinectIndexToCartesianCoordinates(i+origin[0],j+origin[1],distance,focalLengthInPixelUnits,principalPoint);
+        cartesianCoordinates = mitk::ToFProcessingCommon::KinectIndexToCartesianCoordinates(completeIndexX,completeIndexY,distance,focalLengthInPixelUnits,principalPoint);
         break;
       }
       default:
@@ -199,53 +209,82 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
         //in the vertexIdList.
         m_VertexIdList->SetId(pixelID, points->InsertNextPoint(cartesianCoordinates.GetDataPointer()));
 
-        if((i >= 1) && (j >= 1))
+        if (m_GenerateTriangularMesh)
         {
-          //This little piece of art explains the ID's:
-          //
-          // P(x_1y_1)---P(xy_1)
-          // |           |
-          // |           |
-          // |           |
-          // P(x_1y)-----P(xy)
-          //
-          //We can only start triangulation if we are at vertex (1,1),
-          //because we need the other 3 vertices near this one.
-          //To go one pixel line back in the image array, we have to
-          //subtract 1x xDimension.
-          vtkIdType xy = pixelID;
-          vtkIdType x_1y = pixelID-1;
-          vtkIdType xy_1 = pixelID-xDimension;
-          vtkIdType x_1y_1 = xy_1-1;
-
-          //Find the corresponding vertex ID's in the saved vertexIdList:
-          vtkIdType xyV = m_VertexIdList->GetId(xy);
-          vtkIdType x_1yV = m_VertexIdList->GetId(x_1y);
-          vtkIdType xy_1V = m_VertexIdList->GetId(xy_1);
-          vtkIdType x_1y_1V = m_VertexIdList->GetId(x_1y_1);
-
-          if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
+          if((i >= 1) && (j >= 1))
           {
-            polys->InsertNextCell(3);
-            polys->InsertCellPoint(x_1yV);
-            polys->InsertCellPoint(xyV);
-            polys->InsertCellPoint(x_1y_1V);
+            //This little piece of art explains the ID's:
+            //
+            // P(x_1y_1)---P(xy_1)
+            // |           |
+            // |           |
+            // |           |
+            // P(x_1y)-----P(xy)
+            //
+            //We can only start triangulation if we are at vertex (1,1),
+            //because we need the other 3 vertices near this one.
+            //To go one pixel line back in the image array, we have to
+            //subtract 1x xDimension.
+            vtkIdType xy = pixelID;
+            vtkIdType x_1y = pixelID-1;
+            vtkIdType xy_1 = pixelID-xDimension;
+            vtkIdType x_1y_1 = xy_1-1;
 
-            polys->InsertNextCell(3);
-            polys->InsertCellPoint(x_1y_1V);
-            polys->InsertCellPoint(xyV);
-            polys->InsertCellPoint(xy_1V);
+            //Find the corresponding vertex ID's in the saved vertexIdList:
+            vtkIdType xyV = m_VertexIdList->GetId(xy);
+            vtkIdType x_1yV = m_VertexIdList->GetId(x_1y);
+            vtkIdType xy_1V = m_VertexIdList->GetId(xy_1);
+            vtkIdType x_1y_1V = m_VertexIdList->GetId(x_1y_1);
+
+            if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
+            {
+              double pointXY[3], pointX_1Y[3], pointXY_1[3], pointX_1Y_1[3];
+
+              points->GetPoint(xyV, pointXY);
+              points->GetPoint(x_1yV, pointX_1Y);
+              points->GetPoint(xy_1V, pointXY_1);
+              points->GetPoint(x_1y_1V, pointX_1Y_1);
+
+              if( (mitk::Equal(m_TriangulationThreshold, 0.0)) || ((vtkMath::Distance2BetweenPoints(pointXY, pointX_1Y) <= m_TriangulationThreshold)
+                                                                   && (vtkMath::Distance2BetweenPoints(pointXY, pointXY_1) <= m_TriangulationThreshold)
+                                                                   && (vtkMath::Distance2BetweenPoints(pointX_1Y, pointX_1Y_1) <= m_TriangulationThreshold)
+                                                                   && (vtkMath::Distance2BetweenPoints(pointXY_1, pointX_1Y_1) <= m_TriangulationThreshold)))
+              {
+                polys->InsertNextCell(3);
+                polys->InsertCellPoint(x_1yV);
+                polys->InsertCellPoint(xyV);
+                polys->InsertCellPoint(x_1y_1V);
+
+                polys->InsertNextCell(3);
+                polys->InsertCellPoint(x_1y_1V);
+                polys->InsertCellPoint(xyV);
+                polys->InsertCellPoint(xy_1V);
+              }
+              else
+              {
+                //We dont want triangulation, but we want to keep the vertex
+                vertices->InsertNextCell(1);
+                vertices->InsertCellPoint(xyV);
+              }
+            }
+
+            //Scalar values are necessary for mapping colors/texture onto the surface
+            if (scalarFloatData)
+            {
+              scalarArray->InsertTuple1(m_VertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
+            }
+            //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
+            float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
+            float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
+            textureCoords->InsertTuple2(m_VertexIdList->GetId(pixelID), xNorm, yNorm);
           }
         }
-        //Scalar values are necessary for mapping colors/texture onto the surface
-        if (scalarFloatData)
+        else
         {
-          scalarArray->InsertTuple1(m_VertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
+          //We dont want triangulation, we only want vertices
+          vertices->InsertNextCell(1);
+          vertices->InsertCellPoint(m_VertexIdList->GetId(pixelID));
         }
-        //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
-        float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
-        float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
-        textureCoords->InsertTuple2(m_VertexIdList->GetId(pixelID), xNorm, yNorm);
       }
     }
   }
@@ -253,6 +292,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
   mesh->SetPoints(points);
   mesh->SetPolys(polys);
+  mesh->SetVerts(vertices);
   //Pass the scalars to the polydata (if they were set).
   if (scalarArray->GetNumberOfTuples()>0)
   {
@@ -301,4 +341,12 @@ void mitk::ToFDistanceImageToSurfaceFilter::SetTextureImageWidth(int width)
 void mitk::ToFDistanceImageToSurfaceFilter::SetTextureImageHeight(int height)
 {
   this->m_TextureImageHeight = height;
+}
+
+
+void mitk::ToFDistanceImageToSurfaceFilter::SetTriangulationThreshold(double triangulationThreshold)
+{
+  //vtkMath::Distance2BetweenPoints returns the squared distance between two points and
+  //hence we square m_TriangulationThreshold in order to save run-time.
+  this->m_TriangulationThreshold = triangulationThreshold*triangulationThreshold;
 }

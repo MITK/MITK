@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryObjectTest.h"
 
-#include <CppUnit/TestSuite.h>
-#include <CppUnit/TestCaller.h>
+#include <cppunit/TestSuite.h>
+#include <cppunit/TestCaller.h>
 #include <berryObject.h>
 //#include <cstdlib>
 

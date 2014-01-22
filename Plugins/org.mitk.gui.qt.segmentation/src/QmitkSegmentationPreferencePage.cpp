@@ -56,15 +56,18 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 
   m_MainControl = new QWidget(parent);
 
+  QFormLayout *formLayout = new QFormLayout;
+  formLayout->setHorizontalSpacing(8);
+  formLayout->setVerticalSpacing(24);
+
+  m_SlimViewCheckBox = new QCheckBox("Hide tool button texts and increase icon size", m_MainControl);
+  formLayout->addRow("Slim view", m_SlimViewCheckBox);
+
   QVBoxLayout* displayOptionsLayout = new QVBoxLayout;
   m_RadioOutline = new QRadioButton( "Draw as outline", m_MainControl);
   displayOptionsLayout->addWidget( m_RadioOutline );
   m_RadioOverlay = new QRadioButton( "Draw as transparent overlay", m_MainControl);
   displayOptionsLayout->addWidget( m_RadioOverlay );
-
-  QFormLayout *formLayout = new QFormLayout;
-  formLayout->setHorizontalSpacing(8);
-  formLayout->setVerticalSpacing(24);
   formLayout->addRow( "2D display", displayOptionsLayout );
 
   m_VolumeRenderingCheckBox = new QCheckBox( "Show as volume rendering", m_MainControl );
@@ -119,6 +122,7 @@ QWidget* QmitkSegmentationPreferencePage::GetQtControl() const
 
 bool QmitkSegmentationPreferencePage::PerformOk()
 {
+  m_SegmentationPreferencesNode->PutBool("slim view", m_SlimViewCheckBox->isChecked());
   m_SegmentationPreferencesNode->PutBool("draw outline", m_RadioOutline->isChecked());
   m_SegmentationPreferencesNode->PutBool("volume rendering", m_VolumeRenderingCheckBox->isChecked());
   m_SegmentationPreferencesNode->PutBool("smoothing hint", m_SmoothingCheckBox->isChecked());
@@ -137,6 +141,9 @@ void QmitkSegmentationPreferencePage::PerformCancel()
 void QmitkSegmentationPreferencePage::Update()
 {
   //m_EnableSingleEditing->setChecked(m_SegmentationPreferencesNode->GetBool("Single click property editing", true));
+
+  m_SlimViewCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("slim view", false));
+
   if (m_SegmentationPreferencesNode->GetBool("draw outline", true) )
   {
     m_RadioOutline->setChecked( true );

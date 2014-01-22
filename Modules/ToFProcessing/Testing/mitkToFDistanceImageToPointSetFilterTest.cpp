@@ -58,9 +58,9 @@ mitk::PointSet::Pointer CreateTestPointSet()
 }
 
 // Create image with pixelValue in every pixel except for the pixels in subSet, which get successively the values of distances
-inline static mitk::Image::Pointer CreateTestImageWithPointSet(mitk::ScalarType pixelValue, unsigned int dimX, unsigned int dimY, mitk::PointSet::Pointer subSet)
+inline static mitk::Image::Pointer CreateTestImageWithPointSet(float pixelValue, unsigned int dimX, unsigned int dimY, mitk::PointSet::Pointer subSet)
 {
-  typedef itk::Image<mitk::ScalarType,2> ItkImageType2D;
+  typedef itk::Image<float,2> ItkImageType2D;
   typedef itk::ImageRegionIterator<ItkImageType2D> ItkImageRegionIteratorType2D;
 
   ItkImageType2D::Pointer image = ItkImageType2D::New();
@@ -93,7 +93,7 @@ inline static mitk::Image::Pointer CreateTestImageWithPointSet(mitk::ScalarType 
     ++imageIterator;
   }
   // distances varying from pixelValue
-  std::vector<mitk::ScalarType> distances;
+  std::vector<float> distances;
   distances.push_back(50);
   distances.push_back(500);
   distances.push_back(2050);
@@ -105,7 +105,7 @@ inline static mitk::Image::Pointer CreateTestImageWithPointSet(mitk::ScalarType 
     ItkImageType2D::IndexType index;
     index[0] = point[0];
     index[1] = point[1];
-    mitk::ScalarType distance = distances.at(i);
+    float distance = distances.at(i);
     image->SetPixel(index,distance);
   }
   mitk::Image::Pointer mitkImage = mitk::Image::New();
@@ -170,7 +170,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   filter->SetReconstructionMode(true);
   mitk::PointSet::Pointer expectedResult = mitk::PointSet::New();
   unsigned int counter = 0;
-  mitk::ImagePixelReadAccessor<mitk::ScalarType,2> imageAcces(image, image->GetSliceData(0));
+  mitk::ImagePixelReadAccessor<float,2> imageAcces(image, image->GetSliceData(0));
   for (unsigned int j=0; j<dimY; j++)
   {
     for (unsigned int i=0; i<dimX; i++)
@@ -178,7 +178,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
       itk::Index<2> index;
       index[0] = i;
       index[1] = j;
-      mitk::ScalarType distance = imageAcces.GetPixelByIndex(index);
+      float distance = imageAcces.GetPixelByIndex(index);
       mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthX,focalLengthY,principalPoint[0],principalPoint[1]);
       expectedResult->InsertPoint(counter,coordinate);
       counter++;
@@ -218,7 +218,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
       itk::Index<2> index;
       index[0] = i;
       index[1] = j;
-      mitk::ScalarType distance = imageAcces.GetPixelByIndex(index);
+      float distance = imageAcces.GetPixelByIndex(index);
       mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance,principalPoint);
       expectedResult->InsertPoint(counter,coordinate);
       counter++;
@@ -261,7 +261,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
     itk::Index<2> index;
     index[0] = point[0];
     index[1] = point[1];
-    mitk::ScalarType distance = imageAcces.GetPixelByIndex(index);
+    float distance = imageAcces.GetPixelByIndex(index);
     mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(point[0],point[1],
                                                                                       distance,focalLengthX,focalLengthY,principalPoint[0],principalPoint[1]);
     expectedResult->InsertPoint(counter,coordinate);
@@ -290,7 +290,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
     itk::Index<2> index;
     index[0] = point[0];
     index[1] = point[1];
-    mitk::ScalarType distance = imageAcces.GetPixelByIndex(index);
+    float distance = imageAcces.GetPixelByIndex(index);
     mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(point[0],point[1],
                                                                                       distance,focalLength,interPixelDistance,principalPoint);
     expectedResult->InsertPoint(counter,coordinate);

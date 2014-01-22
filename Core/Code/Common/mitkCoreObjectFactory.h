@@ -42,19 +42,33 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     virtual void RegisterExtraFactory(CoreObjectFactoryBase* factory);
     virtual void UnRegisterExtraFactory(CoreObjectFactoryBase* factory);
     static Pointer GetInstance();
+
+    ~CoreObjectFactory();
+
   protected:
+
     CoreObjectFactory();
     void MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap);
     void CreateFileExtensionsMap();
     void CreateSaveFileExtensions();
     typedef std::set<mitk::CoreObjectFactoryBase::Pointer> ExtraFactoriesContainer;
+
     ExtraFactoriesContainer m_ExtraFactories;
-    static FileWriterList m_FileWriters;
     std::string m_FileExtensions;
     MultimapType m_FileExtensionsMap;
     std::string m_SaveFileExtensions;
     MultimapType m_SaveFileExtensionsMap;
 
+    itk::ObjectFactoryBase::Pointer m_PointSetIOFactory;
+    itk::ObjectFactoryBase::Pointer m_STLFileIOFactory;
+    itk::ObjectFactoryBase::Pointer m_VtkSurfaceIOFactory;
+    itk::ObjectFactoryBase::Pointer m_VtkImageIOFactory;
+    itk::ObjectFactoryBase::Pointer m_VtiFileIOFactory;
+    itk::ObjectFactoryBase::Pointer m_ItkImageFileIOFactory;
+
+    itk::ObjectFactoryBase::Pointer m_SurfaceVtkWriterFactory;
+    itk::ObjectFactoryBase::Pointer m_PointSetWriterFactory;
+    itk::ObjectFactoryBase::Pointer m_ImageWriterFactory;
 };
 
 } // namespace mitk

@@ -48,9 +48,9 @@ namespace mitk
     enum MappingStrategy
     {
       EndElementPosition,
-      PrecomputeAndDistance,
+      EndElementPositionAvoidingWhiteMatter,
       JustEndPointVerticesNoLabel,
-      EndElementPositionAvoidingWhiteMatter
+      PrecomputeAndDistance
     };
 
     /** Standard class typedefs. */
@@ -88,6 +88,7 @@ namespace mitk
 
     itkSetMacro(MappingStrategy, MappingStrategy);
     itkSetMacro(EndPointSearchRadius, double);
+    itkSetMacro(ZeroLabelInvalid, bool);
 
     /** \brief Calculate the locations of vertices
      *
@@ -219,6 +220,13 @@ namespace mitk
 
     // search radius for finding a non white matter/background area. Should be in mm
     double m_EndPointSearchRadius;
+
+    // toggles whether a node with the label 0 may be present
+    bool m_ZeroLabelInvalid;
+
+    // used internally to communicate a connection should not be added if the a problem
+    // is encountered while adding it
+    bool m_AbortConnection;
 
     //////////////////////// IDs ////////////////////////////
 

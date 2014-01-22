@@ -237,7 +237,6 @@ const int vtkMitkOpenGLGPUVolumeRayCastMapperNumberOfTextureObjects=vtkMitkOpenG
 const int vtkMitkOpenGLGPUVolumeRayCastMapperOpacityTableSize=1024; //power of two
 
 #ifndef VTK_IMPLEMENT_MESA_CXX
-vtkCxxRevisionMacro(vtkMitkOpenGLGPUVolumeRayCastMapper, "$Revision: 1.9 $");
 vtkStandardNewMacro(vtkMitkOpenGLGPUVolumeRayCastMapper);
 #endif
 
@@ -2827,6 +2826,143 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::ReleaseGraphicsResources(
     this->OpacityTables=0;
     }
 }
+
+
+
+//-----------------------------------------------------------------------------
+// Delete OpenGL objects.
+// \post done: this->OpenGLObjectsCreated==0
+//-----------------------------------------------------------------------------
+void vtkMitkOpenGLGPUVolumeRayCastMapper::ReleaseGraphicsResources(
+  mitk::BaseRenderer * renderer)
+{
+  if(this->OpenGLObjectsCreated)
+  {
+    vtkWindow * window = renderer->GetVtkRenderer()->GetRenderWindow();
+    window->MakeCurrent();
+    this->LastSize[0]=0;
+    this->LastSize[1]=0;
+    GLuint frameBufferObject=static_cast<GLuint>(this->FrameBufferObject);
+    vtkgl::DeleteFramebuffersEXT(1,&frameBufferObject);
+    GLuint depthRenderBufferObject=
+      static_cast<GLuint>(this->DepthRenderBufferObject);
+    vtkgl::DeleteRenderbuffersEXT(1,&depthRenderBufferObject);
+    GLuint textureObjects[vtkMitkOpenGLGPUVolumeRayCastMapperNumberOfTextureObjects];
+    int i=0;
+    while(i<(vtkMitkOpenGLGPUVolumeRayCastMapperTextureObjectFrameBufferLeftFront+this->NumberOfFrameBuffers))
+      {
+      textureObjects[i]=static_cast<GLuint>(this->TextureObjects[i]);
+      ++i;
+      }
+    glDeleteTextures(vtkMitkOpenGLGPUVolumeRayCastMapperTextureObjectFrameBufferLeftFront+this->NumberOfFrameBuffers,textureObjects);
+
+    if(this->MaxValueFrameBuffer!=0)
+      {
+      GLuint maxValueFrameBuffer=
+        static_cast<GLuint>(this->MaxValueFrameBuffer);
+      glDeleteTextures(1,&maxValueFrameBuffer);
+      this->MaxValueFrameBuffer=0;
+      }
+    if(this->MaxValueFrameBuffer2!=0)
+      {
+      GLuint maxValueFrameBuffer2=
+        static_cast<GLuint>(this->MaxValueFrameBuffer2);
+      glDeleteTextures(1,&maxValueFrameBuffer2);
+      this->MaxValueFrameBuffer2=0;
+      }
+
+    GLuint programShader=static_cast<GLuint>(this->ProgramShader);
+    vtkgl::DeleteProgram(programShader);
+    this->ProgramShader=0;
+    GLuint fragmentComponentShader=
+      static_cast<GLuint>(this->FragmentComponentShader);
+    vtkgl::DeleteShader(fragmentComponentShader);
+    GLuint fragmentShadeShader=
+      static_cast<GLuint>(this->FragmentShadeShader);
+    vtkgl::DeleteShader(fragmentShadeShader);
+
+    GLuint scaleBiasProgramShader=
+      static_cast<GLuint>(this->ScaleBiasProgramShader);
+    if(scaleBiasProgramShader!=0)
+      {
+      vtkgl::DeleteProgram(scaleBiasProgramShader);
+      this->ScaleBiasProgramShader=0;
+      }
+    this->LastParallelProjection=
+      vtkMitkOpenGLGPUVolumeRayCastMapperProjectionNotInitialized;
+    this->LastRayCastMethod=
+      vtkMitkOpenGLGPUVolumeRayCastMapperMethodNotInitialized;
+    this->LastCroppingMode=
+      vtkMitkOpenGLGPUVolumeRayCastMapperCroppingNotInitialized;
+    this->LastComponent=
+      vtkMitkOpenGLGPUVolumeRayCastMapperComponentNotInitialized;
+    this->LastShade=vtkMitkOpenGLGPUVolumeRayCastMapperShadeNotInitialized;
+    this->OpenGLObjectsCreated=0;
+    }
+
+  if(this->NoiseTextureId!=0)
+    {
+    window->MakeCurrent();
+    GLuint noiseTextureObjects=static_cast<GLuint>(this->NoiseTextureId);
+    glDeleteTextures(1,&noiseTextureObjects);
+    this->NoiseTextureId=0;
+    }
+
+  if(this->ScalarsTextures!=0)
+    {
+    if(!this->ScalarsTextures->Map.empty())
+      {
+      vtkstd::map<vtkImageData *,vtkKWScalarField *>::iterator it=this->ScalarsTextures->Map.begin();
+      while(it!=this->ScalarsTextures->Map.end())
+        {
+        vtkKWScalarField *texture=(*it).second;
+        delete texture;
+        ++it;
+        }
+      this->ScalarsTextures->Map.clear();
+      }
+    }
+
+  if(this->MaskTextures!=0)
+    {
+    if(!this->MaskTextures->Map.empty())
+      {
+      vtkstd::map<vtkImageData *,vtkKWMask *>::iterator it=this->MaskTextures->Map.begin();
+      while(it!=this->MaskTextures->Map.end())
+        {
+        vtkKWMask *texture=(*it).second;
+        delete texture;
+        ++it;
+        }
+      this->MaskTextures->Map.clear();
+      }
+    }
+
+  if(this->RGBTable!=0)
+    {
+    delete this->RGBTable;
+    this->RGBTable=0;
+    }
+
+  if(this->Mask1RGBTable!=0)
+    {
+    delete this->Mask1RGBTable;
+    this->Mask1RGBTable=0;
+    }
+
+  if(this->Mask2RGBTable!=0)
+    {
+    delete this->Mask2RGBTable;
+    this->Mask2RGBTable=0;
+    }
+
+  if(this->OpacityTables!=0)
+    {
+    delete this->OpacityTables;
+    this->OpacityTables=0;
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 // Allocate memory on the GPU for the framebuffers according to the size of

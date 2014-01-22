@@ -488,7 +488,7 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
     unsigned char mask = maskIt.Get();
     unsigned char dilate = dilateIt.Get();
     unsigned char erode = erodeIt.Get();
-//baut Histogramm auf vom Leberinneren
+    //build barchart of internal of the liver
     if(mask != 0)
     {
       sumIn+=value;
@@ -496,7 +496,7 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
       histogramm[32768+(int)value]++;
       total++;
     }
-//Mittelwert der ‰uﬂeren Schicht
+    //average of the exterior layer
     if(erode != 0 && mask != 0 )
     {
       sum+=value;
@@ -505,17 +505,17 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
       if(value<_min) _min=value;
     }
 
-    //markiere Leberoberfl‰che mit -1024 und update bounding box
+    //mark the surface of the liver with -1024 and update bounding box
     if(erode == 0 && dilate != 0 )
     {
       value = -1024;
 
     }
-    else if( erode != 0 && mask != 0 )//Leberinneres, behalte Grauwert bei
+    else if( erode != 0 && mask != 0 )//Keep the gray values of internal of the liver
     {
 
     }
-    else//markiere ‰uﬂeres mit -2048
+    else//mark the exterior with -2048
     {
       value = -2048;
     }
@@ -579,8 +579,8 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
       value = m_OutOfLiverValue;
     }
     else
-    {//innerhalb der Leber
-    //Label ungleich 1 -->value auf min setzen
+    {//In the space of the liver
+    //Label unequal 1 --> set value on minimum
 /*
       if (label != 1){
         numGesetzt++;
@@ -601,7 +601,7 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
 
   }
 
-  //VVP_INFO << "gesetzt: " << numGesetzt << " --- gelassen: " << numGelassen;
+  //VVP_INFO << "set: " << numGesetzt << " --- unvaried: " << numGelassen;
 
   VVP_INFO << "OutOfLiver value: " << m_OutOfLiverValue;
   VVP_INFO << "surface value: " << m_surfaceValue;

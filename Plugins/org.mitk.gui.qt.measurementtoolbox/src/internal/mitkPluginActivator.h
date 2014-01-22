@@ -19,21 +19,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkPluginActivator.h>
 #include <mitkExportMacros.h>
 
-namespace mitk {
-
-class MITK_LOCAL PluginActivator :
-  public QObject, public ctkPluginActivator
+namespace mitk
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
+  class PluginActivator : public QObject, public ctkPluginActivator
+  {
+    Q_OBJECT
+    Q_INTERFACES(ctkPluginActivator)
 
-public:
+  public:
+    static ctkPluginContext* GetContext();
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+    void start(ctkPluginContext* context);
+    void stop(ctkPluginContext* context);
 
-}; // PluginActivator
-
+  private:
+    static ctkPluginContext* m_Context;
+  };
 }
 
-#endif // MITKPLUGINACTIVATOR_H
+#endif

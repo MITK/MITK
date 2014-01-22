@@ -16,15 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkOpenCVVideoControls.h"
 #include <QmitkVideoBackground.h>
-#include <QmitkStdMultiWidget.h>
+#include <QmitkRenderWindow.h>
 #include <mitkOpenCVVideoSource.h>
 
 QmitkOpenCVVideoControls::QmitkOpenCVVideoControls( QmitkVideoBackground* _VideoBackground
-                                                   , QmitkStdMultiWidget* _MultiWidget
+                                                   , QmitkRenderWindow* _RenderWindow
                                                    , QWidget * parent, Qt::WindowFlags f)
 : QWidget(parent, f)
 , m_VideoBackground(0)
-, m_MultiWidget(0)
+, m_RenderWindow(0)
 , m_VideoSource(0)
 , m_Controls(new Ui::QmitkOpenCVVideoControls)
 , m_SliderCurrentlyMoved(false)
@@ -33,7 +33,7 @@ QmitkOpenCVVideoControls::QmitkOpenCVVideoControls( QmitkVideoBackground* _Video
   m_Controls->FileChooser->SetFileMustExist(true);
   m_Controls->FileChooser->SetSelectDir(false);
 
-  this->SetStdMultiWidget(_MultiWidget);
+  this->SetRenderWindow(_RenderWindow);
   this->SetVideoBackground(_VideoBackground);
 }
 
@@ -130,10 +130,9 @@ void QmitkOpenCVVideoControls::on_PlayButton_clicked( bool checked/*=false*/ )
 
         // resets the whole background
         m_VideoBackground->SetTimerDelay( updateTime );
-        m_VideoBackground->AddRenderWindow( m_MultiWidget->GetRenderWindow4()->GetRenderWindow() );
+        m_VideoBackground->AddRenderWindow( m_RenderWindow->GetVtkRenderWindow() );
         this->connect( m_VideoBackground, SIGNAL(NewFrameAvailable(mitk::VideoSource*))
           , this, SLOT(NewFrameAvailable(mitk::VideoSource*)));
-        m_MultiWidget->DisableGradientBackground();
 
         m_VideoBackground->Enable();
         this->m_Controls->StopButton->setEnabled(true);
@@ -184,14 +183,12 @@ void QmitkOpenCVVideoControls::Stop()
   this->m_Controls->StopButton->setEnabled(false);
   this->SwitchPlayButton(true);
 
-  if(m_MultiWidget)
-    m_MultiWidget->EnableGradientBackground();
   if(m_VideoBackground)
   {
     m_VideoBackground->Disable();
 
-    if(m_MultiWidget)
-      m_VideoBackground->RemoveRenderWindow( m_MultiWidget->GetRenderWindow4()->GetRenderWindow() );
+    if(m_RenderWindow)
+      m_VideoBackground->RemoveRenderWindow( m_RenderWindow->GetVtkRenderWindow() );
 
     this->disconnect( m_VideoBackground, SIGNAL(NewFrameAvailable(mitk::VideoSource*))
       , this, SLOT(NewFrameAvailable(mitk::VideoSource*)));
@@ -229,39 +226,31 @@ void QmitkOpenCVVideoControls::NewFrameAvailable( mitk::VideoSource* /*videoSour
       *m_Controls->VideoProgressSlider->maximum() ) );
 }
 
-void QmitkOpenCVVideoControls::SetStdMultiWidget( QmitkStdMultiWidget* _MultiWidget )
+void QmitkOpenCVVideoControls::SetRenderWindow( QmitkRenderWindow* _RenderWindow )
 {
-  if(m_MultiWidget == _MultiWidget)
+  if(m_RenderWindow == _RenderWindow)
     return;
 
-  if(m_MultiWidget != 0)
-    this->disconnect( m_MultiWidget, SIGNAL(destroyed(QObject*))
-    , this, SLOT(QObjectDestroyed(QObject*)));
-
   // In Reset() m_MultiWidget is used, set it to 0 now for avoiding errors
-  if(_MultiWidget == 0)
-    m_MultiWidget = 0;
+  if(_RenderWindow == 0)
+    m_RenderWindow = 0;
   this->Reset();
 
-  m_MultiWidget = _MultiWidget;
+  m_RenderWindow = _RenderWindow;
 
-  if(m_MultiWidget == 0)
+  if(m_RenderWindow == 0)
   {
-    MITK_WARN << "m_MultiWidget is 0";
     this->setEnabled(false);
   }
   else
   {
     this->setEnabled(true);
-
-    this->connect( m_MultiWidget, SIGNAL(destroyed(QObject*))
-      , this, SLOT(QObjectDestroyed(QObject*)));
   }
 }
 
-QmitkStdMultiWidget* QmitkOpenCVVideoControls::GetStdMultiWidget() const
+QmitkRenderWindow* QmitkOpenCVVideoControls::GetRenderWindow() const
 {
-  return m_MultiWidget;
+  return m_RenderWindow;
 }
 
 void QmitkOpenCVVideoControls::SetVideoBackground( QmitkVideoBackground* _VideoBackground )
@@ -319,9 +308,7 @@ QmitkVideoBackground* QmitkOpenCVVideoControls::GetVideoBackground() const
 
 void QmitkOpenCVVideoControls::QObjectDestroyed( QObject * obj /*= 0 */ )
 {
-  if(m_MultiWidget == obj)
-    this->SetStdMultiWidget(0);
-  else if(m_VideoBackground == obj)
+  if(m_VideoBackground == obj)
   {
     m_VideoSource = 0;
     this->SetVideoBackground(0);

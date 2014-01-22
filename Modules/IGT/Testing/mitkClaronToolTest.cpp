@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * so that only it's friend class ClaronTrackingDevice is able to instantiate
 * tool objects. Therefore, we derive from ClaronTool and add a
 * public itkNewMacro, so that we can instantiate and test the class
+*
 */
 class ClaronToolTestClass : public mitk::ClaronTool
 {

@@ -74,10 +74,9 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::ComputeGeometry()
   m_LandmarkProjector->ProjectLandmarks(m_TargetLandmarks);
   SetPlane(m_LandmarkProjector->GetParameterPlane());
 }
-
 itk::LightObject::Pointer mitk::LandmarkProjectorBasedCurvedGeometry::InternalClone() const
 {
-  itk::LightObject::Pointer newGeometry = new LandmarkProjectorBasedCurvedGeometry(*this);
+  mitk::Geometry3D::Pointer newGeometry = new LandmarkProjectorBasedCurvedGeometry(*this);
   newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }

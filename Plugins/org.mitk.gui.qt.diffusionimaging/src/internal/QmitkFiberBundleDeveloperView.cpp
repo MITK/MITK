@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkGlobalInteraction.h>
 
-//===needed when timeSlicedGeometry is null to invoke rendering mechansims ====
+//===needed when timeGeometry is null to invoke rendering mechansims ====
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 
@@ -967,7 +967,7 @@ void QmitkFiberBundleDeveloperView::PutFibersToDataStorage( vtkSmartPointer<vtkP
                                                                                                             , mitk::BoolProperty::New(false)));
         mitk::DataStorage::SetOfObjects::ConstPointer rs = GetDataStorage()->GetSubset(pred);
         // calculate bounding geometry of these nodes
-        mitk::TimeSlicedGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
+        mitk::TimeGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
         // initialize the views to the bounding geometry
         mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 
@@ -1646,7 +1646,7 @@ void QmitkFiberBundleDeveloperView::DoMonitorFiberThreads(int checkStatus)
                                                                                                                  , mitk::BoolProperty::New(false)));
             mitk::DataStorage::SetOfObjects::ConstPointer rs = GetDataStorage()->GetSubset(pred);
             // calculate bounding geometry of these nodes
-            mitk::TimeSlicedGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
+            mitk::TimeGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(rs);
             // initialize the views to the bounding geometry
             mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
         } else {

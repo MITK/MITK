@@ -48,7 +48,7 @@ namespace mitk
   - interpolation mode either Nearestneighbor, Linear or Cubic.
   - a transform this is a convinient way to adapt the reslice axis for the case
   that the image is transformed e.g. rotated.
-  - time step the time step in a timesliced volume.
+  - time step the time step in a times volume.
   - resample by geometry wether the resampling grid corresponds to the specs of the
   worldgeometry or is directly derived from the input image
 
@@ -100,14 +100,14 @@ namespace mitk
     /** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]
     * The method uses the input of the filter to calculate the bounds.
     * It is recommended to use
-    * GetClippedPlaneBounds(const Geometry3D*, const PlaneGeometry*, vtkFloatingPointType*)
+    * GetClippedPlaneBounds(const Geometry3D*, const PlaneGeometry*, double*)
     * if you are not sure about the input.
     */
     bool GetClippedPlaneBounds(double bounds[6]);
 
     /** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]*/
     bool GetClippedPlaneBounds( const Geometry3D *boundingGeometry,
-      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
+      const PlaneGeometry *planeGeometry, double *bounds );
 
     /** \brief Get the spacing of the slice. returns mitk::ScalarType[2] */
     mitk::ScalarType* GetOutputSpacing();

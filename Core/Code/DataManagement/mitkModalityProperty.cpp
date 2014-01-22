@@ -70,5 +70,6 @@ void mitk::ModalityProperty::AddEnumerationTypes()
 itk::LightObject::Pointer mitk::ModalityProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

@@ -69,24 +69,24 @@ void PointSetDifferenceStatisticsCalculator_TwoSimplePointSetsOfSizeTwo_ResultsI
   m_myTestPointSet2->InsertPoint(1,tmpPoint);
 
   //Ground truth values (No logic in tests! Do not change values! :))
-  double mean = 1.29904; // from (sqrt(0.75)+sqrt(3))/2;
-  double variance = 0.1875; // from ((sqrt(0.75)-mean)*(sqrt(0.75)-mean)+(sqrt(3)-mean)*(sqrt(3)-mean))/2;
-  double sd = 0.433013; //from sqrt(variance);
-  double rms = 1.36931; //from sqrt(3.75/2);
-  double min = 0.866025; //from sqrt(0.75);
-  double max = 1.73205; //from sqrt(3);
-  double median = 1.29904; //from (min + max)/2;
+  const double mean = 1.299038105676658E+00; // from (sqrt(0.75)+sqrt(3))/2;
+  const double variance = 0.1875; // from ((sqrt(0.75)-mean)*(sqrt(0.75)-mean)+(sqrt(3)-mean)*(sqrt(3)-mean))/2;
+  const double sd = 4.330127018922193E-01; //from sqrt(variance);
+  const double rms = 1.369306393762915E+00; //from sqrt(3.75/2);
+  const double min = 0.86602540378444; //from sqrt(0.75);
+  const double max = 1.73205080756888; //from sqrt(3);
+  const double median = 1.29903810567666; //from (min + max)/2;
 
-m_myPointSetDifferenceStatisticsCalculator->SetPointSets( m_myTestPointSet1, m_myTestPointSet2);
+  m_myPointSetDifferenceStatisticsCalculator->SetPointSets( m_myTestPointSet1, m_myTestPointSet2);
 
   MITK_TEST_CONDITION_REQUIRED((m_myPointSetDifferenceStatisticsCalculator->GetNumberOfPoints()==m_myTestPointSet1->GetSize()),".. Testing GetNumberOfPoints");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMean(),mean),".. Testing GetMean");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetSD(),sd),".. Testing GetSD");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetVariance(),variance),".. Testing GetVariance");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetRMS(),rms),".. Testing GetRMS");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMin(),min),".. Testing GetMin");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMax(),max),".. Testing GetMax");
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMedian(),median),".. Testing GetMedian");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMean(),mean, 1E-5),".. Testing GetMean");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetSD(),sd,1E-6),".. Testing GetSD");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetVariance(),variance,1E-4),".. Testing GetVariance");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetRMS(),rms,1E-5),".. Testing GetRMS");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMin(),min,1E-6),".. Testing GetMin");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMax(),max,1E-5),".. Testing GetMax");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_myPointSetDifferenceStatisticsCalculator->GetMedian(),median,1E-5),".. Testing GetMedian");
 }
 
 void PointSetDifferenceStatisticsCalculator_PointSetsOfSameSizeWithDifferentPointIDs_ResultsInGroundTruth()

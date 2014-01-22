@@ -24,11 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceRegistration.h>
-#include <mitkModuleContext.h>
+#include <usModuleContext.h>
 #include <usGetModuleContext.h>
-#include <mitkModule.h>
-#include <mitkModuleResource.h>
-#include <mitkModuleResourceStream.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 namespace mitk
 {
@@ -42,31 +42,27 @@ namespace mitk
 
   public:
 
+    /**
+     * @brief KinectDeviceFactory Default contructor.
+     * This factory internally counts all kinect devices starting at 1.
+     */
     KinectDeviceFactory()
     {
-      this->m_DeviceNumber = 1;
     }
     /*!
-    \brief Defining the Factorie´s Name, here for the Kinect.
+    \brief Get the name of the factory, here for the Kinect.
     */
     std::string GetFactoryName()
     {
       return std::string("Kinect Factory");
     }
-    //Interating the Device name on calling the Factory
-    std::string GetCurrentDeviceName()
+
+    /**
+     * @brief GetDeviceNamePrefix Main part of a device name.
+     */
+    std::string GetDeviceNamePrefix()
     {
-      std::stringstream name;
-      if (m_DeviceNumber>1)
-      {
-        name << "Kinect " << m_DeviceNumber;
-      }
-      else
-      {
-        name << "Kinect ";
-      }
-      m_DeviceNumber++;
-      return name.str();
+      return std::string("Kinect");
     }
 
   private:
@@ -86,14 +82,18 @@ namespace mitk
       return device.GetPointer();
     }
 
-    ModuleResource GetIntrinsicsResource()
+    /**
+     * @brief GetIntrinsicsResource Get the resource of the
+     * default camera intrinsics for a kinect. If you want to
+     * use your own camera intrinsics, just overwrit the
+     * CameraIntrinsicsProperty of your device.
+     * @return A resource path to the camera .xml file.
+     */
+    us::ModuleResource GetIntrinsicsResource()
     {
-      Module* module = GetModuleContext()->GetModule();
+      us::Module* module = us::GetModuleContext()->GetModule();
       return module->GetResource("CalibrationFiles/Kinect_RGB_camera.xml");
     }
-
-    //Member variable as variable for our DeviceNumber
-    int m_DeviceNumber;
   };
 }
 #endif

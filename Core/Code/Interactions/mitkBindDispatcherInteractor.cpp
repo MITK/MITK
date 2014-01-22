@@ -19,14 +19,14 @@
 #include <string.h>
 
 // us
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleRegistry.h"
+#include "usGetModuleContext.h"
+#include "usModule.h"
+#include "usModuleRegistry.h"
 
 mitk::BindDispatcherInteractor::BindDispatcherInteractor( const std::string& rendererName ) :
     m_DataStorage(NULL)
 {
-  ModuleContext* context = ModuleRegistry::GetModule(1)->GetModuleContext();
+  us::ModuleContext* context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
   if (context == NULL)
   {
     MITK_ERROR<< "BindDispatcherInteractor() - Context could not be obtained.";
@@ -106,7 +106,7 @@ void mitk::BindDispatcherInteractor::UnRegisterDataStorageEvents()
         MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
     m_DataStorage->RemoveNodeEvent.RemoveListener(
         MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::UnRegisterInteractor));
-    m_DataStorage->ChangedNodeEvent.RemoveListener(
+    m_DataStorage->InteractorChangedNodeEvent.RemoveListener(
         MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
   }
 }

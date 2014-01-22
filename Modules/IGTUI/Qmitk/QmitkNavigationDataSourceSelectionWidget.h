@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkIGTUIExports.h"
 #include <mitkNavigationToolStorage.h>
 #include <mitkNavigationDataSource.h>
-#include <mitkServiceReference.h>
+#include <usServiceReference.h>
 //ui header
 #include "ui_QmitkNavigationDataSourceSelectionWidgetControls.h"
 
@@ -62,12 +62,16 @@ class MitkIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
     mitk::NavigationToolStorage::Pointer GetNavigationToolStorageOfSource();
 
   signals:
+    /** @brief This signal is emitted when a new navigation data source is selected.
+      * @param n Holds the new selected navigation data source. Is null if the old source is deselected and no new source is selected.
+      */
+    void NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer n);
 
 
 
   protected slots:
 
-    void NavigationDataSourceSelected(mitk::ServiceReference s);
+    void NavigationDataSourceSelected(us::ServiceReferenceU s);
 
 
   protected:

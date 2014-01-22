@@ -23,6 +23,7 @@ set(CPP_FILES
   IO/mitkPlanarFigureSubclassesSerializer.cpp
   Interactions/mitkPlanarFigureInteractor.cpp
   Rendering/mitkPlanarFigureMapper2D.cpp
+  Rendering/mitkPlanarFigureVtkMapper3D.cpp
 )
 
 set(RESOURCE_FILES

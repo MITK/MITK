@@ -36,20 +36,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 
 // MISC
-#include <fstream>
-#include <QFile>
-#include <tinyxml.h>
 #include <math.h>
 
 namespace itk{
 
 FibersFromPlanarFiguresFilter::FibersFromPlanarFiguresFilter()
-    : m_Density(1000)
+    : m_FiberDistribution(DISTRIBUTE_UNIFORM)
+    , m_Density(1000)
     , m_FiberSampling(1)
     , m_Tension(0)
     , m_Continuity(0)
     , m_Bias(0)
-    , m_FiberDistribution(DISTRIBUTE_UNIFORM)
     , m_Variance(0.1)
 {
 
@@ -93,11 +90,11 @@ void FibersFromPlanarFiguresFilter::GeneratePoints()
 void FibersFromPlanarFiguresFilter::GenerateData()
 {
     // check if enough fiducials are available
-    for (int i=0; i<m_Fiducials.size(); i++)
+    for (unsigned int i=0; i<m_Fiducials.size(); i++)
         if (m_Fiducials.at(i).size()<2)
             itkExceptionMacro("At least 2 fiducials needed per fiber bundle!");
 
-    for (int i=0; i<m_Fiducials.size(); i++)
+    for (unsigned int i=0; i<m_Fiducials.size(); i++)
     {
         vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
         vtkSmartPointer<vtkPoints> m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
@@ -122,13 +119,13 @@ void FibersFromPlanarFiguresFilter::GenerateData()
             mitk::Point2D p1 = figure->GetControlPoint(1);
             mitk::Point2D p2 = figure->GetControlPoint(2);
             mitk::Point2D p3 = figure->GetControlPoint(3);
-            float r1 = p0.EuclideanDistanceTo(p1);
-            float r2 = p0.EuclideanDistanceTo(p2);
+            double r1 = p0.EuclideanDistanceTo(p1);
+            double r2 = p0.EuclideanDistanceTo(p2);
             mitk::Vector2D eDir = p1-p0; eDir.Normalize();
             mitk::Vector2D tDir = p3-p0; tDir.Normalize();
 
             // apply twist
-            vnl_matrix_fixed<float, 2, 2> tRot;
+            vnl_matrix_fixed<double, 2, 2> tRot;
             tRot[0][0] = tDir[0];
             tRot[1][1] = tRot[0][0];
             tRot[1][0] = sin(acos(tRot[0][0]));
@@ -138,13 +135,13 @@ void FibersFromPlanarFiguresFilter::GenerateData()
             m_2DPoints[j].SetVnlVector(tRot*m_2DPoints[j].GetVnlVector());
 
             // apply new ellipse shape
-            vnl_vector_fixed< float, 2 > newP;
+            vnl_vector_fixed< double, 2 > newP;
             newP[0] = m_2DPoints.at(j)[0];
             newP[1] = m_2DPoints.at(j)[1];
-            float alpha = acos(eDir[0]);
+            double alpha = acos(eDir[0]);
             if (eDir[1]>0)
                 alpha = 2*M_PI-alpha;
-            vnl_matrix_fixed<float, 2, 2> eRot;
+            vnl_matrix_fixed<double, 2, 2> eRot;
             eRot[0][0] = cos(alpha);
             eRot[1][1] = eRot[0][0];
             eRot[1][0] = sin(alpha);
@@ -168,9 +165,9 @@ void FibersFromPlanarFiguresFilter::GenerateData()
             vtkIdType id = m_VtkPoints->InsertNextPoint(w.GetDataPointer());
             container->GetPointIds()->InsertNextId(id);
 
-            vnl_vector_fixed< float, 3 > n = planeGeo->GetNormalVnl();
+            vnl_vector_fixed< double, 3 > n = planeGeo->GetNormalVnl();
 
-            for (int k=1; k<bundle.size(); k++)
+            for (unsigned int k=1; k<bundle.size(); k++)
             {
                 figure = bundle.at(k);
                 p0 = figure->GetControlPoint(0);
@@ -202,7 +199,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
                 mitk::Geometry2D* pfgeometry = const_cast<mitk::Geometry2D*>(figure->GetGeometry2D());
                 mitk::PlaneGeometry* planeGeo = dynamic_cast<mitk::PlaneGeometry*>(pfgeometry);
                 mitk::Vector3D perp = wc-planeGeo->ProjectPointOntoPlane(wc); perp.Normalize();
-                vnl_vector_fixed< float, 3 > n2 = planeGeo->GetNormalVnl();
+                vnl_vector_fixed< double, 3 > n2 = planeGeo->GetNormalVnl();
                 wc = figure->GetWorldControlPoint(0);
 
                 // is flip needed?

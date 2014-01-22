@@ -33,14 +33,24 @@ if(BUILD_TESTING)
                        DEPENDS "${exec_target};mitkPluginGeneratorCleanTest;mitkPluginGeneratorCleanTest3"
                        LABELS "MITK;BlueBerry")
 
+  set(configure_options
+    -DMITK_DIR:PATH=${MITK_BINARY_DIR}
+    -DCMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+    -DCMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+    -G${CMAKE_GENERATOR}
+    )
+  if(MITK_USE_Qt4)
+    list(APPEND configure_options -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE})
+  endif()
+  if(CMAKE_PREFIX_PATH)
+    list(APPEND configure_options -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH})
+  endif()
+
   if(CMAKE_CONFIGURATION_TYPES)
     foreach(config ${CMAKE_CONFIGURATION_TYPES})
       add_test(NAME mitkPluginGeneratorConfigureTest-${config} CONFIGURATIONS ${config}
                WORKING_DIRECTORY "${test_project_binary_dir}"
-               COMMAND ${CMAKE_COMMAND} -D MITK_DIR:PATH=${MITK_BINARY_DIR}
-                                        -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
-                                        -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
-                                        -G ${CMAKE_GENERATOR}
+               COMMAND ${CMAKE_COMMAND} ${configure_options}
                                         "${test_project_source_dir}")
       set_tests_properties(mitkPluginGeneratorConfigureTest-${config} PROPERTIES
                            DEPENDS mitkPluginGeneratorCreateTest
@@ -55,11 +65,8 @@ if(BUILD_TESTING)
   else()
     add_test(NAME mitkPluginGeneratorConfigureTest-${CMAKE_BUILD_TYPE}
              WORKING_DIRECTORY "${test_project_binary_dir}"
-             COMMAND ${CMAKE_COMMAND} -D MITK_DIR:PATH=${MITK_BINARY_DIR}
-                                      -D CMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-                                      -D CMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
-                                      -D CMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
-                                      -G ${CMAKE_GENERATOR}
+             COMMAND ${CMAKE_COMMAND} ${configure_options}
+                                      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
                                       "${test_project_source_dir}")
     set_tests_properties(mitkPluginGeneratorConfigureTest-${CMAKE_BUILD_TYPE} PROPERTIES
                          DEPENDS mitkPluginGeneratorCreateTest
@@ -87,14 +94,14 @@ if(BUILD_TESTING)
       set_tests_properties(mitkPluginGeneratorPackageTest PROPERTIES
                            DEPENDS mitkPluginGeneratorBuildTest-Release
                            TIMEOUT 6000
-                           LABELS "MITK;BlueBerry")
+                           LABELS "MITK;BlueBerry;PACKAGE_TESTS")
     elseif(CMAKE_BUILD_TYPE)
       add_test(mitkPluginGeneratorPackageTest
                ${CMAKE_COMMAND} --build ${test_project_binary_dir}/${proj}-build --config ${CMAKE_BUILD_TYPE} --target package)
       set_tests_properties(mitkPluginGeneratorPackageTest PROPERTIES
                            DEPENDS mitkPluginGeneratorBuildTest-${CMAKE_BUILD_TYPE}
                            TIMEOUT 6000
-                           LABELS "MITK;BlueBerry")
+                           LABELS "MITK;BlueBerry;PACKAGE_TESTS")
     endif()
 
   endif()

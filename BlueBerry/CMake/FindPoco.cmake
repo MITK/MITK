@@ -42,15 +42,14 @@
 
 set(POCO_INCLUDE_PATH_DESCRIPTION "top-level directory containing the poco include directories. E.g /usr/local/include/ or c:\\poco\\include\\poco-1.3.2")
 set(POCO_INCLUDE_DIR_MESSAGE "Set the Poco_INCLUDE_DIR cmake cache entry to the ${POCO_INCLUDE_PATH_DESCRIPTION}")
-set(POCO_LIBRARY_PATH_DESCRIPTION "top-level directory containing the poco libraries.")
-set(POCO_LIBRARY_DIR_MESSAGE "Set the Poco_LIBRARY_DIR cmake cache entry to the ${POCO_LIBRARY_PATH_DESCRIPTION}")
+set(POCO_LIBRARY_PATH_DESCRIPTION "directory containing the poco libraries:")
 
 
 set(POCO_DIR_SEARCH $ENV{POCO_ROOT})
 if(POCO_DIR_SEARCH)
   file(TO_CMAKE_PATH ${POCO_DIR_SEARCH} POCO_DIR_SEARCH)
 endif(POCO_DIR_SEARCH)
-
+list(APPEND POCO_DIR_SEARCH ${Poco_DIR})
 
 if(WIN32)
   set(POCO_DIR_SEARCH
@@ -66,22 +65,18 @@ endif(WIN32)
 
 # Add in some path suffixes. These will have to be updated whenever a new Poco version comes out.
 set(SUFFIX_FOR_INCLUDE_PATH
- poco-1.3.2
+ include
 )
 
 set(SUFFIX_FOR_LIBRARY_PATH
- poco-1.3.2/lib
- poco-1.3.2/lib/Linux/i686
- poco-1.3.2/lib/Linux/x86_64
  lib
- lib/Linux/i686
- lib/Linux/x86_64
+ bin
 )
 
 #
 # Look for an installation.
 #
-find_path(Poco_INCLUDE_DIR NAMES Foundation/include/Poco/AbstractCache.h PATH_SUFFIXES ${SUFFIX_FOR_INCLUDE_PATH} PATHS
+find_path(Poco_INCLUDE_DIR NAMES Poco/Poco.h PATH_SUFFIXES ${SUFFIX_FOR_INCLUDE_PATH} PATHS
 
   # Look in other places.
   ${POCO_DIR_SEARCH}
@@ -100,56 +95,74 @@ endif(NOT Poco_INCLUDE_DIR)
 # Assume we didn't find it.
 set(Poco_FOUND 0)
 
+set(Poco_LIBRARIES )
+set(Poco_LIBRARY_DIRS )
+
 # Now try to get the include and library path.
-if(Poco_INCLUDE_DIR)
-  if(EXISTS "${Poco_INCLUDE_DIR}/Foundation")
-    set(Poco_INCLUDE_DIRS
-      ${Poco_INCLUDE_DIR}/CppUnit/include
-      ${Poco_INCLUDE_DIR}/Foundation/include
-      ${Poco_INCLUDE_DIR}/Net/include
-      ${Poco_INCLUDE_DIR}/Util/include
-      ${Poco_INCLUDE_DIR}/XML/include
-      ${Poco_INCLUDE_DIR}/Zip/include
+# Find all libraries, store debug and release separately
+foreach(lib
+    Crypto
+    Data
+    DataMySQL
+    DataSQLite
+    Foundation
+    JSON
+    MongoDB
+    Net
+    NetSSL
+    PDF
+    Util
+    XML
+    Zip
     )
-    set(Poco_FOUND 1)
-  elseif(EXISTS "${Poco_INCLUDE_DIR}/Poco/Poco.h")
-    set(Poco_INCLUDE_DIRS
-      ${Poco_INCLUDE_DIR}
+
+  # Find Release libraries
+  find_library(Poco_${lib}_LIBRARY_RELEASE
+    NAMES Poco${lib}
+    PATH_SUFFIXES ${SUFFIX_FOR_LIBRARY_PATH}
+    PATHS ${POCO_DIR_SEARCH}
+    DOC "The ${POCO_LIBRARY_PATH_DESCRIPTION} Poco${lib}"
     )
-    set(Poco_FOUND 1)
-  endif(EXISTS "${Poco_INCLUDE_DIR}/Foundation")
 
-  if(NOT Poco_LIBRARY_DIR)
-    find_library(Poco_FOUNDATION_LIB NAMES PocoFoundation PocoFoundationd  PATH_SUFFIXES ${SUFFIX_FOR_LIBRARY_PATH} PATHS
-
-      # Look in other places.
-      ${Poco_INCLUDE_DIR}
-      ${POCO_DIR_SEARCH}
-
-      # Help the user find it if we cannot.
-      DOC "The ${POCO_LIBRARY_PATH_DESCRIPTION}"
+  # Find Debug libraries
+  find_library(Poco_${lib}_LIBRARY_DEBUG
+    NAMES Poco${lib}d
+    PATH_SUFFIXES ${SUFFIX_FOR_LIBRARY_PATH}
+    PATHS ${POCO_DIR_SEARCH}
+    DOC "The ${POCO_LIBRARY_PATH_DESCRIPTION} Poco${lib}d"
     )
-    set(Poco_LIBRARY_DIR "" CACHE PATH POCO_LIBARARY_PATH_DESCRIPTION)
-    get_filename_component(Poco_LIBRARY_DIR ${Poco_FOUNDATION_LIB} PATH)
-    if(Poco_LIBRARY_DIR)
-      # Look for the poco binary path.
-      set(Poco_BINARY_DIR ${Poco_INCLUDE_DIR})
-      if(Poco_BINARY_DIR AND EXISTS "${Poco_BINARY_DIR}/bin")
-        set(Poco_BINARY_DIRS ${Poco_BINARY_DIR}/bin)
-      endif(Poco_BINARY_DIR AND EXISTS "${Poco_BINARY_DIR}/bin")
-    endif(Poco_LIBRARY_DIR)
 
-  endif(NOT Poco_LIBRARY_DIR)
+  mark_as_advanced(Poco_${lib}_LIBRARY_RELEASE)
+  mark_as_advanced(Poco_${lib}_LIBRARY_DEBUG)
 
-endif(Poco_INCLUDE_DIR)
+  # Add libraries to variable according to build type
+  set(Poco_${lib}_LIBRARY)
+  if(Poco_${lib}_LIBRARY_RELEASE)
+    list(APPEND Poco_LIBRARIES optimized ${Poco_${lib}_LIBRARY_RELEASE})
+    list(APPEND Poco_${lib}_LIBRARY optimized ${Poco_${lib}_LIBRARY_RELEASE})
+    get_filename_component(lib_dir ${Poco_${lib}_LIBRARY_RELEASE} PATH)
+    list(APPEND Poco_LIBRARY_DIRS ${lib_dir})
+  endif()
 
-if(NOT Poco_FOUND)
-  if(Poco_FIND_QUIETLY)
-    message(STATUS "Poco was not found. ${POCO_INCLUDE_DIR_MESSAGE}")
-  else(Poco_FIND_QUIETLY)
-    if(Poco_FIND_REQUIRED)
-      message(FATAL_ERROR "Poco was not found. ${POCO_INCLUDE_DIR_MESSAGE}")
-    endif(Poco_FIND_REQUIRED)
-  endif(Poco_FIND_QUIETLY)
-endif(NOT Poco_FOUND)
+  if(Poco_${lib}_LIBRARY_DEBUG)
+    list(APPEND Poco_LIBRARIES debug ${Poco_${lib}_LIBRARY_DEBUG})
+    list(APPEND Poco_${lib}_LIBRARY debug ${Poco_${lib}_LIBRARY_DEBUG})
+    get_filename_component(lib_dir ${Poco_${lib}_LIBRARY_RELEASE} PATH)
+    list(APPEND Poco_LIBRARY_DIRS ${lib_dir})
+  endif()
+
+endforeach()
+
+if(Poco_LIBRARY_DIRS)
+  list(REMOVE_DUPLICATES Poco_LIBRARY_DIRS)
+endif()
+
+set(Poco_INCLUDE_DIRS ${Poco_INCLUDE_DIR})
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(Poco DEFAULT_MSG
+  Poco_INCLUDE_DIRS
+  Poco_Foundation_LIBRARY
+  Poco_LIBRARIES
+  )
 

@@ -23,10 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageReadAccessor.h"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
-#include <mitkModuleContext.h>
+#include <usModuleResource.h>
 
 #include <itkObjectFactory.h>
 
@@ -167,10 +164,10 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
     }
   }
 
-  if (original->GetTimeSlicedGeometry() )
+  if (original->GetTimeGeometry() )
   {
-    TimeSlicedGeometry::Pointer originalGeometry = original->GetTimeSlicedGeometry()->Clone();
-    segmentation->SetGeometry( originalGeometry );
+    TimeGeometry::Pointer originalGeometry = original->GetTimeGeometry()->Clone();
+    segmentation->SetTimeGeometry( originalGeometry );
   }
   else
   {
@@ -207,18 +204,14 @@ mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const 
   return segmentationNode;
 }
 
-mitk::ModuleResource mitk::Tool::GetIconResource() const
+us::ModuleResource mitk::Tool::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
   // Each specific tool should load its own resource. This one will be invalid
-  ModuleResource resource = module->GetResource("dummy.resource");
-  return resource;
+  return us::ModuleResource();
 }
 
-mitk::ModuleResource mitk::Tool::GetCursorIconResource() const
+us::ModuleResource mitk::Tool::GetCursorIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
   // Each specific tool should load its own resource. This one will be invalid
-  ModuleResource resource = module->GetResource("dummy.resource");
-  return resource;
+  return us::ModuleResource();
 }

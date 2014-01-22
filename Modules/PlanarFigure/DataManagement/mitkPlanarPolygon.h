@@ -73,6 +73,8 @@ protected:
   PlanarPolygon();
   virtual ~PlanarPolygon();
 
+  mitkCloneMacro(Self);
+
   /** \brief Generates the poly-line representation of the planar figure. */
   virtual void GeneratePolyLine();
 

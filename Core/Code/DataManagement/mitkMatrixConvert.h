@@ -57,7 +57,9 @@ namespace mitk
         vtkmatrix->SetElement(i, j, itkTransform->GetMatrix().GetVnlMatrix().get(i, j));
     for(i=0;i<3;++i)
       vtkmatrix->SetElement(i, 3, itkTransform->GetOffset()[i]);
-    vtkmatrix->Modified();
+    for(i=0;i<3;++i)
+      vtkmatrix->SetElement(3, i, 0.0);
+    vtkmatrix->SetElement(3, 3, 1);
   }
 
   template <class TTransformType1, class TTransformType2>

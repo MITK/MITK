@@ -76,5 +76,6 @@ void mitk::LookupTableProperty::SetValue(const ValueType & value)
 itk::LightObject::Pointer mitk::LookupTableProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

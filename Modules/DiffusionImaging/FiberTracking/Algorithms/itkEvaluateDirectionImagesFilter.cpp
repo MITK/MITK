@@ -36,7 +36,7 @@ EvaluateDirectionImagesFilter< PixelType >
     m_IgnoreMissingDirections(false),
     m_Eps(0.0001)
 {
-    this->SetNumberOfOutputs(2);
+    this->SetNumberOfIndexedOutputs(2);
 }
 
 template< class PixelType >
@@ -48,14 +48,14 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
     DirectionImageContainerType::Pointer set1 = DirectionImageContainerType::New();
     DirectionImageContainerType::Pointer set2 = DirectionImageContainerType::New();
 
-    for (int i=0; i<m_ImageSet->Size(); i++)
+    for (unsigned int i=0; i<m_ImageSet->Size(); i++)
     {
         typename itk::ImageDuplicator< DirectionImageType >::Pointer duplicator = itk::ImageDuplicator< DirectionImageType >::New();
         duplicator->SetInputImage( m_ImageSet->GetElement(i) );
         duplicator->Update();
         set1->InsertElement(i, dynamic_cast<DirectionImageType*>(duplicator->GetOutput()));
     }
-    for (int i=0; i<m_ReferenceImageSet->Size(); i++)
+    for (unsigned int i=0; i<m_ReferenceImageSet->Size(); i++)
     {
         typename itk::ImageDuplicator< DirectionImageType >::Pointer duplicator = itk::ImageDuplicator< DirectionImageType >::New();
         duplicator->SetInputImage( m_ReferenceImageSet->GetElement(i) );
@@ -121,46 +121,12 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
     ImageRegionIterator< OutputImageType > oit2(outputImage2, outputImage2->GetLargestPossibleRegion());
     ImageRegionIterator< UCharImageType > mit(m_MaskImage, m_MaskImage->GetLargestPossibleRegion());
 
-    int numImages = m_ImageSet->Size();
+    int numTestImages = m_ImageSet->Size();
     int numReferenceImages = m_ReferenceImageSet->Size();
-
-    // fill missing directions with zeros
-    if (numImages>numReferenceImages)
-    {
-        DirectionType zeroDir; zeroDir.Fill(0.0);
-        for (int i=0; i<numImages-numReferenceImages; i++)
-        {
-            DirectionImageType::Pointer img = DirectionImageType::New();
-            img->SetOrigin( m_ReferenceImageSet->GetElement(0)->GetOrigin() );
-            img->SetRegions( m_ReferenceImageSet->GetElement(0)->GetLargestPossibleRegion() );
-            img->SetSpacing( m_ReferenceImageSet->GetElement(0)->GetSpacing() );
-            img->SetDirection( m_ReferenceImageSet->GetElement(0)->GetDirection() );
-            img->Allocate();
-            img->FillBuffer(zeroDir);
-            m_ReferenceImageSet->InsertElement(m_ReferenceImageSet->Size(), img);
-        }
-        numReferenceImages = numImages;
-    }
-    else if (numReferenceImages>numImages)
-    {
-        DirectionType zeroDir; zeroDir.Fill(0.0);
-        for (int i=0; i<numReferenceImages-numImages; i++)
-        {
-            DirectionImageType::Pointer img = DirectionImageType::New();
-            img->SetOrigin( m_ReferenceImageSet->GetElement(0)->GetOrigin() );
-            img->SetRegions( m_ReferenceImageSet->GetElement(0)->GetLargestPossibleRegion() );
-            img->SetSpacing( m_ReferenceImageSet->GetElement(0)->GetSpacing() );
-            img->SetDirection( m_ReferenceImageSet->GetElement(0)->GetDirection() );
-            img->Allocate();
-            img->FillBuffer(zeroDir);
-            m_ImageSet->InsertElement(m_ImageSet->Size(), img);
-        }
-        numImages = numReferenceImages;
-    }
-    int numDirections = numReferenceImages;
+    int maxNumDirections = std::max(numReferenceImages, numTestImages);
 
     // matrix containing the angular error between the directions
-    vnl_matrix< float > diffM; diffM.set_size(numDirections, numDirections);
+    vnl_matrix< float > diffM; diffM.set_size(maxNumDirections, maxNumDirections);
 
     boost::progress_display disp(outputImage->GetLargestPossibleRegion().GetSize()[0]*outputImage->GetLargestPossibleRegion().GetSize()[1]*outputImage->GetLargestPossibleRegion().GetSize()[2]);
     while( !oit.IsAtEnd() )
@@ -182,33 +148,48 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
         // get number of valid directions (length > 0)
         int numRefDirs = 0;
         int numTestDirs = 0;
-        for (int i=0; i<numDirections; i++)
+        std::vector< vnl_vector_fixed< PixelType, 3 > > testDirs;
+        std::vector< vnl_vector_fixed< PixelType, 3 > > refDirs;
+        for (int i=0; i<numReferenceImages; i++)
         {
-            if (m_ReferenceImageSet->GetElement(i)->GetPixel(index).GetVnlVector().magnitude() > m_Eps )
+            vnl_vector_fixed< PixelType, 3 > refDir = m_ReferenceImageSet->GetElement(i)->GetPixel(index).GetVnlVector();
+            if (refDir.magnitude() > m_Eps )
+            {
+                refDir.normalize();
+                refDirs.push_back(refDir);
                 numRefDirs++;
-            if (m_ImageSet->GetElement(i)->GetPixel(index).GetVnlVector().magnitude() > m_Eps )
+            }
+        }
+        for (int i=0; i<numTestImages; i++)
+        {
+            vnl_vector_fixed< PixelType, 3 > testDir = m_ImageSet->GetElement(i)->GetPixel(index).GetVnlVector();
+            if (testDir.magnitude() > m_Eps )
+            {
+                testDir.normalize();
+                testDirs.push_back(testDir);
                 numTestDirs++;
+            }
         }
 
         // i: index of reference direction
         // j: index of test direction
-        for (int i=0; i<numDirections; i++)     // for each reference direction
+        for (int i=0; i<maxNumDirections; i++)     // for each reference direction
         {
             bool missingDir = false;
-            vnl_vector_fixed< PixelType, 3 > refDir = m_ReferenceImageSet->GetElement(i)->GetPixel(index).GetVnlVector();
+            vnl_vector_fixed< PixelType, 3 > refDir;
 
             if (i<numRefDirs)  // normalize if not null
-                refDir.normalize();
+                refDir = refDirs.at(i);
             else if (m_IgnoreMissingDirections)
                 continue;
             else
                 missingDir = true;
 
-            for (int j=0; j<numDirections; j++)     // and each test direction
+            for (int j=0; j<maxNumDirections; j++)     // and each test direction
             {
-                vnl_vector_fixed< PixelType, 3 > testDir = m_ImageSet->GetElement(j)->GetPixel(index).GetVnlVector();
+                vnl_vector_fixed< PixelType, 3 > testDir;
                 if (j<numTestDirs)  // normalize if not null
-                    testDir.normalize();
+                    testDir = testDirs.at(j);
                 else if (m_IgnoreMissingDirections || missingDir)
                     continue;
                 else
@@ -236,7 +217,7 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
         float lengthError = 0.0;
         int counter = 0;
         vnl_matrix< float > diffM_copy = diffM;
-        for (int k=0; k<numDirections; k++)
+        for (int k=0; k<maxNumDirections; k++)
         {
             float error = -1;
             int a,b; a=-1; b=-1;
@@ -245,10 +226,10 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
             // i: index of reference direction
             // j: index of test direction
             // find smalles error between two directions (large value -> small error)
-            for (int i=0; i<numDirections; i++)
-                for (int j=0; j<numDirections; j++)
+            for (int i=0; i<maxNumDirections; i++)
+                for (int j=0; j<maxNumDirections; j++)
                 {
-                    if (diffM[i][j]>error && diffM[i][j]<2)   // found valid error entry
+                    if (diffM[i][j]>error && diffM[i][j]<2) // found valid error entry
                     {
                         error = diffM[i][j];
                         a = i;
@@ -263,7 +244,7 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
                     }
                 }
 
-            if (a<0 || b<0 || m_IgnoreMissingDirections && missingDir)
+            if (a<0 || b<0 || (m_IgnoreMissingDirections && missingDir))
                 continue; // no more directions found
 
             if (a>=numRefDirs && b>=numTestDirs)
@@ -295,11 +276,16 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
                     }
             }
 
-            float refLength = m_ReferenceImageSet->GetElement(a)->GetPixel(index).GetVnlVector().magnitude();
-            float testLength = m_ImageSet->GetElement(b)->GetPixel(index).GetVnlVector().magnitude();
+            float refLength = 0;
+            float testLength = 1;
 
             if (a>=numRefDirs || b>=numTestDirs || error<0)
                 error = 0;
+            else
+            {
+                refLength = m_ReferenceImageSet->GetElement(a)->GetPixel(index).GetVnlVector().magnitude();
+                testLength = m_ImageSet->GetElement(b)->GetPixel(index).GetVnlVector().magnitude();
+            }
 
             m_LengthErrorVector.push_back( fabs(refLength-testLength) );
             m_AngularErrorVector.push_back( acos(error)*180.0/M_PI );
@@ -327,7 +313,7 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
 
     std::sort( m_AngularErrorVector.begin(), m_AngularErrorVector.end() );
     m_MeanAngularError /= m_AngularErrorVector.size();      // mean
-    for (int i=0; i<m_AngularErrorVector.size(); i++)
+    for (unsigned int i=0; i<m_AngularErrorVector.size(); i++)
     {
         float temp = m_AngularErrorVector.at(i) - m_MeanAngularError;
         m_VarAngularError += temp*temp;
@@ -350,7 +336,7 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
 
     std::sort( m_LengthErrorVector.begin(), m_LengthErrorVector.end() );
     m_MeanLengthError /= m_LengthErrorVector.size();      // mean
-    for (int i=0; i<m_LengthErrorVector.size(); i++)
+    for (unsigned int i=0; i<m_LengthErrorVector.size(); i++)
     {
         float temp = m_LengthErrorVector.at(i) - m_MeanLengthError;
         m_VarLengthError += temp*temp;

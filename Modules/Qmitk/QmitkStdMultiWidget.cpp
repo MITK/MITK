@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLine.h"
 #include "mitkInteractionConst.h"
 #include "mitkDataStorage.h"
+#include "mitkOverlayManager.h"
 
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateDataType.h"
@@ -258,6 +259,12 @@ void QmitkStdMultiWidget::InitializeWidget()
   planeNode->SetColor(1.0,1.0,0.0);
   layer = mitk::IntProperty::New(1000);
   planeNode->SetProperty("layer",layer);
+
+  mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
+  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetOverlayManager(OverlayManager);
+  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetOverlayManager(OverlayManager);
+  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetOverlayManager(OverlayManager);
+  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetOverlayManager(OverlayManager);
 
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
   // Set plane mode (slicing/rotation behavior) to slicing (default)
@@ -2167,20 +2174,7 @@ void QmitkStdMultiWidget::ResetCrosshair()
 {
   if (m_DataStorage.IsNotNull())
   {
-    mitk::NodePredicateNot::Pointer pred
-    = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
-    , mitk::BoolProperty::New(false)));
-
-    mitk::NodePredicateNot::Pointer pred2
-    = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
-    , mitk::BoolProperty::New(true)));
-
-    mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSubset(pred);
-    mitk::DataStorage::SetOfObjects::ConstPointer rs2 = m_DataStorage->GetSubset(pred2);
-    // calculate bounding geometry of these nodes
-    mitk::TimeSlicedGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs, "visible");
-
-    m_RenderingManager->InitializeViews(bounds);
+    m_RenderingManager->InitializeViewsByBoundingObjects(m_DataStorage);
     //m_RenderingManager->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
     // reset interactor to normal slicing
     this->SetWidgetPlaneMode(PLANE_MODE_SLICING);

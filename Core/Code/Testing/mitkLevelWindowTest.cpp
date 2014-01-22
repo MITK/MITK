@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLevelWindow.h"
 #include <mitkImage.h>
+#include "mitkImageWriteAccessor.h"
 
 
 /*
@@ -828,7 +829,8 @@ int mitkLevelWindowTest(int, char* [])
   //image->DebugOn();
 
   image->Initialize( mitk::MakePixelType<int, int, 1>(), 3, dim);
-  int *p = (int*)image->GetData();
+  mitk::ImageWriteAccessor imAccess(image);
+  int *p = (int*)imAccess.GetData();
 
   int size = dim[0]*dim[1]*dim[2];
   int i;

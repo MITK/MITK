@@ -213,6 +213,9 @@ void QmitkOdfMaximaExtractionView::ConvertShCoeffs()
 
     switch (shOrder)
     {
+    case 2:
+        TemplatedConvertShCoeffs<2>(mitkImg);
+        break;
     case 4:
         TemplatedConvertShCoeffs<4>(mitkImg);
         break;
@@ -427,6 +430,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
         QString name(m_TensorImageNodes.at(0)->GetName().c_str());
         name += "_PrincipalDirection";
         node->SetName(name.toStdString().c_str());
+        node->SetVisibility(false);
         GetDataStorage()->Add(node);
     }
 

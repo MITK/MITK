@@ -63,7 +63,7 @@ namespace itk
     m_DirectionImage->FillBuffer(0.0);
 
 
-    for(int z=1; z<size[2]-1; z++) for(int y=1; y<size[1]-1; y++) for(int x=1; x<size[0]-1; x++)
+    for(unsigned int z=1; z<size[2]-1; z++) for(unsigned int y=1; y<size[1]-1; y++) for(unsigned int x=1; x<size[0]-1; x++)
     {
       typename InputImageType::IndexType ix;
       ix[0]=x; ix[1]=y; ix[2]=z;
@@ -159,7 +159,7 @@ namespace itk
 
 
 
-    for(int z=1; z<size[2]-1; z++) for(int y=1; y<size[1]-1; y++) for(int x=1; x<size[0]-1; x++)
+    for(unsigned int z=1; z<size[2]-1; z++) for(unsigned int y=1; y<size[1]-1; y++) for(unsigned int x=1; x<size[0]-1; x++)
     {
       VectorImageType::IndexType ix;
       ix[0]=x; ix[1]=y; ix[2]=z;
@@ -211,7 +211,7 @@ namespace itk
     outputImg->Allocate();
     outputImg->FillBuffer(0.0);
 
-    for(int z=1; z<size[2]-1; z++) for(int y=1; y<size[1]-1; y++) for(int x=1; x<size[0]-1; x++)
+    for(unsigned int z=1; z<size[2]-1; z++) for(unsigned int y=1; y<size[1]-1; y++) for(unsigned int x=1; x<size[0]-1; x++)
     {
 
       typename InputImageType::IndexType ix;
@@ -269,11 +269,11 @@ namespace itk
 
       VectorImageType::SizeType size = m_DirectionImage->GetLargestPossibleRegion().GetSize();
 
-      for(int i=0; i<size[0]; i++)
+      for(std::size_t i=0; i<size[0]; i++)
       {
-        for(int j=0; j<size[1]; j++)
+        for(std::size_t j=0; j<size[1]; j++)
         {
-          for(int k=0; k<size[2]; k++)
+          for(std::size_t k=0; k<size[2]; k++)
           {
             itk::Index<3> ix;
             ix[0] = i;

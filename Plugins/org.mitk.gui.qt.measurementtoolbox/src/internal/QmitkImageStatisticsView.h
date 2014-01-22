@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include "QmitkStepperAdapter.h"
 #include "QmitkImageStatisticsCalculationThread.h"
+#include <berryIPartListener.h>
 
 // mitk includes
 #include "mitkImageStatisticsCalculator.h"
@@ -31,13 +32,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
-       are supported: 1. Statistics of one image, 2. Statistics of an image and a segmentation, 3. Statistics
-       of an image and a Planar Figure. The statistics calculation is realized in a seperate thread to keep the
-       gui accessable during calculation.
+are supported: 1. Statistics of one image, 2. Statistics of an image and a segmentation, 3. Statistics
+of an image and a Planar Figure. The statistics calculation is realized in a seperate thread to keep the
+gui accessable during calculation.
 
 \ingroup Plugins/org.mitk.gui.qt.measurementtoolbox
 */
-class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
+class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::ILifecycleAwarePart, public berry::IPartListener
 {
   Q_OBJECT
 
@@ -75,25 +76,25 @@ public:
 
   static const std::string VIEW_ID;
 
-public slots:
+  public slots:
     /** \brief  Called when the statistics update is finished, sets the results to GUI.*/
     void OnThreadedStatisticsCalculationEnds();
 
-protected slots:
-  /** \brief  Saves the histogram to the clipboard */
-  void OnClipboardHistogramButtonClicked();
-  /** \brief  Saves the statistics to the clipboard */
-  void OnClipboardStatisticsButtonClicked();
-  /** \brief  Indicates if zeros should be excluded from statistics calculation */
-  void OnIgnoreZerosCheckboxClicked(  );
-  /** \brief Checks if update is possible and calls StatisticsUpdate() possible */
-  void RequestStatisticsUpdate();
-  /** \brief Jump to coordinates stored in the double clicked cell */
-  void JumpToCoordinates(int row, int col);
+    protected slots:
+      /** \brief  Saves the histogram to the clipboard */
+      void OnClipboardHistogramButtonClicked();
+      /** \brief  Saves the statistics to the clipboard */
+      void OnClipboardStatisticsButtonClicked();
+      /** \brief  Indicates if zeros should be excluded from statistics calculation */
+      void OnIgnoreZerosCheckboxClicked(  );
+      /** \brief Checks if update is possible and calls StatisticsUpdate() possible */
+      void RequestStatisticsUpdate();
+      /** \brief Jump to coordinates stored in the double clicked cell */
+      void JumpToCoordinates(int row, int col);
 
 signals:
-  /** \brief Method to set the data to the member and start the threaded statistics update */
-  void StatisticsUpdate();
+      /** \brief Method to set the data to the member and start the threaded statistics update */
+      void StatisticsUpdate();
 
 protected:
   /** \brief  Writes the calculated statistics to the GUI */
@@ -103,7 +104,7 @@ protected:
   void InvalidateStatisticsTableView();
 
   /** \brief Recalculate statistics for currently selected image and mask and
-   * update the GUI. */
+  * update the GUI. */
   void UpdateStatistics();
 
   /** \brief Listener for progress events to update progress bar. */
@@ -135,6 +136,15 @@ protected:
 
   void NodeRemoved(const mitk::DataNode *node);
 
+  /** \brief Is called right before the view closes (before the destructor) */
+  virtual void PartClosed( berry::IWorkbenchPartReference::Pointer );
+  /** \brief Is called from the image navigator once the time step has changed */
+  void OnTimeChanged( const itk::EventObject& );
+  /** \brief Required for berry::IPartListener */
+  virtual const char* GetClassName() const { return "QmitkImageStatisticsView"; }
+  /** \brief Required for berry::IPartListener */
+  virtual Events::Types GetPartEventTypes() const { return Events::CLOSED; }
+
   // member variables
   Ui::QmitkImageStatisticsViewControls *m_Controls;
   QmitkImageStatisticsCalculationThread* m_CalculationThread;
@@ -152,6 +162,7 @@ protected:
   long m_ImageObserverTag;
   long m_ImageMaskObserverTag;
   long m_PlanarFigureObserverTag;
+  long m_TimeObserverTag;
 
   SelectedDataNodeVectorType m_SelectedDataNodes;
 

@@ -17,6 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSliceWidget.h"
 #include "QmitkStepperAdapter.h"
 #include "mitkNodePredicateDataType.h"
+
+#include <mitkProportionalTimeGeometry.h>
+
+
 //#include "QmitkRenderWindow.h"
 //
 //#include "mitkSliceNavigationController.h"
@@ -88,14 +92,7 @@ void QmitkSliceWidget::SetDataStorage(
 
 mitk::StandaloneDataStorage* QmitkSliceWidget::GetDataStorage()
 {
-  if (m_DataStorage.IsNotNull())
-  {
-    return m_DataStorage;
-  }
-  else
-  {
-    return NULL;
-  }
+  return m_DataStorage;
 }
 
 void QmitkSliceWidget::SetData(
@@ -212,24 +209,17 @@ void QmitkSliceWidget::InitWidget(
     {
       mitk::ScalarType duration = timebounds[1] - timebounds[0];
 
-      mitk::TimeSlicedGeometry::Pointer timegeometry =
-          mitk::TimeSlicedGeometry::New();
-
-      timegeometry->InitializeEvenlyTimed(geometry.GetPointer(),
-          (unsigned int) duration);
-
-      timegeometry->SetTimeBounds(timebounds); //@bug really required? FIXME
-
       timebounds[1] = timebounds[0] + 1.0f;
       geometry->SetTimeBounds(timebounds);
-
-      geometry = timegeometry;
     }
 
-    if (const_cast<mitk::BoundingBox*> (geometry->GetBoundingBox())->GetDiagonalLength2()
+    mitk::ProportionalTimeGeometry::Pointer timeGeometry = mitk::ProportionalTimeGeometry::New();
+    timeGeometry->Initialize(geometry,1);
+
+    if (const_cast<mitk::BoundingBox*> (timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2()
         >= mitk::eps)
     {
-      controller->SetInputWorldGeometry(geometry);
+      controller->SetInputWorldTimeGeometry(timeGeometry);
       controller->Update();
     }
   }

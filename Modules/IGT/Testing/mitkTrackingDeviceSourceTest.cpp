@@ -77,9 +77,9 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
 
   //test getOutput()
   mitk::NavigationData* nd0 = mySource->GetOutput();
-  MITK_TEST_CONDITION(nd0!=NULL,"Testing GetOutput() [1]");
+  MITK_TEST_CONDITION_REQUIRED(nd0!=NULL,"Testing GetOutput() [1]");
   nd0 = mySource->GetOutput(nd0->GetName());
-  MITK_TEST_CONDITION(nd0!=NULL,"Testing GetOutput() [2]");
+  MITK_TEST_CONDITION_REQUIRED(nd0!=NULL,"Testing GetOutput() [2]");
 
   //test getOutputIndex()
   MITK_TEST_CONDITION(mySource->GetOutputIndex(nd0->GetName())==0,"Testing GetOutputIndex()");

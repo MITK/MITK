@@ -103,7 +103,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
       newPolyData->SetPoints(newPoints);
       newPolyData->BuildLinks();
 
-      this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedOutputs() + 1);
+      this->SetNumberOfIndexedOutputs(numberOfOutputs + 1);
       mitk::Surface::Pointer surface = mitk::Surface::New();
       this->SetNthOutput(numberOfOutputs, surface.GetPointer());
 

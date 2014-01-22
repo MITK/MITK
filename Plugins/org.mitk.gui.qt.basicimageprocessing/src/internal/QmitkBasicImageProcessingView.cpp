@@ -723,8 +723,11 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       }
       else
       {
-        FloatImageType::Pointer fImage = FloatImageType::New();
-        CastToItkImage( newImage, fImage );
+        ImagePTypeToFloatPTypeCasterType::Pointer floatCaster = ImagePTypeToFloatPTypeCasterType::New();
+        floatCaster->SetInput( itkImage );
+        floatCaster->Update();
+        FloatImageType::Pointer fImage = floatCaster->GetOutput();
+
         TotalVariationFilterType::Pointer TVFilter
           = TotalVariationFilterType::New();
         TVFilter->SetInput( fImage.GetPointer() );

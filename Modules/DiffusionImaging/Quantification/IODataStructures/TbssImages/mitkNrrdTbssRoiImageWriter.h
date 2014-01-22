@@ -35,7 +35,7 @@ class Quantification_EXPORT NrrdTbssRoiImageWriter : public mitk::FileWriterWith
 {
 public:
 
-    typedef itk::Image<char,3>     ImageType;
+    typedef itk::Image<unsigned char,3>     ImageType;
 
     mitkClassMacro( NrrdTbssRoiImageWriter, mitk::FileWriterWithInformation )
 
@@ -80,6 +80,7 @@ public:
      * Sets the input object for the filter.
      * @param input the diffusion volumes to write to file.
      */
+    using ProcessObject::SetInput;
     void SetInput( InputType* input );
 
     /**

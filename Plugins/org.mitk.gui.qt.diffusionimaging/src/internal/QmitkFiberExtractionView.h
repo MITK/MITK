@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkFloatArray.h>
 
 /*!
-\brief View to process fiber bundles. Supplies methods to extract fibers from the bundle, join and subtract bundles, generate images from the selected bundle and much more.
+\brief View to process fiber bundles. Supplies methods to extract fibers from the bundle, join and subtract bundles and much more.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
@@ -158,6 +158,7 @@ protected:
   itkUCharImageType::Pointer            m_PlanarFigureImage;
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
   mitk::DataNode::Pointer               m_MaskImageNode;
+  mitk::DataNode::Pointer               m_LastAddedPf;
 
   void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );

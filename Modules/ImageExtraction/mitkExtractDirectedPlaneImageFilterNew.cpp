@@ -46,13 +46,13 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
     m_ImageGeometry = inputImage->GetGeometry();
 
     //If no timestep is set, the lowest given will be selected
-    const mitk::TimeSlicedGeometry* inputTimeGeometry = this->GetInput()->GetTimeSlicedGeometry();
+    const mitk::TimeGeometry* inputTimeGeometry = this->GetInput()->GetTimeGeometry();
     if ( m_ActualInputTimestep == -1)
     {
         ScalarType time = m_CurrentWorldGeometry2D->GetTimeBounds()[0];
         if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
         {
-            m_ActualInputTimestep = inputTimeGeometry->MSToTimeStep( time );
+            m_ActualInputTimestep = inputTimeGeometry->TimePointToTimeStep( time );
         }
     }
 
@@ -184,7 +184,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     //Workaround end
 
     newSliceGeometryTest->SetOrigin(origin);
-    ScalarType bounds[6]={0, size[0], 0, size[1], 0, 1};
+    ScalarType bounds[6]={0, static_cast<ScalarType>(size[0]), 0, static_cast<ScalarType>(size[1]), 0, 1};
     newSliceGeometryTest->SetBounds(bounds);
     newSliceGeometryTest->SetSpacing(newPixelSpacing);
     newSliceGeometryTest->Modified();

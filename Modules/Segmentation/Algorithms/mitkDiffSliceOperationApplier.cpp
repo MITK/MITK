@@ -54,7 +54,7 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
     extractor->SetTimeStep( imageOperation->GetTimeStep() );
     extractor->SetWorldGeometry( dynamic_cast<Geometry2D*>(imageOperation->GetWorldGeometry()) );
     extractor->SetVtkOutputRequest(true);
-    extractor->SetResliceTransformByGeometry( imageOperation->GetImage()->GetTimeSlicedGeometry()->GetGeometry3D( imageOperation->GetTimeStep() ) );
+    extractor->SetResliceTransformByGeometry( imageOperation->GetImage()->GetGeometry( imageOperation->GetTimeStep() ) );
 
     extractor->Modified();
     extractor->Update();

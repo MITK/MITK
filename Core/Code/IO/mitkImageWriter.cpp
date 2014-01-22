@@ -111,7 +111,7 @@ static void writeVti(const char * filename, mitk::Image* image, int t=0)
 {
   vtkXMLImageDataWriter * vtkwriter = vtkXMLImageDataWriter::New();
   vtkwriter->SetFileName( filename );
-  vtkwriter->SetInput(image->GetVtkImageData(t));
+  vtkwriter->SetInputData(image->GetVtkImageData(t));
   vtkwriter->Write();
   vtkwriter->Delete();
 }
@@ -123,7 +123,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
   MITK_INFO << "Writing image: " << fileName << std::endl;
   // Pictures and picture series like .png are written via a different mechanism then volume images.
   // So, they are still multiplexed and thus not support vector images.
-  if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
+  if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos || fileName.find(".bmp") != std::string::npos)
   {
     try
     {
@@ -280,14 +280,14 @@ void mitk::ImageWriter::GenerateData()
         std::ostringstream filename;
         timeSelector->SetTimeNr(t);
         timeSelector->Update();
-        if(input->GetTimeSlicedGeometry()->IsValidTime(t))
+        if(input->GetTimeGeometry()->IsValidTimeStep(t))
         {
-          const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetGeometry3D(t)->GetTimeBounds();
+          const mitk::TimeBounds& timebounds = input->GetTimeGeometry()->GetGeometryForTimeStep(t)->GetTimeBounds();
           filename <<  m_FileNameWithoutExtension << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
         }
         else
         {
-          itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of image " << filename << ".");
+          itkWarningMacro(<<"Error on write: TimeGeometry invalid of image " << filename << ".");
           filename <<  m_FileNameWithoutExtension << "_T" << t << m_Extension;
         }
         if ( vti )
@@ -397,6 +397,8 @@ std::vector<std::string> mitk::ImageWriter::GetPossibleFileExtensions()
   possibleFileExtensions.push_back(".vtk");
   possibleFileExtensions.push_back(".vti");
   possibleFileExtensions.push_back(".hdr");
+  possibleFileExtensions.push_back(".img");
+  possibleFileExtensions.push_back(".img.gz");
   possibleFileExtensions.push_back(".png");
   possibleFileExtensions.push_back(".tif");
   possibleFileExtensions.push_back(".jpg");
@@ -432,9 +434,16 @@ const char* mitk::ImageWriter::GetDefaultFilename()
 
 const char* mitk::ImageWriter::GetFileDialogPattern()
 {
-  return "Image (*.pic, *.pic.gz, *.bmp, *.dcm, *.DCM, *.dicom, *.DICOM, *.gipl, *.gipl.gz, *.mha, "
-      "*.nii, *.nii.gz, *.nrrd, *.nhdr, *.png, *.PNG, *.spr, *.mhd, *.vtk, *.vti, *.hdr, *.png, "
-      "*.tif, *.jpg)";
+  return
+      "Nearly Raw Raster Data (*.nrrd);;"
+      "NIfTI format (*.nii *.nii.gz);;"
+      "VTK Image Data Files (*.vti);;"
+      "NRRD with detached header (*.nhdr);;"
+      "Analyze Format (*.hdr);;"
+      "MetaImage (*.mhd);;"
+      "Sets of 2D slices (*.png *.tiff *.jpg *.jpeg *.bmp);;"
+      "DICOM (*.dcm *.DCM *.dicom *.DICOM);;"
+      "UMDS GIPL Format Files (*.gipl *.gipl.gz)";
 }
 
 const char *mitk::ImageWriter::GetDefaultExtension()

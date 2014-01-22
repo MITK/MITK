@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
+#include "mitkLegacyAdaptors.h"
 
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 
@@ -195,7 +196,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     // copy point from float* to mitk::Contour
     ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Expand(timeStep + 1);
-    contourInImageIndexCoordinates->SetIsClosed(true, timeStep);
+    contourInImageIndexCoordinates->SetClosed(true, timeStep);
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
     {
@@ -220,7 +221,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     // copy point from float* to mitk::Contour
     ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Expand(timeStep + 1);
-    contourInImageIndexCoordinates->SetIsClosed(true, timeStep);
+    contourInImageIndexCoordinates->SetClosed(true, timeStep);
     Point3D newPoint;
     newPoint[0] = 0; newPoint[1] = 0; newPoint[2] = 0.0;
     contourInImageIndexCoordinates->AddVertex( newPoint, timeStep );

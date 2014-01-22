@@ -1,4 +1,5 @@
 SET(CPP_FILES
+  mitkIPythonService.cpp
   mitkPythonActivator.cpp
   mitkPythonService.cpp
   QmitkCtkPythonShell.cpp

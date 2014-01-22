@@ -65,6 +65,11 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
       return m_SelectedCameraName;
     }
 
+    /*!
+    \brief invokes the call of OnConnectCamera()
+    */
+    void ConnectCamera();
+
   signals:
 
     /*!

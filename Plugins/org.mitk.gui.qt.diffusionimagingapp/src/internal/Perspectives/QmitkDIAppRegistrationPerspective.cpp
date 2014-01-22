@@ -49,4 +49,8 @@ void QmitkDIAppRegistrationPerspective::CreateInitialLayout(berry::IPageLayout::
   left->AddView("org.mitk.views.pointbasedregistration");
   lo = layout->GetViewLayout("org.mitk.views.pointbasedregistration");
   lo->SetCloseable(false);
+
+  left->AddView("org.mitk.views.diffusionregistrationview");
+  lo = layout->GetViewLayout("org.mitk.views.diffusionregistrationview");
+  lo->SetCloseable(false);
 }

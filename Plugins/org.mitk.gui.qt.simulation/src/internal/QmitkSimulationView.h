@@ -19,8 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkSurface.h>
 #include <QmitkAbstractView.h>
+#include <QTime>
 #include <QTimer>
 #include <ui_QmitkSimulationViewControls.h>
+
+namespace mitk
+{
+  class ISimulationService;
+}
 
 class QmitkSimulationView : public QmitkAbstractView
 {
@@ -35,26 +41,27 @@ public:
 
 private slots:
   void OnAnimateButtonToggled(bool toggled);
-  void OnDTSpinBoxValueChanged(double value);
+  void OnDtChanged(double dt);
   void OnRecordButtonToggled(bool toggled);
   void OnResetButtonClicked();
-  void OnSimulationComboBoxSelectionChanged(const mitk::DataNode* node);
+  void OnSelectedSceneChanged(const mitk::DataNode* node);
   void OnSnapshotButtonClicked();
+  void OnStep(bool renderWindowUpdate);
   void OnStepButtonClicked();
-  void OnTimerTimeout();
+  void OnTimeout();
 
 private:
-  QmitkSimulationView(const QmitkSimulationView&);
-  QmitkSimulationView& operator=(const QmitkSimulationView&);
-
   void OnNodeRemovedFromDataStorage(const mitk::DataNode* node);
   bool SetSelectionAsCurrentSimulation() const;
 
+  static const int MsPerFrame = 17;
+
   Ui::QmitkSimulationViewControls m_Controls;
+  mitk::ISimulationService* m_SimulationService;
   bool m_SelectionWasRemovedFromDataStorage;
   mitk::DataNode::Pointer m_Selection;
-  mitk::Surface::Pointer m_Record;
   QTimer m_Timer;
+  QTime m_NextRenderWindowUpdate;
 };
 
 #endif

@@ -76,7 +76,7 @@ void mitk::ToolCommand::AddStepsToDo(int steps)
   mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
 }
 
-void mitk::ToolCommand::SetRemainingProgress(int steps)
+void mitk::ToolCommand::SetProgress(int steps)
 {
   mitk::ProgressBar::GetInstance()->Progress(steps);
 }

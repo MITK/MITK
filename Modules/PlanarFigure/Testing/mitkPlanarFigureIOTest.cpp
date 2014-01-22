@@ -32,6 +32,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 
+static mitk::PlanarFigure::Pointer Clone(mitk::PlanarFigure::Pointer original)
+{
+  return original->Clone();
+}
 
 /** \brief Helper class for testing PlanarFigure reader and writer classes. */
 class PlanarFigureIOTestClass
@@ -227,54 +231,30 @@ public:
 
     for ( it1 = original.begin(); it1 != original.end(); ++it1 )
     {
-      mitk::PlanarFigure::Pointer copiedFigure;
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarAngle") == 0)
-      {
-        copiedFigure    = mitk::PlanarAngle::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarCircle") == 0)
-      {
-        copiedFigure    = mitk::PlanarCircle::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarLine") == 0)
-      {
-        copiedFigure    = mitk::PlanarLine::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarPolygon") == 0)
-      {
-        copiedFigure    = mitk::PlanarPolygon::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarSubdivisionPolygon") == 0)
-      {
-        copiedFigure    = mitk::PlanarSubdivisionPolygon::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarCross") == 0)
-      {
-        copiedFigure    = mitk::PlanarCross::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarRectangle") == 0)
-      {
-        copiedFigure    = mitk::PlanarRectangle::New();
-      }
-      if(strcmp((*it1)->GetNameOfClass(), "PlanarFourPointAngle") == 0)
-      {
-        copiedFigure    = mitk::PlanarFourPointAngle::New();
-      }
+      mitk::PlanarFigure::Pointer copiedFigure = (*it1)->Clone();
 
-      copiedFigure->DeepCopy((*it1));
-      copiedPlanarFigures.push_back(copiedFigure.GetPointer());
+      copiedPlanarFigures.push_back(copiedFigure);
     }
     return copiedPlanarFigures;
   }
 
+  static PlanarFigureList CreateClonedPlanarFigures(PlanarFigureList original)
+  {
+    PlanarFigureList clonedPlanarFigures;
+    clonedPlanarFigures.resize(original.size());
+    std::transform(original.begin(), original.end(), clonedPlanarFigures.begin(), Clone);
+    return clonedPlanarFigures;
+  }
 
   static void VerifyPlanarFigures( PlanarFigureList &planarFigures1, PlanarFigureList &planarFigures2 )
   {
     PlanarFigureList::iterator it1, it2;
 
+    int i = 0;
     for ( it1 = planarFigures1.begin(); it1 != planarFigures1.end(); ++it1 )
     {
       bool planarFigureFound = false;
+      int j = 0;
       for ( it2 = planarFigures2.begin(); it2 != planarFigures2.end(); ++it2 )
       {
         // Compare PlanarFigures (returns false if different types)
@@ -282,12 +262,14 @@ public:
         {
           planarFigureFound = true;
         }
+        ++j;
       }
 
       // Test if (at least) on PlanarFigure of the first type was found in the second list
       MITK_TEST_CONDITION_REQUIRED(
           planarFigureFound,
-          "Testing if " << (*it1)->GetNameOfClass() << " has a counterpart" );
+          "Testing if " << (*it1)->GetNameOfClass() << " has a counterpart " << i );
+      ++i;
     }
   }
 
@@ -297,6 +279,11 @@ public:
     if ( strcmp( figure1->GetNameOfClass(), figure2->GetNameOfClass() ) != 0 )
     {
       return false;
+    }
+
+    if( strcmp( figure1->GetNameOfClass(), "PlanarCross" ) == 0 )
+    {
+      std::cout << "Planar Cross Found" << std::endl;
     }
 
     // Test for equal number of control points
@@ -352,7 +339,7 @@ public:
     const mitk::PlaneGeometry* planeGeometry2 = dynamic_cast<const mitk::PlaneGeometry*>(figure2->GetGeometry2D());
 
     // Test Geometry transform parameters
-    typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+    typedef mitk::Geometry3D::TransformType TransformType;
     const TransformType* affineGeometry1 = planeGeometry1->GetIndexToWorldTransform();
     const TransformType::ParametersType& parameters1 = affineGeometry1->GetParameters();
     const TransformType::ParametersType& parameters2 = planeGeometry2->GetIndexToWorldTransform()->GetParameters();
@@ -532,11 +519,17 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
   PlanarFigureIOTestClass::PlanarFigureList originalPlanarFigures =
       PlanarFigureIOTestClass::CreatePlanarFigures();
 
-  // Create a number of "deep-copied" planar figures to test the DeepCopy function
+  // Create a number of "deep-copied" planar figures to test the DeepCopy function (deprecated)
   PlanarFigureIOTestClass::PlanarFigureList copiedPlanarFigures =
       PlanarFigureIOTestClass::CreateDeepCopiedPlanarFigures(originalPlanarFigures);
 
   PlanarFigureIOTestClass::VerifyPlanarFigures(originalPlanarFigures, copiedPlanarFigures );
+
+  // Create a number of cloned planar figures to test the Clone function
+  PlanarFigureIOTestClass::PlanarFigureList clonedPlanarFigures =
+      PlanarFigureIOTestClass::CreateClonedPlanarFigures(originalPlanarFigures);
+
+  PlanarFigureIOTestClass::VerifyPlanarFigures(originalPlanarFigures, clonedPlanarFigures );
 
   // Write PlanarFigure objects into temp file
   // tmpname

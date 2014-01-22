@@ -107,7 +107,12 @@ namespace mitk {
 
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
-    void ReleaseGraphicsResources(vtkWindow *renWin);
+    /*
+    * \deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
+    */
+    DEPRECATED(void ReleaseGraphicsResources(vtkWindow *renWin));
+
+    void ReleaseGraphicsResources(mitk::BaseRenderer* renderer);
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 

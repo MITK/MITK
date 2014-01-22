@@ -17,23 +17,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkOpenCVToMitkImageFilter_h
 #define mitkOpenCVToMitkImageFilter_h
 
+// mitk includes
+#include "mitkOpenCVVideoSupportExports.h"
 #include <mitkCommon.h>
 #include <mitkImageSource.h>
+
+// itk includes
 #include <itkMacro.h>
 #include <itkImage.h>
-#include <itkRGBPixel.h>
-#include <cv.h>
 
-#include "mitkOpenCVVideoSupportExports.h"
+// OpenCV includes
+#include <cv.h>
 
 namespace mitk
 {
 
-/**
-  \brief Filter for creating MITK RGB Images from an OpenCV image
-
-  Last contributor: $Author: mueller $
-*/
+///
+/// \brief Filter for creating MITK RGB Images from an OpenCV image
+///
 class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
 {
   public:
@@ -42,17 +43,30 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
     typedef itk::RGBPixel< float > FloatRGBPixelType;
     typedef itk::RGBPixel< double > DoubleRGBPixelType;
 
+    ///
+    /// the static function for the conversion
+    /// WARNING: copyBuffer is deprecated, data will always be copied
+    ///
     template <typename TPixel, unsigned int VImageDimension>
-    static mitk::Image::Pointer ConvertIplToMitkImage( const IplImage * input, bool copyBuffer = true );
+    static Image::Pointer ConvertIplToMitkImage( const IplImage * input, bool copyBuffer=true );
 
     mitkClassMacro(OpenCVToMitkImageFilter, ImageSource);
     itkNewMacro(OpenCVToMitkImageFilter);
 
+    ///
+    /// sets an iplimage as input
+    ///
     void SetOpenCVImage(const IplImage* image);
     itkGetMacro(OpenCVImage, const IplImage*);
 
-    itkSetMacro(CopyBuffer, bool);
-    itkGetMacro(CopyBuffer, bool);
+    ///
+    /// sets an opencv mat as input (will be used if OpenCVImage Ipl image is 0)
+    ///
+    void SetOpenCVMat(const cv::Mat& image);
+    itkGetMacro(OpenCVMat, cv::Mat);
+
+    DEPRECATED( void SetCopyBuffer( bool ); );
+    DEPRECATED( bool GetCopyBuffer(); );
 
     OutputImageType* GetOutput(void);
 
@@ -64,13 +78,11 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
     virtual void GenerateData();
 
 protected:
-    mitk::Image::Pointer m_Image;
+    Image::Pointer m_Image;
     const IplImage* m_OpenCVImage;
-    bool m_CopyBuffer;
+    cv::Mat m_OpenCVMat;
 };
 
-} // namespace
+} // namespace mitk
 
 #endif // mitkOpenCVToMitkImageFilter_h
-
-

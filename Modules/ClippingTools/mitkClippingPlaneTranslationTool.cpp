@@ -17,9 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClippingPlaneTranslationTool.xpm"
 
 #include "mitkBaseRenderer.h"
-#include "mitkGlobalInteraction.h"
 #include "mitkRenderingManager.h"
 #include "mitkToolManager.h"
+
+// us
+#include "usModule.h"
+#include "usModuleContext.h"
+#include "usGetModuleContext.h"
+#include "usModuleRegistry.h"
 
 namespace mitk
 {
@@ -29,6 +34,7 @@ namespace mitk
 mitk::ClippingPlaneTranslationTool::ClippingPlaneTranslationTool()
 : Tool( "global" )
 {
+  m_AffineDataInteractor = mitk::AffineDataInteractor3D::New();
 }
 
 mitk::ClippingPlaneTranslationTool::~ClippingPlaneTranslationTool()
@@ -52,32 +58,22 @@ const char* mitk::ClippingPlaneTranslationTool::GetGroup() const
 
 void mitk::ClippingPlaneTranslationTool::Activated()
 {
-  Superclass::Activated();
+    Superclass::Activated();
 
-  //check if the Clipping plane is changed.
-  if(m_ClippingPlaneNode != m_ToolManager->GetWorkingData(0))
-  {
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_AffineInteractor);
-    this->ClippingPlaneChanged();
-  }
+    //check if the Clipping plane is changed.
+    if(m_ClippingPlaneNode != m_ToolManager->GetWorkingData(0))
+    {
+      m_ClippingPlaneNode = m_ToolManager->GetWorkingData(0);
+      m_ClippingPlaneNode->SetDataInteractor(NULL);
+    }
 
-  m_AffineInteractor->SetInteractionModeToTranslation();
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_AffineInteractor);
+    m_AffineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+    m_AffineDataInteractor->SetEventConfig("AffineTranslationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+    m_AffineDataInteractor->SetDataNode(m_ClippingPlaneNode);
 }
 
 void mitk::ClippingPlaneTranslationTool::Deactivated()
 {
   Superclass::Deactivated();
-
-  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_AffineInteractor);
-}
-
-//Checks the working data node, if it has an interactor. Otherwise initial a new one.
-void mitk::ClippingPlaneTranslationTool::ClippingPlaneChanged()
-{
-  m_ClippingPlaneNode = m_ToolManager->GetWorkingData(0);
-  m_AffineInteractor = dynamic_cast<mitk::AffineInteractor3D*>(m_ClippingPlaneNode->GetInteractor());
-
-  if (m_AffineInteractor.IsNull())
-    m_AffineInteractor = mitk::AffineInteractor3D::New("AffineInteractor3D", m_ClippingPlaneNode);
+  m_AffineDataInteractor->SetDataNode(NULL);
 }

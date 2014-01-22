@@ -44,6 +44,8 @@ set(INTERNAL_CPP_FILES
   QmitkFiberfoxView.cpp
   QmitkFiberExtractionView.cpp
   QmitkFieldmapGeneratorView.cpp
+  QmitkDiffusionRegistrationView.cpp
+  QmitkDenoisingView.cpp
 )
 
 set(UI_FILES
@@ -77,6 +79,8 @@ set(UI_FILES
   src/QmitkBallModelParametersWidgetControls.ui
   src/QmitkAstrosticksModelParametersWidgetControls.ui
   src/internal/QmitkFieldmapGeneratorViewControls.ui
+  src/internal/QmitkDiffusionRegistrationViewControls.ui
+  src/internal/QmitkDenoisingViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -119,6 +123,8 @@ set(MOC_H_FILES
   src/QmitkBallModelParametersWidget.h
   src/QmitkAstrosticksModelParametersWidget.h
   src/internal/QmitkFieldmapGeneratorView.h
+  src/internal/QmitkDiffusionRegistrationView.h
+  src/internal/QmitkDenoisingView.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -153,7 +159,8 @@ set(CACHED_RESOURCE_FILES
   resources/dwi2.png
   resources/odf.png
   resources/refresh.xpm
-)
+  resources/diffusionregistration.png
+ )
 
 set(QRC_FILES
 # uncomment the following line if you want to use Qt resources

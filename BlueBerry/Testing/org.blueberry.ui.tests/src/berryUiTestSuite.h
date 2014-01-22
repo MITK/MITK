@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYUITESTSUITE_H_
 #define BERRYUITESTSUITE_H_
 
-#include <CppUnit/TestSuite.h>
+#include <cppunit/TestSuite.h>
 
 #include <QObject>
 

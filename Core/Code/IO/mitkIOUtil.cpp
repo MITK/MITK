@@ -21,12 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetWriter.h"
 #include "mitkSurfaceVtkWriter.h"
 
-#include <mitkGetModuleContext.h>
-#include <mitkModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkIDataNodeReader.h>
 #include <mitkProgressBar.h>
-
+#include <mitkExceptionMacro.h>
 #include <mitkCoreObjectFactory.h>
 
 //ITK
@@ -37,6 +37,242 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTriangleFilter.h>
 #include <vtkSmartPointer.h>
 
+#include <cerrno>
+#include <cstdlib>
+
+static std::string GetLastErrorStr()
+{
+#ifdef US_PLATFORM_POSIX
+  return std::string(strerror(errno));
+#else
+  // Retrieve the system error message for the last-error code
+  LPVOID lpMsgBuf;
+  DWORD dw = GetLastError();
+
+  FormatMessage(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+    FORMAT_MESSAGE_FROM_SYSTEM |
+    FORMAT_MESSAGE_IGNORE_INSERTS,
+    NULL,
+    dw,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    (LPTSTR) &lpMsgBuf,
+    0, NULL );
+
+  std::string errMsg((LPCTSTR)lpMsgBuf);
+
+  LocalFree(lpMsgBuf);
+
+  return errMsg;
+#endif
+}
+
+#ifdef US_PLATFORM_WINDOWS
+
+#include <io.h>
+#include <direct.h>
+
+// make the posix flags point to the obsolte bsd types on windows
+#define S_IRUSR S_IREAD
+#define S_IWUSR S_IWRITE
+
+#else
+
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#endif
+
+#include <fcntl.h>
+#include <sys/stat.h>
+
+static const char validLetters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+// A cross-platform version of the mkstemps function
+static int mkstemps_compat(char* tmpl, int suffixlen)
+{
+  static unsigned long long value = 0;
+  int savedErrno = errno;
+
+  // Lower bound on the number of temporary files to attempt to generate.
+#define ATTEMPTS_MIN (62 * 62 * 62)
+
+  /* The number of times to attempt to generate a temporary file.  To
+     conform to POSIX, this must be no smaller than TMP_MAX.  */
+#if ATTEMPTS_MIN < TMP_MAX
+  const unsigned int attempts = TMP_MAX;
+#else
+  const unsigned int attempts = ATTEMPTS_MIN;
+#endif
+
+  const int len = strlen(tmpl);
+  if ((len - suffixlen) < 6 || strncmp(&tmpl[len - 6 - suffixlen], "XXXXXX", 6))
+  {
+    errno = EINVAL;
+    return -1;
+  }
+
+  /* This is where the Xs start.  */
+  char* XXXXXX = &tmpl[len - 6 - suffixlen];
+
+  /* Get some more or less random data.  */
+#ifdef US_PLATFORM_WINDOWS
+  {
+    SYSTEMTIME stNow;
+    FILETIME ftNow;
+
+    // get system time
+    GetSystemTime(&stNow);
+    stNow.wMilliseconds = 500;
+    if (!SystemTimeToFileTime(&stNow, &ftNow))
+    {
+      errno = -1;
+      return -1;
+    }
+    unsigned long long randomTimeBits = ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32)
+                                         | static_cast<unsigned long long>(ftNow.dwLowDateTime));
+    value = randomTimeBits ^ static_cast<unsigned long long>(GetCurrentThreadId());
+  }
+#else
+  {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    unsigned long long randomTimeBits = ((static_cast<unsigned long long>(tv.tv_usec) << 32)
+                                         | static_cast<unsigned long long>(tv.tv_sec));
+    value = randomTimeBits ^ static_cast<unsigned long long>(getpid());
+  }
+#endif
+
+  for (unsigned int count = 0; count < attempts; value += 7777, ++count)
+  {
+    unsigned long long v = value;
+
+    /* Fill in the random bits.  */
+    XXXXXX[0] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[1] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[2] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[3] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[4] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[5] = validLetters[v % 62];
+
+    int fd = open (tmpl, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
+    if (fd >= 0)
+    {
+      errno = savedErrno;
+      return fd;
+    }
+    else if (errno != EEXIST)
+    {
+      return -1;
+    }
+  }
+
+  /* We got out of the loop because we ran out of combinations to try.  */
+  errno = EEXIST;
+  return -1;
+}
+
+// A cross-platform version of the POSIX mkdtemp function
+static char* mkdtemps_compat(char* tmpl, int suffixlen)
+{
+  static unsigned long long value = 0;
+  int savedErrno = errno;
+
+  // Lower bound on the number of temporary dirs to attempt to generate.
+#define ATTEMPTS_MIN (62 * 62 * 62)
+
+  /* The number of times to attempt to generate a temporary dir.  To
+     conform to POSIX, this must be no smaller than TMP_MAX.  */
+#if ATTEMPTS_MIN < TMP_MAX
+  const unsigned int attempts = TMP_MAX;
+#else
+  const unsigned int attempts = ATTEMPTS_MIN;
+#endif
+
+  const int len = strlen(tmpl);
+  if ((len - suffixlen) < 6 || strncmp(&tmpl[len - 6 - suffixlen], "XXXXXX", 6))
+  {
+    errno = EINVAL;
+    return NULL;
+  }
+
+  /* This is where the Xs start.  */
+  char* XXXXXX = &tmpl[len - 6 - suffixlen];
+
+  /* Get some more or less random data.  */
+#ifdef US_PLATFORM_WINDOWS
+  {
+    SYSTEMTIME stNow;
+    FILETIME ftNow;
+
+    // get system time
+    GetSystemTime(&stNow);
+    stNow.wMilliseconds = 500;
+    if (!SystemTimeToFileTime(&stNow, &ftNow))
+    {
+      errno = -1;
+      return NULL;
+    }
+    unsigned long long randomTimeBits = ((static_cast<unsigned long long>(ftNow.dwHighDateTime) << 32)
+                                         | static_cast<unsigned long long>(ftNow.dwLowDateTime));
+    value = randomTimeBits ^ static_cast<unsigned long long>(GetCurrentThreadId());
+  }
+#else
+  {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    unsigned long long randomTimeBits = ((static_cast<unsigned long long>(tv.tv_usec) << 32)
+                                         | static_cast<unsigned long long>(tv.tv_sec));
+    value = randomTimeBits ^ static_cast<unsigned long long>(getpid());
+  }
+#endif
+
+  unsigned int count = 0;
+  for (; count < attempts; value += 7777, ++count)
+  {
+    unsigned long long v = value;
+
+    /* Fill in the random bits.  */
+    XXXXXX[0] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[1] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[2] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[3] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[4] = validLetters[v % 62];
+    v /= 62;
+    XXXXXX[5] = validLetters[v % 62];
+
+#ifdef US_PLATFORM_WINDOWS
+    int fd = _mkdir (tmpl); //, _S_IREAD | _S_IWRITE | _S_IEXEC);
+#else
+    int fd = mkdir (tmpl, S_IRUSR | S_IWUSR | S_IXUSR);
+#endif
+    if (fd >= 0)
+    {
+      errno = savedErrno;
+      return tmpl;
+    }
+    else if (errno != EEXIST)
+    {
+      return NULL;
+    }
+  }
+
+  /* We got out of the loop because we ran out of combinations to try.  */
+  errno = EEXIST;
+  return NULL;
+}
+
+//#endif
 
 namespace mitk {
 
@@ -44,17 +280,155 @@ const std::string IOUtil::DEFAULTIMAGEEXTENSION = ".nrrd";
 const std::string IOUtil::DEFAULTSURFACEEXTENSION = ".stl";
 const std::string IOUtil::DEFAULTPOINTSETEXTENSION = ".mps";
 
+#ifdef US_PLATFORM_WINDOWS
+std::string IOUtil::GetProgramPath()
+{
+  char path[512];
+  std::size_t index = std::string(path, GetModuleFileName(NULL, path, 512)).find_last_of('\\');
+  return std::string(path, index);
+}
+#elif defined(US_PLATFORM_APPLE)
+#include <mach-o/dyld.h>
+std::string IOUtil::GetProgramPath()
+{
+  char path[512];
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) == 0)
+  {
+    std::size_t index = std::string(path).find_last_of('/');
+    std::string strPath = std::string(path, index);
+    //const char* execPath = strPath.c_str();
+    //mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(execPath,false);
+    return strPath;
+  }
+  return std::string();
+}
+#else
+#include <sys/types.h>
+#include <unistd.h>
+#include <sstream>
+std::string IOUtil::GetProgramPath()
+{
+  std::stringstream ss;
+  ss << "/proc/" << getpid() << "/exe";
+  char proc[512] = {0};
+  ssize_t ch = readlink(ss.str().c_str(), proc, 512);
+  if (ch == -1) return std::string();
+  std::size_t index = std::string(proc).find_last_of('/');
+  return std::string(proc, index);
+}
+#endif
+
+std::string IOUtil::GetTempPath()
+{
+  static std::string result;
+  if (result.empty())
+  {
+#ifdef US_PLATFORM_WINDOWS
+    char tempPathTestBuffer[1];
+    DWORD bufferLength = ::GetTempPath(1, tempPathTestBuffer);
+    if (bufferLength == 0)
+    {
+      mitkThrow() << GetLastErrorStr();
+    }
+    std::vector<char> tempPath(bufferLength);
+    bufferLength = ::GetTempPath(bufferLength, &tempPath[0]);
+    if (bufferLength == 0)
+    {
+      mitkThrow() << GetLastErrorStr();
+    }
+    result.assign(tempPath.begin(), tempPath.begin() + static_cast<std::size_t>(bufferLength));
+#else
+    result = "/tmp/";
+#endif
+  }
+
+  return result;
+}
+
+std::string IOUtil::CreateTemporaryFile(std::ofstream& f, const std::string& templateName, std::string path)
+{
+  return CreateTemporaryFile(f, std::ios_base::out | std::ios_base::trunc, templateName, path);
+}
+
+std::string IOUtil::CreateTemporaryFile(std::ofstream& f, std::ios_base::openmode mode, const std::string& templateName, std::string path)
+{
+  if (path.empty())
+  {
+    path = GetTempPath();
+  }
+
+  path += "/" + templateName;
+  std::vector<char> dst_path(path.begin(), path.end());
+  dst_path.push_back('\0');
+
+  std::size_t lastX = path.find_last_of('X');
+  std::size_t firstX = path.find_last_not_of('X', lastX);
+  int firstNonX = firstX == std::string::npos ? - 1 : firstX - 1;
+  while (lastX != std::string::npos && (lastX - firstNonX) < 6)
+  {
+    lastX = path.find_last_of('X', firstX);
+    firstX = path.find_last_not_of('X', lastX);
+    firstNonX = firstX == std::string::npos ? - 1 : firstX - 1;
+  }
+  std::size_t suffixlen = lastX == std::string::npos ? path.size() : path.size() - lastX  - 1;
+
+  int fd = mkstemps_compat(&dst_path[0], suffixlen);
+  if(fd != -1)
+  {
+    path.assign(dst_path.begin(), dst_path.end() - 1);
+    f.open(path.c_str(), mode | std::ios_base::out | std::ios_base::trunc);
+    close(fd);
+  }
+  else
+  {
+    mitkThrow() << "Creating temporary file " << &dst_path[0] << " failed: " << GetLastErrorStr();
+  }
+  return path;
+}
+
+std::string IOUtil::CreateTemporaryDirectory(const std::string& templateName, std::string path)
+{
+  if (path.empty())
+  {
+    path = GetTempPath();
+  }
+
+  path += "/" + templateName;
+  std::vector<char> dst_path(path.begin(), path.end());
+  dst_path.push_back('\0');
+
+  std::size_t lastX = path.find_last_of('X');
+  std::size_t firstX = path.find_last_not_of('X', lastX);
+  int firstNonX = firstX == std::string::npos ? - 1 : firstX - 1;
+  while (lastX != std::string::npos && (lastX - firstNonX) < 6)
+  {
+    lastX = path.find_last_of('X', firstX);
+    firstX = path.find_last_not_of('X', lastX);
+    firstNonX = firstX == std::string::npos ? - 1 : firstX - 1;
+  }
+  std::size_t suffixlen = lastX == std::string::npos ? path.size() : path.size() - lastX  - 1;
+
+  if(mkdtemps_compat(&dst_path[0], suffixlen) == NULL)
+  {
+    mitkThrow() << "Creating temporary directory " << &dst_path[0] << " failed: " << GetLastErrorStr();
+  }
+
+  path.assign(dst_path.begin(), dst_path.end() - 1);
+  return path;
+}
+
 int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds)
 {
     // Get the set of registered mitk::IDataNodeReader services
-    ModuleContext* context = mitk::GetModuleContext();
-    const std::list<ServiceReference> refs = context->GetServiceReferences<IDataNodeReader>();
+    us::ModuleContext* context = us::GetModuleContext();
+    const std::vector<us::ServiceReference<IDataNodeReader> > refs = context->GetServiceReferences<IDataNodeReader>();
     std::vector<IDataNodeReader*> services;
     services.reserve(refs.size());
-    for (std::list<ServiceReference>::const_iterator i = refs.begin();
+    for (std::vector<us::ServiceReference<IDataNodeReader> >::const_iterator i = refs.begin();
          i != refs.end(); ++i)
     {
-        IDataNodeReader* s = context->GetService<IDataNodeReader>(*i);
+        IDataNodeReader* s = context->GetService(*i);
         if (s != 0)
         {
             services.push_back(s);
@@ -86,7 +460,7 @@ int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds
         mitk::ProgressBar::GetInstance()->Progress(2);
     }
 
-    for (std::list<ServiceReference>::const_iterator i = refs.begin();
+    for (std::vector<us::ServiceReference<IDataNodeReader> >::const_iterator i = refs.begin();
          i != refs.end(); ++i)
     {
         context->UngetService(*i);
@@ -239,7 +613,7 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
             if( polys->GetNumberOfStrips() > 0 )
             {
                 vtkSmartPointer<vtkTriangleFilter> triangleFilter = vtkSmartPointer<vtkTriangleFilter>::New();
-                triangleFilter->SetInput(polys);
+                triangleFilter->SetInputData(polys);
                 triangleFilter->Update();
                 polys = triangleFilter->GetOutput();
                 polys->Register(NULL);

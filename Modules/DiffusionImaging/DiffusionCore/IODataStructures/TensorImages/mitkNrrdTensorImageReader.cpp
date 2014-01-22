@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageRegionIterator.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
-
+#include <itkNiftiImageIO.h>
 
 #include "mitkITKImageImport.h"
 #include "mitkImageDataItem.h"
@@ -54,85 +54,46 @@ void NrrdTensorImageReader
                 }
             }
 
-            MITK_INFO << "Loading tensor image ...";
-
-            typedef itk::VectorImage<float,3> ImageType;
-            itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-            typedef itk::ImageFileReader<ImageType> FileReaderType;
-            FileReaderType::Pointer reader = FileReaderType::New();
-            reader->SetImageIO(io);
-            reader->SetFileName(this->m_FileName);
-            reader->Update();
-            ImageType::Pointer img = reader->GetOutput();
-
-            typedef itk::Image<itk::DiffusionTensor3D<float>,3> VecImgType;
-            VecImgType::Pointer vecImg = VecImgType::New();
-            vecImg->SetSpacing( img->GetSpacing() );   // Set the image spacing
-            vecImg->SetOrigin( img->GetOrigin() );     // Set the image origin
-            vecImg->SetDirection( img->GetDirection() );  // Set the image direction
-            vecImg->SetRegions( img->GetLargestPossibleRegion());
-            vecImg->Allocate();
-
-            itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
-            ot = ot.Begin();
-
-            itk::ImageRegionIterator<ImageType> it (img, img->GetLargestPossibleRegion() );
-            it = it.Begin();
-
-            typedef ImageType::PixelType  VarPixType;
-            typedef VecImgType::PixelType FixPixType;
-            int numComponents = img->GetNumberOfComponentsPerPixel();
-
-            itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
-            std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-            std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-            std::string metaString;
-
-            bool readFrame = false;
-            double xx, xy, xz, yx, yy, yz, zx, zy, zz;
-            MeasurementFrameType measFrame;
-            measFrame.SetIdentity();
-            MeasurementFrameType measFrameTransp;
-            measFrameTransp.SetIdentity();
-
-            for (; itKey != imgMetaKeys.end(); itKey ++)
+            try
             {
-                itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-                if (itKey->find("measurement frame") != std::string::npos)
+                std::string fname3 = "temp_dti.nii";
+                itksys::SystemTools::CopyAFile(m_FileName.c_str(), fname3.c_str());
+
+                typedef itk::VectorImage<float,3> ImageType;
+                itk::NiftiImageIO::Pointer io = itk::NiftiImageIO::New();
+                typedef itk::ImageFileReader<ImageType> FileReaderType;
+                FileReaderType::Pointer reader = FileReaderType::New();
+                reader->SetImageIO(io);
+                reader->SetFileName(fname3);
+                reader->Update();
+                ImageType::Pointer img = reader->GetOutput();
+
+                typedef itk::Image<itk::DiffusionTensor3D<float>,3> VecImgType;
+                VecImgType::Pointer vecImg = VecImgType::New();
+                vecImg->SetSpacing( img->GetSpacing() );   // Set the image spacing
+                vecImg->SetOrigin( img->GetOrigin() );     // Set the image origin
+                vecImg->SetDirection( img->GetDirection() );  // Set the image direction
+                vecImg->SetRegions( img->GetLargestPossibleRegion());
+                vecImg->Allocate();
+
+                itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
+                ot.GoToBegin();
+
+                itk::ImageRegionIterator<ImageType> it (img, img->GetLargestPossibleRegion() );
+                it.GoToBegin();
+
+                typedef ImageType::PixelType  VarPixType;
+                typedef VecImgType::PixelType FixPixType;
+                int numComponents = img->GetNumberOfComponentsPerPixel();
+
+                if (numComponents==6)
                 {
-                    sscanf(metaString.c_str(), " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
-
-                    if (xx>10e-10 || xy>10e-10 || xz>10e-10 ||
-                            yx>10e-10 || yy>10e-10 || yz>10e-10 ||
-                            zx>10e-10 || zy>10e-10 || zz>10e-10 )
+                    MITK_INFO << "Trying to load dti as 6-comp nifti ...";
+                    while (!it.IsAtEnd())
                     {
-                        readFrame = true;
+                        VarPixType vec = it.Get();
+                        FixPixType fixVec(vec.GetDataPointer());
 
-                        measFrame(0,0) = xx;
-                        measFrame(0,1) = xy;
-                        measFrame(0,2) = xz;
-                        measFrame(1,0) = yx;
-                        measFrame(1,1) = yy;
-                        measFrame(1,2) = yz;
-                        measFrame(2,0) = zx;
-                        measFrame(2,1) = zy;
-                        measFrame(2,2) = zz;
-
-                        measFrameTransp = measFrame.GetTranspose();
-                    }
-                }
-            }
-
-            if (numComponents==6)
-            {
-                while (!it.IsAtEnd())
-                {
-                    // T'=RTR'
-                    VarPixType vec = it.Get();
-                    FixPixType fixVec(vec.GetDataPointer());
-
-                    if(readFrame)
-                    {
                         itk::DiffusionTensor3D<float> tensor;
                         tensor.SetElement(0, vec.GetElement(0));
                         tensor.SetElement(1, vec.GetElement(1));
@@ -141,44 +102,91 @@ void NrrdTensorImageReader
                         tensor.SetElement(4, vec.GetElement(4));
                         tensor.SetElement(5, vec.GetElement(5));
 
-                        tensor = ConvertMatrixTypeToFixedArrayType(tensor.PreMultiply(measFrame));
-                        tensor = ConvertMatrixTypeToFixedArrayType(tensor.PostMultiply(measFrameTransp));
                         fixVec = tensor;
-                    }
 
-                    ot.Set(fixVec);
-                    ++ot;
-                    ++it;
+                        ot.Set(fixVec);
+                        ++ot;
+                        ++it;
+                    }
                 }
-            }
-            else if(numComponents==9)
-            {
-                while (!it.IsAtEnd())
+                else if(numComponents==9)
                 {
-                    VarPixType vec = it.Get();
-                    itk::DiffusionTensor3D<float> tensor;
-                    tensor.SetElement(0, vec.GetElement(0));
-                    tensor.SetElement(1, vec.GetElement(1));
-                    tensor.SetElement(2, vec.GetElement(2));
-                    tensor.SetElement(3, vec.GetElement(4));
-                    tensor.SetElement(4, vec.GetElement(5));
-                    tensor.SetElement(5, vec.GetElement(8));
-
-                    if(readFrame)
+                    MITK_INFO << "Trying to load dti as 9-comp nifti ...";
+                    while (!it.IsAtEnd())
                     {
-                        tensor = ConvertMatrixTypeToFixedArrayType(tensor.PreMultiply(measFrame));
-                        tensor = ConvertMatrixTypeToFixedArrayType(tensor.PostMultiply(measFrameTransp));
-                    }
+                        VarPixType vec = it.Get();
+                        itk::DiffusionTensor3D<float> tensor;
+                        tensor.SetElement(0, vec.GetElement(0));
+                        tensor.SetElement(1, vec.GetElement(1));
+                        tensor.SetElement(2, vec.GetElement(2));
+                        tensor.SetElement(3, vec.GetElement(4));
+                        tensor.SetElement(4, vec.GetElement(5));
+                        tensor.SetElement(5, vec.GetElement(8));
 
-                    FixPixType fixVec(tensor);
-                    ot.Set(fixVec);
-                    ++ot;
-                    ++it;
+                        FixPixType fixVec(tensor);
+                        ot.Set(fixVec);
+                        ++ot;
+                        ++it;
+                    }
                 }
+                else if (numComponents==1)
+                {
+                    MITK_INFO << "Trying to load dti as 4D nifti ...";
+                    typedef itk::Image<float,4> ImageType;
+                    typedef itk::ImageFileReader<ImageType> FileReaderType;
+                    FileReaderType::Pointer reader = FileReaderType::New();
+                    reader->SetImageIO(io);
+                    reader->SetFileName(fname3);
+                    reader->Update();
+                    ImageType::Pointer img = reader->GetOutput();
+
+                    itk::Size<4> size = img->GetLargestPossibleRegion().GetSize();
+
+                    while (!ot.IsAtEnd())
+                    {
+                        itk::DiffusionTensor3D<float> tensor;
+                        ImageType::IndexType idx;
+                        idx[0] = ot.GetIndex()[0]; idx[1] = ot.GetIndex()[1]; idx[2] = ot.GetIndex()[2];
+
+                        if (size[3]==6)
+                        {
+                            for (unsigned int te=0; te<size[3]; te++)
+                            {
+                                idx[3] = te;
+                                tensor.SetElement(te, img->GetPixel(idx));
+                            }
+                        }
+                        else if (size[3]==9)
+                        {
+                            idx[3] = 0;
+                            tensor.SetElement(0, img->GetPixel(idx));
+                            idx[3] = 1;
+                            tensor.SetElement(1, img->GetPixel(idx));
+                            idx[3] = 2;
+                            tensor.SetElement(2, img->GetPixel(idx));
+                            idx[3] = 4;
+                            tensor.SetElement(3, img->GetPixel(idx));
+                            idx[3] = 5;
+                            tensor.SetElement(4, img->GetPixel(idx));
+                            idx[3] = 8;
+                            tensor.SetElement(5, img->GetPixel(idx));
+                        }
+                        else
+                            throw itk::ImageFileReaderException(__FILE__, __LINE__, "Unknown number of komponents for DTI file. Should be 6 or 9!");
+
+                        FixPixType fixVec(tensor);
+                        ot.Set(fixVec);
+                        ++ot;
+                    }
+                }
+                this->GetOutput()->InitializeByItk(vecImg.GetPointer());
+                this->GetOutput()->SetVolume(vecImg->GetBufferPointer());
             }
-            else if (numComponents==1)
+            catch(...)
             {
-                typedef itk::Image<float,4> ImageType;
+                MITK_INFO << "Trying to load dti as nrrd ...";
+
+                typedef itk::VectorImage<float,3> ImageType;
                 itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
                 typedef itk::ImageFileReader<ImageType> FileReaderType;
                 FileReaderType::Pointer reader = FileReaderType::New();
@@ -187,35 +195,181 @@ void NrrdTensorImageReader
                 reader->Update();
                 ImageType::Pointer img = reader->GetOutput();
 
-                itk::Size<4> size = img->GetLargestPossibleRegion().GetSize();
+                typedef itk::Image<itk::DiffusionTensor3D<float>,3> VecImgType;
+                VecImgType::Pointer vecImg = VecImgType::New();
+                vecImg->SetSpacing( img->GetSpacing() );   // Set the image spacing
+                vecImg->SetOrigin( img->GetOrigin() );     // Set the image origin
+                vecImg->SetDirection( img->GetDirection() );  // Set the image direction
+                vecImg->SetRegions( img->GetLargestPossibleRegion());
+                vecImg->Allocate();
 
-                while (!ot.IsAtEnd())
+                itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
+                ot.GoToBegin();
+
+                itk::ImageRegionIterator<ImageType> it (img, img->GetLargestPossibleRegion() );
+                it.GoToBegin();
+
+                typedef ImageType::PixelType  VarPixType;
+                typedef VecImgType::PixelType FixPixType;
+                int numComponents = img->GetNumberOfComponentsPerPixel();
+
+                itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
+                std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
+                std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+                std::string metaString;
+
+                bool readFrame = false;
+                double xx, xy, xz, yx, yy, yz, zx, zy, zz;
+                MeasurementFrameType measFrame;
+                measFrame.SetIdentity();
+                MeasurementFrameType measFrameTransp;
+                measFrameTransp.SetIdentity();
+
+                for (; itKey != imgMetaKeys.end(); itKey ++)
                 {
-                    itk::DiffusionTensor3D<float> tensor;
-                    ImageType::IndexType idx;
-                    idx[0] = ot.GetIndex()[0]; idx[1] = ot.GetIndex()[1]; idx[2] = ot.GetIndex()[2];
-                    for (int te=0; te<size[3]; te++)
+                    itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+                    if (itKey->find("measurement frame") != std::string::npos)
                     {
-                        idx[3] = te;
-                        tensor.SetElement(te, img->GetPixel(idx));
-                    }
-                    if(readFrame)
-                    {
-                        tensor = ConvertMatrixTypeToFixedArrayType(tensor.PreMultiply(measFrame));
-                        tensor = ConvertMatrixTypeToFixedArrayType(tensor.PostMultiply(measFrameTransp));
-                    }
-                    FixPixType fixVec(tensor);
-                    ot.Set(fixVec);
-                    ++ot;
-                }
-            }
-            else
-            {
-                throw itk::ImageFileReaderException(__FILE__, __LINE__, "Image has wrong number of pixel components!");
-            }
+                        sscanf(metaString.c_str(), " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
 
-            this->GetOutput()->InitializeByItk(vecImg.GetPointer());
-            this->GetOutput()->SetVolume(vecImg->GetBufferPointer());
+                        if (xx>10e-10 || xy>10e-10 || xz>10e-10 ||
+                                yx>10e-10 || yy>10e-10 || yz>10e-10 ||
+                                zx>10e-10 || zy>10e-10 || zz>10e-10 )
+                        {
+                            readFrame = true;
+
+                            measFrame(0,0) = xx;
+                            measFrame(0,1) = xy;
+                            measFrame(0,2) = xz;
+                            measFrame(1,0) = yx;
+                            measFrame(1,1) = yy;
+                            measFrame(1,2) = yz;
+                            measFrame(2,0) = zx;
+                            measFrame(2,1) = zy;
+                            measFrame(2,2) = zz;
+
+                            measFrameTransp = measFrame.GetTranspose();
+                        }
+                    }
+                }
+
+                if (numComponents==6)
+                {
+                    while (!it.IsAtEnd())
+                    {
+                        // T'=RTR'
+                        VarPixType vec = it.Get();
+                        FixPixType fixVec(vec.GetDataPointer());
+
+                        if(readFrame)
+                        {
+                            itk::DiffusionTensor3D<float> tensor;
+                            tensor.SetElement(0, vec.GetElement(0));
+                            tensor.SetElement(1, vec.GetElement(1));
+                            tensor.SetElement(2, vec.GetElement(2));
+                            tensor.SetElement(3, vec.GetElement(3));
+                            tensor.SetElement(4, vec.GetElement(4));
+                            tensor.SetElement(5, vec.GetElement(5));
+
+                            tensor = ConvertMatrixTypeToFixedArrayType(tensor.PreMultiply(measFrame));
+                            tensor = ConvertMatrixTypeToFixedArrayType(tensor.PostMultiply(measFrameTransp));
+                            fixVec = tensor;
+                        }
+
+                        ot.Set(fixVec);
+                        ++ot;
+                        ++it;
+                    }
+                }
+                else if(numComponents==9)
+                {
+                    while (!it.IsAtEnd())
+                    {
+                        VarPixType vec = it.Get();
+                        itk::DiffusionTensor3D<float> tensor;
+                        tensor.SetElement(0, vec.GetElement(0));
+                        tensor.SetElement(1, vec.GetElement(1));
+                        tensor.SetElement(2, vec.GetElement(2));
+                        tensor.SetElement(3, vec.GetElement(4));
+                        tensor.SetElement(4, vec.GetElement(5));
+                        tensor.SetElement(5, vec.GetElement(8));
+
+                        if(readFrame)
+                        {
+                            tensor = ConvertMatrixTypeToFixedArrayType(tensor.PreMultiply(measFrame));
+                            tensor = ConvertMatrixTypeToFixedArrayType(tensor.PostMultiply(measFrameTransp));
+                        }
+
+                        FixPixType fixVec(tensor);
+                        ot.Set(fixVec);
+                        ++ot;
+                        ++it;
+                    }
+                }
+                else if (numComponents==1)
+                {
+                    typedef itk::Image<float,4> ImageType;
+                    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+                    typedef itk::ImageFileReader<ImageType> FileReaderType;
+                    FileReaderType::Pointer reader = FileReaderType::New();
+                    reader->SetImageIO(io);
+                    reader->SetFileName(this->m_FileName);
+                    reader->Update();
+                    ImageType::Pointer img = reader->GetOutput();
+
+                    itk::Size<4> size = img->GetLargestPossibleRegion().GetSize();
+
+                    while (!ot.IsAtEnd())
+                    {
+                        itk::DiffusionTensor3D<float> tensor;
+                        ImageType::IndexType idx;
+                        idx[0] = ot.GetIndex()[0]; idx[1] = ot.GetIndex()[1]; idx[2] = ot.GetIndex()[2];
+
+                        if (size[3]==6)
+                        {
+                            for (unsigned int te=0; te<size[3]; te++)
+                            {
+                                idx[3] = te;
+                                tensor.SetElement(te, img->GetPixel(idx));
+                            }
+                        }
+                        else if (size[3]==9)
+                        {
+                            idx[3] = 0;
+                            tensor.SetElement(0, img->GetPixel(idx));
+                            idx[3] = 1;
+                            tensor.SetElement(1, img->GetPixel(idx));
+                            idx[3] = 2;
+                            tensor.SetElement(2, img->GetPixel(idx));
+                            idx[3] = 4;
+                            tensor.SetElement(3, img->GetPixel(idx));
+                            idx[3] = 5;
+                            tensor.SetElement(4, img->GetPixel(idx));
+                            idx[3] = 8;
+                            tensor.SetElement(5, img->GetPixel(idx));
+                        }
+                        else
+                            throw itk::ImageFileReaderException(__FILE__, __LINE__, "Unknown number of komponents for DTI file. Should be 6 or 9!");
+
+                        if(readFrame)
+                        {
+                            tensor = ConvertMatrixTypeToFixedArrayType(tensor.PreMultiply(measFrame));
+                            tensor = ConvertMatrixTypeToFixedArrayType(tensor.PostMultiply(measFrameTransp));
+                        }
+                        FixPixType fixVec(tensor);
+                        ot.Set(fixVec);
+                        ++ot;
+                    }
+                }
+                else
+                {
+                    throw itk::ImageFileReaderException(__FILE__, __LINE__, "Image has wrong number of pixel components!");
+                }
+
+                this->GetOutput()->InitializeByItk(vecImg.GetPointer());
+                this->GetOutput()->SetVolume(vecImg->GetBufferPointer());
+
+            }
 
             try
             {

@@ -13,8 +13,6 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
-
 #ifndef MITKLookupTable_H_HEADER_INCLUDED_C1EBD53D
 #define MITKLookupTable_H_HEADER_INCLUDED_C1EBD53D
 
@@ -29,12 +27,19 @@ class vtkPiecewiseFunction;
 
 namespace mitk
 {
-
-//##
-//##Documentation
-//## @brief LookupTable containing a vtkLookupTable
-//## @ingroup Data
-//##
+/**
+ * @brief The LookupTable class mitk wrapper for a vtkLookupTable
+ * @ingroup DataManagement
+ *
+ * This class can be used to color images with a LookupTable, such as the
+ * vtkLookupTable.
+ * @note If you want to use this as a property for an mitk::Image, make sure
+ * to use the mitk::LookupTableProperty and set the mitk::RenderingModeProperty
+ * to a mode which supports lookup tables (e.g. LOOKUPTABLE_COLOR). Make
+ * sure to check the documentation of the mitk::RenderingModeProperty. For a
+ * code example how to use the mitk::LookupTable check the
+ * mitkImageVtkMapper2DLookupTableTest.cpp in Core\Code\Testing.
+ */
 class MITK_CORE_EXPORT LookupTable : public itk::DataObject
 {
 public:
@@ -129,9 +134,6 @@ private:
 
     virtual itk::LightObject::Pointer InternalClone() const;
 };
-
 } // namespace mitk
-
-
 
 #endif /* LookupTable_H_HEADER_INCLUDED_C1EBD53D */

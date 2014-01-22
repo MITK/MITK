@@ -128,7 +128,7 @@ template<class TOutputImage>
     //import->SetImageDataItem(m_ImageDataItem);
     import->SetImageAccessor(imageAccess,sizeof(PixelType)*noBytes);
 
-    output->SetPixelContainer(import);
+     output->SetPixelContainer(import);
     itkDebugMacro( << "size of container = " << import->Size() );
   }
 }

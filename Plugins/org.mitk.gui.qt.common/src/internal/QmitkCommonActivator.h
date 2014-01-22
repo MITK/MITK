@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKCOMMONACTIVATOR_H_
 
 #include <ctkPluginActivator.h>
+#include <ctkServiceTracker.h>
+
+#include <berryIPreferencesService.h>
 
 #include "QmitkViewCoordinator.h"
 
@@ -38,6 +41,9 @@ class QmitkCommonActivator : public QObject, public ctkPluginActivator
 public:
 
   static ctkPluginContext* GetContext();
+  static QmitkCommonActivator* GetInstance();
+
+  berry::IPreferencesService::Pointer GetPreferencesService();
 
   /**
    * Sets default StateMachine to EventMapper.
@@ -47,9 +53,11 @@ public:
 
 private:
 
+  static QmitkCommonActivator* m_Instance;
   static ctkPluginContext* m_Context;
 
   QmitkViewCoordinator::Pointer m_ViewCoordinator;
+  QScopedPointer<ctkServiceTracker<berry::IPreferencesService*> > m_PrefServiceTracker;
 
 };
 

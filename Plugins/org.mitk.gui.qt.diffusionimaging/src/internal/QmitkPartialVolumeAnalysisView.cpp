@@ -56,7 +56,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarPolygon.h"
 #include "mitkPartialVolumeAnalysisClusteringCalculator.h"
 #include "mitkDiffusionImage.h"
-#include "mitkModuleRegistry.h"
+#include "usModuleRegistry.h"
 
 #include <itkVectorImage.h>
 #include "itkTensorDerivedMeasurementsFilter.h"
@@ -1286,16 +1286,20 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
             return;
         }
 
-        // Retrieve HistogramStatisticsCalculator from has map (or create a new one
-        // for this image if non-existant)
-        PartialVolumeAnalysisMapType::iterator it =
-                m_PartialVolumeAnalysisMap.find( m_SelectedImage );
-
-        if ( it != m_PartialVolumeAnalysisMap.end() )
+        m_CurrentStatisticsCalculator = NULL;
+        if(!m_IsTensorImage)
         {
+          // Retrieve HistogramStatisticsCalculator from has map (or create a new one
+          // for this image if non-existant)
+          PartialVolumeAnalysisMapType::iterator it =
+              m_PartialVolumeAnalysisMap.find( m_SelectedImage );
+
+          if ( it != m_PartialVolumeAnalysisMap.end() )
+          {
             m_CurrentStatisticsCalculator = it->second;
+          }
         }
-        else
+        if(m_CurrentStatisticsCalculator.IsNull())
         {
             m_CurrentStatisticsCalculator = mitk::PartialVolumeAnalysisHistogramCalculator::New();
             m_CurrentStatisticsCalculator->SetPlanarFigureThickness(m_Controls->m_PlanarFiguresThickness->value());
@@ -1327,6 +1331,14 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
             mitk::PixelType pixelType = m_SelectedImageMask->GetPixelType();
             MITK_DEBUG << pixelType.GetPixelTypeAsString();
 
+
+            if(pixelType.GetComponentTypeAsString() == "char")
+            {
+                MITK_DEBUG << "Pixel type is char instead of uchar";
+                return;
+            }
+
+
             if(pixelType.GetBitsPerComponent() == 16)
             {
                 //convert from short to uchar
@@ -1347,6 +1359,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
 
                 mitk::CastToMitkImage(charImage, m_SelectedImageMask);
             }
+
 
             m_CurrentStatisticsCalculator->SetImageMask( m_SelectedImageMask );
 
@@ -1862,7 +1875,7 @@ void QmitkPartialVolumeAnalysisView::Activated()
           if(figureInteractor.IsNull())
           {
             figureInteractor = mitk::PlanarFigureInteractor::New();
-            mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
             figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
             figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
             figureInteractor->SetDataNode( node );
@@ -2118,7 +2131,7 @@ void QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage(const mitk::DataNode
         if(figureInteractor.IsNull())
         {
           figureInteractor = mitk::PlanarFigureInteractor::New();
-          mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
           figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
           figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
           figureInteractor->SetDataNode( nonConstNode );

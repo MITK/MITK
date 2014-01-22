@@ -376,6 +376,15 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
       // Only get the DICOM files:
       gdcm::Directory::FilenamesType l2 = s.GetKeys();
+
+
+
+      gdcm::Directory::FilenamesType::iterator it;
+
+      for (it = l2.begin() ; it != l2.end(); ++it) {
+        MITK_INFO << "-------FN " << *it;
+      }
+
       const int nfiles = l2.size();
       if(nfiles < 1)
       {
@@ -435,8 +444,15 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       {
         gdcm::Sorter sorter;
         sorter.SetSortFunction( SortBySeriesUID );
-        sorter.StableSort( l2 );
-        files = sorter.GetFilenames();
+        if (sorter.StableSort( l2 ))
+        {
+          files = sorter.GetFilenames();
+        }
+        else
+        {
+          Error("Loading of at least one DICOM file not successfull!");
+          return;
+        }
       }
       else
       {
@@ -480,7 +496,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         gdcm::Scanner::ValuesType::const_iterator it;
 
         const gdcm::Scanner::ValuesType &values3 = s.GetValues(t3);
-        const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);;
+        const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);
         unsigned int nAcquis = values3.size();
 
         if(nAcquis > 1) // More than one element must have this tag (Not != )
@@ -494,13 +510,16 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           subsorter.SetSortFunction( SortBySeqName );
           it = values4.begin();
         }
+
         // Hotfix for Bug 14758, better fix by selecting always availible tags.
-        else
+        if( nAcquis == 0 || values4.size() == 0)
         {
-          Error("Sorting tags (0x0020,0x0012) and (0x0018,0x0024) missing, ABORTING");
-          if(m_OutputFolderNameSet) logfile << "Sorting tags (0x0020,0x0012) and (0x0018,0x0024) missing, ABORTING\n";
+          std::string err_msg = "Sorting tag (0x0020,0x0012) [Acquisition ID] or (0x0018,0x0024) [Sequence Name] missing, ABORTING";
+          Error(err_msg);
+          if(m_OutputFolderNameSet) logfile << err_msg << "\n";
           continue;
         }
+
         nTotalAcquis += nAcquis;
         subsorter.Sort( sub );
 
@@ -630,6 +649,11 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         for(unsigned int i=0; i<hc.size(); i++)
         {
           vnl_vector_fixed<double, 3> vect = hc[i]->DiffusionVector;
+          if (vect.magnitude()<0.0001 && b_vals[i]>0)
+          {
+              vect.fill(0.0);
+              vect[0] = 1;
+          }
           vect.normalize();
           vect *= sqrt(b_vals[i]/maxb);
           directions->push_back(vect);
@@ -758,7 +782,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if (basedata.IsNotNull())
       {
         mitk::RenderingManager::GetInstance()->InitializeViews(
-            basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
       }
     }
 

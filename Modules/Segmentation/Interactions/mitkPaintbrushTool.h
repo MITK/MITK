@@ -83,6 +83,8 @@ class Segmentation_EXPORT PaintbrushTool : public FeedbackContourTool
       */
     void CheckIfCurrentSliceHasChanged(const PositionEvent* event);
 
+    void OnToolManagerWorkingDataModified();
+
     int m_PaintingPixelValue;
     static int m_Size;
 

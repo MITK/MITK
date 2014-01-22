@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
-  * \brief Generates the diffusion signal using an idealised cylinder with zero radius: e^(-bd(ng)²)
+  * \brief Generates the diffusion signal using a collection of idealised cylinder with zero radius: e^(-bd(ng)²)
   *
   */
 
@@ -42,8 +42,11 @@ public:
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
+    ScalarType SimulateMeasurement(unsigned int dir);
 
-    void SetRandomizeSticks(bool randomize=true){ m_RandomizeSticks=randomize; }
+    void SetSeed(int s);    ///< set seed for random generator that creates the stick orientations
+
+    void SetRandomizeSticks(bool randomize=true){ m_RandomizeSticks=randomize; } ///< Random stick configuration in each voxel
     void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
     void SetDiffusivity(ScalarType diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
     void SetNumSticks(unsigned int order)
@@ -88,12 +91,12 @@ public:
 protected:
 
     GradientType GetRandomDirection();
-    ScalarType   m_BValue;       ///< b-value used to generate the artificial signal
-    ScalarType   m_Diffusivity;  ///< Scalar diffusion constant
-    GradientListType m_Sticks;
-    unsigned int m_NumSticks;
+    ScalarType   m_BValue;              ///< b-value used to generate the artificial signal
+    ScalarType   m_Diffusivity;         ///< Scalar diffusion constant
+    GradientListType m_Sticks;          ///< Stick container
+    unsigned int m_NumSticks;           ///< Number of sticks
     bool m_RandomizeSticks;
-    ItkRandGenType::Pointer m_RandGen;      // random generator
+    ItkRandGenType::Pointer m_RandGen;  ///< Random number generator
 };
 
 }

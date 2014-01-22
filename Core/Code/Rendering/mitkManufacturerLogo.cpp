@@ -161,7 +161,7 @@ void mitk::ManufacturerLogo::Enable()
     if(itksys::SystemTools::FileExists(m_FileName.c_str()) && !m_ForceShowMBIDepartmentLogo)
     {
       m_PngReader->Update();
-      m_Actor->SetInput(m_PngReader->GetOutput());
+      m_Actor->SetInputData(m_PngReader->GetOutput());
     }
     else // either logo file not found or logo renderer is forced to show the MBI logo
     {
@@ -195,7 +195,7 @@ void mitk::ManufacturerLogo::Enable()
       m_VtkImageImport->Modified();
       m_VtkImageImport->Update();
 
-      m_Actor->SetInput(m_VtkImageImport->GetOutput());
+      m_Actor->SetInputData(m_VtkImageImport->GetOutput());
     }
 
     m_Actor->SetOpacity(m_Opacity);

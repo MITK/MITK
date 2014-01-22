@@ -74,13 +74,15 @@ m_MultiWidget(mw)
   this->setMaximumWidth(61);
   this->setAutoFillBackground( true );
 
-  //Workaround for fix for bug 3192 which fixed the render window menu issue on linux
-  //but lead to focus issues on Mac OS X
-#ifdef Q_OS_MAC
+  //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
+  //for Mac OS see bug 3192
+  //for Windows see bug 12130
+  //... so Mac OS and Windows must be treated differently:
+#if defined(Q_OS_MAC) || defined(_WIN32)
   this->show();
   this->setWindowOpacity(0.0f);
 #else
-   this->setVisible(false);
+  this->setVisible(false);
 #endif
 
   //this->setAttribute( Qt::WA_NoSystemBackground  );
@@ -243,9 +245,11 @@ void QmitkRenderWindowMenu::HideMenu( )
 
   if( ! m_Entered )
   {
-    //Workaround for fix for bug 3192 which fixed the render window menu issue on linux
-    //but lead to focus issues on Mac OS X
-#ifdef Q_OS_MAC
+     //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
+     //for Mac OS see bug 3192
+     //for Windows see bug 12130
+     //... so Mac OS and Windows must be treated differently:
+#if defined(Q_OS_MAC) || defined(_WIN32)
     this->setWindowOpacity(0.0f);
 #else
     this->setVisible(false);
@@ -258,9 +262,11 @@ void QmitkRenderWindowMenu::ShowMenu( )
   MITK_DEBUG << "menu showMenu";
 
   m_Hidden = false;
-  //Workaround for fix for bug 3192 which fixed the render window menu issue on linux
-  //but lead to focus issues on Mac OS X
-#ifdef Q_OS_MAC
+  //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
+  //for Mac OS see bug 3192
+  //for Windows see bug 12130
+  //... so Mac OS and Windows must be treated differently:
+#if defined(Q_OS_MAC) || defined(_WIN32)
   this->setWindowOpacity(1.0f);
 #else
   this->setVisible(true);
@@ -275,8 +281,6 @@ void QmitkRenderWindowMenu::enterEvent( QEvent * /*e*/ )
   m_Entered=true;
 
   m_Hidden=false;
-
- // setWindowOpacity(1.0f);
 }
 
 void QmitkRenderWindowMenu::DeferredHideMenu( )
@@ -284,10 +288,14 @@ void QmitkRenderWindowMenu::DeferredHideMenu( )
   MITK_DEBUG << "menu deferredhidemenu";
   if(m_Hidden)
   {
-#ifdef Q_OS_MAC
+  //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
+  //for Mac OS see bug 3192
+  //for Windows see bug 12130
+  //... so Mac OS and Windows must be treated differently:
+#if defined(Q_OS_MAC) || defined(_WIN32)
   this->setWindowOpacity(0.0f);
 #else
-   this->setVisible(false);
+  this->setVisible(false);
 #endif
   }
 
@@ -434,9 +442,11 @@ void QmitkRenderWindowMenu::DeferredShowMenu()
 
   MITK_DEBUG << "deferred show menu";
 
-  //Workaround for fix for bug 3192 which fixed the render window menu issue on linux
-  //but lead to focus issues on Mac OS X
-#ifdef Q_OS_MAC
+  //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
+  //for Mac OS see bug 3192
+  //for Windows see bug 12130
+  //... so Mac OS and Windows must be treated differently:
+#if defined(Q_OS_MAC) || defined(_WIN32)
   this->setWindowOpacity(1.0f);
 #else
   this->setVisible(true);

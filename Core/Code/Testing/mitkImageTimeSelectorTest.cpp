@@ -18,73 +18,102 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkImageGenerator.h"
+
+#include "mitkTestingMacros.h"
+
+#include "mitkIOUtil.h"
 #include <itksys/SystemTools.hxx>
 
 #include <fstream>
-int mitkImageTimeSelectorTest(int argc, char* argv[])
-{
 
-  std::cout << "Loading file: ";
-  if(argc==0)
-  {
-    std::cout<<"no file specified [FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  mitk::Image::Pointer image = NULL;
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
+
+/** Global members common for all subtests */
+namespace
+{
+  std::string m_Filename;
+  mitk::Image::Pointer m_Image;
+} // end of anonymous namespace
+
+/** @brief Global test setup */
+static void Setup( )
+{
   try
   {
-    factory->SetFileName( argv[1] );
-    factory->Update();
-
-    if(factory->GetNumberOfOutputs()<1)
-    {
-      std::cout<<"file could not be loaded [FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-    image = dynamic_cast<mitk::Image*>(node->GetData());
-    if(image.IsNull())
-    {
-      std::cout<<"file not an image - test will not be applied [PASSED]"<<std::endl;
-      std::cout<<"[TEST DONE]"<<std::endl;
-      return EXIT_SUCCESS;
-    }
+    m_Image = mitk::IOUtil::LoadImage( m_Filename );
   }
-  catch ( itk::ExceptionObject & ex )
+  catch( const itk::ExceptionObject &e)
   {
-    std::cout << "Exception: " << ex << "[FAILED]" << std::endl;
-    return EXIT_FAILURE;
+    MITK_TEST_FAILED_MSG(<< "(Setup) Caught exception from IOUtil while loading input : " << m_Filename <<"\n")
   }
+}
 
-  //Take a time step
+static void Valid_AllInputTimesteps_ReturnsTrue()
+{
+  Setup();
+
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-  timeSelector->SetInput(image);
-  timeSelector->SetTimeNr( 0 );
-  timeSelector->UpdateLargestPossibleRegion();
-  mitk::Image::Pointer result = timeSelector->GetOutput();
+  timeSelector->SetInput(m_Image);
 
-  std::cout << "Testing IsInitialized(): ";
-  if(result->IsInitialized()==false)
+  // test all timesteps
+  const unsigned int maxTimeStep = m_Image->GetTimeSteps();
+  for( unsigned int t=0; t<maxTimeStep; t++)
   {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
+    timeSelector->SetTimeNr(t);
+    timeSelector->Update();
+
+    mitk::Image::Pointer currentTimestepImage = timeSelector->GetOutput();
+
+    std::stringstream ss;
+    ss << " : Valid image in timestep " << t ;
+
+    MITK_TEST_CONDITION_REQUIRED( currentTimestepImage.IsNotNull()
+                                  , ss.str().c_str() );
   }
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing if Volume is set ";
-  //result->DisconnectPipeline();
-  //timeSelector = NULL;
 
-  if( result->IsVolumeSet(0) == false)
+}
+
+static void Valid_ImageExpandedByTimestep_ReturnsTrue()
+{
+  Setup();
+
+  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+
+  const unsigned int maxTimeStep = m_Image->GetTimeSteps();
+  mitk::TimeGeometry* tsg = m_Image->GetTimeGeometry();
+  mitk::ProportionalTimeGeometry* ptg = dynamic_cast<mitk::ProportionalTimeGeometry*>(tsg);
+  ptg->Expand(maxTimeStep+1);
+  ptg->SetTimeStepGeometry( ptg->GetGeometryForTimeStep(0), maxTimeStep );
+
+  mitk::Image::Pointer expandedImage = mitk::Image::New();
+  expandedImage->Initialize( m_Image->GetPixelType(0), *tsg );
+
+  timeSelector->SetInput(expandedImage);
+
+  for( unsigned int t=0; t<maxTimeStep+1; t++)
   {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
+    timeSelector->SetTimeNr(t);
+    timeSelector->Update();
+
+    mitk::Image::Pointer currentTimestepImage = timeSelector->GetOutput();
+
+    std::stringstream ss;
+    ss << " : Valid image in timestep " << t ;
+
+    MITK_TEST_CONDITION_REQUIRED( currentTimestepImage.IsNotNull()
+                                  , ss.str().c_str() );
   }
-  std::cout<<"[PASSED]"<<std::endl;
+}
 
+int mitkImageTimeSelectorTest(int argc, char* argv[])
+{
+  MITK_TEST_BEGIN(mitkImageTimeSelectorTest);
 
+  m_Filename = std::string( argv[1] );
 
-  std::cout<<"[TEST DONE]"<<std::endl;
-  return EXIT_SUCCESS;
+  Valid_AllInputTimesteps_ReturnsTrue();
+  Valid_ImageExpandedByTimestep_ReturnsTrue();
+
+  MITK_TEST_END();
 }

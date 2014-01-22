@@ -72,9 +72,8 @@ public:
    * Fails the test due to the given throwable.
    */
   void failexc(const std::string& message, const std::exception& e,
-      long lineNumber = CppUnit::CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-      const std::string& fileName =
-          CppUnit::CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+               long lineNumber = -1,
+               const std::string& fileName = "unknown");
 
   /**
    * Open a test window with the empty perspective.

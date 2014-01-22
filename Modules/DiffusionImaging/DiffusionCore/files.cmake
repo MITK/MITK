@@ -20,6 +20,8 @@ set(CPP_FILES
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageIOFactory.cpp
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriterFactory.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSerializer.cpp
+  IODataStructures/DiffusionWeightedImages/mitkImageToDiffusionImageSource.cpp
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp
 
   # DataStructures -> QBall
   IODataStructures/QBallImages/mitkQBallImageSource.cpp
@@ -39,6 +41,8 @@ set(CPP_FILES
   IODataStructures/TensorImages/mitkTensorImage.cpp
   IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
+  #IODataStructures/mitkRegistrationObject.cpp
+
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkCompositeMapper.cpp
@@ -53,6 +57,17 @@ set(CPP_FILES
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
+
+  # Registration Algorithms & Co.
+  Algorithms/Registration/mitkRegistrationWrapper.cpp
+  Algorithms/Registration/mitkPyramidImageRegistrationMethod.cpp
+
+
+  # MultishellProcessing
+  Algorithms/Reconstruction/MultishellProcessing/itkADCAverageFunctor.cpp
+  Algorithms/Reconstruction/MultishellProcessing/itkADCFitFunctor.cpp
+  Algorithms/Reconstruction/MultishellProcessing/itkKurtosisFitFunctor.cpp
+  Algorithms/Reconstruction/MultishellProcessing/itkBiExpFitFunctor.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
@@ -75,8 +90,14 @@ set(H_FILES
   Algorithms/Reconstruction/itkPointShell.h
   Algorithms/Reconstruction/itkOrientationDistributionFunction.h
   Algorithms/Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h
-  Algorithms/Reconstruction/itkMultiShellAdcAverageReconstructionImageFilter.h
-  Algorithms/Reconstruction/itkMultiShellRadialAdcKurtosisImageFilter.h
+
+  # MultishellProcessing
+  Algorithms/Reconstruction/MultishellProcessing/itkRadialMultishellToSingleshellImageFilter.h
+  Algorithms/Reconstruction/MultishellProcessing/itkDWIVoxelFunctor.h
+  Algorithms/Reconstruction/MultishellProcessing/itkADCAverageFunctor.h
+  Algorithms/Reconstruction/MultishellProcessing/itkKurtosisFitFunctor.h
+  Algorithms/Reconstruction/MultishellProcessing/itkBiExpFitFunctor.h
+  Algorithms/Reconstruction/MultishellProcessing/itkADCFitFunctor.h
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
@@ -107,11 +128,18 @@ set(H_FILES
   Algorithms/itkMrtrixPeakImageConverter.h
   Algorithms/itkFslPeakImageConverter.h
   Algorithms/itkShCoefficientImageImporter.h
+  Algorithms/itkShCoefficientImageExporter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
   Algorithms/itkResampleDwiImageFilter.h
   Algorithms/itkDwiGradientLengthCorrectionFilter.h
   Algorithms/itkAdcImageFilter.h
 
+  Algorithms/itkSplitDWImageFilter.h
+
+  Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h
+  Algorithms/mitkDiffusionImageToDiffusionImageFilter.h
+  Algorithms/itkNonLocalMeansDenoisingFilter.h
+  Algorithms/itkVectorImageToImageFilter.h
 
 
 )

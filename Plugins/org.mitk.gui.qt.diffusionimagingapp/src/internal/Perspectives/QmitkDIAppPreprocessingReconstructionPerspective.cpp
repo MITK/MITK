@@ -46,6 +46,10 @@ void QmitkDIAppPreprocessingReconstructionPerspective::CreateInitialLayout(berry
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.diffusionpreprocessing");
   lo->SetCloseable(false);
 
+  left->AddView("org.mitk.views.diffusionregistrationview");
+  lo = layout->GetViewLayout("org.mitk.views.diffusionregistrationview");
+  lo->SetCloseable(false);
+
   left->AddView("org.mitk.views.tensorreconstruction");
   lo = layout->GetViewLayout("org.mitk.views.tensorreconstruction");
   lo->SetCloseable(false);
@@ -59,10 +63,14 @@ void QmitkDIAppPreprocessingReconstructionPerspective::CreateInitialLayout(berry
   lo2->SetCloseable(false);
 
   bottomleft->AddView("org.mitk.views.odfmaximaextraction");
-  layout->GetViewLayout("org.mitk.views.odfmaximaextraction");
+  lo2 = layout->GetViewLayout("org.mitk.views.odfmaximaextraction");
   lo2->SetCloseable(false);
 
   bottomleft->AddView("org.mitk.views.odfdetails");
   lo2 = layout->GetViewLayout("org.mitk.views.odfdetails");
+  lo2->SetCloseable(false);
+
+  bottomleft->AddView("org.mitk.views.denoisingview");
+  lo2 = layout->GetViewLayout("org.mitk.views.denoisingview");
   lo2->SetCloseable(false);
 }

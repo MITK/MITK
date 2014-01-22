@@ -51,15 +51,14 @@ int mitkImageVtkMapper2DSwivelTest(int argc, char* argv[])
   //rotate the image arround its own center
   renderingHelper.ReorientSlices(centerPoint, rotationVector);
 
+  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+
   //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = false;
-  if(generateReferenceScreenshot)
+  if(false)
   {
     renderingHelper.SaveReferenceScreenShot("/media/hdd/thomasHdd/Pictures/RenderingTestData/pic3dSwivel640x480REF.png");
   }
-
-  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
   MITK_TEST_END();
 }

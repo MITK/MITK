@@ -17,29 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDicomExternalDataWidget_h
 #define QmitkDicomExternalDataWidget_h
 
-// #include <QmitkFunctionality.h>
-#include "ui_QmitkDicomExternalDataWidgetControls.h"
 #include "mitkDicomUIExports.h"
+#include "ui_QmitkDicomExternalDataWidgetControls.h"
 
 // include ctk
 #include <ctkDICOMDatabase.h>
-#include <ctkDICOMModel.h>
 #include <ctkDICOMIndexer.h>
 
 //include QT
-#include <QWidget>
+#include <QHash>
+#include <QLabel>
+#include <QProgressDialog>
 #include <QString>
 #include <QStringList>
-#include <QModelIndex>
-//For running dicom import in background
-#include <QtConcurrentRun>
-#include <QFuture>
-#include <QFutureWatcher>
-#include <QTimer>
-#include <QProgressDialog>
-#include <QLabel>
-#include <QHash>
 #include <QVariant>
+#include <QWidget>
+
+class ctkFileDialog;
 
 /**
 * \brief QmitkDicomExternalDataWidget is a QWidget providing functionality for dicom import.
@@ -86,20 +80,8 @@ signals:
     /// @brief emitted when import into database is finished.
     void SignalStartDicomImport(const QStringList&);
 
-    /// @brief emitted when import into database is finished.
-    void SignalFinishedImport();
-
     /// @brief emitted when view button is clicked.
     void SignalDicomToDataManager(QHash<QString,QVariant>);
-
-    /// \brief emitted when import progress changes.
-    void SignalProgress(int);
-
-    /// \brief emitted when anoter file is processed.
-    void SignalProcessingFile(QString);
-
-    /// \brief emitted if cancel button is pressed.
-    void SignalCancelImport();
 
 public slots:
 
@@ -109,9 +91,6 @@ public slots:
     /// @brief Called when view button was clicked.
     void OnViewButtonClicked();
 
-    /// @brief   Called when search parameters change.
-    void OnSearchParameterChanged();
-
     /// @brief   Called when adding a dicom directory. Starts a thread adding the directory.
     void OnStartDicomImport(const QString&);
 
@@ -120,19 +99,33 @@ public slots:
     /// This causes a model update.
     void OnFinishedImport();
 
+    void OnSeriesSelectionChanged(const QStringList &s);
+
+protected slots:
+
+    /// \brief Called when the scan directory button is clicked
+    void OnScanDirectory();
+
 protected:
 
     /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index will be returned.
     QStringList GetFileNamesFromIndex();
 
+    /// \brief SetupImportDialog Sets up import dialog.
+    void SetupImportDialog();
+
+    /// \brief SetupProgressDialog Sets up progress dialog.
+    void SetupProgressDialog(QWidget* parent);
+
     ctkDICOMDatabase* m_ExternalDatabase;
-    ctkDICOMModel* m_ExternalModel;
     ctkDICOMIndexer* m_ExternalIndexer;
+    ctkFileDialog* m_ImportDialog;
 
-    Ui::QmitkDicomExternalDataWidgetControls* m_Controls;
-
+    QLabel* m_ProgressDialogLabel;
+    QProgressDialog* m_ProgressDialog;
     QString m_LastImportDirectory;
 
+    Ui::QmitkDicomExternalDataWidgetControls* m_Controls;
 };
 
 

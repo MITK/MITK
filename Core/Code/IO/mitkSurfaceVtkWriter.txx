@@ -75,7 +75,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
   vtkPolyData * polyData;
   Geometry3D* geometry;
 
-  unsigned int t, timesteps = input->GetTimeSlicedGeometry()->GetTimeSteps();
+  unsigned int t, timesteps = input->GetTimeGeometry()->CountTimeSteps();
 
   for(t = 0; t < timesteps; ++t)
   {
@@ -87,14 +87,14 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     geometry = input->GetGeometry(t);
     if ( timesteps > 1 )
     {
-      if(input->GetTimeSlicedGeometry()->IsValidTime(t))
+      if(input->GetTimeGeometry()->IsValidTimeStep(t))
       {
         const TimeBounds& timebounds = geometry->GetTimeBounds();
         filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
       }
       else
       {
-        itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of surface " << filename << ".");
+        itkWarningMacro(<<"Error on write: TimeGeometry invalid of surface " << filename << ".");
         filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
       }
       m_VtkWriter->SetFileName(filename.str().c_str());
@@ -103,12 +103,12 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
       m_VtkWriter->SetFileName(m_FileName.c_str());
 
     geometry->TransferItkToVtkTransform();
-    transformPolyData->SetInput(input->GetVtkPolyData(t));
+    transformPolyData->SetInputData(input->GetVtkPolyData(t));
     transformPolyData->SetTransform(geometry->GetVtkTransform());
     transformPolyData->UpdateWholeExtent();
     polyData = transformPolyData->GetOutput();
 
-    m_VtkWriter->SetInput(polyData);
+    m_VtkWriter->SetInputData(polyData);
 
     ExecuteWrite( m_VtkWriter );
   }

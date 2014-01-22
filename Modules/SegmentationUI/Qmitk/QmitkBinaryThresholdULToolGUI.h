@@ -40,7 +40,7 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
     mitkClassMacro(QmitkBinaryThresholdULToolGUI, QmitkToolGUI);
     itkNewMacro(QmitkBinaryThresholdULToolGUI);
 
-    void OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper);
+    void OnThresholdingIntervalBordersChanged(double lower, double upper);
     void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
 
   signals:

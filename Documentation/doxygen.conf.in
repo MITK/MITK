@@ -709,32 +709,29 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = @MITK_SOURCE_DIR@/BlueBerry/Documentation/reference/api/MainPage.dox \
-                         @MITK_SOURCE_DIR@/Utilities/ann/ \
-                         @MITK_SOURCE_DIR@/Utilities/glew/ \
                          @MITK_SOURCE_DIR@/Utilities/ipFunc/ \
                          @MITK_SOURCE_DIR@/Utilities/ipSegmentation/ \
                          @MITK_SOURCE_DIR@/Utilities/KWStyle/ \
-                         @MITK_SOURCE_DIR@/Utilities/pic2vtk/ \
                          @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/Utilities/qtsingleapplication/ \
-                         @MITK_SOURCE_DIR@/Utilities/qwt/ \
-                         @MITK_SOURCE_DIR@/Utilities/qxt/ \
-                         @MITK_SOURCE_DIR@/Utilities/tinyxml/ \
-                         @MITK_SOURCE_DIR@/Utilities/vecmath/ \
                          @MITK_SOURCE_DIR@/Applications/PluginGenerator/ \
-                         @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/README.md \
-                         @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/documentation/snippets/ \
-                         @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/documentation/doxygen/standalone/ \
-                         @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/test/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/README.md \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/documentation/snippets/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/documentation/doxygen/standalone/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/examples/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/test/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/src/util/jsoncpp.cpp \
                          @MITK_SOURCE_DIR@/Deprecated/ \
                          @MITK_SOURCE_DIR@/Build/ \
                          @MITK_SOURCE_DIR@/CMake/PackageDepends \
                          @MITK_SOURCE_DIR@/CMake/QBundleTemplate \
                          @MITK_SOURCE_DIR@/CMakeExternals \
                          @MITK_SOURCE_DIR@/Modules/QmitkExt/vtkQtChartHeaders/ \
+                         @MITK_BINARY_DIR@/bin/ \
                          @MITK_BINARY_DIR@/PT/ \
                          @MITK_BINARY_DIR@/GP/ \
-                         @MITK_BINARY_DIR@/Core/Code/CppMicroServices/ \
+                         @MITK_BINARY_DIR@/Core/CppMicroServices/ \
+                         @MITK_BINARY_DIR@/_CPack_Packages/ \
                          @MITK_DOXYGEN_ADDITIONAL_EXCLUDE_DIRS@
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -782,12 +779,13 @@ EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Examples/Plugins/ \
                          @MITK_SOURCE_DIR@/Examples/QtFreeRender/ \
                          @MITK_SOURCE_DIR@/Core/Code/ \
-                         @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/Documentation/Snippets/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/documentation/snippets/ \
+                         @MITK_SOURCE_DIR@/Core/CppMicroServices/examples/ \
                          @MITK_DOXYGEN_OUTPUT_DIR@/html/extension-points/html/ \
                          @MITK_SOURCE_DIR@/Documentation/Snippets/ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/ExampleCode/ \
                          @MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/ \
-                         @MITK_SOURCE_DIR@/BlueBerry/Documentation/snippets/
+                         @MITK_SOURCE_DIR@/Modules/IGT/Tutorial/
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp
@@ -1672,7 +1670,7 @@ SKIP_FUNCTION_MACROS   = YES
 # NOT include the path). If a tag file is not located in the directory in which
 # doxygen is run, you must also specify the path to the tagfile here.
 
-TAGFILES               =
+TAGFILES               = @BLUEBERRY_DOXYGEN_TAGFILE@
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create
 # a tag file that is based on the input files it reads.

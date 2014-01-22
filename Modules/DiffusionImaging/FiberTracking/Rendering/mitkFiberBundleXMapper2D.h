@@ -97,8 +97,6 @@ namespace mitk {
 
     void UpdateShaderParameter(mitk::BaseRenderer*);
 
-    static IShaderRepository* GetShaderRepository();
-
   private:
     vtkSmartPointer<vtkLookupTable> m_lut;
 

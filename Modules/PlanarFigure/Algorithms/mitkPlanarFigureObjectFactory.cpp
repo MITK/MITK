@@ -23,20 +23,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureWriterFactory.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureMapper2D.h"
+#include "mitkPlanarFigureVtkMapper3D.h"
 
 typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
 : m_PlanarFigureIOFactory(PlanarFigureIOFactory::New().GetPointer())
+, m_PlanarFigureWriterFactory(PlanarFigureWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if ( !alreadyDone )
   {
-    RegisterIOFactories();
-
     itk::ObjectFactoryBase::RegisterFactory( m_PlanarFigureIOFactory );
-
-    PlanarFigureWriterFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory( m_PlanarFigureWriterFactory );
 
     m_FileWriters.push_back( PlanarFigureWriter::New().GetPointer() );
 
@@ -48,7 +47,7 @@ mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
 
 mitk::PlanarFigureObjectFactory::~PlanarFigureObjectFactory()
 {
-  PlanarFigureWriterFactory::UnRegisterOneFactory();
+  itk::ObjectFactoryBase::UnRegisterFactory(m_PlanarFigureWriterFactory);
   itk::ObjectFactoryBase::UnRegisterFactory(m_PlanarFigureIOFactory);
 }
 
@@ -57,16 +56,18 @@ mitk::Mapper::Pointer mitk::PlanarFigureObjectFactory::CreateMapper(mitk::DataNo
   mitk::Mapper::Pointer newMapper=NULL;
   mitk::BaseData *data = node->GetData();
 
-  if ( id == mitk::BaseRenderer::Standard2D )
+  if ( dynamic_cast<PlanarFigure*>(data) != NULL )
   {
-    if ( dynamic_cast<PlanarFigure*>(data) != NULL )
+    if ( id == mitk::BaseRenderer::Standard2D )
     {
       newMapper = mitk::PlanarFigureMapper2D::New();
       newMapper->SetDataNode(node);
     }
-  }
-  else if ( id == mitk::BaseRenderer::Standard3D )
-  {
+    else if ( id == mitk::BaseRenderer::Standard3D )
+    {
+      newMapper = mitk::PlanarFigureVtkMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
   }
 
   return newMapper;
@@ -88,6 +89,7 @@ void mitk::PlanarFigureObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     mitk::PlanarFigureMapper2D::SetDefaultProperties(node);
     node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), NULL, true );
     node->AddProperty( "opacity", mitk::FloatProperty::New(0.8), NULL, true );
+    node->AddProperty( "planarfigure.3drendering", mitk::BoolProperty::New(false), NULL, true );
   }
 }
 

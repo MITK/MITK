@@ -49,6 +49,25 @@ namespace mitk
   }
 
   /**
+   * Explicitely reset progress bar.
+   */
+  void ProgressBar::Reset()
+  {
+    if ( !m_Implementations.empty() )
+    {
+      ProgressBarImplementationsListIterator iter;
+      for ( iter = m_Implementations.begin(); iter != m_Implementations.end(); iter++ )
+      {
+        // set steps to do for all ProgressBarImplementations
+        if ( (*iter) != NULL )
+        {
+          (*iter)->Reset();
+        }
+      }
+    }
+  }
+
+  /**
    * Adds steps to totalSteps.
    */
   void ProgressBar::AddStepsToDo(unsigned int steps)

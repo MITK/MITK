@@ -1,31 +1,21 @@
 set(CPP_FILES
-
-  MiniApps/ctkCommandLineParser.h
-
-  # DataStructures -> FiberBundleX
+  ## IO datastructures
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXReader.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
-#  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.cpp
-
-  # DataStructures -> PlanarFigureComposite
+  IODataStructures/FiberBundleX/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
-
-  # DataStructures
   IODataStructures/mitkFiberTrackingObjectFactory.cpp
 
   # Rendering
   Rendering/mitkFiberBundleXMapper2D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
-#  Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
-  #Rendering/mitkPlanarFigureMapper3D.cpp
 
   # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
-
 
   # Tractography
   Algorithms/GibbsTracking/mitkParticleGrid.cpp
@@ -37,13 +27,9 @@ set(CPP_FILES
 )
 
 set(H_FILES
-  MiniApps/ctkCommandLineParser.h
-
   # Rendering
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
-#  Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
-  #Rendering/mitkPlanarFigureMapper3D.h
 
   # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.h
@@ -52,9 +38,9 @@ set(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
-#  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
-
+  IODataStructures/FiberBundleX/mitkTrackvis.h
   IODataStructures/mitkFiberTrackingObjectFactory.h
+  IODataStructures/mitkFiberfoxParameters.h
 
   # Algorithms
   Algorithms/itkTractDensityImageFilter.h
@@ -93,7 +79,7 @@ set(H_FILES
   SignalModels/mitkStickModel.h
   SignalModels/mitkDiffusionNoiseModel.h
   SignalModels/mitkRicianNoiseModel.h
-  SignalModels/mitkKspaceArtifact.h
+  SignalModels/mitkChiSquareNoiseModel.h
 )
 
 set(RESOURCE_FILES

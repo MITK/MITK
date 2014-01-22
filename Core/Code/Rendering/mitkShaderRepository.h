@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITKSHADERREPOSITORY_H_
 #define _MITKSHADERREPOSITORY_H_
 
-#include <MitkExports.h>
-
 #include "mitkIShaderRepository.h"
 
 class vtkXMLDataElement;
@@ -34,22 +32,12 @@ namespace mitk {
  *
  * Additionally, it provides a utility function for applying properties for shaders
  * in mappers.
- *
- * \deprecatedSince{2013_03} Use the micro service interface IShaderRepository instead.
  */
-class MITK_CORE_EXPORT ShaderRepository : public itk::LightObject, public IShaderRepository
+class ShaderRepository : public IShaderRepository
 {
-public:
 
-  mitkClassMacro( ShaderRepository, itk::LightObject )
+protected:
 
-  itkFactorylessNewMacro( Self )
-
-  DEPRECATED(static ShaderRepository *GetGlobalShaderRepository());
-
-  /**
-   * \deprecatedSince{2013_03} Use IShaderRepository::Shader instead.
-   */
   class Shader : public IShaderRepository::Shader
   {
     public:
@@ -108,13 +96,6 @@ public:
      */
     ~Shader();
 
-    // DEPRECATED since 2013.03
-    std::string name;
-    // DEPRECATED since 2013.03
-    std::string path;
-
-    DEPRECATED(void LoadPropertiesFromPath());
-
     Uniform *GetUniform(char * /*id*/) { return 0; }
 
     std::list<Uniform::Pointer> *GetUniforms()
@@ -127,20 +108,22 @@ public:
     friend class ShaderRepository;
 
     void LoadProperties(vtkProperty* prop);
-    void LoadProperties(const std::string& path);
     void LoadProperties(std::istream& stream);
 
   };
 
-
-
-protected:
-
-  std::list<Shader::Pointer> shaders;
-
   void LoadShaders();
 
   Shader::Pointer GetShaderImpl(const std::string& name) const;
+
+private:
+
+  std::list<Shader::Pointer> shaders;
+
+  static int shaderId;
+  static const bool debug;
+
+public:
 
   /**
    * Constructor
@@ -151,20 +134,6 @@ protected:
    * Destructor
    */
   ~ShaderRepository();
-
-private:
-
-  static int shaderId;
-  static const bool debug;
-
-public:
-
-  DEPRECATED(std::list<Shader::Pointer> *GetShaders())
-  {
-    return &shaders;
-  }
-
-  DEPRECATED(Shader *GetShader(const char *id) const);
 
   std::list<IShaderRepository::Shader::Pointer> GetShaders() const;
 
@@ -181,10 +150,6 @@ public:
    * to the VTK object by updating the shader variables of its vtkProperty.
    */
   void ApplyProperties(mitk::DataNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const;
-
-  /** \brief Loads a shader from a given file. Make sure that this file is in the XML shader format.
-   */
-  DEPRECATED(int LoadShader(const std::string& filename));
 
   int LoadShader(std::istream& stream, const std::string& name);
 

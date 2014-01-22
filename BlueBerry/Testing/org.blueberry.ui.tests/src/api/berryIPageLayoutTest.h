@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryUITestCase.h>
 
-#include <CppUnit/TestCaller.h>
+#include <cppunit/TestCaller.h>
 
 namespace berry {
 

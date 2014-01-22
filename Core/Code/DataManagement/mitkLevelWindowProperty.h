@@ -13,8 +13,6 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
-
 #ifndef MITKLEVELWINDOWPROPERTY_H_HEADER_INCLUDED_C10EEAA8
 #define MITKLEVELWINDOWPROPERTY_H_HEADER_INCLUDED_C10EEAA8
 
@@ -28,10 +26,18 @@ namespace mitk {
 # pragma warning(disable: 4522)
 #endif
 
-//##Documentation
-//## @brief Property for level/window data
-//##
-//## @ingroup DataManagement
+/**
+ * @brief The LevelWindowProperty class Property for the mitk::LevelWindow
+ *
+ * @ingroup DataManagement
+ *
+ * @note If you want to apply the mitk::LevelWindowProperty to an mitk::Image,
+ * make sure to set the mitk::RenderingModeProperty to a mode which supports
+ * level window (e.g. LEVELWINDOW_COLOR). Make sure to check the documentation
+ * of the mitk::RenderingModeProperty. For a code example how to use the
+ * mitk::LevelWindowProperty check the mitkImageVtkMapper2DLevelWindowTest.cpp
+ * in Core\Code\Testing.
+ */
 class MITK_CORE_EXPORT LevelWindowProperty : public BaseProperty
 {
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYTESTCASE_H_
 #define BERRYTESTCASE_H_
 
-#include <CppUnit/TestCase.h>
+#include <cppunit/TestCase.h>
 
 #include <org_blueberry_test_Export.h>
 

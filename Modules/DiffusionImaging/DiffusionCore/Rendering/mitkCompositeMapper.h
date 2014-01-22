@@ -92,10 +92,10 @@ namespace mitk {
       return m_OdfMapper->HasVtkProp(prop, renderer);
     }
 
-    void ReleaseGraphicsResources(vtkWindow* window)
+    void ReleaseGraphicsResources(mitk::BaseRenderer* renderer)
     {
-      m_ImgMapper->ReleaseGraphicsResources(window);
-      m_OdfMapper->ReleaseGraphicsResources(window);
+      m_ImgMapper->ReleaseGraphicsResources(renderer);
+      m_OdfMapper->ReleaseGraphicsResources(renderer);
     }
 
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false )

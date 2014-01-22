@@ -14,58 +14,64 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkIndexROI.h"
 #include "mitkSimulation.h"
-#include "mitkSimulationMapper3D.h"
-#include "mitkSimulationModel.h"
 #include "mitkSimulationObjectFactory.h"
-#include "mitkSimulationTemplate.h"
+#include "mitkSimulationVtkMapper3D.h"
+#include "mitkVtkModel.h"
 #include <mitkCoreObjectFactory.h>
+#include <sofa/helper/system/glut.h>
 #include <sofa/component/init.h>
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/simulation/common/xml/initXml.h>
 
-static void InitializeSOFA()
+static void InitializeSofa()
 {
+  int argc = 0;
+  glutInit(&argc, NULL);
+
   sofa::component::init();
   sofa::simulation::xml::initXml();
+}
 
-  int SimulationModelClass = sofa::core::RegisterObject("").add<mitk::SimulationModel>();
-  sofa::core::ObjectFactory::AddAlias("OglModel", "SimulationModel", true);
-  sofa::core::ObjectFactory::AddAlias("VisualModel", "SimulationModel", true);
+static void RegisterSofaClasses()
+{
+  using sofa::core::ObjectFactory;
+  using sofa::core::RegisterObject;
+
+  int IndexROIClass = RegisterObject("").add<mitk::IndexROI>();
+  int VtkModelClass = RegisterObject("").add<mitk::VtkModel>();
+
+  ObjectFactory::AddAlias("VisualModel", "VtkModel", true);
+  ObjectFactory::AddAlias("OglModel", "VtkModel", true);
 }
 
 mitk::SimulationObjectFactory::SimulationObjectFactory()
-  : m_SimulationIOFactory(SimulationIOFactory::New()),
-    m_SimulationTemplateIOFactory(SimulationTemplateIOFactory::New())
+  : m_SimulationIOFactory(SimulationIOFactory::New())
 {
   itk::ObjectFactoryBase::RegisterFactory(m_SimulationIOFactory);
-  itk::ObjectFactoryBase::RegisterFactory(m_SimulationTemplateIOFactory);
 
   std::string description = "SOFA Scene Files";
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.scn", description));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.xml", description));
 
-  description = "SOFA Scene File Templates";
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.scn.template", description));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.xml.template", description));
-
-  InitializeSOFA();
+  InitializeSofa();
+  RegisterSofaClasses();
 }
 
 mitk::SimulationObjectFactory::~SimulationObjectFactory()
 {
-  itk::ObjectFactoryBase::UnRegisterFactory(m_SimulationTemplateIOFactory);
   itk::ObjectFactoryBase::UnRegisterFactory(m_SimulationIOFactory);
 }
 
 mitk::Mapper::Pointer mitk::SimulationObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
 {
-  mitk::Mapper::Pointer mapper;
+  Mapper::Pointer mapper;
 
   if (dynamic_cast<Simulation*>(node->GetData()) != NULL)
   {
-    if (slotId == mitk::BaseRenderer::Standard3D)
-      mapper = mitk::SimulationMapper3D::New();
+    if (slotId == BaseRenderer::Standard3D)
+      mapper = mitk::SimulationVtkMapper3D::New();
 
     if (mapper.IsNotNull())
       mapper->SetDataNode(node);
@@ -76,7 +82,7 @@ mitk::Mapper::Pointer mitk::SimulationObjectFactory::CreateMapper(mitk::DataNode
 
 const char* mitk::SimulationObjectFactory::GetDescription() const
 {
-  return "mitk::SimulationObjectFactory";
+  return "Simulation Object Factory";
 }
 
 const char* mitk::SimulationObjectFactory::GetFileExtensions()
@@ -110,18 +116,11 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SimulationObjectFactory::GetSave
 
 void mitk::SimulationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  if (node != NULL)
-  {
-    if (dynamic_cast<Simulation*>(node->GetData()) != NULL)
-    {
-      SimulationMapper3D::SetDefaultProperties(node);
-    }
-    else if (dynamic_cast<SimulationTemplate*>(node->GetData()) != NULL)
-    {
-      SimulationTemplate* simulationTemplate = static_cast<SimulationTemplate*>(node->GetData());
-      simulationTemplate->SetProperties(node);
-    }
-  }
+  if (node == NULL)
+    return;
+
+  if (dynamic_cast<Simulation*>(node->GetData()) != NULL)
+    SimulationVtkMapper3D::SetDefaultProperties(node);
 }
 
 void mitk::RegisterSimulationObjectFactory()

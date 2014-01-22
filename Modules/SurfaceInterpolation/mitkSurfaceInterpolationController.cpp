@@ -84,7 +84,7 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
 
   for (unsigned int i = 0; i < m_MapOfContourLists[m_SelectedSegmentation].size(); i++)
   {
-      itk::Matrix<float> diffM = transform->GetMatrix()-m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetMatrix();
+      itk::Matrix<ScalarType> diffM = transform->GetMatrix()-m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetMatrix();
       bool isSameMatrix(true);
       for (unsigned int j = 0; j < 3; j++)
       {
@@ -94,7 +94,7 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
           break;
         }
       }
-      itk::Vector<float> diffV = m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetOffset()-transform->GetOffset();
+      itk::Vector<ScalarType> diffV = m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetTransform()->GetOffset()-transform->GetOffset();
       if ( isSameMatrix && m_MapOfContourLists[m_SelectedSegmentation].at(i).position->GetPos() == op->GetPos() && (fabs(diffV[0]) < 0.0001 && fabs(diffV[1]) < 0.0001 && fabs(diffV[2]) < 0.0001) )
       {
         pos = i;
@@ -157,6 +157,8 @@ void mitk::SurfaceInterpolationController::Interpolate()
   mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
   imageToSurfaceFilter->SetInput( distanceImage );
   imageToSurfaceFilter->SetThreshold( 0 );
+  imageToSurfaceFilter->SetSmooth(true);
+  imageToSurfaceFilter->SetSmoothIteration(20);
   imageToSurfaceFilter->Update();
   m_InterpolationResult = imageToSurfaceFilter->GetOutput();
 
@@ -164,7 +166,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
   for (unsigned int i = 0; i < m_ReduceFilter->GetNumberOfOutputs(); i++)
   {
-    polyDataAppender->AddInput(m_ReduceFilter->GetOutput(i)->GetVtkPolyData());
+    polyDataAppender->AddInputData(m_ReduceFilter->GetOutput(i)->GetVtkPolyData());
   }
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());

@@ -18,9 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include <mitkNavigationDataSource.h>
-#include <mitkGetModuleContext.h>
-#include <qlistwidget.h>
-
+#include <usGetModuleContext.h>
+#include <usServiceReference.h>
 
 
 
@@ -48,7 +47,7 @@ void QmitkNavigationDataSourceSelectionWidget::CreateQtPartControl(QWidget *pare
     m_Controls->setupUi(parent);
 
     std::string empty = "";
-    m_Controls->m_NaviagationDataSourceWidget->Initialize<mitk::NavigationDataSource>(mitk::NavigationDataSource::US_PROPKEY_DEVICENAME,empty);
+    m_Controls->m_NavigationDataSourceWidget->Initialize<mitk::NavigationDataSource>(mitk::NavigationDataSource::US_PROPKEY_DEVICENAME,empty);
 
   }
 }
@@ -57,37 +56,44 @@ void QmitkNavigationDataSourceSelectionWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->m_NaviagationDataSourceWidget), SIGNAL(ServiceSelectionChanged(mitk::ServiceReference)), this, SLOT(NavigationDataSourceSelected(mitk::ServiceReference)) );
+    connect( (QObject*)(m_Controls->m_NavigationDataSourceWidget), SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(NavigationDataSourceSelected(us::ServiceReferenceU)) );
 
   }
 }
 
-void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk::ServiceReference s)
+void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::ServiceReferenceU s)
   {
     if (!s) //no device selected
       {
         //reset everything
         m_CurrentSource = NULL;
         m_CurrentStorage = NULL;
+        emit NavigationDataSourceSelected(m_CurrentSource);
         return;
       }
 
     // Get Source
-    m_CurrentSource = this->m_Controls->m_NaviagationDataSourceWidget->TranslateReference<mitk::NavigationDataSource>(s);
+    us::ModuleContext* context = us::GetModuleContext();
+    m_CurrentSource = context->GetService<mitk::NavigationDataSource>(s);
     std::string id = s.GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
-    mitk::ModuleContext* context = mitk::GetModuleContext();
 
+    // clear tool list before filling it
+    m_Controls->m_ToolView->clear();
     //Fill tool list
-    for(int i = 0; i < m_CurrentSource->GetNumberOfOutputs(); i++) {new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);}
+    MITK_INFO<<"no outputs: "<<m_CurrentSource->GetNumberOfOutputs();
+    for(std::size_t i = 0; i < m_CurrentSource->GetNumberOfOutputs(); i++)
+    {
+      new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);
+    }
 
 
     // Create Filter for ToolStorage
-    std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + mitk::NavigationToolStorage::US_INTERFACE_NAME + ")("+ mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + id + "))";
+    std::string filter = "("+ mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + id + ")";
 
     // Get Storage
-    std::list<mitk::ServiceReference> refs = context->GetServiceReferences(mitk::NavigationToolStorage::US_INTERFACE_NAME, filter);
-    if (refs.size() == 0) return; //no storage was found
-    m_CurrentStorage = context->GetService<mitk::NavigationToolStorage>(refs.front());
+    std::vector<us::ServiceReference<mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>(filter);
+    if (refs.empty()) return; //no storage was found
+    m_CurrentStorage = context->GetService(refs.front());
     if (m_CurrentStorage.IsNull())
       {
       MITK_WARN << "Found an invalid storage object!";
@@ -98,6 +104,8 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk
       MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
       m_CurrentStorage = NULL;
       }
+
+    emit NavigationDataSourceSelected(m_CurrentSource);
   }
 
 mitk::NavigationDataSource::Pointer QmitkNavigationDataSourceSelectionWidget::GetSelectedNavigationDataSource()

@@ -4,6 +4,11 @@ set(LIBPOSTFIX "Ext")
 set(module_dirs
     DICOMReader
     DICOMTesting
+    MitkDataTypesExt
+    MitkAlgorithmsExt
+    MitkMapperExt
+    MitkIOExt
+    Qt4Qt5TestModule
     SceneSerializationBase
     PlanarFigure
     ImageExtraction
@@ -13,15 +18,18 @@ set(module_dirs
     MitkExt
     SceneSerialization
     GraphAlgorithms
+    ContourModel
     SurfaceInterpolation
     Segmentation
     PlanarFigureSegmentation
+    OpenViewCore
+    QmlMitk
     Qmitk
     QmitkExt
     SegmentationUI
-    Properties
     DiffusionImaging
     GPGPU
+    IGTBase
     IGT
     CameraCalibration
     IGTUI
@@ -44,6 +52,10 @@ set(module_dirs
     Remeshing
     Python
 )
+
+if(MITK_ENABLE_PIC_READER)
+  list(APPEND module_dirs IpPicSupportIO)
+endif()
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)
 

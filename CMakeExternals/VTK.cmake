@@ -48,21 +48,21 @@ if(NOT DEFINED VTK_DIR)
   endif()
 
   if(MITK_USE_QT)
-    list(APPEND additional_cmake_args
-        -DDESIRED_QT_VERSION:STRING=4
-        -DVTK_USE_GUISUPPORT:BOOL=ON
-        -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
-        -DVTK_USE_QT:BOOL=ON
-        -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-     )
+    if(DESIRED_QT_VERSION MATCHES 4) # current VTK package has a HARD Qt 4 dependency
+      list(APPEND additional_cmake_args
+          -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION}
+          -DVTK_USE_GUISUPPORT:BOOL=ON
+          -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
+          -DVTK_USE_QT:BOOL=ON
+          -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+          -DVTK_Group_Qt:BOOL=ON
+       )
+     endif()
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-5.10.0.tar.gz)
-  set(VTK_URL_MD5 a0363f78910f466ba8f1bd5ab5437cb9)
+  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-6.0.0.tar.gz)
+  set(VTK_URL_MD5 fa07fb55a905186f7d98807585efb20e)
 
-  if(APPLE)
-    set(VTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchVTK-5.10-Mac.cmake)
-  endif()
 
     ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
@@ -71,7 +71,6 @@ if(NOT DEFINED VTK_DIR)
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}
     INSTALL_COMMAND ""
-    PATCH_COMMAND ${VTK_PATCH_COMMAND}
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
@@ -79,13 +78,14 @@ if(NOT DEFINED VTK_DIR)
         -DVTK_WRAP_PYTHON:BOOL=OFF
         -DVTK_WRAP_JAVA:BOOL=OFF
         -DBUILD_SHARED_LIBS:BOOL=ON
-        -DVTK_USE_PARALLEL:BOOL=ON
-        -DVTK_USE_CHARTS:BOOL=OFF
-        -DVTK_USE_QTCHARTS:BOOL=ON
-        -DVTK_USE_GEOVIS:BOOL=OFF
         -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
-        -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
         -DVTK_LEGACY_REMOVE:BOOL=ON
+        -DModule_vtkTestingRendering:BOOL=ON
+        -DModule_vtkGUISupportQt:BOOL=ON
+        -DModule_vtkGUISupportQtWebkit:BOOL=ON
+        -DModule_vtkGUISupportQtSQL:BOOL=ON
+        -DModule_vtkRenderingQt:BOOL=ON
+        -DVTK_MAKE_INSTANTIATORS:BOOL=ON
         ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}
     )

@@ -23,6 +23,10 @@ set(GDCM_DEPENDS ${proj})
 
 if(NOT DEFINED GDCM_DIR)
 
+
+  set(GDCM_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchGDCM-20130814.cmake)
+
+
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
@@ -30,6 +34,7 @@ if(NOT DEFINED GDCM_DIR)
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-2.2.1.tar.gz
      URL_MD5 67c6808a6f62796954f4131e24aaab2c
      INSTALL_COMMAND ""
+     PATCH_COMMAND ${GDCM_PATCH_COMMAND}
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}

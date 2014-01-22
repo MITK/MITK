@@ -35,7 +35,7 @@ itkEventMacro( SliceRotationEvent, itk::AnyEvent);
  * \brief Coordinates a list of SliceNavigationControllers.
  *
  * Each SliceNavigationController can select one slice from a
- * TimeSlicedGeometry. This class (SlicesCoordinator) coordinates several
+ * TimeGeometry. This class (SlicesCoordinator) coordinates several
  * SliceNavigationControllers to facilitate e.g. rotation of slices. A new
  * class is needed, because for rotation one has to know an axis of rotation.
  * Such an axis is most easily determined from the "other slices", which are

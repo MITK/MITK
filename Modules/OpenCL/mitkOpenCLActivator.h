@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * @brief Custom activator for the OpenCL Module in order to register
  * and provide the OclResourceService
  */
-class US_ABI_LOCAL OpenCLActivator : public mitk::ModuleActivator
+class US_ABI_LOCAL OpenCLActivator : public us::ModuleActivator
 {
 private:
 
@@ -42,10 +42,10 @@ private:
 
 public:
   /** @brief Load module context */
-  void Load(mitk::ModuleContext *context);
+  void Load(us::ModuleContext *context);
 
   /** @brief Unload module context */
-  void Unload(mitk::ModuleContext* );
+  void Unload(us::ModuleContext* );
 
 };
 

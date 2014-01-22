@@ -31,6 +31,8 @@ class QDragEnterEvent;
 class QDropEvent;
 class QMouseEvent;
 
+class QmitkDnDFrameWidgetPrivate;
+
 /**
  * \ingroup org_mitk_gui_qt_common
  *
@@ -45,12 +47,13 @@ class MITK_QT_COMMON QmitkDnDFrameWidget : public QWidget
 
 public:
   QmitkDnDFrameWidget(QWidget *parent);
-
+  virtual ~QmitkDnDFrameWidget();
 
 private:
   void dragEnterEvent( QDragEnterEvent *event );
   void dropEvent( QDropEvent * event );
 
+  const QScopedPointer<QmitkDnDFrameWidgetPrivate> d;
 
 };
 

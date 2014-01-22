@@ -16,11 +16,12 @@
 #!        be added to the current source directory. The resulting directories
 #!        will be available in the set of include directories of depending plug-ins.
 #! \param DOXYGEN_TAGFILES (optional) Which external tag files should be available for the plugin documentation
+#! \param MOC_OPTIONS (optional) Additional options to pass to the Qt MOC compiler
 #! \param TEST_PLUGIN (option) Mark this plug-in as a testing plug-in.
 #! \param NO_INSTALL (option) Don't install this plug-in.
 macro(MACRO_CREATE_CTK_PLUGIN)
 
-  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;DOXYGEN_TAGFILES" "TEST_PLUGIN;NO_INSTALL;NO_QHP_TRANSFORM" ${ARGN})
+  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;DOXYGEN_TAGFILES;MOC_OPTIONS" "TEST_PLUGIN;NO_INSTALL;NO_QHP_TRANSFORM" ${ARGN})
 
   message(STATUS "Creating CTK plugin ${PROJECT_NAME}")
 
@@ -109,15 +110,36 @@ macro(MACRO_CREATE_CTK_PLUGIN)
   #------------------------------------------------------------#
   #------------------ Create Plug-in --------------------------#
 
+  set(_additional_target_libraries )
+  if(_PLUGIN_TEST_PLUGIN)
+    find_package(CppUnit REQUIRED)
+    include_directories(${CppUnit_INCLUDE_DIRS})
+    list(APPEND _additional_target_libraries ${CppUnit_LIBRARIES})
+  endif()
+
+  MACRO_ORGANIZE_SOURCES(
+    SOURCE ${_PLUGIN_CPP_FILES}
+    HEADER ${_PLUGIN_H_FILES}
+    TXX ${_PLUGIN_TXX_FILES}
+    DOC ${_PLUGIN_DOX_FILES}
+    UI ${_PLUGIN_UI_FILES}
+    QRC ${_PLUGIN_QRC_FILES} ${_PLUGIN_CACHED_RESOURCE_FILES}
+    META ${_PLUGIN_META_FILES}
+    MOC ${MY_MOC_CPP}
+    GEN_UI ${MY_UI_CPP}
+    GEN_QRC ${MY_QRC_SRCS}
+  )
+
   ctkMacroBuildPlugin(
     NAME ${PLUGIN_TARGET}
     EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}
-    SRCS ${_PLUGIN_CPP_FILES}
+    SRCS ${_PLUGIN_CPP_FILES} ${_PLUGIN_H_FILES} ${CORRESPONDING__H_FILES} ${GLOBBED__H_FILES}
     MOC_SRCS ${_PLUGIN_MOC_H_FILES}
+    MOC_OPTIONS ${_PLUGIN_MOC_OPTIONS}
     UI_FORMS ${_PLUGIN_UI_FILES}
     EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
     RESOURCES ${_PLUGIN_QRC_FILES}
-    TARGET_LIBRARIES ${_PLUGIN_target_libraries}
+    TARGET_LIBRARIES ${_PLUGIN_target_libraries} ${_additional_target_libraries}
     CACHED_RESOURCEFILES ${_PLUGIN_CACHED_RESOURCE_FILES}
     TRANSLATIONS ${_PLUGIN_TRANSLATION_FILES}
     OUTPUT_DIR ${_output_dir}
@@ -131,11 +153,11 @@ macro(MACRO_CREATE_CTK_PLUGIN)
   include_directories(${Poco_INCLUDE_DIRS})
   include_directories(${BlueBerry_BINARY_DIR})
 
-  target_link_libraries(${PLUGIN_TARGET}
-    optimized PocoFoundation debug PocoFoundationd
-    optimized PocoUtil debug PocoUtild
-    optimized PocoXML debug PocoXMLd
-  )
+  # Only add the following Poco libraries due to possible name clashes
+  # in PocoPDF with libpng when also linking QtGui.
+  foreach(lib Foundation Util XML)
+    target_link_libraries(${PLUGIN_TARGET} ${Poco_${lib}_LIBRARY})
+  endforeach()
 
   # Set compiler flags
   get_target_property(_plugin_compile_flags ${PLUGIN_TARGET} COMPILE_FLAGS)
@@ -152,18 +174,6 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     list(APPEND _PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")
   endif()
 
-  MACRO_ORGANIZE_SOURCES(
-    SOURCE ${_PLUGIN_CPP_FILES}
-    HEADER ${_PLUGIN_H_FILES}
-    TXX ${_PLUGIN_TXX_FILES}
-    DOC ${_PLUGIN_DOX_FILES}
-    UI ${_PLUGIN_UI_FILES}
-    QRC ${_PLUGIN_QRC_FILES} ${_PLUGIN_CACHED_RESOURCE_FILES}
-    META ${_PLUGIN_META_FILES}
-    MOC ${MY_MOC_CPP}
-    GEN_UI ${MY_UI_CPP}
-    GEN_QRC ${MY_QRC_SRCS}
-  )
 
 
   #------------------------------------------------------------#

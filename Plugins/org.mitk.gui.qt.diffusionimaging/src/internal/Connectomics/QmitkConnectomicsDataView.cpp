@@ -84,6 +84,9 @@ void QmitkConnectomicsDataView::CreateQtPartControl( QWidget *parent )
     this->m_Controls->syntheticNetworkComboBox->insertItem(0,"Regular lattice");
     this->m_Controls->syntheticNetworkComboBox->insertItem(1,"Heterogenic sphere");
     this->m_Controls->syntheticNetworkComboBox->insertItem(2,"Random network");
+
+    this->m_Controls->mappingStrategyComboBox->insertItem(m_ConnectomicsNetworkCreator->EndElementPosition, "Use label of end position of fibers");
+    this->m_Controls->mappingStrategyComboBox->insertItem(m_ConnectomicsNetworkCreator->EndElementPositionAvoidingWhiteMatter, "Extrapolate label");
   }
   else
   {
@@ -96,6 +99,10 @@ void QmitkConnectomicsDataView::CreateQtPartControl( QWidget *parent )
     this->m_Controls->syntheticNetworkComboBox->insertItem(2,"Random network");
     this->m_Controls->syntheticNetworkComboBox->insertItem(3,"Scale free network");
     this->m_Controls->syntheticNetworkComboBox->insertItem(4,"Small world network");
+
+    this->m_Controls->mappingStrategyComboBox->insertItem(m_ConnectomicsNetworkCreator->EndElementPosition, "Use label of end position of fibers");
+    this->m_Controls->mappingStrategyComboBox->insertItem(m_ConnectomicsNetworkCreator->EndElementPositionAvoidingWhiteMatter, "Extrapolate label");
+    this->m_Controls->mappingStrategyComboBox->insertItem(m_ConnectomicsNetworkCreator->JustEndPointVerticesNoLabel, "Use end position of fibers, no label");
   }
 
   this->WipeDisplay();
@@ -195,7 +202,6 @@ void QmitkConnectomicsDataView::OnSelectionChanged( std::vector<mitk::DataNode*>
         m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
         m_Controls->inputImageOneNameLabel->setVisible( true );
         m_Controls->inputImageOneLabel->setVisible( true );
-
       }
     } // end network section
 
@@ -281,7 +287,6 @@ void QmitkConnectomicsDataView::OnSyntheticNetworkCreationPushButtonClicked()
     break;
   default:
     break;
-
   }
 
   if( numberOfNodes > 5000 )
@@ -326,6 +331,10 @@ void QmitkConnectomicsDataView::OnSyntheticNetworkCreationPushButtonClicked()
   {
     MITK_WARN << "Problem occured during synthetic network generation.";
   }
+
+  mitk::RenderingManager::GetInstance()->InitializeViews(
+    networkNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return;
 }
@@ -374,10 +383,14 @@ void QmitkConnectomicsDataView::OnNetworkifyPushButtonClicked()
 
     if (image && fiberBundle)
     {
+      mitk::ConnectomicsNetworkCreator::MappingStrategy mappingStrategy =
+        static_cast<mitk::ConnectomicsNetworkCreator::MappingStrategy>(this->m_Controls->mappingStrategyComboBox->currentIndex());
+
       m_ConnectomicsNetworkCreator->SetSegmentation( image );
       m_ConnectomicsNetworkCreator->SetFiberBundle( fiberBundle );
       m_ConnectomicsNetworkCreator->CalculateCenterOfMass();
       m_ConnectomicsNetworkCreator->SetEndPointSearchRadius( 15 );
+      m_ConnectomicsNetworkCreator->SetMappingStrategy( mappingStrategy );
       m_ConnectomicsNetworkCreator->CreateNetworkFromFibersAndSegmentation();
       mitk::DataNode::Pointer networkNode = mitk::DataNode::New();
 

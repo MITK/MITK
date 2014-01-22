@@ -42,50 +42,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-  //template <class TInputScalarType, class TOutputScalarType>
-  //void
-  //  TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
-  //  ::GenerateData()
-  //{
-  //  // Call a method that can be overriden by a subclass to allocate
-  //  // memory for the filter's outputs
-  //  this->AllocateOutputs();
+template <class TInputScalarType, class TOutputScalarType>
+void
+TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
+::BeforeThreadedGenerateData()
+{
 
-  //  // Call a method that can be overridden by a subclass to perform
-  //  // some calculations prior to splitting the main computations into
-  //  // separate threads
-  //  this->BeforeThreadedGenerateData();
-
-  //  // Set up the multithreaded processing
-  //  ThreadStruct str;
-  //  str.Filter = this;
-
-  //  this->GetMultiThreader()->SetNumberOfThreads(this->GetNumberOfThreads());
-  //  this->GetMultiThreader()->SetSingleMethod(this->ThreaderCallback, &str);
-
-  //  // multithread the execution
-  //  this->GetMultiThreader()->SingleMethodExecute();
-
-  //  // Call a method that can be overridden by a subclass to perform
-  //  // some calculations after all the threads have completed
-  //  this->AfterThreadedGenerateData();
-
-  //}
-
-  template <class TInputScalarType, class TOutputScalarType>
-  void
-    TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
-    ::BeforeThreadedGenerateData()
+  if( m_GradientList->Size()==0 )
   {
+    throw itk::ExceptionObject (__FILE__,__LINE__,"Error: gradient list is empty, cannot generate DWI.");
+  }
 
-    if( m_GradientList.size()==0 )
-    {
-      throw itk::ExceptionObject (__FILE__,__LINE__,"Error: gradient list is empty, cannot generate DWI.");
-    }
-
+  if( m_BaselineImage.IsNull() )
+  {
     // create a B0 image by taking the norm of the tensor field * scale:
     typedef itk::TensorToL2NormImageFilter<InputImageType, itk::Image<InputScalarType,3> >
-      TensorToL2NormFilterType;
+        TensorToL2NormFilterType;
 
     typename TensorToL2NormFilterType::Pointer myFilter1 = TensorToL2NormFilterType::New();
     myFilter1->SetInput (this->GetInput());
@@ -101,7 +73,7 @@ namespace itk
     }
 
     typename itk::RescaleIntensityImageFilter< itk::Image<InputScalarType,3>, BaselineImageType>::Pointer rescaler=
-      itk::RescaleIntensityImageFilter<itk::Image<InputScalarType,3>, BaselineImageType>::New();
+        itk::RescaleIntensityImageFilter<itk::Image<InputScalarType,3>, BaselineImageType>::New();
 
     rescaler->SetOutputMinimum ( m_Min );
     rescaler->SetOutputMaximum ( m_Max );
@@ -117,112 +89,122 @@ namespace itk
     }
 
     m_BaselineImage = rescaler->GetOutput();
-
-    typename OutputImageType::Pointer outImage = OutputImageType::New();
-    outImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
-    outImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
-    outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction
-    outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
-    outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
-    outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
-    outImage->SetVectorLength(m_GradientList.size());
-    outImage->Allocate();
-
-    this->SetNumberOfRequiredOutputs (1);
-    this->SetNthOutput (0, outImage);
-
   }
 
-  template <class TInputScalarType, class TOutputScalarType>
-  void
-    TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
-    ::ThreadedGenerateData (const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
+  typename OutputImageType::Pointer outImage = OutputImageType::New();
+  outImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
+  outImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
+  outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction
+  outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
+  outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
+  outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
+  outImage->SetVectorLength(m_GradientList->Size());
+  outImage->Allocate();
+
+  this->SetNumberOfRequiredOutputs (1);
+  this->SetNthOutput (0, outImage);
+
+}
+
+template <class TInputScalarType, class TOutputScalarType>
+void
+TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
+::ThreadedGenerateData (const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
+{
+  typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
+  typedef ImageRegionConstIterator<InputImageType>  IteratorInputType;
+  typedef ImageRegionConstIterator<BaselineImageType>  IteratorBaselineType;
+
+  unsigned long numPixels = outputRegionForThread.GetNumberOfPixels();
+  unsigned long step = numPixels/100;
+  unsigned long progress = 0;
+
+  IteratorOutputType itOut (this->GetOutput(), outputRegionForThread);
+  IteratorInputType  itIn (this->GetInput(), outputRegionForThread);
+  IteratorBaselineType itB0 (m_BaselineImage, outputRegionForThread);
+
+  if( threadId==0 )
+  {
+    this->UpdateProgress (0.0);
+  }
+
+
+  while(!itIn.IsAtEnd())
   {
 
-    typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
-    typedef ImageRegionConstIterator<InputImageType>  IteratorInputType;
-    typedef ImageRegionConstIterator<BaselineImageType>  IteratorBaselineType;
-
-    unsigned long numPixels = outputRegionForThread.GetNumberOfPixels();
-    unsigned long step = numPixels/100;
-    unsigned long progress = 0;
-
-    IteratorOutputType itOut (this->GetOutput(), outputRegionForThread);
-    IteratorInputType  itIn (this->GetInput(), outputRegionForThread);
-    IteratorBaselineType itB0 (m_BaselineImage, outputRegionForThread);
-
-    if( threadId==0 )
+    if( this->GetAbortGenerateData() )
     {
-      this->UpdateProgress (0.0);
+      throw itk::ProcessAborted(__FILE__,__LINE__);
     }
 
+    InputPixelType T = itIn.Get();
 
-    while(!itIn.IsAtEnd())
+    BaselinePixelType b0 = itB0.Get();
+
+    OutputPixelType out;
+    out.SetSize(m_GradientList->Size());
+    out.Fill(0);
+
+    if( b0 > 0)
     {
-
-      if( this->GetAbortGenerateData() )
+      for( unsigned int i=0; i<m_GradientList->Size()-1; i++)
       {
-        throw itk::ProcessAborted(__FILE__,__LINE__);
-      }
 
-      InputPixelType T = itIn.Get();
+        GradientType g = m_GradientList->at(i+1);
 
-      BaselinePixelType b0 = itB0.Get();
+        // normalize vector so the following computations work
+        const double twonorm = g.two_norm();
+        GradientType gn = g.normalize();
 
-      OutputPixelType out;
-      out.SetSize(m_GradientList.size());
-      out.Fill(0);
+        InputPixelType S;
+        S[0] = gn[0]*gn[0];
+        S[1] = gn[1]*gn[0];
+        S[2] = gn[2]*gn[0];
+        S[3] = gn[1]*gn[1];
+        S[4] = gn[2]*gn[1];
+        S[5] = gn[2]*gn[2];
 
-      if( b0 > 0)
-      {
-        for( unsigned int i=0; i<m_GradientList.size()-1; i++)
+        const double res =
+                T[0]*S[0] +
+            2 * T[1]*S[1] +     T[3]*S[3] +
+            2 * T[2]*S[2] + 2 * T[4]*S[4] + T[5]*S[5];
+
+        // check for corrupted tensor
+        if (res>=0)
         {
-
-          GradientType g = m_GradientList[i];
-
-          InputPixelType S;
-          S[0] = g[0]*g[0];
-          S[1] = g[1]*g[0];
-          S[2] = g[2]*g[0];
-          S[3] = g[1]*g[1];
-          S[4] = g[2]*g[1];
-          S[5] = g[2]*g[2];
-
-          double res =
-              T[0]*S[0] + T[1]*S[1] + T[2]*S[2] +
-              T[1]*S[1] + T[3]*S[3] + T[4]*S[4] +
-              T[2]*S[2] + T[4]*S[4] + T[5]*S[5];
-
-          // check for corrupted tensor
-          if (res>=0)
-            out[i] = static_cast<OutputScalarType>( 1.0*b0*exp ( -1.0 * m_BValue * res ) );
+          // estimate the bvalue from the base value and the norm of the gradient
+          //   - because of this estimation the vector have to be normalized beforehand
+          //     otherwise the modelled signal is wrong ( i.e. not scaled properly )
+          const double bval = m_BValue * twonorm;
+          out[i+1] = static_cast<OutputScalarType>( 1.0 * b0 * exp ( -1.0 * bval * res ) );
         }
       }
-
-      out[m_GradientList.size()-1] = b0;
-
-      itOut.Set(out);
-
-      if( threadId==0 && step>0)
-      {
-        if( (progress%step)==0 )
-        {
-          this->UpdateProgress ( double(progress)/double(numPixels) );
-        }
-      }
-
-      ++progress;
-      ++itB0;
-      ++itIn;
-      ++itOut;
-
     }
 
-    if( threadId==0 )
+    out[0] = b0;
+
+    itOut.Set(out);
+
+    if( threadId==0 && step>0)
     {
-      this->UpdateProgress (1.0);
+      if( (progress%step)==0 )
+      {
+        this->UpdateProgress ( double(progress)/double(numPixels) );
+      }
     }
+
+    ++progress;
+    ++itB0;
+    ++itIn;
+    ++itOut;
+
   }
+
+  if( threadId==0 )
+  {
+    this->UpdateProgress (1.0);
+  }
+}
 
 
 

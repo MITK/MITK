@@ -83,13 +83,18 @@ function(mitkFunctionCheckCAndCXXCompilerFlags FLAG_TO_TEST C_RESULT_VAR CXX_RES
   # leads to false-negative checks.
   string(REGEX REPLACE "[/-]" "_" suffix ${FLAG_TO_TEST})
   string(REGEX REPLACE "[, \\$\\+\\*\\{\\}\\(\\)\\#]" "" suffix ${suffix})
-  CHECK_CXX_COMPILER_FLAG(${FLAG_TO_TEST} HAS_CXX_FLAG_${suffix})
+
+  # workaround for gcc's strange behaviour on -Wno-... options in combination with -Werror
+  # we test the flag without the "no-" prefix because that is more reliable
+  string(REGEX REPLACE "^-Wno-" "-W" FLAG_TO_TEST_FIXED ${FLAG_TO_TEST})
+
+  CHECK_CXX_COMPILER_FLAG(${FLAG_TO_TEST_FIXED} HAS_CXX_FLAG_${suffix})
 
   if(HAS_CXX_FLAG_${suffix})
     set(${CXX_RESULT_VAR} "${${CXX_RESULT_VAR}} ${FLAG_TO_TEST}" PARENT_SCOPE)
   endif()
 
-  CHECK_C_COMPILER_FLAG(${FLAG_TO_TEST} HAS_C_FLAG_${suffix})
+  CHECK_C_COMPILER_FLAG(${FLAG_TO_TEST_FIXED} HAS_C_FLAG_${suffix})
 
   if(HAS_C_FLAG_${suffix})
     set(${C_RESULT_VAR} "${${C_RESULT_VAR}} ${FLAG_TO_TEST}" PARENT_SCOPE)

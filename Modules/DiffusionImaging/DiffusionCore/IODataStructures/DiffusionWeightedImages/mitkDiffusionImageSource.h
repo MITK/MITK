@@ -43,11 +43,16 @@ template<typename TPixelType>
 class DiffusionImageSource : public ImageSource
 {
 public:
-  mitkClassMacro(DiffusionImageSource, BaseProcess);
+  mitkClassMacro(DiffusionImageSource, BaseDataSource);
   itkNewMacro(Self);
 
   typedef DiffusionImage<TPixelType> OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;
+
+  /**
+    * @brief Get the output data of the diffusion image source object.
+    */
+  mitkBaseDataSourceGetOutputDeclarations
 
   /**
    * Allocates a new output object and returns it. Currently the
@@ -64,18 +69,6 @@ public:
    * virtual.
    */
   virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
-
-
-  //void SetOutput(OutputType* output);
-
-  //OutputType* GetOutput()
-  //{return Superclass::GetOutput();}
-
-  //OutputType* GetOutput(unsigned int idx);
-
-  //virtual void GraftOutput(OutputType* graft);
-
-  //virtual void GraftNthOutput(unsigned int idx, OutputType *graft);
 
 protected:
   DiffusionImageSource();

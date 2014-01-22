@@ -1,13 +1,9 @@
-set(MODULE_TESTS
+SET(MODULE_TESTS
 )
 
-set(MODULE_IMAGE_TESTS
-  mitkImageToOpenCVImageFilterTest.cpp
-)
-
-# list of images for which the tests are run
-set(MODULE_TESTIMAGES
-  Png2D-bw.png
-  RenderingTestData/rgbImage.png
-#NrrdWritingTestImage.jpg
+SET(MODULE_CUSTOM_TESTS
+  mitkOpenCVMitkConversionTest.cpp
+  mitkConvertGrayscaleOpenCVImageFilterTest.cpp
+  mitkCropOpenCVImageFilterTest.cpp
+  mitkBasicCombinationOpenCVImageFilterTest.cpp
 )

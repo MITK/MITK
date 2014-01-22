@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAnnotationProperty.h"
 
-mitk::AnnotationProperty::AnnotationProperty()
+mitk::AnnotationProperty::AnnotationProperty() : m_Position(0.0)
 {
 }
 
@@ -114,5 +114,6 @@ std::string mitk::AnnotationProperty::GetValueAsString() const
 itk::LightObject::Pointer mitk::AnnotationProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

@@ -31,31 +31,99 @@ if(UNIX AND NOT APPLE)
 
 endif()
 
+#-----------------------------------------------------------------------------
+# Qt options for external projects and MITK
+#-----------------------------------------------------------------------------
+
+if(MITK_USE_QT)
+  set(qt_project_args -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION})
+else()
+  set(qt_project_args )
+endif()
+
+if(MITK_USE_Qt4)
+  list(APPEND qt_project_args
+       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE} )
+endif()
+if(MITK_USE_Qt5)
+  find_program(QT_QMAKE_EXECUTABLE qmake)
+  if(NOT QT_QMAKE_EXECUTABLE)
+    message(FATAL_ERROR "Qt qmake executable not found.")
+  endif()
+  execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_VERSION
+                  OUTPUT_VARIABLE _qt_version
+                  OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(_qt_version_minimum "5.0.0")
+  if(_qt_version VERSION_LESS _qt_version_minimum)
+    message(SEND_ERROR "Qt version ${_qt_version} too old. At least Qt ${_qt_version_minimum} is required")
+  endif()
+  execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_PREFIX
+                  OUTPUT_VARIABLE _qt_install_prefix
+                  OUTPUT_STRIP_TRAILING_WHITESPACE)
+  file(TO_CMAKE_PATH "${_qt_install_prefix}" _qt_install_prefix)
+  list(APPEND qt_project_args
+       -DCMAKE_PREFIX_PATH:PATH=${_qt_install_prefix})
+endif()
 
 #-----------------------------------------------------------------------------
 # ExternalProjects
 #-----------------------------------------------------------------------------
 
 set(external_projects
+  tinyxml
+  GLUT
+  ANN
+  CppUnit
+  GLEW
   VTK
   ACVD
   GDCM
   CableSwig
+  OpenCV
+  Poco
   ITK
   Boost
   DCMTK
   CTK
-  OpenCV
   SOFA
   MITKData
+  Qwt
   )
 
-set(MITK_USE_CableSwig ${MITK_USE_Python})
+# Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
+if(MITK_USE_Qt4)
+  list(APPEND external_projects Qxt)
+endif()
+
+# These are "hard" dependencies and always set to ON
+set(MITK_USE_tinyxml 1)
+set(MITK_USE_ANN 1)
+set(MITK_USE_GLEW 1)
 set(MITK_USE_GDCM 1)
 set(MITK_USE_ITK 1)
 set(MITK_USE_VTK 1)
 
-foreach(proj VTK ACVD GDCM CableSwig ITK DCMTK CTK OpenCV SOFA)
+# Semi-hard dependencies, enabled by user-controlled variables
+set(MITK_USE_CableSwig ${MITK_USE_Python})
+if(MITK_USE_QT)
+  set(MITK_USE_Qwt 1)
+  if(MITK_USE_Qt4)
+    set(MITK_USE_Qxt 1) #TODO: Check how Qxt builds with Qt 5
+  endif()
+endif()
+
+if(MITK_USE_BLUEBERRY)
+  set(MITK_USE_CppUnit 1)
+endif()
+
+if(MITK_USE_SOFA)
+  set(MITK_USE_GLUT 1)
+endif()
+
+# A list of "nice" external projects, playing well together with CMake
+set(nice_external_projects ${external_projects})
+list(REMOVE_ITEM nice_external_projects Boost)
+foreach(proj ${nice_external_projects})
   if(MITK_USE_${proj})
     set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
     mark_as_advanced(EXTERNAL_${proj}_DIR)
@@ -124,6 +192,18 @@ if(MSVC_VERSION)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
 endif()
 
+# With the current toolkits like VTK and ITK Mac OSX 10.9
+# does not compile with if stdlib=libc++is used
+# For more information see bug 16803 and 16776
+# This could probably be remove if ITK 4.5.1 and VTK 6.1 is integrated
+if (APPLE)
+  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE osx_version)
+  if (osx_version VERSION_EQUAL "10.9" OR osx_version VERSION_GREATER "10.9")
+    message("Detected OS X version is ${osx_version}...setting C++ library to libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
+  endif()
+endif()
+
 set(ep_common_args
   -DBUILD_TESTING:BOOL=${ep_build_testing}
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
@@ -148,6 +228,19 @@ set(ep_common_args
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
 )
 
+# Pass the CMAKE_OSX variables to external projects
+if(APPLE)
+  set(MAC_OSX_ARCHITECTURE_ARGS
+        -DCMAKE_OSX_ARCHITECTURES:PATH=${CMAKE_OSX_ARCHITECTURES}
+        -DCMAKE_OSX_DEPLOYMENT_TARGET:PATH=${CMAKE_OSX_DEPLOYMENT_TARGET}
+        -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}
+  )
+  set(ep_common_args
+        ${MAC_OSX_ARCHITECTURE_ARGS}
+        ${ep_common_args}
+  )
+endif()
+
 # Include external projects
 foreach(p ${external_projects})
   include(CMakeExternals/${p}.cmake)
@@ -168,16 +261,20 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_TUTORIAL # Deprecated. Use MITK_BUILD_EXAMPLES instead
   MITK_BUILD_EXAMPLES
   MITK_USE_ACVD
+  MITK_USE_CppUnit
+  MITK_USE_GLEW
   MITK_USE_Boost
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_CTK
   MITK_USE_DCMTK
-  MITK_DCMTK_BUILD_SHARED_LIBS
   MITK_USE_OpenCV
+  MITK_USE_Poco
   MITK_USE_SOFA
   MITK_USE_Python
   MITK_USE_OpenCL
+
+  MITK_ENABLE_PIC_READER
   )
 
 #-----------------------------------------------------------------------------
@@ -205,18 +302,25 @@ ExternalProject_Add(${proj}
   INSTALL_COMMAND ""
   DEPENDS
     # Mandatory dependencies
+    ${tinyxml_DEPENDS}
+    ${ANN_DEPENDS}
     ${VTK_DEPENDS}
     ${ITK_DEPENDS}
     # Optionnal dependencies
     ${ACVD_DEPENDS}
+    ${CppUnit_DEPENDS}
+    ${GLUT_DEPENDS}
+    ${GLEW_DEPENDS}
     ${Boost_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
+    ${Poco_DEPENDS}
     ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
+    ${Qwt_DEPENDS}
+    ${Qxt_DEPENDS}
 )
-
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
 #-----------------------------------------------------------------------------
@@ -303,26 +407,35 @@ ExternalProject_Add(${proj}
     -DMITK_CTEST_SCRIPT_MODE:STRING=${MITK_CTEST_SCRIPT_MODE}
     -DMITK_SUPERBUILD_BINARY_DIR:PATH=${MITK_BINARY_DIR}
     -DMITK_MODULES_TO_BUILD:INTERNAL=${MITK_MODULES_TO_BUILD}
+    ${qt_project_args}
     -DMITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_FLOATING_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_DIMENSIONS:STRING=${MITK_ACCESSBYITK_DIMENSIONS}
     # --------------- External project dirs ---------------
-    -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
     -DCTK_DIR:PATH=${CTK_DIR}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
+    -Dtinyxml_DIR:PATH=${tinyxml_DIR}
+    -DGLUT_DIR:PATH=${GLUT_DIR}
+    -DGLEW_DIR:PATH=${GLEW_DIR}
+    -DANN_DIR:PATH=${ANN_DIR}
+    -DCppUnit_DIR:PATH=${CppUnit_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
     -DACVD_DIR:PATH=${ACVD_DIR}
     -DOpenCV_DIR:PATH=${OpenCV_DIR}
+    -DPoco_DIR:PATH=${Poco_DIR}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
+    -DQwt_DIR:PATH=${Qwt_DIR}
+    -DQxt_DIR:PATH=${Qxt_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
+    ${MAC_OSX_ARCHITECTURE_ARGS}
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

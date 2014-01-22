@@ -195,7 +195,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     itk::ImageRegionIterator<ImageType>   it (vecimg, vecimg->GetLargestPossibleRegion() );
     typedef typename ImageType::PixelType VecPixType;
 
-    for (it = it.Begin(); !it.IsAtEnd(); ++it)
+    for (it.GoToBegin(); !it.IsAtEnd(); ++it)
     {
       VecPixType vec = it.Get();
       typename ImageType::IndexType currentIndex = it.GetIndex();

@@ -210,8 +210,6 @@ protected:
 
   QwtPlot*                    m_Plot;
   std::vector<QwtPlotCurve*>  m_PlotCurveVector;
-
-
 };
 
 #endif

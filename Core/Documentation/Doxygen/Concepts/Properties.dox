@@ -1,6 +1,8 @@
 /**
 \page PropertiesPage Properties
 
+\tableofcontents
+
 \section PropertyConcept The Concept Behind MITK Properties
 
 Properties belong to a datanode and contain information relevant to the handling of the node by MITK. They provide a place to store additional information which is not part of the actual data, and as such have no reason to be contained within the data/file itself, but might be needed for such things as rendering (e.g. transfer functions) or interaction (e.g. the name of the node).
@@ -16,6 +18,48 @@ mitk::ColorProperty::Pointer colorProperty = dynamic_cast<mitk::ColorProperty*>(
 mitk::BoolProperty::Pointer newProperty = mitk::BoolProperty::New( true ); //create a new property, in this case a boolean property
 node->SetProperty( "IsTensorVolume", newProperty ); //add this property to node with the key "IsTensorVolume"
 \endcode
+
+\section PropertiesPage_PropertyServices Property Services
+
+Property services enable you to extend the capabilities of the basic property system of MITK.
+Currently there are four property services, i.e., aliases, descriptions, extensions, and filters.
+All of them are briefly described in the following.
+More detailed information can be found in the corresponding API documentation, as all of the services are completely documented.
+
+All property services are provided through the functionalities of the \ref MicroServices_UserDocs "C++ Micro Services".
+Hence, you can use property services from all of your modules and plugins.
+
+\subsection PropertiesPage_PropertyAliases Property Aliases
+
+You can add an alias to a certain property name which is displayed by the Property View instead of the genuine property name.
+A property name can have more than one alias in which case the property is displayed multiple times in the Properties View.
+In addition, aliases can be easily restricted to certain data node types.
+
+Property aliases are provided through the service interface mitk::IPropertyAliases.
+
+\subsection PropertiesPage_PropertyDescriptions Property Descriptions
+
+The Property View will display a description of the currently selected property at its bottom if the property has an associated description.
+Descriptions are parsed and displayed as rich text.
+
+Property descriptions are provided through the service interface mitk::IPropertyDescriptions.
+
+\subsection PropertiesPage_PropertyExtensions Property Extensions
+
+Property extensions are a very generic approach to attach meta data to properties.
+They have the sole requirement of inheriting from mitk::PropertyExtension.
+The Property View searches for known property extensions like mitk::IntPropertyExtension and mitk::FloatPropertyExtension to configure the editors of the properties, e.g., you can specify the valid range for a numeric property.
+
+Property extensions are provided through the service interface mitk::IPropertyExtensions.
+
+\subsection PropertiesPage_PropertyFilters Property Filters
+
+Property filters are a rather powerful tool to filter shown properties by the Property View.
+There is a single global filter and the possibility to add filters on top of it for specific data node types.
+Filters consist of blacklist entries and whitelist entries, i.e., blacklisted entries are filtered out and whitelisted entries are the only properties which remain after filtering.
+If both lists contain entries only whitelisted entries are displayed that are not blacklisted.
+
+Property filters are provided through the service interface mitk::IPropertyFilters.
 
 \section ListOfIndependentProperty A List Of Module Independent Properties
 
@@ -193,6 +237,13 @@ displays the euclidean distance between this points.
 pointset is part of a filter pipeline this also causes an update to the
 pipeline which sometimes may be not desired so it can be switched of by setting
 it to false.
+</ul>
+
+\subsection Geometry2DProperties Geometry2D Properties
+
+<ul>
+  <li> draw edges - Determines if tubes should be drawn around the edges of the 2D
+plane. Default is true.
 </ul>
 
 Information on properties not in this list can be found in the appropriate module.

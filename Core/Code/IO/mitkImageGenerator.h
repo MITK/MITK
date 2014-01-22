@@ -92,9 +92,9 @@ public:
                                                     unsigned int dimY,
                                                     unsigned int dimZ = 1,
                                                     unsigned int dimT = 1,
-                                                    float spacingX = 1,
-                                                    float spacingY = 1,
-                                                    float spacingZ = 1,
+                                                    mitk::ScalarType spacingX = 1,
+                                                    mitk::ScalarType spacingY = 1,
+                                                    mitk::ScalarType spacingZ = 1,
                                                     const double randomMax = 1000.0f, const double randMin = 0.0f)
     {
         //set the data type according to the template

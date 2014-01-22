@@ -1,0 +1,54 @@
+cmake_minimum_required(VERSION 2.8.4)
+
+project(ANN)
+
+set(${PROJECT_NAME}_MAJOR_VERSION 1)
+set(${PROJECT_NAME}_MINOR_VERSION 1)
+set(${PROJECT_NAME}_PATCH_VERSION 2)
+set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
+
+set(ANN_HEADERS
+  include/ANN/ANN.h
+  include/ANN/ANNperf.h
+  include/ANN/ANNx.h
+)
+
+set(ANN_SOURCES
+  src/ANN.cpp
+  src/bd_fix_rad_search.cpp
+  src/bd_pr_search.cpp
+  src/bd_search.cpp
+  src/bd_tree.cpp
+  src/brute.cpp
+  src/kd_dump.cpp
+  src/kd_fix_rad_search.cpp
+  src/kd_pr_search.cpp
+  src/kd_search.cpp
+  src/kd_split.cpp
+  src/kd_tree.cpp
+  src/kd_util.cpp
+  src/perf.cpp
+)
+
+include_directories(${ANN_SOURCE_DIR}/include)
+if(WIN32)
+  add_definitions( -DDLL_EXPORTS )
+endif()
+add_library(ann SHARED ${ANN_HEADERS} ${ANN_SOURCES})
+set_target_properties(ann PROPERTIES
+                      SOVERSION ${${PROJECT_NAME}_VERSION})
+
+# Config files
+set(${PROJECT_NAME}_LIBRARIES ann)
+set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+configure_file(${PROJECT_NAME}Config.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
+export(TARGETS ${${PROJECT_NAME}_LIBRARIES} FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Exports.cmake)
+
+# Version information
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  @ONLY
+  )

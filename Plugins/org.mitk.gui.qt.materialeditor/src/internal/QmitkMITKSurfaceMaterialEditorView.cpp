@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchPage.h"
 
 #include "mitkShaderProperty.h"
-#include "mitkShaderRepository.h"
 
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
@@ -83,9 +82,6 @@ QmitkMITKSurfaceMaterialEditorView::QmitkMITKSurfaceMaterialEditorView()
   shaderProperties.push_back( "material.wireframeLineWidth" );
 
   observerAllocated = false;
-
-
-  mitk::ShaderRepository::GetGlobalShaderRepository();
 }
 
 QmitkMITKSurfaceMaterialEditorView::~QmitkMITKSurfaceMaterialEditorView()

@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::TDMouseEventThrower * mitk::TDMouseEventThrower::GetInstance()
 {
-  //instance wird nicht initialisiert und kommt mit 0 zurück!
+  //instance will not be initialize and return 0
   static TDMouseEventThrower instance;
   return &instance;
 }

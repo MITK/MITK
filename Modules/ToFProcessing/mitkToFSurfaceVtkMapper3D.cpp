@@ -25,8 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkScalarModeProperty.h"
 #include "mitkClippingProperty.h"
 
+#include "mitkIShaderRepository.h"
 #include "mitkShaderProperty.h"
-#include "mitkShaderRepository.h"
+#include "mitkCoreServices.h"
 
 
 #include <vtkActor.h>
@@ -91,12 +92,12 @@ void mitk::ToFSurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
 
   if ( m_GenerateNormals )
   {
-    ls->m_VtkPolyDataNormals->SetInput( polydata );
-    ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput() );
+    ls->m_VtkPolyDataNormals->SetInputData( polydata );
+    ls->m_VtkPolyDataMapper->SetInputConnection( ls->m_VtkPolyDataNormals->GetOutputPort() );
   }
   else
   {
-    ls->m_VtkPolyDataMapper->SetInput( polydata );
+    ls->m_VtkPolyDataMapper->SetInputData( polydata );
   }
 
   //
@@ -269,7 +270,8 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::Bas
     // VTK Properties
     ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
     // Shaders
-    mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
+    CoreServicePointer<IShaderRepository>(mitk::CoreServices::GetShaderRepository())->ApplyProperties(
+          this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
   }
 
   mitk::LookupTableProperty::Pointer lookupTableProp;
@@ -448,7 +450,7 @@ void mitk::ToFSurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataN
 
   // Shaders
   {
-    mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
+    CoreServicePointer<IShaderRepository>(mitk::CoreServices::GetShaderRepository())->AddDefaultProperties(node,renderer,overwrite);
   }
 }
 
@@ -487,7 +489,7 @@ void mitk::ToFSurfaceVtkMapper3D::SetImmediateModeRenderingOn(int  /*on*/)
 void mitk::ToFSurfaceVtkMapper3D::SetTexture(vtkImageData *img)
 {
     this->m_Texture = vtkSmartPointer<vtkTexture>::New();
-    this->m_Texture->SetInput(img);
+    this->m_Texture->SetInputData(img);
     //    MITK_INFO << "Neuer Code";
 }
 

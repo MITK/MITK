@@ -44,19 +44,6 @@ mitk::ShaderRepository::~ShaderRepository()
 {
 }
 
-mitk::ShaderRepository *mitk::ShaderRepository::GetGlobalShaderRepository()
-{
-  static mitk::ShaderRepository::Pointer i;
-
-  if(i.IsNull())
-  {
-    i=mitk::ShaderRepository::New();
-  }
-
-  return i;
-}
-
-
 void mitk::ShaderRepository::LoadShaders()
 {
   itk::Directory::Pointer dir = itk::Directory::New();
@@ -78,11 +65,11 @@ void mitk::ShaderRepository::LoadShaders()
 
         element->SetName(itksys::SystemTools::GetFilenameWithoutExtension(filename));
         std::string filePath = dirPath + std::string("/") + element->GetName() + std::string(".xml");
-        element->path = filePath;
 
-        SR_INFO << "found shader '" << element->GetName() << "'";
+        SR_INFO(debug) << "found shader '" << element->GetName() << "'";
 
-        element->LoadProperties(filePath);
+        std::ifstream fileStream(filePath.c_str());
+        element->LoadProperties(fileStream);
 
         shaders.push_back(element);
       }
@@ -105,33 +92,10 @@ mitk::ShaderRepository::Shader::Pointer mitk::ShaderRepository::GetShaderImpl(co
   return Shader::Pointer();
 }
 
-int mitk::ShaderRepository::LoadShader(const std::string& filename)
-{
-  std::string extension = itksys::SystemTools::GetFilenameExtension(filename);
-  if (extension.compare(".xml")==0)
-  {
-    Shader::Pointer element=Shader::New();
-    element->SetName(itksys::SystemTools::GetFilenameWithoutExtension(filename));
-    element->name = element->GetName();
-    element->path = filename;
-    element->SetId(shaderId++);
-    element->LoadProperties(filename);
-    shaders.push_back(element);
-    SR_INFO(debug) << "found shader '" << element->GetName() << "'";
-    return element->GetId();
-  }
-  else
-  {
-    SR_INFO(debug) << "Error: no xml shader file!";
-    return -1;
-  }
-}
-
 int mitk::ShaderRepository::LoadShader(std::istream& stream, const std::string& filename)
 {
   Shader::Pointer element=Shader::New();
   element->SetName(filename);
-  element->name = filename;
   element->SetId(shaderId++);
   element->LoadProperties(stream);
   shaders.push_back(element);
@@ -159,11 +123,6 @@ mitk::ShaderRepository::Shader::Shader()
 
 mitk::ShaderRepository::Shader::~Shader()
 {
-}
-
-void mitk::ShaderRepository::Shader::LoadPropertiesFromPath()
-{
-  LoadProperties(path);
 }
 
 void mitk::ShaderRepository::Shader::LoadProperties(vtkProperty* p)
@@ -212,14 +171,6 @@ void mitk::ShaderRepository::Shader::LoadProperties(vtkProperty* p)
   }
 }
 
-void mitk::ShaderRepository::Shader::LoadProperties(const std::string& path)
-{
-  vtkProperty *p = vtkProperty::New();
-  p->LoadMaterial(path.c_str());
-  LoadProperties(p);
-  p->Delete();
-}
-
 void mitk::ShaderRepository::Shader::LoadProperties(std::istream& stream)
 {
   std::string content;
@@ -248,22 +199,6 @@ mitk::ShaderRepository::Shader::Uniform::Uniform()
 mitk::ShaderRepository::Shader::Uniform::~Uniform()
 {
 }
-
-mitk::ShaderRepository::Shader *mitk::ShaderRepository::GetShader(const char *id) const
-{
-  std::list<Shader::Pointer>::const_iterator i = shaders.begin();
-
-  while( i != shaders.end() )
-  {
-    if( (*i)->GetName() ==id)
-      return (*i);
-
-    i++;
-  }
-
-  return 0;
-}
-
 
 void mitk::ShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
 {
@@ -298,7 +233,7 @@ void mitk::ShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
 
   defaultFloat[0]=defaultFloat[1]=defaultFloat[2]=defaultFloat[3]=0;
 
-                                     /*
+  /*
   const char *sDefault=y->GetAttribute("value");
 
   switch(type)
@@ -318,10 +253,9 @@ void mitk::ShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
     case glsl_vec4:
       sscanf(sDefault,"%f %f %f %f",&defaultFloat[0],&defaultFloat[1],&defaultFloat[2],&defaultFloat[3]);
       break;
-  }           */
+  }
+  */
 }
-
-
 
 void mitk::ShaderRepository::AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite) const
 {

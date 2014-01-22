@@ -566,6 +566,14 @@ namespace mitk
     m_InternalMask3D  =
         maskSO->GetAxisAlignedBoundingBoxRegion();
 
+    // check if bounding box is empty, if so set it to 1,1,1
+    // to prevent empty mask image
+    if (m_InternalMask3D.GetSize()[0] == 0 )
+    {
+      m_InternalMask3D.SetSize(0,1);
+      m_InternalMask3D.SetSize(1,1);
+      m_InternalMask3D.SetSize(2,1);
+    }
     MITK_DEBUG << "Bounding Box Region: " << m_InternalMask3D;
 
     typedef itk::RegionOfInterestImageFilter< ImageType, MaskImage3DType > ROIFilterType;
@@ -759,8 +767,8 @@ namespace mitk
     itk::ImageRegionIterator<ImageType>
         itimage(outImage, outImage->GetLargestPossibleRegion());
 
-    itmask = itmask.Begin();
-    itimage = itimage.Begin();
+    itmask.GoToBegin();
+    itimage.GoToBegin();
 
     itk::Point< double, 3 > point;
     itk::ContinuousIndex< double, 3 > index;
@@ -933,8 +941,8 @@ namespace mitk
     itk::ImageRegionConstIterator<ImageType>
         itimage(image, image->GetLargestPossibleRegion());
 
-    itmask = itmask.Begin();
-    itimage = itimage.Begin();
+    itmask.GoToBegin();
+    itimage.GoToBegin();
 
     while( !itmask.IsAtEnd() )
     {
@@ -1086,14 +1094,14 @@ namespace mitk
 
     // Extrude the generated contour polygon
     vtkLinearExtrusionFilter *extrudeFilter = vtkLinearExtrusionFilter::New();
-    extrudeFilter->SetInput( polyline );
+    extrudeFilter->SetInputData( polyline );
     extrudeFilter->SetScaleFactor( 1 );
     extrudeFilter->SetExtrusionTypeToNormalExtrusion();
     extrudeFilter->SetVector( 0.0, 0.0, 1.0 );
 
     // Make a stencil from the extruded polygon
     vtkPolyDataToImageStencil *polyDataToImageStencil = vtkPolyDataToImageStencil::New();
-    polyDataToImageStencil->SetInput( extrudeFilter->GetOutput() );
+    polyDataToImageStencil->SetInputConnection( extrudeFilter->GetOutputPort() );
 
 
 
@@ -1111,8 +1119,8 @@ namespace mitk
 
     // Apply the generated image stencil to the input image
     vtkImageStencil *imageStencilFilter = vtkImageStencil::New();
-    imageStencilFilter->SetInput( vtkImporter->GetOutput() );
-    imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput() );
+    imageStencilFilter->SetInputData( vtkImporter->GetOutput() );
+    imageStencilFilter->SetStencilConnection(polyDataToImageStencil->GetOutputPort() );
     imageStencilFilter->ReverseStencilOff();
     imageStencilFilter->SetBackgroundValue( 0 );
     imageStencilFilter->Update();
@@ -1120,7 +1128,7 @@ namespace mitk
 
     // Export from VTK back to ITK
     vtkImageExport *vtkExporter = vtkImageExport::New();
-    vtkExporter->SetInput( imageStencilFilter->GetOutput() );
+    vtkExporter->SetInputData( imageStencilFilter->GetOutput() );
     vtkExporter->Update();
 
     typename ImageImportType::Pointer itkImporter = ImageImportType::New();
@@ -1133,13 +1141,13 @@ namespace mitk
 
     itk::ImageRegionIterator<MaskImage3DType>
         itmask(m_InternalImageMask3D, m_InternalImageMask3D->GetLargestPossibleRegion());
-    itmask = itmask.Begin();
+    itmask.GoToBegin();
     while( !itmask.IsAtEnd() )
     {
       if(itmask.Get() != 0)
       {
         typename ImageType::IndexType index = itmask.GetIndex();
-        for(int thick=0; thick<2*m_PlanarFigureThickness+1; thick++)
+        for(unsigned int thick=0; thick<2*m_PlanarFigureThickness+1; thick++)
         {
           index[axis] = thick;
           m_InternalImageMask3D->SetPixel(index, itmask.Get());
@@ -1148,12 +1156,12 @@ namespace mitk
       ++itmask;
     }
 
-    itmask = itmask.Begin();
+    itmask.GoToBegin();
     itk::ImageRegionIterator<ImageType>
         itimage(image, image->GetLargestPossibleRegion());
-    itimage = itimage.Begin();
+    itimage.GoToBegin();
 
-    typename ImageType::SizeType lowersize = {{9999999999.0,9999999999.0,9999999999.0}};
+    typename ImageType::SizeType lowersize = {{9999999999,9999999999,9999999999}};
     typename ImageType::SizeType uppersize = {{0,0,0}};
     while( !itmask.IsAtEnd() )
     {

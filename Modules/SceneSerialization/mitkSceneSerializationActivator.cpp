@@ -16,34 +16,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSceneDataNodeReader.h"
 
-#include <mitkModuleActivator.h>
-#include <mitkModuleContext.h>
+#include <usModuleActivator.h>
+#include <usModuleContext.h>
 
 namespace mitk {
 
 /*
  * This is the module activator for the "SceneSerialization" module.
  */
-class SceneSerializationActivator : public ModuleActivator
+class SceneSerializationActivator : public us::ModuleActivator
 {
 public:
 
-  void Load(mitk::ModuleContext* context)
+  void Load(us::ModuleContext* context)
   {
-    m_SceneDataNodeReader = mitk::SceneDataNodeReader::New();
-    context->RegisterService<mitk::IDataNodeReader>(m_SceneDataNodeReader);
+    m_SceneDataNodeReader.reset(new mitk::SceneDataNodeReader);
+    context->RegisterService(m_SceneDataNodeReader.get());
   }
 
-  void Unload(mitk::ModuleContext* )
+  void Unload(us::ModuleContext* )
   {
   }
 
 private:
 
-  SceneDataNodeReader::Pointer m_SceneDataNodeReader;
+  std::auto_ptr<IDataNodeReader> m_SceneDataNodeReader;
 };
 
 }
 
 US_EXPORT_MODULE_ACTIVATOR(SceneSerialization, mitk::SceneSerializationActivator)
-

@@ -24,11 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIDataStorageReference.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkPACSPlugin.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkColorProperty.h"
 #include "mitkCommon.h"
-#include "mitkDelegateManager.h"
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
@@ -134,6 +132,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   //# Tree View (experimental)
   m_NodeTreeView = new QTreeView;
+  m_NodeTreeView->setHeaderHidden(true);
   m_NodeTreeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
   m_NodeTreeView->setSelectionBehavior( QAbstractItemView::SelectRows );
   m_NodeTreeView->setAlternatingRowColors(true);
@@ -382,11 +381,7 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   confElem->GetAttribute("class", className);
   confElem->GetAttribute("smoothed", smoothed);
 
-  if(className == "QmitkOtsuAction")
-  {
-    contextMenuAction->SetDataStorage(this->GetDataStorage());
-  }
-  else if(className == "QmitkCreatePolygonModelAction")
+  if(className == "QmitkCreatePolygonModelAction")
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
     if(smoothed == "false")
@@ -489,16 +484,25 @@ void QmitkDataManagerView::OpacityActionChanged()
 }
 
 void QmitkDataManagerView::ColorChanged()
-{
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-  if(node)
-  {
-    QColor color = QColorDialog::getColor();
+ {
+   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+   if(node)
+   {
+    mitk::Color color;
+    mitk::ColorProperty::Pointer colorProp;
+    node->GetProperty(colorProp,"color");
+    if(colorProp.IsNull())
+      return;
+    color = colorProp->GetValue();
+    QColor initial(color.GetRed()*255,color.GetGreen()*255,color.GetBlue()*255);
+    QColor qcolor = QColorDialog::getColor(initial,0,QString("Change color"));
+    if (!qcolor.isValid())
+      return;
     m_ColorButton->setAutoFillBackground(true);
-    node->SetProperty("color",mitk::ColorProperty::New(color.red()/255.0,color.green()/255.0,color.blue()/255.0));
+    node->SetProperty("color",mitk::ColorProperty::New(qcolor.red()/255.0,qcolor.green()/255.0,qcolor.blue()/255.0));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-}
+   }
+ }
 
 void QmitkDataManagerView::ColorActionChanged()
 {
@@ -657,10 +661,10 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
   {
     mitk::BaseData::Pointer basedata = node->GetData();
     if ( basedata.IsNotNull() &&
-         basedata->GetTimeSlicedGeometry()->IsValid() )
+      basedata->GetTimeGeometry()->IsValid() )
     {
       renderWindow->GetRenderingManager()->InitializeViews(
-            basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+          basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
       renderWindow->GetRenderingManager()->RequestUpdateAll();
     }
   }
@@ -786,7 +790,7 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataNode* pare
         this->GetDataStorage()->Add(node, parentNode);
         mitk::BaseData::Pointer basedata = node->GetData();
         mitk::RenderingManager::GetInstance()->InitializeViews(
-          basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+          basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
         //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
@@ -814,17 +818,7 @@ void QmitkDataManagerView::GlobalReinit( bool )
   // no render window available
   if (renderWindow == NULL) return;
 
-  // get all nodes that have not set "includeInBoundingBox" to false
-  mitk::NodePredicateNot::Pointer pred
-    = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
-    , mitk::BoolProperty::New(false)));
-
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
-  // calculate bounding geometry of these nodes
-  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
-
-  // initialize the views to the bounding geometry
-  renderWindow->GetRenderingManager()->InitializeViews(bounds);
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 }
 
 void QmitkDataManagerView::OtsuFilter( bool )

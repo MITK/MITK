@@ -22,11 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //microservices
 #include <usGetModuleContext.h>
-#include <mitkModuleContext.h>
+#include <usModuleContext.h>
 #include <usServiceProperties.h>
 
 #include <mitkCommon.h>
-
 
 const std::string QmitkServiceListWidget::VIEW_ID = "org.mitk.views.QmitkServiceListWidget";
 
@@ -41,7 +40,6 @@ QmitkServiceListWidget::~QmitkServiceListWidget()
   m_Context->RemoveServiceListener(this,  &QmitkServiceListWidget::OnServiceEvent);
 }
 
-
 //////////////////// INITIALIZATION /////////////////////
 
 void QmitkServiceListWidget::CreateQtPartControl(QWidget *parent)
@@ -53,7 +51,7 @@ void QmitkServiceListWidget::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
   }
-  m_Context = mitk::GetModuleContext();
+  m_Context = us::GetModuleContext();
 }
 
 void QmitkServiceListWidget::CreateConnections()
@@ -67,7 +65,7 @@ void QmitkServiceListWidget::CreateConnections()
 void QmitkServiceListWidget::InitPrivate(const std::string& namingProperty, const std::string& filter)
 {
   if (filter.empty())
-    m_Filter = "(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + m_Interface + ")";
+    m_Filter = "(" + us::ServiceConstants::OBJECTCLASS() + "=" + m_Interface + ")";
   else
     m_Filter = filter;
   m_NamingProperty = namingProperty;
@@ -78,9 +76,9 @@ void QmitkServiceListWidget::InitPrivate(const std::string& namingProperty, cons
   m_Controls->m_ServiceList->clear();
 
   // get Services
-  std::list<mitk::ServiceReference> services = this->GetAllRegisteredServices();
+  std::vector<us::ServiceReferenceU> services = this->GetAllRegisteredServices();
   // Transfer them to the List
-  for(std::list<mitk::ServiceReference>::iterator it = services.begin(); it != services.end(); ++it)
+  for(std::vector<us::ServiceReferenceU>::iterator it = services.begin(); it != services.end(); ++it)
     AddServiceToList(*it);
 }
 
@@ -91,69 +89,55 @@ bool QmitkServiceListWidget::GetIsServiceSelected(){
 }
 
 void QmitkServiceListWidget::OnServiceSelectionChanged(){
-  mitk::ServiceReference ref = this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
+  us::ServiceReferenceU ref = this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
   if (! ref){
-    emit (ServiceSelectionChanged(mitk::ServiceReference()));
+    emit (ServiceSelectionChanged(us::ServiceReferenceU()));
     return;
   }
 
   emit (ServiceSelectionChanged(ref));
 }
 
-mitk::ServiceReference QmitkServiceListWidget::GetSelectedServiceReference(){
+us::ServiceReferenceU QmitkServiceListWidget::GetSelectedServiceReference(){
   return this->GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
 }
 
-
 ///////////////// Methods & Slots Handling Logic //////////////////////////
 
-void QmitkServiceListWidget::OnServiceEvent(const mitk::ServiceEvent event){
-
+void QmitkServiceListWidget::OnServiceEvent(const us::ServiceEvent event){
   //MITK_INFO << "ServiceEvent" << event.GetType();
   switch (event.GetType())
   {
-    case mitk::ServiceEvent::MODIFIED:
+    case us::ServiceEvent::MODIFIED:
       emit(ServiceModified(event.GetServiceReference()));
-      RemoveServiceFromList(event.GetServiceReference());
-      AddServiceToList(event.GetServiceReference());
+
+      // Change service; add a new entry if service wasn't on list before
+      if ( ! this->ChangeServiceOnList(event.GetServiceReference()) )
+      {
+        this->AddServiceToList(event.GetServiceReference());
+      }
       break;
-    case mitk::ServiceEvent::REGISTERED:
+    case us::ServiceEvent::REGISTERED:
       emit(ServiceRegistered(event.GetServiceReference()));
       AddServiceToList(event.GetServiceReference());
       break;
-    case mitk::ServiceEvent::UNREGISTERING:
+    case us::ServiceEvent::UNREGISTERING:
       emit(ServiceUnregistering(event.GetServiceReference()));
       RemoveServiceFromList(event.GetServiceReference());
       break;
-    case mitk::ServiceEvent::MODIFIED_ENDMATCH:
+    case us::ServiceEvent::MODIFIED_ENDMATCH:
       emit(ServiceModifiedEndMatch(event.GetServiceReference()));
       RemoveServiceFromList(event.GetServiceReference());
       break;
   }
 }
 
-
 /////////////////////// HOUSEHOLDING CODE /////////////////////////////////
 
-QListWidgetItem* QmitkServiceListWidget::AddServiceToList(mitk::ServiceReference serviceRef){
+QListWidgetItem* QmitkServiceListWidget::AddServiceToList(const us::ServiceReferenceU& serviceRef){
   QListWidgetItem *newItem = new QListWidgetItem;
-  std::string caption;
-  //TODO allow more complex formatting
-  if (m_NamingProperty.empty())
-    caption = m_Interface;
-  else
-  {
-    mitk::Any prop = serviceRef.GetProperty(m_NamingProperty);
-    if (prop.Empty())
-    {
-      MITK_WARN << "QmitkServiceListWidget tried to resolve property '" + m_NamingProperty + "' but failed. Resorting to interface name for display.";
-      caption = m_Interface;
-    }
-    else
-      caption = prop.ToString();
-  }
 
-  newItem->setText(caption.c_str());
+  newItem->setText(this->CreateCaptionForService(serviceRef));
 
   // Add new item to QListWidget
   m_Controls->m_ServiceList->addItem(newItem);
@@ -166,7 +150,7 @@ QListWidgetItem* QmitkServiceListWidget::AddServiceToList(mitk::ServiceReference
   return newItem;
 }
 
-bool QmitkServiceListWidget::RemoveServiceFromList(mitk::ServiceReference serviceRef){
+bool QmitkServiceListWidget::RemoveServiceFromList(const us::ServiceReferenceU& serviceRef){
   for(std::vector<QmitkServiceListWidget::ServiceListLink>::iterator it = m_ListContent.begin(); it != m_ListContent.end(); ++it){
     if ( serviceRef == it->service )
     {
@@ -180,17 +164,48 @@ bool QmitkServiceListWidget::RemoveServiceFromList(mitk::ServiceReference servic
   return false;
 }
 
+bool QmitkServiceListWidget::ChangeServiceOnList(const us::ServiceReferenceU& serviceRef)
+{
+  for(std::vector<QmitkServiceListWidget::ServiceListLink>::iterator it = m_ListContent.begin(); it != m_ListContent.end(); ++it){
+    if ( serviceRef == it->service )
+    {
+      it->item->setText(this->CreateCaptionForService(serviceRef));
+      return true;
+    }
+  }
+  return false;
+}
 
-mitk::ServiceReference QmitkServiceListWidget::GetServiceForListItem(QListWidgetItem* item)
+us::ServiceReferenceU QmitkServiceListWidget::GetServiceForListItem(QListWidgetItem* item)
 {
   for(std::vector<QmitkServiceListWidget::ServiceListLink>::iterator it = m_ListContent.begin(); it != m_ListContent.end(); ++it)
     if (item == it->item) return it->service;
   // Return invalid ServiceReference (will evaluate to false in bool expressions)
-  return mitk::ServiceReference();
+  return us::ServiceReferenceU();
 }
 
-
-std::list<mitk::ServiceReference> QmitkServiceListWidget::GetAllRegisteredServices(){
+std::vector<us::ServiceReferenceU> QmitkServiceListWidget::GetAllRegisteredServices(){
   //Get Service References
   return m_Context->GetServiceReferences(m_Interface, m_Filter);
+}
+
+QString QmitkServiceListWidget::CreateCaptionForService(const us::ServiceReferenceU& serviceRef)
+{
+  std::string caption;
+  //TODO allow more complex formatting
+  if (m_NamingProperty.empty())
+    caption = m_Interface;
+  else
+  {
+    us::Any prop = serviceRef.GetProperty(m_NamingProperty);
+    if (prop.Empty())
+    {
+      MITK_WARN << "QmitkServiceListWidget tried to resolve property '" + m_NamingProperty + "' but failed. Resorting to interface name for display.";
+      caption = m_Interface;
+    }
+    else
+      caption = prop.ToString();
+  }
+
+  return QString::fromStdString(caption);
 }

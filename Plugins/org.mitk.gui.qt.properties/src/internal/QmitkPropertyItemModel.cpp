@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkColorProperty.h>
 #include <mitkEnumerationProperty.h>
 #include <mitkProperties.h>
-#include <mitkPropertyAliases.h>
-#include <mitkPropertyFilters.h>
+#include <mitkIPropertyAliases.h>
+#include <mitkIPropertyFilters.h>
 #include <mitkRenderingManager.h>
 #include <mitkStringProperty.h>
 
@@ -281,7 +281,7 @@ void QmitkPropertyItemModel::OnPreferencesChanged(const berry::IBerryPreferences
   if (updateAliases)
   {
     m_PropertyAliases = showAliases
-      ? mitk::GetPropertyService<mitk::PropertyAliases>()
+      ? mitk::GetPropertyService<mitk::IPropertyAliases>()
       : NULL;
 
     resetPropertyList = m_PropertyList.IsNotNull();
@@ -290,7 +290,7 @@ void QmitkPropertyItemModel::OnPreferencesChanged(const berry::IBerryPreferences
   if (updateFilters)
   {
     m_PropertyFilters = filterProperties
-      ? mitk::GetPropertyService<mitk::PropertyFilters>()
+      ? mitk::GetPropertyService<mitk::IPropertyFilters>()
       : NULL;
 
     if (!resetPropertyList)
@@ -459,7 +459,7 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList* propertyList
 
     if (m_PropertyFilters != NULL && (m_PropertyFilters->HasFilter() || m_PropertyFilters->HasFilter(m_ClassName.toStdString())))
     {
-      filteredProperties = m_PropertyFilters->ApplyFilter(m_ClassName.toStdString(), *m_PropertyList->GetMap());
+      filteredProperties = m_PropertyFilters->ApplyFilter(*m_PropertyList->GetMap(), m_ClassName.toStdString());
       filterProperties = true;
     }
 
@@ -471,21 +471,34 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList* propertyList
 
     for (mitk::PropertyList::PropertyMap::const_iterator iter = propertyMap->begin(); iter != end; ++iter)
     {
-      QStringList nameAndAlias(QString::fromStdString(iter->first));
+      std::vector<std::string> aliases;
 
-      nameAndAlias << (m_PropertyAliases != NULL
-        ? QString::fromStdString(m_PropertyAliases->GetAlias(iter->first))
-        : "");
+      if (m_PropertyAliases != NULL)
+      {
+        aliases = m_PropertyAliases->GetAliases(iter->first, m_ClassName.toStdString());
 
-      QList<QVariant> data;
+        if (aliases.empty() && !m_ClassName.isEmpty())
+          aliases = m_PropertyAliases->GetAliases(iter->first);
+      }
 
-      data << (nameAndAlias[1].isEmpty()
-        ? nameAndAlias[0]
-        : nameAndAlias[1]);
+      if (aliases.empty())
+      {
+        QList<QVariant> data;
+        data << QString::fromStdString(iter->first) << QVariant::fromValue((reinterpret_cast<void *>(iter->second.GetPointer())));
 
-      data << QVariant::fromValue((reinterpret_cast<void *>(iter->second.GetPointer())));
+        m_RootItem->AppendChild(new QmitkPropertyItem(data));
+      }
+      else
+      {
+        std::vector<std::string>::const_iterator end = aliases.end();
+        for (std::vector<std::string>::const_iterator aliasIter = aliases.begin(); aliasIter != end; ++aliasIter)
+        {
+          QList<QVariant> data;
+          data << QString::fromStdString(*aliasIter) << QVariant::fromValue((reinterpret_cast<void *>(iter->second.GetPointer())));
 
-      m_RootItem->AppendChild(new QmitkPropertyItem(data));
+          m_RootItem->AppendChild(new QmitkPropertyItem(data));
+        }
+      }
     }
   }
 
@@ -499,4 +512,9 @@ void QmitkPropertyItemModel::SetPropertyList(mitk::PropertyList* propertyList, c
     m_ClassName = className;
     this->SetNewPropertyList(propertyList);
   }
+}
+
+void QmitkPropertyItemModel::Update()
+{
+  this->SetNewPropertyList(m_PropertyList);
 }

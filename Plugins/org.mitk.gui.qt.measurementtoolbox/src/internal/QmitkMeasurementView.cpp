@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtGui>
 
+#include <mitkIPropertyFilters.h>
+#include <mitkPropertyFilter.h>
 #include <mitkVtkLayerController.h>
 #include <mitkWeakPointer.h>
 #include <mitkPlanarCircle.h>
@@ -39,8 +41,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <QmitkRenderWindow.h>
 
-#include "mitkModuleRegistry.h"
+#include "mitkPluginActivator.h"
+#include "usModuleRegistry.h"
 
+template <class T>
+static T* GetService()
+{
+  ctkPluginContext* context = mitk::PluginActivator::GetContext();
+  ctkServiceReference serviceRef = context->getServiceReference<T>();
+
+  return serviceRef
+    ? context->getService<T>(serviceRef)
+    : NULL;
+}
 
 struct QmitkPlanarFigureData
 {
@@ -98,7 +111,7 @@ struct QmitkMeasurementViewData
 const std::string QmitkMeasurementView::VIEW_ID = "org.mitk.views.measurement";
 
 QmitkMeasurementView::QmitkMeasurementView()
-: d( new QmitkMeasurementViewData )
+  : d( new QmitkMeasurementViewData )
 {
 }
 QmitkMeasurementView::~QmitkMeasurementView()
@@ -121,56 +134,49 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 
   //# add actions
   MEASUREMENT_DEBUG << "Draw Line";
-  QAction* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
-    ":/measurement/line.png"), "Draw Line");
+  QAction* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/line.png"), "Draw Line");
   currentAction->setCheckable(true);
   d->m_DrawLine = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   MEASUREMENT_DEBUG << "Draw Path";
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
-    ":/measurement/path.png"), "Draw Path");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/path.png"), "Draw Path");
   currentAction->setCheckable(true);
   d->m_DrawPath = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   MEASUREMENT_DEBUG << "Draw Angle";
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
-    ":/measurement/angle.png"), "Draw Angle");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/angle.png"), "Draw Angle");
   currentAction->setCheckable(true);
   d->m_DrawAngle = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   MEASUREMENT_DEBUG << "Draw Four Point Angle";
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
-    ":/measurement/four-point-angle.png"), "Draw Four Point Angle");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/four-point-angle.png"), "Draw Four Point Angle");
   currentAction->setCheckable(true);
   d->m_DrawFourPointAngle = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   MEASUREMENT_DEBUG << "Draw Circle";
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
-    ":/measurement/circle.png"), "Draw Circle");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/circle.png"), "Draw Circle");
   currentAction->setCheckable(true);
   d->m_DrawEllipse = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   MEASUREMENT_DEBUG << "Draw Rectangle";
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
-    ":/measurement/rectangle.png"), "Draw Rectangle");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/rectangle.png"), "Draw Rectangle");
   currentAction->setCheckable(true);
   d->m_DrawRectangle = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
   MEASUREMENT_DEBUG << "Draw Polygon";
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(
-    ":/measurement/polygon.png"), "Draw Polygon");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/polygon.png"), "Draw Polygon");
   currentAction->setCheckable(true);
   d->m_DrawPolygon = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
@@ -199,22 +205,14 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 }
 void QmitkMeasurementView::CreateConnections()
 {
-  QObject::connect( d->m_DrawLine, SIGNAL( triggered(bool) )
-    , this, SLOT( ActionDrawLineTriggered(bool) ) );
-  QObject::connect( d->m_DrawPath, SIGNAL( triggered(bool) )
-    , this, SLOT( ActionDrawPathTriggered(bool) ) );
-  QObject::connect( d->m_DrawAngle, SIGNAL( triggered(bool) )
-    , this, SLOT( ActionDrawAngleTriggered(bool) ) );
-  QObject::connect( d->m_DrawFourPointAngle, SIGNAL( triggered(bool) )
-    , this, SLOT( ActionDrawFourPointAngleTriggered(bool) ) );
-  QObject::connect( d->m_DrawEllipse, SIGNAL( triggered(bool) )
-    , this, SLOT( ActionDrawEllipseTriggered(bool) ) );
-  QObject::connect( d->m_DrawRectangle, SIGNAL( triggered(bool) )
-    , this, SLOT( ActionDrawRectangleTriggered(bool) ) );
-  QObject::connect( d->m_DrawPolygon, SIGNAL( triggered(bool) )
-    , this, SLOT( ActionDrawPolygonTriggered(bool) ) );
-  QObject::connect( d->m_CopyToClipboard, SIGNAL( clicked(bool) )
-    , this, SLOT( CopyToClipboard(bool) ) );
+  QObject::connect( d->m_DrawLine, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawLineTriggered(bool) ) );
+  QObject::connect( d->m_DrawPath, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawPathTriggered(bool) ) );
+  QObject::connect( d->m_DrawAngle, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawAngleTriggered(bool) ) );
+  QObject::connect( d->m_DrawFourPointAngle, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawFourPointAngleTriggered(bool) ) );
+  QObject::connect( d->m_DrawEllipse, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawEllipseTriggered(bool) ) );
+  QObject::connect( d->m_DrawRectangle, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawRectangleTriggered(bool) ) );
+  QObject::connect( d->m_DrawPolygon, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawPolygonTriggered(bool) ) );
+  QObject::connect( d->m_CopyToClipboard, SIGNAL( clicked(bool) ), this, SLOT( CopyToClipboard(bool) ) );
 }
 
 void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
@@ -233,21 +231,20 @@ void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
     if(figureInteractor.IsNull())
     {
       figureInteractor = mitk::PlanarFigureInteractor::New();
-      mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
       figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
       figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
       figureInteractor->SetDataNode( nonConstNode );
-
-      nonConstNode->SetBoolProperty( "planarfigure.isextendable", true );
+      //      nonConstNode->SetBoolProperty( "planarfigure.isextendable", true );
     }
     else
     {
       // just to be sure that the interactor is not added twice
-  //    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
+      //    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
     }
 
     MEASUREMENT_DEBUG << "adding interactor to globalinteraction";
-  //  mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+    //  mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
 
     MEASUREMENT_DEBUG << "will now add observers for planarfigure";
     QmitkPlanarFigureData data;
@@ -358,7 +355,7 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
   mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
 
   mitk::DataStorage::SetOfObjects::ConstPointer nodes =
-   GetDataStorage()->GetDerivations(node,isPlanarFigure);
+      GetDataStorage()->GetDerivations(node,isPlanarFigure);
 
   for (unsigned int x = 0; x < nodes->size(); x++)
   {
@@ -371,7 +368,7 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
         if( !d->m_DataNodeToPlanarFigureData.empty() )
         {
           std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it2 =
-            d->m_DataNodeToPlanarFigureData.find(nodes->at(x));
+              d->m_DataNodeToPlanarFigureData.find(nodes->at(x));
           //check if returned it2 valid
           if( it2 != d->m_DataNodeToPlanarFigureData.end() )
           {
@@ -455,17 +452,93 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
     mitk::PlanarFigure* _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
 
     // the last selected planar figure
-    if( _PlanarFigure )
+
+    if (_PlanarFigure && _PlanarFigure->GetGeometry2D())
     {
-      mitk::ILinkedRenderWindowPart* linkedRenderWindow =
-          dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
-      if( linkedRenderWindow )
+
+      QmitkRenderWindow* selectedRenderWindow = 0;
+      bool PlanarFigureInitializedWindow = false;
+
+      mitk::ILinkedRenderWindowPart* linkedRenderWindow = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
+      if(! linkedRenderWindow )
       {
-        mitk::Point3D centerP = _PlanarFigure->GetGeometry()->GetOrigin();
-        linkedRenderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SelectSliceByPoint(centerP);
+        return;
       }
-      break;
+
+      QmitkRenderWindow* RenderWindow1 = linkedRenderWindow->GetQmitkRenderWindow( "axial") ;
+      QmitkRenderWindow* RenderWindow2 = linkedRenderWindow->GetQmitkRenderWindow( "sagittal") ;
+      QmitkRenderWindow* RenderWindow3 = linkedRenderWindow->GetQmitkRenderWindow( "coronal") ;
+      QmitkRenderWindow* RenderWindow4 = linkedRenderWindow->GetQmitkRenderWindow( "3d") ;
+
+      if (node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
+      {
+        selectedRenderWindow = RenderWindow1;
+      }
+
+      if (!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, RenderWindow2->GetRenderer()))
+      {
+        selectedRenderWindow = RenderWindow2;
+      }
+
+      if (!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,RenderWindow3->GetRenderer()))
+      {
+        selectedRenderWindow = RenderWindow3;
+      }
+
+      if (!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, RenderWindow4->GetRenderer()))
+      {
+        selectedRenderWindow = RenderWindow4;
+      }
+
+      const mitk::PlaneGeometry* _PlaneGeometry = dynamic_cast<const mitk::PlaneGeometry*> (_PlanarFigure->GetGeometry2D());
+
+      mitk::VnlVector normal = _PlaneGeometry->GetNormalVnl();
+
+      mitk::Geometry2D::ConstPointer worldGeometry1 = RenderWindow1->GetRenderer()->GetCurrentWorldGeometry2D();
+      mitk::PlaneGeometry::ConstPointer _Plane1 = dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry1.GetPointer() );
+      mitk::VnlVector normal1 = _Plane1->GetNormalVnl();
+
+      mitk::Geometry2D::ConstPointer worldGeometry2 = RenderWindow2->GetRenderer()->GetCurrentWorldGeometry2D();
+      mitk::PlaneGeometry::ConstPointer _Plane2 = dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry2.GetPointer() );
+      mitk::VnlVector normal2 = _Plane2->GetNormalVnl();
+
+      mitk::Geometry2D::ConstPointer worldGeometry3 = RenderWindow3->GetRenderer()->GetCurrentWorldGeometry2D();
+      mitk::PlaneGeometry::ConstPointer _Plane3 = dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry3.GetPointer() );
+      mitk::VnlVector normal3 = _Plane3->GetNormalVnl();
+
+      normal[0]  = fabs(normal[0]);  normal[1]  = fabs(normal[1]);  normal[2]  = fabs(normal[2]);
+      normal1[0] = fabs(normal1[0]); normal1[1] = fabs(normal1[1]); normal1[2] = fabs(normal1[2]);
+      normal2[0] = fabs(normal2[0]); normal2[1] = fabs(normal2[1]); normal2[2] = fabs(normal2[2]);
+      normal3[0] = fabs(normal3[0]); normal3[1] = fabs(normal3[1]); normal3[2] = fabs(normal3[2]);
+
+      double ang1 = angle(normal, normal1);
+      double ang2 = angle(normal, normal2);
+      double ang3 = angle(normal, normal3);
+
+      if(ang1 < ang2 && ang1 < ang3)
+      {
+        selectedRenderWindow = RenderWindow1;
+      }
+      else
+      {
+        if(ang2 < ang3)
+        {
+          selectedRenderWindow = RenderWindow2;
+        }
+        else
+        {
+          selectedRenderWindow = RenderWindow3;
+        }
+      }
+
+      // re-orient view
+      if (selectedRenderWindow)
+      {
+        const mitk::Point3D& centerP = _PlaneGeometry->GetOrigin();
+        selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(centerP, _PlaneGeometry->GetNormal());
+      }
     }
+    break;
   }
 
   this->RequestRenderWindowUpdate();
@@ -486,12 +559,23 @@ void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
 {
   Q_UNUSED(checked)
 
+  mitk::IPropertyFilters* propertyFilters = GetService<mitk::IPropertyFilters>();
+
+  if (propertyFilters != NULL)
+  {
+    mitk::PropertyFilter filter;
+    filter.AddEntry("ClosedPlanarPolygon", mitk::PropertyFilter::Blacklist);
+
+    propertyFilters->AddFilter(filter, "PlanarPolygon");
+  }
+
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOff();
   QString qString = QString("Path%1").arg(++d->m_PathCounter);
   mitk::DataNode::Pointer node = this->AddFigureToDataStorage(figure, qString);
   mitk::BoolProperty::Pointer closedProperty = mitk::BoolProperty::New( false );
   node->SetProperty("ClosedPlanarPolygon", closedProperty);
+  node->SetProperty("planarfigure.isextendable",mitk::BoolProperty::New(true));
 
   MEASUREMENT_DEBUG << "PlanarPath initialized...";
 }
@@ -512,7 +596,7 @@ void QmitkMeasurementView::ActionDrawFourPointAngleTriggered(bool checked)
   Q_UNUSED(checked)
 
   mitk::PlanarFourPointAngle::Pointer figure =
-    mitk::PlanarFourPointAngle::New();
+      mitk::PlanarFourPointAngle::New();
   QString qString = QString("Four Point Angle%1").arg(++d->m_FourPointAngleCounter);
   this->AddFigureToDataStorage(figure, qString);
 
@@ -548,7 +632,8 @@ void QmitkMeasurementView::ActionDrawPolygonTriggered(bool checked)
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOn();
   QString qString = QString("Polygon%1").arg(++d->m_PolygonCounter);
-  this->AddFigureToDataStorage(figure, qString);
+  mitk::DataNode::Pointer node = this->AddFigureToDataStorage(figure, qString);
+  node->SetProperty("planarfigure.isextendable",mitk::BoolProperty::New(true));
 
   MEASUREMENT_DEBUG << "PlanarPolygon initialized...";
 }
@@ -563,7 +648,7 @@ void QmitkMeasurementView::CopyToClipboard( bool checked )
 }
 
 mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(
-  mitk::PlanarFigure* figure, const QString& name)
+    mitk::PlanarFigure* figure, const QString& name)
 {
   // add as
   MEASUREMENT_DEBUG << "Adding new figure to datastorage...";
@@ -617,9 +702,9 @@ void QmitkMeasurementView::UpdateMeasurementText()
       infoText.append("<br />");
 
     infoText.append(QString("<b>%1</b><hr />").arg(QString::fromStdString(
-      node->GetName())));
+                                                     node->GetName())));
     plainInfoText.append(QString("%1").arg(QString::fromStdString(
-      node->GetName())));
+                                             node->GetName())));
 
     planarAngle = dynamic_cast<mitk::PlanarAngle*> (_PlanarFigure);
     if(!planarAngle)
@@ -634,18 +719,18 @@ void QmitkMeasurementView::UpdateMeasurementText()
 
       featureQuantity = _PlanarFigure->GetQuantity(k);
       if ((planarAngle && k == planarAngle->FEATURE_ID_ANGLE)
-        || (planarFourPointAngle && k == planarFourPointAngle->FEATURE_ID_ANGLE))
+          || (planarFourPointAngle && k == planarFourPointAngle->FEATURE_ID_ANGLE))
         featureQuantity = featureQuantity * 180 / vnl_math::pi;
 
       infoText.append(
-        QString("<i>%1</i>: %2 %3") .arg(QString(
-        _PlanarFigure->GetFeatureName(k))) .arg(featureQuantity, 0, 'f',
-        2) .arg(QString(_PlanarFigure->GetFeatureUnit(k))));
+            QString("<i>%1</i>: %2 %3") .arg(QString(
+                                               _PlanarFigure->GetFeatureName(k))) .arg(featureQuantity, 0, 'f',
+                                                                                       2) .arg(QString(_PlanarFigure->GetFeatureUnit(k))));
 
       plainInfoText.append(
-        QString("\n%1: %2 %3") .arg(QString(_PlanarFigure->GetFeatureName(k))) .arg(
-        featureQuantity, 0, 'f', 2) .arg(QString(
-        _PlanarFigure->GetFeatureUnit(k))));
+            QString("\n%1: %2 %3") .arg(QString(_PlanarFigure->GetFeatureName(k))) .arg(
+              featureQuantity, 0, 'f', 2) .arg(QString(
+                                                 _PlanarFigure->GetFeatureUnit(k))));
 
       if(k+1 != _PlanarFigure->GetNumberOfFeatures())
         infoText.append("<br />");
@@ -666,7 +751,7 @@ void QmitkMeasurementView::AddAllInteractors()
   const mitk::DataNode* node = 0;
 
   for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
-    ; it++)
+      ; it++)
   {
     node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
     this->NodeAdded( node );
@@ -681,7 +766,7 @@ void QmitkMeasurementView::RemoveAllInteractors()
   const mitk::DataNode* node = 0;
 
   for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
-    ; it++)
+      ; it++)
   {
     node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
     this->NodeRemoved( node );

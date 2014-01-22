@@ -32,10 +32,20 @@ mitk::TbssImageSource::TbssImageSource()
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-
-itk::DataObject::Pointer mitk::TbssImageSource::MakeOutput( DataObjectPointerArraySizeType /*idx*/ )
+itk::DataObject::Pointer mitk::TbssImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(mitk::TbssImage::New().GetPointer());
+  return OutputType::New().GetPointer();
+}
+
+
+itk::DataObject::Pointer mitk::TbssImageSource::MakeOutput( const DataObjectIdentifierType & name )
+{
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 

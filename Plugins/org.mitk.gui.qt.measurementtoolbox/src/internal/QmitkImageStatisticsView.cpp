@@ -31,22 +31,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkILinkedRenderWindowPart.h>
 #include <QmitkRenderWindow.h>
 
-
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
 
 QmitkImageStatisticsView::QmitkImageStatisticsView(QObject* /*parent*/, const char* /*name*/)
-: m_Controls( NULL ),
-m_TimeStepperAdapter( NULL ),
-m_SelectedImage( NULL ),
-m_SelectedImageMask( NULL ),
-m_SelectedPlanarFigure( NULL ),
-m_ImageObserverTag( -1 ),
-m_ImageMaskObserverTag( -1 ),
-m_PlanarFigureObserverTag( -1 ),
-m_CurrentStatisticsValid( false ),
-m_StatisticsUpdatePending( false ),
-m_DataNodeSelectionChanged ( false ),
-m_Visible(false)
+  : m_Controls( NULL ),
+  m_TimeStepperAdapter( NULL ),
+  m_SelectedImage( NULL ),
+  m_SelectedImageMask( NULL ),
+  m_SelectedPlanarFigure( NULL ),
+  m_ImageObserverTag( -1 ),
+  m_ImageMaskObserverTag( -1 ),
+  m_PlanarFigureObserverTag( -1 ),
+  m_TimeObserverTag( -1 ),
+  m_CurrentStatisticsValid( false ),
+  m_StatisticsUpdatePending( false ),
+  m_DataNodeSelectionChanged ( false ),
+  m_Visible(false)
 {
   this->m_CalculationThread = new QmitkImageStatisticsCalculationThread;
 }
@@ -77,7 +77,6 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 
     m_Controls->m_ErrorMessageLabel->hide();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_LineProfileWidget->SetPathModeToPlanarFigure();
   }
 }
 
@@ -94,25 +93,99 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*) (this->m_Controls->m_barRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnBarRadioButtonSelected()));
     connect( (QObject*) (this->m_Controls->m_lineRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnLineRadioButtonSelected()));
   }
+
+  mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
+
+  if (renderWindow)
+  {
+    itk::ReceptorMemberCommand<QmitkImageStatisticsView>::Pointer cmdTimeEvent =
+      itk::ReceptorMemberCommand<QmitkImageStatisticsView>::New();
+    cmdTimeEvent->SetCallbackFunction(this, &QmitkImageStatisticsView::OnTimeChanged);
+
+    // It is sufficient to add the observer to the axial render window since the GeometryTimeEvent
+    // is always triggered by all views.
+    m_TimeObserverTag = renderWindow->GetQmitkRenderWindow("axial")->
+      GetSliceNavigationController()->
+      AddObserver(mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), cmdTimeEvent);
+  }
+}
+
+void QmitkImageStatisticsView::PartClosed( berry::IWorkbenchPartReference::Pointer )
+{
+  // The slice navigation controller observer is removed here instead of in the destructor.
+  // If it was called in the destructor, the application would freeze because the view's
+  // destructor gets called after the render windows have been destructed.
+  if ( m_TimeObserverTag != NULL )
+  {
+    mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
+
+    if (renderWindow)
+    {
+      renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->
+        RemoveObserver( m_TimeObserverTag );
+    }
+  }
+}
+
+void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject&)
+{
+  if (m_SelectedImage != NULL && !this->m_StatisticsUpdatePending)
+  {
+    while( this->m_CalculationThread->isRunning()) // wait until thread has finished
+    {
+      itksys::SystemTools::Delay(100);
+    }
+
+    if(this->m_SelectedImage != NULL)
+    {
+      this->m_SelectedImage->RemoveObserver( this->m_ImageObserverTag);
+      this->m_SelectedImage = NULL;
+    }
+
+    if(this->m_SelectedImageMask != NULL)
+    {
+      this->m_SelectedImageMask->RemoveObserver( this->m_ImageMaskObserverTag);
+      this->m_SelectedImageMask = NULL;
+    }
+
+    if(this->m_SelectedPlanarFigure != NULL)
+    {
+      this->m_SelectedPlanarFigure->RemoveObserver( this->m_PlanarFigureObserverTag);
+      this->m_SelectedPlanarFigure = NULL;
+    }
+
+    m_Controls->m_ErrorMessageLabel->setText("");
+    m_Controls->m_ErrorMessageLabel->hide();
+    this->InvalidateStatisticsTableView();
+    m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
+
+    emit StatisticsUpdate();
+  }
 }
 
 void QmitkImageStatisticsView::JumpToCoordinates(int row ,int col)
 {
-    mitk::Point3D world;
-    if (row==4)
-        world = m_WorldMin;
-    else if (row==3)
-        world = m_WorldMax;
-    else
-        return;
+  if(m_SelectedDataNodes.isEmpty())
+  {
+    MITK_WARN("QmitkImageStatisticsView") << "No data node selected for statistics calculation." ;
+    return;
+  }
 
-    mitk::IRenderWindowPart* part = this->GetRenderWindowPart();
-    if (part)
-    {
-        part->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SelectSliceByPoint(world);
-        part->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SelectSliceByPoint(world);
-        part->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SelectSliceByPoint(world);
-    }
+  mitk::Point3D world;
+  if (row==4)
+    world = m_WorldMin;
+  else if (row==3)
+    world = m_WorldMax;
+  else
+    return;
+
+  mitk::IRenderWindowPart* part = this->GetRenderWindowPart();
+  if (part)
+  {
+    part->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SelectSliceByPoint(world);
+    part->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SelectSliceByPoint(world);
+    part->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SelectSliceByPoint(world);
+  }
 }
 
 void QmitkImageStatisticsView::OnIgnoreZerosCheckboxClicked()
@@ -210,12 +283,22 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
   }
 
   this->ReinitData();
-  if (!selectedNodes.size())
+  if (selectedNodes.isEmpty())
   {
     m_Controls->m_JSHistogram->ClearHistogram();
     m_Controls->m_lineRadioButton->setEnabled(true);
     m_Controls->m_barRadioButton->setEnabled(true);
     m_Controls->m_InfoLabel->setText(QString(""));
+
+    //   m_Controls->horizontalLayout_3->setEnabled(false);
+    m_Controls->groupBox->setEnabled(false);
+    m_Controls->groupBox_3->setEnabled(false);
+  }
+  else
+  {
+    //  m_Controls->horizontalLayout_3->setEnabled(true);
+    m_Controls->groupBox->setEnabled(true);
+    m_Controls->groupBox_3->setEnabled(true);
   }
   if(selectedNodes.size() == 1 || selectedNodes.size() == 2)
   {
@@ -245,7 +328,6 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
 
 void QmitkImageStatisticsView::ReinitData()
 {
-
   while( this->m_CalculationThread->isRunning()) // wait until thread has finished
   {
     itksys::SystemTools::Delay(100);
@@ -295,7 +377,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
   m_WorldMin.Fill(-1);
   m_WorldMax.Fill(-1);
 
- // classify selected nodes
+  // classify selected nodes
   mitk::NodePredicateDataType::Pointer imagePredicate = mitk::NodePredicateDataType::New("Image");
 
   std::string maskName = std::string();
@@ -364,25 +446,25 @@ void QmitkImageStatisticsView::UpdateStatistics()
 
   if (m_SelectedPlanarFigure != NULL && m_SelectedImage == NULL)
   {
-      mitk::DataStorage::SetOfObjects::ConstPointer parentSet = this->GetDataStorage()->GetSources(planarFigureNode);
-      for (int i=0; i<parentSet->Size(); i++)
+    mitk::DataStorage::SetOfObjects::ConstPointer parentSet = this->GetDataStorage()->GetSources(planarFigureNode);
+    for (int i=0; i<parentSet->Size(); i++)
+    {
+      mitk::DataNode::Pointer node = parentSet->ElementAt(i);
+      if( imagePredicate->CheckNode(node) )
       {
-          mitk::DataNode::Pointer node = parentSet->ElementAt(i);
-          if( imagePredicate->CheckNode(node) )
-          {
-            bool isMask = false;
-            node->GetPropertyValue("binary", isMask);
+        bool isMask = false;
+        node->GetPropertyValue("binary", isMask);
 
-            if( !isMask )
-            {
-              if(this->m_SelectedImage == NULL)
-              {
-                this->m_SelectedImage = static_cast<mitk::Image*>(node->GetData());
-                this->m_ImageObserverTag = this->m_SelectedImage->AddObserver(itk::ModifiedEvent(), changeListener);
-              }
-            }
+        if( !isMask )
+        {
+          if(this->m_SelectedImage == NULL)
+          {
+            this->m_SelectedImage = static_cast<mitk::Image*>(node->GetData());
+            this->m_ImageObserverTag = this->m_SelectedImage->AddObserver(itk::ModifiedEvent(), changeListener);
           }
+        }
       }
+    }
   }
 
   unsigned int timeStep = renderPart->GetTimeNavigationController()->GetTime()->GetPos();
@@ -421,6 +503,24 @@ void QmitkImageStatisticsView::UpdateStatistics()
     if(m_SelectedImage->GetDimension() <= 3 && timeStep > m_SelectedImage->GetDimension(3)-1)
     {
       timeStep = m_SelectedImage->GetDimension(3)-1;
+    }
+
+    // Add the used mask time step to the mask label so the user knows which mask time step was used
+    // if the image time step is bigger than the total number of mask time steps (see
+    // ImageStatisticsCalculator::ExtractImageAndMask)
+    if (m_SelectedImageMask != NULL)
+    {
+      unsigned int maskTimeStep = timeStep;
+
+      if (maskTimeStep >= m_SelectedImageMask->GetTimeSteps())
+      {
+        maskTimeStep = m_SelectedImageMask->GetTimeSteps() - 1;
+      }
+
+      m_Controls->m_SelectedMaskLabel->setText(m_Controls->m_SelectedMaskLabel->text() +
+                                               QString(" (t=") +
+                                               QString::number(maskTimeStep) +
+                                               QString(")"));
     }
 
     //// initialize thread and trigger it
@@ -552,13 +652,22 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     //m_Controls->m_JSHistogram->clearHistogram();
     m_CurrentStatisticsValid = false;
 
-
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
     if ( m_SelectedPlanarFigure != NULL )
     {
+      // Check if the (closed) planar figure is out of bounds and so no image mask could be calculated--> Intensity Profile can not be calculated
+      bool outOfBounds = false;
+      if ( m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == NULL)
+      {
+        outOfBounds = true;
+        std::stringstream message;
+        message << "<font color='red'>Planar figure is outside the images bounds.</font>";
+        m_Controls->m_InfoLabel->setText(message.str().c_str());
+      }
+
       // check whether PlanarFigure is initialized
       const mitk::Geometry2D *planarFigureGeometry2D = m_SelectedPlanarFigure->GetGeometry2D();
-      if ( planarFigureGeometry2D == NULL )
+      if ( planarFigureGeometry2D == NULL || outOfBounds)
       {
         // Clear statistics, histogram, and GUI
         this->InvalidateStatisticsTableView();
@@ -570,7 +679,8 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         this->m_StatisticsUpdatePending = false;
         m_Controls->m_lineRadioButton->setEnabled(true);
         m_Controls->m_barRadioButton->setEnabled(true);
-        m_Controls->m_InfoLabel->setText(QString(""));
+        if (!outOfBounds)
+          m_Controls->m_InfoLabel->setText(QString(""));
         return;
       }
       unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
@@ -591,25 +701,25 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   const mitk::ImageStatisticsCalculator::Statistics &s,
   const mitk::Image *image )
 {
-    if (s.MaxIndex.size()==3)
-    {
-        mitk::Point3D index;
-        index[0] = s.MaxIndex[0];
-        index[1] = s.MaxIndex[1];
-        index[2] = s.MaxIndex[2];
-        m_SelectedImage->GetGeometry()->IndexToWorld(index, m_WorldMax);
-        index[0] = s.MinIndex[0];
-        index[1] = s.MinIndex[1];
-        index[2] = s.MinIndex[2];
-        m_SelectedImage->GetGeometry()->IndexToWorld(index, m_WorldMin);
-    }
+  if (s.MaxIndex.size()==3)
+  {
+    mitk::Point3D index;
+    index[0] = s.MaxIndex[0];
+    index[1] = s.MaxIndex[1];
+    index[2] = s.MaxIndex[2];
+    m_SelectedImage->GetGeometry()->IndexToWorld(index, m_WorldMax);
+    index[0] = s.MinIndex[0];
+    index[1] = s.MinIndex[1];
+    index[2] = s.MinIndex[2];
+    m_SelectedImage->GetGeometry()->IndexToWorld(index, m_WorldMin);
+  }
 
-    int decimals = 2;
+  int decimals = 2;
 
-    mitk::PixelType doublePix = mitk::MakeScalarPixelType< double >();
-    mitk::PixelType floatPix = mitk::MakeScalarPixelType< float >();
-    if (image->GetPixelType()==doublePix || image->GetPixelType()==floatPix)
-        decimals = 5;
+  mitk::PixelType doublePix = mitk::MakeScalarPixelType< double >();
+  mitk::PixelType floatPix = mitk::MakeScalarPixelType< float >();
+  if (image->GetPixelType()==doublePix || image->GetPixelType()==floatPix)
+    decimals = 5;
 
   this->m_Controls->m_StatisticsTable->setItem( 0, 0, new QTableWidgetItem(
     QString("%1").arg(s.Mean, 0, 'f', decimals) ) );
@@ -619,26 +729,26 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   this->m_Controls->m_StatisticsTable->setItem( 0, 2, new QTableWidgetItem(
     QString("%1").arg(s.RMS, 0, 'f', decimals) ) );
 
-    QString max; max.append(QString("%1").arg(s.Max, 0, 'f', decimals));
-    max += " (";
-    for (int i=0; i<s.MaxIndex.size(); i++)
-    {
-        max += QString::number(s.MaxIndex[i]);
-        if (i<s.MaxIndex.size()-1)
-            max += ",";
-    }
-    max += ")";
+  QString max; max.append(QString("%1").arg(s.Max, 0, 'f', decimals));
+  max += " (";
+  for (int i=0; i<s.MaxIndex.size(); i++)
+  {
+    max += QString::number(s.MaxIndex[i]);
+    if (i<s.MaxIndex.size()-1)
+      max += ",";
+  }
+  max += ")";
   this->m_Controls->m_StatisticsTable->setItem( 0, 3, new QTableWidgetItem( max ) );
 
-    QString min; min.append(QString("%1").arg(s.Min, 0, 'f', decimals));
-    min += " (";
-    for (int i=0; i<s.MinIndex.size(); i++)
-    {
-        min += QString::number(s.MinIndex[i]);
-        if (i<s.MinIndex.size()-1)
-            min += ",";
-    }
-    min += ")";
+  QString min; min.append(QString("%1").arg(s.Min, 0, 'f', decimals));
+  min += " (";
+  for (int i=0; i<s.MinIndex.size(); i++)
+  {
+    min += QString::number(s.MinIndex[i]);
+    if (i<s.MinIndex.size()-1)
+      min += ",";
+  }
+  min += ")";
   this->m_Controls->m_StatisticsTable->setItem( 0, 4, new QTableWidgetItem( min ) );
 
   this->m_Controls->m_StatisticsTable->setItem( 0, 5, new QTableWidgetItem(

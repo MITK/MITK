@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryMessage.h>
 //#include <cstdlib>
 
-#include <CppUnit/TestSuite.h>
-#include <CppUnit/TestCaller.h>
+#include <cppunit/TestSuite.h>
+#include <cppunit/TestCaller.h>
 
 namespace berry
 {

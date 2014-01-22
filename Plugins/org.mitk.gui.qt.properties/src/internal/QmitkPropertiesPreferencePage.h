@@ -29,7 +29,8 @@ public:
   static const std::string FILTER_PROPERTIES;
   static const std::string SHOW_ALIASES;
   static const std::string SHOW_DESCRIPTIONS;
-  static const std::string SHOW_GENUINE_NAMES;
+  static const std::string SHOW_ALIASES_IN_DESCRIPTION;
+  static const std::string DEVELOPER_MODE;
 
   QmitkPropertiesPreferencePage();
   ~QmitkPropertiesPreferencePage();

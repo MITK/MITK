@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIEditorRegistry.h>
 #include <berryUIException.h>
 #include <berryIPreferencesService.h>
+#include <berryIBerryPreferences.h>
 
 #include <mitkDataNodeFactory.h>
 #include "mitkIDataStorageService.h"
@@ -35,7 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateProperty.h"
 #include "mitkIOUtil.h"
 #include "mitkWorkbenchUtil.h"
-
 #include <ctkUtils.h>
 
 #include <QMessageBox>
@@ -159,7 +159,18 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
     window->GetWorkbench()->ShowPerspective(defaultPerspId, window);
   }
 
-  if (openEditor)
+  bool globalReinitOnNodeAdded = true;
+  berry::IPreferencesService::Pointer prefService
+    = berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  if (prefService.IsNotNull())
+  {
+      berry::IBerryPreferences::Pointer prefs
+              = (prefService->GetSystemPreferences()->Node("org.mitk.views.datamanager")).Cast<berry::IBerryPreferences>();
+      if(prefs.IsNotNull())
+        globalReinitOnNodeAdded = prefs->GetBool("Call global reinit if node is added", true);
+  }
+
+  if (openEditor && globalReinitOnNodeAdded)
   {
     try
     {
@@ -171,16 +182,7 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
 
       if(dsmodified && renderingManager)
       {
-        // get all nodes that have not set "includeInBoundingBox" to false
-        mitk::NodePredicateNot::Pointer pred
-            = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
-                                                                           , mitk::BoolProperty::New(false)));
-
-        mitk::DataStorage::SetOfObjects::ConstPointer rs = dataStorage->GetSubset(pred);
-        // calculate bounding geometry of these nodes
-        mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
-        // initialize the views to the bounding geometry
-        renderingManager->InitializeViews(bounds);
+        mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
       }
     }
     catch (const berry::PartInitException& e)

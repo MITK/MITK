@@ -275,7 +275,7 @@ private:
   float m_ShadowWidthFactor;
   float m_OutlineWidth;
   float m_HelperlineWidth;
-  float m_PointWidth;
+  //float m_PointWidth;
 
   PlanarFigureControlPointStyleProperty::Shape m_ControlPointShape;
 
@@ -295,6 +295,9 @@ private:
 
   // Observer-tag for listening to itk::ModifiedEvents on the DataNode
   unsigned long m_NodeModifiedObserverTag;
+
+  // Bool flag that indicates if a node modified observer was added
+  bool m_NodeModifiedObserverAdded;
 };
 
 } // namespace mitk

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkUSControlsProbesWidget</class>
+ <widget class="QWidget" name="QmitkUSControlsProbesWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>198</width>
+    <height>40</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Probes</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="probesComboBoxPrev">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>&lt;-</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/USUI.qrc">
+       <normaloff>:/USUI/go-previous.png</normaloff>:/USUI/go-previous.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkComboBoxStepThrough" name="probesComboBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="probesComboBoxNext">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/USUI.qrc">
+       <normaloff>:/USUI/go-next.png</normaloff>:/USUI/go-next.png</iconset>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkComboBoxStepThrough</class>
+   <extends>QComboBox</extends>
+   <header>QmitkComboBoxStepThrough.h</header>
+   <slots>
+    <signal>SignalReachedBegin(bool)</signal>
+    <signal>SignalReachedEnd(bool)</signal>
+    <slot>OnSetPreviousIndex()</slot>
+    <slot>OnSetNextIndex()</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources/USUI.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>probesComboBoxPrev</sender>
+   <signal>clicked()</signal>
+   <receiver>probesComboBox</receiver>
+   <slot>OnSetPreviousIndex()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>59</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>118</x>
+     <y>18</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>probesComboBoxNext</sender>
+   <signal>clicked()</signal>
+   <receiver>probesComboBox</receiver>
+   <slot>OnSetNextIndex()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>177</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>118</x>
+     <y>18</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>probesComboBox</sender>
+   <signal>SignalReachedBegin(bool)</signal>
+   <receiver>probesComboBoxPrev</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>118</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>59</x>
+     <y>18</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>probesComboBox</sender>
+   <signal>SignalReachedEnd(bool)</signal>
+   <receiver>probesComboBoxNext</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>118</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>177</x>
+     <y>18</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

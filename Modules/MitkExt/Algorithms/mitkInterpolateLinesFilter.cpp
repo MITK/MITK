@@ -106,20 +106,20 @@ void mitk::InterpolateLinesFilter::BuildPointAndVectorList(mitk::Mesh::CellType&
   int closed_loop_pre_load=0;//m_SplineResolution;
   if(m_GeometryForInterpolation.IsNull())
   {
-    //bei geschlossener Kontur: vor dem ersten Punkt die zwei letzten einfügen für glatten Übergang
+    //when the contour is closed: first point insert behind two last points for smooth crossing
     ptIt = ptEnd; ptIt-=closed_loop_pre_load+1;
     for(i=0;i<closed_loop_pre_load;++i, ++ptIt)
     {
       pt = input->GetPoint(*ptIt);
       m_SpX->AddPoint(i, pt[0]); m_SpY->AddPoint(i, pt[1]); m_SpZ->AddPoint(i, pt[2]);
     }
-    //Punkte einfügen
+    //insert points
     for(ptIt = cell.PointIdsBegin();i<size+closed_loop_pre_load;++i, ++ptIt)
     {
       pt = input->GetPoint(*ptIt);
       m_SpX->AddPoint(i, pt[0]); m_SpY->AddPoint(i, pt[1]); m_SpZ->AddPoint(i, pt[2]);
     }
-    //bei geschlossener Kontur: nach dem letzten Punkt die zwei ersten einfügen für glatten Übergang
+    //when the contour is closed: after the last point insert two first points for smooth crossing
     int j;
     for(j=0,ptIt = cell.PointIdsBegin();j<closed_loop_pre_load;++j,++i, ++ptIt)
     {
@@ -144,20 +144,20 @@ void mitk::InterpolateLinesFilter::BuildPointAndVectorList(mitk::Mesh::CellType&
   else //m_GeometryForInterpolation!=NULL
   {
     Point2D pt2d;
-    //bei geschlossener Kontur: vor dem ersten Punkt die zwei letzten einfügen für glatten Übergang
+    //when the contour is closed: before the first point insert two last points for smooth crossing
     ptIt = ptEnd; ptIt-=closed_loop_pre_load+1;
     for(i=0;i<closed_loop_pre_load;++i, ++ptIt)
     {
       m_GeometryForInterpolation->Map(input->GetPoint(*ptIt), pt2d);
       m_SpX->AddPoint(i, pt2d[0]); m_SpY->AddPoint(i, pt2d[1]);
     }
-    //Punkte einfügen
+    //insert points
     for(ptIt = cell.PointIdsBegin();i<size+closed_loop_pre_load;++i, ++ptIt)
     {
       m_GeometryForInterpolation->Map(input->GetPoint(*ptIt), pt2d);
       m_SpX->AddPoint(i, pt2d[0]); m_SpY->AddPoint(i, pt2d[1]);
     }
-    //bei geschlossener Kontur: nach dem letzten Punkt die zwei ersten einfügen für glatten Übergang
+    //when the contour is closed: after the last point insert two first points for smooth crossing
     int j;
     for(j=0,ptIt = cell.PointIdsBegin();j<closed_loop_pre_load;++j,++i, ++ptIt)
     {

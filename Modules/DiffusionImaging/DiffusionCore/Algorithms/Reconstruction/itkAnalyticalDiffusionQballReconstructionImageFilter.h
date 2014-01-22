@@ -186,7 +186,7 @@ public:
 
     static void tofile2(vnl_matrix<double> *A, std::string fname);
     static void Cart2Sph(double x, double y, double z, double* cart);
-    static double Yj(int m, int k, double theta, double phi);
+    static double Yj(int m, int k, double theta, double phi, bool useMRtrixBasis = false);
     double Legendre0(int l);
 
     OdfPixelType Normalize(OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 );
@@ -213,6 +213,8 @@ public:
     itkGetConstReferenceMacro( BValue, TOdfPixelType)
     itkSetMacro( Lambda, double )
     itkGetMacro( Lambda, double )
+
+    itkSetMacro( UseMrtrixBasis, bool )
 
 #ifdef ITK_USE_CONCEPT_CHECKING
     /** Begin concept checking */
@@ -270,6 +272,7 @@ private:
     typename CoefficientImageType::Pointer            m_CoefficientImage;
     TOdfPixelType                                     m_Delta1;
     TOdfPixelType                                     m_Delta2;
+    bool                                              m_UseMrtrixBasis;
 };
 
 }

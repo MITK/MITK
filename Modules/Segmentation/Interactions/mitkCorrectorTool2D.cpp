@@ -20,13 +20,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolManager.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
+#include "mitkImageReadAccessor.h"
 
 #include "mitkCorrectorTool2D.xpm"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, CorrectorTool2D, "Correction tool");
@@ -41,7 +43,7 @@ mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)
   CONNECT_ACTION( 90, OnMouseMoved );
   CONNECT_ACTION( 42, OnMouseReleased );
 
-  GetFeedbackContour()->SetIsClosed( false ); // don't close the contour to a polygon
+  GetFeedbackContour()->SetClosed( false ); // don't close the contour to a polygon
 }
 
 mitk::CorrectorTool2D::~CorrectorTool2D()
@@ -53,17 +55,17 @@ const char** mitk::CorrectorTool2D::GetXPM() const
   return mitkCorrectorTool2D_xpm;
 }
 
-mitk::ModuleResource mitk::CorrectorTool2D::GetIconResource() const
+us::ModuleResource mitk::CorrectorTool2D::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Correction_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Correction_48x48.png");
   return resource;
 }
 
-mitk::ModuleResource mitk::CorrectorTool2D::GetCursorIconResource() const
+us::ModuleResource mitk::CorrectorTool2D::GetCursorIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Correction_Cursor_32x32.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Correction_Cursor_32x32.png");
   return resource;
 }
 
@@ -96,7 +98,7 @@ bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* st
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Clear();
   contour->Expand(timestep + 1);
-  contour->SetIsClosed(false, timestep);
+  contour->SetClosed(false, timestep);
   contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
@@ -176,7 +178,8 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
 
   mitk::Image::Pointer resultSlice = mitk::Image::New();
   resultSlice->Initialize(algorithm->GetOutput());
-  resultSlice->SetVolume(algorithm->GetOutput()->GetData());
+  mitk::ImageReadAccessor imAccess(algorithm->GetOutput());
+  resultSlice->SetVolume(imAccess.GetData());
 
   this->WriteBackSegmentationResult(positionEvent, resultSlice);
 

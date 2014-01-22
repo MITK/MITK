@@ -1,0 +1,480 @@
+
+cmake_minimum_required(VERSION 2.8.4)
+
+project(Qxt)
+
+set(${PROJECT_NAME}_MAJOR_VERSION 0)
+set(${PROJECT_NAME}_MINOR_VERSION 6)
+set(${PROJECT_NAME}_PATCH_VERSION 2)
+set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
+
+macro(QT4_GENERATE_MOCS)
+  foreach(file ${ARGN})
+    get_filename_component(source_path ${file} PATH)
+    get_filename_component(source_name ${file} NAME_WE)
+    get_filename_component(source_ext ${file} EXT)
+
+    set(moc_file ${CMAKE_CURRENT_BINARY_DIR}/${source_path}/moc_${source_name}.cpp)
+    QT4_GENERATE_MOC(${file} ${moc_file})
+    set_property(SOURCE ${source_path}/${source_name}.cpp APPEND PROPERTY
+                 OBJECT_DEPENDS ${moc_file})
+  endforeach()
+endmacro()
+
+set(${PROJECT_NAME}_LIBRARIES
+  QxtCore
+  QxtGui
+  QxtNetwork
+  QxtWeb
+)
+
+set(QXT_CORE_MOC_HEADERS
+  qxtabstractconnectionmanager.h
+  qxtboundfunction.h
+  qxtcsvmodel.h
+  qxtdaemon.h
+  qxtdeplex.h
+  qxtdeplex_p.h
+  qxtfifo.h
+  qxtfilelock.h
+  qxtjob.h
+  qxtjob_p.h
+  qxtlinesocket.h
+  qxtlinesocket_p.h
+  qxtlocale.h
+  qxtlogger.h
+  qxtlogger_p.h
+  qxtmultisignalwaiter.h
+  qxtnamespace.h
+  qxtpipe.h
+  qxtpipe_p.h
+  qxtpointerlist.h
+  qxtsignalgroup.h
+  qxtsignalwaiter.h
+  qxtslotjob.h
+  qxtslotjob_p.h
+  qxtstdio.h
+  qxtstdio_p.h
+  qxtstdstreambufdevice.h
+  qxtrpcservice.h
+  qxtrpcservice_p.h
+)
+
+set(QXT_GUI_MOC_HEADERS
+  qxtbasespinbox.h
+  qxtcheckcombobox.h
+  qxtcheckcombobox_p.h
+  qxtconfigdialog.h
+  qxtconfigdialog_p.h
+  qxtconfigwidget.h
+  qxtconfigwidget_p.h
+  qxtconfirmationmessage.h
+  qxtcountrycombobox.h
+  qxtcountrycombobox_p.h
+  qxtcountrymodel.h
+  qxtcountrymodel_p.h
+  qxtcrumbview.h
+  qxtcrumbview_p.h
+  qxtflowview.h
+  qxtflowview_p.h
+  qxtgroupbox.h
+  qxtheaderview.h
+  qxtitemdelegate.h
+  qxtitemdelegate_p.h
+  qxtlabel.h
+  qxtletterboxwidget.h
+  qxtletterboxwidget_p.h
+  qxtlineedit.h
+  qxtlistwidget.h
+  qxtlistwidget_p.h
+  qxtlanguagecombobox.h
+  qxtlanguagecombobox_p.h
+  qxtprogresslabel.h
+  qxtproxystyle.h
+  qxtpushbutton.h
+  qxtspanslider.h
+  qxtspanslider_p.h
+  qxtstars.h
+  qxtstringspinbox.h
+  qxtstringvalidator.h
+  qxttablewidget.h
+  qxttablewidget_p.h
+  qxttabwidget.h
+  qxttabwidget_p.h
+  qxttooltip_p.h
+  qxttreewidget.h
+  qxttreewidget_p.h
+
+  qxtscheduleheaderwidget.h
+  qxtscheduleitemdelegate.h
+  qxtscheduleview.h
+  qxtscheduleviewheadermodel_p.h
+  qxtscheduleview_p.h
+
+  qxtsortfilterproxymodel.h
+  qxtfilterdialog.h
+  qxtfilterdialog_p.h
+  qxtlookuplineedit.h
+
+  # !qws:!symbian
+  qxtapplication.h
+  qxtglobalshortcut.h
+)
+
+set(QXT_NETWORK_MOC_HEADERS
+  qxtjsonrpcclient.h
+  qxtsmtp.h
+  qxtrpcpeer.h
+  qxtsmtp_p.h
+  qxttcpconnectionmanager.h
+  qxttcpconnectionmanager_p.h
+  qxtxmlrpcclient.h
+)
+
+set(QXT_WEB_MOC_HEADERS
+  qxtabstracthttpconnector.h
+  qxtabstractwebservice.h
+  qxtabstractwebsessionmanager.h
+  qxtabstractwebsessionmanager_p.h
+  qxthttpsessionmanager.h
+  qxtwebcontent.h
+  qxtwebservicedirectory.h
+  qxtwebservicedirectory_p.h
+  qxtwebslotservice.h
+  qxtwebcgiservice.h
+  qxtwebcgiservice_p.h
+)
+
+set(QXT_NETWORK_MANUAL_MOC_HEADERS
+  qxtjsonrpccall.h
+  qxtxmlrpccall.h
+)
+
+set(QXT_CORE_SOURCES
+  qxtabstractconnectionmanager.cpp
+  qxtabstractfileloggerengine.cpp
+  qxtabstractiologgerengine.cpp
+  qxtbasicfileloggerengine.cpp
+  qxtbasicstdloggerengine.cpp
+  qxtcommandoptions.cpp
+  qxtcsvmodel.cpp
+  qxtdaemon.cpp
+  qxtdatastreamsignalserializer.cpp
+  qxtdeplex.cpp
+  qxterror.cpp
+  qxtfifo.cpp
+  qxtfilelock.cpp
+  qxtglobal.cpp
+  qxthmac.cpp
+  qxtlocale.cpp
+  qxtjson.cpp
+  qxtjob.cpp
+  qxtlinesocket.cpp
+  qxtlinkedtree.cpp
+  qxtlogger.cpp
+  qxtloggerengine.cpp
+  qxtlogstream.cpp
+  qxtmetaobject.cpp
+  qxtmodelserializer.cpp
+  qxtmultisignalwaiter.cpp
+  qxtnull.cpp
+  qxtpipe.cpp
+  qxtpointerlist.cpp
+  qxtsignalgroup.cpp
+  qxtsignalwaiter.cpp
+  qxtslotjob.cpp
+  qxtslotmapper.cpp
+  qxtstdio.cpp
+  qxtstdstreambufdevice.cpp
+  qxttimer.cpp
+  qxtrpcservice.cpp
+  qxtxmlfileloggerengine.cpp
+)
+
+set(QXT_GUI_SOURCES
+  qxtbasespinbox.cpp
+  qxtcheckcombobox.cpp
+  qxtconfigdialog.cpp
+  qxtconfigwidget.cpp
+  qxtconfirmationmessage.cpp
+  qxtcountrymodel.cpp
+  qxtcountrycombobox.cpp
+  qxtcrumbview.cpp
+  qxtflowview.cpp
+  qxtflowview_p.cpp
+  qxtgroupbox.cpp
+  qxtheaderview.cpp
+  qxtitemdelegate.cpp
+  qxtlabel.cpp
+  qxtletterboxwidget.cpp
+  qxtlineedit.cpp
+  qxtlistwidget.cpp
+  qxtlistwidgetitem.cpp
+  qxtlanguagecombobox.cpp
+  qxtprogresslabel.cpp
+  qxtproxystyle.cpp
+  qxtpushbutton.cpp
+  qxtspanslider.cpp
+  qxtstars.cpp
+  qxtstringspinbox.cpp
+  qxtstringvalidator.cpp
+  qxttablewidget.cpp
+  qxttablewidgetitem.cpp
+  qxttabwidget.cpp
+  qxttooltip.cpp
+  qxttreewidget.cpp
+  qxttreewidgetitem.cpp
+
+  qxtscheduleitemdelegate.cpp
+  qxtscheduleview.cpp
+  qxtscheduleview_p.cpp
+  qxtscheduleviewheadermodel_p.cpp
+  qxtstyleoptionscheduleviewitem.cpp
+  qxtscheduleheaderwidget.cpp
+
+  qxtsortfilterproxymodel.cpp
+  qxtfilterdialog.cpp
+  qxtlookuplineedit.cpp
+
+  # !qws:!symbian
+  qxtapplication.cpp
+  qxtglobalshortcut.cpp
+)
+
+set(QXT_NETWORK_SOURCES
+  qxtjsonrpccall.cpp
+  qxtjsonrpcclient.cpp
+  qxtmailattachment.cpp
+  qxtmailmessage.cpp
+  qxtrpcpeer.cpp
+  qxtsmtp.cpp
+  qxttcpconnectionmanager.cpp
+  qxtxmlrpccall.cpp
+  qxtxmlrpcclient.cpp
+  qxtxmlrpc_p.cpp
+)
+
+set(QXT_WEB_SOURCES
+  qxtabstracthttpconnector.cpp
+  qxtabstractwebservice.cpp
+  qxtabstractwebsessionmanager.cpp
+  qxthtmltemplate.cpp
+  qxthttpserverconnector.cpp
+  qxthttpsessionmanager.cpp
+  qxtscgiserverconnector.cpp
+  qxtwebcontent.cpp
+  qxtwebevent.cpp
+  qxtwebservicedirectory.cpp
+  qxtwebslotservice.cpp
+  qxtwebcgiservice.cpp
+)
+
+if(UNIX)
+  list(APPEND QXT_CORE_MOC_HEADERS qxtserialdevice.h qxtserialdevice_p.h)
+  list(APPEND QXT_CORE_SOURCES
+       qxtfilelock_unix.cpp qxtserialdevice.cpp qxtserialdevice_unix.cpp)
+  if(APPLE)
+    list(APPEND QXT_GUI_SOURCES
+         qxtapplication_mac.cpp qxtglobalshortcut_mac.cpp)
+  else()
+    list(APPEND QXT_GUI_SOURCES
+         qxtapplication_x11.cpp qxtglobalshortcut_x11.cpp
+         qxtscreen_x11.cpp qxtwindowsystem_x11.cpp)
+  endif()
+endif()
+
+if(NOT APPLE)
+  list(APPEND QXT_GUI_SOURCES qxtscreen.cpp qxtwindowsystem.cpp)
+endif()
+
+if(WIN32)
+  list(APPEND QXT_CORE_SOURCES qxtfilelock_win.cpp)
+  list(APPEND QXT_GUI_SOURCES
+       qxtapplication_win.cpp qxtglobalshortcut_win.cpp
+       qxtscreen_win.cpp qxtwindowsystem_win.cpp)
+endif()
+
+set(_qxt_core_moc_headers )
+foreach(_header ${QXT_CORE_MOC_HEADERS})
+  list(APPEND _qxt_core_moc_headers src/core/${_header})
+endforeach()
+
+set(_qxt_gui_moc_headers )
+foreach(_header ${QXT_GUI_MOC_HEADERS})
+  list(APPEND _qxt_gui_moc_headers src/gui/${_header})
+endforeach()
+
+set(_qxt_network_moc_headers )
+foreach(_header ${QXT_NETWORK_MOC_HEADERS})
+  list(APPEND _qxt_network_moc_headers src/network/${_header})
+endforeach()
+
+set(_qxt_network_manual_moc_headers )
+foreach(_header ${QXT_NETWORK_MANUAL_MOC_HEADERS})
+  list(APPEND _qxt_network_manual_moc_headers src/network/${_header})
+endforeach()
+
+set(_qxt_web_moc_headers )
+foreach(_header ${QXT_WEB_MOC_HEADERS})
+  list(APPEND _qxt_web_moc_headers src/web/${_header})
+endforeach()
+
+set(_qxt_core_sources )
+foreach(_source ${QXT_CORE_SOURCES})
+  list(APPEND _qxt_core_sources src/core/${_source})
+endforeach()
+
+set(_qxt_gui_sources )
+foreach(_source ${QXT_GUI_SOURCES})
+  list(APPEND _qxt_gui_sources src/gui/${_source})
+endforeach()
+
+set(_qxt_network_sources )
+foreach(_source ${QXT_NETWORK_SOURCES})
+  list(APPEND _qxt_network_sources src/network/${_source})
+endforeach()
+
+set(_qxt_web_sources )
+foreach(_source ${QXT_WEB_SOURCES})
+  list(APPEND _qxt_web_sources src/web/${_source})
+endforeach()
+
+set(_qxt_gui_resources src/gui/resources.qrc)
+
+set(${PROJECT_NAME}_INCLUDE_DIRS
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/core
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/QxtCore
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/QxtGui
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/network
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/QxtNetwork
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/web
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/QxtWeb
+  )
+
+include_directories(${${PROJECT_NAME}_INCLUDE_DIRS})
+
+find_package(Qt4 REQUIRED)
+
+set(QT_USE_QTNETWORK 1)
+set(QT_USE_QTDESIGNER 1)
+include(${QT_USE_FILE})
+
+# Build the QxtCore library
+qt4_wrap_cpp(_qxt_core_sources ${_qxt_core_moc_headers})
+
+add_library(QxtCore SHARED ${_qxt_core_sources})
+target_link_libraries(QxtCore ${QT_LIBRARIES})
+
+set_target_properties(QxtCore PROPERTIES
+                      SOVERSION ${${PROJECT_NAME}_VERSION}
+                      COMPILE_DEFINITIONS "BUILD_QXT_CORE")
+
+# Build the QxtGui library
+qt4_wrap_cpp(_qxt_gui_sources ${_qxt_gui_moc_headers})
+qt4_add_resources(_qxt_gui_sources ${_qxt_gui_resources})
+
+set(QxtGui_link_libraries ${QT_LIBRARIES})
+if(APPLE)
+  find_library(CARBON_FW NAMES Carbon)
+  list(APPEND QxtGui_link_libraries ${CARBON_FW})
+endif()
+add_library(QxtGui SHARED ${_qxt_gui_sources})
+target_link_libraries(QxtGui QxtCore ${QxtGui_link_libraries})
+
+set_target_properties(QxtGui PROPERTIES
+                      SOVERSION ${${PROJECT_NAME}_VERSION}
+                      COMPILE_DEFINITIONS "BUILD_QXT_GUI")
+
+# Build the QxtNetwork library
+qt4_wrap_cpp(_qxt_network_sources ${_qxt_network_moc_headers})
+qt4_add_resources(_qxt_network_sources ${_qxt_network_resources})
+
+# The generate moc_* sources are included directly in .cpp files
+QT4_GENERATE_MOCS(${_qxt_network_manual_moc_headers})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/network)
+
+add_library(QxtNetwork SHARED ${_qxt_network_sources})
+target_link_libraries(QxtNetwork QxtCore ${QT_LIBRARIES})
+
+set_target_properties(QxtNetwork PROPERTIES
+                      SOVERSION ${${PROJECT_NAME}_VERSION}
+                      COMPILE_DEFINITIONS "BUILD_QXT_NETWORK")
+
+# Build the QxtWeb library
+qt4_wrap_cpp(_qxt_web_sources ${_qxt_web_moc_headers})
+
+add_library(QxtWeb SHARED ${_qxt_web_sources})
+target_link_libraries(QxtWeb QxtCore QxtNetwork ${QT_LIBRARIES})
+
+set_target_properties(QxtWeb PROPERTIES
+                      SOVERSION ${${PROJECT_NAME}_VERSION}
+                      COMPILE_DEFINITIONS "BUILD_QXT_WEB")
+
+
+# Build the designer plug-in
+
+set(_qxt_designer_sources
+  src/designer/qxtbasespinboxplugin.cpp
+  src/designer/qxtcheckcomboboxplugin.cpp
+  src/designer/qxtcountrycomboboxplugin.cpp
+  src/designer/qxtdesignerplugin.cpp
+  src/designer/qxtdesignerplugins.cpp
+  src/designer/qxtflowviewplugin.cpp
+  src/designer/qxtgroupboxplugin.cpp
+  src/designer/qxtlabelplugin.cpp
+  src/designer/qxtlanguagecomboboxplugin.cpp
+  src/designer/qxtletterboxwidgetplugin.cpp
+  src/designer/qxtlineeditplugin.cpp
+  src/designer/qxtlistwidgetplugin.cpp
+  src/designer/qxtprogresslabelplugin.cpp
+  src/designer/qxtpushbuttonplugin.cpp
+  src/designer/qxtspansliderplugin.cpp
+  src/designer/qxtstarsplugin.cpp
+  src/designer/qxtstringspinboxplugin.cpp
+  src/designer/qxttablewidgetplugin.cpp
+  src/designer/qxttreewidgetplugin.cpp
+)
+
+qt4_wrap_cpp(_qxt_designer_sources
+  src/designer/qxtbasespinboxplugin.h
+  src/designer/qxtcheckcomboboxplugin.h
+  src/designer/qxtcountrycomboboxplugin.h
+  src/designer/qxtdesignerplugins.h
+  src/designer/qxtflowviewplugin.h
+  src/designer/qxtgroupboxplugin.h
+  src/designer/qxtlabelplugin.h
+  src/designer/qxtlanguagecomboboxplugin.h
+  src/designer/qxtletterboxwidgetplugin.h
+  src/designer/qxtlineeditplugin.h
+  src/designer/qxtlistwidgetplugin.h
+  src/designer/qxtprogresslabelplugin.h
+  src/designer/qxtpushbuttonplugin.h
+  src/designer/qxtspansliderplugin.h
+  src/designer/qxtstarsplugin.h
+  src/designer/qxtstringspinboxplugin.h
+  src/designer/qxttablewidgetplugin.h
+  src/designer/qxttreewidgetplugin.h
+
+)
+
+qt4_add_resources(_qxt_designer_sources src/designer/resources.qrc)
+add_library(QxtDesignerPlugins SHARED ${_qxt_designer_sources})
+target_link_libraries(QxtDesignerPlugins QxtGui QxtCore ${QT_LIBRARIES})
+
+set_target_properties(QxtDesignerPlugins PROPERTIES
+                      SOVERSION ${${PROJECT_NAME}_VERSION}
+                      COMPILE_DEFINITIONS BUILD_QXT_DESIGNER)
+
+
+# Config files
+configure_file(${PROJECT_NAME}Config.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
+export(TARGETS ${Qxt_LIBRARIES} FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Exports.cmake)
+
+# Version information
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  @ONLY
+  )

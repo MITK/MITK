@@ -306,7 +306,7 @@ mitk::Geometry3D* mitk::WiiMoteInteractor::TransformCurrentDataInGeometry3D()
     MITK_WARN<<"Wiimote Interactor got wrong type of data! Aborting interaction!\n";
     return NULL;
   }
-  Geometry3D* geometry = surface->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
+  Geometry3D* geometry = surface->GetUpdatedTimeGeometry()->GetGeometryForTimeStep( m_TimeStep );
   return geometry;
 }
 

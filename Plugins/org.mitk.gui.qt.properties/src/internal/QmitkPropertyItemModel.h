@@ -30,8 +30,8 @@ namespace berry
 
 namespace mitk
 {
-  class PropertyAliases;
-  class PropertyFilters;
+  class IPropertyAliases;
+  class IPropertyFilters;
 
   enum
   {
@@ -58,6 +58,7 @@ public:
   int rowCount(const QModelIndex& parent = QModelIndex()) const;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
   void SetPropertyList(mitk::PropertyList* propertyList, const QString& className = "");
+  void Update();
 
 private:
   void CreateRootItem();
@@ -67,8 +68,8 @@ private:
   void OnPropertyModified(const itk::Object* property, const itk::EventObject& event);
   void SetNewPropertyList(mitk::PropertyList* propertyList);
 
-  mitk::PropertyAliases* m_PropertyAliases;
-  mitk::PropertyFilters* m_PropertyFilters;
+  mitk::IPropertyAliases* m_PropertyAliases;
+  mitk::IPropertyFilters* m_PropertyFilters;
   mitk::WeakPointer<mitk::PropertyList> m_PropertyList;
   QString m_ClassName;
   std::auto_ptr<QmitkPropertyItem> m_RootItem;

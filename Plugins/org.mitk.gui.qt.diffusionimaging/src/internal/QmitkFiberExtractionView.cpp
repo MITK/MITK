@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeObject.h>
 #include <mitkDiffusionImage.h>
 #include <mitkTensorImage.h>
-#include "mitkModuleRegistry.h"
+#include "usModuleRegistry.h"
 
 // ITK
 #include <itkResampleImageFilter.h>
@@ -63,7 +63,8 @@ QmitkFiberExtractionView::QmitkFiberExtractionView()
     , m_MultiWidget( NULL )
     , m_CircleCounter(0)
     , m_PolygonCounter(0)
-    , m_UpsamplingFactor(5)
+    , m_UpsamplingFactor(1)
+    , m_LastAddedPf(NULL)
 {
 
 }
@@ -231,6 +232,8 @@ void QmitkFiberExtractionView::GenerateRoiImage(){
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.front()->GetData());
         geometry = fib->GetGeometry();
     }
+    else if (m_SelectedImage)
+        geometry = m_SelectedImage->GetGeometry();
     else
         return;
 
@@ -533,14 +536,14 @@ void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image
 
     // Extrude the generated contour polygon
     vtkLinearExtrusionFilter *extrudeFilter = vtkLinearExtrusionFilter::New();
-    extrudeFilter->SetInput( polyline );
+    extrudeFilter->SetInputData( polyline );
     extrudeFilter->SetScaleFactor( 1 );
     extrudeFilter->SetExtrusionTypeToNormalExtrusion();
     extrudeFilter->SetVector( 0.0, 0.0, 1.0 );
 
     // Make a stencil from the extruded polygon
     vtkPolyDataToImageStencil *polyDataToImageStencil = vtkPolyDataToImageStencil::New();
-    polyDataToImageStencil->SetInput( extrudeFilter->GetOutput() );
+    polyDataToImageStencil->SetInputConnection( extrudeFilter->GetOutputPort() );
 
 
 
@@ -559,7 +562,7 @@ void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image
     // Apply the generated image stencil to the input image
     vtkImageStencil *imageStencilFilter = vtkImageStencil::New();
     imageStencilFilter->SetInputConnection( vtkImporter->GetOutputPort() );
-    imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput() );
+    imageStencilFilter->SetStencilConnection(polyDataToImageStencil->GetOutputPort() );
     imageStencilFilter->ReverseStencilOff();
     imageStencilFilter->SetBackgroundValue( 0 );
     imageStencilFilter->Update();
@@ -759,7 +762,7 @@ void QmitkFiberExtractionView::UpdateGui()
     }
     else
     {
-        if ( !m_SelectedFB.empty() )
+        if ( !m_SelectedFB.empty() || m_SelectedImage.IsNotNull())
             m_Controls->m_GenerateRoiImage->setEnabled(true);
         else
             m_Controls->m_GenerateRoiImage->setEnabled(false);
@@ -822,6 +825,48 @@ void QmitkFiberExtractionView::OnSelectionChanged( std::vector<mitk::DataNode*> 
             m_SelectedSurfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
         }
     }
+
+    if (m_SelectedFB.empty())
+    {
+        int maxLayer = 0;
+        itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>::ConstPointer nodes = this->GetDefaultDataStorage()->GetAll();
+        for (unsigned int i=0; i<nodes->Size(); i++)
+            if (dynamic_cast<mitk::FiberBundleX*>(nodes->at(i)->GetData()))
+            {
+                int layer = 0;
+                nodes->at(i)->GetPropertyValue("layer", layer);
+                if (layer>=maxLayer)
+                {
+                    maxLayer = layer;
+                    m_Controls->m_FibLabel->setText(nodes->at(i)->GetName().c_str());
+                    m_SelectedFB.clear();
+                    m_SelectedFB.push_back(nodes->at(i));
+                }
+            }
+    }
+
+    if (m_SelectedPF.empty() && m_LastAddedPf.IsNotNull())
+    {
+        m_Controls->m_PfLabel->setText(m_LastAddedPf->GetName().c_str());
+        m_SelectedPF.push_back(m_LastAddedPf);
+
+//        int maxLayer = 0;
+//        itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>::ConstPointer nodes = this->GetDefaultDataStorage()->GetAll();
+//        for (unsigned int i=0; i<nodes->Size(); i++)
+//            if (dynamic_cast<mitk::PlanarFigure*>(nodes->at(i)->GetData()))
+//            {
+//                int layer;
+//                nodes->at(i)->GetPropertyValue("layer", layer);
+//                if (layer>=maxLayer)
+//                {
+//                    maxLayer = layer;
+//                    m_Controls->m_PfLabel->setText(nodes->at(i)->GetName().c_str());
+//                    m_SelectedPF.clear();
+//                    m_SelectedPF.push_back(nodes->at(i));
+//                }
+//            }
+    }
+
     UpdateGui();
     GenerateStats();
 }
@@ -851,16 +896,16 @@ void QmitkFiberExtractionView::OnDrawPolygon()
 
         if(figureP)
         {
-          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
+            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
-          if(figureInteractor.IsNull())
-          {
-            figureInteractor = mitk::PlanarFigureInteractor::New();
-            mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
-            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
-            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
-            figureInteractor->SetDataNode( node );
-          }
+            if(figureInteractor.IsNull())
+            {
+                figureInteractor = mitk::PlanarFigureInteractor::New();
+                us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+                figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+                figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+                figureInteractor->SetDataNode( node );
+            }
         }
     }
 
@@ -889,13 +934,13 @@ void QmitkFiberExtractionView::OnDrawCircle()
             figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
             if(figureInteractor.IsNull())
-          {
-            figureInteractor = mitk::PlanarFigureInteractor::New();
-            mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
-            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
-            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
-            figureInteractor->SetDataNode( node );
-          }
+            {
+                figureInteractor = mitk::PlanarFigureInteractor::New();
+                us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+                figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+                figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+                figureInteractor->SetDataNode( node );
+            }
         }
     }
 }
@@ -970,13 +1015,14 @@ void QmitkFiberExtractionView::AddFigureToDataStorage(mitk::PlanarFigure* figure
     newNode->SetOpacity(0.8);
     GetDataStorage()->Add(newNode );
 
-    std::vector<mitk::DataNode*> selectedNodes = GetDataManagerSelection();
-    for(unsigned int i = 0; i < selectedNodes.size(); i++)
-    {
-        selectedNodes[i]->SetSelected(false);
-    }
+    for(unsigned int i = 0; i < m_SelectedPF.size(); i++)
+        m_SelectedPF[i]->SetSelected(false);
 
     newNode->SetSelected(true);
+    m_SelectedPF.clear();
+    m_SelectedPF.push_back(newNode);
+    m_LastAddedPf = newNode;
+    m_Controls->m_PfLabel->setText(newNode->GetName().c_str());
 }
 
 void QmitkFiberExtractionView::DoFiberExtraction()
@@ -987,7 +1033,7 @@ void QmitkFiberExtractionView::DoFiberExtraction()
         return;
     }
 
-    for (int i=0; i<m_SelectedFB.size(); i++)
+    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
         mitk::PlanarFigure::Pointer roi = dynamic_cast<mitk::PlanarFigure*> (m_SelectedPF.at(0)->GetData());
@@ -1080,6 +1126,15 @@ void QmitkFiberExtractionView::AddCompositeToDatastorage(mitk::PlanarFigureCompo
     newPFCNode->SetName( pfcomp->getDisplayName() );
     newPFCNode->SetData(pfcomp);
     newPFCNode->SetVisibility(true);
+
+    for(unsigned int i = 0; i < m_SelectedPF.size(); i++)
+        m_SelectedPF[i]->SetSelected(false);
+
+    newPFCNode->SetSelected(true);
+    m_LastAddedPf = newPFCNode;
+    m_SelectedPF.clear();
+    m_SelectedPF.push_back(newPFCNode);
+    m_Controls->m_PfLabel->setText(newPFCNode->GetName().c_str());
 
     switch (pfcomp->getOperationType()) {
     case 0:

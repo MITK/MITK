@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetInteractor.h"
 #include "mitkToolCommand.h"
 
+#include "mitkMessage.h"
+
 #include "itkImage.h"
 
 //itk filter
@@ -34,8 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkSigmoidImageFilter.h"
 #include "itkCurvatureAnisotropicDiffusionImageFilter.h"
 
+namespace us {
 class ModuleResource;
-
+}
 
 namespace mitk
 {
@@ -52,6 +55,8 @@ namespace mitk
 */
 class Segmentation_EXPORT FastMarchingTool3D : public AutoSegmentationTool
 {
+    mitkNewMessageMacro(Ready);
+
   public:
 
     mitkClassMacro(FastMarchingTool3D, AutoSegmentationTool)
@@ -71,11 +76,10 @@ class Segmentation_EXPORT FastMarchingTool3D : public AutoSegmentationTool
     typedef FastMarchingFilterType::NodeContainer                                                       NodeContainer;
     typedef FastMarchingFilterType::NodeType                                                            NodeType;
 
-
     /* icon stuff */
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
-    ModuleResource GetIconResource() const;
+    us::ModuleResource GetIconResource() const;
 
     /// \brief Set parameter used in Threshold filter.
     void SetUpperThreshold(double);

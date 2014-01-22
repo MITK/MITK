@@ -16,8 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkAboutDialog.h"
 #include "QmitkModulesDialog.h"
-#include <QPushButton>
 #include <mitkVersion.h>
+#include <itkConfigure.h>
+#include <vtkConfigure.h>
+#include <QPushButton>
+#include <vtkVersionMacros.h>
 
 QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
   : QDialog(parent, f)
@@ -26,8 +29,16 @@ QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
 
   QString mitkRevision(MITK_REVISION);
   QString mitkRevisionDescription(MITK_REVISION_DESC);
+  QString itkVersion = QString("%1.%2.%3").arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH);
+  QString vtkVersion = QString("%1.%2.%3").arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION);
 
-  m_GUI.m_RevisionLabel->setText(m_GUI.m_RevisionLabel->text().arg(mitkRevision).arg(mitkRevisionDescription));
+  QString revisionText = QString("Revision: %1").arg(MITK_REVISION);
+
+  if (!QString(MITK_REVISION_DESC).isEmpty())
+    revisionText += QString("\nDescription: %1").arg(MITK_REVISION_DESC);
+
+  m_GUI.m_RevisionLabel->setText(revisionText);
+  m_GUI.m_ToolkitVersionsLabel->setText(QString("ITK %1, VTK %2, Qt %3").arg(itkVersion, vtkVersion, QT_VERSION_STR));
 
   QPushButton* btnModules = new QPushButton(QIcon(":/qmitk/ModuleView.png"), "Modules");
   m_GUI.m_ButtonBox->addButton(btnModules, QDialogButtonBox::ActionRole);

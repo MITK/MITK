@@ -71,7 +71,7 @@ class MitkExt_EXPORT vtkMitkOpenGLGPUVolumeRayCastMapper : public vtkMitkGPUVolu
 {
 public:
   static vtkMitkOpenGLGPUVolumeRayCastMapper *New();
-  vtkTypeRevisionMacro(vtkMitkOpenGLGPUVolumeRayCastMapper,vtkMitkGPUVolumeRayCastMapper);
+  vtkTypeMacro(vtkMitkOpenGLGPUVolumeRayCastMapper,vtkMitkGPUVolumeRayCastMapper);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -157,7 +157,15 @@ protected:
   // Description:
   // Delete OpenGL objects.
   // \post done: this->OpenGLObjectsCreated==0
-  void ReleaseGraphicsResources(vtkWindow *window);
+  // \deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
+  //
+  DEPRECATED(void ReleaseGraphicsResources(vtkWindow *window));
+
+   // Description:
+  // Delete OpenGL objects.
+  // \post done: this->OpenGLObjectsCreated==0
+  //
+  void ReleaseGraphicsResources(mitk::BaseRenderer* renderer);
 
   // Description:
   // Allocate memory on the GPU for the framebuffers according to the size of

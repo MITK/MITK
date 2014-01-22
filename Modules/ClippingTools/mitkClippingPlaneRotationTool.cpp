@@ -17,7 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClippingPlaneRotationTool.xpm"
 
 #include "mitkBaseRenderer.h"
-#include "mitkGlobalInteraction.h"
+#include "usModule.h"
+#include "usModuleContext.h"
+#include "usGetModuleContext.h"
+#include "usModuleRegistry.h"
 #include "mitkRenderingManager.h"
 #include "mitkToolManager.h"
 
@@ -30,6 +33,7 @@ namespace mitk
 mitk::ClippingPlaneRotationTool::ClippingPlaneRotationTool()
 : Tool( "global" )
 {
+  m_AffineDataInteractor = mitk::AffineDataInteractor3D::New();
 }
 
 mitk::ClippingPlaneRotationTool::~ClippingPlaneRotationTool()
@@ -58,27 +62,17 @@ void mitk::ClippingPlaneRotationTool::Activated()
   //check if the Clipping plane is changed.
   if(m_ClippingPlaneNode != m_ToolManager->GetWorkingData(0))
   {
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_AffineInteractor);
-    this->ClippingPlaneChanged();
+    m_ClippingPlaneNode = m_ToolManager->GetWorkingData(0);
+    m_ClippingPlaneNode->SetDataInteractor(NULL);
   }
 
-  m_AffineInteractor->SetInteractionModeToRotation();
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_AffineInteractor);
+  m_AffineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+  m_AffineDataInteractor->SetEventConfig("AffineRotationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+  m_AffineDataInteractor->SetDataNode(m_ClippingPlaneNode);
 }
 
 void mitk::ClippingPlaneRotationTool::Deactivated()
 {
   Superclass::Deactivated();
-
-  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_AffineInteractor);
-}
-
-//Checks the working data node, if it has an interactor. Otherwise initial a new one.
-void mitk::ClippingPlaneRotationTool::ClippingPlaneChanged()
-{
-  m_ClippingPlaneNode = m_ToolManager->GetWorkingData(0);
-  m_AffineInteractor = dynamic_cast<mitk::AffineInteractor3D*>(m_ClippingPlaneNode->GetInteractor());
-
-  if (m_AffineInteractor.IsNull())
-    m_AffineInteractor = mitk::AffineInteractor3D::New("AffineInteractor3D", m_ClippingPlaneNode);
+  m_AffineDataInteractor->SetDataNode(NULL);
 }

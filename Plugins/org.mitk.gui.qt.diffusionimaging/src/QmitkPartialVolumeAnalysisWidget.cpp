@@ -16,29 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPartialVolumeAnalysisWidget.h"
 
-#include "mitkHistogramGenerator.h"
-#include "mitkPartialVolumeAnalysisClusteringCalculator.h"
-
-#include <qlabel.h>
-#include <qpen.h>
-#include <qgroupbox.h>
-
-
-#include <vtkQtChartArea.h>
-#include <vtkQtChartTableSeriesModel.h>
-#include <vtkQtChartStyleManager.h>
-#include <vtkQtChartColorStyleGenerator.h>
-
-#include <vtkQtChartMouseSelection.h>
-#include <vtkQtChartInteractorSetup.h>
-#include <vtkQtChartSeriesSelectionHandler.h>
-#include <vtkQtChartAxisLayer.h>
-#include <vtkQtChartAxis.h>
-#include <vtkQtChartAxisOptions.h>
-#include <vtkQtChartLegend.h>
-#include <vtkQtChartLegendManager.h>
-
-//#include <iostream>
+#include <QPen>
+#include <QFrame>
 
 QmitkPartialVolumeAnalysisWidget::QmitkPartialVolumeAnalysisWidget( QWidget * parent )
   : QmitkPlotWidget(parent)
@@ -46,8 +25,12 @@ QmitkPartialVolumeAnalysisWidget::QmitkPartialVolumeAnalysisWidget( QWidget * pa
 //  this->SetAxisTitle( QwtPlot::xBottom, "Grayvalue" );
   //  this->SetAxisTitle( QwtPlot::yLeft, "Probability" );
 //  this->Replot();
-  m_Plot->setCanvasLineWidth(0);
-  m_Plot->setMargin(0);
+  QFrame* canvas = qobject_cast<QFrame*>(m_Plot->canvas());
+  if (canvas)
+  {
+    canvas->setLineWidth(0);
+    canvas->setContentsMargins(0,0,0,0);
+  }
 }
 
 

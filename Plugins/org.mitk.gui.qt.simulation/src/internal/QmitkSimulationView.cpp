@@ -14,20 +14,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "org_mitk_gui_qt_simulation_Activator.h"
 #include "QmitkSimulationView.h"
+#include <mitkExportMitkVisitor.h>
 #include <mitkIRenderingManager.h>
+#include <mitkISimulationService.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkSimulation.h>
-#include <mitkSimulationModel.h>
+
+template <class T>
+static T* GetService()
+{
+  ctkPluginContext* context = mitk::org_mitk_gui_qt_simulation_Activator::GetContext();
+
+  if (context == NULL)
+    return NULL;
+
+  ctkServiceReference serviceReference = context->getServiceReference<T>();
+
+  return serviceReference
+    ? context->getService<T>(serviceReference)
+    : NULL;
+}
 
 QmitkSimulationView::QmitkSimulationView()
-  : m_SelectionWasRemovedFromDataStorage(false),
+  : m_SimulationService(GetService<mitk::ISimulationService>()),
+    m_SelectionWasRemovedFromDataStorage(false),
     m_Timer(this)
 {
   this->GetDataStorage()->RemoveNodeEvent.AddListener(
     mitk::MessageDelegate1<QmitkSimulationView, const mitk::DataNode*>(this, &QmitkSimulationView::OnNodeRemovedFromDataStorage));
 
-  connect(&m_Timer, SIGNAL(timeout()), this, SLOT(OnTimerTimeout()));
+  connect(&m_Timer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
 }
 
 QmitkSimulationView::~QmitkSimulationView()
@@ -40,36 +58,34 @@ void QmitkSimulationView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls.setupUi(parent);
 
-  m_Controls.simulationComboBox->SetDataStorage(this->GetDataStorage());
-  m_Controls.simulationComboBox->SetPredicate(mitk::NodePredicateDataType::New("Simulation"));
+  m_Controls.sceneComboBox->SetDataStorage(this->GetDataStorage());
+  m_Controls.sceneComboBox->SetPredicate(mitk::NodePredicateDataType::New("Simulation"));
 
   m_Controls.stepsRecordedLabel->hide();
 
+  connect(m_Controls.sceneComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnSelectedSceneChanged(const mitk::DataNode*)));
   connect(m_Controls.animateButton, SIGNAL(toggled(bool)), this, SLOT(OnAnimateButtonToggled(bool)));
-  connect(m_Controls.recordButton, SIGNAL(toggled(bool)), this, SLOT(OnRecordButtonToggled(bool)));
-  connect(m_Controls.resetButton, SIGNAL(clicked()), this, SLOT(OnResetButtonClicked()));
   connect(m_Controls.stepButton, SIGNAL(clicked()), this, SLOT(OnStepButtonClicked()));
-  connect(m_Controls.simulationComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnSimulationComboBoxSelectionChanged(const mitk::DataNode*)));
-  connect(m_Controls.dtSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnDTSpinBoxValueChanged(double)));
+  connect(m_Controls.resetButton, SIGNAL(clicked()), this, SLOT(OnResetButtonClicked()));
+  connect(m_Controls.dtSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnDtChanged(double)));
+  connect(m_Controls.recordButton, SIGNAL(toggled(bool)), this, SLOT(OnRecordButtonToggled(bool)));
   connect(m_Controls.snapshotButton, SIGNAL(clicked()), this, SLOT(OnSnapshotButtonClicked()));
 
-  if (m_Controls.simulationComboBox->GetSelectedNode().IsNotNull())
-    this->OnSimulationComboBoxSelectionChanged(m_Controls.simulationComboBox->GetSelectedNode());
+  if (m_Controls.sceneComboBox->GetSelectedNode().IsNotNull())
+    this->OnSelectedSceneChanged(m_Controls.sceneComboBox->GetSelectedNode());
 }
 
 void QmitkSimulationView::OnAnimateButtonToggled(bool toggled)
 {
   if (this->SetSelectionAsCurrentSimulation())
   {
-    mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(m_Selection->GetData());
-    sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
-    sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
-
-    rootNode->getContext()->setAnimate(toggled);
+    mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
+    simulation->SetAnimationFlag(toggled);
 
     if (toggled)
     {
       m_Controls.stepButton->setEnabled(false);
+      m_NextRenderWindowUpdate = QTime::currentTime().addMSecs(MsPerFrame);
       m_Timer.start(0);
     }
   }
@@ -81,15 +97,13 @@ void QmitkSimulationView::OnAnimateButtonToggled(bool toggled)
   }
 }
 
-void QmitkSimulationView::OnDTSpinBoxValueChanged(double value)
+void QmitkSimulationView::OnDtChanged(double dt)
 {
   if (!this->SetSelectionAsCurrentSimulation())
     return;
 
-  mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(m_Selection->GetData());
-  sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
-
-  rootNode->setDt(std::max(0.0, value));
+  mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
+  simulation->SetDt(std::max(0.0, dt));
 }
 
 void QmitkSimulationView::OnNodeRemovedFromDataStorage(const mitk::DataNode* node)
@@ -102,22 +116,11 @@ void QmitkSimulationView::OnRecordButtonToggled(bool toggled)
 {
   if (!toggled)
   {
-    if (m_Record.IsNotNull())
-    {
-      mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
-      dataNode->SetData(m_Record);
-      dataNode->SetName(m_Record->GetTimeSteps() == 1 ? "Snapshot" : "Record");
-
-      this->GetDataStorage()->Add(dataNode, m_Selection);
-      mitk::RenderingManager::GetInstance()->InitializeViews(m_Record->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-
-      m_Record = NULL;
-    }
 
     m_Controls.stepsRecordedLabel->hide();
     m_Controls.stepsRecordedLabel->setText("0 steps recorded");
   }
-  else if (toggled)
+  else
   {
     m_Controls.stepsRecordedLabel->show();
   }
@@ -128,25 +131,15 @@ void QmitkSimulationView::OnResetButtonClicked()
   if (!this->SetSelectionAsCurrentSimulation())
     return;
 
-  if (m_Controls.recordButton->isChecked())
-    m_Controls.recordButton->setChecked(false);
+  mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
 
-  mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(m_Selection->GetData());
-  sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
-  sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
-
-  m_Controls.dtSpinBox->setValue(simulation->GetDefaultDT());
-  sofaSimulation->reset(rootNode.get());
-
-  rootNode->setTime(0.0);
-  sofaSimulation->updateContext(rootNode.get());
-
-  simulation->GetDrawTool()->Reset();
+  m_Controls.dtSpinBox->setValue(simulation->GetRootNode()->getDt());
+  simulation->Reset();
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 }
 
-void QmitkSimulationView::OnSimulationComboBoxSelectionChanged(const mitk::DataNode* node)
+void QmitkSimulationView::OnSelectedSceneChanged(const mitk::DataNode* node)
 {
   if (m_Controls.animateButton->isChecked())
     m_Controls.animateButton->setChecked(false);
@@ -157,28 +150,25 @@ void QmitkSimulationView::OnSimulationComboBoxSelectionChanged(const mitk::DataN
     m_Selection = NULL;
   }
 
-  if (m_Controls.recordButton->isChecked())
-    m_Controls.recordButton->setChecked(false);
-
   if (node != NULL)
   {
-    m_Selection = m_Controls.simulationComboBox->GetSelectedNode();
+    m_Selection = m_Controls.sceneComboBox->GetSelectedNode();
     mitk::Simulation* simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
+
+    m_SimulationService->SetSimulation(simulation);
 
     m_Controls.sceneGroupBox->setEnabled(true);
     m_Controls.snapshotButton->setEnabled(true);
-
-    simulation->SetAsActiveSimulation();
-    m_Controls.dtSpinBox->setValue(simulation->GetDefaultDT());
+    m_Controls.dtSpinBox->setValue(simulation->GetRootNode()->getDt());
   }
   else
   {
     m_Selection = NULL;
 
+    m_SimulationService->SetSimulation(NULL);
+
     m_Controls.sceneGroupBox->setEnabled(false);
     m_Controls.snapshotButton->setEnabled(false);
-
-    mitk::Simulation::SetActiveSimulation(NULL);
     m_Controls.dtSpinBox->setValue(0.0);
   }
 }
@@ -188,52 +178,28 @@ void QmitkSimulationView::OnSnapshotButtonClicked()
   if (!this->SetSelectionAsCurrentSimulation())
     return;
 
-  mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(m_Selection->GetData());
+  mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
+  mitk::ExportMitkVisitor exportVisitor;
 
-  mitk::Surface::Pointer snapshot = simulation->TakeSnapshot();
-
-  if (snapshot.IsNull())
-    return;
-
-  mitk::DataNode::Pointer snapshotDataNode = mitk::DataNode::New();
-  snapshotDataNode->SetData(snapshot);
-  snapshotDataNode->SetName("Snapshot");
-
-  this->GetDataStorage()->Add(snapshotDataNode, m_Selection);
+  simulation->GetRootNode()->executeVisitor(&exportVisitor);
 }
 
-void QmitkSimulationView::OnStepButtonClicked()
+void QmitkSimulationView::OnStep(bool renderWindowUpdate)
 {
   if (!this->SetSelectionAsCurrentSimulation())
     return;
 
-  mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(m_Selection->GetData());
-  sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
-  sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
+  mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
 
-  simulation->GetDrawTool()->Reset();
+  simulation->Animate();
 
-  sofaSimulation->animate(rootNode.get(), rootNode->getDt());
+  if (renderWindowUpdate)
+    this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+}
 
-  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
-
-  if (m_Controls.recordButton->isChecked())
-  {
-    if (m_Record.IsNull())
-      m_Record = mitk::Surface::New();
-
-    if (simulation->AppendSnapshot(m_Record))
-    {
-      unsigned int numSteps = m_Record->GetTimeSteps();
-      QString plural = numSteps != 1 ? "s" : "";
-
-      m_Controls.stepsRecordedLabel->setText(QString("%1 step%2 recorded").arg(numSteps).arg(plural));
-    }
-    else if (m_Record->GetTimeSteps() == 1)
-    {
-      m_Record = NULL;
-    }
-  }
+void QmitkSimulationView::OnStepButtonClicked()
+{
+  this->OnStep(true);
 }
 
 void QmitkSimulationView::SetFocus()
@@ -245,14 +211,24 @@ bool QmitkSimulationView::SetSelectionAsCurrentSimulation() const
 {
   if (m_Selection.IsNotNull())
   {
-    static_cast<mitk::Simulation*>(m_Selection->GetData())->SetAsActiveSimulation();
+    m_SimulationService->SetSimulation(static_cast<mitk::Simulation*>(m_Selection->GetData()));
     return true;
   }
 
   return false;
 }
 
-void QmitkSimulationView::OnTimerTimeout()
+void QmitkSimulationView::OnTimeout()
 {
-  this->OnStepButtonClicked();
+  QTime currentTime = QTime::currentTime();
+
+  if (currentTime.msecsTo(m_NextRenderWindowUpdate) > 0)
+  {
+    this->OnStep(false);
+  }
+  else
+  {
+    m_NextRenderWindowUpdate = currentTime.addMSecs(MsPerFrame);
+    this->OnStep(true);
+  }
 }

@@ -1,0 +1,354 @@
+cmake_minimum_required(VERSION 2.8.4)
+
+project(GLUT)
+
+set(${PROJECT_NAME}_MAJOR_VERSION 2)
+set(${PROJECT_NAME}_MINOR_VERSION 8)
+set(${PROJECT_NAME}_PATCH_VERSION 1)
+set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
+
+find_package(OpenGL REQUIRED)
+
+include_directories(
+  ${OPENGL_INCLUDE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_BINARY_DIR})
+
+if(NOT BUILD_SHARED_LIBS)
+  add_definitions(-DFREEGLUT_STATIC)
+endif()
+
+if(MSVC)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
+add_definitions(-DHAVE_CONFIG_H)
+
+find_file(ERRNO_H errno.h)
+find_file(FCNTL_H fcntl.h)
+find_file(LIMITS_H limits.h)
+find_file(STDBOOL_H stdbool.h)
+find_file(SYS_IOCTL_H sys/ioctl.h)
+find_file(SYS_PARAM_H sys/param.h)
+find_file(SYS_TIME_H sys/time.h)
+find_file(SYS_TYPES_H sys/types.h)
+find_file(UNISTD_H unistd.h)
+find_file(USBHID_H usbhid.h)
+find_file(X11_EXTENSIONS_XF86VMODE_H X11/extensions/xf86vmode.h)
+find_file(X11_EXTENSIONS_XINPUT2_H X11/extensions/XInput2.h)
+find_file(X11_EXTENSIONS_XRANDR_H X11/extensions/Xrandr.h)
+
+mark_as_advanced(
+  ERRNO_H
+  FCNTL_H
+  LIMITS_H
+  STDBOOL_H
+  SYS_IOCTL_H
+  SYS_PARAM_H
+  SYS_TIME_H
+  SYS_TYPES_H
+  UNISTD_H
+  USBHID_H
+  X11_EXTENSIONS_XF86VMODE_H
+  X11_EXTENSIONS_XINPUT2_H
+  X11_EXTENSIONS_XRANDR_H)
+
+if (SYS_TIME_H)
+  file(WRITE ${CMAKE_SOURCE_DIR}/CMake/gettimeofday.c
+"#include <sys/time.h>
+
+int main()
+{
+  struct timeval tv;
+  gettimeofday(&tv, 0);
+  return 0;
+}
+")
+
+  try_compile(GETTIMEOFDAY
+    ${CMAKE_BINARY_DIR}/CMake/gettimeofday
+    ${CMAKE_SOURCE_DIR}/CMake/gettimeofday.c)
+endif()
+
+file(WRITE ${CMAKE_SOURCE_DIR}/CMake/vprintf.c
+"#include <stdio.h>
+#include <stdarg.h>
+
+void test_vprintf(const char *format, ...)
+{
+  va_list args;
+
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
+}
+
+int main()
+{
+  test_vprintf("%d %s\n", 42, "forty-two");
+  return 0;
+}
+")
+
+try_compile(VPRINTF
+  ${CMAKE_BINARY_DIR}/CMake/vprintf
+  ${CMAKE_SOURCE_DIR}/CMake/vprintf.c)
+
+if(NOT VPRINTF)
+  file(WRITE ${CMAKE_SOURCE_DIR}/CMake/_doprnt.c
+"#include <stdio.h>
+
+int main()
+{
+  int args[] = { 23, 42 };
+  _doprnt("%d %d\n", args, stdout);
+  return 0;
+}
+")
+
+  try_compile(_DOPRNT
+    ${CMAKE_BINARY_DIR}/CMake/_doprnt
+    ${CMAKE_SOURCE_DIR}/CMake/_doprnt.c)
+endif()
+
+file(WRITE ${CMAKE_SOURCE_DIR}/CMake/vfprintf.c
+"#include <stdio.h>
+#include <stdarg.h>
+
+void test_vfprintf(FILE *stream, const char *format, ...)
+{
+  va_list args;
+
+  va_start(args, format);
+  vfprintf(stream, format, args);
+  va_end(args);
+}
+
+int main()
+{
+  test_vfprintf(stdout, "%d %s\n", 42, "forty-two");
+  return 0;
+}
+")
+
+try_compile(VFPRINTF
+  ${CMAKE_BINARY_DIR}/CMake/vfprintf
+  ${CMAKE_SOURCE_DIR}/CMake/vfprintf.c)
+
+if(SYS_TIME_H AND SYS_TYPES_H)
+  file(WRITE ${CMAKE_SOURCE_DIR}/CMake/time_with_sys_time.c
+"#include <sys/types.h>
+#include <sys/time.h>
+#include <time.h>
+
+int main()
+{
+  if ((struct tm *)0)
+    return 0;
+
+  return 0;
+}
+")
+
+  try_compile(TIME_WITH_SYS_TIME
+    ${CMAKE_BINARY_DIR}/CMake/time_with_sys_time
+    ${CMAKE_SOURCE_DIR}/CMake/time_with_sys_time.c)
+endif()
+
+file(STRINGS ${CMAKE_SOURCE_DIR}/config.h.in config_h_in NEWLINE_CONSUME)
+
+if(_DOPRNT)
+  string(REPLACE
+    "#undef HAVE__DOPRNT"
+    "#define HAVE__DOPRNT 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(ERRNO_H)
+  string(REPLACE
+    "#undef HAVE_ERRNO_H"
+    "#define HAVE_ERRNO_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(FCNTL_H)
+  string(REPLACE
+    "#undef HAVE_FCNTL_H"
+    "#define HAVE_FCNTL_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(GETTIMEOFDAY)
+  string(REPLACE
+    "#undef HAVE_GETTIMEOFDAY"
+    "#define HAVE_GETTIMEOFDAY 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(LIMITS_H)
+  string(REPLACE
+    "#undef HAVE_LIMITS_H"
+    "#define HAVE_LIMITS_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(SYS_IOCTL_H)
+  string(REPLACE
+    "#undef HAVE_SYS_IOCTL_H"
+    "#define HAVE_SYS_IOCTL_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(SYS_PARAM_H)
+  string(REPLACE
+    "#undef HAVE_SYS_PARAM_H"
+    "#define HAVE_SYS_PARAM_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(SYS_TIME_H)
+  string(REPLACE
+    "#undef HAVE_SYS_TIME_H"
+    "#define HAVE_SYS_TIME_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(SYS_TYPES_H)
+  string(REPLACE
+    "#undef HAVE_SYS_TYPES_H"
+    "#define HAVE_SYS_TYPES_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(UNISTD_H)
+  string(REPLACE
+    "#undef HAVE_UNISTD_H"
+    "#define HAVE_UNISTD_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(USBHID_H)
+  string(REPLACE
+    "#undef HAVE_USBHID_H"
+    "#define HAVE_USBHID_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(VFPRINTF)
+  string(REPLACE
+    "#undef HAVE_VFPRINTF"
+    "#define HAVE_VFPRINTF 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(X11_EXTENSIONS_XF86VMODE_H)
+  string(REPLACE
+    "#undef HAVE_X11_EXTENSIONS_XF86VMODE_H"
+    "#define HAVE_X11_EXTENSIONS_XF86VMODE_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(X11_EXTENSIONS_XINPUT2_H)
+  string(REPLACE
+    "#undef HAVE_X11_EXTENSIONS_XINPUT2_H"
+    "#define HAVE_X11_EXTENSIONS_XINPUT2_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(X11_EXTENSIONS_XRANDR_H)
+  string(REPLACE
+    "#undef HAVE_X11_EXTENSIONS_XRANDR_H"
+    "#define HAVE_X11_EXTENSIONS_XRANDR_H 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+if(TIME_WITH_SYS_TIME)
+  string(REPLACE
+    "#undef TIME_WITH_SYS_TIME"
+    "#define TIME_WITH_SYS_TIME 1"
+    config_h_in
+    "${config_h_in}")
+endif()
+
+file(WRITE ${CMAKE_BINARY_DIR}/config.h "${config_h_in}")
+
+if(STDBOOL_H)
+  file(APPEND ${CMAKE_BINARY_DIR}/config.h "\n#define HAVE_STDBOOL_H 1\n")
+endif()
+
+set(freeglut_HEADERS
+  include/GL/freeglut.h
+  include/GL/freeglut_ext.h
+  include/GL/freeglut_std.h
+  include/GL/glut.h
+  src/freeglut_internal.h
+  src/freeglut_teapot_data.h
+)
+
+set(freeglut_SOURCES
+  src/freeglut_cursor.c
+  src/freeglut_display.c
+  src/freeglut_ext.c
+  src/freeglut_font.c
+  src/freeglut_font_data.c
+  src/freeglut_gamemode.c
+  src/freeglut_geometry.c
+  src/freeglut_glutfont_definitions.c
+  src/freeglut_init.c
+  src/freeglut_input_devices.c
+  src/freeglut_joystick.c
+  src/freeglut_main.c
+  src/freeglut_menu.c
+  src/freeglut_misc.c
+  src/freeglut_overlay.c
+  src/freeglut_spaceball.c
+  src/freeglut_state.c
+  src/freeglut_stroke_mono_roman.c
+  src/freeglut_stroke_roman.c
+  src/freeglut_structure.c
+  src/freeglut_teapot.c
+  src/freeglut_videoresize.c
+  src/freeglut_window.c
+)
+
+if(MSVC)
+  list(APPEND freeglut_SOURCES src/freeglut_callbacks.c)
+elseif(UNIX)
+  list(APPEND freeglut_SOURCES src/freeglut_xinput.c)
+endif()
+
+add_library(freeglut ${freeglut_HEADERS} ${freeglut_SOURCES})
+target_link_libraries(freeglut ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY})
+set_target_properties(freeglut PROPERTIES
+                      DEFINE_SYMBOL FREEGLUT_EXPORTS
+                      SOVERSION ${${PROJECT_NAME}_VERSION})
+
+# Config files
+set(${PROJECT_NAME}_LIBRARIES freeglut)
+set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+configure_file(${PROJECT_NAME}Config.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
+export(TARGETS ${${PROJECT_NAME}_LIBRARIES} FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Exports.cmake)
+
+# Version information
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  @ONLY
+)

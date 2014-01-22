@@ -76,6 +76,18 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="networkCreationOptionsGroupBox">
+     <property name="title">
+      <string>Network Creation Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QComboBox" name="mappingStrategyComboBox"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="networkifyPushButton">
      <property name="toolTip">
       <string>Create a network from a parcellation and a fiber image</string>

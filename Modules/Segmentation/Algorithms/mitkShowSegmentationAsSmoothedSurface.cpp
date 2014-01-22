@@ -237,7 +237,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Correct origin of real geometry (changed by cropping and padding)
 
-  typedef AffineGeometryFrame3D::TransformType TransformType;
+  typedef Geometry3D::TransformType TransformType;
 
   TransformType::Pointer transform = TransformType::New();
   TransformType::OutputVectorType translation;
@@ -417,14 +417,14 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
     MITK_INFO << "Quadric mesh decimation...";
 
     vtkQuadricDecimation *quadricDecimation = vtkQuadricDecimation::New();
-    quadricDecimation->SetInput(m_Surface->GetVtkPolyData());
+    quadricDecimation->SetInputData(m_Surface->GetVtkPolyData());
     quadricDecimation->SetTargetReduction(decimation);
     quadricDecimation->AttributeErrorMetricOn();
     quadricDecimation->GlobalWarningDisplayOff();
     quadricDecimation->Update();
 
     vtkCleanPolyData* cleaner = vtkCleanPolyData::New();
-    cleaner->SetInput(quadricDecimation->GetOutput());
+    cleaner->SetInputConnection(quadricDecimation->GetOutputPort());
     cleaner->PieceInvariantOn();
     cleaner->ConvertLinesToPointsOn();
     cleaner->ConvertStripsToPolysOn();
@@ -439,7 +439,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   // Compute Normals
 
   vtkPolyDataNormals* computeNormals = vtkPolyDataNormals::New();
-  computeNormals->SetInput(m_Surface->GetVtkPolyData());
+  computeNormals->SetInputData(m_Surface->GetVtkPolyData());
   computeNormals->SetFeatureAngle(360.0f);
   computeNormals->FlipNormalsOff();
   computeNormals->Update();
@@ -451,82 +451,62 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
 void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
 {
-  DataNode::Pointer node = LookForPointerTargetBelowGroupNode("Surface representation");
-  bool addToTree = node.IsNull();
+  DataNode::Pointer node = DataNode::New();
 
-  if (addToTree)
+  bool wireframe = false;
+  GetParameter("Wireframe", wireframe);
+
+  if (wireframe)
   {
-    node = DataNode::New();
+    VtkRepresentationProperty *representation = dynamic_cast<VtkRepresentationProperty *>(
+      node->GetProperty("material.representation"));
 
-    bool wireframe = false;
-    GetParameter("Wireframe", wireframe);
-
-    if (wireframe)
-    {
-      VtkRepresentationProperty *representation = dynamic_cast<VtkRepresentationProperty *>(
-        node->GetProperty("material.representation"));
-
-      if (representation != NULL)
-        representation->SetRepresentationToWireframe();
-    }
-
-    node->SetProperty("opacity", FloatProperty::New(1.0));
-    node->SetProperty("line width", IntProperty::New(1));
-    node->SetProperty("scalar visibility", BoolProperty::New(false));
-
-    UIDGenerator uidGenerator("Surface_");
-    node->SetProperty("FILENAME", StringProperty::New(uidGenerator.GetUID() + ".vtk"));
-
-    std::string groupNodeName = "surface";
-    DataNode *groupNode = GetGroupNode();
-
-    if (groupNode != NULL)
-      groupNode->GetName(groupNodeName);
-
-    node->SetProperty("name", StringProperty::New(groupNodeName));
+    if (representation != NULL)
+      representation->SetRepresentationToWireframe();
   }
 
+  node->SetProperty("opacity", FloatProperty::New(1.0));
+  node->SetProperty("line width", IntProperty::New(1));
+  node->SetProperty("scalar visibility", BoolProperty::New(false));
+
+  std::string groupNodeName = "surface";
+  DataNode *groupNode = GetGroupNode();
+
+  if (groupNode != NULL)
+    groupNode->GetName(groupNodeName);
+
+  node->SetProperty("name", StringProperty::New(groupNodeName));
   node->SetData(m_Surface);
 
-  if (addToTree)
-  {
-    DataNode* groupNode = GetGroupNode();
+  BaseProperty *colorProperty = groupNode->GetProperty("color");
 
-    if (groupNode != NULL)
-    {
-      groupNode->SetProperty("Surface representation", SmartPointerProperty::New(node));
+  if (colorProperty != NULL)
+    node->ReplaceProperty("color", colorProperty);
+  else
+    node->SetProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f));
 
-      BaseProperty *colorProperty = groupNode->GetProperty("color");
+  bool showResult = true;
+  GetParameter("Show result", showResult);
 
-      if (colorProperty != NULL)
-        node->ReplaceProperty("color", colorProperty);
-      else
-        node->SetProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f));
+  bool syncVisibility = false;
+  GetParameter("Sync visibility", syncVisibility);
 
-      bool showResult = true;
-      GetParameter("Show result", showResult);
+  Image::Pointer image;
+  GetPointerParameter("Input", image);
 
-      bool syncVisibility = false;
-      GetParameter("Sync visibility", syncVisibility);
+  BaseProperty *organTypeProperty = image->GetProperty("organ type");
 
-      Image::Pointer image;
-      GetPointerParameter("Input", image);
+  if (organTypeProperty != NULL)
+    m_Surface->SetProperty("organ type", organTypeProperty);
 
-      BaseProperty *organTypeProperty = image->GetProperty("organ type");
+  BaseProperty *visibleProperty = groupNode->GetProperty("visible");
 
-      if (organTypeProperty != NULL)
-        m_Surface->SetProperty("organ type", organTypeProperty);
+  if (visibleProperty != NULL && syncVisibility)
+    node->ReplaceProperty("visible", visibleProperty);
+  else
+    node->SetProperty("visible", BoolProperty::New(showResult));
 
-      BaseProperty *visibleProperty = groupNode->GetProperty("visible");
-
-      if (visibleProperty != NULL && syncVisibility)
-        node->ReplaceProperty("visible", visibleProperty);
-      else
-        node->SetProperty("visible", BoolProperty::New(showResult));
-    }
-
-    InsertBelowGroupNode(node);
-  }
+  InsertBelowGroupNode(node);
 
   Superclass::ThreadedUpdateSuccessful();
 }

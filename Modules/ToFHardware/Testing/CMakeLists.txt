@@ -1,9 +1,8 @@
 MITK_CREATE_MODULE_TESTS()
 if(BUILD_TESTING AND MODULE_IS_ENABLED)
-mitkAddCustomModuleTest(mitkAbstractToFDeviceFactoryTest_DefaultCalibrationFile mitkAbstractToFDeviceFactoryTest -V ${MITK_DATA_DIR}/ToF-Data/CalibrationFiles/Default_Parameters.xml)
 #Only enabled for Windows and Mac nightlies.
 #If you want to run this on linux, just enable the flag in the superbuild.
-if(WIN32 OR APPLE OR MITK_ENABLE_GUI_TESTING)
+if(MITK_ENABLE_RENDERING_TESTING)
 
 mitkAddCustomModuleTest(mitkPlayerLoadAndRenderDepthDataTest_KinectDepthImage #testname
 mitkPlayerLoadAndRenderDepthDataTest #testclassname
@@ -16,6 +15,6 @@ mitkAddCustomModuleTest(mitkPlayerLoadAndRenderRGBDataTest_KinectRGBImage mitkPl
 #rendering tests cannot run in parallel
 SET_PROPERTY(TEST mitkPlayerLoadAndRenderDepthDataTest_KinectDepthImage mitkPlayerLoadAndRenderRGBDataTest_KinectRGBImage PROPERTY RUN_SERIAL TRUE)
 
-endif(WIN32 OR APPLE OR MITK_ENABLE_GUI_TESTING)
+endif(MITK_ENABLE_RENDERING_TESTING)
 endif(BUILD_TESTING AND MODULE_IS_ENABLED)
 

@@ -39,7 +39,7 @@ std::string  TransferFunctionProperty::GetValueAsString() const
 }
 
 TransferFunctionProperty::TransferFunctionProperty()
-  : BaseProperty()
+    : BaseProperty(), m_Value(mitk::TransferFunction::New())
 {}
 
 TransferFunctionProperty::TransferFunctionProperty(const TransferFunctionProperty& other)
@@ -55,6 +55,7 @@ TransferFunctionProperty::TransferFunctionProperty( mitk::TransferFunction::Poin
 itk::LightObject::Pointer TransferFunctionProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }
 

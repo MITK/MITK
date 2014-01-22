@@ -77,7 +77,7 @@ void QmitkToFConnectionWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_ConnectCameraButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnConnectCamera()) );
 
     //QmitkServiceListWidget::ServiceSelectionChanged as a Signal for the OnSlectCamera() slot
-    connect( m_Controls->m_DeviceList, SIGNAL(ServiceSelectionChanged(mitk::ServiceReference)), this, SLOT(OnSelectCamera()));
+    connect( m_Controls->m_DeviceList, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnSelectCamera()));
 
     /*Creating an other Datanode structur for Kinect is done here: As soon as a Kinect is connected, the KinectParameterWidget is enabled,
     which can be used to trigger the KinectAcqusitionModeChanged-Method, to create a working Data-Node-structure*/
@@ -207,22 +207,22 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
             int found = baseFilename.rfind("_DistanceImage");  //Defining "found" variable+checking if baseFilname contains "_DistanceImage". If not, found == npos(0)
 
-            if (found == std::string::npos)  //If found =0
+            if (found == static_cast<int>(std::string::npos))  //If found =0
             {
               found = baseFilename.rfind("_AmplitudeImage");  //If "_AmplitudeImage" is found, the found variable is 1-> the next if statment is false
             }
 
-            if (found == std::string::npos)
+            if (found == static_cast<int>(std::string::npos))
             {
               found = baseFilename.rfind("_IntensityImage"); //found = true if baseFilename cotains "_IntesityImage"
             }
 
-            if (found == std::string::npos)
+            if (found == static_cast<int>(std::string::npos))
             {
               found = baseFilename.rfind("_RGBImage");
             }
 
-            if (found == std::string::npos) //If none of the Nodes is found, display an error
+            if (found == static_cast<int>(std::string::npos)) //If none of the Nodes is found, display an error
             {
               msg = msg + "Input file name must end with \"_DistanceImage\", \"_AmplitudeImage\", \"_IntensityImage\" or \"_RGBImage\"!";
               throw std::logic_error(msg.c_str());
@@ -373,4 +373,9 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     // send disconnect signal to the caller functionality
     emit ToFCameraDisconnected();
   }
+}
+
+void QmitkToFConnectionWidget::ConnectCamera()
+{
+  this->m_Controls->m_ConnectCameraButton->animateClick();
 }

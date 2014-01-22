@@ -76,6 +76,19 @@ class ImageExtraction_EXPORT ExtractImageFilter : public ImageToImageFilter
     itkSetMacro(TimeStep, unsigned int);
     itkGetConstMacro(TimeStep, unsigned int);
 
+    typedef enum DirectionCollapseStrategyEnum {
+        DIRECTIONCOLLAPSETOUNKOWN=0,
+        DIRECTIONCOLLAPSETOIDENTITY=1,
+        DIRECTIONCOLLAPSETOSUBMATRIX=2,
+        DIRECTIONCOLLAPSETOGUESS=3
+    } DIRECTIONCOLLAPSESTRATEGY;
+
+    /**
+      \brief Collapse strategy to be used.
+     */
+    itkSetMacro(DirectionCollapseToStrategy, DIRECTIONCOLLAPSESTRATEGY);
+    itkGetConstMacro(DirectionCollapseToStrategy, DIRECTIONCOLLAPSESTRATEGY);
+
   protected:
 
     ExtractImageFilter(); // purposely hidden
@@ -92,6 +105,7 @@ class ImageExtraction_EXPORT ExtractImageFilter : public ImageToImageFilter
     unsigned int m_SliceIndex;
     unsigned int m_SliceDimension;
     unsigned int m_TimeStep;
+    DIRECTIONCOLLAPSESTRATEGY m_DirectionCollapseToStrategy;
 };
 
 } // namespace

@@ -132,7 +132,7 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
   //compute subset of points if input PointSet is defined
   if (m_Subset.size()!=0)
   {
-    mitk::ImagePixelReadAccessor<mitk::ScalarType,2> imageAcces(input, input->GetSliceData(0));
+    mitk::ImagePixelReadAccessor<float,2> imageAcces(input, input->GetSliceData(0));
     for (unsigned int i=0; i<m_Subset.size(); i++)
     {
       mitk::Index3D currentIndex = m_Subset.at(i);
@@ -155,7 +155,7 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
     int xDimension = (int)input->GetDimension(0);
     int yDimension = (int)input->GetDimension(1);
     int pointCount = 0;
-    mitk::ImagePixelReadAccessor<mitk::ScalarType,2> imageAcces(input, input->GetSliceData(0));
+    mitk::ImagePixelReadAccessor<float,2> imageAcces(input, input->GetSliceData(0));
     for (int j=0; j<yDimension; j++)
     {
       for (int i=0; i<xDimension; i++)

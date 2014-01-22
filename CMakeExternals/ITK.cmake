@@ -12,6 +12,9 @@ set(proj_DEPENDENCIES GDCM)
 if(MITK_USE_Python)
   list(APPEND proj_DEPENDENCIES CableSwig)
 endif()
+if(MITK_USE_OpenCV)
+  list(APPEND proj_DEPENDENCIES OpenCV)
+endif()
 
 set(ITK_DEPENDS ${proj})
 
@@ -50,6 +53,14 @@ if(NOT DEFINED ITK_DIR)
   else()
     list(APPEND additional_cmake_args
          -DUSE_WRAP_ITK:BOOL=OFF
+        )
+  endif()
+
+  if(MITK_USE_OpenCV)
+    message("OpenCV_DIR: ${OpenCV_DIR}")
+    list(APPEND additional_cmake_args
+         -DModule_ITKVideoBridgeOpenCV:BOOL=ON
+         -DOpenCV_DIR:PATH=${OpenCV_DIR}
         )
   endif()
 

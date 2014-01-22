@@ -43,7 +43,7 @@ int mitkOclReferenceCountTest( int argc, char* argv[] )
   MITK_TEST_BEGIN("mitkOclReferenceCountTest");
 
   // instancate uService
-  ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
   OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
   cl_context gpuContext = resources->GetContext();
   cl_device_id gpuDevice = resources->GetCurrentDevice();

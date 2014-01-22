@@ -2,7 +2,7 @@
 # Update the CMake module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
 
-include(@MITK_BINARY_DIR@/Core/Code/CppMicroServices/CppMicroServicesConfig.cmake)
+set(CppMicroServices_DIR "@MITK_BINARY_DIR@/Core/CppMicroServices")
 
 # Include MITK macros
 include(MacroParseArguments)
@@ -12,8 +12,11 @@ include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallAutoLoadModules)
 include(mitkFunctionGetLibrarySearchPaths)
+include(mitkFunctionUseModules)
 include(mitkMacroCreateModuleConf)
-include(mitkMacroCreateModule)
+include(mitkFunctionCheckModuleDependencies)
+include(mitkFunctionCreateModule)
+include(mitkMacroCreateExecutable)
 include(mitkMacroCheckModule)
 include(mitkMacroCreateModuleTests)
 include(mitkFunctionAddCustomModuleTest)
@@ -51,6 +54,7 @@ set(MITK_VERSION_PLUGIN_SYSTEM 2) # dropped legacy BlueBerry plug-in CMake suppo
 # MITK specific variables
 set(MITK_SOURCE_DIR "@MITK_SOURCE_DIR@")
 set(MITK_BINARY_DIR "@MITK_BINARY_DIR@")
+set(MITK_CMAKE_DIR "@MITK_CMAKE_DIR@")
 set(UTILITIES_DIR "@UTILITIES_DIR@")
 set(REGISTER_QFUNCTIONALITY_CPP_IN "@REGISTER_QFUNCTIONALITY_CPP_IN@")
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR "@MITK_MODULES_PACKAGE_DEPENDS_DIR@")
@@ -69,34 +73,21 @@ foreach(_module @MITK_MODULE_NAMES@)
   set(${_module}_CONFIG_FILE "@MITK_BINARY_DIR@/@MODULES_CONF_DIRNAME@/${_module}Config.cmake")
 endforeach()
 
-# Include directory variables
-set(MITK_INCLUDE_DIRS "@MITK_INCLUDE_DIRS@")
-set(QMITK_INCLUDE_DIRS "@QMITK_INCLUDE_DIRS@")
-set(ANN_INCLUDE_DIR "@ANN_INCLUDE_DIR@")
-set(IPSEGMENTATION_INCLUDE_DIR "@IPSEGMENTATION_INCLUDE_DIR@")
-set(VECMATH_INCLUDE_DIR "@VECMATH_INCLUDE_DIR@")
-set(IPFUNC_INCLUDE_DIR "@IPFUNC_INCLUDE_DIR@")
-set(MITK_IGT_INCLUDE_DIRS "@MITK_IGT_INCLUDE_DIRS@")
-
-# Library variables
-set(MITK_LIBRARIES "@MITK_LIBRARIES@")
-set(QMITK_LIBRARIES "@QMITK_LIBRARIES@")
-
-# Link directory variables
-set(MITK_LINK_DIRECTORIES "@MITK_LINK_DIRECTORIES@")
-set(QMITK_LINK_DIRECTORIES "@QMITK_LINK_DIRECTORIES@")
-set(MITK_LIBRARY_DIRS "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@" "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@/plugins" @MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS_CONFIG@)
-set(MITK_VTK_LIBRARY_DIRS "@MITK_VTK_LIBRARY_DIRS@")
-set(MITK_ITK_LIBRARY_DIRS "@MITK_ITK_LIBRARY_DIRS@")
-
 # External projects
+set(ANN_DIR "@ANN_DIR@")
+set(CppUnit_DIR "@CppUnit_DIR@")
+set(GLEW_DIR "@GLEW_DIR@")
+set(tinyxml_DIR "@tinyxml_DIR@")
 set(ITK_DIR "@ITK_DIR@")
 set(VTK_DIR "@VTK_DIR@")
 set(DCMTK_DIR "@DCMTK_DIR@")
 set(GDCM_DIR "@GDCM_DIR@")
 set(BOOST_ROOT "@BOOST_ROOT@")
 set(OpenCV_DIR "@OpenCV_DIR@")
+set(Poco_DIR "@Poco_DIR@")
 set(SOFA_DIR "@SOFA_DIR@")
+set(Qwt_DIR "@Qwt_DIR@")
+set(Qxt_DIR "@Qxt_DIR@")
 set(MITK_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
 set(MITK_DATA_DIR "@MITK_DATA_DIR@")
 
@@ -105,6 +96,9 @@ set(MITK_PMD_SDK_DIR @MITK_PMD_SDK_DIR@)
 
 # MITK use variables
 set(MITK_USE_QT @MITK_USE_QT@)
+set(MITK_USE_Qt4 @MITK_USE_Qt4@)
+set(MITK_USE_Qt5 @MITK_USE_Qt5@)
+set(MITK_DESIRED_QT_VERSION @DESIRED_QT_VERSION@)
 set(MITK_USE_BLUEBERRY @MITK_USE_BLUEBERRY@)
 set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
 set(MITK_USE_Boost @MITK_USE_Boost@)
@@ -114,6 +108,14 @@ set(MITK_USE_DCMTK @MITK_USE_DCMTK@)
 set(MITK_USE_OpenCV @MITK_USE_OpenCV@)
 set(MITK_USE_SOFA @MITK_USE_SOFA@)
 set(MITK_USE_Python @MITK_USE_Python@)
+
+if(MITK_USE_Qt4)
+  set(MITK_QT4_MINIMUM_VERSION @MITK_QT4_MINIMUM_VERSION@)
+  find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
+elseif(MITK_USE_Qt5)
+  set(MITK_QT5_MINIMUM_VERSION @MITK_QT5_MINIMUM_VERSION@)
+  find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+endif()
 
 # MITK ToF use variables
 
@@ -146,12 +148,6 @@ if(MITK_TOF_MESASR4000_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
   option(MITK_USE_TOF_MESASR4000 "Enable support for MESA SR4000" @MITK_USE_TOF_MESASR4000@)
   mark_as_advanced(MITK_USE_TOF_MESASR4000)
 endif()
-
-# There is no PocoConfig.cmake, so we set Poco specific CMake variables
-# here. This way the call to find_package(Poco) in BlueBerryConfig.cmake
-# finds the Poco distribution supplied by MITK
-set(Poco_INCLUDE_DIR "@MITK_SOURCE_DIR@/Utilities/Poco")
-set(Poco_LIBRARY_DIR "@MITK_BINARY_DIR@/bin")
 
 if(MITK_USE_IGT)
   #include(${MITK_DIR}/mitkIGTConfig.cmake)
@@ -197,4 +193,3 @@ endif(MITK_USE_BLUEBERRY)
 
 # Set properties on exported targets
 @MITK_EXPORTED_TARGET_PROPERTIES@
-

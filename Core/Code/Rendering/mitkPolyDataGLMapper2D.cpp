@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkMapper3D.h"
 
 #include <vtkPolyData.h>
-#include <vtkPolyDataSource.h>
 #include <vtkPlane.h>
 #include <vtkCutter.h>
 #include <vtkPoints.h>
@@ -99,7 +98,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
               return;
           }
 
-          vtkFloatingPointType vp[ 3 ], vnormal[ 3 ];
+          double vp[ 3 ], vnormal[ 3 ];
 
           vnl2vtk(point.GetVnlVector(), vp);
           vnl2vtk(normal.GetVnlVector(), vnormal);
@@ -115,7 +114,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
           m_Plane->SetNormal( vnormal );
 
           // set data into cutter
-          m_Cutter->SetInput( vtkpolydata );
+          m_Cutter->SetInputData( vtkpolydata );
           //    m_Cutter->GenerateCutScalarsOff();
           //    m_Cutter->SetSortByToSortByCell();
 
@@ -159,12 +158,12 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
 
               if ( m_ColorByCellData )
               {  // color each cell according to cell data
-                vtkFloatingPointType* color = lut->GetColor( vcellscalars->GetComponent( i, 0 ) );
+                double* color = lut->GetColor( vcellscalars->GetComponent( i, 0 ) );
                 glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
               }
               if ( m_ColorByPointData )
               {
-                vtkFloatingPointType* color = lut->GetColor( vscalars->GetComponent( cell[0], 0 ) );
+                double* color = lut->GetColor( vscalars->GetComponent( cell[0], 0 ) );
                 glColor3f( color[ 0 ], color[ 1 ], color[ 2 ] );
               }
 

@@ -47,5 +47,6 @@ void mitk::ResliceMethodProperty::AddThickSlicesTypes()
 itk::LightObject::Pointer mitk::ResliceMethodProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

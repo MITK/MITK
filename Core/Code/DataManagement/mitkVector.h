@@ -18,9 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 
-// this is needed for memcopy in ITK
-// can be removed when fixed in ITK
-#include <cstring>
+#include <MitkExports.h>
+#include <mitkLogMacros.h>
 
 #include <itkPoint.h>
 #include <float.h>
@@ -30,12 +29,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMatrix.h>
 #include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
-#include <MitkExports.h>
+
+#include <iomanip>
 
 #ifndef DOXYGEN_SKIP
 
 namespace mitk {
-typedef float ScalarType;
+typedef double ScalarType;
 
 typedef itk::Matrix<ScalarType, 3, 3> Matrix3D;
 typedef itk::Matrix<ScalarType,4,4> Matrix4D;
@@ -82,10 +82,11 @@ template <> class VectorTraits<VnlVector> {
     typedef ScalarType ValueType;
 };
 
-template<> class VectorTraits<double[4]> {
+template<> class VectorTraits<float[4]> {
   public:
-    typedef double ValueType;
+    typedef float ValueType;
 };
+
 template<> class VectorTraits< itk::Index<5> > {
   public:
     typedef itk::Index<5>::IndexValueType ValueType;
@@ -124,9 +125,9 @@ template<> class VectorTraits< unsigned int *> {
     typedef unsigned int ValueType;
 };
 
-template<> class VectorTraits< ScalarType[4] > {
+template<> class VectorTraits< double[4] > {
   public:
-    typedef ScalarType ValueType;
+    typedef double ValueType;
 };
 
 template<> class VectorTraits< itk::Vector<float,3> > {
@@ -144,6 +145,7 @@ template<> class VectorTraits< itk::Point<float,4> > {
     typedef float ValueType;
 };
 
+
 template<> class VectorTraits< itk::Vector<double,3> > {
   public:
     typedef double ValueType;
@@ -151,6 +153,11 @@ template<> class VectorTraits< itk::Vector<double,3> > {
 
 template<> class VectorTraits< itk::Point<double,3> > {
   public:
+    typedef double ValueType;
+};
+
+template<> class VectorTraits< itk::Point<double,4> > {
+public:
     typedef double ValueType;
 };
 
@@ -359,54 +366,142 @@ inline bool MatrixEqualElementWise(const itk::Matrix<TCoordRep, NRows, NCols>& m
   return mitk::MatrixEqualElementWise(matrix1.GetVnlMatrix(),matrix2.GetVnlMatrix(),epsilon);
 }
 
+/**
+ * @ingroup MITKTestingAPI
+ *
+ * @param vector1 Vector to compare.
+ * @param vector2 Vector to compare.
+ * @param eps Tolerance for floating point comparison.
+ * @param verbose Flag indicating detailed console output.
+ * @return True if vectors are equal.
+ */
 template <typename TCoordRep, unsigned int NPointDimension>
-inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps)
+inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps, bool verbose=false)
 {
+  bool isEqual = true;
   typename itk::Vector<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
   for (unsigned int i=0; i<NPointDimension; i++)
-      if (diff[i]>eps || diff[i]<-eps)
-      return false;
-  return true;
-}
-
-template <typename TCoordRep, unsigned int NPointDimension>
-  inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& vector1, const itk::Point<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps)
-{
-  typename itk::Point<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
-  for (unsigned int i=0; i<NPointDimension; i++)
+  {
     if (diff[i]>eps || diff[i]<-eps)
-      return false;
-  return true;
+    {
+      isEqual = false;
+      break;
+    }
+  }
+
+  if(verbose && !isEqual)
+  {
+    MITK_INFO << "Vectors not equal. Lefthandside " << std::setprecision(12) << vector1 << " - Righthandside " << vector2 << " - epsilon " << eps;
+  }
+  return isEqual;
 }
 
-inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2, ScalarType eps=mitk::eps)
+/**
+ * @ingroup MITKTestingAPI
+ *
+ * @param point1 Point to compare.
+ * @param point2 Point to compare.
+ * @param eps Tolerance for floating point comparison.
+ * @param verbose Flag indicating detailed console output.
+ * @return True if points are equal.
+ */
+template <typename TCoordRep, unsigned int NPointDimension>
+  inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& point1, const itk::Point<TCoordRep, NPointDimension>& point2, TCoordRep eps=mitk::eps, bool verbose=false)
 {
+  bool isEqual = true;
+  typename itk::Point<TCoordRep, NPointDimension>::VectorType diff = point1-point2;
+  for (unsigned int i=0; i<NPointDimension; i++)
+  {
+    if (diff[i]>eps || diff[i]<-eps)
+    {
+      isEqual = false;
+      break;
+    }
+  }
+
+  if(verbose && !isEqual)
+  {
+    MITK_INFO << "Points not equal. Lefthandside " << std::setprecision(12) << point1 << " - Righthandside " << point2 << " - epsilon " << eps;
+  }
+  return isEqual;
+}
+
+/**
+ * @ingroup MITKTestingAPI
+ *
+ * @param vector1 Vector to compare.
+ * @param vector2 Vector to compare.
+ * @param eps Tolerance for floating point comparison.
+ * @param verbose Flag indicating detailed console output.
+ * @return True if vectors are equal.
+ */
+inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2, ScalarType eps=mitk::eps, bool verbose=false)
+{
+  bool isEqual = true;
   mitk::VnlVector diff = vector1-vector2;
   for (unsigned int i=0; i<diff.size(); i++)
+  {
     if (diff[i]>eps || diff[i]<-eps)
-      return false;
-  return true;
+    {
+      isEqual = false;
+      break;
+    }
+  }
+
+  if(verbose && !isEqual)
+  {
+    MITK_INFO << "Vectors not equal. Lefthandside " << std::setprecision(12) << vector1 << " - Righthandside " << vector2 << " - epsilon " << eps;
+  }
+  return isEqual;
 }
 
-inline bool Equal(double scalar1, double scalar2, ScalarType eps=mitk::eps)
+/**
+ * @ingroup MITKTestingAPI
+ *
+ * @param scalar1 Scalar value to compare.
+ * @param scalar2 Scalar value to compare.
+ * @param eps Tolerance for floating point comparison.
+ * @param verbose Flag indicating detailed console output.
+ * @return True if scalars are equal.
+ */
+inline bool Equal(ScalarType scalar1, ScalarType scalar2, ScalarType eps=mitk::eps, bool verbose=false)
 {
-  return fabs(scalar1-scalar2) < eps;
+  bool isEqual( fabs(scalar1-scalar2) < eps );
+  if(verbose && !isEqual)
+  {
+    MITK_INFO << "Scalars not equal. Lefthandside " << std::setprecision(12) << scalar1 << " - Righthandside " << scalar2 << " - epsilon " << eps;
+  }
+  return isEqual;
 }
 
+/**
+ * @ingroup MITKTestingAPI
+ *
+ * @param vector1 Vector to compare.
+ * @param vector2 Vector to compare.
+ * @param eps Tolerance for floating point comparison.
+ * @param verbose Flag indicating detailed console output.
+ * @return True if vectors are equal.
+ */
 template <typename TCoordRep, unsigned int NPointDimension>
-  inline bool Equal(const vnl_vector_fixed<TCoordRep, NPointDimension> & vector1, const vnl_vector_fixed<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps)
+  inline bool Equal(const vnl_vector_fixed<TCoordRep, NPointDimension> & vector1, const vnl_vector_fixed<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps, bool verbose=false)
 {
   vnl_vector_fixed<TCoordRep, NPointDimension> diff = vector1-vector2;
-  bool returnValue = true;
+  bool isEqual = true;
   for( unsigned int i=0; i<diff.size(); i++)
   {
     if(diff[i]>eps || diff[i]<-eps)
     {
-     returnValue = false;
+      isEqual = false;
+      break;
     }
   }
 
-  return returnValue;
+  if(verbose && !isEqual)
+  {
+    MITK_INFO << "Vectors not equal. Lefthandside " << std::setprecision(12) << vector1 << " - Righthandside " << vector2 << " - epsilon " << eps;
+  }
+  return isEqual;
 }
 
 template <typename U, typename V, unsigned int NRows, unsigned int NColumns>

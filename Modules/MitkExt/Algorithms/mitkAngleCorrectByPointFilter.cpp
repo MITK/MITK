@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkProperties.h"
 #include "mitkImageReadAccessor.h"
+#include <mitkProportionalTimeGeometry.h>
 
 mitk::AngleCorrectByPointFilter::AngleCorrectByPointFilter() : m_PreferTransducerPositionFromProperty(true)
 {
@@ -63,7 +64,9 @@ void mitk::AngleCorrectByPointFilter::GenerateOutputInformation()
   //@fixme!!! will not work for not evenly timed data!
   output->GetSlicedGeometry()->SetTimeBounds(input->GetSlicedGeometry()->GetTimeBounds());
 
-  output->GetTimeSlicedGeometry()->InitializeEvenlyTimed(output->GetSlicedGeometry(), output->GetTimeSlicedGeometry()->GetTimeSteps());
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(output->GetSlicedGeometry(),  output->GetTimeGeometry()->CountTimeSteps());
+  output->SetTimeGeometry(timeGeometry);
 
   output->SetPropertyList(input->GetPropertyList()->Clone());
 

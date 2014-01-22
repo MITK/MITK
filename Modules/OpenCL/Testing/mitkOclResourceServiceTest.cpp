@@ -37,16 +37,16 @@ int mitkOclResourceServiceTest( int argc, char* argv[] )
 {
   MITK_TEST_BEGIN("mitkOclResourceServiceTest");
 
-  ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  us::ServiceReference<OclResourceService> ref = us::GetModuleContext()->GetServiceReference<OclResourceService>();
   MITK_TEST_CONDITION_REQUIRED( ref != NULL, "Resource service available." );
 
-  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+  OclResourceService* resources = us::GetModuleContext()->GetService<OclResourceService>(ref);
   MITK_TEST_CONDITION_REQUIRED( resources != NULL, "Resource service available." );
 
   cl_context first = resources->GetContext();
   MITK_TEST_CONDITION_REQUIRED(first != NULL, "Got not-null OpenCL context.");
 
-  OclResourceService* resources_2 = GetModuleContext()->GetService<OclResourceService>(ref);
+  OclResourceService* resources_2 = us::GetModuleContext()->GetService<OclResourceService>(ref);
   MITK_TEST_CONDITION_REQUIRED( resources == resources_2, "Same resource reference the second time." );
 
   cl_context second = resources_2->GetContext();
@@ -111,5 +111,4 @@ int mitkOclResourceServiceTest( int argc, char* argv[] )
 
   MITK_TEST_END();
 }
-
-US_INITIALIZE_MODULE("OpenCLTestDriver", "", "", "" )
+US_INITIALIZE_MODULE("OpenCLTestDriver", "" )

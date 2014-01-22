@@ -41,9 +41,7 @@ vtkImageData *GenerateTestImageForTSFilter()
 
   i->SetExtent(0,1,0,1,0,1);
 
-  i->SetScalarTypeToShort();
-
-  i->AllocateScalars();
+  i->AllocateScalars(VTK_SHORT,1);
 
   short *p = (short*)i->GetScalarPointer();
 
@@ -85,7 +83,7 @@ int vtkMitkThickSlicesFilterTest(int /*argc*/, char* /*argv*/[])
 
   vtkMitkThickSlicesFilter *f = vtkMitkThickSlicesFilter::New();
   f->SetThickSliceMode( 0 ); // MIP
-  f->SetInput( i );
+  f->SetInputData( i );
   f->Update();
   o = f->GetOutput();
 

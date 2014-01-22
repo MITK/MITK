@@ -22,11 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class CoreDataNodeReader : public itk::LightObject, public mitk::IDataNodeReader
+class CoreDataNodeReader : public mitk::IDataNodeReader
 {
 public:
-
-  itkNewMacro(CoreDataNodeReader)
 
   int Read(const std::string& fileName, mitk::DataStorage& storage);
 };

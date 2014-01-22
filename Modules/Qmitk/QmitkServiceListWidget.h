@@ -56,7 +56,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
 
   private:
 
-    mitk::ModuleContext* m_Context;
+    us::ModuleContext* m_Context;
     /** \brief a filter to further narrow down the list of results*/
     std::string m_Filter;
     /** \brief The name of the ServiceInterface that this class should list */
@@ -89,7 +89,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * If no Service is selected, the result will probably be a bad pointer. call GetIsServiceSelected()
     * beforehand to avoid this
     */
-    mitk::ServiceReference GetSelectedServiceReference();
+    us::ServiceReferenceU GetSelectedServiceReference();
 
     /**
     * \brief Use this function to return the currently selected service as a class directly.
@@ -103,8 +103,8 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     T* GetSelectedService()
     {
       if (this->m_Controls->m_ServiceList->currentRow()==-1) return NULL;
-      mitk::ServiceReference ref = GetServiceForListItem( this->m_Controls->m_ServiceList->currentItem() );
-      return ( m_Context->GetService<T>(ref) );
+      us::ServiceReferenceU ref = GetServiceForListItem( this->m_Controls->m_ServiceList->currentItem() );
+      return ( m_Context->GetService(us::ServiceReference<T>(ref)) );
     }
 
     /**
@@ -116,14 +116,14 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * matching interfaces are shown. If no namingProperty is supplied, the interfaceName will be used to caption Items in the list.
     * For example, this Initialization will filter for all USDevices that are set to active. The USDevice's model will be used to display it in the list:
     * \verbatim
-        std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(IsActive=true))";
+        std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(IsActive=true))";
         m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USImageMetadata::PROP_DEV_MODEL ,filter);
     * \endverbatim
     */
     template <class T>
     void Initialize(const std::string& namingProperty = static_cast< std::string >(""),const std::string& filter = static_cast< std::string >(""))
       {
-        std::string interfaceName ( us_service_interface_iid<T*>() );
+        std::string interfaceName ( us_service_interface_iid<T>() );
         m_Interface = interfaceName;
         InitPrivate(namingProperty, filter);
       }
@@ -136,9 +136,9 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * \verbatim mitk::USDevice::Pointer device = TranslateReference<mitk::USDevice>(myDeviceReference); \endverbatim
     */
     template <class T>
-    T* TranslateReference(mitk::ServiceReference reference)
+    T* TranslateReference(const us::ServiceReferenceU& reference)
       {
-        return dynamic_cast<T*> ( m_Context->GetService<T>(reference) );
+        return m_Context->GetService(us::ServiceReference<T>(reference));
       }
 
     /**
@@ -146,7 +146,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     *
     * The user of this widget does not need to call this method, it is instead used to recieve events from the module registry.
     */
-    void OnServiceEvent(const mitk::ServiceEvent event);
+    void OnServiceEvent(const us::ServiceEvent event);
 
   signals:
 
@@ -157,18 +157,18 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * If a device does not match the filter when registering, but modifies it's properties later to match the filter,
     * then the first signal you will see this device in will be ServiceModified.
     */
-    void ServiceRegistered(mitk::ServiceReference);
+    void ServiceRegistered(us::ServiceReferenceU);
 
     /**
     *\brief Emitted directly before a Service matching the filter is being unregistered.
     */
-    void ServiceUnregistering(mitk::ServiceReference);
+    void ServiceUnregistering(us::ServiceReferenceU);
 
     /**
     *\brief Emitted when a Service matching the filter changes it's properties, or when a service that formerly not matched the filter
     * changed it's properties and now matches the filter.
     */
-    void ServiceModified(mitk::ServiceReference);
+    void ServiceModified(us::ServiceReferenceU);
 
     /**
     *\brief Emitted when a Service matching the filter changes it's properties,
@@ -176,7 +176,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * and the new properties make it fall trough the filter. This effectively means that
     * the widget will not track the service anymore. Usually, the Service should still be useable though
     */
-    void ServiceModifiedEndMatch(mitk::ServiceReference);
+    void ServiceModifiedEndMatch(us::ServiceReferenceU);
 
     /**
     *\brief Emitted if the user selects a Service from the list.
@@ -184,7 +184,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * If no service is selected, an invalid serviceReference is returned. The user can easily check for this.
     * if (serviceReference) will evaluate to false, if the reference is invalid and true if valid.
     */
-    void ServiceSelectionChanged(mitk::ServiceReference);
+    void ServiceSelectionChanged(us::ServiceReferenceU);
 
   public slots:
 
@@ -204,7 +204,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * \brief  Internal structure used to link ServiceReferences to their QListWidgetItems
     */
     struct ServiceListLink {
-      mitk::ServiceReference service;
+      us::ServiceReferenceU service;
       QListWidgetItem* item;
     };
 
@@ -223,25 +223,34 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     /**
     * \brief Constructs a ListItem from the given service, displays it, and locally stores the service.
     */
-    QListWidgetItem* AddServiceToList(mitk::ServiceReference serviceRef);
+    QListWidgetItem* AddServiceToList(const us::ServiceReferenceU& serviceRef);
 
     /**
     * \brief Removes the given service from the list and cleans up. Returns true if successful, false if service was not found.
     */
-    bool RemoveServiceFromList(mitk::ServiceReference serviceRef);
+    bool RemoveServiceFromList(const us::ServiceReferenceU& serviceRef);
+
+    /**
+     * \brief Changes list entry of given service to match the changed service properties.
+     * \return true if successful, false if service was not found
+     */
+    bool ChangeServiceOnList(const us::ServiceReferenceU& serviceRef);
 
     /**
     * \brief Returns the serviceReference corresponding to the given ListEntry or an invalid one if none was found (will evaluate to false in bool expressions).
     */
-    mitk::ServiceReference GetServiceForListItem(QListWidgetItem* item);
+    us::ServiceReferenceU GetServiceForListItem(QListWidgetItem* item);
 
     /**
     * \brief Returns a list of ServiceReferences matching the filter criteria by querying the service registry.
     */
-    std::list<mitk::ServiceReference> GetAllRegisteredServices();
+    std::vector<us::ServiceReferenceU> GetAllRegisteredServices();
 
-
-
+    /**
+     * \brief Gets string from the naming property of the service.
+     * \return caption string for given us::ServiceReferenceU
+     */
+    QString CreateCaptionForService(const us::ServiceReferenceU& serviceRef);
 };
 
 #endif // _QmitkServiceListWidget_H_INCLUDED

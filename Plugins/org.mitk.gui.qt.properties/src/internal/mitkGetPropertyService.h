@@ -18,15 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkGetPropertyService_h
 
 #include "org_mitk_gui_qt_properties_Activator.h"
-#include <mitkLoadPropertiesModule.h>
 
 namespace mitk
 {
   template <class T>
   T* GetPropertyService()
   {
-    mitk::LoadPropertiesModule();
-
     ctkPluginContext* context = mitk::org_mitk_gui_qt_properties_Activator::GetContext();
     ctkServiceReference serviceRef = context->getServiceReference<T>();
 

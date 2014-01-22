@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>368</width>
-    <height>449</height>
+    <width>382</width>
+    <height>538</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -290,6 +290,19 @@
         </property>
        </widget>
       </item>
+      <item row="10" column="0">
+       <widget class="QCheckBox" name="m_ResampleFibersBox">
+        <property name="toolTip">
+         <string>Resample fibers to 0.5*voxel size (recommended for small step sizes to avoid memory issues).</string>
+        </property>
+        <property name="text">
+         <string>Resample fibers</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -299,8 +312,8 @@
       <string>Please Select Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="1">
-       <widget class="QLabel" name="m_RoiImageLabel">
+      <item row="2" column="1">
+       <widget class="QLabel" name="m_MaskImageLabel">
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -309,28 +322,17 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="toolTip">
-         <string>Binary seed ROI. If not specified, the whole image area is seeded.</string>
-        </property>
-        <property name="text">
-         <string>Seed ROI:</string>
-        </property>
+      <item row="4" column="1">
+       <widget class="QmitkDataStorageComboBox" name="m_FaImageBox">
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="toolTip">
-         <string>Input DTI</string>
-        </property>
-        <property name="text">
-         <string>Tensor Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="m_MaskImageLabel">
+      <item row="1" column="1">
+       <widget class="QLabel" name="m_RoiImageLabel">
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -349,6 +351,16 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="toolTip">
+         <string>Binary seed ROI. If not specified, the whole image area is seeded.</string>
+        </property>
+        <property name="text">
+         <string>Seed ROI:</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QLabel" name="m_TensorImageLabel">
         <property name="text">
@@ -359,12 +371,42 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="toolTip">
+         <string>Input DTI</string>
+        </property>
+        <property name="text">
+         <string>Tensor Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="m_UseFaImage">
+        <property name="toolTip">
+         <string>Check to use selected FA image instead of internally calculated one. Recommended for multi-tensor tractography.</string>
+        </property>
+        <property name="text">
+         <string>FA image</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

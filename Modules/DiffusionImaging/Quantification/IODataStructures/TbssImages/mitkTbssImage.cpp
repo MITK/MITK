@@ -58,10 +58,10 @@ void mitk::TbssImage::InitializeFromVectorImage()
 
 
   itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
-  itw = itw.Begin();
+  itw.GoToBegin();
 
   itk::ImageRegionConstIterator<ImageType> itr (m_Image, m_Image->GetLargestPossibleRegion() );
-  itr = itr.Begin();
+  itr.GoToBegin();
 
   while(!itr.IsAtEnd())
   {
@@ -93,10 +93,10 @@ void mitk::TbssImage::SetDisplayIndexForRendering(int displayIndex)
     CastToItkImage<ImgType>(this, img);
 
     itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
-    itw = itw.Begin();
+    itw.GoToBegin();
 
     itk::ImageRegionConstIterator<ImageType> itr (m_Image, m_Image->GetLargestPossibleRegion() );
-    itr = itr.Begin();
+    itr.GoToBegin();
 
     while(!itr.IsAtEnd())
     {

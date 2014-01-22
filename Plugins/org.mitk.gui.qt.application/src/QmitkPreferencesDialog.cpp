@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPreferencesDialog.h"
 
+#include "internal/org_mitk_gui_qt_application_Activator.h"
+
 #include "berryPlatform.h"
 #include "berryIConfigurationElement.h"
 #include "berryIExtensionPointService.h"
@@ -70,8 +72,7 @@ public:
     : m_CurrentPage(0)
   {
     // m_PreferencesService
-    m_PreferencesService =
-      berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+    m_PreferencesService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
 
     // m_PrefPages
     berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();

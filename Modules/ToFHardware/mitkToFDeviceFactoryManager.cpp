@@ -41,12 +41,12 @@ namespace mitk
     ModuleContext* context = GetModuleContext();
     //    std::string filter("(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.IToFDeviceFactory)");
     //    std::list<ServiceReference> serviceRef = context->GetServiceReference<IToFDeviceFactory>(/*filter*/);
-    std::list<ServiceReference> serviceRefs = context->GetServiceReferences<IToFDeviceFactory>(/*filter*/);
-    if (serviceRefs.size() > 0)
+    std::vector<us::ServiceReference<IToFDeviceFactory> > serviceRefs = context->GetServiceReferences<IToFDeviceFactory>(/*filter*/);
+    if (!serviceRefs.empty())
     {
-      for(std::list<ServiceReference>::iterator it = serviceRefs.begin(); it != serviceRefs.end(); ++it)
+      for(std::vector<us::ServiceReference<IToFDeviceFactory> >::iterator it = serviceRefs.begin(); it != serviceRefs.end(); ++it)
       {
-        IToFDeviceFactory* service = context->GetService<IToFDeviceFactory>( *it );
+        IToFDeviceFactory* service = context->GetService( *it );
         if(service)
         {
           m_RegisteredFactoryNames.push_back(std::string(service->GetFactoryName()));
@@ -58,14 +58,14 @@ namespace mitk
 
   std::vector<std::string> ToFDeviceFactoryManager::GetConnectedDevices()
   {
-    ModuleContext* context = GetModuleContext();
+    us::ModuleContext* context = us::GetModuleContext();
     std::vector<std::string> result;
-    std::list<ServiceReference> serviceRefs = context->GetServiceReferences<ToFCameraDevice>();
-    if (serviceRefs.size() > 0)
+    std::vector<us::ServiceReference<ToFCameraDevice> > serviceRefs = context->GetServiceReferences<ToFCameraDevice>();
+    if (!serviceRefs.empty())
     {
-      for(std::list<ServiceReference>::iterator it = serviceRefs.begin(); it != serviceRefs.end(); ++it)
+      for(std::empty<us::ServiceReference<ToFCameraDevice> >::iterator it = serviceRefs.begin(); it != serviceRefs.end(); ++it)
       {
-        ToFCameraDevice* service = context->GetService<ToFCameraDevice>( *it );
+        ToFCameraDevice* service = context->GetService( *it );
         if(service)
         {
           result.push_back(std::string(service->GetNameOfClass()));
@@ -81,15 +81,15 @@ namespace mitk
 
   ToFCameraDevice* ToFDeviceFactoryManager::GetInstanceOfDevice(int index)
   {
-    ModuleContext* context = GetModuleContext();
+    us::ModuleContext* context = us::GetModuleContext();
 
-    std::list<ServiceReference> serviceRefs = context->GetServiceReferences<IToFDeviceFactory>(/*filter*/);
-    if (serviceRefs.size() > 0)
+    std::vector<us::ServiceReference<IToFDeviceFactory> > serviceRefs = context->GetServiceReferences<IToFDeviceFactory>(/*filter*/);
+    if (!serviceRefs.empty())
     {
       int i = 0;
-      for(std::list<ServiceReference>::iterator it = serviceRefs.begin(); it != serviceRefs.end(); ++it)
+      for(std::vector<us::ServiceReference<IToFDeviceFactory> >::iterator it = serviceRefs.begin(); it != serviceRefs.end(); ++it)
       {
-        IToFDeviceFactory* service = context->GetService<IToFDeviceFactory>( *it );
+        IToFDeviceFactory* service = context->GetService( *it );
         if(service && (i == index))
         {
           return dynamic_cast<mitk::AbstractToFDeviceFactory*>(service)->ConnectToFDevice();

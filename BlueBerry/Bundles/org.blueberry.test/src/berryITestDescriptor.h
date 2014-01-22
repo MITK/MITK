@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include <CppUnit/Test.h>
+#include <cppunit/Test.h>
 
 namespace berry {
 

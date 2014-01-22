@@ -52,11 +52,13 @@ namespace mitk
   protected:
     PointSetDataInteractor();
     virtual ~PointSetDataInteractor();
+
     /**
      * Here actions strings from the loaded state machine pattern are mapped to functions of
      * the DataInteractor. These functions are called when an action from the state machine pattern is executed.
      */
     virtual void ConnectActionsAndFunctions();
+
     /**
      * This function is called when a DataNode has been set/changed.
      * It is used to initialize the DataNode, e.g. if no PointSet exists yet it is created
@@ -70,71 +72,104 @@ namespace mitk
      */
     void SetAccuracy(float accuracy);
 
+
     /**
-     * @ brief Return index in PointSet of the point that is within given accuracy to the provided position.
+     * @brief SetMaxPoints Sets the maximal number of points for the pointset
+     * Default ist zero, which result in infinite number of allowed points
+     * @param maxNumber
+     */
+    void SetMaxPoints(unsigned int maxNumber = 0);
+
+    /**
+     * \brief Return index in PointSet of the point that is within given accuracy to the provided position.
      *
      * Assumes that the DataNode contains a PointSet, if so it iterates over all points
      * in the DataNode to check if it contains a point near the pointer position.
      * If a point is found its index-position is returned, else -1 is returned.
      */
-    virtual int GetPointIndexByPosition(Point3D position, int time = 0);
+    virtual int GetPointIndexByPosition(Point3D position, int time = 0, float accuracy = -1);
+
+
+
+    virtual bool CheckSelection( const InteractionEvent* interactionEvent );
 
     /** Adds a point at the given coordinates.
      *  Every time a point is added it is also checked if the maximal number of points is reached,
      *  and if so an InternalEvent with the signal name "MaxNumberOfPoints" is triggered.
      */
-    virtual bool AddPoint(StateMachineAction*, InteractionEvent*);
+    virtual bool AddPoint(StateMachineAction*, InteractionEvent* event);
+
     /** Removes point that is selected */
-    virtual bool RemovePoint(StateMachineAction*, InteractionEvent*);
+    virtual bool RemovePoint(StateMachineAction*, InteractionEvent*interactionEvent);
+
     /**
      * Checks if new point is close enough to an old one,
      * if so, trigger the ClosedContour signal which can be caught by the state machine.
      */
     virtual bool IsClosedContour(StateMachineAction*, InteractionEvent*);
+
     /**
-     * Moves the currenlty selected point to the new coodinates.
+     * Moves the currently selected point to the new coodinates.
      */
     virtual bool MovePoint(StateMachineAction*, InteractionEvent*);
+
     /**
      * Initializes the movement, stores starting position.
      */
-    virtual bool InitMove(StateMachineAction*, InteractionEvent*);
+    virtual bool InitMove(StateMachineAction*, InteractionEvent*interactionEvent);
+
     /**
      * Is called when a movement is finished, changes back to regular color.
      */
     virtual bool FinishMove(StateMachineAction*, InteractionEvent*);
-    /**
-     * Stores original position from which movement can be calculated.
-     */
-    virtual bool InitMoveAll(StateMachineAction*, InteractionEvent*);
-    /**
-     * Moves all points of the PointSet by the same vector, which is the relative distance from the
-     * initialization point.
-     */
-    virtual bool MoveSet(StateMachineAction*, InteractionEvent*);
+
     /**
      * Selects a point from the PointSet as currently active.
      */
     virtual bool SelectPoint(StateMachineAction*, InteractionEvent*);
+
     /**
-     * Unselects a point, e.g. the pointer coordinates point to empty space.
+     * Unselects a point at the given coordinate.
      */
-    virtual bool UnSelectPoint(StateMachineAction*, InteractionEvent*);
+    virtual bool UnSelectPointAtPosition(StateMachineAction*, InteractionEvent*);
+
+    /**
+     * Unselects all points out of reach.
+     */
+    virtual bool UnSelectAll(StateMachineAction*, InteractionEvent*);
+
+
+    /**
+     * @brief UpdatePointSet Updates the member variable that holds the point set, evaluating the time step of the sender.
+     */
+
+    virtual bool UpdatePointSet(StateMachineAction* stateMachineAction, InteractionEvent*);
+
     /**
      * Calls for inactivation of the DataInteractor
      */
     virtual bool Abort(StateMachineAction*, InteractionEvent*);
 
-  private:
+    /** \brief to calculate a direction vector from last point and actual
+     * point
+     */
 
+    Point3D m_LastPoint;
+
+    /** \brief summ-vector for Movement */
+    Vector3D m_SumVec;
+
+
+  private:
+    // DATA
     PointSet::Pointer m_PointSet;
-    int m_NumberOfPoints; // to keep track of number of points in pointset
     int m_MaxNumberOfPoints; // maximum of allowed number of points
-    int m_SelectedPointIndex; // index of currently selected point in PointSet
-    /** member to keep track of PointSet movements */
-    Point3D m_LastMovePosition;
 
     float m_SelectionAccuracy; // accuracy that's needed to select a point
+
+    // FUNCTIONS
+    void UnselectAll(unsigned int timeStep , ScalarType timeInMs);
+    void SelectPoint(int position, unsigned int timeStep  , ScalarType timeInMS);
   };
 
 }

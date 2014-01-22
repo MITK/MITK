@@ -145,12 +145,12 @@ bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
     return false;
 
   //initialize world geometry
-  mitk::TimeSlicedGeometry::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D( NULL, "includeInBoundingBox" );
+  mitk::TimeGeometry::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D( NULL, "includeInBoundingBox" );
 
   if ( geometry.IsNull() )
     return false;
 
-  this->SetWorldGeometry(geometry);
+  this->SetWorldTimeGeometry(geometry);
   //this->GetDisplayGeometry()->SetSizeInDisplayUnits( this->m_TextRenderer->GetRenderWindow()->GetSize()[0], this->m_TextRenderer->GetRenderWindow()->GetSize()[1] );
   this->GetDisplayGeometry()->Fit();
   this->GetVtkRenderer()->ResetCamera();
@@ -207,6 +207,8 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   mapper->MitkRender(this, type);
 
   }
+
+  this->UpdateOverlays();
 
   if (lastVtkBased == false)
     Disable2DOpenGL();
@@ -548,6 +550,12 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
         vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
         break;
       }
+    case(CellPicking) :
+      {
+        m_CellPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
+        vtk2itk(m_CellPicker->GetPickPosition(), worldPoint);
+        break;
+      }
     }
   }
   else
@@ -745,7 +753,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 }
 
 
-void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
+void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow* /*renWin*/)
 {
   if( m_DataStorage.IsNull() )
     return;
@@ -764,7 +772,7 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
         VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
 
        if(vtkmapper)
-         vtkmapper->ReleaseGraphicsResources(renWin);
+         vtkmapper->ReleaseGraphicsResources(this);
       }
    }
 }

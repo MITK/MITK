@@ -103,9 +103,11 @@ void mitk::FiberTrackingObjectFactory::CreateFileExtensionsMap()
 {
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.fib", "Fiber Bundle"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.trk", "TrackVis Fiber Bundle"));
 
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.fib", "Fiber Bundle"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Fiber Bundle"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.trk", "TrackVis Fiber Bundle"));
 }
 
 void mitk::FiberTrackingObjectFactory::RegisterIOFactories()

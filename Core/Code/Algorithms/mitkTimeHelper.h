@@ -18,28 +18,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKTIMEHELPER_H_HEADER_INCLUDED_C1C2FCD2
 #define MITKTIMEHELPER_H_HEADER_INCLUDED_C1C2FCD2
 
+#include <mitkTimeGeometry.h>
+
 namespace mitk
 {
 
 //## @brief convert the start- and end-index-time of output-region in
 //## start- and end-index-time of input-region via millisecond-time
 template <class TOutputRegion, class TInputRegion>
-void GenerateTimeInInputRegion(const mitk::TimeSlicedGeometry *outputTimeGeometry, const TOutputRegion& outputRegion, const mitk::TimeSlicedGeometry *inputTimeGeometry, TInputRegion& inputRegion)
+void GenerateTimeInInputRegion(const mitk::TimeGeometry *outputTimeGeometry, const TOutputRegion& outputRegion, const mitk::TimeGeometry *inputTimeGeometry, TInputRegion& inputRegion)
 {
   assert(outputTimeGeometry!=NULL);
   assert(inputTimeGeometry!=NULL);
 
   // convert the start-index-time of output in start-index-time of input via millisecond-time
-  ScalarType timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3));
-  int timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( inputTimeGeometry->IsValidTime( timestep ) ) )
+  mitk::TimePointType timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3));
+  mitk::TimeStepType timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
+  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( inputTimeGeometry->IsValidTimeStep( timestep ) ) )
     inputRegion.SetIndex( 3, timestep );
   else
     inputRegion.SetIndex( 3, 0 );
   // convert the end-index-time of output in end-index-time of input via millisecond-time
-  timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
-  timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTime( timestep ) ) )
+  timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
+  timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
+  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTimeStep( timestep ) ) )
     inputRegion.SetSize( 3, timestep - inputRegion.GetIndex(3) + 1 );
   else
     inputRegion.SetSize( 3, 1 );
@@ -67,7 +69,7 @@ void GenerateTimeInInputRegion(const TOutputData* output, TInputData* input)
 
   // convert the start-index-time of output in start-index-time of input via millisecond-time
   inputRegion = input->GetRequestedRegion();
-  GenerateTimeInInputRegion(output->GetTimeSlicedGeometry(), outputRegion, input->GetTimeSlicedGeometry(), inputRegion);
+  GenerateTimeInInputRegion(output->GetTimeGeometry(), outputRegion, input->GetTimeGeometry(), inputRegion);
   input->SetRequestedRegion( &inputRegion  );
 }
 

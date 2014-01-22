@@ -20,14 +20,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkITKImageImport.h"
 #include "mitkImageTimeSelector.h"
 
-#include <mitkImageAccessByItk.h>
-
 #include <itkExtractImageFilter.h>
+
+#include <mitkImageAccessByItk.h>
 
 mitk::ExtractImageFilter::ExtractImageFilter()
 :m_SliceIndex(0),
  m_SliceDimension(0),
- m_TimeStep(0)
+ m_TimeStep(0),
+ m_DirectionCollapseToStrategy( DIRECTIONCOLLAPSETOGUESS )
 {
   MITK_WARN << "Class ExtractImageFilter is deprecated! Use ExtractSliceFilter instead.";
 }
@@ -109,14 +110,32 @@ void mitk::ExtractImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimen
   typedef itk::Image< TPixel, VImageDimension >   ImageType3D;
   typedef itk::Image< TPixel, VImageDimension-1 > ImageType2D;
 
+  typedef itk::ExtractImageFilter<ImageType3D, ImageType2D> ExtractImageFilterType;
   typename ImageType3D::RegionType inSliceRegion = itkImage->GetLargestPossibleRegion();
 
   inSliceRegion.SetSize( m_SliceDimension, 0 );
 
-  typedef itk::ExtractImageFilter<ImageType3D, ImageType2D> ExtractImageFilterType;
-
   typename ExtractImageFilterType::Pointer sliceExtractor = ExtractImageFilterType::New();
-  sliceExtractor->SetDirectionCollapseToSubmatrix();
+
+  typename ExtractImageFilterType::DIRECTIONCOLLAPSESTRATEGY collapseStrategy;
+  switch( m_DirectionCollapseToStrategy )
+  {
+    case DIRECTIONCOLLAPSETOUNKOWN:
+      collapseStrategy = ExtractImageFilterType::DIRECTIONCOLLAPSETOUNKOWN;
+      break;
+    case DIRECTIONCOLLAPSETOIDENTITY:
+      collapseStrategy = ExtractImageFilterType::DIRECTIONCOLLAPSETOIDENTITY;
+      break;
+    case DIRECTIONCOLLAPSETOSUBMATRIX:
+      collapseStrategy = ExtractImageFilterType::DIRECTIONCOLLAPSETOSUBMATRIX;
+      break;
+    case DIRECTIONCOLLAPSETOGUESS:
+    default:
+      collapseStrategy = ExtractImageFilterType::DIRECTIONCOLLAPSETOGUESS;
+      break;
+  }
+
+  sliceExtractor->SetDirectionCollapseToStrategy( collapseStrategy );
   sliceExtractor->SetInput( itkImage );
 
   inSliceRegion.SetIndex( m_SliceDimension, m_SliceIndex );

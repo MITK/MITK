@@ -24,7 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkContourModelLiveWireInteractor.h>
 #include <mitkImageLiveWireContourModelFilter.h>
 
+namespace us {
 class ModuleResource;
+}
 
 namespace mitk
 {
@@ -53,8 +55,8 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     itkNewMacro(LiveWireTool2D);
 
     virtual const char** GetXPM() const;
-    virtual ModuleResource GetCursorIconResource() const;
-    ModuleResource GetIconResource() const;
+    virtual us::ModuleResource GetCursorIconResource() const;
+    us::ModuleResource GetIconResource() const;
 
     virtual const char* GetName() const;
 
@@ -101,6 +103,13 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
 
     /// \brief Finish contour interaction.
     void FinishTool();
+
+    /** \brief Enable interaction with contours.
+    * Contours that are created by the tool can be edited using LiveWire functionality.
+    * Points can thus be inserted, moved or deleted.
+    * \param on true to have interaction enabled.
+    */
+    void EnableContourLiveWireInteraction(bool on);
 
 
     //the contour already set by the user

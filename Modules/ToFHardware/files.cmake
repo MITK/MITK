@@ -13,7 +13,10 @@ SET(CPP_FILES
   mitkToFCameraDevice.cpp
   mitkToFCameraMITKPlayerController.cpp
   mitkToFCameraMITKPlayerDevice.cpp
+)
 
+SET(H_FILES
+  mitkToFDebugHelper.h
 )
 
 set(RESOURCE_FILES

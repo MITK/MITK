@@ -87,7 +87,7 @@ void mitk::ConnectomicsNetworkReader::GenerateOutputInformation()
       geometry->SetOrigin(origin);
 
       // read spacing
-      float spacing[3];
+      ScalarType spacing[3];
       pElem->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_SPACING_X, &temp);
       spacing[0] = temp;
       pElem->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_SPACING_Y, &temp);
@@ -134,7 +134,7 @@ void mitk::ConnectomicsNetworkReader::GenerateOutputInformation()
         // walk through the vertices
         TiXmlElement* vertexElement = pElem->FirstChildElement();
 
-        for( vertexElement; vertexElement; vertexElement=vertexElement->NextSiblingElement())
+        for( ; vertexElement; vertexElement=vertexElement->NextSiblingElement())
         {
           std::vector< float > pos;
           std::string label;
@@ -168,7 +168,7 @@ void mitk::ConnectomicsNetworkReader::GenerateOutputInformation()
         // walk through the edges
         TiXmlElement* edgeElement = pElem->FirstChildElement();
 
-        for( edgeElement; edgeElement; edgeElement=edgeElement->NextSiblingElement())
+        for( ; edgeElement; edgeElement=edgeElement->NextSiblingElement())
         {
           int edgeID(0), edgeSourceID(0), edgeTargetID(0), edgeWeight(0);
 

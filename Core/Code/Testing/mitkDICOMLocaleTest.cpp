@@ -31,101 +31,117 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDicomSeriesReader.h"
 
 #include "mitkTestingMacros.h"
+#include "mitkTestFixture.h"
 
 #include <list>
 #include <locale>
 #include <locale.h>
 
-bool mitkDICOMLocaleTestChangeLocale(const std::string& locale)
+class mitkDICOMLocaleTestSuite : public mitk::TestFixture
 {
-  try
+  CPPUNIT_TEST_SUITE(mitkDICOMLocaleTestSuite);
+  CPPUNIT_TEST_SUITE_ADD_CUSTOM_TESTS(addDICOMLocaleWithReferenceImageTests);
+  CPPUNIT_TEST_SUITE_END();
+
+private:
+
+  // A custom method for adding a combination of filename and locale tests
+  static void addDICOMLocaleWithReferenceImageTests(TestSuiteBuilderContextType& context)
   {
-    MITK_TEST_OUTPUT(<< " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'");
-    setlocale(LC_ALL, locale.c_str());
-    std::locale l( locale.c_str() );
-    std::cin.imbue(l);
-    return true;
-  }
-  catch(...)
-  {
-    MITK_TEST_OUTPUT(<< "Could not activate locale " << locale);
-    return false;
-  }
+    std::vector<std::string> fileArgs;
+    fileArgs.push_back("spacing-ok-ct.dcm");
+    fileArgs.push_back("spacing-ok-mr.dcm");
+    fileArgs.push_back("spacing-ok-sc.dcm");
 
-}
+    // load a reference DICOM file with German locales being set
+    std::vector<std::string> localeArgs;
+    localeArgs.push_back("C");
+    localeArgs.push_back("de_DE");
+    localeArgs.push_back("de_DE.utf8");
+    localeArgs.push_back("de_DE.UTF8");
+    localeArgs.push_back("de_DE@euro");
+    localeArgs.push_back("German_Germany");
 
-void mitkDICOMLocaleTestWithReferenceImage(std::string filename)
-{
-  mitk::Image::Pointer image;
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
-  factory->SetFileName( filename );
-  factory->Update();
-  MITK_TEST_CONDITION_REQUIRED(factory->GetNumberOfOutputs() > 0, "file " << filename << " loaded");
-
-  mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-  image = dynamic_cast<mitk::Image*>(node->GetData());
-  if(image.IsNull())
-  {
-    MITK_TEST_FAILED_MSG(<< "File "<< filename << " is not an image - test will not be applied." );
-
-    return;
-  }
-
-  // note importance of minor differences in spacings:
-  // DICOM has order y-spacing, x-spacing, while in MITK we assume x-spacing, y-spacing (both meant for 0 and 1 index in array)
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[0], 0.3141592), "correct x spacing? found "
-                               << image->GetGeometry()->GetSpacing()[0]);
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[1], 0.3411592), "correct y spacing? found "
-                               << image->GetGeometry()->GetSpacing()[1]);
-}
-
-int mitkDICOMLocaleTest(int argc, char* argv[])
-{
-  MITK_TEST_BEGIN("DICOMLocaleTest");
-
-  MITK_TEST_CONDITION_REQUIRED(argc >= 2, "File to load has been specified on commandline");
-
-  MITK_TEST_OUTPUT(<< "Configuration: \n" << mitk::DicomSeriesReader::GetConfigurationString() );
-
-  std::string filename = argv[1];
-
-  // load a reference DICOM file with the "C" locale being set
-  mitkDICOMLocaleTestChangeLocale("C");
-  mitkDICOMLocaleTestWithReferenceImage(filename);
-  // load a reference DICOM file with German locales being set
-  typedef std::list<std::string> StringList;
-  StringList alllocales;
-  alllocales.push_back("de_DE");
-  alllocales.push_back("de_DE.utf8");
-  alllocales.push_back("de_DE.UTF8");
-  alllocales.push_back("de_DE@euro");
-  alllocales.push_back("German_Germany");
-
-  // supressing this test to be run on MacOS X
-  // See bug #3894
-#if defined (__APPLE__) || defined(MACOSX)
-  alllocales.push_back("C");
-#endif
-
-  unsigned int numberOfTestedGermanLocales(0);
-
-  for (StringList::iterator iter = alllocales.begin();
-       iter != alllocales.end();
-       ++iter)
-  {
-    if ( mitkDICOMLocaleTestChangeLocale(*iter) )
+    for (std::size_t fileIndex = 0; fileIndex < fileArgs.size(); ++fileIndex)
     {
-      ++numberOfTestedGermanLocales;
-      mitkDICOMLocaleTestWithReferenceImage(filename);
+      for (std::size_t localeIndex = 0; localeIndex < localeArgs.size(); ++localeIndex)
+      {
+        MITK_PARAMETERIZED_TEST_2(testLocaleWithReferenceImage, fileArgs[fileIndex], localeArgs[localeIndex]);
+      }
     }
   }
 
-  if(numberOfTestedGermanLocales == 0)
+private:
+
+  std::string m_FileName;
+  std::string m_Locale;
+  bool m_SkipImageTest;
+
+  char* m_OldLocale;
+
+  void SetTestParameter()
   {
-    MITK_TEST_OUTPUT(<< "Warning: No German locale was found on the system.");
+    std::vector<std::string> parameter = GetTestParameter();
+    CPPUNIT_ASSERT(parameter.size() == 2);
+    m_FileName = GetTestDataFilePath(parameter[0]);
+    m_Locale = parameter[1];
   }
-  //MITK_TEST_CONDITION_REQUIRED( numberOfTestedGermanLocales > 0, "Verify that at least one German locale has been tested.");
 
-  MITK_TEST_END();
-}
+public:
 
+  mitkDICOMLocaleTestSuite() : m_OldLocale(NULL) {}
+
+
+
+  // Change the current locale to m_Locale
+  void setUp()
+  {
+    m_SkipImageTest = false;
+    m_OldLocale = NULL;
+    SetTestParameter();
+
+    try
+    {
+      m_OldLocale = setlocale(LC_ALL, NULL);
+      MITK_TEST_OUTPUT(<< " ** Changing locale from " << m_OldLocale << " to '" << m_Locale << "'")
+      setlocale(LC_ALL, m_Locale.c_str());
+      std::cin.imbue(std::locale(m_Locale.c_str()));
+    }
+    catch(...)
+    {
+      MITK_TEST_OUTPUT(<< "Could not activate locale " << m_Locale)
+      m_SkipImageTest = true;
+    }
+  }
+
+  void tearDown()
+  {
+    if (m_OldLocale)
+    {
+      setlocale(LC_ALL, m_OldLocale);
+      std::cin.imbue(std::locale(m_OldLocale));
+    }
+  }
+
+  void testLocaleWithReferenceImage()
+  {
+    if (m_SkipImageTest) return;
+
+    mitk::Image::Pointer image;
+    mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
+    factory->SetFileName( m_FileName );
+    factory->Update();
+    CPPUNIT_ASSERT(factory->GetNumberOfOutputs() > 0);
+
+    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
+    image = dynamic_cast<mitk::Image*>(node->GetData());
+    CPPUNIT_ASSERT(image.IsNotNull());
+
+    // note importance of minor differences in spacings:
+    // DICOM has order y-spacing, x-spacing, while in MITK we assume x-spacing, y-spacing (both meant for 0 and 1 index in array)
+    CPPUNIT_ASSERT_MESSAGE("incorrect x spacing", mitk::Equal(image->GetGeometry()->GetSpacing()[0], 0.3141592));
+    CPPUNIT_ASSERT_MESSAGE("incorrect y spacing ", mitk::Equal(image->GetGeometry()->GetSpacing()[1], 0.3411592));
+  }
+};
+
+MITK_TEST_SUITE_REGISTRATION(mitkDICOMLocale)

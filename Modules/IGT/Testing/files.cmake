@@ -34,7 +34,7 @@ set(MODULE_TESTS
    mitkNavigationToolStorageTest.cpp
    mitkNavigationToolTest.cpp
    mitkNavigationToolReaderAndWriterTest.cpp
-   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
+   mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp
    # -----------------------------------------------------------------------
 )
 

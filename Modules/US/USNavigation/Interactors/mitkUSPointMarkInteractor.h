@@ -26,14 +26,13 @@ namespace itk {
 
 namespace mitk
 {
-
 class MitkUSNavigation_EXPORT USPointMarkInteractor : public DataInteractor
 {
 public:
   mitkClassMacro(USPointMarkInteractor, DataInteractor)
   itkNewMacro(Self)
 
-  typedef Message1<const DataNode*> PointMarkInteractorEvent;
+  typedef Message1<DataNode*> PointMarkInteractorEvent;
   PointMarkInteractorEvent CoordinatesChangedEvent;
 
 protected:
@@ -56,8 +55,6 @@ protected:
 
   bool AddPoint(StateMachineAction* , InteractionEvent*);
 };
-
 } // namespace mitk
 
 #endif // MITKUSPOINTMARKINTERACTOR_H
-

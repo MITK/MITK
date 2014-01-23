@@ -47,7 +47,13 @@ typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
 typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
-  :CoreObjectFactoryBase()
+  : CoreObjectFactoryBase()
+  , m_NrrdDiffusionImageIOFactory(mitk::NrrdDiffusionImageIOFactory::New().GetPointer())
+  , m_NrrdQBallImageIOFactory(mitk::NrrdQBallImageIOFactory::New().GetPointer())
+  , m_NrrdTensorImageIOFactory(mitk::NrrdTensorImageIOFactory::New().GetPointer())
+  , m_NrrdDiffusionImageWriterFactory(mitk::NrrdDiffusionImageWriterFactory::New().GetPointer())
+  , m_NrrdQBallImageWriterFactory(mitk::NrrdQBallImageWriterFactory::New().GetPointer())
+  , m_NrrdTensorImageWriterFactory(mitk::NrrdTensorImageWriterFactory::New().GetPointer())
 {
 
   static bool alreadyDone = false;
@@ -55,24 +61,35 @@ mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
   {
     MITK_DEBUG << "DiffusionCoreObjectFactory c'tor" << std::endl;
 
-    mitk::NrrdDiffusionImageIOFactory::RegisterOneFactory();
-    mitk::NrrdQBallImageIOFactory::RegisterOneFactory();
-    mitk::NrrdTensorImageIOFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory(m_NrrdDiffusionImageIOFactory);
+    itk::ObjectFactoryBase::RegisterFactory(m_NrrdQBallImageIOFactory);
+    itk::ObjectFactoryBase::RegisterFactory(m_NrrdTensorImageIOFactory);
 
-    mitk::NrrdDiffusionImageWriterFactory::RegisterOneFactory();
-    mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
-    mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory(m_NrrdDiffusionImageWriterFactory);
+    itk::ObjectFactoryBase::RegisterFactory(m_NrrdQBallImageWriterFactory);
+    itk::ObjectFactoryBase::RegisterFactory(m_NrrdTensorImageWriterFactory);
 
     m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
 
 
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     CreateFileExtensionsMap();
 
     alreadyDone = true;
   }
+
+}
+
+mitk::DiffusionCoreObjectFactory::~DiffusionCoreObjectFactory()
+{
+  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdDiffusionImageIOFactory);
+  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdQBallImageIOFactory);
+  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdTensorImageIOFactory);
+
+  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdDiffusionImageWriterFactory);
+  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdQBallImageWriterFactory);
+  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdTensorImageWriterFactory);
 
 }
 

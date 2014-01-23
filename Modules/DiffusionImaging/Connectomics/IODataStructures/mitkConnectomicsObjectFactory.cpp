@@ -25,24 +25,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ConnectomicsObjectFactory::ConnectomicsObjectFactory()
   : CoreObjectFactoryBase()
+  , m_ConnectomicsNetworkIOFactory(mitk::ConnectomicsNetworkIOFactory::New().GetPointer())
+  , m_ConnectomicsNetworkWriterFactory(mitk::ConnectomicsNetworkWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_DEBUG << "ConnectomicsObjectFactory c'tor" << std::endl;
 
-    mitk::ConnectomicsNetworkIOFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory(m_ConnectomicsNetworkIOFactory);
 
-    mitk::ConnectomicsNetworkWriterFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory(m_ConnectomicsNetworkWriterFactory);
 
     m_FileWriters.push_back( mitk::ConnectomicsNetworkWriter::New().GetPointer() );
 
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     CreateFileExtensionsMap();
 
     alreadyDone = true;
   }
 
+}
+
+mitk::ConnectomicsObjectFactory::~ConnectomicsObjectFactory()
+{
+  itk::ObjectFactoryBase::UnRegisterFactory(m_ConnectomicsNetworkIOFactory);
+  itk::ObjectFactoryBase::UnRegisterFactory(m_ConnectomicsNetworkWriterFactory);
 }
 
 mitk::Mapper::Pointer mitk::ConnectomicsObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)

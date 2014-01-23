@@ -24,10 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK includes
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
-#include <mitkConnectomicsObjectFactory.h>
 #include "mitkConnectomicsNetworkCreator.h"
+#include <mitkCoreObjectFactory.h>
 
 int NetworkCreation(int argc, char* argv[])
 {
@@ -63,10 +61,6 @@ int NetworkCreation(int argc, char* argv[])
 
   try
   {
-    // registering Factories
-    RegisterDiffusionCoreObjectFactory();
-    RegisterFiberTrackingObjectFactory();
-    RegisterConnectomicsObjectFactory();
 
     const std::string s1="", s2="";
 

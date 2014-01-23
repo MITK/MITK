@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
-#include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
 #include <metaCommand.h>
 #include "ctkCommandLineParser.h"
 #include <usAny.h>
@@ -29,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <itkEvaluateDirectionImagesFilter.h>
 #include <itkTractsToVectorImageFilter.h>
+#include <mitkCoreObjectFactory.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -66,8 +65,6 @@ int FiberDirectionExtraction(int argc, char* argv[])
 
     try
     {
-        RegisterFiberTrackingObjectFactory();
-
         typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
         typedef itk::Image< itk::Vector< float, 3>, 3 >                         ItkDirectionImage3DType;
         typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >   ItkDirectionImageContainerType;

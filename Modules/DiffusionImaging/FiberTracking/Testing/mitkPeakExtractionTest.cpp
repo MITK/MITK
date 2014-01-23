@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkTensorImage.h>
 
-#include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkFiberBundleXWriter.h>
 #include <itkShCoefficientImageImporter.h>
@@ -56,8 +54,6 @@ int mitkPeakExtractionTest(int argc, char* argv[])
     try
     {
         mitk::CoreObjectFactory::GetInstance();
-
-        RegisterFiberTrackingObjectFactory();
 
         mitk::Image::Pointer image = mitk::IOUtil::LoadImage(shCoeffFileName);
         mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(maskFileName);

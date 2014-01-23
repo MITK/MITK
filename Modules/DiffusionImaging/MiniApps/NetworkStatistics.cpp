@@ -82,7 +82,6 @@ int NetworkStatistics(int argc, char* argv[])
   try
   {
     const std::string s1="", s2="";
-    RegisterConnectomicsObjectFactory();
 
     // load network
     std::vector<mitk::BaseData::Pointer> networkFile =
@@ -204,7 +203,7 @@ int NetworkStatistics(int argc, char* argv[])
         << statisticsCalculator->GetSmallWorldness()
         << std::endl;
 
-      ofstream outFile( globalOutName.c_str(), ios::out );
+      std::ofstream outFile( globalOutName.c_str(), ios::out );
 
       if( ! outFile.is_open() )
       {
@@ -302,7 +301,7 @@ int NetworkStatistics(int argc, char* argv[])
         << count
         << std::endl;
 
-      ofstream outFile( localOutName.c_str(), ios::out );
+      std::ofstream outFile( localOutName.c_str(), ios::out );
 
       if( ! outFile.is_open() )
       {

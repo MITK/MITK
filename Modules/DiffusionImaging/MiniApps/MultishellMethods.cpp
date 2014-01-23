@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseData.h>
-#include <mitkFiberTrackingObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include "ctkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
@@ -71,8 +70,6 @@ int MultishellMethods(int argc, char* argv[])
 
   try
   {
-    RegisterFiberTrackingObjectFactory();
-
     MITK_INFO << "Loading " << inName;
     const std::string s1="", s2="";
     std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );

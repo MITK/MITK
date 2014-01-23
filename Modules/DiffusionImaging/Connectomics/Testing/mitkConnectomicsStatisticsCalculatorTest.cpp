@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 static void CalculateStatistics(std::string networkName, std::string outName, std::vector< std::vector< std::string > > /*vectorOfLabelVectors*/ )
 {
   const std::string s1="", s2="";
-  RegisterConnectomicsObjectFactory();
 
   // load network
   std::vector<mitk::BaseData::Pointer> networkFile =

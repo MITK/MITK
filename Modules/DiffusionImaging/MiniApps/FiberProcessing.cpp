@@ -28,10 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
-#include <mitkFiberTrackingObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include "ctkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
+#include <mitkCoreObjectFactory.h>
 
 
 mitk::FiberBundleX::Pointer LoadFib(std::string filename)
@@ -149,8 +149,6 @@ int FiberProcessing(int argc, char* argv[])
 
     try
     {
-        RegisterFiberTrackingObjectFactory();
-
         mitk::FiberBundleX::Pointer fib = LoadFib(inFileName);
 
         if (minFiberLength>0)

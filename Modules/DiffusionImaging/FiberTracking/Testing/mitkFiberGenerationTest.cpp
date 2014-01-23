@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
-#include <mitkFiberTrackingObjectFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include <mitkPlanarEllipse.h>
 #include <itkFibersFromPlanarFiguresFilter.h>
@@ -32,7 +30,6 @@ int mitkFiberGenerationTest(int argc, char* argv[])
     MITK_TEST_CONDITION_REQUIRED(argc==6,"check for input data")
 
             try{
-        RegisterFiberTrackingObjectFactory();
 
         mitk::PlanarEllipse::Pointer pf1 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::LoadDataNode(argv[1])->GetData());
         mitk::PlanarEllipse::Pointer pf2 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());

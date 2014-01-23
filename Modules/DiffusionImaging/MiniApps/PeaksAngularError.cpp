@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
-#include <mitkFiberTrackingObjectFactory.h>
 #include <itkEvaluateDirectionImagesFilter.h>
 #include <metaCommand.h>
 #include "ctkCommandLineParser.h"
@@ -68,8 +67,6 @@ int PeaksAngularError(int argc, char* argv[])
 
     try
     {
-        RegisterFiberTrackingObjectFactory();
-
         typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
         typedef itk::Image< itk::Vector< float, 3>, 3 >                         ItkDirectionImage3DType;
         typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >   ItkDirectionImageContainerType;

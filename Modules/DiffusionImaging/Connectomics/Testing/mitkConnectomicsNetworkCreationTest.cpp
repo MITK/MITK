@@ -22,18 +22,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK includes
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
-#include <mitkConnectomicsObjectFactory.h>
 #include "mitkConnectomicsNetworkCreator.h"
+#include <mitkCoreObjectFactory.h>
 
 
 static void CreateNetworkFromFibersAndParcellation(std::string fiberFilename, std::string parcellationFilename, std::string outputFilename, bool testMode, std::string referenceFilename)
 {
-  // registering Factories
-  RegisterFiberTrackingObjectFactory();
-  RegisterConnectomicsObjectFactory();
-
   const std::string s1="", s2="";
 
   // load fiber image

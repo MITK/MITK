@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkNrrdTbssImageReader.h>
 #include <mitkNrrdTbssImageWriter.h>
-#include "mitkQuantificationObjectFactory.h"
 #include "mitkCoreObjectFactory.h"
 
 
@@ -31,8 +30,6 @@ int mitkTbssNrrdImageWriterTest(int argc , char* argv[])
   mitk::NrrdTbssImageReader::Pointer tbssNrrdReader = mitk::NrrdTbssImageReader::New();
 
   MITK_TEST_CONDITION_REQUIRED(tbssNrrdReader.GetPointer(), "Testing initialization of test object!");
-
-  RegisterQuantificationObjectFactory();
 
   tbssNrrdReader->SetFileName(argv[1]);
   MITK_TEST_CONDITION_REQUIRED( tbssNrrdReader->CanReadFile(argv[1], "", ""), "Testing CanReadFile() method with valid input file name!");

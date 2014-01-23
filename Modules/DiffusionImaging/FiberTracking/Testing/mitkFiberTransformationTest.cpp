@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
-#include <mitkFiberTrackingObjectFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberBundleX.h>
 
 /**Documentation
@@ -30,8 +28,6 @@ int mitkFiberTransformationTest(int argc, char* argv[])
     MITK_TEST_CONDITION_REQUIRED(argc==3,"check for input data")
 
             try{
-        RegisterFiberTrackingObjectFactory();
-
         mitk::FiberBundleX::Pointer groundTruthFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[1])->GetData());
         mitk::FiberBundleX::Pointer transformedFibs = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());
 

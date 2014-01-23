@@ -15,9 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDiffusionImagingActivator.h"
-#include "mitkConnectomicsObjectFactory.h"
-#include "mitkFiberTrackingObjectFactory.h"
-#include "mitkQuantificationObjectFactory.h"
 
 #include "QmitkNodeDescriptorManager.h"
 #include "mitkNodePredicateDataType.h"
@@ -28,10 +25,6 @@ void
 mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
 {
   Q_UNUSED(context)
-
-  RegisterFiberTrackingObjectFactory();
-  RegisterConnectomicsObjectFactory();
-  RegisterQuantificationObjectFactory();
 
   QmitkNodeDescriptorManager* manager =
     QmitkNodeDescriptorManager::GetInstance();

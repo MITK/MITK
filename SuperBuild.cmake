@@ -147,6 +147,7 @@ if(BUILD_TESTING)
   if(EXTERNAL_MITK_DATA_DIR)
     set(MITK_DATA_DIR ${EXTERNAL_MITK_DATA_DIR})
   endif()
+  set(MITK_USE_CppUnit 1)
 endif()
 
 # Look for git early on, if needed

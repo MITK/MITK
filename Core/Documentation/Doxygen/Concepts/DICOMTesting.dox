@@ -6,11 +6,11 @@
 
 Reading DICOM data into mitk::Images is a complicated business since DICOM and MITK have very different ideas of images.
 
-DicomSeriesReader brings DICOM and MITK as close together as possible by offering methods to load DICOM CT and MR images
+DICOMITKSeriesGDCMReader (formerly: DicomSeriesReader) brings DICOM and MITK as close together as possible by offering methods to load DICOM CT and MR images
 into mitk::Images, optionally grouping slices to 3D+t images.
 
 Since there are so many possible sources for mistakes with any change to this loading process, testing the many
-assumptions implemented in DicomSeriesReader is worthwhile. This document describes what and how theses kind of tests are implemented.
+assumptions implemented in DICOMITKSeriesGDCMReader is worthwhile. This document describes what and how theses kind of tests are implemented.
 
 \section DICOMTesting_problem Problem description
 
@@ -37,7 +37,7 @@ For more background information, see David Clunie's most valuable posts on comp.
 
 \section DICOMTesting_testidea Test principle
 
-The general idea for DICOM loaing tests is to run a set of known DICOM files through DicomSeriesReader's methods
+The general idea for DICOM loaing tests is to run a set of known DICOM files through DICOMITKSeriesGDCMReader's methods
 GetSeries() and LoadDicomSeries() to generate mitk::Images. These images are then compared to expected image properties,
 such as the number of individual mitk::Images, positions, orientations, spacings, etc.
 
@@ -143,10 +143,10 @@ This list is meant to provide an up-to-date list of all implemented DICOM loadin
 <b>If you ever find this outdated, please update it or make the persons who invalidated the list update it.</b>
 
 <b>mitkDICOMTestingSanityTest_*</b>
-These tests implement basic testing of the implemented helper classes. The tests use DicomSeriesReader to load
+These tests implement basic testing of the implemented helper classes. The tests use DICOMITKSeriesGDCMReader to load
 a number of DICOM image. They verify:
- - DicomSeriesReader recognizes all input files as DICOM images
- - DicomSeriesReader generates a number of mitk::Images from the DICOM images
+ - DICOMITKSeriesGDCMReader recognizes all input files as DICOM images
+ - DICOMITKSeriesGDCMReader generates a number of mitk::Images from the DICOM images
  - the number of mitk::Images matches a number given on the command line or CTest's add_test()
  - helper methods in class TestDICOMLoading make minimal sense (comparison of an image dump to itself must be valid)
 

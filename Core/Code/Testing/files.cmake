@@ -99,8 +99,6 @@ set(MODULE_CUSTOM_TESTS
     #mitkExternalToolsTest.cpp
     mitkDataStorageTest.cpp
     mitkDataNodeTest.cpp
-    mitkDicomSeriesReaderTest.cpp
-    mitkDICOMLocaleTest.cpp
     mitkEventMapperTest.cpp
     mitkEventConfigTest.cpp
     mitkNodeDependentPointSetInteractorTest.cpp

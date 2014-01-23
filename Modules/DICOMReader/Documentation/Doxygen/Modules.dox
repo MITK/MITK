@@ -1,0 +1,39 @@
+/**
+\defgroup DICOMReaderModule The DICOMReader Module
+\ingroup MITKModules
+
+\brief DICOM This module contains a number of classes for DICOM image loading within MITK.
+
+\section DICOMReaderModule_overview Scope
+
+When people around MITK talk about loading DICOM images or series, they are really not interested in the
+images (2D slices) but in a 3D mitk::Image instance that groups DICOM images in a meaningful way.
+
+The task of this module is to provide
+ - an interface for the general "DICOM files to mitk::Images" transformation: mitk::DICOMFileReader
+ - a flexible default reader for the most common DICOM images: mitk::DICOMITKSeriesGDCMReader
+
+Most documentation is kept with these classes, so please have a look at their documentations.
+
+\remark Prior to this module, a class called DicomSeriesReader grew too much to be maintainable anymore. Its functionality is conserved by class mitk::ClassicDICOMSeriesReader.
+
+\section DICOMReaderModule_interface Module Interface
+
+The general loading proceduce is structured by mitk::DICOMFileReader, under the assumption that the best reader for a set of files is not known prior to inspection.
+To facilitate applications that need to select between possible readers based on what would be loaded,
+file readers are required to implement loading in two separate steps:
+
+ 1. analysis of a list of files and description of potential mitk::Image%s by means of mitk::DICOMImageBlockDescriptor
+ 2. actual loading of pixel data into mitk::Image%s
+
+A very simple implementation is mitk::DICOMFileReaderSelector which selects the reader with the least possible number of mitk::Images (least confusing for the user?).
+
+\section DICOMReaderModule_tasks Tasks for future development
+
+Unstructured development tasks and ideas for future extensions
+
+ - a reader for vector-valued diffusion images is currently being implemented
+ - a multi-frame image reader based on DCMTK
+ - perspective: slice-by-slice loading
+
+*/

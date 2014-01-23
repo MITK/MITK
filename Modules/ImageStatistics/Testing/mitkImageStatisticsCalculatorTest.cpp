@@ -20,8 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsCalculator.h"
 #include "mitkPlanarPolygon.h"
 
-#include "mitkDicomSeriesReader.h"
-#include <itkGDCMSeriesFileNames.h>
+#include "mitkClassicDICOMSeriesReader.h"
 
 #include "vtkStreamingDemandDrivenPipeline.h"
 
@@ -415,14 +414,18 @@ public:
     }
 
 
-    itk::FilenamesContainer file;
-    file.push_back( filename );
+    MITK_TEST_OUTPUT(<< "Loading test image '" << filename << "'")
+    mitk::StringList files;
+    files.push_back( filename );
 
-    mitk::DicomSeriesReader* reader = new mitk::DicomSeriesReader;
+    mitk::ClassicDICOMSeriesReader::Pointer reader = mitk::ClassicDICOMSeriesReader::New();
+    reader->SetInputFiles( files );
+    reader->AnalyzeInputFiles();
+    reader->LoadImages();
+    MITK_TEST_CONDITION_REQUIRED( reader->GetNumberOfOutputs() == 1, "Loaded one result from file" );
 
-    mitk::DataNode::Pointer node = reader->LoadDicomSeries( file, false, false );
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-
+    mitk::Image::Pointer image = reader->GetOutput(0).GetMitkImage();
+    MITK_TEST_CONDITION_REQUIRED( image.IsNotNull(), "Loaded an mitk::Image" );
     return image;
   }
 
@@ -460,7 +463,7 @@ int mitkImageStatisticsCalculatorTest(int, char* [])
 
     //QCoreApplication app(argc, argv);
 
-    mitk::Image::Pointer image = mitkImageStatisticsCalculatorTestClass::GetTestImage();
+  mitk::Image::Pointer image = mitkImageStatisticsCalculatorTestClass::GetTestImage();
   MITK_TEST_CONDITION_REQUIRED( image.IsNotNull(), "Loading test image" );
 
   mitk::Geometry2D::Pointer geom = image->GetSlicedGeometry()->GetGeometry2D(0);

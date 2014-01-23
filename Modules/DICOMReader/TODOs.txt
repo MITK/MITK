@@ -1,0 +1,64 @@
+Important
+
+[x] Make sure that ..Selector does tag scanning only once
+[x] Check Gantry Tilt ToDo/Bug in old reader
+[x] - and in new reader, how do we WANT to handle this?
+      - old and new code both did not correctly check the stored value against the calculated value
+        - it SEEMS like tilts below 45 degrees were never checked against the tag, and bigger values are probably unrealistic(?)
+        - so, nothing wrong. It just seems that we calculated a DIFFERENT angle than the one recorded
+      - in the new reader we remove the check. We are right as far as our shearing is affected.
+[x] Keep OLD DICOMTesting module, in order to test code until it is removed
+    - restored this module as DCMTesting module
+[x] ONLY load a pre-sorted list
+    - Should work now by:
+      - get the list of images, construct FrameInfo list (order must be known from prior sorting)
+      - prepare a tagcache object that provides tag information (from some kind of database, or run AnalyzeInputFiles() on file reader)
+      - create DICOMImageBlockDescriptor with frame list and tag cache
+      - Call SetFixTiltByShearing() and TiltInfo object as appropriate...
+      - call DICOMITKSeriesGDCMReader::LoadMitkImageForImageBlockDescriptor(block)
+[x] Option to just provide properties to a pre-loaded mitk::Image
+    - see TestDICOMLoading::DecorateVerifyCachedImage()
+[x] Performance of mitkdump / DICOMReaderSelector (TagCache?)
+    - the note in GDCM..Reader::GetTagValue() is correct.
+      This piece of code is taking lots of time.
+      Approx. half of the time is tag scanning, the other
+      half is construction of block describing properties,
+      which accesses GetTagValue.
+[x]   - maybe we can evaluate these properties in a lazy way
+        (only when asked for).
+        Solution: Yes, this helps, implemented.
+[x] Gantry tilt broken during implementation
+    - Was a wrong implementation of NormalDirectionConsistencySorter
+[x] Accepted image origin error during EquiDistantBlocksSorter
+    must be configurable. To support legacy behavior of the reader,
+    the tolerance must be fixable to a constant value. For newer
+    readers, it should be adapted to the actual slice distance.
+[x] Sorting by "Image Time" seems undeterministic (clarkson test data)
+[x] - Numeric conversion of "1.2.3.4" yields 1.2 on Windows, seems to fail on Linux(?)
+      - need to verify that the whole string (except whitespace at the begin/end) was converted
+        Solution: GetTagValue as String does a right-trim plus we check after conversion! Works.
+[x] Implement Configurator::GetBuiltIn3DReaders() (don't ignore "classic reader")
+[x] Complete MITK properties of images: level/window and color type (MONOCHROME1/2)
+[x] Check input images fo DICOMness and non-multi-frameness
+[x] Use CanHandleFile() in selection!
+    - implicitly now, the reader checks itself and produces no output if it cannot handle the files
+[x] Check ToDo in mitkDICOMTag.cpp
+    - operator< for DICOMTag has been re-implemented in a readable and safer way.
+[x] Configurable precision for tag value comparisons
+[x] Images are upside-down in some cases
+    - error was hidden assumption somewhere: filenames for ImageSeriesReader need
+      to be in an order that goes along the image normals, not in the opposite
+      direction
+
+Questionable
+
+[ ] Fallback to filename instead of instance UID?
+
+Nice-to-have
+
+[ ] Multi-Frame images (DCMTK)
+[ ] ...
+[x] Add the tags used by DICOMImageBlockDescriptor dynamically instead of hard-coded
+    (look for ToDo around m_GDCMScanner.AddTag() in mitkDICOMITKSeriesGDCMReader.cpp)
+[ ] Let DICOMImageBlockDescriptor describe attributes common and different for all blocks of a series
+[ ] Let DICOMImageBlockDescriptor check image properties when mitk::Image is set (pre-loaded case)

@@ -45,7 +45,6 @@ mitk::QuantificationObjectFactory::QuantificationObjectFactory()
   if (!alreadyDone)
   {
     MITK_DEBUG << "QuantificationObjectFactory c'tor" << std::endl;
-    RegisterIOFactories();
 
     itk::ObjectFactoryBase::RegisterFactory(m_NrrdTbssImageIOFactory);
     itk::ObjectFactoryBase::RegisterFactory(m_NrrdTbssRoiImageIOFactory);
@@ -162,10 +161,6 @@ void mitk::QuantificationObjectFactory::CreateFileExtensionsMap()
 
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tbss", "TBSS data"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.roi", "TBSS ROI data"));
-}
-
-void mitk::QuantificationObjectFactory::RegisterIOFactories()
-{
 }
 
 struct RegisterQuantificationObjectFactory{

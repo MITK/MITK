@@ -19,12 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "ConnectomicsExports.h"
 
 namespace mitk
 {
 
-class Connectomics_EXPORT ConnectomicsNetworkWriterFactory : public itk::ObjectFactoryBase
+class ConnectomicsNetworkWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 
@@ -36,18 +35,6 @@ public:
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
-
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
-  {
-    static bool IsRegistered = false;
-    if ( !IsRegistered )
-    {
-      ConnectomicsNetworkWriterFactory::Pointer cnfWriterFactory = ConnectomicsNetworkWriterFactory::New();
-      ObjectFactoryBase::RegisterFactory( cnfWriterFactory );
-      IsRegistered = true;
-    }
-  }
 
 protected:
   ConnectomicsNetworkWriterFactory();

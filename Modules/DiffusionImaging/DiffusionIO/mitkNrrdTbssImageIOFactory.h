@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __MITK_FIBER_BUNDLEX_IO_FACTORY_H_HEADER__
-#define __MITK_FIBER_BUNDLEX_IO_FACTORY_H_HEADER__
+#ifndef __MITK_NRRD_TBSS_VOULMES_IO_FACTORY_H_HEADER__
+#define __MITK_NRRD_TBSS_VOULMES_IO_FACTORY_H_HEADER__
 
 #ifdef _MSC_VER
 #pragma warning ( disable : 4786 )
@@ -22,22 +22,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "FiberTrackingExports.h"
-
-//NOTE>umbenennen in internal FiberBundleIOFactory
-
 
 namespace mitk
 {
 //##Documentation
-//## @brief Create instances of NrrdQBallImageReader objects using an object factory.
+//## @brief Create instances of NrrdDiffusionImageReader objects using an object factory.
 //##
-//## @ingroup IO
-class FiberTracking_EXPORT FiberBundleXIOFactory : public itk::ObjectFactoryBase
+class NrrdTbssImageIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */
-  typedef FiberBundleXIOFactory   Self;
+  typedef NrrdTbssImageIOFactory   Self;
   typedef itk::ObjectFactoryBase  Superclass;
   typedef itk::SmartPointer<Self>  Pointer;
   typedef itk::SmartPointer<const Self>  ConstPointer;
@@ -48,23 +43,16 @@ public:
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
-  static FiberBundleXIOFactory* FactoryNew() { return new FiberBundleXIOFactory;}
+  static NrrdTbssImageIOFactory* FactoryNew() { return new NrrdTbssImageIOFactory;}
   /** Run-time type information (and related methods). */
-  itkTypeMacro(FiberBundleXIOFactory, ObjectFactoryBase);
-
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
-  {
-    FiberBundleXIOFactory::Pointer FiberBundleXIOFactory = FiberBundleXIOFactory::New();
-    ObjectFactoryBase::RegisterFactory(FiberBundleXIOFactory);
-  }
+  itkTypeMacro(NrrdTbssImageIOFactory, ObjectFactoryBase);
 
 protected:
-  FiberBundleXIOFactory();
-  ~FiberBundleXIOFactory();
+  NrrdTbssImageIOFactory();
+  ~NrrdTbssImageIOFactory();
 
 private:
-  FiberBundleXIOFactory(const Self&); //purposely not implemented
+  NrrdTbssImageIOFactory(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 };
@@ -72,4 +60,4 @@ private:
 
 } // end namespace mitk
 
-#endif  // __MITK_FIBER_BUNDLE_IO_FACTORY_H_HEADER__
+#endif  // __MITK_NRRD_TBSS_VOULMES_IO_FACTORY_H_HEADER__

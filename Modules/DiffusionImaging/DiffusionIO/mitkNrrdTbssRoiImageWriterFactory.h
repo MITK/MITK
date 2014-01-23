@@ -14,48 +14,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef NRRDTBSSIMAGE_WRITERFACTORY_H_HEADER_INCLUDED
-#define NRRDTBSSIMAGE_WRITERFACTORY_H_HEADER_INCLUDED
+#ifndef NRRDTBSSROIIMAGE_WRITERFACTORY_H_HEADER_INCLUDED
+#define NRRDTBSSROIIMAGE_WRITERFACTORY_H_HEADER_INCLUDED
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "QuantificationExports.h"
-#include "QuantificationExports.h"
 
 namespace mitk
 {
 
-class Quantification_EXPORT NrrdTbssImageWriterFactory : public itk::ObjectFactoryBase
+class NrrdTbssRoiImageWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 
-  mitkClassMacro( mitk::NrrdTbssImageWriterFactory, itk::ObjectFactoryBase )
+  mitkClassMacro( mitk::NrrdTbssRoiImageWriterFactory, itk::ObjectFactoryBase )
 
   /** Class methods used to interface with the registered factories. */
   virtual const char* GetITKSourceVersion(void) const;
   virtual const char* GetDescription(void) const;
 
   /** Method for class instantiation. */
-  itkFactorylessNewMacro(Self);
-
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
-  {
-    static bool IsRegistered = false;
-    if ( !IsRegistered )
-    {
-      mitk::NrrdTbssImageWriterFactory::Pointer fac = mitk::NrrdTbssImageWriterFactory::New();
-      ObjectFactoryBase::RegisterFactory( fac );
-      IsRegistered = true;
-    }
-  }
+  itkFactorylessNewMacro(Self)
 
 protected:
-  NrrdTbssImageWriterFactory();
-  ~NrrdTbssImageWriterFactory();
+  NrrdTbssRoiImageWriterFactory();
+  ~NrrdTbssRoiImageWriterFactory();
 
 private:
-  NrrdTbssImageWriterFactory(const Self&); //purposely not implemented
+  NrrdTbssRoiImageWriterFactory(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 };

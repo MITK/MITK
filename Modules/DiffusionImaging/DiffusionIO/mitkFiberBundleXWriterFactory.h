@@ -19,12 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "FiberTrackingExports.h"
 
 namespace mitk
 {
 
-class FiberTracking_EXPORT FiberBundleXWriterFactory : public itk::ObjectFactoryBase
+class FiberBundleXWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 
@@ -36,18 +35,6 @@ public:
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
-
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
-  {
-    static bool IsRegistered = false;
-    if ( !IsRegistered )
-    {
-      FiberBundleXWriterFactory::Pointer ugVtkWriterFactory = FiberBundleXWriterFactory::New();
-      ObjectFactoryBase::RegisterFactory( ugVtkWriterFactory );
-      IsRegistered = true;
-    }
-  }
 
 protected:
   FiberBundleXWriterFactory();

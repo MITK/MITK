@@ -277,11 +277,6 @@ void mitk::DiffusionCoreObjectFactory::CreateFileExtensionsMap()
 
 }
 
-void mitk::DiffusionCoreObjectFactory::RegisterIOFactories()
-{
-}
-
-
 struct RegisterDiffusionCoreObjectFactory{
   RegisterDiffusionCoreObjectFactory()
     : m_Factory( mitk::DiffusionCoreObjectFactory::New() )

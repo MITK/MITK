@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // std includes
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <vector>
 #include <map>
 
@@ -30,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK includes
 #include <mitkBaseDataIOFactory.h>
-#include <mitkConnectomicsObjectFactory.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
 #include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
 

@@ -15,8 +15,6 @@ mitk::FiberTrackingObjectFactory::FiberTrackingObjectFactory()
     itk::ObjectFactoryBase::RegisterFactory(m_FiberBundleXIOFactory);
     itk::ObjectFactoryBase::RegisterFactory(m_FiberBundleXWriterFactory);
 
-    mitk::FiberBundleXWriterFactory::RegisterOneFactory();//modernized
-
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
 
     CreateFileExtensionsMap();

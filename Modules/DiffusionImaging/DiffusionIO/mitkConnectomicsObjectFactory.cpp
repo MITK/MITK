@@ -110,10 +110,6 @@ void mitk::ConnectomicsObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnf", "Connectomics Network File"));
 }
 
-void mitk::ConnectomicsObjectFactory::RegisterIOFactories()
-{
-}
-
 struct RegisterConnectomicsObjectFactory{
   RegisterConnectomicsObjectFactory()
     : m_Factory( mitk::ConnectomicsObjectFactory::New() )

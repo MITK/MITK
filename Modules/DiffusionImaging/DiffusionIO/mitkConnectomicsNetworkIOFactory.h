@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __MITK_NRRD_TBSS_VOULMES_IO_FACTORY_H_HEADER__
-#define __MITK_NRRD_TBSS_VOULMES_IO_FACTORY_H_HEADER__
+#ifndef __MITK_CONNECTOMICS_NETWORK_IO_FACTORY_H_HEADER__
+#define __MITK_CONNECTOMICS_NETWORK_IO_FACTORY_H_HEADER__
 
 #ifdef _MSC_VER
 #pragma warning ( disable : 4786 )
@@ -22,19 +22,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "QuantificationExports.h"
 
 namespace mitk
 {
-//##Documentation
-//## @brief Create instances of NrrdDiffusionImageReader objects using an object factory.
-//##
-//## @ingroup IO
-class Quantification_EXPORT NrrdTbssImageIOFactory : public itk::ObjectFactoryBase
+ /**
+   * \brief Create instances of ConnectomicsNetwork objects using an object factory.
+   */
+class ConnectomicsNetworkIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */
-  typedef NrrdTbssImageIOFactory   Self;
+  typedef ConnectomicsNetworkIOFactory   Self;
   typedef itk::ObjectFactoryBase  Superclass;
   typedef itk::SmartPointer<Self>  Pointer;
   typedef itk::SmartPointer<const Self>  ConstPointer;
@@ -45,28 +43,16 @@ public:
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
-  static NrrdTbssImageIOFactory* FactoryNew() { return new NrrdTbssImageIOFactory;}
+  static ConnectomicsNetworkIOFactory* FactoryNew() { return new ConnectomicsNetworkIOFactory;}
   /** Run-time type information (and related methods). */
-  itkTypeMacro(NrrdTbssImageIOFactory, ObjectFactoryBase);
-
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
-  {
-    static bool IsRegistered = false;
-    if ( !IsRegistered )
-    {
-      NrrdTbssImageIOFactory::Pointer fac = NrrdTbssImageIOFactory::New();
-      ObjectFactoryBase::RegisterFactory( fac );
-      IsRegistered = true;
-    }
-  }
+  itkTypeMacro(ConnectomicsNetworkIOFactory, ObjectFactoryBase);
 
 protected:
-  NrrdTbssImageIOFactory();
-  ~NrrdTbssImageIOFactory();
+  ConnectomicsNetworkIOFactory();
+  ~ConnectomicsNetworkIOFactory();
 
 private:
-  NrrdTbssImageIOFactory(const Self&); //purposely not implemented
+  ConnectomicsNetworkIOFactory(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 };
@@ -74,4 +60,4 @@ private:
 
 } // end namespace mitk
 
-#endif  // __MITK_NRRD_TBSS_VOULMES_IO_FACTORY_H_HEADER__
+#endif  // __MITK_CONNECTOMICS_NETWORK_IO_FACTORY_H_HEADER__

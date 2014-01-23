@@ -58,8 +58,6 @@ public:
 
   protected slots:
 
-    /// \brief Called when the user clicks the GUI button
-    void StartBrowser();
     void OnActivatedNode(const QModelIndex& index);
     void DoFetchMore(const QModelIndex& index);
 

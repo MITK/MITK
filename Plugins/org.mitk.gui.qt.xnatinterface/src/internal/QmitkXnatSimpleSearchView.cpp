@@ -38,15 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ctkXnatCore
 #include "ctkXnatProject.h"
 
-
-enum MatchingObject
-{
-  EMPTY,
-  PROJECT,
-  SUBJECT,
-  EXPERIMENT
-};
-
 const std::string QmitkXnatSimpleSearchView::VIEW_ID = "org.mitk.views.qmitkxnatsimplesearchview";
 
 QmitkXnatSimpleSearchView::QmitkXnatSimpleSearchView() :
@@ -57,7 +48,6 @@ QmitkXnatSimpleSearchView::QmitkXnatSimpleSearchView() :
 
 QmitkXnatSimpleSearchView::~QmitkXnatSimpleSearchView()
 {
-  if ( m_Session ) delete m_Session;
   delete m_TreeModel;
 }
 
@@ -78,19 +68,6 @@ void QmitkXnatSimpleSearchView::CreateQtPartControl( QWidget *parent )
 void QmitkXnatSimpleSearchView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                       const QList<mitk::DataNode::Pointer>& nodes )
 {
-  // iterate all selected objects, adjust warning visibility
-  //foreach( mitk::DataNode::Pointer node, nodes )
-  //{
-  //  if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-  //  {
-  //    m_Controls.labelWarning->setVisible( false );
-  //    m_Controls.buttonStartSearch->setEnabled( true );
-  //    return;
-  //  }
-  //}
-
-  //m_Controls.labelWarning->setVisible( true );
-  //m_Controls.buttonStartSearch->setEnabled( false );
 }
 
 void QmitkXnatSimpleSearchView::StartSearch()
@@ -99,17 +76,17 @@ void QmitkXnatSimpleSearchView::StartSearch()
 
   switch(m_Controls.objectComboBox->currentIndex())
   {
-  case MatchingObject::PROJECT:
-    type = MatchingObject::PROJECT;
+  case QmitkXnatSimpleSearchView::PROJECT:
+    type = QmitkXnatSimpleSearchView::PROJECT;
     break;
-  case MatchingObject::SUBJECT:
-    type = MatchingObject::SUBJECT;
+  case QmitkXnatSimpleSearchView::SUBJECT:
+    type = QmitkXnatSimpleSearchView::SUBJECT;
     break;
-  case MatchingObject::EXPERIMENT:
-    type = MatchingObject::EXPERIMENT;
+  case QmitkXnatSimpleSearchView::EXPERIMENT:
+    type = QmitkXnatSimpleSearchView::EXPERIMENT;
     break;
   default:
-    type = MatchingObject::EMPTY;
+    type = QmitkXnatSimpleSearchView::EMPTY;
     MITK_INFO << "You did something weird or chose nothing!";
     break;
   }

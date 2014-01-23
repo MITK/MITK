@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkXnatTreeBrowserView.h"
 #include "QmitkXnatObjectEditorInput.h"
 #include "QmitkXnatEditor.h"
+#include "org_mitk_gui_qt_xnatinterface_Activator.h"
 
 // Standard
 #include <iostream>
@@ -51,17 +52,11 @@ QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView():
 QmitkXnatTreeBrowserView::~QmitkXnatTreeBrowserView()
 {
   delete m_Profile;
-  if ( m_Session )
-  {
-    m_Session->close();
-    delete m_Session;
-  }
   delete m_TreeModel;
 }
 
 void QmitkXnatTreeBrowserView::SetFocus()
 {
-  m_Controls.buttonStartBrowser->setFocus();
 }
 
 void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
@@ -72,60 +67,23 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
 
   m_SelectionProvider = new berry::QtSelectionProvider();
   m_SelectionProvider->SetItemSelectionModel(m_Controls.treeView->selectionModel());
-  SetSelectionProvider();
+  this->SetSelectionProvider();
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
-
-  connect( m_Controls.buttonStartBrowser, SIGNAL(clicked()), this, SLOT(StartBrowser()) );
 
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)) );
   connect( m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(DoFetchMore(const QModelIndex&)) );
+
+  // get the XNAT Session from Activator
+  m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
+
+  // fill model and show in the GUI
+  m_TreeModel->addDataModel(m_Session->dataModel());
+  m_Controls.treeView->reset();
 }
 
 void QmitkXnatTreeBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                       const QList<mitk::DataNode::Pointer>& nodes )
 {
-  // iterate all selected objects, adjust warning visibility
-  //foreach( mitk::DataNode::Pointer node, nodes )
-  //{
-  //  if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-  //  {
-  //    m_Controls.labelWarning->setVisible( false );
-  //    m_Controls.buttonStartBrowser->setEnabled( true );
-  //    return;
-  //  }
-  //}
-
-  //m_Controls.labelWarning->setVisible( true );
-  //m_Controls.buttonStartBrowser->setEnabled( false );
-}
-
-void QmitkXnatTreeBrowserView::StartBrowser()
-{
-  if ( m_Session )
-  {
-    return;
-    //delete m_Session;
-    //m_Session = 0;
-    //QModelIndex index = m_TreeModel->index(1,1,QModelIndex());
-    //m_TreeModel->removeAllRows(index);
-  }
-  else
-  {
-    // fill profile
-    m_Profile->setName(QString("localhost"));
-    m_Profile->setServerUrl(m_Controls.inHostAddress->text());
-    m_Profile->setUserName(m_Controls.inUser->text());
-    m_Profile->setPassword(m_Controls.inPassword->text());
-    m_Profile->setDefault(true);
-
-    // create ctkXnatSession with the profile
-    m_Session = new ctkXnatSession(*m_Profile);
-    m_Session->open();
-
-    // fill model and show in the GUI
-    m_TreeModel->addDataModel(m_Session->dataModel());
-    m_Controls.treeView->reset();
-  }
 }
 
 void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)

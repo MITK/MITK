@@ -25,6 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+QmitkXnatConnectionManager* org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()
+{
+  static QmitkXnatConnectionManager manager;
+  return &manager;
+}
+
 void org_mitk_gui_qt_xnatinterface_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkXnatEditor, context)

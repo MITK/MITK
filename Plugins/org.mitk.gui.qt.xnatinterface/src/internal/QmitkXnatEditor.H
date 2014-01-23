@@ -71,16 +71,7 @@ public:
 
   protected slots:
 
-    /// \brief Called when the user clicks the GUI button
-    //void DownloadResource();
-    //void DownloadFile();
     void OnObjectActivated(const QModelIndex& index);
-    void ProjectSelected(const QModelIndex& index);
-    void SubjectSelected(const QModelIndex& index);
-    void ExperimentSelected(const QModelIndex& index);
-    void ScanSelected(const QModelIndex& index);
-    void ResourceSelected(const QModelIndex& index);
-
     void OnDataModelButtonClicked();
     void OnProjectButtonClicked();
     void OnSubjectButtonClicked();
@@ -100,14 +91,13 @@ protected:
   Ui::QmitkXnatEditorControls m_Controls;
 
 private:
-  //QMap::QMap<QString, ctkXnatLoginProfile*> m_Profiles;
-  //bool DownloadExists(QString filename);
-  //friend class QmitkXnatTreeBrowserView;
+
   int ParentChecker(ctkXnatObject* child);
   int m_ParentCount;
   void ToHigherLevel();
 
   ctkXnatListModel* m_ListModel;
+  ctkXnatSession* m_Session;
 
   berry::ISelectionListener::Pointer m_SelectionListener;
   void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);

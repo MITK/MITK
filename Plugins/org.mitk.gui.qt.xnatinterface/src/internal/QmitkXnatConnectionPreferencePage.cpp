@@ -50,6 +50,7 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
 
   m_LineEditors["XNAT Host Address"] = new QLineEdit("");
   m_LineEditors["XNAT Host Address"]->setObjectName("inHostAddress");
+  m_LineEditors["XNAT Host Address"]->setToolTip("<html><head/><body><p>Examples:</p><p>&quot;http://localhost:8080/xnat&quot;</p><p>&quot;http://central.xnat.org:80&quot;</p><p>&quot;https://xnat.myserver.de:443&quot;</p></body></html>");
 
   m_LineEditors["Username"] = new QLineEdit("");
   m_LineEditors["Username"]->setObjectName("inUser");

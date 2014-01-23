@@ -240,7 +240,7 @@ public:
      {
         windowAdvisor->openDicomEditorAction->setEnabled(true);
      }
-     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnatprojects"))
+     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.qmitkxnateditor"))
      {
         windowAdvisor->openXnatEditorAction->setEnabled(true);
      }
@@ -284,7 +284,7 @@ public:
      {
         windowAdvisor->openDicomEditorAction->setEnabled(false);
      }
-     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnatprojects"))
+     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.qmitkxnateditor"))
      {
         windowAdvisor->openXnatEditorAction->setEnabled(false);
      }
@@ -478,7 +478,7 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
 {
  openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
 }
-if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnatprojects"))
+if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.qmitkxnateditor"))
 {
  openXnatEditorAction = new QmitkOpenXnatEditorAction(QIcon(":/org.mitk.gui.qt.ext/xnat-icon.png"),window);
 }
@@ -537,14 +537,14 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
  mainActionsToolBar->addAction(closeProjectAction);
  mainActionsToolBar->addAction(undoAction);
  mainActionsToolBar->addAction(redoAction);
-if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
-{
- mainActionsToolBar->addAction(openDicomEditorAction);
-}
-if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnatprojects"))
-{
- mainActionsToolBar->addAction(openXnatEditorAction);
-}
+ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+ {
+   mainActionsToolBar->addAction(openDicomEditorAction);
+ }
+ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.qmitkxnateditor"))
+ {
+   mainActionsToolBar->addAction(openXnatEditorAction);
+ }
  if (imageNavigatorViewFound)
  {
    mainActionsToolBar->addAction(imageNavigatorAction);

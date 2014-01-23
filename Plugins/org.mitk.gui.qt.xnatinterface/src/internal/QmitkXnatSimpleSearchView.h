@@ -45,6 +45,14 @@ class QmitkXnatSimpleSearchView : public QmitkAbstractView
 
 public:
 
+  enum MatchingObject
+  {
+    EMPTY,
+    PROJECT,
+    SUBJECT,
+    EXPERIMENT
+  };
+
   QmitkXnatSimpleSearchView();
   ~QmitkXnatSimpleSearchView();
   static const std::string VIEW_ID;

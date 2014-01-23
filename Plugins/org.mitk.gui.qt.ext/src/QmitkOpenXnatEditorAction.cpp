@@ -38,9 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 
-
-//#include <QmitkStdMultiWidgetEditor.h>
-
 QmitkOpenXnatEditorAction::QmitkOpenXnatEditorAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
@@ -73,42 +70,27 @@ void QmitkOpenXnatEditorAction::init(berry::IWorkbenchWindow::Pointer window)
 
 void QmitkOpenXnatEditorAction::Run()
 {
+  // check if there is an open perspective, if not open the default perspective
+  if (m_Window->GetActivePage().IsNull())
+  {
+    std::string defaultPerspId = m_Window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
+    m_Window->GetWorkbench()->ShowPerspective(defaultPerspId, m_Window);
+  }
 
- // check if there is an open perspective, if not open the default perspective
-    if (m_Window->GetActivePage().IsNull())
-    {
-        std::string defaultPerspId = m_Window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
-        m_Window->GetWorkbench()->ShowPerspective(defaultPerspId, m_Window);
-    }
+  std::vector<berry::IEditorReference::Pointer> editors =
+    m_Window->GetActivePage()->FindEditors(berry::IEditorInput::Pointer(0),
+    "org.mitk.editors.qmitkxnateditor", berry::IWorkbenchPage::MATCH_ID);
 
-    mitk::DataStorageEditorInput::Pointer editorInput;
-    //mitk::DataStorage::Pointer dataStorage;
-    //QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
-    //berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
-
-
-
-    //if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
-    //{
-    //    editorInput = new mitk::DataStorageEditorInput();
-    //    dataStorage = editorInput->GetDataStorageReference()->GetDataStorage();
-    //}
-    //else
-    //{
-    //    multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
-    //    dataStorage = multiWidgetEditor->GetEditorInput().Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference()->GetDataStorage();
-    //}
-
-    //if (multiWidgetEditor.IsNull())
-    //{
-    //    //berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
-    //    multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
-    //}
-    //else
-    //{
-    //    multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
-    //}
-
-    berry::IEditorInput::Pointer editorInput2(new berry::FileEditorInput(Poco::Path()));
-    m_Window->GetActivePage()->OpenEditor(editorInput2, "org.mitk.editors.xnatprojects");
+  if (editors.empty())
+  {
+    // no XnatEditor is currently open, create a new one
+    berry::IEditorInput::Pointer editorInput(new berry::FileEditorInput(Poco::Path()));
+    m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.qmitkxnateditor");
+  }
+  else
+  {
+    // reuse an existing editor
+    berry::IEditorPart::Pointer reuseEditor = editors.front()->GetEditor(true);
+    m_Window->GetActivePage()->Activate(reuseEditor);
+  }
 }

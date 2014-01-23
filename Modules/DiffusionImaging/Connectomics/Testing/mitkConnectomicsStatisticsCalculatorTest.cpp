@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK includes
 #include <mitkBaseDataIOFactory.h>
-#include <mitkConnectomicsObjectFactory.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
 
 static void CalculateStatistics(std::string networkName, std::string outName, std::vector< std::vector< std::string > > /*vectorOfLabelVectors*/ )
@@ -198,7 +197,7 @@ static void CalculateStatistics(std::string networkName, std::string outName, st
       << statisticsCalculator->GetSmallWorldness()
       << std::endl;
 
-    ofstream outFile( outName.c_str(), ios::out );
+    std::ofstream outFile( outName.c_str(), std::ios::out );
 
     if( ! outFile.is_open() )
     {

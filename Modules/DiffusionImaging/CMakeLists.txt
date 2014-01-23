@@ -3,6 +3,7 @@ set( diffusion_module_dirs
       FiberTracking
       Connectomics
       Quantification
+      DiffusionIO
 )
 
 foreach(diffusion_module_dir ${diffusion_module_dirs})

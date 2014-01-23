@@ -3,12 +3,9 @@ set(CPP_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXReader.cpp
-  IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.cpp
-  IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
   IODataStructures/FiberBundleX/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
-  IODataStructures/mitkFiberTrackingObjectFactory.cpp
 
   # Rendering
   Rendering/mitkFiberBundleXMapper2D.cpp
@@ -35,11 +32,8 @@ set(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleX.h
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.h
   IODataStructures/FiberBundleX/mitkFiberBundleXReader.h
-  IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.h
-  IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
   IODataStructures/FiberBundleX/mitkTrackvis.h
-  IODataStructures/mitkFiberTrackingObjectFactory.h
   IODataStructures/mitkFiberfoxParameters.h
 
   # Algorithms

@@ -3,11 +3,10 @@
 
 
 #include "mitkCoreObjectFactory.h"
-#include <QuantificationExports.h>
 
 namespace mitk {
 
-class Quantification_EXPORT QuantificationObjectFactory : public CoreObjectFactoryBase
+class QuantificationObjectFactory : public CoreObjectFactoryBase
 {
   public:
     mitkClassMacro(QuantificationObjectFactory,CoreObjectFactoryBase)
@@ -26,8 +25,6 @@ class Quantification_EXPORT QuantificationObjectFactory : public CoreObjectFacto
     virtual const char* GetSaveFileExtensions();
 
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
-
-    DEPRECATED(void RegisterIOFactories());
 
 protected:
     QuantificationObjectFactory();

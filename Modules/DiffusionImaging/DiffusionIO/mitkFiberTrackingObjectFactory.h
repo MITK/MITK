@@ -2,7 +2,6 @@
 #define MITKFIBERTRACKINGOBJECTFACTORY_H
 
 #include "mitkCoreObjectFactory.h"
-#include "FiberTrackingExports.h"
 
 //modernized fiberbundle datastrucutre
 #include "mitkFiberBundleX.h"
@@ -21,7 +20,7 @@
 
 namespace mitk {
 
-class FiberTracking_EXPORT FiberTrackingObjectFactory : public CoreObjectFactoryBase
+class FiberTrackingObjectFactory : public CoreObjectFactoryBase
 {
   public:
     mitkClassMacro(FiberTrackingObjectFactory,CoreObjectFactoryBase)

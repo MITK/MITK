@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __MITK_CONNECTOMICS_NETWORK_IO_FACTORY_H_HEADER__
-#define __MITK_CONNECTOMICS_NETWORK_IO_FACTORY_H_HEADER__
+#ifndef __MITK_FIBER_BUNDLEX_IO_FACTORY_H_HEADER__
+#define __MITK_FIBER_BUNDLEX_IO_FACTORY_H_HEADER__
 
 #ifdef _MSC_VER
 #pragma warning ( disable : 4786 )
@@ -22,20 +22,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "ConnectomicsExports.h"
+
+//NOTE>umbenennen in internal FiberBundleIOFactory
+
 
 namespace mitk
 {
- /**
-   * \brief Create instances of ConnectomicsNetwork objects using an object factory.
-   *
-   * \ingroup IO
-   */
-class Connectomics_EXPORT ConnectomicsNetworkIOFactory : public itk::ObjectFactoryBase
+//##Documentation
+//## @brief Create instances of NrrdQBallImageReader objects using an object factory.
+//##
+class FiberBundleXIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */
-  typedef ConnectomicsNetworkIOFactory   Self;
+  typedef FiberBundleXIOFactory   Self;
   typedef itk::ObjectFactoryBase  Superclass;
   typedef itk::SmartPointer<Self>  Pointer;
   typedef itk::SmartPointer<const Self>  ConstPointer;
@@ -46,23 +46,16 @@ public:
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
-  static ConnectomicsNetworkIOFactory* FactoryNew() { return new ConnectomicsNetworkIOFactory;}
+  static FiberBundleXIOFactory* FactoryNew() { return new FiberBundleXIOFactory;}
   /** Run-time type information (and related methods). */
-  itkTypeMacro(ConnectomicsNetworkIOFactory, ObjectFactoryBase);
-
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
-  {
-    ConnectomicsNetworkIOFactory::Pointer ConnectomicsNetworkIOFactory = ConnectomicsNetworkIOFactory::New();
-    ObjectFactoryBase::RegisterFactory(ConnectomicsNetworkIOFactory);
-  }
+  itkTypeMacro(FiberBundleXIOFactory, ObjectFactoryBase);
 
 protected:
-  ConnectomicsNetworkIOFactory();
-  ~ConnectomicsNetworkIOFactory();
+  FiberBundleXIOFactory();
+  ~FiberBundleXIOFactory();
 
 private:
-  ConnectomicsNetworkIOFactory(const Self&); //purposely not implemented
+  FiberBundleXIOFactory(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 };
@@ -70,4 +63,4 @@ private:
 
 } // end namespace mitk
 
-#endif  // __MITK_CONNECTOMICS_NETWORK_IO_FACTORY_H_HEADER__
+#endif  // __MITK_FIBER_BUNDLE_IO_FACTORY_H_HEADER__

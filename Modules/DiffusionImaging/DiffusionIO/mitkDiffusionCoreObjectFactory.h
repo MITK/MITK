@@ -18,11 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define DiffusionCoreObjectFactory_H_INCLUDED
 
 #include "mitkCoreObjectFactory.h"
-#include "DiffusionCoreExports.h"
 
 namespace mitk {
 
-class DiffusionCore_EXPORT DiffusionCoreObjectFactory : public CoreObjectFactoryBase
+class DiffusionCoreObjectFactory : public CoreObjectFactoryBase
 {
   public:
     mitkClassMacro(DiffusionCoreObjectFactory,CoreObjectFactoryBase)
@@ -41,8 +40,6 @@ class DiffusionCore_EXPORT DiffusionCoreObjectFactory : public CoreObjectFactory
     virtual const char* GetSaveFileExtensions();
 
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
-
-    DEPRECATED(void RegisterIOFactories());
 
 protected:
     DiffusionCoreObjectFactory();

@@ -22,15 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "QuantificationExports.h"
 
 namespace mitk
 {
 //##Documentation
 //## @brief Create instances of NrrdDiffusionImageReader objects using an object factory.
 //##
-//## @ingroup IO
-class Quantification_EXPORT NrrdTbssRoiImageIOFactory : public itk::ObjectFactoryBase
+class NrrdTbssRoiImageIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */
@@ -48,18 +46,6 @@ public:
   static NrrdTbssRoiImageIOFactory* FactoryNew() { return new NrrdTbssRoiImageIOFactory;}
   /** Run-time type information (and related methods). */
   itkTypeMacro(NrrdTbssRoiImageIOFactory, ObjectFactoryBase);
-
-  /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
-  {
-    static bool IsRegistered = false;
-    if ( !IsRegistered )
-    {
-      NrrdTbssRoiImageIOFactory::Pointer fac = NrrdTbssRoiImageIOFactory::New();
-      ObjectFactoryBase::RegisterFactory( fac );
-      IsRegistered = true;
-    }
-  }
 
 protected:
   NrrdTbssRoiImageIOFactory();

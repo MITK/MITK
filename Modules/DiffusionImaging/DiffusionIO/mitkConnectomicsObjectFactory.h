@@ -19,11 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKCONNECTOMICSOBJECTFACTORY_H
 
 #include "mitkCoreObjectFactory.h"
-#include "ConnectomicsExports.h"
 
 namespace mitk {
 
-class Connectomics_EXPORT ConnectomicsObjectFactory : public CoreObjectFactoryBase
+class ConnectomicsObjectFactory : public CoreObjectFactoryBase
 {
   public:
     mitkClassMacro(ConnectomicsObjectFactory,CoreObjectFactoryBase)
@@ -43,7 +42,6 @@ class Connectomics_EXPORT ConnectomicsObjectFactory : public CoreObjectFactoryBa
 
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
 
-    DEPRECATED(void RegisterIOFactories());
   protected:
     ConnectomicsObjectFactory();
   private:

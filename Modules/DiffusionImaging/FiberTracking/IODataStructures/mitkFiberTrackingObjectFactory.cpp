@@ -2,7 +2,9 @@
 
 
 mitk::FiberTrackingObjectFactory::FiberTrackingObjectFactory()
-  :CoreObjectFactoryBase()
+  : CoreObjectFactoryBase()
+  , m_FiberBundleXIOFactory(mitk::FiberBundleXIOFactory::New().GetPointer())
+  , m_FiberBundleXWriterFactory(mitk::FiberBundleXWriterFactory::New().GetPointer())
 {
 
   static bool alreadyDone = false;
@@ -10,18 +12,24 @@ mitk::FiberTrackingObjectFactory::FiberTrackingObjectFactory()
   {
     MITK_DEBUG << "FiberTrackingObjectFactory c'tor" << std::endl;
 
-    mitk::FiberBundleXIOFactory::RegisterOneFactory(); //modernized
+    itk::ObjectFactoryBase::RegisterFactory(m_FiberBundleXIOFactory);
+    itk::ObjectFactoryBase::RegisterFactory(m_FiberBundleXWriterFactory);
 
     mitk::FiberBundleXWriterFactory::RegisterOneFactory();//modernized
 
     m_FileWriters.push_back( mitk::FiberBundleXWriter::New().GetPointer() );//modernized
 
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     CreateFileExtensionsMap();
 
     alreadyDone = true;
   }
 
+}
+
+mitk::FiberTrackingObjectFactory::~FiberTrackingObjectFactory()
+{
+  itk::ObjectFactoryBase::UnRegisterFactory(m_FiberBundleXWriterFactory);
+  itk::ObjectFactoryBase::UnRegisterFactory(m_FiberBundleXIOFactory);
 }
 
 mitk::Mapper::Pointer mitk::FiberTrackingObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)

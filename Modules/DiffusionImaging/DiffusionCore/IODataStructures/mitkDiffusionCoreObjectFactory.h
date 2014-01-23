@@ -28,6 +28,8 @@ class DiffusionCore_EXPORT DiffusionCoreObjectFactory : public CoreObjectFactory
     mitkClassMacro(DiffusionCoreObjectFactory,CoreObjectFactoryBase)
     itkNewMacro(DiffusionCoreObjectFactory)
 
+    ~DiffusionCoreObjectFactory();
+
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
 
     virtual void SetDefaultProperties(mitk::DataNode* node);
@@ -52,6 +54,14 @@ private:
     std::string m_ExternalFileExtensions;
     std::string m_InternalFileExtensions;
     std::string m_SaveFileExtensions;
+
+    itk::ObjectFactoryBase::Pointer m_NrrdDiffusionImageIOFactory;
+    itk::ObjectFactoryBase::Pointer m_NrrdQBallImageIOFactory;
+    itk::ObjectFactoryBase::Pointer m_NrrdTensorImageIOFactory;
+
+    itk::ObjectFactoryBase::Pointer m_NrrdDiffusionImageWriterFactory;
+    itk::ObjectFactoryBase::Pointer m_NrrdQBallImageWriterFactory;
+    itk::ObjectFactoryBase::Pointer m_NrrdTensorImageWriterFactory;
 
 };
 

@@ -34,7 +34,11 @@ typedef float TbssPixelType;
 typedef int TbssGradientPixelType;
 
 mitk::QuantificationObjectFactory::QuantificationObjectFactory()
-:CoreObjectFactoryBase()
+  : CoreObjectFactoryBase()
+  , m_NrrdTbssImageIOFactory(mitk::NrrdTbssImageIOFactory::New().GetPointer())
+  , m_NrrdTbssRoiImageIOFactory(mitk::NrrdTbssRoiImageIOFactory::New().GetPointer())
+  , m_NrrdTbssImageWriterFactory(mitk::NrrdTbssImageWriterFactory::New().GetPointer())
+  , m_NrrdTbssRoiImageWriterFactory(mitk::NrrdTbssRoiImageWriterFactory::New().GetPointer())
 {
 
   static bool alreadyDone = false;
@@ -43,21 +47,29 @@ mitk::QuantificationObjectFactory::QuantificationObjectFactory()
     MITK_DEBUG << "QuantificationObjectFactory c'tor" << std::endl;
     RegisterIOFactories();
 
-    mitk::NrrdTbssImageIOFactory::RegisterOneFactory();
-    mitk::NrrdTbssRoiImageIOFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory(m_NrrdTbssImageIOFactory);
+    itk::ObjectFactoryBase::RegisterFactory(m_NrrdTbssRoiImageIOFactory);
 
-    mitk::NrrdTbssImageWriterFactory::RegisterOneFactory();
-    mitk::NrrdTbssRoiImageWriterFactory::RegisterOneFactory();
+    itk::ObjectFactoryBase::RegisterFactory(m_NrrdTbssImageWriterFactory);
+    itk::ObjectFactoryBase::RegisterFactory(m_NrrdTbssRoiImageWriterFactory);
 
     m_FileWriters.push_back( NrrdTbssImageWriter::New().GetPointer() );
     m_FileWriters.push_back( NrrdTbssRoiImageWriter::New().GetPointer() );
 
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     CreateFileExtensionsMap();
 
     alreadyDone = true;
   }
 
+}
+
+mitk::QuantificationObjectFactory::~QuantificationObjectFactory()
+{
+  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdTbssImageIOFactory);
+  itk::ObjectFactoryBase::RegisterFactory(m_NrrdTbssRoiImageIOFactory);
+
+  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdTbssImageWriterFactory);
+  itk::ObjectFactoryBase::UnRegisterFactory(m_NrrdTbssRoiImageWriterFactory);
 }
 
 mitk::Mapper::Pointer mitk::QuantificationObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)

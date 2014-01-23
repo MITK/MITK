@@ -27,6 +27,8 @@ class FiberTracking_EXPORT FiberTrackingObjectFactory : public CoreObjectFactory
     mitkClassMacro(FiberTrackingObjectFactory,CoreObjectFactoryBase)
     itkNewMacro(FiberTrackingObjectFactory)
 
+    ~FiberTrackingObjectFactory();
+
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
 
     virtual void SetDefaultProperties(mitk::DataNode* node);
@@ -50,6 +52,9 @@ protected:
     std::string m_SaveFileExtensions;
     MultimapType m_FileExtensionsMap;
     MultimapType m_SaveFileExtensionsMap;
+
+    itk::ObjectFactoryBase::Pointer m_FiberBundleXIOFactory;
+    itk::ObjectFactoryBase::Pointer m_FiberBundleXWriterFactory;
 };
 
 }

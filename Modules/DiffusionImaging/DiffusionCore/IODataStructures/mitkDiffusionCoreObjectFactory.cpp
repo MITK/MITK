@@ -54,7 +54,6 @@ mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
   if (!alreadyDone)
   {
     MITK_DEBUG << "DiffusionCoreObjectFactory c'tor" << std::endl;
-    RegisterIOFactories();
 
     mitk::NrrdDiffusionImageIOFactory::RegisterOneFactory();
     mitk::NrrdQBallImageIOFactory::RegisterOneFactory();

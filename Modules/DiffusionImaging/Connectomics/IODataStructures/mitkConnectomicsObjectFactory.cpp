@@ -23,14 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsNetworkWriterFactory.h"
 #include "mitkConnectomicsNetworkMapper3D.h"
 
-mitk::ConnectomicsObjectFactory::ConnectomicsObjectFactory(bool /*registerSelf*/)
+mitk::ConnectomicsObjectFactory::ConnectomicsObjectFactory()
   : CoreObjectFactoryBase()
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
     MITK_DEBUG << "ConnectomicsObjectFactory c'tor" << std::endl;
-    RegisterIOFactories();
 
     mitk::ConnectomicsNetworkIOFactory::RegisterOneFactory();
 
@@ -108,14 +107,19 @@ void mitk::ConnectomicsObjectFactory::RegisterIOFactories()
 {
 }
 
-void RegisterConnectomicsObjectFactory()
-{
-  static bool oneConnectomicsObjectFactoryRegistered = false;
-  if ( ! oneConnectomicsObjectFactoryRegistered ) {
-    MITK_DEBUG << "Registering ConnectomicsObjectFactory..." << std::endl;
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::ConnectomicsObjectFactory::New());
-
-    oneConnectomicsObjectFactoryRegistered = true;
+struct RegisterConnectomicsObjectFactory{
+  RegisterConnectomicsObjectFactory()
+    : m_Factory( mitk::ConnectomicsObjectFactory::New() )
+  {
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
   }
-}
 
+  ~RegisterConnectomicsObjectFactory()
+  {
+    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
+  }
+
+  mitk::ConnectomicsObjectFactory::Pointer m_Factory;
+};
+
+static RegisterConnectomicsObjectFactory registerDiffusionCoreObjectFactory;

@@ -104,15 +104,27 @@ void TestRandomPixelAccess( const mitk::PixelType ptype, mitk::Image::Pointer im
   unsigned int dim = image->GetDimension();
   if(dim == 3 || dim == 4){
     mitk::ImagePixelReadAccessor<T,3> imAccess3(image,image->GetVolumeData(0));
-    value = static_cast<mitk::ScalarType>(imAccess3.GetPixelByWorldCoordinates(point));
+
+    // Comparison ?>=0 not needed since all position[i] and timestep are unsigned int
+    // (position[0]>=0 && position[1] >=0 && position[2]>=0 && timestep>=0)
+    // bug-11978 : we still need to catch index with negative values
+    if ( point[0] < 0 ||
+         point[1] < 0 ||
+         point[2] < 0 )
+    {
+      MITK_WARN << "Given position ("<< point << ") is out of image range, returning 0." ;
+    }
+    else {
+      value = static_cast<mitk::ScalarType>(imAccess3.GetPixelByWorldCoordinates(point));
+      MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
+    }
     mitk::Index3D itkIndex;
     image->GetGeometry()->WorldToIndex(position, itkIndex);
-    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception);
     imAccess3.GetPixelByIndexSafe(itkIndex);
     MITK_TEST_FOR_EXCEPTION_END(mitk::Exception);
   }
   MITK_INFO << imageMin << " "<< imageMax << " "<< value << "";
-  MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
 
 }
 
@@ -423,7 +435,7 @@ int mitkImageTest(int argc, char* argv[])
 
   mitk::Image::Pointer image = imageReader->GetOutput();
   mitk::Point3D point;
-  mitk::ScalarType value = -1;
+  mitk::ScalarType value = -1.;
 
   mitkPixelTypeMultiplex3(TestRandomPixelAccess,image->GetImageDescriptor()->GetChannelTypeById(0),image,point,value)
 
@@ -482,7 +494,7 @@ int mitkImageTest(int argc, char* argv[])
 
     MITK_INFO << "ITK Index " << idx[0] << " "<< idx[1] << " "<< idx[2] << "";
 
-    if(status)
+    if(status && value != -1.)
     {
       float valByItk = itkimage->GetPixel(idx);
       MITK_TEST_CONDITION_REQUIRED( mitk::Equal(valByItk, value), "Compare value of pixel returned by mitk in comparison to itk");

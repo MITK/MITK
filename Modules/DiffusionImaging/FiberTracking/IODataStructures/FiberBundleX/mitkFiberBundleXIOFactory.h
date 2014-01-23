@@ -26,13 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //NOTE>umbenennen in internal FiberBundleIOFactory
 
-
 namespace mitk
 {
-//##Documentation
-//## @brief Create instances of NrrdQBallImageReader objects using an object factory.
-//##
-//## @ingroup IO
+
 class FiberTracking_EXPORT FiberBundleXIOFactory : public itk::ObjectFactoryBase
 {
 public:

@@ -955,22 +955,15 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
 }
 
 template < typename ImageType1, typename ImageType2 >
-void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* input, ImageType2* labeled)
+void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output, ImageType2* input)
 {
   typedef itk::ImageRegionConstIterator< ImageType2 > SourceIteratorType;
   typedef itk::ImageRegionIterator< ImageType1 > TargetIteratorType;
   typedef itk::RelabelComponentImageFilter<ImageType2, ImageType2> FilterType;
 
   typename FilterType::Pointer relabelFilter = FilterType::New();
-  relabelFilter->SetInput(labeled);
+  relabelFilter->SetInput(input);
   relabelFilter->Update();
-
-  TargetIteratorType targetIter( input, input->GetLargestPossibleRegion() );
-  targetIter.GoToBegin();
-
-  SourceIteratorType sourceIter( relabelFilter->GetOutput(), relabelFilter->GetOutput()->GetLargestPossibleRegion() );
-  sourceIter.GoToBegin();
-
   int numberOfObjects = relabelFilter->GetNumberOfObjects();
 
   for (int i=0; i<numberOfObjects; ++i)
@@ -990,6 +983,13 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* input, 
 
     this->AddLabel(*label);
   }
+
+  TargetIteratorType targetIter( output, output->GetLargestPossibleRegion() );
+  targetIter.GoToBegin();
+
+  //SourceIteratorType sourceIter( relabelFilter->GetOutput(), relabelFilter->GetOutput()->GetLargestPossibleRegion() );
+  SourceIteratorType sourceIter( input, input->GetLargestPossibleRegion() );
+  sourceIter.GoToBegin();
 
   while ( !sourceIter.IsAtEnd() )
   {

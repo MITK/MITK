@@ -132,7 +132,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::permutateMapping
   const int previousModuleNumber = iter->second;
 
   // if we move the node to its own module, do nothing
-  if( previousModuleNumber == randomModule )
+  if( previousModuleNumber == (long)randomModule )
   {
     return;
   }
@@ -238,10 +238,6 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::splitModule(
   // The submap
   ToModuleMapType vertexToModuleSubMap;
 
-  // copy vertices
-  VertexToVertexMapType::iterator iter = graphToSubgraphVertexMap.begin();
-  VertexToVertexMapType::iterator end =  graphToSubgraphVertexMap.end();
-
   // run simulated annealing on the subgraph to determine how the module should be split
   if( m_Depth > 0 && m_StepSize > 0 )
   {
@@ -267,7 +263,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::splitModule(
   int originalNumber = getNumberOfModules( vertexToModuleMap );
 
   // the new parts are added at the end
-  for(int index( 0 ); index < moduleTranslationVector.size()  ; index++)
+  for(unsigned int index( 0 ); index < moduleTranslationVector.size()  ; index++)
   {
     moduleTranslationVector[ index ] = originalNumber + index;
   }
@@ -303,9 +299,8 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::extractModuleSub
   const std::vector< VertexDescriptorType > allNodesVector = network->GetVectorOfAllVertexDescriptors();
 
   // add vertices to subgraph
-  for( int nodeNumber( 0 ); nodeNumber < allNodesVector.size() ; nodeNumber++)
+  for( unsigned int nodeNumber( 0 ); nodeNumber < allNodesVector.size() ; nodeNumber++)
   {
-    int correspondingModule = vertexToModuleMap->find( allNodesVector[ nodeNumber ] )->second;
 
     if( moduleToSplit == vertexToModuleMap->find( allNodesVector[ nodeNumber ] )->second )
     {
@@ -334,7 +329,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::extractModuleSub
     const std::vector< VertexDescriptorType > adjacentNodexVector
       = network->GetVectorOfAdjacentNodes( iter->first );
 
-    for( int adjacentNodeNumber( 0 ); adjacentNodeNumber < adjacentNodexVector.size() ; adjacentNodeNumber++)
+    for( unsigned int adjacentNodeNumber( 0 ); adjacentNodeNumber < adjacentNodexVector.size() ; adjacentNodeNumber++)
     {
       // if the adjacent vertex is part of the subgraph,
       // add edge, if it does not exist yet, else do nothing
@@ -431,7 +426,8 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::randomlyAssignNo
   // we make sure that each intended module contains *at least* one node
   // thus if more modules are asked for than node exists we will only generate
   // as many modules as there are nodes
-  if( numberOfIntendedModules > vertexToModuleMap->size() )
+  if( numberOfIntendedModules > 0 &&
+      (unsigned int)numberOfIntendedModules > vertexToModuleMap->size() )
   {
     MBI_ERROR << "Tried to generate more modules than vertices were provided";
     numberOfIntendedModules = vertexToModuleMap->size();
@@ -449,7 +445,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::randomlyAssignNo
   int numberOfVertices = vertexToModuleMap->size();
 
   //randomly distribute nodes to modules
-  for( int nodeIndex( 0 ); nodeIndex < nodeList.size(); nodeIndex++ )
+  for( unsigned int nodeIndex( 0 ); nodeIndex < nodeList.size(); nodeIndex++ )
   {
     //select random module
     nodeList[ nodeIndex ] = rng.lrand32( numberOfIntendedModules - 1 );
@@ -460,7 +456,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::randomlyAssignNo
 
   // make sure no module contains no node, if one does assign it one of a random module
   // that does contain at least two
-  for( int moduleIndex( 0 ); moduleIndex < histogram.size(); moduleIndex++ )
+  for( unsigned int moduleIndex( 0 ); moduleIndex < histogram.size(); moduleIndex++ )
   {
     while( histogram[ moduleIndex ] == 0 )
     {
@@ -477,7 +473,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::randomlyAssignNo
   ToModuleMapType::iterator iter = vertexToModuleMap->begin();
   ToModuleMapType::iterator end =  vertexToModuleMap->end();
 
-  for( int index( 0 ); ( iter != end ) && ( index < nodeList.size() ); index++, iter++ )
+  for( unsigned int index( 0 ); ( iter != end ) && ( index < nodeList.size() ); index++, iter++ )
   {
     iter->second = nodeList[ index ] ;
   }

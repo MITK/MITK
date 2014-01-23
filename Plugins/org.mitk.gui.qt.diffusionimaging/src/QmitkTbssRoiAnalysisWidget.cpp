@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkTbssRoiAnalysisWidget.h"
+#include "mitkImagePixelReadAccessor.h"
+#include "mitkPixelTypeMultiplex.h"
 
 #include <qwt_plot_marker.h>
 #include <qwt_plot_picker.h>
@@ -46,7 +48,7 @@ void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundleX *fib, mit
 
 
 
-  PlotFiberBundles(resampledTracts, img, avg);
+  mitkPixelTypeMultiplex3(PlotFiberBundles,img->GetImageDescriptor()->GetChannelTypeById(0),resampledTracts, img, avg);
   m_CurrentTracts = resampledTracts;
 }
 
@@ -808,8 +810,8 @@ void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
 }
 
 
-
-void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mitk::Image *img, bool avg)
+template <typename T>
+void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType ptype, TractContainerType tracts, mitk::Image *img, bool avg)
 {
 
   m_PlottingFiberBundle = true;
@@ -819,6 +821,8 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
 
 
   std::vector< std::vector <mitk::ScalarType > > profiles;
+
+  mitk::ImagePixelReadAccessor<T,3> imAccess(img,img->GetVolumeData(0));
 
   it = tracts.begin();
   while(it != tracts.end())
@@ -834,7 +838,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
       PointType p = *tractIt;
 
       // Get value from image
-      profile.push_back( (mitk::ScalarType)img->GetPixelValueByWorldCoordinate(p) );
+      profile.push_back( (mitk::ScalarType) imAccess.GetPixelByWorldCoordinates(p) );
 
       ++tractIt;
     }

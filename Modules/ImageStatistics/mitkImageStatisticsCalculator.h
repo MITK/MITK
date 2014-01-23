@@ -73,6 +73,11 @@ public:
 
   struct Statistics
   {
+    Statistics()
+    {
+      Reset();
+    }
+
     int Label;
     unsigned int N;
     double Min;

@@ -26,11 +26,25 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkImageSource.h>
 #include <vcl_complex.h>
 #include <vector>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
+#include <mitkFiberfoxParameters.h>
+
+using namespace std;
 
 namespace itk{
 
 /**
-* \brief Performes deterministic streamline tracking on the input tensor image.   */
+* \brief Simulates k-space acquisition of one slice with a single shot EPI sequence. Enables the simulation of various effects occuring during real MR acquisitions:
+* - T2 signal relaxation
+* - Spikes
+* - N/2 Ghosts
+* - Aliasing (wrap around)
+* - Image distortions (off-frequency effects)
+* - Gibbs ringing
+* - Eddy current effects
+* Based on a discrete fourier transformation.
+* See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
+*/
 
   template< class TPixelType >
   class KspaceImageFilter :
@@ -57,57 +71,41 @@ namespace itk{
     typedef itk::Matrix<double, 3, 3>                       MatrixType;
     typedef itk::Point<double,2>                            Point2D;
 
-    itkSetMacro( FrequencyMap, typename InputImageType::Pointer )
-    itkSetMacro( tLine, double )
-    itkSetMacro( kOffset, double )
-    itkSetMacro( TE, double)
-    itkSetMacro( Tinhom, double)
-    itkSetMacro( Tau, double)
-    itkSetMacro( SimulateRelaxation, bool )
-    itkSetMacro( SimulateEddyCurrents, bool )
-    itkSetMacro( Z, double )
-    itkSetMacro( DirectionMatrix, MatrixType )
-    itkSetMacro( SignalScale, double )
-    itkSetMacro( OutSize, itk::Size<2> )
-    itkSetMacro( Spikes, int )
-    itkSetMacro( SpikeAmplitude, double )
+    itkSetMacro( SpikesPerSlice, unsigned int )     ///< Number of spikes per slice. Corresponding parameter in fiberfox parameter object specifies the number of spikes for the whole image and can thus not be used here.
+    itkSetMacro( FrequencyMapSlice, typename InputImageType::Pointer )   ///< Used to simulate distortions. Specifies additional frequency component per voxel.
+    itkSetMacro( Z, double )                        ///< Slice position, necessary for eddy current simulation.
+    itkSetMacro( OutSize, itk::Size<2> )            ///< Output slice size. Can be different from input size, e.g. if Gibbs ringing is enabled.
+    itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results.
 
-    void SetT2( std::vector< double > t2Vector ) { m_T2=t2Vector; }
-    void SetCompartmentImages( std::vector< InputImagePointerType > cImgs ) { m_CompartmentImages=cImgs; }
-    void SetDiffusionGradientDirection(itk::Vector<double,3> g) { m_DiffusionGradientDirection=g; }
-    void SetEddyGradientMagnitude(double g_mag) { m_EddyGradientMagnitude=g_mag; }    ///< in T/m
+    void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
+    FiberfoxParameters<double> GetParameters(){ return m_Parameters; }
+
+    void SetCompartmentImages( std::vector< InputImagePointerType > cImgs ) { m_CompartmentImages=cImgs; }  ///< One signal image per compartment.
+    void SetT2( std::vector< double > t2Vector ) { m_T2=t2Vector; } ///< One T2 relaxation constant per compartment image.
+    void SetDiffusionGradientDirection(itk::Vector<double,3> g) { m_DiffusionGradientDirection=g; } ///< Gradient direction is needed for eddy current simulation.
 
   protected:
     KspaceImageFilter();
     ~KspaceImageFilter() {}
 
     void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
     void AfterThreadedGenerateData();
 
-    bool                                    m_SimulateRelaxation;
-    bool                                    m_SimulateDistortions;
-    bool                                    m_SimulateEddyCurrents;
-
-    typename InputImageType::Pointer        m_TEMPIMAGE;
-    typename InputImageType::Pointer        m_FrequencyMap;
-    double                                  m_tLine;
-    double                                  m_kOffset;
-
-    double                                  m_Tinhom;
-    double                                  m_TE;
-    std::vector< double >                   m_T2;
-    std::vector< InputImagePointerType >    m_CompartmentImages;
+    FiberfoxParameters<double>              m_Parameters;
+    typename InputImageType::Pointer        m_FrequencyMapSlice;
+    vector< double >                        m_T2;
+    vector< InputImagePointerType >         m_CompartmentImages;
     itk::Vector<double,3>                   m_DiffusionGradientDirection;
-    double                                  m_Tau;                          ///< eddy current decay constant
-    double                                  m_EddyGradientMagnitude;   ///< in T/m
     double                                  m_Z;
-    MatrixType                              m_DirectionMatrix;
-    bool                                    m_IsBaseline;
-    double                                  m_SignalScale;
+    bool                                    m_UseConstantRandSeed;
+    unsigned int                            m_SpikesPerSlice;
     itk::Size<2>                            m_OutSize;
-    int                                     m_Spikes;
-    double                                  m_SpikeAmplitude;
+
+    bool                                    m_IsBaseline;
+    vcl_complex<double>                     m_Spike;
+    MatrixType                              m_Transform;
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 
   private:
 

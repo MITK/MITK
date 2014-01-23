@@ -27,8 +27,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
 
+#include <usModuleContext.h>
+
 namespace us {
   class PrototypeServiceFactory;
+  class ModuleContext;
 }
 
 /**

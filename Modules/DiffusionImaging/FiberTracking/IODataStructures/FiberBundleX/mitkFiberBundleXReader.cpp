@@ -170,13 +170,13 @@ void FiberBundleXReader::GenerateOutputInformation()
                 geometry->SetImageGeometry(true);
 
                 pElem = hRoot.FirstChildElement("fiber_bundle").FirstChild().Element();
-                for( pElem; pElem; pElem=pElem->NextSiblingElement())
+                for( ; pElem ; pElem=pElem->NextSiblingElement())
                 {
                     TiXmlElement* pElem2 = pElem->FirstChildElement();
 
                     vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
 
-                    for( pElem2; pElem2; pElem2=pElem2->NextSiblingElement())
+                    for( ; pElem2; pElem2=pElem2->NextSiblingElement())
                     {
               Point3D point;
                         pElem2->Attribute("pos_x", &temp);

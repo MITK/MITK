@@ -1,4 +1,5 @@
-MITK_CHECK_MODULE(_missing_deps DiffusionCore MitkGraphAlgorithms)
+mitk_check_module_dependencies(MODULES DiffusionCore MitkGraphAlgorithms
+  MISSING_DEPENDENCIES_VAR _missing_deps)
 
 if(NOT _missing_deps)
   set(lut_url http://mitk.org/download/data/FibertrackingLUT.tar.gz)
@@ -37,6 +38,8 @@ MITK_CREATE_MODULE( FiberTracking
   SUBPROJECTS MITK-DTI
   INCLUDE_DIRS Algorithms Algorithms/GibbsTracking Algorithms/StochasticTracking IODataStructures IODataStructures/FiberBundleX IODataStructures/PlanarFigureComposite Interactions SignalModels Rendering ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS DiffusionCore MitkGraphAlgorithms
+  PACKAGE_DEPENDS ITK|ITKFFT
+  WARNINGS_AS_ERRORS
 )
 
 if(MODULE_IS_ENABLED)

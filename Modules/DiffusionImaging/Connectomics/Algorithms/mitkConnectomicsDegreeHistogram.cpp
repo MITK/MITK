@@ -32,7 +32,7 @@ void mitk::ConnectomicsDegreeHistogram::ComputeFromConnectomicsNetwork( Connecto
 
   int maximumDegree( 0 );
 
-  for( int index( 0 ); index < degreeOfNodesVector.size(); index++ )
+  for(unsigned int index( 0 ); index < degreeOfNodesVector.size(); index++ )
   {
     if( maximumDegree < degreeOfNodesVector[ index ] )
     {
@@ -42,13 +42,13 @@ void mitk::ConnectomicsDegreeHistogram::ComputeFromConnectomicsNetwork( Connecto
 
   this->m_HistogramVector.resize( maximumDegree + 1 );
 
-  for( int index( 0 ); index < m_HistogramVector.size(); index++ )
+  for(unsigned int index( 0 ); index < m_HistogramVector.size(); index++ )
   {
     this->m_HistogramVector[ index ] = 0;
   }
   this->m_TopValue = maximumDegree;
 
-  for( int index( 0 ); index < degreeOfNodesVector.size(); index++ )
+  for(unsigned int index( 0 ); index < degreeOfNodesVector.size(); index++ )
   {
     this->m_HistogramVector[ degreeOfNodesVector[ index ] ]++;
 

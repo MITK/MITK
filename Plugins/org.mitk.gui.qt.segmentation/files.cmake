@@ -5,7 +5,6 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkSegmentationView.cpp
-  QmitkSegmentationPostProcessing.cpp
   QmitkThresholdAction.cpp
   QmitkCreatePolygonModelAction.cpp
   #QmitkStatisticsAction.cpp
@@ -36,7 +35,6 @@ set(MOC_H_FILES
   src/QmitkSegmentationPreferencePage.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkSegmentationView.h
-  src/internal/QmitkSegmentationPostProcessing.h
   src/internal/QmitkThresholdAction.h
   src/internal/QmitkCreatePolygonModelAction.h
   #src/internal/QmitkStatisticsAction.h

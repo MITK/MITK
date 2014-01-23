@@ -140,8 +140,8 @@ TInputImagePixelType, TOutputImagePixelType >::GenerateData()
     itk::ImageRegionIterator< OutputImageType> outputIt( outputImage.GetPointer(), outputRegion );
 
     // iterate over the current b0 image and store it to corresponding place
-    outputIt = outputIt.Begin();
-    inputIt = inputIt.Begin();
+    outputIt.GoToBegin();
+    inputIt.GoToBegin();
     while( !outputIt.IsAtEnd() && !inputIt.IsAtEnd() )
     {
       // the input vector

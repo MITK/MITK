@@ -73,7 +73,6 @@ class GPGPU_DLL_API GPGPU
         int myWidth,myHeight,myDepth;
 
         int glTarget;
-        int glInternalFormat;
         int glTextureHandle;
         int glFBOHandle;
     };
@@ -123,7 +122,6 @@ class GPGPU_DLL_API GPGPU
     GLXContext openGLContext;
     GLXDrawable GLX_drawable;
     Display *X_display;
-    Window *windowHandle;
 #endif
 
 

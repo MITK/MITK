@@ -192,6 +192,18 @@ if(MSVC_VERSION)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
 endif()
 
+# With the current toolkits like VTK and ITK Mac OSX 10.9
+# does not compile with if stdlib=libc++is used
+# For more information see bug 16803 and 16776
+# This could probably be remove if ITK 4.5.1 and VTK 6.1 is integrated
+if (APPLE)
+  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE osx_version)
+  if (osx_version VERSION_EQUAL "10.9" OR osx_version VERSION_GREATER "10.9")
+    message("Detected OS X version is ${osx_version}...setting C++ library to libstdc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
+  endif()
+endif()
+
 set(ep_common_args
   -DBUILD_TESTING:BOOL=${ep_build_testing}
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
@@ -215,6 +227,19 @@ set(ep_common_args
   -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
 )
+
+# Pass the CMAKE_OSX variables to external projects
+if(APPLE)
+  set(MAC_OSX_ARCHITECTURE_ARGS
+        -DCMAKE_OSX_ARCHITECTURES:PATH=${CMAKE_OSX_ARCHITECTURES}
+        -DCMAKE_OSX_DEPLOYMENT_TARGET:PATH=${CMAKE_OSX_DEPLOYMENT_TARGET}
+        -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}
+  )
+  set(ep_common_args
+        ${MAC_OSX_ARCHITECTURE_ARGS}
+        ${ep_common_args}
+  )
+endif()
 
 # Include external projects
 foreach(p ${external_projects})
@@ -410,6 +435,7 @@ ExternalProject_Add(${proj}
     -DQxt_DIR:PATH=${Qxt_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
+    ${MAC_OSX_ARCHITECTURE_ARGS}
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

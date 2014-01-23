@@ -14,7 +14,7 @@ Available sections:
 \section QmitkGibbsTrackingUserManualInputData Input Data
 
 Mandatory Input:
-\li One Q-Ball image selected in the datamanager
+\li One Q-Ball or tensor image selected in the datamanager
 
 Optional Input:
 \li Mask Image: Float image used as probability mask for the generation of fiber segments. Usually used as binary brain mask to reduce the searchspace of the algorithm and to avoid fibers resulting from noise outside of the brain.
@@ -33,7 +33,7 @@ The automatic selection of parameters for the particle length/width and weight a
 
 \section QmitkGibbsTrackingUserManualTrackingSurveillance Surveilance of the tracking process
 
-Once started, the tracking can be monitored via the textual output that informs about the tracking progress and several stats of the current state of the algorithm. 
+Once started, the tracking can be monitored via the textual output that informs about the tracking progress and several stats of the current state of the algorithm.
 If enabled, the intermediate tracking results are displayed in the renderwindows each second. This live visualization should usually be disabled for performance reasons. It can be turned on and off during the tracking process via the according checkbox. The button next to this checkbox allows the visualization of only the next iteration step.
 
 \section QmitkGibbsTrackingUserManualReferences References

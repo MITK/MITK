@@ -15,47 +15,31 @@ macro(MITK_CREATE_MODULE_TESTS)
     include(files.cmake)
     include_directories(.)
 
-    if(MODULE_TEST_EXTRA_DEPENDS)
-      message(WARNING "The keyword EXTRA_DEPENDS is deprecated. Use a separate call to mitk_use_modules instead.")
-    endif()
-
     if(DEFINED MOC_H_FILES)
       QT4_WRAP_CPP(MODULE_TEST_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
     endif(DEFINED MOC_H_FILES)
 
-    # The PACKAGE_DEPENDS variable is filled in the MITK_CHECK_MODULE() macro
-    foreach(package ${PACKAGE_DEPENDS})
-      if(NOT ${package} MATCHES "^Qt[45].*$")
-        foreach(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
-          if(EXISTS "${dir}/MITK_${package}_Config.cmake")
-            include("${dir}/MITK_${package}_Config.cmake")
-            break()
-          endif()
-        endforeach()
-      endif()
-    endforeach()
-    if(ALL_LIBRARY_DIRS)
-      list(REMOVE_DUPLICATES ALL_LIBRARY_DIRS)
-      link_directories(${ALL_LIBRARY_DIRS})
-    endif()
+    mitk_check_module_dependencies(MODULES ${MODULE_NAME} MitkTestingHelper ${MODULE_TEST_EXTRA_DEPENDS}
+                                   PACKAGE_DEPENDENCIES_VAR package_deps)
+    _link_directories_for_packages(${package_deps})
 
     set(TESTDRIVER ${MODULE_NAME}TestDriver)
     set(MODULE_TEST_EXTRA_DRIVER_INIT "${MODULE_TEST_EXTRA_DRIVER_INIT}")
 
     # Write a header file containing include directives and custom code
     # for the test driver.
-    set(_extra_include_content )
+    set(TESTDRIVER_EXTRA_INCLUDES )
     list(APPEND MODULE_TEST_EXTRA_DRIVER_INCLUDE "mitkLog.h")
     list(REMOVE_DUPLICATES MODULE_TEST_EXTRA_DRIVER_INCLUDE)
     foreach(_include ${MODULE_TEST_EXTRA_DRIVER_INCLUDE})
-      set(_extra_include_content "${_extra_include_content}
+      set(TESTDRIVER_EXTRA_INCLUDES "${TESTDRIVER_EXTRA_INCLUDES}
 #include <${_include}>")
     endforeach()
-    set(_extra_include_content "${_extra_include_content}
+    set(TESTDRIVER_EXTRA_INCLUDES "${TESTDRIVER_EXTRA_INCLUDES}
 #include <vector>
 std::vector<std::string> globalCmdLineArgs;")
     set(_extra_include_file ${CMAKE_CURRENT_BINARY_DIR}/${TESTDRIVER}_extras.h)
-    file(WRITE ${_extra_include_file} "${_extra_include_content}")
+    configure_file(${MITK_CMAKE_DIR}/mitkTestDriverExtraIncludes.h.in ${_extra_include_file})
 
     set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
 for (int avIndex = 1; avIndex < ac; ++avIndex) globalCmdLineArgs.push_back(av[avIndex]);
@@ -71,8 +55,7 @@ ${MODULE_TEST_EXTRA_DRIVER_INIT};"
 
     add_executable(${TESTDRIVER} ${MODULETEST_SOURCE} ${MODULE_TEST_GENERATED_MOC_CPP} ${TEST_CPP_FILES})
     mitk_use_modules(TARGET ${TESTDRIVER}
-                     MODULES ${MODULE_PROVIDES} ${MODULE_TEST_EXTRA_DEPENDS}
-                     PACKAGES CppUnit
+                     MODULES ${MODULE_NAME} MitkTestingHelper ${MODULE_TEST_EXTRA_DEPENDS}
                     )
 
     if(MODULE_SUBPROJECTS)

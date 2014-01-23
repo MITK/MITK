@@ -17,6 +17,7 @@ set(MODULE_TESTS
   mitkImageEqualTest.cpp
   mitkImageDataItemTest.cpp
   mitkImageGeneratorTest.cpp
+  mitkIOUtilTest.cpp
   mitkBaseDataTest.cpp
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
@@ -131,7 +132,6 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DSwivelTest.cpp
     mitkImageVtkMapper2DTransferFunctionTest.cpp
     mitkImageVtkMapper2DLookupTableTest.cpp
-    mitkIOUtilTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
     mitkSurfaceGLMapper2DColorTest.cpp
@@ -154,10 +154,6 @@ set(MODULE_CUSTOM_TESTS
     mitkImageToItkTest.cpp
     mitkImageSliceSelectorTest.cpp
 )
-
-if (${VTK_MAJOR_VERSION} VERSION_LESS 6) # test can be removed with VTK 6
-  set(MODULE_TESTS ${MODULE_TESTS} mitkVTKRenderWindowSizeTest.cpp)
-endif()
 
 set(MODULE_RESOURCE_FILES
   Interactions/AddAndRemovePoints.xml

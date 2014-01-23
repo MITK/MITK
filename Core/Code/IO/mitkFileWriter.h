@@ -98,12 +98,6 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     //## @brief Return the MimeType of the saved File.
     virtual std::string GetWritenMIMEType();
 
-    //##Documentation
-    //## @brief Set the DataTreenode as Input. Important: The Writer
-    //## always have a SetInput-Function.
-    using itk::ProcessObject::SetInput;
-    virtual void SetInput( DataNode* );
-
     virtual void Write() = 0;
 
     /**

@@ -70,7 +70,7 @@ void mitk::ConnectomicsShortestPathHistogram::CalculateUnweightedUndirectedShort
   int numberOfNodes( boost::num_vertices( *boostGraph ) );
 
   m_DistanceMatrix.resize( numberOfNodes );
-  for( int index(0); index < m_DistanceMatrix.size(); index++ )
+  for(unsigned int index(0); index < m_DistanceMatrix.size(); index++ )
   {
     m_DistanceMatrix[ index ].resize( numberOfNodes );
   }
@@ -98,9 +98,9 @@ void mitk::ConnectomicsShortestPathHistogram::ConvertDistanceMapToHistogram()
   int numberOfNodes( m_DistanceMatrix.size() );
   m_EverythingConnected = true;
 
-  for( int index(0); index < m_DistanceMatrix.size(); index++ )
+  for(unsigned int index(0); index < m_DistanceMatrix.size(); index++ )
   {
-    for( int innerIndex(0); innerIndex < m_DistanceMatrix[ index ].size(); innerIndex++ )
+    for(unsigned int innerIndex(0); innerIndex < m_DistanceMatrix[ index ].size(); innerIndex++ )
     {
       if( m_DistanceMatrix[ index ][ innerIndex ] > longestPath )
       {
@@ -119,9 +119,9 @@ void mitk::ConnectomicsShortestPathHistogram::ConvertDistanceMapToHistogram()
 
   m_HistogramVector.resize( longestPath + 1 );
 
-  for( int index(0); index < m_DistanceMatrix.size(); index++ )
+  for(unsigned int index(0); index < m_DistanceMatrix.size(); index++ )
   {
-    for( int innerIndex(0); innerIndex < m_DistanceMatrix[ index ].size(); innerIndex++ )
+    for( unsigned int innerIndex(0); innerIndex < m_DistanceMatrix[ index ].size(); innerIndex++ )
     {
       if( m_DistanceMatrix[ index ][ innerIndex ] < numberOfNodes )
       {
@@ -132,7 +132,7 @@ void mitk::ConnectomicsShortestPathHistogram::ConvertDistanceMapToHistogram()
 
   // correct for every path being counted twice
 
-  for( int index(1); index < m_HistogramVector.size(); index++ )
+  for( unsigned int index(1); index < m_HistogramVector.size(); index++ )
   {
     m_HistogramVector[ index ] = m_HistogramVector[ index ] / 2;
   }
@@ -171,7 +171,7 @@ double mitk::ConnectomicsShortestPathHistogram::GetEfficiency()
   double overallDistance( 0.0 );
   double numberOfPairs( 0.0 );
   // add up all distances
-  for( int index(0); index < m_HistogramVector.size(); index++ )
+  for( unsigned int index(0); index < m_HistogramVector.size(); index++ )
   {
     overallDistance = overallDistance + m_HistogramVector[ index ] * index;
     numberOfPairs = numberOfPairs + m_HistogramVector[ index ];

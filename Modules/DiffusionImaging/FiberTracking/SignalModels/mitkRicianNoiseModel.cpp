@@ -34,6 +34,15 @@ RicianNoiseModel< ScalarType >::~RicianNoiseModel()
 }
 
 template< class ScalarType >
+void RicianNoiseModel< ScalarType >::SetSeed(int seed)
+{
+    if (seed>=0)
+        m_RandGen->SetSeed(seed);
+    else
+        m_RandGen->SetSeed();
+}
+
+template< class ScalarType >
 void RicianNoiseModel< ScalarType >::AddNoise(PixelType& pixel)
 {
     for( unsigned int i=0; i<pixel.Size(); i++)

@@ -54,26 +54,26 @@ public:
     typedef Image< float, 3 >                       ItkFloatImageType;
     typedef vtkSmartPointer< vtkPolyData >          FiberPolyDataType;
 
-    // parameter setter
-    itkSetMacro( StartTemperature, float )
-    itkSetMacro( EndTemperature, float )
-    itkSetMacro( Iterations, unsigned long )
-    itkSetMacro( ParticleWeight, float )
-    itkSetMacro( ParticleWidth, float )
+    /** Setter. */
+    itkSetMacro( StartTemperature, float )          ///< Start temperature of simulated annealing process.
+    itkSetMacro( EndTemperature, float )            ///< End temperature of simulated annealing process.
+    itkSetMacro( Iterations, unsigned long )        ///< Number of iterations. More iterations usually mean better results. Maximum 5x10^8
+    itkSetMacro( ParticleWeight, float )            ///< Smaller particle weights result in a higher sensitivity if the method.
+    itkSetMacro( ParticleWidth, float )             ///< Thinner particles cause more reconstructed fibers.
     itkSetMacro( ParticleLength, float )
     itkSetMacro( ConnectionPotential, float )
-    itkSetMacro( InexBalance, float )
+    itkSetMacro( InexBalance, float )               ///< Values < 0 result in a stronger weighting of the internal energy, values > 0 cause a stronger weighting of the external energy,
     itkSetMacro( ParticlePotential, float )
-    itkSetMacro( MinFiberLength, int )
-    itkSetMacro( AbortTracking, bool )
-    itkSetMacro( CurvatureThreshold, float)
-    itkSetMacro( DuplicateImage, bool )
-    itkSetMacro( RandomSeed, int )
-    itkSetMacro( LoadParameterFile, std::string )
+    itkSetMacro( MinFiberLength, int )              ///< Shorter fibers are discarded
+    itkSetMacro( AbortTracking, bool )              ///< Set flag to prematurely abort tracking.
+    itkSetMacro( CurvatureThreshold, float)         ///< Absolute angular threshold between two particles (in radians).
+    itkSetMacro( DuplicateImage, bool )             ///< Work on copy of input image.
+    itkSetMacro( RandomSeed, int )                  ///< Seed for random generator.
+    itkSetMacro( LoadParameterFile, std::string )   ///< Parameter file.
     itkSetMacro( SaveParameterFile, std::string )
-    itkSetMacro( LutPath, std::string )
+    itkSetMacro( LutPath, std::string )             ///< Path to lookuptables. Default is binary directory.
 
-    // getter
+    /** Getter. */
     itkGetMacro( ParticleWeight, float )
     itkGetMacro( ParticleWidth, float )
     itkGetMacro( ParticleLength, float )
@@ -84,21 +84,20 @@ public:
     itkGetMacro( ProposalAcceptance, float )
     itkGetMacro( Steps, unsigned int)
     itkGetMacro( IsInValidState, bool)
+    FiberPolyDataType GetFiberBundle();             ///< Output fibers
 
-    // input data
+    /** Input images. */
     itkSetMacro(QBallImage, typename ItkQBallImageType::Pointer)
     itkSetMacro(MaskImage, ItkFloatImageType::Pointer)
     itkSetMacro(TensorImage, ItkTensorImage::Pointer)
-
-    void GenerateData();
 
     virtual void Update(){
         this->GenerateData();
     }
 
-    FiberPolyDataType GetFiberBundle();
-
 protected:
+
+    void GenerateData();
 
     GibbsTrackingFilter();
     virtual ~GibbsTrackingFilter();

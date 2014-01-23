@@ -69,8 +69,8 @@ protected:
 
   virtual void GenerateData();
 
-  unsigned long   m_Steps;
   unsigned long   m_CurrentStep;
+  unsigned long   m_Steps;
   bool            m_IsInValidState;       ///< Whether the filter is in a valid state, false if error occured
   bool            m_AbortRegistration;        ///< set flag to abort
 

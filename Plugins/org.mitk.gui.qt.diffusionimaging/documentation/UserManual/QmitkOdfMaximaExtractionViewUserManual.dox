@@ -10,8 +10,6 @@ Available sections:
   - \ref OdfMaxUserManualParameters
   - \ref OdfMaxUserManualReferences
 
-\image html peakextractionview.png Peak Extraction View
-
 \section OdfMaxUserManualInputData Input Data
 
 Mandatory Input:
@@ -34,7 +32,7 @@ Optional Input:
 \li The finite differences extraction uses a higly sampled version of the image ODFs, extracts all local maxima and clusters the resulting directions that point in a similar direction.
 \li For details about the analytical method (experimental) please refer to [1].
 
-\image html peaks.png Peaks extracted from the ODFs of a crossing Phantom using the finite differences method.
+\image html crossingmaxima.png Peaks of a fiber crossing extracted using finite differences method.
 
 \section OdfMaxUserManualParameters Input Parameters
 

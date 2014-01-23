@@ -236,6 +236,9 @@ if(MITK_USE_QT)
     set(MITK_USE_Qt4 FALSE)
     set(MITK_USE_Qt5 TRUE)
   endif(DESIRED_QT_VERSION MATCHES 5)
+else()
+  set(MITK_USE_Qt4 FALSE)
+  set(MITK_USE_Qt5 FALSE)
 endif()
 
 if(MITK_USE_SOFA)
@@ -380,6 +383,7 @@ endif()
 # CMake function(s) and macro(s)
 #-----------------------------------------------------------------------------
 
+include(WriteBasicConfigVersionFile)
 include(CheckCXXSourceCompiles)
 include(mitkFunctionCheckCompilerFlags)
 include(mitkFunctionGetGccVersion)
@@ -395,7 +399,8 @@ include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionCompileSnippets)
 include(mitkFunctionUseModules)
 include(mitkMacroCreateModuleConf)
-include(mitkMacroCreateModule)
+include(mitkFunctionCheckModuleDependencies)
+include(mitkFunctionCreateModule)
 include(mitkMacroCreateExecutable)
 include(mitkMacroCheckModule)
 include(mitkMacroCreateModuleTests)
@@ -408,15 +413,6 @@ include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
 include(mitkMacroGetPMDPlatformString)
-
-#-----------------------------------------------------------------------------
-# Prerequesites
-#-----------------------------------------------------------------------------
-
-find_package(ITK REQUIRED)
-find_package(VTK REQUIRED)
-
-find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
 
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
@@ -567,7 +563,7 @@ set(MITK_EXE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
 #-----------------------------------------------------------------------------
 
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR ${MITK_SOURCE_DIR}/CMake/PackageDepends)
-set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR} ${MITK_MODULES_PACKAGE_DEPENDS_DIR}/Qt)
+set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 
 #-----------------------------------------------------------------------------
 # Testing
@@ -982,6 +978,9 @@ endforeach()
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
+
+write_basic_config_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  VERSION ${MITK_VERSION_STRING} COMPATIBILITY AnyNewerVersion)
 
 # If we are under Windows, create two batch files which correctly
 # set up the environment for the application and for Visual Studio

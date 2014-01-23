@@ -260,8 +260,8 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
                 itk::Point<float, 3> point2_start = GetItkPoint(points2->GetPoint(0));
                 itk::Point<float, 3> point2_end = GetItkPoint(points2->GetPoint(numPoints2-1));
 
-                if (point_start.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps ||
-                        point_start.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps)
+                if ((point_start.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps) ||
+                        (point_start.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps))
                 {
                     // further checking ???
                     contained = true;
@@ -815,7 +815,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
             }
 
             MITK_DEBUG << "resize Vector";
-            long i=0;
+            unsigned long i=0;
             while (i < AND_Assamblage.size() && AND_Assamblage[i] != -1){ //-1 represents a placeholder in the array
                 ++i;
             }
@@ -965,7 +965,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
 
             double distPF = V1w.EuclideanDistanceTo(V2w);
 
-            for (int i=0; i<PointsOnPlane.size(); i++)
+            for (unsigned int i=0; i<PointsOnPlane.size(); i++)
             {
                 //distance between circle radius and given point
                 double XdistPnt =  sqrt((double) (clipperout->GetPoint(PointsOnPlane[i])[0] - V1w[0]) * (clipperout->GetPoint(PointsOnPlane[i])[0] - V1w[0]) +
@@ -984,7 +984,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
             //get the control points from pf and insert them to vtkPolygon
             unsigned int nrCtrlPnts = pf->GetNumberOfControlPoints();
 
-            for (int i=0; i<nrCtrlPnts; ++i)
+            for (unsigned int i=0; i<nrCtrlPnts; ++i)
             {
                 polygonVtk->GetPoints()->InsertNextPoint((double)pf->GetWorldControlPoint(i)[0], (double)pf->GetWorldControlPoint(i)[1], (double)pf->GetWorldControlPoint(i)[2] );
             }
@@ -997,7 +997,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
             double bounds[6];
             polygonVtk->GetPoints()->GetBounds(bounds);
 
-            for (int i=0; i<PointsOnPlane.size(); i++)
+            for (unsigned int i=0; i<PointsOnPlane.size(); i++)
             {
                 double checkIn[3] = {clipperout->GetPoint(PointsOnPlane[i])[0], clipperout->GetPoint(PointsOnPlane[i])[1], clipperout->GetPoint(PointsOnPlane[i])[2]};
                 int isInPolygon = polygonVtk->PointInPolygon(checkIn, polygonVtk->GetPoints()->GetNumberOfPoints()
@@ -1055,7 +1055,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
         MITK_DEBUG << "\n===== Pointindex based structure finalized ======\n";
 
         // get all Points in ROI with according fiberID
-        for (long k = 0; k < PointsInROI.size(); k++)
+        for (unsigned long k = 0; k < PointsInROI.size(); k++)
         {
             //MITK_DEBUG << "point " << PointsInROI[k] << " belongs to fiber " << pointindexFiberMap[ PointsInROI[k] ];
             if (pointindexFiberMap[ PointsInROI[k] ]<=GetNumFibers() && pointindexFiberMap[ PointsInROI[k] ]>=0)
@@ -1073,7 +1073,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
 
     sort(FibersInROI.begin(), FibersInROI.end());
     bool hasDuplicats = false;
-    for(long i=0; i<FibersInROI.size()-1; ++i)
+    for(unsigned long i=0; i<FibersInROI.size()-1; ++i)
     {
         if(FibersInROI[i] == FibersInROI[i+1])
             hasDuplicats = true;

@@ -91,12 +91,12 @@ void TbssImporter::Import(const mitk::PixelType , mitk::TbssImage::Pointer tbssI
   try {
     mitk::ImagePixelReadAccessor<TPixel,4> readTbss( m_InputVolume );
 
-    for(int i=0; i<dataSize[0]; i++)
+    for(unsigned int i=0; i<dataSize[0]; i++)
     {
       MITK_INFO << "i " << i << " / " << dataSize[0];
-      for(int j=0; j<dataSize[1]; j++)
+      for(unsigned int j=0; j<dataSize[1]; j++)
       {
-        for(int k=0; k<dataSize[2]; k++)
+        for(unsigned int k=0; k<dataSize[2]; k++)
         {
           itk::VariableLengthVector<float> pixel;
           itk::Index<3> id;

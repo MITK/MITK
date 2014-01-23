@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkImageGenerator.h"
 
-#include "mitkTesting.h"
 #include "mitkTestingMacros.h"
 
 #include "mitkIOUtil.h"

@@ -403,7 +403,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
         oit.Set( odf );
         oit2.Set( b0 );
         float sum = 0;
-        for (int k=0; k<odf.Size(); k++)
+        for (unsigned int k=0; k<odf.Size(); k++)
             sum += (float) odf[k];
         oit3.Set( sum-1 );
         oit4.Set(coeffPixel);
@@ -429,9 +429,9 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
     myfile.open (fname.c_str());
     myfile << "A1=[";
-    for(int i=0; i<A.rows(); i++)
+    for(unsigned int i=0; i<A.rows(); i++)
     {
-        for(int j=0; j<A.columns(); j++)
+        for(unsigned int j=0; j<A.columns(); j++)
         {
             myfile << A(i,j) << " ";
             if(j==A.columns()-1 && i!=A.rows()-1)

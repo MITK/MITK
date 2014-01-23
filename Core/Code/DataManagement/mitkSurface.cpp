@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 #include <vtkPolyData.h>
-#include <mitkTesting.h>
 
 static vtkPolyData* DeepCopy(vtkPolyData* other)
 {

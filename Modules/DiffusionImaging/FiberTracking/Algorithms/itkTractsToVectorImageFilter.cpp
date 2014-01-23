@@ -25,14 +25,14 @@ static bool CompareVectorLengths(const vnl_vector_fixed< double, 3 >& v1, const 
 template< class PixelType >
 TractsToVectorImageFilter< PixelType >::TractsToVectorImageFilter():
     m_AngularThreshold(0.7),
-    m_MaskImage(NULL),
-    m_NumDirectionsImage(NULL),
-    m_NormalizeVectors(false),
     m_Epsilon(0.999),
+    m_MaskImage(NULL),
+    m_NormalizeVectors(false),
     m_UseWorkingCopy(true),
-    m_MaxNumDirections(3),
     m_UseTrilinearInterpolation(false),
-    m_Thres(0.5)
+    m_MaxNumDirections(3),
+    m_Thres(0.5),
+    m_NumDirectionsImage(NULL)
 {
     this->SetNumberOfRequiredOutputs(1);
 }
@@ -190,14 +190,14 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
             if (!m_UseTrilinearInterpolation)
             {
-                if (index[0] < 0 || index[0] >= outImageSize[0])
+                if (index[0] < 0 || (unsigned long)index[0] >= outImageSize[0])
                     continue;
-                if (index[1] < 0 || index[1] >= outImageSize[1])
+                if (index[1] < 0 || (unsigned long)index[1] >= outImageSize[1])
                     continue;
-                if (index[2] < 0 || index[2] >= outImageSize[2])
+                if (index[2] < 0 || (unsigned long)index[2] >= outImageSize[2])
                     continue;
 
-                int idx = index[0] + outImageSize[0]*(index[1] + outImageSize[1]*index[2]);
+                unsigned int idx = index[0] + outImageSize[0]*(index[1] + outImageSize[1]*index[2]);
                 DirectionContainerType::Pointer dirCont = DirectionContainerType::New();
                 if (m_DirectionsContainer->IndexExists(idx))
                 {
@@ -245,11 +245,11 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
             frac_z = 1-frac_z;
 
             // int coordinates inside image?
-            if (index[0] < 0 || index[0] >= outImageSize[0]-1)
+            if (index[0] < 0 || (unsigned long)index[0] >= outImageSize[0]-1)
                 continue;
-            if (index[1] < 0 || index[1] >= outImageSize[1]-1)
+            if (index[1] < 0 || (unsigned long)index[1] >= outImageSize[1]-1)
                 continue;
-            if (index[2] < 0 || index[2] >= outImageSize[2]-1)
+            if (index[2] < 0 || (unsigned long)index[2] >= outImageSize[2]-1)
                 continue;
 
             DirectionContainerType::Pointer dirCont;
@@ -472,7 +472,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
     itk::ImageRegionIterator<ItkUcharImgType> crossIt(m_CrossingsImage, m_CrossingsImage->GetLargestPossibleRegion());
 
     m_DirectionImageContainer = DirectionImageContainerType::New();
-    int maxNumDirections = 0;
+    unsigned int maxNumDirections = 0;
 
     MITK_INFO << "Clustering directions";
     boost::progress_display disp2(outImageSize[0]*outImageSize[1]*outImageSize[2]);
@@ -488,7 +488,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
             continue;
         }
         DirectionContainerType::Pointer dirCont = m_DirectionsContainer->GetElement(idx);
-        if (dirCont.IsNull() || index[0] < 0 || index[0] >= outImageSize[0] || index[1] < 0 || index[1] >= outImageSize[1] || index[2] < 0 || index[2] >= outImageSize[2])
+        if (dirCont.IsNull() || index[0] < 0 || (unsigned long)index[0] >= outImageSize[0] || index[1] < 0 || (unsigned long)index[1] >= outImageSize[1] || index[2] < 0 || (unsigned long)index[2] >= outImageSize[2])
         {
             ++dirIt;
             continue;
@@ -496,7 +496,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
         std::vector< DirectionType > directions;
 
-        for (int i=0; i<dirCont->Size(); i++)
+        for (unsigned int i=0; i<dirCont->Size(); i++)
             if (dirCont->ElementAt(i).magnitude()>0.0001)
                 directions.push_back(dirCont->ElementAt(i));
 
@@ -507,7 +507,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
         if ( directions.size() > maxNumDirections )
         {
-            for (int i=maxNumDirections; i<std::min((int)directions.size(), m_MaxNumDirections); i++)
+            for (unsigned int i=maxNumDirections; i<std::min<unsigned int>(directions.size(), m_MaxNumDirections); i++)
             {
                 ItkDirectionImageType::Pointer directionImage = ItkDirectionImageType::New();
                 directionImage->SetSpacing( spacing );
@@ -519,14 +519,14 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
                 directionImage->FillBuffer(nullVec);
                 m_DirectionImageContainer->InsertElement(i, directionImage);
             }
-            maxNumDirections = std::min((int)directions.size(), m_MaxNumDirections);
+            maxNumDirections = std::min<unsigned int>(directions.size(), m_MaxNumDirections);
         }
 
-        int numDir = directions.size();
+        unsigned int numDir = directions.size();
         if (numDir>m_MaxNumDirections)
             numDir = m_MaxNumDirections;
 
-        for (int i=0; i<numDir; i++)
+        for (unsigned int i=0; i<numDir; i++)
         {
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
             itk::ContinuousIndex<float, 3> center;
@@ -581,7 +581,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
 
     std::vector< vnl_vector_fixed< double, 3 > > normalizedDirs;
     std::vector< int > touched;
-    for (int i=0; i<inDirs.size(); i++)
+    for (unsigned int i=0; i<inDirs.size(); i++)
     {
         normalizedDirs.push_back(inDirs[i]);
         normalizedDirs.back().normalize();
@@ -606,7 +606,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
             workingMean = oldMean;
             workingMean.normalize();
             currentMean.fill(0.0);
-            for (int i=0; i<normalizedDirs.size(); i++)
+            for (unsigned int i=0; i<normalizedDirs.size(); i++)
             {
                 angle = dot_product(workingMean, normalizedDirs[i]);
                 if (angle>=m_AngularThreshold)
@@ -641,7 +641,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
 
         // find next unused seed
         free = false;
-        for (int i=0; i<touched.size(); i++)
+        for (unsigned int i=0; i<touched.size(); i++)
             if (touched[i]==0)
             {
                 currentMean = inDirs[i];
@@ -650,10 +650,10 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
     }
 
     if (m_NormalizeVectors)
-        for (int i=0; i<outDirs.size(); i++)
+        for (unsigned int i=0; i<outDirs.size(); i++)
             outDirs[i].normalize();
     else if (max>0)
-        for (int i=0; i<outDirs.size(); i++)
+        for (unsigned int i=0; i<outDirs.size(); i++)
             outDirs[i] /= max;
 
     if (inDirs.size()==outDirs.size())
@@ -673,7 +673,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
 
     std::vector< vnl_vector_fixed< double, 3 > > normalizedDirs;
     std::vector< int > touched;
-    for (int i=0; i<inDirs.size(); i++)
+    for (std::size_t i=0; i<inDirs.size(); i++)
     {
         normalizedDirs.push_back(inDirs[i]);
         normalizedDirs.back().normalize();
@@ -682,7 +682,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
     // initialize
     float max = 0.0;
     touched.resize(inDirs.size(), 0);
-    for (int j=0; j<inDirs.size(); j++)
+    for (std::size_t j=0; j<inDirs.size(); j++)
     {
         currentMean = inDirs[j];
         oldMean.fill(0.0);
@@ -697,7 +697,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
             workingMean = oldMean;
             workingMean.normalize();
             currentMean.fill(0.0);
-            for (int i=0; i<normalizedDirs.size(); i++)
+            for (std::size_t i=0; i<normalizedDirs.size(); i++)
             {
                 angle = dot_product(workingMean, normalizedDirs[i]);
                 if (angle>=m_AngularThreshold)
@@ -719,7 +719,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
             bool add = true;
             vnl_vector_fixed< double, 3 > normMean = currentMean;
             normMean.normalize();
-            for (int i=0; i<outDirs.size(); i++)
+            for (std::size_t i=0; i<outDirs.size(); i++)
             {
                 vnl_vector_fixed< double, 3 > dir = outDirs[i];
                 dir.normalize();
@@ -746,10 +746,10 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
     }
 
     if (m_NormalizeVectors)
-        for (int i=0; i<outDirs.size(); i++)
+        for (std::size_t i=0; i<outDirs.size(); i++)
             outDirs[i].normalize();
     else if (max>0)
-        for (int i=0; i<outDirs.size(); i++)
+        for (std::size_t i=0; i<outDirs.size(); i++)
             outDirs[i] /= max;
 
     if (inDirs.size()==outDirs.size())
@@ -796,7 +796,7 @@ TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsTo
 
     // max normalize voxel directions
     if (max>0 && !m_NormalizeVectors)
-        for (int i=0; i<container->Size(); i++)
+        for (std::size_t i=0; i<container->Size(); i++)
             container->ElementAt(i) /= max;
 
     if (container->Size()<dirCont->Size())

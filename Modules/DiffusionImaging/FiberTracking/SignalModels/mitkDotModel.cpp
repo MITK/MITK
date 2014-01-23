@@ -15,6 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <vnl/vnl_cross.h>
 #include <vnl/vnl_quaternion.h>
+#include <mitkDotModel.h>
+
+using namespace mitk;
 
 template< class ScalarType >
 DotModel< ScalarType >::DotModel()
@@ -29,7 +32,7 @@ DotModel< ScalarType >::~DotModel()
 }
 
 template< class ScalarType >
-ScalarType DotModel< ScalarType >::SimulateMeasurement(int dir)
+ScalarType DotModel< ScalarType >::SimulateMeasurement(unsigned int /*dir*/)
 {
     return 1;
 }

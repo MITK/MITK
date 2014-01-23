@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 /*!
-\brief View for deterministic streamline fiber tracking.
+\brief View for tensor based deterministic streamline fiber tracking.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */

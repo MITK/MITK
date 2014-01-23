@@ -68,7 +68,7 @@ struct ImageParameters {
 
   mitk::RicianNoiseModel<double>       ricianNoiseModel;
   mitk::DiffusionSignalModel<double>::GradientListType  gradientDirections;
-  itk::TractsToDWIImageFilter< short >::DiffusionModelList fiberModelList, nonFiberModelList;
+  itk::TractsToDWIImageFilter< short >::DiffusionModelListType fiberModelList, nonFiberModelList;
   std::string signalModelString, artifactModelString;
 
   itk::Image<double, 3>::Pointer           frequencyMap;

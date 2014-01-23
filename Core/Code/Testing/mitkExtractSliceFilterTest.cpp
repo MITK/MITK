@@ -585,7 +585,6 @@ public:
 
     //compare the pixelvalues of the defined point in the 3D volume with the value of the resliced image
     unsigned short valueAt3DVolume = VolumeReadAccessor.GetPixelByIndex( testPoint3DInIndex );
-    //unsigned short valueAt3DVolumeByWorld = imageInMitk->GetPixelValueByWorldCoordinate(testPoint3DInWorld);
     unsigned short valueAtSlice = SliceReadAccessor.GetPixelByIndex( testPoint2DIn2DIndex );
 
     //valueAt3DVolume == valueAtSlice is not always working. because of rounding errors

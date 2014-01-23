@@ -7,6 +7,8 @@ SET(MODULE_CUSTOM_TESTS
   mitkFiberTransformationTest.cpp
   mitkFiberExtractionTest.cpp
   mitkFiberGenerationTest.cpp
+  mitkFiberfoxSignalGenerationTest.cpp
+  mitkFiberfoxAddArtifactsToDwiTest.cpp
 )
 
 

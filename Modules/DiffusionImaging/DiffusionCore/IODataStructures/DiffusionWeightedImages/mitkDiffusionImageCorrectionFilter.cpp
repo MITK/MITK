@@ -107,7 +107,7 @@ void mitk::DiffusionImageCorrectionFilter<TPixelType>
     mitkThrow() << " No diffusion image given! ";
   }
   TransformsVectorType transfVec;
-  for (int i=0; i< m_SourceImage->GetDirections()->Size();i++)
+  for (unsigned int i=0; i< m_SourceImage->GetDirections()->Size();i++)
   {
     transfVec.push_back(transformation);
   }

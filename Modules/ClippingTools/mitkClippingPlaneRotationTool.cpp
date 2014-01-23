@@ -66,8 +66,8 @@ void mitk::ClippingPlaneRotationTool::Activated()
     m_ClippingPlaneNode->SetDataInteractor(NULL);
   }
 
-  m_AffineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkExt"));
-  m_AffineDataInteractor->SetEventConfig("AffineRotationConfig.xml", us::ModuleRegistry::GetModule("MitkExt"));
+  m_AffineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+  m_AffineDataInteractor->SetEventConfig("AffineRotationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
   m_AffineDataInteractor->SetDataNode(m_ClippingPlaneNode);
 }
 

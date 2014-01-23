@@ -163,7 +163,7 @@ namespace itk
       NodeNumType m_Graph_NumberOfNodes;
       NodeNumType m_Graph_StartNode;
       NodeNumType m_Graph_EndNode;
-      int m_ImageDimensions;
+      unsigned int m_ImageDimensions;
       bool m_Graph_fullNeighbors;
       std::vector<ShortestPathNode*> m_Graph_DiscoveredNodeList;
       ShortestPathImageFilter(Self&);   // intentionally not implemented

@@ -65,7 +65,6 @@ FunctionCreateBlueBerryApplication(
   DESCRIPTION "MITK Diffusion"
   PLUGINS ${_plugins}
   EXCLUDE_PLUGINS ${_exclude_plugins}
-  LINK_LIBRARIES ${ALL_LIBRARIES}
   ${_app_options}
 )
 mitk_use_modules(TARGET ${DIFFUSIONAPP_NAME} MODULES qtsingleapplication)

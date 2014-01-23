@@ -179,7 +179,7 @@ namespace mitk
 
           itk::ImageRegionIterator<ImageType>   it (img, img->GetLargestPossibleRegion() );
           typedef typename ImageType::PixelType VecPixType;
-          for (it = it.Begin(); !it.IsAtEnd(); ++it)
+          for (it.GoToBegin(); !it.IsAtEnd(); ++it)
           {
             VecPixType vec = it.Get();
             typename ImageType::IndexType currentIndex = it.GetIndex();
@@ -209,7 +209,6 @@ namespace mitk
           int numberOfImages = 0;
           int numberOfGradientImages = 0;
           bool readb0 = false;
-          bool readFrame = false;
           double xx, xy, xz, yx, yy, yz, zx, zy, zz;
 
           for (; itKey != imgMetaKeys.end(); itKey ++)
@@ -241,7 +240,6 @@ namespace mitk
             {
               sscanf(metaString.c_str(), " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
 
-              readFrame = true;
               if (xx>10e-10 || xy>10e-10 || xz>10e-10 ||
                   yx>10e-10 || yy>10e-10 || yz>10e-10 ||
                   zx>10e-10 || zy>10e-10 || zz>10e-10 )

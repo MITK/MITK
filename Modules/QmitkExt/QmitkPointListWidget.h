@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <mitkPointSet.h>
 #include <mitkPointSetInteractor.h>
+#include <mitkDataInteractor.h>
 #include <QmitkStdMultiWidget.h>
 #include <mitkSliceNavigationController.h>
 
@@ -161,11 +162,10 @@ protected:
     mitk::SliceNavigationController* m_Snc2;
     mitk::SliceNavigationController* m_Snc3;
 
-    mitk::PointSetInteractor::Pointer   m_Interactor;
+    mitk::DataInteractor::Pointer m_DataInteractor;
     int     m_TimeStep;
     bool m_EditAllowed;
     unsigned long m_NodeObserverTag;
-
 };
 
 #endif

@@ -15,6 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <vnl/vnl_cross.h>
 #include <vnl/vnl_quaternion.h>
+#include <mitkBallModel.h>
+
+using namespace mitk;
 
 template< class ScalarType >
 BallModel< ScalarType >::BallModel()
@@ -31,7 +34,7 @@ BallModel< ScalarType >::~BallModel()
 }
 
 template< class ScalarType >
-ScalarType BallModel< ScalarType >::SimulateMeasurement(int dir)
+ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 {
     ScalarType signal = 0;
 

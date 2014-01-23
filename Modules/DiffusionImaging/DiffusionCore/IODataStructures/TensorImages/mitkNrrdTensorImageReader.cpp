@@ -77,10 +77,10 @@ void NrrdTensorImageReader
                 vecImg->Allocate();
 
                 itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
-                ot = ot.Begin();
+                ot.GoToBegin();
 
                 itk::ImageRegionIterator<ImageType> it (img, img->GetLargestPossibleRegion() );
-                it = it.Begin();
+                it.GoToBegin();
 
                 typedef ImageType::PixelType  VarPixType;
                 typedef VecImgType::PixelType FixPixType;
@@ -150,7 +150,7 @@ void NrrdTensorImageReader
 
                         if (size[3]==6)
                         {
-                            for (int te=0; te<size[3]; te++)
+                            for (unsigned int te=0; te<size[3]; te++)
                             {
                                 idx[3] = te;
                                 tensor.SetElement(te, img->GetPixel(idx));
@@ -204,10 +204,10 @@ void NrrdTensorImageReader
                 vecImg->Allocate();
 
                 itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
-                ot = ot.Begin();
+                ot.GoToBegin();
 
                 itk::ImageRegionIterator<ImageType> it (img, img->GetLargestPossibleRegion() );
-                it = it.Begin();
+                it.GoToBegin();
 
                 typedef ImageType::PixelType  VarPixType;
                 typedef VecImgType::PixelType FixPixType;
@@ -327,7 +327,7 @@ void NrrdTensorImageReader
 
                         if (size[3]==6)
                         {
-                            for (int te=0; te<size[3]; te++)
+                            for (unsigned int te=0; te<size[3]; te++)
                             {
                                 idx[3] = te;
                                 tensor.SetElement(te, img->GetPixel(idx));

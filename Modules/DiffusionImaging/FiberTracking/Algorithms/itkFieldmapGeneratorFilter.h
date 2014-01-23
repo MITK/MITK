@@ -27,7 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk{
 
 /**
-* \brief Generates tract density images from input fiberbundles (Calamante 2010).   */
+* \brief Generate float image with artificial frequency maps used by Fiberfox. Simulates additional frequencies at (possibly multiple) positions based on 3D gaussians with the specified variance and amplitude and/or as a linear gradient in the image.
+* See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
+*/
 
 template< class OutputImageType >
 class FieldmapGeneratorFilter : public ImageSource< OutputImageType >
@@ -47,12 +49,17 @@ public:
     itkNewMacro(Self)
     itkTypeMacro( FieldmapGeneratorFilter, ImageSource )
 
+    /** Output image parameters. */
     itkSetMacro( Spacing, itk::Vector<double> )
     itkSetMacro( Origin, mitk::Point3D )
     itkSetMacro( DirectionMatrix, MatrixType )
     itkSetMacro( ImageRegion, OutputImageRegionType )
+
+    /** Gradient direction and offset. */
     void SetGradient( vnl_vector_fixed< double, 3 > gradient ) { m_Gradient=gradient; }
     void SetOffset( vnl_vector_fixed< double, 3 > offset ) { m_Offset=offset; }
+
+    /** Parameters of gaussian frequency sources. */
     void SetVariances( std::vector< double > variances ) { m_Variances=variances; }
     void SetHeights( std::vector< double > heights ) { m_Heights=heights; }
     void SetWorldPositions( std::vector< mitk::Point3D > worldPositions ) { m_WorldPositions=worldPositions; }

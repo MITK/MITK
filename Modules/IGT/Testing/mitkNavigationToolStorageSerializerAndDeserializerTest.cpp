@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //POCO
 #include <Poco/Exception.h>
 #include <Poco/Path.h>
+#include <Poco/File.h>
 
 static void TestInstantiationSerializer()
 {
@@ -67,7 +68,7 @@ static void TestWriteSimpleToolStorage()
   mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
 
   //create filename
-  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage.storage";
+  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage.storage";
 
   //test serialization
   bool success = mySerializer->Serialize(filename,myStorage);
@@ -103,7 +104,7 @@ static void TestWriteAndReadSimpleToolStorageWithToolLandmarks()
   mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
 
   //create filename
-  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorageToolReg.storage";
+  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorageToolReg.storage";
 
   //test serialization
   bool success = mySerializer->Serialize(filename,myStorage);
@@ -111,7 +112,7 @@ static void TestWriteAndReadSimpleToolStorageWithToolLandmarks()
 
   mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
-  mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorageToolReg.storage");
+  mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorageToolReg.storage");
   MITK_TEST_CONDITION_REQUIRED(readStorage.IsNotNull(),"Testing deserialization of tool storage with tool registrations");
   MITK_TEST_CONDITION_REQUIRED(readStorage->GetToolCount()==1," ..Testing number of tools in storage");
 
@@ -140,7 +141,7 @@ static void TestReadSimpleToolStorage()
 {
   mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
-  mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage.storage");
+  mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage.storage");
   MITK_TEST_CONDITION_REQUIRED(readStorage.IsNotNull(),"Testing deserialization of simple tool storage");
   MITK_TEST_CONDITION_REQUIRED(readStorage->GetToolCount()==3," ..Testing number of tools in storage");
   //TODO: why is the order of tools changed is save/load process??
@@ -160,9 +161,9 @@ static void CleanUp()
 {
   try
   {
-    std::remove((std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage.storage").c_str());
-    std::remove((std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorageToolReg.storage").c_str());
-    std::remove((std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage2.storage").c_str());
+    std::remove((std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage.storage").c_str());
+    std::remove((std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorageToolReg.storage").c_str());
+    std::remove((std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage2.storage").c_str());
   }
   catch(...)
   {
@@ -222,7 +223,7 @@ static void TestWriteComplexToolStorage()
   mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
 
   //create filename
-  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage2.storage";
+  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage2.storage";
 
   //test serialization
   bool success = mySerializer->Serialize(filename,myStorage);
@@ -233,7 +234,7 @@ static void TestReadComplexToolStorage()
 {
   mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
   mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
-  mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage2.storage");
+  mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage2.storage");
   MITK_TEST_CONDITION_REQUIRED(readStorage.IsNotNull(),"Testing deserialization of complex tool storage");
   MITK_TEST_CONDITION_REQUIRED(readStorage->GetToolCount()==2," ..Testing number of tools in storage");
 }
@@ -275,7 +276,7 @@ static void TestReadStorageWithUnknownFiletype()
   MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a wrong file type is given for deserialization.");
 }
 
-/*
+
 static void TestReadZipFileWithNoToolstorage()
 {
   mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
@@ -300,7 +301,7 @@ static void TestReadZipFileWithNoToolstorage()
   }
   MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a empty zip file is given for deserialization.");
 }
-*/
+
 
 static void TestWriteStorageToInvalidFile()
 {
@@ -359,7 +360,8 @@ static void TestWriteEmptyToolStorage()
     //create filename
     separator = Poco::Path::separator();
     optionDirectory = std::string( MITK_TEST_OUTPUT_DIR );
-    filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage.storage";
+    mitk::UIDGenerator myGen = mitk::UIDGenerator();
+    filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage"+myGen.GetUID()+".storage";
   }
   catch (std::exception& e) {
     MITK_ERROR << "File access Exception: " << e.what();
@@ -371,6 +373,11 @@ static void TestWriteEmptyToolStorage()
   //test serialization
   bool success = mySerializer->Serialize(filename,myStorage);
   MITK_TEST_CONDITION_REQUIRED(success,"Testing serialization of simple tool storage");
+
+  //clean up
+  Poco::File file = Poco::File(filename);
+  file.remove();
+
 }
 
 //new tests for exception throwing of NavigationToolStorageSerializer
@@ -380,7 +387,7 @@ static void TestSerializerForExceptions()
   mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
 
   //create an invalid filename
-  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+".."+Poco::Path::separator()+"";
+  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"";
 
   //now try to serialize an check if an exception is thrown
   bool ExceptionThrown = false;
@@ -419,7 +426,7 @@ static void TestDeserializerForExceptions()
   try
   {
     std::string filename(MITK_IGT_DATA_DIR);
-    filename.append("/Empty.zip");
+    filename.append("/Empty2.zip");
     mitk::NavigationToolStorage::Pointer readStorage = testDeseralizer2->Deserialize(filename);
   }
   catch(mitk::IGTException)
@@ -443,7 +450,7 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
     TestReadComplexToolStorage();
     TestReadNotExistingStorage();
     TestReadStorageWithUnknownFiletype();
-    //TestReadZipFileWithNoToolstorage(); deactivated because of bug 16566
+    TestReadZipFileWithNoToolstorage();
     TestWriteStorageToInvalidFile();
     TestWriteEmptyToolStorage();
     TestSerializerForExceptions();

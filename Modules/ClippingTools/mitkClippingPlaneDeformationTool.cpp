@@ -65,8 +65,8 @@ void mitk::ClippingPlaneDeformationTool::Activated()
       m_ClippingPlaneNode->SetDataInteractor(NULL);
     }
 
-    m_SurfaceInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkExt"));
-    m_SurfaceInteractor->SetEventConfig("AffineDeformationConfig.xml", us::ModuleRegistry::GetModule("MitkExt"));
+    m_SurfaceInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+    m_SurfaceInteractor->SetEventConfig("AffineDeformationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
     m_SurfaceInteractor->SetDataNode(m_ClippingPlaneNode);
 
 }

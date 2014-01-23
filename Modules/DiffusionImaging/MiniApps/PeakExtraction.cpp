@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkTensorImage.h>
 
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkCoreObjectFactory.h>
 #include "ctkCommandLineParser.h"
 #include <mitkFiberBundleXWriter.h>
@@ -116,10 +115,6 @@ int StartPeakExtraction(int argc, char* argv[])
 
     try
     {
-        mitk::CoreObjectFactory::GetInstance();
-
-        RegisterDiffusionCoreObjectFactory();
-
         mitk::Image::Pointer image = LoadData(imageName);
         mitk::Image::Pointer mask = LoadData(maskImageName);
 

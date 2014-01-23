@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
 #include <mitkFiberTrackingObjectFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include <itkTractsToDWIImageFilter.h>
 #include <mitkFiberfoxParameters.h>
@@ -100,8 +99,6 @@ void StartSimulation(FiberfoxParameters<double> parameters, FiberBundleX::Pointe
 
 int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
 {
-    RegisterDiffusionCoreObjectFactory();
-
     MITK_TEST_BEGIN("mitkFiberfoxSignalGenerationTest");
 
     MITK_TEST_CONDITION_REQUIRED(argc>=19,"check for input data");

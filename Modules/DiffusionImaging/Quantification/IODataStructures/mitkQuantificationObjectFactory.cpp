@@ -33,7 +33,7 @@ typedef char TbssRoiPixelType;
 typedef float TbssPixelType;
 typedef int TbssGradientPixelType;
 
-mitk::QuantificationObjectFactory::QuantificationObjectFactory(bool /*registerSelf*/)
+mitk::QuantificationObjectFactory::QuantificationObjectFactory()
 :CoreObjectFactoryBase()
 {
 
@@ -156,13 +156,19 @@ void mitk::QuantificationObjectFactory::RegisterIOFactories()
 {
 }
 
-void RegisterQuantificationObjectFactory()
-{
-  static bool oneQuantificationObjectFactoryRegistered = false;
-  if ( ! oneQuantificationObjectFactoryRegistered ) {
-    MITK_DEBUG << "Registering QuantificationObjectFactory..." << std::endl;
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::QuantificationObjectFactory::New());
-
-    oneQuantificationObjectFactoryRegistered = true;
+struct RegisterQuantificationObjectFactory{
+  RegisterQuantificationObjectFactory()
+    : m_Factory( mitk::QuantificationObjectFactory::New() )
+  {
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
   }
-}
+
+  ~RegisterQuantificationObjectFactory()
+  {
+    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
+  }
+
+  mitk::QuantificationObjectFactory::Pointer m_Factory;
+};
+
+static RegisterQuantificationObjectFactory registerQuantificationObjectFactory;

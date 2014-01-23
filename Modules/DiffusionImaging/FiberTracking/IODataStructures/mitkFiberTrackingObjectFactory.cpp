@@ -1,7 +1,7 @@
 #include "mitkFiberTrackingObjectFactory.h"
 
 
-mitk::FiberTrackingObjectFactory::FiberTrackingObjectFactory(bool /*registerSelf*/)
+mitk::FiberTrackingObjectFactory::FiberTrackingObjectFactory()
   :CoreObjectFactoryBase()
 {
 
@@ -9,7 +9,6 @@ mitk::FiberTrackingObjectFactory::FiberTrackingObjectFactory(bool /*registerSelf
   if (!alreadyDone)
   {
     MITK_DEBUG << "FiberTrackingObjectFactory c'tor" << std::endl;
-    RegisterIOFactories();
 
     mitk::FiberBundleXIOFactory::RegisterOneFactory(); //modernized
 
@@ -114,13 +113,19 @@ void mitk::FiberTrackingObjectFactory::RegisterIOFactories()
 {
 }
 
-void RegisterFiberTrackingObjectFactory()
-{
-  static bool oneFiberTrackingObjectFactoryRegistered = false;
-  if ( ! oneFiberTrackingObjectFactoryRegistered ) {
-    MITK_DEBUG << "Registering FiberTrackingObjectFactory..." << std::endl;
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::FiberTrackingObjectFactory::New());
-
-    oneFiberTrackingObjectFactoryRegistered = true;
+struct RegisterFiberTrackingObjectFactory{
+  RegisterFiberTrackingObjectFactory()
+    : m_Factory( mitk::FiberTrackingObjectFactory::New() )
+  {
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
   }
-}
+
+  ~RegisterFiberTrackingObjectFactory()
+  {
+    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
+  }
+
+  mitk::FiberTrackingObjectFactory::Pointer m_Factory;
+};
+
+static RegisterFiberTrackingObjectFactory registerFiberTrackingObjectFactory;

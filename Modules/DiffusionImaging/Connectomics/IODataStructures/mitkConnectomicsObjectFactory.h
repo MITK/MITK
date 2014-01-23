@@ -26,18 +26,24 @@ namespace mitk {
 class Connectomics_EXPORT ConnectomicsObjectFactory : public CoreObjectFactoryBase
 {
   public:
-    mitkClassMacro(ConnectomicsObjectFactory,CoreObjectFactoryBase);
-    itkNewMacro(ConnectomicsObjectFactory);
+    mitkClassMacro(ConnectomicsObjectFactory,CoreObjectFactoryBase)
+    itkNewMacro(ConnectomicsObjectFactory)
 
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
+
     virtual void SetDefaultProperties(mitk::DataNode* node);
+
     virtual const char* GetFileExtensions();
+
     virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap();
+
     virtual const char* GetSaveFileExtensions();
+
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
-    void RegisterIOFactories();
+
+    DEPRECATED(void RegisterIOFactories());
   protected:
-    ConnectomicsObjectFactory(bool registerSelf = true);
+    ConnectomicsObjectFactory();
   private:
     void CreateFileExtensionsMap();
     std::string m_ExternalFileExtensions;
@@ -48,8 +54,5 @@ class Connectomics_EXPORT ConnectomicsObjectFactory : public CoreObjectFactoryBa
 };
 
 }
-// global declaration for simple call by
-// applications
-void Connectomics_EXPORT RegisterConnectomicsObjectFactory();
 
 #endif

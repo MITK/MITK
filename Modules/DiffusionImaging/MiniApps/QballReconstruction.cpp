@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseDataIOFactory.h"
 #include "mitkDiffusionImage.h"
-#include "mitkDiffusionCoreObjectFactory.h"
 #include "itkAnalyticalDiffusionQballReconstructionImageFilter.h"
 #include <boost/lexical_cast.hpp>
 #include <mitkNrrdQBallImageWriter.h>
@@ -78,8 +77,6 @@ int QballReconstruction(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-
         MITK_INFO << "Loading image ...";
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );

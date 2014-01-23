@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
 #include <mitkFiberTrackingObjectFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include <itkAddArtifactsToDwiImageFilter.h>
 #include <mitkFiberfoxParameters.h>
@@ -61,8 +60,6 @@ public:
 
     void setUp()
     {
-        RegisterDiffusionCoreObjectFactory();
-
         // reference files
         m_InputDwi = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(GetTestDataFilePath("DiffusionImaging/Fiberfox/StickBall_RELAX.dwi"))->GetData());
 

@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkNrrdDiffusionImageWriter.h>
 #include "ctkCommandLineParser.h"
@@ -45,7 +44,6 @@ int CopyGeometry(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
 
         MITK_INFO << "Loading image " << imageName;
         const std::string s1="", s2="";

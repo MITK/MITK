@@ -25,31 +25,37 @@ namespace mitk {
 class DiffusionCore_EXPORT DiffusionCoreObjectFactory : public CoreObjectFactoryBase
 {
   public:
-    mitkClassMacro(DiffusionCoreObjectFactory,CoreObjectFactoryBase);
-    itkNewMacro(DiffusionCoreObjectFactory);
+    mitkClassMacro(DiffusionCoreObjectFactory,CoreObjectFactoryBase)
+    itkNewMacro(DiffusionCoreObjectFactory)
 
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
+
     virtual void SetDefaultProperties(mitk::DataNode* node);
+
     virtual const char* GetFileExtensions();
+
     virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap();
+
     virtual const char* GetSaveFileExtensions();
+
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
-    void RegisterIOFactories();
-  protected:
-    DiffusionCoreObjectFactory(bool registerSelf = true);
-  private:
+
+    DEPRECATED(void RegisterIOFactories());
+
+protected:
+    DiffusionCoreObjectFactory();
     void CreateFileExtensionsMap();
+    MultimapType m_FileExtensionsMap;
+    MultimapType m_SaveFileExtensionsMap;
+private:
+
     std::string m_ExternalFileExtensions;
     std::string m_InternalFileExtensions;
     std::string m_SaveFileExtensions;
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
+
 };
 
 }
-// global declaration for simple call by
-// applications
-void DiffusionCore_EXPORT RegisterDiffusionCoreObjectFactory();
 
 #endif
 

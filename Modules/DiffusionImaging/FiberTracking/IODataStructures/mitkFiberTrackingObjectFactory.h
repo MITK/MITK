@@ -24,18 +24,25 @@ namespace mitk {
 class FiberTracking_EXPORT FiberTrackingObjectFactory : public CoreObjectFactoryBase
 {
   public:
-    mitkClassMacro(FiberTrackingObjectFactory,CoreObjectFactoryBase);
-    itkNewMacro(FiberTrackingObjectFactory);
+    mitkClassMacro(FiberTrackingObjectFactory,CoreObjectFactoryBase)
+    itkNewMacro(FiberTrackingObjectFactory)
 
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
+
     virtual void SetDefaultProperties(mitk::DataNode* node);
+
     virtual const char* GetFileExtensions();
+
     virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap();
+
     virtual const char* GetSaveFileExtensions();
+
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
+
     void RegisterIOFactories();
-  protected:
-    FiberTrackingObjectFactory(bool registerSelf = true);
+
+protected:
+    FiberTrackingObjectFactory();
   private:
     void CreateFileExtensionsMap();
     std::string m_ExternalFileExtensions;
@@ -46,9 +53,6 @@ class FiberTracking_EXPORT FiberTrackingObjectFactory : public CoreObjectFactory
 };
 
 }
-// global declaration for simple call by
-// applications
-void FiberTracking_EXPORT RegisterFiberTrackingObjectFactory();
 
 
 #endif // MITKFIBERTRACKINGOBJECTFACTORY_H

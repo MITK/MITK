@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <itkGibbsTrackingFilter.h>
 #include <mitkFiberBundleX.h>
 
@@ -44,9 +42,6 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     MITK_INFO << "Mask image: " << argv[2];
     MITK_INFO << "Parameter file: " << argv[3];
     MITK_INFO << "Reference bundle: " << argv[4];
-
-    RegisterDiffusionCoreObjectFactory();
-    RegisterFiberTrackingObjectFactory();
 
     const std::string s1="", s2="";
     std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[1], s1, s2, false );

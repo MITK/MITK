@@ -19,12 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTensorImage.h>
 #include <mitkIOUtil.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include <itkStreamlineTrackingFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include "ctkCommandLineParser.h"
+#include <mitkCoreObjectFactory.h>
 
 int StreamlineTracking(int argc, char* argv[])
 {
@@ -85,9 +84,6 @@ int StreamlineTracking(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-        RegisterFiberTrackingObjectFactory();
-
         typedef itk::StreamlineTrackingFilter< float > FilterType;
         FilterType::Pointer filter = FilterType::New();
 

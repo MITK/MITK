@@ -10,18 +10,25 @@ namespace mitk {
 class Quantification_EXPORT QuantificationObjectFactory : public CoreObjectFactoryBase
 {
   public:
-    mitkClassMacro(QuantificationObjectFactory,CoreObjectFactoryBase);
-    itkNewMacro(QuantificationObjectFactory);
+    mitkClassMacro(QuantificationObjectFactory,CoreObjectFactoryBase)
+    itkNewMacro(QuantificationObjectFactory)
 
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
+
     virtual void SetDefaultProperties(mitk::DataNode* node);
+
     virtual const char* GetFileExtensions();
+
     virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap();
+
     virtual const char* GetSaveFileExtensions();
+
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
-    void RegisterIOFactories();
-  protected:
-    QuantificationObjectFactory(bool registerSelf = true);
+
+    DEPRECATED(void RegisterIOFactories());
+
+protected:
+    QuantificationObjectFactory();
   private:
     void CreateFileExtensionsMap();
     std::string m_ExternalFileExtensions;
@@ -32,8 +39,5 @@ class Quantification_EXPORT QuantificationObjectFactory : public CoreObjectFacto
 };
 
 }
-// global declaration for simple call by
-// applications
-void Quantification_EXPORT RegisterQuantificationObjectFactory();
 
 #endif // MITKQUANTIFICATIONOBJECTFACTORY_H

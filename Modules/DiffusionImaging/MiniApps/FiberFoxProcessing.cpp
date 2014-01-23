@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkDiffusionImage.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberTrackingObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkNrrdDiffusionImageWriter.h>
@@ -415,7 +414,6 @@ int FiberFoxProcessing(int argc, char* argv[])
   string paramName = us::any_cast<string>(parsedArgs["loadparameters"]);
 
   {
-    RegisterDiffusionCoreObjectFactory();
     RegisterFiberTrackingObjectFactory();
 
     ImageParameters m_ImageGenParameters;

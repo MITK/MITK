@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkQBallImage.h>
-#include <mitkDiffusionCoreObjectFactory.h>
 #include <itkTensorDerivedMeasurementsFilter.h>
 #include <itkDiffusionQballGeneralizedFaImageFilter.h>
 #include <mitkTensorImage.h>
@@ -55,8 +54,6 @@ int DiffusionIndices(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-
         // load input image
         const std::string s1="", s2="";
         std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );

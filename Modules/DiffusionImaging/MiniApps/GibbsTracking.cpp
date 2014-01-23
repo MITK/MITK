@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkQBallImage.h>
 #include <mitkTensorImage.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionCoreObjectFactory.h>
-#include <mitkFiberTrackingObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include <itkGibbsTrackingFilter.h>
 #include <itkDiffusionTensor3D.h>
@@ -31,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
 #include <itkFlipImageFilter.h>
+#include <mitkCoreObjectFactory.h>
 
 template<int shOrder>
 typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Pointer TemplatedConvertShCoeffs(mitk::Image* mitkImg, int toolkit, bool noFlip = false)
@@ -110,9 +109,6 @@ int GibbsTracking(int argc, char* argv[])
 
     try
     {
-        RegisterDiffusionCoreObjectFactory();
-        RegisterFiberTrackingObjectFactory();
-
         // instantiate gibbs tracker
         typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
         typedef itk::Image<OdfVectorType,3>         ItkQballImageType;

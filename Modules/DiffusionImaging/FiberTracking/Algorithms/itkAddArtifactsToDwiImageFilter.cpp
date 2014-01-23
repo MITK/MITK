@@ -143,8 +143,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         if (m_Parameters.m_KspaceLineOffset>0)
             m_StatusText += "Simulating ghosts\n";
 
-        std::vector< int > spikeVolume;
-        for (int i=0; i<m_Parameters.m_Spikes; i++)
+        std::vector< unsigned int > spikeVolume;
+        for (unsigned int i=0; i<m_Parameters.m_Spikes; i++)
             spikeVolume.push_back(m_RandGen->GetIntegerVariate()%inputImage->GetVectorLength());
         std::sort (spikeVolume.begin(), spikeVolume.end());
         std::reverse (spikeVolume.begin(), spikeVolume.end());
@@ -156,7 +156,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         boost::progress_display disp(inputImage->GetVectorLength()*inputRegion.GetSize(2));
         for (unsigned int g=0; g<inputImage->GetVectorLength(); g++)
         {
-            std::vector< int > spikeSlice;
+            std::vector< unsigned int > spikeSlice;
             while (!spikeVolume.empty() && spikeVolume.back()==g)
             {
                 spikeSlice.push_back(m_RandGen->GetIntegerVariate()%inputImage->GetLargestPossibleRegion().GetSize(2));

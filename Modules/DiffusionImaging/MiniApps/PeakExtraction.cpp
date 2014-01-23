@@ -261,7 +261,7 @@ int StartPeakExtraction(int argc, char* argv[])
         {
             typedef typename MaximaExtractionFilterType::ItkDirectionImageContainer ItkDirectionImageContainer;
             typename ItkDirectionImageContainer::Pointer container = filter->GetDirectionImageContainer();
-            for (int i=0; i<container->Size(); i++)
+            for (unsigned int i=0; i<container->Size(); i++)
             {
                 typename MaximaExtractionFilterType::ItkDirectionImage::Pointer itkImg = container->GetElement(i);
 

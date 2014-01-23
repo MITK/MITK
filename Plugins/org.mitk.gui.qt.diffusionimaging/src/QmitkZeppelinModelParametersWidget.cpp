@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkZeppelinModelParametersWidget::VIEW_ID = "org.mitk.views.ZeppelinModelParameterswidget";
 
-QmitkZeppelinModelParametersWidget::QmitkZeppelinModelParametersWidget( QWidget * parent, Qt::WindowFlags f )
+QmitkZeppelinModelParametersWidget::QmitkZeppelinModelParametersWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
     m_Controls = NULL;
@@ -56,7 +56,7 @@ void QmitkZeppelinModelParametersWidget::UpdateUi()
     m_Controls->m_FaLabel->setText(QString::number(tensor.GetFractionalAnisotropy()));
 }
 
-void QmitkZeppelinModelParametersWidget::DChanged( double value )
+void QmitkZeppelinModelParametersWidget::DChanged( double )
 {
     UpdateUi();
 }

@@ -96,7 +96,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     newImage->Allocate();
 
     std::vector< unsigned int > spikeVolume;
-    for (int i=0; i<m_Parameters.m_Spikes; i++)
+    for (unsigned int i=0; i<m_Parameters.m_Spikes; i++)
         spikeVolume.push_back(m_RandGen->GetIntegerVariate()%images.at(0)->GetVectorLength());
     std::sort (spikeVolume.begin(), spikeVolume.end());
     std::reverse (spikeVolume.begin(), spikeVolume.end());
@@ -108,7 +108,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     boost::progress_display disp(2*images.at(0)->GetVectorLength()*images.at(0)->GetLargestPossibleRegion().GetSize(2));
     for (unsigned int g=0; g<images.at(0)->GetVectorLength(); g++)
     {
-        std::vector< int > spikeSlice;
+        std::vector< unsigned int > spikeSlice;
         while (!spikeVolume.empty() && spikeVolume.back()==g)
         {
             spikeSlice.push_back(m_RandGen->GetIntegerVariate()%images.at(0)->GetLargestPossibleRegion().GetSize(2));
@@ -183,7 +183,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
             ++disp;
             unsigned long newTick = 50*disp.count()/disp.expected_count();
-            for (int tick = 0; tick<(newTick-lastTick); tick++)
+            for (unsigned  long tick = 0; tick<(newTick-lastTick); tick++)
                 m_StatusText += "*";
             lastTick = newTick;
 
@@ -207,7 +207,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 }
             ++disp;
             newTick = 50*disp.count()/disp.expected_count();
-            for (int tick = 0; tick<(newTick-lastTick); tick++)
+            for (unsigned long tick = 0; tick<(newTick-lastTick); tick++)
                 m_StatusText += "*";
             lastTick = newTick;
         }
@@ -490,9 +490,9 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
     m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
-    unsigned int lastTick = 0;
+    unsigned long lastTick = 0;
 
-    for (int g=0; g<m_Parameters.GetNumVolumes(); g++)
+    for (unsigned int g=0; g<m_Parameters.GetNumVolumes(); g++)
     {
         vtkPolyData* fiberPolyData = fiberBundleTransformed->GetFiberPolyData();
 
@@ -764,7 +764,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
         ++disp2;
         unsigned long newTick = 50*disp2.count()/disp2.expected_count();
-        for (int tick = 0; tick<(newTick-lastTick); tick++)
+        for (unsigned long tick = 0; tick<(newTick-lastTick); tick++)
             m_StatusText += "*";
         lastTick = newTick;
 

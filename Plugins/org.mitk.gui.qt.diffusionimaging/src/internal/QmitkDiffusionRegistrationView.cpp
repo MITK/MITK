@@ -76,7 +76,7 @@ void QmitkRegistrationWorker::run()
   typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
   typedef DiffusionImageType::BValueMap BValueMap;
 
-  for( int i=0; i< m_View->m_SelectedDiffusionNodes.size(); i++)
+  for(unsigned int i=0; i< m_View->m_SelectedDiffusionNodes.size(); i++)
   {
 
     m_View->m_GlobalRegisterer = QmitkDiffusionRegistrationView::DWIHeadMotionCorrectionFilterType::New();
@@ -124,12 +124,11 @@ QmitkDiffusionRegistrationView::QmitkDiffusionRegistrationView()
   : QmitkAbstractView()
   , m_Controls( 0 )
   , m_DiffusionImage( NULL )
-
   , m_ThreadIsRunning(false)
-  , m_GlobalRegisterer(NULL)
-  , m_RegistrationWorker(this)
   , m_Steps(100)
   , m_LastStep(0)
+  , m_GlobalRegisterer(NULL)
+  , m_RegistrationWorker(this)
 
 {
 

@@ -199,7 +199,7 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
 
 #endif
 
-void QmitkDiffusionImagingAppIntroPart::StandbyStateChanged(bool standby)
+void QmitkDiffusionImagingAppIntroPart::StandbyStateChanged(bool)
 {
 
 }

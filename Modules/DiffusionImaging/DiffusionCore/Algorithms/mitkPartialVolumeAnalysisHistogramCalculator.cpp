@@ -592,7 +592,7 @@ namespace mitk
   template < typename TPixel, unsigned int VImageDimension >
       void PartialVolumeAnalysisHistogramCalculator::InternalReorientImagePlane(
           const itk::Image< TPixel, VImageDimension > *image,
-          mitk::Geometry3D* imggeo, mitk::Geometry3D* planegeo3D, int additionalIndex )
+          mitk::Geometry3D* , mitk::Geometry3D* planegeo3D, int additionalIndex )
   {
 
     MITK_DEBUG << "InternalReorientImagePlane() start";
@@ -917,7 +917,7 @@ namespace mitk
       void PartialVolumeAnalysisHistogramCalculator::InternalCalculateStatisticsMasked(
           const itk::Image< TPixel, VImageDimension > *image,
           itk::Image< unsigned char, VImageDimension > *maskImage,
-          Statistics &statistics,
+          Statistics &,
           typename HistogramType::ConstPointer *histogram )
   {
     MITK_DEBUG << "InternalCalculateStatisticsMasked() start";

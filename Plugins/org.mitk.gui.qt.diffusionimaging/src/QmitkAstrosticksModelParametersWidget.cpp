@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkAstrosticksModelParametersWidget::VIEW_ID = "org.mitk.views.AstrosticksModelParametersWidget";
 
-QmitkAstrosticksModelParametersWidget::QmitkAstrosticksModelParametersWidget( QWidget * parent, Qt::WindowFlags f )
+QmitkAstrosticksModelParametersWidget::QmitkAstrosticksModelParametersWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
     m_Controls = NULL;

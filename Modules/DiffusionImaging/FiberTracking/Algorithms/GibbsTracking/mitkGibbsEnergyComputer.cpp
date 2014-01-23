@@ -159,7 +159,6 @@ float GibbsEnergyComputer::ComputeInternalEnergy(Particle *dp)
 
     if (dp->pID != -1)  // has predecessor
         energy += ComputeInternalEnergyConnection(dp,+1);
-
     if (dp->mID != -1)  // has successor
         energy += ComputeInternalEnergyConnection(dp,-1);
 

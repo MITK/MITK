@@ -78,12 +78,6 @@ QmitkTensorReconstructionView::QmitkTensorReconstructionView()
     m_TensorImages = mitk::DataStorage::SetOfObjects::New();
 }
 
-QmitkTensorReconstructionView::QmitkTensorReconstructionView(const QmitkTensorReconstructionView& other)
-{
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-}
-
 QmitkTensorReconstructionView::~QmitkTensorReconstructionView()
 {
 
@@ -161,7 +155,7 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
 
         GradientDirectionContainerType::Pointer dirs = diffImage->GetDirections();
 
-        for(int i=0; i<dirs->Size() && i<=volume; i++)
+        for(unsigned int i=0; i<dirs->Size() && i<=volume; i++)
         {
             GradientDirectionType grad = dirs->ElementAt(i);
 
@@ -340,8 +334,6 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     // If you don't want to use the whole color range, you can use
     // SetValueRange, SetHueRange, and SetSaturationRange
     lookupTable->Build();
-
-    int size = lookupTable->GetTable()->GetSize();
 
     vtkSmartPointer<vtkLookupTable> reversedlookupTable =
             vtkSmartPointer<vtkLookupTable>::New();
@@ -702,7 +694,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
             tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorReconstructionThreshold->value() );
             tensorReconstructionFilter->Update();
             clock.Stop();
-            MITK_DEBUG << "took " << clock.GetMeanTime() << "s.";
+            MITK_DEBUG << "took " << clock.GetMean() << "s.";
 
             // TENSORS TO DATATREE
             mitk::TensorImage::Pointer image = mitk::TensorImage::New();
@@ -796,7 +788,7 @@ void QmitkTensorReconstructionView::TensorsToDWI()
 
 void QmitkTensorReconstructionView::TensorsToQbi()
 {
-    for (int i=0; i<m_TensorImages->size(); i++)
+    for (unsigned int i=0; i<m_TensorImages->size(); i++)
     {
         mitk::DataNode::Pointer tensorImageNode = m_TensorImages->at(i);
         MITK_INFO << "starting Q-Ball estimation";
@@ -990,7 +982,7 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
             //filter->SetNumberOfThreads(1);
             filter->Update();
             clock.Stop();
-            MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
+            MBI_DEBUG << "took " << clock.GetMean() << "s.";
 
             // TENSORS TO DATATREE
             mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();

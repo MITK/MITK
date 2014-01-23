@@ -26,32 +26,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template< class ScalarType >
 mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
-    : m_DoAddGibbsRinging(false)
-    , m_ArtifactModelString("")
-    , m_AxonRadius(0)
+    : m_Repetitions(1)
+    , m_SignalScale(100)
+    , m_tEcho(100)
+    , m_tLine(1)
+    , m_tInhom(50)
     , m_Bvalue(1000)
-    , m_DoAddMotion(false)
-    , m_DoDisablePartialVolume(false)
-    , m_DoSimulateRelaxation(true)
+    , m_AxonRadius(0)
+    , m_Spikes(0)
+    , m_SpikeAmplitude(1)
+    , m_KspaceLineOffset(0)
     , m_EddyStrength(0)
     , m_Tau(70)
-    , m_KspaceLineOffset(0)
-    , m_NumGradients(6)
-    , m_NumBaseline(1)
-    , m_OutputPath("")
-    , m_DoRandomizeMotion(true)
-    , m_Repetitions(1)
-    , m_SignalModelString("")
-    , m_SignalScale(100)
-    , m_SpikeAmplitude(1)
-    , m_Spikes(0)
-    , m_tEcho(100)
-    , m_tInhom(50)
-    , m_tLine(1)
     , m_CroppingFactor(1)
-    , m_MaskImage(NULL)
-    , m_FrequencyMap(NULL)
+    , m_DoAddGibbsRinging(false)
+    , m_DoSimulateRelaxation(true)
+    , m_DoDisablePartialVolume(false)
+    , m_DoAddMotion(false)
+    , m_DoRandomizeMotion(true)
     , m_NoiseModel(NULL)
+    , m_FrequencyMap(NULL)
+    , m_MaskImage(NULL)
+    , m_ResultNode(mitk::DataNode::New())
+    , m_ParentNode(NULL)
+    , m_SignalModelString("")
+    , m_ArtifactModelString("")
+    , m_OutputPath("")
+    , m_NumBaseline(1)
+    , m_NumGradients(6)
 {
     m_ImageDirection.SetIdentity();
     m_ImageOrigin.Fill(0.0);
@@ -62,9 +64,6 @@ mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
 
     m_Translation.Fill(0.0);
     m_Rotation.Fill(0.0);
-
-    m_ResultNode = mitk::DataNode::New();
-    m_ParentNode = NULL;
 
     GenerateGradientHalfShell();
 }
@@ -175,8 +174,7 @@ typename mitk::FiberfoxParameters< ScalarType >::GradientListType mitk::Fiberfox
 template< class ScalarType >
 typename mitk::FiberfoxParameters< ScalarType >::GradientType mitk::FiberfoxParameters< ScalarType >::GetGradientDirection(unsigned int i)
 {
-    if (i<m_GradientDirections.size())
-        return m_GradientDirections.at(i);
+    return m_GradientDirections.at(i);
 }
 
 template< class ScalarType >

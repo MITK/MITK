@@ -875,7 +875,7 @@ template< class TTensorPixelType,
           class TPDPixelType>
 void StreamlineTrackingFilter< TTensorPixelType,
 TPDPixelType>
-::PrintSelf(std::ostream& os, Indent indent) const
+::PrintSelf(std::ostream&, Indent) const
 {
 }
 

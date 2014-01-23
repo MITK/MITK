@@ -72,7 +72,7 @@ AdcImageFilter< TInPixelType, TOutPixelType>
 
         double S0 = 0;
         int c = 0;
-        for (int i=0; i<inputImagePointer->GetVectorLength(); i++)
+        for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
         {
             GradientDirectionType g = m_GradientDirections->GetElement(i);
             if (g.magnitude()<0.001)
@@ -87,7 +87,7 @@ AdcImageFilter< TInPixelType, TOutPixelType>
         if (S0>0)
         {
             c = 0;
-            for (int i=0; i<inputImagePointer->GetVectorLength(); i++)
+            for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
             {
                 GradientDirectionType g = m_GradientDirections->GetElement(i);
                 if (g.magnitude()>0.001)

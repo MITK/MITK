@@ -79,7 +79,7 @@ namespace itk
 
     // Detrmine number of B0 images
     int numberB0=0;
-    for(int i=0; i<m_Gradients->Size(); i++)
+    for(unsigned int i=0; i<m_Gradients->Size(); i++)
     {
       GradientDirectionType grad = m_Gradients->ElementAt(i);
 
@@ -92,14 +92,14 @@ namespace itk
     residuals.resize(this->GetInput()->GetVectorLength()-numberB0);
 
     // Calculate the standard residual image and for each volume put all residuals in a vector
-    for(int z=0; z<size[2]; z++)
+    for(unsigned int z=0; z<size[2]; z++)
     {
       std::vector< std::vector<double> > sliceResiduals; // residuals per volume for this slice
       sliceResiduals.resize(this->GetInput()->GetVectorLength()-numberB0);
 
-      for(int y=0; y<size[1]; y++)
+      for(unsigned int y=0; y<size[1]; y++)
       {
-        for(int x=0; x<size[0]; x++)
+        for(unsigned int x=0; x<size[0]; x++)
         {
 
           // Check if b0 exceeds threshold
@@ -111,10 +111,6 @@ namespace itk
 
           typename InputImageType::PixelType p1 = this->GetInput()->GetPixel(ix);
           typename InputImageType::PixelType p2 = m_SecondDiffusionImage->GetPixel(ix);
-
-
-          int s1 = p1.GetSize();
-          int s2 = p2.GetSize();
 
           if(p1.GetSize() != p2.GetSize())
           {
@@ -133,7 +129,7 @@ namespace itk
           double res = 0;
           int shift = 0; // correction for the skipped B0 images
 
-          for(int i = 0; i<p1.GetSize(); i++)
+          for(unsigned int i = 0; i<p1.GetSize(); i++)
           {
 
 

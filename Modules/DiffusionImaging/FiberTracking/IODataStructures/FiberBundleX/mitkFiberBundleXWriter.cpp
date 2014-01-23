@@ -92,7 +92,7 @@ void mitk::FiberBundleXWriter::GenerateData()
         size.SetElement(0,input->GetGeometry()->GetExtent(0));
         size.SetElement(1,input->GetGeometry()->GetExtent(1));
         size.SetElement(2,input->GetGeometry()->GetExtent(2));
-        trk.create(m_FileName,size,input->GetGeometry()->GetOrigin());
+        trk.create(m_FileName,size);
         trk.writeHdr();
         trk.append(input);
     }

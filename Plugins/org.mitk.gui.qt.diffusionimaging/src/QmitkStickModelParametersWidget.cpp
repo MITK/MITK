@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkStickModelParametersWidget::VIEW_ID = "org.mitk.views.StickModelParametersWidget";
 
-QmitkStickModelParametersWidget::QmitkStickModelParametersWidget( QWidget * parent, Qt::WindowFlags f )
+QmitkStickModelParametersWidget::QmitkStickModelParametersWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
     m_Controls = NULL;

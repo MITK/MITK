@@ -64,10 +64,6 @@ void QmitkODFDetailsWidget::SetParameters( itk::OrientationDistributionFunction<
   int curveId = this->InsertCurve( "ODF Values" );
   this->SetCurveData( curveId, xVals, yVals );
   this->SetCurvePen( curveId, QPen(Qt::blue, 0.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin) );
-
-  QwtLegend* legend = new QwtLegend();
-  //m_Plot->insertLegend(legend, QwtPlot::BottomLegend);
-
   this->Replot();
 }
 

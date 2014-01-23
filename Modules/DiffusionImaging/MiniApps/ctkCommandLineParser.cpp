@@ -306,7 +306,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
     this->Internal->ProcessedArguments.clear();
     this->Internal->ErrorString.clear();
     //    foreach (CommandLineParserArgumentDescription* desc, this->Internal->ArgumentDescriptionList)
-    for (int i=0; i<Internal->ArgumentDescriptionList.size(); i++)
+    for (unsigned int i=0; i<Internal->ArgumentDescriptionList.size(); i++)
     {
         CommandLineParserArgumentDescription* desc = Internal->ArgumentDescriptionList.at(i);
         desc->Value = us::Any(desc->ValueType);
@@ -320,7 +320,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
     bool ignoreRest = false;
     CommandLineParserArgumentDescription * currentArgDesc = 0;
     vector<CommandLineParserArgumentDescription*> parsedArgDescriptions;
-    for(int i = 1; i < arguments.size(); ++i)
+    for(unsigned int i = 1; i < arguments.size(); ++i)
     {
         string argument = arguments.at(i);
         if (this->Internal->Debug) { MITK_DEBUG << "Processing" << argument; }
@@ -357,7 +357,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
 
         // Skip if argument has already been parsed ...
         bool alreadyProcessed = false;
-        for (int i=0; i<Internal->ProcessedArguments.size(); i++)
+        for (unsigned int i=0; i<Internal->ProcessedArguments.size(); i++)
             if (argument.compare(Internal->ProcessedArguments.at(i))==0)
             {
                 alreadyProcessed = true;
@@ -706,7 +706,7 @@ bool ctkCommandLineParser::argumentAdded(const string& argument) const
 // --------------------------------------------------------------------------
 bool ctkCommandLineParser::argumentParsed(const string& argument) const
 {
-    for (int i=0; i<Internal->ProcessedArguments.size(); i++)
+    for (unsigned int i=0; i<Internal->ProcessedArguments.size(); i++)
         if (argument.compare(Internal->ProcessedArguments.at(i))==0)
             return true;
     return false;

@@ -436,7 +436,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainer
       continue;
 
     PointType p0 = tract.at(0);
-    for(int i = 1; i<tract.size(); i++)
+    for(unsigned int i = 1; i<tract.size(); i++)
     {
       PointType p1 = tract.at(i);
       mitk::ScalarType length = p0.EuclideanDistanceTo(p1);
@@ -450,7 +450,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainer
 
     p0 = tract.at(0);
     PointType p1 = tract.at(1);
-    int tractCounter = 2;
+    unsigned int tractCounter = 2;
     mitk::ScalarType distance = p0.EuclideanDistanceTo(p1);
     mitk::ScalarType locationBetween = 0;
 
@@ -577,7 +577,7 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
 
     //initialize a vector of the right length with zeroes
     std::vector<mitk::ScalarType> averageProfile;
-    for(int i=0; i<profiles.at(0).size(); i++)
+    for(unsigned int i=0; i<profiles.at(0).size(); i++)
     {
       averageProfile.push_back(0.0);
     }
@@ -586,7 +586,7 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
 
     for(int i=0; i<size; i++)
     {
-      for(int j=0; j<averageProfile.size(); ++j)
+      for(unsigned int j=0; j<averageProfile.size(); ++j)
       {
         averageProfile.at(j) = averageProfile.at(j) + profiles.at(c).at(j);
       }
@@ -594,7 +594,7 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
     }
 
     // Divide by the number of profiles to get group average
-    for(int i=0; i<averageProfile.size(); i++)
+    for(unsigned int i=0; i<averageProfile.size(); i++)
     {
       averageProfile.at(i) = averageProfile.at(i) / size;
     }
@@ -622,20 +622,20 @@ void QmitkTbssRoiAnalysisWidget::Plot(std::vector <std::vector<mitk::ScalarType>
 
 
     std::vector<mitk::ScalarType> xAxis;
-    for(int i=0; i<groupProfiles.at(0).size(); ++i)
+    for(unsigned int i=0; i<groupProfiles.at(0).size(); ++i)
     {
       xAxis.push_back((mitk::ScalarType)i);
     }
 
 
     // fill m_Vals. This might be used by the user to copy data to the clipboard
-    for(int i=0; i<groupProfiles.size(); i++)
+    for(unsigned int i=0; i<groupProfiles.size(); i++)
     {
 
       v1.clear();
 
 
-      for(int j=0; j<groupProfiles.at(i).size(); j++)
+      for(unsigned int j=0; j<groupProfiles.at(i).size(); j++)
       {
         v1.push_back(groupProfiles.at(i).at(j));
       }
@@ -760,7 +760,7 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
 
       //initialize a vector of the right length with zeroes
       std::vector<mitk::ScalarType> averageProfile;
-      for(int i=0; i<profiles.at(0).size(); i++)
+      for(unsigned int i=0; i<profiles.at(0).size(); i++)
       {
         averageProfile.push_back(0.0);
       }
@@ -769,7 +769,7 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
 
       for(int i=0; i<size*nTracts; i++)
       {
-        for(int j=0; j<averageProfile.size(); ++j)
+        for(unsigned int j=0; j<averageProfile.size(); ++j)
         {
           averageProfile.at(j) = averageProfile.at(j) + profiles.at(c).at(j);
         }
@@ -777,7 +777,7 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
       }
 
       // Divide by the number of profiles to get group average
-      for(int i=0; i<averageProfile.size(); i++)
+      for(unsigned int i=0; i<averageProfile.size(); i++)
       {
         averageProfile.at(i) = averageProfile.at(i) / (size*nTracts);
       }
@@ -859,7 +859,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
   // initialize average profile
   std::vector<mitk::ScalarType> averageProfile;
   std::vector<mitk::ScalarType> profile = profiles.at(0); // can do this because we checked the size of profiles before
-  for(int i=0; i<profile.size(); ++i)
+  for(unsigned int i=0; i<profile.size(); ++i)
   {
     averageProfile.push_back(0.0);
   }
@@ -875,7 +875,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
 
 
     std::vector<mitk::ScalarType> xAxis;
-    for(int i=0; i<profile.size(); ++i)
+    for(unsigned int i=0; i<profile.size(); ++i)
     {
       xAxis.push_back((mitk::ScalarType)i);
       averageProfile.at(i) += profile.at(i) / profiles.size();
@@ -899,7 +899,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
 
     // Draw the average profile
     std::vector<mitk::ScalarType> xAxis;
-    for(int i=0; i<averageProfile.size(); ++i)
+    for(unsigned int i=0; i<averageProfile.size(); ++i)
     {
       xAxis.push_back((mitk::ScalarType)i);
     }

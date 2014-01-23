@@ -94,7 +94,7 @@ int StreamlineTracking(int argc, char* argv[])
         MITK_INFO << "Loading tensor images ...";
         typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
         dtiFileName = inputImages.at(0);
-        for (int i=0; i<inputImages.size(); i++)
+        for (unsigned int i=0; i<inputImages.size(); i++)
         {
             try
             {

@@ -200,9 +200,9 @@ struct QbrSelListener : ISelectionListener
         if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
         {
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-          mitk::DiffusionImage<DiffusionPixelType>* diffusionImage;
+          mitk::DiffusionImage<DiffusionPixelType>* diffusionImage = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType> * >(node->GetData());
           // only look at interesting types
-          if(diffusionImage = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType> * >(node->GetData()))
+          if(diffusionImage)
           {
             foundDwiVolume = true;
             selected_images += QString(node->GetName().c_str());
@@ -250,12 +250,6 @@ QmitkQBallReconstructionView::QmitkQBallReconstructionView()
     m_Controls(NULL),
     m_MultiWidget(NULL)
 {
-}
-
-QmitkQBallReconstructionView::QmitkQBallReconstructionView(const QmitkQBallReconstructionView& other)
-{
-  Q_UNUSED(other);
-  throw std::runtime_error("Copy constructor not implemented");
 }
 
 QmitkQBallReconstructionView::~QmitkQBallReconstructionView()
@@ -317,7 +311,7 @@ void QmitkQBallReconstructionView::CreateConnections()
   }
 }
 
-void QmitkQBallReconstructionView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkQBallReconstructionView::OnSelectionChanged( std::vector<mitk::DataNode*> )
 {
 
 }
@@ -586,7 +580,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
 
       filter->Update();
       clock.Stop();
-      MITK_DEBUG << "took " << clock.GetMeanTime() << "s." ;
+      MITK_DEBUG << "took " << clock.GetMean() << "s." ;
 
       // ODFs TO DATATREE
       mitk::QBallImage::Pointer image = mitk::QBallImage::New();
@@ -701,7 +695,7 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
         }
 
         clock.Stop();
-        MITK_DEBUG << "took " << clock.GetMeanTime() << "s." ;
+        MITK_DEBUG << "took " << clock.GetMean() << "s." ;
         mitk::ProgressBar::GetInstance()->Progress();
 
       }
@@ -899,7 +893,7 @@ void QmitkQBallReconstructionView::MultiQBallReconstruction(
         }
 
         clock.Stop();
-        MITK_DEBUG << "took " << clock.GetMeanTime() << "s." ;
+        MITK_DEBUG << "took " << clock.GetMean() << "s." ;
         mitk::ProgressBar::GetInstance()->Progress();
 
       }

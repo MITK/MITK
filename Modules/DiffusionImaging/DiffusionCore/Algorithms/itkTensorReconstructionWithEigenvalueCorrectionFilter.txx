@@ -179,11 +179,11 @@ namespace itk
     // 1 in mask voxel means that B0 > assumed treshold.
 
     int mask_cnt=0;
-    for(int x=0;x<size[0];x++)
+    for(unsigned int x=0;x<size[0];x++)
     {
-      for(int y=0;y<size[1];y++)
+      for(unsigned int y=0;y<size[1];y++)
       {
-        for(int z=0;z<size[2];z++)
+        for(unsigned int z=0;z<size[2];z++)
         {
           double mean_b=0.0;
 
@@ -261,11 +261,11 @@ namespace itk
 
     int counter_corrected =0;
 
-    for ( int x=0;x<size[0];x++)
+    for (unsigned int x=0;x<size[0];x++)
     {
-      for ( int y=0;y<size[1];y++)
+      for (unsigned int y=0;y<size[1];y++)
       {
-        for ( int z=0;z<size[2];z++)
+        for (unsigned int z=0;z<size[2];z++)
         {
           itk::Index<3> ix = {x,y,z};
 
@@ -514,7 +514,6 @@ namespace itk
 
     double tempsum=0;
     double temp_number=0;
-    double temp_mask=0;
 
     for(int i=back_x; i<=forth_x; i++)
     {
@@ -523,8 +522,6 @@ namespace itk
         for (int k=back_z; k<=forth_z; k++)
         {
           itk::Index<3> ix = {i,j,k};
-          temp_mask=mask->GetPixel(ix);
-
 
           GradientVectorType p = corrected_diffusion_temp->GetPixel(ix);
 
@@ -611,13 +608,13 @@ namespace itk
       vnl_vector<double> tensor (6);
 
       // for every pixel from the image
-      for (int x=0;x<size[0];x++)
+      for (unsigned int x=0;x<size[0];x++)
       {
 
-        for (int y=0;y<size[1];y++)
+        for (unsigned int y=0;y<size[1];y++)
         {
 
-          for (int z=0;z<size[2];z++)
+          for (unsigned int z=0;z<size[2];z++)
           {
 
 
@@ -692,13 +689,13 @@ namespace itk
     vnl_vector<double> atten(nof-numberb0);
     double cnt_atten=0;
 
-    for (int z=0;z<size[2];z++)
+    for (unsigned int z=0;z<size[2];z++)
     {
 
-      for (int x=0;x<size[0];x++)
+      for (unsigned int x=0;x<size[0];x++)
       {
 
-        for (int y=0;y<size[1];y++)
+        for (unsigned int y=0;y<size[1];y++)
         {
           itk::Index<3> ix = {x, y, z};
 
@@ -751,18 +748,16 @@ namespace itk
                   int y_max=size[1]-1;
                   int z_max=size[2]-1;
 
-                  double back_x=std::max(0,x-1);
-                  double back_y=std::max(0,y-1);
-                  double back_z=std::max(0,z-1);
+                  double back_x=std::max(0,(int)x-1);
+                  double back_y=std::max(0,(int)y-1);
+                  double back_z=std::max(0,(int)z-1);
 
-                  double forth_x=std::min((x+1),x_max);
-                  double forth_y=std::min((y+1),y_max);
-                  double forth_z=std::min((z+1),z_max);
-
+                  double forth_x=std::min(((int)x+1),x_max);
+                  double forth_y=std::min(((int)y+1),y_max);
+                  double forth_z=std::min(((int)z+1),z_max);
 
                   double tempsum=0;
                   double temp_number=0;
-                  double temp_mask=0;
 
                   for(int i=back_x; i<=forth_x; i++)
                   {
@@ -771,8 +766,6 @@ namespace itk
                       for (int k=back_z; k<=forth_z; k++)
                       {
                         itk::Index<3> ix = {i,j,k};
-                        temp_mask=mask->GetPixel(ix);
-
 
                         GradientVectorType p = corrected_diffusion->GetPixel(ix);
 
@@ -824,18 +817,17 @@ namespace itk
                   int y_max=size[1] - 1;
                   int z_max=size[2] - 1;
 
-                  double back_x=std::max(0,x-1);
-                  double back_y=std::max(0,y-1);
-                  double back_z=std::max(0,z-1);
+                  double back_x=std::max(0,(int)x-1);
+                  double back_y=std::max(0,(int)y-1);
+                  double back_z=std::max(0,(int)z-1);
 
-                  double forth_x=std::min((x+1),x_max);
-                  double forth_y=std::min((y+1),y_max);
-                  double forth_z=std::min((z+1),z_max);
+                  double forth_x=std::min(((int)x+1),x_max);
+                  double forth_y=std::min(((int)y+1),y_max);
+                  double forth_z=std::min(((int)z+1),z_max);
 
 
                   double tempsum=0;
                   double temp_number=0;
-                  double temp_mask=0;
 
                   for(int i=back_x; i<=forth_x; i++)
                   {
@@ -844,8 +836,6 @@ namespace itk
                       for (int k=back_z; k<=forth_z; k++)
                       {
                         itk::Index<3> ix = {i,j,k};
-                        temp_mask=mask->GetPixel(ix);
-
 
                         GradientVectorType p = corrected_diffusion->GetPixel(ix);
 
@@ -926,13 +916,13 @@ namespace itk
       double mask_val=0;
 
 
-      for (int x=0;x<size[0];x++)
+      for (unsigned int x=0;x<size[0];x++)
       {
 
-        for (int y=0;y<size[1];y++)
+        for (unsigned int y=0;y<size[1];y++)
         {
 
-         for (int z=0;z<size[2];z++)
+         for (unsigned int z=0;z<size[2];z++)
           {
 
 
@@ -959,7 +949,6 @@ namespace itk
                   {
                     if(m_B0Mask[i]>0)
                     {
-                      double o_d=org_data[i];
                       mean_b=mean_b+org_data[i];
                     }
 
@@ -1036,11 +1025,11 @@ namespace itk
     itk::Index<3> ix;
     double temp_mask_value=0;
 
-    for(int x=0;x<size[0];x++)
+    for(unsigned int x=0;x<size[0];x++)
     {
-      for(int y=0;y<size[1];y++)
+      for(unsigned int y=0;y<size[1];y++)
       {
-        for(int z=0;z<size[2];z++)
+        for(unsigned int z=0;z<size[2];z++)
         {
           ix[0] = x; ix[1] = y; ix[2] = z;
           temp_mask_value=mask->GetPixel(ix);

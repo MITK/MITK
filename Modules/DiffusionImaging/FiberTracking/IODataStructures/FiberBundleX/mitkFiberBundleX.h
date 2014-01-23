@@ -55,7 +55,7 @@ public:
     virtual void SetRequestedRegionToLargestPossibleRegion();
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
     virtual bool VerifyRequestedRegion();
-    virtual void SetRequestedRegion(const itk::DataObject *data );
+    virtual void SetRequestedRegion(const itk::DataObject*);
 
     mitkClassMacro( FiberBundleX, BaseData )
     itkNewMacro( Self )

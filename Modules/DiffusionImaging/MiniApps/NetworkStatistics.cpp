@@ -259,7 +259,7 @@ int NetworkStatistics(int argc, char* argv[])
       // Create LabelToIndex translation
       std::map< std::string, int > labelToIdMap;
       std::vector< mitk::ConnectomicsNetwork::NetworkNode > nodeVector = network->GetVectorOfAllNodes();
-      for(int loop(0); loop < nodeVector.size(); loop++)
+      for(unsigned int loop(0); loop < nodeVector.size(); loop++)
       {
         labelToIdMap.insert( std::pair< std::string, int>(nodeVector.at(loop).label, nodeVector.at(loop).id) );
       }
@@ -273,7 +273,7 @@ int NetworkStatistics(int argc, char* argv[])
       double sumBC( 0 );
       double count( 0 );
 
-      for( int loop(0); loop < localLabels.size(); loop++ )
+      for(unsigned int loop(0); loop < localLabels.size(); loop++ )
       {
         if( network->CheckForLabel(localLabels.at( loop )) )
         {

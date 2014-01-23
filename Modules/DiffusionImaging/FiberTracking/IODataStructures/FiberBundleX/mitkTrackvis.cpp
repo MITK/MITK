@@ -7,7 +7,7 @@ TrackVis::~TrackVis() { if (fp) fclose( fp ); }
 
 // Create a TrackVis file and store standard metadata. The file is ready to append fibers.
 // ---------------------------------------------------------------------------------------
-short TrackVis::create(string filename , itk::Size<3> size, itk::Point<float,3> origin)
+short TrackVis::create(string filename , itk::Size<3> size)
 {
     // prepare the header
     for(int i=0; i<3 ;i++)

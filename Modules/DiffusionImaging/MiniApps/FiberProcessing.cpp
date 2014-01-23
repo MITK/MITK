@@ -233,5 +233,6 @@ int FiberProcessing(int argc, char* argv[])
         MITK_INFO << "ERROR!?!";
         return EXIT_FAILURE;
     }
+    return EXIT_SUCCESS;
 }
 RegisterDiffusionMiniApp(FiberProcessing);

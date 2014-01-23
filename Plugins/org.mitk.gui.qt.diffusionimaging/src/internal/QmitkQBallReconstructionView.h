@@ -59,7 +59,6 @@ class QmitkQBallReconstructionView : public QmitkFunctionality
   static const std::string VIEW_ID;
 
   QmitkQBallReconstructionView();
-  QmitkQBallReconstructionView(const QmitkQBallReconstructionView& other);
   virtual ~QmitkQBallReconstructionView();
 
   virtual void CreateQtPartControl(QWidget *parent);

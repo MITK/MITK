@@ -132,19 +132,12 @@ namespace mitk
         toFCameraDevice->m_Controller->GetIntensities(toFCameraDevice->m_IntensityDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_Controller->GetRgb(toFCameraDevice->m_RGBDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->Modified();
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         TODO Buffer Handling currently only works for buffer size 1
-         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_ImageSequence++;
         if (toFCameraDevice->m_FreePos == toFCameraDevice->m_CurrentPos)
         {
-          // buffer overflow
-          //MITK_INFO << "Buffer overflow!! ";
-          //toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
-          //toFCameraDevice->m_ImageSequence++;
           overflow = true;
         }
         if (toFCameraDevice->m_ImageSequence % n == 0)
@@ -154,13 +147,8 @@ namespace mitk
         toFCameraDevice->m_ImageMutex->Unlock();
         if (overflow)
         {
-          //itksys::SystemTools::Delay(10);
           overflow = false;
         }
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         END TODO Buffer Handling currently only works for buffer size 1
-         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-
         // print current framerate
         if (printStatus)
         {
@@ -174,20 +162,9 @@ namespace mitk
     return ITK_THREAD_RETURN_VALUE;
   }
 
-//    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-//  void ToFCameraMITKPlayerDevice::ResetBuffer(int bufferSize)
-//  {
-//    this->m_BufferSize = bufferSize;
-//    this->m_CurrentPos = -1;
-//    this->m_FreePos = 0;
-//  }
-
   void ToFCameraMITKPlayerDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
     m_ImageMutex->Lock();
-    /*!!!!!!!!!!!!!!!!!!!!!!
-      TODO Buffer handling???
-    !!!!!!!!!!!!!!!!!!!!!!!!*/
     // write amplitude image data to float array
     for (int i=0; i<this->m_PixelNumber; i++)
     {
@@ -200,9 +177,6 @@ namespace mitk
   void ToFCameraMITKPlayerDevice::GetIntensities(float* intensityArray, int& imageSequence)
   {
     m_ImageMutex->Lock();
-    /*!!!!!!!!!!!!!!!!!!!!!!
-      TODO Buffer handling???
-    !!!!!!!!!!!!!!!!!!!!!!!!*/
     // write intensity image data to float array
     for (int i=0; i<this->m_PixelNumber; i++)
     {
@@ -215,9 +189,6 @@ namespace mitk
   void ToFCameraMITKPlayerDevice::GetDistances(float* distanceArray, int& imageSequence)
   {
     m_ImageMutex->Lock();
-    /*!!!!!!!!!!!!!!!!!!!!!!
-      TODO Buffer handling???
-    !!!!!!!!!!!!!!!!!!!!!!!!*/
     // write distance image data to float array
     for (int i=0; i<this->m_PixelNumber; i++)
     {
@@ -230,9 +201,6 @@ namespace mitk
   void ToFCameraMITKPlayerDevice::GetRgb(unsigned char* rgbArray, int& imageSequence)
   {
     m_ImageMutex->Lock();
-    /*!!!!!!!!!!!!!!!!!!!!!!
-      TODO Buffer handling???
-    !!!!!!!!!!!!!!!!!!!!!!!!*/
     // write intensity image data to unsigned char array
     for (int i=0; i<this->m_PixelNumber*3; i++)
     {

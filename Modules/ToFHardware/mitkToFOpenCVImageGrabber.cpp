@@ -181,7 +181,6 @@ namespace mitk
     colorTransferFunction->AddRGBPoint(min, 0, 0, 0);
     colorTransferFunction->AddRGBPoint(max, 1, 1, 1);
     colorTransferFunction->SetColorSpaceToHSV();
-    //TODO other depth values
     colorTransferFunction->MapScalarsThroughTable(floatArrayInt, (unsigned char*)openCVImage->imageData, VTK_LUMINANCE);
   }
 

@@ -222,19 +222,11 @@ namespace mitk
         // call modified to indicate that cameraDevice was modified
         toFCameraDevice->Modified();
 
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        TODO Buffer Handling currently only works for buffer size 1
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        //toFCameraDevice->m_ImageSequence++;
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_ImageSequence++;
         if (toFCameraDevice->m_FreePos == toFCameraDevice->m_CurrentPos)
         {
-          // buffer overflow
-          //MITK_INFO << "Buffer overflow!! ";
-          //toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
-          //toFCameraDevice->m_ImageSequence++;
           overflow = true;
         }
         if (toFCameraDevice->m_ImageSequence % n == 0)
@@ -243,18 +235,13 @@ namespace mitk
         }
         if (overflow)
         {
-          //itksys::SystemTools::Delay(10);
           overflow = false;
         }
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        END TODO Buffer Handling currently only works for buffer size 1
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
         // print current framerate
         if (printStatus)
         {
           t2 = realTimeClock->GetCurrentStamp() - t1;
-          //MITK_INFO << "t2: " << t2 <<" Time (s) for 1 image: " << (t2/1000) / n << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
           MITK_INFO << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
           t1 = realTimeClock->GetCurrentStamp();
           printStatus = false;
@@ -264,32 +251,12 @@ namespace mitk
     return ITK_THREAD_RETURN_VALUE;
   }
 
-  //    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-  //  void KinectDevice::ResetBuffer(int bufferSize)
-  //  {
-  //    this->m_BufferSize = bufferSize;
-  //    this->m_CurrentPos = -1;
-  //    this->m_FreePos = 0;
-  //  }
-
   void KinectDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
     m_ImageMutex->Lock();
     if (m_CameraActive)
     {
-      // 1) copy the image buffer
-      // 2) Flip around y- axis (vertical axis)
-
-      /*
-      this->m_Controller->GetAmplitudes(this->m_SourceDataBuffer[this->m_CurrentPos], this->m_AmplitudeArray);
-      for (int i=0; i<this->m_CaptureHeight; i++)
-      {
-      for (int j=0; j<this->m_CaptureWidth; j++)
-      {
-      amplitudeArray[i*this->m_CaptureWidth+j] = this->m_AmplitudeArray[(i+1)*this->m_CaptureWidth-1-j];
-      }
-      }
-      */
+      // copy the image buffer
       for (int i=0; i<this->m_PixelNumber; i++)
       {
         amplitudeArray[i] = this->m_AmplitudeDataBuffer[this->m_CurrentPos][i];
@@ -308,19 +275,6 @@ namespace mitk
     m_ImageMutex->Lock();
     if (m_CameraActive)
     {
-      // 1) copy the image buffer
-      // 2) Flip around y- axis (vertical axis)
-
-      /*
-      this->m_Controller->GetIntensities(this->m_SourceDataBuffer[this->m_CurrentPos], this->m_IntensityArray);
-      for (int i=0; i<this->m_CaptureHeight; i++)
-      {
-      for (int j=0; j<this->m_CaptureWidth; j++)
-      {
-      intensityArray[i*this->m_CaptureWidth+j] = this->m_IntensityArray[(i+1)*this->m_CaptureWidth-1-j];
-      }
-      }
-      */
       for (int i=0; i<this->m_PixelNumber; i++)
       {
         intensityArray[i] = this->m_IntensityDataBuffer[this->m_CurrentPos][i];
@@ -339,20 +293,6 @@ namespace mitk
     m_ImageMutex->Lock();
     if (m_CameraActive)
     {
-      // 1) copy the image buffer
-      // 2) convert the distance values from m to mm
-      // 3) Flip around y- axis (vertical axis)
-
-      /*
-      this->m_Controller->GetDistances(this->m_SourceDataBuffer[this->m_CurrentPos], this->m_DistanceArray);
-      for (int i=0; i<this->m_CaptureHeight; i++)
-      {
-      for (int j=0; j<this->m_CaptureWidth; j++)
-      {
-      distanceArray[i*this->m_CaptureWidth+j] = 1000 * this->m_DistanceArray[(i+1)*this->m_CaptureWidth-1-j];
-      }
-      }
-      */
       for (int i=0; i<this->m_PixelNumber; i++)
       {
         distanceArray[i] = this->m_DistanceDataBuffer[this->m_CurrentPos][i]; // * 1000
@@ -371,10 +311,6 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      // 1) copy the image buffer
-      // 2) convert the distance values from m to mm
-      // 3) Flip around y- axis (vertical axis)
-
       // check for empty buffer
       if (this->m_ImageSequence < 0)
       {
@@ -389,13 +325,11 @@ namespace mitk
       {
         capturedImageSequence = this->m_ImageSequence;
         pos = this->m_CurrentPos;
-        //MITK_INFO << "Required image not found! Required: " << requiredImageSequence << " delivered/current: " << this->m_ImageSequence;
       }
       else if (requiredImageSequence <= this->m_ImageSequence - this->m_BufferSize)
       {
         capturedImageSequence = (this->m_ImageSequence - this->m_BufferSize) + 1;
         pos = (this->m_CurrentPos + 1) % this->m_BufferSize;
-        //MITK_INFO << "Out of buffer! Required: " << requiredImageSequence << " delivered: " << capturedImageSequence << " current: " << this->m_ImageSequence;
       }
       else // (requiredImageSequence > this->m_ImageSequence - this->m_BufferSize) && (requiredImageSequence <= this->m_ImageSequence)
 

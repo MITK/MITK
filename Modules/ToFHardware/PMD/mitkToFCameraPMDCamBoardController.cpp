@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define SOURCE_PARAM ""
 #define PROC_PARAM ""
 
-extern PMDHandle m_PMDHandle; //TODO
-extern PMDDataDescription m_DataDescription; //TODO
+extern PMDHandle m_PMDHandle;
+extern PMDDataDescription m_DataDescription;
 
 namespace mitk
 {

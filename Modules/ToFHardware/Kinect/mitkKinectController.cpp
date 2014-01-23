@@ -177,7 +177,6 @@ KinectController::~KinectController()
     return updateSuccessful;
   }
 
-  // TODO flag image
   void KinectController::GetDistances(float* distances)
   {
     xn::DepthMetaData DepthMD;

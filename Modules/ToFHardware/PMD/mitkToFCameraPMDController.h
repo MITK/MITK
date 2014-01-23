@@ -42,12 +42,10 @@ namespace mitk
     \brief opens a connection to the ToF camera. Has to be implemented by the sub class
     \throws mitkException In case of no connection, an exception is thrown!
     */
-    //TODO return value
     virtual bool OpenCameraConnection() = 0;
     /*!
     \brief closes the connection to the camera
     */
-    //TODO return value
     virtual bool CloseCameraConnection();
     /*!
     \brief Gets the current amplitude array from the device

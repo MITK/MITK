@@ -193,10 +193,6 @@ namespace mitk
         toFCameraDevice->m_RawDataSource->GetAllData(toFCameraDevice->m_DistanceArray,
           toFCameraDevice->m_AmplitudeArray, toFCameraDevice->m_IntensityArray);
         toFCameraDevice->m_ImageMutex->Unlock();
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         TODO Buffer Handling currently only works for buffer size 1
-         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-
 
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
@@ -215,15 +211,11 @@ namespace mitk
         {
           overflow = false;
         }
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         END TODO Buffer Handling currently only works for buffer size 1
-         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
         // print current frame rate
         if (printStatus)
         {
           t2 = realTimeClock->GetCurrentStamp() - t1;
-          //MITK_INFO << "t2: " << t2 <<" Time (s) for 1 image: " << (t2/1000) / n << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
           MITK_INFO << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
           t1 = realTimeClock->GetCurrentStamp();
           printStatus = false;
@@ -233,14 +225,6 @@ namespace mitk
     }
     return ITK_THREAD_RETURN_VALUE;
   }
-
-  //    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-  //  void ToFCameraPMDDevice::ResetBuffer(int bufferSize)
-  //  {
-  //    this->m_BufferSize = bufferSize;
-  //    this->m_CurrentPos = -1;
-  //    this->m_FreePos = 0;
-  //  }
 
   void ToFCameraPMDRawDataDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
@@ -286,10 +270,6 @@ namespace mitk
   {
     if (m_CameraActive)
     {
-      // 1) copy the image buffer
-      // 2) convert the distance values from m to mm
-      // 3) Flip around y- axis (vertical axis)
-
       // check for empty buffer
       if (this->m_ImageSequence < 0)
       {

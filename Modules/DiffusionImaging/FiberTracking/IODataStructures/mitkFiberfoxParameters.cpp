@@ -260,13 +260,19 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 switch (v1.second.get<int>("artifacts.noisedistribution"))
                 {
                 case 0:
+                {
                     m_NoiseModel = new mitk::RicianNoiseModel< ScalarType >();
                     break;
+                }
                 case 1:
+                {
                     m_NoiseModel = new mitk::ChiSquareNoiseModel< ScalarType >();
                     break;
+                }
                 default:
+                {
                     m_NoiseModel = new mitk::RicianNoiseModel< ScalarType >();
+                }
                 }
                 m_NoiseModel->SetNoiseVariance(v1.second.get<double>("artifacts.noisevariance"));
             }
@@ -290,6 +296,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             switch (v1.second.get<int>("compartment1.index"))
             {
             case 0:
+            {
                 mitk::StickModel<double>* stickModel = new mitk::StickModel<double>();
                 stickModel->SetGradientList(m_GradientDirections);
                 stickModel->SetBvalue(m_Bvalue);
@@ -297,7 +304,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 stickModel->SetT2(v1.second.get<double>("compartment1.stick.t2"));
                 m_FiberModelList.push_back(stickModel);
                 break;
+            }
             case 1:
+            {
                 mitk::TensorModel<double>* zeppelinModel = new mitk::TensorModel<double>();
                 zeppelinModel->SetGradientList(m_GradientDirections);
                 zeppelinModel->SetBvalue(m_Bvalue);
@@ -307,7 +316,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 zeppelinModel->SetT2(v1.second.get<double>("compartment1.zeppelin.t2"));
                 m_FiberModelList.push_back(zeppelinModel);
                 break;
+            }
             case 2:
+            {
                 mitk::TensorModel<double>* tensorModel = new mitk::TensorModel<double>();
                 tensorModel->SetGradientList(m_GradientDirections);
                 tensorModel->SetBvalue(m_Bvalue);
@@ -318,11 +329,13 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 m_FiberModelList.push_back(tensorModel);
                 break;
             }
+            }
 
             // compartment 2
             switch (v1.second.get<int>("compartment2.index"))
             {
             case 0:
+            {
                 mitk::StickModel<double>* stickModel = new mitk::StickModel<double>();
                 stickModel->SetGradientList(m_GradientDirections);
                 stickModel->SetBvalue(m_Bvalue);
@@ -330,7 +343,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 stickModel->SetT2(v1.second.get<double>("compartment2.stick.t2"));
                 m_FiberModelList.push_back(stickModel);
                 break;
+            }
             case 1:
+            {
                 mitk::TensorModel<double>* zeppelinModel = new mitk::TensorModel<double>();
                 zeppelinModel->SetGradientList(m_GradientDirections);
                 zeppelinModel->SetBvalue(m_Bvalue);
@@ -340,7 +355,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 zeppelinModel->SetT2(v1.second.get<double>("compartment2.zeppelin.t2"));
                 m_FiberModelList.push_back(zeppelinModel);
                 break;
+            }
             case 2:
+            {
                 mitk::TensorModel<double>* tensorModel = new mitk::TensorModel<double>();
                 tensorModel->SetGradientList(m_GradientDirections);
                 tensorModel->SetBvalue(m_Bvalue);
@@ -351,11 +368,13 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 m_FiberModelList.push_back(tensorModel);
                 break;
             }
+            }
 
             // compartment 3
             switch (v1.second.get<int>("compartment3.index"))
             {
             case 0:
+            {
                 mitk::BallModel<double>* ballModel = new mitk::BallModel<double>();
                 ballModel->SetGradientList(m_GradientDirections);
                 ballModel->SetBvalue(m_Bvalue);
@@ -364,7 +383,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 ballModel->SetWeight(v1.second.get<double>("compartment3.weight"));
                 m_NonFiberModelList.push_back(ballModel);
                 break;
+            }
             case 1:
+            {
                 mitk::AstroStickModel<double>* astrosticksModel = new mitk::AstroStickModel<double>();
                 astrosticksModel->SetGradientList(m_GradientDirections);
                 astrosticksModel->SetBvalue(m_Bvalue);
@@ -374,7 +395,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 astrosticksModel->SetWeight(v1.second.get<double>("compartment3.weight"));
                 m_NonFiberModelList.push_back(astrosticksModel);
                 break;
+            }
             case 2:
+            {
                 mitk::DotModel<double>* dotModel = new mitk::DotModel<double>();
                 dotModel->SetGradientList(m_GradientDirections);
                 dotModel->SetT2(v1.second.get<double>("compartment3.dot.t2"));
@@ -382,11 +405,13 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 m_NonFiberModelList.push_back(dotModel);
                 break;
             }
+            }
 
             // compartment 4
             switch (v1.second.get<int>("compartment4.index"))
             {
             case 0:
+            {
                 mitk::BallModel<double>* ballModel = new mitk::BallModel<double>();
                 ballModel->SetGradientList(m_GradientDirections);
                 ballModel->SetBvalue(m_Bvalue);
@@ -395,7 +420,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 ballModel->SetWeight(v1.second.get<double>("compartment4.weight"));
                 m_NonFiberModelList.push_back(ballModel);
                 break;
+            }
             case 1:
+            {
                 mitk::AstroStickModel<double>* astrosticksModel = new mitk::AstroStickModel<double>();
                 astrosticksModel->SetGradientList(m_GradientDirections);
                 astrosticksModel->SetBvalue(m_Bvalue);
@@ -405,13 +432,16 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 astrosticksModel->SetWeight(v1.second.get<double>("compartment4.weight"));
                 m_NonFiberModelList.push_back(astrosticksModel);
                 break;
+            }
             case 2:
+            {
                 mitk::DotModel<double>* dotModel = new mitk::DotModel<double>();
                 dotModel->SetGradientList(m_GradientDirections);
                 dotModel->SetT2(v1.second.get<double>("compartment4.dot.t2"));
                 dotModel->SetWeight(v1.second.get<double>("compartment4.weight"));
                 m_NonFiberModelList.push_back(dotModel);
                 break;
+            }
             }
         }
     }

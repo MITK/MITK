@@ -13,5 +13,6 @@
         <file>document-save.png</file>
         <file>system-lock-screen.png</file>
         <file>accept.png</file>
+        <file>process-stop.png</file>
     </qresource>
 </RCC>

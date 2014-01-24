@@ -150,6 +150,8 @@ int mitkRoiMeasurementsTest(int argc, char* argv[])
 
     mitk::DicomSeriesReader::StringContainer fileGrayvalues;
     std::string filenameGrayvalues(path + "grayvalues.dcm");
+    MITK_TEST_OUTPUT(<<"Loading rectangles test image from "<<filenameGrayvalues)
+
     fileGrayvalues.push_back(filenameGrayvalues);
     mitk::Image::Pointer testImageGrayvalues;
     mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries( fileGrayvalues, true );
@@ -212,6 +214,8 @@ int mitkRoiMeasurementsTest(int argc, char* argv[])
 
     mitk::DicomSeriesReader::StringContainer fileCircle;
     std::string filenameCircle(path + "circle.dcm");
+    MITK_TEST_OUTPUT(<<"Loading gradient circle test image from "<<filenameCircle)
+
     fileCircle.push_back(filenameCircle);
     mitk::Image::Pointer testImageCircle;
     seriesInFiles = mitk::DicomSeriesReader::GetSeries( fileCircle, true );

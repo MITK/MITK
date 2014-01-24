@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionImage.h"
 #include "itkAnalyticalDiffusionQballReconstructionImageFilter.h"
 #include <boost/lexical_cast.hpp>
-#include <mitkNrrdQBallImageWriter.h>
 #include "ctkCommandLineParser.h"
 #include <mitkIOUtil.h>
 #include <itksys/SystemTools.hxx>
@@ -218,14 +217,7 @@ int QballReconstruction(int argc, char* argv[])
 
         outfilename += ".qbi";
         MITK_INFO << "writing image " << outfilename;
-        mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-        for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-        {
-          if ( (*it)->CanWriteBaseDataType(image.GetPointer()) ) {
-            (*it)->SetFileName( outfilename.c_str() );
-            (*it)->DoWrite( image.GetPointer() );
-          }
-        }
+        mitk::IOUtil::SaveBaseData(image, outfilename);
 
         if (outCoeffs)
             mitk::IOUtil::SaveImage(coeffsImage, coeffout);

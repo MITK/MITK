@@ -36,22 +36,22 @@ mitk::DICOMTagBasedSorter::CutDecimalPlaces
 {
   // be a bit tolerant for tags such as image orientation orienatation, let only the first few digits matter (http://bugs.mitk.org/show_bug.cgi?id=12263)
   // iterate all fields, convert each to a number, cut this number as configured, then return a concatenated string with all cut-off numbers
-  static std::ostringstream resultString;
+  std::ostringstream resultString;
   resultString.str(std::string());
   resultString.clear();
   resultString.setf(std::ios::fixed, std::ios::floatfield);
   resultString.precision(m_Precision);
 
-  static std::stringstream ss(input);
+  std::stringstream ss(input);
   ss.str(input);
   ss.clear();
-  static std::string item;
+  std::string item;
+  double number(0);
+  std::istringstream converter(item);
   while (std::getline(ss, item, '\\'))
   {
-    static std::istringstream converter(item);
     converter.str(item);
     converter.clear();
-    static double number(0);
     if (converter >> number && converter.eof())
     {
       // converted to double

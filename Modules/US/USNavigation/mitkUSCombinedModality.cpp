@@ -214,10 +214,11 @@ bool mitk::USCombinedModality::OnActivation()
   }
 
   mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDevice.GetPointer());
-  if ( trackingDeviceSource.IsNull() || ! trackingDeviceSource->StartTracking() )
+  if ( trackingDeviceSource.IsNull() )
   {
-    MITK_WARN("USCombinedModality")("USDevice") << "Cannot start tracking.";
+    MITK_WARN("USCombinedModality")("USDevice") << "Cannot start tracking as TrackingDeviceSource is null.";
   }
+  trackingDeviceSource->StartTracking();
 
   return m_UltrasoundDevice->Activate();
 }
@@ -231,14 +232,15 @@ bool mitk::USCombinedModality::OnDeactivation()
   }
 
   mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDevice.GetPointer());
-  if ( trackingDeviceSource.IsNull() || ! trackingDeviceSource->StopTracking() )
+  if ( trackingDeviceSource.IsNull() )
   {
-    MITK_WARN("USCombinedModality")("USDevice") << "Cannot stop tracking.";
+    MITK_WARN("USCombinedModality")("USDevice") << "Cannot stop tracking as TrackingDeviceSource is null.";
   }
+  trackingDeviceSource->StopTracking();
 
   m_UltrasoundDevice->Deactivate();
 
-  return m_UltrasoundDevice->GetIsInitialized();
+  return m_UltrasoundDevice->GetIsConnected();
 }
 
 void mitk::USCombinedModality::OnFreeze(bool freeze)

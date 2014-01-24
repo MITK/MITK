@@ -420,11 +420,11 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const InteractionPositionEvent*
 void mitk::SegTool2D::WritePreviewOnWorkingImage( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep )
 {
   if ((!targetSlice) || (!sourceSlice)) return;
-  AccessFixedDimensionByItk_2( targetSlice, InternalProcessing, 2, sourceSlice, paintingPixelValue );
+  AccessFixedDimensionByItk_2( targetSlice, InternalWritePreviewOnWorkingImage, 2, sourceSlice, paintingPixelValue );
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::SegTool2D::InternalProcessing( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int overwritevalue )
+void mitk::SegTool2D::InternalWritePreviewOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int overwritevalue )
 {
   typedef itk::Image<TPixel,VImageDimension> SliceType;
 

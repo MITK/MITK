@@ -151,7 +151,7 @@ class Segmentation_EXPORT SegTool2D : public Tool
     DiffSliceOperation* m_undoOperation;
 
     template<typename TPixel, unsigned int VImageDimension>
-    void InternalProcessing( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int pixelvalue );
+    void InternalWritePreviewOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int pixelvalue );
 };
 
 } // namespace

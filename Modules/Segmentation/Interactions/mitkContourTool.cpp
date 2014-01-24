@@ -22,10 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImage.h"
 #include "mitkContourUtils.h"
 #include "mitkSurfaceInterpolationController.h"
-
-//#include "mitkProperties.h"
-//#include "mitkPlanarCircle.h"
-
 #include "mitkStateMachineAction.h"
 #include "mitkInteractionEvent.h"
 #include "mitkPositionEvent.h"

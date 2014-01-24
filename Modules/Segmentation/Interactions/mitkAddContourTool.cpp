@@ -50,14 +50,20 @@ void mitk::AddContourTool::ConnectActionsAndFunctions()
 
 bool mitk::AddContourTool::OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
-  assert (workingImage);
+  if (this->CanHandleEvent(interactionEvent) > 0.0)
+  {
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
-  const mitk::Color& color = workingImage->GetActiveLabelColor();
-  this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
+    assert (workingImage);
 
-  return Superclass::OnMousePressed(NULL, interactionEvent);
+    m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    const mitk::Color& color = workingImage->GetActiveLabelColor();
+    this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+
+    return Superclass::OnMousePressed(NULL, interactionEvent);
+  }
+  else
+    return false;
 }
 
 const char** mitk::AddContourTool::GetXPM() const

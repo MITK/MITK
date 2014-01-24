@@ -73,7 +73,7 @@ public:
     double radius = 290.0;
 
     double angleStep = 2.0 * vnl_math::pi / 20;
-    for(double angle = 0 ; angle <= 2.0 * vnl_math::pi; angle += angleStep)
+    for(double angle = 0.1 ; angle < 1.98 * vnl_math::pi; angle += angleStep)
     {
       mitk::Point2D point;
       point[0] = origin[0] + radius * cos(angle);

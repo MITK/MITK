@@ -52,7 +52,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 #  ENDFOREACH(tool)
 
   mitk_create_executable(mitkDiffusionMiniApps
-    DEPENDS DiffusionCore FiberTracking Connectomics
+    DEPENDS DiffusionCore FiberTracking Connectomics DiffusionIO
     PACKAGE_DEPENDS ITK|ITKDiffusionTensorImage
   )
 

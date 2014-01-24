@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
 #include <mitkTbssImage.h>
-#include <QString>
 #include "QuantificationExports.h"
 
 namespace mitk

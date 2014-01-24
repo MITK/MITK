@@ -1052,7 +1052,16 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
   analyzer.SetPointSet(m_PointSetNode);
 
   // Run Analyzer
-  analyzer.MakeRoi();
+  try
+  {
+    analyzer.MakeRoi();
+  }
+  catch (const mitk::Exception& e)
+  {
+    QMessageBox msgBox;
+    msgBox.setText(QString::fromStdString(e.what()));
+    msgBox.exec();
+  }
 
   // Obtain tbss roi image from analyzer
   mitk::TbssRoiImage::Pointer tbssRoi = analyzer.GetRoiImage();

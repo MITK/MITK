@@ -70,28 +70,22 @@ public:
     subdivisionPolygon->SetGeometry2D(image->GetSlicedGeometry()->GetGeometry2D(0));
 
     mitk::Point2D origin; origin[0] = 299.5; origin[1] = 299.5;
-    const double radius = 290.0;
+    double radius = 290.0;
 
-    for(double i = - vnl_math::pi ; i <= vnl_math::pi; i += 0.01)
+    double angleStep = 2.0 * vnl_math::pi / 20;
+    for(double angle = 0 ; angle <= 2.0 * vnl_math::pi; angle += angleStep)
     {
       mitk::Point2D point;
-      point[0] = origin[0] + radius * cos(i);
-      point[1] = origin[1] + radius * sin(i);
+      point[0] = origin[0] + radius * cos(angle);
+      point[1] = origin[1] + radius * sin(angle);
 
       subdivisionPolygon->AddControlPoint(point);
     }
 
-
-    MITK_DEBUG << "NumberOfControlPoints [step length: 0.01]: " << subdivisionPolygon->GetNumberOfControlPoints();
     subdivisionPolygon->SetClosed(true);
 
-    itk::TimeProbe clock;
-
     subdivisionPolygon->Initialize();
-    clock.Start();
     subdivisionPolygon->EvaluateFeatures();
-    clock.Stop();
-    //MITK_ERROR << "EvaluateFeatures(): " << clock.GetTotal();
 
     result = subdivisionPolygon;
 

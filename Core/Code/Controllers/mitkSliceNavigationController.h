@@ -526,6 +526,10 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      */
     void AdjustSliceStepperRange();
 
+    /**
+     * \brief Blocks sending signals. Returns true if the signals have been blocked already, otherwise false.
+     */
+    bool BlockSignals(bool blocked);
 
   protected:
     SliceNavigationController(const char * type = NULL);
@@ -591,6 +595,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     bool m_Rotated;
 
     bool m_BlockUpdate;
+    bool m_BlockSignals;
 
     bool m_SliceLocked;
     bool m_SliceRotationLocked;

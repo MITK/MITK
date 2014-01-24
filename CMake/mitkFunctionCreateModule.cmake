@@ -431,6 +431,22 @@ function(mitk_create_module MODULE_NAME_IN)
 
           _link_directories_for_packages(${PACKAGE_NAMES})
 
+          # Apply properties to the module target.
+          # We cannot use set_target_properties like below since there is no way to
+          # differentiate C/C++ and Releas/Debug flags using target properties.
+          # See http://www.cmake.org/Bug/view.php?id=6493
+          #set_target_properties(${MODULE_PROVIDES} PROPERTIES
+          #                      COMPILE_FLAGS "${module_compile_flags}")
+          #
+          # Strangely, we need to set the variables below in the parent scope
+          # (outside of the function) to be picked up by the target.
+          set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${module_c_flags}" PARENT_SCOPE)
+          set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${module_c_flags_debug}" PARENT_SCOPE)
+          set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${module_c_flags_release}" PARENT_SCOPE)
+          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${module_cxx_flags}" PARENT_SCOPE)
+          set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${module_cxx_flags_debug}" PARENT_SCOPE)
+          set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${module_cxx_flags_release}" PARENT_SCOPE)
+
           if(MODULE_EXECUTABLE)
             add_executable(${MODULE_PROVIDES}
                            ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
@@ -468,19 +484,6 @@ function(mitk_create_module MODULE_NAME_IN)
           if(MINGW)
             target_link_libraries(${MODULE_PROVIDES} ssp) # add stack smash protection lib
           endif()
-
-          # Apply properties to the module target.
-          # We cannot use set_target_properties like below since there is no way to
-          # differentiate C/C++ and Releas/Debug flags using target properties.
-          # See http://www.cmake.org/Bug/view.php?id=6493
-          #set_target_properties(${MODULE_PROVIDES} PROPERTIES
-          #                      COMPILE_FLAGS "${module_compile_flags}")
-          set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${module_c_flags}")
-          set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${module_c_flags_debug}")
-          set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${module_c_flags_release}")
-          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${module_cxx_flags}")
-          set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${module_cxx_flags_debug}")
-          set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${module_cxx_flags_release}")
 
           # Add additional library search directories to a global property which
           # can be evaluated by other CMake macros, e.g. our install scripts.

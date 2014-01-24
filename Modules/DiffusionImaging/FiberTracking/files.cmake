@@ -7,10 +7,6 @@ set(CPP_FILES
   IODataStructures/FiberBundleX/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 
-  # Rendering
-  Rendering/mitkFiberBundleXMapper2D.cpp
-  Rendering/mitkFiberBundleXMapper3D.cpp
-
   # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
@@ -24,10 +20,6 @@ set(CPP_FILES
 )
 
 set(H_FILES
-  # Rendering
-  Rendering/mitkFiberBundleXMapper3D.h
-  Rendering/mitkFiberBundleXMapper2D.h
-
   # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.h
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.h

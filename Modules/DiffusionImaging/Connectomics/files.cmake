@@ -2,10 +2,6 @@ set(CPP_FILES
 
   # DataStructures Connectomics
   IODataStructures/mitkConnectomicsNetwork.cpp
-  IODataStructures/mitkConnectomicsNetworkReader.cpp
-  IODataStructures/mitkConnectomicsNetworkSerializer.cpp
-  IODataStructures/mitkConnectomicsNetworkWriter.cpp
-  IODataStructures/mitkConnectomicsNetworkDefinitions.cpp
   IODataStructures/mitkConnectomicsConstantsManager.cpp
 
   # Rendering Connectomics
@@ -56,10 +52,6 @@ set(H_FILES
 
   # Datastructures Connectomics
   IODataStructures/mitkConnectomicsNetwork.h
-  IODataStructures/mitkConnectomicsNetworkReader.h
-  IODataStructures/mitkConnectomicsNetworkSerializer.h
-  IODataStructures/mitkConnectomicsNetworkWriter.h
-  IODataStructures/mitkConnectomicsNetworkDefinitions.h
   IODataStructures/mitkConnectomicsConstantsManager.h
 
   # Algorithms Connectomics

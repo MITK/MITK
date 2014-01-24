@@ -12,43 +12,27 @@ set(CPP_FILES
   # DataStructures -> DWI
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageHeaderInformation.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSource.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageReader.cpp
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriter.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageIOFactory.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriterFactory.cpp
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSerializer.cpp
+
   IODataStructures/DiffusionWeightedImages/mitkImageToDiffusionImageSource.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp
 
   # DataStructures -> QBall
   IODataStructures/QBallImages/mitkQBallImageSource.cpp
-  IODataStructures/QBallImages/mitkNrrdQBallImageReader.cpp
-  IODataStructures/QBallImages/mitkNrrdQBallImageWriter.cpp
-  IODataStructures/QBallImages/mitkNrrdQBallImageIOFactory.cpp
-  IODataStructures/QBallImages/mitkNrrdQBallImageWriterFactory.cpp
   IODataStructures/QBallImages/mitkQBallImage.cpp
-  IODataStructures/QBallImages/mitkQBallImageSerializer.cpp
 
   # DataStructures -> Tensor
-  IODataStructures/TensorImages/mitkTensorImageSource.cpp
-  IODataStructures/TensorImages/mitkNrrdTensorImageReader.cpp
-  IODataStructures/TensorImages/mitkNrrdTensorImageWriter.cpp
-  IODataStructures/TensorImages/mitkNrrdTensorImageIOFactory.cpp
-  IODataStructures/TensorImages/mitkNrrdTensorImageWriterFactory.cpp
   IODataStructures/TensorImages/mitkTensorImage.cpp
-  IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
   #IODataStructures/mitkRegistrationObject.cpp
 
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
-  Rendering/mitkCompositeMapper.cpp
   Rendering/mitkVectorImageVtkGlyphMapper3D.cpp
   Rendering/vtkOdfSource.cxx
   Rendering/vtkThickPlane.cxx
   Rendering/mitkOdfNormalizationMethodProperty.cpp
   Rendering/mitkOdfScaleByProperty.cpp
-  Rendering/mitkPlanarFigureMapper3D.cpp
 
   # Algorithms
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
@@ -77,7 +61,6 @@ set(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
-  Rendering/mitkPlanarFigureMapper3D.h
 
   # Reconstruction
   Algorithms/Reconstruction/itkDiffusionQballReconstructionImageFilter.h

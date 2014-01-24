@@ -22,15 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "DiffusionCoreExports.h"
 
 namespace mitk
 {
 //##Documentation
 //## @brief Create instances of NrrdTensorImageReader objects using an object factory.
 //##
-//## @ingroup IO
-class DiffusionCore_EXPORT NrrdTensorImageIOFactory : public itk::ObjectFactoryBase
+class NrrdTensorImageIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */

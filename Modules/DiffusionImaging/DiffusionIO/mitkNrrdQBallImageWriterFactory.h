@@ -13,31 +13,21 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __MITK_NRRD_QBI_IO_FACTORY_H_HEADER__
-#define __MITK_NRRD_QBI_IO_FACTORY_H_HEADER__
 
-#ifdef _MSC_VER
-#pragma warning ( disable : 4786 )
-#endif
+#ifndef NRRDQBI_WRITERFACTORY_H_HEADER_INCLUDED
+#define NRRDQBI_WRITERFACTORY_H_HEADER_INCLUDED
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "DiffusionCoreExports.h"
 
 namespace mitk
 {
-//##Documentation
-//## @brief Create instances of NrrdQBallImageReader objects using an object factory.
-//##
-//## @ingroup IO
-class DiffusionCore_EXPORT NrrdQBallImageIOFactory : public itk::ObjectFactoryBase
+
+class NrrdQBallImageWriterFactory : public itk::ObjectFactoryBase
 {
 public:
-  /** Standard class typedefs. */
-  typedef NrrdQBallImageIOFactory   Self;
-  typedef itk::ObjectFactoryBase  Superclass;
-  typedef itk::SmartPointer<Self>  Pointer;
-  typedef itk::SmartPointer<const Self>  ConstPointer;
+
+  mitkClassMacro( mitk::NrrdQBallImageWriterFactory, itk::ObjectFactoryBase )
 
   /** Class methods used to interface with the registered factories. */
   virtual const char* GetITKSourceVersion(void) const;
@@ -45,9 +35,6 @@ public:
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
-  static NrrdQBallImageIOFactory* FactoryNew() { return new NrrdQBallImageIOFactory;}
-  /** Run-time type information (and related methods). */
-  itkTypeMacro(NrrdQBallImageIOFactory, ObjectFactoryBase);
 
   /** Register one factory of this type  */
   static void RegisterOneFactory(void)
@@ -55,24 +42,25 @@ public:
     static bool IsRegistered = false;
     if ( !IsRegistered )
     {
-      NrrdQBallImageIOFactory::Pointer fac = NrrdQBallImageIOFactory::New();
+      NrrdQBallImageWriterFactory::Pointer fac = NrrdQBallImageWriterFactory::New();
       ObjectFactoryBase::RegisterFactory( fac );
       IsRegistered = true;
     }
   }
 
-
 protected:
-  NrrdQBallImageIOFactory();
-  ~NrrdQBallImageIOFactory();
+  NrrdQBallImageWriterFactory();
+  ~NrrdQBallImageWriterFactory();
 
 private:
-  NrrdQBallImageIOFactory(const Self&); //purposely not implemented
+  NrrdQBallImageWriterFactory(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 };
 
-
 } // end namespace mitk
 
-#endif  // __MITK_NRRD_QBI_IO_FACTORY_H_HEADER__
+#endif // NRRDQBI_WRITERFACTORY_H_HEADER_INCLUDED
+
+
+

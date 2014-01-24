@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkQBallImage.h"
 #include "mitkQBallImageSource.h"
 #include "itkVectorImage.h"
-#include <DiffusionCoreExports.h>
 
 namespace mitk
 {
@@ -32,7 +31,7 @@ namespace mitk
   /** \brief
   */
 
-  class DiffusionCore_EXPORT NrrdQBallImageReader : public mitk::QBallImageSource, public FileReader
+  class NrrdQBallImageReader : public mitk::QBallImageSource, public FileReader
   {
   public:
 

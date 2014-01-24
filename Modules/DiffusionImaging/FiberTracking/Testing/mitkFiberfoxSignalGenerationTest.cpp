@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDotModel.h>
 #include <mitkAstroStickModel.h>
 #include <mitkDiffusionImage.h>
-#include <mitkNrrdDiffusionImageWriter.h>
 #include <itkTestingComparisonImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include <mitkRicianNoiseModel.h>
@@ -75,24 +74,15 @@ void StartSimulation(FiberfoxParameters<double> parameters, FiberBundleX::Pointe
         bool cond = CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage());
         if (!cond)
         {
-            NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-            writer->SetFileName("/tmp/testImage.dwi");
-            writer->SetInput(testImage);
-            writer->Update();
-
-            writer->SetFileName("/tmp/refImage.dwi");
-            writer->SetInput(refImage);
-            writer->Update();
+            mitk::IOUtil::SaveBaseData(testImage, "/tmp/testImage.dwi");
+            mitk::IOUtil::SaveBaseData(refImage, "/tmp/refImage.dwi");
         }
         MITK_TEST_CONDITION_REQUIRED(cond, message);
     }
     else
     {
         MITK_INFO << "Saving test image to " << message;
-        NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-        writer->SetFileName(message);
-        writer->SetInput(testImage);
-        writer->Update();
+        mitk::IOUtil::SaveBaseData(testImage, message);
     }
 }
 

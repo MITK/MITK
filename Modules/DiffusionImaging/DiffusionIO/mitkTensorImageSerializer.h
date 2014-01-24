@@ -14,10 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkQBallImageSerializer_h_included
-#define mitkQBallImageSerializer_h_included
+#ifndef mitkTensorImageSerializer_h_included
+#define mitkTensorImageSerializer_h_included
 
-#include "DiffusionCoreExports.h"
 #include "mitkBaseDataSerializer.h"
 
 namespace mitk
@@ -25,15 +24,15 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class DiffusionCore_EXPORT QBallImageSerializer : public BaseDataSerializer
+class TensorImageSerializer : public BaseDataSerializer
 {
   public:
-    mitkClassMacro( QBallImageSerializer, BaseDataSerializer );
+    mitkClassMacro( TensorImageSerializer, BaseDataSerializer );
     itkNewMacro(Self);
     virtual std::string Serialize();
   protected:
-    QBallImageSerializer();
-    virtual ~QBallImageSerializer();
+    TensorImageSerializer();
+    virtual ~TensorImageSerializer();
 };
 } // namespace
 #endif

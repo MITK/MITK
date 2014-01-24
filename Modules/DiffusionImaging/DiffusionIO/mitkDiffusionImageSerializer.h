@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDiffusionImageSerializer_h_included
 #define mitkDiffusionImageSerializer_h_included
 
-#include "DiffusionCoreExports.h"
 #include "mitkBaseDataSerializer.h"
 
 namespace mitk
@@ -25,7 +24,7 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class DiffusionCore_EXPORT DiffusionImageSerializer : public BaseDataSerializer
+class DiffusionImageSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( DiffusionImageSerializer, BaseDataSerializer );

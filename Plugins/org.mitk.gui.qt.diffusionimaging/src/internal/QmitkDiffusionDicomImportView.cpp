@@ -30,12 +30,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkMemoryUtilities.h"
+#include "mitkIOUtil.h"
 
 // diffusion module includes
 #include "mitkDicomDiffusionImageHeaderReader.h"
 #include "mitkDicomDiffusionImageReader.h"
 #include "mitkDiffusionImage.h"
-#include "mitkNrrdDiffusionImageWriter.h"
 
 #include "gdcmDirectory.h"
 #include "gdcmScanner.h"
@@ -698,8 +698,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         }
         else
         {
-          typedef mitk::NrrdDiffusionImageWriter<PixelValueType> WriterType;
-          WriterType::Pointer writer = WriterType::New();
           QString fullpath = QString("%1/%2.dwi")
                              .arg(m_OutputFolderName)
                              .arg(descr);
@@ -729,11 +727,9 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
               outputFile.setFileName( fullpath );
             }
           }
-          writer->SetFileName(fullpath.toStdString());
-          writer->SetInput(diffImage);
           try
           {
-            writer->Update();
+            mitk::IOUtil::SaveBaseData(diffImage, fullpath.toStdString());
           }
           catch (itk::ExceptionObject &ex)
           {

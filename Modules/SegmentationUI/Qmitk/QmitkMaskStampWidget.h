@@ -23,8 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWidget>
 
-
-#include "ui_QmitkMaskStampWidgetControls.h"
+#include "ui_QmitkMaskStampWidgetGUIControls.h"
 
 namespace mitk {
   class ToolManager;
@@ -64,7 +63,7 @@ class SegmentationUI_EXPORT QmitkMaskStampWidget : public QWidget
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
-    Ui::QmitkMaskStampWidgetControls m_Controls;
+    Ui::QmitkMaskStampWidgetGUIControls m_Controls;
 
 };
 

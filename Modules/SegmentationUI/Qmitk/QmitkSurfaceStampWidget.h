@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWidget>
 
-#include "ui_QmitkSurfaceStampWidgetControls.h"
+#include "ui_QmitkSurfaceStampWidgetGUIControls.h"
 
 namespace mitk {
   class ToolManager;
@@ -61,7 +61,7 @@ private:
 
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
-    Ui::QmitkSurfaceStampWidgetControls m_Controls;
+    Ui::QmitkSurfaceStampWidgetGUIControls m_Controls;
 };
 
 #endif

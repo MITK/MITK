@@ -44,7 +44,7 @@ static void Setup( )
   }
   catch( const itk::ExceptionObject &e)
   {
-    MITK_TEST_FAILED_MSG(<< "(Setup) Caught exception from IOUtil while loading input : " << m_Filename <<"\n")
+    MITK_TEST_FAILED_MSG(<< "(Setup) Caught exception from IOUtil while loading input : " << m_Filename <<"\n" << e.what())
   }
 }
 

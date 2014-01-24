@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
 #include <mitkQBallImage.h>
-#include <DiffusionCoreExports.h>
 
 
 namespace mitk
@@ -30,7 +29,7 @@ namespace mitk
  * Writes diffusion volumes to a file
  * @ingroup Process
  */
-class DiffusionCore_EXPORT NrrdQBallImageWriter : public mitk::FileWriterWithInformation
+class NrrdQBallImageWriter : public mitk::FileWriterWithInformation
 {
 public:
 

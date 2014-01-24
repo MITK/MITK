@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3D.h>
 #include <itkDiffusionQballReconstructionImageFilter.h>
 #include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
-#include <mitkNrrdQBallImageWriter.h>
 
 using namespace std;
 

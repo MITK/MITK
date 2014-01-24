@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPixelType.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageFileReader.h"
-
 #include "mitkNrrdDiffusionImageWriter.h"
 
 template< class D, class T >

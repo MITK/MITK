@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDotModel.h>
 #include <mitkAstroStickModel.h>
 #include <mitkDiffusionImage.h>
-#include <mitkNrrdDiffusionImageWriter.h>
 #include <itkTestingComparisonImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include <mitkRicianNoiseModel.h>
@@ -116,23 +115,14 @@ public:
             bool ok = CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage());
             if (!ok)
             {
-                NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-                writer->SetFileName("/tmp/test2.dwi");
-                writer->SetInput(testImage);
-                writer->Update();
-
-                writer->SetFileName("/tmp/ref2.dwi");
-                writer->SetInput(refImage);
-                writer->Update();
+                mitk::IOUtil::SaveBaseData(testImage, "/tmp/test2.dwi");
+                mitk::IOUtil::SaveBaseData(refImage, "/tmp/ref2.dwi");
             }
             CPPUNIT_ASSERT_MESSAGE(testFileName, ok);
         }
         else
         {
-            NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-            writer->SetFileName("/local/distortions2.dwi");
-            writer->SetInput(testImage);
-            writer->Update();
+            mitk::IOUtil::SaveBaseData(testImage, "/local/distortions2.dwi");
         }
     }
 

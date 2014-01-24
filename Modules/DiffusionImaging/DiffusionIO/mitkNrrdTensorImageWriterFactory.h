@@ -19,12 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "DiffusionCoreExports.h"
 
 namespace mitk
 {
 
-class DiffusionCore_EXPORT NrrdTensorImageWriterFactory : public itk::ObjectFactoryBase
+class NrrdTensorImageWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 

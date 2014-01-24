@@ -13,22 +13,29 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+#ifndef __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_H_HEADER__
+#define __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_H_HEADER__
 
-#ifndef NRRDDIFFIMAGE_WRITERFACTORY_H_HEADER_INCLUDED
-#define NRRDDIFFIMAGE_WRITERFACTORY_H_HEADER_INCLUDED
+#ifdef _MSC_VER
+#pragma warning ( disable : 4786 )
+#endif
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "DiffusionCoreExports.h"
 
 namespace mitk
 {
-
-class DiffusionCore_EXPORT NrrdDiffusionImageWriterFactory : public itk::ObjectFactoryBase
+//##Documentation
+//## @brief Create instances of NrrdDiffusionImageReader objects using an object factory.
+//##
+class NrrdDiffusionImageIOFactory : public itk::ObjectFactoryBase
 {
 public:
-
-  mitkClassMacro( mitk::NrrdDiffusionImageWriterFactory, itk::ObjectFactoryBase )
+  /** Standard class typedefs. */
+  typedef NrrdDiffusionImageIOFactory   Self;
+  typedef itk::ObjectFactoryBase  Superclass;
+  typedef itk::SmartPointer<Self>  Pointer;
+  typedef itk::SmartPointer<const Self>  ConstPointer;
 
   /** Class methods used to interface with the registered factories. */
   virtual const char* GetITKSourceVersion(void) const;
@@ -36,6 +43,9 @@ public:
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
+  static NrrdDiffusionImageIOFactory* FactoryNew() { return new NrrdDiffusionImageIOFactory;}
+  /** Run-time type information (and related methods). */
+  itkTypeMacro(NrrdDiffusionImageIOFactory, ObjectFactoryBase);
 
   /** Register one factory of this type  */
   static void RegisterOneFactory(void)
@@ -43,25 +53,23 @@ public:
     static bool IsRegistered = false;
     if ( !IsRegistered )
     {
-      NrrdDiffusionImageWriterFactory::Pointer fac = NrrdDiffusionImageWriterFactory::New();
+      NrrdDiffusionImageIOFactory::Pointer fac = NrrdDiffusionImageIOFactory::New();
       ObjectFactoryBase::RegisterFactory( fac );
       IsRegistered = true;
     }
   }
 
 protected:
-  NrrdDiffusionImageWriterFactory();
-  ~NrrdDiffusionImageWriterFactory();
+  NrrdDiffusionImageIOFactory();
+  ~NrrdDiffusionImageIOFactory();
 
 private:
-  NrrdDiffusionImageWriterFactory(const Self&); //purposely not implemented
+  NrrdDiffusionImageIOFactory(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 };
 
+
 } // end namespace mitk
 
-#endif // NRRDDIFFIMAGE_WRITERFACTORY_H_HEADER_INCLUDED
-
-
-
+#endif  // __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_H_HEADER__

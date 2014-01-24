@@ -14,26 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkConnectomicsNetworkSerializer_h_included
-#define mitkConnectomicsNetworkSerializer_h_included
+#ifndef mitkQBallImageSerializer_h_included
+#define mitkQBallImageSerializer_h_included
 
-#include "ConnectomicsExports.h"
 #include "mitkBaseDataSerializer.h"
 
 namespace mitk
 {
 /**
-  \brief Serializes mitk::ConnectomicsNetwork for mitk::SceneIO
+  \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class Connectomics_EXPORT ConnectomicsNetworkSerializer : public BaseDataSerializer
+class QBallImageSerializer : public BaseDataSerializer
 {
   public:
-    mitkClassMacro( ConnectomicsNetworkSerializer, BaseDataSerializer );
+    mitkClassMacro( QBallImageSerializer, BaseDataSerializer );
     itkNewMacro(Self);
     virtual std::string Serialize();
   protected:
-    ConnectomicsNetworkSerializer();
-    virtual ~ConnectomicsNetworkSerializer();
+    QBallImageSerializer();
+    virtual ~QBallImageSerializer();
 };
 } // namespace
 #endif

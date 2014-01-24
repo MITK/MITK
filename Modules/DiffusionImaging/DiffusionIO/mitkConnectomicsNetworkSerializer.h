@@ -14,26 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkTensorImageSerializer_h_included
-#define mitkTensorImageSerializer_h_included
+#ifndef mitkConnectomicsNetworkSerializer_h_included
+#define mitkConnectomicsNetworkSerializer_h_included
 
-#include "DiffusionCoreExports.h"
 #include "mitkBaseDataSerializer.h"
 
 namespace mitk
 {
 /**
-  \brief Serializes mitk::Surface for mitk::SceneIO
+  \brief Serializes mitk::ConnectomicsNetwork for mitk::SceneIO
 */
-class DiffusionCore_EXPORT TensorImageSerializer : public BaseDataSerializer
+class ConnectomicsNetworkSerializer : public BaseDataSerializer
 {
   public:
-    mitkClassMacro( TensorImageSerializer, BaseDataSerializer );
+    mitkClassMacro( ConnectomicsNetworkSerializer, BaseDataSerializer );
     itkNewMacro(Self);
     virtual std::string Serialize();
   protected:
-    TensorImageSerializer();
-    virtual ~TensorImageSerializer();
+    ConnectomicsNetworkSerializer();
+    virtual ~ConnectomicsNetworkSerializer();
 };
 } // namespace
 #endif

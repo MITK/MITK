@@ -55,7 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleRegistry.h"
 #include <mitkChiSquareNoiseModel.h>
 #include <itksys/SystemTools.hxx>
-#include <mitkNrrdDiffusionImageWriter.h>
+#include <mitkIOUtil.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -230,10 +230,7 @@ void QmitkFiberfoxView::AfterThread()
             status += parameters.m_ResultNode->GetName().c_str();
             status += ".dwi";
             m_Controls->m_SimulationStatusText->append(status);
-            mitk::NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-            writer->SetFileName(parameters.m_OutputPath+parameters.m_ResultNode->GetName()+".dwi");
-            writer->SetInput(mitkImage);
-            writer->Update();
+            mitk::IOUtil::SaveBaseData(mitkImage, parameters.m_OutputPath+parameters.m_ResultNode->GetName()+".dwi");
             m_Controls->m_SimulationStatusText->append("File saved successfully.");
         }
         catch (itk::ExceptionObject &e)

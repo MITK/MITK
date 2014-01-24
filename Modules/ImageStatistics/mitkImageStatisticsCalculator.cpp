@@ -1508,7 +1508,7 @@ ImageStatisticsCalculator
 
   for(unsigned int i = 0; i < VImageDimension; ++i)
   {
-    maskSize[i] = ::ceil( 2.0 * radiusInMM / spacing[i] );
+    maskSize[i] = static_cast<int>( 2 * radiusInMM / spacing[i]);
 
     // We always want an uneven size to have a clear center point in the convolution mask
     if(maskSize[i] % 2 == 0 )
@@ -1516,7 +1516,6 @@ ImageStatisticsCalculator
       ++maskSize[i];
     }
   }
-
   return maskSize;
 }
 

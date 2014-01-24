@@ -28,105 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  \section hotspotCalculationTestCases Testcases
 
- To check the correctness of the hotspot calculation, this special class has been created, which
- generates images with known hotspot location and statistics. A number of unit tests use this class to first generate
- an image of known properties and then verify that \ref mitk::ImageStatisticsCalculator is able to reproduce the known statistics.
+ To see the different Hotspot-Testcases have a look at the \ref hotspottestdoc.
 
- Every testcase has a defined hotspot, maximum and minimum including their corresponding index-values and mean value.
- The XML-files to each testcase is located in Modules/ImageStatistics/Testing/Data.
-
- The following cases describe situations of hotspot-calculation and their supposed results.
-
- <b>Note:</b> Below only the behaviour of maximum is mentioned mostly, but the other statistics (minimum and mean) behave
-    in the same way like maximum.
-
- <b> Testcase 1: No values outside of hotspot are used for statistic-calculation </b>
-
-  The purpose of this testcase is primarily to confirm the correct detection of the hotspot even if there is an global maximum
-  which is "hotter" than the mean value itself. On the other hand the test verifies that only voxels are used for statistic-calculation
-  which are located in the hotspot.
-
-   Description:
- - Defined location of hotspot in image: left upper corner
- - Defined location of maximum in image: bottom right corner
- - Segmentation is not available
-
- \image html mitkimagestatisticshotspottestcase1.jpg
-
-   Assumed results:
- - Hotspot is calculated correctly in the left upper corner of the image
- - Defined maximum is not inside hotspot
- - A maximum inside the hotspot is calculated
-
- <b> Testcase 2: Correct detection of hotspot </b>
-
- In this testcase we want to make sure that when a segmentation is available the origin of the hotspot-sphere is located within it. The
- image is so structured that there are two hot regions: One region inside and another one, which is hotter than the other region, outside the segmentation.
- So we can assume that the segmentation is also considered when detecting the hotspot, even an actual hotspot outside the segmentation exists.
-
-   Description:
- - Segmentation is available
- - Defined location of hotspot: inside segmentation
- - Defined location of maximum: inside hotspot
- - Another "hotter" region outside of the segmentation
-
- \image html mitkimagestatisticshotspottestcase2.jpg
-
-   Assumed results:
- - Defined hotspot is correctly calculated inside segmentation
- - Defined maximum is correctly calculated inside hotspot
- - "Hotter" region outside of segmentation is disregarded
-
- <b> Testcase 3: Correct calculation of statistics in hotspot, although the whole hotspot is not inside segmentation </b>
-
- The difficulty of calculating the hotspot statistics in testcase 3 is that the origin of the hotspot is close to the segmentation-borders. So
- if the whole hotspot is not inside the segmentation (or even the segmentation is smaller than the hotspot itself) this test checks that
- calculation of hotspot statistics is possible anyway.
-
-   Description:
- - Segmentation is available
- - Defined location of hotspot: inside segmentation
- - Defined location of maximum: outside of segmentation, but inside of hotspot
-
- \image html mitkimagestatisticshotspottestcase3.jpg
-
-   Assumed results:
- - Defined hotspot is correctly calculated inside segmentation
- - Defined maximum is correctly calculated inside hotspot although it is located outside of the segmentation
-
- <b> Testcase 4 and 5: Hotspot must (not) be  completely inside image </b>
-
- Testcase 4 and 5 are very similar so we mention it at the same time: In testcase 4 the hotspot is not completely inside the image and just
- voxels are considered for calculation which are located inside the image. But in testcase 5 the hotspot must be completely inside the image
- even there is an possible hotspot-location at the borders of the image.
-
- <b>Note:</b> Because of the fact that you cannot avoid a failure at the image borders (during the convolution unknown pixel-values outside
-             the image are used) it is not possible make a clear statement about the behaviour of hotspotstatistics. So no tests for Testcase 4 were created.
-
-   Description:
- - Defined location of hotspot: At the border of the image
- - Defined location of maximum: Inside hotspot
- - Segmentation is not available
-
- \image html mitkimagestatisticshotspottestcase5.jpg
-
- Assumed results in testcase 5:
- - Defined hotspot and statistics are not calculated, because hotspot is not completely inside image
- - A hotspot, which is not as hot as the defined one but is inside the image, is calculated
-
-
- <b> Testcase 6: Multi label mask </b>
-
- This testcase confirms that mitkImageStatisticsCalculator has the possibility to calculate hotspot statistics even if
- there are multiple regions of interest.
-
-   Description:
- - Two defined regions of interest with defined statistics for each one.
-
- \image html mitkimagestatisticshotspottestcase6.jpg
-
-   Assumed results:
- - For every region of interest the hotspot-statistics are calculated correctly
  */
 
 struct mitkImageStatisticsHotspotTestClass
@@ -312,10 +215,6 @@ struct mitkImageStatisticsHotspotTestClass
   */
   static Parameters ParseParameters(int argc, char* argv[])
   {
-    // - parse parameters
-    // - fill ALL values of result structure
-    // - if necessary, provide c'tor and default parameters to Parameters
-
     MITK_TEST_CONDITION_REQUIRED(argc == 2, "Test is invoked with exactly 1 parameter (XML parameters file)");
     MITK_INFO << "Reading parameters from file '" << argv[1] << "'";
     std::string filename = argv[1];
@@ -329,7 +228,6 @@ struct mitkImageStatisticsHotspotTestClass
       xmlReader->Update();
       itk::DOMNode::Pointer domRoot = xmlReader->GetOutput();
       typedef std::vector<itk::DOMNode*> NodeList;
-      // read test image parameters, fill result structure
       NodeList testimages;
       domRoot->GetChildren("testimage", testimages);
       MITK_TEST_CONDITION_REQUIRED( testimages.size() == 1, "One test image defined" )
@@ -479,7 +377,6 @@ struct mitkImageStatisticsHotspotTestClass
 
   static mitk::Image::Pointer BuildTestImage(const Parameters& testParameters)
   {
-    // evaluate parameters, create corresponding image
     mitk::Image::Pointer result;
 
     typedef double PixelType;
@@ -638,7 +535,6 @@ struct mitkImageStatisticsHotspotTestClass
 
     double eps = 0.01;
 
-    // float comparisons, allow tiny differences
     MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMean[label] - statistics.GetHotspotStatistics().GetMean() ) < eps, "Mean value of hotspot in XML-File: " << testParameters.m_HotspotMean[label] << " (Mean value of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotStatistics().GetMean() << ")" );
     MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMax[label]- statistics.GetHotspotStatistics().GetMax() ) < eps, "Maximum of hotspot in XML-File:  " << testParameters.m_HotspotMax[label] << " (Maximum of hotspot calculated in mitkImageStatisticsCalculator: "  << statistics.GetHotspotStatistics().GetMax() << ")" );
     MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMin[label] - statistics.GetHotspotStatistics().GetMin() ) < eps, "Minimum of hotspot in XML-File: " << testParameters.m_HotspotMin[label] << " (Minimum of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotStatistics().GetMin() << ")" );
@@ -673,19 +569,15 @@ int mitkImageStatisticsHotspotTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkImageStatisticsHotspotTest")
   try {
-  // parse commandline parameters (see CMakeLists.txt)
   mitkImageStatisticsHotspotTestClass::Parameters parameters = mitkImageStatisticsHotspotTestClass::ParseParameters(argc,argv);
 
-  // build a test image as described in parameters
   mitk::Image::Pointer image = mitkImageStatisticsHotspotTestClass::BuildTestImage(parameters);
   MITK_TEST_CONDITION_REQUIRED( image.IsNotNull(), "Generate test image" );
 
   for(int label = 0; label < parameters.m_NumberOfLabels; ++label)
   {
-    // calculate statistics for this image (potentially use parameters for statistics ROI)
     mitk::ImageStatisticsCalculator::Statistics statistics = mitkImageStatisticsHotspotTestClass::CalculateStatistics(image, parameters, label);
 
-    // compare statistics against stored expected values
     mitkImageStatisticsHotspotTestClass::ValidateStatistics(statistics, parameters, label);
     std::cout << std::endl;
   }

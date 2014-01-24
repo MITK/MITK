@@ -9,6 +9,8 @@
  Every testcase has a defined hotspot, maximum and minimum including their corresponding index-values and mean value.
  The XML-files to each testcase is located in Modules/ImageStatistics/Testing/Data.
 
+ This test checks the hotspot-statistics of images with a spacing[x,y,z] of [3,3,3], [4,4,3] and [5,5,5], according to common PET-resolutions.
+
  The following cases describe situations of hotspot-calculation and their supposed results.
 
  <b>Note:</b> Below only the behaviour of maximum is mentioned mostly, but the other statistics (minimum and mean) behave

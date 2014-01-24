@@ -143,7 +143,7 @@ public:
         output->SetSpacing(spacing);
 
         //get a pointer to the image buffer to write into
-        TPixelType* imageBuffer;
+        TPixelType* imageBuffer = NULL;
         try
         {
           mitk::ImageWriteAccessor writeAccess( output );

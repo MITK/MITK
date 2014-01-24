@@ -4,6 +4,7 @@ if(MITK_USE_OpenCL)
   MITK_CREATE_MODULE(MitkOcl
     DEPENDS Mitk
     PACKAGE_DEPENDS OpenCL
+                    ITK|ITKThresholding
   )
 
   add_subdirectory(Testing)

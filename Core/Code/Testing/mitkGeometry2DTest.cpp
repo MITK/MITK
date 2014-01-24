@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVector.h>
 
 
-  const mitk::Geometry2D::Pointer  createGeometry2D()
+mitk::Geometry2D::Pointer  createGeometry2D()
 {
    mitk::Vector3D mySpacing;
    mySpacing[0] = 31;
@@ -55,7 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
    return geometry2D;
 }
 
-  const int testGeometry2DCloning()
+int testGeometry2DCloning()
 {
   mitk::Geometry2D::Pointer geometry2D = createGeometry2D();
 
@@ -66,11 +66,9 @@ See LICENSE.txt or http://www.mitk.org for details.
     MITK_TEST_CONDITION(matrix[0][0] == 31, "Test if matrix element exists...");
 
     double origin = geometry2D->GetOrigin()[0];
-    mitk::Point3D ori = geometry2D->GetOrigin();
     MITK_TEST_CONDITION(mitk::Equal(origin, 8),"First Point of origin as expected...");
 
     double spacing = geometry2D->GetSpacing()[0];
-    mitk::Vector3D spac = geometry2D->GetSpacing();
     MITK_TEST_CONDITION(mitk::Equal(spacing, 31),"First Point of spacing as expected...");
   }
   catch (...)
@@ -83,7 +81,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   return EXIT_SUCCESS;
 }
 
-const bool compareMatrix(itk::Matrix<mitk::ScalarType, 3,3> left, itk::Matrix<mitk::ScalarType, 3,3> right)
+bool compareMatrix(itk::Matrix<mitk::ScalarType, 3,3> left, itk::Matrix<mitk::ScalarType, 3,3> right)
 {
   bool equal = true;
   for (int i = 0; i < 3; ++i)
@@ -92,7 +90,7 @@ const bool compareMatrix(itk::Matrix<mitk::ScalarType, 3,3> left, itk::Matrix<mi
   return equal;
 }
 
-const int testGeometry2DInitializeOrder()
+int testGeometry2DInitializeOrder()
 {
    mitk::Vector3D mySpacing;
    mySpacing[0] = 31;

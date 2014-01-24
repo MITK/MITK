@@ -333,7 +333,8 @@ mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference,
                    << ", test Token '" << testToken << "'" << " value " << testNumber;
 
         bool old_result = result;
-        result &= ( fabs(refNumber - testNumber) < mitk::eps );
+
+        result &= ( fabs(refNumber - testNumber) < 0.0001 /*mitk::eps*/ );
         // log the token/number which causes the test to fail
         if( old_result != result)
         {

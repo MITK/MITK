@@ -27,7 +27,7 @@ mitk::ITKDICOMSeriesReaderHelper
 ::CanHandleFile(const std::string& filename)
 {
   MITK_DEBUG << "ITKDICOMSeriesReaderHelper::CanHandleFile " << filename;
-  static itk::GDCMImageIO::Pointer tester = itk::GDCMImageIO::New();
+  itk::GDCMImageIO::Pointer tester = itk::GDCMImageIO::New();
   if ( tester->CanReadFile(filename.c_str()) )
   {
     tester->SetFileName( filename.c_str() );

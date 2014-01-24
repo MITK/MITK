@@ -94,24 +94,24 @@ mitk::SortByImagePositionPatient
   static const DICOMTag tagImagePositionPatient = DICOMTag(0x0020,0x0032); // Image Position (Patient)
   static const DICOMTag    tagImageOrientation = DICOMTag(0x0020, 0x0037); // Image Orientation
 
-  static Vector3D leftRight; leftRight.Fill(0.0);
-  static Vector3D leftUp; leftUp.Fill(0.0);
-  static bool leftHasOrientation(false);
+  Vector3D leftRight; leftRight.Fill(0.0);
+  Vector3D leftUp; leftUp.Fill(0.0);
+  bool leftHasOrientation(false);
   DICOMStringToOrientationVectors( left->GetTagValueAsString( tagImageOrientation ),
                                    leftRight, leftUp, leftHasOrientation );
 
-  static Vector3D rightRight; rightRight.Fill(0.0);
-  static Vector3D rightUp; rightUp.Fill(0.0);
-  static bool rightHasOrientation(false);
+  Vector3D rightRight; rightRight.Fill(0.0);
+  Vector3D rightUp; rightUp.Fill(0.0);
+  bool rightHasOrientation(false);
   DICOMStringToOrientationVectors( right->GetTagValueAsString( tagImageOrientation ),
                                    rightRight, rightUp, rightHasOrientation );
 
-  static Point3D leftOrigin; leftOrigin.Fill(0.0f);
-  static bool leftHasOrigin(false);
+  Point3D leftOrigin; leftOrigin.Fill(0.0f);
+  bool leftHasOrigin(false);
   leftOrigin = DICOMStringToPoint3D( left->GetTagValueAsString( tagImagePositionPatient ), leftHasOrigin );
 
-  static Point3D rightOrigin; rightOrigin.Fill(0.0f);
-  static bool rightHasOrigin(false);
+  Point3D rightOrigin; rightOrigin.Fill(0.0f);
+  bool rightHasOrigin(false);
   rightOrigin = DICOMStringToPoint3D( right->GetTagValueAsString( tagImagePositionPatient ), rightHasOrigin );
 
   //   we tolerate very small differences in image orientation, since we got to know about
@@ -128,15 +128,13 @@ mitk::SortByImagePositionPatient
     }
   }
 
-  static Vector3D normal;
+  Vector3D normal;
   normal[0] = leftRight[1] * leftUp[2] - leftRight[2] * leftUp[1];
   normal[1] = leftRight[2] * leftUp[0] - leftRight[0] * leftUp[2];
   normal[2] = leftRight[0] * leftUp[1] - leftRight[1] * leftUp[0];
 
-  static double leftDistance = 0.0;
-  static double rightDistance = 0.0;
-  leftDistance = 0.0;
-  rightDistance = 0.0;
+  double leftDistance = 0.0;
+  double rightDistance = 0.0;
 
   // this computes the distance from world origin (0,0,0) ALONG THE NORMAL of the image planes
   for (unsigned int dim = 0; dim < 3; ++dim)

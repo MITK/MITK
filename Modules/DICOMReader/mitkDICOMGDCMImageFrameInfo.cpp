@@ -20,7 +20,7 @@ mitk::DICOMGDCMImageFrameInfo
 ::DICOMGDCMImageFrameInfo(const std::string& filename, unsigned int frameNo)
 :itk::LightObject()
 ,m_FrameInfo( DICOMImageFrameInfo::New(filename, frameNo) )
-,m_TagForValue(gdcm::Scanner::TagToValue()) // empty
+,m_TagForValue()
 {
 }
 
@@ -28,7 +28,7 @@ mitk::DICOMGDCMImageFrameInfo
 ::DICOMGDCMImageFrameInfo(DICOMImageFrameInfo::Pointer frameinfo)
 :itk::LightObject()
 ,m_FrameInfo(frameinfo)
-,m_TagForValue(gdcm::Scanner::TagToValue()) // empty
+,m_TagForValue()
 {
 }
 

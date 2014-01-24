@@ -62,7 +62,7 @@ namespace mitk
       DICOMGDCMImageFrameInfo(DICOMImageFrameInfo::Pointer frameinfo, gdcm::Scanner::TagToValue const& tagToValueMapping);
       DICOMGDCMImageFrameInfo(const std::string& filename = "", unsigned int frameNo = 0);
 
-      gdcm::Scanner::TagToValue const& m_TagForValue;
+      const gdcm::Scanner::TagToValue m_TagForValue;
   };
 
   typedef std::vector<DICOMGDCMImageFrameInfo::Pointer> DICOMGDCMImageFrameList;

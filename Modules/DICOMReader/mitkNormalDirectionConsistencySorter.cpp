@@ -99,33 +99,31 @@ mitk::NormalDirectionConsistencySorter
     std::string imagePositionPatientFirst = firstDS->GetTagValueAsString( tagImagePositionPatient );
     std::string imagePositionPatientLast = lastDS->GetTagValueAsString( tagImagePositionPatient );
 
-    static Vector3D right; right.Fill(0.0);
-    static Vector3D up; up.Fill(0.0);
-    static bool hasOrientation(false);
+    Vector3D right; right.Fill(0.0);
+    Vector3D up; up.Fill(0.0);
+    bool hasOrientation(false);
     DICOMStringToOrientationVectors( imageOrientationString,
         right, up, hasOrientation );
 
-    static Point3D firstOrigin; firstOrigin.Fill(0.0f);
-    static bool firstHasOrigin(false);
+    Point3D firstOrigin; firstOrigin.Fill(0.0f);
+    bool firstHasOrigin(false);
     firstOrigin = DICOMStringToPoint3D( imagePositionPatientFirst, firstHasOrigin );
 
-    static Point3D lastOrigin; lastOrigin.Fill(0.0f);
-    static bool lastHasOrigin(false);
+    Point3D lastOrigin; lastOrigin.Fill(0.0f);
+    bool lastHasOrigin(false);
     lastOrigin = DICOMStringToPoint3D( imagePositionPatientLast, lastHasOrigin );
 
-    static Vector3D normal;
+    Vector3D normal;
     normal[0] = right[1] * up[2] - right[2] * up[1];
     normal[1] = right[2] * up[0] - right[0] * up[2];
     normal[2] = right[0] * up[1] - right[1] * up[0];
     normal.Normalize();
 
-    static Vector3D directionOfSlices;
+    Vector3D directionOfSlices;
     directionOfSlices = lastOrigin - firstOrigin;
     directionOfSlices.Normalize();
 
-    static double projection = 0.0;
-    projection = 0.0;
-    projection = normal * directionOfSlices;
+    double projection = normal * directionOfSlices;
 
     MITK_DEBUG << "Making sense of \norientation '" << imageOrientationString
                << "'\nfirst position '" << imagePositionPatientFirst

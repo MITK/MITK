@@ -89,6 +89,23 @@ m_LastSliceIndex(0)
   this->setEnabled(false);
 }
 
+QmitkSliceBasedInterpolatorWidget::~QmitkSliceBasedInterpolatorWidget()
+{
+  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkSliceBasedInterpolatorWidget>(this, &QmitkSliceBasedInterpolatorWidget::OnToolManagerWorkingDataModified);
+
+  foreach(mitk::SliceNavigationController* slicer, m_ControllerToSliceObserverTag.keys())
+  {
+    slicer->RemoveObserver(m_ControllerToDeleteObserverTag.take(slicer));
+    slicer->RemoveObserver(m_ControllerToTimeObserverTag.take(slicer));
+    slicer->RemoveObserver(m_ControllerToSliceObserverTag.take(slicer));
+  }
+
+  m_ActionToSliceDimensionMap.clear();
+
+  // remove observer
+  m_SliceInterpolatorController->RemoveObserver( m_InterpolationInfoChangedObserverTag );
+}
+
 const QmitkSliceBasedInterpolatorWidget::ActionToSliceDimensionMapType QmitkSliceBasedInterpolatorWidget::CreateActionToSliceDimension()
 {
   ActionToSliceDimensionMapType actionToSliceDimension;
@@ -138,23 +155,6 @@ void QmitkSliceBasedInterpolatorWidget::SetSliceNavigationControllers(const QLis
   }
 
   m_ActionToSliceDimensionMap = this->CreateActionToSliceDimension();
-}
-
-QmitkSliceBasedInterpolatorWidget::~QmitkSliceBasedInterpolatorWidget()
-{
-  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkSliceBasedInterpolatorWidget>(this, &QmitkSliceBasedInterpolatorWidget::OnToolManagerWorkingDataModified);
-
-  foreach(mitk::SliceNavigationController* slicer, m_ControllerToSliceObserverTag.keys())
-  {
-    slicer->RemoveObserver(m_ControllerToDeleteObserverTag.take(slicer));
-    slicer->RemoveObserver(m_ControllerToTimeObserverTag.take(slicer));
-    slicer->RemoveObserver(m_ControllerToSliceObserverTag.take(slicer));
-  }
-
-  m_ActionToSliceDimensionMap.clear();
-
-  // remove observer
-  m_SliceInterpolatorController->RemoveObserver( m_InterpolationInfoChangedObserverTag );
 }
 
 void QmitkSliceBasedInterpolatorWidget::OnToolManagerWorkingDataModified()
@@ -420,8 +420,6 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
     mitk::Image::Pointer sliceImage = this->GetWorkingSlice(planeGeometry);
     if (sliceImage.IsNull()) return;
 
-    unsigned int timeStep = m_LastSNC->GetTime()->GetPos();
-
     mitk::Image::Pointer previewSlice = dynamic_cast<mitk::Image*>( m_PreviewNode->GetData() );
 
     AccessFixedDimensionByItk_2( sliceImage, WritePreviewOnWorkingImage, 2, previewSlice, m_WorkingImage->GetActiveLabelIndex() );
@@ -432,6 +430,8 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
     //set overwrite mode to true to write back to the image volume
     overwrite->SetOverwriteMode(true);
     overwrite->Modified();
+
+    unsigned int timeStep = m_LastSNC->GetTime()->GetPos();
 
     mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(overwrite);
     extractor->SetInput( m_WorkingImage );
@@ -457,7 +457,9 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
 
     int clickedSliceDimension(-1);
     int clickedSliceIndex(-1);
+
     mitk::SegTool2D::DetermineAffectedImageSlice( m_WorkingImage, planeGeometry, clickedSliceDimension, clickedSliceIndex );
+
     m_SliceInterpolatorController->SetChangedSlice( sliceImage, clickedSliceDimension, clickedSliceIndex, timeStep );
 
     //specify the undo operation with the edited slice
@@ -471,7 +473,7 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
     //add it to the undo controller
     mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
 
-    //clear the pointers as the operation are stored in the undocontroller and also deleted from there
+    //clear the pointers as the operation are stored in the undo controller and also deleted from there
     m_undoOperation = NULL;
     m_doOperation = NULL;
 
@@ -483,16 +485,18 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
 
 void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavigationController* slicer)
 {
-  /*
   // Since we need to shift the plane it must be clone so that the original plane isn't altered
   mitk::PlaneGeometry::Pointer reslicePlane = slicer->GetCurrentPlaneGeometry()->Clone();
   unsigned int timeStep = slicer->GetTime()->GetPos();
 
   int sliceDimension(-1);
   int sliceIndex(-1);
+
   mitk::SegTool2D::DetermineAffectedImageSlice( m_WorkingImage, reslicePlane, sliceDimension, sliceIndex );
 
   unsigned int zslices = m_WorkingImage->GetDimension( sliceDimension );
+
+  mitk::ProgressBar::GetInstance()->Reset();
   mitk::ProgressBar::GetInstance()->AddStepsToDo(zslices);
 
   mitk::Point3D origin = reslicePlane->GetOrigin();
@@ -510,35 +514,14 @@ void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavig
 
     if (interpolation.IsNotNull())
     {
-      mitk::ImageToContourModelSetFilter::Pointer contourExtractor = mitk::ImageToContourModelSetFilter::New();
-      contourExtractor->SetInput(interpolation);
-
-      try
-      {
-        contourExtractor->Update();
-      }
-      catch ( itk::ExceptionObject& e )
-      {
-        MITK_ERROR << "Exception caught: " << e.GetDescription();
-        return;
-      }
-
-      m_FeedbackContour = contourExtractor->GetOutput();
-      m_FeedbackContour->DisconnectPipeline();
-
-      m_FeedbackContourNode->SetData( m_FeedbackContour );
+      m_PreviewNode->SetData(interpolation);
 
       mitk::Image::Pointer sliceImage = this->GetWorkingSlice(reslicePlane);
       if (sliceImage.IsNull()) return;
 
-      int numberOfContours = m_FeedbackContour->GetSize();
-      for (int i=0; i<numberOfContours; i++)
-      {
-//         mitk::ContourModel::Pointer projectedContour = mitk::ContourModel::New();
-//         const mitk::Geometry3D* sliceGeometry = sliceImage->GetGeometry();
-//         mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, m_FeedbackContour->GetContourModelAt(i), projectedContour );
-         mitk::ContourUtils::FillContourInSlice( m_FeedbackContour->GetContourModelAt(i), sliceImage, m_WorkingImage->GetActiveLabelIndex() );
-      }
+//      mitk::Image::Pointer previewSlice = dynamic_cast<mitk::Image*>( m_PreviewNode->GetData() );
+
+      AccessFixedDimensionByItk_2( sliceImage, WritePreviewOnWorkingImage, 2, interpolation, m_WorkingImage->GetActiveLabelIndex() );
 
       //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
       vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -560,15 +543,13 @@ void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavig
       {
         extractor->Update();
       }
-      catch ( itk::ExceptionObject& e )
+      catch ( itk::ExceptionObject & excep )
       {
-        MITK_ERROR << "Exception caught: " << e.GetDescription();
+        MITK_ERROR << "Exception caught: " << excep.GetDescription();
         return;
       }
 
       m_WorkingImage->Modified();
-
-      m_SliceInterpolatorController->SetChangedSlice( interpolation, sliceDimension, idx, timeStep );
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
     }
@@ -576,9 +557,8 @@ void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavig
     mitk::ProgressBar::GetInstance()->Progress();
   }
 
-  //the image was modified within the pipeline, but not marked so
-  m_WorkingImage->Modified();
-*/
+  m_SliceInterpolatorController->SetWorkingImage(m_WorkingImage);
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

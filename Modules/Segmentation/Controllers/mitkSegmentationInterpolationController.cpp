@@ -89,8 +89,6 @@ void mitk::SegmentationInterpolationController::ResetLabelCount()
 
 void mitk::SegmentationInterpolationController::SetWorkingImage( LabelSetImage* newImage )
 {
-  assert(newImage);
-
   if (m_WorkingImage != newImage)
   {
     // delete the current working image from the list of interpolators
@@ -153,20 +151,7 @@ void mitk::SegmentationInterpolationController::SetReferenceImage( Image* newIma
     }
   }
 }
-/*
-void mitk::SegmentationInterpolationController::SetChangedImage( const Image* image, unsigned int timeStep )
-{
-  if ( !image ) return;
-  if ( image->GetDimension() != 3 ) return;
-  if ( m_WorkingImage.IsNull() ) return;
 
-  this->ResetLabelCount();
-
-  AccessFixedDimensionByItk_1( image, ScanImageITKProcessing, 3, timeStep );
-
-  this->Modified();
-}
-*/
 void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* slice, unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep )
 {
   if ( !slice ) return;
@@ -336,7 +321,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
 
   if (!bounds) return NULL;
 
-  // ok, we have found two neighboring slices with segmentations
+  // ok, we have found two neighboring slices with the active label
   // (and we made sure that the current slice does NOT contain the active label
   //Setting up the ExtractSliceFilter
   mitk::ExtractSliceFilter::Pointer extractor = ExtractSliceFilter::New();

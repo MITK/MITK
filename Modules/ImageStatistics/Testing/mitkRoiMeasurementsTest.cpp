@@ -171,10 +171,10 @@ int mitkRoiMeasurementsTest(int argc, char* argv[])
     MITK_INFO << "Test 2:";
 
     // Do not change values!
-    p0; p0[0] = 0.5; p0[1] = 2.5;
-    p1; p1[0] = 2.5; p1[1] = 2.5;
-    p2; p2[0] = 2.5; p2[1] = 36.5;
-    p3; p3[0] = 0.5; p3[1] = 36.5;
+    p0[0] = 0.5; p0[1] = 2.5;
+    p1[0] = 2.5; p1[1] = 2.5;
+    p2[0] = 2.5; p2[1] = 36.5;
+    p3[0] = 0.5; p3[1] = 36.5;
 
     figure = mitkRoiMeasurementsTestClass::CreatePolygonROI( testImageGrayvalues, p0, p1, p2, p3 );
     statistics = mitkRoiMeasurementsTestClass::CalculateStatistics(testImageGrayvalues, figure);
@@ -184,10 +184,10 @@ int mitkRoiMeasurementsTest(int argc, char* argv[])
     MITK_INFO << "Test 3:";
 
     // Do not change values!
-    p0; p0[0] = 2.5; p0[1] = 2.5;
-    p1; p1[0] = 36.5; p1[1] = 2.5;
-    p2; p2[0] = 36.5; p2[1] = 36.5;
-    p3; p3[0] = 2.5; p3[1] = 36.5;
+    p0[0] = 2.5; p0[1] = 2.5;
+    p1[0] = 36.5; p1[1] = 2.5;
+    p2[0] = 36.5; p2[1] = 36.5;
+    p3[0] = 2.5; p3[1] = 36.5;
 
     figure = mitkRoiMeasurementsTestClass::CreatePolygonROI( testImageGrayvalues, p0, p1, p2, p3 );
     statistics = mitkRoiMeasurementsTestClass::CalculateStatistics(testImageGrayvalues, figure);
@@ -197,10 +197,10 @@ int mitkRoiMeasurementsTest(int argc, char* argv[])
     MITK_INFO << "Test 4:";
 
     // Do not change values!
-    p0; p0[0] = 10.5; p0[1] = 11.5;
-    p1; p1[0] = 28.5; p1[1] = 11.5;
-    p2; p2[0] = 28.5; p2[1] = 27.5;
-    p3; p3[0] = 10.5; p3[1] = 27.5;
+    p0[0] = 10.5; p0[1] = 11.5;
+    p1[0] = 28.5; p1[1] = 11.5;
+    p2[0] = 28.5; p2[1] = 27.5;
+    p3[0] = 10.5; p3[1] = 27.5;
 
     figure = mitkRoiMeasurementsTestClass::CreatePolygonROI( testImageGrayvalues, p0, p1, p2, p3 );
 

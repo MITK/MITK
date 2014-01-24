@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkCommandLineParser.h"
 #include <mitkFiberBundleXWriter.h>
 #include <itkShCoefficientImageImporter.h>
-#include <mitkNrrdQBallImageWriter.h>
 #include <itkFlipImageFilter.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>

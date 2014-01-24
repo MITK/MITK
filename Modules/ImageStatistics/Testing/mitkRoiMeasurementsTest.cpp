@@ -122,14 +122,16 @@ public:
   */
   static void CompareValues(mitk::ImageStatisticsCalculator::Statistics statistics,
     mitk::PlanarFigure* figure,
-    double area, double sigma, double mean, double areaEps)
+    double expectedArea, double expectedSigma, double expectedMean, double areaEps)
   {
-    MITK_TEST_CONDITION(mean - 0.5 < statistics.Sigma && statistics.Mean < mean + 0.5, "Calculated Density Mean: " << statistics.Mean
-      << " (expected: " << mean << ")" );
-    MITK_TEST_CONDITION(sigma - 0.5 < statistics.Sigma && statistics.Sigma < sigma + 0.5, "Calculated Density SD: " << statistics.Sigma
-      << " (expected: " << sigma << ")" );
-    MITK_TEST_CONDITION(area - areaEps < figure->GetQuantity(1) && figure->GetQuantity(1) < area + areaEps, "Calculated Area: " << figure->GetQuantity(1)
-      << " (expected: " << area << ")" );
+    MITK_TEST_CONDITION( fabs(statistics.Mean - expectedMean) < 0.5,
+                         "Mean is close enough to " << expectedMean << " (actual value " << statistics.Mean << ")" );
+
+    MITK_TEST_CONDITION( fabs(statistics.Sigma - expectedSigma) < 0.5,
+                         "Sigma is close enough to " << expectedSigma << " (actual value " << statistics.Sigma << ")" );
+
+    MITK_TEST_CONDITION( fabs( figure->GetQuantity(1) - expectedArea) < areaEps,
+                         "Area is close enough to " << expectedArea << " (actual value " << figure->GetQuantity(1) << ")" );
   }
 };
 

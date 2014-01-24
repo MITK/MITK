@@ -31,11 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <fstream>
 
-
-#include <QMessageBox>
-
-
-
 using namespace std;
 
 namespace mitk {
@@ -54,15 +49,11 @@ namespace mitk {
       n = m_PointSetNode->GetSize();
       if(n==0)
       {
-        QMessageBox msgBox;
-        msgBox.setText("No points have been set yet.");
-        msgBox.exec();
+        mitkThrow() << "No points have been set yet.";
       }
     }
     else{
-      QMessageBox msgBox;
-      msgBox.setText("No points have been set yet.");
-      msgBox.exec();
+      mitkThrow() << "No points have been set yet.";
     }
 
     std::string pathDescription = "";

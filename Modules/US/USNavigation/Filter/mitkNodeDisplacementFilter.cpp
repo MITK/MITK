@@ -19,38 +19,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
   mitk::NodeDisplacementFilter::NodeDisplacementFilter()
+    : m_SelectedInput(-1)
   {
-    m_SelectedInput = -1;
   }
 
   mitk::NodeDisplacementFilter::~NodeDisplacementFilter()
   {
-
   }
 
-  void mitk::NodeDisplacementFilter::AddNode( mitk::DataNode::Pointer node )
+  bool mitk::NodeDisplacementFilter::AddNode( mitk::DataNode::Pointer node )
   {
     // Consistency Checks
     if (node.IsNull())
     {
       MITK_WARN << "Null Node passed to NodeDisplacementFilter. Ignoring Node....";
-      return;
+      return false;
     }
     if (node->GetData() == 0)
     {
       MITK_WARN << "Empty Node passed to NodeDisplacementFilter. Ignoring Node....";
-      return;
+      return false;
     }
     if(m_SelectedInput == -1)
       mitkThrow() << "Cannot add nodes before input Stream was selected";
 
-    //this->Update(); // Make sure we are working on current data
-    mitk::NavigationData::Pointer reference = GetOutput(this->m_SelectedInput);
+    this->Update(); // Make sure we are working on current data
+    mitk::NavigationData::Pointer reference = GetOutput(m_SelectedInput);
 
     if (! reference->IsDataValid())
     {
       MITK_WARN << "Cannot add node while selected tool is not tracked. Ignoring Node....";
-      return;
+      return false;
     }
 
     // Find Offset and add Node
@@ -59,6 +58,8 @@ See LICENSE.txt or http://www.mitk.org for details.
     mitk::Point3D referenceOffset;
     g3d->WorldToIndex(node->GetData()->GetGeometry()->GetOrigin(), referenceOffset);
     m_Offsets.push_back(referenceOffset);
+
+    return true;
   }
 
   bool mitk::NodeDisplacementFilter::RemoveNode(unsigned int i)
@@ -101,29 +102,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   void mitk::NodeDisplacementFilter::GenerateData()
   {
-    //get each input and transfer the data
-    DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
-    for (unsigned int index=0; index < inputs.size(); index++)
-    {
-      //get the needed variables
-      const mitk::NavigationData* nd = this->GetInput(index);
-      assert(nd);
+    // copy the navigation data from the inputs to the outputs
+    mitk::NavigationDataPassThroughFilter::GenerateData();
 
-      mitk::NavigationData* output = this->GetOutput(index);
-      assert(output);
-
-      //check if the data is valid
-      if (!nd->IsDataValid())
-      {
-        output->SetDataValid(false);
-        continue;
-      }
-      output->Graft(nd); // copy all information from input to output
-
-      output->SetDataValid(true); // operation was successful, therefore data of output is valid.
-    }
-
-    //
     // If no reference has been set yet, warn and abort
     if (m_SelectedInput == -1)
     {
@@ -132,11 +113,11 @@ See LICENSE.txt or http://www.mitk.org for details.
     }
 
     // Cancel, if selected tool is currently not being tracked
-    if (! GetInput(m_SelectedInput)->IsDataValid()) return;
+    if (! this->GetInput(m_SelectedInput)->IsDataValid()) return;
 
     // Outputs have been updated, now to transform the nodes
     // 1) Generate Pseudo-Geometry for Reference
-    mitk::AffineTransform3D::Pointer refTrans = this->NavigationDataToTransform(GetInput(m_SelectedInput));
+    mitk::AffineTransform3D::Pointer refTrans = this->NavigationDataToTransform(this->GetInput(m_SelectedInput));
     mitk::Geometry3D::Pointer refGeom = this->TransformToGeometry(refTrans);
     // 2) For each node, calculate new position
     for (unsigned int index=0; index < m_Nodes.size(); index++)
@@ -186,8 +167,6 @@ mitk::AffineTransform3D::Pointer mitk::NodeDisplacementFilter::NavigationDataToT
 
 mitk::Geometry3D::Pointer mitk::NodeDisplacementFilter::TransformToGeometry(mitk::AffineTransform3D::Pointer transform){
   mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
-  float scale[] = {1.0, 1.0, 1.0};
-  g3d->SetSpacing(scale);
   g3d->SetIndexToWorldTransform(transform);
   g3d->TransferItkToVtkTransform(); // update VTK Transform for rendering too
   g3d->Modified();

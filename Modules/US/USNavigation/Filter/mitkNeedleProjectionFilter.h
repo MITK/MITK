@@ -19,17 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkUSNavigationExports.h>
 
-#include <itkProcessObject.h>
-
-//MITK
-#include <mitkBaseRenderer.h>
-#include <mitkCommon.h>
+// MITK
+#include <mitkNavigationDataPassThroughFilter.h>
 #include <mitkNavigationData.h>
-#include <mitkNavigationDataToNavigationDataFilter.h>
 #include <mitkPointSet.h>
-
-//VTK
-#include <vtkPlane.h>
 
 namespace mitk {
   /**
@@ -50,10 +43,10 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUSNavigation_EXPORT NeedleProjectionFilter : public NavigationDataToNavigationDataFilter
+  class MitkUSNavigation_EXPORT NeedleProjectionFilter : public NavigationDataPassThroughFilter
   {
   public:
-    mitkClassMacro(NeedleProjectionFilter, NavigationDataToNavigationDataFilter);
+    mitkClassMacro(NeedleProjectionFilter, NavigationDataPassThroughFilter);
     itkNewMacro(Self);
 
     virtual void SelectInput(int i);
@@ -70,10 +63,10 @@ namespace mitk {
 
     mitk::AffineTransform3D::Pointer m_TargetPlane;
 
-    mitk::PointSet::Pointer m_Projection;
-    mitk::PointSet::Pointer m_OriginalPoints;
+    mitk::PointSet::Pointer          m_Projection;
+    mitk::PointSet::Pointer          m_OriginalPoints;
 
-    int m_SelectedInput;
+    int                              m_SelectedInput;
 
 
     /**
@@ -84,9 +77,6 @@ namespace mitk {
     * \brief Creates an Geometry 3D Object from an AffineTransformation.
     */
     mitk::Geometry3D::Pointer TransformToGeometry(mitk::AffineTransform3D::Pointer transform);
-
-
-
   };
 } // namespace mitk
 

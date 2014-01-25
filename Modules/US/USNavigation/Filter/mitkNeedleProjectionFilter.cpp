@@ -14,8 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// MITK
 #include "mitkNeedleProjectionFilter.h"
+#include <mitkPlaneGeometry.h>
 
+// VTK
+#include <vtkPlane.h>
 
 
 mitk::NeedleProjectionFilter::NeedleProjectionFilter()
@@ -49,27 +53,8 @@ void mitk::NeedleProjectionFilter::SelectInput(int i)
 
 void mitk::NeedleProjectionFilter::GenerateData()
 {
-  //get each input and transfer the data
-  DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
-  for (unsigned int index=0; index < inputs.size(); index++)
-  {
-    //get the needed variables
-    const mitk::NavigationData* nd = this->GetInput(index);
-    assert(nd);
-
-    mitk::NavigationData* output = this->GetOutput(index);
-    assert(output);
-
-    //check if the data is valid
-    if (!nd->IsDataValid())
-    {
-      output->SetDataValid(false);
-      continue;
-    }
-    output->Graft(nd); // copy all information from input to output
-
-    output->SetDataValid(true); // operation was successful, therefore data of output is valid.
-  }
+  // copy the navigation data from the inputs to the outputs
+  mitk::NavigationDataPassThroughFilter::GenerateData();
 
   // If no reference has been set yet, warn and abort
   if (m_SelectedInput == -1)

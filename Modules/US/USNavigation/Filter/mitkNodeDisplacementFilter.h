@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkCommon.h"
 #include "mitkNavigationData.h"
-#include "mitkNavigationDataToNavigationDataFilter.h"
+#include "mitkNavigationDataPassThroughFilter.h"
 
 //MITK
 
@@ -44,10 +44,10 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUSNavigation_EXPORT NodeDisplacementFilter : public NavigationDataToNavigationDataFilter
+  class MitkUSNavigation_EXPORT NodeDisplacementFilter : public NavigationDataPassThroughFilter
   {
   public:
-    mitkClassMacro(NodeDisplacementFilter, NavigationDataToNavigationDataFilter);
+    mitkClassMacro(NodeDisplacementFilter, NavigationDataPassThroughFilter);
     itkNewMacro(Self);
 
     /**
@@ -56,7 +56,7 @@ namespace mitk {
     *
     * The node should have a geometry and position set in the coordinate system of the selected input stream
     */
-    virtual void AddNode(mitk::DataNode::Pointer node);
+    bool AddNode(mitk::DataNode::Pointer node);
 
     /**
      * \brief Removes a node from the filter.

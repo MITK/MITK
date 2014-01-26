@@ -584,7 +584,6 @@ public:
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
 
-    mitk::BoundingBox::BoundsArrayType bound =  geometry->GetBoundsInWorld();
     bool isEqual = true;
     isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(0), extentX, test_eps);//30*0.5);
     isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(1), extentY, test_eps);//25*0.33);

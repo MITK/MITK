@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageTimeSelector.h"
-#include <mitkExtractSliceFilter.h>
+#include "mitkExtractSliceFilter.h"
 #include "mitkImageReadAccessor.h"
 
 #include "mitkShapeBasedInterpolationAlgorithm.h"

@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSegmentationInterpolationController_h_Included
 #define mitkSegmentationInterpolationController_h_Included
 
-#include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkLabelSetImage.h"
 

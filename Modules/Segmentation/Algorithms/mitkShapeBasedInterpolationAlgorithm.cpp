@@ -122,11 +122,9 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   // add the rest of data in the slice
   InputSliceType::Pointer itkAuxImage;
   CastToItkImage( auxImage, itkAuxImage );
-  assert ( itkAuxImage.IsNotNull() );
 
   InputSliceType::Pointer itkResultImage;
   CastToItkImage( resultImage, itkResultImage );
-  assert ( itkResultImage.IsNotNull() );
 
   typedef itk::ImageRegionConstIterator< InputSliceType > SourceIteratorType;
   typedef itk::ImageRegionIterator< InputSliceType >      TargetIteratorType;
@@ -143,11 +141,11 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
     if ( sourceIterator.Get() != 0 )
     {
       if (!workingImage->GetLabelLocked(targetValue))
-        targetIterator.Set( activePixelValue );
+        targetIterator.Set(1);
     }
     else
     {
-      targetIterator.Set( 0 );
+      targetIterator.Set(0);
     }
 
     ++sourceIterator;

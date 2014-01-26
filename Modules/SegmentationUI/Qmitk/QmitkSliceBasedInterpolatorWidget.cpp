@@ -21,8 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkProgressBar.h>
 #include <mitkOperationEvent.h>
-#include <mitkInteractionConst.h>
-#include "mitkDiffSliceOperation.h"
+#include <mitkDiffSliceOperation.h>
 #include <mitkDiffSliceOperationApplier.h>
 #include <mitkUndoController.h>
 #include <mitkSegTool2D.h>
@@ -220,17 +219,17 @@ void QmitkSliceBasedInterpolatorWidget::TranslateAndInterpolateChangedSlice(cons
 {
   if (m_Activated && m_WorkingImage.IsNotNull())
   {
-    const mitk::SliceNavigationController::GeometrySliceEvent& event = dynamic_cast<const mitk::SliceNavigationController::GeometrySliceEvent&>(e);
-    mitk::TimeGeometry* tsg = event.GetTimeGeometry();
-    if (tsg && m_TimeStep.contains(slicer))
+    const mitk::SliceNavigationController::GeometrySliceEvent& geometrySliceEvent = dynamic_cast<const mitk::SliceNavigationController::GeometrySliceEvent&>(e);
+    mitk::TimeGeometry* timeGeometry = geometrySliceEvent.GetTimeGeometry();
+    if (timeGeometry && m_TimeStep.contains(slicer))
     {
-      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometryForTimeStep(m_TimeStep[slicer]).GetPointer());
+      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(timeGeometry->GetGeometryForTimeStep(m_TimeStep[slicer]).GetPointer());
       if (slicedGeometry)
       {
-        m_LastSNC = slicer;
-        mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( event.GetPos() ));
+        mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( geometrySliceEvent.GetPos() ));
         if (plane)
         {
+          m_LastSNC = slicer;
           this->Interpolate(plane, m_TimeStep[slicer], slicer);
         }
       }
@@ -314,7 +313,7 @@ void QmitkSliceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
     m_Controls.m_btStart->setText("Start");
 
   unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
-  for(unsigned int i = 0; i < numberOfExistingTools; i++)
+  for (unsigned int i = 0; i < numberOfExistingTools; i++)
   {
     mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
     if (tool) tool->SetEnable2DInterpolation( enabled );
@@ -332,7 +331,6 @@ void QmitkSliceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
   }
   else
   {
-
     if (m_DataStorage->Exists(m_PreviewNode))
     {
       m_DataStorage->Remove( m_PreviewNode );
@@ -349,14 +347,14 @@ void QmitkSliceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
 template<typename TPixel, unsigned int VImageDimension>
 void QmitkSliceBasedInterpolatorWidget::WritePreviewOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int overwritevalue )
 {
-  typedef itk::Image<TPixel,VImageDimension> SliceType;
+  typedef itk::Image<TPixel,VImageDimension> ImageType;
 
-  typename SliceType::Pointer sourceSliceITK;
+  typename ImageType::Pointer sourceSliceITK;
   mitk::CastToItkImage( sourceSlice, sourceSliceITK );
 
   // now the original slice and the ipSegmentation-painted slice are in the same format, and we can just copy all pixels that are non-zero
-  typedef itk::ImageRegionIterator< SliceType >        OutputIteratorType;
-  typedef itk::ImageRegionConstIterator< SliceType >   InputIteratorType;
+  typedef itk::ImageRegionIterator< ImageType >        OutputIteratorType;
+  typedef itk::ImageRegionConstIterator< ImageType >   InputIteratorType;
 
   InputIteratorType inputIterator( sourceSliceITK, sourceSliceITK->GetLargestPossibleRegion() );
   OutputIteratorType outputIterator( targetSlice, targetSlice->GetLargestPossibleRegion() );
@@ -464,7 +462,7 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
 
     //specify the undo operation with the edited slice
     m_doOperation = new mitk::DiffSliceOperation(
-      m_WorkingImage, extractor->GetVtkOutput(),sliceImage->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+      m_WorkingImage, extractor->GetVtkOutput(), sliceImage->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
 
     //create an operation event for the undo stack
     mitk::OperationEvent* undoStackItem = new mitk::OperationEvent(
@@ -518,8 +516,6 @@ void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavig
 
       mitk::Image::Pointer sliceImage = this->GetWorkingSlice(reslicePlane);
       if (sliceImage.IsNull()) return;
-
-//      mitk::Image::Pointer previewSlice = dynamic_cast<mitk::Image*>( m_PreviewNode->GetData() );
 
       AccessFixedDimensionByItk_2( sliceImage, WritePreviewOnWorkingImage, 2, interpolation, m_WorkingImage->GetActiveLabelIndex() );
 

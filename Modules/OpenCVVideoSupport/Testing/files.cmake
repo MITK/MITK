@@ -6,4 +6,5 @@ SET(MODULE_CUSTOM_TESTS
   mitkConvertGrayscaleOpenCVImageFilterTest.cpp
   mitkCropOpenCVImageFilterTest.cpp
   mitkBasicCombinationOpenCVImageFilterTest.cpp
+  mitkGrabCutOpenCVImageFilterTest.cpp
 )

@@ -23,10 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactory.h"
 
 namespace mitk {
-
 class MITK_OPENCVVIDEOSUPPORT_EXPORT BasicCombinationOpenCVImageFilter : public AbstractOpenCVImageFilter
 {
-
 public:
   mitkClassMacro(BasicCombinationOpenCVImageFilter, AbstractOpenCVImageFilter);
   itkNewMacro(Self);
@@ -35,10 +33,10 @@ public:
     * \brief Apply list of filters to the given image.
     * \return false if one of the filter returns false. Be careful, that the image could already be changed when the function returned false.
     */
-  bool FilterImage( cv::Mat& image );
+  bool OnFilterImage( cv::Mat& image );
 
   /**
-    * \brief Push an additional filter to the list of filter for applying to an image.
+    * \brief Push an additional filter to the list of filters for applying to an image.
     */
   void PushFilter( AbstractOpenCVImageFilter::Pointer filter );
 
@@ -49,9 +47,22 @@ public:
   AbstractOpenCVImageFilter::Pointer PopFilter( );
 
   /**
-    *
+    * \brief Remove the given filter from the list of filters.
+    * \return true if the filter was on the list, false if it wasn't
     */
   bool RemoveFilter( AbstractOpenCVImageFilter::Pointer filter );
+
+  /**
+   * \brief Get the information if the given filter is on the filter list.
+   * \return true if the filter is on the list, false otherwise
+   */
+  bool GetIsFilterOnTheList( AbstractOpenCVImageFilter::Pointer filter );
+
+  /**
+   * \brief Get the information if no filter is on the filter list.
+   * \return true if the filter list if empty, false otherwise
+   */
+  bool GetIsEmpty();
 
 protected:
   /**

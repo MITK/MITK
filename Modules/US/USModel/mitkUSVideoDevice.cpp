@@ -60,7 +60,7 @@ void mitk::USVideoDevice::Init()
   m_Source = mitk::USImageVideoSource::New();
   m_ControlInterfaceCustom = mitk::USVideoDeviceCustomControls::New(this);
   //this->SetNumberOfInputs(1);
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedOutputs(1);
 
   // mitk::USImage::Pointer output = mitk::USImage::New();
   // output->Initialize();
@@ -87,7 +87,7 @@ bool mitk::USVideoDevice::OnConnection()
   if (m_SourceIsFile){
     m_Source->SetVideoFileInput(m_FilePath);
   } else {
-     m_Source->SetCameraInput(m_DeviceID);
+    m_Source->SetCameraInput(m_DeviceID);
   }
   //SetSourceCropArea();
   return true;
@@ -118,19 +118,6 @@ bool mitk::USVideoDevice::OnDeactivation()
   return true;
 }
 
-void mitk::USVideoDevice::GenerateData()
-{
-  mitk::USImage::Pointer result;
-  result = m_Image;
-
-  // Set Metadata
-  result->SetMetadata(this->m_Metadata);
-  // Apply Transformation
-  this->ApplyCalibration(result);
-  // Set Output
-  this->SetNthOutput(0, result);
-}
-
 void mitk::USVideoDevice::UnregisterOnService()
 {
   if (m_DeviceState == State_Activated) { this->Deactivate(); }
@@ -143,4 +130,3 @@ mitk::USImageSource::Pointer mitk::USVideoDevice::GetUSImageSource()
 {
   return m_Source.GetPointer();
 }
-

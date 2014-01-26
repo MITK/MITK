@@ -1,0 +1,6 @@
+MITK_CREATE_MODULE(MitkUSNavigationUI
+  INCLUDE_DIRS Qmitk
+  DEPENDS Mitk MitkUSUI MitkUSNavigation Qmitk QmitkExt
+  PACKAGE_DEPENDS Qt4|QtCore
+  GENERATED_CPP ${TOOL_GUI_CPPS} ${TOOL_CPPS}
+)

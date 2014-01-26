@@ -76,8 +76,8 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
   else
   {
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    if ( ! device->GetIsConnected() ) { device->Connect(); }
-    device->Activate();
+    if ( device->GetDeviceState() < mitk::USDevice::State_Connected ) { device->Connect(); }
+    if ( device->GetIsConnected()) { device->Activate(); }
     QApplication::restoreOverrideCursor();
 
     if ( ! device->GetIsActive() )

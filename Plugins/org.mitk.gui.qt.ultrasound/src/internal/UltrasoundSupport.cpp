@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkIRenderingManager.h>
 
 // Qmitk
 #include "UltrasoundSupport.h"
@@ -69,9 +70,14 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(" + mitk::USDevice::US_PROPKEY_ISACTIVE + "=true))";
   m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL ,filter);
 
-  m_Node = mitk::DataNode::New();
-  m_Node->SetName("US Image Stream");
-  this->GetDataStorage()->Add(m_Node);
+  m_Node = this->GetDataStorage()->GetNamedNode("US Image Stream");
+  if (m_Node.IsNull())
+  {
+    // Create Node for US Stream
+    m_Node = mitk::DataNode::New();
+    m_Node->SetName("US Image Stream");
+    this->GetDataStorage()->Add(m_Node);
+  }
 
   m_Controls.tabWidget->setTabEnabled(1, false);
 
@@ -90,17 +96,27 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 
 void UltrasoundSupport::DisplayImage()
 {
+  m_Device->Modified();
   m_Device->UpdateOutputData(0);
+
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
-  m_Node->SetData(curOutput->Clone());
-  //m_Node->SetData(curOutput);
+  if (curOutput.IsNotNull() && curOutput->IsInitialized()) { m_Node->SetData(curOutput); }
+
   this->RequestRenderWindowUpdate();
 
   if ( curOutput->GetDimension() > 1
     && (curOutput->GetDimension(0) != m_CurrentImageWidth
     || curOutput->GetDimension(1) != m_CurrentImageHeight) )
   {
-    this->GlobalReinit();
+    // make a reinit on the ultrasound image
+    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+    if ( renderWindow != NULL && curOutput->GetTimeGeometry()->IsValid() )
+    {
+      renderWindow->GetRenderingManager()->InitializeViews(
+        curOutput->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+      renderWindow->GetRenderingManager()->RequestUpdateAll();
+    }
+
     m_CurrentImageWidth = curOutput->GetDimension(0);
     m_CurrentImageHeight = curOutput->GetDimension(1);
   }
@@ -181,8 +197,6 @@ void UltrasoundSupport::StartViewing()
     m_Timer->stop();
     return;
   }
-  m_Device->Update();
-  m_Node->SetData(m_Device->GetOutput());
 
   //start timer
   int interval = (1000 / m_Controls.m_FrameRate->value());

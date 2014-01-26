@@ -15,8 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSDevice.h"
+#include "mitkImageReadAccessor.h"
 
-//Microservices
+// US Control Interfaces
+#include "mitkUSControlInterfaceProbes.h"
+#include "mitkUSControlInterfaceBMode.h"
+#include "mitkUSControlInterfaceDoppler.h"
+
+// Microservices
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usServiceProperties.h>
@@ -48,13 +54,14 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 }
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
-: mitk::ImageSource(),
-m_MultiThreader(itk::MultiThreader::New()),
-m_ImageMutex(itk::FastMutexLock::New()),
-m_CameraActiveMutex(itk::FastMutexLock::New()),
-m_IsFreezed(false),
-m_DeviceState(State_NoState),
-m_UnregisteringStarted(false)
+  : mitk::ImageSource(),
+  m_IsFreezed(false),
+  m_DeviceState(State_NoState),
+  m_SpawnAcquireThread(true),
+  m_MultiThreader(itk::MultiThreader::New()),
+  m_ImageMutex(itk::FastMutexLock::New()),
+  m_ThreadID(-1),
+  m_UnregisteringStarted(false)
 {
   // Initialize Members
   m_Metadata = mitk::USImageMetadata::New();
@@ -69,21 +76,22 @@ m_UnregisteringStarted(false)
   this->m_CropArea = empty;
 
   //set number of outputs
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedOutputs(1);
 
   //create a new output
-  mitk::USImage::Pointer newOutput = mitk::USImage::New();
+  mitk::Image::Pointer newOutput = mitk::Image::New();
   this->SetNthOutput(0,newOutput);
 }
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
-: mitk::ImageSource(),
-m_MultiThreader(itk::MultiThreader::New()),
-m_ImageMutex(itk::FastMutexLock::New()),
-m_CameraActiveMutex(itk::FastMutexLock::New()),
-m_IsFreezed(false),
-m_DeviceState(State_NoState),
-m_UnregisteringStarted(false)
+  : mitk::ImageSource(),
+  m_IsFreezed(false),
+  m_DeviceState(State_NoState),
+  m_SpawnAcquireThread(true),
+  m_MultiThreader(itk::MultiThreader::New()),
+  m_ImageMutex(itk::FastMutexLock::New()),
+  m_ThreadID(-1),
+  m_UnregisteringStarted(false)
 {
   m_Metadata = metadata;
 
@@ -95,15 +103,20 @@ m_UnregisteringStarted(false)
   this->m_CropArea = empty;
 
   //set number of outputs
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedOutputs(1);
 
   //create a new output
-  mitk::USImage::Pointer newOutput = mitk::USImage::New();
+  mitk::Image::Pointer newOutput = mitk::Image::New();
   this->SetNthOutput(0,newOutput);
 }
 
 mitk::USDevice::~USDevice()
 {
+  if (m_ThreadID >= 0)
+  {
+    m_MultiThreader->TerminateThread(m_ThreadID);
+  }
+
   // make sure that the us device is not registered at the micro service
   // anymore after it is destructed
   this->UnregisterOnService();
@@ -123,13 +136,13 @@ mitk::USControlInterfaceBMode::Pointer mitk::USDevice::GetControlInterfaceBMode(
 
 mitk::USControlInterfaceProbes::Pointer mitk::USDevice::GetControlInterfaceProbes()
 {
-  MITK_INFO << "Control interface BMode does not exist for this object.";
+  MITK_INFO << "Control interface Probes does not exist for this object.";
   return 0;
 }
 
 mitk::USControlInterfaceDoppler::Pointer mitk::USDevice::GetControlInterfaceDoppler()
 {
-  MITK_INFO << "Control interface BMode does not exist for this object.";
+  MITK_INFO << "Control interface Doppler does not exist for this object.";
   return 0;
 }
 
@@ -140,9 +153,21 @@ us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
   props[mitk::USDevice::US_PROPKEY_ISCONNECTED] = this->GetIsConnected() ? yes : no;
   props[mitk::USDevice::US_PROPKEY_ISACTIVE] = this->GetIsActive() ? yes : no;
 
-  props[ mitk::USDevice::US_PROPKEY_LABEL] = this->GetServicePropertyLabel();
+  props[mitk::USDevice::US_PROPKEY_LABEL] = this->GetServicePropertyLabel();
 
-  props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = m_Calibration.IsNotNull() ? yes : no;
+  // get identifier of selected probe if there is one selected
+  mitk::USControlInterfaceProbes::Pointer probesControls = this->GetControlInterfaceProbes();
+  if (probesControls.IsNotNull() && probesControls->GetIsActive())
+  {
+    mitk::USProbe::Pointer probe = probesControls->GetSelectedProbe();
+    if (probe.IsNotNull())
+    {
+      props[mitk::USDevice::US_PROPKEY_PROBES_SELECTED] = probe->GetName();
+    }
+  }
+
+  //TODO Handle in subclasses?
+  //props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = m_Calibration.IsNotNull() ? yes : no;
 
   props[ mitk::USDevice::US_PROPKEY_CLASS ] = GetDeviceClass();
   props[ mitk::USImageMetadata::PROP_DEV_MANUFACTURER ] = m_Metadata->GetDeviceManufacturer();
@@ -174,13 +199,13 @@ bool mitk::USDevice::Initialize()
 {
   if (! this->OnInitialization() ) { return false; }
 
+  m_DeviceState = State_Initialized;
+
   // Get Context and Module
   us::ModuleContext* context = us::GetModuleContext();
   us::ServiceProperties props = this->ConstructServiceProperties();
 
   m_ServiceRegistration = context->RegisterService(this, props);
-
-  m_DeviceState = State_Initialized;
 
   return true;
 }
@@ -189,8 +214,8 @@ bool mitk::USDevice::Connect()
 {
   if ( this->GetIsConnected() )
   {
-    MITK_WARN("mitkUSDevice") << "Tried to connect an ultrasound device that was already connected. Ignoring call...";
-    return false;
+    MITK_INFO("mitkUSDevice") << "Tried to connect an ultrasound device that was already connected. Ignoring call...";
+    return true;
   }
 
   if ( ! this->GetIsInitialized() )
@@ -207,6 +232,11 @@ bool mitk::USDevice::Connect()
 
   this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISCONNECTED, true);
   return true;
+}
+
+void mitk::USDevice::ConnectAsynchron()
+{
+  this->m_MultiThreader->SpawnThread(this->ConnectThread, this);
 }
 
 bool mitk::USDevice::Disconnect()
@@ -231,8 +261,8 @@ bool mitk::USDevice::Activate()
 {
   if (! this->GetIsConnected())
   {
-    MITK_WARN("mitkUSDevice") << "Cannot activate device if it is not in connected state.";
-    return false;
+    MITK_INFO("mitkUSDevice") << "Cannot activate device if it is not in connected state.";
+    return true;
   }
 
   if ( OnActivation() )
@@ -242,7 +272,10 @@ bool mitk::USDevice::Activate()
     m_FreezeBarrier = itk::ConditionVariable::New();
 
     // spawn thread for aquire images if us device is active
-    this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
+    if (m_SpawnAcquireThread)
+    {
+      this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
+    }
 
     this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISACTIVE, true);
     this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_LABEL, this->GetServicePropertyLabel());
@@ -277,6 +310,8 @@ void mitk::USDevice::SetIsFreezed(bool freeze)
     return;
   }
 
+  this->OnFreeze(freeze);
+
   if ( freeze )
   {
     m_IsFreezed = true;
@@ -302,29 +337,43 @@ bool mitk::USDevice::GetIsFreezed()
   return m_IsFreezed;
 }
 
-void mitk::USDevice::AddProbe(mitk::USProbe::Pointer probe)
+void mitk::USDevice::PushFilter(AbstractOpenCVImageFilter::Pointer filter)
 {
-  for(unsigned int i = 0; i < m_ConnectedProbes.size(); i++)
+  mitk::USImageSource::Pointer imageSource = this->GetUSImageSource();
+  if ( imageSource.IsNull() )
   {
-    if (m_ConnectedProbes[i]->IsEqualToProbe(probe)) return;
+    MITK_ERROR << "ImageSource must not be null when pushing a filter.";
+    mitkThrow() << "ImageSource must not be null when pushing a filter.";
   }
-  m_ConnectedProbes.push_back(probe);
+
+  imageSource->PushFilter(filter);
 }
 
-void mitk::USDevice::ActivateProbe(mitk::USProbe::Pointer probe){
-  // currently, we may just add the probe. This behaviour should be changed, should more complicated SDK applications emerge
-  AddProbe(probe);
-  int index = -1;
-  for(unsigned int i = 0; i < m_ConnectedProbes.size(); i++)
+void mitk::USDevice::PushFilterIfNotPushedBefore(AbstractOpenCVImageFilter::Pointer filter)
+{
+  mitk::USImageSource::Pointer imageSource = this->GetUSImageSource();
+  if ( imageSource.IsNull() )
   {
-    if (m_ConnectedProbes[i]->IsEqualToProbe(probe)) index = i;
+    MITK_ERROR << "ImageSource must not be null when pushing a filter.";
+    mitkThrow() << "ImageSource must not be null when pushing a filter.";
   }
-  // index now contains the position of the original instance of this probe
-  m_ActiveProbe = m_ConnectedProbes[index];
+
+  if ( ! imageSource->GetIsFilterInThePipeline(filter) )
+  {
+    imageSource->PushFilter(filter);
+  }
 }
 
-void mitk::USDevice::DeactivateProbe(){
-  m_ActiveProbe = 0;
+bool mitk::USDevice::RemoveFilter(AbstractOpenCVImageFilter::Pointer filter)
+{
+  mitk::USImageSource::Pointer imageSource = this->GetUSImageSource();
+  if ( imageSource.IsNull() )
+  {
+    MITK_ERROR << "ImageSource must not be null when pushing a filter.";
+    mitkThrow() << "ImageSource must not be null when removing a filter.";
+  }
+
+  return imageSource->RemoveFilter(filter);
 }
 
 void mitk::USDevice::UpdateServiceProperty(std::string key, std::string value)
@@ -345,75 +394,60 @@ void mitk::USDevice::UpdateServiceProperty(std::string key, bool value)
   this->UpdateServiceProperty(key, value ? std::string("true") : std::string("false"));
 }
 
-mitk::USImage* mitk::USDevice::GetOutput()
+/**
+mitk::Image* mitk::USDevice::GetOutput()
 {
-  if (this->GetNumberOfOutputs() < 1)
-    return NULL;
+if (this->GetNumberOfOutputs() < 1)
+return NULL;
 
-  return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
+return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
 }
 
-mitk::USImage* mitk::USDevice::GetOutput(unsigned int idx)
+mitk::Image* mitk::USDevice::GetOutput(unsigned int idx)
 {
-  if (this->GetNumberOfOutputs() < 1)
-    return NULL;
-  return static_cast<USImage*>(this->ProcessObject::GetOutput(idx));
+if (this->GetNumberOfOutputs() < 1)
+return NULL;
+return static_cast<USImage*>(this->ProcessObject::GetOutput(idx));
 }
 
 void mitk::USDevice::GraftOutput(itk::DataObject *graft)
 {
-  this->GraftNthOutput(0, graft);
+this->GraftNthOutput(0, graft);
 }
 
 void mitk::USDevice::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
 {
-  if ( idx >= this->GetNumberOfOutputs() )
-  {
-    itkExceptionMacro(<<"Requested to graft output " << idx <<
-      " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
-  }
-
-  if ( !graft )
-  {
-    itkExceptionMacro(<<"Requested to graft output with a NULL pointer object" );
-  }
-
-  itk::DataObject* output = this->GetOutput(idx);
-  if ( !output )
-  {
-    itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
-  }
-  // Call Graft on USImage to copy member data
-  output->Graft( graft );
+if ( idx >= this->GetNumberOfOutputs() )
+{
+itkExceptionMacro(<<"Requested to graft output " << idx <<
+" but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
 }
 
-bool mitk::USDevice::ApplyCalibration(mitk::USImage::Pointer image){
-  if ( m_Calibration.IsNull() ) return false;
-
-  image->GetGeometry()->SetIndexToWorldTransform(m_Calibration);
-  return true;
+if ( !graft )
+{
+itkExceptionMacro(<<"Requested to graft output with a NULL pointer object" );
 }
+
+itk::DataObject* output = this->GetOutput(idx);
+if ( !output )
+{
+itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
+}
+// Call Graft on USImage to copy member data
+output->Graft( graft );
+}
+
+*/
 
 void mitk::USDevice::GrabImage()
 {
-  m_Image = this->GetUSImageSource()->GetNextImage();
+  mitk::Image::Pointer image = this->GetUSImageSource()->GetNextImage();
+  m_ImageMutex->Lock();
+  this->SetImage(image);
+  m_ImageMutex->Unlock();
 }
 
 //########### GETTER & SETTER ##################//
-
-void mitk::USDevice::setCalibration (mitk::AffineTransform3D::Pointer calibration){
-  if (calibration.IsNull())
-  {
-    MITK_ERROR << "Null pointer passed to SetCalibration of mitk::USDevice. Ignoring call.";
-    return;
-  }
-  m_Calibration = calibration;
-  m_Metadata->SetDeviceIsCalibrated(true);
-  if (m_ServiceRegistration != 0)
-  {
-    this->UpdateServiceProperty(mitk::USImageMetadata::PROP_DEV_ISCALIBRATED, m_Calibration.IsNotNull());
-  }
-}
 
 bool mitk::USDevice::GetIsInitialized()
 {
@@ -442,10 +476,25 @@ std::string mitk::USDevice::GetDeviceComment(){
   return this->m_Metadata->GetDeviceComment();
 }
 
-std::vector<mitk::USProbe::Pointer> mitk::USDevice::GetConnectedProbes()
+void mitk::USDevice::GenerateData()
 {
-  return m_ConnectedProbes;
-}
+  m_ImageMutex->Lock();
+
+  if ( m_Image.IsNull() || ! m_Image->IsInitialized() ) { m_ImageMutex->Unlock(); return; }
+
+  mitk::Image::Pointer output = this->GetOutput();
+
+  if ( ! output->IsInitialized()
+    || output->GetDimension(0) != m_Image->GetDimension(0) || output->GetDimension(1) != m_Image->GetDimension(1) )
+  {
+    output->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
+  }
+
+  mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
+  output->SetSlice(inputReadAccessor.GetData());
+
+  m_ImageMutex->Unlock();
+};
 
 std::string mitk::USDevice::GetServicePropertyLabel()
 {
@@ -460,7 +509,7 @@ ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
 {
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  mitk::USDevice * device = (mitk::USDevice *) pInfo->UserData;
+  mitk::USDevice* device = (mitk::USDevice*) pInfo->UserData;
   while (device->GetIsActive())
   {
     // lock this thread when ultrasound device is freezed
@@ -477,5 +526,16 @@ ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
 
     device->GrabImage();
   }
+  return ITK_THREAD_RETURN_VALUE;
+}
+
+ITK_THREAD_RETURN_TYPE mitk::USDevice::ConnectThread(void* pInfoStruct)
+{
+  /* extract this pointer from Thread Info structure */
+  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+  mitk::USDevice* device = (mitk::USDevice*) pInfo->UserData;
+
+  device->Connect();
+
   return ITK_THREAD_RETURN_VALUE;
 }

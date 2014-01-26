@@ -1,8 +1,9 @@
 SET(CPP_FILES
 
+## Module Activator
 mitkUSActivator.cpp
 
-## Model classes
+## Model Classes
 USModel/mitkUSImage.cpp
 USModel/mitkUSImageMetadata.cpp
 USModel/mitkUSDevice.cpp
@@ -11,13 +12,9 @@ USModel/mitkUSVideoDeviceCustomControls.cpp
 USModel/mitkUSProbe.cpp
 USModel/mitkUSDevicePersistence.cpp
 
-## Services
-USService/mitkUSDeviceService.cpp
-
-## Filters and sources
+## Filters and Sources
 USFilters/mitkUSImageSource.cpp
 USFilters/mitkUSImageVideoSource.cpp
-USFilters/mitkUSImageToUSImageFilter.cpp
 
 ## Control Interfaces
 USControlInterfaces/mitkUSAbstractControlInterface.cpp

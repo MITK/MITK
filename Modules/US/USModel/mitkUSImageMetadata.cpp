@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSImageMetadata.h"
 
-
 const char* mitk::USImageMetadata::PROP_DEV_MANUFACTURER  = "US.Device.Manufacturer";
 const char* mitk::USImageMetadata::PROP_DEV_MODEL         = "US.Device.Model";
 const char* mitk::USImageMetadata::PROP_DEV_COMMENT       = "US.Device.Comment";
@@ -42,6 +41,4 @@ mitk::USImageMetadata::USImageMetadata() : itk::Object()
 
 mitk::USImageMetadata::~USImageMetadata()
 {
-
 }
-

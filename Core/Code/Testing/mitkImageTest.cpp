@@ -185,8 +185,8 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED( imgMem->GetPixelType() == pt, "PixelType was set correctly.");
 
 
-  int *p;
-  int *p2;
+  int *p = NULL;
+  int *p2 = NULL;
   try
   {
     mitk::ImageReadAccessor imgMemAcc(imgMem);

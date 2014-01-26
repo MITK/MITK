@@ -145,7 +145,6 @@ public:
     newSpacing[1] = 1.254;
     newSpacing[2] = 0.224;
     image->SetSpacing(newSpacing);
-    mitk::BaseData* base;
     expectedPoint[0] = 3*2;
     expectedPoint[1] = 3*1.254;
     expectedPoint[2] = 3*0.224;
@@ -422,7 +421,7 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation match expection. ");
   }
 
-  void Expand_BaseDataDoubleSize_SizeChanged(mitk::BaseData* baseData, int DimT)
+  void Expand_BaseDataDoubleSize_SizeChanged(mitk::BaseData* baseData, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     MITK_TEST_CONDITION(geometry->CountTimeSteps()==DimT, "Number of time Steps match expection. ");
@@ -585,7 +584,6 @@ public:
     baseData->Update();
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
 
-    mitk::BoundingBox::BoundsArrayType bound =  geometry->GetBoundsInWorld();
     bool isEqual = true;
     isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(0), extentX, test_eps);//30*0.5);
     isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(1), extentY, test_eps);//25*0.33);

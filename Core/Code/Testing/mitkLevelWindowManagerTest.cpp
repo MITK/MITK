@@ -211,7 +211,7 @@ public:
         parity >>= 1;
       }
 
-      MITK_TEST_CONDITION( renderingModesValid && ( !manager->GetLevelWindowProperty() && !i || manager->GetLevelWindowProperty() && i ), "Testing level window property member according to rendering mode");
+      MITK_TEST_CONDITION( renderingModesValid && ( (!manager->GetLevelWindowProperty() && !i) || (manager->GetLevelWindowProperty() && i) ), "Testing level window property member according to rendering mode");
     }
   }
 

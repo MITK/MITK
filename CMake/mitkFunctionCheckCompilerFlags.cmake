@@ -58,6 +58,11 @@ function(mitkFunctionCheckCAndCXXCompilerFlags FLAG_TO_TEST C_RESULT_VAR CXX_RES
     message(FATAL_ERROR "FLAG_TO_TEST shouldn't be empty")
   endif()
 
+  # Save the contents of CXX_RESULT_VAR temporarily.
+  # This is needed of ${CXX_RESULT_VAR} is one of the CMAKE_<LANG>_FLAGS_* variables.
+  set(_saved_c_result_var ${${C_RESULT_VAR}})
+  set(_saved_cxx_result_var ${${CXX_RESULT_VAR}})
+
   # Clear all flags. If not, existing flags triggering warnings might lead to
   # false-negatives when checking for certain compiler flags.
   set(CMAKE_C_FLAGS )
@@ -91,13 +96,13 @@ function(mitkFunctionCheckCAndCXXCompilerFlags FLAG_TO_TEST C_RESULT_VAR CXX_RES
   CHECK_CXX_COMPILER_FLAG(${FLAG_TO_TEST_FIXED} HAS_CXX_FLAG_${suffix})
 
   if(HAS_CXX_FLAG_${suffix})
-    set(${CXX_RESULT_VAR} "${${CXX_RESULT_VAR}} ${FLAG_TO_TEST}" PARENT_SCOPE)
+    set(${CXX_RESULT_VAR} "${_saved_cxx_result_var} ${FLAG_TO_TEST}" PARENT_SCOPE)
   endif()
 
   CHECK_C_COMPILER_FLAG(${FLAG_TO_TEST_FIXED} HAS_C_FLAG_${suffix})
 
   if(HAS_C_FLAG_${suffix})
-    set(${C_RESULT_VAR} "${${C_RESULT_VAR}} ${FLAG_TO_TEST}" PARENT_SCOPE)
+    set(${C_RESULT_VAR} "${_saved_c_result_var} ${FLAG_TO_TEST}" PARENT_SCOPE)
   endif()
 
 endfunction()

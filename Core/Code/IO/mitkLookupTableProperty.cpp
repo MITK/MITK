@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::LookupTableProperty::LookupTableProperty()
 {
+    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+    this->SetLookupTable(lut);
 }
 
 mitk::LookupTableProperty::LookupTableProperty(const LookupTableProperty& other)
@@ -57,7 +59,6 @@ mitk::LookupTableProperty::ValueType mitk::LookupTableProperty::GetValue() const
 
 void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer aLookupTable)
 {
-//    MITK_INFO << "setting LUT property ... " << std::endl;
 
     if((m_LookupTable != aLookupTable) || (*m_LookupTable != *aLookupTable))
     {
@@ -65,7 +66,6 @@ void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer 
         Modified();
     }
 
-//    MITK_INFO << "setting LUT property OK! " << std::endl;
 }
 
 void mitk::LookupTableProperty::SetValue(const ValueType & value)

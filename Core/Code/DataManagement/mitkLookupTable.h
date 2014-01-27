@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <mitkCommon.h>
 #include "vtkLookupTable.h"
+#include "vtkSmartPointer.h"
 #include <itkDataObject.h>
 #include <itkObjectFactory.h>
 
@@ -64,6 +65,18 @@ public:
     virtual void ChangeOpacityForAll( float opacity );
 
     virtual void ChangeOpacity(int index, float opacity );
+
+    virtual void GetColor(int, double rgb[3]);
+
+    virtual void GetTableValue(int, double rgba[4]);
+
+    virtual void SetTableValue(int, double rgba[4]);
+
+//    virtual void SetActiveColormap(int index);
+
+    itkSetMacro(Window, float);
+    itkSetMacro(Level, float);
+    itkSetMacro(Opacity, float);
 
 
     /*!
@@ -128,7 +141,21 @@ protected:
 
     LookupTable(const LookupTable& other);
 
-    vtkLookupTable* m_LookupTable;
+    virtual void BuildGrayScaleLookupTable();
+    virtual void BuildLegacyBinaryLookupTable();
+    virtual void BuildInverseGrayScaleLookupTable();
+    virtual void BuildHotIronLookupTable();
+    virtual void BuildPETColorLookupTable();
+    virtual void BuildPET20LookupTable();
+    virtual void BuildMultiLabelLookupTable();
+
+    vtkSmartPointer<vtkLookupTable> m_LookupTable;
+
+    float m_Window;
+
+    float m_Level;
+
+    float m_Opacity;
 
 private:
 

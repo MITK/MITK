@@ -400,18 +400,18 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   //set the interpolation modus according to the property
   localStorage->m_Texture->SetInterpolate(textureInterpolation);
 
-  bool doseProperty;
-  if(datanode->GetBoolProperty("dose",doseProperty) && doseProperty)
-  {
-    // if the input is a dose file dont use the levelwindow filter because we need a float texture
-    // and the levelwindow filter is casting to unsigned char
-    localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
-  }
-  else
-  {
-    // connect the texture with the output of the levelwindow filter
-    localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
-  }
+//  bool doseProperty;
+//  if(datanode->GetBoolProperty("dose",doseProperty) && doseProperty)
+//  {
+//    // if the input is a dose file dont use the levelwindow filter because we need a float texture
+//    // and the levelwindow filter is casting to unsigned char
+//    localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
+//  }
+//  else
+//  {
+  // connect the texture with the output of the levelwindow filter
+  localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
+//  }
 
   this->TransformActor( renderer );
 
@@ -605,7 +605,7 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
       MITK_DEBUG << "'Image Rendering.Mode' = IsoDoseShader_Color";
       localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_DefaultLookupTable);
       this->ApplyLevelWindow( renderer );
-      this->ApplyShader( renderer );
+//      this->ApplyShader( renderer );
       break;
     default:
       MITK_ERROR << "No valid 'Image Rendering.Mode' set";

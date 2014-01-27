@@ -17,12 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDicomRTReader.h"
 
+#include <vtkColorTransferFunction.h>
+#include <mitkTransferFunction.h>
+#include <mitkTransferFunctionProperty.h>
+
 namespace mitk
 {
 
-  DicomRTReader::DicomRTReader()
-  {
-  }
+  DicomRTReader::DicomRTReader(){}
 
   DicomRTReader::~DicomRTReader(){}
 
@@ -32,13 +34,10 @@ namespace mitk
     DisplayColor[0]=1.0;
     DisplayColor[1]=0.0;
     DisplayColor[2]=0.0;
-    PolyData=NULL;
+    ContourModelSet=mitk::ContourModelSet::New();
   }
 
-  DicomRTReader::RoiEntry::~RoiEntry()
-  {
-    SetPolyData(NULL);
-  }
+  DicomRTReader::RoiEntry::~RoiEntry(){}
 
   DicomRTReader::RoiEntry::RoiEntry(const RoiEntry& src)
   {
@@ -48,8 +47,8 @@ namespace mitk
     DisplayColor[0]=src.DisplayColor[0];
     DisplayColor[1]=src.DisplayColor[1];
     DisplayColor[2]=src.DisplayColor[2];
-    PolyData=NULL;
-    SetPolyData(src.PolyData);
+    ContourModelSet=mitk::ContourModelSet::New();
+    SetPolyData(src.ContourModelSet);
   }
 
   DicomRTReader::RoiEntry& DicomRTReader::RoiEntry::operator=(const RoiEntry &src)
@@ -60,33 +59,19 @@ namespace mitk
     DisplayColor[0]=src.DisplayColor[0];
     DisplayColor[1]=src.DisplayColor[1];
     DisplayColor[2]=src.DisplayColor[2];
-    SetPolyData(src.PolyData);
+    SetPolyData(src.ContourModelSet);
     return (*this);
   }
 
-  void DicomRTReader::RoiEntry::SetPolyData(vtkPolyData* roiPolyData)
+  void DicomRTReader::RoiEntry::SetPolyData(mitk::ContourModelSet::Pointer roiPolyData)
   {
-    if (roiPolyData == this->PolyData)
-    {
-      // not changed
+    if (roiPolyData == this->ContourModelSet)
       return;
-    }
-    if (this->PolyData != NULL)
-    {
-      this->PolyData->UnRegister(NULL);
-    }
-
-    this->PolyData = roiPolyData;
-
-    if (this->PolyData != NULL)
-    {
-      this->PolyData->Register(NULL);
-    }
+    this->ContourModelSet = roiPolyData;
   }
 
   std::deque<mitk::ContourModelSet::Pointer> DicomRTReader::ReadDicomFile(char* filename)
   {
-    std::cout << "\n\n" << "Filename:" << filename << "\n\n";
     DcmFileFormat file;
     OFCondition outp;
     outp = file.loadFile(filename, EXS_Unknown);
@@ -110,27 +95,28 @@ namespace mitk
         }
         else if(sopClass == UID_RTPlanStorage)
         {
-          int x = this->DicomRTReader::LoadRTPlan(dataset);
+//          Function isnt implemented yet
+//          int x = this->DicomRTReader::LoadRTPlan(dataset);
           ContourModelSetVector y;
           return y;
         }
         else
         {
-          std::cout << "Error reading the RTStructureSetStorage\n\n";
+          MITK_ERROR << "Error matching the SOP Class, maybe an unsupported type" << endl;
           ContourModelSetVector y;
           return y;
         }
       }
       else
       {
-        std::cout << "Error reading the SOPClassID\n\n";
+        MITK_ERROR << "Error reading the SOPClassID" << endl;
         ContourModelSetVector y;
         return y;
       }
     }
     else
     {
-      std::cout << "Cant read the input file\n\n";
+      MITK_ERROR << "Error rading the input file" << endl;
       ContourModelSetVector y;
       return y;
     }
@@ -141,14 +127,12 @@ namespace mitk
     return this->RoiSequenceVector.size();
   }
 
-  DicomRTReader::RoiEntry* DicomRTReader::FindRoiByNumber(int roiNumber)
+  DicomRTReader::RoiEntry* DicomRTReader::FindRoiByNumber(unsigned int roiNumber)
   {
-    for(int i=0; i<this->RoiSequenceVector.size(); i++)
+    for(unsigned int i=0; i<this->RoiSequenceVector.size(); ++i)
     {
       if(this->RoiSequenceVector[i].Number == roiNumber)
-      {
         return &this->RoiSequenceVector[i];
-      }
     }
     return NULL;
   }
@@ -167,14 +151,14 @@ namespace mitk
     OFCondition outp = structureSetObject.read(*dataset);
     if(!outp.good())
     {
-      std::cout << "Error reading the file\n\n";
+      MITK_ERROR << "Error reading the file" << endl;
       std::deque<mitk::ContourModelSet::Pointer> x;
       return x;
     }
     DRTStructureSetROISequence &roiSequence = structureSetObject.getStructureSetROISequence();
     if(!roiSequence.gotoFirstItem().good())
     {
-      std::cout << "Error reading the structure sequence\n\n";
+      MITK_ERROR << "Error reading the structure sequence" << endl;
       std::deque<mitk::ContourModelSet::Pointer> x;
       return x;
     }
@@ -201,15 +185,15 @@ namespace mitk
     }
     while(roiSequence.gotoNextItem().good());
 
-    OFString refSOPInstUID = GetReferencedFrameOfReferenceSOPInstanceUID(structureSetObject);
-
-    double sliceThickness = 2.0;
+//    Dont know anymore >.<
+//    OFString refSOPInstUID = GetReferencedFrameOfReferenceSOPInstanceUID(structureSetObject);
+//    double sliceThickness = 2.0;
 
     Sint32 refRoiNumber;
     DRTROIContourSequence &roiContourSeqObject = structureSetObject.getROIContourSequence();
     if(!roiContourSeqObject.gotoFirstItem().good())
     {
-      std::cout << "Error reading the contour sequence\n\n";
+      MITK_ERROR << "Error reading the contour sequence" << endl;
       std::deque<mitk::ContourModelSet::Pointer> x;
       return x;
     }
@@ -247,7 +231,7 @@ namespace mitk
           stream << numberOfPoints;
           stream >> number;
 
-          for(int i=0; i<contourData_LPS.size()/3;i++)
+          for(unsigned int i=0; i<contourData_LPS.size()/3;i++)
           {
             mitk::Point3D point;
             point[0] = contourData_LPS.at(3*i);
@@ -262,12 +246,12 @@ namespace mitk
       }
       else
       {
-        std::cout << "Error reading contourSeqObject\n\n";
+        MITK_ERROR << "Error reading contourSeqObject" << endl;
       }
       RoiEntry* refROI = this->FindRoiByNumber(refRoiNumber);
       if(refROI==NULL)
       {
-        std::cout << "Cant find referenced ROI\n\n";
+        MITK_ERROR << "Can not find references ROI" << endl;
         continue;
       }
       Sint32 roiColor;
@@ -276,13 +260,16 @@ namespace mitk
         currentRoiObject.getROIDisplayColor(roiColor, j);
         refROI->DisplayColor[j] = roiColor/255.0;
       }
+      //TODO check for ordering maybe outsource contourmodelsetvector to
+      //Roientry and maybe it can replace the ContoruModelSet
+      refROI->ContourModelSet = contourSet;
       contourSet->SetProperty("name", mitk::StringProperty::New(refROI->Name));
       contourModelSetVector.push_back(contourSet);
 
     }
     while(roiContourSeqObject.gotoNextItem().good());
 
-    std::cout << "Anzahl von ROI: " << contourModelSetVector.size() << "\n\n";
+    MITK_INFO << "Number of ROIs found: " << contourModelSetVector.size() << endl;
 
     return contourModelSetVector;
   }
@@ -292,44 +279,28 @@ namespace mitk
     OFString invalid;
     DRTReferencedFrameOfReferenceSequence &refFrameOfRefSeqObject = structSetObject.getReferencedFrameOfReferenceSequence();
     if(!refFrameOfRefSeqObject.gotoFirstItem().good())
-    {
       return invalid;
-    }
     DRTReferencedFrameOfReferenceSequence::Item &currentRefFrameOfRefSeqItem = refFrameOfRefSeqObject.getCurrentItem();
     if(!currentRefFrameOfRefSeqItem.isValid())
-    {
       return invalid;
-    }
     DRTRTReferencedStudySequence &refStudySeqObject = currentRefFrameOfRefSeqItem.getRTReferencedStudySequence();
     if(!refStudySeqObject.gotoFirstItem().good())
-    {
       return invalid;
-    }
     DRTRTReferencedStudySequence::Item &refStudySeqItem = refStudySeqObject.getCurrentItem();
     if(!refStudySeqItem.isValid())
-    {
       return invalid;
-    }
     DRTRTReferencedSeriesSequence &refSeriesSeqObject = refStudySeqItem.getRTReferencedSeriesSequence();
     if(!refSeriesSeqObject.gotoFirstItem().good())
-    {
       return invalid;
-    }
     DRTRTReferencedSeriesSequence::Item &refSeriesSeqItem = refSeriesSeqObject.getCurrentItem();
     if(!refSeriesSeqItem.isValid())
-    {
       return invalid;
-    }
     DRTContourImageSequence &contourImageSeqObject = refSeriesSeqItem.getContourImageSequence();
     if(!contourImageSeqObject.gotoFirstItem().good())
-    {
       return invalid;
-    }
     DRTContourImageSequence::Item &contourImageSeqItem = contourImageSeqObject.getCurrentItem();
     if(!contourImageSeqItem.isValid())
-    {
       return invalid;
-    }
 
     OFString resultUid;
     contourImageSeqItem.getReferencedSOPInstanceUID(resultUid);
@@ -440,13 +411,6 @@ namespace mitk
 
   mitk::DataNode::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset, char* filename)
   {
-//    mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
-
-//    std::string path = "/home/riecker/mitkShaderLighting.xml"; //mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderTOF.xml");
-//    MITK_INFO << "shader found under: " << path;
-//    std::ifstream str(path.c_str());
-//    shadoRepo->LoadShader(str,"mitkIsoLineShader");
-
     std::string name = filename;
     itk::FilenamesContainer file;
     file.push_back(name);
@@ -489,7 +453,7 @@ namespace mitk
 
     //standard testing picture: 0.001
     gridscale = OFStandard::atof(gridScaling.c_str());
-    std::cout << std::setprecision(50) << "Gridscale " << gridscale << endl;
+    std::cout << std::setprecision(10) << "GRIDSCALE >> " << gridscale << endl;
     frames = atoi(nrframes.c_str());
 
     dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count);
@@ -516,40 +480,24 @@ namespace mitk
 
     image->SetGeometry(geo);
 
-    double prescripeDose = this->GetDefaultPrescriptionDose(dataset);
-    double hsvValue = 0.002778;
-
-    vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-    transferFunction->AddHSVPoint(prescripeDose*0.0,(240*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->AddHSVPoint(prescripeDose*0.2,(180*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->AddHSVPoint(prescripeDose*0.4,(120*hsvValue),1.0,0.5,1.0,1.0);
-    transferFunction->AddHSVPoint(prescripeDose*0.5,(120*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->AddHSVPoint(prescripeDose*0.6,(060*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->AddHSVPoint(prescripeDose*0.7,(026*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->AddHSVPoint(prescripeDose*1.0,(000*hsvValue),1.0,1.0,1.0,1.0);
-    transferFunction->Build();
-
-    mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
-    mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
-    mitkTransFunc->SetColorTransferFunction(transferFunction);
-    mitkTransFuncProp->SetValue(mitkTransFunc);
-
-    mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-    renderingMode->SetValue(mitk::RenderingModeProperty::ISODOSESHADER_COLOR);
+    double prescripeDose = this->GetMaxDoseValue(dataset);
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetName("DicomRT Dosis");
-    node->SetProperty("shader.mitkIsoLineShader.Gridscale", mitk::FloatProperty::New(10.0));
+//    node->SetProperty("shader.mitkIsoLineShader.Gridscale", mitk::FloatProperty::New(10.0));
+    node->SetFloatProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
     node->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),true);
-    node->SetProperty("Image Rendering.Mode", renderingMode);
 //    node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
-    node->SetProperty("opacity", mitk::FloatProperty::New(0.3));
+//    node->SetProperty("Image Rendering.Mode", renderingMode);
+//    node->SetProperty("opacity", mitk::FloatProperty::New(0.3));
     node->SetData(image);
+
+    MITK_INFO << "PRESCRIPEDOSE >> " << prescripeDose << endl;
 
     return node;
   }
 
-  double DicomRTReader::GetDefaultPrescriptionDose(DcmDataset* dataSet)
+  double DicomRTReader::GetMaxDoseValue(DcmDataset* dataSet)
   {
     DRTDoseIOD doseObject;
     OFCondition result = doseObject.read(*dataSet);
@@ -587,59 +535,7 @@ namespace mitk
       }
     }
 
-    return highest * 0.8;
-  }
-
-  vtkSmartPointer<vtkPolyData> DicomRTReader::GetIsoLine(double value, vtkDataObject* dataObject)
-  {
-    vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
-    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-
-    contourFilter->SetInput(dataObject);
-    contourFilter->SetNumberOfContours(1);
-    contourFilter->SetValue(0,value);
-    contourFilter->Update();
-
-    polyData = contourFilter->GetOutput();
-    return polyData;
-  }
-
-  vtkSmartPointer<vtkPolyData> DicomRTReader::GetStandardIsoLines(vtkDataObject* dataObject)
-  {
-    vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
-    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-
-    contourFilter->SetInput(dataObject);
-    contourFilter->SetNumberOfContours(1);
-    contourFilter->SetValue(0,10);
-
-    polyData = contourFilter->GetOutput();
-    return polyData;
-  }
-
-  bool DicomRTReader::Equals(mitk::ContourModel::Pointer first, mitk::ContourModel::Pointer second)
-  {
-    if(first->GetNumberOfVertices() != second->GetNumberOfVertices())
-    {
-      return false;
-    }
-    for( int i = 0; i < first->GetNumberOfVertices(); i++)
-    {
-      const mitk::ContourElement::VertexType* x = first->GetVertexAt(i);
-      const mitk::ContourElement::VertexType* y = second->GetVertexAt(i);
-
-      mitk::ContourElement::VertexType xx = *x;
-      mitk::ContourElement::VertexType yy = *y;
-
-      for(int j=0; j<3; j++)
-      {
-        if(xx.Coordinates[j] != yy.Coordinates[j])
-        {
-          return false;
-        }
-      }
-    }
-    return true;
+    return highest;
   }
 
 }

@@ -66,6 +66,10 @@ class RTDoseVisualizer : public QmitkAbstractView
 
   protected slots:
 
+    void LoadISOLines();
+
+    void LoadRTDoseFile();
+
     void OnConvertButtonClicked();
 
     void OnAddFreeValueClicked();

@@ -7,12 +7,14 @@ set(INTERNAL_CPP_FILES
   RTUIPreferencePage.cpp
   DoseVisualizationPreferencePage.cpp
   mitkDoseVisPreferenceHelper.cpp
+  LoadingRTView.cpp
 )
 
 set(UI_FILES
   src/internal/RTDoseVisualizerControls.ui
   src/internal/DoseVisualizationPreferencePageControls.ui
   src/internal/RTUIPreferencePageControls.ui
+  src/internal/LoadingRTViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -20,6 +22,7 @@ set(MOC_H_FILES
   src/internal/RTDoseVisualizer.h
   src/internal/RTUIPreferencePage.h
   src/internal/DoseVisualizationPreferencePage.h
+  src/internal/LoadingRTView.h
 )
 
 # list of resource files which can be used by the plug-in
@@ -28,6 +31,7 @@ set(MOC_H_FILES
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
   resources/iso.png
+  resources/iso2.png
   plugin.xml
 )
 

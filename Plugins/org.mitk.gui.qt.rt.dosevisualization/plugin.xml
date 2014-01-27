@@ -6,6 +6,10 @@
           name="RT Dose Visualization"
           class="RTDoseVisualizer"
           icon="resources/iso.png" />
+    <view id="org.mitk.views.loadingrtview"
+          name=" Loading RT"
+          class="LoadingRTView"
+          icon="resources/iso2.png" />
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">

@@ -38,18 +38,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "dcmtk/dcmrt/drtionpl.h"
 #include "dcmtk/dcmrt/drtiontr.h"
 
-//######################################################
-#include <mitkLookupTable.h>
-#include <mitkLookupTableProperty.h>
-#include <vtkLookupTable.h>
-#include <vtkContourFilter.h>
 #include <fstream>
-#include <vtkColorTransferFunction.h>
 #include <mitkImage.h>
 #include <mitkPixelType.h>
 #include <mitkDataNode.h>
-#include <mitkTransferFunction.h>
-#include <mitkTransferFunctionProperty.h>
 #include <mitkProperties.h>
 #include <mitkRenderingModeProperty.h>
 #include <mitkDataNodeFactory.h>
@@ -59,7 +51,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCoreServices.h>
 #include <mitkIShaderRepository.h>
-//######################################################
 
 #include "dcmtk/dcmrt/drtstrct.h"
 
@@ -126,14 +117,13 @@ namespace mitk
       RoiEntry(const RoiEntry& src);
       RoiEntry &operator=(const RoiEntry &src);
 
-      void SetPolyData(vtkPolyData* roiPolyData);
+      void SetPolyData(ContourModelSet::Pointer roiPolyData);
 
       unsigned int Number;
       std::string  Name;
       std::string  Description;
       double       DisplayColor[3];
-      //vllt direkt durch die contourmodels ersetzen ?!
-      vtkPolyData* PolyData;
+      mitk::ContourModelSet::Pointer ContourModelSet;
     };
 
   public:
@@ -142,35 +132,13 @@ namespace mitk
     itkNewMacro( Self );
 
     /**
-     * @brief Used for getting a custom Isoline
-     * @param value The gray-value which the isoline represents
-     * @param dataObject The vtkDataObject from the DicomRT dose image
-     * @return Returns a vtkPolyData including the contour/isoline
-     *
-     * This method is used for a custom Isoline e.g. from the DicomRT IsoSlider.
-     * You define the value where the Isoline is by setting the value as a parameter.
-     */
-    vtkSmartPointer<vtkPolyData> GetIsoLine(double value, vtkDataObject* dataObject);
-
-    /**
-     * @brief Used for getting the StandardIsoLines
-     * @param dataObject The vtkDataObject from the DicomRT dose image
-     * @return Returns a vtkPolyData including the contours/isolines
-     *
-     * The IsoLines should be equal to the contours of the colorwash.
-     */
-    vtkSmartPointer<vtkPolyData> GetStandardIsoLines(vtkDataObject* dataObject);
-
-    /**
-     * @brief Get a default prescription dose
+     * @brief Get the maximum dose value from the dose file
      * @param dataSet The DcmDataset of the DicomRTDose file
      * @return  The dose value
      *
-     * If you dont define a prescription dose use this method, it calculates a
-     * default value by reading the dose values from the dose file and multiplys
-     * the highest value with 0.8.
+     * Checks all pixel values for the maximum value
      */
-    double GetDefaultPrescriptionDose(DcmDataset* dataSet);
+    double GetMaxDoseValue(DcmDataset* dataSet);
 
     /**
      * @brief Used for reading a DicomRT file
@@ -226,7 +194,7 @@ namespace mitk
      * @param roiNumber The number of the searched roi
      * @return Returns a mitk::DicomRTReader::RoiEntry object
      */
-    RoiEntry* FindRoiByNumber(int roiNumber);
+    RoiEntry* FindRoiByNumber(unsigned int roiNumber);
 
     /**
      * @brief GetReferencedFrameOfReferenceSOPInstanceUID
@@ -234,14 +202,6 @@ namespace mitk
      * @return
      */
     OFString GetReferencedFrameOfReferenceSOPInstanceUID(DRTStructureSetIOD &structSetObject);
-
-    /**
-     * @brief Compares two mitk::ContourModel::Pointer for testing the Structuresets.
-     * @param first The first mitk::ContourModel::Pointer
-     * @param second The second mitk::ContourModel::Pointer
-     * @return Returns true if they are equal and false if they are different
-     */
-    bool Equals(mitk::ContourModel::Pointer first, mitk::ContourModel::Pointer second);
 
     /**
     * Virtual destructor.

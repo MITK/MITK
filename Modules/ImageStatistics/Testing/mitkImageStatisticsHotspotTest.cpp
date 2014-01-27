@@ -533,7 +533,7 @@ struct mitkImageStatisticsHotspotTestClass
   {
     // check all expected test result against actual results
 
-    double eps = 0.01;
+    double eps = 1.6;
 
     MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMean[label] - statistics.GetHotspotStatistics().GetMean() ) < eps, "Mean value of hotspot in XML-File: " << testParameters.m_HotspotMean[label] << " (Mean value of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotStatistics().GetMean() << ")" );
     MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMax[label]- statistics.GetHotspotStatistics().GetMax() ) < eps, "Maximum of hotspot in XML-File:  " << testParameters.m_HotspotMax[label] << " (Maximum of hotspot calculated in mitkImageStatisticsCalculator: "  << statistics.GetHotspotStatistics().GetMax() << ")" );
@@ -568,19 +568,19 @@ struct mitkImageStatisticsHotspotTestClass
 int mitkImageStatisticsHotspotTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkImageStatisticsHotspotTest")
-  try {
-  mitkImageStatisticsHotspotTestClass::Parameters parameters = mitkImageStatisticsHotspotTestClass::ParseParameters(argc,argv);
+    try {
+      mitkImageStatisticsHotspotTestClass::Parameters parameters = mitkImageStatisticsHotspotTestClass::ParseParameters(argc,argv);
 
-  mitk::Image::Pointer image = mitkImageStatisticsHotspotTestClass::BuildTestImage(parameters);
-  MITK_TEST_CONDITION_REQUIRED( image.IsNotNull(), "Generate test image" );
+      mitk::Image::Pointer image = mitkImageStatisticsHotspotTestClass::BuildTestImage(parameters);
+      MITK_TEST_CONDITION_REQUIRED( image.IsNotNull(), "Generate test image" );
 
-  for(int label = 0; label < parameters.m_NumberOfLabels; ++label)
-  {
-    mitk::ImageStatisticsCalculator::Statistics statistics = mitkImageStatisticsHotspotTestClass::CalculateStatistics(image, parameters, label);
+      for(int label = 0; label < parameters.m_NumberOfLabels; ++label)
+      {
+        mitk::ImageStatisticsCalculator::Statistics statistics = mitkImageStatisticsHotspotTestClass::CalculateStatistics(image, parameters, label);
 
-    mitkImageStatisticsHotspotTestClass::ValidateStatistics(statistics, parameters, label);
-    std::cout << std::endl;
-  }
+        mitkImageStatisticsHotspotTestClass::ValidateStatistics(statistics, parameters, label);
+        std::cout << std::endl;
+      }
 
 
   }

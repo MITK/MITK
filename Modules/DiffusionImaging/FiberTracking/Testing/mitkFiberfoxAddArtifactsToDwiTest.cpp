@@ -118,17 +118,16 @@ public:
         if (refImage.IsNotNull())
         {
             bool ok = CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage());
-            if (!ok)
-            {
-                NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
-                writer->SetFileName("/tmp/test2.dwi");
-                writer->SetInput(testImage);
-                writer->Update();
-
-                writer->SetFileName("/tmp/ref2.dwi");
-                writer->SetInput(refImage);
-                writer->Update();
-            }
+//            if (!ok)
+//            {
+//                MITK_INFO << "******************************************";
+//                MITK_INFO << testFileName;
+//                MITK_INFO << "******************************************";
+//                NrrdDiffusionImageWriter<short>::Pointer writer = NrrdDiffusionImageWriter<short>::New();
+//                writer->SetFileName(testFileName);
+//                writer->SetInput(testImage);
+//                writer->Update();
+//            }
             CPPUNIT_ASSERT_MESSAGE(testFileName, ok);
         }
         else
@@ -177,7 +176,7 @@ public:
         ricianNoiseModel->SetNoiseVariance(1000000);
         ricianNoiseModel->SetSeed(0);
         m_Parameters.m_NoiseModel = ricianNoiseModel;
-//        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/riciannoise2.dwi") );
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/riciannoise2.dwi") );
         delete m_Parameters.m_NoiseModel;
     }
 
@@ -187,7 +186,7 @@ public:
         chiSquareNoiseModel->SetNoiseVariance(1000000);
         chiSquareNoiseModel->SetSeed(0);
         m_Parameters.m_NoiseModel = chiSquareNoiseModel;
-//        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/chisquarenoise2.dwi") );
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/chisquarenoise2.dwi") );
         delete m_Parameters.m_NoiseModel;
     }
 

@@ -354,9 +354,8 @@ void QmitkGibbsTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
             m_ImageNode = node;
         else if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
-            bool isBinary = false;
-            node->GetPropertyValue<bool>("binary", isBinary);
-            if (isBinary)
+            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(node->GetData());
+            if (img->GetPixelType().GetPixelType()==itk::ImageIOBase::SCALAR)
                 m_MaskImageNode = node;
         }
     }

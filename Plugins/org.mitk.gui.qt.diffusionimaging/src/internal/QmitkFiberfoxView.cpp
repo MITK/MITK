@@ -56,6 +56,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkChiSquareNoiseModel.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkNrrdDiffusionImageWriter.h>
+#include <QScrollBar>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -268,6 +269,8 @@ void QmitkFiberfoxView::UpdateSimulationStatus()
         m_Controls->m_SimulationStatusText->clear();
         statusText = "<pre>"+statusText+"</pre>";
         m_Controls->m_SimulationStatusText->setText(statusText);
+        QScrollBar *vScrollBar = m_Controls->m_SimulationStatusText->verticalScrollBar();
+        vScrollBar->triggerAction(QScrollBar::SliderToMaximum);
     }
 }
 
@@ -805,12 +808,12 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.fibers.spline.continuity", m_Controls->m_ContinuityBox->value());
     parameters.put("fiberfox.fibers.spline.bias", m_Controls->m_BiasBox->value());
     parameters.put("fiberfox.fibers.constantradius", m_Controls->m_ConstantRadiusBox->isChecked());
-    parameters.put("fiberfox.fibers.m_Rotation.x", m_Controls->m_XrotBox->value());
-    parameters.put("fiberfox.fibers.m_Rotation.y", m_Controls->m_YrotBox->value());
-    parameters.put("fiberfox.fibers.m_Rotation.z", m_Controls->m_ZrotBox->value());
-    parameters.put("fiberfox.fibers.m_Translation.x", m_Controls->m_XtransBox->value());
-    parameters.put("fiberfox.fibers.m_Translation.y", m_Controls->m_YtransBox->value());
-    parameters.put("fiberfox.fibers.m_Translation.z", m_Controls->m_ZtransBox->value());
+    parameters.put("fiberfox.fibers.rotation.x", m_Controls->m_XrotBox->value());
+    parameters.put("fiberfox.fibers.rotation.y", m_Controls->m_YrotBox->value());
+    parameters.put("fiberfox.fibers.rotation.z", m_Controls->m_ZrotBox->value());
+    parameters.put("fiberfox.fibers.translation.x", m_Controls->m_XtransBox->value());
+    parameters.put("fiberfox.fibers.translation.y", m_Controls->m_YtransBox->value());
+    parameters.put("fiberfox.fibers.translation.z", m_Controls->m_ZtransBox->value());
     parameters.put("fiberfox.fibers.scale.x", m_Controls->m_XscaleBox->value());
     parameters.put("fiberfox.fibers.scale.y", m_Controls->m_YscaleBox->value());
     parameters.put("fiberfox.fibers.scale.z", m_Controls->m_ZscaleBox->value());
@@ -841,24 +844,24 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.artifacts.noisedistribution", m_Controls->m_NoiseDistributionBox->currentIndex());
     parameters.put("fiberfox.image.artifacts.noisevariance", m_Controls->m_NoiseLevel->value());
     parameters.put("fiberfox.image.artifacts.addghost", m_Controls->m_AddGhosts->isChecked());
-    parameters.put("fiberfox.image.artifacts.m_KspaceLineOffset", m_Controls->m_kOffsetBox->value());
+    parameters.put("fiberfox.image.artifacts.kspaceLineOffset", m_Controls->m_kOffsetBox->value());
     parameters.put("fiberfox.image.artifacts.distortions", m_Controls->m_AddDistortions->isChecked());
     parameters.put("fiberfox.image.artifacts.addeddy", m_Controls->m_AddEddy->isChecked());
-    parameters.put("fiberfox.image.artifacts.m_EddyStrength", m_Controls->m_EddyGradientStrength->value());
+    parameters.put("fiberfox.image.artifacts.eddyStrength", m_Controls->m_EddyGradientStrength->value());
     parameters.put("fiberfox.image.artifacts.addringing", m_Controls->m_AddGibbsRinging->isChecked());
     parameters.put("fiberfox.image.artifacts.addspikes", m_Controls->m_AddSpikes->isChecked());
-    parameters.put("fiberfox.image.artifacts.m_Spikesnum", m_Controls->m_SpikeNumBox->value());
-    parameters.put("fiberfox.image.artifacts.m_Spikesscale", m_Controls->m_SpikeScaleBox->value());
+    parameters.put("fiberfox.image.artifacts.spikesnum", m_Controls->m_SpikeNumBox->value());
+    parameters.put("fiberfox.image.artifacts.spikesscale", m_Controls->m_SpikeScaleBox->value());
     parameters.put("fiberfox.image.artifacts.addaliasing", m_Controls->m_AddAliasing->isChecked());
     parameters.put("fiberfox.image.artifacts.aliasingfactor", m_Controls->m_WrapBox->value());
-    parameters.put("fiberfox.image.artifacts.m_DoAddMotion", m_Controls->m_AddMotion->isChecked());
-    parameters.put("fiberfox.image.artifacts.m_RandomMotion", m_Controls->m_RandomMotion->isChecked());
-    parameters.put("fiberfox.image.artifacts.m_Translation0", m_Controls->m_MaxTranslationBoxX->value());
-    parameters.put("fiberfox.image.artifacts.m_Translation1", m_Controls->m_MaxTranslationBoxY->value());
-    parameters.put("fiberfox.image.artifacts.m_Translation2", m_Controls->m_MaxTranslationBoxZ->value());
-    parameters.put("fiberfox.image.artifacts.m_Rotation0", m_Controls->m_MaxRotationBoxX->value());
-    parameters.put("fiberfox.image.artifacts.m_Rotation1", m_Controls->m_MaxRotationBoxY->value());
-    parameters.put("fiberfox.image.artifacts.m_Rotation2", m_Controls->m_MaxRotationBoxZ->value());
+    parameters.put("fiberfox.image.artifacts.doAddMotion", m_Controls->m_AddMotion->isChecked());
+    parameters.put("fiberfox.image.artifacts.randomMotion", m_Controls->m_RandomMotion->isChecked());
+    parameters.put("fiberfox.image.artifacts.translation0", m_Controls->m_MaxTranslationBoxX->value());
+    parameters.put("fiberfox.image.artifacts.translation1", m_Controls->m_MaxTranslationBoxY->value());
+    parameters.put("fiberfox.image.artifacts.translation2", m_Controls->m_MaxTranslationBoxZ->value());
+    parameters.put("fiberfox.image.artifacts.rotation0", m_Controls->m_MaxRotationBoxX->value());
+    parameters.put("fiberfox.image.artifacts.rotation1", m_Controls->m_MaxRotationBoxY->value());
+    parameters.put("fiberfox.image.artifacts.rotation2", m_Controls->m_MaxRotationBoxZ->value());
 
     parameters.put("fiberfox.image.compartment1.index", m_Controls->m_Compartment1Box->currentIndex());
     parameters.put("fiberfox.image.compartment2.index", m_Controls->m_Compartment2Box->currentIndex());
@@ -981,24 +984,24 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_NoiseDistributionBox->setCurrentIndex(v1.second.get<int>("artifacts.noisedistribution"));
             m_Controls->m_NoiseLevel->setValue(v1.second.get<double>("artifacts.noisevariance"));
             m_Controls->m_AddGhosts->setChecked(v1.second.get<bool>("artifacts.addghost"));
-            m_Controls->m_kOffsetBox->setValue(v1.second.get<double>("artifacts.m_KspaceLineOffset"));
+            m_Controls->m_kOffsetBox->setValue(v1.second.get<double>("artifacts.kspaceLineOffset"));
             m_Controls->m_AddAliasing->setChecked(v1.second.get<bool>("artifacts.addaliasing"));
             m_Controls->m_WrapBox->setValue(v1.second.get<double>("artifacts.aliasingfactor"));
             m_Controls->m_AddDistortions->setChecked(v1.second.get<bool>("artifacts.distortions"));
             m_Controls->m_AddSpikes->setChecked(v1.second.get<bool>("artifacts.addspikes"));
-            m_Controls->m_SpikeNumBox->setValue(v1.second.get<int>("artifacts.m_Spikesnum"));
-            m_Controls->m_SpikeScaleBox->setValue(v1.second.get<double>("artifacts.m_Spikesscale"));
+            m_Controls->m_SpikeNumBox->setValue(v1.second.get<int>("artifacts.spikesnum"));
+            m_Controls->m_SpikeScaleBox->setValue(v1.second.get<double>("artifacts.spikesscale"));
             m_Controls->m_AddEddy->setChecked(v1.second.get<bool>("artifacts.addeddy"));
-            m_Controls->m_EddyGradientStrength->setValue(v1.second.get<double>("artifacts.m_EddyStrength"));
+            m_Controls->m_EddyGradientStrength->setValue(v1.second.get<double>("artifacts.eddyStrength"));
             m_Controls->m_AddGibbsRinging->setChecked(v1.second.get<bool>("artifacts.addringing"));
-            m_Controls->m_AddMotion->setChecked(v1.second.get<bool>("artifacts.m_DoAddMotion"));
-            m_Controls->m_RandomMotion->setChecked(v1.second.get<bool>("artifacts.m_RandomMotion"));
-            m_Controls->m_MaxTranslationBoxX->setValue(v1.second.get<double>("artifacts.m_Translation0"));
-            m_Controls->m_MaxTranslationBoxY->setValue(v1.second.get<double>("artifacts.m_Translation1"));
-            m_Controls->m_MaxTranslationBoxZ->setValue(v1.second.get<double>("artifacts.m_Translation2"));
-            m_Controls->m_MaxRotationBoxX->setValue(v1.second.get<double>("artifacts.m_Rotation0"));
-            m_Controls->m_MaxRotationBoxY->setValue(v1.second.get<double>("artifacts.m_Rotation1"));
-            m_Controls->m_MaxRotationBoxZ->setValue(v1.second.get<double>("artifacts.m_Rotation2"));
+            m_Controls->m_AddMotion->setChecked(v1.second.get<bool>("artifacts.doAddMotion"));
+            m_Controls->m_RandomMotion->setChecked(v1.second.get<bool>("artifacts.randomMotion"));
+            m_Controls->m_MaxTranslationBoxX->setValue(v1.second.get<double>("artifacts.translation0"));
+            m_Controls->m_MaxTranslationBoxY->setValue(v1.second.get<double>("artifacts.translation1"));
+            m_Controls->m_MaxTranslationBoxZ->setValue(v1.second.get<double>("artifacts.translation2"));
+            m_Controls->m_MaxRotationBoxX->setValue(v1.second.get<double>("artifacts.rotation0"));
+            m_Controls->m_MaxRotationBoxY->setValue(v1.second.get<double>("artifacts.rotation1"));
+            m_Controls->m_MaxRotationBoxZ->setValue(v1.second.get<double>("artifacts.rotation2"));
 
             m_Controls->m_Compartment1Box->setCurrentIndex(v1.second.get<int>("compartment1.index"));
             m_Controls->m_Compartment2Box->setCurrentIndex(v1.second.get<int>("compartment2.index"));

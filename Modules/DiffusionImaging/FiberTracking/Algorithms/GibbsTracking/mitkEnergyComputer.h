@@ -60,7 +60,6 @@ protected:
     SphereInterpolator*             m_SphereInterpolator;
     ParticleGrid*                   m_ParticleGrid;
     ItkRandGenType*                 m_RandGen;
-//    ItkQBallImgType*                m_Image;
     ItkFloatImageType*              m_Mask;
     vnl_vector_fixed<int, 3>        m_Size;
     vnl_vector_fixed<float, 3>      m_Spacing;

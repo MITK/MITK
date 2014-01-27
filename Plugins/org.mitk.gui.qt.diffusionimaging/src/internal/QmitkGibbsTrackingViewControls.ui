@@ -65,7 +65,7 @@
       <item row="1" column="1">
        <widget class="QLabel" name="m_MaskImageLabel">
         <property name="toolTip">
-         <string>Optional input to limit the algorithms search space.</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;White matter probability mask image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -90,7 +90,16 @@
       <number>0</number>
      </property>
      <layout class="QGridLayout" name="gridLayout_8">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <property name="spacing">
@@ -251,7 +260,16 @@
          <number>0</number>
         </property>
         <layout class="QGridLayout" name="gridLayout">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <property name="spacing">
@@ -811,7 +829,16 @@
       <number>0</number>
      </property>
      <layout class="QGridLayout" name="gridLayout_7">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <property name="spacing">
@@ -1081,8 +1108,8 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../../../../Modules/QmitkExt/resources/QmitkResources.qrc"/>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+  <include location="../../../../Modules/QmitkExt/resources/QmitkResources.qrc"/>
  </resources>
  <connections/>
 </ui>

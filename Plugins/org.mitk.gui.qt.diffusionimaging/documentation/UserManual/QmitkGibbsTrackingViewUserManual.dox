@@ -17,7 +17,7 @@ Mandatory Input:
 \li One Q-Ball or tensor image selected in the datamanager
 
 Optional Input:
-\li Mask Image: Float image used as probability mask for the generation of fiber segments. Usually used as binary brain mask to reduce the searchspace of the algorithm and to avoid fibers resulting from noise outside of the brain.
+\li Mask Image: White matter probability mask. Corresponds to the probability to generate fiber segments in the respective voxel.
 
 \section QmitkGibbsTrackingUserManualParameters Q-Ball Reconstruction
 

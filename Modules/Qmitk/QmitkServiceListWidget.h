@@ -63,6 +63,8 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     std::string m_Interface;
     /** \brief The name of the ServiceProperty that will be displayed in the list to represent the service */
     std::string m_NamingProperty;
+    /** \brief Determines if the first entry of the list should be selected automatically if no entry was selected before (default false). */
+    bool m_AutomaticallySelectFirstEntry;
 
   public:
 
@@ -70,6 +72,9 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
 
     QmitkServiceListWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
     virtual ~QmitkServiceListWidget();
+
+    /** \brief Set if the first entry of the list should be selected automatically if no entry was selected before. */
+    void SetAutomaticallySelectFirstEntry(bool automaticallySelectFirstEntry);
 
     /** \brief This method is part of the widget an needs not to be called separately. */
     virtual void CreateQtPartControl(QWidget *parent);

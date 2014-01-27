@@ -29,15 +29,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkServiceListWidget::VIEW_ID = "org.mitk.views.QmitkServiceListWidget";
 
-QmitkServiceListWidget::QmitkServiceListWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
+QmitkServiceListWidget::QmitkServiceListWidget(QWidget* parent, Qt::WindowFlags f)
+  : QWidget(parent, f),
+    m_AutomaticallySelectFirstEntry(false),
+    m_Controls(NULL)
 {
-  m_Controls = NULL;
   CreateQtPartControl(this);
 }
 
 QmitkServiceListWidget::~QmitkServiceListWidget()
 {
   m_Context->RemoveServiceListener(this,  &QmitkServiceListWidget::OnServiceEvent);
+}
+
+void QmitkServiceListWidget::SetAutomaticallySelectFirstEntry(bool automaticallySelectFirstEntry)
+{
+  m_AutomaticallySelectFirstEntry = automaticallySelectFirstEntry;
 }
 
 //////////////////// INITIALIZATION /////////////////////
@@ -142,11 +149,21 @@ QListWidgetItem* QmitkServiceListWidget::AddServiceToList(const us::ServiceRefer
   // Add new item to QListWidget
   m_Controls->m_ServiceList->addItem(newItem);
   m_Controls->m_ServiceList->sortItems();
+
   // Construct link and add to internal List for reference
   QmitkServiceListWidget::ServiceListLink link;
   link.service = serviceRef;
   link.item = newItem;
   m_ListContent.push_back(link);
+
+  // Select first entry and emit corresponding signal if the list was
+  // empty before and this feature is enabled
+  if ( m_AutomaticallySelectFirstEntry && m_Controls->m_ServiceList->selectedItems().isEmpty() )
+  {
+    m_Controls->m_ServiceList->setCurrentIndex(m_Controls->m_ServiceList->indexAt(QPoint(0, 0)));
+    this->OnServiceSelectionChanged();
+  }
+
   return newItem;
 }
 

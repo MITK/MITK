@@ -600,7 +600,7 @@ void  mitk::OdfVtkMapper2D<T,N>
             glyphGenerator->SetMaximumNumberOfPoints(std::min(m_ShowMaxNumber,(int)cuttedPlane->GetNumberOfPoints()));
             glyphGenerator->SetRandomMode(0);
             glyphGenerator->SetUseMaskPoints(1);
-            glyphGenerator->SetSourceData(trans->GetOutput() );
+            glyphGenerator->SetSourceConnection(trans->GetOutputPort() );
             glyphGenerator->SetInput(cuttedPlane);
             glyphGenerator->SetColorModeToColorBySource();
             glyphGenerator->SetInputArrayToProcess(0,0,0, vtkDataObject::FIELD_ASSOCIATION_POINTS , "vector");

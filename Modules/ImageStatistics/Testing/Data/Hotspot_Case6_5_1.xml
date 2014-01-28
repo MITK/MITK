@@ -1,0 +1,16 @@
+<testcase>
+  <testimage image-rows="20" image-columns="20" image-slices="20" numberOfGaussians="6" spacingX="5" spacingY="5" spacingZ="5" entireHotSpotInImage="1">
+    <gaussian centerIndexX="16" centerIndexY="16" centerIndexZ="13" deviationX="4" deviationY="2" deviationZ="1" altitude="3"/>
+    <gaussian centerIndexX="15" centerIndexY="11" centerIndexZ="12" deviationX="3" deviationY="1" deviationZ="1" altitude="14"/>
+    <gaussian centerIndexX="17" centerIndexY="14" centerIndexZ="14" deviationX="2" deviationY="3" deviationZ="2" altitude="10"/>
+    <gaussian centerIndexX="4" centerIndexY="4" centerIndexZ="6" deviationX="2" deviationY="1" deviationZ="2" altitude="9"/>
+    <gaussian centerIndexX="5" centerIndexY="5" centerIndexZ="5" deviationX="3" deviationY="1" deviationZ="2" altitude="8"/>
+    <gaussian centerIndexX="4" centerIndexY="6" centerIndexZ="6" deviationX="2" deviationY="2" deviationZ="2" altitude="10"/>
+  </testimage>
+  <segmentation numberOfLabels="2" hotspotRadiusInMM="6.2035">
+    <roi label="1" maximumSizeX="10" minimumSizeX="0" maximumSizeY="10" minimumSizeY="0" maximumSizeZ="10" minimumSizeZ="0"/>
+    <roi label="2" maximumSizeX="20" minimumSizeX="11" maximumSizeY="20" minimumSizeY="11" maximumSizeZ="20" minimumSizeZ="11"/>
+  </segmentation>
+  <statistic hotspotIndexX="4" hotspotIndexY="5" hotspotIndexZ="6" mean="18.4498" maximumIndexX="4" maximumIndexY="5" maximumIndexZ="6" maximum="20.253" minimumIndexX="4" minimumIndexY="6" minimumIndexZ="6" minimum="15.0325"/>
+  <statistic hotspotIndexX="16" hotspotIndexY="11" hotspotIndexZ="12" mean="12.9812" maximumIndexX="16" maximumIndexY="11" maximumIndexZ="12" maximum="15.4562" minimumIndexX="16" minimumIndexY="11" minimumIndexZ="11" minimum="9.43815"/>
+</testcase>

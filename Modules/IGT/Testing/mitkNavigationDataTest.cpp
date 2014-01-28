@@ -21,6 +21,52 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkIndent.h>
 
 
+using namespace mitk;
+
+/**
+ * helper function which checks if the non position / orientation / covariance related members are all set to certain values
+ */
+static bool AreBasicNavigationMembersEqual(const NavigationData::Pointer nd, const bool dataValid,
+    const NavigationData::TimeStampType timeStamp, const std::string name)
+{
+  bool result = true;
+  result = result && (nd->IsDataValid() == dataValid);
+  result = result && (mitk::Equal(nd->GetIGTTimeStamp(), timeStamp));
+  result = result && (0 == name.compare(nd->GetName()));
+
+  return result;
+}
+
+/**
+ * helper function which checks if the basic members, meaning the members not related to position / orientation / covariance
+ * are the same for two NavigationData objects.
+ */
+static bool AreBasicNavigationMembersEqual(const NavigationData::Pointer nd1, const NavigationData::Pointer nd2)
+{
+  return AreBasicNavigationMembersEqual(nd1, nd2->IsDataValid(),
+      nd2->GetIGTTimeStamp(),
+      nd2->GetName());
+}
+
+static bool AreCovarianceNavigationMembersEqual(const NavigationData::Pointer nd, bool hasPosition,
+    bool hasOrientation, NavigationData::CovarianceMatrixType covMatrix)
+{
+  bool result = true;
+  result = result && (nd->GetHasPosition() == hasPosition);
+  result = result && (nd->GetHasOrientation() == hasOrientation);
+  result = result && (mitk::MatrixEqualElementWise(nd->GetCovErrorMatrix(), covMatrix));
+
+  return result;
+}
+
+
+static bool AreCovarianceNavigationMembersEqual(const NavigationData::Pointer nd1, const NavigationData::Pointer nd2)
+{
+  return AreCovarianceNavigationMembersEqual(nd1,
+      nd2->GetHasPosition(), nd2->GetHasOrientation(), nd2->GetCovErrorMatrix());
+}
+
+
 static mitk::NavigationData::Pointer GetTestData()
 {
   mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
@@ -99,7 +145,6 @@ static void TestGetterSetter()
     && mitk::Equal(result2(5, 5), 100.0), "SetOrientationAccuracy()");
 }
 
-
 static void TestGraft()
 {
   //create test data
@@ -110,16 +155,11 @@ static void TestGraft()
 
   bool graftIsEqual = (nd->GetPosition() == graftedCopy->GetPosition())
     && (nd->GetOrientation() == graftedCopy->GetOrientation())
-    && (nd->IsDataValid() == graftedCopy->IsDataValid())
-    && mitk::Equal(nd->GetIGTTimeStamp(), graftedCopy->GetIGTTimeStamp())
-    && (nd->GetHasPosition() == graftedCopy->GetHasPosition())
-    && (nd->GetHasOrientation() == graftedCopy->GetHasOrientation())
-    && (nd->GetCovErrorMatrix() == graftedCopy->GetCovErrorMatrix())
-    && (std::string(nd->GetName()) == graftedCopy->GetName());
+    && AreCovarianceNavigationMembersEqual(nd, graftedCopy)
+    && AreBasicNavigationMembersEqual(nd, graftedCopy);
 
   MITK_TEST_CONDITION(graftIsEqual, "Graft() produces equal NavigationData object");
 }
-
 
 static void TestPrintSelf()
 {
@@ -276,12 +316,10 @@ static void TestInverse()
   MITK_TEST_CONDITION(mitk::Equal(nd->GetOrientation().inverse(), ndInverse->GetOrientation()),"Testing GetInverse: orientation inverted");
   MITK_TEST_CONDITION(mitk::Equal(invertedPosition, ndInverse->GetPosition()), "Testing GetInverse: position inverted");
 
-  bool otherFlagsOk = (nd->IsDataValid() == ndInverse->IsDataValid())
-    && mitk::Equal(nd->GetIGTTimeStamp(), ndInverse->GetIGTTimeStamp())
-    && (false == ndInverse->GetHasPosition()) // covariance update mechanism not yet implemented
-    && (false == ndInverse->GetHasOrientation())
-    && (nd->GetCovErrorMatrix() == ndInverse->GetCovErrorMatrix())
-    && (std::string(nd->GetName()) == ndInverse->GetName());
+  bool otherFlagsOk = AreBasicNavigationMembersEqual(nd, ndInverse)
+      && AreCovarianceNavigationMembersEqual(ndInverse, false, false, nd->GetCovErrorMatrix());
+  // covariance update mechanism not yet implemented, thus validities are set to false.
+
 
   MITK_TEST_CONDITION(otherFlagsOk, "Testing GetInverse: other flags are same");
 }
@@ -327,12 +365,17 @@ static void TestAffineConstructor()
 
   mitk::NavigationData::Pointer navigationData = mitk::NavigationData::New(affineTransform3D);
 
+
+  MITK_TEST_CONDITION(AreBasicNavigationMembersEqual(navigationData, true, 0.0, ""),
+      "Testing affine constructor: dataValid, timeStamp and name have been initialized to default values");
+
+  NavigationData::CovarianceMatrixType covMatrix; // empty covariance matrix
+  MITK_TEST_CONDITION(AreCovarianceNavigationMembersEqual(navigationData, true, true, covMatrix),
+      "Testing affine constructor: covariance matrix values have been correctly initialized"); // TODO: discuss with Alfred
+  // why this is the desired initialization of the covariance information.
+
   MITK_TEST_CONDITION(mitk::Equal(navigationData->GetPosition(), offsetPoint), "Testing affine constructor: offset");
   MITK_TEST_CONDITION(mitk::Equal(navigationData->GetOrientation(), quaternion), "Testing affine constructor: quaternion");
-  MITK_TEST_CONDITION(true == navigationData->GetHasPosition(), "Testing affine constructor: hasposition == true");
-  MITK_TEST_CONDITION(true == navigationData->GetHasOrientation(), "Testing affine constructor: hasorientation == true");
-  MITK_TEST_CONDITION(true == navigationData->IsDataValid(), "Testing affine constructor: isdatavalid == true");
-  MITK_TEST_CONDITION(mitk::Equal(navigationData->GetIGTTimeStamp(),0.0), "Testing affine constructor: IGTTimestamp is zero");
 }
 
 

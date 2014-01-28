@@ -264,6 +264,7 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
   mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
   mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
 
+  //############### conversion to vtk data types (we will use the vtk landmark based transform) ##########################
   //convert point sets to vtk poly data
   vtkSmartPointer<vtkPoints> sourcePoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkPoints> targetPoints = vtkSmartPointer<vtkPoints>::New();
@@ -275,6 +276,7 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
     targetPoints->InsertNextPoint(point_targets);
     }
 
+  //########################### here, the actual transform is computed ##########################
   //compute transform
   vtkSmartPointer<vtkLandmarkTransform> transform = vtkSmartPointer<vtkLandmarkTransform>::New();
   transform->SetSourceLandmarks(sourcePoints);
@@ -282,11 +284,12 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
   transform->SetModeToRigidBody();
   transform->Modified();
   transform->Update();
-
-  //compute FRE
+  //compute FRE of transform
   double FRE = ComputeFRE(imageFiducials,trackerFiducials,transform);
   m_Controls.m_RegistrationWidget->SetQualityDisplayText("FRE: " + QString::number(FRE) + " mm");
+  //#############################################################################################
 
+  //############### conversion back to itk/mitk data types ##########################
   //convert from vtk to itk data types
   itk::Matrix<float,3,3> rotationFloat = itk::Matrix<float,3,3>();
   itk::Vector<float,3> translationFloat = itk::Vector<float,3>();
@@ -305,29 +308,35 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
     translationFloat[k] = m->GetElement(k,3);
     translationDouble[k] = m->GetElement(k,3);
   }
-
   //create affine transform 3D surface
-  mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
-  newTransform->SetMatrix(rotationDouble);
-  newTransform->SetOffset(translationDouble);
+  mitk::AffineTransform3D::Pointer mitkTransform = mitk::AffineTransform3D::New();
+  mitkTransform->SetMatrix(rotationDouble);
+  mitkTransform->SetOffset(translationDouble);
+  //#############################################################################################
 
+  //############### object is transformed ##########################
   //save transform
-  m_T_ObjectReg = mitk::NavigationData::New(newTransform);
+  m_T_ObjectReg = mitk::NavigationData::New(mitkTransform); // this is stored in a member because it is needed for permanent registration later on
 
   //transform surface
   if(m_Controls.m_SurfaceActive->isChecked() && m_Controls.m_ObjectComboBox->GetSelectedNode().IsNotNull())
   {
-    m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform);
+    m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(mitkTransform);
   }
+  //################################################################
 
+  //############### if activated: ct image is also transformed ##########################
   //transform ct image
   if(m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNotNull())
   {
+    //first we have to store the original ct image transform to compose it with the new transform later
     mitk::AffineTransform3D::Pointer imageTransform = m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
-    m_T_ImageGeo = mitk::AffineTransform3D::New();
+    m_T_ImageGeo = mitk::AffineTransform3D::New(); // this is also stored in a member because it is needed for permanent registration later on
+    //now the new transform of the ct image is computed
     m_T_ImageGeo->Compose(imageTransform);
-    imageTransform->Compose(newTransform);
+    imageTransform->Compose(mitkTransform);
     mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
+    //todo
     itk::Matrix<mitk::ScalarType,3,3> rotationFloatNew = imageTransform->GetMatrix();
     itk::Vector<mitk::ScalarType,3> translationFloatNew = imageTransform->GetOffset();
     newImageTransform->SetMatrix(rotationFloatNew);
@@ -335,6 +344,7 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
     m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
     m_T_ImageReg = m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
   }
+  //################################################################
 
 }
 

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkComboBoxStepThrough.h"
 
 QmitkComboBoxStepThrough::QmitkComboBoxStepThrough(QWidget* parent)
-  : QComboBox(parent), m_LastIndex(0), m_LastMaxIndex(0)
+  : QComboBox(parent), m_LastMaxIndex(0), m_LastIndex(0)
 {
   connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCurrentIndexChanged(int)));
 }

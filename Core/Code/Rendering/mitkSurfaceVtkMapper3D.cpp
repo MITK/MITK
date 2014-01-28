@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkCoreServices.h>
+#include <mitkTransferFunctionProperty.h>
 
 //VTK
 #include <vtkActor.h>
@@ -256,6 +257,13 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
     CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
     shaderRepo->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
 
+    mitk::TransferFunctionProperty::Pointer transferFuncProp;
+    this->GetDataNode()->GetProperty(transferFuncProp, "Surface.TransferFunction", renderer);
+    if (transferFuncProp.IsNotNull() )
+    {
+        ls->m_VtkPolyDataMapper->SetLookupTable(transferFuncProp->GetValue()->GetColorTransferFunction());
+    }
+
     mitk::LookupTableProperty::Pointer lookupTableProp;
     this->GetDataNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
     if (lookupTableProp.IsNotNull() )
@@ -326,7 +334,6 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
         {
             vtkTxture->SetInputData(miktTexture->GetVtkImageData());
         }
-        vtkTxture->Update();
         //pass the texture to the actor
         ls->m_Actor->SetTexture(vtkTxture);
         if(ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == NULL)

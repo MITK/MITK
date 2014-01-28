@@ -36,7 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkBaseRenderer.h>
 #include <mitkGlobalInteraction.h>
-#include <mitkLookupTableProperty.h>
 #include <mitkToFDistanceImageToPointSetFilter.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
@@ -50,10 +49,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // VTK
 #include <vtkCamera.h>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
 
 // ITK
 #include <itkCommand.h>
 #include <mitkRenderingModeProperty.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkVtkScalarModeProperty.h>
 
 const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 
@@ -76,7 +79,6 @@ QmitkToFUtilView::QmitkToFUtilView()
   this->m_ToFDistanceImageToSurfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
   this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
   this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
-  this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 }
 
 //Destructor, specifically calling OnToFCameraStopped() and OnToFCammeraDiconnected()
@@ -195,7 +197,6 @@ void QmitkToFUtilView::OnToFCameraConnected()
 
   // initialize surface generation
   this->m_ToFDistanceImageToSurfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
-  this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 
   // initialize ToFImageRecorder and ToFRecorderWidget
   this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
@@ -454,7 +455,7 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
     //initialize the surface once
     MITK_DEBUG << "OnSurfaceCheckboxChecked true";
     this->m_SurfaceNode->SetData(this->m_Surface);
-    this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, m_ToFSurfaceVtkMapper3D);
+    //this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D);
 
     this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThreshold->value() );
 
@@ -489,21 +490,9 @@ void QmitkToFUtilView::OnUpdateCamera()
     // update surface
     m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
 
-    //if the user wants to see the texture, it has to be updated for every frame
-    if(m_Controls->m_KinectTextureCheckBox->isChecked() && (m_SelectedCamera.contains("Kinect")) && (m_ToFImageGrabber->GetBoolProperty("RGB")))
-    {
-      //remove the vtkScalarsToColors object, if there was one.
-      this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(NULL);
-      //set RGB-iamge as texture
-      this->m_ToFSurfaceVtkMapper3D->SetTexture((this->m_ToFImageGrabber->GetOutput(3)->GetVtkImageData()));
-    }
-    else
-    {
-      //we have to delete the texture, if there was one.
-      this->m_ToFSurfaceVtkMapper3D->SetTexture(NULL);
-      //get the colortransferfunction from the visualization widget
-      this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
-    }
+    //get the colortransferfunction from the visualization widget
+    //this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
+
     //update pipeline
     this->m_ToFImageGrabber->Modified();
     this->m_Surface->Update();
@@ -533,6 +522,11 @@ void QmitkToFUtilView::OnTextureCheckBoxChecked(bool checked)
   {
     if (checked)
     {
+      //this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
+      mitk::TransferFunction::Pointer transferFunction = mitk::TransferFunction::New();
+      transferFunction->SetColorTransferFunction(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
+
+      this->m_SurfaceNode->SetProperty("Surface.TransferFunction", mitk::TransferFunctionProperty::New(transferFunction));
       this->m_SurfaceNode->SetBoolProperty("scalar visibility", true);
     }
     else
@@ -548,9 +542,11 @@ void QmitkToFUtilView::OnKinectRGBTextureCheckBoxChecked(bool checked)
   {
     if (checked)
     {
-      //define the dimensions of the texture
-      this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(0));
-      this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(1));
+      // enable texture
+      this->m_SurfaceNode->SetProperty("Surface.Texture",mitk::SmartPointerProperty::New(this->m_ToFImageGrabber->GetOutput(3)));
+    } else {
+      // disable texture
+      this->m_SurfaceNode->GetPropertyList()->DeleteProperty("Surface.Texture");
     }
   }
 }

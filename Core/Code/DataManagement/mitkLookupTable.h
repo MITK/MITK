@@ -73,7 +73,6 @@ public:
 
     virtual void SetTableValue(int, double rgba[4]);
 
-    virtual void SetActiveColormap(int index);
 
     itkSetMacro(Window, float);
     itkSetMacro(Level, float);
@@ -136,6 +135,38 @@ public:
     void CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction);
     void CreateGradientTransferFunction(vtkPiecewiseFunction*& gradientFunction);
 
+    enum LookupTableType
+    {
+       GRAYSCALE,
+       INVERSE_GRAYSCALE,
+       HOT_IRON,
+       JET,
+       LEGACY_BINARY,
+       MULTILABEL,
+       PET_COLOR,
+       PET_20
+    };
+
+    static const char* const typenameList[];
+
+    /*!
+     *  \brief Set the look-up table type by enum (or integer).
+     *  \details Returns if the given type doesn't exist. Only changes the type if it is different
+     *           from the current one.
+     */
+    virtual void SetType(const LookupTableType type);
+
+    /*!
+     *  \brief Set the look-up table type by string.
+     *  \details Returns if the given type doesn't exist. Only changes the type if it is different
+     *           from the current one.
+     */
+    virtual void SetType(const std::string& typeName);
+
+    /*!
+     *  \brief Return the current look-up table type as a string.
+     */
+    virtual const std::string GetActiveTypeAsString();
 protected:
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const;
@@ -158,6 +189,8 @@ protected:
     float m_Level;
 
     float m_Opacity;
+
+    LookupTableType m_type;
 
 private:
 

@@ -87,6 +87,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNodeObject.h"
 #include "mitkIContextMenuAction.h"
 #include "berryIExtensionPointService.h"
+#include "mitkRenderingModeProperty.h"
 
 const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
@@ -569,26 +570,27 @@ void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
   if(!node)
     return;
 
-  //mitk::EnumerationProperty* cmProp =
-//      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("colormap"));
-//  if(!cmProp)
-//    return;
+  mitk::LookupTableProperty::Pointer lookupTableProperty =
+    dynamic_cast<mitk::LookupTableProperty*>(node->GetProperty("LookupTable"));
+  if (!lookupTableProperty)
+    return;
 
-//  QAction* senderAction = qobject_cast<QAction*> ( QObject::sender() );
+  QAction* senderAction = qobject_cast<QAction*>(QObject::sender());
+  if(!senderAction)
+    return;
 
-//  if(!senderAction)
-//    return;
+  std::string activatedItem = senderAction->text().toStdString();
 
-//  std::string activatedItem = senderAction->text().toStdString();
+  mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
+  if (!lookupTable)
+    return;
 
-//  if ( activatedItem != cmProp->GetValueAsString() )
-//  {
-//    if ( cmProp->IsValidEnumerationValue( activatedItem ) )
-//    {
-//        cmProp->SetValue( activatedItem );
-//        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-//    }
-//  }
+  lookupTable->SetType(activatedItem);
+  lookupTableProperty->SetValue(lookupTable);
+  mitk::RenderingModeProperty::Pointer renderingMode =
+    dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty("Image Rendering.Mode"));
+  renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ColormapMenuAboutToShow()
@@ -597,31 +599,35 @@ void QmitkDataManagerView::ColormapMenuAboutToShow()
   if(!node)
     return;
 
-//  mitk::EnumerationProperty* cmProp =
-//      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("colormap"));
-//  if(!cmProp)
-//    return;
+  mitk::LookupTableProperty::Pointer lookupTableProperty =
+    dynamic_cast<mitk::LookupTableProperty*>(node->GetProperty("LookupTable"));
+  if (!lookupTableProperty)
+    return;
 
-//  // clear menu
-//  m_ColormapAction->menu()->clear();
-//  QAction* tmp;
+  mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
+  if (!lookupTable)
+    return;
 
-//  // create menu entries
-//  for(mitk::EnumerationProperty::EnumConstIterator it=cmProp->Begin(); it!=cmProp->End()
-//    ; it++)
-//  {
-//    tmp = m_ColormapAction->menu()->addAction(QString::fromStdString(it->second));
-//    tmp->setCheckable(true);
+  m_ColormapAction->menu()->clear();
+  QAction* tmp;
 
-//    if(it->second == cmProp->GetValueAsString())
-//    {
-//      tmp->setChecked(true);
-//    }
+  int i = 0;
+  std::string lutType = lookupTable->typenameList[i];
 
-//    QObject::connect( tmp, SIGNAL( triggered(bool) )
-//      , this, SLOT( ColormapActionToggled(bool) ) );
-//  }
+  while (lutType != "END_OF_ARRAY")
+  {
+    tmp = m_ColormapAction->menu()->addAction(QString::fromStdString(lutType));
+    tmp->setCheckable(true);
 
+    if (lutType == lookupTable->GetActiveTypeAsString())
+    {
+      tmp->setChecked(true);
+    }
+
+    QObject::connect(tmp, SIGNAL(triggered(bool)), this, SLOT(ColormapActionToggled(bool)));
+
+    lutType = lookupTable->typenameList[++i];
+  }
 }
 
 void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()

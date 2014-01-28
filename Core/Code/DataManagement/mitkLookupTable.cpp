@@ -26,12 +26,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Colortables/HotIron.h>
 #include <Colortables/PETColor.h>
 #include <Colortables/PET20.h>
+#include <algorithm>
 
+const char* const mitk::LookupTable::typenameList[] =
+{
+  "Grayscale",
+  "Inverse Grayscale",
+  "Hot Iron",
+  "Jet",
+  "Legacy Binary",
+  "Multilabel",
+  "PET Color",
+  "PET 20",
+  "END_OF_ARRAY" // Do not add typenames after this entry (see QmitkDataManagerView::ColormapMenuAboutToShow())
+};
 
 mitk::LookupTable::LookupTable():
     m_Window(0.0),
     m_Level(0.0),
-    m_Opacity(1.0)
+    m_Opacity(1.0),
+    m_type(mitk::LookupTable::GRAYSCALE)
 {
   m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
   this->BuildGrayScaleLookupTable();
@@ -61,34 +75,64 @@ void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
 
 }
 
-void mitk::LookupTable::SetActiveColormap(int index)
+void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
 {
-    switch(index)
-    {
-    case (mitk::LookupTableProperty::GRAYSCALE):
-        this->BuildGrayScaleLookupTable();
-        break;
-    case (mitk::LookupTableProperty::GRAYSCALE_INVERSE):
-        this->BuildInverseGrayScaleLookupTable();
-        break;
-    case (mitk::LookupTableProperty::HOT_IRON):
-        this->BuildHotIronLookupTable();
-        break;
-    case (mitk::LookupTableProperty::PET_COLOR):
-        this->BuildPETColorLookupTable();
-        break;
-    case (mitk::LookupTableProperty::PET_20):
-        this->BuildPET20LookupTable();
-        break;
-    case (mitk::LookupTableProperty::MULTILABEL):
-        this->BuildMultiLabelLookupTable();
-        break;
-    case (mitk::LookupTableProperty::LEGACY_BINARY):
-        this->BuildLegacyBinaryLookupTable();
-        break;
+  if (m_type == type)
+    return;
+
+  switch(type)
+  {
+    case (mitk::LookupTable::GRAYSCALE):
+      this->BuildGrayScaleLookupTable();
+      break;
+    case (mitk::LookupTable::INVERSE_GRAYSCALE):
+      this->BuildInverseGrayScaleLookupTable();
+      break;
+    case (mitk::LookupTable::HOT_IRON):
+      this->BuildHotIronLookupTable();
+      break;
+    case (mitk::LookupTable::JET):
+      this->BuildJetLookupTable();
+      break;
+    case (mitk::LookupTable::LEGACY_BINARY):
+      this->BuildLegacyBinaryLookupTable();
+      break;
+    case (mitk::LookupTable::MULTILABEL):
+      this->BuildMultiLabelLookupTable();
+      break;
+    case (mitk::LookupTable::PET_COLOR):
+      this->BuildPETColorLookupTable();
+      break;
+    case (mitk::LookupTable::PET_20):
+      this->BuildPET20LookupTable();
+      break;
     default:
-        MITK_ERROR << "non existing colormap";
+      MITK_ERROR << "non-existing colormap";
+      return;
     }
+
+    m_type = type;
+}
+
+void mitk::LookupTable::SetType(const std::string& typeName)
+{
+  int i = 0;
+  std::string lutType = this->typenameList[i];
+
+  while (lutType != "END_OF_ARRAY")
+  {
+    if (lutType == typeName)
+    {
+      this->SetType(static_cast<mitk::LookupTable::LookupTableType>(i));
+    }
+
+    lutType = this->typenameList[++i];
+  }
+}
+
+const std::string mitk::LookupTable::GetActiveTypeAsString()
+{
+  return std::string(typenameList[(int)m_type]);
 }
 
 void mitk::LookupTable::ChangeOpacityForAll( float opacity )
@@ -104,7 +148,7 @@ void mitk::LookupTable::ChangeOpacityForAll( float opacity )
     rgba[ 3 ] = opacity;
     m_LookupTable->SetTableValue ( i, rgba );
   }
-  this->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-updat is executed
+  this->Modified();  // need to call modified, since LookupTableProperty seems to be unchanged so no widget-update is executed
 }
 
 void mitk::LookupTable::ChangeOpacity(int index, float opacity )
@@ -123,7 +167,7 @@ void mitk::LookupTable::ChangeOpacity(int index, float opacity )
   rgba[ 3 ] = opacity;
   m_LookupTable->SetTableValue ( index, rgba );
 
-  this->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-updat is executed
+  this->Modified();  // need to call modified, since LookupTableProperty seems to be unchanged so no widget-update is executed
 }
 
 void mitk::LookupTable::GetColor(int x, double rgb[3])
@@ -413,7 +457,7 @@ void mitk::LookupTable::BuildJetLookupTable()
 
   m_LookupTable = lut;
   this->Modified();
-}gi
+}
 
 void mitk::LookupTable::BuildPETColorLookupTable()
 {

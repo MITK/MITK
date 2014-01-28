@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageIterator.h>
 #include <vtkLookupTable.h>
 #include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
 #include "vtkObjectFactory.h"
 
 //used for acos etc.
@@ -33,7 +34,7 @@ static const double PI = itk::Math::pi;
 
 vtkStandardNewMacro(vtkMitkLevelWindowFilter);
 
-vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter(): m_LookupTable(NULL), m_MinOpacity(0.0),m_MaxOpacity(255.0)
+vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter(): m_LookupTable(NULL), m_OpacityFunction(NULL), m_MinOpacity(0.0), m_MaxOpacity(255.0)
 {
   //MITK_INFO << "mitk level/window filter uses " << GetNumberOfThreads() << " thread(s)";
 }
@@ -68,6 +69,15 @@ void vtkMitkLevelWindowFilter::SetLookupTable(vtkScalarsToColors *lookupTable)
 vtkScalarsToColors* vtkMitkLevelWindowFilter::GetLookupTable()
 {
   return m_LookupTable;
+}
+
+void vtkMitkLevelWindowFilter::SetOpacityPiecewiseFunction(vtkPiecewiseFunction *opacityFunction)
+{
+  if (m_OpacityFunction != opacityFunction)
+  {
+    m_OpacityFunction = opacityFunction;
+    this->Modified();
+  }
 }
 
 //This code was copied from the iil. The template works only for float and double.
@@ -391,6 +401,7 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
   vtkImageIterator<T> inputIt(inData, outExt);
   vtkImageIterator<unsigned char> outputIt(outData, outExt);
   vtkColorTransferFunction* lookupTable =  dynamic_cast<vtkColorTransferFunction*>(self->GetLookupTable());
+  vtkPiecewiseFunction* opacityFunction =  self->GetOpacityPiecewiseFunction();
 
   int y = outExt[2];
 
@@ -417,13 +428,16 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
 
           // applying directly colortransferfunction
           // because vtkColorTransferFunction::MapValue is not threadsafe
-          double rgb[3];
-          lookupTable->GetColor( grayValue, rgb );
+          double rgba[4];
+          lookupTable->GetColor( grayValue, rgba );       // RGB mapping
+          rgba[3] = 1.0;
+          if (opacityFunction)
+            rgba[3] = opacityFunction->GetValue(grayValue); // Alpha mapping
 
-          outputSI[0] = static_cast<unsigned char>(255.0*rgb[0] + 0.5);
-          outputSI[1] = static_cast<unsigned char>(255.0*rgb[1] + 0.5);
-          outputSI[2] = static_cast<unsigned char>(255.0*rgb[2] + 0.5);
-          outputSI[3] = 255;
+          for (int i = 0; i < 4; ++i)
+          {
+            outputSI[i] = static_cast<unsigned char>(255.0*rgba[i] + 0.5);
+          }
         }
         else
         {

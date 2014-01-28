@@ -689,26 +689,25 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New();
   node->AddProperty( "Image Rendering.Mode", renderingModeProperty);
 
+  // Set default grayscale look-up table
+  mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+  mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+  mitkLutProp->SetLookupTable(mitkLut);
+  node->SetProperty("LookupTable", mitkLutProp);
+
   std::string photometricInterpretation; // DICOM tag telling us how pixel values should be displayed
   if ( node->GetStringProperty( "dicom.pixel.PhotometricInterpretation", photometricInterpretation ) )
   {
     // modality provided by DICOM or other reader
     if ( photometricInterpretation.find("MONOCHROME1") != std::string::npos ) // meaning: display MINIMUM pixels as WHITE
     {
-      // generate LUT (white to black)
-      mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-      vtkLookupTable* bwLut = mitkLut->GetVtkLookupTable();
-      bwLut->SetTableRange (0, 1);
-      bwLut->SetSaturationRange (0, 0);
-      bwLut->SetHueRange (0, 0);
-      bwLut->SetValueRange (1, 0);
-      bwLut->SetAlphaRange (1, 1);
-      bwLut->SetRampToLinear();
-      bwLut->Build();
-      mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+      // Set inverse grayscale look-up table
+      mitkLut->SetType(mitk::LookupTable::INVERSE_GRAYSCALE);
       mitkLutProp->SetLookupTable(mitkLut);
-      node->SetProperty( "LookupTable", mitkLutProp );
+      node->SetProperty("LookupTable", mitkLutProp);
     }
+    // Otherwise do nothing - the default grayscale look-up table has already been set
+    /*
     else
       if ( photometricInterpretation.find("MONOCHROME2") != std::string::npos ) // meaning: display MINIMUM pixels as BLACK
       {
@@ -716,6 +715,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
         node->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ), renderer );
       }
     // PALETTE interpretation should be handled ok by RGB loading
+    */
   }
 
   bool isBinaryImage(false);

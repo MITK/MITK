@@ -327,6 +327,7 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
 
   //############### if activated: ct image is also transformed ##########################
   //transform ct image
+  //todo: Erklären, dass hier AffineTransform3D verwendet wird, weil NavigationData kein Spacing unterstützt!
   if(m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNotNull())
   {
     //first we have to store the original ct image transform to compose it with the new transform later
@@ -336,7 +337,6 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
     m_T_ImageGeo->Compose(imageTransform);
     imageTransform->Compose(mitkTransform);
     mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
-    //todo
     itk::Matrix<mitk::ScalarType,3,3> rotationFloatNew = imageTransform->GetMatrix();
     itk::Vector<mitk::ScalarType,3> translationFloatNew = imageTransform->GetOffset();
     newImageTransform->SetMatrix(rotationFloatNew);

@@ -24,12 +24,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIEditorInput.h"
 #include "berryIEditorSite.h"
 
+#include <mitkIDataStorageService.h>
+
 #include <QmitkAbstractView.h>
 
 #include "ui_QmitkXnatEditorControls.h"
 
 #include "ctkXnatListModel.h"
 #include "ctkXnatSession.h"
+#include <ctkServiceTracker.h>
 
 /*!
 \brief QmitkXnatEditor
@@ -47,11 +50,11 @@ class QmitkXnatEditor : public berry::QtEditorPart, virtual public berry::IReusa
 
 public:
 
+  //berryObjectMacro(QmitkXnatEditor);
   QmitkXnatEditor();
   ~QmitkXnatEditor();
 
   static const std::string EDITOR_ID;
-  static const QString DOWNLOAD_PATH;
 
   void CreateQtPartControl(QWidget *parent);
 
@@ -70,6 +73,9 @@ public:
   void UpdateList();
 
   protected slots:
+
+    void DownloadResource();
+    void DownloadFile();
 
     void OnObjectActivated(const QModelIndex& index);
     void OnDataModelButtonClicked();
@@ -92,6 +98,9 @@ protected:
 
 private:
 
+  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
+  QString m_DownloadPath;
+  void InternalFileDownload(const QModelIndex& index);
   int ParentChecker(ctkXnatObject* child);
   int m_ParentCount;
   void ToHigherLevel();

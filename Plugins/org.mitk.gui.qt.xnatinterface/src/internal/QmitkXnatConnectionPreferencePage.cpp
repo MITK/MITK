@@ -26,8 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QApplication>
+#include <QMap>
 
-#include <map>
+#include "ctkXnatSession.h"
+#include "ctkXnatLoginProfile.h"
+#include "ctkXnatException.h"
 
 using namespace berry;
 
@@ -48,26 +51,30 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
   berry::IPreferences::Pointer _XnatConnectionPreferencesNode = prefService->GetSystemPreferences()->Node("/XnatConnection");
   m_XnatConnectionPreferencesNode = _XnatConnectionPreferencesNode;
 
-  m_LineEditors["XNAT Host Address"] = new QLineEdit("");
-  m_LineEditors["XNAT Host Address"]->setObjectName("inHostAddress");
-  m_LineEditors["XNAT Host Address"]->setToolTip("<html><head/><body><p>Examples:</p><p>&quot;http://localhost:8080/xnat&quot;</p><p>&quot;http://central.xnat.org:80&quot;</p><p>&quot;https://xnat.myserver.de:443&quot;</p></body></html>");
+  m_LineEditors[1] = qMakePair(QString("Server Address"), new QLineEdit(""));
+  m_LineEditors[1].second->setObjectName("inHostAddress");
+  m_LineEditors[1].second->setToolTip("<html><head/><body><p>Examples:</p><p>&quot;http://localhost:8080/xnat&quot;</p><p>&quot;http://central.xnat.org:80&quot;</p><p>&quot;https://xnat.myserver.de:443&quot;</p></body></html>");
 
-  m_LineEditors["Username"] = new QLineEdit("");
-  m_LineEditors["Username"]->setObjectName("inUser");
+  m_LineEditors[2] = qMakePair(QString("Username"), new QLineEdit(""));
+  m_LineEditors[2].second->setObjectName("inUser");
 
-  m_LineEditors["Password"] = new QLineEdit("");
-  m_LineEditors["Password"]->setObjectName("inPassword");
-  m_LineEditors["Password"]->setEchoMode(QLineEdit::Password);
+  m_LineEditors[3] = qMakePair(QString("Password"), new QLineEdit(""));
+  m_LineEditors[3].second->setObjectName("inPassword");
+  m_LineEditors[3].second->setEchoMode(QLineEdit::Password);
+
+  m_LineEditors[4] = qMakePair(QString("Download Path"), new QLineEdit(""));
+  m_LineEditors[4].second->setObjectName("inDownloadPath");
+  m_LineEditors[4].second->setToolTip(QString("<html><head/><body><p>The default download path is:\nC:/Users/knorr/Downloads/MITK_XNAT_DOWNLOADS/</p></body></html>"));
 
   m_MainControl = new QWidget(parent);
 
   QGridLayout* layout = new QGridLayout;
   int i = 0;
-  for (QMap<QString, QLineEdit*>::iterator it = m_LineEditors.end()-1;
-    it != m_LineEditors.begin()-1; --it)
+  for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin();
+    it != m_LineEditors.end(); ++it)
   {
-    layout->addWidget(new QLabel(it.key()), i,0);
-    layout->addWidget(it.value(), i,1);
+    layout->addWidget(new QLabel(it.value().first), i,0);
+    layout->addWidget(it.value().second, i,1);
     layout->setRowStretch(i,0);
     ++i;
   }
@@ -88,16 +95,55 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
   if(_XnatConnectionPreferencesNode.IsNotNull())
   {
     // Regular Expression for uri
-    QRegExp uriregex("^(https?)://([a-zA-Z0-9\\.]+):([0-9]+)(/[^ /]+)*$");
+    QRegExp uriregex("^(https?)://([a-zA-Z0-9\\.]+):?([0-9]+)?(/[^ /]+)*$");
+    QRegExp downloadPathRegex("([/|\\]?[^/|^\\])+[/|\\]?");
 
     QString keyString;
     QString errString;
-    for (QMap<QString, QLineEdit*>::iterator it = m_LineEditors.end()-1; it != m_LineEditors.begin()-1; --it)
+    for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin(); it != m_LineEditors.end()-1; ++it)
     {
-      keyString = it.value()->text();
+      keyString = it.value().second->text();
 
-      if(keyString.isEmpty() || !uriregex.exactMatch(m_MainControl->findChild<QLineEdit*>("inHostAddress")->text()))
-        errString += QString("No valid input for \"%1\"\n").arg(it.key());
+      if(keyString.isEmpty())
+      {
+        if(it.value().first != QString("Download Path"))
+        {
+          errString += QString("No input for \"%1\"\n").arg(it.value().first);
+        }
+      }
+      else
+      {
+        if(it.value().first == QString("Server Address") && !uriregex.exactMatch(m_MainControl->findChild<QLineEdit*>("inHostAddress")->text()))
+        {
+          errString += QString("No valid input for \"Server Address\"\n");
+        }
+        else if(it.value().first == QString("Download Path"))
+        {
+          if(!downloadPathRegex.exactMatch(m_MainControl->findChild<QLineEdit*>("inDownloadPath")->text()))
+          {
+            errString += QString("No valid input for \"Download Path\"\n");
+          }
+          else
+          {
+            QString downloadPath = m_MainControl->findChild<QLineEdit*>("inDownloadPath")->text();
+            if(downloadPath.contains('\\'))
+            {
+              if(!downloadPath.endsWith('\\'))
+              {
+                downloadPath += '\\';
+              }
+            }
+            else if(downloadPath.contains('/'))
+            {
+              if(!downloadPath.endsWith('/'))
+              {
+                downloadPath += '/';
+              }
+            }
+            m_MainControl->findChild<QLineEdit*>("inDownloadPath")->setText(downloadPath);
+          }
+        }
+      }
     }
 
     if(!errString.isEmpty())
@@ -105,10 +151,42 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
       QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
       return false;
     }
+    else
+    {
+      // Set up the session for the connection test
+      ctkXnatLoginProfile profile;
+      profile.setName("Default");
+      profile.setServerUrl(m_LineEditors[1].second->text());
+      profile.setUserName(m_LineEditors[2].second->text());
+      profile.setPassword(m_LineEditors[3].second->text());
+      profile.setDefault(true);
+      ctkXnatSession* session = new ctkXnatSession(profile);
+
+      // Testing the inputs by trying to create a session
+      try
+      {
+        session->open();
+      }
+      catch(ctkXnatAuthenticationException auth)
+      {
+        errString += QString("Test connection failed.\nAuthentication error: Wrong name or password.");
+        delete session;
+        QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
+        return false;
+      }
+      catch(ctkException e)
+      {
+        errString += QString("Test connection failed with error code:\n\"%1\"").arg(e.message());
+        delete session;
+        QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
+        return false;
+      }
+      delete session;
+    }
 
     // no error in the input
-    for (QMap<QString, QLineEdit*>::iterator it = m_LineEditors.begin(); it != m_LineEditors.end(); ++it)
-      _XnatConnectionPreferencesNode->Put(it.key().toStdString(), it.value()->text().toStdString());
+    for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin(); it != m_LineEditors.end(); ++it)
+      _XnatConnectionPreferencesNode->Put(it.value().first.toStdString(), it.value().second->text().toStdString());
 
     _XnatConnectionPreferencesNode->Flush();
 
@@ -127,11 +205,11 @@ void QmitkXnatConnectionPreferencePage::Update()
   IPreferences::Pointer _XnatConnectionPreferencesNode = m_XnatConnectionPreferencesNode.Lock();
   if(_XnatConnectionPreferencesNode.IsNotNull())
   {
-    for (QMap<QString, QLineEdit*>::iterator it = m_LineEditors.begin()
+    for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin()
       ; it != m_LineEditors.end(); ++it)
     {
-      it.value()->setText(QString::fromStdString(_XnatConnectionPreferencesNode->Get(it.key().toStdString(),
-        it.value()->text().toStdString())));
+      it.value().second->setText(QString::fromStdString(_XnatConnectionPreferencesNode->Get(it.value().first.toStdString(),
+        it.value().second->text().toStdString())));
     }
   }
 }

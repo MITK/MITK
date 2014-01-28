@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkXnatListModel.h"
 #include "ctkXnatScanFolder.h"
 #include "ctkXnatScanResource.h"
+#include "ctkXnatFile.h"
 
 // CTK XNAT Widgets
 #include "ctkXnatTreeModel.h"
@@ -45,6 +46,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryQModelIndexObject.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchPart.h>
+#include "berryPlatform.h"
+#include "berryIPreferences.h"
+#include "berryIEditorPart.h"
 
 // Qt
 #include <QScopedPointer>
@@ -60,19 +64,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QRegExp>
 #include <QModelIndex>
 
+// MITK
+#include <mitkDataStorage.h>
+#include <mitkIOUtil.h>
+
 const std::string QmitkXnatEditor::EDITOR_ID = "org.mitk.editors.qmitkxnateditor";
-const QString QmitkXnatEditor::DOWNLOAD_PATH = QString("C:/Users/knorr/Downloads/MITK_XNAT/");
 
 QmitkXnatEditor::QmitkXnatEditor() :
+  m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
   m_Session(0),
   m_ListModel(new ctkXnatListModel()),
-  m_SelectionListener(new berry::SelectionChangedAdapter<QmitkXnatEditor>(this, &QmitkXnatEditor::SelectionChanged))
+  m_SelectionListener(new berry::SelectionChangedAdapter<QmitkXnatEditor>(this, &QmitkXnatEditor::SelectionChanged)),
+  m_DownloadPath(berry::Platform::GetServiceRegistry().
+    GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID)->
+    GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", "").c_str())
 {
-
+  m_DataStorageServiceTracker.open();
+  if(m_DownloadPath.isEmpty())
+  {
+    m_DownloadPath = "C:/Users/knorr/Downloads/MITK_XNAT_DOWNLOADS/";
+  }
 }
 
 QmitkXnatEditor::~QmitkXnatEditor()
 {
+  m_DataStorageServiceTracker.close();
   delete m_ListModel;
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   s->RemoveSelectionListener(m_SelectionListener);
@@ -140,8 +156,8 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
 
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnObjectActivated(const QModelIndex&)) );
-  //connect( m_Controls.buttonDownloadResource, SIGNAL(clicked()), this, SLOT(DownloadResource()) );
-  //connect( m_Controls.buttonDownloadFile, SIGNAL(clicked()), this, SLOT(DownloadFile()) );
+  connect( m_Controls.buttonDownloadResource, SIGNAL(clicked()), this, SLOT(DownloadResource()) );
+  connect( m_Controls.buttonDownloadFile, SIGNAL(clicked()), this, SLOT(DownloadFile()) );
   connect( m_Controls.buttonDataModel, SIGNAL(clicked()), this, SLOT(OnDataModelButtonClicked()) );
   connect( m_Controls.buttonProject, SIGNAL(clicked()), this, SLOT(OnProjectButtonClicked()) );
   connect( m_Controls.buttonSubject, SIGNAL(clicked()), this, SLOT(OnSubjectButtonClicked()) );
@@ -173,7 +189,7 @@ void QmitkXnatEditor::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 void QmitkXnatEditor::UpdateList()
 {
   ctkXnatObject* inputObject = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject();
-  if( inputObject == NULL )
+  if( inputObject == NULL /*|| dynamic_cast<ctkXnatFile*>(inputObject) == NULL*/ )
     return;
   m_ListModel->setRootObject( inputObject );
   m_Controls.treeView->reset();
@@ -195,6 +211,8 @@ void QmitkXnatEditor::UpdateList()
   ctkXnatObject* parent = NULL;
   for(int i = m_ParentCount*2; i >= 0; i--)
   {
+    if(i > 12)
+      break;
     m_Controls.breadcrumbDescriptionLayout->itemAt(i)->widget()->setVisible(true);
     QLayoutItem* child = m_Controls.breadcrumbHorizontalLayout->itemAt(i);
     child->widget()->setVisible(true);
@@ -246,6 +264,39 @@ void QmitkXnatEditor::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart
   }
 }
 
+void QmitkXnatEditor::DownloadResource()
+{
+  if (!m_Controls.treeView->selectionModel()->hasSelection())
+    return;
+
+  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  QVariant variant = m_ListModel->data(index, Qt::UserRole);
+  if ( variant.isValid() )
+  {
+    ctkXnatScanResource* resource = dynamic_cast<ctkXnatScanResource*>(variant.value<ctkXnatObject*>());
+    if (resource != NULL)
+    {
+      MITK_INFO << "Download started ...";
+      MITK_INFO << "...";
+      QString resourcePath = m_DownloadPath + resource->id() + ".zip";
+      resource->download(resourcePath);
+      MITK_INFO << "Download " << resource->id().toStdString() << ".zip was completed!";
+    }
+    else
+    {
+      MITK_INFO << "Selection was not a resource folder!";
+    }
+  }
+}
+
+void QmitkXnatEditor::DownloadFile()
+{
+  if (!m_Controls.treeView->selectionModel()->hasSelection())
+    return;
+  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  InternalFileDownload(index);
+}
+
 void QmitkXnatEditor::ToHigherLevel()
 {
   ctkXnatObject* parent = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->parent();
@@ -264,19 +315,61 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
   if (!index.isValid()) return;
 
   ctkXnatObject* child = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->children().takeAt(index.row());
-  if( child ==  NULL)
+  if( child != NULL )
   {
-    return;
-  }
-  QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( child );
-  berry::IEditorInput::Pointer editorInput( oPtr );
-  SetInput(editorInput);
+    ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(child);
+    if( file != NULL )
+    {
+      // Download file and put into datamanager
+      InternalFileDownload(index);
+      mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
+      if(dsService != NULL)
+      {
+        mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode(m_DownloadPath.append(file->id()).toStdString());
+        if ( ( node.IsNotNull() ) && ( node->GetData() != NULL ) )
+        {
+          dsService->GetDataStorage()->GetDataStorage()->Add(node);
+          mitk::BaseData::Pointer basedata = node->GetData();
+          mitk::RenderingManager::GetInstance()->InitializeViews(
+            basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        }
+      }
+    }
+    else
+    {
+      QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( child );
+      berry::IEditorInput::Pointer editorInput( oPtr );
+      SetInput(editorInput);
 
-  if ( !this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->isFetched() )
-  {
-    this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
+      if ( !this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->isFetched() )
+      {
+        this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
+      }
+      UpdateList();
+    }
   }
-  UpdateList();
+
+}
+
+void QmitkXnatEditor::InternalFileDownload(const QModelIndex& index)
+{
+  QVariant variant = m_ListModel->data(index, Qt::UserRole);
+  if ( variant.isValid() )
+  {
+    ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(variant.value<ctkXnatObject*>());
+    if (file != NULL)
+    {
+      MITK_INFO << "Download started ...";
+      MITK_INFO << "...";
+      QString filePath = m_DownloadPath + file->id();
+      file->download(filePath);
+      MITK_INFO << "Download of " << file->id().toStdString() << " was completed!";
+    }
+    else
+    {
+      MITK_INFO << "Selection was not a file!";
+    }
+  }
 }
 
 int QmitkXnatEditor::ParentChecker(ctkXnatObject* child)

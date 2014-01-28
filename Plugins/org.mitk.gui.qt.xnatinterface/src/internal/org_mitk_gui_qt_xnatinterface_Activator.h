@@ -32,9 +32,14 @@ class org_mitk_gui_qt_xnatinterface_Activator :
 public:
 
   static QmitkXnatConnectionManager* GetXnatConnectionManager();
+  static ctkPluginContext* GetContext();
 
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
+
+private:
+
+  static ctkPluginContext* m_Context;
 
 }; // org_mitk_gui_qt_xnatinterface_Activator
 

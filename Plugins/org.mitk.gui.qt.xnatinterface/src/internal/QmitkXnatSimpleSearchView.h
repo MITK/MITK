@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
+#include "QmitkXnatTreeBrowserView.h"
 
 #include "ui_QmitkXnatSimpleSearchViewControls.h"
 
@@ -37,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 \sa QmitkFunctionality
 \ingroup ${plugin_target}_internal
 */
-class QmitkXnatSimpleSearchView : public QmitkAbstractView
+class QmitkXnatSimpleSearchView : public QmitkXnatTreeBrowserView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -59,6 +60,8 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
+  berry::QtSelectionProvider::Pointer m_SelectionProvider;
+
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
@@ -68,13 +71,11 @@ protected:
 
   virtual void SetFocus();
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes );
-
   Ui::QmitkXnatSimpleSearchViewControls m_Controls;
 
 private:
+
+  void SetSelectionProvider();
 
   ctkXnatSession* m_Session;
   ctkXnatTreeModel* m_TreeModel;

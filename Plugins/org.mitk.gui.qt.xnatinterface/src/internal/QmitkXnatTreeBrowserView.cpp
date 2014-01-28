@@ -44,14 +44,12 @@ const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.qmitkxnatt
 
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView():
   m_Session(0),
-  m_Profile(new ctkXnatLoginProfile()),
   m_TreeModel(new ctkXnatTreeModel())
 {
 }
 
 QmitkXnatTreeBrowserView::~QmitkXnatTreeBrowserView()
 {
-  delete m_Profile;
   delete m_TreeModel;
 }
 
@@ -160,9 +158,4 @@ void QmitkXnatTreeBrowserView::DoFetchMore(const QModelIndex &index)
     berry::IEditorPart::Pointer editor = editors.front()->GetEditor(true);
     editor.Cast<QmitkXnatEditor>()->UpdateList();
   }
-}
-
-ctkXnatTreeModel* QmitkXnatTreeBrowserView::GetTreeModel()
-{
-  return m_TreeModel;
 }

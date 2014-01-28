@@ -65,11 +65,6 @@ void QmitkXnatSimpleSearchView::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.buttonStartSearch, SIGNAL(clicked()), this, SLOT(StartSearch()) );
 }
 
-void QmitkXnatSimpleSearchView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                      const QList<mitk::DataNode::Pointer>& nodes )
-{
-}
-
 void QmitkXnatSimpleSearchView::StartSearch()
 {
   int type;
@@ -101,4 +96,9 @@ void QmitkXnatSimpleSearchView::StartSearch()
 
   //m_TreeModel->addServer(server);
   //m_Controls.treeView->reset();
+}
+
+void QmitkXnatSimpleSearchView::SetSelectionProvider()
+{
+  GetSite()->SetSelectionProvider(m_SelectionProvider);
 }

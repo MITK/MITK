@@ -61,7 +61,7 @@ protected:
   ///
   /// Maps a label to lineedit
   ///
-  QMap<QString, QLineEdit*> m_LineEditors;
+  QMap<int, QPair<QString, QLineEdit*>> m_LineEditors;
 };
 
 #endif /* QMITKXNATCONNECTIONPREFERENCEPAGE_H_ */

@@ -47,7 +47,6 @@ class QmitkXnatTreeBrowserView : public QmitkAbstractView
 
 public:
 
-  //berryObjectMacro(QmitkXnatTreeBrowserView);
   QmitkXnatTreeBrowserView();
   ~QmitkXnatTreeBrowserView();
   static const std::string VIEW_ID;
@@ -73,14 +72,10 @@ protected:
 
 private:
 
-  friend class QmitkXnatEditor;
-
-  ctkXnatTreeModel* GetTreeModel();
   void SetSelectionProvider();
 
   ctkXnatSession* m_Session;
   ctkXnatTreeModel* m_TreeModel;
-  ctkXnatLoginProfile* m_Profile;
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

@@ -2,6 +2,7 @@
 
 if(UNIX)
   mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unused-variable" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+  mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unneeded-internal-declaration" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
 endif()
 
 MITK_CREATE_MODULE( Connectomics

@@ -413,7 +413,7 @@ void mitk::LookupTable::BuildJetLookupTable()
 
   m_LookupTable = lut;
   this->Modified();
-}
+}gi
 
 void mitk::LookupTable::BuildPETColorLookupTable()
 {

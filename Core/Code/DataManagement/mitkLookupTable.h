@@ -146,6 +146,7 @@ protected:
     virtual void BuildLegacyBinaryLookupTable();
     virtual void BuildInverseGrayScaleLookupTable();
     virtual void BuildHotIronLookupTable();
+    virtual void BuildJetLookupTable();
     virtual void BuildPETColorLookupTable();
     virtual void BuildPET20LookupTable();
     virtual void BuildMultiLabelLookupTable();

@@ -111,7 +111,7 @@ void OnAddRegistrationTrackingFiducial();
 /**
 \brief This method calls the fiducial registration.
 */
-void OnRegisterFiducials();
+void OnInitialRegistration();
 
 /**
 \brief This method initializes the registration for the FiducialRegistrationWidget.
@@ -159,10 +159,6 @@ bool CheckRegistrationInitialization();
 * true if the difference exeeds the given position and angular threshold.
 */
 bool IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB, double euclideanDistanceThreshold = .8, double angularDifferenceThreshold = .8);
-/**
-\brief This method sets up the filter pipeline.
-*/
-void SetupIGTPipeline();
 /**
 \brief This method destroys the filter pipeline.
 */

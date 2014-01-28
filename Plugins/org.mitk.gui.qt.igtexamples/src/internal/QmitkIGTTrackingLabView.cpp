@@ -107,7 +107,7 @@ void QmitkIGTTrackingLabView::CreateConnections()
   connect( m_Controls.m_UseAsPointerButton, SIGNAL(clicked()), this, SLOT(OnInstrumentSelected()) );
   connect( m_Controls.m_UseAsObjectmarkerButton, SIGNAL(clicked()), this, SLOT(OnObjectmarkerSelected()) );
   connect( m_Controls.m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
-  connect( m_Controls.m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnRegisterFiducials()) );
+  connect( m_Controls.m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnInitialRegistration()) );
   connect( m_Controls.m_PointSetRecordCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnPointSetRecording(bool)) );
   connect( m_Controls.m_ActivateNeedleView, SIGNAL(toggled(bool)), this, SLOT(OnVirtualCamera(bool)) );
 
@@ -240,7 +240,7 @@ void QmitkIGTTrackingLabView::OnSetupNavigation()
   //Building up the filter pipeline
   try
   {
-    this->SetupIGTPipeline();
+    this->InitializeRegistration();
   }
   catch(mitk::IGTException& e)
   {
@@ -256,12 +256,7 @@ void QmitkIGTTrackingLabView::OnSetupNavigation()
   }
 }
 
-void QmitkIGTTrackingLabView::SetupIGTPipeline()
-{
-  this->InitializeRegistration(); //initializes the registration widget
-}
-
-void QmitkIGTTrackingLabView::OnRegisterFiducials()
+void QmitkIGTTrackingLabView::OnInitialRegistration()
 {
   //Check for initialization
   if (!CheckRegistrationInitialization()) return;

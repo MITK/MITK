@@ -32,6 +32,9 @@ set(MOC_H_FILES
 set(CACHED_RESOURCE_FILES
   resources/iso.png
   resources/iso2.png
+  resources/icon4.png
+  resources/icon5.png
+  resources/icon7.png
   plugin.xml
 )
 

@@ -9,7 +9,7 @@
     <view id="org.mitk.views.loadingrtview"
           name=" Loading RT"
           class="LoadingRTView"
-          icon="resources/iso2.png" />
+          icon="resources/icon4.png" />
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">

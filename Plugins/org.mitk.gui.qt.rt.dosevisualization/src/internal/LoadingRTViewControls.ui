@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>222</width>
+    <width>288</width>
     <height>161</height>
    </rect>
   </property>
@@ -34,11 +34,21 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>50</height>
+         <height>60</height>
         </size>
        </property>
        <property name="text">
         <string>RT Struct</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../../../../bin/MITK/MITK-build/Plugins/org.mitk.gui.qt.rt.dosevisualization/org_mitk_gui_qt_rt_dosevisualization_cached.qrc">
+         <normaloff>:/org.mitk.gui.qt.rt.dosevisualization/resources/icon7.png</normaloff>:/org.mitk.gui.qt.rt.dosevisualization/resources/icon7.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>50</width>
+         <height>50</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -47,11 +57,21 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>50</height>
+         <height>60</height>
         </size>
        </property>
        <property name="text">
         <string>RT Dose</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../../../../bin/MITK/MITK-build/Plugins/org.mitk.gui.qt.rt.dosevisualization/org_mitk_gui_qt_rt_dosevisualization_cached.qrc">
+         <normaloff>:/org.mitk.gui.qt.rt.dosevisualization/resources/icon5.png</normaloff>:/org.mitk.gui.qt.rt.dosevisualization/resources/icon5.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>50</width>
+         <height>50</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -73,6 +93,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../../../../../../bin/MITK/MITK-build/Plugins/org.mitk.gui.qt.rt.dosevisualization/org_mitk_gui_qt_rt_dosevisualization_cached.qrc"/>
+ </resources>
  <connections/>
 </ui>

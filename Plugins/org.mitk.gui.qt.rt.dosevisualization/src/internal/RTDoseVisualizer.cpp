@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
+#include <vtkMath.h>
 
 const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualization";
 
@@ -352,13 +353,18 @@ void RTDoseVisualizer::OnConvertButtonClicked()
 
     mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = this->m_Presets[this->m_selectedPresetName];
 
+    MITK_INFO << "FUNCTION PRESCRIBE " << prescribed << endl;
     for(mitk::IsoDoseLevelSet::ConstIterator setIT = isoDoseLevelSet->Begin(); setIT != isoDoseLevelSet->End(); ++setIT)
     {
-//      transferFunction->AddHSVPoint(setIT->GetDoseValue()*100,(10*hsvValue),1.0,1.0,1.0,1.0);
-      transferFunction->AddRGBPoint(setIT->GetDoseValue()*prescribed,setIT->GetColor()[0],setIT->GetColor()[1],setIT->GetColor()[2]);
-      MITK_INFO << "ISOVALUE: " << setIT->GetDoseValue()*prescribed << endl;
-      MITK_INFO << "R: " << setIT->GetColor()[0] << " G: " << setIT->GetColor()[1] << " B: " << setIT->GetColor()[2] << endl;
+      float *hsv = new float[3];
+      vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
+      cCalc->RGBToHSV(setIT->GetColor()[0],setIT->GetColor()[1],setIT->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
+      transferFunction->AddHSVPoint(setIT->GetDoseValue()*prescribed,hsv[0],hsv[1],hsv[2],1.0,1.0);
+      MITK_INFO << "FUNCTION " << setIT->GetDoseValue()*prescribed << endl;
     }
+    float pref;
+    selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+    MITK_INFO << "PREF " << pref << endl;
 
     mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
     mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();

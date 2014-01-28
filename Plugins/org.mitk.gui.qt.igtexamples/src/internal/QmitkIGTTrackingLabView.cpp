@@ -63,9 +63,6 @@ QmitkIGTTrackingLabView::QmitkIGTTrackingLabView()
 ,m_Visualizer(NULL)
 ,m_VirtualView(NULL)
 ,m_PSRecordingPointSet(NULL)
-,m_RegistrationTrackingFiducialsName("Tracking Fiducials")
-,m_RegistrationImageFiducialsName("Image Fiducials")
-,m_PointSetRecordingDataNodeName("Recorded Points")
 ,m_PointSetRecording(false)
 ,m_PermanentRegistration(false)
 ,m_CameraView(false)
@@ -84,9 +81,6 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-
-  m_ToolBox = m_Controls.m_ToolBox;
-
   this->CreateBundleWidgets( parent );
   this->CreateConnections();
 }
@@ -95,10 +89,9 @@ void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
 void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
 {
   //initialize registration widget
-  m_RegistrationWidget = m_Controls.m_RegistrationWidget;
-  m_RegistrationWidget->HideStaticRegistrationRadioButton(true);
-  m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
-  m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
+  m_Controls.m_RegistrationWidget->HideStaticRegistrationRadioButton(true);
+  m_Controls.m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
+  m_Controls.m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
 }
 
 
@@ -109,13 +102,12 @@ void QmitkIGTTrackingLabView::CreateConnections()
 
   //create connections
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(UpdateTimer()));
-  connect( m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnToolBoxCurrentChanged(int)) );
   connect( m_Controls.m_UsePermanentRegistrationToggle, SIGNAL(toggled(bool)), this, SLOT(OnPermanentRegistration(bool)) );
   connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), this, SLOT(OnSetupNavigation()) );
   connect( m_Controls.m_UseAsPointerButton, SIGNAL(clicked()), this, SLOT(OnInstrumentSelected()) );
   connect( m_Controls.m_UseAsObjectmarkerButton, SIGNAL(clicked()), this, SLOT(OnObjectmarkerSelected()) );
-  connect( m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
-  connect( m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnRegisterFiducials()) );
+  connect( m_Controls.m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
+  connect( m_Controls.m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnRegisterFiducials()) );
   connect( m_Controls.m_PointSetRecordCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnPointSetRecording(bool)) );
   connect( m_Controls.m_ActivateNeedleView, SIGNAL(toggled(bool)), this, SLOT(OnVirtualCamera(bool)) );
 
@@ -384,7 +376,7 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
   // in the active render window part (crosshair updates)
   foreach(QmitkRenderWindow* renderWindow, this->GetRenderWindowPart()->GetQmitkRenderWindows().values())
   {
-    m_RegistrationWidget->AddSliceNavigationController(renderWindow->GetSliceNavigationController());
+    m_Controls.m_RegistrationWidget->AddSliceNavigationController(renderWindow->GetSliceNavigationController());
   }
 
   if(m_ImageFiducialsDataNode.IsNull())
@@ -396,13 +388,13 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
 
     mitk::Color color;
     color.Set(1.0f, 0.0f, 0.0f);
-    m_ImageFiducialsDataNode->SetName(m_RegistrationImageFiducialsName);
+    m_ImageFiducialsDataNode->SetName("Image Fiducials");
     m_ImageFiducialsDataNode->SetColor(color);
     m_ImageFiducialsDataNode->SetBoolProperty( "updateDataOnRender", false );
 
     ds->Add(m_ImageFiducialsDataNode);
   }
-  m_RegistrationWidget->SetImageFiducialsNode(m_ImageFiducialsDataNode);
+  m_Controls.m_RegistrationWidget->SetImageFiducialsNode(m_ImageFiducialsDataNode);
 
   if(m_TrackerFiducialsDataNode.IsNull())
   {
@@ -412,28 +404,14 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
 
     mitk::Color color;
     color.Set(0.0f, 1.0f, 0.0f);
-    m_TrackerFiducialsDataNode->SetName(m_RegistrationTrackingFiducialsName);
+    m_TrackerFiducialsDataNode->SetName("Tracking Fiducials");
     m_TrackerFiducialsDataNode->SetColor(color);
     m_TrackerFiducialsDataNode->SetBoolProperty( "updateDataOnRender", false );
 
     ds->Add(m_TrackerFiducialsDataNode);
   }
 
-  m_RegistrationWidget->SetTrackerFiducialsNode(m_TrackerFiducialsDataNode);
-}
-
-
-void QmitkIGTTrackingLabView::OnToolBoxCurrentChanged(const int index)
-{
-  switch (index)
-  {
-  case RegistrationWidget:
-    this->InitializeRegistration();
-    break;
-
-  default:
-    break;
-  }
+  m_Controls.m_RegistrationWidget->SetTrackerFiducialsNode(m_TrackerFiducialsDataNode);
 }
 
 void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
@@ -451,13 +429,13 @@ void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
     m_PointSetRecordingNavigationData = m_Controls.m_PointSetRecordingToolSelectionWidget->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_PointSetRecordingToolSelectionWidget->GetSelectedToolID());
 
     //initialize point set
-    mitk::DataNode::Pointer psRecND = ds->GetNamedNode(m_PointSetRecordingDataNodeName);
+    mitk::DataNode::Pointer psRecND = ds->GetNamedNode("Recorded Points");
     if(m_PSRecordingPointSet.IsNull() || psRecND.IsNull())
     {
       m_PSRecordingPointSet = NULL;
       m_PSRecordingPointSet = mitk::PointSet::New();
       mitk::DataNode::Pointer dn = mitk::DataNode::New();
-      dn->SetName(m_PointSetRecordingDataNodeName);
+      dn->SetName("Recorded Points");
       dn->SetColor(0.,1.,0.);
       dn->SetData(m_PSRecordingPointSet);
       ds->Add(dn);
@@ -529,53 +507,63 @@ else
 
 bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
 {
-  mitk::DataStorage* ds = this->GetDataStorage();
-  mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
-  mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
+  // a couple of variables which we need in this method
+  std::string warningMessage = "";
+  bool initializationErrorDetected = false;
+  mitk::PointSet::Pointer imageFiducials,trackerFiducials;
 
+  // check some initialization stuff
+  if (m_ImageFiducialsDataNode.IsNull() || m_TrackerFiducialsDataNode.IsNull())
+  {
+    warningMessage = "Initialization not finished!";
+    MITK_WARN << warningMessage;
+    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
+    return false;
+  }
+  else
+  {
+    imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
+    trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
+  }
+
+  // now, do a lot of other checks...
   if (m_Controls.m_SurfaceActive->isChecked() && m_Controls.m_ObjectComboBox->GetSelectedNode().IsNull())
   {
-    std::string warningMessage = "No surface selected for registration.\nRegistration is not possible";
-    MITK_WARN << warningMessage;
-    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
-    return false;
+    warningMessage = "No surface selected for registration.\nRegistration is not possible";
+    initializationErrorDetected = true;
   }
-
-  if (m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNull())
+  else if (m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNull())
   {
-    std::string warningMessage = "No image selected for registration.\nRegistration is not possible";
-    MITK_WARN << warningMessage;
-    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
-    return false;
+    warningMessage = "No image selected for registration.\nRegistration is not possible";
+    initializationErrorDetected = true;
   }
-
-  if (imageFiducials.IsNull() || trackerFiducials.IsNull())
+  else if (imageFiducials.IsNull() || trackerFiducials.IsNull())
   {
-    std::string warningMessage = "Fiducial data objects not found. \n"
+   warningMessage = "Fiducial data objects not found. \n"
       "Please set 3 or more fiducials in the image and with the tracking system.\n\n"
       "Registration is not possible";
+    initializationErrorDetected = true;
+  }
+  else if ((imageFiducials->GetSize() < 3) || (trackerFiducials->GetSize() < 3) || (imageFiducials->GetSize() != trackerFiducials->GetSize()))
+  {
+    warningMessage = "Not enough fiducial pairs found. At least 3 fiducial must exist for the image and the tracking system respectively.";
+    initializationErrorDetected = true;
+  }
+
+  // finaly: if an err was detected, give a warning and an error popup, then return false
+  if(initializationErrorDetected)
+  {
     MITK_WARN << warningMessage;
     QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
     return false;
   }
+  //if no error was detected simply return true
+  else {return true;}
 
-  unsigned int minFiducialCount = 3; // \Todo: move to view option
-  if ((imageFiducials->GetSize() < minFiducialCount) || (trackerFiducials->GetSize() < minFiducialCount) || (imageFiducials->GetSize() != trackerFiducials->GetSize()))
-  {
-    QMessageBox::warning(NULL, "Registration not possible", QString("Not enough fiducial pairs found. At least %1 fiducial must "
-      "exist for the image and the tracking system respectively.\n"
-      "Currently, %2 fiducials exist for the image, %3 fiducials exist for the tracking system").arg(minFiducialCount).arg(imageFiducials->GetSize()).arg(trackerFiducials->GetSize()));
-    return false;
-  }
-
-  return true;
 }
 
-bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB)
+bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB, double euclideanDistanceThreshold, double angularDifferenceThreshold)
 {
-  double euclideanDistanceThreshold = .8;
-  double angularDifferenceThreshold = .8;
-
   if(transformA.IsNull() || transformA.IsNull())
     {return false;}
   mitk::Point3D posA,posB;

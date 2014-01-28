@@ -1383,14 +1383,14 @@ ImageStatisticsCalculator::CalculateExtremaWorld(
   typedef itk::ImageRegionConstIteratorWithIndex<MaskImageType> MaskImageIteratorType;
   typedef itk::ImageRegionConstIteratorWithIndex<ImageType> InputImageIndexIteratorType;
 
-  ImageType::SpacingType spacing = inputImage->GetSpacing();
+  typename ImageType::SpacingType spacing = inputImage->GetSpacing();
 
   ImageExtrema minMax;
   minMax.Defined = false;
   minMax.MaxIndex.set_size(VImageDimension);
   minMax.MaxIndex.set_size(VImageDimension);
 
-  ImageType::RegionType allowedExtremaRegion = inputImage->GetLargestPossibleRegion();
+  typename ImageType::RegionType allowedExtremaRegion = inputImage->GetLargestPossibleRegion();
 
   bool keepDistanceToImageBorders( neccessaryDistanceToImageBorderInMM > 0 );
   if (keepDistanceToImageBorders)

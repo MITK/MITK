@@ -34,6 +34,7 @@
 #include "itkImageRegionIterator.h"
 #include "itkObjectFactory.h"
 #include "itkProgressReporter.h"
+#include "itkDOMNodeXMLWriter.h"
 #include "stdlib.h"
 
 namespace itk
@@ -393,7 +394,7 @@ namespace itk
     MultiGaussianImageSource< TOutputImage >
     ::InsertPoints( PointType globalCoordinateMidpointCuboid, double cuboidRadius)
   {
-    MapContainerPoints::ElementIdentifier id = m_Midpoints.Size();
+    typename MapContainerPoints::ElementIdentifier id = m_Midpoints.Size();
     m_Midpoints.InsertElement(id, globalCoordinateMidpointCuboid);
     m_RadiusCuboid.InsertElement(id, cuboidRadius);
   }
@@ -604,7 +605,7 @@ namespace itk
     m_MeanValue = 0.0;
     double meanValueTemp;
     PointType midpoint;
-    MapContainerPoints::ElementIdentifier cuboidNumber = m_Midpoints.Size();
+    typename MapContainerPoints::ElementIdentifier cuboidNumber = m_Midpoints.Size();
    // SetNormalDistributionValues();
     double radius;
     //double xMin, xMax, yMin, yMax, zMin, zMax;

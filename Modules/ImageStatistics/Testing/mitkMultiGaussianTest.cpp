@@ -52,12 +52,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 bool IsInOtherROI(int,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType);
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType);
 
 
 int mitkMultiGaussianTest(int argc, char* argv[])
@@ -503,12 +503,12 @@ int mitkMultiGaussianTest(int argc, char* argv[])
 
 // check whether the edges of the i'th ROI is in another ROI included
 bool IsInOtherROI(int i,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROIminSizeX,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROImaxSizeX,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROIminSizeY,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROImaxSizeY,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROIminSizeZ,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3>>::VectorType ROImaxSizeZ  )
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROIminSizeX,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROImaxSizeX,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROIminSizeY,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROImaxSizeY,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROIminSizeZ,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROImaxSizeZ  )
 {
   bool error = 0;
   std::vector<double> xBound, yBound, zBound;

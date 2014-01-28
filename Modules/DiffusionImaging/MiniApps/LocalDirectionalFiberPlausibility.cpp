@@ -84,7 +84,7 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
 
         // load reference directions
         ItkDirectionImageContainerType::Pointer referenceImageContainer = ItkDirectionImageContainerType::New();
-        for (int i=0; i<referenceImages.size(); i++)
+        for (unsigned int i=0; i<referenceImages.size(); i++)
         {
             try
             {
@@ -136,7 +136,7 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
             }
 
             // write direction images
-            for (int i=0; i<directionImageContainer->Size(); i++)
+            for (unsigned int i=0; i<directionImageContainer->Size(); i++)
             {
                 itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
                 typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;
@@ -176,7 +176,7 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
 
         if (maskImages.size()>0)
         {
-            for (int i=0; i<maskImages.size(); i++)
+            for (unsigned int i=0; i<maskImages.size(); i++)
             {
                 mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImages.at(i))->GetData());
                 mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);

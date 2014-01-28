@@ -119,7 +119,7 @@ public:
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
 
     /** Artifacts */
-    int                                 m_Spikes;                   ///< Number of spikes randomly appearing in the image
+    unsigned int                        m_Spikes;                   ///< Number of spikes randomly appearing in the image
     double                              m_SpikeAmplitude;           ///< amplitude of spikes relative to the largest signal intensity (magnitude of complex)
     double                              m_KspaceLineOffset;         ///< Causes N/2 ghosts. Larger offset means stronger ghost.
     double                              m_EddyStrength;             ///< Strength of eddy current induced gradients in mT/m.

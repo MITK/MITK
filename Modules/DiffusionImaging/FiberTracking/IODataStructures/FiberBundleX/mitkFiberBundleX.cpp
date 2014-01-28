@@ -533,7 +533,7 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
 }
 
 template <typename TPixel>
-void mitk::FiberBundleX::SetFAMap(const mitk::PixelType pixelType, mitk::Image::Pointer FAimage)
+void mitk::FiberBundleX::SetFAMap(const mitk::PixelType, mitk::Image::Pointer FAimage)
 {
     MITK_DEBUG << "SetFAMap";
     vtkSmartPointer<vtkDoubleArray> faValues = vtkSmartPointer<vtkDoubleArray>::New();
@@ -1959,7 +1959,7 @@ bool mitk::FiberBundleX::VerifyRequestedRegion()
 {
     return true;
 }
-void mitk::FiberBundleX::SetRequestedRegion(const itk::DataObject *data )
+void mitk::FiberBundleX::SetRequestedRegion(const itk::DataObject* )
 {
 
 }

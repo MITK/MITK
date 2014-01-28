@@ -46,7 +46,7 @@ const mitk::PlanarFigure* mitk::PlanarFigureMapper3D::GetInput()
 }
 
 
-void mitk::PlanarFigureMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
+void mitk::PlanarFigureMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* )
 {
     try
     {
@@ -106,7 +106,7 @@ void mitk::PlanarFigureMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk
     Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-vtkProp* mitk::PlanarFigureMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp* mitk::PlanarFigureMapper3D::GetVtkProp(mitk::BaseRenderer*)
 {
     return m_PolygonAssembly;
 

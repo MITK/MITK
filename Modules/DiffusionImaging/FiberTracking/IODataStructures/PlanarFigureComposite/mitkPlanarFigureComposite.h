@@ -56,7 +56,7 @@ namespace mitk {
     itkNewMacro( Self );
 
     // ///MUST HAVE IMPLEMENTATION//////
-    bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist );
+    bool SetControlPoint(unsigned int, const Point2D &, bool);
     unsigned int GetMinimumNumberOfControlPoints() const
     {
       return 0;
@@ -104,7 +104,7 @@ namespace mitk {
     /** \brief Calculates feature quantities of the planar figure. */
     virtual void EvaluateFeaturesInternal();
 
-    virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
+    virtual void PrintSelf(std::ostream &, itk::Indent) const;
     // ////////////////////
 
 

@@ -340,7 +340,7 @@ template<typename TPixelType>
 typename mitk::DiffusionImage<TPixelType>::IndicesVector mitk::DiffusionImage<TPixelType>::GetB0Indices()
 {
   IndicesVector indices;
-  for (int i=0; i<m_OriginalDirections->Size(); i++)
+  for (unsigned int i=0; i<m_OriginalDirections->Size(); i++)
     if (GetB_Value(i)<=0)
     {
       indices.push_back(i);

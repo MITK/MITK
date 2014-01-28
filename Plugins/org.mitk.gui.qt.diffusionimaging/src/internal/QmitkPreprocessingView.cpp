@@ -80,12 +80,6 @@ QmitkPreprocessingView::QmitkPreprocessingView()
 {
 }
 
-QmitkPreprocessingView::QmitkPreprocessingView(const QmitkPreprocessingView& other)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
-}
-
 QmitkPreprocessingView::~QmitkPreprocessingView()
 {
 
@@ -230,7 +224,7 @@ void QmitkPreprocessingView::DoBiExpFit()
 {
   itk::BiExpFitFunctor::Pointer functor = itk::BiExpFitFunctor::New();
 
-  for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
   {
     mitk::DiffusionImage<DiffusionPixelType>::Pointer inImage =
         dynamic_cast< mitk::DiffusionImage<DiffusionPixelType>* >(m_SelectedDiffusionNodes.at(i)->GetData());
@@ -255,7 +249,7 @@ void QmitkPreprocessingView::DoAKCFit()
 {
   itk::KurtosisFitFunctor::Pointer functor = itk::KurtosisFitFunctor::New();
 
-  for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
   {
     mitk::DiffusionImage<DiffusionPixelType>::Pointer inImage =
         dynamic_cast< mitk::DiffusionImage<DiffusionPixelType>* >(m_SelectedDiffusionNodes.at(i)->GetData());
@@ -285,7 +279,7 @@ void QmitkPreprocessingView::DoADCAverage()
 {
   itk::ADCAverageFunctor::Pointer functor = itk::ADCAverageFunctor::New();
 
-  for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
   {
     mitk::DiffusionImage<DiffusionPixelType>::Pointer inImage =
         dynamic_cast< mitk::DiffusionImage<DiffusionPixelType>* >(m_SelectedDiffusionNodes.at(i)->GetData());
@@ -315,7 +309,7 @@ void QmitkPreprocessingView::DoAdcCalculation()
   typedef itk::AdcImageFilter< DiffusionPixelType, double >     FilterType;
 
 
-  for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
   {
     DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
     FilterType::Pointer filter = FilterType::New();
@@ -513,7 +507,7 @@ void QmitkPreprocessingView::DoHalfSphereGradientDirections()
 {
   GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();
 
-  for (int j=0; j<gradientContainer->Size(); j++)
+  for (unsigned int j=0; j<gradientContainer->Size(); j++)
     if (gradientContainer->at(j)[0]<0)
       gradientContainer->at(j) = -gradientContainer->at(j);
   m_DiffusionImage->SetDirections(gradientContainer);
@@ -542,7 +536,7 @@ void QmitkPreprocessingView::DoShowGradientDirections()
     return;
 
   int maxIndex = 0;
-  int maxSize = m_DiffusionImage->GetDimension(0);
+  unsigned int maxSize = m_DiffusionImage->GetDimension(0);
   if (maxSize<m_DiffusionImage->GetDimension(1))
   {
     maxSize = m_DiffusionImage->GetDimension(1);
@@ -567,7 +561,7 @@ void QmitkPreprocessingView::DoShowGradientDirections()
   for(BValueMapIterator it = bValMap.begin(); it!=bValMap.end(); ++it)
   {
     mitk::PointSet::Pointer pointset = mitk::PointSet::New();
-    for (int j=0; j<it->second.size(); j++)
+    for (unsigned int j=0; j<it->second.size(); j++)
     {
       mitk::Point3D ip;
       vnl_vector_fixed< double, 3 > v = gradientContainer->at(it->second[j]);
@@ -635,7 +629,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
   // GetShellSelection from GUI
   BValueMap shellSlectionMap;
   BValueMap originalShellMap = m_DiffusionImage->GetB_ValueMap();
-  std::vector<int> newNumGradientDirections;
+  std::vector<unsigned int> newNumGradientDirections;
   int shellCounter = 0;
 
   foreach(QCheckBox * box , m_ReduceGradientCheckboxes)
@@ -712,7 +706,7 @@ void QmitkPreprocessingView::MergeDwis()
   std::vector< double >       bValueContainer;
 
   QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
-  for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
   {
     DiffusionImageType::Pointer dwi = dynamic_cast< mitk::DiffusionImage<DiffusionPixelType>* >( m_SelectedDiffusionNodes.at(i)->GetData() );
     if ( dwi.IsNotNull() )

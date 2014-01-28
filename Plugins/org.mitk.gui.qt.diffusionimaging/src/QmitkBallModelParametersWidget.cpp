@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkBallModelParametersWidget::VIEW_ID = "org.mitk.views.BallModelParametersWidget";
 
-QmitkBallModelParametersWidget::QmitkBallModelParametersWidget( QWidget * parent, Qt::WindowFlags f )
+QmitkBallModelParametersWidget::QmitkBallModelParametersWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
     m_Controls = NULL;

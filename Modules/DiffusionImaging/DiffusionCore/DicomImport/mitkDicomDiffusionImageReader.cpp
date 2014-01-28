@@ -131,7 +131,7 @@ void DicomDiffusionImageReader<TPixelType, TDimension>
         ++it;
         ++ot;
       }
-    ot = ot.Begin();
+    ot.GoToBegin();
     progress.CompletedPixel();
     }
 }

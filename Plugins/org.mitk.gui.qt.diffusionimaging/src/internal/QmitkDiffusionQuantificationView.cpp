@@ -276,7 +276,6 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
         GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
         gfaFilter->SetInput(itkvol);
 
-        double scale = 1;
         std::string newname;
         newname.append(nodename);
         switch(method)
@@ -383,7 +382,6 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
         }
         gfaFilter->Update();
         clock.Stop();
-        MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
         typedef itk::Image<TOdfPixelType, 3> ImgType;
         ImgType::Pointer img = ImgType::New();
@@ -394,12 +392,11 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
         img->SetBufferedRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion() );
         img->Allocate();
         itk::ImageRegionIterator<ImgType> ot (img, img->GetLargestPossibleRegion() );
-        ot = ot.Begin();
+        ot.GoToBegin();
         itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it
                 (gfaFilter->GetOutput(), gfaFilter->GetOutput()->GetLargestPossibleRegion() );
-        it = it.Begin();
 
-        for (it = it.Begin(); !it.IsAtEnd(); ++it)
+        for (it.GoToBegin(); !it.IsAtEnd(); ++it)
         {
             GfaFilterType::OutputImageType::PixelType val = it.Get();
             ot.Set(val * m_Controls->m_ScaleImageValuesBox->value());
@@ -549,7 +546,6 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
 
         multi->Update();
         clock.Stop();
-        MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
         // FA TO DATATREE
         mitk::Image::Pointer image = mitk::Image::New();

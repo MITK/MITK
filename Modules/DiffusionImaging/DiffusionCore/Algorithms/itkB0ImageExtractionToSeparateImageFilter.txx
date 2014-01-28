@@ -29,7 +29,7 @@ itk::B0ImageExtractionToSeparateImageFilter< TInputImagePixelType, TOutputImageP
 template< class TInputImagePixelType,
           class TOutputImagePixelType>
 void itk::B0ImageExtractionToSeparateImageFilter<
-TInputImagePixelType, TOutputImagePixelType >::CopyInformation( const DataObject *data)
+TInputImagePixelType, TOutputImagePixelType >::CopyInformation( const DataObject *)
 {
 
 }

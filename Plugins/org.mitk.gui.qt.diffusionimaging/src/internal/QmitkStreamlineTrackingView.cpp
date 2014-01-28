@@ -54,8 +54,8 @@ QmitkStreamlineTrackingView::QmitkStreamlineTrackingView()
     : QmitkFunctionality()
     , m_Controls( 0 )
     , m_MultiWidget( NULL )
-    , m_SeedRoi( NULL )
     , m_MaskImage( NULL )
+    , m_SeedRoi( NULL )
 {
 }
 

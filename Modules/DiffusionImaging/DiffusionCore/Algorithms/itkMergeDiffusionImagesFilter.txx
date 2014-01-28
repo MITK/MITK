@@ -105,7 +105,7 @@ MergeDiffusionImagesFilter<TScalarType>
     typename DwiImageType::Pointer img = m_ImageVolumes.at(0);
 
     m_NumGradients = 0;
-    for (int i=0; i<m_GradientLists.size(); i++)
+    for (unsigned int i=0; i<m_GradientLists.size(); i++)
     {
         m_NumGradients += m_GradientLists.at(i)->Size();
         typename DwiImageType::Pointer tmp = m_ImageVolumes.at(i);
@@ -143,12 +143,12 @@ MergeDiffusionImagesFilter<TScalarType>
         out.Fill(0);
 
         int c=0;
-        for (int i=0; i<m_GradientLists.size(); i++)
+        for (unsigned int i=0; i<m_GradientLists.size(); i++)
         {
             GradientListType::Pointer gradients = m_GradientLists.at(i);
             typename DwiImageType::Pointer img = m_ImageVolumes.at(i);
 
-            for (int j=0; j<gradients->Size(); j++)
+            for (unsigned int j=0; j<gradients->Size(); j++)
             {
                 GradientType g = gradients->GetElement(j);
                 double mag = g.two_norm();

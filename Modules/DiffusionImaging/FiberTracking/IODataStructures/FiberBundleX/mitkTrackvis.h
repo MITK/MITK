@@ -67,7 +67,7 @@ private:
 public:
     TrackVis_header        hdr;
 
-    short     create( string filename, itk::Size<3> size, itk::Point<float,3> origin );
+    short     create(string filename, itk::Size<3> size);
     short     open( string filename );
     short     read( mitk::FiberBundleX* fib );
     short    append( mitk::FiberBundleX* fib );

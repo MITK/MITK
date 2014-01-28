@@ -117,7 +117,7 @@ mitk::DataNode::Pointer mitk::PlanarFigureComposite::getDataNodeAt(int idx)
 
 
 //musthave implementations from superclass.... not sure if return true makes sense
-bool mitk::PlanarFigureComposite::SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist )
+bool mitk::PlanarFigureComposite::SetControlPoint( unsigned int , const Point2D &, bool  )
 {
   return true;
 }
@@ -137,7 +137,7 @@ void mitk::PlanarFigureComposite::EvaluateFeaturesInternal()
 
 }
 
-void mitk::PlanarFigureComposite::PrintSelf( std::ostream& os, itk::Indent indent) const
+void mitk::PlanarFigureComposite::PrintSelf( std::ostream&, itk::Indent) const
 {
 
 }

@@ -56,7 +56,6 @@ class QmitkPreprocessingView : public QmitkFunctionality
   typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
 
   QmitkPreprocessingView();
-  QmitkPreprocessingView(const QmitkPreprocessingView& other);
   virtual ~QmitkPreprocessingView();
 
   virtual void CreateQtPartControl(QWidget *parent);

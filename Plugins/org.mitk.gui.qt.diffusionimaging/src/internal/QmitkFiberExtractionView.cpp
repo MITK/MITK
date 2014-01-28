@@ -114,7 +114,7 @@ void QmitkFiberExtractionView::DoRemoveInsideMask()
         return;
 
     mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
-    for (int i=0; i<m_SelectedFB.size(); i++)
+    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
         QString name(m_SelectedFB.at(i)->GetName().c_str());
@@ -142,7 +142,7 @@ void QmitkFiberExtractionView::DoRemoveOutsideMask()
         return;
 
     mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
-    for (int i=0; i<m_SelectedFB.size(); i++)
+    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
         QString name(m_SelectedFB.at(i)->GetName().c_str());
@@ -170,7 +170,7 @@ void QmitkFiberExtractionView::ExtractEndingInMask()
         return;
 
     mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
-    for (int i=0; i<m_SelectedFB.size(); i++)
+    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
         QString name(m_SelectedFB.at(i)->GetName().c_str());
@@ -199,7 +199,7 @@ void QmitkFiberExtractionView::ExtractPassingMask()
         return;
 
     mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
-    for (int i=0; i<m_SelectedFB.size(); i++)
+    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
         QString name(m_SelectedFB.at(i)->GetName().c_str());
@@ -267,7 +267,7 @@ void QmitkFiberExtractionView::GenerateRoiImage(){
     tmpImage->InitializeByItk(m_PlanarFigureImage.GetPointer());
     tmpImage->SetVolume(m_PlanarFigureImage->GetBufferPointer());
 
-    for (int i=0; i<m_SelectedPF.size(); i++)
+    for (unsigned int i=0; i<m_SelectedPF.size(); i++)
         CompositeExtraction(m_SelectedPF.at(i), tmpImage);
 
     DataNode::Pointer node = DataNode::New();
@@ -407,7 +407,7 @@ void QmitkFiberExtractionView::InternalReorientImagePlane( const itk::Image< TPi
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image< TPixel, VImageDimension > *image, unsigned int axis, std::string nodeName )
+void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image< TPixel, VImageDimension > *image, unsigned int axis, std::string )
 {
 
     MITK_DEBUG << "InternalCalculateMaskFromPlanarFigure() start";
@@ -586,8 +586,8 @@ void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image
     itk::ImageRegionIterator<ImageType>
             itimage(image, image->GetLargestPossibleRegion());
 
-    itmask = itmask.Begin();
-    itimage = itimage.Begin();
+    itmask.GoToBegin();
+    itimage.GoToBegin();
 
     typename ImageType::SizeType lowersize = {{9999999999,9999999999,9999999999}};
     typename ImageType::SizeType uppersize = {{0,0,0}};
@@ -951,7 +951,7 @@ void QmitkFiberExtractionView::Activated()
 }
 
 void QmitkFiberExtractionView::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
-                                                      const char *propertyKey, mitk::BaseProperty *property )
+                                                      const char *, mitk::BaseProperty * )
 {
     // initialize figure's geometry with empty geometry
     mitk::PlaneGeometry::Pointer emptygeometry = mitk::PlaneGeometry::New();
@@ -1423,7 +1423,7 @@ void QmitkFiberExtractionView::JoinBundles()
     m_SelectedFB.at(0)->SetVisibility(false);
     QString name("");
     name += QString(m_SelectedFB.at(0)->GetName().c_str());
-    for (int i=1; i<m_SelectedFB.size(); i++)
+    for (unsigned int i=1; i<m_SelectedFB.size(); i++)
     {
         newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData()));
         name += "+"+QString(m_SelectedFB.at(i)->GetName().c_str());
@@ -1449,7 +1449,7 @@ void QmitkFiberExtractionView::SubstractBundles()
     m_SelectedFB.at(0)->SetVisibility(false);
     QString name("");
     name += QString(m_SelectedFB.at(0)->GetName().c_str());
-    for (int i=1; i<m_SelectedFB.size(); i++)
+    for (unsigned int i=1; i<m_SelectedFB.size(); i++)
     {
         newBundle = newBundle->SubtractBundle(dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData()));
         if (newBundle.IsNull())
@@ -1477,7 +1477,7 @@ void QmitkFiberExtractionView::GenerateStats()
 
     QString stats("");
 
-    for( int i=0; i<m_SelectedFB.size(); i++ )
+    for(unsigned int i=0; i<m_SelectedFB.size(); i++ )
     {
         mitk::DataNode::Pointer node = m_SelectedFB[i];
         if (node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()))

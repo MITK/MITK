@@ -36,9 +36,10 @@ template< class TPixelType >
 KspaceImageFilter< TPixelType >
 ::KspaceImageFilter()
     : m_FrequencyMapSlice(NULL)
-    , m_IsBaseline(true)
+    , m_Z(0)
     , m_UseConstantRandSeed(false)
     , m_SpikesPerSlice(0)
+    , m_IsBaseline(true)
 {
     m_DiffusionGradientDirection.Fill(0.0);
 

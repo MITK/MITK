@@ -93,7 +93,7 @@ int FiberDirectionExtraction(int argc, char* argv[])
         ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
 
         // write direction images
-        for (int i=0; i<directionImageContainer->Size(); i++)
+        for (unsigned int i=0; i<directionImageContainer->Size(); i++)
         {
             itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
             typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;

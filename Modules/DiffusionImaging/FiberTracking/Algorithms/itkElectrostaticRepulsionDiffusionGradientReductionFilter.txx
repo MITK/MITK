@@ -122,9 +122,9 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
         }
         MITK_INFO << "Shell number: " << shellCounter;
 
-        int c=0;
+        unsigned int c=0;
 
-        for (int i=0; i<it->second.size(); i++)
+        for (unsigned int i=0; i<it->second.size(); i++)
         {
             if (c<m_NumGradientDirections[shellCounter])
                 m_UsedGradientIndices.push_back(it->second.at(i));
@@ -216,7 +216,7 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
 
         int index = 0;
         for(BValueMap::iterator it=manipulatedMap.begin(); it!=manipulatedMap.end(); it++)
-            for(int j=0; j<it->second.size(); j++)
+            for(unsigned int j=0; j<it->second.size(); j++)
             {
                 newVec[index] = oldVec[it->second.at(j)];
                 index++;
@@ -231,7 +231,7 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
     m_GradientDirections = GradientDirectionContainerType::New();
     int index = 0;
     for(BValueMap::iterator it = manipulatedMap.begin(); it != manipulatedMap.end(); it++)
-        for(int j = 0; j < it->second.size(); j++)
+        for(unsigned int j = 0; j < it->second.size(); j++)
         {
             m_GradientDirections->InsertElement(index, m_OriginalGradientDirections->at(it->second.at(j)));
             index++;

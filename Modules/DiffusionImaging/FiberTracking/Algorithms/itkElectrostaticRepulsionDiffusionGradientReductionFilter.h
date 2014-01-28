@@ -88,7 +88,7 @@ namespace itk
     IndicesVector GetUsedGradientIndices(){return m_UsedGradientIndices;}
     void SetOriginalBValueMap(BValueMap inp){m_OriginalBValueMap = inp;}
     void SetShellSelectionBValueMap(BValueMap inp){m_InputBValueMap = inp;}
-    void SetNumGradientDirections(std::vector<int> numDirs){m_NumGradientDirections = numDirs;}
+    void SetNumGradientDirections(std::vector<unsigned int> numDirs){m_NumGradientDirections = numDirs;}
 
   protected:
     ElectrostaticRepulsionDiffusionGradientReductionFilter();
@@ -107,7 +107,7 @@ namespace itk
     BValueMap m_OriginalBValueMap;
     BValueMap m_InputBValueMap;
 
-    std::vector<int> m_NumGradientDirections;
+    std::vector<unsigned int> m_NumGradientDirections;
   };
 
 

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 
+#include <mitkLookupTableProperty.h>
 #include <Colortables/HotIron.h>
 #include <Colortables/PETColor.h>
 #include <Colortables/PET20.h>
@@ -59,7 +60,35 @@ void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
 
 }
 
-
+void mitk::LookupTable::SetActiveColormap(int index)
+{
+    switch(index)
+    {
+    case (mitk::LookupTableProperty::GRAYSCALE):
+        this->BuildGrayScaleLookupTable();
+        break;
+    case (mitk::LookupTableProperty::GRAYSCALE_INVERSE):
+        this->BuildInverseGrayScaleLookupTable();
+        break;
+    case (mitk::LookupTableProperty::HOT_IRON):
+        this->BuildHotIronLookupTable();
+        break;
+    case (mitk::LookupTableProperty::PET_COLOR):
+        this->BuildPETColorLookupTable();
+        break;
+    case (mitk::LookupTableProperty::PET_20):
+        this->BuildPET20LookupTable();
+        break;
+    case (mitk::LookupTableProperty::MULTILABEL):
+        this->BuildMultiLabelLookupTable();
+        break;
+    case (mitk::LookupTableProperty::LEGACY_BINARY):
+        this->BuildLegacyBinaryLookupTable();
+        break;
+    default:
+        MITK_ERROR << "non existing colormap";
+    }
+}
 
 void mitk::LookupTable::ChangeOpacityForAll( float opacity )
 {

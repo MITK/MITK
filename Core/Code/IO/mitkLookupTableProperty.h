@@ -60,6 +60,18 @@ class MITK_CORE_EXPORT LookupTableProperty : public BaseProperty
     itkNewMacro(LookupTableProperty);
     mitkNewMacro1Param(LookupTableProperty, const mitk::LookupTable::Pointer);
 
+    enum ColorTableType
+          {
+            GRAYSCALE,
+            GRAYSCALE_INVERSE,
+            HOT_IRON,
+            PET_COLOR,
+            PET_20,
+            MULTILABEL,
+            LEGACY_BINARY
+          //  Default = GRAYSCALE;
+          };
+
     itkGetObjectMacro(LookupTable, LookupTable );
     ValueType GetValue() const;
 

@@ -96,10 +96,18 @@ public slots:
   ///
   void TextureInterpolationToggled ( bool checked );
   ///
+  /// \brief Agreggates available colormaps
+  ///
+  void ColormapMenuAboutToShow ();
+  ///
+  /// \brief changes the active colormap
+  ///
+  void ColormapActionToggled (bool);
+  ///
   /// SurfaceRepresentationActionToggled
   ///
   void SurfaceRepresentationMenuAboutToShow ();
-  ///public
+  ///
   /// SurfaceRepresentationActionToggled
   ///
   void SurfaceRepresentationActionToggled ( bool checked );
@@ -225,6 +233,8 @@ protected:
   QAction* m_TextureInterpolation;
   /// SurfaceRepresentation action
   QAction* m_SurfaceRepresentation;
+  /// Lookuptable selection action
+  QAction* m_ColormapAction;
 
   /// Maps "Show in" actions to editor ids
   QSignalMapper* m_ShowInMapper;

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDataObject.h>
 #include <itkObjectFactory.h>
 
+
 class vtkColorTransferFunction;
 class vtkPiecewiseFunction;
 
@@ -72,7 +73,7 @@ public:
 
     virtual void SetTableValue(int, double rgba[4]);
 
-//    virtual void SetActiveColormap(int index);
+    virtual void SetActiveColormap(int index);
 
     itkSetMacro(Window, float);
     itkSetMacro(Level, float);

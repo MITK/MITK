@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkEnumerationProperty.h"
+#include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
 #include <mitkNodePredicateAnd.h>
 #include <mitkITKImageImport.h>
@@ -307,6 +308,17 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   imageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,m_TextureInterpolation));
 
+  m_ColormapAction = new QAction("Colormap", this);
+  m_ColormapAction->setMenu(new QMenu);
+  //  m_ColormapAction->setCheckable(true);
+  //  m_ColormapAction->setChecked(false);
+  //  QObject::connect( m_ColormapAction, SIGNAL( toggled (bool) )
+  //    , this, SLOT( ColormapActionEnabled(bool) ) );
+  QObject::connect( m_ColormapAction->menu(), SIGNAL( aboutToShow() )
+    , this, SLOT( ColormapMenuAboutToShow() ) );
+  imageDataNodeDescriptor->AddAction(m_ColormapAction, false);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor, m_ColormapAction));
+
   m_SurfaceRepresentation = new QAction("Surface Representation", this);
   m_SurfaceRepresentation->setMenu(new QMenu);
   QObject::connect( m_SurfaceRepresentation->menu(), SIGNAL( aboutToShow() )
@@ -548,6 +560,67 @@ void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
     node->SetBoolProperty("texture interpolation", checked);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+
+}
+
+void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
+{
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if(!node)
+    return;
+
+  //mitk::EnumerationProperty* cmProp =
+//      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("colormap"));
+//  if(!cmProp)
+//    return;
+
+//  QAction* senderAction = qobject_cast<QAction*> ( QObject::sender() );
+
+//  if(!senderAction)
+//    return;
+
+//  std::string activatedItem = senderAction->text().toStdString();
+
+//  if ( activatedItem != cmProp->GetValueAsString() )
+//  {
+//    if ( cmProp->IsValidEnumerationValue( activatedItem ) )
+//    {
+//        cmProp->SetValue( activatedItem );
+//        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+//    }
+//  }
+}
+
+void QmitkDataManagerView::ColormapMenuAboutToShow()
+{
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if(!node)
+    return;
+
+//  mitk::EnumerationProperty* cmProp =
+//      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("colormap"));
+//  if(!cmProp)
+//    return;
+
+//  // clear menu
+//  m_ColormapAction->menu()->clear();
+//  QAction* tmp;
+
+//  // create menu entries
+//  for(mitk::EnumerationProperty::EnumConstIterator it=cmProp->Begin(); it!=cmProp->End()
+//    ; it++)
+//  {
+//    tmp = m_ColormapAction->menu()->addAction(QString::fromStdString(it->second));
+//    tmp->setCheckable(true);
+
+//    if(it->second == cmProp->GetValueAsString())
+//    {
+//      tmp->setChecked(true);
+//    }
+
+//    QObject::connect( tmp, SIGNAL( triggered(bool) )
+//      , this, SLOT( ColormapActionToggled(bool) ) );
+//  }
 
 }
 

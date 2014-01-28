@@ -275,20 +275,20 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 m_NoiseModel->SetNoiseVariance(v1.second.get<double>("artifacts.noisevariance"));
             }
 
-            m_KspaceLineOffset = v1.second.get<double>("artifacts.m_KspaceLineOffset");
+            m_KspaceLineOffset = v1.second.get<double>("artifacts.kspaceLineOffset");
             m_CroppingFactor = (100-v1.second.get<double>("artifacts.aliasingfactor"))/100;
-            m_Spikes = v1.second.get<int>("artifacts.m_Spikesnum");
-            m_SpikeAmplitude = v1.second.get<double>("artifacts.m_Spikesscale");
-            m_EddyStrength = v1.second.get<double>("artifacts.m_EddyStrength");
+            m_Spikes = v1.second.get<int>("artifacts.spikesnum");
+            m_SpikeAmplitude = v1.second.get<double>("artifacts.spikesscale");
+            m_EddyStrength = v1.second.get<double>("artifacts.eddyStrength");
             m_DoAddGibbsRinging = v1.second.get<bool>("artifacts.addringing");
-            m_DoAddMotion = v1.second.get<bool>("artifacts.m_DoAddMotion");
-            m_DoRandomizeMotion = v1.second.get<bool>("artifacts.m_RandomMotion");
-            m_Translation[0] = v1.second.get<double>("artifacts.m_Translation0");
-            m_Translation[1] = v1.second.get<double>("artifacts.m_Translation1");
-            m_Translation[2] = v1.second.get<double>("artifacts.m_Translation2");
-            m_Rotation[0] = v1.second.get<double>("artifacts.m_Rotation0");
-            m_Rotation[1] = v1.second.get<double>("artifacts.m_Rotation1");
-            m_Rotation[2] = v1.second.get<double>("artifacts.m_Rotation2");
+            m_DoAddMotion = v1.second.get<bool>("artifacts.doAddMotion");
+            m_DoRandomizeMotion = v1.second.get<bool>("artifacts.randomMotion");
+            m_Translation[0] = v1.second.get<double>("artifacts.translation0");
+            m_Translation[1] = v1.second.get<double>("artifacts.translation1");
+            m_Translation[2] = v1.second.get<double>("artifacts.translation2");
+            m_Rotation[0] = v1.second.get<double>("artifacts.rotation0");
+            m_Rotation[1] = v1.second.get<double>("artifacts.rotation1");
+            m_Rotation[2] = v1.second.get<double>("artifacts.rotation2");
 
             // compartment 1
             switch (v1.second.get<int>("compartment1.index"))

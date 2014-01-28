@@ -352,6 +352,8 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     MITK_INFO << "GibbsTrackingFilter: preparation of the data took " << m << "m and " << s << "s";
     MITK_INFO << "GibbsTrackingFilter: " << m_NumAcceptedFibers << " fibers accepted";
 
+//    sampler->PrintProposalTimes();
+
     SaveParameters();
 }
 

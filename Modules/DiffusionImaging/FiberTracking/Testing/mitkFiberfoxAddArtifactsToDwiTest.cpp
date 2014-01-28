@@ -163,7 +163,7 @@ public:
         ricianNoiseModel->SetNoiseVariance(1000000);
         ricianNoiseModel->SetSeed(0);
         m_Parameters.m_NoiseModel = ricianNoiseModel;
-//        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/riciannoise2.dwi") );
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/riciannoise2.dwi") );
         delete m_Parameters.m_NoiseModel;
     }
 
@@ -173,7 +173,7 @@ public:
         chiSquareNoiseModel->SetNoiseVariance(1000000);
         chiSquareNoiseModel->SetSeed(0);
         m_Parameters.m_NoiseModel = chiSquareNoiseModel;
-//        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/chisquarenoise2.dwi") );
+        StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/chisquarenoise2.dwi") );
         delete m_Parameters.m_NoiseModel;
     }
 

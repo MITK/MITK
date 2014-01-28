@@ -43,19 +43,19 @@ EnergyComputer::EnergyComputer(ItkFloatImageType* mask, ParticleGrid* particleGr
     m_Spacing[1] = mask->GetSpacing()[1];
     m_Spacing[2] = mask->GetSpacing()[2];
 
-    // calculate rotation matrix
+    // get rotation matrix
     vnl_matrix<double> temp = mask->GetDirection().GetVnlMatrix();
     vnl_matrix<float>  directionMatrix; directionMatrix.set_size(3,3);
     vnl_copy(temp, directionMatrix);
-    vnl_vector_fixed<float, 3> d0 = directionMatrix.get_column(0); d0.normalize();
-    vnl_vector_fixed<float, 3> d1 = directionMatrix.get_column(1); d1.normalize();
-    vnl_vector_fixed<float, 3> d2 = directionMatrix.get_column(2); d2.normalize();
-    directionMatrix.set_column(0, d0);
-    directionMatrix.set_column(1, d1);
-    directionMatrix.set_column(2, d2);
     vnl_matrix_fixed<float, 3, 3> I = directionMatrix*directionMatrix.transpose();
-    if(!I.is_identity(mitk::eps))
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            I[i][j] = fabs(I[i][j]);
+    if(!I.is_identity(0.001))
+    {
         fprintf(stderr,"EnergyComputer: image direction is not a rotation matrix. Tracking not possible!\n");
+        std::cout << directionMatrix << std::endl;
+    }
     m_RotationMatrix = directionMatrix;
 
     if (QBALL_ODFSIZE != m_SphereInterpolator->nverts)

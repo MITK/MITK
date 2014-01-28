@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPiecewiseFunction.h>
 
 #include <mitkLookupTableProperty.h>
+#include <Colortables/Jet.h>
 #include <Colortables/HotIron.h>
 #include <Colortables/PETColor.h>
 #include <Colortables/PET20.h>
@@ -393,6 +394,21 @@ void mitk::LookupTable::BuildHotIronLookupTable()
 
     lut->SetTableValue(i, (double)HotIron[i][0]/255.0, (double)HotIron[i][1]/255.0, (double)HotIron[i][2]/255.0, 1.0);
 
+  }
+
+  m_LookupTable = lut;
+  this->Modified();
+}
+
+void mitk::LookupTable::BuildJetLookupTable()
+{
+  vtkLookupTable* lut = vtkLookupTable::New();
+  lut->SetNumberOfTableValues(256);
+  lut->Build();
+
+  for (int i = 0; i < 256; i++)
+  {
+    lut->SetTableValue(i, (double)Jet[i][0] / 255.0, (double)Jet[i][1] / 255.0, (double)Jet[i][2] / 255.0, 1.0);
   }
 
   m_LookupTable = lut;

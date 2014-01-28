@@ -487,6 +487,7 @@ namespace mitk
 //    node->SetProperty("shader.mitkIsoLineShader.Gridscale", mitk::FloatProperty::New(10.0));
     node->SetFloatProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
     node->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),true);
+    node->SetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
 //    node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
 //    node->SetProperty("Image Rendering.Mode", renderingMode);
 //    node->SetProperty("opacity", mitk::FloatProperty::New(0.3));

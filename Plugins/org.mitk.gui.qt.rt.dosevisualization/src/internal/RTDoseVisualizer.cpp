@@ -356,15 +356,14 @@ void RTDoseVisualizer::OnConvertButtonClicked()
     MITK_INFO << "FUNCTION PRESCRIBE " << prescribed << endl;
     for(mitk::IsoDoseLevelSet::ConstIterator setIT = isoDoseLevelSet->Begin(); setIT != isoDoseLevelSet->End(); ++setIT)
     {
+      float pref;
+      selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
       float *hsv = new float[3];
       vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
       cCalc->RGBToHSV(setIT->GetColor()[0],setIT->GetColor()[1],setIT->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
-      transferFunction->AddHSVPoint(setIT->GetDoseValue()*prescribed,hsv[0],hsv[1],hsv[2],1.0,1.0);
-      MITK_INFO << "FUNCTION " << setIT->GetDoseValue()*prescribed << endl;
+      transferFunction->AddHSVPoint(setIT->GetDoseValue()*pref,hsv[0],hsv[1],hsv[2],1.0,1.0);
+      MITK_INFO << "FUNCTION " << setIT->GetDoseValue()*pref << endl;
     }
-    float pref;
-    selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
-    MITK_INFO << "PREF " << pref << endl;
 
     mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
     mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();

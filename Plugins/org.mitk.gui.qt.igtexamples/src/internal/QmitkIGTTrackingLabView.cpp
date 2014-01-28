@@ -41,8 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkAppendPolyData.h>
-#include <vtkLandmarkTransform.h>
-#include <vtkSmartPointer.h>
 #include <vtkPoints.h>
 
 // Qt
@@ -286,15 +284,7 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
   transform->Update();
 
   //compute FRE
-  double FRE = 0;
-  for(unsigned int i = 0; i < imageFiducials->GetSize(); i++)
-    {
-    itk::Point<double> transformed = transform->TransformPoint(imageFiducials->GetPoint(i)[0],imageFiducials->GetPoint(i)[1],imageFiducials->GetPoint(i)[2]);
-    double cur_error_squared = transformed.SquaredEuclideanDistanceTo(trackerFiducials->GetPoint(i));
-    FRE += cur_error_squared;
-    }
-
-  FRE = sqrt(FRE/ (double) imageFiducials->GetSize());
+  double FRE = ComputeFRE(imageFiducials,trackerFiducials,transform);
   m_Controls.m_RegistrationWidget->SetQualityDisplayText("FRE: " + QString::number(FRE) + " mm");
 
   //convert from vtk to itk data types
@@ -679,4 +669,24 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //delete filter
     m_PermanentRegistrationFilter = NULL;
     }
+}
+
+double QmitkIGTTrackingLabView::ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform)
+{
+  if(imageFiducials->GetSize() != realWorldFiducials->GetSize()) return -1;
+  double FRE = 0;
+  for(unsigned int i = 0; i < imageFiducials->GetSize(); i++)
+    {
+    itk::Point<double> current_image_fiducial_point = imageFiducials->GetPoint(i);
+    if (transform != NULL)
+      {
+      current_image_fiducial_point = transform->TransformPoint(imageFiducials->GetPoint(i)[0],imageFiducials->GetPoint(i)[1],imageFiducials->GetPoint(i)[2]);
+      }
+    double cur_error_squared = current_image_fiducial_point.SquaredEuclideanDistanceTo(realWorldFiducials->GetPoint(i));
+    FRE += cur_error_squared;
+    }
+
+  FRE = sqrt(FRE/ (double) imageFiducials->GetSize());
+
+  return FRE;
 }

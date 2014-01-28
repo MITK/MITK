@@ -41,6 +41,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSpinBox>
 #include <QTimer>
 
+#include <vtkLandmarkTransform.h>
+#include <vtkSmartPointer.h>
+
 /*!
 \brief QmitkIGTTrackingLabView
 
@@ -163,6 +166,13 @@ bool IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::N
 \brief This method destroys the filter pipeline.
 */
 void DestroyIGTPipeline();
+
+/** @brief Computes the fiducial registration error out of two sets of fiducials.
+ *  The two sets must have the same size and the points must correspond to each other.
+ *  @param transform        This transform is applied to the image fiducials before the FRE calculation if it is given.
+ *  @return                 Returns the FRE. Returns -1 if there was an error.
+ */
+double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = NULL);
 
 //####################### Members for the IGT pipeline ######################################
 // The IGT pipeline is basically initialized in the method OnSetupNavigation(). Further initialization

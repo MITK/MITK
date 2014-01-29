@@ -2,6 +2,8 @@ set(LIBPOSTFIX "Ext")
 
 # Modules must be listed according to their dependencies
 set(module_dirs
+    DICOMReader
+    DICOMTesting
     MitkDataTypesExt
     MitkAlgorithmsExt
     MitkMapperExt

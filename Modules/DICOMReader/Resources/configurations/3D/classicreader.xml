@@ -1,0 +1,10 @@
+<?xml version="1.0" standalone=no>
+<DICOMFileReader
+  label="2013 default"
+  description="Legacy sorting of 2013"
+  class="ClassicDICOMSeriesReader"
+  version="1"
+  group3DnT="false"
+  fixTiltByShearing="true"
+  >
+</DICOMFileReader>

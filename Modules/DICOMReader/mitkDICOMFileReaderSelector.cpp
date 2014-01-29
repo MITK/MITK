@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMFileReaderSelector.h"
 #include "mitkDICOMReaderConfigurator.h"
-
 #include "mitkDICOMGDCMTagScanner.h"
 
 #include <usModuleContext.h>

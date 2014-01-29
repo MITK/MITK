@@ -374,5 +374,4 @@ namespace mitk {
   args.push_back(arg2);                                        \
   MITK_PARAMETERIZED_TEST(TESTMETHOD, args)                    \
 }
-
 #endif

@@ -9,24 +9,12 @@ set(CPP_FILES
   DicomImport/mitkSiemensDicomDiffusionImageHeaderReader.cpp
   DicomImport/mitkSiemensMosaicDicomDiffusionImageHeaderReader.cpp
 
-  # DataStructures -> DWI
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageHeaderInformation.cpp
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSource.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriter.cpp
+  DicomImport/mitkDiffusionDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderSiemensDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderSiemensMosaicDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderGEDICOMFileReader.cpp
 
-  IODataStructures/DiffusionWeightedImages/mitkImageToDiffusionImageSource.cpp
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp
-
-  # DataStructures -> QBall
-  IODataStructures/QBallImages/mitkQBallImageSource.cpp
-  IODataStructures/QBallImages/mitkQBallImage.cpp
-
-  # DataStructures -> Tensor
-  IODataStructures/TensorImages/mitkTensorImage.cpp
-
-  #IODataStructures/mitkRegistrationObject.cpp
-
-  # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkVectorImageVtkGlyphMapper3D.cpp
   Rendering/vtkOdfSource.cxx
@@ -78,9 +66,6 @@ set(H_FILES
   Algorithms/Reconstruction/MultishellProcessing/itkKurtosisFitFunctor.h
   Algorithms/Reconstruction/MultishellProcessing/itkBiExpFitFunctor.h
   Algorithms/Reconstruction/MultishellProcessing/itkADCFitFunctor.h
-
-  # IO Datastructures
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
 
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h

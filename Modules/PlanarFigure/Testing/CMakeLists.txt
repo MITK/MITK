@@ -1,4 +1,5 @@
-if (BUILD_TESTING)
+# Temporarily deactivating test for Mac. See Bug #16941
+if (BUILD_TESTING AND NOT APPLE)
 
 MITK_CREATE_MODULE_TESTS()
 

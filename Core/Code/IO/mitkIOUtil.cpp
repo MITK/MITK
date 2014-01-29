@@ -346,10 +346,18 @@ std::string IOUtil::GetTempPath()
   return result;
 }
 
-std::string IOUtil::CreateTemporaryFile()
+std::string IOUtil::CreateTemporaryFile(const std::string& templateName, std::string path)
 {
   ofstream tmpOutputStream;
-  std::string returnValue = CreateTemporaryFile(tmpOutputStream);
+  std::string returnValue = CreateTemporaryFile(tmpOutputStream,templateName,path);
+  tmpOutputStream.close();
+  return returnValue;
+}
+
+std::string IOUtil::CreateTemporaryFile(std::ios_base::openmode mode, const std::string& templateName, std::string path)
+{
+  ofstream tmpOutputStream;
+  std::string returnValue = CreateTemporaryFile(tmpOutputStream,mode,templateName,path);
   tmpOutputStream.close();
   return returnValue;
 }

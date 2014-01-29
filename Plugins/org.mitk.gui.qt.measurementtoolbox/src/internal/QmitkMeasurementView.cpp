@@ -43,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPluginActivator.h"
 #include "usModuleRegistry.h"
-
+#include <mitkNodePredicateDataType.h>
 template <class T>
 static T* GetService()
 {
@@ -444,18 +444,24 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
   MEASUREMENT_DEBUG << "refreshing selection and detailed text";
   d->m_CurrentSelection = nodes;
   this->UpdateMeasurementText();
-
+  // bug 16600: deselecting all planarfigures by clicking on datamanager when no node is selected
   if(d->m_CurrentSelection.size() == 0)
   {
-    mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
-
-    for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End(); it++)
+    mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
+    mitk::DataStorage::SetOfObjects::ConstPointer planarFigures = this->GetDataStorage()->GetSubset( isPlanarFigure );
+    // setting all planar figures which are not helper objects not selected
+    for(mitk::DataStorage::SetOfObjects::ConstIterator it=planarFigures->Begin(); it!=planarFigures->End(); it++)
     {
-      mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(it->Value().GetPointer());
-      nonConstNode->SetSelected(false);
+      mitk::DataNode* node = it.Value();
+      bool isHelperObject(false);
+      node->GetBoolProperty("helper object", isHelperObject);
+      if(!isHelperObject)
+      {
+        node->SetSelected(false);
+      }
     }
-
   }
+
   for( int i=d->m_CurrentSelection.size()-1; i>= 0; --i)
   {
     mitk::DataNode* node = d->m_CurrentSelection.at(i);

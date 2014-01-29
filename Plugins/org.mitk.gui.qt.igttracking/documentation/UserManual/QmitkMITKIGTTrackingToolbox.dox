@@ -2,7 +2,7 @@
 
 \page org_mitk_views_igttrackingtoolbox The MITK-IGT Tracking Toolbox
 
-\image html iconTrackingToolbox.png "Icon of the module"
+\image html QmitkIGTTracking_IconTrackingToolbox.png "Icon of the module"
 
 Available sections:
   - \ref QmitkMITKIGTTrackingToolboxIntroduction
@@ -18,7 +18,7 @@ Available sections:
 
 The MITK-IGT Tracking Toolbox is a view which allows you to connect to a tracking device, track and visualize navigation tools and write the tracked data into a log file. Currently the devices Polaris, Aurora (both Northern Digital Inc. (NDI); Waterloo, Ontario, Canada) and MicronTracker (Claron Technology, Inc.; Toronto, Ontario, Canada) are supported. The MicroBird family (Ascension Technology Corporation, Inc.; Burlington, USA) will hopefully follow soon since it is already supported by the tracking layer of IGT. The logging feature of the Tracking Toolbox supports logging in XML or CSV format.
 
-\image html screenshot_mitk.png "MITK Screenshot with the TrackingToolbox activated"
+\image html QmitkIGTTracking_ScreenshotMitk.png "MITK Screenshot with the TrackingToolbox activated"
 
 \section QmitkMITKIGTTrackingToolboxWorkflow General workflow Introduction
 
@@ -35,7 +35,7 @@ A general Workflow with the Tracking Toolbox may be:
 
 The tracking device can be specified in the tracking device configuration section located in the upper area of the tracking tab. As shown in the screenshot below, you choose your tracking device in the drop down menu. If you use a tracking system connected to a serial port, like Aurora or Polaris, you then need to specifiy the serial port. In case of the MicronTracker you only need to ensure that all drivers are installed correctly and integrated into MITK. If you want to check the connection, press "test connection". The results are displayed in the small black box on the right.
 
-\image html configurationWidget.png "Tracking Device Configuration"
+\image html QmitkIGTTracking_ConfigurationWidget.png "Tracking Device Configuration"
 
 \section QmitkMITKIGTTrackingToolboxLoadingTools Loading tools
 
@@ -43,7 +43,7 @@ To load tools which can be tracked you need a predefined tracking tool storage. 
 
 Navigation tool storages can be loaded by pressing the button "Load Tools". Please ensure that the tracking device type of the tools matches the chosen tracking device, otherwise you will get an error message if you try to start tracking. All loaded tools will then be displayed in grey as shown in the screenshot below. If you start tracking they will become green if the tools were found and red if they were not found inside the tracking volume.
 
-\image html trackingToolsWidget.png "Tracking Tools"
+\image html QmitkIGTTracking_TrackingToolsWidget.png "Tracking Tools"
 
 \section QmitkMITKIGTTrackingToolboxAutoDetection Auto detection of tools (only Aurora)
 

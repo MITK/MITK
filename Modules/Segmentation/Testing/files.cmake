@@ -4,7 +4,7 @@ set(MODULE_TESTS
   mitkDataNodeSegmentationTest.cpp
 #  mitkSegmentationInterpolationTest.cpp
   mitkOverwriteSliceFilterTest.cpp
-#  mitkOverwriteSliceFilterObliquePlaneTest.cpp
+  mitkOverwriteSliceFilterObliquePlaneTest.cpp
   #mitkContourModelTest.cpp
   #mitkContourModelIOTest.cpp
 #  mitkToolManagerTest.cpp

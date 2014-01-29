@@ -27,7 +27,11 @@ namespace mitk
 {
 /**
  * \class EventFactory
- * \brief Generates InteractionEvent-Objects which are described by a PropertyList.
+ * \brief Generates InteractionEvent-Objects/XML.
+ *
+ * 1) InteractionEvents can be constructed by a PropertyList describing the event (see mitk::EventConfig for examples)
+ * 2) An XML description of InteractionEvents can be retrieved.
+ *
  * This class is used by the EventConfig object to parse configuration files and create Events based on the xml description.
  *
  * \ingroup Interaction
@@ -35,6 +39,8 @@ namespace mitk
   class MITK_CORE_EXPORT EventFactory
   {
   public:
+
+
     /**
      * Parses PropertyList and queries all possible Information.
      * If an attribute is not present the default value is used.
@@ -49,7 +55,7 @@ namespace mitk
      */
     static std::string EventToXML(InteractionEvent* event);
 
-
+  private:
     /**
      * @brief GetEventButton Return EventButton as String
      * @param event

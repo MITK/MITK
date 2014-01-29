@@ -29,6 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 
 #include <usModuleInitialization.h>
+#include <mitkXML2EventParser.h>
+#include <vtkSmartPointer.h>
+#include "QmitkRenderWindow.h"
+
 
 US_INITIALIZE_MODULE("InteractionEventRecorder","liborg_mitk_gui_qt_eventrecorder")
 
@@ -47,11 +51,25 @@ void InteractionEventRecorder::StartRecording()
   m_CurrentObserver->StartRecording();
 }
 
+void InteractionEventRecorder::Play()
+{
+  std::ifstream xmlStream(m_Controls.textFileName->text().toStdString().c_str());
+  mitk::XML2EventParser parser(xmlStream);
+  std::vector<mitk::InteractionEvent*> events = parser.GetInteractions();
+
+  MITK_INFO << "parsed events";
+  for (int i=0; i < events.size(); ++i)
+    this->GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderer()->GetDispatcher()->ProcessEvent(events.at(i));
+  MITK_INFO << "DONE";
+
+}
+
 void InteractionEventRecorder::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
   connect( m_Controls.btnStartRecording, SIGNAL(clicked()), this, SLOT(StartRecording()) );
+  connect( m_Controls.btnPlay, SIGNAL(clicked()), this, SLOT(Play()) );
 
   m_CurrentObserver = new mitk::EventRecorder();
   // Register as listener via micro services
@@ -59,6 +77,7 @@ void InteractionEventRecorder::CreateQtPartControl( QWidget *parent )
 
   props["name"] = std::string("EventRecorder");
   m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(m_CurrentObserver,props);
+
 
 
   /*

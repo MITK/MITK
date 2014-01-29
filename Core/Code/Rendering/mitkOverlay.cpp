@@ -194,7 +194,7 @@ void mitk::Overlay::SetFontSize(int fontSize)
 
 int mitk::Overlay::GetFontSize() const
 {
-  int fontSize;
+  int fontSize = 1;
   GetPropertyList()->GetIntProperty("Overlay.FontSize", fontSize);
   return fontSize;
 }
@@ -291,3 +291,15 @@ bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer 
 
   return false;
 }
+
+mitk::Overlay::Bounds mitk::Overlay::GetBoundsOnDisplay(mitk::BaseRenderer*) const
+{
+  mitk::Overlay::Bounds bounds;
+  bounds.Position[0] = bounds.Position[1] = bounds.Size[0] = bounds.Size[1] = 0;
+  return bounds;
+}
+
+void mitk::Overlay::SetBoundsOnDisplay(mitk::BaseRenderer*, const mitk::Overlay::Bounds&)
+{
+}
+

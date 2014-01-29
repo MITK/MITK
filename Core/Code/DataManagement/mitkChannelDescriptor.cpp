@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMemoryUtilities.h"
 
 mitk::ChannelDescriptor::ChannelDescriptor( mitk::PixelType type, size_t numOfElements, bool /*allocate*/)
-  : m_PixelType(new PixelType(type)), m_Size(numOfElements), m_Data(NULL)
+  : m_PixelType(type), m_Size(numOfElements), m_Data(NULL)
 {
   //MITK_INFO << "Entering ChannelDescriptor constructor.";
 }

@@ -73,6 +73,7 @@ public:
   /** \brief Coordinates of the labels */
   void SetLabelCoordinates(itk::SmartPointer<PointSet> LabelCoordinates);
 
+  void PointSetModified(const itk::Object *, const itk::EventObject &);
 protected:
 
   /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
@@ -97,6 +98,8 @@ private:
 
   /** \brief The coordinates of the labels. Indices must match the labelVector and the priorityVector.*/
   itk::SmartPointer<PointSet> m_LabelCoordinates;
+
+  unsigned long m_PointSetModifiedObserverTag;
 
   /** \brief copy constructor */
   LabelOverlay3D( const LabelOverlay3D &);

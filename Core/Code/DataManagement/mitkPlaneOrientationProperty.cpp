@@ -95,6 +95,7 @@ bool PlaneOrientationProperty::AddEnum( const std::string& name, const IdType& i
 itk::LightObject::Pointer PlaneOrientationProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }
 

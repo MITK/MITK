@@ -51,7 +51,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
 
   //MarchingCube -->create Surface
-  vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
+  vtkSmartPointer<vtkMarchingCubes> skinExtractor = vtkSmartPointer<vtkMarchingCubes>::New();
   skinExtractor->ComputeScalarsOff();
   skinExtractor->SetInputConnection(indexCoordinatesImageFilter->GetOutputPort());//RC++
   indexCoordinatesImageFilter->Delete();
@@ -61,7 +61,6 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   skinExtractor->Update();
   polydata = skinExtractor->GetOutput();
   polydata->Register(NULL);//RC++
-  skinExtractor->Delete();
 
   if (m_Smooth)
   {

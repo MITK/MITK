@@ -69,6 +69,7 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
     GetOpacity(opacity,renderer);
     ls->m_follower->GetProperty()->SetColor(color[0], color[1], color[2]);
     ls->m_follower->GetProperty()->SetOpacity(opacity);
+    ls->m_follower->SetScale(this->GetFontSize());
     ls->UpdateGenerateDataTime();
   }
 }

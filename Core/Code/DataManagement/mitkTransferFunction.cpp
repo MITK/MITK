@@ -26,7 +26,7 @@ namespace mitk
 {
 
 
-TransferFunction::TransferFunction()
+TransferFunction::TransferFunction() : m_Min(0), m_Max(0)
 {
   m_ScalarOpacityFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
   m_ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
@@ -326,6 +326,7 @@ void TransferFunction::PrintSelf(std::ostream &os, itk::Indent indent) const
 itk::LightObject::Pointer mitk::TransferFunction::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }
 

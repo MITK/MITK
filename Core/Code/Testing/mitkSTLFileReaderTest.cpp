@@ -20,58 +20,65 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSlicedGeometry3D.h"
 #include "mitkSurface.h"
 #include "mitkTestingMacros.h"
+#include "mitkTestFixture.h"
 #include <vtkSTLReader.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
 #include <fstream>
-int mitkSTLFileReaderTest(int argc, char* argv[])
-{
-  // always start with this!
-  MITK_TEST_BEGIN("STLFileReader")
 
+class mitkSTLFileReaderTestSuite : public mitk::TestFixture
+{
+  CPPUNIT_TEST_SUITE(mitkSTLFileReaderTestSuite);
+  MITK_TEST(testReadFile);
+  CPPUNIT_TEST_SUITE_END();
+
+private:
+
+  /** Members used inside the different test methods. All members are initialized via setUp().*/
+  std::string m_SurfacePath;
+
+public:
+
+  /**
+   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+   */
+  void setUp()
+  {
+    m_SurfacePath = GetTestDataFilePath("ball.stl");
+  }
+
+  void tearDown()
+  {
+  }
+
+void testReadFile()
+  {
   //Read STL-Image from file
   mitk::STLFileReader::Pointer reader = mitk::STLFileReader::New();
-
-  if(argc==0)
-  {
-    std::cout<<"file not found - test not applied [PASSED]"<<std::endl;
-    std::cout<<"[TEST DONE]"<<std::endl;
-    return EXIT_SUCCESS;
-  }
-
-  std::cout << "Testing CanReadFile(): ";
-  if (!reader->CanReadFile(argv[1], "", ""))
-  {
-    //std::cout<<"[FAILED]"<<std::endl;
-    //return EXIT_FAILURE;
-    MITK_TEST_OUTPUT(<< mitkTestName << ": "<< mitk::TestManager::GetInstance()->NumberOfPassedTests() << " tests [DONE PASSED] File is not STL!")
-    return EXIT_SUCCESS;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  reader->SetFileName(argv[1]);
+  if (!reader->CanReadFile(m_SurfacePath, "", "")) {CPPUNIT_FAIL("Cannot read test data STL file.");}
+  reader->SetFileName(m_SurfacePath);
   reader->Update();
-
-  MITK_TEST_CONDITION_REQUIRED((reader->GetOutput() != NULL),"Reader output not NULL")
-
   mitk::Surface::Pointer surface = reader->GetOutput();
-  MITK_TEST_CONDITION_REQUIRED(surface->IsInitialized(),"IsInitialized()")
 
-  MITK_TEST_CONDITION_REQUIRED((surface->GetVtkPolyData()!=NULL),"mitk::Surface::SetVtkPolyData()")
+  //check some basic stuff
+  CPPUNIT_ASSERT_MESSAGE("Reader output not NULL",surface.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("IsInitialized()",surface->IsInitialized());
+  CPPUNIT_ASSERT_MESSAGE("mitk::Surface::SetVtkPolyData()",(surface->GetVtkPolyData()!=NULL));
+  CPPUNIT_ASSERT_MESSAGE("Availability of geometry",(surface->GetGeometry()!=NULL));
 
-  MITK_TEST_CONDITION_REQUIRED((surface->GetGeometry()!=NULL),"Availability of geometry")
-
+  //use vtk stl reader for reference
   vtkSmartPointer<vtkSTLReader> myVtkSTLReader = vtkSmartPointer<vtkSTLReader>::New();
-  myVtkSTLReader->SetFileName( argv[1] );
+  myVtkSTLReader->SetFileName( m_SurfacePath.c_str() );
   myVtkSTLReader->Update();
   vtkSmartPointer<vtkPolyData> myVtkPolyData = myVtkSTLReader->GetOutput();
-  // vtkPolyData from vtkSTLReader directly
+  //vtkPolyData from vtkSTLReader directly
   int n = myVtkPolyData->GetNumberOfPoints();
-  // vtkPolyData from mitkSTLFileReader
+  //vtkPolyData from mitkSTLFileReader
   int m = surface->GetVtkPolyData()->GetNumberOfPoints();
-  MITK_TEST_CONDITION_REQUIRED((n == m),"Number of Points in VtkPolyData")
+  CPPUNIT_ASSERT_MESSAGE("Number of Points in VtkPolyData",(n == m));
 
-  // always end with this!
-  MITK_TEST_END()
-}
+  }
+
+};
+MITK_TEST_SUITE_REGISTRATION(mitkSTLFileReader)

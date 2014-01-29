@@ -59,12 +59,19 @@ Module* ModuleContext::GetModule() const
 
 Module* ModuleContext::GetModule(long id) const
 {
-  return ModuleRegistry::GetModule(id);
+  return d->module->coreCtx->moduleHooks.FilterModule(this, ModuleRegistry::GetModule(id));
 }
 
-void ModuleContext::GetModules(std::vector<Module*>& modules) const
+Module*ModuleContext::GetModule(const std::string& name)
 {
-  ModuleRegistry::GetModules(modules);
+  return ModuleRegistry::GetModule(name);
+}
+
+std::vector<Module*> ModuleContext::GetModules() const
+{
+  std::vector<Module*> modules = ModuleRegistry::GetModules();
+  d->module->coreCtx->moduleHooks.FilterModules(this, modules);
+  return modules;
 }
 
 ServiceRegistrationU ModuleContext::RegisterService(const InterfaceMap& service,
@@ -157,5 +164,12 @@ void ModuleContext::RemoveModuleListener(const ModuleListener& delegate, void* d
 {
   d->module->coreCtx->listeners.RemoveModuleListener(this, delegate, data);
 }
+
+std::string ModuleContext::GetDataFile(const std::string &filename) const
+{
+  if (d->module->storagePath.empty()) return std::string();
+  return d->module->storagePath + filename;
+}
+
 
 US_END_NAMESPACE

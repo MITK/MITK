@@ -193,6 +193,7 @@ set(CPP_FILES
   DataManagement/mitkProperties.cpp
   DataManagement/mitkPropertyList.cpp
   DataManagement/mitkRestorePlanePositionOperation.cpp
+  DataManagement/mitkApplyTransformMatrixOperation.cpp
   DataManagement/mitkRotationOperation.cpp
   DataManagement/mitkSlicedData.cpp
   DataManagement/mitkSlicedGeometry3D.cpp
@@ -383,6 +384,7 @@ set(CPP_FILES
   Rendering/mitkTextOverlay3D.cpp
   Rendering/mitkLabelOverlay3D.cpp
   Rendering/mitkOverlay2DLayouter.cpp
+  Rendering/mitkScaleLegendOverlay
 
   Common/mitkException.cpp
   Common/mitkCommon.h

@@ -375,10 +375,10 @@ public:
   virtual void Update(BaseRenderer *renderer) = 0;
 
   /** \brief Returns position and size of the overlay on the display.*/
-  virtual Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const = 0;
+  virtual Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const;
 
   /** \brief Sets position and size of the overlay on the display.*/
-  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds&) = 0;
+  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds&);
 
   mitkClassMacro(Overlay, itk::Object);
 
@@ -407,8 +407,6 @@ protected:
   * @brief Timestamp of the last change of m_Data
   */
   itk::TimeStamp m_DataReferenceChangedTime;
-
-  unsigned long m_PropertyListModifiedObserverTag;
 
 private:
 

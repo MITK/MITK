@@ -74,5 +74,6 @@ bool mitk::PointSetShapeProperty::AddEnum( const std::string& name, const IdType
 itk::LightObject::Pointer mitk::PointSetShapeProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

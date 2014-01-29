@@ -41,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateDataType.h"
 #include "mitkStatusBar.h"
 
+#include "mitkApplyTransformMatrixOperation.h"
+
 #include "mitkMemoryUtilities.h"
 
 
@@ -655,6 +657,14 @@ SliceNavigationController::ExecuteOperation( Operation *operation )
       break;
     }
     case OpRESTOREPLANEPOSITION:
+      {
+        m_CreatedWorldGeometry->ExecuteOperation( operation );
+
+        this->SendCreatedWorldGeometryUpdate();
+
+        break;
+      }
+    case OpAPPLYTRANSFORMMATRIX:
       {
         m_CreatedWorldGeometry->ExecuteOperation( operation );
 

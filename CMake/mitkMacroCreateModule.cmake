@@ -247,15 +247,17 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           set(_STATIC )
         endif(MODULE_FORCE_STATIC)
 
-        if(NOT MODULE_NO_INIT AND NOT MODULE_HEADERS_ONLY)
+        if(NOT MODULE_HEADERS_ONLY)
           set(MODULE_LIBNAME ${MODULE_PROVIDES})
 
-          usFunctionGenerateModuleInit(CPP_FILES
-                                       NAME ${MODULE_NAME}
-                                       LIBRARY_NAME ${MODULE_LIBNAME}
-                                       DEPENDS ${MODULE_DEPENDS} ${MODULE_DEPENDS_INTERNAL} ${MODULE_PACKAGE_DEPENDS}
-                                       #VERSION ${MODULE_VERSION}
-                                      )
+          if(NOT MODULE_NO_INIT)
+            usFunctionGenerateModuleInit(CPP_FILES
+                                         NAME ${MODULE_NAME}
+                                         LIBRARY_NAME ${MODULE_LIBNAME}
+                                         DEPENDS ${MODULE_DEPENDS} ${MODULE_DEPENDS_INTERNAL} ${MODULE_PACKAGE_DEPENDS}
+                                         #VERSION ${MODULE_VERSION}
+                                        )
+          endif()
 
           if(RESOURCE_FILES)
             set(res_dir Resources)

@@ -117,5 +117,6 @@ void mitk::OrganTypeProperty::AddEnumerationTypes()
 itk::LightObject::Pointer mitk::OrganTypeProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

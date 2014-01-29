@@ -24,7 +24,7 @@
 
 // TODO: Replace includes with forward directives!
 
-#include "usUtils_p.h"
+#include "usListenerFunctors_p.h"
 #include "usServiceInterface.h"
 #include "usServiceEvent.h"
 #include "usServiceRegistration.h"
@@ -115,6 +115,13 @@ public:
    */
   Module* GetModule(long id) const;
 
+  /**
+   * Get the module that with the specified module name.
+   *
+   * @param name The name of the module to get.
+   * @return The requested \c Module or \c NULL.
+   */
+  Module* GetModule(const std::string& name);
 
   /**
    * Returns a list of all known modules.
@@ -123,10 +130,10 @@ public:
    * environment at the time of the call to this method. This list will
    * also contain modules which might already have been unloaded.
    *
-   * @param modules A std::vector of <code>Module</code> objects which
-   *                will hold one object per known module.
+   * @return A std::vector of <code>Module</code> objects which
+   *         will hold one object per known module.
    */
-  void GetModules(std::vector<Module*>& modules) const;
+  std::vector<Module*> GetModules() const;
 
   /**
    * Registers the specified service object with the specified properties
@@ -803,6 +810,19 @@ public:
     RemoveModuleListener(ModuleListenerMemberFunctor(receiver, callback),
                          static_cast<void*>(receiver));
   }
+
+  /**
+   * Get the absolute path for a file or directory in the persistent
+   * storage area provided for the module. The returned path
+   * might be empty if no storage path has been set previously.
+   * If the path is non-empty, it is safe to assume that the path is writable.
+   *
+   * @see ModuleSettings::SetStoragePath(const std::string&)
+   *
+   * @param filename A relative name to the file or directory to be accessed.
+   * @return The absolute path to the persistent storage area for the given file name.
+   */
+  std::string GetDataFile(const std::string& filename) const;
 
 
 private:

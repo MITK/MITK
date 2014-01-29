@@ -82,5 +82,6 @@ std::string mitk::LevelWindowProperty::GetValueAsString() const
 itk::LightObject::Pointer mitk::LevelWindowProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));
+  result->UnRegister();
   return result;
 }

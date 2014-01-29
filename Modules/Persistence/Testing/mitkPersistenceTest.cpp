@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkIPersistenceService.h>
 #include <mitkSceneIO.h>
-#include "Poco\File.h"
+#include <Poco/File.h>
 
 struct PersistenceTestClass
 {

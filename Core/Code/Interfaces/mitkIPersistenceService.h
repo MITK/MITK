@@ -205,7 +205,7 @@ private:\
             if( m_##THE_CLASS_NAME && m_##THE_CLASS_NAME->GetId() == id )\
                 m_##THE_CLASS_NAME->FromPropertyList();\
         }\
-        void Initialize( THE_CLASS_NAME##* _##THE_CLASS_NAME, mitk::IPersistenceService* persistenceService )\
+        void Initialize( THE_CLASS_NAME * _##THE_CLASS_NAME, mitk::IPersistenceService* persistenceService )\
         {\
             m_##THE_CLASS_NAME = _##THE_CLASS_NAME;\
             m_PersistenceService = persistenceService;\
@@ -213,7 +213,7 @@ private:\
                 m_PersistenceService->AddPropertyListReplacedObserver(this);\
         }\
     private:\
-        THE_CLASS_NAME##* m_##THE_CLASS_NAME;\
+        THE_CLASS_NAME * m_##THE_CLASS_NAME;\
         mitk::IPersistenceService* m_PersistenceService;\
     };\
     MyPropertyListReplacedObserver m_MyPropertyListReplacedObserver;\

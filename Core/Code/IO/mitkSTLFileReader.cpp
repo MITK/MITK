@@ -36,7 +36,7 @@ void mitk::STLFileReader::GenerateData()
 
   if( m_FileName != "")
   {
-    MITK_INFO << "Loading " << m_FileName << " as stl..." << std::endl;
+    MITK_INFO("mitkSTLFileReader") << "Loading " << m_FileName << " as stl..." << std::endl;
     vtkSmartPointer<vtkSTLReader> stlReader = vtkSmartPointer<vtkSTLReader>::New();
     stlReader->SetFileName( m_FileName.c_str() );
 

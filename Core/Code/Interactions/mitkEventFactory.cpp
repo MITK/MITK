@@ -245,7 +245,7 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
     {
       // EventButton
       eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyEventButton() + "\" ";
-      eventXML += InteractionEventConst::xmlParameterValue() + "\"";
+      eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
       eventXML += GetEventButton(event);
       eventXML += "\"/>\n";
     }
@@ -253,7 +253,7 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
     if (GetButtonState(event) != "")
     {
       eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyButtonState() + "\" ";
-      eventXML += InteractionEventConst::xmlParameterValue() + "\"";
+      eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
       eventXML += GetButtonState(event);
       eventXML += "\"/>\n";
     }
@@ -262,20 +262,20 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
     if (GetModifierState(event) != "")
     {
       eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyModifier() + "\" ";
-      eventXML += InteractionEventConst::xmlParameterValue() + "\"";
+      eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
       eventXML += GetModifierState(event);
       eventXML += "\"/>\n";
     }
 
     // Position on Screen
     eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyPositionOnScreen() + "\" ";
-    eventXML += InteractionEventConst::xmlParameterValue() + "\"";
+    eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
     eventXML += GetPositionOnScreen(event);
     eventXML += "\"/>\n";
 
     // Position in World
     eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyPositionInWorld() + "\" ";
-    eventXML += InteractionEventConst::xmlParameterValue() + "\"";
+    eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
     eventXML += GetPositionInWorld(event);
     eventXML += "\"/>\n";
   }
@@ -297,7 +297,7 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
     ss << delta;
 
     eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyWheelDelta() + "\" ";
-    eventXML += InteractionEventConst::xmlParameterValue() + "\"";
+    eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
     eventXML += ss.str();
     eventXML += "\"/>\n";
   }

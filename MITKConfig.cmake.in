@@ -74,6 +74,7 @@ foreach(_module @MITK_MODULE_NAMES@)
 endforeach()
 
 # External projects
+set(CTK_DIR "@CTK_DIR@")
 set(ANN_DIR "@ANN_DIR@")
 set(CppUnit_DIR "@CppUnit_DIR@")
 set(GLEW_DIR "@GLEW_DIR@")

@@ -522,7 +522,6 @@ void QmitkToFUtilView::OnTextureCheckBoxChecked(bool checked)
   {
     if (checked)
     {
-      //this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
       mitk::TransferFunction::Pointer transferFunction = mitk::TransferFunction::New();
       transferFunction->SetColorTransferFunction(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
 

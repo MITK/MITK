@@ -40,6 +40,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <fstream>
 #include <itkImageDuplicator.h>
+#include <itksys/SystemTools.hxx>
+#include <mitkIOUtil.h>
 #include <boost/lexical_cast.hpp>
 
 namespace itk
@@ -421,8 +423,22 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     double maxVolume = 0;
     double voxelVolume = m_UpsampledSpacing[0]*m_UpsampledSpacing[1]*m_UpsampledSpacing[2];
 
+    ofstream logFile;
     if (m_Parameters.m_DoAddMotion)
     {
+        std::string fileName = "fiberfox_motion_0.log";
+        int c = 1;
+        while (itksys::SystemTools::FileExists(mitk::IOUtil::GetTempPath().append(fileName).c_str()))
+        {
+            fileName = "fiberfox_motion_";
+            fileName += boost::lexical_cast<std::string>(c);
+            fileName += ".log";
+            c++;
+        }
+
+        logFile.open(mitk::IOUtil::GetTempPath().append(fileName).c_str());
+        logFile << "0 rotation: 0,0,0; translation: 0,0,0\n";
+
         if (m_Parameters.m_DoRandomizeMotion)
         {
             m_StatusText += "Adding random motion artifacts:\n";
@@ -435,6 +451,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             m_StatusText += "Maximum rotation: " + boost::lexical_cast<std::string>(m_Parameters.m_Rotation) + "°\n";
             m_StatusText += "Maximum translation: " + boost::lexical_cast<std::string>(m_Parameters.m_Translation) + "mm\n";
         }
+        m_StatusText += "Motion logfile: " + mitk::IOUtil::GetTempPath().append(fileName) + "\n";
         MITK_INFO << "Adding motion artifacts";
         MITK_INFO << "Maximum rotation: " << m_Parameters.m_Rotation;
         MITK_INFO << "Maxmimum translation: " << m_Parameters.m_Translation;
@@ -446,9 +463,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     int numFibers = m_FiberBundle->GetNumFibers();
     boost::progress_display disp(numFibers*m_Parameters.GetNumVolumes());
 
-    ofstream logFile;
-    logFile.open("fiberfox_motion.log");
-    logFile << "0 rotation: 0,0,0; translation: 0,0,0\n";
 
     // get transform for motion artifacts
     FiberBundleType fiberBundleTransformed = fiberBundle;
@@ -682,12 +696,16 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             }
 
             // rotate fibers
-            logFile << g+1 << " rotation:" << rotation[0] << "," << rotation[1] << "," << rotation[2] << ";";
-            logFile << " translation:" << translation[0] << "," << translation[1] << "," << translation[2] << "\n";
+            if (logFile.is_open())
+            {
+                logFile << g+1 << " rotation: " << rotation[0] << "," << rotation[1] << "," << rotation[2] << ";";
+                logFile << " translation: " << translation[0] << "," << translation[1] << "," << translation[2] << "\n";
+            }
             fiberBundleTransformed->TransformFibers(rotation[0],rotation[1],rotation[2],translation[0],translation[1],translation[2]);
         }
     }
-    logFile.close();
+    if (logFile.is_open())
+        logFile.close();
     m_StatusText += "\n\n";
     if (this->GetAbortGenerateData())
     {

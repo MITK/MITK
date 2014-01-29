@@ -15,8 +15,12 @@ IF(BUILD_TESTING AND MODULE_IS_ENABLED)
   "${MITK_DATA_DIR}/OpenCV-Data/BaseImage.png"
   "${MITK_DATA_DIR}/OpenCV-Data/GrayscaleImage.png"
   )
-
   mitkAddCustomModuleTest("mitkBasicCombinationOpenCVImageFilterTest" "mitkBasicCombinationOpenCVImageFilterTest"
   "${MITK_DATA_DIR}/OpenCV-Data/BaseImage.png"
+  )
+  mitkAddCustomModuleTest("mitkGrabCutOpenCVImageFilterTest" "mitkGrabCutOpenCVImageFilterTest"
+  "${MITK_DATA_DIR}/OpenCV-Data/GrabCutInput.png"
+  "${MITK_DATA_DIR}/OpenCV-Data/GrabCutMask.png"
+  "${MITK_DATA_DIR}/OpenCV-Data/GrabCutOutput.png"
   )
 ENDIF(BUILD_TESTING AND MODULE_IS_ENABLED)

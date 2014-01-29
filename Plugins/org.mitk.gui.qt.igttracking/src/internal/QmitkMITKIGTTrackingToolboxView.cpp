@@ -260,7 +260,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
     }
   catch (...) //todo: change to mitk::IGTException
     {
-    MessageBox("Error while starting the tracking device!");
+    MessageBox("Error on connecting the tracking device.");
     return;
     }
 

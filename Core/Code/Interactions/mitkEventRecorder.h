@@ -19,35 +19,56 @@
 
 #include <MitkExports.h>
 #include "mitkInteractionEventObserver.h"
+#include "iostream"
 
 namespace mitk
 {
-  /**
+/**
    *\class EventRecorder
    *@brief Observer that enables recoding of all user interaction with the render windows and storing it in an XML file.
    *
    * @ingroup Interaction
    **/
-  class MITK_CORE_EXPORT EventRecorder: public InteractionEventObserver
-  {
-  public:
-    EventRecorder(){}
-    ~EventRecorder(){}
+class MITK_CORE_EXPORT EventRecorder: public InteractionEventObserver
+{
+public:
+  EventRecorder();
+  ~EventRecorder();
 
-    /**
+  /**
      * By this function the Observer gets notified about new events.
      */
-    virtual void Notify(InteractionEvent* interactionEvent, bool);
+  virtual void Notify(InteractionEvent* interactionEvent, bool);
 
-    /**
+  /**
      * @brief SetEventIgnoreList Optional. Provide a list of strings that describe which events are to be ignored
      */
-    void SetEventIgnoreList(std::vector<std::string> list);
+  void SetEventIgnoreList(std::vector<std::string> list);
 
-  private:
+  void StartRecording();
+  void StopRecording();
 
-    std::vector<std::string> m_IgnoreList;
+  void SetOutputFile(std::string filename)
+  {
+    m_FileName = filename;
+  }
 
-  };
+private:
+
+  /**
+   * @brief m_IgnoreList lists the names of events that are dropped
+   */
+  std::vector<std::string> m_IgnoreList;
+
+  /**
+   * @brief m_Active determindes if events are caught and written to file
+   */
+  bool m_Active;
+  std::string m_FileName;
+
+  std::ofstream m_FileStream;
+
+
+};
 }
 #endif

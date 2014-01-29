@@ -48,7 +48,7 @@ public:
   {
     //load network
 
-    m_NetworkPath = GetTestDataFilePath("/DiffusionImaging/Connectomics/reference.cnf");
+    m_NetworkPath = GetTestDataFilePath("DiffusionImaging/Connectomics/reference.cnf");
     const std::string s1="", s2="";
 
     std::vector<mitk::BaseData::Pointer> networkFile =

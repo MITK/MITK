@@ -45,9 +45,9 @@ public:
   */
   void setUp()
   {
-    m_ReferenceNetworkPath = GetTestDataFilePath("/DiffusionImaging/Connectomics/reference.cnf");
-    m_ParcellationPath = GetTestDataFilePath("/DiffusionImaging/Connectomics/parcellation.nrrd");
-    m_FiberPath = GetTestDataFilePath("/DiffusionImaging/Connectomics/fiberBundle.fib");
+    m_ReferenceNetworkPath = GetTestDataFilePath("DiffusionImaging/Connectomics/reference.cnf");
+    m_ParcellationPath = GetTestDataFilePath("DiffusionImaging/Connectomics/parcellation.nrrd");
+    m_FiberPath = GetTestDataFilePath("DiffusionImaging/Connectomics/fiberBundle.fib");
   }
 
   void tearDown()

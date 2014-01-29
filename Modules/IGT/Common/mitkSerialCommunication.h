@@ -74,7 +74,7 @@ namespace mitk
       BaudRate19200   = 19200,
       BaudRate38400   = 38400,
       BaudRate57600   = 57600,
-      BaudRate115200  = 115200, // Highest supported rate for NDI Polaris
+      BaudRate115200  = 115200, // Highest supported rate for NDI Aurora
       BaudRate230400  = 230400,
       BaudRate460800  = 460800,
       BaudRate500000  = 500000,
@@ -82,7 +82,7 @@ namespace mitk
       BaudRate921600  = 921600,
       BaudRate1000000 = 1000000,
       BaudRate1152000 = 1152000,
-      BaudRate1228739 = 1228739, // Highest supported rate for NDI Polaris
+      // BaudRate1228739 = 1228739, // Highest supported rate for NDI Polaris According to handbook, unknown value to most compilers though
       BaudRate1500000 = 1500000,
       BaudRate2000000 = 2000000,
       BaudRate2500000 = 2500000,
@@ -298,8 +298,27 @@ namespace mitk
 
     /**
     * \brief configures the serial interface with all parameters
+    *
+    * This automatically reroutes the call to the hardware specific function
     */
     int ApplyConfiguration();
+
+
+    #ifdef WIN32
+    /**
+    * \brief Applies the configuration for Windows
+    */
+    int ApplyConfigurationWin();
+
+    #else
+    /**
+    * \brief Applies the configuration for Linux
+    */
+    int ApplyConfigurationUnix();
+
+
+    #endif
+
 
     std::string m_DeviceName; ///< device name that is used to connect to the serial interface (will be used if != "")
     PortNumber m_PortNumber;  ///< port number of the device

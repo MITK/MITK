@@ -54,7 +54,10 @@ public:
       ) :
     ImageAccessorBase(iP,iDI,OptionFlags)
   {
-    OrganizeReadAccess();
+    if(!(OptionFlags & ImageAccessorBase::IgnoreLock))
+    {
+      OrganizeReadAccess();
+    }
   }
 
   /** \brief Gives const access to the data. */
@@ -66,6 +69,8 @@ public:
   /** Destructor informs Image to unlock memory. */
   virtual ~ImageReadAccessor()
   {
+    if(!(m_Options & ImageAccessorBase::IgnoreLock))
+    {
     // Future work: In case of non-coherent memory, copied area needs to be deleted
 
     m_Image->m_ReadWriteLock.Lock();
@@ -86,6 +91,7 @@ public:
     }
 
     m_Image->m_ReadWriteLock.Unlock();
+    }
   }
 
 protected:

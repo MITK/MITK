@@ -72,7 +72,9 @@ public:
     /** Defines if the Constructor waits for locked memory until it is released or not. If not, an exception is thrown.*/
     ExceptionIfLocked = 1,
     /** Defines if requested Memory has to be coherent. If the parameter is true, it is possible that new Memory has to be allocated to arrange this desired condition. Consequently, this parameter can heavily affect computation time.*/
-    ForceCoherentMemory = 2
+    ForceCoherentMemory = 2,
+    /** Ignores the lock mechanism for immediate access. Only possible with read accessors. */
+    IgnoreLock = 4
   };
 
   virtual ~ImageAccessorBase()

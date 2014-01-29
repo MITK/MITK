@@ -39,3 +39,22 @@ mitk::DiffusionHeaderDICOMFileReader
 
   return m_HeaderInformationList;
 }
+
+bool mitk::RevealBinaryTag(const gdcm::Tag tag, const gdcm::DataSet& dataset, std::string& target)
+{
+  if( dataset.FindDataElement( tag ) )
+  {
+    MITK_DEBUG << "Found tag " << tag.PrintAsPipeSeparatedString();
+
+    const gdcm::DataElement& de = dataset.GetDataElement( tag );
+    target = std::string( de.GetByteValue()->GetPointer(),
+                          de.GetByteValue()->GetLength() );
+    return true;
+
+  }
+  else
+  {
+    MITK_DEBUG << "Could not find tag " << tag.PrintAsPipeSeparatedString();
+    return false;
+  }
+}

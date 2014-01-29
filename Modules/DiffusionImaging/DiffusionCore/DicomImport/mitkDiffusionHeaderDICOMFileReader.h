@@ -107,24 +107,7 @@ protected:
  *
  * @return true if a string was found, false otherwise
  */
-static bool RevealBinaryTag(const gdcm::Tag tag, const gdcm::DataSet& dataset, std::string& target, bool verbose = true)
-{
-  if( dataset.FindDataElement( tag ) )
-  {
-    if(verbose) MITK_INFO << "Found tag " << tag.PrintAsPipeSeparatedString();
-
-    const gdcm::DataElement& de = dataset.GetDataElement( tag );
-    target = std::string( de.GetByteValue()->GetPointer(),
-                          de.GetByteValue()->GetLength() );
-    return true;
-
-  }
-  else
-  {
-    if(verbose) MITK_INFO << "Could not find tag " << tag.PrintAsPipeSeparatedString();
-    return false;
-  }
-}
+bool RevealBinaryTag(const gdcm::Tag tag, const gdcm::DataSet& dataset, std::string& target);
 
 
 } // end namespace mitk

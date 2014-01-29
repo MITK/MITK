@@ -1,3 +1,4 @@
+#include "mitkDiffusionHeaderSiemensDICOMFileHelper.h"
 #include "mitkDiffusionHeaderSiemensMosaicDICOMFileReader.h"
 
 mitk::DiffusionHeaderSiemensMosaicDICOMFileReader::DiffusionHeaderSiemensMosaicDICOMFileReader()
@@ -34,10 +35,9 @@ bool mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
 
     //MITK_INFO << siemens_diffusionheader_str;
 
-    SiemensDiffusionHeaderType hformat = GetHeaderType( siemens_diffusionheader_str );
+    mitk::SiemensDiffusionHeaderType hformat = GetHeaderType( siemens_diffusionheader_str );
     Siemens_Header_Format specs = this->m_SiemensFormatsCollection.at( hformat );
 
-    double n_images = 0;
     std::string::size_type tag_position = siemens_diffusionheader_str.find( "NumberOfImagesInMosaic", 0 );
     if( tag_position != std::string::npos )
     {
@@ -75,5 +75,7 @@ bool mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
     m_HeaderInformationList.push_back( header_values );
 
   }
+
+  return (m_HeaderInformationList.size() > 0);
 
 }

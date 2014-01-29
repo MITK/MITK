@@ -142,6 +142,8 @@ bool mitk::DiffusionDICOMFileReader
   DICOMImageBlockDescriptor& block = this->InternalGetOutput(0);
   block.SetMitkImage( (mitk::Image::Pointer) output_image );
 
+  return block.GetMitkImage().IsNotNull();
+
 }
 
 void mitk::DiffusionDICOMFileReader
@@ -218,7 +220,7 @@ void mitk::DiffusionDICOMFileReader
   }
 
   bool canread = false;
-  for( size_t idx; idx < number_of_outputs; idx++ )
+  for( size_t idx = 0; idx < number_of_outputs; idx++ )
   {
     DICOMImageFrameInfo::Pointer frame = this->GetOutput( idx ).GetImageFrameList().at(0);
     canread = header_reader->ReadDiffusionHeader(frame->Filename);
@@ -240,6 +242,7 @@ void mitk::DiffusionDICOMFileReader
 bool mitk::DiffusionDICOMFileReader
 ::CanHandleFile(const std::string &filename)
 {
-
+  //FIXME :
+  return true;
 }
 

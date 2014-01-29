@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDiffusionHeaderSiemensDICOMFileReader.h"
+#include "mitkDiffusionHeaderSiemensDICOMFileHelper.h"
 
 #include "gdcmScanner.h"
 #include "gdcmReader.h"
@@ -26,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 bool mitk::DiffusionHeaderSiemensDICOMFileReader
 ::ExtractSiemensDiffusionTagInformation( std::string tag_value, mitk::DiffusionImageDICOMHeaderInformation& values)
 {
-  SiemensDiffusionHeaderType hformat = GetHeaderType( tag_value );
+  SiemensDiffusionHeaderType hformat = mitk::GetHeaderType( tag_value );
   Siemens_Header_Format specs = this->m_SiemensFormatsCollection.at( hformat );
 
   MITK_DEBUG << " Header format: " << hformat;
@@ -138,6 +139,8 @@ bool mitk::DiffusionHeaderSiemensDICOMFileReader
 
     m_HeaderInformationList.push_back( values );
   }
+
+  return true;
 
 
 }

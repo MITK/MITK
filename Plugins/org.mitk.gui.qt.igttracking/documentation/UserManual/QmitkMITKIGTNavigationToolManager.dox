@@ -2,7 +2,7 @@
 
 \page org_mitk_views_igtnavigationtoolmanager The MITK-IGT Navigation Tool Manager
 
-\image html iconNavigationToolManager.png "Icon of the Module"
+\image html QmitkIGTTracking_IconNavigationToolManager.png "Icon of the Module"
 
 \section QmitkMITKIGTNavigationToolManager Introduction
 
@@ -34,7 +34,7 @@ Note that not all properties are needed for all types of tools. A tool definitio
 
 In order to create a new storage container, or edit an existing one, you can use the buttons "add", "edit" and "delete" to manage the contained navigation tools. If you click "edit" or "delete" the operation is applied on the currently selected tool, as shown in the screenshot below. If you want to create a new storage container, just start adding tools when you start the program and save the storage container. To edit an existing tool storage container click "load" and add/edit/delete tools.
 
-\image html NavigationToolManagemantStartScreen.png "Screenshot of the main view of NavigationToolManagent"
+\image html QmitkIGTTracking_NavigationToolManagemantStartScreen.png "Screenshot of the main view of NavigationToolManagent"
 
 \section QmitkMITKIGTNavigationToolManagerAddingEditingNavigationTools Adding / Editing Navigation Tools
 
@@ -42,6 +42,6 @@ If you add or edit a navigation tool, an input mask, as shown in the screenshot 
 
 The tool type is additional information which is not needed by the tracking device but might be needed by further IGT applications.
 
-\image html NavigationToolManagementAddTool.png "Screenshot of add/edit navigation tool screen"
+\image html QmitkIGTTracking_NavigationToolManagementAddTool.png "Screenshot of add/edit navigation tool screen"
 
 */

@@ -46,7 +46,7 @@ Select Camera View and as usual the Tracking Source and the tool you want to pla
 
 You may need to adjust the Needle View Direction and the View Up Vector. This is always relative to your tools coordinate center origin. An example of the NDI pointer tool coordinate system is shown below:
 
-\image html tool.png "The coordinate system of the NDI pointing tool"
+\image html QmitkIGTExamples_Tool.png "The coordinate system of the NDI pointing tool"
 
 In the above case, the camera should look in inverse z-direction, and the view up vector should probably be set to positive x. Note this is just an example and may be different depending on your pointer.
 

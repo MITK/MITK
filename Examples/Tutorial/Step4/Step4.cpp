@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
+#include "mitkNodePredicateDataType.h"
 
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
@@ -136,7 +137,12 @@ int main(int argc, char* argv[])
   // Tell the QmitkSliceWidget which (part of) the tree to render.
   // By default, it slices the data axially
   view2.SetDataStorage(ds);
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetAll();
+
+  // Get the image from the data storage. A predicate (mitk::NodePredicateBase)
+  // is used to get only nodes of the type mitk::Image.
+  mitk::DataStorage::SetOfObjects::ConstPointer rs =
+      ds->GetSubset(mitk::TNodePredicateDataType<mitk::Image>::New());
+
   view2.SetData(rs->Begin(),mitk::SliceNavigationController::Axial);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the datastorage!

@@ -53,39 +53,6 @@ public:
 
   virtual std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > Read(std::istream& stream, mitk::DataStorage& ds);
 
-  /**
-   * \brief Returns the service ranking for this file reader.
-   *
-   * Default is zero and should only be chosen differently for a reason.
-   * The priority is used to determine which reader to use if several
-   * equivalent readers have been found.
-   * It may be used to replace a default reader from MITK in your own project.
-   * E.g. if you want to use your own reader for nrrd files instead of the default,
-   * implement it and give it a higher priority than zero.
-   */
-  virtual int GetPriority() const;
-
-  /**
-   * @brief Returns the mime-type this reader can handle.
-   * @return
-   */
-  virtual std::string GetMimeType() const;
-
-  /**
-  * \brief Returns the file extensions that this FileReader is able to handle.
-  *
-  * File extensions must not contain a leading period, e.g "nrrd" is correct
-  * while "*.nrrd" and ".nrrd" are incorrect.
-  */
-  virtual std::vector<std::string> GetExtensions() const;
-
-  /**
-  * \brief Returns a human readable description of this file reader.
-  *
-  * This can be used in FileDialogs for example.
-  */
-  virtual std::string GetDescription() const;
-
   virtual OptionList GetOptions() const;
 
   virtual void SetOptions(const OptionList& options);
@@ -115,27 +82,110 @@ public:
 
   virtual void RemoveProgressCallback(const ProgressCallback& callback);
 
+  /**
+   * Associate this reader with the MIME type returned by the current IMimeTypeProvider
+   * service for the provided extension if the MIME type exists, otherwise registers
+   * a new MIME type when RegisterService() is called.
+   *
+   * If no MIME type for \c extension is already registered, a call to RegisterService()
+   * will register a new MIME type and associate this reader instance with it. The MIME
+   * type id can be set via SetMimeType() or it will be auto-generated using \c extension,
+   * having the form "application/vnd.mitk.<extension>".
+   *
+   * @param extension The file extension (without a leading period) for which a registered
+   *        IMimeType object is looked up and associated with this reader instance.
+   * @param description A human readable description of this reader.
+   */
   us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext* context = us::GetModuleContext());
 
 protected:
+
+  class MITK_CORE_EXPORT MimeType : public std::string
+  {
+  public:
+    MimeType(const std::string& mimeType);
+
+  private:
+    MimeType();
+
+    friend class AbstractFileReader;
+  };
 
   AbstractFileReader();
   ~AbstractFileReader();
 
   AbstractFileReader(const AbstractFileReader& other);
 
-  AbstractFileReader(const std::string& mimeType, const std::string& extension, const std::string& description);
+  /**
+   * Associate this reader instance with the given MIME type.
+   *
+   * @param mimeType The mime type this reader can read.
+   * @param description A human readable description of this reader.
+   *
+   * @throws std::invalid_argument if \c mimeType is empty.
+   *
+   * @see RegisterService
+   */
+  explicit AbstractFileReader(const MimeType& mimeType, const std::string& description);
+
+  /**
+   * Associate this reader with the given file extension.
+   *
+   * Additonal file extensions can be added by sub-classes by calling AddExtension
+   * or SetExtensions.
+   *
+   * @param extension The file extension (without a leading period) for which a registered
+   *        IMimeType object is looked up and associated with this reader instance.
+   * @param description A human readable description of this reader.
+   *
+   * @see RegisterService
+   */
+  explicit AbstractFileReader(const std::string& extension, const std::string& description);
 
   virtual us::ServiceProperties GetServiceProperties() const;
-  virtual us::ServiceProperties GetMimeTypeServiceProperties() const;
 
+  /**
+   * @brief Returns the mime-type this reader can handle.
+   * @return
+   */
+  std::string GetMimeType() const;
+
+  /**
+   * Registers a new IMimeType service object.
+   *
+   * This method is called from RegisterService and the default implementation
+   * registers a new IMimeType service object if all of the following conditions
+   * are true:
+   *
+   *  - The reader
+   *
+   * @param context
+   * @return
+   * @throws std::invalid_argument if \c context is NULL.
+   */
   virtual us::ServiceRegistration<IMimeType> RegisterMimeType(us::ModuleContext* context);
 
   void SetMimeType(const std::string& mimeType);
   void SetCategory(const std::string& category);
-  void SetExtensions(const std::vector<std::string>& extensions);
+  void AddExtension(const std::string& extension);
   void SetDescription(const std::string& description);
-  void SetPriority(int priority);
+
+  /**
+   * \brief Set the service ranking for this file reader.
+   *
+   * Default is zero and should only be chosen differently for a reason.
+   * The ranking is used to determine which reader to use if several
+   * equivalent readers have been found.
+   * It may be used to replace a default reader from MITK in your own project.
+   * E.g. if you want to use your own reader for nrrd files instead of the default,
+   * implement it and give it a higher ranking than zero.
+   */
+  void SetRanking(int ranking);
+  int GetRanking() const;
+
+  std::string GetCategory() const;
+  std::vector<std::string> GetExtensions() const;
+  std::string GetDescription() const;
 
 private:
 

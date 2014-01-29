@@ -17,12 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileReader.h>
 
 #include <mitkIOUtil.h>
+#include <mitkCoreServices.h>
+#include <mitkIMimeTypeProvider.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usPrototypeServiceFactory.h>
 
 #include <itksys/SystemTools.hxx>
+
+#include <usLDAPProp.h>
 
 #include <fstream>
 
@@ -33,7 +37,7 @@ class AbstractFileReader::Impl
 public:
 
   Impl()
-    : m_Priority(0)
+    : m_Ranking(0)
     , m_PrototypeFactory(NULL)
   {}
 
@@ -42,7 +46,7 @@ public:
     , m_Category(other.m_Category)
     , m_Extensions(other.m_Extensions)
     , m_Description(other.m_Description)
-    , m_Priority(other.m_Priority)
+    , m_Ranking(other.m_Ranking)
     , m_Options(other.m_Options)
     , m_PrototypeFactory(NULL)
   {}
@@ -52,7 +56,7 @@ public:
   std::string m_Category;
   std::vector<std::string> m_Extensions;
   std::string m_Description;
-  int m_Priority;
+  int m_Ranking;
 
   /**
    * \brief Options supported by this reader. Set sensible default values!
@@ -90,13 +94,19 @@ AbstractFileReader::AbstractFileReader(const AbstractFileReader& other)
 {
 }
 
-AbstractFileReader::AbstractFileReader(const std::string& mimeType,const std::string& extension,
-                                             const std::string& description)
+AbstractFileReader::AbstractFileReader(const MimeType& mimeType, const std::string& description)
   : d(new Impl)
 {
   d->m_MimeType = mimeType;
-  d->m_Extensions.push_back(extension);
   d->m_Description = description;
+}
+
+AbstractFileReader::AbstractFileReader(const std::string& extension, const std::string& description)
+  : d(new Impl)
+{
+  d->m_Description = description;
+
+  d->m_Extensions.push_back(extension);
 }
 
 ////////////////////// Reading /////////////////////////
@@ -154,7 +164,18 @@ us::ServiceRegistration<IFileReader> AbstractFileReader::RegisterService(us::Mod
 {
   if (d->m_PrototypeFactory) return us::ServiceRegistration<IFileReader>();
 
+  if(context == NULL)
+  {
+    context = us::GetModuleContext();
+  }
+
   d->m_MimeTypeReg = this->RegisterMimeType(context);
+
+  if (this->GetMimeType().empty())
+  {
+    MITK_WARN << "Not registering reader " << typeid(this).name() << " due to empty MIME type.";
+    return us::ServiceRegistration<IFileReader>();
+  }
 
   struct PrototypeFactory : public us::PrototypeServiceFactory
   {
@@ -183,19 +204,14 @@ us::ServiceRegistration<IFileReader> AbstractFileReader::RegisterService(us::Mod
 
 us::ServiceProperties AbstractFileReader::GetServiceProperties() const
 {
-  if ( d->m_MimeType.empty() )
-    MITK_WARN << "Registered a Reader with no mime type defined (m_MimeType is empty). Reader will not be found by calls from ReaderManager.)";
-  if ( d->m_Extensions.empty() )
-    MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";
   if ( d->m_Description.empty() )
-    MITK_WARN << "Registered a Reader with no description defined (m_Description is empty). Reader will have no human readable extension information in FileDialogs.)";
+    MITK_WARN << "Registered a Reader with no description defined. Reader will have no human readable extension information.)";
 
   us::ServiceProperties result;
 
-  result[IFileReader::PROP_DESCRIPTION()]    = d->m_Description;
-  result[IFileReader::PROP_MIMETYPE()]       = d->m_MimeType;
-
-  result[us::ServiceConstants::SERVICE_RANKING()]  = d->m_Priority;
+  result[IFileReader::PROP_DESCRIPTION()] = this->GetDescription();
+  result[IFileReader::PROP_MIMETYPE()] = this->GetMimeType();
+  result[us::ServiceConstants::SERVICE_RANKING()]  = this->GetRanking();
 
   for (IFileReader::OptionList::const_iterator it = d->m_Options.begin(); it != d->m_Options.end(); ++it) {
     if (it->second)
@@ -205,24 +221,77 @@ us::ServiceProperties AbstractFileReader::GetServiceProperties() const
   return result;
 }
 
-us::ServiceProperties AbstractFileReader::GetMimeTypeServiceProperties() const
-{
-  us::ServiceProperties result;
-
-  result[IMimeType::PROP_ID()] = d->m_MimeType;
-  result[IMimeType::PROP_CATEGORY()] = d->m_Category;
-  result[IMimeType::PROP_EXTENSIONS()] = d->m_Extensions;
-  result[IMimeType::PROP_DESCRIPTION()] = d->m_Description;
-
-  result[us::ServiceConstants::SERVICE_RANKING()]  = d->m_Priority;
-
-  return result;
-}
-
 us::ServiceRegistration<IMimeType> AbstractFileReader::RegisterMimeType(us::ModuleContext* context)
 {
-  us::ServiceProperties mimeTypeProps = this->GetMimeTypeServiceProperties();
-  return context->RegisterService<IMimeType>(&d->m_SimpleMimeType, mimeTypeProps);
+  if (context == NULL) throw std::invalid_argument("The context argument must not be NULL.");
+
+  const std::string mimeType = this->GetMimeType();
+  std::vector<std::string> extensions = this->GetExtensions();
+  const std::string primaryExtension = extensions.empty() ? "" : extensions.front();
+  std::sort(extensions.begin(), extensions.end());
+  extensions.erase(std::unique(extensions.begin(), extensions.end()), extensions.end());
+
+  us::ServiceProperties props;
+
+  props[IMimeType::PROP_ID()] = mimeType;
+  props[IMimeType::PROP_CATEGORY()] = this->GetCategory();
+  props[IMimeType::PROP_EXTENSIONS()] = extensions;
+  props[IMimeType::PROP_DESCRIPTION()] = std::string("Generated MIME type from mitk::AbstractFileReader");
+  props[us::ServiceConstants::SERVICE_RANKING()]  = this->GetRanking();
+
+  // If the mime type is set and the list of extensions is not empty,
+  // register a new IMimeType service
+  if (!mimeType.empty() && !extensions.empty())
+  {
+    return context->RegisterService<IMimeType>(&d->m_SimpleMimeType, props);
+  }
+
+  // If the mime type is set and the list of extensions is empty,
+  // look up the mime type in the registry and print a warning if
+  // there is none
+  if (!mimeType.empty() && extensions.empty())
+  {
+    if(us::GetModuleContext()->GetServiceReferences<IMimeType>(us::LDAPProp(IMimeType::PROP_ID()) == mimeType).empty())
+    {
+      MITK_WARN << "Registering a MITK reader with an unknown MIME type " << mimeType;
+    }
+    return us::ServiceRegistration<IMimeType>();
+  }
+
+  // If the mime type is empty, get a mime type using the extensions list
+  assert(mimeType.empty());
+  mitk::CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
+
+  if(extensions.empty())
+  {
+    MITK_WARN << "Trying to register a MITK reader with an empty mime type and empty extension list.";
+    return us::ServiceRegistration<IMimeType>();
+  }
+  else if(extensions.size() == 1)
+  {
+    // If there is only one extension, try to look-up an existing mime tpye
+    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extensions.front());
+    if (!mimeTypes.empty())
+    {
+      d->m_MimeType = mimeTypes.front();
+    }
+  }
+
+  if (d->m_MimeType.empty())
+  {
+    // There is no registered mime type for the extension or the extensions
+    // list contains more than one entry.
+    // Register a new mime type by creating a synthetic mime type id from the
+    // first extension in the list
+    d->m_MimeType = "application/vnd.mitk." + primaryExtension;
+    props[IMimeType::PROP_ID()] = d->m_MimeType;
+    return context->RegisterService<IMimeType>(&d->m_SimpleMimeType, props);
+  }
+  else
+  {
+    // A mime type for one of the listed extensions was found, do nothing.
+    return us::ServiceRegistration<IMimeType>();
+  }
 }
 
 void AbstractFileReader::SetMimeType(const std::string& mimeType)
@@ -235,9 +304,9 @@ void AbstractFileReader::SetCategory(const std::string& category)
   d->m_Category = category;
 }
 
-void AbstractFileReader::SetExtensions(const std::vector<std::string>& extensions)
+void AbstractFileReader::AddExtension(const std::string& extension)
 {
-  d->m_Extensions = extensions;
+  d->m_Extensions.push_back(extension);
 }
 
 void AbstractFileReader::SetDescription(const std::string& description)
@@ -245,11 +314,15 @@ void AbstractFileReader::SetDescription(const std::string& description)
   d->m_Description = description;
 }
 
-void AbstractFileReader::SetPriority(int priority)
+void AbstractFileReader::SetRanking(int ranking)
 {
-  d->m_Priority = priority;
+  d->m_Ranking = ranking;
 }
 
+int AbstractFileReader::GetRanking() const
+{
+  return d->m_Ranking;
+}
 
 //////////////////////// Options ///////////////////////
 
@@ -302,9 +375,9 @@ void AbstractFileReader::RemoveProgressCallback(const ProgressCallback& callback
 
 ////////////////// µS related Getters //////////////////
 
-int AbstractFileReader::GetPriority() const
+std::string AbstractFileReader::GetCategory() const
 {
-  return d->m_Priority;
+  return d->m_Category;
 }
 
 std::string AbstractFileReader::GetMimeType() const
@@ -320,6 +393,19 @@ std::vector<std::string> AbstractFileReader::GetExtensions() const
 std::string AbstractFileReader::GetDescription() const
 {
   return d->m_Description;
+}
+
+AbstractFileReader::MimeType::MimeType(const std::string& mimeType)
+  : std::string(mimeType)
+{
+  if (this->empty())
+  {
+    throw std::invalid_argument("MIME type must not be empty.");
+  }
+}
+
+AbstractFileReader::MimeType::MimeType()
+{
 }
 
 }

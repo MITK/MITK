@@ -31,9 +31,10 @@ public:
   }
 
   DummyReader(const std::string& mimeType, const std::string& extension, int priority)
-    : mitk::AbstractFileReader(mimeType, extension, "This is a dummy description")
+    : mitk::AbstractFileReader(MimeType(mimeType), "This is a dummy description")
   {
-    this->SetPriority(priority);
+    this->AddExtension(extension);
+    this->SetRanking(priority);
     m_ServiceReg = this->RegisterService();
   }
 
@@ -70,9 +71,10 @@ public:
   }
 
   DummyReader2(const std::string& mimeType, const std::string& extension, int priority)
-    : mitk::AbstractFileReader(mimeType, extension, "This is a second dummy description")
+    : mitk::AbstractFileReader(MimeType(mimeType), "This is a second dummy description")
   {
-    this->SetPriority(priority);
+    this->AddExtension(extension);
+    this->SetRanking(priority);
     m_ServiceReg = this->RegisterService();
   }
 

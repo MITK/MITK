@@ -24,8 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <locale>
 
 mitk::PointSetReaderService::PointSetReaderService()
-  : AbstractFileReader("application/vnd.mitk.pointset", "mps", "Great Reader of Point Sets")
+  : AbstractFileReader(MimeType("application/vnd.mitk.pointset"), "Great Reader of Point Sets")
 {
+  this->AddExtension("mps");
   RegisterService();
 }
 

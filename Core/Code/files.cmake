@@ -373,8 +373,9 @@ set(CPP_FILES
   Common/mitkCoreServices.cpp
 
   Internal/mitkCoreActivator.cpp
+  Internal/mitkItkFileReaderService.cpp
   Internal/mitkLegacyFileReaderService.cpp
-  Internal/mitkLegacyFileWriterService.cpp
+  #Internal/mitkLegacyFileWriterService.cpp
   Internal/mitkMimeTypeProvider.cpp
   Internal/mitkPointSetReaderService.cpp
   Internal/mitkPointSetWriterService.cpp

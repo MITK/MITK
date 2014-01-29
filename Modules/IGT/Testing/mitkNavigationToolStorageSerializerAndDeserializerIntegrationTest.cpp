@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
+#include <mitkNavigationToolStorageTestHelper.h>
 
 //some general mitk headers
 #include <mitkCommon.h>
@@ -43,19 +44,45 @@ class mitkNavigationToolStorageSerializerAndDeserializerIntegrationTestSuite : p
   CPPUNIT_TEST_SUITE(mitkNavigationToolStorageSerializerAndDeserializerIntegrationTestSuite);
   MITK_TEST(TestInstantiationSerializer);
   MITK_TEST(TestInstantiationDeserializer);
+  MITK_TEST(TestWriteAndReadSimpleToolStorageWithToolLandmarks);
   CPPUNIT_TEST_SUITE_END();
 
 private:
   /** Members used inside the different test methods. All members are initialized via setUp().*/
+  mitk::NavigationToolStorageSerializer::Pointer m_Serializer;
+  mitk::NavigationToolStorageDeserializer::Pointer m_Deserializer;
+  std::string m_FileName1;
 
 public:
   /**@brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).*/
   void setUp()
   {
+  m_Serializer = mitk::NavigationToolStorageSerializer::New();
+  mitk::DataStorage::Pointer DataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
+  m_Deserializer = mitk::NavigationToolStorageDeserializer::New(DataStorage);
+  try
+    {
+      m_FileName1 = mitk::IOUtil::CreateTemporaryFile();
+    }
+    catch (std::exception& e)
+    {
+      MITK_ERROR << "File access Exception: " << e.what();
+      MITK_ERROR <<"Could not create filename during setUp() method.";
+    }
   }
 
   void tearDown()
   {
+  m_Serializer = NULL;
+  m_Deserializer = NULL;
+  try
+    {
+      std::remove(m_FileName1.c_str());
+    }
+    catch(...)
+    {
+      MITK_ERROR << "Warning: Error occured when deleting test file!";
+    }
   }
 
   void TestInstantiationSerializer()
@@ -72,106 +99,39 @@ public:
   CPPUNIT_ASSERT_MESSAGE("Testing instantiation of NavigationToolStorageDeserializer",testDeserializer.IsNotNull());
   }
 
+  void TestWriteAndReadSimpleToolStorageWithToolLandmarks()
+  {
+    //create Tool Storage
+    mitk::NavigationToolStorage::Pointer storage = mitk::CreateTestData_StorageWithOneTool();
+
+    //test serialization
+    bool success = m_Serializer->Serialize(m_FileName1,storage);
+    CPPUNIT_ASSERT_MESSAGE("Testing serialization of tool storage with tool registrations",success);
+
+    //test deserialization of the same file
+    mitk::NavigationToolStorage::Pointer readStorage = m_Deserializer->Deserialize(m_FileName1);
+    CPPUNIT_ASSERT_MESSAGE("Testing deserialization of tool storage with tool registrations",readStorage.IsNotNull());
+    CPPUNIT_ASSERT_MESSAGE(" ..Testing number of tools in storage",readStorage->GetToolCount()==1);
+
+    mitk::PointSet::Pointer readRegLandmarks = readStorage->GetTool(0)->GetToolRegistrationLandmarks();
+    mitk::PointSet::Pointer readCalLandmarks = readStorage->GetTool(0)->GetToolCalibrationLandmarks();
+
+    CPPUNIT_ASSERT_MESSAGE("..Testing if tool registration landmarks have been stored and loaded correctly.",((readRegLandmarks->GetPoint(5)[0] == 4)&&(readRegLandmarks->GetPoint(5)[1] == 5)&&(readRegLandmarks->GetPoint(5)[2] == 6)));
+    CPPUNIT_ASSERT_MESSAGE("..Testing if tool calibration landmarks have been stored and loaded correctly.",((readCalLandmarks->GetPoint(0)[0] == 1)&&(readCalLandmarks->GetPoint(0)[1] == 2)&&(readCalLandmarks->GetPoint(0)[2] == 3)));
+
+    mitk::Point3D readToolTipPos = readStorage->GetTool(0)->GetToolTipPosition();
+    mitk::Quaternion readToolTipRot = readStorage->GetTool(0)->GetToolTipOrientation();
+
+    CPPUNIT_ASSERT_MESSAGE("..Testing if tool tip position has been stored and loaded correctly.",
+      ((float(readToolTipPos[0]) == float(1.3423))&&
+      (float(readToolTipPos[1]) == float(2.323))&&
+      (float(readToolTipPos[2]) == float(4.332))));
+
+    CPPUNIT_ASSERT_MESSAGE("..Testing if tool tip orientation has been stored and loaded correctly.",
+      ((float(readToolTipRot.x()) == float(0.1))&&
+      (float(readToolTipRot.y()) == float(0.2))&&
+      (float(readToolTipRot.z()) == float(0.3))&&
+      (float(readToolTipRot.r()) == float(0.4))));
+  }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkNavigationToolStorageSerializerAndDeserializerIntegration)
-
-
-
-//
-//static void TestWriteAndReadSimpleToolStorageWithToolLandmarks()
-//{
-//  //create Tool Storage
-//  mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-//
-//  //first tool
-//  mitk::NavigationTool::Pointer myTool1 = mitk::NavigationTool::New();
-//  myTool1->SetIdentifier("001");
-//  mitk::PointSet::Pointer CalLandmarks1 = mitk::PointSet::New();
-//  mitk::Point3D testPt1;
-//  mitk::FillVector3D(testPt1,1,2,3);
-//  CalLandmarks1->SetPoint(0,testPt1);
-//  mitk::PointSet::Pointer RegLandmarks1 = mitk::PointSet::New();
-//  mitk::Point3D testPt2;
-//  mitk::FillVector3D(testPt2,4,5,6);
-//  RegLandmarks1->SetPoint(5,testPt2);
-//  myTool1->SetToolCalibrationLandmarks(CalLandmarks1);
-//  myTool1->SetToolRegistrationLandmarks(RegLandmarks1);
-//  mitk::Point3D toolTipPos;
-//  mitk::FillVector3D(toolTipPos,1.3423,2.323,4.332);
-//  mitk::Quaternion toolTipRot = mitk::Quaternion(0.1,0.2,0.3,0.4);
-//  myTool1->SetToolTipPosition(toolTipPos);
-//  myTool1->SetToolTipOrientation(toolTipRot);
-//  myStorage->AddTool(myTool1);
-//
-//  //create Serializer
-//  mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-//
-//  //create filename
-//  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorageToolReg.storage";
-//
-//  //test serialization
-//  bool success = mySerializer->Serialize(filename,myStorage);
-//  MITK_TEST_CONDITION_REQUIRED(success,"Testing serialization of tool storage with tool registrations");
-//
-//  mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
-//  mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
-//  mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorageToolReg.storage");
-//  MITK_TEST_CONDITION_REQUIRED(readStorage.IsNotNull(),"Testing deserialization of tool storage with tool registrations");
-//  MITK_TEST_CONDITION_REQUIRED(readStorage->GetToolCount()==1," ..Testing number of tools in storage");
-//
-//  mitk::PointSet::Pointer readRegLandmarks = readStorage->GetTool(0)->GetToolRegistrationLandmarks();
-//  mitk::PointSet::Pointer readCalLandmarks = readStorage->GetTool(0)->GetToolCalibrationLandmarks();
-//
-//  MITK_TEST_CONDITION_REQUIRED(((readRegLandmarks->GetPoint(5)[0] == 4)&&(readRegLandmarks->GetPoint(5)[1] == 5)&&(readRegLandmarks->GetPoint(5)[2] == 6)),"..Testing if tool registration landmarks have been stored and loaded correctly.");
-//  MITK_TEST_CONDITION_REQUIRED(((readCalLandmarks->GetPoint(0)[0] == 1)&&(readCalLandmarks->GetPoint(0)[1] == 2)&&(readCalLandmarks->GetPoint(0)[2] == 3)),"..Testing if tool calibration landmarks have been stored and loaded correctly.");
-//
-//  mitk::Point3D readToolTipPos = readStorage->GetTool(0)->GetToolTipPosition();
-//  mitk::Quaternion readToolTipRot = readStorage->GetTool(0)->GetToolTipOrientation();
-//
-//  MITK_TEST_CONDITION_REQUIRED(((float(readToolTipPos[0]) == float(1.3423))&&
-//    (float(readToolTipPos[1]) == float(2.323))&&
-//    (float(readToolTipPos[2]) == float(4.332))),
-//    "..Testing if tool tip position has been stored and loaded correctly.");
-//
-//  MITK_TEST_CONDITION_REQUIRED(((float(readToolTipRot.x()) == float(0.1))&&
-//    (float(readToolTipRot.y()) == float(0.2))&&
-//    (float(readToolTipRot.z()) == float(0.3))&&
-//    (float(readToolTipRot.r()) == float(0.4))),
-//    "..Testing if tool tip orientation has been stored and loaded correctly.");
-//}
-//
-//
-
-///** This function is testing the TrackingVolume class. */
-//int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char* /*argv*/[])
-//{
-//  MITK_TEST_BEGIN("NavigationToolStorageSerializerAndDeserializer");
-//  try{
-//    TestInstantiationSerializer();
-//    TestInstantiationDeserializer();
-//    TestWriteSimpleToolStorage();
-//    TestWriteAndReadSimpleToolStorageWithToolLandmarks();
-//    TestReadSimpleToolStorage();
-//    TestWriteComplexToolStorage();
-//    TestReadComplexToolStorage();
-//    TestReadNotExistingStorage();
-//    TestReadStorageWithUnknownFiletype();
-//    TestReadZipFileWithNoToolstorage();
-//    TestWriteStorageToInvalidFile();
-//    TestWriteEmptyToolStorage();
-//    TestSerializerForExceptions();
-//    TestDeserializerForExceptions();
-//  }
-//  catch (std::exception& e) {
-//    MITK_ERROR << "exception:" << e.what();
-//    MITK_TEST_FAILED_MSG(<<"Exception occured, test failed!");
-//  }
-//  catch (...) {
-//    MITK_ERROR << "Unknown Exception?";
-//    MITK_TEST_FAILED_MSG(<<"Exception occured, test failed!");
-//  }
-//
-//  CleanUp();
-//
-//  MITK_TEST_END();
-//}

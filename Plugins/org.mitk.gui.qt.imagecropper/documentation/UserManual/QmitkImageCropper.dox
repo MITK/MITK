@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_imagecropper The Image Cropper Plugin
 
-\image html QmitkImageCropperIcon.png "Icon of the Plugin"
+\image html QmitkImageCropper_Icon.png "Icon of the Plugin"
 
 Available sections:
   - \ref QmitkImageCropperUserManualOverview

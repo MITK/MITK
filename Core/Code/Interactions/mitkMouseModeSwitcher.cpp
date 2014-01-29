@@ -31,9 +31,6 @@ mitk::MouseModeSwitcher::MouseModeSwitcher() :
 mitk::MouseModeSwitcher::~MouseModeSwitcher()
 {
   m_ServiceRegistration.Unregister();
-
-  delete m_CurrentObserverDEBUG;
-  m_ServiceRegistrationDEBUG.Unregister();
 }
 
 void mitk::MouseModeSwitcher::InitializeListeners()
@@ -41,7 +38,6 @@ void mitk::MouseModeSwitcher::InitializeListeners()
   if (m_CurrentObserver.IsNull())
   {
     m_CurrentObserver = mitk::DisplayInteractor::New();
-    m_CurrentObserverDEBUG = new EventRecorder();
     m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
     m_CurrentObserver->SetEventConfig("DisplayConfigMITK.xml");
     // Register as listener via micro services
@@ -49,11 +45,6 @@ void mitk::MouseModeSwitcher::InitializeListeners()
     props["name"] = std::string("DisplayInteractor");
     m_ServiceRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>(
         m_CurrentObserver.GetPointer(),props);
-
-    props["name"] = std::string("EventRecorder");
-    m_ServiceRegistrationDEBUG = us::GetModuleContext()->RegisterService<InteractionEventObserver>(
-        m_CurrentObserverDEBUG,props);
-
   }
 }
 

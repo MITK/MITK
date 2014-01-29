@@ -24,78 +24,48 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
+// us
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE("InteractionEventRecorder","liborg_mitk_gui_qt_eventrecorder")
 
 
 const std::string InteractionEventRecorder::VIEW_ID = "org.mitk.views.interactioneventrecorder";
 
 void InteractionEventRecorder::SetFocus()
 {
-  m_Controls.buttonPerformImageProcessing->setFocus();
+  m_Controls.textFileName->setFocus();
+}
+
+void InteractionEventRecorder::StartRecording()
+{
+  MITK_INFO << "Start Recording";
+  m_CurrentObserver->SetOutputFile(m_Controls.textFileName->text().toStdString());
+  m_CurrentObserver->StartRecording();
 }
 
 void InteractionEventRecorder::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
-}
+  connect( m_Controls.btnStartRecording, SIGNAL(clicked()), this, SLOT(StartRecording()) );
 
-void InteractionEventRecorder::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                             const QList<mitk::DataNode::Pointer>& nodes )
-{
-  // iterate all selected objects, adjust warning visibility
-  foreach( mitk::DataNode::Pointer node, nodes )
-  {
-    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-    {
-      m_Controls.labelWarning->setVisible( false );
-      m_Controls.buttonPerformImageProcessing->setEnabled( true );
-      return;
-    }
-  }
+  m_CurrentObserver = new mitk::EventRecorder();
+  // Register as listener via micro services
+  us::ServiceProperties props;
 
-  m_Controls.labelWarning->setVisible( true );
-  m_Controls.buttonPerformImageProcessing->setEnabled( false );
+  props["name"] = std::string("EventRecorder");
+  m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(m_CurrentObserver,props);
+
+
+  /*
+
+delete m_CurrentObserverDEBUG;
+  m_ServiceRegistrationDEBUG.Unregister();
+  */
 }
 
 
-void InteractionEventRecorder::DoImageProcessing()
-{
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
-
-  mitk::DataNode* node = nodes.front();
-
-  if (!node)
-  {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
-    return;
-  }
-
-  // here we have a valid mitk::DataNode
-
-  // a node itself is not very useful, we need its data item (the image)
-  mitk::BaseData* data = node->GetData();
-  if (data)
-  {
-    // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-    if (image)
-    {
-      std::stringstream message;
-      std::string name;
-      message << "Performing image processing for image ";
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        message << "'" << name << "'";
-      }
-      message << ".";
-      MITK_INFO << message.str();
-
-      // actually do something here...
-
-    }
-  }
-}

@@ -21,22 +21,22 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="labelWarning">
-     <property name="styleSheet">
-      <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
-     </property>
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Please select an image!</string>
+      <string>Filename to store interaction</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="buttonPerformImageProcessing">
+    <widget class="QLineEdit" name="textFileName"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnStartRecording">
      <property name="toolTip">
       <string>Do image processing</string>
      </property>
      <property name="text">
-      <string>Do Something</string>
+      <string>Start Recording</string>
      </property>
     </widget>
    </item>

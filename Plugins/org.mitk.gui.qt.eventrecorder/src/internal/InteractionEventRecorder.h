@@ -24,11 +24,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_InteractionEventRecorderControls.h"
 
+#include "mitkInteractionEventObserver.h"
+#include "mitkEventRecorder.h"
 
 /**
   \brief InteractionEventRecorder
 
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+  Demontrates the use of InteractionOversers.
+
+  Allows to record all mouse interaction in the renderwindows save it as XML file. And also replay the interaction.
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
@@ -46,7 +50,8 @@ class InteractionEventRecorder : public QmitkAbstractView
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
+
+    void StartRecording();
 
   protected:
 
@@ -54,11 +59,14 @@ class InteractionEventRecorder : public QmitkAbstractView
 
     virtual void SetFocus();
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes );
+
 
     Ui::InteractionEventRecorderControls m_Controls;
+
+ private:
+    mitk::EventRecorder* m_CurrentObserver;
+
+    us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
 
 };
 

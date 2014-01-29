@@ -1,12 +1,12 @@
 /**
 \page org_mitk_views_imagecropper The Image Cropper Plugin
 
-\image html icon.png "Icon of the Plugin"
+\image html QmitkImageCropperIcon.png "Icon of the Plugin"
 
 Available sections:
-  - \ref QmitkImageCropperUserManualOverview 
-  - \ref QmitkImageCropperUserManualFeatures 
-  - \ref QmitkImageCropperUserManualUsage 
+  - \ref QmitkImageCropperUserManualOverview
+  - \ref QmitkImageCropperUserManualFeatures
+  - \ref QmitkImageCropperUserManualUsage
   - \ref QmitkImageCropperUserManualTroubleshooting
 
 \section QmitkImageCropperUserManualOverview Overview
@@ -38,4 +38,3 @@ To set the border voxels to a specific value after cropping the image, activate 
 \section QmitkImageCropperUserManualTroubleshooting Troubleshooting
 
 */
-

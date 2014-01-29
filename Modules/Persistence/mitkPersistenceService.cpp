@@ -49,6 +49,12 @@ mitk::PersistenceService::~PersistenceService()
 std::string mitk::PersistenceService::GetDefaultPersistenceFile() const
 {
     std::string file = "PersistentData.mitk";
+    us::ModuleContext* context = us::GetModuleContext();
+    std::string contextDataFile = context->GetDataFile("PersistentData.mitk");
+    if( !contextDataFile.empty() )
+    {
+        file = contextDataFile;
+    }
     return file;
 }
 

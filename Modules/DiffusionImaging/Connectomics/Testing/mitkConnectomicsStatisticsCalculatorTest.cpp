@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Tesing
+// Testing
 #include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
 
@@ -75,6 +75,7 @@ public:
   void tearDown()
   {
     m_Network = NULL;
+    m_NetworkPath = "";
   }
 
   void StatisticsCalculatorUpdate()

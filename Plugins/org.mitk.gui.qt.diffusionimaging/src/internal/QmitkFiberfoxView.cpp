@@ -93,7 +93,6 @@ QmitkFiberfoxView::QmitkFiberfoxView()
     : QmitkAbstractView()
     , m_Controls( 0 )
     , m_SelectedImage( NULL )
-    , m_OutputPath("")
     , m_Worker(this)
     , m_ThreadIsRunning(false)
 {
@@ -226,12 +225,14 @@ void QmitkFiberfoxView::AfterThread()
     if (!parameters.m_OutputPath.empty())
     {
         try{
+            QString outputFileName(parameters.m_OutputPath.c_str());
+            outputFileName += parameters.m_ResultNode->GetName().c_str();
+            outputFileName.replace(QString("."), QString("_"));
+            outputFileName += ".dwi";
             QString status("Saving output image to ");
-            status += QString(parameters.m_OutputPath.c_str());
-            status += parameters.m_ResultNode->GetName().c_str();
-            status += ".dwi";
+            status += outputFileName;
             m_Controls->m_SimulationStatusText->append(status);
-            mitk::IOUtil::SaveBaseData(mitkImage, parameters.m_OutputPath+parameters.m_ResultNode->GetName()+".dwi");
+            mitk::IOUtil::SaveBaseData(mitkImage, outputFileName.toStdString());
             m_Controls->m_SimulationStatusText->append("File saved successfully.");
         }
         catch (itk::ExceptionObject &e)
@@ -375,7 +376,15 @@ template< class ScalarType >
 FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
 {
     FiberfoxParameters< ScalarType > parameters;
-    parameters.m_OutputPath = m_OutputPath;
+    parameters.m_OutputPath = "";
+
+    string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
+    if (outputPath.compare("-")!=0)
+    {
+        parameters.m_OutputPath = outputPath;
+        parameters.m_OutputPath += "/";
+    }
+
     parameters.m_MaskImage = m_ItkMaskImage;
 
     if (m_SelectedDWI.IsNotNull())  // use parameters of selected DWI
@@ -2214,13 +2223,13 @@ void QmitkFiberfoxView::SetOutputPath()
 {
     // SELECT FOLDER DIALOG
 
-    m_OutputPath = QFileDialog::getExistingDirectory(NULL, "Save images to...", QString(m_OutputPath.c_str())).toStdString();
+    string outputPath = QFileDialog::getExistingDirectory(NULL, "Save images to...", QString(outputPath.c_str())).toStdString();
 
-    if (m_OutputPath.empty())
+    if (outputPath.empty())
         m_Controls->m_SavePathEdit->setText("-");
     else
     {
-        m_OutputPath += "/";
-        m_Controls->m_SavePathEdit->setText(QString(m_OutputPath.c_str()));
+        outputPath += "/";
+        m_Controls->m_SavePathEdit->setText(QString(outputPath.c_str()));
     }
 }

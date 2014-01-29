@@ -705,7 +705,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         }
     }
     if (logFile.is_open())
+    {
+        logFile << "DONE";
         logFile.close();
+    }
     m_StatusText += "\n\n";
     if (this->GetAbortGenerateData())
     {

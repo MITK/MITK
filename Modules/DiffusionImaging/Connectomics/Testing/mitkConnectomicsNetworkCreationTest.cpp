@@ -14,8 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// macros
+// Testing
 #include "mitkTestingMacros.h"
+#include "mitkTestFixture.h"
 
 // std includes
 #include <string>
@@ -25,109 +26,87 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsNetworkCreator.h"
 #include <mitkCoreObjectFactory.h>
 
-
-static void CreateNetworkFromFibersAndParcellation(std::string fiberFilename, std::string parcellationFilename, std::string outputFilename, bool testMode, std::string referenceFilename)
+class mitkConnectomicsNetworkCreationTestSuite : public mitk::TestFixture
 {
-  const std::string s1="", s2="";
+  CPPUNIT_TEST_SUITE(mitkConnectomicsNetworkCreationTestSuite);
+  MITK_TEST(CreateNetworkFromFibersAndParcellation);
+  CPPUNIT_TEST_SUITE_END();
 
-  // load fiber image
-  std::vector<mitk::BaseData::Pointer> fiberInfile =
-    mitk::BaseDataIO::LoadBaseDataFromFile( fiberFilename, s1, s2, false );
-  if( fiberInfile.empty() )
+private:
+
+  std::string m_ParcellationPath;
+  std::string m_FiberPath;
+  std::string m_ReferenceNetworkPath;
+
+public:
+
+  /**
+  * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+  */
+  void setUp()
   {
-    std::string errorMessage = "Fiber Image at " + parcellationFilename + " could not be read. Aborting.";
-    MITK_TEST_CONDITION_REQUIRED( false, errorMessage);
+    m_ReferenceNetworkPath = GetTestDataFilePath("DiffusionImaging/Connectomics/reference.cnf");
+    m_ParcellationPath = GetTestDataFilePath("DiffusionImaging/Connectomics/parcellation.nrrd");
+    m_FiberPath = GetTestDataFilePath("DiffusionImaging/Connectomics/fiberBundle.fib");
   }
-  mitk::BaseData* fiberBaseData = fiberInfile.at(0);
-  mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>( fiberBaseData );
 
-  // load parcellation
-  std::vector<mitk::BaseData::Pointer> parcellationInFile =
-    mitk::BaseDataIO::LoadBaseDataFromFile( parcellationFilename, s1, s2, false );
-  if( parcellationInFile.empty() )
+  void tearDown()
   {
-    std::string errorMessage = "Parcellation at " + parcellationFilename + " could not be read. Aborting.";
-    MITK_TEST_CONDITION_REQUIRED( false, errorMessage);
+    m_ReferenceNetworkPath = "";
+    m_ParcellationPath = "";
+    m_FiberPath = "";
   }
-  mitk::BaseData* parcellationBaseData = parcellationInFile.at(0);
-  mitk::Image* parcellationImage = dynamic_cast<mitk::Image*>( parcellationBaseData );
 
-
-
-  // do creation
-  mitk::ConnectomicsNetworkCreator::Pointer connectomicsNetworkCreator = mitk::ConnectomicsNetworkCreator::New();
-  connectomicsNetworkCreator->SetSegmentation( parcellationImage );
-  connectomicsNetworkCreator->SetFiberBundle( fiberBundle );
-  connectomicsNetworkCreator->CalculateCenterOfMass();
-  connectomicsNetworkCreator->SetEndPointSearchRadius( 15 );
-  connectomicsNetworkCreator->CreateNetworkFromFibersAndSegmentation();
-
-  // write if not test mode
-  if( !testMode )
+  void CreateNetworkFromFibersAndParcellation()
   {
-    mitk::ConnectomicsNetwork::Pointer network = connectomicsNetworkCreator->GetNetwork();
+    const std::string s1="", s2="";
 
-    MITK_INFO << "searching writer";
-    mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-    for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
+    // load fiber image
+    std::vector<mitk::BaseData::Pointer> fiberInfile =
+      mitk::BaseDataIO::LoadBaseDataFromFile( m_FiberPath, s1, s2, false );
+    if( fiberInfile.empty() )
     {
-      if ( (*it)->CanWriteBaseDataType(network.GetPointer()) )
-      {
-        MITK_INFO << "writing";
-        (*it)->SetFileName( outputFilename.c_str() );
-        (*it)->DoWrite( network.GetPointer() );
-      }
+      std::string errorMessage = "Fiber Image at " + m_FiberPath + " could not be read. Aborting.";
+      CPPUNIT_ASSERT_MESSAGE( errorMessage, false );
     }
-  }
-  else
-  {
+    mitk::BaseData* fiberBaseData = fiberInfile.at(0);
+    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*>( fiberBaseData );
+
+    // load parcellation
+    std::vector<mitk::BaseData::Pointer> parcellationInFile =
+      mitk::BaseDataIO::LoadBaseDataFromFile( m_ParcellationPath, s1, s2, false );
+    if( parcellationInFile.empty() )
+    {
+      std::string errorMessage = "Parcellation at " + m_ParcellationPath + " could not be read. Aborting.";
+      CPPUNIT_ASSERT_MESSAGE( errorMessage, false );
+    }
+    mitk::BaseData* parcellationBaseData = parcellationInFile.at(0);
+    mitk::Image* parcellationImage = dynamic_cast<mitk::Image*>( parcellationBaseData );
+
+    // do creation
+    mitk::ConnectomicsNetworkCreator::Pointer connectomicsNetworkCreator = mitk::ConnectomicsNetworkCreator::New();
+    connectomicsNetworkCreator->SetSegmentation( parcellationImage );
+    connectomicsNetworkCreator->SetFiberBundle( fiberBundle );
+    connectomicsNetworkCreator->CalculateCenterOfMass();
+    connectomicsNetworkCreator->SetEndPointSearchRadius( 15 );
+    connectomicsNetworkCreator->CreateNetworkFromFibersAndSegmentation();
+
     // load network
     std::vector<mitk::BaseData::Pointer> referenceFile =
-      mitk::BaseDataIO::LoadBaseDataFromFile( referenceFilename, s1, s2, false );
+      mitk::BaseDataIO::LoadBaseDataFromFile( m_ReferenceNetworkPath, s1, s2, false );
     if( referenceFile.empty() )
     {
-      std::string errorMessage = "Reference Network at " + referenceFilename + " could not be read. Aborting.";
-      MITK_TEST_CONDITION_REQUIRED( false, errorMessage);
+      std::string errorMessage = "Reference Network at " + m_ReferenceNetworkPath + " could not be read. Aborting.";
+      CPPUNIT_ASSERT_MESSAGE( errorMessage, false );
     }
     mitk::BaseData* referenceBaseData = referenceFile.at(0);
     mitk::ConnectomicsNetwork* referenceNetwork = dynamic_cast<mitk::ConnectomicsNetwork*>( referenceBaseData );
 
     mitk::ConnectomicsNetwork::Pointer network = connectomicsNetworkCreator->GetNetwork();
 
-    MITK_TEST_CONDITION_REQUIRED( mitk::Equal( network.GetPointer(), referenceNetwork, mitk::eps, true), "Comparing created and reference network.");
+    CPPUNIT_ASSERT_MESSAGE( "Comparing created and reference network.", mitk::Equal( network.GetPointer(), referenceNetwork, mitk::eps, true) );
+
   }
-}
+};
 
-
-/**
-* @brief mitkConnectomicsNetworkCreationTest A test for network creation
-*/
-int mitkConnectomicsNetworkCreationTest(int argc, char* argv[])
-{
-  MITK_TEST_BEGIN(mitkConnectomicsNetworkCreationTest);
-
-  bool validNumberOfArguments( (argc == 4) || (argc == 5) );
-
-  if( !validNumberOfArguments )
-  {
-    std::string errorMessage = "Wrong number of arguments.\nUsage: <fiber-filename> <parcellation-filename> <network-out-filename> [<reference filename>]";
-    MITK_TEST_CONDITION_REQUIRED( !validNumberOfArguments, errorMessage);
-    return 0;
-  }
-
-  std::string fiber_name = argv[1];
-  std::string parcellation_name = argv[2];
-  std::string network_name = argv[3];
-
-  if(argc == 4)
-  {
-    CreateNetworkFromFibersAndParcellation(fiber_name, parcellation_name, network_name, false, ""  );
-  }
-  if(argc == 5)
-  {
-    std::string reference_name = argv[4];
-    CreateNetworkFromFibersAndParcellation(fiber_name, parcellation_name, network_name, true, reference_name  );
-  }
-
-  MITK_TEST_END();
-}
+MITK_TEST_SUITE_REGISTRATION(mitkConnectomicsNetworkCreation)

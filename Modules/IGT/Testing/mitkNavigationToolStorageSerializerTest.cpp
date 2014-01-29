@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 #include <mitkIOUtil.h>
 #include <mitkIGTException.h>
+#include <mitkNavigationToolStorageTestHelper.h>
 
 //headers of IGT classes releated to the tested class
 #include <mitkNavigationToolStorageSerializer.h>
@@ -40,65 +41,6 @@ private:
   /** Members used inside the different test methods. All members are initialized via setUp().*/
   std::string m_FileName1;
   mitk::NavigationToolStorageSerializer::Pointer m_Serializer;
-
-  //help methods for test tool storages
-  mitk::NavigationToolStorage::Pointer CreateTestData_SimpleStorage()
-    {
-    //create Tool Storage
-    mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-    //first tool
-    mitk::NavigationTool::Pointer myTool1 = mitk::NavigationTool::New();
-    myTool1->SetIdentifier("001");
-    myStorage->AddTool(myTool1);
-    //second tool
-    mitk::NavigationTool::Pointer myTool2 = mitk::NavigationTool::New();
-    myTool2->SetIdentifier("002");
-    myStorage->AddTool(myTool2);
-    //third tool
-    mitk::NavigationTool::Pointer myTool3 = mitk::NavigationTool::New();
-    myTool3->SetIdentifier("003");
-    myStorage->AddTool(myTool3);
-
-    return myStorage;
-    }
-  mitk::NavigationToolStorage::Pointer CreateTestData_ComplexStorage()
-    {
-    //create first tool
-    mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
-    myNavigationTool->SetCalibrationFile(GetTestDataFilePath("ClaronTool"));
-    mitk::DataNode::Pointer myNode = mitk::DataNode::New();
-    myNode->SetName("ClaronTool");
-    myNode->SetData(mitk::IOUtil::LoadSurface(GetTestDataFilePath("IGT-Data/ClaronTool.stl"))); //load an stl File
-    myNavigationTool->SetDataNode(myNode);
-    myNavigationTool->SetIdentifier("ClaronTool#1");
-    myNavigationTool->SetSerialNumber("0815");
-    myNavigationTool->SetTrackingDeviceType(mitk::ClaronMicron);
-    myNavigationTool->SetType(mitk::NavigationTool::Fiducial);
-
-    //create second tool
-    mitk::NavigationTool::Pointer myNavigationTool2 = mitk::NavigationTool::New();
-    mitk::Surface::Pointer testSurface2;
-
-    mitk::DataNode::Pointer myNode2 = mitk::DataNode::New();
-    myNode2->SetName("AuroraTool");
-
-    //load an stl File
-    testSurface2 = mitk::IOUtil::LoadSurface(GetTestDataFilePath("IGT-Data/EMTool.stl"));
-    myNode2->SetData(testSurface2);
-
-    myNavigationTool2->SetDataNode(myNode2);
-    myNavigationTool2->SetIdentifier("AuroraTool#1");
-    myNavigationTool2->SetSerialNumber("0816");
-    myNavigationTool2->SetTrackingDeviceType(mitk::NDIAurora);
-    myNavigationTool2->SetType(mitk::NavigationTool::Instrument);
-
-    //create navigation tool storage
-    mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-    myStorage->AddTool(myNavigationTool);
-    myStorage->AddTool(myNavigationTool2);
-
-    return myStorage;
-    }
 
 public:
 
@@ -138,7 +80,7 @@ public:
   void TestWriteSimpleToolStorage()
   {
   //create Tool Storage
-  mitk::NavigationToolStorage::Pointer myStorage = this->CreateTestData_SimpleStorage();
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::CreateTestData_SimpleStorage();
 
   //test serialization
   bool success = m_Serializer->Serialize(m_FileName1,myStorage);
@@ -148,7 +90,7 @@ public:
   void TestWriteComplexToolStorage()
   {
     //create navigation tool storage
-    mitk::NavigationToolStorage::Pointer myStorage = this->CreateTestData_ComplexStorage();
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::CreateTestData_ComplexStorage(GetTestDataFilePath("ClaronTool"),GetTestDataFilePath("IGT-Data/ClaronTool.stl"),GetTestDataFilePath("IGT-Data/EMTool.stl"));
 
     //test serialization
     bool success = m_Serializer->Serialize(m_FileName1,myStorage);
@@ -158,7 +100,7 @@ public:
   void TestWriteStorageToInvalidFile()
   {
     //create Tool Storage
-    mitk::NavigationToolStorage::Pointer myStorage = this->CreateTestData_SimpleStorage();
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::CreateTestData_SimpleStorage();
 
     //create invalid filename
   #ifdef WIN32

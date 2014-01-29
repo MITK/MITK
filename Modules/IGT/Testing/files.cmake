@@ -1,3 +1,7 @@
+set(H_FILES
+   mitkNavigationToolStorageTestHelper.h
+)
+
 set(MODULE_TESTS
    mitkCameraVisualizationTest.cpp
    mitkClaronInterfaceTest.cpp

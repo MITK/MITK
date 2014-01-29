@@ -94,6 +94,7 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
   m_Controls->m_CalibrationFileName->setText("none");
   m_Controls->m_Surface_Use_Sphere->setChecked(true);
   m_AdvancedWidget->SetDataStorage(m_DataStorage);
+  m_Controls->m_IdentifierEdit->setText(supposedIdentifier.c_str());
 
 }
 

@@ -235,97 +235,10 @@ MITK_TEST_SUITE_REGISTRATION(mitkNavigationToolStorageSerializerAndDeserializerI
 //}
 //
 //
-//static void TestWriteStorageToInvalidFile()
-//{
-//  //create Tool Storage
-//  mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-//  //first tool
-//  mitk::NavigationTool::Pointer myTool1 = mitk::NavigationTool::New();
-//  myTool1->SetIdentifier("001");
-//  myStorage->AddTool(myTool1);
-//  //second tool
-//  mitk::NavigationTool::Pointer myTool2 = mitk::NavigationTool::New();
-//  myTool2->SetIdentifier("002");
-//  myStorage->AddTool(myTool2);
-//  //third tool
-//  mitk::NavigationTool::Pointer myTool3 = mitk::NavigationTool::New();
-//  myTool3->SetIdentifier("003");
-//  myStorage->AddTool(myTool3);
 //
-//  //create Serializer
-//  mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
+
 //
-//  //create filename
-//#ifdef WIN32
-//  std::string filename = "C:\342INVALIDFILE<>.storage"; //invalid filename for windows
-//#else
-//  std::string filename = "/dsfdsf:$�$342INVALIDFILE.storage"; //invalid filename for linux
-//#endif
-//
-//
-//  //test serialization
-//  bool exceptionThrown = false;
-//  try
-//  {
-//    mySerializer->Serialize(filename,myStorage);
-//  }
-//  catch(mitk::IGTException e)
-//  {
-//    exceptionThrown = true;
-//  }
-//  MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if an exception is thrown if an invalid file is used.");
-//}
-//
-//static void TestWriteEmptyToolStorage()
-//{
-//  //create Tool Storage
-//  mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-//
-//  //create Serializer
-//  mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-//
-//  std::string filename;
-//  try
-//  {
-//    //create filename
-//    filename = mitk::IOUtil::CreateTemporaryFile();
-//  }
-//  catch (std::exception& e) {
-//    MITK_ERROR << "File access Exception: " << e.what();
-//    MITK_TEST_FAILED_MSG(<<"Could not create filename for Exceptiontest");
-//  }
-//
-//  //test serialization
-//  bool success = mySerializer->Serialize(filename,myStorage);
-//  MITK_TEST_CONDITION_REQUIRED(success,"Testing serialization of simple tool storage");
-//
-//  //clean up
-//  Poco::File file = Poco::File(filename);
-//  file.remove();
-//
-//}
-//
-////new tests for exception throwing of NavigationToolStorageSerializer
-//static void TestSerializerForExceptions()
-//{
-//  mitk::NavigationToolStorageSerializer::Pointer testSerializer = mitk::NavigationToolStorageSerializer::New();
-//  mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
-//
-//  //create an invalid filename
-//  std::string filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"";
-//
-//  //now try to serialize an check if an exception is thrown
-//  bool ExceptionThrown = false;
-//  try
-//  {
-//    testSerializer->Serialize(filename,myStorage);
-//  }
-//  catch(mitk::IGTException)
-//  {
-//    ExceptionThrown = true;
-//  }
-//  MITK_TEST_CONDITION_REQUIRED(ExceptionThrown, "Testing serializer with invalid filename.");
-//}
+
 //
 ////new tests for exception throwing of NavigationToolStorageDeserializer
 //static void TestDeserializerForExceptions()

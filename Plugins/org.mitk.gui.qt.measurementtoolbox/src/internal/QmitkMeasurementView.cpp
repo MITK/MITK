@@ -447,14 +447,11 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
 
   if(d->m_CurrentSelection.size() == 0)
   {
-
     mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
-    const mitk::DataNode* node = 0;
 
     for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End(); it++)
     {
-      node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
-      mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
+      mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(it->Value().GetPointer());
       nonConstNode->SetSelected(false);
     }
 

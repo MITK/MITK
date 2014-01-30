@@ -221,7 +221,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::GenerateData()
 {
-    m_StartTime = clock();
+    m_TimeProbe.Start();
     m_StatusText = "Starting simulation\n";
 
     // check input data
@@ -830,6 +830,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     m_StatusText += "\n\n";
     m_StatusText += "Finished simulation\n";
     m_StatusText += "Simulation time: "+GetTime();
+    m_TimeProbe.Stop();
 }
 
 template< class PixelType >
@@ -875,7 +876,8 @@ vnl_vector_fixed<double, 3> TractsToDWIImageFilter< PixelType >::GetVnlVector(Ve
 template< class PixelType >
 std::string TractsToDWIImageFilter< PixelType >::GetTime()
 {
-    unsigned long total = (double)(clock() - m_StartTime)/CLOCKS_PER_SEC;
+    m_TimeProbe.Stop();
+    unsigned long total = round(m_TimeProbe.GetTotal());
     unsigned long hours = total/3600;
     unsigned long minutes = (total%3600)/60;
     unsigned long seconds = total%60;
@@ -885,6 +887,7 @@ std::string TractsToDWIImageFilter< PixelType >::GetTime()
     out.append(boost::lexical_cast<std::string>(minutes));
     out.append(":");
     out.append(boost::lexical_cast<std::string>(seconds));
+    m_TimeProbe.Start();
     return out;
 }
 

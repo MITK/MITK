@@ -56,10 +56,10 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
       CastToItkImage(resampleReference,itkReference);
 
       typedef itk::WindowedSincInterpolateImageFunction< ItkImageType, 3> WindowedSincInterpolatorType;
-      typename WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
+      WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
 
       typedef itk::NearestNeighborInterpolateImageFunction< ItkImageType, double > NearestNeighborInterpolatorType;
-      typename NearestNeighborInterpolatorType::Pointer nn_interpolator = NearestNeighborInterpolatorType::New();
+      NearestNeighborInterpolatorType::Pointer nn_interpolator = NearestNeighborInterpolatorType::New();
 
 
       ResampleFilterType::Pointer resampler = ResampleFilterType::New();

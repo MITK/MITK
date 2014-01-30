@@ -100,14 +100,14 @@ void QmitkDoseValueDelegate::setModelData(QWidget *editor, QAbstractItemModel* m
 
   if(data.isValid())
   {
-      QDoubleSpinBox* spinBox = qobject_cast<QDoubleSpinBox *>(editor);
-      double doubleValue = spinBox->value();
+    QDoubleSpinBox* spinBox = qobject_cast<QDoubleSpinBox *>(editor);
+    double doubleValue = spinBox->value();
 
-      QVariant doubleValueVariant(doubleValue);
-      model->setData(index, doubleValueVariant);
+    QVariant doubleValueVariant(doubleValue);
+    model->setData(index, doubleValueVariant);
   }
   else
   {
-      QStyledItemDelegate::setModelData(editor, model, index);
+    QStyledItemDelegate::setModelData(editor, model, index);
   }
 }

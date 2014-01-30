@@ -26,18 +26,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-void org_mitk_gui_qt_rt_dosevisualization_Activator::start(ctkPluginContext* context)
-{
-  BERRY_REGISTER_EXTENSION_CLASS(RTDoseVisualizer, context);
-  BERRY_REGISTER_EXTENSION_CLASS(RTUIPreferencePage, context)
-  BERRY_REGISTER_EXTENSION_CLASS(DoseVisualizationPreferencePage, context)
-  BERRY_REGISTER_EXTENSION_CLASS(LoadingRTView, context)
-}
+  ctkPluginContext* org_mitk_gui_qt_rt_dosevisualization_Activator::m_Context = NULL;
 
-void org_mitk_gui_qt_rt_dosevisualization_Activator::stop(ctkPluginContext* context)
-{
-  Q_UNUSED(context)
-}
+  void org_mitk_gui_qt_rt_dosevisualization_Activator::start(ctkPluginContext* context)
+  {
+    BERRY_REGISTER_EXTENSION_CLASS(RTDoseVisualizer, context);
+    BERRY_REGISTER_EXTENSION_CLASS(RTUIPreferencePage, context)
+    BERRY_REGISTER_EXTENSION_CLASS(DoseVisualizationPreferencePage, context)
+    BERRY_REGISTER_EXTENSION_CLASS(LoadingRTView, context)
+
+      m_Context = context;
+  }
+
+  void org_mitk_gui_qt_rt_dosevisualization_Activator::stop(ctkPluginContext* context)
+  {
+    Q_UNUSED(context);
+
+    m_Context = NULL;
+  }
+
+  ctkPluginContext* org_mitk_gui_qt_rt_dosevisualization_Activator::GetContext()
+  {
+    return m_Context;
+  }
 
 }
 

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //-----------------------------------------------------------------------------
 RTUIPreferencePage::RTUIPreferencePage()
-: m_MainControl(0), m_Controls(0)
+  : m_MainControl(0), m_Controls(0)
 {
 
 }
@@ -78,7 +78,7 @@ bool RTUIPreferencePage::PerformOk()
 
   if (useAsDefaultValue)
   {
-      m_PreferencesNode->PutDouble(mitk::rt::UIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_VALUE_ID, m_Controls->spinDefault->value());
+    m_PreferencesNode->PutDouble(mitk::rt::UIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_VALUE_ID, m_Controls->spinDefault->value());
   }
   else
   {

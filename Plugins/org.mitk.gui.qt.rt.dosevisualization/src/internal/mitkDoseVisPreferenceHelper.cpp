@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIPreferences.h>
 
+#include <ctkPluginContext.h>
+#include <service/event/ctkEventAdmin.h>
+
 void mitk::rt::StorePresetsMap(const PresetMapType& presetMap)
 {
   berry::IPreferencesService::Pointer prefService =
@@ -85,7 +88,7 @@ mitk::rt::PresetMapType mitk::rt::LoadPresetsMap()
 
     if (aPresetNode.IsNull())
     {
-      mitkThrow()<< "Error in preference interface. Cannot finde preset node under given name. Name: "<<*pos;
+      mitkThrow()<< "Error in preference interface. Cannot find preset node under given name. Name: "<<*pos;
     }
 
     mitk::IsoDoseLevelSet::Pointer levelSet = mitk::IsoDoseLevelSet::New();
@@ -96,7 +99,7 @@ mitk::rt::PresetMapType mitk::rt::LoadPresetsMap()
       berry::IPreferences::Pointer levelNode = aPresetNode->Node(*levelName);
       if (aPresetNode.IsNull())
       {
-        mitkThrow()<< "Error in preference interface. Cannot finde level node under given preset name. Name: "<<*pos<<"; Level id: "<<*levelName;
+        mitkThrow()<< "Error in preference interface. Cannot find level node under given preset name. Name: "<<*pos<<"; Level id: "<<*levelName;
       }
 
       mitk::IsoDoseLevel::Pointer isoLevel = mitk::IsoDoseLevel::New();
@@ -117,8 +120,9 @@ mitk::rt::PresetMapType mitk::rt::LoadPresetsMap()
   }
 
   if (presetMap.size() == 0)
-  { //if there are no presets use fallback.
+  { //if there are no presets use fallback and store it.
     presetMap = mitk::rt::GenerateDefaultPresetsMap();
+    StorePresetsMap(presetMap);
   }
 
   return presetMap;
@@ -144,7 +148,7 @@ std::string mitk::rt::GetSelectedPresetName()
   return result;
 }
 
-void mitk::rt::SetSelectedPresetName(std::string presetName)
+void mitk::rt::SetSelectedPresetName(const std::string& presetName)
 {
   berry::IPreferencesService::Pointer prefService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
@@ -173,7 +177,7 @@ bool mitk::rt::GetReferenceDoseValue(mitk::DoseValueAbs& value)
   berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
 
   bool result = prefNode->GetBool(mitk::rt::UIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, true);
-  value = prefNode->GetDouble(mitk::rt::UIConstants::REFERENCE_DOSE_ID, 0);
+  value = prefNode->GetDouble(mitk::rt::UIConstants::REFERENCE_DOSE_ID, mitk::rt::UIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
 
   return result;
 }
@@ -205,7 +209,7 @@ bool mitk::rt::GetDoseDisplayAbsolute()
   return result;
 }
 
-void mitk::rt::SetDoseDisplayAbsolute(bool& isAbsolute)
+void mitk::rt::SetDoseDisplayAbsolute(bool isAbsolute)
 {
   berry::IPreferencesService::Pointer prefService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
@@ -213,4 +217,29 @@ void mitk::rt::SetDoseDisplayAbsolute(bool& isAbsolute)
   berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
 
   prefNode->PutBool(mitk::rt::UIConstants::DOSE_DISPLAY_ABSOLUTE_ID, isAbsolute);
+}
+
+void mitk::rt::SignalReferenceDoseChange(bool globalSync, mitk::DoseValueAbs value, ctkPluginContext* context)
+{
+  ctkServiceReference ref = context->getServiceReference<ctkEventAdmin>();
+  if (ref)
+  {
+    ctkEventAdmin* eventAdmin = context->getService<ctkEventAdmin>(ref);
+    ctkProperties props;
+    props["value"] = value;
+    props["globalSync"] = globalSync;
+    ctkEvent presetMapChangedEvent(mitk::rt::CTKEventConstants::TOPIC_REFERENCE_DOSE_CHANGED.c_str());
+    eventAdmin->sendEvent(presetMapChangedEvent);
+  }
+}
+
+void mitk::rt::SignalPresetMapChange(ctkPluginContext* context)
+{
+  ctkServiceReference ref = context->getServiceReference<ctkEventAdmin>();
+  if (ref)
+  {
+    ctkEventAdmin* eventAdmin = context->getService<ctkEventAdmin>(ref);
+    ctkEvent presetMapChangedEvent(mitk::rt::CTKEventConstants::TOPIC_ISO_DOSE_LEVEL_PRESETS_CHANGED.c_str());
+    eventAdmin->sendEvent(presetMapChangedEvent);
+  }
 }

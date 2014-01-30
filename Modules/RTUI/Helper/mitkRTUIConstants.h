@@ -14,10 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITK_RT_CONSTANTS_H_
-#define _MITK_RT_CONSTANTS_H_
+#ifndef _MITK_RT_UI_CONSTANTS_H_
+#define _MITK_RT_UI_CONSTANTS_H_
 
 #include <string>
+#include <mitkDoseValueType.h>
 
 #include "RTUIExports.h"
 
@@ -30,7 +31,7 @@ namespace mitk
       /** ID/Path of main preference node for RT UI.  */
       static const std::string ROOT_PREFERENCE_NODE_ID;
       /** Bool that indicates how the prescribed dose should be defined, if unkown. True: UNKNOWN_PRESCRIBED_DOSE_HANDLING_VALUE should be used as
-       default dose value in Gy; False: it should be used as fraction of the max dose to determin the prescribed dose.*/
+      default dose value in Gy; False: it should be used as fraction of the max dose to determin the prescribed dose.*/
       static const std::string UNKNOWN_PRESCRIBED_DOSE_HANDLING_AS_DEFAULT_ID;
       /** Value that is used to determin unknown prescribed doses.*/
       static const std::string UNKNOWN_PRESCRIBED_DOSE_HANDLING_VALUE_ID;
@@ -50,7 +51,7 @@ namespace mitk
       /** ID for the global visiblity switch for color wash visualization.  */
       static const std::string GLOBAL_VISIBILITY_COLORWASH_ID;
       /** ID for the selected iso preset that should be used (value of ROOT_ISO_PRESETS_PREFERENCE_NODE_ID + value of this key can
-     be used to construct the passed to the selected preset.  */
+      be used to construct the passed to the selected preset.  */
       static const std::string SELECTED_ISO_PRESET_ID;
 
       /** ID for the relative dose value of an iso dose level.  */
@@ -66,7 +67,19 @@ namespace mitk
       /** ID for the visiblity switch for color wash visualization.  */
       static const std::string ISO_LEVEL_VISIBILITY_COLORWASH_ID;
 
+      /** Default value used as reference_dose_if not defined by application or data node*/
+      static const DoseValueAbs DEFAULT_REFERENCE_DOSE_VALUE;
     };
+
+    struct RTUI_EXPORT CTKEventConstants
+    {
+      /** ID/Path of main preference node for RT UI.  */
+      static const std::string TOPIC_REFERENCE_DOSE;
+      static const std::string TOPIC_REFERENCE_DOSE_CHANGED;
+      static const std::string TOPIC_ISO_DOSE_LEVEL_PRESETS;
+      static const std::string TOPIC_ISO_DOSE_LEVEL_PRESETS_CHANGED;
+    };
+
   }
 }
 

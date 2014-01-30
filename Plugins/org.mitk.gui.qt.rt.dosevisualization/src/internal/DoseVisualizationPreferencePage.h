@@ -35,49 +35,49 @@ class QmitkDoseVisualStyleDelegate;
 class QWidget;
 
 /**
- * \class DoseVisualizationPreferencePage
- * \brief Preference page for RT Dose visualization
- */
+* \class DoseVisualizationPreferencePage
+* \brief Preference page for RT Dose visualization
+*/
 class DoseVisualizationPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
-  Q_INTERFACES(berry::IPreferencePage)
+    Q_INTERFACES(berry::IPreferencePage)
 
 public:
   DoseVisualizationPreferencePage();
   ~DoseVisualizationPreferencePage();
 
   /**
-   * \brief Called by framework to initialize this preference page, but currently does nothing.
-   * \param workbench The workbench.
-   */
+  * \brief Called by framework to initialize this preference page, but currently does nothing.
+  * \param workbench The workbench.
+  */
   void Init(berry::IWorkbench::Pointer workbench);
 
   /**
-   * \brief Called by framework to create the GUI, and connect signals and slots.
-   * \param widget The Qt widget that acts as parent to all GUI components, as this class itself is not derived from QWidget.
-   */
+  * \brief Called by framework to create the GUI, and connect signals and slots.
+  * \param widget The Qt widget that acts as parent to all GUI components, as this class itself is not derived from QWidget.
+  */
   void CreateQtControl(QWidget* widget);
 
   /**
-   * \brief Required by framework to get hold of the GUI.
-   * \return QWidget* the top most QWidget for the GUI.
-   */
+  * \brief Required by framework to get hold of the GUI.
+  * \return QWidget* the top most QWidget for the GUI.
+  */
   QWidget* GetQtControl() const;
 
   /**
-   * \see IPreferencePage::PerformOk
-   */
+  * \see IPreferencePage::PerformOk
+  */
   virtual bool PerformOk();
 
   /**
-   * \see IPreferencePage::PerformCancel
-   */
+  * \see IPreferencePage::PerformCancel
+  */
   virtual void PerformCancel();
 
   /**
-   * \see IPreferencePage::Update
-   */
+  * \see IPreferencePage::Update
+  */
   virtual void Update();
 
   public slots:
@@ -89,6 +89,7 @@ public:
     void OnResetPresetClicked(bool checked);
     void OnAddLevelClicked(bool checked);
     void OnDelLevelClicked(bool checked);
+    void OnReferenceDoseChanged(double dose);
 
 protected:
 
@@ -108,6 +109,9 @@ protected:
   typedef mitk::rt::PresetMapType PresetMapType;
   PresetMapType m_Presets;
   std::string m_selectedPresetName;
+
+  bool m_referenceDoseChanged;
+  bool m_presetMapChanged;
 
   QmitkIsoDoseLevelSetModel* m_LevelSetModel;
   QmitkDoseColorDelegate* m_DoseColorDelegate;

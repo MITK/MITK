@@ -43,14 +43,15 @@ class QmitkIsoDoseLevelSetModel;
 class QmitkDoseColorDelegate;
 class QmitkDoseValueDelegate;
 class QmitkDoseVisualStyleDelegate;
+class ctkEvent;
 
 /**
-  \brief RTDoseVisualizer
+\brief RTDoseVisualizer
 
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+\warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 
-  \sa QmitkAbstractView
-  \ingroup ${plugin_target}_internal
+\sa QmitkAbstractView
+\ingroup ${plugin_target}_internal
 */
 class RTDoseVisualizer : public QmitkAbstractView
 {
@@ -58,11 +59,11 @@ class RTDoseVisualizer : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    RTDoseVisualizer();
-    virtual ~RTDoseVisualizer();
-    static const std::string VIEW_ID;
+  RTDoseVisualizer();
+  virtual ~RTDoseVisualizer();
+  static const std::string VIEW_ID;
 
   protected slots:
 
@@ -86,60 +87,64 @@ class RTDoseVisualizer : public QmitkAbstractView
 
     void OnReferenceDoseChanged(double);
 
-  protected:
+    void OnHandleCTKEventReferenceDoseChanged(const ctkEvent& event);
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    void OnHandleCTKEventPresetsChanged(const ctkEvent& event);
 
-    virtual void SetFocus();
+protected:
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes );
+  virtual void CreateQtPartControl(QWidget *parent);
 
-    /** Method updates the list widget according to the current m_freeIsoValues.*/
-    void UpdateFreeIsoValues();
+  virtual void SetFocus();
 
-    /** Update the members according to the currently selected node */
-    void UpdateBySelectedNode();
+  /// \brief called by QmitkFunctionality when DataManager's selection has changed
+  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+    const QList<mitk::DataNode::Pointer>& nodes );
 
-    /** Update the member widgets according to the information stored in the application preferences*/
-    void UpdateByPreferences();
+  /** Method updates the list widget according to the current m_freeIsoValues.*/
+  void UpdateFreeIsoValues();
 
-    /**helper function that iterates throug all data nodes and sets there iso level set property
-     according to the selected preset.
-     @TODO: should be moved outside the class, to be available for other classes at well.*/
-    void ActualizeIsoLevelsForAllDoseDataNodes();
+  /** Update the members according to the currently selected node */
+  void UpdateBySelectedNode();
 
-    /**helper function that iterates throug all data nodes and sets there reference dose value
-     according to the preference.
-     @TODO: should be moved outside the class, to be available for other classes at well.*/
-    void ActualizeReferenceDoseForAllDoseDataNodes();
+  /** Update the member widgets according to the information stored in the application preferences*/
+  void UpdateByPreferences();
 
-    /**helper function that iterates through all data nodes and sets there dose display style (relative/absolute)
-     according to the preference.
-     @TODO: should be moved outside the class, to be available for other classes at well.*/
-    void ActualizeDisplayStyleForAllDoseDataNodes();
+  /**helper function that iterates throug all data nodes and sets there iso level set property
+  according to the selected preset.
+  @TODO: should be moved outside the class, to be available for other classes at well.*/
+  void ActualizeIsoLevelsForAllDoseDataNodes();
 
-    Ui::RTDoseVisualizerControls m_Controls;
-    mitk::DataNode::Pointer m_selectedNode;
-    mitk::IsoDoseLevelVector::Pointer m_freeIsoValues;
-    /** Iso level set of the current node. Should normaly be a clone of the
-     * current iso preset. It held as own member because visibility
-     * settings may differ.*/
-    mitk::IsoDoseLevelSet::Pointer m_selectedNodeIsoSet;
-    mitk::rt::PresetMapType m_Presets;
-    std::string m_selectedPresetName;
+  /**helper function that iterates throug all data nodes and sets there reference dose value
+  according to the preference.
+  @TODO: should be moved outside the class, to be available for other classes at well.*/
+  void ActualizeReferenceDoseForAllDoseDataNodes();
 
-    /** Prescribed Dose of the selected data.*/
-    mitk::DoseValueAbs m_PrescribedDose_Data;
+  /**helper function that iterates through all data nodes and sets there dose display style (relative/absolute)
+  according to the preference.
+  @TODO: should be moved outside the class, to be available for other classes at well.*/
+  void ActualizeDisplayStyleForAllDoseDataNodes();
 
-    QmitkIsoDoseLevelSetModel* m_LevelSetModel;
-    QmitkDoseColorDelegate* m_DoseColorDelegate;
-    QmitkDoseValueDelegate* m_DoseValueDelegate;
-    QmitkDoseVisualStyleDelegate* m_DoseVisualDelegate;
+  Ui::RTDoseVisualizerControls m_Controls;
+  mitk::DataNode::Pointer m_selectedNode;
+  mitk::IsoDoseLevelVector::Pointer m_freeIsoValues;
+  /** Iso level set of the current node. Should normaly be a clone of the
+  * current iso preset. It held as own member because visibility
+  * settings may differ.*/
+  mitk::IsoDoseLevelSet::Pointer m_selectedNodeIsoSet;
+  mitk::rt::PresetMapType m_Presets;
+  std::string m_selectedPresetName;
+
+  /** Prescribed Dose of the selected data.*/
+  mitk::DoseValueAbs m_PrescribedDose_Data;
+
+  QmitkIsoDoseLevelSetModel* m_LevelSetModel;
+  QmitkDoseColorDelegate* m_DoseColorDelegate;
+  QmitkDoseValueDelegate* m_DoseValueDelegate;
+  QmitkDoseVisualStyleDelegate* m_DoseVisualDelegate;
 
 
-    bool m_internalUpdate;
+  bool m_internalUpdate;
 };
 
 #endif // RTDoseVisualizer_h

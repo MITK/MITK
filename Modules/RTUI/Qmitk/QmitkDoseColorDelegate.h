@@ -23,22 +23,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "RTUIExports.h"
 
 /** \class QmitkDoseColorDelegate
- \brief An item delegate for rendering and editing dose color in a QTableView.*/
+\brief An item delegate for rendering and editing dose color in a QTableView.*/
 class RTUI_EXPORT QmitkDoseColorDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 
-  public:
-    ///
-    /// Creates a new PropertyDelegate.
-    ///
-    QmitkDoseColorDelegate(QObject *parent = 0);
+public:
+  ///
+  /// Creates a new PropertyDelegate.
+  ///
+  QmitkDoseColorDelegate(QObject *parent = 0);
 
-    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
-      const QModelIndex &index);
+  bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+    const QModelIndex &index);
 
-    void paint(QPainter *painter, const QStyleOptionViewItem &option,
-      const QModelIndex &index) const;
+  void paint(QPainter *painter, const QStyleOptionViewItem &option,
+    const QModelIndex &index) const;
 };
 
 #endif

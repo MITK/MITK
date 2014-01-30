@@ -39,6 +39,7 @@ public:
   QmitkIsoDoseLevelSetModel(QObject *parent = NULL);
   virtual ~QmitkIsoDoseLevelSetModel() {};
 
+  /** Sets the data handled by the model and resets the modified flag*/
   void setIsoDoseLevelSet(mitk::IsoDoseLevelSet *pSet);
 
   virtual Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -62,20 +63,23 @@ public:
   void addLevel();
   void deleteLevel(const QModelIndex &index);
 
-public Q_SLOTS:
-  /**
-  * \brief Slot that can be used to set the prescribed dose.
-  */
-  void setReferenceDose(double newReferenceDose);
-  /**
-  * \brief Slot that can be used to adjust whether the dose should be displayed in absolute or relative units.
-  */
-  void setShowAbsoluteDose(bool showAbsoluteDose);
+  /**Indicates if the content of the model was modified since the data was set via setIsoDoseLevelSet()*/
+  bool isModified();
 
-  /**
-  * \brief Slat that can be used to adjust wether the model allows to edit only visibilities (no dose value or color)
-  */
-  void setVisibilityEditOnly(bool onlyVisibility);
+  public Q_SLOTS:
+    /**
+    * \brief Slot that can be used to set the prescribed dose.
+    */
+    void setReferenceDose(double newReferenceDose);
+    /**
+    * \brief Slot that can be used to adjust whether the dose should be displayed in absolute or relative units.
+    */
+    void setShowAbsoluteDose(bool showAbsoluteDose);
+
+    /**
+    * \brief Slat that can be used to adjust wether the model allows to edit only visibilities (no dose value or color)
+    */
+    void setVisibilityEditOnly(bool onlyVisibility);
 
 private:
   mitk::IsoDoseLevelSet::Pointer m_DoseSet;
@@ -84,6 +88,9 @@ private:
   bool m_visibilityEditOnly;
 
   mitk::DoseValueAbs m_referenceDose;
+
+  /** Indicates if the data of the model was modified, since the model was set. */
+  bool m_modified;
 
 };
 

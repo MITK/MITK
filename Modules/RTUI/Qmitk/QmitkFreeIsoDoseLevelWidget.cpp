@@ -32,114 +32,114 @@ QmitkFreeIsoDoseLevelWidget::QmitkFreeIsoDoseLevelWidget(QWidget*): m_ReferenceD
   connect(this->colorBtn, SIGNAL(colorChanged(QColor)), this, SLOT(OnColorChanged(QColor)));
 }
 
-  mitk::DoseValueAbs
-    QmitkFreeIsoDoseLevelWidget::
-    getReferenceDose() const
-  {
-    return this->m_ReferenceDose;
-  };
+mitk::DoseValueAbs
+  QmitkFreeIsoDoseLevelWidget::
+  getReferenceDose() const
+{
+  return this->m_ReferenceDose;
+};
 
-  mitk::IsoDoseLevel*
-    QmitkFreeIsoDoseLevelWidget::
-    getIsoDoseLevel() const
-  {
-    return this->m_IsoDoseLevel;
-  };
+mitk::IsoDoseLevel*
+  QmitkFreeIsoDoseLevelWidget::
+  getIsoDoseLevel() const
+{
+  return this->m_IsoDoseLevel;
+};
 
-  void QmitkFreeIsoDoseLevelWidget::
-    setReferenceDose(double newReferenceDose)
+void QmitkFreeIsoDoseLevelWidget::
+  setReferenceDose(double newReferenceDose)
+{
+  if (newReferenceDose != m_ReferenceDose)
   {
-    if (newReferenceDose != m_ReferenceDose)
-    {
-      this->m_ReferenceDose = newReferenceDose;
-      this->update();
-    }
-  };
-
-  void QmitkFreeIsoDoseLevelWidget::
-    setIsoDoseLevel(mitk::IsoDoseLevel* level)
-  {
-    if (level != m_IsoDoseLevel)
-    {
-      if(!level)
-      {
-        mitkThrow() << "Error. Cannot set iso dose level for widget to NULL pointer.";
-      }
-
-      this->m_IsoDoseLevel = level;
-      this->update();
-    }
+    this->m_ReferenceDose = newReferenceDose;
+    this->update();
   }
+};
 
-  void QmitkFreeIsoDoseLevelWidget::
-    OnRelValueChanged(double newValue)
+void QmitkFreeIsoDoseLevelWidget::
+  setIsoDoseLevel(mitk::IsoDoseLevel* level)
+{
+  if (level != m_IsoDoseLevel)
   {
-    if(!m_InternalUpdate)
+    if(!level)
     {
-      updateValue(newValue/100.0);
+      mitkThrow() << "Error. Cannot set iso dose level for widget to NULL pointer.";
     }
-  };
 
-  void QmitkFreeIsoDoseLevelWidget::
-    OnAbsValueChanged(double newValue)
+    this->m_IsoDoseLevel = level;
+    this->update();
+  }
+}
+
+void QmitkFreeIsoDoseLevelWidget::
+  OnRelValueChanged(double newValue)
+{
+  if(!m_InternalUpdate)
   {
-    if(!m_InternalUpdate)
-    {
-      updateValue(newValue/this->m_ReferenceDose);
-    }
-  };
+    updateValue(newValue/100.0);
+  }
+};
 
-  void QmitkFreeIsoDoseLevelWidget::
-    OnSliderChanged(int newValue)
+void QmitkFreeIsoDoseLevelWidget::
+  OnAbsValueChanged(double newValue)
+{
+  if(!m_InternalUpdate)
   {
-    if(!m_InternalUpdate)
-    {
-      updateValue(newValue/100.0);
-    }
-  };
+    updateValue(newValue/this->m_ReferenceDose);
+  }
+};
 
-  void QmitkFreeIsoDoseLevelWidget::
-    OnVisibleClicked(bool checked)
+void QmitkFreeIsoDoseLevelWidget::
+  OnSliderChanged(int newValue)
+{
+  if(!m_InternalUpdate)
   {
-    this->m_IsoDoseLevel->SetVisibleIsoLine(checked);
-    emit VisualizationStyleChanged(this->m_IsoDoseLevel);
-  };
+    updateValue(newValue/100.0);
+  }
+};
 
-  void QmitkFreeIsoDoseLevelWidget::
-    OnColorChanged(QColor color)
-  {
-    mitk::IsoDoseLevel::ColorType doseColor;
-    doseColor.SetRed(color.redF());
-    doseColor.SetGreen(color.greenF());
-    doseColor.SetBlue(color.blueF());
-    this->m_IsoDoseLevel->SetColor(doseColor);
-    emit ColorChanged(this->m_IsoDoseLevel);
-  };
+void QmitkFreeIsoDoseLevelWidget::
+  OnVisibleClicked(bool checked)
+{
+  this->m_IsoDoseLevel->SetVisibleIsoLine(checked);
+  emit VisualizationStyleChanged(this->m_IsoDoseLevel);
+};
 
-  void QmitkFreeIsoDoseLevelWidget::
-    updateValue(mitk::DoseValueRel newDose)
-  {
-    m_InternalUpdate = true;
+void QmitkFreeIsoDoseLevelWidget::
+  OnColorChanged(QColor color)
+{
+  mitk::IsoDoseLevel::ColorType doseColor;
+  doseColor.SetRed(color.redF());
+  doseColor.SetGreen(color.greenF());
+  doseColor.SetBlue(color.blueF());
+  this->m_IsoDoseLevel->SetColor(doseColor);
+  emit ColorChanged(this->m_IsoDoseLevel);
+};
 
-    mitk::DoseValueRel oldValue = this->m_IsoDoseLevel->GetDoseValue();
-    this->m_IsoDoseLevel->SetDoseValue(newDose);
-    this->sbAbsValue->setValue(newDose*this->m_ReferenceDose);
-    this->sbRelValue->setValue(newDose*100);
-    this->doseSlider->setValue(newDose*100);
+void QmitkFreeIsoDoseLevelWidget::
+  updateValue(mitk::DoseValueRel newDose)
+{
+  m_InternalUpdate = true;
 
-    m_InternalUpdate = false;
+  mitk::DoseValueRel oldValue = this->m_IsoDoseLevel->GetDoseValue();
+  this->m_IsoDoseLevel->SetDoseValue(newDose);
+  this->sbAbsValue->setValue(newDose*this->m_ReferenceDose);
+  this->sbRelValue->setValue(newDose*100);
+  this->doseSlider->setValue(newDose*100);
 
-    emit ValueChanged(this->m_IsoDoseLevel,oldValue);
-  };
+  m_InternalUpdate = false;
 
-  void QmitkFreeIsoDoseLevelWidget::
-    update()
-  {
-    updateValue(this->m_IsoDoseLevel->GetDoseValue());
+  emit ValueChanged(this->m_IsoDoseLevel,oldValue);
+};
 
-    this->checkVisibleIso->setChecked(this->m_IsoDoseLevel->GetVisibleIsoLine());
+void QmitkFreeIsoDoseLevelWidget::
+  update()
+{
+  updateValue(this->m_IsoDoseLevel->GetDoseValue());
 
-    QColor color;
-    color.setRgbF(this->m_IsoDoseLevel->GetColor().GetRed(),this->m_IsoDoseLevel->GetColor().GetGreen(),this->m_IsoDoseLevel->GetColor().GetBlue());
-    this->colorBtn->setColor(color);
-  };
+  this->checkVisibleIso->setChecked(this->m_IsoDoseLevel->GetVisibleIsoLine());
+
+  QColor color;
+  color.setRgbF(this->m_IsoDoseLevel->GetColor().GetRed(),this->m_IsoDoseLevel->GetColor().GetGreen(),this->m_IsoDoseLevel->GetColor().GetBlue());
+  this->colorBtn->setColor(color);
+};

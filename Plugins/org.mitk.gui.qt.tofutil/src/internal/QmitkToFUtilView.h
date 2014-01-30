@@ -32,7 +32,6 @@ class QTimer;
 #include <mitkOpenCVVideoSource.h>
 #include <mitkSurface.h>
 #include <mitkToFDistanceImageToSurfaceFilter.h>
-#include <mitkToFSurfaceVtkMapper3D.h>
 #include <mitkToFImageRecorder.h>
 #include <mitkToFCompositeFilter.h>
 #include <mitkCameraIntrinsics.h>
@@ -185,8 +184,6 @@ private:
       \brief Reset all GUI related things to default. E.g. show sagittal and coronal slices in the renderwindows.
       */
   void ResetGUIToDefault();
-
-  mitk::ToFSurfaceVtkMapper3D::Pointer m_ToFSurfaceVtkMapper3D;
 };
 
 #endif // _QMITKTOFUTILVIEW_H_INCLUDED

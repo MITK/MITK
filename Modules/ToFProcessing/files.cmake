@@ -4,6 +4,5 @@ set(CPP_FILES
   mitkToFDistanceImageToSurfaceFilter.cpp
   mitkToFImageDownsamplingFilter.cpp
   mitkToFProcessingCommon.cpp
-  mitkToFSurfaceVtkMapper3D.cpp
   mitkToFTestingCommon.cpp
 )

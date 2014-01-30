@@ -172,6 +172,10 @@ namespace itk
     mask->SetRegions(m_GradientImagePointer->GetLargestPossibleRegion().GetSize());
     mask->SetSpacing(m_GradientImagePointer->GetSpacing());
     mask->SetOrigin(m_GradientImagePointer->GetOrigin());
+    mask->SetDirection( m_GradientImagePointer->GetDirection() );  // Set the image direction
+    mask->SetLargestPossibleRegion( m_GradientImagePointer->GetLargestPossibleRegion() );
+    mask->SetBufferedRegion( m_GradientImagePointer->GetLargestPossibleRegion() );
+    mask->SetRequestedRegion( m_GradientImagePointer->GetLargestPossibleRegion() );
     mask->Allocate();
 
     // Image thresholding: For every voxel mean B0 image is calculated and then voxels of mean B0 less than the
@@ -315,33 +319,15 @@ namespace itk
 
 
 
-
-
     typename TensorImageType::Pointer tensorImg;
-    tensorImg = TensorImageType::New();
-    tensorImg->SetRegions(m_GradientImagePointer->GetLargestPossibleRegion().GetSize());
-    tensorImg->SetSpacing(m_GradientImagePointer->GetSpacing());
-    tensorImg->SetOrigin(m_GradientImagePointer->GetOrigin());
-    tensorImg->Allocate();
-
-    //14.10.2013
-    /*
-
-    typename TensorImageType::Pointer temp_tensorImg = TensorImageType::New();
-    temp_tensorImg->SetRegions(m_GradientImagePointer->GetLargestPossibleRegion().GetSize());
-    temp_tensorImg->SetSpacing(m_GradientImagePointer->GetSpacing());
-    temp_tensorImg->SetOrigin(m_GradientImagePointer->GetOrigin());
-    temp_tensorImg->Allocate();
-
-    */
-
-
-    //typename TensorImageType::Pointer temp_tensorImg = TensorImageType::New();
-
-    // Deep copy a temporary tensor image for the pre-processing methods.
-
-    //14.10.2013
-    //DeepCopyTensorImage(tensorImg,temp_tensorImg);
+     tensorImg = TensorImageType::New();
+     tensorImg->SetSpacing( m_GradientImagePointer->GetSpacing() );   // Set the image spacing
+     tensorImg->SetOrigin( m_GradientImagePointer->GetOrigin() );     // Set the image origin
+     tensorImg->SetDirection( m_GradientImagePointer->GetDirection() );  // Set the image direction
+     tensorImg->SetLargestPossibleRegion( m_GradientImagePointer->GetLargestPossibleRegion() );
+     tensorImg->SetBufferedRegion( m_GradientImagePointer->GetLargestPossibleRegion() );
+     tensorImg->SetRequestedRegion( m_GradientImagePointer->GetLargestPossibleRegion() );
+     tensorImg->Allocate();
 
     //Declaration of vectors that contains too high or too low atenuation for each gradient. Attenuation is only calculated for
     //non B0 images so nof-numberb0.

@@ -9,6 +9,8 @@ if(MITK_USE_Boost)
     message(FATAL_ERROR "BOOST_ROOT variable is defined but corresponds to non-existing directory")
   endif()
 
+  string(REPLACE "^^" ";" MITK_USE_Boost_LIBRARIES "${MITK_USE_Boost_LIBRARIES}")
+
   set(proj Boost)
   set(proj_DEPENDENCIES )
   set(Boost_DEPENDS ${proj})
@@ -24,7 +26,6 @@ if(MITK_USE_Boost)
       set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
 
       # We need binary boost libraries
-      string(REPLACE "^^" ";" MITK_USE_Boost_LIBRARIES "${MITK_USE_Boost_LIBRARIES}")
       foreach(_boost_lib ${MITK_USE_Boost_LIBRARIES})
         set(_boost_libs ${_boost_libs} --with-${_boost_lib})
       endforeach()

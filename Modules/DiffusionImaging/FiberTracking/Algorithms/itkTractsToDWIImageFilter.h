@@ -78,6 +78,7 @@ protected:
     itk::Vector<double, 3> GetItkVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
+    double RoundToNearest(double num);
     std::string GetTime();
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts. */

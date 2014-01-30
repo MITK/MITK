@@ -27,6 +27,8 @@ class DiffusionCore_EXPORT RegistrationWrapper : public itk::LightObject
 {
 public:
 
+  typedef itk::Image<ScalarType,3> ItkImageType;
+  typedef itk::Image<unsigned char,3> ItkBinaryImageType;
   typedef double* RidgidTransformType;
 
   mitkClassMacro(RegistrationWrapper, itk::LightObject)

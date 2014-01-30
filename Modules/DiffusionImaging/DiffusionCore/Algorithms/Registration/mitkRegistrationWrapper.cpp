@@ -4,6 +4,9 @@
 #include "mitkDiffusionImage.h"
 #include <mitkDiffusionImageCorrectionFilter.h>
 #include "itkB0ImageExtractionImageFilter.h"
+#include <itkResampleImageFilter.h>
+#include <itkWindowedSincInterpolateImageFunction.h>
+#include <itkNearestNeighborExtrapolateImageFunction.h>
 
 #include <vnl/vnl_inverse.h>
 
@@ -16,26 +19,9 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
 {
   typedef mitk::DiffusionImage<short> DiffusionImageType;
 
-  mitk::Image::Pointer ref;
-  mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
-  registrationMethod->SetTransformToRigid();
-  if (binary)
-    registrationMethod->SetUseNearestNeighborInterpolation(true);
-
-  if (resampleReference.IsNotNull())
-  {
-    registrationMethod->SetFixedImage( resampleReference );
-  }
-  else
-  {
-    // clone image, to prevent recursive access on resampling ..
-    ref = img->Clone();
-    registrationMethod->SetFixedImage( ref );
-  }
-
   if (dynamic_cast<DiffusionImageType*> (img.GetPointer()) == NULL)
   {
-    itk::Image<float,3>::Pointer itkImage = itk::Image<float,3>::New();
+    ItkImageType::Pointer itkImage = ItkImageType::New();
     CastToItkImage(img, itkImage);
 
     typedef itk::Euler3DTransform< double > RigidTransformType;
@@ -60,7 +46,37 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
 
     itkImage->SetOrigin(newOrigin);
     itkImage->SetDirection(newDirection);
-    GrabItkImageMemory(itkImage, img);
+
+    // Perform Resampling if reference image is provided
+    if (resampleReference.IsNotNull())
+    {
+      typedef itk::ResampleImageFilter<ItkImageType, ItkImageType>  ResampleFilterType;
+
+      ItkImageType::Pointer itkReference = ItkImageType::New();
+      CastToItkImage(resampleReference,itkReference);
+
+      typedef itk::WindowedSincInterpolateImageFunction< ItkImageType, 3> WindowedSincInterpolatorType;
+      typename WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
+
+      typedef itk::NearestNeighborInterpolateImageFunction< ItkImageType, double > NearestNeighborInterpolatorType;
+      typename NearestNeighborInterpolatorType::Pointer nn_interpolator = NearestNeighborInterpolatorType::New();
+
+
+      ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+      resampler->SetInput(itkImage);
+      resampler->SetReferenceImage( itkReference );
+      resampler->UseReferenceImageOn();
+      if (binary)
+        resampler->SetInterpolator(nn_interpolator);
+      else
+        resampler->SetInterpolator(sinc_interpolator);
+
+      resampler->Update();
+
+      GrabItkImageMemory(resampler->GetOutput(), img);
+    }
+    else
+     GrabItkImageMemory(itkImage, img);
 
   }
   else

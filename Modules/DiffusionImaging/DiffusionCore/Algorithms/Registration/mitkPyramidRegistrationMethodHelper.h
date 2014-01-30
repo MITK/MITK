@@ -22,11 +22,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 #include <itkRegularStepGradientDescentOptimizer.h>
-#include <itkMattesMutualInformationImageToImageMetric.h>
-#include <itkNormalizedCorrelationImageToImageMetric.h>
+#include <itkMattesMutualInformationImageToImageMetricv4.h>
+#include <itkCorrelationImageToImageMetricv4.h>
+#include <itkGradientDescentLineSearchOptimizerv4.h>
+
+#include <itkImageRegistrationMethodv4.h>
 
 #include <itkAffineTransform.h>
 #include <itkEuler3DTransform.h>
+
+#include <itkMattesMutualInformationImageToImageMetric.h>
+#include <itkNormalizedCorrelationImageToImageMetric.h>
 
 #include <itkMultiResolutionImageRegistrationMethod.h>
 #include <itkImageMomentsCalculator.h>
@@ -85,7 +91,7 @@ public:
 
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >(registration->GetOptimizer());
 
-    MITK_INFO << optimizer->GetStopConditionDescription()  << "\n"
+    MITK_INFO /*<< optimizer->GetStopConditionDescription()  << "\n"*/
                << optimizer->GetValue() << " : " << optimizer->GetCurrentPosition();
 
     optimizer->SetMaximumStepLength( optimizer->GetMaximumStepLength() * 0.25f );
@@ -105,6 +111,7 @@ public:
 
   void Execute(itk::Object *caller, const itk::EventObject & /*event*/)
   {
+
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >( caller );
 
     unsigned int currentIter = optimizer->GetCurrentIteration();
@@ -114,6 +121,33 @@ public:
 
   void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/)
   {
+
+  }
+};
+
+template <typename OptimizerType>
+class OptimizerIterationCommandv4 : public itk::Command
+{
+public:
+  itkNewMacro( OptimizerIterationCommandv4 )
+
+  void Execute(itk::Object *object, const itk::EventObject & event)
+  {
+    OptimizerType* optimizer = dynamic_cast< OptimizerType* >( object );
+
+    if( typeid( event ) != typeid( itk::IterationEvent ) )
+      { return; }
+
+    unsigned int currentIter = optimizer->GetCurrentIteration();
+    MITK_INFO << "[" << currentIter << "] : " << optimizer->GetCurrentMetricValue() << " : "
+              << optimizer->GetMetric()->GetParameters() ;
+              //<< " : " << optimizer->GetScales();
+
+  }
+
+  void Execute(const itk::Object * object, const itk::EventObject & event)
+  {
+
 
   }
 };

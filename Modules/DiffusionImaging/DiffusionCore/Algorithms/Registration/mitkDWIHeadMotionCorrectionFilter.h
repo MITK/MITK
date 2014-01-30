@@ -55,6 +55,7 @@ public:
   itkGetMacro( CurrentStep, unsigned long )
   itkGetMacro( IsInValidState, bool)
   itkSetMacro( AbortRegistration, bool )
+  itkSetMacro( AverageUnweighted, bool )
 
   // public typedefs
   typedef typename Superclass::InputImageType         DiffusionImageType;
@@ -73,6 +74,7 @@ protected:
   unsigned long   m_Steps;
   bool            m_IsInValidState;       ///< Whether the filter is in a valid state, false if error occured
   bool            m_AbortRegistration;        ///< set flag to abort
+  bool            m_AverageUnweighted;
 
   /**
    * @brief Averages an 3d+t image along the time axis.

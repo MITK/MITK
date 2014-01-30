@@ -31,7 +31,7 @@ QmitkXnatConnectionManager::QmitkXnatConnectionManager() :
 
   ctkXnatLoginProfile profile;
   profile.setName("Default");
-  profile.setServerUrl(QString::fromStdString(nodeConnectionPref->Get("Host Address", "")));
+  profile.setServerUrl(QString::fromStdString(nodeConnectionPref->Get("Server Address", "")));
   profile.setUserName(QString::fromStdString(nodeConnectionPref->Get("Username", "")));
   profile.setPassword(QString::fromStdString(nodeConnectionPref->Get("Password", "")));
   profile.setDefault(true);

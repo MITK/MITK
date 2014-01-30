@@ -100,7 +100,7 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
 
     QString keyString;
     QString errString;
-    for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin(); it != m_LineEditors.end()-1; ++it)
+    for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin(); it != m_LineEditors.end(); ++it)
     {
       keyString = it.value().second->text();
 
@@ -205,8 +205,7 @@ void QmitkXnatConnectionPreferencePage::Update()
   IPreferences::Pointer _XnatConnectionPreferencesNode = m_XnatConnectionPreferencesNode.Lock();
   if(_XnatConnectionPreferencesNode.IsNotNull())
   {
-    for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin()
-      ; it != m_LineEditors.end(); ++it)
+    for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin(); it != m_LineEditors.end(); ++it)
     {
       it.value().second->setText(QString::fromStdString(_XnatConnectionPreferencesNode->Get(it.value().first.toStdString(),
         it.value().second->text().toStdString())));

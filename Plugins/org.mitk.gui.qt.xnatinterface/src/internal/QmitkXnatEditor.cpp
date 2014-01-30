@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "QmitkXnatEditor.h"
 
 // Qmitk
-#include "QmitkXnatEditor.h"
 #include "QmitkXnatObjectEditorInput.h"
 #include "QmitkXnatTreeBrowserView.h"
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <direct.h>
 
 // CTK XNAT Core
 #include "ctkXnatLoginProfile.h"
@@ -35,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkXnatScanFolder.h"
 #include "ctkXnatScanResource.h"
 #include "ctkXnatFile.h"
+#include "ctkXnatException.h"
 
 // CTK XNAT Widgets
 #include "ctkXnatTreeModel.h"
@@ -82,16 +84,21 @@ QmitkXnatEditor::QmitkXnatEditor() :
   m_DataStorageServiceTracker.open();
   if(m_DownloadPath.isEmpty())
   {
-    m_DownloadPath = "C:/Users/knorr/Downloads/MITK_XNAT_DOWNLOADS/";
+    m_DownloadPath = "../../../../MITK_XNAT_DOWNLOADS/";
+#ifndef __MSDOS__
+    mkdir(m_DownloadPath.toStdString().c_str());
+#else /* Annahme: Unix */
+    mkdir(m_DownloadPath.toStdString().c_str(), 777);
+#endif
   }
 }
 
 QmitkXnatEditor::~QmitkXnatEditor()
 {
-  m_DataStorageServiceTracker.close();
   delete m_ListModel;
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   s->RemoveSelectionListener(m_SelectionListener);
+  m_DataStorageServiceTracker.close();
 }
 
 bool QmitkXnatEditor::IsDirty() const
@@ -127,7 +134,24 @@ void QmitkXnatEditor::SetInput(berry::IEditorInput::Pointer input)
   }
   else
   {
-    m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
+    QString errString;
+    try
+    {
+      m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
+    }
+    catch(ctkXnatAuthenticationException auth)
+    {
+      errString += QString("Test connection failed.\nAuthentication error: Wrong name or password.");
+      QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
+      return;
+    }
+    catch(ctkException e)
+    {
+      errString += QString("Test connection failed with error code:\n\"%1\"").arg(e.message());
+      QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
+      return;
+    }
+
     QmitkXnatObjectEditorInput::Pointer xoPtr = QmitkXnatObjectEditorInput::New( m_Session->dataModel() );
     berry::IEditorInput::Pointer editorInput( xoPtr );
     SetInputWithNotify(editorInput);
@@ -189,7 +213,7 @@ void QmitkXnatEditor::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 void QmitkXnatEditor::UpdateList()
 {
   ctkXnatObject* inputObject = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject();
-  if( inputObject == NULL /*|| dynamic_cast<ctkXnatFile*>(inputObject) == NULL*/ )
+  if( inputObject == NULL )
     return;
   m_ListModel->setRootObject( inputObject );
   m_Controls.treeView->reset();
@@ -314,7 +338,7 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
 {
   if (!index.isValid()) return;
 
-  ctkXnatObject* child = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->children().takeAt(index.row());
+  ctkXnatObject* child = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->children().at(index.row());
   if( child != NULL )
   {
     ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(child);
@@ -325,7 +349,7 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
       mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
       if(dsService != NULL)
       {
-        mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode(m_DownloadPath.append(file->id()).toStdString());
+        mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode((m_DownloadPath + file->id()).toStdString());
         if ( ( node.IsNotNull() ) && ( node->GetData() != NULL ) )
         {
           dsService->GetDataStorage()->GetDataStorage()->Add(node);

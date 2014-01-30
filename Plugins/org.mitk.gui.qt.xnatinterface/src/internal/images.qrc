@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="windowIcon">
-    <file>xnat_icon.ico</file>
+    <file>xnat_search_icon.ico</file>
+    <file>xnat_treebrowser_icon.ico</file>
   </qresource>
 </RCC>

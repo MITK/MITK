@@ -19,10 +19,6 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>xnat_icon.ico</normaloff>xnat_icon.ico</iconset>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">

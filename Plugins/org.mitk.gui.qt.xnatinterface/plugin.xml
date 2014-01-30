@@ -12,11 +12,7 @@
     <view id="org.mitk.views.qmitkxnattreebrowserview"
       name="XNAT Tree Browser"
       class="QmitkXnatTreeBrowserView"
-      icon="resources/icon.xpm"/>
-    <view id="org.mitk.views.qmitkxnatsimplesearchview"
-      name="XNAT Simple Search"
-      class="QmitkXnatSimpleSearchView"
-      icon="resources/icon.xpm"/>
+      icon="resources/xnat_treebrowser_icon.xpm"/>
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">

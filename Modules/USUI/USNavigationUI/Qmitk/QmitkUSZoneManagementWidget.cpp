@@ -123,6 +123,8 @@ void QmitkUSZoneManagementWidget::RemoveSelectedRows()
   {
     m_ZonesDataModel->removeRow(i.previous().row());
   }
+
+  emit ZoneRemoved();
 }
 
 void QmitkUSZoneManagementWidget::OnStartAddingZone()

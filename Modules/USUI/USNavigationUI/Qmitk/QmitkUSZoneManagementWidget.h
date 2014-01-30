@@ -40,6 +40,11 @@ signals:
    */
   void ZoneAdded();
 
+  /**
+   * \brief Emmited whenever a new zone was removed from the data mode.
+   */
+  void ZoneRemoved();
+
 public slots:
   /**
    * \brief Removes all rows from the data model which are selected in the table.

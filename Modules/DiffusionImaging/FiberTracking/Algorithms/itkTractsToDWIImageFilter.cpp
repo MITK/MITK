@@ -49,9 +49,11 @@ namespace itk
 
 template< class PixelType >
 TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
-    : m_UseConstantRandSeed(false)
+    : m_FiberBundle(NULL)
+    , m_StatusText("")
+    , m_UseConstantRandSeed(false)
+    , m_RandGen(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
 {
-    m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
     m_RandGen->SetSeed();
 }
 

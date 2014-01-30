@@ -31,21 +31,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk {
 
-//#define QBALL_RECON_PI       M_PI
-
 template< class TTensorPixelType, class TPDPixelType>
 StreamlineTrackingFilter< TTensorPixelType,
 TPDPixelType>
-::StreamlineTrackingFilter():
-    m_FaThreshold(0.2),
-    m_StepSize(1),
-    m_MaxLength(10000),
-    m_MinTractLength(0.0),
-    m_SeedsPerVoxel(1),
-    m_F(1.0),
-    m_G(0.0),
-    m_Interpolate(true),
-    m_ResampleFibers(false)
+::StreamlineTrackingFilter()
+    : m_FiberPolyData(NULL)
+    , m_Points(NULL)
+    , m_Cells(NULL)
+    , m_FaImage(NULL)
+    , m_NumberOfInputs(1)
+    , m_FaThreshold(0.2)
+    , m_MinCurvatureRadius(0)
+    , m_StepSize(0)
+    , m_MaxLength(10000)
+    , m_MinTractLength(0.0)
+    , m_SeedsPerVoxel(1)
+    , m_F(1.0)
+    , m_G(0.0)
+    , m_Interpolate(true)
+    , m_PointPistance(0.0)
+    , m_ResampleFibers(false)
+    , m_SeedImage(NULL)
+    , m_MaskImage(NULL)
 {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
@@ -68,8 +75,8 @@ TPDPixelType>
 ::BeforeThreadedGenerateData()
 {
     m_FiberPolyData = FiberPolyDataType::New();
-    m_Points = vtkPoints::New();
-    m_Cells = vtkCellArray::New();
+    m_Points = vtkSmartPointer< vtkPoints >::New();
+    m_Cells = vtkSmartPointer< vtkCellArray >::New();
 
     InputImageType* inputImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
     m_ImageSize.resize(3);

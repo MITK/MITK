@@ -50,6 +50,8 @@ void mitk::USZonesInteractor::UpdateSurface(mitk::DataNode::Pointer dataNode)
   vtkSphereSource *vtkData = vtkSphereSource::New();
   vtkData->SetRadius( radius );
   vtkData->SetCenter(0,0,0);
+  vtkData->SetPhiResolution(20);
+  vtkData->SetThetaResolution(20);
   vtkData->Update();
   zone->SetVtkPolyData(vtkData->GetOutput());
   vtkData->Delete();
@@ -94,12 +96,21 @@ bool mitk::USZonesInteractor::AddCenter(mitk::StateMachineAction* , mitk::Intera
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL) { return false; }
 
-  this->GetDataNode()->SetBoolProperty(DATANODE_PROPERTY_CREATED, false);
+  mitk::DataNode::Pointer dataNode = this->GetDataNode();
+  dataNode->SetBoolProperty(DATANODE_PROPERTY_CREATED, false);
+
+  // make sure that data node contains data
+  mitk::BaseData::Pointer dataNodeData = this->GetDataNode()->GetData();
+  if ( dataNodeData.IsNull() )
+  {
+    dataNodeData = mitk::Surface::New();
+    this->GetDataNode()->SetData(dataNodeData);
+  }
 
   // set origin of the data node to the mouse click position
-  this->GetDataNode()->GetData()->GetGeometry()->SetOrigin(positionEvent->GetPositionInWorld());
+  dataNodeData->GetGeometry()->SetOrigin(positionEvent->GetPositionInWorld());
 
-  this->GetDataNode()->SetFloatProperty("opacity", 0.60f );
+  dataNode->SetFloatProperty("opacity", 0.60f );
 
   return true;
 }

@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkIOUtil.h"
 
-#include "mitkDiffusionCoreObjectFactory.h"
-
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
 
 #include "mitkDWIHeadMotionCorrectionFilter.h"
@@ -33,8 +31,6 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
   MITK_TEST_BEGIN("mitkExtractSingleShellTest");
 
   MITK_TEST_CONDITION_REQUIRED( argc > 3, "Specify input and output and the shell to be extracted");
-
-  RegisterDiffusionCoreObjectFactory();
 
   /*
     1. Get input data
@@ -56,8 +52,7 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
   // GetShellSelection from GUI
   BValueMap shellSelectionMap;
   BValueMap originalShellMap = dwimage->GetB_ValueMap();
-  std::vector<int> newNumGradientDirections;
-  int shellCounter = 0;
+  std::vector<unsigned int> newNumGradientDirections;
 
   shellSelectionMap[extract_value] = originalShellMap[extract_value];
   newNumGradientDirections.push_back( originalShellMap[extract_value].size() ) ;

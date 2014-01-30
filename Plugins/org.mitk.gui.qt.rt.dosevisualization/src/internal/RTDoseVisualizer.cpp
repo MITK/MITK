@@ -55,12 +55,12 @@ RTDoseVisualizer::RTDoseVisualizer()
     m_internalUpdate = false;
     m_PrescribedDose_Data = 0.0;
 
-    mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
-    std::string path = "/home/riecker/mitkShaderLighting.xml";
-    std::string isoShaderName = "mitkIsoLineShader";
-    MITK_INFO << "shader found under: " << path;
-    std::ifstream str(path.c_str());
-    shadoRepo->LoadShader(str,isoShaderName);
+//    mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
+//    std::string path = "/home/riecker/mitkShaderLighting.xml";
+//    std::string isoShaderName = "mitkIsoLineShader";
+//    MITK_INFO << "shader found under: " << path;
+//    std::ifstream str(path.c_str());
+//    shadoRepo->LoadShader(str,isoShaderName);
 }
 
 RTDoseVisualizer::~RTDoseVisualizer()
@@ -98,8 +98,6 @@ void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
   this->m_Controls.isoLevelSetView->setItemDelegateForColumn(3,m_DoseVisualDelegate);
   this->m_Controls.isoLevelSetView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  connect(m_Controls.btnloadDose, SIGNAL(clicked()), this, SLOT(LoadRTDoseFile()));
-  connect(m_Controls.btnIsoLines, SIGNAL(clicked()), this, SLOT(LoadISOLines()));
   connect(m_Controls.btnConvert, SIGNAL(clicked()), this, SLOT(OnConvertButtonClicked()));
   connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), this, SLOT(OnReferenceDoseChanged(double)));
   connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), m_LevelSetModel, SLOT(setReferenceDose(double)));
@@ -114,68 +112,6 @@ void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
   connect(m_Controls.btnUsePrescribedDose, SIGNAL(clicked()), this, SLOT(OnUsePrescribedDoseClicked()));
 
   this->UpdateBySelectedNode();
-}
-
-void RTDoseVisualizer::LoadISOLines()
-{
-  mitk::rt::PresetMapType preset = mitk::rt::LoadPresetsMap();
-  mitk::IsoDoseLevelSet::Pointer levelSets = preset.at("Virtuos");
-  for(mitk::IsoDoseLevelSet::ConstIterator levelSet = levelSets->Begin(); levelSet != levelSets->End(); ++levelSet)
-  {
-    MITK_INFO << "X###############################################################" << levelSet->GetColor() << endl;
-  }
-
-  bool result;
-  if(m_selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),result) && result)
-  {
-    m_selectedNode->SetProperty("shader",mitk::ShaderProperty::New("mitkIsoLineShader"));
-    m_selectedNode->SetProperty("shader.mitkIsoLineShader.CustomISO", mitk::FloatProperty::New(20));
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-  else
-  {
-    MITK_WARN << "Selected file has to be a Dose file!";
-  }
-}
-
-void RTDoseVisualizer::LoadRTDoseFile()
-{
-  QFileDialog dialog;
-  dialog.setNameFilter(tr("Images (*.dcm"));
-
-  mitk::DicomSeriesReader::StringContainer files;
-  QStringList fileNames = dialog.getOpenFileNames();
-  if(fileNames.empty())
-  {
-    return;
-  }
-  QStringListIterator fileNamesIterator(fileNames);
-  while(fileNamesIterator.hasNext())
-  {
-    files.push_back(fileNamesIterator.next().toStdString());
-  }
-
-  std::string tmp = files.front();
-  const char* filename = tmp.c_str();
-  char* ncFilename = const_cast<char*>(filename);
-
-  mitk::DicomRTReader::Pointer _DicomRTReader = mitk::DicomRTReader::New();
-
-  DcmFileFormat file;
-  OFCondition outp = file.loadFile(filename, EXS_Unknown);
-  if(outp.bad())
-  {
-    QMessageBox::information(NULL,"Error","Cant read the file");
-  }
-  DcmDataset *dataset = file.getDataset();
-
-  mitk::DataNode::Pointer mitkImage = mitk::DataNode::New();
-  mitkImage = _DicomRTReader->LoadRTDose(dataset,ncFilename);
-
-  GetDataStorage()->Add(mitkImage);
-
-  mitk::TimeSlicedGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );
 }
 
 void RTDoseVisualizer::OnReferenceDoseChanged(double value)

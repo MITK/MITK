@@ -874,10 +874,15 @@ vnl_vector_fixed<double, 3> TractsToDWIImageFilter< PixelType >::GetVnlVector(Ve
 }
 
 template< class PixelType >
+double TractsToDWIImageFilter< PixelType >::RoundToNearest(double num) {
+    return (num > 0.0) ? floor(num + 0.5) : ceil(num - 0.5);
+}
+
+template< class PixelType >
 std::string TractsToDWIImageFilter< PixelType >::GetTime()
 {
     m_TimeProbe.Stop();
-    unsigned long total = round(m_TimeProbe.GetTotal());
+    unsigned long total = RoundToNearest(m_TimeProbe.GetTotal());
     unsigned long hours = total/3600;
     unsigned long minutes = (total%3600)/60;
     unsigned long seconds = total%60;

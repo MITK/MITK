@@ -104,19 +104,22 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         infile = mitk::BaseDataIO::LoadBaseDataFromFile( referenceFileName, s1, s2, false );
         mitk::FiberBundleX::Pointer fib2 = dynamic_cast<mitk::FiberBundleX*>(infile.at(0).GetPointer());
         MITK_TEST_CONDITION_REQUIRED(fib2.IsNotNull(), "Check if reference tractogram is not null.");
-        if (!fib1->Equals(fib2))
+        bool ok = fib1->Equals(fib2);
+        if (!ok)
         {
             MITK_WARN << "TEST FAILED. TRACTOGRAMS ARE NOT EQUAL!";
             mitk::FiberBundleXWriter::Pointer writer = mitk::FiberBundleXWriter::New();
-            writer->SetFileName("testBundle.fib");
+            writer->SetFileName(mitk::IOUtil::GetTempPath()+"testBundle.fib");
             writer->SetInputFiberBundleX(fib1);
             writer->Update();
 
-            writer->SetFileName("refBundle.fib");
+            writer->SetFileName(mitk::IOUtil::GetTempPath()+"refBundle.fib");
             writer->SetInputFiberBundleX(fib2);
             writer->Update();
+
+            MITK_INFO << "OUTPUT: " << mitk::IOUtil::GetTempPath();
         }
-        //MITK_TEST_CONDITION_REQUIRED(fib1->Equals(fib2), "Check if tractograms are equal.");
+        MITK_TEST_CONDITION_REQUIRED(ok, "Check if tractograms are equal.");
     }
     catch (itk::ExceptionObject e)
     {

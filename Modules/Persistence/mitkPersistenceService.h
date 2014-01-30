@@ -31,7 +31,7 @@ namespace mitk
     public:
         static const std::string PERSISTENCE_PROPERTY_NAME;
         static const std::string PERSISTENCE_PROPERTYLIST_NAME;
-        static const std::string ID_PROPERTY_NAME;
+
         static us::ModuleContext* GetModuleContext();
 
         PersistenceService();
@@ -46,7 +46,7 @@ namespace mitk
 
         std::string GetPersistenceNodePropertyName() const;
 
-        DataStorage::SetOfObjects::Pointer GetDataNodes() const;
+        DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage* ds=0) const;
 
         bool Save(const std::string& fileName="", bool appendChanges=false);
 
@@ -60,7 +60,7 @@ namespace mitk
 
         void RemovePropertyListReplacedObserver( PropertyListReplacedObserver* observer );
 
-        bool RestorePropertyListsFromPersistentDataNodes(DataStorage* storage);
+        bool RestorePropertyListsFromPersistentDataNodes(const DataStorage* storage);
 
         void Clear();
     private:

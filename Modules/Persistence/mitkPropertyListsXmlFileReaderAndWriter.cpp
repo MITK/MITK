@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+const std::string mitk::PropertyListsXmlFileReaderAndWriter::PROPERTY_LIST_ID_ELEMENT_NAME("Name");
+
 bool PropertyListsXmlFileReaderAndWriter::PropertyFromXmlElem(std::string& name, mitk::BaseProperty::Pointer& prop, TiXmlElement* elem) const
 {
     if(!elem)
@@ -169,7 +171,7 @@ bool PropertyListsXmlFileReaderAndWriter::WriteLists( const std::string& fileNam
         const std::string& id = (*it).first;
         const PropertyList* propList = (*it).second;
         TiXmlElement* propertyListElem = new TiXmlElement( "PropertyList" );
-        propertyListElem->SetAttribute("id", id);
+        propertyListElem->SetAttribute(PROPERTY_LIST_ID_ELEMENT_NAME, id);
 
         const std::map< std::string, BaseProperty::Pointer>* propMap = propList->GetMap();
         std::map< std::string, BaseProperty::Pointer>::const_iterator propMapIt = propMap->begin();
@@ -213,7 +215,7 @@ bool PropertyListsXmlFileReaderAndWriter::ReadLists( const std::string& fileName
     while(elem)
     {
         std::string propListId;
-        opRead = elem->QueryStringAttribute( "id", &propListId ) == TIXML_SUCCESS;
+        opRead = elem->QueryStringAttribute( PROPERTY_LIST_ID_ELEMENT_NAME.c_str(), &propListId ) == TIXML_SUCCESS;
         if( !opRead )
             break;
 

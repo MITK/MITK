@@ -118,6 +118,10 @@ static void TestWriteAndReadSimpleToolStorageWithToolLandmarks()
   mitk::PointSet::Pointer readRegLandmarks = readStorage->GetTool(0)->GetToolRegistrationLandmarks();
   mitk::PointSet::Pointer readCalLandmarks = readStorage->GetTool(0)->GetToolCalibrationLandmarks();
 
+    int val1 = readRegLandmarks->GetPoint(5)[0];
+    int val2 = readRegLandmarks->GetPoint(5)[1];
+    int val3 = readRegLandmarks->GetPoint(5)[2];
+    std::cout << val1 << val2 << val3 << std::endl;
   MITK_TEST_CONDITION_REQUIRED(((readRegLandmarks->GetPoint(5)[0] == 4)&&(readRegLandmarks->GetPoint(5)[1] == 5)&&(readRegLandmarks->GetPoint(5)[2] == 6)),"..Testing if tool registration landmarks have been stored and loaded correctly.");
   MITK_TEST_CONDITION_REQUIRED(((readCalLandmarks->GetPoint(0)[0] == 1)&&(readCalLandmarks->GetPoint(0)[1] == 2)&&(readCalLandmarks->GetPoint(0)[2] == 3)),"..Testing if tool calibration landmarks have been stored and loaded correctly.");
 

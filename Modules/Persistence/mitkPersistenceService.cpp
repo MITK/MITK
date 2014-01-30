@@ -27,8 +27,6 @@ const std::string mitk::PersistenceService::PERSISTENCE_PROPERTY_NAME("Persisten
 
 const std::string mitk::PersistenceService::PERSISTENCE_PROPERTYLIST_NAME("PersistenceService");
 
-const std::string mitk::PersistenceService::ID_PROPERTY_NAME("id");
-
 
 mitk::PersistenceService::PersistenceService()
 : m_AutoLoadAndSave( true ), m_SceneIO( SceneIO::New() ), m_PropertyListsXmlFileReaderAndWriter( PropertyListsXmlFileReaderAndWriter::New() )
@@ -112,46 +110,56 @@ bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChan
         xmlFile = true;
 
     mitk::DataStorage::Pointer tempDs;
-    if(appendChanges && xmlFile == false)
+    if( appendChanges )
     {
-        if( itksys::SystemTools::FileExists(theFile.c_str()) )
+        if(xmlFile == false)
         {
+            if( itksys::SystemTools::FileExists(theFile.c_str()) )
+            {
 
-            bool load = false;
-            DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
-            load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
-            if( !load )
-                return false;
+                bool load = false;
+                DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
+                load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
+                if( !load )
+                    return false;
 
-            tempDs = ds;
+                tempDs = ds;
 
+            }
         }
+        else
+        {
+            tempDs = mitk::StandaloneDataStorage::New();
+            if( xmlFile && appendChanges && itksys::SystemTools::FileExists(theFile.c_str()) )
+            {
+                if( !m_PropertyListsXmlFileReaderAndWriter->ReadLists( theFile, m_PropertyLists ) )
+                    return false;
+            }
+        }
+
+        this->RestorePropertyListsFromPersistentDataNodes( tempDs );
     }
-    else
+    else if( xmlFile == false )
     {
         tempDs = mitk::StandaloneDataStorage::New();
-        if( xmlFile && appendChanges && itksys::SystemTools::FileExists(theFile.c_str()) )
-        {
-            if( !m_PropertyListsXmlFileReaderAndWriter->ReadLists( theFile, m_PropertyLists ) )
-                return false;
-        }
     }
-
-    DataStorage::SetOfObjects::Pointer rs = DataStorage::SetOfObjects::New();
 
     if( xmlFile )
     {
         save = m_PropertyListsXmlFileReaderAndWriter->WriteLists(theFile, m_PropertyLists);
     }
+
     else
     {
-        save = m_SceneIO->SaveScene( rs.GetPointer(), tempDs, theFile );
+        DataStorage::SetOfObjects::Pointer sceneNodes = this->GetDataNodes(tempDs);
+        save = m_SceneIO->SaveScene( sceneNodes.GetPointer(), tempDs, theFile );
     }
     if( save )
     {
         long int currentModifiedTime = itksys::SystemTools::ModifiedTime( theFile.c_str() );
         m_FileNamesToModifiedTimes[theFile] = currentModifiedTime;
     }
+
     return save;
 }
 
@@ -198,6 +206,10 @@ bool mitk::PersistenceService::Load(const std::string& fileName, bool enforceRel
     {
         DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
         load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
+        if( load )
+        {
+            this->RestorePropertyListsFromPersistentDataNodes( ds );
+        }
     }
     if( !load )
     {
@@ -236,7 +248,7 @@ std::string mitk::PersistenceService::GetPersistenceNodePropertyName() const
 {
     return PERSISTENCE_PROPERTY_NAME;
 }
-mitk::DataStorage::SetOfObjects::Pointer mitk::PersistenceService::GetDataNodes() const
+mitk::DataStorage::SetOfObjects::Pointer mitk::PersistenceService::GetDataNodes(mitk::DataStorage* ds) const
 {
     DataStorage::SetOfObjects::Pointer set = DataStorage::SetOfObjects::New();
 
@@ -250,8 +262,8 @@ mitk::DataStorage::SetOfObjects::Pointer mitk::PersistenceService::GetDataNodes(
 
         node->SetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str(), true );
         node->SetName( name );
-        node->SetStringProperty(ID_PROPERTY_NAME.c_str(), name.c_str() );
 
+        ds->Add(node);
         set->push_back( node );
         ++it;
     }
@@ -259,7 +271,7 @@ mitk::DataStorage::SetOfObjects::Pointer mitk::PersistenceService::GetDataNodes(
     return set;
 }
 
-bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes( DataStorage* storage )
+bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes( const DataStorage* storage )
 {
     bool oneFound = false;
     DataStorage::SetOfObjects::ConstPointer allNodes = storage->GetAll();
@@ -276,6 +288,7 @@ bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes( Data
             oneFound = true;
             MITK_DEBUG("mitk::PersistenceService") << "isPersistenceNode was true";
             std::string name = node->GetName();
+
             bool existed = false;
             mitk::PropertyList::Pointer propList = this->GetPropertyList( name, &existed );
 
@@ -293,8 +306,6 @@ bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes( Data
             MITK_DEBUG("mitk::PersistenceService") << "replacing values";
 
             this->ClonePropertyList(  node->GetPropertyList(), propList );
-
-            propList->SetStringProperty(ID_PROPERTY_NAME.c_str(), name.c_str());
 
             if( existed )
             {

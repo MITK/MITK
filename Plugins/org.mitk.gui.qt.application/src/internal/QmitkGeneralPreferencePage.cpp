@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QLabel>
-#include <mitkSceneIO.h>
 
 QmitkGeneralPreferencePage::QmitkGeneralPreferencePage()
 : m_MainControl(0)

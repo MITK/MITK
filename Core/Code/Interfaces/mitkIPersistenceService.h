@@ -64,15 +64,15 @@ namespace mitk
         virtual std::string GetPersistenceNodePropertyName() const = 0;
         ///
         /// Creates a vector of DataNodes that contain all PropertyLists. Additionally, the DataNodes
-        /// will have the property name set to the PropertyList's id and a BoolProperty equal to GetPersistenceNodePropertyName() set to true
+        /// will have the property name set to the PropertyList's id and a BoolProperty equal to GetPersistenceNodePropertyName() set to true. If ds is set the returned DataNodes will also be added to that DS.
         /// \return vector of DataNodes with the described attributes
         ///
-        virtual DataStorage::SetOfObjects::Pointer GetDataNodes() const = 0;
+        virtual DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage* ds=0) const = 0;
         ///
         /// Searches storage for persistent DataNodes, extracts and inserts the appended property lists to this service
         /// \return true if at least one node was found from which a PropertyList could be restored
         ///
-        virtual bool RestorePropertyListsFromPersistentDataNodes(DataStorage* storage) = 0;
+        virtual bool RestorePropertyListsFromPersistentDataNodes(const DataStorage* storage) = 0;
         ///
         /// Save the current PropertyLists to fileName. If fileName is empty, a special file in the users home directory will be used.
         /// if appendchanges is true, the file will not replaced but first loaded, then overwritten and then replaced

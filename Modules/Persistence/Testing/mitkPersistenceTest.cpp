@@ -151,8 +151,8 @@ int mitkPersistenceTest(int /*argc*/, char* /*argv*/[])
     TestPropertyListReplacedObserver testObserver;
     testObserver.m_Id = testClassId;
     persistenceService->AddPropertyListReplacedObserver( &testObserver );
-    persistenceService->Load();
-    MITK_TEST_CONDITION( testObserver.counter == 2, "testObserver.counter == 2" );
+    persistenceService->Load(testTempFile.path());
+    MITK_TEST_CONDITION( testObserver.counter == 2, "testObserver.counter == 2, testObserver.counter is " << testObserver.counter );
 
     MITK_INFO << "Cleaning test files.";
     if( testXmlTempFile.exists() )

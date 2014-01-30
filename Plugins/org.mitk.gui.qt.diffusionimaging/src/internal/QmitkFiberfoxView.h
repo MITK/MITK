@@ -207,7 +207,6 @@ protected:
     mitk::DotModel<double> m_DotModel2;
 
     QString m_ParameterFile;    ///< parameter file name
-    string  m_OutputPath;       ///< image save path
 
     // GUI thread
     QmitkFiberfoxWorker     m_Worker;   ///< runs filter

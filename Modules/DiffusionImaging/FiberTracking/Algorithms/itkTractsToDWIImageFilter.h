@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorImage.h>
 #include <cmath>
 #include <mitkFiberfoxParameters.h>
-#include "FiberTrackingExports.h"
+#include <itkTimeProbe.h>
 
 namespace itk
 {
@@ -91,7 +91,7 @@ protected:
     mitk::LevelWindow                           m_LevelWindow;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;
     std::string                                 m_StatusText;
-    time_t                                      m_StartTime;
+    itk::TimeProbe                              m_TimeProbe;
     bool                                        m_UseConstantRandSeed;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };

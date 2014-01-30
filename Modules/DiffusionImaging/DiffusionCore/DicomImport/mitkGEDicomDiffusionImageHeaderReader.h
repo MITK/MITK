@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #ifndef __mitkGEDicomDiffusionImageHeaderReader_h__
-#define __mitkGEDicomDiffusionImageHeaderReader_h_
+#define __mitkGEDicomDiffusionImageHeaderReader_h__
 
 #include "mitkDicomDiffusionImageHeaderReader.h"
 

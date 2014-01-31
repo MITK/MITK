@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkUnsignedShortArray.h"
 #include "vtkFloatArray.h"
 #include "vtkgl.h" // vtkgl namespace
-#include "GL/glext.h"
+//#include "GL/glext.h"
 
 #include <math.h>
 
@@ -298,7 +298,8 @@ void vtkMitkShaderTexture::Load(vtkRenderer *ren)
                         vtkgl::CLAMP_TO_EDGE );
     }
 
-    int internalFormat = GL_LUMINANCE32F_ARB;
+//    int internalFormat = GL_LUMINANCE32F_ARB;
+    int internalFormat = 0;
     format = GL_LUMINANCE;
 
     glTexImage2D( GL_TEXTURE_2D, 0 , internalFormat,

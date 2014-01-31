@@ -55,7 +55,7 @@ void InteractionEventRecorder::Play()
 {
   std::ifstream xmlStream(m_Controls.textFileName->text().toStdString().c_str());
   mitk::XML2EventParser parser(xmlStream);
-  std::vector<mitk::InteractionEvent*> events = parser.GetInteractions();
+  mitk::XML2EventParser::EventContainerType events = parser.GetInteractions();
 
   MITK_INFO << "parsed events";
   for (int i=0; i < events.size(); ++i)

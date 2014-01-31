@@ -23,14 +23,14 @@
 
 #include <vtkXMLParser.h>
 
+#include "mitkInteractionEvent.h"
+
 namespace us {
 class Module;
 }
 
 namespace mitk
 {
-
-class InteractionEvent;
 
 /**
    * \class InteractionEventList
@@ -66,7 +66,9 @@ public:
      */
   XML2EventParser(std::istream &inputStream);
 
-  std::vector<InteractionEvent*> GetInteractions()
+  typedef std::vector<mitk::InteractionEvent::Pointer> EventContainerType;
+
+  EventContainerType GetInteractions()
   {
     return m_InteractionList;
   }
@@ -92,7 +94,7 @@ private:
 
   PropertyList::Pointer m_EventPropertyList;
 
-  std::vector<InteractionEvent*> m_InteractionList;
+  EventContainerType m_InteractionList;
 
 
 };

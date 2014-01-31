@@ -50,6 +50,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunctionProperty.h>
 #include <vtkMath.h>
 
+#include <vtkContourFilter.h>
+
 const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualization";
 
 RTDoseVisualizer::RTDoseVisualizer()
@@ -152,6 +154,32 @@ void RTDoseVisualizer::OnReferenceDoseChanged(double value)
       {
         this->m_selectedNode->SetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), value);
       }
+    }
+    if (this->m_selectedNode.IsNotNull())
+    {
+      vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+      mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = this->m_Presets[this->m_selectedPresetName];
+      for(mitk::IsoDoseLevelSet::ConstIterator setIT = isoDoseLevelSet->Begin(); setIT != isoDoseLevelSet->End(); ++setIT)
+      {
+        float *hsv = new float[3];
+        vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
+        if(setIT->GetVisibleColorWash()){
+          cCalc->RGBToHSV(setIT->GetColor()[0],setIT->GetColor()[1],setIT->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
+          transferFunction->AddHSVPoint(setIT->GetDoseValue()*value,hsv[0],hsv[1],hsv[2],1.0,1.0);
+        }
+      }
+      mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
+      mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
+      mitkTransFunc->SetColorTransferFunction(transferFunction);
+      mitkTransFuncProp->SetValue(mitkTransFunc);
+
+      mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
+      renderingMode->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
+
+      m_selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
+
+      mitk::TimeSlicedGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+      mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );
     }
   }
 }
@@ -304,8 +332,6 @@ void RTDoseVisualizer::OnConvertButtonClicked()
     m_selectedNode->GetFloatProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescribed);
 
     vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-    transferFunction->SetColorSpaceToRGB();
-
 
     mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = this->m_Presets[this->m_selectedPresetName];
 
@@ -316,8 +342,10 @@ void RTDoseVisualizer::OnConvertButtonClicked()
       selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
       float *hsv = new float[3];
       vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
-      cCalc->RGBToHSV(setIT->GetColor()[0],setIT->GetColor()[1],setIT->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
-      transferFunction->AddHSVPoint(setIT->GetDoseValue()*pref,hsv[0],hsv[1],hsv[2],1.0,1.0);
+      if(setIT->GetVisibleColorWash()){
+        cCalc->RGBToHSV(setIT->GetColor()[0],setIT->GetColor()[1],setIT->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
+        transferFunction->AddHSVPoint(setIT->GetDoseValue()*pref,hsv[0],hsv[1],hsv[2],1.0,1.0);
+      }
       MITK_INFO << "FUNCTION " << setIT->GetDoseValue()*pref << endl;
     }
 
@@ -331,6 +359,36 @@ void RTDoseVisualizer::OnConvertButtonClicked()
 
     selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
     selectedNode->SetProperty("Image Rendering.Mode", renderingMode);
+
+    //Testing the vtkContourFilter for Isolines
+//    vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
+//    contourFilter->SetInput(dynamic_cast<mitk::Image*>(selectedNode->GetData()));
+
+//    mitk::DataNode::Pointer doseNode = GetDataStorage()->GetNamedNode("DicomRT Dose");
+//    mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(doseNode->GetData());
+//    vtkMarchingSquares* contourFilter = vtkMarchingSquares::New();
+//    int numberOfIsoLines = 5;
+//    std::deque<mitk::Surface::Pointer> surfaceStorage;
+
+//    for(int i=0; i<numberOfIsoLines;i++)
+//    {
+//      vtkContourFilter* contourFilter = vtkContourFilter::New();
+//      vtkPolyData* polyData = vtkPolyData::New();
+//      contourFilter->SetInput(doseImage->GetVtkImageData());
+//      contourFilter->SetNumberOfContours(5);
+//      contourFilter->SetValue(0,50000);
+//      contourFilter->GenerateValues(1,i*100*i,(i+1)*200*(i+1));
+//      polyData = contourFilter->GetOutput();
+//      mitk::Surface::Pointer c = mitk::Surface::New();
+//      c->SetVtkPolyData(polyData);
+//      mitk::Geometry3D::Pointer geo = doseImage->GetGeometry()->Clone();
+//      geo->ChangeImageGeometryConsideringOriginOffset(false);
+//      mitk::Vector3D spacing;
+//      spacing.Fill(1);
+//      geo->SetSpacing(spacing);
+//      c->SetGeometry(geo);
+//      surfaceStorage.push_back(c);
+//    }
 
     mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
     mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);

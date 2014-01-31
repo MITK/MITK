@@ -127,6 +127,7 @@ void QmitkXnatEditor::DoSaveAs()
 
 void QmitkXnatEditor::SetInput(berry::IEditorInput::Pointer input)
 {
+  // If the input in not a QmitkXnatObjectEditorInput the semi global xnat session will be loaded
   QmitkXnatObjectEditorInput::Pointer oPtr = input.Cast<QmitkXnatObjectEditorInput>();
   if(oPtr.IsNotNull())
   {
@@ -166,6 +167,7 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
 
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnObjectActivated(const QModelIndex&)) );
+
   connect( m_Controls.buttonDownloadResource, SIGNAL(clicked()), this, SLOT(DownloadResource()) );
   connect( m_Controls.buttonDownloadFile, SIGNAL(clicked()), this, SLOT(DownloadFile()) );
   connect( m_Controls.buttonDataModel, SIGNAL(clicked()), this, SLOT(OnDataModelButtonClicked()) );
@@ -176,6 +178,7 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.buttonSession, SIGNAL(clicked()), this, SLOT(OnSessionButtonClicked()) );
   connect( m_Controls.buttonResource, SIGNAL(clicked()), this, SLOT(OnResourceButtonClicked()) );
 
+  // Makes the breadcrumb feature invisible
   for(int i = 0; i < m_Controls.breadcrumbHorizontalLayout->count()-1; i++)
   {
     QLayoutItem* child = m_Controls.breadcrumbHorizontalLayout->itemAt(i);
@@ -193,9 +196,6 @@ void QmitkXnatEditor::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 {
 }
 
-/**
-\brief Here the root object will be set and the view reset.
-*/
 void QmitkXnatEditor::UpdateList()
 {
   ctkXnatObject* inputObject = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject();
@@ -347,6 +347,7 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
     }
     else
     {
+      // Updates the root item
       QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( child );
       berry::IEditorInput::Pointer editorInput( oPtr );
       SetInput(editorInput);

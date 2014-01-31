@@ -59,7 +59,7 @@ void QmitkXnatTreeBrowserView::SetFocus()
 
 void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
 {
-  // create GUI widgets from the Qt Designer's .ui file
+  // Create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
   m_Controls.treeView->setModel(m_TreeModel);
 
@@ -71,12 +71,12 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)) );
   connect( m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(DoFetchMore(const QModelIndex&)) );
 
-  // get the XNAT Session from Activator
+  // Get the XNAT Session from Activator
   m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
 
   if(m_Session == 0) return;
 
-  // fill model and show in the GUI
+  // Fill model and show in the GUI
   m_TreeModel->addDataModel(m_Session->dataModel());
   m_Controls.treeView->reset();
 }
@@ -102,7 +102,7 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 
   if(reuseEditor)
   {
-    //just set it activ
+    // Just set it activ
     reuseEditor.Cast<QmitkXnatEditor>()->UpdateList();
     page->Activate(reuseEditor);
   }
@@ -123,12 +123,12 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 
       if (editors.empty())
       {
-        // no XnatEditor is currently open, create a new one
+        // No XnatEditor is currently open, create a new one
         page->OpenEditor(editorInput, QmitkXnatEditor::EDITOR_ID);
       }
       else
       {
-        // reuse an existing editor
+        // Reuse an existing editor
         reuseEditor = editors.front()->GetEditor(true);
         page->ReuseEditor(reuseEditor.Cast<berry::IReusableEditor>(), editorInput);
         reuseEditor.Cast<QmitkXnatEditor>()->UpdateList();

@@ -59,7 +59,7 @@ protected:
   berry::IPreferences::WeakPtr m_XnatConnectionPreferencesNode;
 
   ///
-  /// Maps a label to lineedit
+  /// Maps a label to lineedit (sorted)
   ///
   QMap<int, QPair<QString, QLineEdit*>> m_LineEditors;
 };

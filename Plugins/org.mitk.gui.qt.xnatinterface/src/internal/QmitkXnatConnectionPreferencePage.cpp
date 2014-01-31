@@ -93,7 +93,7 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
   IPreferences::Pointer _XnatConnectionPreferencesNode = m_XnatConnectionPreferencesNode.Lock();
   if(_XnatConnectionPreferencesNode.IsNotNull())
   {
-    // Regular Expression for uri
+    // Regular Expression for uri and download path
     QRegExp uriregex("^(https?)://([a-zA-Z0-9\\.]+):?([0-9]+)?(/[^ /]+)*$");
     QRegExp downloadPathRegex("([/|\\]?[^/|^\\])+[/|\\]?");
 

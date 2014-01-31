@@ -28,6 +28,7 @@ public:
 
   ~QmitkXnatObjectEditorInput();
 
+  /// \brief Returns the kept ctkXnatObject.
   ctkXnatObject* GetXnatObject() const;
 
   virtual bool Exists() const;
@@ -37,8 +38,8 @@ public:
 
 private:
   QmitkXnatObjectEditorInput(ctkXnatObject* object);
-  ctkXnatObject* m_Object;
 
+  ctkXnatObject* m_Object;
 };
 
 #endif /*QMITKXNATOBJECTEDITORINPUT_H_*/

@@ -32,6 +32,8 @@ public:
 
   QmitkXnatConnectionManager();
   ~QmitkXnatConnectionManager();
+
+  /// \brief Opens a xnat session and returns it.
   ctkXnatSession* GetXnatConnection();
 
 private:

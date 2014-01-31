@@ -65,19 +65,31 @@ public:
   bool IsSaveAsAllowed() const;
 
   virtual void SetInput(berry::IEditorInput::Pointer input);
-  //virtual void AddPropertyListener(berry::IPropertyChangeListener::Pointer listener);
-  //virtual void CreatePartControl(void* parent);
   const char* GetClassNameA() const;
 
-  void CheckUserInput();
+  /**
+  \brief Here the root object will be set and the view reset. Additionally the breadcrumbs will be set visible.
+  */
   void UpdateList();
 
   protected slots:
 
+    /**
+    \brief A resource folder will be downloaded to the chosen download path.
+    */
     void DownloadResource();
+
+    /**
+    \brief A file will be downloaded to the chosen download path.
+    */
     void DownloadFile();
 
+    /**
+    \brief Every time you activate a node in the list, the root item will be updated to a child of the previous parent.
+    In exception of the node is a file. The file will be downloaded and loaded to the DataManager.
+    */
     void OnObjectActivated(const QModelIndex& index);
+
     void OnDataModelButtonClicked();
     void OnProjectButtonClicked();
     void OnSubjectButtonClicked();
@@ -98,11 +110,12 @@ protected:
 
 private:
 
-  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
+  int m_ParentCount;
   QString m_DownloadPath;
+  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
+
   void InternalFileDownload(const QModelIndex& index);
   int ParentChecker(ctkXnatObject* child);
-  int m_ParentCount;
   void ToHigherLevel();
 
   ctkXnatListModel* m_ListModel;

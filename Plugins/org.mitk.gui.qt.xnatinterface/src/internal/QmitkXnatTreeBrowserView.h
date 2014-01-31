@@ -49,6 +49,7 @@ public:
 
   QmitkXnatTreeBrowserView();
   ~QmitkXnatTreeBrowserView();
+
   static const std::string VIEW_ID;
 
   virtual void CreateQtPartControl(QWidget *parent);
@@ -57,14 +58,17 @@ public:
 
   protected slots:
 
+    /// \brief Opens or reuses the xnat editor with the activated node as root item.
     void OnActivatedNode(const QModelIndex& index);
+
+    /// \brief Fetches the clicked ctkXnatObject.
     void DoFetchMore(const QModelIndex& index);
 
 protected:
 
   virtual void SetFocus();
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
+  /// \brief Called by QmitkFunctionality when DataManager's selection has changed.
   virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes );
 

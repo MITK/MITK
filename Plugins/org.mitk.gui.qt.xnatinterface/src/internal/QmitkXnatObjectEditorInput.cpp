@@ -23,7 +23,6 @@ QmitkXnatObjectEditorInput::QmitkXnatObjectEditorInput(ctkXnatObject* object)
 
 QmitkXnatObjectEditorInput::~QmitkXnatObjectEditorInput()
 {
-  //delete m_Object;
 }
 
 ctkXnatObject* QmitkXnatObjectEditorInput::GetXnatObject() const

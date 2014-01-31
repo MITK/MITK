@@ -49,6 +49,7 @@ set(module_dirs
     Simulation
     Remeshing
     Python
+    Persistence
 )
 
 if(MITK_ENABLE_PIC_READER)

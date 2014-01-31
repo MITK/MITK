@@ -157,6 +157,8 @@ void RTDoseVisualizer::OnReferenceDoseChanged(double value)
     }
     if (this->m_selectedNode.IsNotNull())
     {
+      mitk::TransferFunction::ControlPoints scalarOpacityPoints;
+      scalarOpacityPoints.push_back( std::make_pair(0, 1 ) );
       vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
       mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = this->m_Presets[this->m_selectedPresetName];
       for(mitk::IsoDoseLevelSet::ConstIterator setIT = isoDoseLevelSet->Begin(); setIT != isoDoseLevelSet->End(); ++setIT)
@@ -167,10 +169,15 @@ void RTDoseVisualizer::OnReferenceDoseChanged(double value)
           cCalc->RGBToHSV(setIT->GetColor()[0],setIT->GetColor()[1],setIT->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
           transferFunction->AddHSVPoint(setIT->GetDoseValue()*value,hsv[0],hsv[1],hsv[2],1.0,1.0);
         }
+        else
+        {
+          scalarOpacityPoints.push_back( std::make_pair(setIT->GetDoseValue()*value, 1 ) );
+        }
       }
       mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
       mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
       mitkTransFunc->SetColorTransferFunction(transferFunction);
+      mitkTransFunc->SetScalarOpacityPoints(scalarOpacityPoints);
       mitkTransFuncProp->SetValue(mitkTransFunc);
 
       mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();

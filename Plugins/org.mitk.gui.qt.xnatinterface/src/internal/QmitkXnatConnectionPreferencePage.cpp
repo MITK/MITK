@@ -64,7 +64,6 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
 
   m_LineEditors[4] = qMakePair(QString("Download Path"), new QLineEdit(""));
   m_LineEditors[4].second->setObjectName("inDownloadPath");
-  m_LineEditors[4].second->setToolTip(QString("<html><head/><body><p>The default download path is:\nC:/Users/knorr/Downloads/MITK_XNAT_DOWNLOADS/</p></body></html>"));
 
   m_MainControl = new QWidget(parent);
 
@@ -167,14 +166,14 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
       {
         session->open();
       }
-      catch(ctkXnatAuthenticationException auth)
+      catch(const ctkXnatAuthenticationException& auth)
       {
         errString += QString("Test connection failed.\nAuthentication error: Wrong name or password.");
         delete session;
         QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
         return false;
       }
-      catch(ctkException e)
+      catch(const ctkException& e)
       {
         errString += QString("Test connection failed with error code:\n\"%1\"").arg(e.message());
         delete session;

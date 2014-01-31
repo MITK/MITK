@@ -65,6 +65,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QListView>
 #include <QRegExp>
 #include <QModelIndex>
+#include <QDir>
 
 // MITK
 #include <mitkDataStorage.h>
@@ -84,12 +85,11 @@ QmitkXnatEditor::QmitkXnatEditor() :
   m_DataStorageServiceTracker.open();
   if(m_DownloadPath.isEmpty())
   {
-    m_DownloadPath = "../../../../MITK_XNAT_DOWNLOADS/";
-#ifndef __MSDOS__
-    mkdir(m_DownloadPath.toStdString().c_str());
-#else /* Annahme: Unix */
-    mkdir(m_DownloadPath.toStdString().c_str(), 777);
-#endif
+    QString xnatFolder = "XNAT_DOWNLOADS";
+    QDir dir(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()->getDataFile("").absoluteFilePath());
+    dir.mkdir(xnatFolder);
+    dir.setPath(dir.path() + "/" + xnatFolder);
+    m_DownloadPath = dir.path() + "/";
   }
 }
 
@@ -134,23 +134,9 @@ void QmitkXnatEditor::SetInput(berry::IEditorInput::Pointer input)
   }
   else
   {
-    QString errString;
-    try
-    {
-      m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
-    }
-    catch(ctkXnatAuthenticationException auth)
-    {
-      errString += QString("Test connection failed.\nAuthentication error: Wrong name or password.");
-      QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
-      return;
-    }
-    catch(ctkException e)
-    {
-      errString += QString("Test connection failed with error code:\n\"%1\"").arg(e.message());
-      QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
-      return;
-    }
+    m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
+
+    if(m_Session == 0) return;
 
     QmitkXnatObjectEditorInput::Pointer xoPtr = QmitkXnatObjectEditorInput::New( m_Session->dataModel() );
     berry::IEditorInput::Pointer editorInput( xoPtr );

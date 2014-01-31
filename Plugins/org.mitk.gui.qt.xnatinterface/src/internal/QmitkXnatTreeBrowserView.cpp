@@ -74,6 +74,8 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
   // get the XNAT Session from Activator
   m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
 
+  if(m_Session == 0) return;
+
   // fill model and show in the GUI
   m_TreeModel->addDataModel(m_Session->dataModel());
   m_Controls.treeView->reset();

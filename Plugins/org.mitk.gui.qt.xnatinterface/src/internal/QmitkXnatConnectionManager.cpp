@@ -20,6 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIPreferences.h"
 #include "mitkLogMacros.h"
 
+#include <QMessageBox>
+#include <QApplication>
+
+#include "ctkXnatException.h"
+
 QmitkXnatConnectionManager::QmitkXnatConnectionManager() :
   m_Session(0)
 {
@@ -48,7 +53,24 @@ ctkXnatSession* QmitkXnatConnectionManager::GetXnatConnection()
 {
   if(!m_Session->isOpen())
   {
-    m_Session->open();
+    // Testing the inputs by trying to create a session
+    QString errString;
+    try
+    {
+      m_Session->open();
+    }
+    catch(const ctkXnatAuthenticationException& auth)
+    {
+      errString += QString("Test connection failed.\nAuthentication error: Wrong name or password.\n'%1'").arg(auth.message());
+      QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
+      return 0;
+    }
+    catch(const ctkException& e)
+    {
+      errString += QString("Test connection failed with error code:\n\"%1\"").arg(e.message());
+      QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
+      return 0;
+    }
   }
   return m_Session;
 }

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <mitkTestingMacros.h>
 #include <mitkIPersistenceService.h>
-//#include <mitkSceneIO.h>
+#include <mitkSceneIO.h>
 #include <Poco/File.h>
 
 struct PersistenceTestClass
@@ -73,7 +73,7 @@ int mitkPersistenceTest(int /*argc*/, char* /*argv*/[])
 {
     MITK_TEST_BEGIN("PersistenceTest")
     // dummy load of SceneIO, otherwise PersistenceService won't be available
-    // mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
+    mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
     MITK_INFO << "Testing availability of the PersistenceService.";
     PERSISTENCE_GET_SERVICE_MACRO

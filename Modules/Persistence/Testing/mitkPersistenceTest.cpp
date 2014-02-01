@@ -82,12 +82,12 @@ int mitkPersistenceTest(int /*argc*/, char* /*argv*/[])
     MITK_INFO << "Initialize testable parameter values.";
 
     Poco::File defaultPersistenceFile(persistenceService->GetDefaultPersistenceFile());
+    PersistenceTestClass autoLoadTestClass;
+    autoLoadTestClass.id = testClassId;
     if( defaultPersistenceFile.exists() && persistenceService->GetAutoLoadAndSave() )
     {
         MITK_INFO << "Testing auto load/save of the PersistenceService.";
-
-        PersistenceTestClass autoLoadTestClass;
-        autoLoadTestClass.id = testClassId;
+        defaultPersistenceFile.remove();
         autoLoadTestClass.FromPropertyList();
 
         testParams( autoLoadTestClass, "autoLoadTestClass" );
@@ -160,5 +160,9 @@ int mitkPersistenceTest(int /*argc*/, char* /*argv*/[])
     if( testTempFile.exists() )
         testTempFile.remove(false);
 
+    autoLoadTestClass.param1 = param1;
+    autoLoadTestClass.param2 = param2;
+    autoLoadTestClass.param3 = param3;
+    autoLoadTestClass.ToPropertyList();
     MITK_TEST_END()
 }

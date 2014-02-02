@@ -119,12 +119,6 @@ class SegmentationUI_EXPORT QmitkSliceBasedInterpolatorWidget : public QWidget
     */
     void OnAcceptAllPopupActivated(QAction* action);
 
-    /*
-      \brief Reaction to "Usage Information" checkbox button click.
-      Shows an overview of the underlining algorithm and key directions on how to use the tool
-    */
-    void OnShowInformation(bool);
-
   protected:
 
     typedef std::map<QAction*, mitk::SliceNavigationController*> ActionToSliceDimensionMapType;

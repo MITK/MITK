@@ -44,7 +44,6 @@ m_DataStorage(NULL),
 m_Activated(false)
 {
   m_Controls.setupUi(this);
-  m_Controls.m_InformationWidget->hide();
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   Q_ASSERT(m_ToolManager);
@@ -54,7 +53,6 @@ m_Activated(false)
   connect(m_Controls.m_btStart, SIGNAL(toggled(bool)), this, SLOT(OnToggleWidgetActivation(bool)));
   connect(m_Controls.m_btAccept, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
   connect(m_Controls.m_cbShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
-  connect(m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)));
 
   itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolatorWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolatorWidget>::New();
   command->SetCallbackFunction( this, &QmitkSurfaceBasedInterpolatorWidget::OnSurfaceInterpolationInfoChanged );
@@ -112,14 +110,6 @@ QmitkSurfaceBasedInterpolatorWidget::~QmitkSurfaceBasedInterpolatorWidget()
   m_SurfaceInterpolator->RemoveObserver( m_SurfaceInterpolationInfoChangedObserverTag );
 
   delete m_Timer;
-}
-
-void QmitkSurfaceBasedInterpolatorWidget::OnShowInformation(bool on)
-{
-  if (on)
-    m_Controls.m_InformationWidget->show();
-  else
-    m_Controls.m_InformationWidget->hide();
 }
 
 void QmitkSurfaceBasedInterpolatorWidget::ShowInterpolationResult(bool status)

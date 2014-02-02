@@ -53,7 +53,6 @@ m_LastSNC(0),
 m_LastSliceIndex(0)
 {
   m_Controls.setupUi(this);
-  m_Controls.m_InformationWidget->hide();
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   Q_ASSERT(m_ToolManager);
@@ -63,7 +62,6 @@ m_LastSliceIndex(0)
   connect(m_Controls.m_btStart, SIGNAL(toggled(bool)), this, SLOT(OnToggleWidgetActivation(bool)));
   connect(m_Controls.m_btApplyForCurrentSlice, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
   connect(m_Controls.m_btApplyForAllSlices, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
-  connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
 
   itk::ReceptorMemberCommand<QmitkSliceBasedInterpolatorWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSliceBasedInterpolatorWidget>::New();
   command->SetCallbackFunction( this, &QmitkSliceBasedInterpolatorWidget::OnSliceInterpolationInfoChanged );
@@ -568,14 +566,6 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptAllInterpolationsClicked()
   connect( &orientationPopup, SIGNAL(triggered(QAction*)), this, SLOT(OnAcceptAllPopupActivated(QAction*)) );
 
   orientationPopup.exec( QCursor::pos() );
-}
-
-void QmitkSliceBasedInterpolatorWidget::OnShowInformation(bool on)
-{
-  if (on)
-    m_Controls.m_InformationWidget->show();
-  else
-    m_Controls.m_InformationWidget->hide();
 }
 
 void QmitkSliceBasedInterpolatorWidget::OnAcceptAllPopupActivated(QAction* action)

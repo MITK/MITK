@@ -57,17 +57,17 @@ namespace mitk
         /**
         * Get the default name of the PersistenceFile (the one that is loaded at startup)
         */
-        virtual std::string GetDefaultPersistenceFile() const = 0;
+        virtual std::string GetDefaultPersistenceFile() = 0;
         /**
         * \return The name of the Bool Property that specifies whether a DataNode is a Node carrying Persistence PropertyLists
         */
-        virtual std::string GetPersistenceNodePropertyName() const = 0;
+        virtual std::string GetPersistenceNodePropertyName() = 0;
         /**
         * Creates a vector of DataNodes that contain all PropertyLists. Additionally, the DataNodes
         * will have the property name set to the PropertyList's id and a BoolProperty equal to GetPersistenceNodePropertyName() set to true. If ds is set the returned DataNodes will also be added to that DS.
         * \return vector of DataNodes with the described attributes
         */
-        virtual DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage* ds=0) const = 0;
+        virtual DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage* ds=0) = 0;
         /**
         * Searches storage for persistent DataNodes, extracts and inserts the appended property lists to this service
         * \return true if at least one node was found from which a PropertyList could be restored
@@ -96,7 +96,7 @@ namespace mitk
         /**
         * \return whether AutoLoading is activated or not
         */
-        virtual bool GetAutoLoadAndSave() const = 0;
+        virtual bool GetAutoLoadAndSave() = 0;
         /**
         * adds a observer which is informed if a propertyList gets replaced during a Load() procedure
         */

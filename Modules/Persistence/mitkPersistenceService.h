@@ -38,15 +38,15 @@ namespace mitk
 
         ~PersistenceService();
 
-        std::string GetDefaultPersistenceFile() const;
+        std::string GetDefaultPersistenceFile();
 
         mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 );
 
         bool RemovePropertyList( std::string& id );
 
-        std::string GetPersistenceNodePropertyName() const;
+        std::string GetPersistenceNodePropertyName();
 
-        DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage* ds=0) const;
+        DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage* ds=0);
 
         bool Save(const std::string& fileName="", bool appendChanges=false);
 
@@ -54,7 +54,7 @@ namespace mitk
 
         void SetAutoLoadAndSave(bool autoLoadAndSave);
 
-        bool GetAutoLoadAndSave() const;
+        bool GetAutoLoadAndSave();
 
         void AddPropertyListReplacedObserver( PropertyListReplacedObserver* observer );
 
@@ -63,6 +63,8 @@ namespace mitk
         bool RestorePropertyListsFromPersistentDataNodes(const DataStorage* storage);
 
         void Clear();
+
+        void Unitialize();
     private:
         void ClonePropertyList( mitk::PropertyList* from, mitk::PropertyList* to ) const;
         void Initialize();
@@ -73,6 +75,7 @@ namespace mitk
         PropertyListsXmlFileReaderAndWriter::Pointer m_PropertyListsXmlFileReaderAndWriter;
         std::map<std::string, long int> m_FileNamesToModifiedTimes;
         bool m_Initialized;
+        bool m_InInitialized;
     };
 }
 #endif

@@ -34,10 +34,20 @@ namespace mitk
         void Load(us::ModuleContext* context)
         {
           MITK_DEBUG << "PersistenceActivator::Load";
+
+          mitk::IPersistenceService* persistenceService = 0;
           us::ServiceReference<mitk::IPersistenceService> persistenceServiceRef
             = context->GetServiceReference<mitk::IPersistenceService>();
+          if( persistenceServiceRef )
+          {
+            persistenceService = dynamic_cast<mitk::IPersistenceService*> ( context->GetService<mitk::IPersistenceService>(persistenceServiceRef) );
+          }
 
-          if( ! persistenceServiceRef )
+          bool instanceAlreadyAdded = persistenceService != 0;
+          if( instanceAlreadyAdded )
+            instanceAlreadyAdded = dynamic_cast<mitk::PersistenceService*>(persistenceService) != 0;
+
+          if( instanceAlreadyAdded == false )
           {
             // Registering PersistenceService as MicroService
             m_PersistenceService = itk::SmartPointer<mitk::PersistenceService>(new PersistenceService());
@@ -46,23 +56,10 @@ namespace mitk
 
             m_PersistenceServiceRegistration = context->RegisterService<mitk::IPersistenceService>(m_PersistenceService, _PersistenceServiceProps);
 
-            // Load Default File in any case
-            m_PersistenceService->Load();
-            std::string id = mitk::PersistenceService::PERSISTENCE_PROPERTYLIST_NAME;
-            mitk::PropertyList::Pointer propList = m_PersistenceService->GetPropertyList( id );
-            bool autoLoadAndSave = true;
-            propList->GetBoolProperty("m_AutoLoadAndSave", autoLoadAndSave);
-
-            if( autoLoadAndSave == false )
-            {
-              MITK_DEBUG("mitk::PersistenceService") << "autoloading was not wished. clearing data we got so far.";
-              m_PersistenceService->SetAutoLoadAndSave(false);
-              m_PersistenceService->Clear();
-            }
           }
           else
           {
-            MITK_WARN << "Another Persistence service already installed."
+            MITK_ERROR << "Another Persistence instance already installed. Library was loaded twice. Please check configuration!";
           }
         }
 
@@ -71,12 +68,10 @@ namespace mitk
           MITK_DEBUG("PersistenceActivator") << "PersistenceActivator::Unload";
           MITK_DEBUG("PersistenceActivator") << "m_PersistenceService GetReferenceCount " << m_PersistenceService->GetReferenceCount();
 
-          if(m_PersistenceService->GetAutoLoadAndSave())
-              m_PersistenceService->Save();
+          m_PersistenceService->Unitialize();
 
           m_PersistenceServiceRegistration.Unregister();
           m_PersistenceService->Delete();
-          MITK_DEBUG("PersistenceActivator") << "m_PersistenceService GetReferenceCount " << m_PersistenceService->GetReferenceCount();
         }
 
         virtual ~PersistenceActivator()

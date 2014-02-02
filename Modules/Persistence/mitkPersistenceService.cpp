@@ -29,7 +29,7 @@ const std::string mitk::PersistenceService::PERSISTENCE_PROPERTYLIST_NAME("Persi
 
 
 mitk::PersistenceService::PersistenceService()
-: m_AutoLoadAndSave( true ), m_SceneIO( SceneIO::New() ), m_PropertyListsXmlFileReaderAndWriter( PropertyListsXmlFileReaderAndWriter::New() )
+: m_AutoLoadAndSave( true ), m_Initialized(false)
 {
 }
 
@@ -337,4 +337,16 @@ bool mitk::PersistenceService::RemovePropertyList( std::string& id )
         return true;
     }
     return false;
+}
+
+void mitk::PersistenceService::Initialize()
+{
+  if( m_Initialized )
+    return;
+
+  m_SceneIO = SceneIO::New();
+  m_PropertyListsXmlFileReaderAndWriter = PropertyListsXmlFileReaderAndWriter::New();
+  this->Load();
+
+  m_Initialized = true;
 }

@@ -65,12 +65,14 @@ namespace mitk
         void Clear();
     private:
         void ClonePropertyList( mitk::PropertyList* from, mitk::PropertyList* to ) const;
+        void Initialize();
         std::map<std::string, mitk::PropertyList::Pointer> m_PropertyLists;
         bool m_AutoLoadAndSave;
         std::set<PropertyListReplacedObserver*> m_PropertyListReplacedObserver;
         SceneIO::Pointer m_SceneIO;
         PropertyListsXmlFileReaderAndWriter::Pointer m_PropertyListsXmlFileReaderAndWriter;
         std::map<std::string, long int> m_FileNamesToModifiedTimes;
+        bool m_Initialized;
     };
 }
 #endif

@@ -30,6 +30,9 @@ namespace mitk
     class PersistenceActivator : public us::ModuleActivator
     {
     public:
+        PersistenceActivator()
+        {
+        }
 
         void Load(us::ModuleContext* context)
         {
@@ -65,12 +68,14 @@ namespace mitk
 
         void Unload(us::ModuleContext* context)
         {
+          if( m_PersistenceService.IsNull() )
+            return;
+
           MITK_DEBUG("PersistenceActivator") << "PersistenceActivator::Unload";
           MITK_DEBUG("PersistenceActivator") << "m_PersistenceService GetReferenceCount " << m_PersistenceService->GetReferenceCount();
 
+          //m_PersistenceServiceRegistration.Unregister();
           m_PersistenceService->Unitialize();
-
-          m_PersistenceServiceRegistration.Unregister();
           m_PersistenceService->Delete();
         }
 

@@ -22,14 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFileReader.h"
 #include "mitkLabelSetImage.h"
 #include "mitkLabelSetImageSource.h"
-#include "SegmentationExports.h"
 
 #include "itkVectorImage.h"
 
 namespace mitk
 {
+
 /**
- * Reads a labelset image from file
+ * Reads a segmentation session from file
  * @ingroup Process
  */
 class Segmentation_EXPORT LabelSetImageReader : public LabelSetImageSource, public FileReader
@@ -71,7 +71,5 @@ class Segmentation_EXPORT LabelSetImageReader : public LabelSetImageSource, publ
   };
 
 } //namespace MITK
-
-//#include "mitkLabelSetImageReader.cpp"
 
 #endif // __mitkLabelSetImageReader_h

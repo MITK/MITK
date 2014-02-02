@@ -19,8 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLabelSetImageReader.h"
 
-#include "mitkLabelSetImage.h"
-
+// itk
 #include "itkImageFileReader.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
@@ -241,41 +240,38 @@ bool LabelSetImageReader::CanReadFile(const std::string filename,
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
   ext = itksys::SystemTools::LowerCase(ext);
 
-  if (ext == ".lset")
+  itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+
+  typedef itk::ImageFileReader<LabelSetImage::VectorImageType> FileReaderType;
+  FileReaderType::Pointer reader = FileReaderType::New();
+  reader->SetImageIO(io);
+  reader->SetFileName(filename);
+
+  try
   {
-    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+    reader->Update();
+  }
+  catch(itk::ExceptionObject& e)
+  {
+    mitkThrow() << e.GetDescription();
+  }
 
-    typedef itk::ImageFileReader<LabelSetImage::VectorImageType> FileReaderType;
-    FileReaderType::Pointer reader = FileReaderType::New();
-    reader->SetImageIO(io);
-    reader->SetFileName(filename);
+  LabelSetImage::VectorImageType::Pointer image = reader->GetOutput();
+  if (image.IsNotNull())
+  {
+    itk::MetaDataDictionary imgMetaDictionary = image->GetMetaDataDictionary();
+    std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
+    std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+    std::string metaString;
 
-    try
+    for (; itKey != imgMetaKeys.end(); itKey ++)
     {
-      reader->Update();
-    }
-    catch(itk::ExceptionObject& e)
-    {
-      mitkThrow() << e.GetDescription();
-    }
-
-    LabelSetImage::VectorImageType::Pointer image = reader->GetOutput();
-    if (image.IsNotNull())
-    {
-      itk::MetaDataDictionary imgMetaDictionary = image->GetMetaDataDictionary();
-      std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-      std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-      std::string metaString;
-
-      for (; itKey != imgMetaKeys.end(); itKey ++)
+      itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
+      if (itKey->find("modality") != std::string::npos)
       {
-        itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-        if (itKey->find("modality") != std::string::npos)
+        if (metaString.find("LSET") != std::string::npos)
         {
-          if (metaString.find("LSET") != std::string::npos)
-          {
-            return true;
-          }
+          return true;
         }
       }
     }

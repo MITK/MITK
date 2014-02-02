@@ -31,10 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPluginActivator.h"
 #include "mitkInteractionEventObserver.h"
 
-//move to core file load/save
-#include "mitkLabelSetImageReader.h"
-#include "mitkLabelSetImageWriter.h"
-
 // Qmitk
 #include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
 #include "QmitkRenderWindow.h"

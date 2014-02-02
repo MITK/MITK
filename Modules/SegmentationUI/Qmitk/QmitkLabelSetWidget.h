@@ -50,7 +50,7 @@ public:
 
   void SetOrganColors(const QStringList& organColors);
 
-  void OnToolManagerWorkingDataModified();
+  void UpdateControls();
 
   virtual void setEnabled(bool enabled);
 
@@ -94,9 +94,6 @@ private slots:
   // reaction to the button "Change Label"
   void OnActiveLabelChanged(int);
 
-  // reaction to the button "New Label"
-//  void OnNewLabel();
-
   // reaction to the button "Add Layer"
   void OnAddLayer();
 
@@ -130,8 +127,6 @@ private:
     void WaitCursorOff();
 
     void RestoreOverrideCursor();
-
-    void UpdateControls();
 
     void OnThreadedCalculationDone();
 

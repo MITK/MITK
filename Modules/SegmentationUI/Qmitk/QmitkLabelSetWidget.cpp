@@ -57,8 +57,6 @@ m_ToolManager(NULL)
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   assert(m_ToolManager);
 
-  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkLabelSetWidget>( this, &QmitkLabelSetWidget::OnToolManagerWorkingDataModified );
-
   connect( m_Controls.m_LabelSetTableWidget, SIGNAL(activeLabelChanged(int)), this, SLOT(OnActiveLabelChanged(int)) );
   //connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importSegmentation()), this, SLOT( OnImportSegmentation()) );
   //connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importLabeledImage()), this, SLOT( OnImportLabeledImage()) );
@@ -100,7 +98,6 @@ m_ToolManager(NULL)
   QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
   completeModel->setStringList(m_Controls.m_LabelSetTableWidget->GetLabelStringList());
 
- // m_Controls.m_LabelSetTableWidget->setEnabled(false);
   m_Controls.m_LabelSearchBox->setEnabled(false);
   m_Controls.m_btLockExterior->setEnabled(false);
   m_Controls.m_btSegmentationInteractor->setEnabled(false);
@@ -112,27 +109,18 @@ m_ToolManager(NULL)
 
 QmitkLabelSetWidget::~QmitkLabelSetWidget()
 {
-  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkLabelSetWidget>(this, &QmitkLabelSetWidget::OnToolManagerWorkingDataModified);
 }
 
 void QmitkLabelSetWidget::setEnabled(bool enabled)
 {
-  m_Controls.m_LabelSetTableWidget->setEnabled(enabled);
-//  m_Controls.m_btNewLabel->setEnabled(enabled);
-//  m_Controls.m_btLoadSegmentation->setEnabled(enabled);
-//  m_Controls.m_btImportLabeledImage->setEnabled(enabled);
-
   QWidget::setEnabled(enabled);
+
+  this->UpdateControls();
 }
 
 void QmitkLabelSetWidget::SetDataStorage( mitk::DataStorage& storage )
 {
   m_DataStorage = &storage;
-}
-
-void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
-{
-  this->UpdateControls();
 }
 
 void QmitkLabelSetWidget::OnSearchLabel()
@@ -404,22 +392,18 @@ void QmitkLabelSetWidget::OnLockExteriorToggled(bool checked)
 void QmitkLabelSetWidget::UpdateControls()
 {
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  bool enabled = (workingNode != NULL);
+  bool hasWorkingData = (workingNode != NULL);
 
-  m_Controls.m_LabelSetTableWidget->setEnabled(enabled);
-  m_Controls.m_LabelSearchBox->setEnabled(enabled);
-//  m_Controls.m_btSaveSegmentation->setEnabled(enabled);
-//  m_Controls.m_btNewLabel->setEnabled(enabled);
-  m_Controls.m_btLockExterior->setEnabled(enabled);
-  m_Controls.m_btSegmentationInteractor->setEnabled(enabled);
-  m_Controls.m_btAddLayer->setEnabled(enabled);
-  m_Controls.m_btDeleteLayer->setEnabled(enabled);
-  m_Controls.m_btPreviousLayer->setEnabled(enabled);
-  m_Controls.m_btNextLayer->setEnabled(enabled);
-//  m_Controls.m_btDeleteSegmentation->setEnabled(enabled);
-//  m_Controls.m_btImportSegmentation->setEnabled(enabled);
+  m_Controls.m_LabelSetTableWidget->setEnabled(hasWorkingData);
+  m_Controls.m_LabelSearchBox->setEnabled(hasWorkingData);
+  m_Controls.m_btLockExterior->setEnabled(hasWorkingData);
+  m_Controls.m_btSegmentationInteractor->setEnabled(hasWorkingData);
+  m_Controls.m_btAddLayer->setEnabled(hasWorkingData);
+  m_Controls.m_btDeleteLayer->setEnabled(hasWorkingData);
+  m_Controls.m_btPreviousLayer->setEnabled(hasWorkingData);
+  m_Controls.m_btNextLayer->setEnabled(hasWorkingData);
 
-  if (!enabled) return;
+  if (!hasWorkingData) return;
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   assert(workingImage);

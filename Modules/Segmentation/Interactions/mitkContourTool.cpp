@@ -105,7 +105,7 @@ bool mitk::ContourTool::OnMousePressed (StateMachineAction*, InteractionEvent* i
 
 bool mitk::ContourTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  //if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
@@ -125,17 +125,16 @@ bool mitk::ContourTool::OnMouseMoved( StateMachineAction*, InteractionEvent* int
 
 bool mitk::ContourTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
+
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of
   // the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
   InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
-
-  //if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);

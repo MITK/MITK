@@ -90,6 +90,7 @@ set(CPP_FILES
   IO/mitkLabelSetImageReader.cpp
   IO/mitkLabelSetImageWriter.cpp
   IO/mitkLabelSetImageSource.cpp
+  IO/mitkLabelSetImageSerializer.cpp
   Rendering/mitkContourMapper2D.cpp
   #Rendering/mitkContourModelGLMapper2D.cpp
   #Rendering/mitkContourModelMapper2D.cpp

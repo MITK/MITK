@@ -48,7 +48,7 @@ mitk::ColormapProperty::ColormapProperty( const std::string& value )
   }
 }
 
-int mitk::ColormapProperty::GetColormap()
+int mitk::ColormapProperty::GetColormap() const
 {
   return static_cast<int>( this->GetValueAsId() );
 }

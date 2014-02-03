@@ -5,4 +5,3 @@ file(GLOB SRCS
   )
 
 set(CPP_FILES ${SRCS})
-

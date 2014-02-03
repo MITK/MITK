@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkLabelSetImageReader_h
 #define __mitkLabelSetImageReader_h
 
-#include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkFileReader.h"
 #include "mitkLabelSetImage.h"

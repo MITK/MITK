@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkLabelSetImageWriter__cpp
 
 #include "mitkLabelSetImageWriter.h"
+
+// itk
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
@@ -65,75 +67,70 @@ void mitk::LabelSetImageWriter::GenerateData()
     }
   }
 
-  std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
-  ext = itksys::SystemTools::LowerCase(ext);
-  if (ext == ".lset")
+  typedef itk::ImageFileWriter<VectorImageType> WriterType;
+
+  VectorImageType::Pointer vectorImage = input->GetVectorImage(true); // force update
+
+  char keybuffer[512];
+  char valbuffer[512];
+
+  sprintf( valbuffer, "LSET");
+  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("modality"), std::string(valbuffer));
+
+  sprintf( valbuffer, input->GetName().c_str() );
+  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("name"), std::string(valbuffer));
+
+  sprintf( valbuffer, input->GetLastModificationTime().c_str() );
+  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("last modification time"), std::string(valbuffer));
+
+  sprintf( valbuffer, "%1d", input->GetTotalNumberOfLabels());
+  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("number of labels"), std::string(valbuffer));
+
+  int idx = 0;
+  for (int layerIdx=0; layerIdx<input->GetNumberOfLayers(); layerIdx++)
   {
-    typedef itk::ImageFileWriter<VectorImageType> WriterType;
-
-    VectorImageType::Pointer vectorImage = input->GetVectorImage(true); // force update
-
-    char keybuffer[512];
-    char valbuffer[512];
-
-    sprintf( valbuffer, "LSET");
-    itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("modality"),std::string(valbuffer));
-
-    sprintf( valbuffer, input->GetName().c_str() );
-    itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("name"),std::string(valbuffer));
-
-    sprintf( valbuffer, input->GetLastModificationTime().c_str() );
-    itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("last modification time"),std::string(valbuffer));
-
-    sprintf( valbuffer, "%1d", input->GetTotalNumberOfLabels());
-    itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("number of labels"),std::string(valbuffer));
-
-    int idx = 0;
-    for (int layer=0; layer<input->GetNumberOfLayers(); layer++)
+    for (int labelIdx=0; labelIdx<input->GetNumberOfLabels(layerIdx); labelIdx++)
     {
-      for (int label=0; label<input->GetNumberOfLabels(layer); label++)
-      {
-        sprintf( keybuffer, "label_%03d_name", idx );
-        sprintf( valbuffer, "%s", input->GetLabelName(label,layer).c_str());
+      sprintf( keybuffer, "label_%03d_name", idx );
+      sprintf( valbuffer, "%s", input->GetLabelName(labelIdx,layerIdx).c_str());
 
-        itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
+      itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
-        sprintf( keybuffer, "label_%03d_props", idx );
-        float rgba[4];
-        const mitk::Color& color = input->GetLabelColor(label, layer);
-        rgba[0] = color.GetRed();
-        rgba[1] = color.GetGreen();
-        rgba[2] = color.GetBlue();
-        rgba[3] = input->GetLabelOpacity(label, layer);
-        int locked = input->GetLabelLocked(label, layer);
-        int visible = input->GetLabelVisible(label, layer);
-        sprintf( valbuffer, "%f %f %f %f %d %d %d %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, layer, label);
+      sprintf( keybuffer, "label_%03d_props", idx );
+      float rgba[4];
+      const mitk::Color& color = input->GetLabelColor(labelIdx, layerIdx);
+      rgba[0] = color.GetRed();
+      rgba[1] = color.GetGreen();
+      rgba[2] = color.GetBlue();
+      rgba[3] = input->GetLabelOpacity(labelIdx, layerIdx);
+      int locked = input->GetLabelLocked(labelIdx, layerIdx);
+      int visible = input->GetLabelVisible(labelIdx, layerIdx);
+      sprintf(valbuffer, "%f %f %f %f %d %d %d %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, layerIdx, labelIdx);
 
-        itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
-        ++idx;
-      }
+      itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
+      ++idx;
     }
+  }
 
-    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-    io->SetFileType( itk::ImageIOBase::Binary );
-    io->UseCompressionOn();
+  itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+  io->SetFileType( itk::ImageIOBase::Binary );
+  io->UseCompressionOn();
 
-    WriterType::Pointer nrrdWriter = WriterType::New();
-    nrrdWriter->UseInputMetaDataDictionaryOn();
-    nrrdWriter->SetInput(vectorImage);
-    nrrdWriter->SetFileName(m_FileName);
-    nrrdWriter->UseCompressionOn();
-    nrrdWriter->SetImageIO(io);
+  WriterType::Pointer nrrdWriter = WriterType::New();
+  nrrdWriter->UseInputMetaDataDictionaryOn();
+  nrrdWriter->SetInput(vectorImage);
+  nrrdWriter->SetFileName(m_FileName);
+  nrrdWriter->UseCompressionOn();
+  nrrdWriter->SetImageIO(io);
 
-    try
-    {
-      nrrdWriter->Update();
-    }
-    catch (itk::ExceptionObject e)
-    {
-      MITK_ERROR << "Could not write segmentation. See error log for details.";
-      mitkThrow() << e.GetDescription();
-    }
+  try
+  {
+    nrrdWriter->Update();
+  }
+  catch (itk::ExceptionObject e)
+  {
+    MITK_ERROR << "Could not write segmentation session. See error log for details.";
+    mitkThrow() << e.GetDescription();
   }
 
   try

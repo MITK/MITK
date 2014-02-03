@@ -69,7 +69,7 @@ void LabelSetImageReader::GenerateData()
   ext = itksys::SystemTools::LowerCase(ext);
   if (ext != ".lset")
   {
-    MITK_WARN << "Selected file is not a segmentation";
+    MITK_WARN << "Selected file is not a segmentation session";
     return;
   }
 

@@ -58,7 +58,7 @@ class MITK_CORE_EXPORT ColormapProperty : public EnumerationProperty
     /**
     * Returns the current rendering mode
     */
-    virtual int GetColormap();
+    virtual int GetColormap() const;
 
     using BaseProperty::operator=;
 

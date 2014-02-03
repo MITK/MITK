@@ -17,9 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkLabelSetImageWriter_h
 #define __mitkLabelSetImageWriter_h
 
-#include "mitkCommon.h"
 #include "SegmentationExports.h"
-#include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
 #include <mitkLabelSetImage.h>
 
@@ -27,7 +25,7 @@ namespace mitk
 {
 
 /**
- * Writes a labelset image to a file
+ * Writes a segmentation session to a file
  * @ingroup Process
  */
 class Segmentation_EXPORT LabelSetImageWriter : public mitk::FileWriterWithInformation
@@ -99,8 +97,8 @@ public:
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
     // FileWriterWithInformation methods
-    virtual const char * GetDefaultFilename() { return "LabelsetImages.lset"; }
-    virtual const char * GetFileDialogPattern() { return "Label Set Images (*.lset)"; }
+    virtual const char * GetDefaultFilename() { return "labels.lset"; }
+    virtual const char * GetFileDialogPattern() { return "Segmentation session (*.lset)"; }
     virtual const char * GetDefaultExtension() { return ".lset"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data)
     {

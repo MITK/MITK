@@ -51,6 +51,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMath.h>
 
 #include <vtkContourFilter.h>
+#include <vtkMarchingSquares.h>
+#include <mitkSurface.h>
+#include "QmitkRenderWindow.h"
+#include <mitkExtractSliceFilter.h>
 
 const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualization";
 
@@ -367,35 +371,36 @@ void RTDoseVisualizer::OnConvertButtonClicked()
     selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
     selectedNode->SetProperty("Image Rendering.Mode", renderingMode);
 
+    //Getting a 2D-Slice
+    mitk::ExtractSliceFilter::Pointer extractFilter = mitk::ExtractSliceFilter::New();
+    extractFilter->SetInput(dynamic_cast<mitk::Image*>(selectedNode->GetData()));
+    extractFilter->SetWorldGeometry(this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderer()->GetCurrentWorldGeometry2D());
+    extractFilter->Update();
+    mitk::Image::Pointer reslicedImage = extractFilter->GetOutput();
+
     //Testing the vtkContourFilter for Isolines
-//    vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
-//    contourFilter->SetInput(dynamic_cast<mitk::Image*>(selectedNode->GetData()));
+    vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
+    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+//    contourFilter->SetInput(dynamic_cast<mitk::Image*>(selectedNode->GetData())->GetVtkImageData());
+    contourFilter->SetInput(reslicedImage->GetVtkImageData());
+    contourFilter->GenerateValues(3,10,20);
+    polyData = contourFilter->GetOutput();
 
-//    mitk::DataNode::Pointer doseNode = GetDataStorage()->GetNamedNode("DicomRT Dose");
-//    mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(doseNode->GetData());
-//    vtkMarchingSquares* contourFilter = vtkMarchingSquares::New();
-//    int numberOfIsoLines = 5;
-//    std::deque<mitk::Surface::Pointer> surfaceStorage;
+    mitk::Geometry3D::Pointer geo = dynamic_cast<mitk::Image*>(selectedNode->GetData())->GetGeometry()->Clone();
+    mitk::Vector3D spacing;
+    spacing.Fill(1);
+    geo->SetSpacing(spacing);
 
-//    for(int i=0; i<numberOfIsoLines;i++)
-//    {
-//      vtkContourFilter* contourFilter = vtkContourFilter::New();
-//      vtkPolyData* polyData = vtkPolyData::New();
-//      contourFilter->SetInput(doseImage->GetVtkImageData());
-//      contourFilter->SetNumberOfContours(5);
-//      contourFilter->SetValue(0,50000);
-//      contourFilter->GenerateValues(1,i*100*i,(i+1)*200*(i+1));
-//      polyData = contourFilter->GetOutput();
-//      mitk::Surface::Pointer c = mitk::Surface::New();
-//      c->SetVtkPolyData(polyData);
-//      mitk::Geometry3D::Pointer geo = doseImage->GetGeometry()->Clone();
-//      geo->ChangeImageGeometryConsideringOriginOffset(false);
-//      mitk::Vector3D spacing;
-//      spacing.Fill(1);
-//      geo->SetSpacing(spacing);
-//      c->SetGeometry(geo);
-//      surfaceStorage.push_back(c);
-//    }
+    mitk::Surface::Pointer isoline = mitk::Surface::New();
+    isoline->SetVtkPolyData(polyData);
+    isoline->SetGeometry(geo);
+
+    mitk::DataNode::Pointer isolineNode = mitk::DataNode::New();
+    isolineNode->SetData(isoline);
+    mitk::Color green; green[0]=1.0; green[1]=0.0; green[2]=0.0;
+    isolineNode->SetColor(green);
+    isolineNode->SetName("Isoline");
+    GetDataStorage()->Add(isolineNode);
 
     mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
     mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);

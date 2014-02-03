@@ -157,12 +157,12 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
     // number formatting)
     QString clipboard( "Mean \t StdDev \t RMS \t Max \t Min \t N \t V (mm³)\n" );
     clipboard = clipboard.append( "%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7" )
-      .arg( statistics.Mean, 0, 'f', 10 )
-      .arg( statistics.Sigma, 0, 'f', 10 )
-      .arg( statistics.RMS, 0, 'f', 10 )
-      .arg( statistics.Max, 0, 'f', 10 )
-      .arg( statistics.Min, 0, 'f', 10 )
-      .arg( statistics.N )
+      .arg( statistics.GetMean(), 0, 'f', 10 )
+      .arg( statistics.GetSigma(), 0, 'f', 10 )
+      .arg( statistics.GetRMS(), 0, 'f', 10 )
+      .arg( statistics.GetMax(), 0, 'f', 10 )
+      .arg( statistics.GetMin(), 0, 'f', 10 )
+      .arg( statistics.GetN() )
       .arg( m_Controls->m_StatisticsTable->item( 0, 6 )->text() );
 
     QApplication::clipboard()->setText(
@@ -591,16 +591,16 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   const mitk::ImageStatisticsCalculator::Statistics &s,
   const mitk::Image *image )
 {
-    if (s.MaxIndex.size()==3)
+    if (s.GetMaxIndex().size()==3)
     {
         mitk::Point3D index;
-        index[0] = s.MaxIndex[0];
-        index[1] = s.MaxIndex[1];
-        index[2] = s.MaxIndex[2];
+        index[0] = s.GetMaxIndex()[0];
+        index[1] = s.GetMaxIndex()[1];
+        index[2] = s.GetMaxIndex()[2];
         m_SelectedImage->GetGeometry()->IndexToWorld(index, m_WorldMax);
-        index[0] = s.MinIndex[0];
-        index[1] = s.MinIndex[1];
-        index[2] = s.MinIndex[2];
+        index[0] = s.GetMinIndex()[0];
+        index[1] = s.GetMinIndex()[1];
+        index[2] = s.GetMinIndex()[2];
         m_SelectedImage->GetGeometry()->IndexToWorld(index, m_WorldMin);
     }
 
@@ -612,43 +612,43 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
         decimals = 5;
 
   this->m_Controls->m_StatisticsTable->setItem( 0, 0, new QTableWidgetItem(
-    QString("%1").arg(s.Mean, 0, 'f', decimals) ) );
+    QString("%1").arg(s.GetMean(), 0, 'f', decimals) ) );
   this->m_Controls->m_StatisticsTable->setItem( 0, 1, new QTableWidgetItem(
-    QString("%1").arg(s.Sigma, 0, 'f', decimals) ) );
+    QString("%1").arg(s.GetSigma(), 0, 'f', decimals) ) );
 
   this->m_Controls->m_StatisticsTable->setItem( 0, 2, new QTableWidgetItem(
-    QString("%1").arg(s.RMS, 0, 'f', decimals) ) );
+    QString("%1").arg(s.GetRMS(), 0, 'f', decimals) ) );
 
-    QString max; max.append(QString("%1").arg(s.Max, 0, 'f', decimals));
+    QString max; max.append(QString("%1").arg(s.GetMax(), 0, 'f', decimals));
     max += " (";
-    for (int i=0; i<s.MaxIndex.size(); i++)
+    for (int i=0; i<s.GetMaxIndex().size(); i++)
     {
-        max += QString::number(s.MaxIndex[i]);
-        if (i<s.MaxIndex.size()-1)
+        max += QString::number(s.GetMaxIndex()[i]);
+        if (i<s.GetMaxIndex().size()-1)
             max += ",";
     }
     max += ")";
   this->m_Controls->m_StatisticsTable->setItem( 0, 3, new QTableWidgetItem( max ) );
 
-    QString min; min.append(QString("%1").arg(s.Min, 0, 'f', decimals));
+    QString min; min.append(QString("%1").arg(s.GetMin(), 0, 'f', decimals));
     min += " (";
-    for (int i=0; i<s.MinIndex.size(); i++)
+    for (int i=0; i<s.GetMinIndex().size(); i++)
     {
-        min += QString::number(s.MinIndex[i]);
-        if (i<s.MinIndex.size()-1)
+        min += QString::number(s.GetMinIndex()[i]);
+        if (i<s.GetMinIndex().size()-1)
             min += ",";
     }
     min += ")";
   this->m_Controls->m_StatisticsTable->setItem( 0, 4, new QTableWidgetItem( min ) );
 
   this->m_Controls->m_StatisticsTable->setItem( 0, 5, new QTableWidgetItem(
-    QString("%1").arg(s.N) ) );
+    QString("%1").arg(s.GetN()) ) );
 
   const mitk::Geometry3D *geometry = image->GetGeometry();
   if ( geometry != NULL )
   {
     const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
-    double volume = spacing[0] * spacing[1] * spacing[2] * (double) s.N;
+    double volume = spacing[0] * spacing[1] * spacing[2] * (double) s.GetN();
     this->m_Controls->m_StatisticsTable->setItem( 0, 6, new QTableWidgetItem(
       QString("%1").arg(volume, 0, 'f', decimals) ) );
   }
@@ -659,25 +659,25 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   }
 
 
-  QString hotspotPeak; hotspotPeak.append(QString("%1").arg(s.HotspotPeak, 0, 'f', decimals));
-    hotspotPeak += " (";
-    for (int i=0; i<s.HotspotPeakIndex.size(); i++)
+  QString hotspotMean; hotspotMean.append(QString("%1").arg(s.GetHotspotMean(), 0, 'f', decimals));
+    hotspotMean += " (";
+    for (int i=0; i<s.GetHotspotIndex().size(); i++)
     {
-        hotspotPeak += QString::number(s.HotspotPeakIndex[i]);
-        if (i<s.HotspotPeakIndex.size()-1)
-            hotspotPeak += ",";
+        hotspotMean += QString::number(s.GetHotspotIndex()[i]);
+        if (i<s.GetHotspotIndex().size()-1)
+            hotspotMean += ",";
     }
-    hotspotPeak += ")";
+    hotspotMean += ")";
 
-  this->m_Controls->m_StatisticsTable->setItem( 0, 7, new QTableWidgetItem( hotspotPeak ) );
+  this->m_Controls->m_StatisticsTable->setItem( 0, 7, new QTableWidgetItem( hotspotMean ) );
 
 
-  QString hotspotMax; hotspotMax.append(QString("%1").arg(s.HotspotMax, 0, 'f', decimals));
+  QString hotspotMax; hotspotMax.append(QString("%1").arg(s.GetHotspotMax(), 0, 'f', decimals));
     hotspotMax += " (";
-    for (int i=0; i<s.HotspotMaxIndex.size(); i++)
+    for (int i=0; i<s.GetHotspotMaxIndex().size(); i++)
     {
-        hotspotMax += QString::number(s.HotspotMaxIndex[i]);
-        if (i<s.HotspotMaxIndex.size()-1)
+        hotspotMax += QString::number(s.GetHotspotMaxIndex()[i]);
+        if (i<s.GetHotspotMaxIndex().size()-1)
             hotspotMax += ",";
     }
     hotspotMax += ")";
@@ -685,12 +685,12 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   this->m_Controls->m_StatisticsTable->setItem( 0, 8, new QTableWidgetItem( hotspotMax ) );
 
 
-  QString hotspotMin; hotspotMin.append(QString("%1").arg(s.HotspotMin, 0, 'f', decimals));
+  QString hotspotMin; hotspotMin.append(QString("%1").arg(s.GetHotspotMin(), 0, 'f', decimals));
     hotspotMin += " (";
-    for (int i=0; i<s.HotspotMinIndex.size(); i++)
+    for (int i=0; i<s.GetHotspotMinIndex().size(); i++)
     {
-        hotspotMin += QString::number(s.HotspotMinIndex[i]);
-        if (i<s.HotspotMinIndex.size()-1)
+        hotspotMin += QString::number(s.GetHotspotMinIndex()[i]);
+        if (i<s.GetHotspotMinIndex().size()-1)
             hotspotMin += ",";
     }
     hotspotMin += ")";

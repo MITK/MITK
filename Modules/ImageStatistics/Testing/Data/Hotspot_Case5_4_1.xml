@@ -1,0 +1,9 @@
+<testcase>
+  <testimage image-rows="20" image-columns="20" image-slices="20" numberOfGaussians="1" spacingX="4" spacingY="4" spacingZ="3" entireHotSpotInImage="1">
+    <gaussian centerIndexX="4" centerIndexY="10" centerIndexZ="4" deviationX="1" deviationY="7" deviationZ="1" altitude="11"/>
+  </testimage>
+  <segmentation numberOfLabels="1" hotspotRadiusInMM="6.2035">
+    <roi label="1" maximumSizeX="20" minimumSizeX="0" maximumSizeY="20" minimumSizeY="0" maximumSizeZ="20" minimumSizeZ="0"/>
+  </segmentation>
+  <statistic hotspotIndexX="4" hotspotIndexY="10" hotspotIndexZ="4" mean="6.15149" maximumIndexX="4" maximumIndexY="10" maximumIndexZ="4" maximum="10.1245" minimumIndexX="4" minimumIndexY="10" minimumIndexZ="2" minimum="1.60227"/>
+</testcase>

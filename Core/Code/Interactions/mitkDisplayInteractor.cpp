@@ -204,9 +204,11 @@ bool mitk::DisplayInteractor::ScrollOneDown(StateMachineAction*, InteractionEven
     {
       stepper = sliceNaviController->GetTime();
     }
+    MITK_INFO << "ScrollOneDown: ";
     stepper->Next();
+    return true;
   }
-  return true;
+  return false;
 }
 
 bool mitk::DisplayInteractor::ScrollOneUp(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -219,6 +221,7 @@ bool mitk::DisplayInteractor::ScrollOneUp(StateMachineAction*, InteractionEvent*
     {
       stepper = sliceNaviController->GetTime();
     }
+    MITK_INFO << "ScrollOneUp: ";
     stepper->Previous();
     return true;
   }

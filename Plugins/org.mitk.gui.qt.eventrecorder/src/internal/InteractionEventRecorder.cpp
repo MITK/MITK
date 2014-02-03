@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // us
 #include "usGetModuleContext.h"
 #include "usModuleContext.h"
+#include "usModuleResource.h"
 
 #include <usModuleInitialization.h>
 #include <mitkXML2EventParser.h>
@@ -67,9 +68,9 @@ void InteractionEventRecorder::Play()
   MITK_INFO << "parsed events";
   for (int i=0; i < events.size(); ++i)
   {
-    events.at(i)->SetSender(this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderer());
-    this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderer()->GetDispatcher()->ProcessEvent(events.at(i));
-   }
+    //this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderer()->GetDispatcher()->ProcessEvent(events.at(i));
+    events.at(i)->GetSender()->GetDispatcher()->ProcessEvent(events.at(i));
+  }
   MITK_INFO << "DONE";
 
 }
@@ -97,7 +98,6 @@ void InteractionEventRecorder::CreateQtPartControl( QWidget *parent )
 
   props["name"] = std::string("EventRecorder");
   m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(m_CurrentObserver,props);
-
 
 
   /*

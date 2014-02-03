@@ -48,14 +48,14 @@ void mitk::XML2EventParser::StartElement(const char* elementName, const char **a
     // New list in which all parameters are stored that are given within the <input/> tag
     m_EventPropertyList = PropertyList::New();
     m_EventPropertyList->SetStringProperty(InteractionEventConst::xmlParameterEventClass().c_str(), eventClass.c_str());
-    MITK_INFO << "event class " << eventClass;
+    //MITK_INFO << "event class " << eventClass;
   }
   else if (name == InteractionEventConst::xmlTagAttribute())
   {
     // Attributes that describe an Input Event, such as which MouseButton triggered the event,or which modifier keys are pressed
     std::string name = ReadXMLStringAttribute(InteractionEventConst::xmlParameterName(), atts);
     std::string value = ReadXMLStringAttribute(InteractionEventConst::xmlParameterValue(), atts);
-    MITK_INFO << "tag attr " << value;
+    //MITK_INFO << "tag attr " << value;
     m_EventPropertyList->SetStringProperty(name.c_str(), value.c_str());
   }
 }

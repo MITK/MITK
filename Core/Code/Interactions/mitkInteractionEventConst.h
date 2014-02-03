@@ -50,6 +50,7 @@ struct MITK_CORE_EXPORT InteractionEventConst
   static const std::string xmlEventPropertyScrollDirection(); // = "ScrollDirection";
   static const std::string xmlEventPropertyWheelDelta(); // = "WheelDelta";
   static const std::string xmlEventPropertySignalName(); // = "SignalName";
+  static const std::string xmlEventPropertyRendererName(); // = "RendererName";
 };
 
 }     //namespace mitk

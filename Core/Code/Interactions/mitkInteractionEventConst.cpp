@@ -121,5 +121,11 @@ const std::string InteractionEventConst::xmlEventPropertySignalName()
   return xmlEventPropertySignalName;
 }
 
+const std::string InteractionEventConst::xmlEventPropertyRendererName()
+{
+  static const std::string xmlEventPropertyRendererName = "RendererName";
+  return xmlEventPropertyRendererName;
+}
+
 
 }

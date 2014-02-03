@@ -187,6 +187,16 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   // Internal Signals Name
   list->GetStringProperty(InteractionEventConst::xmlEventPropertySignalName().c_str(), strSignalName);
 
+  // Get BaseRenderer by name
+  mitk::BaseRenderer* renderer = NULL;
+  std::string strRenderer;
+
+  if(list->GetStringProperty(mitk::InteractionEventConst::xmlEventPropertyRendererName().c_str(), strRenderer))
+  {
+    //look up for renderer registered with the name in xml file
+    renderer = mitk::BaseRenderer::GetByName(strRenderer);
+  }
+
   /*
    * Here the objects are created
    */
@@ -198,40 +208,40 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     // buttonstates incorporate the event button (as in Qt)
     buttonState = buttonState | eventButton;
-    event = MousePressEvent::New(NULL, pos, buttonState, modifiers, eventButton);
+    event = MousePressEvent::New(renderer, pos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "MOUSEDOUBLECLICKEVENT")
   {
     buttonState = buttonState | eventButton;
-    event = MouseDoubleClickEvent::New(NULL, pos, buttonState, modifiers, eventButton);
+    event = MouseDoubleClickEvent::New(renderer, pos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "MOUSEMOVEEVENT")
   {
-    event = MouseMoveEvent::New(NULL, pos, buttonState, modifiers);
+    event = MouseMoveEvent::New(renderer, pos, buttonState, modifiers);
   }
   else if (eventClass == "MOUSERELEASEEVENT")
   {
-    event = MouseReleaseEvent::New(NULL, pos, buttonState, modifiers, eventButton);
+    event = MouseReleaseEvent::New(renderer, pos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "INTERACTIONKEYEVENT")
   {
-    event = InteractionKeyEvent::New(NULL, key, modifiers);
+    event = InteractionKeyEvent::New(renderer, key, modifiers);
   }
   else if (eventClass == "MOUSEWHEELEVENT")
   {
-    event = MouseWheelEvent::New(NULL, pos, buttonState, modifiers, wheelDelta);
+    event = MouseWheelEvent::New(renderer, pos, buttonState, modifiers, wheelDelta);
   }
   else if (eventClass == "INTERACTIONPOSITIONEVENT")
   {
-    event = InteractionPositionEvent::New(NULL, pos);
+    event = InteractionPositionEvent::New(renderer, pos);
   }
   else if (eventClass == "INTERNALEVENT")
   {
-    event = InternalEvent::New(NULL, NULL, strSignalName);
+    event = InternalEvent::New(renderer, NULL, strSignalName);
   }
   else if (eventClass == "INTERACTIONEVENT")
   {
-    event = InteractionEvent::New(NULL);
+    event = InteractionEvent::New(renderer);
   }
   if (event.IsNull())
   {
@@ -313,6 +323,13 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
     eventXML += ss.str();
     eventXML += "\"/>\n";
   }
+
+  // Renderer name
+  eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyRendererName() + "\" ";
+  eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
+  eventXML += event->GetSender()->GetName();
+  eventXML += "\"/>\n";
+
   // closing tag:
   eventXML += "</" + InteractionEventConst::xmlTagEventVariant() +  ">";
   return eventXML;

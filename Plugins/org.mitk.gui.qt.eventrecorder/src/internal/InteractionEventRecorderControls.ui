@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>253</width>
-    <height>214</height>
+    <width>432</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -64,28 +64,89 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="btnStartRecording">
-     <property name="toolTip">
-      <string>Do image processing</string>
-     </property>
-     <property name="text">
-      <string>Start Recording</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btnStopRecording">
-     <property name="text">
-      <string>Stop Recording</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btnPlay">
-     <property name="text">
-      <string>Play Recording</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="btnStartRecording">
+       <property name="toolTip">
+        <string>Do image processing</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../../../bin/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_gt_eventrecorder_cached.qrc">
+         <normaloff>:/org.mitk.gui.gt.eventrecorder/resources/rec.png</normaloff>:/org.mitk.gui.gt.eventrecorder/resources/rec.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnStopRecording">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../../../bin/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_gt_eventrecorder_cached.qrc">
+         <normaloff>:/org.mitk.gui.gt.eventrecorder/resources/stop_rec.png</normaloff>:/org.mitk.gui.gt.eventrecorder/resources/stop_rec.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnPlay">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../../../bin/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_gt_eventrecorder_cached.qrc">
+         <normaloff>:/org.mitk.gui.gt.eventrecorder/resources/play.png</normaloff>:/org.mitk.gui.gt.eventrecorder/resources/play.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="spacer1">
@@ -106,6 +167,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../../../../../bin/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_gt_eventrecorder_cached.qrc"/>
+ </resources>
  <connections/>
 </ui>

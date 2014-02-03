@@ -23,6 +23,10 @@ set(MOC_H_FILES
 set(CACHED_RESOURCE_FILES
   resources/icon.xpm
   plugin.xml
+  resources/play.png
+  resources/rec.png
+  resources/stop_rec.png
+  resources/stop.png
 )
 
 # list of Qt .qrc files which contain additional resources

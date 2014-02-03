@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
+#include <QFileDialog>
 // us
 #include "usGetModuleContext.h"
 #include "usModuleContext.h"
@@ -51,6 +52,12 @@ void InteractionEventRecorder::StartRecording()
   m_CurrentObserver->StartRecording();
 }
 
+void InteractionEventRecorder::StopRecording()
+{
+  MITK_INFO << "Stop Recording";
+  m_CurrentObserver->StopRecording();
+}
+
 void InteractionEventRecorder::Play()
 {
   std::ifstream xmlStream(m_Controls.textFileName->text().toStdString().c_str());
@@ -59,17 +66,30 @@ void InteractionEventRecorder::Play()
 
   MITK_INFO << "parsed events";
   for (int i=0; i < events.size(); ++i)
-    this->GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderer()->GetDispatcher()->ProcessEvent(events.at(i));
+  {
+    events.at(i)->SetSender(this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderer());
+    this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderer()->GetDispatcher()->ProcessEvent(events.at(i));
+   }
   MITK_INFO << "DONE";
 
+}
+
+void InteractionEventRecorder::OpenFile()
+{
+  QString fn = QFileDialog::getOpenFileName(NULL, "Open File...",
+                                                QString(), "All Files (*)");
+      if (!fn.isEmpty())
+        this->m_Controls.textFileName->setText(fn);
 }
 
 void InteractionEventRecorder::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
+  connect( m_Controls.btnStopRecording, SIGNAL(clicked()), this, SLOT(StopRecording()) );
   connect( m_Controls.btnStartRecording, SIGNAL(clicked()), this, SLOT(StartRecording()) );
   connect( m_Controls.btnPlay, SIGNAL(clicked()), this, SLOT(Play()) );
+  connect( m_Controls.btnOpenFile, SIGNAL(clicked()), this, SLOT(OpenFile()) );
 
   m_CurrentObserver = new mitk::EventRecorder();
   // Register as listener via micro services

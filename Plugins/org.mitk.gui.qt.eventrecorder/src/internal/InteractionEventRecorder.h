@@ -52,6 +52,8 @@ class InteractionEventRecorder : public QmitkAbstractView
     /// \brief Called when the user clicks the GUI button
 
     void StartRecording();
+    void StopRecording();
+    void OpenFile();
     void Play();
 
   protected:

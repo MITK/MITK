@@ -74,7 +74,7 @@ namespace mitk
           MITK_DEBUG("PersistenceActivator") << "PersistenceActivator::Unload";
           MITK_DEBUG("PersistenceActivator") << "m_PersistenceService GetReferenceCount " << m_PersistenceService->GetReferenceCount();
 
-          //m_PersistenceServiceRegistration.Unregister();
+          m_PersistenceServiceRegistration.Unregister();
           m_PersistenceService->Unitialize();
           m_PersistenceService->Delete();
         }

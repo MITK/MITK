@@ -65,12 +65,18 @@ void mitk::EventRecorder::StartRecording()
     m_FileStream.close();
     return ;
   }
+
+  //write open tag
+  m_FileStream << "<events>\n";
 }
 
 void mitk::EventRecorder::StopRecording()
 {
   if (m_FileStream.is_open())
   {
+    //write end tag
+    m_FileStream << "</events>\n";
+
     m_FileStream.flush();
     m_FileStream.close();
   }

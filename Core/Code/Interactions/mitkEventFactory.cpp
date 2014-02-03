@@ -71,6 +71,18 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
 
   Point2D pos;
   pos.Fill(0);
+  std::string strPos;
+
+  // Position on screen
+  if( list->GetStringProperty(InteractionEventConst::xmlEventPropertyPositionOnScreen().c_str(), strPos))
+  {
+    //split comma separated string
+    int commaPos;
+    commaPos = strPos.find_first_of(',');
+
+    pos[0] = static_cast<mitk::ScalarType>(std::atof(strPos.substr(0, commaPos).c_str()));
+    pos[1] = static_cast<mitk::ScalarType>(std::atof(strPos.substr(commaPos+1, strPos.length()).c_str()));
+  }
 
   // Parse modifier information
   if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyModifier().c_str(), strModifiers))

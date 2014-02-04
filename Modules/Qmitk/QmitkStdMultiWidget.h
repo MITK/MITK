@@ -40,6 +40,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkTextProperty.h"
 #include "vtkCornerAnnotation.h"
 
+#include "mitkBaseRenderer.h"
+
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
@@ -58,7 +60,7 @@ class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 
 public:
 
-  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0);
+  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
   virtual ~QmitkStdMultiWidget();
 
   mitk::SliceNavigationController*
@@ -69,7 +71,6 @@ public:
   void ForceImmediateUpdate();
 
   mitk::MouseModeSwitcher* GetMouseModeSwitcher();
-
 
   QmitkRenderWindow* GetRenderWindow1() const;
 
@@ -255,7 +256,6 @@ public slots:
 
   void MouseModeSelected( mitk::MouseModeSwitcher::MouseMode mouseMode );
 
-
 signals:
 
   void LeftMouseClicked(mitk::Point3D pointValue);
@@ -296,7 +296,6 @@ public:
     THREE_D
   };
 
-
 protected:
 
   QHBoxLayout* QmitkStdMultiWidgetLayout;
@@ -321,7 +320,6 @@ protected:
   mitk::GradientBackground::Pointer m_GradientBackground4;
   mitk::GradientBackground::Pointer m_GradientBackground3;
   bool m_GradientBackgroundFlag;
-
 
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
   mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
@@ -357,6 +355,5 @@ protected:
 
   bool m_PendingCrosshairPositionEvent;
   bool m_CrosshairNavigationEnabled;
-
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

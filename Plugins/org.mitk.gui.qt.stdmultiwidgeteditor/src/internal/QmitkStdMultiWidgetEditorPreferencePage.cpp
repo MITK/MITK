@@ -147,6 +147,7 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
                                         , m_EnableFlexibleZooming->isChecked());
   m_StdMultiWidgetEditorPreferencesNode->PutBool("Show level/window widget", m_ShowLevelWindowWidget->isChecked());
   m_StdMultiWidgetEditorPreferencesNode->PutBool("PACS like mouse interaction", m_PACSLikeMouseMode->isChecked());
+  m_StdMultiWidgetEditorPreferencesNode->PutInt("Rendering Mode", m_RenderingMode->currentIndex());
 
   return true;
 }
@@ -164,6 +165,9 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_SecondColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("second background color style sheet", ""));
   m_FirstColor = m_StdMultiWidgetEditorPreferencesNode->GetByteArray("first background color", "");
   m_SecondColor = m_StdMultiWidgetEditorPreferencesNode->GetByteArray("second background color", "");
+  int index=m_StdMultiWidgetEditorPreferencesNode->GetInt("Rendering Mode",0);
+  m_RenderingMode->setCurrentIndex(index);
+
   if (m_FirstColorStyleSheet=="")
   {
     m_FirstColorStyleSheet = "background-color:rgb(25,25,25)";

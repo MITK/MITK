@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
 #define MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
 
@@ -38,10 +37,8 @@ class vtkTextActor;
 class vtkTextProperty;
 class vtkAssemblyPath;
 
-
 namespace mitk
 {
-
 class Mapper;
 
 /*!
@@ -66,7 +63,7 @@ private:
 public:
 
   mitkClassMacro(VtkPropRenderer,BaseRenderer);
-  mitkNewMacro3Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager* );
+  mitkNewMacro4Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager*, mitk::BaseRenderer::RenderingMode::Type );
 
   typedef std::map<int,Mapper*> MappersMapType;
 
@@ -153,7 +150,7 @@ public:
   static bool useImmediateModeRendering();
 
 protected:
-  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL );
+  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard );
   virtual ~VtkPropRenderer();
   virtual void Update();
 
@@ -165,7 +162,6 @@ protected:
     Conversion is done in this method.
   */
   mitk::Point2D TransformOpenGLPointToViewport( mitk::Point2D point );
-
 
 private:
 
@@ -254,7 +250,6 @@ private:
   DataStorage::SetOfObjects::ConstPointer m_PickingObjects;
   DataStorage::SetOfObjects::const_iterator m_PickingObjectsIterator;
 };
-
 } // namespace mitk
 
 #endif /* MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D */

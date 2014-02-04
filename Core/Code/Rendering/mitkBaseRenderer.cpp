@@ -107,7 +107,7 @@ vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName(const std::string& na
   return NULL;
 }
 
-mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm) :
+mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm,RenderingMode::Type renderingMode) :
     m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataStorage(NULL), m_RenderingManager(rm), m_LastUpdateTime(0), m_CameraController(
         NULL), m_SliceNavigationController(NULL), m_CameraRotationController(NULL), /*m_Size(),*/
     m_Focused(false), m_WorldGeometry(NULL), m_WorldTimeGeometry(NULL), m_CurrentWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL), m_DisplayGeometry(
@@ -198,6 +198,13 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
 #endif
 
   m_VtkRenderer = vtkRenderer::New();
+
+  if( renderingMode == RenderingMode::DepthPeeling )
+  {
+    m_VtkRenderer->SetUseDepthPeeling(1);
+    m_VtkRenderer->SetMaximumNumberOfPeels(8);
+    m_VtkRenderer->SetOcclusionRatio(0.0);
+  }
 
   if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == NULL)
   {

@@ -51,7 +51,6 @@ public:
   berry::IPartListener::Pointer m_PartListener;
 
   QHash<QString, QmitkRenderWindow*> m_RenderWindows;
-
 };
 
 struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
@@ -112,7 +111,6 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 private:
 
   QmitkStdMultiWidgetEditorPrivate* const d;
-
 };
 
 QmitkStdMultiWidgetEditorPrivate::QmitkStdMultiWidgetEditorPrivate()
@@ -284,7 +282,11 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
       layout->addWidget(d->m_MouseModeToolbar);
     }
 
-    d->m_StdMultiWidget = new QmitkStdMultiWidget(parent);
+    berry::IPreferences::Pointer prefs = this->GetPreferences();
+
+    mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt( "Rendering Mode" , 0 ));
+
+    d->m_StdMultiWidget = new QmitkStdMultiWidget(parent,0,0,renderingMode);
 
     d->m_RenderWindows.insert("transversal", d->m_StdMultiWidget->GetRenderWindow1());
     d->m_RenderWindows.insert("axial", d->m_StdMultiWidget->GetRenderWindow1());
@@ -326,7 +328,6 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     this->GetSite()->GetPage()->AddPartListener(d->m_PartListener);
 
-    berry::IPreferences::Pointer prefs = this->GetPreferences();
     this->OnPreferencesChanged(dynamic_cast<berry::IBerryPreferences*>(prefs.GetPointer()));
 
     this->RequestUpdate();
@@ -458,4 +459,3 @@ void QmitkStdMultiWidgetEditor::RequestActivateMenuWidget(bool on)
     }
   }
 }
-

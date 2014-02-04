@@ -77,6 +77,16 @@ namespace mitk
   class MITK_CORE_EXPORT BaseRenderer: public itk::Object
   {
   public:
+
+    struct RenderingMode
+    {
+      enum Type {
+        Standard = 0,
+        MultiSampling,
+        DepthPeeling
+      };
+    };
+
     typedef std::map<vtkRenderWindow*, BaseRenderer*> BaseRendererMapType;
     static BaseRendererMapType baseRendererMap;
 
@@ -94,7 +104,7 @@ namespace mitk
     /** Standard class typedefs. */
     mitkClassMacro(BaseRenderer, itk::Object);
 
-    BaseRenderer(const char* name = NULL, vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL);
+    BaseRenderer(const char* name = NULL, vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL,RenderingMode::Type mode = RenderingMode::Standard);
 
     //##Documentation
     //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.

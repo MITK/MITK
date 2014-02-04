@@ -3,7 +3,7 @@ MITK_CREATE_MODULE(MitkUS
   INCLUDE_DIRS USControlInterfaces USFilters USModel USService
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   QT_MODULE
-  DEPENDS Mitk mitkOpenCVVideoSupport Qmitk QmitkExt
+  DEPENDS Mitk mitkOpenCVVideoSupport Qmitk QmitkExt MitkIGT
 )
 
 ## create US config

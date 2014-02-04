@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <MitkUSExports.h>
 #include <mitkImageToImageFilter.h>
+#include <mitkRealTimeClock.h>
 
 
 namespace mitk {
@@ -34,9 +35,25 @@ namespace mitk {
 
     mitkClassMacro(USImageLoggingFilter, mitk::ImageToImageFilter);
 
+    itkNewMacro(USImageLoggingFilter);
+
+    virtual void GenerateData();
+
+    void AddMessageToCurrentImage(std::string message);
+
+    void SaveImages(std::string path, std::vector<std::string>& imageFilenames = std::vector<std::string>(), std::string& csvFileName = std::string());
+
   protected:
     USImageLoggingFilter();
     virtual ~USImageLoggingFilter();
+    typedef std::vector<mitk::Image::Pointer> ImageCollection;
+    mitk::RealTimeClock::Pointer m_SystemTimeClock;  ///< system time clock for system time tag
+
+    //members for logging
+    ImageCollection m_LoggedImages; ///< An image collection for every input. The string identifies the input.
+    std::map<int, std::string> m_LoggedMessages; ///< (Optional) messages for every logged image
+    std::vector<double> m_LoggedMITKSystemTimes; ///< Logged system times for every logged image
+
   };
 } // namespace mitk
 #endif /* MITKUSImageSource_H_HEADER_INCLUDED_ */

@@ -247,6 +247,11 @@ void mitk::PersistenceService::RemovePropertyListReplacedObserver(PropertyListRe
   m_PropertyListReplacedObserver.erase( observer );
 }
 
+void mitk::PersistenceService::LoadModule()
+{
+    MITK_INFO << "Persistence Module loaded.";
+}
+
 us::ModuleContext* mitk::PersistenceService::GetModuleContext()
 {
   return us::GetModuleContext();

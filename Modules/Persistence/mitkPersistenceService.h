@@ -20,18 +20,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPropertyListsXmlFileReaderAndWriter.h"
 #include <itkLightObject.h>
 #include "mitkSceneIO.h"
+#include "PersistenceExports.h"
 
 namespace mitk
 {
     ///
     /// implementation of the IPersistenceService
     /// \see IPersistenceService
-    class PersistenceService: public itk::LightObject, public mitk::IPersistenceService
+    class Persistence_EXPORT PersistenceService: public itk::LightObject, public mitk::IPersistenceService
     {
     public:
         static const std::string PERSISTENCE_PROPERTY_NAME;
         static const std::string PERSISTENCE_PROPERTYLIST_NAME;
 
+        static void LoadModule();
         static us::ModuleContext* GetModuleContext();
 
         PersistenceService();

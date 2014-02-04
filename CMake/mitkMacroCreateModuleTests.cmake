@@ -64,6 +64,11 @@ ${MODULE_TEST_EXTRA_DRIVER_INIT};"
       endforeach()
     endif()
 
+    # Add meta dependencies (e.g. on auto-load modules from depending modules)
+    if(ALL_META_DEPENDENCIES)
+      add_dependencies(${TESTDRIVER} ${ALL_META_DEPENDENCIES})
+    endif()
+
     #
     # Now tell CMake which tests should be run. This is done automatically
     # for all tests in ${KITNAME}_TESTS and ${KITNAME}_IMAGE_TESTS. The IMAGE_TESTS

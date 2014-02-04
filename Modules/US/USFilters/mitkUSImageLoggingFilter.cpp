@@ -29,13 +29,22 @@ mitk::USImageLoggingFilter::~USImageLoggingFilter()
 void mitk::USImageLoggingFilter::GenerateData()
 {
   mitk::Image::ConstPointer inputImage = this->GetInput();
-  //mitk::Image::Pointer output = this->GetOutput();
 
   if(inputImage.IsNull() || inputImage->IsEmpty())
     {
     MITK_WARN << "Input image is not valid. Cannot save image!";
     return;
     }
+
+  //simply redirecy the input to the output
+  /* not working at the moment: TODO fix it!
+  if (this->GetNumberOfOutputs() == 0)
+    {
+    mitk::Image::Pointer newOutput = mitk::Image::New();
+    this->SetNthOutput(0, newOutput);
+    }
+  this->GetOutput()->Graft(this->GetInput());
+  */
 
   m_LoggedImages.push_back(inputImage->Clone());
   m_LoggedMITKSystemTimes.push_back(m_SystemTimeClock->GetCurrentStamp());

@@ -13,6 +13,7 @@ USModel/mitkUSProbe.cpp
 USModel/mitkUSDevicePersistence.cpp
 
 ## Filters and Sources
+USFilters/mitkUSImageLoggingFilter.cpp
 USFilters/mitkUSImageSource.cpp
 USFilters/mitkUSImageVideoSource.cpp
 

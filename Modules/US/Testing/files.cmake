@@ -1,6 +1,7 @@
 SET(MODULE_TESTS
    mitkUSDeviceTest.cpp
    mitkUSProbeTest.cpp
+   mitkUSImageLoggingFilterTest.cpp
 
    # -----------------------------------------------------------------------
 

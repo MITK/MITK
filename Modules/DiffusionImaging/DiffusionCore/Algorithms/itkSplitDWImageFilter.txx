@@ -92,7 +92,7 @@ void itk::SplitDWImageFilter< TInputImagePixelType, TOutputImagePixelType >
     IndexListType::const_iterator listIt = bvalueIt->second.begin();
     if( std::fabs( bvalueIt->first - b_value) < tol)
     {
-      m_IndexList.push_back(*listIt);
+      m_IndexList.insert( m_IndexList.begin(), bvalueIt->second.begin(), bvalueIt->second.end() );
       ++listIt;
     }
 

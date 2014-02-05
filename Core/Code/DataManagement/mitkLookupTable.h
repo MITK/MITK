@@ -57,11 +57,11 @@ public:
     /**
      * @returns the associated vtkLookupTable
      */
-    virtual vtkLookupTable* GetVtkLookupTable() const;
+    virtual vtkSmartPointer<vtkLookupTable> GetVtkLookupTable() const;
 
     virtual RawLookupTableType * GetRawLookupTable() const;
 
-    virtual void SetVtkLookupTable( vtkLookupTable* lut );
+    virtual void SetVtkLookupTable( vtkSmartPointer<vtkLookupTable> lut );
 
     virtual void ChangeOpacityForAll( float opacity );
 

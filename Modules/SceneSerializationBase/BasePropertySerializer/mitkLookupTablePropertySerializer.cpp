@@ -109,7 +109,7 @@ class SceneSerializationBase_EXPORT LookupTablePropertySerializer : public BaseP
 
       double d;  // bec. of tinyXML's interface that takes a pointer to float or double...
 
-      vtkLookupTable* lut = vtkLookupTable::New();
+      vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
 
       int numberOfColors;
       int scale;
@@ -195,8 +195,6 @@ class SceneSerializationBase_EXPORT LookupTablePropertySerializer : public BaseP
 
       LookupTable::Pointer mitkLut = LookupTable::New();
       mitkLut->SetVtkLookupTable( lut );
-
-      lut->Delete();
 
       return LookupTableProperty::New(mitkLut).GetPointer();
     }

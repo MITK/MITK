@@ -311,10 +311,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   m_ColormapAction = new QAction("Colormap", this);
   m_ColormapAction->setMenu(new QMenu);
-  //  m_ColormapAction->setCheckable(true);
-  //  m_ColormapAction->setChecked(false);
-  //  QObject::connect( m_ColormapAction, SIGNAL( toggled (bool) )
-  //    , this, SLOT( ColormapActionEnabled(bool) ) );
   QObject::connect( m_ColormapAction->menu(), SIGNAL( aboutToShow() )
     , this, SLOT( ColormapMenuAboutToShow() ) );
   imageDataNodeDescriptor->AddAction(m_ColormapAction, false);

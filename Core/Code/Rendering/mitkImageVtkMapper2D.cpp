@@ -1059,31 +1059,19 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   //in the constructor for each image (i.e. the image-corresponding local storage)
   m_TSFilter->ReleaseDataFlagOn();
 
+  mitk::LookupTable::Pointer mitkLUT = mitk::LookupTable::New();
   //built a default lookuptable
-  m_DefaultLookupTable->SetRampToLinear();
-  m_DefaultLookupTable->SetSaturationRange( 0.0, 0.0 );
-  m_DefaultLookupTable->SetHueRange( 0.0, 0.0 );
-  m_DefaultLookupTable->SetValueRange( 0.0, 1.0 );
-  m_DefaultLookupTable->Build();
+  mitkLUT->SetType(mitk::LookupTable::GRAYSCALE);
+  m_DefaultLookupTable = mitkLUT->GetVtkLookupTable();
 
-  m_BinaryLookupTable->SetRampToLinear();
-  m_BinaryLookupTable->SetSaturationRange( 0.0, 0.0 );
-  m_BinaryLookupTable->SetHueRange( 0.0, 0.0 );
-  m_BinaryLookupTable->SetValueRange( 0.0, 1.0 );
-  m_BinaryLookupTable->SetRange(0.0, 1.0);
-  m_BinaryLookupTable->Build();
+  mitkLUT->SetType(mitk::LookupTable::LEGACY_BINARY);
+  m_BinaryLookupTable = mitkLUT->GetVtkLookupTable();
 
   // add a default rainbow lookup table for color mapping
   m_ColorLookupTable->SetRampToLinear();
   m_ColorLookupTable->SetHueRange(0.6667, 0.0);
   m_ColorLookupTable->SetTableRange(0.0, 20.0);
   m_ColorLookupTable->Build();
-  // make first value transparent
-  {
-    double rgba[4];
-    m_BinaryLookupTable->GetTableValue(0, rgba);
-    m_BinaryLookupTable->SetTableValue(0, rgba[0], rgba[1], rgba[2], 0.0); // background to 0
-  }
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();

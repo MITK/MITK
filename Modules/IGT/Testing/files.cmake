@@ -1,3 +1,7 @@
+set(H_FILES
+   mitkNavigationToolStorageTestHelper.h
+)
+
 set(MODULE_TESTS
    mitkCameraVisualizationTest.cpp
    mitkClaronInterfaceTest.cpp
@@ -34,7 +38,9 @@ set(MODULE_TESTS
    mitkNavigationToolStorageTest.cpp
    mitkNavigationToolTest.cpp
    mitkNavigationToolReaderAndWriterTest.cpp
-   mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
+   mitkNavigationToolStorageSerializerTest.cpp
+   mitkNavigationToolStorageDeserializerTest.cpp
+   mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp
    # -----------------------------------------------------------------------
 )
 

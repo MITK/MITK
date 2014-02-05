@@ -79,7 +79,7 @@ public:
     }
     CPPUNIT_ASSERT_MESSAGE(" ..Testing if tool 1 was loaded successfully",foundtool1);
     CPPUNIT_ASSERT_MESSAGE(" ..Testing if tool 2 was loaded successfully",foundtool2);
-    CPPUNIT_ASSERT_MESSAGE(" ..Testing if tool 3 was loaded successfully",foundtool2);
+    CPPUNIT_ASSERT_MESSAGE(" ..Testing if tool 3 was loaded successfully",foundtool3);
   }
 
   void TestReadComplexToolStorage()

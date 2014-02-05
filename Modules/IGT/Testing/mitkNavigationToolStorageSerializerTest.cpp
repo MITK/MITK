@@ -80,7 +80,7 @@ public:
   void TestWriteSimpleToolStorage()
   {
   //create Tool Storage
-    mitk::NavigationToolStorage::Pointer myStorage = mitk::CreateTestData_SimpleStorage();
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorageTestHelper::CreateTestData_SimpleStorage();
 
   //test serialization
   bool success = m_Serializer->Serialize(m_FileName1,myStorage);
@@ -90,7 +90,7 @@ public:
   void TestWriteComplexToolStorage()
   {
     //create navigation tool storage
-    mitk::NavigationToolStorage::Pointer myStorage = mitk::CreateTestData_ComplexStorage(GetTestDataFilePath("ClaronTool"),GetTestDataFilePath("IGT-Data/ClaronTool.stl"),GetTestDataFilePath("IGT-Data/EMTool.stl"));
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorageTestHelper::CreateTestData_ComplexStorage(GetTestDataFilePath("ClaronTool"),GetTestDataFilePath("IGT-Data/ClaronTool.stl"),GetTestDataFilePath("IGT-Data/EMTool.stl"));
 
     //test serialization
     bool success = m_Serializer->Serialize(m_FileName1,myStorage);
@@ -100,7 +100,7 @@ public:
   void TestWriteStorageToInvalidFile()
   {
     //create Tool Storage
-    mitk::NavigationToolStorage::Pointer myStorage = mitk::CreateTestData_SimpleStorage();
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorageTestHelper::CreateTestData_SimpleStorage();
 
     //create invalid filename
   #ifdef WIN32

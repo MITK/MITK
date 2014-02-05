@@ -16,11 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   #include <mitkNavigationToolStorage.h>
   #include <mitkIOUtil.h>
-  #include <mitkTestFixture.h>
+  #include "mitkNavigationToolStorageTestHelper.h"
 
-namespace mitk {
-  //help methods for test tool storages
-  static mitk::NavigationToolStorage::Pointer CreateTestData_SimpleStorage()
+mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::CreateTestData_SimpleStorage()
     {
     //create Tool Storage
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
@@ -38,9 +36,9 @@ namespace mitk {
     myStorage->AddTool(myTool3);
 
     return myStorage;
-    };
+    }
 
-  static mitk::NavigationToolStorage::Pointer CreateTestData_StorageWithOneTool()
+  mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::CreateTestData_StorageWithOneTool()
     {
     //create Tool Storage
     mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
@@ -68,7 +66,7 @@ namespace mitk {
     return myStorage;
     }
 
-  static mitk::NavigationToolStorage::Pointer CreateTestData_ComplexStorage(std::string toolFilePath, std::string toolSurfacePath1, std::string toolSurfacePath2)
+  mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::CreateTestData_ComplexStorage(std::string toolFilePath, std::string toolSurfacePath1, std::string toolSurfacePath2)
     {
     //create first tool
     mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
@@ -105,5 +103,4 @@ namespace mitk {
     myStorage->AddTool(myNavigationTool2);
 
     return myStorage;
-    };
-}
+    }

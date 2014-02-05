@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkActor.h>
 #include <vtkProperty.h>
-#include <vtkXMLMaterial.h>
-#include <vtkXMLShader.h>
+//#include <vtkXMLMaterial.h>
+//#include <vtkXMLShader.h>
 #include <vtkXMLDataElement.h>
 
 #include <itkDirectory.h>
@@ -127,48 +127,152 @@ mitk::ShaderRepository::Shader::~Shader()
 
 void mitk::ShaderRepository::Shader::LoadProperties(vtkProperty* p)
 {
-  vtkXMLMaterial *m=p->GetMaterial();
-  if (m == NULL) return;
+//  vtkXMLMaterial *m=p->GetMaterial();
+//  if (m == NULL) return;
 
   // Vertexshader uniforms
-  {
-    vtkXMLShader *s=m->GetVertexShader();
-    if (s)
-    {
-      vtkXMLDataElement *x=s->GetRootElement();
-      int n=x->GetNumberOfNestedElements();
-      for(int r=0;r<n;r++)
-      {
-        vtkXMLDataElement *y=x->GetNestedElement(r);
-        if(!strcmp(y->GetName(),"ApplicationUniform"))
-        {
-          Uniform::Pointer element=Uniform::New();
-          element->LoadFromXML(y);
-          uniforms.push_back(element);
-        }
-      }
-    }
-  }
+//  {
+//    vtkXMLShader *s=m->GetVertexShader();
+//    if (s)
+//    {
+//      vtkXMLDataElement *x=s->GetRootElement();
+//      int n=x->GetNumberOfNestedElements();
+//      for(int r=0;r<n;r++)
+//      {
+//        vtkXMLDataElement *y=x->GetNestedElement(r);
+//        if(!strcmp(y->GetName(),"ApplicationUniform"))
+//        {
+//          Uniform::Pointer element=Uniform::New();
+//          element->LoadFromXML(y);
+//          uniforms.push_back(element);
+//        }
+//      }
+//    }
+//  }
 
   // Fragmentshader uniforms
-  {
-    vtkXMLShader *s=m->GetFragmentShader();
-    if (s)
+//  {
+//    vtkXMLShader *s=m->GetFragmentShader();
+//    if (s)
+//    {
+//      vtkXMLDataElement *x=s->GetRootElement();
+//      int n=x->GetNumberOfNestedElements();
+//      for(int r=0;r<n;r++)
+//      {
+//        vtkXMLDataElement *y=x->GetNestedElement(r);
+//        if(!strcmp(y->GetName(),"ApplicationUniform"))
+//        {
+//          Uniform::Pointer element=Uniform::New();
+//          element->LoadFromXML(y);
+//          uniforms.push_back(element);
+//        }
+//      }
+//    }
+//  }
+}
+
+//----------------------------------------------------------------------------
+void vtkProperty::LoadMaterial(const char* name)
+{
+  this->SetMaterialName(0);
+  if( !name || strlen(name) == 0)
     {
-      vtkXMLDataElement *x=s->GetRootElement();
-      int n=x->GetNumberOfNestedElements();
-      for(int r=0;r<n;r++)
+    this->LoadMaterial(static_cast<vtkXMLMaterial*>(0));
+    return;
+    }
+
+  // vtkXMLMaterial::CreateInstance using library/absolute path/repository
+  // in that order.
+  vtkXMLMaterial* material = vtkXMLMaterial::CreateInstance(name);
+  if (!material)
+    {
+    vtkErrorMacro("Failed to create Material : " << name);
+    return;
+    }
+  this->LoadMaterial(material);
+  material->Delete();
+  return;
+}
+
+//----------------------------------------------------------------------------
+void vtkProperty::LoadMaterialFromString(const char* materialxml)
+{
+  this->SetMaterialName(0);
+  if (!materialxml)
+    {
+    this->LoadMaterial(static_cast<vtkXMLMaterial*>(0));
+    return;
+    }
+  vtkXMLMaterialParser* parser = vtkXMLMaterialParser::New();
+  vtkXMLMaterial* material = vtkXMLMaterial::New();
+  parser->SetMaterial(material);
+  parser->Parse(materialxml);
+  parser->Delete();
+  this->LoadMaterial(material);
+  material->Delete();
+}
+
+// ----------------------------------------------------------------------------
+// Description:
+// Read this->Material from new style shaders.
+// Default implementation is empty.
+void vtkProperty::ReadFrameworkMaterial()
+{
+  // empty. See vtkOpenGLProperty.
+}
+
+//----------------------------------------------------------------------------
+void vtkProperty::LoadMaterial(vtkXMLMaterial* material)
+{
+  this->SetMaterialName(0);
+  vtkSetObjectBodyMacro(Material, vtkXMLMaterial, material);
+  if (this->Material)
+    {
+    this->SetMaterialName(this->Material->GetRootElement()->GetAttribute("name"));
+    this->LoadProperty();
+    this->LoadTextures();
+    int lang = this->Material->GetShaderLanguage();
+    int style = this->Material->GetShaderStyle();
+
+    if (style == 2) // TODO: use a constant instead of a literal
       {
-        vtkXMLDataElement *y=x->GetNestedElement(r);
-        if(!strcmp(y->GetName(),"ApplicationUniform"))
+      if (lang == vtkXMLShader::LANGUAGE_GLSL)
         {
-          Uniform::Pointer element=Uniform::New();
-          element->LoadFromXML(y);
-          uniforms.push_back(element);
+        // ready-for-multipass
+        this->ReadFrameworkMaterial();
+//        vtkShader2Collection *shaders=vtkShader2Collection::New();
+//        this->SetShaderCollection(shaders);
+//        shaders->Delete();
+        }
+      else
+        {
+        vtkErrorMacro(<<"style 2 is only supported with GLSL. Failed to setup the shader.");
+        this->SetShaderProgram(0); // failed to create shaders.
+        }
+      }
+    else
+      {
+      vtkShaderProgram* shader = vtkShaderProgram::CreateShaderProgram(lang);
+      if (shader)
+        {
+        this->SetShaderProgram(shader);
+        shader->Delete();
+        this->ShaderProgram->SetMaterial(this->Material);
+        this->ShaderProgram->ReadMaterial();
+        }
+      // Some materials may have no shaders and only set ivars for vtkProperty.
+      else if ((material->GetNumberOfVertexShaders() != 0) ||
+               (material->GetNumberOfFragmentShaders() != 0))
+        {
+        vtkErrorMacro("Failed to setup the shader.");
+        this->SetShaderProgram(0); // failed to create shaders.
         }
       }
     }
-  }
+  else
+    {
+    this->SetShaderProgram(0);
+    }
 }
 
 void mitk::ShaderRepository::Shader::LoadProperties(std::istream& stream)
@@ -187,7 +291,7 @@ void mitk::ShaderRepository::Shader::LoadProperties(std::istream& stream)
   this->SetMaterialXml(content);
 
   vtkProperty *p = vtkProperty::New();
-  p->LoadMaterialFromString(content.c_str());
+//  p->LoadMaterialFromString(content.c_str());
   LoadProperties(p);
   p->Delete();
 }
@@ -347,7 +451,7 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataNode* node, vtkActor *act
       {
         //MITK_INFO << "enabling shader";
         property->ShadingOn();
-        property->LoadMaterialFromString(s->GetMaterialXml().c_str());
+//        property->LoadMaterialFromString(s->GetMaterialXml().c_str());
       }
     }
     setMTime = true;

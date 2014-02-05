@@ -47,6 +47,7 @@ set(module_dirs
     USUI
     DicomUI
     Simulation
+    Shaders
     Remeshing
     Python
 )

@@ -102,7 +102,7 @@ public:
   void TestWriteAndReadSimpleToolStorageWithToolLandmarks()
   {
     //create Tool Storage
-    mitk::NavigationToolStorage::Pointer storage = mitk::CreateTestData_StorageWithOneTool();
+    mitk::NavigationToolStorage::Pointer storage = mitk::NavigationToolStorageTestHelper::CreateTestData_StorageWithOneTool();
 
     //test serialization
     bool success = m_Serializer->Serialize(m_FileName1,storage);

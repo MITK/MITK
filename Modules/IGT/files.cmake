@@ -1,4 +1,6 @@
 set(CPP_FILES
+  TestingHelper/mitkNavigationToolStorageTestHelper.cpp
+
   Algorithms/mitkNavigationDataDisplacementFilter.cpp
   Algorithms/mitkNavigationDataEvaluationFilter.cpp
   Algorithms/mitkNavigationDataLandmarkTransformFilter.cpp

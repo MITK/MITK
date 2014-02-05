@@ -84,6 +84,20 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     pos[1] = static_cast<mitk::ScalarType>(std::atof(strPos.substr(commaPos+1, strPos.length()).c_str()));
   }
 
+  std::string strWorld;
+  Point3D worldPos;
+  worldPos.Fill(0);
+  //Position in world coordinates
+  if(list->GetStringProperty(InteractionEventConst::xmlEventPropertyPositionInWorld().c_str(), strWorld))
+  {
+    std::vector<std::string> coords = split(strWorld, ',');
+    int i = 0;
+    for ( std::vector<std::string>::iterator it = coords.begin(); it != coords.end(); ++it, ++i)
+    {
+      worldPos[i] = atof((*it).c_str());
+    }
+  }
+
   // Parse modifier information
   if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyModifier().c_str(), strModifiers))
   {
@@ -208,20 +222,20 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     // buttonstates incorporate the event button (as in Qt)
     buttonState = buttonState | eventButton;
-    event = MousePressEvent::New(renderer, pos, buttonState, modifiers, eventButton);
+    event = MousePressEvent::New(renderer, pos,worldPos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "MOUSEDOUBLECLICKEVENT")
   {
     buttonState = buttonState | eventButton;
-    event = MouseDoubleClickEvent::New(renderer, pos, buttonState, modifiers, eventButton);
+    event = MouseDoubleClickEvent::New(renderer, pos,worldPos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "MOUSEMOVEEVENT")
   {
-    event = MouseMoveEvent::New(renderer, pos, buttonState, modifiers);
+    event = MouseMoveEvent::New(renderer, pos,worldPos, buttonState, modifiers);
   }
   else if (eventClass == "MOUSERELEASEEVENT")
   {
-    event = MouseReleaseEvent::New(renderer, pos, buttonState, modifiers, eventButton);
+    event = MouseReleaseEvent::New(renderer, pos,worldPos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "INTERACTIONKEYEVENT")
   {
@@ -229,11 +243,11 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
   else if (eventClass == "MOUSEWHEELEVENT")
   {
-    event = MouseWheelEvent::New(renderer, pos, buttonState, modifiers, wheelDelta);
+    event = MouseWheelEvent::New(renderer, pos,worldPos, buttonState, modifiers, wheelDelta);
   }
   else if (eventClass == "INTERACTIONPOSITIONEVENT")
   {
-    event = InteractionPositionEvent::New(renderer, pos);
+    event = InteractionPositionEvent::New(renderer, pos,worldPos);
   }
   else if (eventClass == "INTERNALEVENT")
   {

@@ -213,7 +213,7 @@ mitk::MousePressEvent::Pointer mitk::VtkEventAdapter::AdaptMousePressEvent(mitk:
   mitk::Point2D point;
   point[0] = rwi->GetEventPosition()[0];
   point[1] = rwi->GetEventPosition()[1];
-  point[1] = rwi->GetSize()[1] - point[1]; // flip y axis
+
 
   int button = 0;
   int modifiers = 0;
@@ -261,7 +261,8 @@ mitk::MousePressEvent::Pointer mitk::VtkEventAdapter::AdaptMousePressEvent(mitk:
     modifiers |= InteractionEvent::AltKey;
   }
 
-  MousePressEvent::Pointer mpe = MousePressEvent::New(sender, point,
+  Point3D worldPos = sender->Map2DRendererPositionTo3DWorldPosition(point);
+  MousePressEvent::Pointer mpe = MousePressEvent::New(sender, point,worldPos,
                                                       static_cast<InteractionEvent::MouseButtons>(buttonState),
                                                       static_cast<InteractionEvent::ModifierKeys>(modifiers),
                                                       static_cast<InteractionEvent::MouseButtons>(button));
@@ -275,7 +276,6 @@ mitk::MouseMoveEvent::Pointer mitk::VtkEventAdapter::AdaptMouseMoveEvent(mitk::B
   mitk::Point2D point;
   point[0] = rwi->GetEventPosition()[0];
   point[1] = rwi->GetEventPosition()[1];
-  point[1] = rwi->GetSize()[1] - point[1]; // flip y axis
 
   int modifiers = 0;
 
@@ -316,7 +316,8 @@ mitk::MouseMoveEvent::Pointer mitk::VtkEventAdapter::AdaptMouseMoveEvent(mitk::B
     modifiers |= InteractionEvent::AltKey;
   }
 
-  MouseMoveEvent::Pointer mme = MouseMoveEvent::New(sender, point,
+  Point3D worldPos = sender->Map2DRendererPositionTo3DWorldPosition(point);
+  MouseMoveEvent::Pointer mme = MouseMoveEvent::New(sender, point,worldPos,
                                                     static_cast<InteractionEvent::MouseButtons>(buttonState),
                                                     static_cast<InteractionEvent::ModifierKeys>(modifiers));
   return mme;
@@ -329,7 +330,6 @@ mitk::MouseReleaseEvent::Pointer mitk::VtkEventAdapter::AdaptMouseReleaseEvent(m
   mitk::Point2D point;
   point[0] = rwi->GetEventPosition()[0];
   point[1] = rwi->GetEventPosition()[1];
-  point[1] = rwi->GetSize()[1] - point[1]; // flip y axis
 
   int button = 0;
   int modifiers = 0;
@@ -382,7 +382,9 @@ mitk::MouseReleaseEvent::Pointer mitk::VtkEventAdapter::AdaptMouseReleaseEvent(m
     buttonState = buttonStateMap.find(sender)->second;
   }
 
-  MouseReleaseEvent::Pointer mre = MouseReleaseEvent::New(sender, point,
+  Point3D worldPos = sender->Map2DRendererPositionTo3DWorldPosition(point);
+
+  MouseReleaseEvent::Pointer mre = MouseReleaseEvent::New(sender, point,worldPos,
                                                           static_cast<InteractionEvent::MouseButtons>(buttonState),
                                                           static_cast<InteractionEvent::ModifierKeys>(modifiers),
                                                           static_cast<InteractionEvent::MouseButtons>(button));
@@ -429,7 +431,8 @@ mitk::MouseWheelEvent::Pointer mitk::VtkEventAdapter::AdaptMouseWheelEvent(mitk:
 
   // vtkWheelEvent does not have a buttonState or event button
   int buttonState = 0;
-  MouseWheelEvent::Pointer mpe = MouseWheelEvent::New(sender, point,
+  Point3D worldPos = sender->Map2DRendererPositionTo3DWorldPosition(point);
+  MouseWheelEvent::Pointer mpe = MouseWheelEvent::New(sender, point,worldPos,
                                                       static_cast<InteractionEvent::MouseButtons>(buttonState),
                                                       static_cast<InteractionEvent::ModifierKeys>(modifiers),
                                                       delta);

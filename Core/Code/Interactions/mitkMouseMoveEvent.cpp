@@ -17,8 +17,8 @@
 #include "mitkException.h"
 #include "mitkMouseMoveEvent.h"
 
-mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, const mitk::Point2D& mousePosition , MouseButtons buttonStates, ModifierKeys modifiers)
-: InteractionPositionEvent(baseRenderer, mousePosition)
+mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, const mitk::Point2D& mousePosition ,const mitk::Point3D& worldPosition , MouseButtons buttonStates, ModifierKeys modifiers)
+: InteractionPositionEvent(baseRenderer, mousePosition,worldPosition)
 , m_ButtonStates(buttonStates)
 , m_Modifiers(modifiers)
 {

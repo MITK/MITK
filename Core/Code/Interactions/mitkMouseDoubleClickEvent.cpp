@@ -18,11 +18,11 @@
 #include "mitkMouseDoubleClickEvent.h"
 
 mitk::MouseDoubleClickEvent::MouseDoubleClickEvent(mitk::BaseRenderer* baseRenderer,
-    const mitk::Point2D& mousePosition,
+    const mitk::Point2D& mousePosition, const Point3D& worldPosition,
     MouseButtons buttonStates,
     ModifierKeys modifiers,
     MouseButtons eventButton)
-: InteractionPositionEvent(baseRenderer, mousePosition)
+: InteractionPositionEvent(baseRenderer, mousePosition, worldPosition)
 , m_EventButton(eventButton)
 , m_ButtonStates(buttonStates)
 , m_Modifiers( modifiers)

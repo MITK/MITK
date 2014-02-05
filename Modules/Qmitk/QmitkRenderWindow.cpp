@@ -82,9 +82,14 @@ void QmitkRenderWindow::LayoutDesignListChanged(int layoutDesignIndex)
 
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 {
+  mitk::Point2D displayPos = GetMousePosition(me);
+  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
 
-  mitk::MousePressEvent::Pointer mPressEvent = mitk::MousePressEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me),
-      GetModifiers(me), GetEventButton(me));
+  mitk::MousePressEvent::Pointer mPressEvent = mitk::MousePressEvent::New(m_Renderer,
+                                                              displayPos,
+                                                              worldPos,
+                                                              GetButtonState(me),
+                                                              GetModifiers(me), GetEventButton(me));
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
@@ -99,7 +104,10 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 
 void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
 {
-  mitk::MouseDoubleClickEvent::Pointer mPressEvent = mitk::MouseDoubleClickEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me),
+  mitk::Point2D displayPos = GetMousePosition(me);
+  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
+
+  mitk::MouseDoubleClickEvent::Pointer mPressEvent = mitk::MouseDoubleClickEvent::New(m_Renderer,displayPos, worldPos, GetButtonState(me),
     GetModifiers(me), GetEventButton(me));
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
@@ -116,7 +124,11 @@ void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
 
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 {
-  mitk::MouseReleaseEvent::Pointer mReleaseEvent = mitk::MouseReleaseEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me),
+
+  mitk::Point2D displayPos = GetMousePosition(me);
+  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
+
+  mitk::MouseReleaseEvent::Pointer mReleaseEvent = mitk::MouseReleaseEvent::New(m_Renderer, displayPos,worldPos, GetButtonState(me),
       GetModifiers(me), GetEventButton(me));
 
   if (!this->HandleEvent(mReleaseEvent.GetPointer()))
@@ -132,9 +144,12 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 
 void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
+  mitk::Point2D displayPos = GetMousePosition(me);
+  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
+
   this->AdjustRenderWindowMenuVisibility(me->pos());
 
-  mitk::MouseMoveEvent::Pointer mMoveEvent = mitk::MouseMoveEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me),
+  mitk::MouseMoveEvent::Pointer mMoveEvent = mitk::MouseMoveEvent::New(m_Renderer, displayPos, worldPos, GetButtonState(me),
       GetModifiers(me));
 
   if (!this->HandleEvent(mMoveEvent.GetPointer()))
@@ -147,7 +162,10 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
-  mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, GetMousePosition(we), GetButtonState(we),
+  mitk::Point2D displayPos = GetMousePosition(we);
+  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(we));
+
+  mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, displayPos,worldPos, GetButtonState(we),
       GetModifiers(we), GetDelta(we));
 
   if (!this->HandleEvent(mWheelEvent.GetPointer()))
@@ -325,10 +343,10 @@ void QmitkRenderWindow::dropEvent(QDropEvent * event)
 
 mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me) const
 {
-
   mitk::Point2D point;
   point[0] = me->x();
   point[1] = me->y();
+  m_Renderer->GetDisplayGeometry()->ULDisplayToDisplay(point, point);
   return point;
 }
 
@@ -337,6 +355,7 @@ mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent* we) const
   mitk::Point2D point;
   point[0] = we->x();
   point[1] = we->y();
+  m_Renderer->GetDisplayGeometry()->ULDisplayToDisplay(point, point);
   return point;
 }
 

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 #include <mitkIOUtil.h>
 
-
 #include "mitkImageGenerator.h"
 
 #include "Poco/File.h"
@@ -29,13 +28,19 @@ class mitkUSImageLoggingFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkUSImageLoggingFilterTestSuite);
   MITK_TEST(TestInstantiation);
+  MITK_TEST(TestSavingValidTestImage);
+  MITK_TEST(TestSavingAfterMupltipleUpdateCalls);
   MITK_TEST(TestFilterWithEmptyImages);
+  MITK_TEST(TestFilterWithInvalidPath);
   CPPUNIT_TEST_SUITE_END();
 
 private:
 
   mitk::USImageLoggingFilter::Pointer m_TestFilter;
   std::string m_TemporaryTestDirectory;
+  mitk::Image::Pointer m_RandomRestImage1;
+  mitk::Image::Pointer m_RandomRestImage2;
+  mitk::Image::Pointer m_RealTestImage;
 
 public:
 
@@ -43,19 +48,75 @@ public:
   {
     m_TestFilter = mitk::USImageLoggingFilter::New();
     m_TemporaryTestDirectory = mitk::IOUtil::GetTempPath();
-    //m_ImagePath = GetTestDataFilePath("Pic3D.nrrd");
-    //m_SurfacePath = GetTestDataFilePath("binary.stl");
-    //m_PointSetPath = GetTestDataFilePath("pointSet.mps");
+    m_RandomRestImage1 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
+    m_RandomRestImage2 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
+    m_RealTestImage = mitk::IOUtil::LoadImageA(GetTestDataFilePath("Pic3D.nrrd"));
   }
 
   void tearDown()
   {
     m_TestFilter = NULL;
+    m_RandomRestImage1 = NULL;
+    m_RandomRestImage2 = NULL;
+    m_RealTestImage = NULL;
   }
 
   void TestInstantiation()
   {
   CPPUNIT_ASSERT_MESSAGE("Testing instantiation",m_TestFilter.IsNotNull());
+  }
+
+  void TestSavingValidTestImage()
+  {
+  //######################## Test with valid test images ################################
+  m_TestFilter->SetInput(m_RandomRestImage1);
+  m_TestFilter->SetInput("secondImage",m_RandomRestImage2);
+  m_TestFilter->Update();
+  MITK_TEST_OUTPUT(<<"Tested method Update() with valid data.");
+  std::vector<std::string> filenames;
+  std::string csvFileName;
+  m_TestFilter->SaveImages(m_TemporaryTestDirectory,filenames,csvFileName);
+  MITK_TEST_OUTPUT(<<"Tested method SaveImages(...).");
+  CPPUNIT_ASSERT_MESSAGE("Testing if correct number of images was saved",filenames.size() == 1);
+  CPPUNIT_ASSERT_MESSAGE("Testing if image file exists",Poco::File(filenames.at(0).c_str()).exists());
+  CPPUNIT_ASSERT_MESSAGE("Testing if csv file exists",Poco::File(csvFileName.c_str()).exists());
+
+  //clean up
+  std::remove(filenames.at(0).c_str());
+  std::remove(csvFileName.c_str());
+  }
+
+  void TestSavingAfterMupltipleUpdateCalls()
+  {
+  //######################## Test multiple calls of update ################################
+  m_TestFilter->SetInput(m_RandomRestImage1);
+  m_TestFilter->SetInput("secondImage",m_RandomRestImage2);
+
+  for(int i=0; i<5; i++)
+    {
+    m_TestFilter->Update();
+    std::stringstream testmessage;
+    testmessage << "testmessage" << i;
+    m_TestFilter->AddMessageToCurrentImage(testmessage.str());
+    Sleep(50);
+    }
+  MITK_TEST_OUTPUT(<<"Call Update() 5 times.");
+
+  std::vector<std::string> filenames;
+  std::string csvFileName;
+  m_TestFilter->SaveImages(m_TemporaryTestDirectory,filenames,csvFileName);
+  MITK_TEST_OUTPUT(<<"Tested method SaveImages(...).");
+  CPPUNIT_ASSERT_MESSAGE("Testing if correct number of images was saved",filenames.size() == 5);
+  CPPUNIT_ASSERT_MESSAGE("Testing if file 1 exists",Poco::File(filenames.at(0).c_str()).exists());
+  CPPUNIT_ASSERT_MESSAGE("Testing if file 2 exists",Poco::File(filenames.at(1).c_str()).exists());
+  CPPUNIT_ASSERT_MESSAGE("Testing if file 3 exists",Poco::File(filenames.at(2).c_str()).exists());
+  CPPUNIT_ASSERT_MESSAGE("Testing if file 4 exists",Poco::File(filenames.at(3).c_str()).exists());
+  CPPUNIT_ASSERT_MESSAGE("Testing if file 5 exists",Poco::File(filenames.at(4).c_str()).exists());
+  CPPUNIT_ASSERT_MESSAGE("Testing if csv file exists",Poco::File(csvFileName.c_str()).exists());
+
+  //clean up
+  for(int i=0; i<filenames.size(); i++) std::remove(filenames.at(i).c_str());
+  std::remove(csvFileName.c_str());
   }
 
   void TestFilterWithEmptyImages()
@@ -73,68 +134,20 @@ public:
   //images are empty, but update method should not crash
   CPPUNIT_ASSERT_NO_THROW_MESSAGE("Tested method Update() with invalid data.",m_TestFilter->Update());
   }
+
+  void TestFilterWithInvalidPath()
+  {
+  #ifdef WIN32
+  std::string filename = "XV:/342INVALID<>"; //invalid filename for windows
+  #else
+  std::string filename = "/dsfdsf:$�$342INVALID; //invalid filename for linux
+  #endif
+
+  m_TestFilter->SetInput(m_RealTestImage);
+  m_TestFilter->Update();
+  m_TestFilter->SaveImages(filename);
+
+  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkUSImageLoggingFilter)
-
-///**
-//* This function is testing methods of the class USDevice.
-//*/
-//int mitkUSImageLoggingFilterTest(int /* argc */, char* /*argv*/[])
-//{
-//  MITK_TEST_BEGIN("mitkUSDeviceTest");
-//
-//  std::string temporaryTestDirectory = MITK_TEST_OUTPUT_DIR;
-//
-//  //######################## Test with empty test images ################################
-//
-//
-//  //######################## Test with valid test images ################################
-//  testFilter = mitk::USImageLoggingFilter::New();
-//  testImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
-//  testImage2 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
-//  testFilter->SetInput(testImage);
-//  testFilter->SetInput("secondImage",testImage2);
-//  testFilter->Update();
-//  MITK_TEST_OUTPUT(<<"Tested method Update() with valid data.");
-//  std::vector<std::string> filenames;
-//  std::string csvFileName;
-//  testFilter->SaveImages(temporaryTestDirectory,filenames,csvFileName);
-//  MITK_TEST_OUTPUT(<<"Tested method SaveImages(...).");
-//  MITK_TEST_CONDITION_REQUIRED(filenames.size() == 1,"Testing if correct number of images was saved");
-//  MITK_TEST_CONDITION_REQUIRED(Poco::File(filenames.at(0).c_str()).exists(),"Testing if image file exists");
-//  MITK_TEST_CONDITION_REQUIRED(Poco::File(csvFileName.c_str()).exists(),"Testing if csv file exists");
-//
-//  //clean up
-//  std::remove(filenames.at(0).c_str());
-//  std::remove(csvFileName.c_str());
-//
-//
-//  //######################## Test multiple calls of update ################################
-//  for(int i=0; i<5; i++)
-//    {
-//    testFilter->Update();
-//    std::stringstream testmessage;
-//    testmessage << "testmessage" << i;
-//    testFilter->AddMessageToCurrentImage(testmessage.str());
-//    Sleep(50);
-//    }
-//  MITK_TEST_OUTPUT(<<"Call Update() 5 times.");
-//
-//  testFilter->SaveImages(temporaryTestDirectory,filenames,csvFileName);
-//  MITK_TEST_OUTPUT(<<"Tested method SaveImages(...).");
-//  MITK_TEST_CONDITION_REQUIRED(filenames.size() == 6,"Testing if correct number of images was saved");
-//  MITK_TEST_CONDITION_REQUIRED(Poco::File(filenames.at(0).c_str()).exists(),"Testing if file 1 exists");
-//  MITK_TEST_CONDITION_REQUIRED(Poco::File(filenames.at(1).c_str()).exists(),"Testing if file 2 exists");
-//  MITK_TEST_CONDITION_REQUIRED(Poco::File(filenames.at(2).c_str()).exists(),"Testing if file 3 exists");
-//  MITK_TEST_CONDITION_REQUIRED(Poco::File(filenames.at(3).c_str()).exists(),"Testing if file 4 exists");
-//  MITK_TEST_CONDITION_REQUIRED(Poco::File(filenames.at(4).c_str()).exists(),"Testing if file 5 exists");
-//  MITK_TEST_CONDITION_REQUIRED(Poco::File(filenames.at(5).c_str()).exists(),"Testing if file 6 exists");
-//  MITK_TEST_CONDITION_REQUIRED(Poco::File(csvFileName.c_str()).exists(),"Testing if csv file exists");
-//
-//  //clean up
-//  for(int i=0; i<filenames.size(); i++) std::remove(filenames.at(i).c_str());
-//  std::remove(csvFileName.c_str());
-//
-//  MITK_TEST_END();
-//}

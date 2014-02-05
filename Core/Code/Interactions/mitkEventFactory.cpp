@@ -254,6 +254,10 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
 std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
 {
 
+  InternalEvent* ie = dynamic_cast<InternalEvent*> (event);
+  if (ie != NULL)
+    return "";
+
   std::string eventClass = event->GetNameOfClass();
   std::string eventXML = "<" + InteractionEventConst::xmlTagEventVariant() +  " " + InteractionEventConst::xmlParameterEventClass() + "=\"";
 

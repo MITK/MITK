@@ -95,7 +95,12 @@ bool mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
   InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
   // perform translation
-  sender->GetDisplayGeometry()->MoveBy((positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * (-1.0));
+  Vector2D offset;
+  offset[0] = positionEvent->GetPointerPositionOnScreen()[0] - m_LastDisplayCoordinate[0];
+  offset[1] = positionEvent->GetPointerPositionOnScreen()[1] - m_LastDisplayCoordinate[1];
+  // Invert x-axis since renderwindow has inverted y axis
+  offset[0]*=-1.0;
+  sender->GetDisplayGeometry()->MoveBy(offset);
   sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   return true;
@@ -117,11 +122,11 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
     distance = m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0];
   }
   // set zooming speed
-  if (distance < 0.0)
+  if (distance > 0.0)
   {
     factor = 1.0 / m_ZoomFactor;
   }
-  else if (distance > 0.0)
+  else if (distance < 0.0)
   {
     factor = 1.0 * m_ZoomFactor;
   }

@@ -24,7 +24,7 @@ mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* bas
 {
   if (GetSender() != NULL)
   {
-    m_WorldPosition = GetSender()->Map2DRendererPositionTo3DWorldPosition(&m_PointerPosition);
+    m_WorldPosition = GetSender()->Map2DRendererPositionTo3DWorldPosition(m_PointerPosition);
   }
   else
   {
@@ -32,12 +32,12 @@ mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* bas
   }
 }
 
-const mitk::Point2D mitk::InteractionPositionEvent::GetPointerPositionOnScreen() const
+mitk::Point2D mitk::InteractionPositionEvent::GetPointerPositionOnScreen() const
 {
   return m_PointerPosition;
 }
 
-const mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld() const
+mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld() const
 {
   return m_WorldPosition;
 }

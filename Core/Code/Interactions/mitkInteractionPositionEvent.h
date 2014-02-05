@@ -44,8 +44,8 @@ namespace mitk
     mitkClassMacro(InteractionPositionEvent,InteractionEvent);
     mitkNewMacro2Param(Self, BaseRenderer*, const Point2D&);
 
-    const Point2D GetPointerPositionOnScreen() const;
-    const Point3D GetPositionInWorld() const;
+    Point2D GetPointerPositionOnScreen() const;
+    Point3D GetPositionInWorld() const;
 
     virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
 
@@ -56,7 +56,7 @@ namespace mitk
     virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
-    Point2D m_PointerPosition;
+    const Point2D m_PointerPosition;
     Point3D m_WorldPosition;
   };
 

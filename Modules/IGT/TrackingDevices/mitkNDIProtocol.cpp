@@ -623,7 +623,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::BEEP(unsigned char count)
   /* cleanup and return */
   m_TrackingDevice->ClearReceiveBuffer();         // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
   return returnValue;
-
 }
 
 
@@ -850,7 +849,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
     //Read Reply Option 1000 data
     if(trackIndividualMarkers)
     {
-
       /* parse number of markers from first 2 characters */
       m_TrackingDevice->Receive(&s, 2);
       reply += s;
@@ -891,7 +889,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
           markerPosition[i] = number / 100.0;     // the value is send with an implied decimal point with 2 digits to the right
         }
         markerPositions->push_back(markerPosition);
-
       } // end for all markers
     }
     //END read Reply Option 1000 data
@@ -927,7 +924,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
 
 mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPositions)
 {
-
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from trackingsystem
 
   markerPositions->clear();
@@ -1138,7 +1134,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
         markerPosition[i] = number / 100.0;     // the value is send with an implied decimal point with 2 digits to the right
       }
       markerPositions->push_back(markerPosition);
-
     } // end for all markers
     //m_TrackingDevice->Receive(&s, 1);   // read the line feed character, that terminates each handle data
     //reply += s;                         // build complete command string
@@ -1714,6 +1709,14 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
     converter.clear();                        // converter must be cleared to be reused
     converter.str("");
 
+    if ( numberOfVolumes > 9 )
+    {
+      MITK_WARN << "Number of volumes (" << numberOfVolumes
+        << ") is not smaller then ten as it was expected. Cannot get supported volumes.";
+      numberOfVolumes = 0;
+      reply[0] = numberOfVolumes;
+    }
+
     //reply currently contains the first 5 elements
     if (numberOfVolumes>0)
     {
@@ -1743,6 +1746,14 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
           m_TrackingDevice->Receive(&s, 73); //need total of 73 bytes for a volume
           reply += s;
           currentVolume += s;
+
+          if ( s.empty() )
+          {
+            MITK_INFO << "Cannot get information of tracking volume " << i << ". Abort getting of tracking volumes.";
+            numberOfVolumes = 0;
+            reply[0] = numberOfVolumes;
+            break;
+          }
         }
         //analyze volume here
 
@@ -1776,7 +1787,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
     */
 
     returnValue = NDIOKAY;
-
   }
 
   *info = reply;

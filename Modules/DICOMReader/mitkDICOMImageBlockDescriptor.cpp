@@ -491,7 +491,6 @@ mitk::DICOMImageBlockDescriptor
   std::string windowWidth  = this->GetPropertyAsString("windowWidth");
   try
   {
-    MITK_INFO << "Found happy L/W: " << windowCenter << "/" << windowWidth;
     double level = stringtodouble( windowCenter );
     double window = stringtodouble( windowWidth );
     mitkImage->SetProperty("levelwindow", LevelWindowProperty::New(LevelWindow(level,window)) );

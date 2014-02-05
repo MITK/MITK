@@ -2,6 +2,7 @@ set(LIBPOSTFIX "Ext")
 
 # Modules must be listed according to their dependencies
 set(module_dirs
+    Shaders
     MitkDataTypesExt
     MitkAlgorithmsExt
     MitkMapperExt
@@ -47,7 +48,6 @@ set(module_dirs
     USUI
     DicomUI
     Simulation
-    Shaders
     Remeshing
     Python
 )

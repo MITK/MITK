@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIShaderRepository.h"
 
 class vtkXMLDataElement;
+class vtkXMLMaterial;
 class vtkProperty;
 
 namespace mitk {
@@ -123,7 +124,7 @@ private:
   static int shaderId;
   static const bool debug;
 
-public:
+  public:
 
   /**
    * Constructor

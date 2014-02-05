@@ -211,7 +211,6 @@ set(CPP_FILES
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
   DataManagement/mitkRenderingModeProperty.cpp
-  DataManagement/mitkShaderProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp
   DataManagement/mitkPointSetShapeProperty.cpp
@@ -360,7 +359,6 @@ set(CPP_FILES
   Rendering/mitkVtkEventProvider.cpp
   Rendering/mitkRenderWindow.cpp
   Rendering/mitkRenderWindowBase.cpp
-  Rendering/mitkShaderRepository.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkLevelWindowFilter.cpp
@@ -400,8 +398,6 @@ Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
 Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
-
-Shaders/mitkShaderLighting.xml
 
 mitkLevelWindowPresets.xml
 )

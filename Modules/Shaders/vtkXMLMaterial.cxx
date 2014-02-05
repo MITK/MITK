@@ -58,6 +58,35 @@ vtkXMLMaterial::~vtkXMLMaterial()
   delete this->Internals;
 }
 
+vtkXMLMaterial* vtkXMLMaterial::CreateInstance(const char* name)
+{
+  if (!name)
+    {
+    return 0;
+    }
+
+  vtkXMLMaterialParser* parser = vtkXMLMaterialParser::New();
+  vtkXMLMaterial* material = vtkXMLMaterial::New();
+  parser->SetMaterial(material);
+
+  // First, look for material library files.
+  // Then, look for Repository files.
+
+  char* filename = vtkXMLShader::LocateFile(name);
+  if (filename)
+    {
+    parser->SetFileName( filename );
+    delete [] filename;
+    parser->Parse();
+    parser->Delete();
+    return material;
+    }
+
+  parser->Delete();
+  material->Delete();
+  return NULL;
+}
+
 //-----------------------------------------------------------------------------
 void vtkXMLMaterial::SetRootElement(vtkXMLDataElement* root)
 {

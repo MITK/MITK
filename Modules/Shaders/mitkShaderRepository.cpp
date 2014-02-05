@@ -25,9 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkActor.h>
 #include <vtkProperty.h>
-//#include <vtkXMLMaterial.h>
-//#include <vtkXMLShader.h>
+#include <vtkPropertyXMLParser.h>
+#include <vtkXMLMaterial.h>
+#include <vtkXMLShader.h>
 #include <vtkXMLDataElement.h>
+#include <vtkXMLMaterialParser.h>
 
 #include <itkDirectory.h>
 #include <itksys/SystemTools.hxx>
@@ -169,110 +171,6 @@ void mitk::ShaderRepository::Shader::LoadProperties(vtkProperty* p)
 //      }
 //    }
 //  }
-}
-
-//----------------------------------------------------------------------------
-void vtkProperty::LoadMaterial(const char* name)
-{
-  this->SetMaterialName(0);
-  if( !name || strlen(name) == 0)
-    {
-    this->LoadMaterial(static_cast<vtkXMLMaterial*>(0));
-    return;
-    }
-
-  // vtkXMLMaterial::CreateInstance using library/absolute path/repository
-  // in that order.
-  vtkXMLMaterial* material = vtkXMLMaterial::CreateInstance(name);
-  if (!material)
-    {
-    vtkErrorMacro("Failed to create Material : " << name);
-    return;
-    }
-  this->LoadMaterial(material);
-  material->Delete();
-  return;
-}
-
-//----------------------------------------------------------------------------
-void vtkProperty::LoadMaterialFromString(const char* materialxml)
-{
-  this->SetMaterialName(0);
-  if (!materialxml)
-    {
-    this->LoadMaterial(static_cast<vtkXMLMaterial*>(0));
-    return;
-    }
-  vtkXMLMaterialParser* parser = vtkXMLMaterialParser::New();
-  vtkXMLMaterial* material = vtkXMLMaterial::New();
-  parser->SetMaterial(material);
-  parser->Parse(materialxml);
-  parser->Delete();
-  this->LoadMaterial(material);
-  material->Delete();
-}
-
-// ----------------------------------------------------------------------------
-// Description:
-// Read this->Material from new style shaders.
-// Default implementation is empty.
-void vtkProperty::ReadFrameworkMaterial()
-{
-  // empty. See vtkOpenGLProperty.
-}
-
-//----------------------------------------------------------------------------
-void vtkProperty::LoadMaterial(vtkXMLMaterial* material)
-{
-  this->SetMaterialName(0);
-  vtkSetObjectBodyMacro(Material, vtkXMLMaterial, material);
-  if (this->Material)
-    {
-    this->SetMaterialName(this->Material->GetRootElement()->GetAttribute("name"));
-    this->LoadProperty();
-    this->LoadTextures();
-    int lang = this->Material->GetShaderLanguage();
-    int style = this->Material->GetShaderStyle();
-
-    if (style == 2) // TODO: use a constant instead of a literal
-      {
-      if (lang == vtkXMLShader::LANGUAGE_GLSL)
-        {
-        // ready-for-multipass
-        this->ReadFrameworkMaterial();
-//        vtkShader2Collection *shaders=vtkShader2Collection::New();
-//        this->SetShaderCollection(shaders);
-//        shaders->Delete();
-        }
-      else
-        {
-        vtkErrorMacro(<<"style 2 is only supported with GLSL. Failed to setup the shader.");
-        this->SetShaderProgram(0); // failed to create shaders.
-        }
-      }
-    else
-      {
-      vtkShaderProgram* shader = vtkShaderProgram::CreateShaderProgram(lang);
-      if (shader)
-        {
-        this->SetShaderProgram(shader);
-        shader->Delete();
-        this->ShaderProgram->SetMaterial(this->Material);
-        this->ShaderProgram->ReadMaterial();
-        }
-      // Some materials may have no shaders and only set ivars for vtkProperty.
-      else if ((material->GetNumberOfVertexShaders() != 0) ||
-               (material->GetNumberOfFragmentShaders() != 0))
-        {
-        vtkErrorMacro("Failed to setup the shader.");
-        this->SetShaderProgram(0); // failed to create shaders.
-        }
-      }
-    }
-  else
-    {
-    this->SetShaderProgram(0);
-    }
 }
 
 void mitk::ShaderRepository::Shader::LoadProperties(std::istream& stream)

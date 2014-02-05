@@ -44,7 +44,7 @@ public:
   // treat the name as an absolute path and try to locate it; third,
   // search the Material repository. Returns null is it fails to
   // locate the material.
-//  static vtkXMLMaterial* CreateInstance(const char* name);
+  static vtkXMLMaterial* CreateInstance(const char* name);
 
   // Description:
   // Get number of elements of type Property.

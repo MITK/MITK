@@ -114,9 +114,6 @@ public:
     m_CoreDataNodeReader.reset(new mitk::CoreDataNodeReader);
     context->RegisterService<mitk::IDataNodeReader>(m_CoreDataNodeReader.get());
 
-    m_ShaderRepository.reset(new mitk::ShaderRepository);
-    context->RegisterService<mitk::IShaderRepository>(m_ShaderRepository.get());
-
     m_PropertyAliases.reset(new mitk::PropertyAliases);
     context->RegisterService<mitk::IPropertyAliases>(m_PropertyAliases.get());
 
@@ -158,7 +155,6 @@ private:
   //mitk::RenderingManager::Pointer m_RenderingManager;
   std::auto_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
   std::auto_ptr<mitk::CoreDataNodeReader> m_CoreDataNodeReader;
-  std::auto_ptr<mitk::ShaderRepository> m_ShaderRepository;
   std::auto_ptr<mitk::PropertyAliases> m_PropertyAliases;
   std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
   std::auto_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
@@ -178,11 +174,11 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
       if (*i)
       {
         us::ModuleResourceStream rs(*i);
-        int id = m_ShaderRepository->LoadShader(rs, i->GetBaseName());
-        if (id >= 0)
-        {
-          moduleIdToShaderIds[moduleEvent.GetModule()->GetModuleId()].push_back(id);
-        }
+//        int id = m_ShaderRepository->LoadShader(rs, i->GetBaseName());
+//        if (id >= 0)
+//        {
+//          moduleIdToShaderIds[moduleEvent.GetModule()->GetModuleId()].push_back(id);
+//        }
       }
     }
   }
@@ -192,12 +188,12 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
         moduleIdToShaderIds.find(moduleEvent.GetModule()->GetModuleId());
     if (shaderIdsIter != moduleIdToShaderIds.end())
     {
-      for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin();
-           idIter != shaderIdsIter->second.end(); ++idIter)
-      {
-        m_ShaderRepository->UnloadShader(*idIter);
-      }
-      moduleIdToShaderIds.erase(shaderIdsIter);
+//      for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin();
+//           idIter != shaderIdsIter->second.end(); ++idIter)
+//      {
+//        m_ShaderRepository->UnloadShader(*idIter);
+//      }
+//      moduleIdToShaderIds.erase(shaderIdsIter);
     }
   }
 

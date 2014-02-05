@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSImageLoggingFilter.h"
 #include "mitkIOUtil.h"
 #include "mitkUIDGenerator.h"
+#include "Poco/Path.h"
 
 mitk::USImageLoggingFilter::USImageLoggingFilter() : m_SystemTimeClock(RealTimeClock::New())
 {
@@ -60,6 +61,9 @@ void mitk::USImageLoggingFilter::AddMessageToCurrentImage(std::string message)
 void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::string>& filenames, std::string& csvFileName)
 {
   filenames = std::vector<std::string>();
+
+  //test if path is valid
+  //TODO
 
   //generate a unique ID which is used as part of the filenames, so we avoid to overwrite old files by mistake.
   mitk::UIDGenerator myGen = mitk::UIDGenerator("",5);

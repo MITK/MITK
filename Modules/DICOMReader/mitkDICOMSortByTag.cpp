@@ -168,6 +168,7 @@ mitk::DICOMSortByTag
   }
   else
   {
+    MITK_WARN << "NO NUMERIC DISTANCE between '" << fromString << "' and '" << toString << "'";
     return 0;
   }
 

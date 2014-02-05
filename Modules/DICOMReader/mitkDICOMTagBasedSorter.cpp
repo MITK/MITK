@@ -428,17 +428,15 @@ mitk::DICOMTagBasedSorter
             double currentDistance = m_SortCriterion->NumericDistance(previousDS, *dataset);
             if (constantDistanceInitialized)
             {
-              if (fabs(currentDistance - constantDistance) < constantDistance * 0.01) // ok, deviation of up to 1% of distance is tolerated
+              if (fabs(currentDistance - constantDistance) < fabs(constantDistance * 0.01)) // ok, deviation of up to 1% of distance is tolerated
               {
                 // nothing to do, just ok
+                MITK_DEBUG << "Checking currentDistance==" << currentDistance << ": small enough";
               }
-              else if (currentDistance < mitk::eps) // close enough to 0
-              {
-                // no numeric comparison possible?
-                // rare case(?), just accept
-              }
+              //else if (currentDistance < mitk::eps) // close enough to 0
               else
               {
+                MITK_DEBUG << "Split consecutive group at index " << dsIndex << " (current distance " << currentDistance << ", constant distance " << constantDistance << ")";
                 // split! this is done by simply creating a new group (key)
                 groupKey.str(std::string());
                 groupKey.clear();
@@ -457,10 +455,13 @@ mitk::DICOMTagBasedSorter
               if ((currentDistance - (int)currentDistance == 0.0) && fabs(currentDistance) != 1.0)
                 // exact comparison. An integer should not be expressed as 1.000000000000000000000000001!
               {
+                MITK_DEBUG << "Split consecutive group at index " << dsIndex << " (strange special case)";
                 groupKey.str(std::string());
                 groupKey.clear();
                 groupKey << std::setfill('0') << std::setw(6) << groupIndex++;
               }
+
+              MITK_DEBUG << "Initialize strict distance to currentDistance=" << currentDistance;
 
               constantDistance = currentDistance;
               constantDistanceInitialized = true;
@@ -518,6 +519,24 @@ mitk::DICOMTagBasedSorter
 
     groups = sortedResultBlocks;
   }
+
+  unsigned int groupIndex(0);
+  for (GroupIDToListType::iterator gIter = groups.begin();
+      gIter != groups.end();
+      ++groupIndex, ++gIter)
+  {
+    DICOMDatasetList& dsList = gIter->second;
+    MITK_DEBUG << "   --------------------------------------------------------------------------------";
+    MITK_DEBUG << "   DICOMTagBasedSorter after sorting group : " << groupIndex;
+    for (DICOMDatasetList::iterator oi = dsList.begin();
+        oi != dsList.end();
+        ++oi)
+    {
+      MITK_DEBUG << "     OUTPUT    : " << (*oi)->GetFilenameIfAvailable();
+    }
+    MITK_DEBUG << "   --------------------------------------------------------------------------------";
+  }
+
 
   return groups;
 }

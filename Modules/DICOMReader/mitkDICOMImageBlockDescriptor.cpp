@@ -426,8 +426,10 @@ mitk::DICOMImageBlockDescriptor
   std::string trimmedstring(str);
   trimmedstring = trimmedstring.erase(trimmedstring.find_last_not_of(" \n\r\t")+1);
 
-  std::istringstream converter(trimmedstring);
-  if ( !trimmedstring.empty() && (converter >> d) && converter.eof() )
+  std::string firstcomponent = trimmedstring.erase(trimmedstring.find_first_of("\\"));
+
+  std::istringstream converter(firstcomponent);
+  if ( !firstcomponent.empty() && (converter >> d) && converter.eof() )
   {
     return d;
   }
@@ -489,6 +491,7 @@ mitk::DICOMImageBlockDescriptor
   std::string windowWidth  = this->GetPropertyAsString("windowWidth");
   try
   {
+    MITK_INFO << "Found happy L/W: " << windowCenter << "/" << windowWidth;
     double level = stringtodouble( windowCenter );
     double window = stringtodouble( windowWidth );
     mitkImage->SetProperty("levelwindow", LevelWindowProperty::New(LevelWindow(level,window)) );

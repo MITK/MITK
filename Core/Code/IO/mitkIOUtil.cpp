@@ -354,14 +354,6 @@ std::string IOUtil::CreateTemporaryFile(const std::string& templateName, std::st
   return returnValue;
 }
 
-std::string IOUtil::CreateTemporaryFile(std::ios_base::openmode mode, const std::string& templateName, std::string path)
-{
-  ofstream tmpOutputStream;
-  std::string returnValue = CreateTemporaryFile(tmpOutputStream,mode,templateName,path);
-  tmpOutputStream.close();
-  return returnValue;
-}
-
 std::string IOUtil::CreateTemporaryFile(std::ofstream& f, const std::string& templateName, std::string path)
 {
   return CreateTemporaryFile(f, std::ios_base::out | std::ios_base::trunc, templateName, path);

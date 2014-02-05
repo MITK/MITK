@@ -225,75 +225,80 @@ void mitk::LookupTable::SetRequestedRegion(const itk::DataObject *)
   //to be set to LargestPossibleRegion
 }
 
-void mitk::LookupTable::CreateColorTransferFunction(vtkColorTransferFunction*& colorFunction)
+vtkSmartPointer<vtkColorTransferFunction> mitk::LookupTable::CreateColorTransferFunction()
 {
-  if(colorFunction==NULL)
-    colorFunction = vtkColorTransferFunction::New();
+  vtkSmartPointer<vtkColorTransferFunction> colorFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
 
-  mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
-  int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
+  mitk::LookupTable::RawLookupTableType *rawLookupTable = this->GetRawLookupTable();
+  int num_of_values = m_LookupTable->GetNumberOfTableValues();
 
+  double* cols = new double[3*num_of_values];
+  double* colsHead = new double[3*num_of_values];
 
-  double *cols;
-  double *colsHead;
-  colsHead=cols=(double *)malloc(sizeof(double)*num_of_values*3);
-
-  for(i=0;i<num_of_values;++i)
+  for (int i = 0; i<num_of_values; ++i)
   {
-    *cols=*rgba/255.0; ++cols; ++rgba;
-    *cols=*rgba/255.0; ++cols; ++rgba;
-    *cols=*rgba/255.0; ++cols; ++rgba;
-    ++rgba;
+    *cols=*rawLookupTable/255.0; ++cols; ++rawLookupTable;
+    *cols=*rawLookupTable/255.0; ++cols; ++rawLookupTable;
+    *cols=*rawLookupTable/255.0; ++cols; ++rawLookupTable;
+    ++rawLookupTable;
   }
   colorFunction->BuildFunctionFromTable(m_LookupTable->GetTableRange()[0], m_LookupTable->GetTableRange()[1], num_of_values-1, colsHead);
-
-  free(colsHead);
+  return colorFunction;
 }
 
-void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction)
+void mitk::LookupTable::CreateColorTransferFunction(vtkColorTransferFunction*& colorFunction)
 {
-  if(opacityFunction==NULL)
-    opacityFunction = vtkPiecewiseFunction::New();
+  colorFunction = this->CreateColorTransferFunction();
+}
 
-  mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
-  int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
+vtkSmartPointer<vtkPiecewiseFunction> mitk::LookupTable::CreateOpacityTransferFunction()
+{
+  vtkSmartPointer<vtkPiecewiseFunction> opacityFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
 
-  double *alphas;
-  double *alphasHead;
-  alphasHead=alphas=(double*)malloc(sizeof(double)*num_of_values);
+  mitk::LookupTable::RawLookupTableType *rgba = this->GetRawLookupTable();
+  int num_of_values=m_LookupTable->GetNumberOfTableValues();
+
+  double *alphas = new double [num_of_values];
+  double *alphasHead = new double [num_of_values];
 
   rgba+=3;
-  for(i=0;i<num_of_values;++i)
+  for(int i=0;i<num_of_values;++i)
   {
     *alphas=*rgba * 1024.0; ++alphas; rgba+=4;
   }
 
   opacityFunction->BuildFunctionFromTable(m_LookupTable->GetTableRange()[0], m_LookupTable->GetTableRange()[1], num_of_values-1, alphasHead);
-
-  free(alphasHead);
+  return opacityFunction;
 }
 
-void mitk::LookupTable::CreateGradientTransferFunction(vtkPiecewiseFunction*& gradientFunction)
+void mitk::LookupTable::CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction)
 {
-  if(gradientFunction==NULL)
-    gradientFunction = vtkPiecewiseFunction::New();
+  opacityFunction = this->CreateOpacityTransferFunction();
+}
 
-  mitk::LookupTable::RawLookupTableType *rgba = GetRawLookupTable();
-  int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
+vtkSmartPointer<vtkPiecewiseFunction> mitk::LookupTable::CreateGradientTransferFunction()
+{
+  vtkSmartPointer<vtkPiecewiseFunction> gradientFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
 
-  double *alphas;
-  double *alphasHead;
-  alphasHead=alphas=(double*)malloc(sizeof(double)*num_of_values);
+  mitk::LookupTable::RawLookupTableType *rgba = this->GetRawLookupTable();
+  int num_of_values=m_LookupTable->GetNumberOfTableValues();
+
+  double *alphas = new double [num_of_values];
+  double *alphasHead = new double [num_of_values];
 
   rgba+=3;
-  for(i=0;i<num_of_values;++i)
+  for(int i=0;i<num_of_values;++i)
   {
     *alphas=*rgba * 1024.0; ++alphas; rgba+=4;
   }
 
   gradientFunction->BuildFunctionFromTable(m_LookupTable->GetTableRange()[0], m_LookupTable->GetTableRange()[1], num_of_values-1, alphasHead);
+  return gradientFunction;
+}
 
-  free(alphasHead);
+void mitk::LookupTable::CreateGradientTransferFunction(vtkPiecewiseFunction*& gradientFunction)
+{
+  gradientFunction = this->CreateGradientTransferFunction();
 }
 
 void mitk::LookupTable::PrintSelf(std::ostream &os, itk::Indent indent) const

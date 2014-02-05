@@ -413,9 +413,9 @@ void mitk::VolumeDataVtkMapper3D::CreateDefaultTransferFunctions()
 
 void mitk::VolumeDataVtkMapper3D::UpdateTransferFunctions( mitk::BaseRenderer *renderer )
 {
-  vtkPiecewiseFunction *opacityTransferFunction = NULL;
-  vtkPiecewiseFunction *gradientTransferFunction = NULL;
-  vtkColorTransferFunction *colorTransferFunction = NULL;
+  vtkSmartPointer<vtkPiecewiseFunction> opacityTransferFunction;
+  vtkSmartPointer<vtkPiecewiseFunction> gradientTransferFunction;
+  vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction;
 
   mitk::LookupTableProperty::Pointer lookupTableProp;
   lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable"));
@@ -429,11 +429,11 @@ void mitk::VolumeDataVtkMapper3D::UpdateTransferFunctions( mitk::BaseRenderer *r
   }
   else if (lookupTableProp.IsNotNull() )
   {
-    lookupTableProp->GetLookupTable()->CreateOpacityTransferFunction(opacityTransferFunction);
+    opacityTransferFunction = lookupTableProp->GetLookupTable()->CreateOpacityTransferFunction();
     opacityTransferFunction->ClampingOn();
-    lookupTableProp->GetLookupTable()->CreateGradientTransferFunction(gradientTransferFunction);
+    gradientTransferFunction = lookupTableProp->GetLookupTable()->CreateGradientTransferFunction();
     gradientTransferFunction->ClampingOn();
-    lookupTableProp->GetLookupTable()->CreateColorTransferFunction(colorTransferFunction);
+    colorTransferFunction = lookupTableProp->GetLookupTable()->CreateColorTransferFunction();
     colorTransferFunction->ClampingOn();
   }
   else

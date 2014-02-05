@@ -83,6 +83,12 @@ public:
     tmpFile3.close();
     //CPPUNIT_ASSERT(std::remove(tmpFilePath3.c_str()) == 0)
 
+    std::string tmpFilePath4 = mitk::IOUtil::CreateTemporaryFile();
+    std::ofstream file;
+    file.open(tmpFilePath4.c_str());
+    CPPUNIT_ASSERT_MESSAGE("Testing if file exists after CreateTemporaryFile()",file.is_open());
+
+
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::CreateTemporaryFile(tmpFile2, "XX"), mitk::Exception);
 
     std::string tmpDir = mitk::IOUtil::CreateTemporaryDirectory();

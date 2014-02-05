@@ -357,20 +357,13 @@ static void TestWriteEmptyToolStorage()
   mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
 
   std::string filename;
-  std::string optionDirectory;
-  std::string separator;
   try
   {
     //create filename
-    separator = Poco::Path::separator();
-    optionDirectory = std::string( MITK_TEST_OUTPUT_DIR );
-    mitk::UIDGenerator myGen = mitk::UIDGenerator();
-    filename = std::string( MITK_TEST_OUTPUT_DIR )+Poco::Path::separator()+"TestStorage"+myGen.GetUID()+".storage";
+    filename = mitk::IOUtil::CreateTemporaryFile();
   }
   catch (std::exception& e) {
     MITK_ERROR << "File access Exception: " << e.what();
-    MITK_INFO << "separator: " << separator;
-    MITK_INFO << "optionDirectory: " << optionDirectory;
     MITK_TEST_FAILED_MSG(<<"Could not create filename for Exceptiontest");
   }
 

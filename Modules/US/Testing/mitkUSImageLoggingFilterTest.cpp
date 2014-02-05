@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 #include <mitkIOUtil.h>
 
+
 #include "mitkImageGenerator.h"
 
 #include "Poco/File.h"

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClippingProperty.h"
 #include "mitkSmartPointerProperty.h"
 
-#include "mitkShaderProperty.h"
+//#include "mitkShaderProperty.h"
 #include "mitkIShaderRepository.h"
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageSliceSelector.h>

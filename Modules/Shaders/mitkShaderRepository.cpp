@@ -127,50 +127,50 @@ mitk::ShaderRepository::Shader::~Shader()
 {
 }
 
-void mitk::ShaderRepository::Shader::LoadProperties(vtkProperty* p)
+void mitk::ShaderRepository::Shader::LoadProperties(vtkPropertyXMLParser* p)
 {
-//  vtkXMLMaterial *m=p->GetMaterial();
-//  if (m == NULL) return;
+  vtkXMLMaterial *m=p->GetMaterial();
+  if (m == NULL) return;
 
   // Vertexshader uniforms
-//  {
-//    vtkXMLShader *s=m->GetVertexShader();
-//    if (s)
-//    {
-//      vtkXMLDataElement *x=s->GetRootElement();
-//      int n=x->GetNumberOfNestedElements();
-//      for(int r=0;r<n;r++)
-//      {
-//        vtkXMLDataElement *y=x->GetNestedElement(r);
-//        if(!strcmp(y->GetName(),"ApplicationUniform"))
-//        {
-//          Uniform::Pointer element=Uniform::New();
-//          element->LoadFromXML(y);
-//          uniforms.push_back(element);
-//        }
-//      }
-//    }
-//  }
+  {
+    vtkXMLShader *s=m->GetVertexShader();
+    if (s)
+    {
+      vtkXMLDataElement *x=s->GetRootElement();
+      int n=x->GetNumberOfNestedElements();
+      for(int r=0;r<n;r++)
+      {
+        vtkXMLDataElement *y=x->GetNestedElement(r);
+        if(!strcmp(y->GetName(),"ApplicationUniform"))
+        {
+          Uniform::Pointer element=Uniform::New();
+          element->LoadFromXML(y);
+          uniforms.push_back(element);
+        }
+      }
+    }
+  }
 
   // Fragmentshader uniforms
-//  {
-//    vtkXMLShader *s=m->GetFragmentShader();
-//    if (s)
-//    {
-//      vtkXMLDataElement *x=s->GetRootElement();
-//      int n=x->GetNumberOfNestedElements();
-//      for(int r=0;r<n;r++)
-//      {
-//        vtkXMLDataElement *y=x->GetNestedElement(r);
-//        if(!strcmp(y->GetName(),"ApplicationUniform"))
-//        {
-//          Uniform::Pointer element=Uniform::New();
-//          element->LoadFromXML(y);
-//          uniforms.push_back(element);
-//        }
-//      }
-//    }
-//  }
+  {
+    vtkXMLShader *s=m->GetFragmentShader();
+    if (s)
+    {
+      vtkXMLDataElement *x=s->GetRootElement();
+      int n=x->GetNumberOfNestedElements();
+      for(int r=0;r<n;r++)
+      {
+        vtkXMLDataElement *y=x->GetNestedElement(r);
+        if(!strcmp(y->GetName(),"ApplicationUniform"))
+        {
+          Uniform::Pointer element=Uniform::New();
+          element->LoadFromXML(y);
+          uniforms.push_back(element);
+        }
+      }
+    }
+  }
 }
 
 void mitk::ShaderRepository::Shader::LoadProperties(std::istream& stream)
@@ -188,8 +188,8 @@ void mitk::ShaderRepository::Shader::LoadProperties(std::istream& stream)
 
   this->SetMaterialXml(content);
 
-  vtkProperty *p = vtkProperty::New();
-//  p->LoadMaterialFromString(content.c_str());
+  vtkPropertyXMLParser *p = vtkPropertyXMLParser::New();
+  p->LoadMaterialFromString(content.c_str());
   LoadProperties(p);
   p->Delete();
 }

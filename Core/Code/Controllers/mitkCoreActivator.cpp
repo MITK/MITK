@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanePositionManager.h"
 #include <mitkCoreDataNodeReader.h>
 #include <mitkStandardFileLocations.h>
-#include <mitkShaderRepository.h>
+//#include <mitkShaderRepository.h>
 #include <mitkPropertyAliases.h>
 #include <mitkPropertyDescriptions.h>
 #include <mitkPropertyExtensions.h>

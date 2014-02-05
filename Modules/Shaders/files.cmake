@@ -6,6 +6,7 @@ SET(CPP_FILES
   mitkShaderRepository.cpp
   mitkShaderProperty.cpp
   vtkPropertyXMLParser.cxx
+  mitkShadersActivator.cpp
 )
 
 SET(H_FILES

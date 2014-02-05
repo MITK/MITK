@@ -12,7 +12,7 @@ endif(MITK_USE_MICROBIRD_TRACKER)
 
 MITK_CREATE_MODULE(MitkIGT
   SUBPROJECTS MITK-IGT
-  INCLUDE_DIRS Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices
+  INCLUDE_DIRS Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices TestingHelper
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   DEPENDS Mitk ImageStatistics SceneSerialization MitkIGTBase
   PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml

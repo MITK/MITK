@@ -37,6 +37,8 @@
 */
 
 #include "mitkDICOMFileReaderSelector.h"
+#include "mitkDICOMReaderConfigurator.h"
+#include "mitkDICOMImageFrameInfo.h"
 
 using mitk::DICOMTag;
 
@@ -183,6 +185,60 @@ int main(int argc, char* argv[])
   fs << "---- " << dirString << ": Best reader configuration '" << reader->GetConfigurationLabel() << "' with " << reader->GetNumberOfOutputs() << " outputs" << std::endl;
   reader->PrintOutputs( fs, true); // always verbose in log file
   fs.close();
+
+  // serialize, deserialize, analyze again, verify result!
+  mitk::DICOMReaderConfigurator::Pointer serializer = mitk::DICOMReaderConfigurator::New();
+  std::string readerSerialization = serializer->CreateConfigStringFromReader(reader.GetPointer());
+
+  bool outputError(false);
+  for (unsigned int outputIndex = 0; outputIndex < reader->GetNumberOfOutputs(); ++outputIndex)
+  {
+    const mitk::DICOMImageBlockDescriptor& outputDescriptor = reader->GetOutput(outputIndex);
+
+    mitk::StringList filenamesOfThisGroup;
+    const mitk::DICOMImageFrameList& frames = outputDescriptor.GetImageFrameList();
+    for (mitk::DICOMImageFrameList::const_iterator fIter = frames.begin(); fIter != frames.end(); ++fIter)
+    {
+      filenamesOfThisGroup.push_back( (*fIter)->Filename );
+    }
+
+    mitk::DICOMReaderConfigurator::Pointer readerConfigurator = mitk::DICOMReaderConfigurator::New();
+    mitk::DICOMFileReader::Pointer dicomReader = readerConfigurator->CreateFromUTF8ConfigString( readerSerialization );
+    dicomReader->SetInputFiles( filenamesOfThisGroup );
+    dicomReader->AnalyzeInputFiles();
+    if (dicomReader->GetNumberOfOutputs() != 1)
+    {
+      MITK_ERROR << "****** Re-analyzing files of output group " << outputIndex << " yields " << dicomReader->GetNumberOfOutputs() << " groups";
+      outputError = true;
+
+      for (mitk::DICOMImageFrameList::const_iterator fIter = frames.begin(); fIter != frames.end(); ++fIter)
+      {
+        MITK_INFO << "filename group " << outputIndex << ": "  << (*fIter)->Filename;
+      }
+    }
+    else
+    {
+      MITK_INFO << "Re-analyzing files of output group " << outputIndex << " yields " << dicomReader->GetNumberOfOutputs() << " groups";
+    }
+  }
+
+  if (outputError)
+  {
+    std::stringstream es;
+    es << "Original reader configuration: " << std::endl;
+    reader->PrintConfiguration(es);
+    es << std::endl;
+    mitk::DICOMReaderConfigurator::Pointer readerConfigurator = mitk::DICOMReaderConfigurator::New();
+    mitk::DICOMFileReader::Pointer dicomReader = readerConfigurator->CreateFromUTF8ConfigString( readerSerialization );
+    es << "New reader configuration: " << std::endl;
+    dicomReader->PrintConfiguration(es);
+    es << std::endl;
+
+    es << "Original XML: \n" << readerSerialization << std::endl;
+    std::string newSerialization = serializer->CreateConfigStringFromReader(dicomReader.GetPointer());
+    es << "New XML: \n" << newSerialization << std::endl;
+    MITK_ERROR << es.str();
+  }
 
   if (loadimage)
   {

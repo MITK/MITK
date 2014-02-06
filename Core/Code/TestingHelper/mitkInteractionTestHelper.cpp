@@ -44,8 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-//VTK Testing to compare the rendered image pixel-wise against a reference screen shot
-#include "vtkTesting.h"
 
 mitk::InteractionTestHelper::InteractionTestHelper(int width, int height, std::string interactionFilePath)
   : m_AutomaticallyCloseRenderWindow(true)
@@ -179,15 +177,15 @@ void mitk::InteractionTestHelper::SetViewDirection(mitk::SliceNavigationControll
 }
 
 
-vtkRenderer* mitk::InteractionTestHelper::GetVtkRenderer()
+mitk::BaseRenderer* mitk::InteractionTestHelper::GetRenderer()
 {
-  return m_RenderWindow->GetRenderer()->GetVtkRenderer();
+  return m_RenderWindow->GetRenderer();
 }
 
 
-vtkRenderWindow* mitk::InteractionTestHelper::GetVtkRenderWindow()
+mitk::RenderWindow* mitk::InteractionTestHelper::GetRenderWindow()
 {
-  return m_RenderWindow->GetVtkRenderWindow();
+  return m_RenderWindow;
 }
 
 
@@ -209,6 +207,7 @@ void mitk::InteractionTestHelper::AddToStorage(const std::string &filename)
     MITK_ERROR << "Failed loading test data '" << filename << "': " << e.what();
   }
 }
+
 
 void mitk::InteractionTestHelper::AddNodeToStorage(mitk::DataNode::Pointer node)
 {

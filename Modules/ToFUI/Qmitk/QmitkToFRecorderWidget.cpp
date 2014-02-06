@@ -136,7 +136,6 @@ void QmitkToFRecorderWidget::OnPlay()
 
 void QmitkToFRecorderWidget::StartCamera()
 {
-  bool ok = false;
   if (!m_ToFImageGrabber->IsCameraActive())
   {
     m_ToFImageGrabber->StartCamera();
@@ -168,10 +167,15 @@ void QmitkToFRecorderWidget::OnStartRecorder()
   {
     bool fileOK = true;
     bool distanceImageSelected = true;
-    bool amplitudeImageSelected = true;
-    bool intensityImageSelected = true;
+    bool amplitudeImageSelected = false;
+    bool intensityImageSelected = false;
     bool rgbImageSelected = false;
     bool rawDataSelected = false;
+
+    //Set check boxes in dialog according to device properties
+    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasAmplitudeImage",amplitudeImageSelected);
+    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasIntensityImage",intensityImageSelected);
+    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasRGBImage",rgbImageSelected);
 
     QString tmpFileName("");
     QString selectedFilter("");
@@ -298,16 +302,16 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
 
   QCheckBox* distanceImageCheckBox = new QCheckBox;
   distanceImageCheckBox->setText("Distance image");
-  distanceImageCheckBox->setChecked(true);
+  distanceImageCheckBox->setChecked(distanceImageSelected);
   QCheckBox* amplitudeImageCheckBox = new QCheckBox;
   amplitudeImageCheckBox->setText("Amplitude image");
-  amplitudeImageCheckBox->setChecked(true);
+  amplitudeImageCheckBox->setChecked(amplitudeImageSelected);
   QCheckBox* intensityImageCheckBox = new QCheckBox;
   intensityImageCheckBox->setText("Intensity image");
-  intensityImageCheckBox->setChecked(true);
+  intensityImageCheckBox->setChecked(intensityImageSelected);
   QCheckBox* rgbImageCheckBox = new QCheckBox;
   rgbImageCheckBox->setText("RGB image");
-  rgbImageCheckBox->setChecked(false);
+  rgbImageCheckBox->setChecked(rgbImageSelected);
   QCheckBox* rawDataCheckBox = new QCheckBox;
   rawDataCheckBox->setText("Raw data");
   rawDataCheckBox->setChecked(false);

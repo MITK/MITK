@@ -205,11 +205,20 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   mitk::BaseRenderer* renderer = NULL;
   std::string strRenderer;
 
-  if(list->GetStringProperty(mitk::InteractionEventConst::xmlEventPropertyRendererName().c_str(), strRenderer))
+  // only search for a renderer if there is at least one renderer registered
+  if(mitk::BaseRenderer::baseRendererMap.size() > 0)
   {
-    //look up for renderer registered with the name in xml file
-    renderer = mitk::BaseRenderer::GetByName(strRenderer);
-  }
+
+    if(list->GetStringProperty(mitk::InteractionEventConst::xmlEventPropertyRendererName().c_str(), strRenderer))
+    {
+      //look up for renderer registered with the name in xml file
+      renderer = mitk::BaseRenderer::GetByName(strRenderer);
+    }
+
+    //if not found always use first registered renderer
+    if(renderer == NULL)
+      renderer = (*(mitk::BaseRenderer::baseRendererMap.begin())).second;
+}
 
   /*
    * Here the objects are created

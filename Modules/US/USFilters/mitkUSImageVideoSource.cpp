@@ -76,6 +76,13 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID)
   }
 }
 
+void mitk::USImageVideoSource::ReleaseInput()
+{
+  m_VideoCapture->release();
+  delete m_VideoCapture;
+  m_VideoCapture = new cv::VideoCapture();
+}
+
 void mitk::USImageVideoSource::SetColorOutput(bool isColor){
   if ( ! isColor && ! m_IsGreyscale )
   {

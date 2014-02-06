@@ -91,6 +91,8 @@ namespace mitk {
       */
     void SetCameraInput(int deviceID);
 
+    void ReleaseInput();
+
     /**
       * \brief Sets the output image to rgb or grayscale.
       * Output is color by default

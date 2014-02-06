@@ -96,6 +96,9 @@ bool mitk::USVideoDevice::OnConnection()
 bool mitk::USVideoDevice::OnDisconnection()
 {
   if (m_DeviceState == State_Activated) this->Deactivate();
+
+  m_Source->ReleaseInput();
+
   return true;
 }
 

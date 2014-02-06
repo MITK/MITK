@@ -14,34 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkGeometry2D.h"
 #include <vtkTransform.h>
 
-
 mitk::Geometry2D::Geometry2D()
   : m_ScaleFactorMMPerUnitX( 1.0 ),
-    m_ScaleFactorMMPerUnitY( 1.0 ),
-    m_ReferenceGeometry( NULL )
+  m_ScaleFactorMMPerUnitY( 1.0 ),
+  m_ReferenceGeometry( NULL )
 {
 }
 
 mitk::Geometry2D::Geometry2D(const Geometry2D& other)
   : Geometry3D(other), m_ScaleFactorMMPerUnitX( other.m_ScaleFactorMMPerUnitX),
-    m_ScaleFactorMMPerUnitY( other.m_ScaleFactorMMPerUnitY),
-    m_ReferenceGeometry( other.m_ReferenceGeometry )
+  m_ScaleFactorMMPerUnitY( other.m_ScaleFactorMMPerUnitY),
+  m_ReferenceGeometry( other.m_ReferenceGeometry )
 {
 }
-
-
 
 mitk::Geometry2D::~Geometry2D()
 {
 }
 
-
 void
-mitk::Geometry2D::SetIndexToWorldTransform(
+  mitk::Geometry2D::SetIndexToWorldTransform(
   mitk::AffineTransform3D* transform)
 {
   Superclass::SetIndexToWorldTransform(transform);
@@ -53,9 +48,8 @@ mitk::Geometry2D::SetIndexToWorldTransform(
   assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
 }
 
-
 void
-mitk::Geometry2D::SetExtentInMM(int direction, ScalarType extentInMM)
+  mitk::Geometry2D::SetExtentInMM(int direction, ScalarType extentInMM)
 {
   Superclass::SetExtentInMM(direction, extentInMM);
 
@@ -66,9 +60,8 @@ mitk::Geometry2D::SetExtentInMM(int direction, ScalarType extentInMM)
   assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
 }
 
-
 bool
-mitk::Geometry2D::Map(
+  mitk::Geometry2D::Map(
   const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
@@ -81,9 +74,8 @@ mitk::Geometry2D::Map(
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
-
 void
-mitk::Geometry2D::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
+  mitk::Geometry2D::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
 {
   Point3D pt3d_units;
   pt3d_units[0]=pt2d_mm[0]/m_ScaleFactorMMPerUnitX;
@@ -92,9 +84,8 @@ mitk::Geometry2D::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) cons
   pt3d_mm = GetParametricTransform()->TransformPoint(pt3d_units);
 }
 
-
 void
-mitk::Geometry2D::IndexToWorld(
+  mitk::Geometry2D::IndexToWorld(
   const mitk::Point2D &/*pt_units*/, mitk::Point2D &/*pt_mm*/) const
 {
   itkExceptionMacro(<< "No general transform possible (only affine) ==> no general" \
@@ -102,9 +93,8 @@ mitk::Geometry2D::IndexToWorld(
     " possible. Has to be implemented in sub-class.");
 }
 
-
 void
-mitk::Geometry2D::WorldToIndex(
+  mitk::Geometry2D::WorldToIndex(
   const mitk::Point2D &/*pt_mm*/, mitk::Point2D &/*pt_units*/) const
 {
   itkExceptionMacro(<< "No general back transform possible (only affine) ==> no general" \
@@ -112,9 +102,8 @@ mitk::Geometry2D::WorldToIndex(
     " possible. Has to be implemented in sub-class.");
 }
 
-
 void
-mitk::Geometry2D::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/,
+  mitk::Geometry2D::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/,
   const mitk::Vector2D &/*vec_units*/, mitk::Vector2D &/*vec_mm*/) const
 {
   itkExceptionMacro(<< "No general transform possible (only affine) ==> no general" \
@@ -122,9 +111,8 @@ mitk::Geometry2D::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/,
     " possible. Has to be implemented in sub-class.");
 }
 
-
 void
-mitk::Geometry2D::WorldToIndex(const mitk::Point2D &/*atPt2d_mm*/,
+  mitk::Geometry2D::WorldToIndex(const mitk::Point2D &/*atPt2d_mm*/,
   const mitk::Vector2D &/*vec_mm*/, mitk::Vector2D &/*vec_units*/) const
 {
   itkExceptionMacro(<< "No general back transform possible (only affine) ==> no general" \
@@ -133,7 +121,7 @@ mitk::Geometry2D::WorldToIndex(const mitk::Point2D &/*atPt2d_mm*/,
 }
 
 void
-mitk::Geometry2D::SetSizeInUnits(mitk::ScalarType width, mitk::ScalarType height)
+  mitk::Geometry2D::SetSizeInUnits(mitk::ScalarType width, mitk::ScalarType height)
 {
   ScalarType bounds[6]={0, width, 0, height, 0, 1};
   ScalarType extent, newextentInMM;
@@ -158,9 +146,8 @@ mitk::Geometry2D::SetSizeInUnits(mitk::ScalarType width, mitk::ScalarType height
   SetBounds(bounds);
 }
 
-
 bool
-mitk::Geometry2D::Project(
+  mitk::Geometry2D::Project(
   const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
@@ -173,37 +160,36 @@ mitk::Geometry2D::Project(
 }
 
 bool
-mitk::Geometry2D::Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
+  mitk::Geometry2D::Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
 {
-   assert(m_BoundingBox.IsNotNull());
+  assert(m_BoundingBox.IsNotNull());
 
-   Vector3D vec3d_units;
-   BackTransform(vec3d_mm, vec3d_units);
-   vec3d_units[2] = 0;
-   projectedVec3d_mm = GetParametricTransform()->TransformVector(vec3d_units);
-   return true;
+  Vector3D vec3d_units;
+  BackTransform(vec3d_mm, vec3d_units);
+  vec3d_units[2] = 0;
+  projectedVec3d_mm = GetParametricTransform()->TransformVector(vec3d_units);
+  return true;
 }
 
 bool
-mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm,
-                          const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
+  mitk::Geometry2D::Project(const mitk::Point3D & atPt3d_mm,
+  const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
 {
-   MITK_WARN << "Deprecated function! Call Project(vec3D,vec3D) instead.";
-   assert(m_BoundingBox.IsNotNull());
+  MITK_WARN << "Deprecated function! Call Project(vec3D,vec3D) instead.";
+  assert(m_BoundingBox.IsNotNull());
 
-   Vector3D vec3d_units;
-   BackTransform(atPt3d_mm, vec3d_mm, vec3d_units);
-   vec3d_units[2] = 0;
-   projectedVec3d_mm = GetParametricTransform()->TransformVector(vec3d_units);
+  Vector3D vec3d_units;
+  BackTransform(atPt3d_mm, vec3d_mm, vec3d_units);
+  vec3d_units[2] = 0;
+  projectedVec3d_mm = GetParametricTransform()->TransformVector(vec3d_units);
 
-   Point3D pt3d_units;
-   BackTransform(atPt3d_mm, pt3d_units);
-   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
+  Point3D pt3d_units;
+  BackTransform(atPt3d_mm, pt3d_units);
+  return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 
-
 bool
-mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm,
+  mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm,
   const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
 {
   Point2D pt2d_mm_start, pt2d_mm_end;
@@ -215,18 +201,16 @@ mitk::Geometry2D::Map(const mitk::Point3D & atPt3d_mm,
   return inside;
 }
 
-
 void
-mitk::Geometry2D::Map(const mitk::Point2D &/*atPt2d_mm*/,
+  mitk::Geometry2D::Map(const mitk::Point2D &/*atPt2d_mm*/,
   const mitk::Vector2D &/*vec2d_mm*/, mitk::Vector3D &/*vec3d_mm*/) const
 {
   //@todo implement parallel to the other Map method!
   assert(false);
 }
 
-
 mitk::ScalarType
-mitk::Geometry2D::SignedDistance(const mitk::Point3D& pt3d_mm) const
+  mitk::Geometry2D::SignedDistance(const mitk::Point3D& pt3d_mm) const
 {
   Point3D projectedPoint;
   Project(pt3d_mm, projectedPoint);
@@ -240,7 +224,7 @@ mitk::Geometry2D::SignedDistance(const mitk::Point3D& pt3d_mm) const
 }
 
 bool
-mitk::Geometry2D::IsAbove(const mitk::Point3D& pt3d_mm) const
+  mitk::Geometry2D::IsAbove(const mitk::Point3D& pt3d_mm) const
 {
   Point3D pt3d_units;
   Geometry3D::WorldToIndex(pt3d_mm, pt3d_units);
@@ -248,7 +232,7 @@ mitk::Geometry2D::IsAbove(const mitk::Point3D& pt3d_mm) const
 }
 
 itk::LightObject::Pointer
-mitk::Geometry2D::InternalClone() const
+  mitk::Geometry2D::InternalClone() const
 {
   Self::Pointer newGeometry = new Geometry2D(*this);
   newGeometry->UnRegister();
@@ -256,29 +240,29 @@ mitk::Geometry2D::InternalClone() const
 }
 
 void
-mitk::Geometry2D::PrintSelf(std::ostream& os, itk::Indent indent) const
+  mitk::Geometry2D::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os,indent);
   os << indent << " ScaleFactorMMPerUnitX: "
-     << m_ScaleFactorMMPerUnitX << std::endl;
+    << m_ScaleFactorMMPerUnitX << std::endl;
   os << indent << " ScaleFactorMMPerUnitY: "
-     << m_ScaleFactorMMPerUnitY << std::endl;
+    << m_ScaleFactorMMPerUnitY << std::endl;
 }
 
 void
-mitk::Geometry2D::SetReferenceGeometry( mitk::Geometry3D *geometry )
+  mitk::Geometry2D::SetReferenceGeometry( mitk::Geometry3D *geometry )
 {
   m_ReferenceGeometry = geometry;
 }
 
 mitk::Geometry3D *
-mitk::Geometry2D::GetReferenceGeometry() const
+  mitk::Geometry2D::GetReferenceGeometry() const
 {
   return m_ReferenceGeometry;
 }
 
 bool
-mitk::Geometry2D::HasReferenceGeometry() const
+  mitk::Geometry2D::HasReferenceGeometry() const
 {
   return ( m_ReferenceGeometry != NULL );
 }

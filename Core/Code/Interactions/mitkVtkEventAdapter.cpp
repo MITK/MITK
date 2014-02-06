@@ -34,7 +34,6 @@ mitk::MouseEvent mitk::VtkEventAdapter::AdaptMouseEvent(mitk::BaseRenderer* send
   mitk::Point2D p;
   p[0] = rwi->GetEventPosition()[0];
   p[1] = rwi->GetEventPosition()[1];
-  p[1] = rwi->GetSize()[1] - p[1];       // flip y axis
 
   // http://doc.trolltech.com/4.6/qt.html#MouseButton-enum
   int button = 0;
@@ -427,7 +426,6 @@ mitk::MouseWheelEvent::Pointer mitk::VtkEventAdapter::AdaptMouseWheelEvent(mitk:
   mitk::Point2D point;
   point[0] = rwi->GetEventPosition()[0];
   point[1] = rwi->GetEventPosition()[1];
-  point[1] = rwi->GetSize()[1] - point[1]; // flip y axis
 
   // vtkWheelEvent does not have a buttonState or event button
   int buttonState = 0;

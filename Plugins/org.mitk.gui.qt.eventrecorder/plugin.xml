@@ -5,7 +5,7 @@
     <view id="org.mitk.views.interactioneventrecorder"
           name="Interaction Event Recorder"
           class="InteractionEventRecorder"
-          icon="resources/icon.xpm" />
+          icon="resources/icon.png" />
   </extension>
 
 </plugin>

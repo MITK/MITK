@@ -340,6 +340,11 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
     eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
     eventXML += ss.str();
     eventXML += "\"/>\n";
+
+    eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyScrollDirection() + "\" ";
+    eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
+    eventXML += delta < 0 ? "DOWN" : "UP";
+    eventXML += "\"/>\n";
   }
 
   // Renderer name

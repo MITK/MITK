@@ -6,5 +6,6 @@ set(H_FILES
 
 set(CPP_FILES
   mitkRenderingTestHelper.cpp
+  mitkInteractionTestHelper.cpp
 )
 

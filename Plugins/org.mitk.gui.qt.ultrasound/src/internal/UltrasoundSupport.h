@@ -80,11 +80,6 @@ public:
 
 protected:
 
-  /**
-  * \brief Reinits the view globally.
-  */
-  void GlobalReinit();
-
   void StartViewing();
   void StopViewing();
 
@@ -96,9 +91,9 @@ protected:
   /*
   * \brief This timer triggers periodic updates to the pipeline
   */
-  QTimer *m_Timer;
+  QTimer* m_Timer;
 
-  QTime m_Clock;
+  QTime   m_Clock;
 
   /*
   * \brief The device that is currently used to aquire images
@@ -123,8 +118,6 @@ protected:
 
   unsigned int m_CurrentImageWidth;
   unsigned int m_CurrentImageHeight;
-
-  //void OnPreferencesChanged(const berry::IBerryPreferences*);
 };
 
 #endif // UltrasoundSupport_h

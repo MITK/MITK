@@ -40,14 +40,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include "internal/org_mitk_gui_qt_ultrasound_Activator.h"
 
-#include <ctkFlowLayout.h>
-#include <ctkDoubleSlider.h>
-
 const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
 void UltrasoundSupport::SetFocus()
 {
-  //m_Controls.m_AddDevice->setFocus();
 }
 
 void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
@@ -80,10 +76,6 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   }
 
   m_Controls.tabWidget->setTabEnabled(1, false);
-
-  /*ctkFlowLayout* flowLayout = ctkFlowLayout::replaceLayout(m_Controls.m_WidgetDevices);
-  flowLayout->setAlignItems(true);
-  flowLayout->setOrientation(Qt::Vertical);*/
 }
 
 void UltrasoundSupport::OnClickedAddNewDevice()
@@ -97,7 +89,7 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 void UltrasoundSupport::DisplayImage()
 {
   m_Device->Modified();
-  m_Device->UpdateOutputData(0);
+  m_Device->Update();
 
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
   if (curOutput.IsNotNull() && curOutput->IsInitialized()) { m_Node->SetData(curOutput); }
@@ -172,19 +164,6 @@ void UltrasoundSupport::OnNewDeviceWidgetDone()
   m_Controls.m_WidgetActiveDevices->setVisible(true);
 }
 
-void UltrasoundSupport::GlobalReinit()
-{
-  // get all nodes that have not set "includeInBoundingBox" to false
-  mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
-
-  // calculate bounding geometry of these nodes
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
-
-  // initialize the views to the bounding geometry
-  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-}
-
 void UltrasoundSupport::StartViewing()
 {
   m_Controls.tabWidget->setTabEnabled(1, true);
@@ -202,9 +181,6 @@ void UltrasoundSupport::StartViewing()
   int interval = (1000 / m_Controls.m_FrameRate->value());
   m_Timer->setInterval(interval);
   m_Timer->start();
-
-  //reinit view
-  //this->GlobalReinit();
 
   //change UI elements
   m_Controls.m_BtnView->setText("Stop Viewing");

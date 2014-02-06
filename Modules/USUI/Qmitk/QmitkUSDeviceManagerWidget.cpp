@@ -72,6 +72,7 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
   if (device->GetIsActive())
   {
     device->Deactivate();
+    device->Disconnect();
   }
   else
   {

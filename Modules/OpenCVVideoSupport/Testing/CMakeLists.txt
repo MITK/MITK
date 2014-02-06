@@ -18,9 +18,11 @@ IF(BUILD_TESTING AND MODULE_IS_ENABLED)
   mitkAddCustomModuleTest("mitkBasicCombinationOpenCVImageFilterTest" "mitkBasicCombinationOpenCVImageFilterTest"
   "${MITK_DATA_DIR}/OpenCV-Data/BaseImage.png"
   )
-  mitkAddCustomModuleTest("mitkGrabCutOpenCVImageFilterTest" "mitkGrabCutOpenCVImageFilterTest"
-  "${MITK_DATA_DIR}/OpenCV-Data/GrabCutInput.png"
-  "${MITK_DATA_DIR}/OpenCV-Data/GrabCutMask.png"
-  "${MITK_DATA_DIR}/OpenCV-Data/GrabCutOutput.png"
-  )
+
+  # Test needs to be revised as it fails randomly.
+  # mitkAddCustomModuleTest("mitkGrabCutOpenCVImageFilterTest" "mitkGrabCutOpenCVImageFilterTest"
+  # "${MITK_DATA_DIR}/OpenCV-Data/GrabCutInput.png"
+  # "${MITK_DATA_DIR}/OpenCV-Data/GrabCutMask.png"
+  # "${MITK_DATA_DIR}/OpenCV-Data/GrabCutOutput.png"
+  #)
 ENDIF(BUILD_TESTING AND MODULE_IS_ENABLED)

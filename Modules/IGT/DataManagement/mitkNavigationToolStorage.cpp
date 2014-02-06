@@ -25,7 +25,10 @@ const std::string  mitk::NavigationToolStorage::US_INTERFACE_NAME = "org.mitk.se
 const std::string  mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID = US_INTERFACE_NAME + ".sourceID";
 const std::string  mitk::NavigationToolStorage::US_PROPKEY_STORAGE_NAME = US_INTERFACE_NAME + ".name";
 
-mitk::NavigationToolStorage::NavigationToolStorage() : m_ToolCollection(std::vector<mitk::NavigationTool::Pointer>()),m_DataStorage(NULL),m_storageLocked(false)
+mitk::NavigationToolStorage::NavigationToolStorage()
+  : m_ToolCollection(std::vector<mitk::NavigationTool::Pointer>()),
+    m_DataStorage(NULL),
+    m_storageLocked(false)
   {
   this->SetName("ToolStorage (no name given)");
   }
@@ -67,6 +70,13 @@ void mitk::NavigationToolStorage::RegisterAsMicroservice(std::string sourceID){
 
 
 void mitk::NavigationToolStorage::UnRegisterMicroservice(){
+  if ( ! m_ServiceRegistration )
+  {
+    MITK_WARN("NavigationToolStorage")
+        << "Cannot unregister microservice as it wasn't registered before.";
+    return;
+  }
+
   m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
 }

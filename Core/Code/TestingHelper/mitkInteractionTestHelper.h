@@ -48,11 +48,11 @@ public:
 
   /** @brief Getter for the vtkRenderer.
     **/
-  vtkRenderer* GetVtkRenderer();
+  BaseRenderer* GetRenderer();
 
   /** @brief Getter for the vtkRenderWindow which should be used to call vtkRegressionTestImage.
     **/
-  vtkRenderWindow* GetVtkRenderWindow();
+  RenderWindow* GetRenderWindow();
 
   /**
    * @brief SetStopRenderWindow Convenience method to make the renderwindow hold after rendering. Usefull for debugging.

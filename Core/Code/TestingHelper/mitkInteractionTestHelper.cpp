@@ -61,7 +61,7 @@ void mitk::InteractionTestHelper::Initialize(int width, int height, std::string 
 
   m_RenderWindow->GetRenderer()->SetDataStorage(m_DataStorage);
   this->SetMapperIDToRender2D();
-  this->GetVtkRenderWindow()->SetSize( width, height );
+  m_RenderWindow->GetVtkRenderWindow()->SetSize( width, height );
 
 #ifdef RESIZE_WORKAROUND
 

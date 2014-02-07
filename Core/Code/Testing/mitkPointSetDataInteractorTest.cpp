@@ -28,38 +28,25 @@ class mitkPointSetDataInteractorTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkPointSetDataInteractorTestSuite);
-  MITK_TEST(TestAddPointInteraction);
+  MITK_TEST(AddPointInteraction);
   CPPUNIT_TEST_SUITE_END();
 
+
+private:
+  mitk::DataNode::Pointer testPointSetNode;
+  mitk::PointSetDataInteractor::Pointer dataInteractor;
+  mitk::PointSet::Pointer testPointSet;
+  mitk::InteractionTestHelper interactionTestHelper;
 
 public:
 
   void setUp()
   {
-
-  }
-
-  void TestAddPointInteraction()
-  {
-    //Path to the reference PointSet
-    std::string referencePointSetPath = GetTestDataFilePath("/Users/schroedt/Desktop/pointsetTestRef.mps");
-
-    //Path to the interaction xml file
-    std::string interactionXmlPath = "/Users/schroedt/Desktop/pointsetTest.xml";
-
-    //execute
-    CPPUNIT_ASSERT(TestPointSetInteraction(interactionXmlPath, referencePointSetPath));
-  }
-
-private:
-
-  bool TestPointSetInteraction(std::string interactionXmlPath, std::string referencePointSetPath)
-  {
     //Create DataNode as a container for our PointSet to be tested
-    mitk::DataNode::Pointer testPointSetNode = mitk::DataNode::New();
+    testPointSetNode = mitk::DataNode::New();
 
     // Create PointSetData Interactor
-    mitk::PointSetDataInteractor::Pointer dataInteractor = mitk::PointSetDataInteractor::New();
+    dataInteractor = mitk::PointSetDataInteractor::New();
     // Load the according state machine for regular point set interaction
     dataInteractor->LoadStateMachine("PointSet.xml");
     // Set the configuration file that defines the triggers for the transitions
@@ -67,14 +54,34 @@ private:
     // set the DataNode (which already is added to the DataStorage)
     dataInteractor->SetDataNode(testPointSetNode);
 
-    //Create new PointSet which will receive the interaction input
-    mitk::PointSet::Pointer testPointSet = mitk::PointSet::New();
-    testPointSetNode->SetData(testPointSet);
-
     //Create test helper to initialize all necessary objects for interaction
-    mitk::InteractionTestHelper interactionTestHelper(interactionXmlPath);
+    interactionTestHelper = mitk::InteractionTestHelper();
     //Add our test node to the DataStorage of our test helper
     interactionTestHelper.AddNodeToStorage(testPointSetNode);
+
+
+    //Create new PointSet which will receive the interaction input
+    testPointSet = mitk::PointSet::New();
+    testPointSetNode->SetData(testPointSet);
+  }
+
+  void tearDown()
+  {
+    testPointSetNode = NULL;
+    testPointSet = NULL;
+    dataInteractor = NULL;
+  }
+
+  void AddPointInteraction()
+  {
+    //Path to the reference PointSet
+    std::string referencePointSetPath = "/Users/schroedt/Desktop/pointsetTestRef.mps";
+
+    //Path to the interaction xml file
+    std::string interactionXmlPath = "/Users/schroedt/Desktop/pointsetTest.xml";
+
+    //load interaction events
+    interactionTestHelper.LoadInteraction(interactionXmlPath);
     //Start Interaction
     interactionTestHelper.PlaybackInteraction();
 
@@ -82,9 +89,8 @@ private:
     mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::LoadPointSet(referencePointSetPath);
 
     //Compare reference with the result of the interaction
-    return mitk::Equal(testPointSet.GetPointer(), referencePointSet.GetPointer(), mitk::eps, false);
+    MITK_ASSERT_EQUAL(testPointSet.GetPointer(), referencePointSet.GetPointer(), "");
   }
-
 
 };
 

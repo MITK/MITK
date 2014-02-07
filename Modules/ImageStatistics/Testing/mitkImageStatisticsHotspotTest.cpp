@@ -524,6 +524,32 @@ struct mitkImageStatisticsHotspotTestClass
     return result;
   }
 
+  static void ValidateStatisticsItem(const std::string& label, double testvalue, double reference, double tolerance)
+  {
+    double diff = ::fabs(reference - testvalue);
+    MITK_TEST_CONDITION( diff < tolerance, "'" << label << "' value close enough to reference value "
+                                           "(value=" << testvalue <<
+                                           ", reference=" << reference <<
+                                           ", diff=" << diff << ")" );
+  }
+
+  static void ValidateStatisticsItem(const std::string& label, const vnl_vector<int>& testvalue, const vnl_vector<int>& reference)
+  {
+    double diffX = testvalue[0] - reference[0];
+    double diffY = testvalue[1] - reference[1];
+    double diffZ = testvalue[2] - reference[2];
+
+    std::stringstream testPosition;
+    testPosition << testvalue[0] << "," << testvalue[1] << "," << testvalue[2];
+    std::stringstream referencePosition;
+    referencePosition << reference[0] << "," << reference[1] << "," << reference[2];
+    MITK_TEST_CONDITION( diffX < mitk::eps && diffY < mitk::eps && diffZ < mitk::eps,
+                         "'" << label << "' close enough to reference value " <<
+                         "(value=[" << testPosition.str() << "]," <<
+                         " reference=[" << referencePosition.str() << "]");
+  }
+
+
   /**
     \brief Compares calculated against actual statistics values.
 
@@ -532,31 +558,29 @@ struct mitkImageStatisticsHotspotTestClass
   static void ValidateStatistics(const mitk::ImageStatisticsCalculator::Statistics& statistics, const Parameters& testParameters, unsigned int label)
   {
     // check all expected test result against actual results
-
     double eps = 1.6;
 
-    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMean[label] - statistics.GetHotspotStatistics().GetMean() ) < eps, "Mean value of hotspot in XML-File: " << testParameters.m_HotspotMean[label] << " (Mean value of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotStatistics().GetMean() << ")" );
-    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMax[label]- statistics.GetHotspotStatistics().GetMax() ) < eps, "Maximum of hotspot in XML-File:  " << testParameters.m_HotspotMax[label] << " (Maximum of hotspot calculated in mitkImageStatisticsCalculator: "  << statistics.GetHotspotStatistics().GetMax() << ")" );
-    MITK_TEST_CONDITION( ::fabs(testParameters.m_HotspotMin[label] - statistics.GetHotspotStatistics().GetMin() ) < eps, "Minimum of hotspot in XML-File: " << testParameters.m_HotspotMin[label] << " (Minimum of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotStatistics().GetMin() << ")" );
+    ValidateStatisticsItem("Hotspot mean", statistics.GetHotspotStatistics().GetMean(), testParameters.m_HotspotMean[label], eps);
+    ValidateStatisticsItem("Hotspot maximum", statistics.GetHotspotStatistics().GetMax(), testParameters.m_HotspotMax[label], eps);
+    ValidateStatisticsItem("Hotspot minimum", statistics.GetHotspotStatistics().GetMin(), testParameters.m_HotspotMin[label], eps);
 
-     MITK_TEST_CONDITION( statistics.GetHotspotStatistics().GetHotspotIndex()[0] == testParameters.m_HotspotIndexX[label] &&
-      statistics.GetHotspotStatistics().GetHotspotIndex()[1] == testParameters.m_HotspotIndexY[label] &&
-      statistics.GetHotspotStatistics().GetHotspotIndex()[2] == testParameters.m_HotspotIndexZ[label] ,
-      "Index of hotspot in XML-File: " << testParameters.m_HotspotIndexX[label] << " " << testParameters.m_HotspotIndexY[label] << " " << testParameters.m_HotspotIndexZ[label]
-    << " (Index of hotspot calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotStatistics().GetHotspotIndex() << ")" );
+    vnl_vector<int> referenceHotspotCenterIndex; referenceHotspotCenterIndex.set_size(3);
+    referenceHotspotCenterIndex[0] = testParameters.m_HotspotIndexX[label];
+    referenceHotspotCenterIndex[1] = testParameters.m_HotspotIndexY[label];
+    referenceHotspotCenterIndex[2] = testParameters.m_HotspotIndexZ[label];
+    ValidateStatisticsItem("Hotspot center position", statistics.GetHotspotStatistics().GetHotspotIndex(), referenceHotspotCenterIndex);
 
-    MITK_TEST_CONDITION( statistics.GetHotspotStatistics().GetMaxIndex()[0] == testParameters.m_HotspotMaxIndexX[label] &&
-      statistics.GetHotspotStatistics().GetMaxIndex()[1] == testParameters.m_HotspotMaxIndexY[label] &&
-      statistics.GetHotspotStatistics().GetMaxIndex()[2] == testParameters.m_HotspotMaxIndexZ[label] ,
-      "Index of hotspot-maximum  in XML-File: " << testParameters.m_HotspotMaxIndexX[label] << " " << testParameters.m_HotspotMaxIndexY[label] << " " << testParameters.m_HotspotMaxIndexZ[label]
-    << " (Index of hotspot-maximum calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotStatistics().GetMaxIndex() << ")" );
+    vnl_vector<int> referenceHotspotMaxIndex; referenceHotspotMaxIndex.set_size(3);
+    referenceHotspotMaxIndex[0] = testParameters.m_HotspotMaxIndexX[label];
+    referenceHotspotMaxIndex[1] = testParameters.m_HotspotMaxIndexY[label];
+    referenceHotspotMaxIndex[2] = testParameters.m_HotspotMaxIndexZ[label];
+    ValidateStatisticsItem("Hotspot maximum position", statistics.GetHotspotStatistics().GetHotspotIndex(), referenceHotspotMaxIndex);
 
-    MITK_TEST_CONDITION( statistics.GetHotspotStatistics().GetMinIndex()[0] == testParameters.m_HotspotMinIndexX[label] &&
-      statistics.GetHotspotStatistics().GetMinIndex()[1] == testParameters.m_HotspotMinIndexY[label] &&
-      statistics.GetHotspotStatistics().GetMinIndex()[2] == testParameters.m_HotspotMinIndexZ[label] ,
-      "Index of hotspot-minimum in XML-File: " << testParameters.m_HotspotMinIndexX[label] << " " << testParameters.m_HotspotMinIndexY[label] << " " << testParameters.m_HotspotMinIndexZ[label]
-    << " (Index of hotspot-minimum calculated in mitkImageStatisticsCalculator: " << statistics.GetHotspotStatistics().GetMinIndex() << ")" );
-
+    vnl_vector<int> referenceHotspotMinIndex; referenceHotspotMinIndex.set_size(3);
+    referenceHotspotMinIndex[0] = testParameters.m_HotspotMinIndexX[label];
+    referenceHotspotMinIndex[1] = testParameters.m_HotspotMinIndexY[label];
+    referenceHotspotMinIndex[2] = testParameters.m_HotspotMinIndexZ[label];
+    ValidateStatisticsItem("Hotspot minimum position", statistics.GetHotspotStatistics().GetHotspotIndex(), referenceHotspotMinIndex);
   }
 };
 /**

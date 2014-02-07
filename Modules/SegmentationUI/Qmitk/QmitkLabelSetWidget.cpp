@@ -594,6 +594,7 @@ void QmitkLabelSetWidget::OnCreateSurface(int index, bool smooth)
 
 void QmitkLabelSetWidget::OnImportLabeledImage()
 {
+/*
   m_ToolManager->ActivateTool(-1);
 
   mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
@@ -639,6 +640,7 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
   this->UpdateControls();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  */
 }
 
 void QmitkLabelSetWidget::OnImportSegmentation()
@@ -707,7 +709,3 @@ void QmitkLabelSetWidget::OnThreadedCalculationDone()
   mitk::StatusBar::GetInstance()->Clear();
 }
 
-void QmitkLabelSetWidget::SetLastFileOpenPath(const QString& path)
-{
-  m_LastFileOpenPath = path;
-}

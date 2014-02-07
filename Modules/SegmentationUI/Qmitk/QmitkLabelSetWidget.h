@@ -46,8 +46,6 @@ public:
 
   void SetDataStorage( mitk::DataStorage& storage );
 
-  void SetLastFileOpenPath(const QString& path);
-
   void SetOrganColors(const QStringList& organColors);
 
   void UpdateControls();
@@ -61,7 +59,7 @@ signals:
 
 private slots:
 
-  // reaction to ...
+  // reaction to "returnPressed" signal from ...
   void OnSearchLabel();
 
   // reaction to signal "mergeLabel" from QmitkLabelSetTableWidget
@@ -112,6 +110,7 @@ private slots:
   // reaction to the button "Deactive Active Tool"
   void OnDeactivateActiveTool();
 
+  // reaction to the button "Lock exterior"
   void OnLockExteriorToggled(bool);
 
   // reaction to the button "Import Segmentation"
@@ -139,8 +138,6 @@ private:
     mitk::ToolManager* m_ToolManager;
 
     QStringList m_OrganColors;
-
-    QString m_LastFileOpenPath;
 };
 
 #endif

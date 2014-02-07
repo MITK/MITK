@@ -72,7 +72,7 @@ private:
     testPointSetNode->SetData(testPointSet);
 
     //Create test helper to initialize all necessary objects for interaction
-    mitk::InteractionTestHelper interactionTestHelper(640, 480, interactionXmlPath);
+    mitk::InteractionTestHelper interactionTestHelper(interactionXmlPath);
     //Add our test node to the DataStorage of our test helper
     interactionTestHelper.AddNodeToStorage(testPointSetNode);
     //Start Interaction

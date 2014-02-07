@@ -45,10 +45,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 
-mitk::InteractionTestHelper::InteractionTestHelper(int width, int height, std::string interactionFilePath)
+mitk::InteractionTestHelper::InteractionTestHelper(std::string interactionFilePath)
   : m_AutomaticallyCloseRenderWindow(true)
 {
-  this->Initialize(width, height, interactionFilePath);
+  this->Initialize(640, 480, interactionFilePath);
 }
 
 void mitk::InteractionTestHelper::Initialize(int width, int height, std::string interactionFilePath)

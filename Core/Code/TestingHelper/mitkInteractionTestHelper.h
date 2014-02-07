@@ -31,9 +31,21 @@ class vtkRenderer;
 namespace mitk
 {
 
-/** @brief  Generate all necessary objects to handle interaction events.
-
-
+/** @brief Creates everything needed to load and playback interaction events.
+ *
+  * The interaction is loaded from an xml file and the event are created. This file is
+  * usually a recorded user interaction with the GUI. This can be done with InteractionEventRecorder
+  * plugin. Also all necessary objects to handle interaction events are generated.
+  * The user of this class is responsible to add the data object to interact with to the data storage
+  * of InteractionTestHelper. And must also make sure that a proper data interactor is associated with the data object.
+  *
+  * To test PointSet interaction for instance make sure you have a PointSet node and a PointSetDataInteractor.
+  * Then just add the node to the storage of the your InteractionTestHelper by calling InteractionTestHelper::AddNodeToStorage.
+  * Use InteractionTestHelper::PlaybackInteraction to execute.
+  *
+  * \sa XML2EventParser
+  * \sa EventFactory
+  * \sa EventRecorder
 */
 class MITK_TESTINGHELPER_EXPORT InteractionTestHelper
 {
@@ -41,7 +53,7 @@ class MITK_TESTINGHELPER_EXPORT InteractionTestHelper
 public:
   /** @param interactionFilePath Path to xml file containing interaction events.
     **/
-  InteractionTestHelper(int width, int height, std::string interactionFilePath);
+  InteractionTestHelper(std::string interactionFilePath);
 
   /** Default destructor */
   ~InteractionTestHelper();

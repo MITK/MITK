@@ -41,7 +41,7 @@ namespace itk
 
 \brief Generate an 3-dimensional multigaussian image.
 
-This class defines an 3-dimensional Image, in which the value at one voxel equals the value of a multigaussian function evaluated at the voxel's coordinates. The multigaussian function is build as a sum of N gaussian function. This is defined by the following parameters:
+This class defines an 3-dimensional Image, in which the value at one voxel equals the value of a multigaussian function evaluated at the voxel's coordinates. The multigaussian function is built as a sum of N gaussian function and is defined by the following parameters (\ref Generation-of-a-multigauss-image):
 
 1. CenterX, CenterY, CenterZ - vectors of the size of N determining the expectancy value at the x-, y- and the z-axis. That means: The i-th gaussian bell curve takes its maximal value at the voxel with index [CenterX(i); CenterY(i); Centerz(i)].
 
@@ -50,16 +50,11 @@ This class defines an 3-dimensional Image, in which the value at one voxel equal
 3. Altitude - vector of the size of N determining the altitude: the i-th gaussian bell curve has a height of Altitude(i).
 This class allows by the method CalculateMidpointAndMeanValue() to find a sphere with a specified radius that has a maximal mean value over all sphere with that radius with midpoint inside or on the boundary of the image. Furthermore it can calculate the maximal und minimal pixel intensities and whose indices in the founded sphere.
 
+To serve as a test tool for ImageStatisticsCalculator, esp. the "hotspot search" feature of this class, MultiGaussianImageSource is also able to calculate the position of a sphere that maximizes the mean value of the voxels within the sphere (\ref Algorithm-for-calculating-statistic-in-a-sphere).
 
-\section Multigaussian-image-source-generator Multigaussian image source generator
+\section Generation-of-a-multigauss-image Generation of a multigauss image
 
-\subsection Abstract Abstract
-
-The class name is MultiGaussianImageSource and can be found in the directory MINT\Mint_Bin\CMakeExternals\Source\MITK\Modules\ImageStatistics. This class generates an image, which pixel intensities are the values of a multigauss function. The class allows calculating a spherical region of defined size which has a maximal mean value and returns the position and the mean value. Furthermore it can calculate the maximal und minimal pixel intensities and whose indices in the founded sphere.
-
-\subsection Generation-of-a-multigauss-image Generation of a multigauss image
-
-A multigauss function consists of the sum of \f$ N \f$ gauss function. The \f$ i \f$-th \linebreak (\f$0 \leq i \leq N \f$) gaussian is described with the following seven parameters:
+A multigauss function consists of the sum of \f$ N \f$ gauss function. The \f$ i \f$-th \linebreak (\f$0 \leq i \leq N \f$) gaussian is described with the following seven parameters (see above):
 - \f$ x_0^{(i)} \f$ is the expectancy value in the \f$ x \f$-Axis
 - \f$ y_0^{(i)} \f$ is the expectancy value in the \f$ y \f$-Axis
 - \f$ z_0^{(i)} \f$ is the expectancy value in the \f$ z \f$-Axis
@@ -94,7 +89,7 @@ exp \left[ - \left(
 
 The multigauss function \f$f_N\f$ will be evaluated at each voxel coordinate to become the voxel intensity.
 
-\subsection Algorithm-for-calculating-statistic-in-a-sphere Algorithm for calculating statistic in a sphere
+\section Algorithm-for-calculating-statistic-in-a-sphere Algorithm for calculating statistic in a sphere
 
 This section explains how we can find a sphere region which has a maximal mean value over all sphere regions with a fixed radius. Furthermore we want to calculate the maximal and minimal value in the wanted sphere.
 
@@ -135,7 +130,7 @@ m_k =& \sum_{i=0}^{N} \sigma_x^{(i)} \sigma_y^{(i)} \sigma_z^{(i)} \pi^{1.5}
 
 For the integral over the prism we take the half of the integral over the corresponding cuboid.
 
-Altogether we become for the mean value in the sphere:
+Altogether we find the mean value in the sphere as:
 \f{align*}{
 \left( \sum_{Q_k \text{ Cuboid}} m_k + \sum_{P_l \text{ Prism}} 0.5 m_l \right )/Volume(B),
 \f}
@@ -146,14 +141,18 @@ Now we know how to calculate the mean value in a sphere for given midpoint and r
 
 After we found the midpoint and the maximal mean value, we can calculate the maximum and the minimum in the sphere: we just traverse all the voxels in the region and take the maximum and minimum value and the respective coordinates.
 
-\subsection  Input-and-output Input and output
+\section  Input-and-output Input and output
 
-An example for an input in the command-line is: mitkMultiGaussianTest C:/temp/outputFile C:/temp/inputFile.xml
+An example for an input in the command-line is:
+\verbatim
+  mitkMultiGaussianTest C:/temp/outputFile C:/temp/inputFile.xml
+\endverbatim
+
 Here is outputFile the name of the gaussian image with extension .nrrd and at the same time the name of the output file with extension .xml, which is the same as the inputFile, only added the calculated mean value, max and min and the corresponding indexes in the statistic tag. Here we see an example for the input and output .xml file:
 
---------------------- INPUT ---------------------------------------------------
-
 \verbatim
+INPUT:
+
 <testcase>
   <testimage image-rows="20" image-columns="20" image-slices="20" numberOfGaussians="2" spacingX="1" spacingY="1" spacingZ="1" entireHotSpotInImage="1">
     <gaussian centerIndexX="4" centerIndexY="16" centerIndexZ="10" deviationX="7" deviationY="7" deviationZ="7" altitude="200"/>
@@ -165,9 +164,9 @@ Here is outputFile the name of the gaussian image with extension .nrrd and at th
 </testcase>
 \endverbatim
 
---------------------- OUTPUT  --------------------------------------------------
-
 \verbatim
+OUTPUT:
+
 <testcase>
   <testimage image-rows="20" image-columns="20" image-slices="20" numberOfGaussians="2" spacingX="1" spacingY="1" spacingZ="1" entireHotSpotInImage="1">
     <gaussian centerIndexX="4" centerIndexY="16" centerIndexZ="10" deviationX="7" deviationY="7" deviationZ="7" altitude="200"/>
@@ -264,7 +263,7 @@ public:
   virtual const double MultiGaussianFunctionValueAtPoint(double , double, double);
   /** Adds a multigaussian defined by the parameter: CenterX, CenterY, CenterZ, SigmaX, SigmaY, SigmaZ, Altitude.
    All parameters should have the same size, which determinates the number of the gaussian added. */
-  virtual void AddGaussian( VectorType, VectorType, VectorType, VectorType, VectorType, VectorType, VectorType);
+  virtual void AddGaussian( VectorType centerX, VectorType centerY, VectorType centerZ, VectorType sigmaX, VectorType sigmaY, VectorType sigmaZ, VectorType altitude);
   /** Calculates and set the index of the midpoint of the sphere with the maximal mean value as well as the mean value. */
   virtual void CalculateTheMidpointAndTheMeanValueWithOctree();
   /** Calculates and set the index an the value of maximulm and minimum in the wanted sphere. */

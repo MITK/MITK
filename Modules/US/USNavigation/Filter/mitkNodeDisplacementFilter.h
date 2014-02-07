@@ -105,27 +105,24 @@ namespace mitk {
     virtual void GenerateData();
 
     /**
-    * \brief Creates an Affine Transformation from a Navigation Data Object.
-    */
-    mitk::AffineTransform3D::Pointer NavigationDataToTransform(const mitk::NavigationData * nd);
-    /**
-    * \brief Creates an Geometry 3D Object from an AffineTransformation.
-    */
+     * \brief Creates an Geometry 3D Object from an AffineTransformation.
+     */
     mitk::Geometry3D::Pointer TransformToGeometry(mitk::AffineTransform3D::Pointer transform);
-    /**
-    * \brief All Nodes that are being managed by this Filter.
-    */
-    std::vector<mitk::DataNode::Pointer> m_Nodes;
-    /**
-    * \brief The Offset that each node has from the selected Navigation Tool.
-    *
-    * The indexes correspond to indexes in the Node vector
-    */
-    std::vector<mitk::Point3D> m_Offsets;
 
     /**
-    * \brief The Input that is used as a reference to orient the managed nodes.
-    */
+     * \brief All Nodes that are being managed by this Filter.
+     */
+    std::vector<mitk::DataNode::Pointer> m_Nodes;
+
+    /**
+     * \brief The transformation that each node has to be reached from the selected navigation tool.
+     * The indexes correspond to indexes in the node vector.
+     */
+    std::vector<mitk::AffineTransform3D::Pointer> m_Transforms;
+
+    /**
+     * \brief The Input that is used as a reference to orient the managed nodes.
+     */
     int m_SelectedInput;
   };
 } // namespace mitk

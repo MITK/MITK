@@ -29,10 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMatrixConvert.h"
 
 // Standard constructor for the New() macro. Sets the geometry to 3 dimensions
-mitk::Geometry3D::Geometry3D()
+mitk::Geometry3D::Geometry3D() :  m_ImageGeometry(false)
 {
 }
-mitk::Geometry3D::Geometry3D(const Geometry3D& other) : BaseGeometry(other)
+mitk::Geometry3D::Geometry3D(const Geometry3D& other) : BaseGeometry(other), m_ImageGeometry(other.m_ImageGeometry)
 {
 }
 

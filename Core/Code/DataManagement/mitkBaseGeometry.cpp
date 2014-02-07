@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMatrix4x4.h>
 
 mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
-  m_ImageGeometry(false), m_Valid(true), m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0)
+  m_Valid(true), m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0)
 {
   FillVector3D(m_FloatSpacing, 1,1,1);
   m_VtkMatrix = vtkMatrix4x4::New();
@@ -34,7 +34,7 @@ mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
 }
 
 mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), m_ParametricBoundingBox(other.m_ParametricBoundingBox), m_TimeBounds(other.m_TimeBounds),
-  m_ImageGeometry(other.m_ImageGeometry), m_Valid(other.m_Valid), m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_RotationQuaternion( other.m_RotationQuaternion ), m_Origin(other.m_Origin)
+  m_Valid(other.m_Valid), m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_RotationQuaternion( other.m_RotationQuaternion ), m_Origin(other.m_Origin)
 {
   // AffineGeometryFrame
   SetBounds(other.GetBounds());
@@ -119,8 +119,6 @@ void mitk::BaseGeometry::Initialize()
   m_TimeBounds[0]=ScalarTypeNumericTraits::NonpositiveMin(); m_TimeBounds[1]=ScalarTypeNumericTraits::max();
 
   m_FrameOfReferenceID = 0;
-
-  m_ImageGeometry = false;
 }
 
 void mitk::BaseGeometry::SetFloatBounds(const float bounds[6])

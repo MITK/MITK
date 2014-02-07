@@ -215,7 +215,7 @@ namespace mitk {
     virtual void Translate(const Vector3D&  vector);
 
     //##Documentation
-    //## @brief Set the transform to identity
+    //## @brief Set the transform to identity and origin to 0
     //##
     virtual void SetIdentity();
 
@@ -449,10 +449,6 @@ namespace mitk {
       return IsIndexInside(pt_index);
     }
 
-    //##Documentation
-    //## @brief Get the spacing (size of a pixel).
-    //##
-    itkGetConstReferenceMacro(Spacing, mitk::Vector3D);
 
     //##Documentation
     //## @brief Get the spacing as a float[3] array.
@@ -462,14 +458,7 @@ namespace mitk {
     //## @brief Set the spacing (m_Spacing)
     virtual void SetSpacing(const mitk::Vector3D& aSpacing);
 
-    //##Documentation
-    //## @brief Get the DICOM FrameOfReferenceID referring to the
-    //## used world coordinate system
-    itkGetConstMacro(FrameOfReferenceID, unsigned int);
-    //##Documentation
-    //## @brief Set the DICOM FrameOfReferenceID referring to the
-    //## used world coordinate system
-    itkSetMacro(FrameOfReferenceID, unsigned int);
+
 
     //##Documentation
     //## @brief Copy the VTK transform
@@ -546,11 +535,6 @@ namespace mitk {
     //##@brief executes affine operations (translate, rotate, scale)
     virtual void ExecuteOperation(Operation* operation);
 
-    /** Set/Get the IndexToWorldTransform */
-    itkGetConstObjectMacro(IndexToWorldTransform, AffineTransform3D);
-    itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
-    /** Get the bounding box */
-    itkGetConstObjectMacro(BoundingBox, BoundingBoxType);
 
     /** Get the extent of the bounding box */
     ScalarType GetExtent(unsigned int direction) const
@@ -590,6 +574,9 @@ namespace mitk {
     * the current value of m_IndexToWorldTransform and setting the rotation
     * component to zero. */
     virtual void ResetSubTransforms();
+
+
+    bool m_ImageGeometry;
 
     static const std::string INDEX_TO_OBJECT_TRANSFORM;
     static const std::string OBJECT_TO_NODE_TRANSFORM;

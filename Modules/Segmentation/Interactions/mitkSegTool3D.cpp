@@ -72,7 +72,14 @@ void mitk::SegTool3D::AcceptPreview()
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+  //check if active label has changed in the meanwhile (between Run and AcceptPreview)
+  if (m_PaintingPixelValue != workingImage->GetActiveLabelIndex())
+  {
+    m_PreviewNode->SetVisibility(false);
+    m_PreviewImage = NULL;
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return;
+  }
 
   CurrentlyBusy.Send(true);
 
@@ -100,7 +107,7 @@ void mitk::SegTool3D::AcceptPreview()
   workingImage->Modified();
 
   m_PreviewNode->SetVisibility(false);
-//  m_PreviewImage = NULL;
+  m_PreviewImage = NULL;
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

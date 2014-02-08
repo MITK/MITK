@@ -128,9 +128,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   //use the same ToolManager instance for our 3D Tools
   m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*m_ToolManager);
 
-  m_Controls.m_LabelSetWidget->SetDataStorage( *(this->GetDataStorage()) );
+  m_Controls.m_LabelSetWidget->SetDataStorage( this->GetDataStorage() );
   m_Controls.m_LabelSetWidget->SetOrganColors(this->GetDefaultOrganColorString());
-  m_Controls.m_LabelSetWidget->SetLastFileOpenPath(this->GetLastFileOpenPath());
   m_Controls.m_LabelSetWidget->hide();
 
   m_Controls.m_SurfaceBasedInterpolatorWidget->SetDataStorage( *(this->GetDataStorage()) );
@@ -139,8 +138,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   // all part of open source MITK
   m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
   m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
-  //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Correction Paint Wipe 'Live Wire'");
-  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Fill Erase 'Region Growing' FastMarching2D");
+  //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups();
+  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Fill Erase 'Region Growing' FastMarching2D");// todo: "Correction Paint Wipe 'Live Wire'"
   m_Controls.m_ManualToolSelectionBox2D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
   connect( m_Controls.m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
@@ -149,8 +148,10 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
   m_Controls.m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
-//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("FastMarching3D RegionGrowing Watershed");
-  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Median Dilate Erode Open Close 'Fill Holes' 'Keep N Largest' 'Split' 'Region Selector' Threshold 'Two Thresholds' 'Auto Threshold' 'Multiple Otsu'");
+//  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups();
+  m_Controls.m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Median Dilate Erode Open Close 'Fill Holes' 'Keep N Largest' 'Split' 'Region Selector' Threshold \\
+    'Two Thresholds' 'Auto Threshold' 'Multiple Otsu'"); // todo add : FastMarching3D RegionGrowing Watershed
+
   m_Controls.m_ManualToolSelectionBox3D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
 

@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QCompleter>
 #include <QStringListModel>
 #include <QFileDialog>
-#include <QInputDialog>
 #include <QMessageBox>
 #include <QDateTime>
 
@@ -49,8 +48,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // berry
 //#include <berryIPreferencesService.h>
 
-QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent) : QWidget(parent),
-m_ToolManager(NULL)
+QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
+: QWidget(parent)
+, m_ToolManager(NULL)
+, m_DataStorage(NULL)
+, m_Completer(NULL)
 {
   m_Controls.setupUi(this);
 
@@ -118,9 +120,9 @@ void QmitkLabelSetWidget::setEnabled(bool enabled)
   this->UpdateControls();
 }
 
-void QmitkLabelSetWidget::SetDataStorage( mitk::DataStorage& storage )
+void QmitkLabelSetWidget::SetDataStorage( mitk::DataStorage* storage )
 {
-  m_DataStorage = &storage;
+  m_DataStorage = storage;
 }
 
 void QmitkLabelSetWidget::OnSearchLabel()
@@ -483,7 +485,7 @@ void QmitkLabelSetWidget::OnCreateCroppedMask(int index)
   maskNode->SetColor(workingImage->GetLabelColor(index));
   maskNode->SetOpacity(1.0);
 
-  this->m_DataStorage->Add(maskNode, workingNode);
+  m_DataStorage->Add(maskNode, workingNode);
 }
 
 void QmitkLabelSetWidget::OnCreateMask(int index)
@@ -530,7 +532,7 @@ void QmitkLabelSetWidget::OnCreateMask(int index)
   maskNode->SetColor(workingImage->GetLabelColor(index));
   maskNode->SetOpacity(1.0);
 
-  this->m_DataStorage->Add(maskNode, workingNode);
+  m_DataStorage->Add(maskNode, workingNode);
 }
 
 void QmitkLabelSetWidget::OnToggleOutline(bool value)

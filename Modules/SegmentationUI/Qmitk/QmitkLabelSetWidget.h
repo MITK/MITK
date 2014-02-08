@@ -21,9 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ui_QmitkLabelSetWidgetControls.h>
 
-#include "mitkWeakPointer.h"
-#include "mitkDataNode.h"
-
 class QmitkDataStorageComboBox;
 class QCompleter;
 
@@ -44,7 +41,7 @@ public:
 
   void SetActiveLabel(int);
 
-  void SetDataStorage( mitk::DataStorage& storage );
+  void SetDataStorage( mitk::DataStorage* storage );
 
   void SetOrganColors(const QStringList& organColors);
 
@@ -133,7 +130,7 @@ private:
 
     QCompleter* m_Completer;
 
-    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+    mitk::DataStorage* m_DataStorage;
 
     mitk::ToolManager* m_ToolManager;
 

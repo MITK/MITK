@@ -80,7 +80,7 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
   connect( m_Controls.m_btNextLayer, SIGNAL(clicked()), this, SLOT( OnNextLayer()) );
 
   connect( m_Controls.m_btLockExterior, SIGNAL(toggled(bool)), this, SLOT( OnLockExteriorToggled(bool)) );
-  connect( m_Controls.m_btSegmentationInteractor, SIGNAL(clicked()), this, SLOT( OnDeactivateActiveTool()) );
+  connect( m_Controls.m_btDeactivateTool, SIGNAL(clicked()), this, SLOT( OnDeactivateActiveTool()) );
 
   connect( m_Controls.m_cbActiveLayer, SIGNAL(currentIndexChanged(int)), this, SLOT( OnChangeLayer(int)) );
 
@@ -89,7 +89,7 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
 
   QStringList completionList;
   completionList << "";
-  m_Completer = new QCompleter(completionList,this);
+  m_Completer = new QCompleter(completionList, this);
   m_Completer->setCaseSensitivity(Qt::CaseInsensitive);
   m_Controls.m_LabelSearchBox->setCompleter(m_Completer);
 
@@ -102,7 +102,7 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
 
   m_Controls.m_LabelSearchBox->setEnabled(false);
   m_Controls.m_btLockExterior->setEnabled(false);
-  m_Controls.m_btSegmentationInteractor->setEnabled(false);
+  m_Controls.m_btDeactivateTool->setEnabled(false);
   m_Controls.m_btAddLayer->setEnabled(false);
   m_Controls.m_btDeleteLayer->setEnabled(false);
   m_Controls.m_btPreviousLayer->setEnabled(false);
@@ -399,7 +399,7 @@ void QmitkLabelSetWidget::UpdateControls()
   m_Controls.m_LabelSetTableWidget->setEnabled(hasWorkingData);
   m_Controls.m_LabelSearchBox->setEnabled(hasWorkingData);
   m_Controls.m_btLockExterior->setEnabled(hasWorkingData);
-  m_Controls.m_btSegmentationInteractor->setEnabled(hasWorkingData);
+  m_Controls.m_btDeactivateTool->setEnabled(hasWorkingData);
   m_Controls.m_btAddLayer->setEnabled(hasWorkingData);
   m_Controls.m_btDeleteLayer->setEnabled(hasWorkingData);
   m_Controls.m_btPreviousLayer->setEnabled(hasWorkingData);

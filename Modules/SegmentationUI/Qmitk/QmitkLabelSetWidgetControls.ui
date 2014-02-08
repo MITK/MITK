@@ -42,9 +42,9 @@
       <number>2</number>
      </property>
      <item>
-      <widget class="QToolButton" name="m_btSegmentationInteractor">
+      <widget class="QToolButton" name="m_btDeactivateTool">
        <property name="toolTip">
-        <string>Disable any active tool and allow for label interaction (e.g. selection)</string>
+        <string>Disable the active tool</string>
        </property>
        <property name="text">
         <string>...</string>
@@ -181,6 +181,9 @@
         <font>
          <pointsize>12</pointsize>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>Switch to a layer</string>
        </property>
        <item>
         <property name="text">

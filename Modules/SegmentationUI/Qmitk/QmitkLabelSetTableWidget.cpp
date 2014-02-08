@@ -89,10 +89,12 @@ void QmitkLabelSetTableWidget::OnToolManagerWorkingDataModified()
 
 void QmitkLabelSetTableWidget::setEnabled(bool enabled)
 {
-  if (!enabled)
-  {
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+
+  if (workingNode)
+    this->SetActiveLabelSetImage( dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() ));
+  else
     this->SetActiveLabelSetImage(NULL);
-  }
 
   QWidget::setEnabled(enabled);
 }

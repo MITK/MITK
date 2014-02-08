@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSliceNavigationController.h>
 #include <cassert>
 
-static const char* const HelpText = "Select two different segmentations above";
+static const char* const HelpText = "Select two different masks above";
 
 std::string GetPrefix(mitk::BooleanOperation::Type type)
 {

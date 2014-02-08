@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkMorphologicalOperationsWidget.h"
 #include <mitkMorphologicalOperations.h>
 #include <mitkProgressBar.h>
+#include <berryPlatform.h>
+#include <mitkIDataStorageService.h>
 #include <mitkSliceNavigationController.h>
 
 static const char* const HelpText = "Select a mask above";
@@ -26,8 +28,22 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::MaskPredicate);
-  m_Controls.dataSelectionWidget->SetHelpText(HelpText);
+  m_Controls.m_DataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::MaskPredicate);
+  m_Controls.m_DataSelectionWidget->SetHelpText(HelpText);
+
+  mitk::IDataStorageService::Pointer service =
+    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+
+  assert(service.IsNotNull());
+
+  m_Controls.m_LabelSetWidget->SetDataStorage(service->GetDefaultDataStorage()->GetDataStorage());
+  m_Controls.m_LabelSetWidget->setEnabled(true);
+
+  m_Controls.m_ToolSelectionBox->SetGenerateAccelerators(true);
+  m_Controls.m_ToolSelectionBox->SetToolGUIArea( m_Controls.m_ToolGUIContainer );
+  m_Controls.m_ToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
+  m_Controls.m_ToolSelectionBox->SetDisplayedToolGroups("Median Dilate Erode Open Close 'Fill Holes' 'Keep N Largest' 'Split'");
+//  m_Controls.m_LabelSetWidget->SetDataStorage( *(this->GetDataStorage()) );
 
   connect(m_Controls.btnClosing, SIGNAL(clicked()), this, SLOT(OnClosingButtonClicked()));
   connect(m_Controls.btnOpening, SIGNAL(clicked()), this, SLOT(OnOpeningButtonClicked()));
@@ -36,10 +52,10 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
   connect(m_Controls.btnFillHoles, SIGNAL(clicked()), this, SLOT(OnFillHolesButtonClicked()));
   connect(m_Controls.radioButtonMorphoCross, SIGNAL(clicked()), this, SLOT(OnRadioButtonsClicked()));
   connect(m_Controls.radioButtonMorphoBall, SIGNAL(clicked()), this, SLOT(OnRadioButtonsClicked()));
-  connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)), this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
+  connect(m_Controls.m_DataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)), this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
 
-  if (m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull())
-    this->OnSelectionChanged(0, m_Controls.dataSelectionWidget->GetSelection(0));
+  if (m_Controls.m_DataSelectionWidget->GetSelection(0).IsNotNull())
+    this->OnSelectionChanged(0, m_Controls.m_DataSelectionWidget->GetSelection(0));
 }
 
 QmitkMorphologicalOperationsWidget::~QmitkMorphologicalOperationsWidget()
@@ -48,17 +64,17 @@ QmitkMorphologicalOperationsWidget::~QmitkMorphologicalOperationsWidget()
 
 void QmitkMorphologicalOperationsWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
 {
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  QmitkDataSelectionWidget* m_DataSelectionWidget = m_Controls.m_DataSelectionWidget;
+  mitk::DataNode::Pointer node = m_DataSelectionWidget->GetSelection(0);
 
   if (node.IsNotNull())
   {
-    m_Controls.dataSelectionWidget->SetHelpText("");
+    m_Controls.m_DataSelectionWidget->SetHelpText("");
     this->EnableButtons(true);
   }
   else
   {
-    m_Controls.dataSelectionWidget->SetHelpText(HelpText);
+    m_Controls.m_DataSelectionWidget->SetHelpText(HelpText);
     this->EnableButtons(false);
   }
 }
@@ -85,8 +101,8 @@ void QmitkMorphologicalOperationsWidget::OnClosingButtonClicked()
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  QmitkDataSelectionWidget* m_DataSelectionWidget = m_Controls.m_DataSelectionWidget;
+  mitk::DataNode::Pointer node = m_DataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
   bool ball = m_Controls.radioButtonMorphoBall->isChecked();
 
@@ -117,8 +133,8 @@ void QmitkMorphologicalOperationsWidget::OnOpeningButtonClicked()
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  QmitkDataSelectionWidget* m_DataSelectionWidget = m_Controls.m_DataSelectionWidget;
+  mitk::DataNode::Pointer node = m_DataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
   bool ball = m_Controls.radioButtonMorphoBall->isChecked();
 
@@ -149,8 +165,8 @@ void QmitkMorphologicalOperationsWidget::OnDilatationButtonClicked()
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  QmitkDataSelectionWidget* m_DataSelectionWidget = m_Controls.m_DataSelectionWidget;
+  mitk::DataNode::Pointer node = m_DataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
   bool ball = m_Controls.radioButtonMorphoBall->isChecked();
 
@@ -181,8 +197,8 @@ void QmitkMorphologicalOperationsWidget::OnErosionButtonClicked()
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  QmitkDataSelectionWidget* m_DataSelectionWidget = m_Controls.m_DataSelectionWidget;
+  mitk::DataNode::Pointer node = m_DataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
   bool ball = m_Controls.radioButtonMorphoBall->isChecked();
 
@@ -213,8 +229,8 @@ void QmitkMorphologicalOperationsWidget::OnFillHolesButtonClicked()
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  QmitkDataSelectionWidget* m_DataSelectionWidget = m_Controls.m_DataSelectionWidget;
+  mitk::DataNode::Pointer node = m_DataSelectionWidget->GetSelection(0);
   mitk::Image::Pointer image = static_cast<mitk::Image*>(node->GetData());
 
   try

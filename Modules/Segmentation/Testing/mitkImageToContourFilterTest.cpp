@@ -21,9 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-// Temp includes
-#include <mitkExtractSliceFilter.h>
-
 class mitkImageToContourFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkImageToContourFilterTestSuite);
@@ -61,6 +58,7 @@ public:
   // Extract contours from an empty slice
   void TestExtractContoursFromAnEmptySlice()
   {
+//    MITK_INFO<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@#############################";
     m_ContourExtractor->SetInput(m_EmptySlice);
     m_ContourExtractor->Update();
     mitk::Surface::Pointer emptyContour = m_ContourExtractor->GetOutput();
@@ -83,7 +81,18 @@ public:
                            referenceContour->GetVtkPolyData()->GetNumberOfPoints());
 
     // TODO: Looks like surface cannot be compared after IO
-    // CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(contour->GetVtkPolyData(), referenceContour->GetVtkPolyData(), mitk::eps*1000, true));
+    MITK_INFO<<"\n\n########################################################\n\n";
+    for (int i = 0; i < contour->GetVtkPolyData()->GetNumberOfPoints(); ++i)
+    {
+      MITK_INFO<<std::setprecision(10)<<"[Contour Point]: ("<<contour->GetVtkPolyData()->GetPoint(i)[0]<<","<<contour->GetVtkPolyData()->GetPoint(i)[1]<<","<<contour->GetVtkPolyData()->GetPoint(i)[2]
+              <<")  ----  [Reference Point]: ("<<referenceContour->GetVtkPolyData()->GetPoint(i)[0]<<","<<referenceContour->GetVtkPolyData()->GetPoint(i)[1]
+              <<","<<referenceContour->GetVtkPolyData()->GetPoint(i)[2]<<")";
+    }
+    MITK_INFO<<"\n\n########################################################\n\n";
+
+    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(contour->GetVtkPolyData(), referenceContour->GetVtkPolyData(), 0.000001, true));
+
+
   }
 
   // Extract multiple contours from a single slice
@@ -102,7 +111,7 @@ public:
                            referenceContour->GetVtkPolyData()->GetNumberOfPolys());
 
     // TODO: Looks like surface cannot be compared after IO
-    // CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(contour2->GetVtkPolyData(), referenceContour2->GetVtkPolyData(), mitk::eps*1000, true));
+     CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(contour->GetVtkPolyData(), referenceContour->GetVtkPolyData(), 0.000001, true));
 
   }
 };

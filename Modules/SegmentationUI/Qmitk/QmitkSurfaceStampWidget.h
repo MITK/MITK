@@ -43,9 +43,8 @@ class SegmentationUI_EXPORT QmitkSurfaceStampWidget : public QWidget
     QmitkSurfaceStampWidget(QWidget* parent = 0, const char* name = 0);
     virtual ~QmitkSurfaceStampWidget();
 
-    void OnToolManagerWorkingDataModified();
 
-    void SetDataStorage( mitk::DataStorage& storage );
+    void SetDataStorage( mitk::DataStorage* storage );
 
   protected slots:
 
@@ -55,11 +54,9 @@ class SegmentationUI_EXPORT QmitkSurfaceStampWidget : public QWidget
 
 private:
 
-    mitk::DataNode::Pointer m_WorkingNode;
-
     mitk::ToolManager* m_ToolManager;
 
-    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+    mitk::DataStorage* m_DataStorage;
 
     Ui::QmitkSurfaceStampWidgetGUIControls m_Controls;
 };

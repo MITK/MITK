@@ -39,6 +39,7 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
   m_Controls.m_LabelSetWidget->SetDataStorage(service->GetDefaultDataStorage()->GetDataStorage());
   m_Controls.m_LabelSetWidget->setEnabled(true);
 
+
   m_Controls.m_ToolSelectionBox->SetGenerateAccelerators(true);
   m_Controls.m_ToolSelectionBox->SetToolGUIArea( m_Controls.m_ToolGUIContainer );
   m_Controls.m_ToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );

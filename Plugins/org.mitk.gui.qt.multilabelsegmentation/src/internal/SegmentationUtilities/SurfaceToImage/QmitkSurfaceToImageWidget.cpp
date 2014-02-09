@@ -20,34 +20,47 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExceptionMacro.h>
 #include <mitkProgressBar.h>
 #include <mitkProperties.h>
+#include <mitkIDataStorageService.h>
 #include <mitkSurfaceStampImageFilter.h>
+
+#include <berryPlatform.h>
 
 #include <qmessagebox.h>
 
-static const char* const HelpText = "Select a regular image and a surface";
+static const char* const HelpText = "Select a patient image and a surface";
 
 QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImagePredicate);
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::SurfacePredicate);
-  m_Controls.dataSelectionWidget->SetHelpText(HelpText);
+  m_Controls.m_DataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImagePredicate);
+  m_Controls.m_DataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::SurfacePredicate);
+  m_Controls.m_DataSelectionWidget->SetHelpText(HelpText);
+
+  mitk::IDataStorageService::Pointer service =
+    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+
+  assert(service.IsNotNull());
+
+  m_Controls.m_LabelSetWidget->SetDataStorage(service->GetDefaultDataStorage()->GetDataStorage());
+  m_Controls.m_LabelSetWidget->setEnabled(true);
+
+  m_Controls.m_SurfaceStampWidget->SetDataStorage(service->GetDefaultDataStorage()->GetDataStorage());
 
   this->EnableButtons(false);
 
   m_Controls.m_chkMakeOutputBinary->setChecked(true);
 
   connect (m_Controls.btnSurface2Image, SIGNAL(pressed()), this, SLOT(OnSurface2ImagePressed()));
-  connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
+  connect(m_Controls.m_DataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
     this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
   connect (m_Controls.m_chkMakeOutputBinary, SIGNAL(toggled(bool)), this, SLOT(OnMakeOutputBinaryChanged(bool)));
 
-  if( m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull() &&
-    m_Controls.dataSelectionWidget->GetSelection(1).IsNotNull() )
+  if( m_Controls.m_DataSelectionWidget->GetSelection(0).IsNotNull() &&
+    m_Controls.m_DataSelectionWidget->GetSelection(1).IsNotNull() )
   {
-    this->OnSelectionChanged( 0, m_Controls.dataSelectionWidget->GetSelection(0));
+    this->OnSelectionChanged( 0, m_Controls.m_DataSelectionWidget->GetSelection(0));
   }
 }
 
@@ -66,27 +79,26 @@ void QmitkSurfaceToImageWidget::EnableButtons(bool enable)
 
 void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
 {
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::DataNode::Pointer imageNode = dataSelectionWidget->GetSelection(0);
-  mitk::DataNode::Pointer surfaceNode = dataSelectionWidget->GetSelection(1);
+  mitk::DataNode::Pointer imageNode = m_Controls.m_DataSelectionWidget->GetSelection(0);
+  mitk::DataNode::Pointer surfaceNode = m_Controls.m_DataSelectionWidget->GetSelection(1);
 
   if (imageNode.IsNull() || surfaceNode.IsNull() )
   {
-    dataSelectionWidget->SetHelpText(HelpText);
+    m_Controls.m_DataSelectionWidget->SetHelpText(HelpText);
     this->EnableButtons(false);
   }
   else
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( dataSelectionWidget->GetSelection(0)->GetData() );
-    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( dataSelectionWidget->GetSelection(1)->GetData() );
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_Controls.m_DataSelectionWidget->GetSelection(0)->GetData() );
+    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( m_Controls.m_DataSelectionWidget->GetSelection(1)->GetData() );
     if( image->GetTimeSteps() != surface->GetTimeSteps() )
     {
-      dataSelectionWidget->SetHelpText("Image and surface are of different size");
+      m_Controls.m_DataSelectionWidget->SetHelpText("Image and surface are of different size");
       this->EnableButtons(false);
     }
     else
     {
-      dataSelectionWidget->SetHelpText("");
+      m_Controls.m_DataSelectionWidget->SetHelpText("");
       this->EnableButtons();
     }
   }
@@ -96,9 +108,8 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
 {
   this->EnableButtons(false);
 
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( dataSelectionWidget->GetSelection(0)->GetData() );
-  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( dataSelectionWidget->GetSelection(1)->GetData() );
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_Controls.m_DataSelectionWidget->GetSelection(0)->GetData() );
+  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( m_Controls.m_DataSelectionWidget->GetSelection(1)->GetData() );
 
   if( image.IsNull() || surface.IsNull())
   {
@@ -119,9 +130,9 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
   }
 
   //create name for result node
-  std::string nameOfResultImage = dataSelectionWidget->GetSelection(0)->GetName();
+  std::string nameOfResultImage = m_Controls.m_DataSelectionWidget->GetSelection(0)->GetName();
   nameOfResultImage.append("_");
-  nameOfResultImage.append(dataSelectionWidget->GetSelection(1)->GetName());
+  nameOfResultImage.append(m_Controls.m_DataSelectionWidget->GetSelection(1)->GetName());
 
   //create data node and add to data storage
   mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
@@ -129,7 +140,7 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
   resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
   resultNode->SetProperty("binary", mitk::BoolProperty::New(m_Controls.m_chkMakeOutputBinary->isChecked()) );
 
-  dataSelectionWidget->GetDataStorage()->Add(resultNode, dataSelectionWidget->GetSelection(0));
+  m_Controls.m_DataSelectionWidget->GetDataStorage()->Add(resultNode, m_Controls.m_DataSelectionWidget->GetSelection(0));
 
   this->EnableButtons();
 }

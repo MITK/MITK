@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SegmentationUIExports.h"
 #include "mitkDataNode.h"
-#include "mitkDataStorage.h"
 
 #include <QWidget>
 
@@ -45,9 +44,7 @@ class SegmentationUI_EXPORT QmitkMaskStampWidget : public QWidget
     QmitkMaskStampWidget(QWidget* parent = 0, const char* name = 0);
     virtual ~QmitkMaskStampWidget();
 
-    void OnToolManagerWorkingDataModified();
-
-    void SetDataStorage( mitk::DataStorage& storage );
+    void SetDataStorage( mitk::DataStorage* storage );
 
   protected slots:
 
@@ -57,11 +54,9 @@ class SegmentationUI_EXPORT QmitkMaskStampWidget : public QWidget
 
   private:
 
-    mitk::DataNode::Pointer m_WorkingNode;
-
     mitk::ToolManager* m_ToolManager;
 
-    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+    mitk::DataStorage* m_DataStorage;
 
     Ui::QmitkMaskStampWidgetGUIControls m_Controls;
 

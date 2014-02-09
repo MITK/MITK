@@ -128,7 +128,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   //use the same ToolManager instance for our 3D Tools
   m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*m_ToolManager);
 
-  m_Controls.m_LabelSetWidget->SetDataStorage( this->GetDataStorage() );
+  m_Controls.m_LabelSetWidget->SetDataStorage(this->GetDataStorage());
   m_Controls.m_LabelSetWidget->SetOrganColors(this->GetDefaultOrganColorString());
   m_Controls.m_LabelSetWidget->hide();
 
@@ -140,7 +140,6 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
   //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups();
   m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Fill Erase 'Region Growing' FastMarching2D");// todo: "Correction Paint Wipe 'Live Wire'"
-  m_Controls.m_ManualToolSelectionBox2D->SetLayoutColumns(2);
   m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
   connect( m_Controls.m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
 

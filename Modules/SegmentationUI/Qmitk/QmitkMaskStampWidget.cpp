@@ -22,7 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QMessageBox>
 
-QmitkMaskStampWidget::QmitkMaskStampWidget(QWidget* parent, const char*  /*name*/) : QWidget(parent)
+QmitkMaskStampWidget::QmitkMaskStampWidget(QWidget* parent, const char*  /*name*/) :
+QWidget(parent),
+m_ToolManager(NULL),
+m_DataStorage(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -41,8 +44,6 @@ QmitkMaskStampWidget::QmitkMaskStampWidget(QWidget* parent, const char*  /*name*
 
   m_Controls.m_cbMaskNodeSelector->SetPredicate( maskPredicate );
 
-  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkMaskStampWidget>( this, &QmitkMaskStampWidget::OnToolManagerWorkingDataModified );
-
   connect(m_Controls.m_pbStamp, SIGNAL(clicked()), this, SLOT(OnStamp()));
   connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
   m_Controls.m_InformationWidget->hide();
@@ -50,17 +51,11 @@ QmitkMaskStampWidget::QmitkMaskStampWidget(QWidget* parent, const char*  /*name*
 
 QmitkMaskStampWidget::~QmitkMaskStampWidget()
 {
-  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkMaskStampWidget>(this, &QmitkMaskStampWidget::OnToolManagerWorkingDataModified);
 }
 
-void QmitkMaskStampWidget::OnToolManagerWorkingDataModified()
+void QmitkMaskStampWidget::SetDataStorage( mitk::DataStorage* storage )
 {
-  m_WorkingNode = m_ToolManager->GetWorkingData(0);
-}
-
-void QmitkMaskStampWidget::SetDataStorage( mitk::DataStorage& storage )
-{
-  m_DataStorage = &storage;
+  m_DataStorage = storage;
   m_Controls.m_cbMaskNodeSelector->SetDataStorage(m_DataStorage);
 }
 
@@ -81,13 +76,15 @@ void QmitkMaskStampWidget::OnStamp()
     return;
   }
 
-  if (m_WorkingNode.IsNull())
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+
+  if (!workingNode)
   {
    QMessageBox::information( this, "Mask Stamp", "Please load and select a segmentation before starting some action.");
    return;
   }
 
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( m_WorkingNode->GetData() );
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
 
   if (!workingImage)
   {

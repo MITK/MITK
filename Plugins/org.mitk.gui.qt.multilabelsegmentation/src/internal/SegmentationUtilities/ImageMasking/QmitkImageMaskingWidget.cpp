@@ -23,12 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkMaskImageFilter.h>
 #include <mitkPadImageFilter.h>
 #include <mitkProgressBar.h>
+#include <mitkIDataStorageService.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkSurfaceToImageFilter.h>
 
+#include <berryPlatform.h>
+
 #include <qmessagebox.h>
 
-static const char* const HelpText = "Select a regular image and a mask";
+static const char* const HelpText = "Select a patient image and a mask";
 
 QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
@@ -38,6 +41,16 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController
   m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImagePredicate);
   m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::MaskPredicate);
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
+
+  mitk::IDataStorageService::Pointer service =
+    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+
+  assert(service.IsNotNull());
+
+  m_Controls.m_LabelSetWidget->SetDataStorage(service->GetDefaultDataStorage()->GetDataStorage());
+  m_Controls.m_LabelSetWidget->setEnabled(true);
+
+  m_Controls.m_MaskStampWidget->SetDataStorage(service->GetDefaultDataStorage()->GetDataStorage());
 
   this->EnableButtons(false);
 
@@ -73,7 +86,7 @@ void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk:
     }
     else
     {
-      dataSelectionWidget->SetHelpText("Select a regular image and a surface");
+      dataSelectionWidget->SetHelpText("Select a patient image and a surface");
     }
     this->EnableButtons(false);
   }
@@ -132,7 +145,7 @@ void QmitkImageMaskingWidget::OnImageMaskingToggled(bool status)
 {
   if (status)
   {
-    m_Controls.dataSelectionWidget->SetHelpText("Select a regular image and a mask");
+    m_Controls.dataSelectionWidget->SetHelpText("Select a patient image and a mask");
     m_Controls.dataSelectionWidget->SetPredicate(1, QmitkDataSelectionWidget::MaskPredicate);
   }
 }
@@ -141,7 +154,7 @@ void QmitkImageMaskingWidget::OnSurfaceMaskingToggled(bool status)
 {
   if (status)
   {
-    m_Controls.dataSelectionWidget->SetHelpText("Select a regular image and a surface");
+    m_Controls.dataSelectionWidget->SetHelpText("Select a patient image and a surface");
     m_Controls.dataSelectionWidget->SetPredicate(1, QmitkDataSelectionWidget::SurfacePredicate);
   }
 }

@@ -54,7 +54,7 @@ public:
    *  used when the lookupTable is a vtkColorTransferFunction) */
   vtkPiecewiseFunction* GetOpacityPiecewiseFunction()
   { return m_OpacityFunction; }
-  /** \brief Set the iiecewise function used to map scalar to alpha component value (only
+  /** \brief Set the piecewise function used to map scalar to alpha component value (only
    *  used when the lookupTable is a vtkColorTransferFunction) */
   void SetOpacityPiecewiseFunction(vtkPiecewiseFunction *opacityFunction);
 

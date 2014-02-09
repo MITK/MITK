@@ -99,7 +99,7 @@ void mitk::ImageToLookupTableFilter::GenerateData()
         // the default vtkLookupTable has range=[0,1]; and hsv ranges set
         // up for rainbow color table (from red to blue).
 
-        vtkLookupTable* vtkLut = vtkLookupTable::New();
+        vtkSmartPointer<vtkLookupTable> vtkLut = vtkSmartPointer<vtkLookupTable>::New();
         /*
         if ( ( image->GetPixelType().GetNumberOfComponents() == 3 ) && ( image->GetDimension() == 3 ) )
         {
@@ -138,6 +138,5 @@ void mitk::ImageToLookupTableFilter::GenerateData()
         }*/
         vtkLut->SetRange(0, 10);
         output->SetVtkLookupTable( vtkLut );
-        vtkLut->Delete();
     }
 }

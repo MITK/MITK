@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkEnumerationProperty.h"
-#include "mitkRenderingModeProperty.h"
+#include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
 #include "mitkLookupTableProperty.h"
 #include <mitkNodePredicateAnd.h>
@@ -340,6 +340,13 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   imageDataNodeDescriptor->AddAction(m_ColormapAction, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor, m_ColormapAction));
 
+  m_ColormapAction = new QAction("Colormap", this);
+  m_ColormapAction->setMenu(new QMenu);
+  QObject::connect( m_ColormapAction->menu(), SIGNAL( aboutToShow() )
+    , this, SLOT( ColormapMenuAboutToShow() ) );
+  imageDataNodeDescriptor->AddAction(m_ColormapAction, false);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor, m_ColormapAction));
+
   m_SurfaceRepresentation = new QAction("Surface Representation", this);
   m_SurfaceRepresentation->setMenu(new QMenu);
   QObject::connect( m_SurfaceRepresentation->menu(), SIGNAL( aboutToShow() )
@@ -624,26 +631,27 @@ void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
   if(!node)
     return;
 
-  mitk::EnumerationProperty* cmProp =
-      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("colormap"));
-  if(!cmProp)
+  mitk::LookupTableProperty::Pointer lookupTableProperty =
+    dynamic_cast<mitk::LookupTableProperty*>(node->GetProperty("LookupTable"));
+  if (!lookupTableProperty)
     return;
 
-  QAction* senderAction = qobject_cast<QAction*> ( QObject::sender() );
-
+  QAction* senderAction = qobject_cast<QAction*>(QObject::sender());
   if(!senderAction)
     return;
 
   std::string activatedItem = senderAction->text().toStdString();
 
-  if ( activatedItem != cmProp->GetValueAsString() )
-  {
-    if ( cmProp->IsValidEnumerationValue( activatedItem ) )
-    {
-        cmProp->SetValue( activatedItem );
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
+  mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
+  if (!lookupTable)
+    return;
+
+  lookupTable->SetType(activatedItem);
+  lookupTableProperty->SetValue(lookupTable);
+  mitk::RenderingModeProperty::Pointer renderingMode =
+    dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty("Image Rendering.Mode"));
+  renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ColormapMenuAboutToShow()
@@ -652,29 +660,34 @@ void QmitkDataManagerView::ColormapMenuAboutToShow()
   if(!node)
     return;
 
-  mitk::EnumerationProperty* cmProp =
-      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("colormap"));
-  if(!cmProp)
+  mitk::LookupTableProperty::Pointer lookupTableProperty =
+    dynamic_cast<mitk::LookupTableProperty*>(node->GetProperty("LookupTable"));
+  if (!lookupTableProperty)
     return;
 
-  // clear menu
+  mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
+  if (!lookupTable)
+    return;
+
   m_ColormapAction->menu()->clear();
   QAction* tmp;
 
-  // create menu entries
-  for(mitk::EnumerationProperty::EnumConstIterator it=cmProp->Begin(); it!=cmProp->End()
-    ; it++)
+  int i = 0;
+  std::string lutType = lookupTable->typenameList[i];
+
+  while (lutType != "END_OF_ARRAY")
   {
-    tmp = m_ColormapAction->menu()->addAction(QString::fromStdString(it->second));
+    tmp = m_ColormapAction->menu()->addAction(QString::fromStdString(lutType));
     tmp->setCheckable(true);
 
-    if(it->second == cmProp->GetValueAsString())
+    if (lutType == lookupTable->GetActiveTypeAsString())
     {
       tmp->setChecked(true);
     }
 
-    QObject::connect( tmp, SIGNAL( triggered(bool) )
-      , this, SLOT( ColormapActionToggled(bool) ) );
+    QObject::connect(tmp, SIGNAL(triggered(bool)), this, SLOT(ColormapActionToggled(bool)));
+
+    lutType = lookupTable->typenameList[++i];
   }
 }
 

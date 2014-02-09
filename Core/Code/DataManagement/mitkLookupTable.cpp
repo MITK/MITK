@@ -22,14 +22,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPiecewiseFunction.h>
 #include <mitkColormapProperty.h>
 
-#include "HotIron.h"
-#include "PETColor.h"
-#include "PET20.h"
+
+#include <mitkLookupTableProperty.h>
+#include <Colortables/Jet.h>
+#include <Colortables/HotIron.h>
+#include <Colortables/PETColor.h>
+#include <Colortables/PET20.h>
+
+const char* const mitk::LookupTable::typenameList[] =
+{
+  "Grayscale",
+  "Inverse Grayscale",
+  "Hot Iron",
+  "Jet",
+  "Legacy Binary",
+  "Multilabel",
+  "PET Color",
+  "PET 20",
+  "END_OF_ARRAY" // Do not add typenames after this entry (see QmitkDataManagerView::ColormapMenuAboutToShow())
+};
 
 mitk::LookupTable::LookupTable():
-m_Window(0.0),
-m_Level(0.0),
-m_Opacity(1.0)
+    m_Window(0.0),
+    m_Level(0.0),
+    m_Opacity(1.0),
+    m_type(mitk::LookupTable::GRAYSCALE)
 {
   m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
   this->BuildGrayScaleLookupTable();
@@ -44,50 +61,78 @@ mitk::LookupTable::LookupTable(const LookupTable& other)
 
 mitk::LookupTable::~LookupTable()
 {
-
 }
 
-void mitk::LookupTable::SetActiveColormap(int index)
+void mitk::LookupTable::SetVtkLookupTable( vtkSmartPointer<vtkLookupTable> lut )
 {
-    switch(index)
+    if ((!lut) || (m_LookupTable == lut))
     {
-    case (mitk::ColormapProperty::CM_BW):
-        this->BuildGrayScaleLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_BWINVERSE):
-        this->BuildInverseGrayScaleLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_HOTIRON):
-        this->BuildHotIronLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_PETCOLOR):
-        this->BuildPETColorLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_PET20):
-        this->BuildPET20LookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_MULTILABEL):
-        this->BuildMultiLabelLookupTable();
-        break;
-    case (mitk::ColormapProperty::CM_LEGACYBINARY):
-        this->BuildLegacyBinaryLookupTable();
-        break;
-    default:
-        MITK_ERROR << "Unexisting colormap";
+      return;
     }
+
+    m_LookupTable = lut;
+    this->Modified();
 }
 
-void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
+void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
 {
-  if ((!lut) || (m_LookupTable == lut))
-  {
+  if (m_type == type)
     return;
-  }
 
-  m_LookupTable = lut;
-  this->Modified();
+  switch(type)
+  {
+    case (mitk::LookupTable::GRAYSCALE):
+      this->BuildGrayScaleLookupTable();
+      break;
+    case (mitk::LookupTable::INVERSE_GRAYSCALE):
+      this->BuildInverseGrayScaleLookupTable();
+      break;
+    case (mitk::LookupTable::HOT_IRON):
+      this->BuildHotIronLookupTable();
+      break;
+    case (mitk::LookupTable::JET):
+      this->BuildJetLookupTable();
+      break;
+    case (mitk::LookupTable::LEGACY_BINARY):
+      this->BuildLegacyBinaryLookupTable();
+      break;
+    case (mitk::LookupTable::MULTILABEL):
+      this->BuildMultiLabelLookupTable();
+      break;
+    case (mitk::LookupTable::PET_COLOR):
+      this->BuildPETColorLookupTable();
+      break;
+    case (mitk::LookupTable::PET_20):
+      this->BuildPET20LookupTable();
+      break;
+    default:
+      MITK_ERROR << "non-existing colormap";
+      return;
+    }
+
+    m_type = type;
 }
 
+void mitk::LookupTable::SetType(const std::string& typeName)
+{
+  int i = 0;
+  std::string lutType = this->typenameList[i];
+
+  while (lutType != "END_OF_ARRAY")
+  {
+    if (lutType == typeName)
+    {
+      this->SetType(static_cast<mitk::LookupTable::LookupTableType>(i));
+    }
+
+    lutType = this->typenameList[++i];
+  }
+}
+
+const std::string mitk::LookupTable::GetActiveTypeAsString()
+{
+  return std::string(typenameList[(int)m_type]);
+}
 
 void mitk::LookupTable::ChangeOpacityForAll( float opacity )
 {
@@ -102,22 +147,7 @@ void mitk::LookupTable::ChangeOpacityForAll( float opacity )
     rgba[ 3 ] = opacity;
     m_LookupTable->SetTableValue ( i, rgba );
   }
-  this->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-update is executed
-}
-
-void mitk::LookupTable::GetColor(int x, double rgb[3])
-{
-    this->GetVtkLookupTable()->GetColor(x,rgb);
-}
-
-void mitk::LookupTable::GetTableValue(int x, double rgba[4])
-{
-    this->GetVtkLookupTable()->GetTableValue(x,rgba);
-}
-
-void mitk::LookupTable::SetTableValue(int x, double rgba[4])
-{
-    this->GetVtkLookupTable()->SetTableValue(x,rgba);
+  this->Modified();  // need to call modified, since LookupTableProperty seems to be unchanged so no widget-update is executed
 }
 
 void mitk::LookupTable::ChangeOpacity(int index, float opacity )
@@ -139,16 +169,30 @@ void mitk::LookupTable::ChangeOpacity(int index, float opacity )
   this->Modified();  // need to call modified, since LookupTableProperty seems to be unchanged so no widget-update is executed
 }
 
-
-vtkLookupTable* mitk::LookupTable::GetVtkLookupTable() const
+void mitk::LookupTable::GetColor(int x, double rgb[3])
 {
-  return m_LookupTable.GetPointer();
-};
+    this->GetVtkLookupTable()->GetColor(x,rgb);
+}
+
+void mitk::LookupTable::GetTableValue(int x, double rgba[4])
+{
+    this->GetVtkLookupTable()->GetTableValue(x,rgba);
+}
+
+void mitk::LookupTable::SetTableValue(int x, double rgba[4])
+{
+    this->GetVtkLookupTable()->SetTableValue(x,rgba);
+}
+
+vtkSmartPointer<vtkLookupTable> mitk::LookupTable::GetVtkLookupTable() const
+{
+  return m_LookupTable;
+}
 
 mitk::LookupTable::RawLookupTableType * mitk::LookupTable::GetRawLookupTable() const
 {
   return m_LookupTable->GetPointer( 0 );
-};
+}
 
 /*!
 * \brief equality operator inplementation
@@ -261,7 +305,7 @@ void mitk::LookupTable::SetRequestedRegion(const itk::DataObject *)
 void mitk::LookupTable::CreateColorTransferFunction(vtkColorTransferFunction*& colorFunction)
 {
   if(colorFunction==NULL)
-    colorFunction = vtkColorTransferFunction::New();
+    colorFunction = vtkColorTransferFunction::New(); /** \todo memory leak? , cant find destruction of it*/
 
   mitk::LookupTable::RawLookupTableType *rgba = this->GetRawLookupTable();
   int i, num_of_values=m_LookupTable->GetNumberOfTableValues();
@@ -343,7 +387,7 @@ itk::LightObject::Pointer mitk::LookupTable::InternalClone() const
 
 void mitk::LookupTable::BuildGrayScaleLookupTable()
 {
-  vtkLookupTable* lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
   lut->SetRampToLinear();
   lut->SetSaturationRange( 0.0, 0.0 );
   lut->SetHueRange( 0.0, 0.0 );
@@ -356,7 +400,7 @@ void mitk::LookupTable::BuildGrayScaleLookupTable()
 
 void mitk::LookupTable::BuildLegacyBinaryLookupTable()
 {
-  vtkLookupTable* lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
   lut->SetRampToLinear();
   lut->SetSaturationRange( 0.0, 0.0 );
   lut->SetHueRange( 0.0, 0.0 );
@@ -370,7 +414,7 @@ void mitk::LookupTable::BuildLegacyBinaryLookupTable()
 
 void mitk::LookupTable::BuildInverseGrayScaleLookupTable()
 {
-  vtkLookupTable* lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
   lut->SetTableRange (0, 1);
   lut->SetSaturationRange (0, 0);
   lut->SetHueRange (0, 0);
@@ -384,13 +428,30 @@ void mitk::LookupTable::BuildInverseGrayScaleLookupTable()
 
 void mitk::LookupTable::BuildHotIronLookupTable()
 {
-  vtkLookupTable* lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
   lut->SetNumberOfTableValues(256);
   lut->Build();
 
   for( int i=0; i<256; i++)
   {
+
     lut->SetTableValue(i, (double)HotIron[i][0]/255.0, (double)HotIron[i][1]/255.0, (double)HotIron[i][2]/255.0, 1.0);
+
+  }
+
+  m_LookupTable = lut;
+  this->Modified();
+}
+
+void mitk::LookupTable::BuildJetLookupTable()
+{
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+  lut->SetNumberOfTableValues(256);
+  lut->Build();
+
+  for (int i = 0; i < 256; i++)
+  {
+    lut->SetTableValue(i, (double)Jet[i][0] / 255.0, (double)Jet[i][1] / 255.0, (double)Jet[i][2] / 255.0, 1.0);
   }
 
   m_LookupTable = lut;
@@ -399,7 +460,7 @@ void mitk::LookupTable::BuildHotIronLookupTable()
 
 void mitk::LookupTable::BuildPETColorLookupTable()
 {
-  vtkLookupTable* lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
   lut->SetNumberOfTableValues(256);
   lut->SetTableRange ( (m_Level - m_Window/2.0), (m_Level + m_Window/2.0) );
   lut->Build();
@@ -415,7 +476,7 @@ void mitk::LookupTable::BuildPETColorLookupTable()
 
 void mitk::LookupTable::BuildPET20LookupTable()
 {
-  vtkLookupTable* lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
   lut->SetNumberOfTableValues(256);
   lut->SetTableRange ( (m_Level - m_Window/2.0), (m_Level + m_Window/2.0) );
   lut->Build();
@@ -431,7 +492,7 @@ void mitk::LookupTable::BuildPET20LookupTable()
 
 void mitk::LookupTable::BuildMultiLabelLookupTable()
 {
-  vtkLookupTable* lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
   lut->SetNumberOfTableValues (256);
   lut->SetTableRange ( 0, 255 );
   lut->SetTableValue (0, 0.0, 0.0, 0.0, 0.0); // background

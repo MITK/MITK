@@ -700,11 +700,11 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW );
   node->AddProperty( "Image Rendering.Mode", renderingModeProperty);
 
-  mitk::ColormapProperty::Pointer colormapProperty = mitk::ColormapProperty::New();
-  node->AddProperty( "colormap", colormapProperty, renderer, overwrite );
-
-  mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
-  node->AddProperty( "LookupTable", lutProp, renderer, overwrite );
+  // Set default grayscale look-up table
+  mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+  mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+  mitkLutProp->SetLookupTable(mitkLut);
+  node->SetProperty("LookupTable", mitkLutProp);
 
   std::string photometricInterpretation; // DICOM tag telling us how pixel values should be displayed
   if ( node->GetStringProperty( "dicom.pixel.PhotometricInterpretation", photometricInterpretation ) )
@@ -712,13 +712,21 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     // modality provided by DICOM or other reader
     if ( photometricInterpretation.find("MONOCHROME1") != std::string::npos ) // meaning: display MINIMUM pixels as WHITE
     {
-      colormapProperty->SetValue(mitk::ColormapProperty::CM_BWINVERSE);
+      // Set inverse grayscale look-up table
+      mitkLut->SetType(mitk::LookupTable::INVERSE_GRAYSCALE);
+      mitkLutProp->SetLookupTable(mitkLut);
+      node->SetProperty("LookupTable", mitkLutProp);
     }
-    else if ( photometricInterpretation.find("MONOCHROME2") != std::string::npos ) // meaning: display MINIMUM pixels as BLACK
-    {
-      colormapProperty->SetValue(mitk::ColormapProperty::CM_BW);
-    }
+    // Otherwise do nothing - the default grayscale look-up table has already been set
+    /*
+    else
+      if ( photometricInterpretation.find("MONOCHROME2") != std::string::npos ) // meaning: display MINIMUM pixels as BLACK
+      {
+        // apply default LUT (black to white)
+        node->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ), renderer );
+      }
     // PALETTE interpretation should be handled ok by RGB loading
+    */
   }
 
   bool isBinaryImage(false);
@@ -1060,6 +1068,20 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   //the following actions are always the same and thus can be performed
   //in the constructor for each image (i.e. the image-corresponding local storage)
   m_TSFilter->ReleaseDataFlagOn();
+
+  mitk::LookupTable::Pointer mitkLUT = mitk::LookupTable::New();
+  //built a default lookuptable
+  mitkLUT->SetType(mitk::LookupTable::GRAYSCALE);
+  m_DefaultLookupTable = mitkLUT->GetVtkLookupTable();
+
+  mitkLUT->SetType(mitk::LookupTable::LEGACY_BINARY);
+  m_BinaryLookupTable = mitkLUT->GetVtkLookupTable();
+
+  // add a default rainbow lookup table for color mapping
+  m_ColorLookupTable->SetRampToLinear();
+  m_ColorLookupTable->SetHueRange(0.6667, 0.0);
+  m_ColorLookupTable->SetTableRange(0.0, 20.0);
+  m_ColorLookupTable->Build();
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();

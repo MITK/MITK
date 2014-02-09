@@ -100,20 +100,18 @@ public slots:
   ///
   void TextureInterpolationToggled ( bool checked );
   ///
-  /// SurfaceRepresentationActionToggled
-  ///
-  void SurfaceRepresentationMenuAboutToShow ();
-
-  ///
   /// \brief Agreggates available colormaps
   ///
   void ColormapMenuAboutToShow ();
-
   ///
   /// \brief changes the active colormap
   ///
   void ColormapActionToggled (bool);
-
+  ///
+  /// SurfaceRepresentationActionToggled
+  ///
+  void SurfaceRepresentationMenuAboutToShow ();
+  ///
   /// SurfaceRepresentationActionToggled
   ///
   void SurfaceRepresentationActionToggled ( bool checked );
@@ -242,6 +240,8 @@ protected:
   QAction* m_ActionCenterRotation;
   /// SurfaceRepresentation action
   QAction* m_SurfaceRepresentation;
+  /// Lookuptable selection action
+  QAction* m_ColormapAction;
 
   QAction* m_ColormapAction;
 

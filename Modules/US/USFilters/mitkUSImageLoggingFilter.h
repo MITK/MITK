@@ -56,8 +56,17 @@ namespace mitk {
      *  @param[in]     path            Should contain a valid path were all logging data will be stored.
      *  @param[out]    imageFilenames  Returns a list of all images filenames which were stored to the harddisc.
      *  @param[out]    csvFileName     Returns the filename of the csv list with the timestamps and the messages.
+     *  @throw         mitk::Exception Throws an exception if there is a problem during writing the images. E.g.,
+     *                                 if the path is not valid / not writable.
      */
     void SaveImages(std::string path, std::vector<std::string>& imageFilenames = std::vector<std::string>(), std::string& csvFileName = std::string());
+
+    /** Sets the extension of the output images which alse defines the file type. E.g., ".nrrd" or ".jpg".
+     *  ".nrrd" is default.
+     *  @return Returns true if the file extension was successfully set which means it is supported. False if not.
+     */
+    bool SetImageFilesExtension(std::string extension);
+
 
   protected:
     USImageLoggingFilter();
@@ -69,6 +78,7 @@ namespace mitk {
     ImageCollection m_LoggedImages; ///< An image collection for every input. The string identifies the input.
     std::map<int, std::string> m_LoggedMessages; ///< (Optional) messages for every logged image
     std::vector<double> m_LoggedMITKSystemTimes; ///< Logged system times for every logged image
+    std::string m_ImageExtension; ///< stores the image extension, default is ".nrrd"
 
   };
 } // namespace mitk

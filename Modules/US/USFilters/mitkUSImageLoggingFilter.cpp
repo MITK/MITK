@@ -15,10 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSImageLoggingFilter.h"
-#include "mitkIOUtil.h"
-#include "mitkUIDGenerator.h"
+#include <mitkIOUtil.h>
+#include <mitkImageWriter.h>
+#include <mitkUIDGenerator.h>
+#include <Poco/Path.h>
 
-mitk::USImageLoggingFilter::USImageLoggingFilter() : m_SystemTimeClock(RealTimeClock::New())
+mitk::USImageLoggingFilter::USImageLoggingFilter() : m_SystemTimeClock(RealTimeClock::New()),
+                                                     m_ImageExtension(".nrrd")
 {
 }
 
@@ -61,6 +64,13 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
 {
   filenames = std::vector<std::string>();
 
+  //test if path is valid
+  Poco::Path testPath(path);
+  if(!testPath.isDirectory())
+    {
+    mitkThrow() << "Attemting to write to directory " << path << " which is not valid! Aborting!";
+    }
+
   //generate a unique ID which is used as part of the filenames, so we avoid to overwrite old files by mistake.
   mitk::UIDGenerator myGen = mitk::UIDGenerator("",5);
   std::string uniqueID = myGen.GetUID();
@@ -69,7 +79,7 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
   for(int i=0; i<m_LoggedImages.size(); i++)
     {
       std::stringstream name;
-      name << path << uniqueID << "_Image_" << i << ".nrrd";
+      name << path << uniqueID << "_Image_" << i << m_ImageExtension;
       mitk::IOUtil::SaveImage(m_LoggedImages.at(i),name.str());
       filenames.push_back(name.str());
     }
@@ -98,3 +108,18 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
   //close file
   fb.close();
 }
+
+bool mitk::USImageLoggingFilter::SetImageFilesExtension(std::string extension)
+ {
+ mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
+ if(!imageWriter->IsExtensionValid(extension))
+  {
+  MITK_WARN << "Extension " << extension << " is not supported; still using " << m_ImageExtension << " as before.";
+  return false;
+  }
+ else
+  {
+  m_ImageExtension = extension;
+  return true;
+  }
+ }

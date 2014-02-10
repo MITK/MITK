@@ -145,8 +145,9 @@ public:
 
   m_TestFilter->SetInput(m_RealTestImage);
   m_TestFilter->Update();
-  m_TestFilter->SaveImages(filename);
-
+  CPPUNIT_ASSERT_THROW_MESSAGE("Testing if correct exception if thrown if an invalid path is given.",
+                               m_TestFilter->SaveImages(filename),
+                               mitk::Exception);
   }
 };
 

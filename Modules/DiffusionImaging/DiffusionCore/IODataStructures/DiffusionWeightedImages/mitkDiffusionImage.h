@@ -101,6 +101,7 @@ public:
 
 protected:
   DiffusionImage();
+  DiffusionImage(const mitk::DiffusionImage<TPixelType> &);
   virtual ~DiffusionImage();
 
   void ApplyMeasurementFrame();
@@ -109,11 +110,9 @@ protected:
   GradientDirectionContainerType::Pointer   m_Directions;
   GradientDirectionContainerType::Pointer   m_OriginalDirections;
   float                                     m_B_Value;
-  typename AdaptorType::Pointer             m_VectorImageAdaptor;
   int                                       m_DisplayIndex;
   MeasurementFrameType                      m_MeasurementFrame;
   BValueMap                                 m_B_ValueMap;
-  unsigned long    m_DirectionsObserverTag;
 };
 
 /**

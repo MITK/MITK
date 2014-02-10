@@ -122,10 +122,12 @@ protected:
 * @ingroup MITKTestingAPI
 *
 * Following aspects are tested for equality:
-*  - dimension of the images
-*  - size of the images
-*  - pixel type
-*  - pixel values : pixel values are expected to be identical at each position ( for other options see mitk::CompareImageFilter )
+*  - mitk image equal test
+*  - gradient direction container
+*  - measurement frame
+*  - reference BValue
+*  - BValue map
+*  - itk vector image
 *
 * @param rightHandSide An image to be compared
 * @param leftHandSide An image to be compared

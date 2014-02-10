@@ -7,6 +7,6 @@
     <roi label="1" maximumSizeX="6" minimumSizeX="0" maximumSizeY="6" minimumSizeY="0" maximumSizeZ="6" minimumSizeZ="0"/>
     <roi label="2" maximumSizeX="13" minimumSizeX="8" maximumSizeY="13" minimumSizeY="8" maximumSizeZ="15" minimumSizeZ="8"/>
   </segmentation>
-  <statistic hotspotIndexX="5" hotspotIndexY="5" hotspotIndexZ="5" mean="11.935" maximumIndexX="6" maximumIndexY="6" maximumIndexZ="5" maximum="13.5247" minimumIndexX="4" minimumIndexY="4" minimumIndexZ="5" minimum="10.2468"/>
-  <statistic hotspotIndexX="11" hotspotIndexY="8" hotspotIndexZ="10" mean="20.6053" maximumIndexX="11" maximumIndexY="8" maximumIndexZ="10" maximum="21.2001" minimumIndexX="10" minimumIndexY="9" minimumIndexZ="10" minimum="19.412"/>
+  <statistic hotspotIndexX="6" hotspotIndexY="6" hotspotIndexZ="6" mean="13.4651" maximumIndexX="7" maximumIndexY="6" maximumIndexZ="7" maximum="14.8425" minimumIndexX="5" minimumIndexY="5" minimumIndexZ="6" minimum="12.1336"/>
+  <statistic hotspotIndexX="10" hotspotIndexY="8" hotspotIndexZ="10" mean="19.6405" maximumIndexX="11" maximumIndexY="8" maximumIndexZ="10" maximum="21.2001" minimumIndexX="9" minimumIndexY="9" minimumIndexZ="10" minimum="17.4011"/>
 </testcase>

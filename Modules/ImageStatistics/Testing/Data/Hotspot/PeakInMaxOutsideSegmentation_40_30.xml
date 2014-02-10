@@ -5,5 +5,5 @@
   <segmentation numberOfLabels="1" hotspotRadiusInMM="6.2035">
     <roi label="1" maximumSizeX="6" minimumSizeX="0" maximumSizeY="6" minimumSizeY="0" maximumSizeZ="6" minimumSizeZ="0"/>
   </segmentation>
-  <statistic hotspotIndexX="5" hotspotIndexY="5" hotspotIndexZ="5" mean="11.1746" maximumIndexX="6" maximumIndexY="6" maximumIndexZ="5" maximum="11.9487" minimumIndexX="4" minimumIndexY="4" minimumIndexZ="5" minimum="9.98136"/>
+  <statistic hotspotIndexX="6" hotspotIndexY="6" hotspotIndexZ="5" mean="11.6775" maximumIndexX="6" maximumIndexY="6" maximumIndexZ="5" maximum="11.9487" minimumIndexX="5" minimumIndexY="5" minimumIndexZ="5" minimum="11.4237"/>
 </testcase>

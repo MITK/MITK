@@ -407,7 +407,7 @@ void ImageStatisticsCalculator::SetHotspotRadiusInMM(double value)
     if(m_CalculateHotspot)
     {
       m_HotspotRadiusInMMChanged = true;
-      MITK_INFO <<"Hotspot radius changed, new convolution required";
+      //MITK_INFO <<"Hotspot radius changed, new convolution required";
     }
     this->Modified();
   }
@@ -424,7 +424,7 @@ void ImageStatisticsCalculator::SetCalculateHotspot(bool on)
   {
     m_CalculateHotspot = on;
     m_HotspotRadiusInMMChanged = true;
-    MITK_INFO <<"Hotspot calculation changed, new convolution required";
+    //MITK_INFO <<"Hotspot calculation changed, new convolution required";
     this->Modified();
   }
 }
@@ -907,7 +907,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       )
     )
   {
-    MITK_INFO <<"  --> Update required.";
+    //MITK_INFO <<"  --> Update required.";
     if ( m_InternalImage->GetDimension() == 3 )
     {
       AccessFixedDimensionByItk(

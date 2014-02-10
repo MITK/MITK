@@ -61,6 +61,13 @@ namespace mitk {
      */
     void SaveImages(std::string path, std::vector<std::string>& imageFilenames = std::vector<std::string>(), std::string& csvFileName = std::string());
 
+    /** Sets the extension of the output images which alse defines the file type. E.g., ".nrrd" or ".jpg".
+     *  ".nrrd" is default.
+     *  @return Returns true if the file extension was successfully set which means it is supported. False if not.
+     */
+    bool SetImageFilesExtension(std::string extension);
+
+
   protected:
     USImageLoggingFilter();
     virtual ~USImageLoggingFilter();
@@ -71,6 +78,7 @@ namespace mitk {
     ImageCollection m_LoggedImages; ///< An image collection for every input. The string identifies the input.
     std::map<int, std::string> m_LoggedMessages; ///< (Optional) messages for every logged image
     std::vector<double> m_LoggedMITKSystemTimes; ///< Logged system times for every logged image
+    std::string m_ImageExtension; ///< stores the image extension, default is ".nrrd"
 
   };
 } // namespace mitk

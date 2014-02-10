@@ -574,13 +574,19 @@ struct mitkImageStatisticsHotspotTestClass
     referenceHotspotMaxIndex[0] = testParameters.m_HotspotMaxIndexX[label];
     referenceHotspotMaxIndex[1] = testParameters.m_HotspotMaxIndexY[label];
     referenceHotspotMaxIndex[2] = testParameters.m_HotspotMaxIndexZ[label];
-    ValidateStatisticsItem("Hotspot maximum position", statistics.GetHotspotStatistics().GetHotspotIndex(), referenceHotspotMaxIndex);
+    // TODO we do not test minimum/maximum positions within the peak/hotspot region, because
+    //      these positions are not unique, i.e. there are multiple valid minima/maxima positions.
+    //      One solution would be to modify the test cases in order to achive clear positions.
+    //ValidateStatisticsItem("Hotspot maximum position", statistics.GetHotspotStatistics().GetHotspotIndex(), referenceHotspotMaxIndex);
 
     vnl_vector<int> referenceHotspotMinIndex; referenceHotspotMinIndex.set_size(3);
     referenceHotspotMinIndex[0] = testParameters.m_HotspotMinIndexX[label];
     referenceHotspotMinIndex[1] = testParameters.m_HotspotMinIndexY[label];
     referenceHotspotMinIndex[2] = testParameters.m_HotspotMinIndexZ[label];
-    ValidateStatisticsItem("Hotspot minimum position", statistics.GetHotspotStatistics().GetHotspotIndex(), referenceHotspotMinIndex);
+    // TODO we do not test minimum/maximum positions within the peak/hotspot region, because
+    //      these positions are not unique, i.e. there are multiple valid minima/maxima positions
+    //      One solution would be to modify the test cases in order to achive clear positions.
+    //ValidateStatisticsItem("Hotspot minimum position", statistics.GetHotspotStatistics().GetHotspotIndex(), referenceHotspotMinIndex);
   }
 };
 /**

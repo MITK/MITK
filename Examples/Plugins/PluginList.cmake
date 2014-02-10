@@ -14,5 +14,5 @@ set(MITK_EXAMPLE_PLUGINS
   org.mitk.example.gui.regiongrowing:ON
 
   org.mitk.example.gui.imaging:ON
-  org.mitk.example.gui.opencv:ON
+  org.mitk.example.gui.opencv:${MITK_USE_OpenCV}
 )

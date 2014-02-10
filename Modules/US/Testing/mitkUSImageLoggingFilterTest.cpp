@@ -32,6 +32,8 @@ class mitkUSImageLoggingFilterTestSuite : public mitk::TestFixture
   MITK_TEST(TestSavingAfterMupltipleUpdateCalls);
   MITK_TEST(TestFilterWithEmptyImages);
   MITK_TEST(TestFilterWithInvalidPath);
+  MITK_TEST(TestWrongImageFileExtensions);
+  MITK_TEST(TestJpgFileExtension);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -40,6 +42,7 @@ private:
   std::string m_TemporaryTestDirectory;
   mitk::Image::Pointer m_RandomRestImage1;
   mitk::Image::Pointer m_RandomRestImage2;
+  mitk::Image::Pointer m_RandomSingleSliceImage;
   mitk::Image::Pointer m_RealTestImage;
 
 public:
@@ -50,6 +53,7 @@ public:
     m_TemporaryTestDirectory = mitk::IOUtil::GetTempPath();
     m_RandomRestImage1 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
     m_RandomRestImage2 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
+    m_RandomSingleSliceImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 0.2, 0.3, 0.4);
     m_RealTestImage = mitk::IOUtil::LoadImageA(GetTestDataFilePath("Pic3D.nrrd"));
   }
 
@@ -59,6 +63,7 @@ public:
     m_RandomRestImage1 = NULL;
     m_RandomRestImage2 = NULL;
     m_RealTestImage = NULL;
+    m_RandomSingleSliceImage = NULL;
   }
 
   void TestInstantiation()
@@ -148,6 +153,29 @@ public:
   CPPUNIT_ASSERT_THROW_MESSAGE("Testing if correct exception if thrown if an invalid path is given.",
                                m_TestFilter->SaveImages(filename),
                                mitk::Exception);
+  }
+
+  void TestWrongImageFileExtensions()
+  {
+  CPPUNIT_ASSERT_MESSAGE("Testing invalid extension.",!m_TestFilter->SetImageFilesExtension(".INVALID"));
+  }
+
+  void TestJpgFileExtension()
+  {
+  CPPUNIT_ASSERT_MESSAGE("Testing setting of jpg extension.",m_TestFilter->SetImageFilesExtension(".jpg"));
+  m_TestFilter->SetInput(m_RandomSingleSliceImage);
+  m_TestFilter->Update();
+
+  std::vector<std::string> filenames;
+  std::string csvFileName;
+  m_TestFilter->SaveImages(m_TemporaryTestDirectory,filenames,csvFileName);
+  CPPUNIT_ASSERT_MESSAGE("Testing if correct number of images was saved",filenames.size() == 1);
+  CPPUNIT_ASSERT_MESSAGE("Testing if jpg image file exists",Poco::File(filenames.at(0).c_str()).exists());
+  CPPUNIT_ASSERT_MESSAGE("Testing if csv file exists",Poco::File(csvFileName.c_str()).exists());
+
+  //clean up
+  std::remove(filenames.at(0).c_str());
+  std::remove(csvFileName.c_str());
   }
 };
 

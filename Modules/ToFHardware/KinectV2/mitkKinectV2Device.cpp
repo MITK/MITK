@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiThreader.h"
 #include <itksys/SystemTools.hxx>
 
+#include <mitkSmartPointerProperty.h>
+
 namespace mitk
 {
 
@@ -298,9 +300,12 @@ namespace mitk
         pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
       }
       //// write image data to arrays
+      m_ImageMutex->Lock();
       memcpy(distanceArray, this->m_DistanceDataBuffer[pos], this->m_DepthBufferSize);
       memcpy(amplitudeArray, this->m_AmplitudeDataBuffer[pos], this->m_DepthBufferSize);
       memcpy(rgbDataArray, this->m_RGBDataBuffer[pos], this->m_RGBBufferSize);
+      this->SetProperty("ToFSurface", mitk::SmartPointerProperty::New( m_Controller->GetSurface() ));
+      m_ImageMutex->Unlock();
 
       this->Modified();
     }

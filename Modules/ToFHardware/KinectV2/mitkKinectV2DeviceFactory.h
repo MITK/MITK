@@ -82,6 +82,8 @@ namespace mitk
       device->SetBoolProperty("HasIntensityImage", false);
       device->SetBoolProperty("KinectReconstructionMode", true);
       device->SetBoolProperty("RGBImageHasDifferentResolution", true);
+      device->SetBoolProperty("HasSurface", true);
+      device->SetBoolProperty("HasTextureCoordinates", true);
 
       return device.GetPointer();
     }

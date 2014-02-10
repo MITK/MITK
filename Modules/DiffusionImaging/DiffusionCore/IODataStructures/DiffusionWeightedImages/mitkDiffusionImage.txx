@@ -332,18 +332,6 @@ int mitk::DiffusionImage<TPixelType>::GetNumDirections()
     return gradients;
 }
 
-// returns number of not diffusion weighted images
-template<typename TPixelType>
-int mitk::DiffusionImage<TPixelType>::GetNumB0()
-{
-    int b0 = 0;
-    for (int i=0; i<m_OriginalDirections->Size(); i++)
-        if (GetB_Value(i)<=0)
-        {
-            b0++;
-        }
-    return b0;
-}
 
 // returns a list of indices belonging to the not diffusion weighted images
 template<typename TPixelType>

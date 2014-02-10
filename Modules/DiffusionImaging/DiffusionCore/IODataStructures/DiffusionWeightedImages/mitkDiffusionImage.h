@@ -83,7 +83,7 @@ public:
 
   bool AreAlike(GradientDirectionType g1, GradientDirectionType g2, double precision);
   int GetNumDirections();
-  int GetNumB0();
+  int GetNumB0(){return m_B_ValueMap[0].size();}
 
   float GetB_Value(unsigned int i);
   bool IsMultiBval();

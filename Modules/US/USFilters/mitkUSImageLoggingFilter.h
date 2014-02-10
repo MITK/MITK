@@ -56,6 +56,8 @@ namespace mitk {
      *  @param[in]     path            Should contain a valid path were all logging data will be stored.
      *  @param[out]    imageFilenames  Returns a list of all images filenames which were stored to the harddisc.
      *  @param[out]    csvFileName     Returns the filename of the csv list with the timestamps and the messages.
+     *  @throw         mitk::Exception Throws an exception if there is a problem during writing the images. E.g.,
+     *                                 if the path is not valid / not writable.
      */
     void SaveImages(std::string path, std::vector<std::string>& imageFilenames = std::vector<std::string>(), std::string& csvFileName = std::string());
 

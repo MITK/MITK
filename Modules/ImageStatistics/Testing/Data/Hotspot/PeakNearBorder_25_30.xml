@@ -4,7 +4,7 @@
     <gaussian centerIndexX="14" centerIndexY="16" centerIndexZ="15" deviationX="6" deviationY="5" deviationZ="6" altitude="7"/>
   </testimage>
   <segmentation numberOfLabels="1" hotspotRadiusInMM="6.2035">
-    <roi label="1" maximumSizeX="20" minimumSizeX="0" maximumSizeY="20" minimumSizeY="0" maximumSizeZ="17" minimumSizeZ="0"/>
+    <roi label="1" maximumIndexX="20" minimumIndexX="0" maximumIndexY="20" minimumIndexY="0" maximumIndexZ="17" minimumIndexZ="0"/>
   </segmentation>
   <statistic hotspotIndexX="2" hotspotIndexY="5" hotspotIndexZ="2" mean="15.6619" maximumIndexX="1" maximumIndexY="5" maximumIndexZ="1" maximum="16.9279" minimumIndexX="2" minimumIndexY="3" minimumIndexZ="3" minimum="14.0348"/>
 </testcase>

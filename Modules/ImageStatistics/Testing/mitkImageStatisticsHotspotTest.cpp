@@ -484,9 +484,9 @@ struct mitkImageStatisticsHotspotTestClass
         {
           MaskImageType::IndexType index = maskIt.GetIndex();
 
-          if((index[0] >= testParameters.m_MinSizeX[i]  && index[0] < testParameters.m_MaxSizeX[i] ) &&
-            (index[1] >= testParameters.m_MinSizeY[i]  && index[1] < testParameters.m_MaxSizeY[i] ) &&
-            (index[2] >= testParameters.m_MinSizeZ[i]  && index[2] < testParameters.m_MaxSizeZ[i] ))
+          if((index[0] >= testParameters.m_MinIndexX[i]  && index[0] <= testParameters.m_MaxIndexX[i] ) &&
+             (index[1] >= testParameters.m_MinIndexY[i]  && index[1] <= testParameters.m_MaxIndexY[i] ) &&
+             (index[2] >= testParameters.m_MinIndexZ[i]  && index[2] <= testParameters.m_MaxIndexZ[i] ))
           {
             maskIt.Set(testParameters.m_Label[i]);
           }

@@ -337,9 +337,9 @@ int mitkMultiGaussianTest(int argc, char* argv[])
       {
 
         // x axis region of interest------------------------------------------------------
-        maxSize = size[0] - static_cast<int>((radius)/spacing[0] + 0.9999) + 1;
-        minSize = 0.0 + static_cast<int>((radius)/spacing[0]+ 0.9999) - 1;
-        if( minSize >= maxSize )
+        minIndex = 0.0 + static_cast<int>((radius)/spacing[0]+ 0.5);
+        maxIndex = size[0]-1-minIndex;
+        if( minIndex >= maxIndex )
         {
           std::cout << "The sphere is larger then the image in the x axis!" << std::endl;
 
@@ -350,9 +350,9 @@ int mitkMultiGaussianTest(int argc, char* argv[])
         regionOfInterestMin.SetElement( 0, ( ROIminSizeX[i] > minSize ) ? ROIminSizeX[i] : minSize );
 
         // y axis region of interest------------------------------------------------------
-        maxSize = size[1] - static_cast<int>((radius)/spacing[1] + 0.9999) + 1;
-        minSize = 0.0 + static_cast<int>((radius)/spacing[1]+ 0.9999) - 1;
-        if( minSize >= maxSize )
+        minIndex = 0.0 + static_cast<int>((radius)/spacing[1]+ 0.5);
+        maxIndex = size[1]-1-minIndex;
+        if( minIndex >= maxIndex )
         {
           std::cout << "The sphere is larger then the image in the y axis!" << std::endl;
         }
@@ -362,9 +362,9 @@ int mitkMultiGaussianTest(int argc, char* argv[])
         regionOfInterestMin.SetElement( 1, ( ROIminSizeY[i] > minSize ) ? ROIminSizeY[i] : minSize );
 
         // z axis region of interest------------------------------------------------------
-        maxSize = size[2] - static_cast<int>((radius)/spacing[2] + 0.9999) + 1;
-        minSize = 0.0 + static_cast<int>((radius)/spacing[2]+ 0.9999) - 1;
-        if( minSize >= maxSize )
+        minIndex = 0.0 + static_cast<int>((radius)/spacing[2]+ 0.5); // int(6.2/3.0 + 0.5) = 2
+        maxIndex = size[2]-1-minIndex;
+        if( minIndex >= maxIndex )
         {
           std::cout << "The sphere is larger then the image in the z axis!" << std::endl;
         }

@@ -92,17 +92,17 @@ struct mitkImageStatisticsHotspotTestClass
     // XML-Tag <roi>
 
     /** \brief  XML-Tag "maximumSizeX": maximum position of ROI in x-dimension */
-    vnl_vector<int> m_MaxSizeX;
+    vnl_vector<int> m_MaxIndexX;
     /** \brief  XML-Tag "minimumSizeX": minimum position of ROI in x-dimension */
-    vnl_vector<int> m_MinSizeX;
+    vnl_vector<int> m_MinIndexX;
     /** \brief  XML-Tag "maximumSizeX": maximum position of ROI in y-dimension */
-    vnl_vector<int> m_MaxSizeY;
+    vnl_vector<int> m_MaxIndexY;
     /** \brief  XML-Tag "minimumSizeX": minimum position of ROI in y-dimension */
-    vnl_vector<int> m_MinSizeY;
+    vnl_vector<int> m_MinIndexY;
     /** \brief  XML-Tag "maximumSizeX": maximum position of ROI in z-dimension */
-    vnl_vector<int> m_MaxSizeZ;
+    vnl_vector<int> m_MaxIndexZ;
     /** \brief  XML-Tag "minimumSizeX": minimum position of ROI in z-dimension */
-    vnl_vector<int> m_MinSizeZ;
+    vnl_vector<int> m_MinIndexZ;
 
     /** \brief  XML-Tag "label": value of label */
     vnl_vector<unsigned int> m_Label;
@@ -300,22 +300,24 @@ struct mitkImageStatisticsHotspotTestClass
       segmentation->GetChildren("roi", rois);
       MITK_TEST_CONDITION_REQUIRED( rois.size() >= 1, "At least one ROI defined" )
 
-      result.m_MaxSizeX.set_size(result.m_NumberOfLabels);
-      result.m_MinSizeX.set_size(result.m_NumberOfLabels);
-      result.m_MaxSizeY.set_size(result.m_NumberOfLabels);
-      result.m_MinSizeY.set_size(result.m_NumberOfLabels);
-      result.m_MaxSizeZ.set_size(result.m_NumberOfLabels);
-      result.m_MinSizeZ.set_size(result.m_NumberOfLabels);
+      result.m_MaxIndexX.set_size(result.m_NumberOfLabels);
+      result.m_MinIndexX.set_size(result.m_NumberOfLabels);
+      result.m_MaxIndexY.set_size(result.m_NumberOfLabels);
+      result.m_MinIndexY.set_size(result.m_NumberOfLabels);
+      result.m_MaxIndexZ.set_size(result.m_NumberOfLabels);
+      result.m_MinIndexZ.set_size(result.m_NumberOfLabels);
       result.m_Label.set_size(result.m_NumberOfLabels);
 
       for(int i = 0; i < rois.size(); ++i)
       {
-        result.m_MaxSizeX[i] = GetIntegerAttribute(rois[i], "maximumSizeX");
-        result.m_MinSizeX[i] = GetIntegerAttribute(rois[i], "minimumSizeX");
-        result.m_MaxSizeY[i] = GetIntegerAttribute(rois[i], "maximumSizeY");
-        result.m_MinSizeY[i] = GetIntegerAttribute(rois[i], "minimumSizeY");
-        result.m_MaxSizeZ[i] = GetIntegerAttribute(rois[i], "maximumSizeZ");
-        result.m_MinSizeZ[i] = GetIntegerAttribute(rois[i], "minimumSizeZ");
+        result.m_MaxIndexX[i] = GetIntegerAttribute(rois[i], "maximumIndexX");
+        result.m_MinIndexX[i] = GetIntegerAttribute(rois[i], "minimumIndexX");
+
+        result.m_MaxIndexY[i] = GetIntegerAttribute(rois[i], "maximumIndexY");
+        result.m_MinIndexY[i] = GetIntegerAttribute(rois[i], "minimumIndexY");
+
+        result.m_MaxIndexZ[i] = GetIntegerAttribute(rois[i], "maximumIndexZ");
+        result.m_MinIndexZ[i] = GetIntegerAttribute(rois[i], "minimumIndexZ");
 
         result.m_Label[i] = GetIntegerAttribute(rois[i], "label");
       }
@@ -447,9 +449,9 @@ struct mitkImageStatisticsHotspotTestClass
     statisticsCalculator->SetImage(image);
     mitk::Image::Pointer mitkMaskImage;
 
-    if((testParameters.m_MaxSizeX[label] > testParameters.m_MinSizeX[label] && testParameters.m_MinSizeX[label] >= 0) &&
-      (testParameters.m_MaxSizeY[label] > testParameters.m_MinSizeY[label] && testParameters.m_MinSizeY[label] >= 0) &&
-      (testParameters.m_MaxSizeZ[label] > testParameters.m_MinSizeZ[label] && testParameters.m_MinSizeZ[label] >= 0))
+    if((testParameters.m_MaxIndexX[label] > testParameters.m_MinIndexX[label] && testParameters.m_MinIndexX[label] >= 0) &&
+      (testParameters.m_MaxIndexY[label] > testParameters.m_MinIndexY[label] && testParameters.m_MinIndexY[label] >= 0) &&
+      (testParameters.m_MaxIndexZ[label] > testParameters.m_MinIndexZ[label] && testParameters.m_MinIndexZ[label] >= 0))
     {
       for(int i = 0; i < Dimension; ++i)
       {
@@ -577,7 +579,7 @@ struct mitkImageStatisticsHotspotTestClass
     // TODO we do not test minimum/maximum positions within the peak/hotspot region, because
     //      these positions are not unique, i.e. there are multiple valid minima/maxima positions.
     //      One solution would be to modify the test cases in order to achive clear positions.
-    //ValidateStatisticsItem("Hotspot maximum position", statistics.GetHotspotStatistics().GetHotspotIndex(), referenceHotspotMaxIndex);
+    ValidateStatisticsItem("Hotspot maximum position", statistics.GetHotspotStatistics().GetMaxIndex(), referenceHotspotMaxIndex);
 
     vnl_vector<int> referenceHotspotMinIndex; referenceHotspotMinIndex.set_size(3);
     referenceHotspotMinIndex[0] = testParameters.m_HotspotMinIndexX[label];
@@ -586,7 +588,7 @@ struct mitkImageStatisticsHotspotTestClass
     // TODO we do not test minimum/maximum positions within the peak/hotspot region, because
     //      these positions are not unique, i.e. there are multiple valid minima/maxima positions
     //      One solution would be to modify the test cases in order to achive clear positions.
-    //ValidateStatisticsItem("Hotspot minimum position", statistics.GetHotspotStatistics().GetHotspotIndex(), referenceHotspotMinIndex);
+    //ValidateStatisticsItem("Hotspot minimum position", statistics.GetHotspotStatistics().GetMinIndex(), referenceHotspotMinIndex);
   }
 };
 /**

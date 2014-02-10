@@ -33,8 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //    <gaussian centerIndexX="10" centerIndexY="10" centerIndexZ="10" deviationX="6" deviationY="6" deviationZ="6" altitude="200"/>
 //  </testimage>
 //<segmentation numberOfLabels="2" hotspotRadiusInMM="6.2035">
-//  <roi label="1" maximumSizeX="20" minimumSizeX="12" maximumSizeY="20" minimumSizeY="12" maximumSizeZ="20" minimumSizeZ="12"/>
-//  <roi label="2" maximumSizeX="10" minimumSizeX="0" maximumSizeY="10" minimumSizeY="0" maximumSizeZ="10" minimumSizeZ="0"/>
+//  <roi label="1" maximumIndexX="20" minimumIndexX="12" maximumIndexY="20" minimumIndexY="12" maximumIndexZ="20" minimumIndexZ="12"/>
+//  <roi label="2" maximumIndexX="10" minimumIndexX="0" maximumIndexY="10" minimumIndexY="0" maximumIndexZ="10" minimumIndexZ="0"/>
 // </segmentation>
 //</testcase>
 //
@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //    <gaussian centerIndexX="46" centerIndexY="46" centerIndexZ="46" deviationX="40" deviationY="40" deviationZ="40" altitude="170"/>
 //  </testimage>
 // <segmentation numberOfLabels="1" hotspotRadiusInMM="8">
-//  <roi hotspotRadiusInMM="6.2035" maximumSizeX="122" minimumSizeX="7" maximumSizeY="122" minimumSizeY="7" maximumSizeZ="60" minimumSizeZ="4"/>
+//  <roi hotspotRadiusInMM="6.2035" maximumIndexX="122" minimumIndexX="7" maximumIndexY="122" minimumIndexY="7" maximumIndexZ="60" minimumIndexZ="4"/>
 // </segmentation>
 //  <statistic hotspotIndexX="50" hotspotIndexY="50" hotspotIndexZ="25" peak="291.067" mean="291.067" maximumIndexX="50" maximumIndexY="50" maximumIndexZ="25" maximum="367.469" minimumIndexX="55" minimumIndexY="53" minimumIndexZ="26" minimum="254.939"/>
 //</testcase>
@@ -74,7 +74,7 @@ int mitkMultiGaussianTest(int argc, char* argv[])
     int                                                                  numberOfImages;
     double                                                               centerX, centerY, centerZ, sigmaX, sigmaY, sigmaZ, altitude, hotSpotRadiusInMM;
     unsigned int                                                         numberOfGaussians, minWidthOfGaussian, maxWidthOfGaussian, minAltitudeOfGaussian, maxAltitudeOfGaussian, numberOfLabels;
-    itk::MultiGaussianImageSource< ImageType >::VectorType               centerXVec, centerYVec, centerZVec, sigmaXVec, sigmaYVec, sigmaZVec, altitudeVec,  ROImaxSizeX, ROIminSizeX, ROImaxSizeY, ROIminSizeY, ROImaxSizeZ, ROIminSizeZ, label;
+    itk::MultiGaussianImageSource< ImageType >::VectorType               centerXVec, centerYVec, centerZVec, sigmaXVec, sigmaYVec, sigmaZVec, altitudeVec,  ROImaxIndexX, ROIminIndexX, ROImaxIndexY, ROIminIndexY, ROImaxIndexZ, ROIminIndexZ, label;
     itk::MultiGaussianImageSource< ImageType >::ItkVectorType            regionOfInterestMax, regionOfInterestMin;
     itk::MultiGaussianImageSource< ImageType >::IndexType                sphereMidpt, maxValueIndexInSphere, minValueIndexInSphere;
     MultiGaussianImageSource::Pointer                                    gaussianGenerator;
@@ -88,7 +88,7 @@ int mitkMultiGaussianTest(int argc, char* argv[])
     std::string                                                          attributeValue;
     double                                                               value;
     bool                                                                 entireHotSpotInImage;
-    int                                                                  maxSize, minSize;
+    int                                                                  maxIndex, minIndex;
 
     std::string filename = argv[2];
     itk::DOMNodeXMLReader::Pointer xmlReader = itk::DOMNodeXMLReader::New();
@@ -183,7 +183,7 @@ int mitkMultiGaussianTest(int argc, char* argv[])
     NodeList rois;
     segmentation->GetChildren("roi", rois);
     itk::DOMNode* roi;
-    // for each label i take the ROI and set it to be the i'th  element of ROImaxSize* and ROIminSize* ( * = X, Y, Z)
+    // for each label i take the ROI and set it to be the i'th  element of ROImaxIndex* and ROIminIndex* ( * = X, Y, Z)
     for(int i = 0; i < numberOfLabels ; ++i)
     {
       roi = rois[i];
@@ -192,38 +192,38 @@ int mitkMultiGaussianTest(int argc, char* argv[])
       std::stringstream(attributeValue) >> value;
       label.push_back(value);
 
-      attributeValue = roi->GetAttribute( "maximumSizeX" );
+      attributeValue = roi->GetAttribute( "maximumIndexX" );
       std::stringstream(attributeValue) >> value;
-      ROImaxSizeX.push_back(value);
+      ROImaxIndexX.push_back(value);
 
-      attributeValue = roi->GetAttribute( "minimumSizeX" );
+      attributeValue = roi->GetAttribute( "minimumIndexX" );
       std::stringstream(attributeValue) >> value;
-      ROIminSizeX.push_back(value);
+      ROIminIndexX.push_back(value);
 
-      attributeValue = roi->GetAttribute( "maximumSizeY" );
+      attributeValue = roi->GetAttribute( "maximumIndexY" );
       std::stringstream(attributeValue) >> value;
-      ROImaxSizeY.push_back(value);
+      ROImaxIndexY.push_back(value);
 
-      attributeValue = roi->GetAttribute( "minimumSizeY" );
+      attributeValue = roi->GetAttribute( "minimumIndexY" );
       std::stringstream(attributeValue) >> value;
-      ROIminSizeY.push_back(value);
+      ROIminIndexY.push_back(value);
 
-      attributeValue = roi->GetAttribute( "maximumSizeZ" );
+      attributeValue = roi->GetAttribute( "maximumIndexZ" );
       std::stringstream(attributeValue) >> value;
-      ROImaxSizeZ.push_back(value);
+      ROImaxIndexZ.push_back(value);
 
-      attributeValue = roi->GetAttribute( "minimumSizeZ" );
+      attributeValue = roi->GetAttribute( "minimumIndexZ" );
       std::stringstream(attributeValue) >> value;
-      ROIminSizeZ.push_back(value);
+      ROIminIndexZ.push_back(value);
 
-      std::cout << "Read ROI with label number: " << label[i] << " with min and max values in the x-, y-, z-Achse: [" << ROIminSizeX[i] << " " << ROImaxSizeX[i] <<"], [" << ROIminSizeY[i] << " " << ROImaxSizeY[i] <<"], [" << ROIminSizeZ[i] << " " << ROImaxSizeZ[i] <<"]\n" << std::endl;
+      std::cout << "Read ROI with label number: " << label[i] << " with min and max values in the x-, y-, z-Achse: [" << ROIminIndexX[i] << " " << ROImaxIndexX[i] <<"], [" << ROIminIndexY[i] << " " << ROImaxIndexY[i] <<"], [" << ROIminIndexZ[i] << " " << ROImaxIndexZ[i] <<"]\n" << std::endl;
     }
 
     // Check whether the ROI's are correct defined, i.e. whether the ROI's are disjoint
     for(int i = 1; i < numberOfLabels ; ++i)
     {
       // check whether the edges of the i'th ROI is in another ROI included (when yes -> ERROR)
-      bool isInOtherROI = IsInOtherROI( i, ROIminSizeX, ROImaxSizeX, ROIminSizeY, ROImaxSizeY, ROIminSizeZ, ROImaxSizeZ );
+      bool isInOtherROI = IsInOtherROI( i, ROIminIndexX, ROImaxIndexX, ROIminIndexY, ROImaxIndexY, ROIminIndexZ, ROImaxIndexZ );
       if( isInOtherROI)
       {
         std::cout << "The ROI's in the different labels should be disjoint! Please define it correct. " << std::endl;
@@ -345,9 +345,9 @@ int mitkMultiGaussianTest(int argc, char* argv[])
 
         }
         // the maximum in the x-Axis
-        regionOfInterestMax.SetElement( 0, ( ROImaxSizeX[i] < maxSize ) ? ROImaxSizeX[i] : maxSize );
+        regionOfInterestMax.SetElement( 0, ( ROImaxIndexX[i] < maxIndex ) ? ROImaxIndexX[i] : maxIndex );
         // the minimum in the x-Axis
-        regionOfInterestMin.SetElement( 0, ( ROIminSizeX[i] > minSize ) ? ROIminSizeX[i] : minSize );
+        regionOfInterestMin.SetElement( 0, ( ROIminIndexX[i] > minIndex ) ? ROIminIndexX[i] : minIndex );
 
         // y axis region of interest------------------------------------------------------
         minIndex = 0.0 + static_cast<int>((radius)/spacing[1]+ 0.5);
@@ -357,9 +357,9 @@ int mitkMultiGaussianTest(int argc, char* argv[])
           std::cout << "The sphere is larger then the image in the y axis!" << std::endl;
         }
         // the maximum in the y-Axis
-        regionOfInterestMax.SetElement( 1, ( ROImaxSizeY[i] < maxSize ) ? ROImaxSizeY[i] : maxSize );
+        regionOfInterestMax.SetElement( 1, ( ROImaxIndexY[i] < maxIndex ) ? ROImaxIndexY[i] : maxIndex );
         // the minimum in the y-Axis
-        regionOfInterestMin.SetElement( 1, ( ROIminSizeY[i] > minSize ) ? ROIminSizeY[i] : minSize );
+        regionOfInterestMin.SetElement( 1, ( ROIminIndexY[i] > minIndex ) ? ROIminIndexY[i] : minIndex );
 
         // z axis region of interest------------------------------------------------------
         minIndex = 0.0 + static_cast<int>((radius)/spacing[2]+ 0.5); // int(6.2/3.0 + 0.5) = 2
@@ -369,23 +369,23 @@ int mitkMultiGaussianTest(int argc, char* argv[])
           std::cout << "The sphere is larger then the image in the z axis!" << std::endl;
         }
         // the maximum in the z-Axis
-        regionOfInterestMax.SetElement( 2, ( ROImaxSizeZ[i] < maxSize ) ? ROImaxSizeZ[i] : maxSize );
+        regionOfInterestMax.SetElement( 2, ( ROImaxIndexZ[i] < maxIndex ) ? ROImaxIndexZ[i] : maxIndex );
         // the minimum in the z-Axis
-        regionOfInterestMin.SetElement( 2, ( ROIminSizeZ[i] > minSize ) ? ROIminSizeZ[i] : minSize );
+        regionOfInterestMin.SetElement( 2, ( ROIminIndexZ[i] > minIndex ) ? ROIminIndexZ[i] : minIndex );
 
       }
       // Set region of interest in index values. The midpoint of the HotSpot is in the image, but not necessary the whole HotSpot
       else
       {
         // x axis region of interest------------------------------------------------------
-        regionOfInterestMax.SetElement( 0, ROImaxSizeX[i] );
-        regionOfInterestMin.SetElement( 0, ROIminSizeX[i] );
+        regionOfInterestMax.SetElement( 0, ROImaxIndexX[i] );
+        regionOfInterestMin.SetElement( 0, ROIminIndexX[i] );
         // y axis region of interest------------------------------------------------------
-        regionOfInterestMax.SetElement( 1, ROImaxSizeY[i] );
-        regionOfInterestMin.SetElement( 1, ROIminSizeY[i] );
+        regionOfInterestMax.SetElement( 1, ROImaxIndexY[i] );
+        regionOfInterestMin.SetElement( 1, ROIminIndexY[i] );
         // z axis region of interest------------------------------------------------------
-        regionOfInterestMax.SetElement( 2, ROImaxSizeZ[i] );
-        regionOfInterestMin.SetElement( 2, ROIminSizeZ[i] );
+        regionOfInterestMax.SetElement( 2, ROImaxIndexZ[i] );
+        regionOfInterestMin.SetElement( 2, ROIminIndexZ[i] );
 
       }
 
@@ -403,23 +403,23 @@ int mitkMultiGaussianTest(int argc, char* argv[])
       ss << label[i];
       domROI->SetAttribute("label", ss.str());
       ss.str("");
-      ss << ROImaxSizeX[i];
-      domROI->SetAttribute("maximumSizeX", ss.str());
+      ss << ROImaxIndexX[i];
+      domROI->SetAttribute("maximumIndexX", ss.str());
       ss.str("");
-      ss << ROIminSizeX[i];
-      domROI->SetAttribute("minimumSizeX", ss.str());
+      ss << ROIminIndexX[i];
+      domROI->SetAttribute("minimumIndexX", ss.str());
       ss.str("");
-      ss << ROImaxSizeY[i];
-      domROI->SetAttribute("maximumSizeY", ss.str());
+      ss << ROImaxIndexY[i];
+      domROI->SetAttribute("maximumIndexY", ss.str());
       ss.str("");
-      ss << ROIminSizeY[i];
-      domROI->SetAttribute("minimumSizeY", ss.str());
+      ss << ROIminIndexY[i];
+      domROI->SetAttribute("minimumIndexY", ss.str());
       ss.str("");
-      ss << ROImaxSizeZ[i];
-      domROI->SetAttribute("maximumSizeZ", ss.str());
+      ss << ROImaxIndexZ[i];
+      domROI->SetAttribute("maximumIndexZ", ss.str());
       ss.str("");
-      ss << ROIminSizeZ[i];
-      domROI->SetAttribute("minimumSizeZ", ss.str());
+      ss << ROIminIndexZ[i];
+      domROI->SetAttribute("minimumIndexZ", ss.str());
 
 
       // Calculate the mean value and the midpoint of the wanted sphere.
@@ -503,21 +503,21 @@ int mitkMultiGaussianTest(int argc, char* argv[])
 
 // check whether the edges of the i'th ROI is in another ROI included
 bool IsInOtherROI(int i,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROIminSizeX,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROImaxSizeX,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROIminSizeY,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROImaxSizeY,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROIminSizeZ,
-                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROImaxSizeZ  )
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROIminIndexX,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROImaxIndexX,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROIminIndexY,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROImaxIndexY,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROIminIndexZ,
+                  itk::MultiGaussianImageSource<itk::Image< double, 3> >::VectorType ROImaxIndexZ  )
 {
   bool error = 0;
   std::vector<double> xBound, yBound, zBound;
-  xBound.push_back( ROIminSizeX[i] );
-  xBound.push_back( ROImaxSizeX[i] );
-  yBound.push_back( ROIminSizeY[i] );
-  yBound.push_back( ROImaxSizeY[i] );
-  zBound.push_back( ROIminSizeZ[i] );
-  zBound.push_back( ROImaxSizeZ[i] );
+  xBound.push_back( ROIminIndexX[i] );
+  xBound.push_back( ROImaxIndexX[i] );
+  yBound.push_back( ROIminIndexY[i] );
+  yBound.push_back( ROImaxIndexY[i] );
+  zBound.push_back( ROIminIndexZ[i] );
+  zBound.push_back( ROImaxIndexZ[i] );
   //for each ROI
   for( unsigned int j = 0; j < i; ++j )
   {
@@ -531,9 +531,9 @@ bool IsInOtherROI(int i,
           double edgeYCoord = yBound[y];
           double edgeZCoord = zBound[z];
           // check if the edge with coordinate [edgeXCoord; edgeYCoord; edgeZCoord] is inside the j'th ROI
-          if ( ROIminSizeX[j] < edgeXCoord && edgeXCoord < ROImaxSizeX[j] &&
-               ROIminSizeY[j] < edgeYCoord && edgeYCoord < ROImaxSizeY[j] &&
-               ROIminSizeZ[j] < edgeZCoord && edgeZCoord < ROImaxSizeZ[j])
+          if ( ROIminIndexX[j] < edgeXCoord && edgeXCoord < ROImaxIndexX[j] &&
+               ROIminIndexY[j] < edgeYCoord && edgeYCoord < ROImaxIndexY[j] &&
+               ROIminIndexZ[j] < edgeZCoord && edgeZCoord < ROImaxIndexZ[j])
           {
             error = 1;
             return error;

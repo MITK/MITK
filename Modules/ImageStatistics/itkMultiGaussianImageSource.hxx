@@ -259,8 +259,8 @@ namespace itk
     MultiGaussianImageSource< TOutputImage >
     ::SetRegionOfInterest( ItkVectorType roiMin, ItkVectorType roiMax )
   {
-    m_RegionOfInterestMax.operator=(roiMax);
-    m_RegionOfInterestMin.operator=(roiMin);
+    m_RegionOfInterestMax = roiMax;
+    m_RegionOfInterestMin = roiMin;
   }
 
   //-----------------------------------------------------------------------------------------------------------------------
@@ -500,7 +500,9 @@ namespace itk
       }
       // check if the boundary of the image intersect the cuboid and if yes, change the limits of the cuboid to be only inside the image;  therefor we cut the sphere and neglect the part of it outside the image
 
-      else if( // one plane crosses the cuboid
+      else
+        /*
+         if( // one plane crosses the cuboid
         ( (yzPlaneAtOriginCrossXSection      && xzPlaneNotCrossYSection           && xyPlaneNotCrossZSection) ||
         (yzPlaneAtImageBorderCrossXSection   && xzPlaneNotCrossYSection           && xyPlaneNotCrossZSection) ||
 
@@ -525,6 +527,7 @@ namespace itk
         (yzPlaneNotCrossYSection             && xzPlaneAtImageBorderCrossYSection && xyPlaneAtImageBorderCrossZSection)) ||
         (yzPlaneAtImageBorderCrossXSection   && xzPlaneNotCrossYSection           && xyPlaneAtImageBorderCrossZSection) )
         )
+        */
       {
         // x-Axis
         if(xMin <= m_Origin[0] && xMax >= m_Origin[0])
@@ -620,9 +623,9 @@ namespace itk
     indexR.SetElement( 2, m_RegionOfInterestMin[2] );
     regionOfInterest.SetIndex(indexR);
     SizeType sizeROI;
-    sizeROI.SetElement( 0, m_RegionOfInterestMax[0] - m_RegionOfInterestMin[0] );
-    sizeROI.SetElement( 1, m_RegionOfInterestMax[1] - m_RegionOfInterestMin[1] );
-    sizeROI.SetElement( 2, m_RegionOfInterestMax[2] - m_RegionOfInterestMin[2] );
+    sizeROI.SetElement( 0, m_RegionOfInterestMax[0] - m_RegionOfInterestMin[0] + 1);
+    sizeROI.SetElement( 1, m_RegionOfInterestMax[1] - m_RegionOfInterestMin[1] + 1);
+    sizeROI.SetElement( 2, m_RegionOfInterestMax[2] - m_RegionOfInterestMin[2] + 1);
     regionOfInterest.SetSize(sizeROI);
     typename TOutputImage::Pointer image = this->GetOutput(0);
     IteratorType regionOfInterestIterator(image, regionOfInterest);
@@ -668,7 +671,10 @@ namespace itk
           cuboidEdge[1] = globalCoordinateMidpointCuboid[1] + static_cast<double>(k) * cuboidRadius;
           cuboidEdge[2] = globalCoordinateMidpointCuboid[2] + static_cast<double>(j) * cuboidRadius;
 
-          count = count  + ( globalCoordinateMidpointSphere.SquaredEuclideanDistanceTo(cuboidEdge) <= m_Radius * m_Radius );
+          if (globalCoordinateMidpointSphere.SquaredEuclideanDistanceTo(cuboidEdge) <= m_Radius * m_Radius)
+          {
+            ++count;
+          }
         }
       }
     }
@@ -990,4 +996,4 @@ namespace itk
 
 } // end namespace itk
 
-#endif
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    #endif

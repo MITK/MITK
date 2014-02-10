@@ -54,7 +54,7 @@ public:
 
   mitkClassMacro( DiffusionImage, Image )
   itkNewMacro(Self)
-
+  mitkCloneMacro( Self )
 
   void AverageRedundantGradients(double precision);
 

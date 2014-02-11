@@ -44,6 +44,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFCameraDevice.h>
 #include <mitkCameraIntrinsicsProperty.h>
 
+#include <mitkSmartPointerProperty.h>
+
 //itk headers
 #include <itksys/SystemTools.hxx>
 
@@ -373,22 +375,20 @@ void QmitkToFUtilView::OnToFCameraStarted()
       this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
     }
 
-    //    if ((rgbFileName!="") || hasRGBImage)
-    //    {
-
-    //    }
-    //    else
-    //    {
-
-
-    //    }
-    //    this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
-    //    this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
-
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
-    this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
+
+    bool hasSurface = false;
+    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasSurface", hasSurface);
+    if(hasSurface)
+    {
+      this->m_Surface = mitk::Surface::New();
+    }
+    else
+    {
+      this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
+    }
     this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
 
     this->UseToFVisibilitySettings(true);
@@ -461,7 +461,7 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
 
     //we need to initialize (reinit) the surface, to make it fit into the renderwindow
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
-          this->m_Surface->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
+      this->m_Surface->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
 
     // correctly place the vtk camera for appropriate surface rendering
     vtkCamera* camera3d = GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
@@ -494,8 +494,11 @@ void QmitkToFUtilView::OnUpdateCamera()
     //this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
 
     //update pipeline
+    mitk::SmartPointerProperty::Pointer surfaceProp = dynamic_cast< mitk::SmartPointerProperty * >(this->m_ToFImageGrabber->GetCameraDevice()->GetProperty("ToFSurface"));
+    this->m_Surface = dynamic_cast< mitk::Surface* >( surfaceProp->GetSmartPointer().GetPointer() );
+
     this->m_ToFImageGrabber->Modified();
-    this->m_Surface->Update();
+    //this->m_Surface->Update();
   }
   //##### End code for surface #####
   else

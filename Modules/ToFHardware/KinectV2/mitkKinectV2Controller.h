@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 
+#include <mitkSurface.h>
+
 namespace mitk
 {
   /**
@@ -41,6 +43,8 @@ namespace mitk
     int GetRGBCaptureHeight() const;
     int GetDepthCaptureWidth() const;
     int GetDepthCaptureHeight() const;
+
+    mitk::Surface::Pointer GetSurface();
 
     /**
     \brief Setup MultiFrameReader of Kinect V2.

@@ -16,6 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkKinectV2Controller.h"
 #include <Kinect.h>
 #include <mitkToFDebugHelper.h>
+#include <mitkSurface.h>
+
+#include <vtkPolyData.h>
+#include <vtkCellArray.h>
+#include <vtkPoints.h>
+#include <vtkSmartPointer.h>
+#include <vtkFloatArray.h>
+#include <vtkPointData.h>
 
 //Taken from official Microsoft SDK samples. Should never be public or part of the class,
 //because it is just for cleaning up.
@@ -56,6 +64,12 @@ namespace mitk
     unsigned char* m_Colors;
     size_t m_RGBBufferSize;
     size_t m_DepthBufferSize;
+
+    mitk::Surface::Pointer m_Surface;
+    CameraSpacePoint* m_CameraCoordinates;
+    vtkSmartPointer<vtkPolyData> m_PolyData;
+
+    ColorSpacePoint* m_ColorPoints;
   };
 
   KinectV2Controller::KinectV2ControllerPrivate::KinectV2ControllerPrivate():
@@ -72,13 +86,22 @@ namespace mitk
     m_Amplitudes(NULL),
     m_Colors(NULL),
     m_RGBBufferSize(1920*1080*3),
-    m_DepthBufferSize(sizeof(float)*512*424)
+    m_DepthBufferSize(sizeof(float)*512*424),
+    m_Surface(NULL),
+    m_CameraCoordinates(NULL),
+    m_PolyData(NULL),
+    m_ColorPoints(NULL)
   {
     // create heap storage for color pixel data in RGBX format
     m_pColorRGBX = new RGBQUAD[m_RGBCaptureWidth * m_RGBCaptureHeight];
     m_Distances = new float[m_DepthCaptureWidth * m_DepthCaptureHeight];
     m_Amplitudes = new float[m_DepthCaptureWidth * m_DepthCaptureHeight];
     m_Colors = new unsigned char[m_RGBBufferSize];
+
+    m_Surface = mitk::Surface::New();
+    m_CameraCoordinates = new CameraSpacePoint[m_DepthCaptureWidth * m_DepthCaptureHeight];
+    m_PolyData = vtkSmartPointer<vtkPolyData>::New();
+    m_ColorPoints = new ColorSpacePoint[m_DepthCaptureWidth * m_DepthCaptureHeight];
   }
 
   KinectV2Controller::KinectV2ControllerPrivate::~KinectV2ControllerPrivate()
@@ -258,13 +281,48 @@ namespace mitk
         }
         if (SUCCEEDED(hr))
         {
+          UINT pointCount = d->m_DepthCaptureWidth * d->m_DepthCaptureHeight;
+          d->m_pCoordinateMapper->MapDepthFrameToCameraSpace(pointCount, pDepthBuffer, pointCount, d->m_CameraCoordinates);
+          vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+          vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
+          vtkSmartPointer<vtkFloatArray> textureCoordinates = vtkSmartPointer<vtkFloatArray>::New();
+          textureCoordinates->SetNumberOfComponents(2);
+          textureCoordinates->Allocate(pointCount);
+
+          d->m_pCoordinateMapper->MapDepthFrameToColorSpace(pointCount, pDepthBuffer, pointCount, d->m_ColorPoints);
+
           for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
           {
+            vtkIdType id = points->InsertNextPoint(d->m_CameraCoordinates[i].X, d->m_CameraCoordinates[i].Y, d->m_CameraCoordinates[i].Z);
+            vertices->InsertNextCell(1);
+            vertices->InsertCellPoint(id);
             d->m_Distances[i] = static_cast<float>(*pDepthBuffer);
             d->m_Amplitudes[i] = static_cast<float>(*pIntraRedBuffer);
             ++pDepthBuffer;
             ++pIntraRedBuffer;
+
+            ColorSpacePoint colorPoint = d->m_ColorPoints[i];
+            // retrieve the depth to color mapping for the current depth pixel
+            int colorInDepthX = (int)(floor(colorPoint.X + 0.5));
+            int colorInDepthY = (int)(floor(colorPoint.Y + 0.5));
+
+            float xNorm = static_cast<float>(colorInDepthX)/d->m_RGBCaptureWidth;
+            float yNorm = static_cast<float>(colorInDepthY)/d->m_RGBCaptureHeight;
+
+            // make sure the depth pixel maps to a valid point in color space
+            if ( colorInDepthX >= 0 && colorInDepthX < d->m_RGBCaptureWidth && colorInDepthY >= 0 && colorInDepthY < d->m_RGBCaptureHeight )
+            {
+              textureCoordinates->InsertTuple2(id, xNorm, yNorm);
+            }
           }
+
+          d->m_PolyData->SetPoints(points);
+          d->m_PolyData->SetVerts(vertices);
+          d->m_PolyData->GetPointData()->SetTCoords(textureCoordinates);
+          vtkSmartPointer<vtkPolyData> copy = vtkSmartPointer<vtkPolyData>::New();
+          copy->DeepCopy(d->m_PolyData);
+          d->m_Surface->SetVtkPolyData(copy);
+          d->m_Surface->Modified();
         }
         else
         {
@@ -366,4 +424,10 @@ namespace mitk
   {
     return d->m_DepthCaptureHeight;
   }
+
+  mitk::Surface::Pointer KinectV2Controller::GetSurface()
+  {
+    return d->m_Surface;
+  }
+
 }

@@ -109,4 +109,12 @@ set(RESOURCE_FILES
   Watershed_Cursor_32x32.png
   Wipe_48x48.png
   Wipe_Cursor_32x32.png
+
+  Interactions/dummy.xml
+  Interactions/LiveWireTool.xml
+  Interactions/PressMoveRelease.xml
+  Interactions/PressMoveReleaseAndPointSetting.xml
+  Interactions/PressMoveReleaseWithCTRLInversion.xml
+  Interactions/PressMoveReleaseWithCTRLInversionAllMouseMoves.xml
+  Interactions/SegmentationToolsConfig.xml
 )

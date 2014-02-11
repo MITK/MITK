@@ -53,8 +53,6 @@ m_SensibleMaximumThresholdValue(+100),
 m_CurrentThresholdValue(0.0),
 m_IsFloatImage(false)
 {
-  this->SupportRoiOn();
-
   m_ThresholdFeedbackNode = DataNode::New();
   mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_ThresholdFeedbackNode );
 

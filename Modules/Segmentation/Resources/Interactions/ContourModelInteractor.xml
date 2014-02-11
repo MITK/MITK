@@ -1,0 +1,38 @@
+<statemachine name="ContourModelInteractor">
+  
+  <state name="Start" ID="1" startstate="true">
+    
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="EditPoint" ><!-- left mbtn = 1 -->
+      <condition name="CheckPoint" />
+    </transition>
+    
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="Start" >   <!-- left mbtn = 1 -->
+      <condition name="CheckPoint" inverted="true" />
+    </transition>
+
+    
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="Start">  <!-- MouseMove = 520 -->
+      <action name="Move" ID="92"/>  <!-- AcMOVE = 92 -->
+    </transition>
+    
+    <transition event_class="InteractionKeyEvent" event_variant="KeyDelete" target="Start">   <!-- Delete = 12 -->
+      <action name="DeletePoint" ID="120"/>   <!-- AcDELETEPOINT = 120 -->
+      <action name="Finish" ID="44" />  <!-- AcFINISH = 44 -->
+    </transition>
+    
+  </state>
+  
+  
+  <state name="EditPoint" ID="2" >
+    
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" target="EditPoint">   <!-- left MouseButton and MouseMove = 530 -->
+      <action name="MovePoint" ID="90" />    <!-- AcMOVEPOINT = 90 -->
+    </transition>
+    
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="Start" >
+      <action name="Finish" ID="44" />   <!-- AcFINISH = 44 -->
+    </transition>
+    
+  </state>
+  
+</statemachine>

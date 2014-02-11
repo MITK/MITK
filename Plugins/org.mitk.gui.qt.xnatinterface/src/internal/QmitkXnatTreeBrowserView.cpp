@@ -14,31 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Qmitk
 #include "QmitkXnatTreeBrowserView.h"
+
+// Qmitk
 #include "QmitkXnatObjectEditorInput.h"
 #include "QmitkXnatEditor.h"
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
 
-// Standard
-#include <iostream>
-#include <string>
-
 // Blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
 #include <berryIWorkbenchPage.h>
-#include <berryIEditorInput.h>
 
-// Qt
-#include <QMessageBox>
-#include <QTreeView>
-#include <QAbstractItemModel>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QString>
-#include <QBrush>
-#include <QListView>
+// CTK XNAT Core
+#include "ctkXnatFile.h"
 
 const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.qmitkxnattreebrowserview";
 
@@ -62,6 +49,7 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
   // Create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
   m_Controls.treeView->setModel(m_TreeModel);
+  m_Controls.treeView->header()->hide();
 
   m_SelectionProvider = new berry::QtSelectionProvider();
   m_SelectionProvider->SetItemSelectionModel(m_Controls.treeView->selectionModel());
@@ -69,7 +57,6 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
 
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)) );
-  connect( m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(DoFetchMore(const QModelIndex&)) );
 
   // Get the XNAT Session from Activator
   m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
@@ -81,59 +68,47 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
   m_Controls.treeView->reset();
 }
 
-void QmitkXnatTreeBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                      const QList<mitk::DataNode::Pointer>& nodes )
-{
-}
-
 void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 {
   if (!index.isValid()) return;
 
-  if ( m_TreeModel->canFetchMore(index) )
-  {
-    m_TreeModel->fetchMore(index);
-  }
-
   berry::IWorkbenchPage::Pointer page = GetSite()->GetPage();
-  QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( index.data(Qt::EditRole).value<ctkXnatObject*>() );
+  QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( index.data(Qt::UserRole).value<ctkXnatObject*>() );
   berry::IEditorInput::Pointer editorInput( oPtr );
   berry::IEditorPart::Pointer reuseEditor = page->FindEditor(editorInput);
 
   if(reuseEditor)
   {
     // Just set it activ
-    reuseEditor.Cast<QmitkXnatEditor>()->UpdateList();
     page->Activate(reuseEditor);
   }
   else
   {
-    reuseEditor = page->GetActiveEditor();
+    std::vector<berry::IEditorReference::Pointer> editors =
+      page->FindEditors(berry::IEditorInput::Pointer(0), QmitkXnatEditor::EDITOR_ID, berry::IWorkbenchPage::MATCH_ID);
 
-    if( reuseEditor.IsNotNull() && page->GetReference(reuseEditor)->GetId() == QmitkXnatEditor::EDITOR_ID )
+    if (editors.empty())
     {
-      page->ReuseEditor(reuseEditor.Cast<berry::IReusableEditor>(), editorInput);
-      reuseEditor.Cast<QmitkXnatEditor>()->UpdateList();
-      page->Activate(reuseEditor);
-    }
-    else
-    {
-      std::vector<berry::IEditorReference::Pointer> editors =
-        page->FindEditors(berry::IEditorInput::Pointer(0), QmitkXnatEditor::EDITOR_ID, berry::IWorkbenchPage::MATCH_ID);
-
-      if (editors.empty())
+      // No XnatEditor is currently open, create a new one
+      ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(oPtr->GetXnatObject());
+      if(file != NULL)
       {
-        // No XnatEditor is currently open, create a new one
-        page->OpenEditor(editorInput, QmitkXnatEditor::EDITOR_ID);
+        // If a file is activated take the parent and open a new editor
+        QmitkXnatObjectEditorInput::Pointer oPtr2 = QmitkXnatObjectEditorInput::New( file->parent() );
+        berry::IEditorInput::Pointer editorInput2( oPtr2 );
+        page->OpenEditor(editorInput2, QmitkXnatEditor::EDITOR_ID);
       }
       else
       {
-        // Reuse an existing editor
-        reuseEditor = editors.front()->GetEditor(true);
-        page->ReuseEditor(reuseEditor.Cast<berry::IReusableEditor>(), editorInput);
-        reuseEditor.Cast<QmitkXnatEditor>()->UpdateList();
-        page->Activate(reuseEditor);
+        page->OpenEditor(editorInput, QmitkXnatEditor::EDITOR_ID);
       }
+    }
+    else
+    {
+      // Reuse an existing editor
+      reuseEditor = editors.front()->GetEditor(true);
+      page->ReuseEditor(reuseEditor.Cast<berry::IReusableEditor>(), editorInput);
+      page->Activate(reuseEditor);
     }
   }
 }
@@ -141,23 +116,4 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 void QmitkXnatTreeBrowserView::SetSelectionProvider()
 {
   GetSite()->SetSelectionProvider(m_SelectionProvider);
-}
-
-void QmitkXnatTreeBrowserView::DoFetchMore(const QModelIndex &index)
-{
-  if (!index.isValid()) return;
-
-  if ( m_TreeModel->canFetchMore(index) )
-  {
-    m_TreeModel->fetchMore(index);
-  }
-
-  std::vector<berry::IEditorReference::Pointer> editors =
-    GetSite()->GetPage()->FindEditors(berry::IEditorInput::Pointer(0), QmitkXnatEditor::EDITOR_ID, berry::IWorkbenchPage::MATCH_ID);
-
-  if (!editors.empty())
-  {
-    berry::IEditorPart::Pointer editor = editors.front()->GetEditor(true);
-    editor.Cast<QmitkXnatEditor>()->UpdateList();
-  }
 }

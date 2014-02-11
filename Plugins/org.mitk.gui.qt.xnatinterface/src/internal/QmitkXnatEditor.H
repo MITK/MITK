@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIReusableEditor.h>
 #include <berryQtEditorPart.h>
 #include <berryISelectionListener.h>
-#include "berryIEditorInput.h"
-#include "berryIEditorSite.h"
 
 #include <mitkIDataStorageService.h>
 
@@ -32,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ctkXnatListModel.h"
 #include "ctkXnatSession.h"
+
 #include <ctkServiceTracker.h>
 
 /*!
@@ -63,12 +62,11 @@ public:
   void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);
   bool IsDirty() const;
   bool IsSaveAsAllowed() const;
-
-  virtual void SetInput(berry::IEditorInput::Pointer input);
+  void SetInput(berry::IEditorInput::Pointer input);
   const char* GetClassNameA() const;
 
   /**
-  \brief Here the root object will be set and the view reset. Additionally the breadcrumbs will be set visible.
+  \brief Here the root object will be set and the view reset. Additionally the breadcrumbs will set visible.
   */
   void UpdateList();
 
@@ -85,11 +83,12 @@ public:
     void DownloadFile();
 
     /**
-    \brief Every time you activate a node in the list, the root item will be updated to a child of the previous parent.
+    \brief Every time you activate a node in the list, the root item will be updated to a child of the previous parent.\
     In exception of the node is a file. The file will be downloaded and loaded to the DataManager.
     */
     void OnObjectActivated(const QModelIndex& index);
 
+    // Breadcrumb button slots
     void OnDataModelButtonClicked();
     void OnProjectButtonClicked();
     void OnSubjectButtonClicked();
@@ -101,10 +100,6 @@ public:
 protected:
 
   virtual void SetFocus();
-
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes );
 
   Ui::QmitkXnatEditorControls m_Controls;
 

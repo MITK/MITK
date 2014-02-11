@@ -33,7 +33,7 @@ public:
   QmitkXnatConnectionManager();
   ~QmitkXnatConnectionManager();
 
-  /// \brief Opens a xnat session and returns it.
+  /// \brief Opens and tests a xnat session and returns it if the test was ok.
   ctkXnatSession* GetXnatConnection();
 
 private:

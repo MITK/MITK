@@ -18,50 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkXnatObjectEditorInput.h"
-#include "QmitkXnatTreeBrowserView.h"
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
 
-// Standard
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <direct.h>
-
 // CTK XNAT Core
-#include "ctkXnatLoginProfile.h"
 #include "ctkXnatObject.h"
-#include "ctkXnatProject.h"
-#include "ctkXnatSubject.h"
-#include "ctkXnatListModel.h"
-#include "ctkXnatScanFolder.h"
+#include "ctkXnatDataModel.h"
 #include "ctkXnatScanResource.h"
 #include "ctkXnatFile.h"
-#include "ctkXnatException.h"
 
 // CTK XNAT Widgets
-#include "ctkXnatTreeModel.h"
-#include "ctkXnatTreeItem.h"
+#include "ctkXnatListModel.h"
 
 // Blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
 #include <berryQModelIndexObject.h>
 #include <berryIWorkbenchPage.h>
-#include <berryIWorkbenchPart.h>
-#include "berryPlatform.h"
-#include "berryIPreferences.h"
-#include "berryIEditorPart.h"
 
 // Qt
-#include <QScopedPointer>
-#include <QSharedPointer>
-#include <QMessageBox>
-#include <QTreeView>
-#include <QAbstractItemModel>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QString>
-#include <QBrush>
 #include <QListView>
 #include <QRegExp>
 #include <QModelIndex>
@@ -127,25 +99,27 @@ void QmitkXnatEditor::DoSaveAs()
 
 void QmitkXnatEditor::SetInput(berry::IEditorInput::Pointer input)
 {
-  // If the input in not a QmitkXnatObjectEditorInput the semi global xnat session will be loaded
+  // If the input is not a QmitkXnatObjectEditorInput the semi global xnat session will be loaded.
   QmitkXnatObjectEditorInput::Pointer oPtr = input.Cast<QmitkXnatObjectEditorInput>();
   if(oPtr.IsNotNull())
   {
     SetInputWithNotify(oPtr);
+    this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
   }
   else
   {
     m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
 
-    if(m_Session == 0) return;
+    if(m_Session == 0)
+    {
+      MITK_INFO << "Please check your XNAT Connection Preferences!";
+      return;
+    }
 
     QmitkXnatObjectEditorInput::Pointer xoPtr = QmitkXnatObjectEditorInput::New( m_Session->dataModel() );
     berry::IEditorInput::Pointer editorInput( xoPtr );
     SetInputWithNotify(editorInput);
-    if ( !this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->isFetched() )
-    {
-      this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
-    }
+    this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
   }
 }
 
@@ -192,13 +166,12 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
   UpdateList();
 }
 
-void QmitkXnatEditor::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
-{
-}
-
 void QmitkXnatEditor::UpdateList()
 {
-  ctkXnatObject* inputObject = GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject();
+  QmitkXnatObjectEditorInput::Pointer xoPtr(GetEditorInput().Cast<QmitkXnatObjectEditorInput>());
+  if( xoPtr == NULL )
+    return;
+  ctkXnatObject* inputObject = xoPtr->GetXnatObject();
   if( inputObject == NULL )
     return;
   m_ListModel->setRootObject( inputObject );
@@ -207,6 +180,7 @@ void QmitkXnatEditor::UpdateList()
   // recursive method to check parents of the inputObject
   m_ParentCount = ParentChecker(inputObject);
 
+  // breadcrumb labels
   for(int i = 0; i < m_Controls.breadcrumbHorizontalLayout->count()-1; i++)
   {
     QLayoutItem* child = m_Controls.breadcrumbHorizontalLayout->itemAt(i);
@@ -235,6 +209,7 @@ void QmitkXnatEditor::UpdateList()
     {
       parent = inputObject;
     }
+    // make breadcrumb button
     QPushButton* breadcrumbButton = dynamic_cast<QPushButton*>(child->widget());
     breadcrumbButton->setText(parent->id());
     parent = parent->parent();
@@ -262,13 +237,17 @@ void QmitkXnatEditor::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart
       if (berry::SmartPointer<berry::QModelIndexObject> objectPointer = itr->Cast<berry::QModelIndexObject>())
       {
         // get object of selected ListWidgetElement
-        ctkXnatObject* object = objectPointer->GetQModelIndex().data(Qt::EditRole).value<ctkXnatObject*>();
-        QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( object );
-        berry::IEditorInput::Pointer editorInput( oPtr );
-        if ( !(editorInput == this->GetEditorInput()) )
-          SetInput(editorInput);
+        ctkXnatObject* object = objectPointer->GetQModelIndex().data(Qt::UserRole).value<ctkXnatObject*>();
 
-        UpdateList();
+        // if a file is selected, don't change the input and list view
+        if ( dynamic_cast<ctkXnatFile*>(object) == NULL ){
+          QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( object );
+          berry::IEditorInput::Pointer editorInput( oPtr );
+          if ( !(editorInput == this->GetEditorInput()) )
+            this->SetInput(editorInput);
+
+          UpdateList();
+        }
       }
     }
   }
@@ -290,7 +269,17 @@ void QmitkXnatEditor::DownloadResource()
       MITK_INFO << "...";
       QString resourcePath = m_DownloadPath + resource->id() + ".zip";
       resource->download(resourcePath);
-      MITK_INFO << "Download " << resource->id().toStdString() << ".zip was completed!";
+
+      // Testing if the path exists
+      QDir downDir(m_DownloadPath);
+      if( downDir.exists(resource->id() + ".zip") )
+      {
+        MITK_INFO << "Download of " << resource->id().toStdString() << ".zip was completed!";
+      }
+      else
+      {
+        MITK_INFO << "Download of " << resource->id().toStdString() << ".zip failed!";
+      }
     }
     else
     {
@@ -352,10 +341,8 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
       berry::IEditorInput::Pointer editorInput( oPtr );
       SetInput(editorInput);
 
-      if ( !this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->isFetched() )
-      {
-        this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
-      }
+      this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
+
       UpdateList();
     }
   }
@@ -374,7 +361,17 @@ void QmitkXnatEditor::InternalFileDownload(const QModelIndex& index)
       MITK_INFO << "...";
       QString filePath = m_DownloadPath + file->id();
       file->download(filePath);
-      MITK_INFO << "Download of " << file->id().toStdString() << " was completed!";
+
+      // Testing if the file exists
+      QDir downDir(m_DownloadPath);
+      if( downDir.exists(file->id()) )
+      {
+        MITK_INFO << "Download of " << file->id().toStdString() << " was completed!";
+      }
+      else
+      {
+        MITK_INFO << "Download of " << file->id().toStdString() << " failed!";
+      }
     }
     else
     {

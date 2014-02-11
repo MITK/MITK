@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkXnatConnectionPreferencePage.h"
-#include <QmitkHotkeyLineEdit.h>
 
 #include "berryIPreferencesService.h"
 #include "berryPlatform.h"
@@ -168,7 +167,7 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
       }
       catch(const ctkXnatAuthenticationException& auth)
       {
-        errString += QString("Test connection failed.\nAuthentication error: Wrong name or password.");
+        errString += QString("Test connection failed.\nAuthentication error: Wrong name or password.\nCode:\"%1\"").arg(auth.message());
         delete session;
         QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
         return false;

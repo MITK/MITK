@@ -67,7 +67,7 @@ ctkXnatSession* QmitkXnatConnectionManager::GetXnatConnection()
     }
     catch(const ctkException& e)
     {
-      errString += QString("Test connection failed with error code:\n\"%1\"").arg(e.message());
+      errString += QString("Test connection failed with error code:\n'%1'").arg(e.message());
       QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
       return 0;
     }

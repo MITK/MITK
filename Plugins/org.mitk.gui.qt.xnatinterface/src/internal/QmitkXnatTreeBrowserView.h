@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKXNATTREEBROWSERVIEW_H
 #define QMITKXNATTREEBROWSERVIEW_H
 
-#include <berryISelectionListener.h>
 #include <berryQtSelectionProvider.h>
 
 #include <QmitkAbstractView.h>
@@ -26,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ctkXnatCore
 #include "ctkXnatSession.h"
-#include "ctkXnatLoginProfile.h"
 
 // ctkXnatWidget
 #include "ctkXnatTreeModel.h"
@@ -61,16 +59,9 @@ public:
     /// \brief Opens or reuses the xnat editor with the activated node as root item.
     void OnActivatedNode(const QModelIndex& index);
 
-    /// \brief Fetches the clicked ctkXnatObject.
-    void DoFetchMore(const QModelIndex& index);
-
 protected:
 
   virtual void SetFocus();
-
-  /// \brief Called by QmitkFunctionality when DataManager's selection has changed.
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes );
 
   Ui::QmitkXnatTreeBrowserViewControls m_Controls;
 

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 
 #include "itkTestingComparisonImageFilter.h"
+#include "mitkDiffusionImage.h"
 
 
 template<typename TPixelType>

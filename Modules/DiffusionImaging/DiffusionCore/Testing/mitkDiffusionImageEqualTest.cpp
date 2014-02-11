@@ -47,8 +47,7 @@ public:
   {
     //generate a gradient test image
     std::string imagePath = GetTestDataFilePath("DiffusionImaging/ImageReconstruction/test.dwi");
-    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(imagePath);
-    m_Image = static_cast<mitk::DiffusionImage<short>*>( image.GetPointer() );
+    m_Image = static_cast<mitk::DiffusionImage<short>*>( mitk::IOUtil::LoadImage(imagePath).GetPointer());
     m_AnotherImage = m_Image->Clone();
   }
 
@@ -60,7 +59,7 @@ public:
 
   void Equal_CloneAndOriginal_ReturnsTrue()
   {
-    MITK_ASSERT_EQUAL( m_Image, m_Image->Clone(), "A clone should be equal to its original.");
+    MITK_ASSERT_EQUAL( m_Image, m_AnotherImage, "A clone should be equal to its original.");
   }
 
   void Equal_InputIsNull_ReturnsFalse()

@@ -106,12 +106,13 @@ protected:
 
   void ApplyMeasurementFrame();
 
+
   typename ImageType::Pointer               m_VectorImage;
-  GradientDirectionContainerType::Pointer   m_Directions;
-  GradientDirectionContainerType::Pointer   m_OriginalDirections;
   float                                     m_B_Value;
-  int                                       m_DisplayIndex;
   MeasurementFrameType                      m_MeasurementFrame;
+  GradientDirectionContainerType::Pointer   m_OriginalDirections;
+  GradientDirectionContainerType::Pointer   m_Directions;
+  int                                       m_DisplayIndex;
   BValueMap                                 m_B_ValueMap;
 };
 

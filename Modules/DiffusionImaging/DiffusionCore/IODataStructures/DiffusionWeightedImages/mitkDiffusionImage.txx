@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::DiffusionImage()
-    : m_VectorImage(0), m_Directions(0), m_OriginalDirections(0), m_B_Value(-1.0)
+    : m_VectorImage(0), m_B_Value(-1.0), m_OriginalDirections(0), m_Directions(0)
 {
     MeasurementFrameType mf;
     for(int i=0; i<3; i++)

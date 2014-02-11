@@ -122,6 +122,7 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
   std::filebuf fb;
   fb.open (csvFileName.c_str(),std::ios::out);
   std::ostream os(&fb);
+  os.precision(15); //set high precision to avoid loss of digits
 
   //write header
   os << "image filename; MITK system timestamp; message\n";

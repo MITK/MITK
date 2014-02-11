@@ -18,9 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageRegionConstIterator.h"
 #include "mitkImageCast.h"
 
+#include "itkTestingComparisonImageFilter.h"
+#include "mitkDiffusionImage.h"
+#include "itkImageDuplicator.h"
+
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::DiffusionImage()
-  : m_VectorImage(0), m_Directions(0), m_OriginalDirections(0), m_B_Value(-1.0), m_VectorImageAdaptor(0)
+  : m_VectorImage(0), m_B_Value(-1.0), m_OriginalDirections(0), m_Directions(0)
 {
   MeasurementFrameType mf;
   for(int i=0; i<3; i++)
@@ -30,6 +34,24 @@ mitk::DiffusionImage<TPixelType>::DiffusionImage()
     mf[i][i] = 1;
   m_MeasurementFrame = mf;
 }
+
+template<typename TPixelType>
+mitk::DiffusionImage<TPixelType>::DiffusionImage(const mitk::DiffusionImage<TPixelType> & orig)
+  : mitk::Image(orig),
+    m_VectorImage( 0 ),
+    m_B_Value(orig.m_B_Value),
+    m_MeasurementFrame(orig.m_MeasurementFrame),
+    m_OriginalDirections(orig.m_OriginalDirections),
+    m_Directions(orig.m_Directions)
+{
+
+  typename itk::ImageDuplicator<ImageType>::Pointer duplicator = itk::ImageDuplicator<ImageType>::New();
+  duplicator->SetInputImage( orig.m_VectorImage );
+  duplicator->Update();
+  this->SetVectorImage(duplicator->GetOutput());
+  this->InitializeFromVectorImage();
+}
+
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::~DiffusionImage()
@@ -322,18 +344,6 @@ int mitk::DiffusionImage<TPixelType>::GetNumDirections()
   return gradients;
 }
 
-// returns number of not diffusion weighted images
-template<typename TPixelType>
-int mitk::DiffusionImage<TPixelType>::GetNumB0()
-{
-  int b0 = 0;
-  for (int i=0; i<m_OriginalDirections->Size(); i++)
-    if (GetB_Value(i)<=0)
-    {
-      b0++;
-    }
-  return b0;
-}
 
 // returns a list of indices belonging to the not diffusion weighted images
 template<typename TPixelType>
@@ -385,9 +395,9 @@ float mitk::DiffusionImage<TPixelType>::GetB_Value(unsigned int i)
     double bval = m_B_Value*twonorm*twonorm;
 
     if (bval<0)
-        bval = ceil(bval - 0.5);
+      bval = ceil(bval - 0.5);
     else
-        bval = floor(bval + 0.5);
+      bval = floor(bval + 0.5);
 
     return bval;
   }
@@ -420,5 +430,140 @@ void mitk::DiffusionImage<TPixelType>::RemoveDirectionsContainerObserver()
   if(m_Directions){
     m_Directions->RemoveAllObservers();
   }
+}
+
+
+template<typename TPixelType>
+bool mitk::Equal(const mitk::DiffusionImage<TPixelType>* rightHandSide, const mitk::DiffusionImage<TPixelType>* leftHandSide, ScalarType eps, bool verbose)
+{
+
+  // Fast testing area
+  MITK_INFO << "[( DiffusionImage )] EQUAL METHOD.";
+  bool returnValue = true;
+  if( rightHandSide == NULL )
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] rightHandSide is NULL.";
+    return false;
+  }
+
+  if( leftHandSide == NULL )
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] leftHandSide is NULL.";
+    return false;
+  }
+
+  if(leftHandSide->IsMultiBval() != rightHandSide->IsMultiBval())
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] IsMultiBval properie is not Equal.";
+    return false;
+  }
+
+  if(leftHandSide->GetNumB0() != rightHandSide->GetNumB0())
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] Number of B0Values is not Equal.";
+    return false;
+  }
+
+  if(leftHandSide->GetB_Value() != rightHandSide->GetB_Value())
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] Reference BValue is not Equal.";
+    return false;
+  }
+
+  if(leftHandSide->GetMeasurementFrame() != rightHandSide->GetMeasurementFrame())
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] MeasurementFrame is not Equal.";
+    return false;
+  }
+
+  if(leftHandSide->GetDirections()->Size() != rightHandSide->GetDirections()->Size())
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] GradientDirectionContainer size is not Equal.";
+    return false;
+  }
+
+
+  if(leftHandSide->GetB_ValueMap().size() != rightHandSide->GetB_ValueMap().size())
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] BValue Map: Size is not Equal.";
+    return false;
+  }
+
+  // Slow testing area
+
+  if(mitk::Equal(static_cast<mitk::Image*>(rightHandSide),static_cast<mitk::Image*>(leftHandSide),eps,verbose) == false)
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] Base-Class (mitk::Image) is not Equal.";
+    return false;
+  }
+
+  typename itk::Testing::ComparisonImageFilter<TPixelType,TPixelType>::Pointer EqualFilter = itk::Testing::ComparisonImageFilter<TPixelType, TPixelType>::New();
+  EqualFilter->SetInput(rightHandSide->GetVectorImage());
+  EqualFilter->SetInput(leftHandSide->GetVectorImage());
+  EqualFilter->Update();
+
+  if(EqualFilter->GetNumberOfPixelsWithDifferences() != 0)
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] Capsulated itk::VectorImage is not Equal.";
+    return false;
+  }
+
+
+  if(!std::equal(leftHandSide->GetDirections()->Begin(),leftHandSide->GetDirections()->End(),rightHandSide->GetDirections()->Begin()))
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] GradientDirections are not Equal.";
+    return false;
+  }
+
+  if(!std::equal(leftHandSide->GetB0Indices().begin(), leftHandSide->GetB0Indices().end(), rightHandSide->GetB0Indices().begin()))
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] Number of B0Values is not Equal.";
+    return false;
+  }
+
+
+  std::map<unsigned int, std::vector<unsigned int> >::const_iterator rhsBValueMapIterator = rightHandSide->GetB_ValueMap().begin();
+  std::map<unsigned int, std::vector<unsigned int> >::const_iterator lhsBValueMapIterator = leftHandSide->GetB_ValueMap().begin();
+  std::map<unsigned int, std::vector<unsigned int> >::const_iterator lhsBValueMapIteratorEnd = leftHandSide->GetB_ValueMap().end();
+  for(;lhsBValueMapIterator != lhsBValueMapIteratorEnd;)
+  {
+    if(lhsBValueMapIterator->first != rhsBValueMapIterator->first)
+    {
+      if(verbose)
+        MITK_INFO << "[( DiffusionImage )] BValue Map: lhsKey " <<  lhsBValueMapIterator->first << " != rhsKey " << rhsBValueMapIterator->first << " is not Equal.";
+      return false;
+    }
+
+    if(lhsBValueMapIterator->second.size() != rhsBValueMapIterator->second.size())
+    {
+      if(verbose)
+        MITK_INFO << "[( DiffusionImage )] BValue Map: Indices vector size is not Equal. (Key: " << lhsBValueMapIterator->first <<")";
+      return false;
+    }
+
+    if(!std::equal(lhsBValueMapIterator->second.begin(),lhsBValueMapIterator->second.end(), rhsBValueMapIterator->second.begin()))
+    {
+      if(verbose)
+        MITK_INFO << "[( DiffusionImage )] BValue Map: Indices are not Equal. (Key: " << lhsBValueMapIterator->first <<")";
+      return false;
+    }
+
+    rhsBValueMapIterator++;
+    lhsBValueMapIterator++;
+  }
+
+  return returnValue;
 }
 

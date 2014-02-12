@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_remeshing The Remeshing Plugin
 
-\image html org_mitk_gui_qt_remeshing.png "Icon of the Remeshing Plugin."
+\image html QmitkRemashing_Icon.png "Icon of the Remeshing Plugin."
 
 \tableofcontents
 
@@ -15,13 +15,13 @@ Hence, be careful when using remeshed surfaces for evaluation purposes and alway
 
 \section org_mitk_gui_qt_remeshingUsage Usage
 
-\image html remeshingView.png "Basic and advanced mode of the Remeshing View."
+\image html QmitkRemashing_RemeshingView.png "Basic and advanced mode of the Remeshing View."
 
 There are two basic and about a handful of advanced settings that influence remeshing.
 Most of the time you should be able to gain satisfying results by adjusting only the two basic settings or even without changing any of the default parameters.
 In the following the effects of all settings are described in more detail. Image examples are based on the following surface:
 
-\image html originalMesh.png "The surface from which all examples below originate from."
+\image html QmitkRemashing_OriginalMesh.png "The surface from which all examples below originate from."
 
 \subsection org_mitk_gui_qt_remeshingBasicSettings Basic Settings
 
@@ -33,7 +33,7 @@ The <b>Gradation</b> setting controls the distribution of vertices in the remesh
 If set to zero the vertices are distributed equally all over the remeshed surface.
 You can push more vertices towards surface regions with high curvature, i.e., more detailed regions, by increasing this setting.
 
-\image html gradation_10percent.png "Vertex count reduced to 10 percent, gradation 0 vs. 1."
+\image html QmitkRemashing_Gradation10Percent.png "Vertex count reduced to 10 percent, gradation 0 vs. 1."
 
 \subsection org_mitk_gui_qt_remeshingAdvancedSettings Advanced Settings
 
@@ -44,20 +44,20 @@ This setting represents a number by which the average edge length of the input s
 Long edges are split recursively until all edges satisfy the threshold.
 Edge splitting is useful for surfaces that contain thin and long polygons.
 
-\image html cylinder.png "A surface that contains extremely long polygons."
+\image html QmitkRemashing_Cylinder.png "A surface that contains extremely long polygons."
 
 <br>
 
-\image html cylinder_bad.png "A remeshing attempt without edge splitting."
+\image html QmitkRemashing_CylinderBad.png "A remeshing attempt without edge splitting."
 
 <br>
 
-\image html cylinder_good.png "Increased max. # of vertices, enabled edge splitting, followed by a second remeshing run without edge splitting."
+\image html QmitkRemashing_CylinderGood.png "Increased max. # of vertices, enabled edge splitting, followed by a second remeshing run without edge splitting."
 
 The <b>Subsampling</b> setting has direct impact on the quality of the remeshed surface.
 The input surface is recursively subdivided until the total number of vertices exceeds its initial vertex count times this setting.
 
-\image html subsampling_20percent.png "Vertex count reduced to 20 percent, subsampling 10 vs. 500."
+\image html QmitkRemashing_Subsampling20Percent.png "Vertex count reduced to 20 percent, subsampling 10 vs. 500."
 
 You usually leave the <b>Optimization level</b> set to its default value 1.
 When disabled, the remeshed surface has usually a slightly smaller volume than the original surface.
@@ -67,5 +67,5 @@ If your surface is open, i.e., it has holes in it, boundaries tend to shrink irr
 If the position and smoothness of your surface boundaries are important, you should activate the <b>Boundary fixing</b> setting.
 This results in additional vertices that make up extra polygons at the remeshed boundaries to keep the original boundaries.
 
-\image html noBoundaryFixing_10percent.png "Vertex count reduced to 10 percent, no boundary fixing."
+\image html QmitkRemashing_NoBoundaryFixing10Percent.png "Vertex count reduced to 10 percent, no boundary fixing."
 */

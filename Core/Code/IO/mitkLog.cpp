@@ -14,14 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkLog.h"
-#include "mitkLogMacros.h"
+#include <mitkLog.h>
+#include <mitkLogMacros.h>
+#include <mitkExceptionMacro.h>
 
-#include "itkSimpleFastMutexLock.h"
+#include <itkSimpleFastMutexLock.h>
 #include <itkOutputWindow.h>
 
 #include <iostream>
 #include <fstream>
+#include <cstdio>
 
 static itk::SimpleFastMutexLock logMutex;
 static mitk::LoggingBackend *mitkLogBackend = 0;
@@ -168,4 +170,65 @@ void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc,char **arg
       return;
     }
   }
+}
+
+void mitk::LoggingBackend::RotateLogFiles(const std::string& prefixPath)
+{
+  static const int numLogFiles = 10;
+  std::string newEmptyLogFileName;
+
+  //first: rotate the old log files to get a new, free logfile name
+  newEmptyLogFileName = IncrementLogFileNames(prefixPath,numLogFiles);
+
+  //now: use the new empty logfile name as name for this run
+   mitk::LoggingBackend::SetLogFile(newEmptyLogFileName.c_str());
+  }
+
+std::string mitk::LoggingBackend::IncrementLogFileNames(const std::string& prefixPath, int numLogFiles)
+{
+  // delete last one
+  {
+    std::stringstream s;
+    s << prefixPath.c_str() << "-" << numLogFiles-1 << ".log";
+    //check if the file exists
+    if (CheckIfFileExists(s.str())) //if yes: delete it
+      {
+      int retVal = ::remove(s.str().c_str());
+      if (retVal!=0) {mitkThrow() << "Problem while deleting the oldest log file. Maybe the access to this files is blocked. Aborting!";}
+      }
+  }
+
+  // rename the others
+  for( int r = numLogFiles-1 ; r >= 1 ; r-- )
+  {
+    std::stringstream dst;
+    dst << prefixPath.c_str() << "-" << r << ".log";
+
+    std::stringstream src;
+    src << prefixPath.c_str() << "-" << r-1 << ".log";
+
+    //check if the source exists
+    if (CheckIfFileExists(src.str())) //if yes: rename it
+      {
+      int retVal = ::rename( src.str().c_str(), dst.str().c_str() );
+      if (retVal!=0) {mitkThrow() << "Problem while renaming the log files. Maybe the access to this files is blocked. Aborting!";}
+      }
+  }
+
+  //create new empty name and return it
+  {
+    std::stringstream s;
+    s << prefixPath.c_str() << "-0.log";
+    return s.str();
+  }
+}
+
+bool mitk::LoggingBackend::CheckIfFileExists(std::string& filename)
+{
+  bool returnValue = false;
+  std::ifstream File(filename.c_str());
+  if (File.good()) {returnValue = true;}
+  else {returnValue = false;}
+  File.close();
+  return returnValue;
 }

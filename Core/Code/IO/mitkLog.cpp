@@ -208,7 +208,7 @@ std::string mitk::LoggingBackend::IncrementLogFileNames(const std::string& prefi
     src << prefixPath.c_str() << "-" << r-1 << ".log";
 
     //check if the source exists
-    if (CheckIfFileExists(src.str())) //if yes: rename it
+    if (CheckIfFileExists(src.str().c_str())) //if yes: rename it
       {
       int retVal = ::rename( src.str().c_str(), dst.str().c_str() );
       if (retVal!=0) {mitkThrow() << "Problem while renaming the log files. Maybe the access to this files is blocked. Aborting!";}

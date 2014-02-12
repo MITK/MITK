@@ -128,6 +128,9 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_toolStorage = mitk::NavigationToolStorage::New(GetDataStorage());
     m_toolStorage->SetName("TrackingToolbox Default Storage");
     m_toolStorage->RegisterAsMicroservice("no tracking device");
+
+    //set home directory as default path for logfile
+    m_Controls->m_LoggingFileName->setText(QDir::homePath() + QDir::separator() + "logfile.csv");
   }
 }
 
@@ -540,7 +543,16 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
 
 void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
   {
-  QString filename = QFileDialog::getSaveFileName(NULL,tr("Choose Logging File"), "/", "*.*");
+  QDir currentPath = QFileInfo(m_Controls->m_LoggingFileName->text()).dir();
+
+  // if no path was selected (QDir would select current working dir then) or the
+  // selected path does not exist -> use home directory
+  if ( currentPath == QDir() || ! currentPath.exists() )
+  {
+    currentPath = QDir(QDir::homePath());
+  }
+
+  QString filename = QFileDialog::getSaveFileName(NULL,tr("Choose Logging File"), currentPath.absolutePath(), "*.*");
   if (filename == "") return;
   this->m_Controls->m_LoggingFileName->setText(filename);
   }

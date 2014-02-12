@@ -224,6 +224,12 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
   m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
 
+  if ( m_TrackingDeviceSource.IsNull() )
+  {
+    MessageBox(std::string("Cannot connect to device: ") + myTrackingDeviceSourceFactory->GetErrorMessage());
+    return;
+  }
+
   //set filter to rotation mode transposed becaus we are working with VNL style quaternions
   if(m_Controls->m_InverseMode->isChecked())
     m_ToolVisualizationFilter->SetRotationMode(mitk::NavigationDataObjectVisualizationFilter::RotationTransposed);

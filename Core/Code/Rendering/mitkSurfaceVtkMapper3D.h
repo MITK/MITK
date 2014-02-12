@@ -89,12 +89,6 @@ public:
 
   itkGetMacro(GenerateNormals, bool);
 
-  //enable ImmediateModeRendering for vtkMapping
-  //yet to solve bug 1398
-  void SetImmediateModeRenderingOn(int on = 1);
-
-  itkGetMacro(ImmediateModeRenderingOn, int);
-
   virtual const mitk::Surface* GetInput();
 
   virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
@@ -117,9 +111,6 @@ protected:
   virtual void CheckForClippingProperty( mitk::BaseRenderer* renderer, mitk::BaseProperty *property );
 
   bool m_GenerateNormals;
-
-  //enable ImmediateModeRendering for the vtkMapper
-  int m_ImmediateModeRenderingOn;
 
 public:
 

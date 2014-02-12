@@ -223,7 +223,7 @@ std::string mitk::LoggingBackend::IncrementLogFileNames(const std::string& prefi
   }
 }
 
-bool mitk::LoggingBackend::CheckIfFileExists(std::string& filename)
+bool mitk::LoggingBackend::CheckIfFileExists(const std::string& filename)
 {
   bool returnValue = false;
   std::ifstream File(filename.c_str());

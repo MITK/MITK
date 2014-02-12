@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 #include <fstream>
+#include <cstdio>
 
 static itk::SimpleFastMutexLock logMutex;
 static mitk::LoggingBackend *mitkLogBackend = 0;
@@ -167,5 +168,36 @@ void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc,char **arg
       argc-=2;
       return;
     }
+  }
+}
+
+void mitk::LoggingBackend::HandleRollingLogFile( const char * prefixPath )
+{
+  static const int numLogFiles = 10;
+
+  // delete last one
+  {
+    std::stringstream s;
+    s << prefixPath << "-" << numLogFiles-1 << ".log";
+    ::remove(s.str().c_str());
+  }
+
+  // rename
+  for( int r = numLogFiles-1 ; r >= 1 ; r-- )
+  {
+    std::stringstream dst;
+    dst << prefixPath << "-" << r << ".log";
+
+    std::stringstream src;
+    src << prefixPath << "-" << r-1 << ".log";
+
+    ::rename( src.str().c_str(), dst.str().c_str() );
+  }
+
+  // set first as new log file
+  {
+    std::stringstream s;
+    s << prefixPath << "-0.log";
+    mitk::LoggingBackend::SetLogFile(s.str().c_str());
   }
 }

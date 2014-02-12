@@ -75,9 +75,9 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
 
   //initialize logging
   mitk::LoggingBackend::Register();
-  QString filename = "mitk.log";
-  QFileInfo path = context->getDataFile(filename);
-  mitk::LoggingBackend::SetLogFile(path.absoluteFilePath().toStdString().c_str());
+  QString logFilenamePrefix = "mitk";
+  QFileInfo path = context->getDataFile(logFilenamePrefix);
+  mitk::LoggingBackend::HandleRollingLogFile(path.absoluteFilePath().toStdString().c_str());
   mitk::VtkLoggingAdapter::Initialize();
   mitk::ItkLoggingAdapter::Initialize();
 

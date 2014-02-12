@@ -47,6 +47,24 @@ namespace mitk
       */
       static void SetLogFile(const char *file);
 
+      /** @brief Activates and handles a rolling log file with the given prefix and path.
+       *         This method handles 10 log files with a given prefix, e.g. "myLogFile".
+       *         The 10 log files will then look like this:
+       *              myLogFile-0.log (current file)
+       *              myLogFile-1.log (last file)
+       *              myLogFile-2.log
+       *                [...]
+       *              myLogFile-9.log
+       *
+       *         Everytime this method this called, normally when MITK is started, then
+       *         all log files are copied one file below (0 to 1, 1 to 2, and so on).
+       *         The oldes logfile (number 9) is always deleted. So users have access to
+       *         the log files of the last 10 runs.
+       *
+       *   @param prefixPath  Should hold the prefix of the logfile together with its path. E.g., "C:/programs/mitk/myLogFile".
+       */
+      static void HandleRollingLogFile( const char * prefixPath );
+
      /** @return Returns the log file if there is one. Returns an empty string
       *          if no log file is active.
       */
@@ -60,7 +78,6 @@ namespace mitk
      /** \brief Automatically extracts and removes the "--logfile <file>" parameters from the standard C main(argc,argv) parameter list and calls SetLogFile if needed
       */
       static void CatchLogFileCommandLineParameter(int &argc,char **argv);
-
   };
 
 }

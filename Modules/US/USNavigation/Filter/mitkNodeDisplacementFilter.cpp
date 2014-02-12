@@ -43,9 +43,11 @@ See LICENSE.txt or http://www.mitk.org for details.
       return false;
     }
     if(m_SelectedInput == -1)
+    {
       MITK_ERROR("NodeDisplacementFilter")
         << "Cannot add nodes before input Stream was selected";
       mitkThrow() << "Cannot add nodes before input Stream was selected";
+    }
 
     this->Update(); // make sure we are working on current data
     mitk::NavigationData::Pointer reference = this->GetOutput(m_SelectedInput);

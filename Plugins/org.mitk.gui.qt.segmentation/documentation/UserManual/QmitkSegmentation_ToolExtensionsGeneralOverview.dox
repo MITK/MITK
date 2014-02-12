@@ -22,12 +22,12 @@ with a tool class framework that is extensible with new tools (description at
 \ref QmitkSegmentationTechnicalPage). The usual way
 to create new tools (since it is mostly used inside DKFZ) is to just add new
 files to the MITK source code tree. However, this requires to be familiar with
-the MITK build system and turnaround time during development might be long 
+the MITK build system and turnaround time during development might be long
 (recompiling parts of MITK again and again).
 
 For external users who just want to use
-MITK as a library and application, there is a way to create new segmentation 
-tools in an MITK external project, which will compile the new tools into a 
+MITK as a library and application, there is a way to create new segmentation
+tools in an MITK external project, which will compile the new tools into a
 shared object (DLL). Such shared objects can be loaded via the ITK object factory
 and its autoload feature on application startup. This document describes
 how to build such external extensions.
@@ -130,12 +130,12 @@ set( TOOL_ADDITIONAL_MOC_H
 MITK_GENERATE_TOOLS_LIBRARY(mitkExternalTools)
 \endcode
 
-Basically, you only have to change the definitions of \c TOOL_FILES and, optionally, 
-\c TOOL_QT3GUI_FILES, \c TOOL_ADDITIONAL_CPPS and \c TOOL_ADDITIONAL_MOC_H. 
+Basically, you only have to change the definitions of \c TOOL_FILES and, optionally,
+\c TOOL_QT3GUI_FILES, \c TOOL_ADDITIONAL_CPPS and \c TOOL_ADDITIONAL_MOC_H.
 For all .cpp files in \c TOOL_FILES and \c TOOL_QT3GUI_FILES there will be factories
 created assuming the naming conventions described in the sections above.
 Files listed in \c TOOL_ADDITIONAL_CPPS will just be compiled. Files listed in
-\c TOOL_ADDITIONAL_MOC_H will be run through Qts meta object compiler \c moc -- 
+\c TOOL_ADDITIONAL_MOC_H will be run through Qts meta object compiler \c moc --
 this is neccessary for all objects that have the Q_OBJECT macro in their declaration.
 \c moc will create new files that will also be compiled into the library.
 
@@ -162,7 +162,7 @@ This should do it and leave you with a or project file or Makefile that you can 
 If the compile succeeds, you will get a library mitkExternalTools.dll or libmitkExternalTools.so.
 This library exports a symbol \c itkLoad which is expected by the ITK object factory.
 
-On application startup the ITK object factory will search a list of directories from 
+On application startup the ITK object factory will search a list of directories from
 the environment variable \c ITK_AUTOLOAD_PATH. Set this environment variable to your binary directory (<tt>/home/user/mitk/tool-extension-debug</tt>).
 
 The ITK object factory will load all shared objects that it finds in the specified directories
@@ -178,4 +178,3 @@ there will be a new icon in Segmentation, which activates your tool.
 <b>Have fun!</b> (And Windows users: welcome to the world of DLLs)
 
 **/
-

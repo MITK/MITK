@@ -2,12 +2,12 @@
 
 \page org_mitk_views_moviemaker The Movie Maker View
 
-\image html icon.png "Icon of the View"
+\image html QmitkMovieMaker_Icon.png "Icon of the View"
 
 Available sections:
-  - \ref QmitkMovieMakerUserManualOverview 
-  - \ref QmitkMovieMakerUserManualFeatures 
-  - \ref QmitkMovieMakerUserManualUsage 
+  - \ref QmitkMovieMakerUserManualOverview
+  - \ref QmitkMovieMakerUserManualFeatures
+  - \ref QmitkMovieMakerUserManualUsage
 
 \section QmitkMovieMakerUserManualOverview Overview
 
@@ -17,10 +17,10 @@ It is also possible to slide through your data, automatically rotate 3D scenes a
 \section QmitkMovieMakerUserManualFeatures Features
 
  The Movie Maker allows you to create movies and screenshots from within MITK. It can automatically scroll thorugh timesteps and slices while recording a movie. This way, you can record visualizations like a beating heart or a rotating skull.
- 
+
 \section QmitkMovieMakerUserManualUsage Usage
 
-\image html QmitkMovieMakerControlArea.png "A view of the command area of QmitkMovieMaker"
+\image html QmitkMovieMaker_ControlArea.png "A view of the command area of QmitkMovieMaker"
 
 \subsection QmitkMovieMakerUserManualWindowSelection Window selection
 With the first two drop down boxes, you can choose which window you want to step through and which window you want to record in. Left clicking inside a window will set both drop down boxes to that window, but you can choose different windows for stepping and recording.
@@ -42,4 +42,3 @@ In the second section the direction of stepping can be set. Options are: Forward
 Although stepping speed is a total time in sec., this can not always be achieved. As a minimal frame rate of 25 fps is assumed to provide smooth movies, a dataset with only 25 slices will always be stepped through in 1 sec or faster.
 
 */
-

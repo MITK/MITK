@@ -6,7 +6,7 @@ This view provides the functionality to create and save screenshots of the data.
 Available sections:
   - \ref QmitkScreenshotMakerUserManualUse
 
-\image html screenshot_maker_interface.png The Screenshot Maker User Interface
+\image html QmitkMovieMaker_ScreenshotMakerInterface.png The Screenshot Maker User Interface
 
 \section QmitkScreenshotMakerUserManualUse Usage
 

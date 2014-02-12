@@ -65,6 +65,19 @@ namespace mitk
        */
       static void RotateLogFiles(const std::string& prefixPath);
 
+      /** @brief Increments the names of logfiles with the given prefixPath.
+       *         This means, if the prefixPath is "myLogFile" myLogFile-0.log
+       *         is renamed to myLogFile-1.log, myLogFile-1.log to myLogFile-2.log,
+       *         and so on. The oldest logfile is deleted. The number of log files is
+       *         defined by the parameter "numLogFiles". The first logfile name is
+       *         "free" ([prefix]-0.log) again. This name is retured.
+       *  @param prefixPath   Should hold the prefix of the logfile together with its path. E.g., "C:/programs/mitk/myLogFile".
+       *  @param numLogFiles  Sets the number of logfiles. Default value is 10. This means logfiles from [prefix]-0.log
+       *                      to [prefix]-1.log are stored.
+       *  @return             Returns a new logfile name which is free again because the old first log file was renamed.
+       */
+      static std::string IncrementLogFileNames(const std::string& prefixPath, int numLogFiles = 10);
+
      /** @return Returns the log file if there is one. Returns an empty string
       *          if no log file is active.
       */

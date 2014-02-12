@@ -174,7 +174,18 @@ void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc,char **arg
 void mitk::LoggingBackend::RotateLogFiles(const std::string& prefixPath)
 {
   static const int numLogFiles = 10;
+  std::string newEmptyLogFileName;
 
+  //first: rotate the old log files to get a new, free logfile name
+  newEmptyLogFileName = IncrementLogFileNames(prefixPath,numLogFiles);
+
+
+  //now: use the new empty logfile name as name for this run
+   mitk::LoggingBackend::SetLogFile(newEmptyLogFileName.c_str());
+  }
+
+std::string mitk::LoggingBackend::IncrementLogFileNames(const std::string& prefixPath, int numLogFiles)
+{
   // delete last one
   {
     std::stringstream s;
@@ -182,7 +193,7 @@ void mitk::LoggingBackend::RotateLogFiles(const std::string& prefixPath)
     ::remove(s.str().c_str());
   }
 
-  // rename
+  // rename the others
   for( int r = numLogFiles-1 ; r >= 1 ; r-- )
   {
     std::stringstream dst;
@@ -194,10 +205,10 @@ void mitk::LoggingBackend::RotateLogFiles(const std::string& prefixPath)
     ::rename( src.str().c_str(), dst.str().c_str() );
   }
 
-  // set first as new log file
+  //create new empty name and return it
   {
     std::stringstream s;
     s << prefixPath.c_str() << "-0.log";
-    mitk::LoggingBackend::SetLogFile(s.str().c_str());
+    return s.str();
   }
 }

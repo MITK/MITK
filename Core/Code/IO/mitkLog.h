@@ -63,7 +63,7 @@ namespace mitk
        *
        *   @param prefixPath  Should hold the prefix of the logfile together with its path. E.g., "C:/programs/mitk/myLogFile".
        */
-      static void HandleRollingLogFile( const char * prefixPath );
+      static void RotateLogFiles(const std::string& prefixPath);
 
      /** @return Returns the log file if there is one. Returns an empty string
       *          if no log file is active.

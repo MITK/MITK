@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNDITrackingDevice.h"
 #include "mitkClaronTrackingDevice.h"
 
+#include <mitkIGTException.h>
+#include <mitkIGTHardwareException.h>
+
 
 mitk::TrackingDeviceSourceConfigurator::TrackingDeviceSourceConfigurator(mitk::NavigationToolStorage::Pointer NavigationTools, mitk::TrackingDevice::Pointer TrackingDevice)
 {
@@ -136,8 +139,21 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
   mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
   mitk::NDITrackingDevice::Pointer thisDevice = dynamic_cast<mitk::NDITrackingDevice*>(trackingDevice.GetPointer());
 
-  //connect to aurora to dectect tools automatically
-  thisDevice->OpenConnection();
+  try
+  {
+    //connect to aurora to dectect tools automatically
+    thisDevice->OpenConnection();
+  }
+  catch (mitk::IGTHardwareException& e)
+  {
+    m_ErrorMessage = std::string("Hardware error on opening the connection (") + e.GetDescription() + ")";
+    return NULL;
+  }
+  catch (mitk::IGTException& e)
+  {
+    m_ErrorMessage = std::string("Error on opening the connection (") + e.GetDescription() + ")";
+    return NULL;
+  }
 
   //now search for automatically detected tools in the tool storage and save them
   mitk::NavigationToolStorage::Pointer newToolStorageInRightOrder = mitk::NavigationToolStorage::New();

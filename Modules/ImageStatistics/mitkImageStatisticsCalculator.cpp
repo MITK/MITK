@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 #include <itkVTKImageImport.h>
 #include <itkVTKImageExport.h>
+#include <itkImageDuplicator.h>
 
 
 #include <vtkPoints.h>
@@ -1191,8 +1192,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   imageStencilFilter->Update();
 
   // Export from VTK back to ITK
-  vtkSmartPointer<vtkImageExport> vtkExporter = vtkImageExport::New(); // TODO: this is WRONG, should be vtkSmartPointer<vtkImageExport>::New(), but bug # 14455
-  //vtkSmartPointer<vtkImageExport> vtkExporter = vtkSmartPointer<vtkImageExport>::New();
+  vtkSmartPointer<vtkImageExport> vtkExporter = vtkSmartPointer<vtkImageExport>::New();
   vtkExporter->SetInputConnection( imageStencilFilter->GetOutputPort() );
   vtkExporter->Update();
 
@@ -1200,8 +1200,13 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   this->ConnectPipelines( vtkExporter, itkImporter );
   itkImporter->Update();
 
+  typedef itk::ImageDuplicator< ImageImportType::OutputImageType > DuplicatorType;
+  DuplicatorType::Pointer duplicator = DuplicatorType::New();
+  duplicator->SetInputImage( itkImporter->GetOutput() );
+  duplicator->Update();
+
   // Store mask
-  m_InternalImageMask2D = itkImporter->GetOutput();
+  m_InternalImageMask2D = duplicator->GetOutput();
 }
 
 

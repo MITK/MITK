@@ -62,6 +62,8 @@ namespace mitk {
   *   - \b "material.representation": (VtkRepresentationProperty*) Representation
   *   - \b "material.wireframeLineWidth": (FloatProperty) Width in pixels of the lines drawn.
   *   - \b "scalar visibility": (BoolProperty) If the scarlars of the surface are visible
+  *   - \b "Surface.TransferFunction (TransferFunctionProperty) Set a transferfunction for coloring the surface
+  *   - \b "LookupTable (LookupTableProperty) LookupTable
 
   * Properties to look for are:
   *

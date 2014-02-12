@@ -43,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPluginActivator.h"
 #include "usModuleRegistry.h"
-#include <mitkNodePredicateDataType.h>
+
 template <class T>
 static T* GetService()
 {
@@ -761,16 +761,14 @@ void QmitkMeasurementView::UpdateMeasurementText()
 
 void QmitkMeasurementView::AddAllInteractors()
 {
-  MEASUREMENT_DEBUG << "Adding interactors to all planar figures";
+  MEASUREMENT_DEBUG << "Adding interactors and observers to all planar figures";
 
-  mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
-  const mitk::DataNode* node = 0;
+  mitk::DataStorage::SetOfObjects::ConstPointer planarFigures = this->GetAllPlanarFigures();
 
-  for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
-      ; it++)
+  for(mitk::DataStorage::SetOfObjects::ConstIterator it=planarFigures->Begin();
+    it!=planarFigures->End(); it++)
   {
-    node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
-    this->NodeAdded( node );
+    this->NodeAdded( it.Value() );
   }
 }
 
@@ -778,14 +776,12 @@ void QmitkMeasurementView::RemoveAllInteractors()
 {
   MEASUREMENT_DEBUG << "Removing interactors and observers from all planar figures";
 
-  mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
-  const mitk::DataNode* node = 0;
+  mitk::DataStorage::SetOfObjects::ConstPointer planarFigures = this->GetAllPlanarFigures();
 
-  for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
-      ; it++)
+  for(mitk::DataStorage::SetOfObjects::ConstIterator it=planarFigures->Begin();
+    it!=planarFigures->End(); it++)
   {
-    node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
-    this->NodeRemoved( node );
+    this->NodeRemoved( it.Value() );
   }
 }
 
@@ -858,4 +854,14 @@ void QmitkMeasurementView::DisableCrosshairNavigation()
     linkedRenderWindow->EnableLinkedNavigation(false);
     linkedRenderWindow->EnableSlicingPlanes(false);
   }
+}
+
+mitk::DataStorage::SetOfObjects::ConstPointer QmitkMeasurementView::GetAllPlanarFigures() const
+{
+  mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
+
+  mitk::NodePredicateProperty::Pointer isNotHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(false));
+  mitk::NodePredicateAnd::Pointer isNotHelperButPlanarFigure = mitk::NodePredicateAnd::New( isPlanarFigure, isNotHelperObject );
+
+  return this->GetDataStorage()->GetSubset( isPlanarFigure );
 }

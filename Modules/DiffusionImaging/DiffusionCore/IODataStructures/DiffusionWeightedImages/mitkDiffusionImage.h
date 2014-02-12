@@ -136,7 +136,7 @@ protected:
 * @return true, if all subsequent comparisons are true, false otherwise
 */
 template<class TPixelType>
-MITK_CORE_EXPORT bool Equal( const mitk::DiffusionImage<TPixelType>* leftHandSide, const mitk::DiffusionImage<TPixelType>* rightHandSide, ScalarType eps, bool verbose );
+bool Equal( const mitk::DiffusionImage<TPixelType>* leftHandSide, const mitk::DiffusionImage<TPixelType>* rightHandSide, ScalarType eps, bool verbose );
 
 } // namespace mitk
 

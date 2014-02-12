@@ -31,6 +31,7 @@ class mitkIOUtilTestSuite : public mitk::TestFixture
   MITK_TEST(TestLoadAndSaveImage);
   MITK_TEST(TestLoadAndSavePointSet);
   MITK_TEST(TestLoadAndSaveSurface);
+  MITK_TEST(TestTempMethodsForUniqueFilenames);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -94,6 +95,29 @@ public:
     CPPUNIT_ASSERT(tmpDir2.size() > programPath.size());
     CPPUNIT_ASSERT(tmpDir2.substr(0, programPath.size()) == programPath);
     CPPUNIT_ASSERT(itksys::SystemTools::RemoveADirectory(tmpDir2.c_str()));
+  }
+
+  void TestTempMethodsForUniqueFilenames()
+  {
+    int numberOfFiles = 100;
+
+    //create 100 empty files
+    std::vector<std::string> v100filenames;
+    for(int i=0; i<numberOfFiles; i++) {v100filenames.push_back(mitk::IOUtil::CreateTemporaryFile());}
+
+    //check if all of them are unique
+    for(int i=0; i<numberOfFiles; i++) for(int j=0; j<numberOfFiles; j++)
+    {
+      if(i!=j)
+        {
+        std::stringstream message;
+        message << "Checking if file " << i << " and file " << j << " are different, which should be the case because each of them should be unique.";
+        CPPUNIT_ASSERT_MESSAGE(message.str(),(v100filenames.at(i)!=v100filenames.at(j)));
+        }
+    }
+
+    //delete all the files / clean up
+    for(int i=0; i<numberOfFiles; i++) {std::remove(v100filenames.at(i).c_str());}
   }
 
   void TestLoadAndSaveImage()

@@ -3,6 +3,7 @@
 
 Available sections:
   - \ref QmitkIGTTrackingLabUsersManualOverview
+  - \ref QmitkIGTTrackingLabUsersManualPrel
   - \ref QmitkIGTTrackingLabUsersManualConf
   - \ref QmitkIGTTrackingLabUsersManualIntialReg
   - \ref QmitkIGTTrackingLabUsersManualPermReg
@@ -13,7 +14,7 @@ Available sections:
 
 The IGT-TrackingLab is the last step of the IGT tutorial. It is a plugin which shows examples usage for many IGT classes and is also an example navigation implemented with IGT. In the following you can learn how to use the plugin by reading this manual together with the source code.
 
-\section Preliminaries
+\section QmitkIGTTrackingLabUsersManualPrel Preliminaries
 First connect your tracking device to your PC. Then start the MITK Workbench and configure your tracking device using the org_mitk_views_igttrackingtoolbox .
 
 \section QmitkIGTTrackingLabUsersManualConf Configuration

@@ -93,11 +93,10 @@ namespace mitk
       */
       static void CatchLogFileCommandLineParameter(int &argc,char **argv);
 
-    protected:
       /** Checks if a file exists.
        *  @return Returns true if the file exists, false if not.
        */
-      static bool CheckIfFileExists(std::string filename);
+      static bool CheckIfFileExists(std::string& filename);
   };
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone=no>
 <DICOMFileReader
-  label="Instance Number"
-  description="Sort by Instance Number"
+  label="Instance Number, consecutive"
+  description="Sort images by Instance Number, require equal distances of 1"
   class="DICOMITKSeriesGDCMReader"
   version="1"
   fixTiltByShearing="true">

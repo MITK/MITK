@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone=no>
 <DICOMFileReader
-  label="Image Position (A)"
-  description="Sort by Image Position (Patient)"
+  label="Image Position by Acquisition"
+  description="Group images by Acquistion, then sort groups by Image Position (Patient)"
   class="DICOMITKSeriesGDCMReader"
   version="1"
   fixTiltByShearing="true">

@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageDataItem.h"
 #include "mitkContourUtils.h"
 
+#include <mitkContourModelUtils.h>
+
 mitk::CorrectorAlgorithm::CorrectorAlgorithm()
 :ImageToImageFilter()
 {
@@ -125,8 +127,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   segData.reserve( 16 );
 
 
-  ContourUtils::Pointer contourUtils = ContourUtils::New();
-  ContourModel::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice( m_WorkingImage, m_Contour, true, false );
+  ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice( m_WorkingImage, m_Contour, true, false );
 
   if (projectedContour.IsNull())
   {
@@ -298,8 +299,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
 
     free(contourPoints);
 
-    ContourUtils::Pointer contourUtils = ContourUtils::New();
-    contourUtils->FillContourInSlice( contourInImageIndexCoordinates, m_WorkingImage );
+    mitk::ContourModelUtils::FillContourInSlice( contourInImageIndexCoordinates, m_WorkingImage );
   }
 
   delete[] _ofsArray;

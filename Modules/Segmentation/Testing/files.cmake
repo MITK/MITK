@@ -1,13 +1,10 @@
 set(MODULE_TESTS
-  mitkContourUtilsTest.cpp
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
   mitkDataNodeSegmentationTest.cpp
 #  mitkSegmentationInterpolationTest.cpp
   mitkOverwriteSliceFilterTest.cpp
 #  mitkOverwriteSliceFilterObliquePlaneTest.cpp
-  #mitkContourModelTest.cpp
-  #mitkContourModelIOTest.cpp
 #  mitkToolManagerTest.cpp
   mitkToolManagerProviderTest.cpp
 )

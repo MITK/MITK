@@ -56,7 +56,7 @@ namespace mitk
     struct ContourModelVertex
     {
       ContourModelVertex(mitk::Point3D &point, bool active=false)
-        : Coordinates(point), IsControlPoint(active)
+        : IsControlPoint(active), Coordinates(point)
       {
 
       };

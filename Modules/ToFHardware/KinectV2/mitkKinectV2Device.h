@@ -137,6 +137,8 @@ namespace mitk
 
     size_t m_DepthBufferSize; ///< Size of depth buffer (i.e. memory size of depth and infrared image)
     size_t m_RGBBufferSize; ///< Size of RGB buffer (i.e. memory size of RGB image)
+
+    mitk::Surface::Pointer m_Surface;
   };
 } //END mitk namespace
 #endif

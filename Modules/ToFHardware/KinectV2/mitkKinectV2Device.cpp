@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkSmartPointerProperty.h>
 
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+
 namespace mitk
 {
 
@@ -32,6 +35,7 @@ namespace mitk
     m_RGBBufferSize(3*1920*1080)
   {
     m_Controller = mitk::KinectV2Controller::New();
+    m_Surface = mitk::Surface::New();
   }
 
   KinectV2Device::~KinectV2Device()
@@ -197,10 +201,14 @@ namespace mitk
       while (toFCameraDevice->IsCameraActive())
       {
         // update the ToF camera
-        toFCameraDevice->UpdateCamera();
         // get the image data from the camera and write it at the next free position in the buffer
         toFCameraDevice->m_ImageMutex->Lock();
+        toFCameraDevice->UpdateCamera();
         toFCameraDevice->m_Controller->GetAllData(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos],toFCameraDevice->m_AmplitudeDataBuffer[toFCameraDevice->m_FreePos],toFCameraDevice->m_RGBDataBuffer[toFCameraDevice->m_FreePos]);
+        vtkSmartPointer<vtkPolyData> poly = vtkSmartPointer<vtkPolyData>::New();
+        if( toFCameraDevice->m_Controller->GetSurface()->GetVtkPolyData() != NULL )
+          poly->DeepCopy( toFCameraDevice->m_Controller->GetSurface()->GetVtkPolyData() );
+        toFCameraDevice->m_Surface->SetVtkPolyData( poly );
         toFCameraDevice->m_ImageMutex->Unlock();
 
         // call modified to indicate that cameraDevice was modified
@@ -304,7 +312,8 @@ namespace mitk
       memcpy(distanceArray, this->m_DistanceDataBuffer[pos], this->m_DepthBufferSize);
       memcpy(amplitudeArray, this->m_AmplitudeDataBuffer[pos], this->m_DepthBufferSize);
       memcpy(rgbDataArray, this->m_RGBDataBuffer[pos], this->m_RGBBufferSize);
-      this->SetProperty("ToFSurface", mitk::SmartPointerProperty::New( m_Controller->GetSurface() ));
+      //mitk::Surface::Pointer surfaceClone = this->m_Surface->Clone();
+      this->SetProperty("ToFSurface", mitk::SmartPointerProperty::New( this->m_Surface ));
       m_ImageMutex->Unlock();
 
       this->Modified();

@@ -67,7 +67,7 @@ namespace mitk
 
     mitk::Surface::Pointer m_Surface;
     CameraSpacePoint* m_CameraCoordinates;
-    vtkSmartPointer<vtkPolyData> m_PolyData;
+    //vtkSmartPointer<vtkPolyData> m_PolyData;
 
     ColorSpacePoint* m_ColorPoints;
   };
@@ -89,7 +89,7 @@ namespace mitk
     m_DepthBufferSize(sizeof(float)*512*424),
     m_Surface(NULL),
     m_CameraCoordinates(NULL),
-    m_PolyData(NULL),
+    //m_PolyData(NULL),
     m_ColorPoints(NULL)
   {
     // create heap storage for color pixel data in RGBX format
@@ -100,7 +100,7 @@ namespace mitk
 
     m_Surface = mitk::Surface::New();
     m_CameraCoordinates = new CameraSpacePoint[m_DepthCaptureWidth * m_DepthCaptureHeight];
-    m_PolyData = vtkSmartPointer<vtkPolyData>::New();
+    //m_PolyData = vtkSmartPointer<vtkPolyData>::New();
     m_ColorPoints = new ColorSpacePoint[m_DepthCaptureWidth * m_DepthCaptureHeight];
   }
 
@@ -315,13 +315,12 @@ namespace mitk
               textureCoordinates->InsertTuple2(id, xNorm, yNorm);
             }
           }
-
-          d->m_PolyData->SetPoints(points);
-          d->m_PolyData->SetVerts(vertices);
-          d->m_PolyData->GetPointData()->SetTCoords(textureCoordinates);
-          vtkSmartPointer<vtkPolyData> copy = vtkSmartPointer<vtkPolyData>::New();
-          copy->DeepCopy(d->m_PolyData);
-          d->m_Surface->SetVtkPolyData(copy);
+          vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+          polyData->SetPoints(points);
+          polyData->SetVerts(vertices);
+          polyData->GetPointData()->SetTCoords(textureCoordinates);
+          d->m_Surface->SetVtkPolyData(polyData);
+          //d->m_Surface->SetVtkPolyData(d->m_PolyData);
           d->m_Surface->Modified();
         }
         else

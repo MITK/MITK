@@ -54,7 +54,7 @@ public:
 
   mitkClassMacro( DiffusionImage, Image )
   itkNewMacro(Self)
-  mitkCloneMacro( Self )
+  //mitkCloneMacro( Self )
 
   void AverageRedundantGradients(double precision);
 
@@ -101,7 +101,6 @@ public:
 
 protected:
   DiffusionImage();
-  DiffusionImage(const mitk::DiffusionImage<TPixelType> &);
   virtual ~DiffusionImage();
 
   void ApplyMeasurementFrame();
@@ -135,8 +134,8 @@ protected:
 * @param verbose Flag indicating if the user wants detailed console output or not.
 * @return true, if all subsequent comparisons are true, false otherwise
 */
-template<class TPixelType>
-bool Equal( const mitk::DiffusionImage<TPixelType>* leftHandSide, const mitk::DiffusionImage<TPixelType>* rightHandSide, ScalarType eps, bool verbose );
+//template<class TPixelType>
+//bool Equal( const mitk::DiffusionImage<TPixelType>* leftHandSide, const mitk::DiffusionImage<TPixelType>* rightHandSide, ScalarType eps, bool verbose );
 
 } // namespace mitk
 

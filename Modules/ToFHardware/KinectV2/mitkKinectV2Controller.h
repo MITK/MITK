@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 
-#include <mitkSurface.h>
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
 
 namespace mitk
 {
@@ -43,8 +44,6 @@ namespace mitk
     int GetRGBCaptureHeight() const;
     int GetDepthCaptureWidth() const;
     int GetDepthCaptureHeight() const;
-
-    mitk::Surface::Pointer GetSurface();
 
     /**
     \brief Setup MultiFrameReader of Kinect V2.
@@ -74,6 +73,9 @@ namespace mitk
     void GetDistances(float* distances);
     void GetAmplitudes(float* amplitudes);
     void GetIntensities(float* intensities);
+
+    vtkSmartPointer<vtkPolyData> GetVtkPolyData();
+
     /*!
     \brief acquire new rgb data from the Kinect camera
     \param rgb pointer to memory location where rgb information should be stored

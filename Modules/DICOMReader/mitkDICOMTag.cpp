@@ -187,10 +187,13 @@ mitk::DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarTyp
     if (converter >> spacingY && converter.eof())
     {
       if ( std::getline( spacingReader, spacing, '\\' ) )
-      converter.str(spacing);
-      if (converter >> spacingX && converter.eof())
       {
-        successful = true;
+        converter.str(spacing);
+        converter.clear();
+        if (converter >> spacingX && converter.eof())
+        {
+          successful = true;
+        }
       }
     }
   }

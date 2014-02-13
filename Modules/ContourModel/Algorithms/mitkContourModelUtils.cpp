@@ -34,8 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPointData.h"
 
 
-#define InstantiateAccessFunction_ItkCopyFilledContourToSlice(pixelType, dim) \
-  template void mitk::ContourModelUtils::ItkCopyFilledContourToSlice(itk::Image<pixelType,dim>*, const mitk::Image*, int);
 
 mitk::ContourModelUtils::ContourModelUtils()
 {
@@ -201,34 +199,4 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
 
       //copy scalars to output image slice
       sliceImage->SetVolume(booleanOperation->GetOutput()->GetScalarPointer());
-}
-
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::ContourModelUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDimension>* originalSlice, const Image* filledContourSlice, int overwritevalue )
-{
-  typedef itk::Image<TPixel,VImageDimension> SliceType;
-
-  typename SliceType::Pointer filledContourSliceITK;
-  CastToItkImage( filledContourSlice, filledContourSliceITK );
-
-  // now the original slice and the ipSegmentation-painted slice are in the same format, and we can just copy all pixels that are non-zero
-  typedef itk::ImageRegionIterator< SliceType >        OutputIteratorType;
-  typedef itk::ImageRegionConstIterator< SliceType >   InputIteratorType;
-
-  InputIteratorType inputIterator( filledContourSliceITK, filledContourSliceITK->GetLargestPossibleRegion() );
-  OutputIteratorType outputIterator( originalSlice, originalSlice->GetLargestPossibleRegion() );
-
-  outputIterator.GoToBegin();
-  inputIterator.GoToBegin();
-
-  while ( !outputIterator.IsAtEnd() )
-  {
-    if ( inputIterator.Get() != 0 )
-    {
-      outputIterator.Set( overwritevalue );
-    }
-
-    ++outputIterator;
-    ++inputIterator;
-  }
 }

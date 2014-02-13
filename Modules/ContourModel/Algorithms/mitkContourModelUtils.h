@@ -69,13 +69,6 @@ protected:
     ContourModelUtils();
     virtual ~ContourModelUtils();
 
-    /**
-      \brief Paint a filled contour (e.g. of an ipSegmentation pixel type) into a mitk::Image (or arbitraty pixel type).
-      Will not copy the whole filledContourSlice, but only set those pixels in originalSlice to overwritevalue, where the corresponding pixel
-      in filledContourSlice is non-zero.
-    */
-    template<typename TPixel, unsigned int VImageDimension>
-    static void ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDimension>* originalSlice, const Image* filledContourSlice, int overwritevalue = 1 );
 };
 
 }

@@ -18,11 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelUtils.h"
 
 
-#define InstantiateAccessFunction_ItkCopyFilledContourToSlice(pixelType, dim) \
-  template void mitk::ContourUtils::ItkCopyFilledContourToSlice(itk::Image<pixelType,dim>*, const mitk::Image*, int);
-
-// explicitly instantiate the 2D version of this method
-//InstantiateAccessFunctionForFixedDimension(ItkCopyFilledContourToSlice, 2);
 
 mitk::ContourUtils::ContourUtils()
 {

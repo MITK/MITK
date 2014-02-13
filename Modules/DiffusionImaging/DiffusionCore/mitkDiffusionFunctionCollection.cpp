@@ -174,6 +174,7 @@ vnl_matrix<double> mitk::gradients::ComputeSphericalFromCartesian(const Indicies
 {
 
   vnl_matrix<double> Q(3, refShell.size());
+  Q.fill(0.0);
 
   for(unsigned int i = 0; i < refShell.size(); i++)
   {
@@ -193,14 +194,16 @@ vnl_matrix<double> mitk::gradients::ComputeSphericalFromCartesian(const Indicies
 vnl_matrix<double> mitk::gradients::ComputeSphericalHarmonicsBasis(const vnl_matrix<double> & QBallReference, const unsigned int & LOrder)
 {
   vnl_matrix<double> SHBasisOutput(QBallReference.cols(), (LOrder+1)*(LOrder+2)*0.5);
-  for(unsigned int i=0; i< SHBasisOutput.rows(); i++)
-    for(unsigned int k = 0; k <= LOrder; k += 2)
-      for(unsigned int m =- k; m <= k; m++)
+  SHBasisOutput.fill(0.0);
+  for(int i=0; i< (int)SHBasisOutput.rows(); i++)
+    for(int k = 0; k <= (int)LOrder; k += 2)
+      for(int m =- k; m <= k; m++)
       {
-        int j = ( k * k + k + 2 ) / 2 + m - 1;
+        int j = ( k * k + k + 2 ) / 2.0 + m - 1;
         double phi = QBallReference(0,i);
         double th = QBallReference(1,i);
-        SHBasisOutput(i,j) = mitk::sh::Yj(m,k,th,phi);
+        double val = mitk::sh::Yj(m,k,th,phi);
+        SHBasisOutput(i,j) = val;
       }
   return SHBasisOutput;
 }

@@ -40,7 +40,6 @@ mitk::NeedleProjectionFilter::NeedleProjectionFilter()
 
 mitk::NeedleProjectionFilter::~NeedleProjectionFilter()
 {
-
 }
 
 
@@ -95,15 +94,19 @@ void mitk::NeedleProjectionFilter::GenerateData()
 
   vtkPlane::IntersectWithLine(p1, p2, normal, center, t, x);
 
-  // Convert vtk to itk
-  mitk::Point3D intersection;
-  intersection[0] = x[0];
-  intersection[1] = x[1];
-  intersection[2] = x[2];
+  // change (cut) needle path only if the needle points to the image plane;
+  // otherwise the needle path direction would be changed pointing to the image plane
+  if ( t >= 0 )
+  {
+    // Convert vtk to itk
+    mitk::Point3D intersection;
+    intersection[0] = x[0];
+    intersection[1] = x[1];
+    intersection[2] = x[2];
 
-  // Replace distant point with image intersection
-  m_Projection->SetPoint(1, intersection);
-
+    // Replace distant point with image intersection
+    m_Projection->SetPoint(1, intersection);
+  }
 }
 
 mitk::AffineTransform3D::Pointer mitk::NeedleProjectionFilter::NavigationDataToTransform(const mitk::NavigationData * nd)

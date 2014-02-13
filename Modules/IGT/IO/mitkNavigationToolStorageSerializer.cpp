@@ -15,9 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //Poco headers
-#include "Poco/Zip/Compress.h"
-#include "Poco/Path.h"
-#include "Poco/File.h"
+#include <Poco/Zip/Compress.h>
+#include <Poco/Path.h>
+#include <Poco/File.h>
 
 #include "mitkNavigationToolStorageSerializer.h"
 #include "mitkNavigationToolWriter.h"
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTIOException.h"
 #include <mitkStandaloneDataStorage.h>
 #include <mitkSceneIO.h>
-#include <mitkStandardFileLocations.h>
+#include <mitkIOUtil.h>
 
 #include <sstream>
 
@@ -34,10 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NavigationToolStorageSerializer::NavigationToolStorageSerializer()
 {
   //create temp directory
-  mitk::UIDGenerator myUIDGen = mitk::UIDGenerator("",16);
-  m_tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "tempNavigationToolSerializer_" + myUIDGen.GetUID();
-  Poco::File myFile(m_tempDirectory);
-  myFile.createDirectory();
+  m_tempDirectory = mitk::IOUtil::CreateTemporaryDirectory();
+  //Poco::File myFile(m_tempDirectory);
+  //myFile.createDirectory();
 }
 
 mitk::NavigationToolStorageSerializer::~NavigationToolStorageSerializer()

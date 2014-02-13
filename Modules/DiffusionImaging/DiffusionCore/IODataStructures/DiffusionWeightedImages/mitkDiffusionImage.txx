@@ -35,23 +35,6 @@ mitk::DiffusionImage<TPixelType>::DiffusionImage()
   m_MeasurementFrame = mf;
 }
 
-template<typename TPixelType>
-mitk::DiffusionImage<TPixelType>::DiffusionImage(const mitk::DiffusionImage<TPixelType> & orig)
-  : mitk::Image(orig),
-    m_VectorImage( 0 ),
-    m_B_Value(orig.m_B_Value),
-    m_MeasurementFrame(orig.m_MeasurementFrame),
-    m_OriginalDirections(orig.m_OriginalDirections),
-    m_Directions(orig.m_Directions)
-{
-
-  typename itk::ImageDuplicator<ImageType>::Pointer duplicator = itk::ImageDuplicator<ImageType>::New();
-  duplicator->SetInputImage( orig.m_VectorImage );
-  duplicator->Update();
-  this->SetVectorImage(duplicator->GetOutput());
-  this->InitializeFromVectorImage();
-}
-
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::~DiffusionImage()
@@ -433,7 +416,7 @@ void mitk::DiffusionImage<TPixelType>::RemoveDirectionsContainerObserver()
 }
 
 
-template<typename TPixelType>
+/*template<typename TPixelType>
 bool mitk::Equal(const mitk::DiffusionImage<TPixelType>* rightHandSide, const mitk::DiffusionImage<TPixelType>* leftHandSide, ScalarType eps, bool verbose)
 {
 
@@ -565,5 +548,5 @@ bool mitk::Equal(const mitk::DiffusionImage<TPixelType>* rightHandSide, const mi
   }
 
   return returnValue;
-}
+}*/
 

@@ -1424,34 +1424,35 @@ ImageStatisticsCalculator::CalculateExtremaWorld(
 
   if (maskImage != NULL)
   {
-    MaskImageIteratorType maskIt(maskImage, allowedExtremaRegion);
+    MaskImageIteratorType maskIt(maskImage, maskImage->GetLargestPossibleRegion());
     typename ImageType::IndexType imageIndex;
     typename ImageType::PointType worldPosition;
     typename ImageType::IndexType maskIndex;
 
-    for(imageIndexIt.GoToBegin(); !imageIndexIt.IsAtEnd(); ++imageIndexIt)
+    for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
     {
-      imageIndex = imageIndexIt.GetIndex();
-      inputImage->TransformIndexToPhysicalPoint(imageIndex, worldPosition);
-      maskImage->TransformPhysicalPointToIndex(worldPosition, maskIndex);
+      imageIndex = maskIndex = maskIt.GetIndex();
 
-      maskIt.SetIndex( maskIndex );
       if(maskIt.Get() == label)
       {
-        double value = imageIndexIt.Get();
-        minMax.Defined = true;
-
-        //Calculate minimum, maximum and corresponding index-values
-        if( value > maxValue )
+        if( allowedExtremaRegion.IsInside(imageIndex) )
         {
-          maxIndex = imageIndexIt.GetIndex();
-          maxValue = value;
-        }
+          imageIndexIt.SetIndex( imageIndex );
+          double value = imageIndexIt.Get();
+          minMax.Defined = true;
 
-        if(value < minValue )
-        {
-          minIndex = imageIndexIt.GetIndex();
-          minValue = value;
+          //Calculate minimum, maximum and corresponding index-values
+          if( value > maxValue )
+          {
+            maxIndex = imageIndexIt.GetIndex();
+            maxValue = value;
+          }
+
+          if(value < minValue )
+          {
+            minIndex = imageIndexIt.GetIndex();
+            minValue = value;
+          }
         }
       }
     }

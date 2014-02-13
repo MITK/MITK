@@ -141,7 +141,7 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       surface2D->SetPoints(surface->GetVtkPolyData(timeStep)->GetPoints());
       surface2D->SetLines(surface->GetVtkPolyData(timeStep)->GetLines());
       surface2D->Modified();
-      surface2D->Update();
+      //surface2D->Update();
 
       // prepare the binary image's voxel grid
       vtkSmartPointer<vtkImageData> whiteImage =
@@ -150,7 +150,6 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
 
       // fill the image with foreground voxels:
       unsigned char inval = 255;
-      unsigned char outval = 0;
       vtkIdType count = whiteImage->GetNumberOfPoints();
       for (vtkIdType i = 0; i < count; ++i)
       {
@@ -161,16 +160,16 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
         vtkSmartPointer<vtkPolyDataToImageStencil>::New();
       //pol2stenc->SetTolerance(0); // important if extruder->SetVector(0, 0, 1) !!!
-      pol2stenc->SetInput(surface2D);
+      pol2stenc->SetInputData(surface2D);
       pol2stenc->Update();
 
       // cut the corresponding white image and set the background:
       vtkSmartPointer<vtkImageStencil> imgstenc =
         vtkSmartPointer<vtkImageStencil>::New();
 
-      imgstenc->SetInput(whiteImage);
+      imgstenc->SetInputData(whiteImage);
       imgstenc->ReverseStencilOff();
-      imgstenc->SetStencil(pol2stenc->GetOutput());
+      imgstenc->SetStencilConnection(pol2stenc->GetOutputPort());
       imgstenc->SetBackgroundValue(0);
       imgstenc->Update();
 
@@ -178,24 +177,24 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       //Fill according to painting value
       vtkSmartPointer<vtkImageLogic> booleanOperation = vtkSmartPointer<vtkImageLogic>::New();
 
-      booleanOperation->SetInput2(sliceImage->GetVtkImageData());
+      booleanOperation->SetInput2Data(sliceImage->GetVtkImageData());
       booleanOperation->SetOperationToOr();
 
       if(paintingPixelValue == 1)
       {
         //COMBINE
         //slice or stencil
-        booleanOperation->SetInput1(imgstenc->GetOutput());
+        booleanOperation->SetInputConnection(imgstenc->GetOutputPort());
         booleanOperation->SetOperationToOr();
       } else
       {
         //CUT
         //slice and not(stencil)
         vtkSmartPointer<vtkImageLogic> booleanOperationNOT = vtkSmartPointer<vtkImageLogic>::New();
-        booleanOperationNOT->SetInput1(imgstenc->GetOutput());
+        booleanOperationNOT->SetInputConnection(imgstenc->GetOutputPort());
         booleanOperationNOT->SetOperationToNot();
         booleanOperationNOT->Update();
-        booleanOperation->SetInput1(booleanOperationNOT->GetOutput());
+        booleanOperation->SetInputConnection(booleanOperationNOT->GetOutputPort());
         booleanOperation->SetOperationToAnd();
       }
       booleanOperation->Update();

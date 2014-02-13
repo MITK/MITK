@@ -68,7 +68,7 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
 
   QGridLayout* layout = new QGridLayout;
   int i = 0;
-  for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin();
+  for (QMap<int, QPair<QString, QLineEdit*> >::iterator it = m_LineEditors.begin();
     it != m_LineEditors.end(); ++it)
   {
     layout->addWidget(new QLabel(it.value().first), i,0);
@@ -98,7 +98,7 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
 
     QString keyString;
     QString errString;
-    for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin(); it != m_LineEditors.end(); ++it)
+    for (QMap<int, QPair<QString, QLineEdit*> >::iterator it = m_LineEditors.begin(); it != m_LineEditors.end(); ++it)
     {
       keyString = it.value().second->text();
 
@@ -183,7 +183,7 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
     }
 
     // no error in the input
-    for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin(); it != m_LineEditors.end(); ++it)
+    for (QMap<int, QPair<QString, QLineEdit*> >::iterator it = m_LineEditors.begin(); it != m_LineEditors.end(); ++it)
       _XnatConnectionPreferencesNode->Put(it.value().first.toStdString(), it.value().second->text().toStdString());
 
     _XnatConnectionPreferencesNode->Flush();
@@ -203,7 +203,7 @@ void QmitkXnatConnectionPreferencePage::Update()
   IPreferences::Pointer _XnatConnectionPreferencesNode = m_XnatConnectionPreferencesNode.Lock();
   if(_XnatConnectionPreferencesNode.IsNotNull())
   {
-    for (QMap<int, QPair<QString, QLineEdit*>>::iterator it = m_LineEditors.begin(); it != m_LineEditors.end(); ++it)
+    for (QMap<int, QPair<QString, QLineEdit*> >::iterator it = m_LineEditors.begin(); it != m_LineEditors.end(); ++it)
     {
       it.value().second->setText(QString::fromStdString(_XnatConnectionPreferencesNode->Get(it.value().first.toStdString(),
         it.value().second->text().toStdString())));

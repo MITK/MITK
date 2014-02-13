@@ -123,10 +123,10 @@ void QmitkXnatEditor::SetInput(berry::IEditorInput::Pointer input)
   }
 }
 
-const char* QmitkXnatEditor::GetClassNameA() const
-{
-  return QtEditorPart::GetClassNameA();
-}
+//const char* QmitkXnatEditor::GetClassNameA() const
+//{
+//  return QtEditorPart::GetClassNameA();
+//}
 
 void QmitkXnatEditor::SetFocus()
 {
@@ -169,7 +169,7 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
 void QmitkXnatEditor::UpdateList()
 {
   QmitkXnatObjectEditorInput::Pointer xoPtr(GetEditorInput().Cast<QmitkXnatObjectEditorInput>());
-  if( xoPtr == NULL )
+  if( xoPtr.IsNull() )
     return;
   ctkXnatObject* inputObject = xoPtr->GetXnatObject();
   if( inputObject == NULL )

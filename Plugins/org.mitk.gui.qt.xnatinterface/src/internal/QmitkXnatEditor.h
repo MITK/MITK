@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 \sa QmitkFunctionality
 \ingroup ${plugin_target}_internal
 */
-class QmitkXnatEditor : public berry::QtEditorPart, virtual public berry::IReusableEditor
+class QmitkXnatEditor : public berry::QtEditorPart, public berry::IReusableEditor
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -49,7 +49,8 @@ class QmitkXnatEditor : public berry::QtEditorPart, virtual public berry::IReusa
 
 public:
 
-  //berryObjectMacro(QmitkXnatEditor);
+  berryObjectMacro(QmitkXnatEditor)
+
   QmitkXnatEditor();
   ~QmitkXnatEditor();
 

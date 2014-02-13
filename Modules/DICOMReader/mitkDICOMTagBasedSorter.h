@@ -96,9 +96,34 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
 
     /**
       \brief Whether or not groups should be checked for consecutive tag values.
+
+      When this flag is set (default in constructor=off), the sorter will
+      not only sort in a way that the values of a configured tag are ascending
+      BUT in addition the sorter will enforce a constant numerical distance
+      between values.
+
+      Having this flag is useful for handling of series with missing slices,
+      e.g. Instance Numbers 1 2 3 5 6 7 8. With the flag set to true, the sorter
+      would split this group into two, because the initial distance of 1 is
+      not kept between Instance Numbers 3 and 5.
+
+      A special case of this behavior can be configured by SetExpectDistanceOne().
+      When this additional flag is set to true, the sorter will expect distance
+      1 exactly. This can help if the second slice is missing already. Without
+      this additional flag, we would "learn" about a wrong distance of 2 (or similar)
+      and then sort completely wrong.
     */
     void SetStrictSorting(bool strict);
     bool GetStrictSorting() const;
+
+    /**
+      \brief Flag for a special case in "strict sorting".
+      Please see documentation of SetStrictSorting().
+      \sa SetStrictSorting
+    */
+    void SetExpectDistanceOne(bool strict);
+    bool GetExpectDistanceOne() const;
+
 
     /**
       \brief Actually sort as described in the Detailed Description.
@@ -158,6 +183,7 @@ class DICOMReader_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     DICOMSortCriterion::ConstPointer m_SortCriterion;
 
     bool m_StrictSorting;
+    bool m_ExpectDistanceOne;
 };
 
 }

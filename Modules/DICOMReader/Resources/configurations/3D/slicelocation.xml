@@ -5,7 +5,7 @@
   class="DICOMITKSeriesGDCMReader"
   version="1"
   fixTiltByShearing="true">
-<DICOMDatasetSorter class="DICOMTagBasedSorter">
+<DICOMDatasetSorter class="DICOMTagBasedSorter" strictSorting="true" expectDistanceOne="false">
   <Distinguishing>
    <Tag name="SeriesInstanceUID" group="0020" element="000e"/>
    <Tag name="SeriesDescription" group="0008" element="103e"/>

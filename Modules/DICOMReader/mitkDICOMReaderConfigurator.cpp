@@ -300,6 +300,16 @@ mitk::DICOMReaderConfigurator
   }
   tagSorter->SetStrictSorting(strictSorting);
 
+  // "strictSorting" parameter!
+  bool expectDistanceOne(true);
+  const char* expectDistanceOneC = element->Attribute("expectDistanceOne");
+  if (expectDistanceOneC)
+  {
+    std::string expectDistanceOneS(expectDistanceOneC);
+    expectDistanceOne = boolStringTrue(expectDistanceOneS);
+  }
+  tagSorter->SetExpectDistanceOne(expectDistanceOne);
+
   TiXmlElement* dElement = element->FirstChildElement("Distinguishing");
   if (dElement)
   {
@@ -560,6 +570,7 @@ mitk::DICOMReaderConfigurator
   TiXmlElement* sorterTag = new TiXmlElement("DICOMDatasetSorter");
   sorterTag->SetAttribute("class", sorter->GetNameOfClass());
   sorterTag->SetAttribute("strictSorting", toString(sorter->GetStrictSorting()));
+  sorterTag->SetAttribute("expectDistanceOne", toString(sorter->GetExpectDistanceOne()));
 
   TiXmlElement* distinguishingTagsElement = new TiXmlElement("Distinguishing");
   sorterTag->LinkEndChild(distinguishingTagsElement);

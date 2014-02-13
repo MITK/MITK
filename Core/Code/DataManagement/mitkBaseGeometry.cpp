@@ -34,8 +34,9 @@ mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
 }
 
 mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), m_ParametricBoundingBox(other.m_ParametricBoundingBox), m_TimeBounds(other.m_TimeBounds),
-  m_Valid(other.m_Valid), m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_RotationQuaternion( other.m_RotationQuaternion ), m_Origin(other.m_Origin)
+  m_Valid(other.m_Valid), m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin)
 {
+  //  DEPRECATED(m_RotationQuaternion = other.m_RotationQuaternion);
   // AffineGeometryFrame
   SetBounds(other.GetBounds());
   //SetIndexToObjectTransform(other.GetIndexToObjectTransform());
@@ -191,4 +192,15 @@ void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* trans
     TransferItkToVtkTransform();
     Modified();
   }
+}
+
+const  mitk::BaseGeometry::BoundsArrayType  mitk::BaseGeometry::GetBounds() const
+{
+  assert(m_BoundingBox.IsNotNull());
+  return m_BoundingBox->GetBounds();
+}
+
+bool mitk::BaseGeometry::IsValid() const
+{
+  return m_Valid;
 }

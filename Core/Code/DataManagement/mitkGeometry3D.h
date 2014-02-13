@@ -385,13 +385,6 @@ namespace mitk {
     itkBooleanMacro(ImageGeometry);
 
     //##Documentation
-    //## @brief Is this Geometry3D in a state that is valid?
-    virtual bool IsValid() const
-    {
-      return m_Valid;
-    }
-
-    //##Documentation
     //## @brief Test whether the point \a p (world coordinates in mm) is
     //## inside the bounding box
     bool IsInside(const mitk::Point3D& p) const
@@ -449,7 +442,6 @@ namespace mitk {
       return IsIndexInside(pt_index);
     }
 
-
     //##Documentation
     //## @brief Get the spacing as a float[3] array.
     const float* GetFloatSpacing() const;
@@ -457,8 +449,6 @@ namespace mitk {
     //##Documentation
     //## @brief Set the spacing (m_Spacing)
     virtual void SetSpacing(const mitk::Vector3D& aSpacing);
-
-
 
     //##Documentation
     //## @brief Copy the VTK transform
@@ -535,7 +525,6 @@ namespace mitk {
     //##@brief executes affine operations (translate, rotate, scale)
     virtual void ExecuteOperation(Operation* operation);
 
-
     /** Get the extent of the bounding box */
     ScalarType GetExtent(unsigned int direction) const
     {
@@ -574,7 +563,6 @@ namespace mitk {
     * the current value of m_IndexToWorldTransform and setting the rotation
     * component to zero. */
     virtual void ResetSubTransforms();
-
 
     bool m_ImageGeometry;
 

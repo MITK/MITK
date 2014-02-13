@@ -71,9 +71,10 @@ public:
   {
     //test standard constructor
     DummyTestClass dummy1;
-    /*  // for standard test: get() missing
-    CPPUNIT_ASSERT(dummy1.m_ImageGeometry==false);
-    CPPUNIT_ASSERT(dummy1.m_Valid==true);
+
+    CPPUNIT_ASSERT(dummy1.IsValid() == true);
+    CPPUNIT_ASSERT(2==1);
+    /*
     CPPUNIT_ASSERT(dummy1.m_FrameOfReferenceID==0);
     CPPUNIT_ASSERT(dummy1.m_IndexToWorldTransformLastModified==0);
     float l_FloatSpacing[3];
@@ -98,7 +99,7 @@ public:
     // m_InvertedTransform*/
 
     //test BaseGeometry(const BaseGeometry& other) constructor
-    DummyTestClass dummy2;
+    //    DummyTestClass dummy2;
     //CPPUNIT_ASSERT(Equal(dummy1,dummy2,mitk::eps,true));
   }
 };

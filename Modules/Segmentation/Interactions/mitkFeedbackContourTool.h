@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkSegTool2D.h"
-#include "mitkContourModel.h"
-#include "mitkContourUtils.h"
+#include "mitkContourModelUtils.h"
+#include "mitkContourUtils.h" //TODO remove legacy support
 #include "mitkImage.h"
 
 #include "mitkDataNode.h"
@@ -102,7 +102,6 @@ class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
     DataNode::Pointer m_FeedbackContourNode;
     bool                  m_FeedbackContourVisible;
 
-    ContourUtils::Pointer m_ContourUtils;
 };
 
 } // namespace

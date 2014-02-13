@@ -131,7 +131,7 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
     {
       lines->InsertNextCell(2);
       lines->InsertCellPoint(0);
-      lines->InsertCellPoint( (inputContour->GetNumberOfVertices() - 1) );
+      lines->InsertCellPoint( (inputContour->GetNumberOfVertices(currentTimeStep) - 1) );
     }
 
     polygons->InsertNextCell(polygon);

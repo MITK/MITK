@@ -65,9 +65,9 @@ namespace mitk
     size_t m_RGBBufferSize;
     size_t m_DepthBufferSize;
 
-    mitk::Surface::Pointer m_Surface;
+    //mitk::Surface::Pointer m_Surface;
     CameraSpacePoint* m_CameraCoordinates;
-    //vtkSmartPointer<vtkPolyData> m_PolyData;
+    vtkSmartPointer<vtkPolyData> m_PolyData;
 
     ColorSpacePoint* m_ColorPoints;
   };
@@ -87,9 +87,9 @@ namespace mitk
     m_Colors(NULL),
     m_RGBBufferSize(1920*1080*3),
     m_DepthBufferSize(sizeof(float)*512*424),
-    m_Surface(NULL),
+    //m_Surface(NULL),
     m_CameraCoordinates(NULL),
-    //m_PolyData(NULL),
+    m_PolyData(NULL),
     m_ColorPoints(NULL)
   {
     // create heap storage for color pixel data in RGBX format
@@ -98,9 +98,9 @@ namespace mitk
     m_Amplitudes = new float[m_DepthCaptureWidth * m_DepthCaptureHeight];
     m_Colors = new unsigned char[m_RGBBufferSize];
 
-    m_Surface = mitk::Surface::New();
+    //m_Surface = mitk::Surface::New();
     m_CameraCoordinates = new CameraSpacePoint[m_DepthCaptureWidth * m_DepthCaptureHeight];
-    //m_PolyData = vtkSmartPointer<vtkPolyData>::New();
+    m_PolyData = vtkSmartPointer<vtkPolyData>::New();
     m_ColorPoints = new ColorSpacePoint[m_DepthCaptureWidth * m_DepthCaptureHeight];
   }
 
@@ -201,6 +201,21 @@ namespace mitk
 
   bool KinectV2Controller::UpdateCamera()
   {
+   return true;
+  }
+
+  void KinectV2Controller::GetDistances(float* distances)
+  {
+    memcpy(distances, d->m_Distances, d->m_DepthBufferSize);
+  }
+
+  void KinectV2Controller::GetRgb(unsigned char* rgb)
+  {
+    memcpy(rgb, d->m_Colors, d->m_RGBBufferSize);
+  }
+
+  void KinectV2Controller::GetAllData(float* distances, float* amplitudes, unsigned char* rgb)
+  {
     if(InitializeMultiFrameReader())
     {
 
@@ -296,8 +311,8 @@ namespace mitk
             vtkIdType id = points->InsertNextPoint(d->m_CameraCoordinates[i].X, d->m_CameraCoordinates[i].Y, d->m_CameraCoordinates[i].Z);
             vertices->InsertNextCell(1);
             vertices->InsertCellPoint(id);
-            d->m_Distances[i] = static_cast<float>(*pDepthBuffer);
-            d->m_Amplitudes[i] = static_cast<float>(*pIntraRedBuffer);
+            distances[i] = static_cast<float>(*pDepthBuffer);
+            amplitudes[i] = static_cast<float>(*pIntraRedBuffer);
             ++pDepthBuffer;
             ++pIntraRedBuffer;
 
@@ -315,13 +330,11 @@ namespace mitk
               textureCoordinates->InsertTuple2(id, xNorm, yNorm);
             }
           }
-          vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-          polyData->SetPoints(points);
-          polyData->SetVerts(vertices);
-          polyData->GetPointData()->SetTCoords(textureCoordinates);
-          d->m_Surface->SetVtkPolyData(polyData);
-          //d->m_Surface->SetVtkPolyData(d->m_PolyData);
-          d->m_Surface->Modified();
+          d->m_PolyData = vtkSmartPointer<vtkPolyData>::New();
+          d->m_PolyData->SetPoints(points);
+          d->m_PolyData->SetVerts(vertices);
+          d->m_PolyData->GetPointData()->SetTCoords(textureCoordinates);
+          d->m_PolyData->Modified();
         }
         else
         {
@@ -355,9 +368,9 @@ namespace mitk
             for(int i = 0; i < d->m_RGBBufferSize; i+=3)
             {
               //convert from BGR to RGB
-              d->m_Colors[i+0] = pColorBuffer->rgbRed;
-              d->m_Colors[i+1] = pColorBuffer->rgbGreen;
-              d->m_Colors[i+2] = pColorBuffer->rgbBlue;
+              rgb[i+0] = pColorBuffer->rgbRed;
+              rgb[i+1] = pColorBuffer->rgbGreen;
+              rgb[i+2] = pColorBuffer->rgbBlue;
               ++pColorBuffer;
             }
           }
@@ -373,30 +386,11 @@ namespace mitk
       {
         //The thread gets here, if the data is requested faster than the device can deliver it.
         //This may happen from time to time.
-        return false;
+        return;
       }
-
-      return true;
+      return;
     }
     MITK_ERROR << "Unable to initialize MultiFrameReader";
-    return false;
-  }
-
-  void KinectV2Controller::GetDistances(float* distances)
-  {
-    memcpy(distances, d->m_Distances, d->m_DepthBufferSize);
-  }
-
-  void KinectV2Controller::GetRgb(unsigned char* rgb)
-  {
-    memcpy(rgb, d->m_Colors, d->m_RGBBufferSize);
-  }
-
-  void KinectV2Controller::GetAllData(float* distances, float* amplitudes, unsigned char* rgb)
-  {
-    this->GetDistances(distances);
-    this->GetRgb(rgb);
-    this->GetAmplitudes(amplitudes);
   }
 
   void KinectV2Controller::GetAmplitudes( float* amplitudes )
@@ -424,9 +418,8 @@ namespace mitk
     return d->m_DepthCaptureHeight;
   }
 
-  mitk::Surface::Pointer KinectV2Controller::GetSurface()
+  vtkSmartPointer<vtkPolyData> KinectV2Controller::GetVtkPolyData()
   {
-    return d->m_Surface;
+    return d->m_PolyData;
   }
-
 }

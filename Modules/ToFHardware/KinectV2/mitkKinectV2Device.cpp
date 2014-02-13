@@ -320,6 +320,7 @@ namespace mitk
 
       mitk::Surface::Pointer surface = mitk::Surface::New();
       surface->SetVtkPolyData( deepCopyOfPoly );
+      surface->Modified();
       this->SetProperty("ToFSurface", mitk::SmartPointerProperty::New( surface ));
 
       this->Modified();

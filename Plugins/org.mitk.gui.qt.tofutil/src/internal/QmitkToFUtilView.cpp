@@ -495,10 +495,11 @@ void QmitkToFUtilView::OnUpdateCamera()
 
     //update pipeline
     mitk::SmartPointerProperty::Pointer surfaceProp = dynamic_cast< mitk::SmartPointerProperty * >(this->m_ToFImageGrabber->GetCameraDevice()->GetProperty("ToFSurface"));
-    this->m_Surface = dynamic_cast< mitk::Surface* >( surfaceProp->GetSmartPointer().GetPointer() );
+    this->m_Surface->SetVtkPolyData( dynamic_cast< mitk::Surface* >( surfaceProp->GetSmartPointer().GetPointer() )->GetVtkPolyData() );
+    this->m_Surface->Modified();
 
     this->m_ToFImageGrabber->Modified();
-    //this->m_Surface->Update();
+    this->m_Surface->Update();
   }
   //##### End code for surface #####
   else

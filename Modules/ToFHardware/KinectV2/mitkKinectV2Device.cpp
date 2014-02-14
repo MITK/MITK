@@ -14,10 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkKinectV2Device.h"
-#include "mitkRealTimeClock.h"
 
-#include "itkMultiThreader.h"
+
+#include <mitkRealTimeClock.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkSurface.h>
+
+#include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
+
 
 namespace mitk
 {
@@ -30,6 +35,7 @@ namespace mitk
     m_RGBBufferSize(3*1920*1080)
   {
     m_Controller = mitk::KinectV2Controller::New();
+    m_PolyData = vtkSmartPointer<vtkPolyData>::New();
   }
 
   KinectV2Device::~KinectV2Device()
@@ -199,6 +205,10 @@ namespace mitk
         // get the image data from the camera and write it at the next free position in the buffer
         toFCameraDevice->m_ImageMutex->Lock();
         toFCameraDevice->m_Controller->GetAllData(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos],toFCameraDevice->m_AmplitudeDataBuffer[toFCameraDevice->m_FreePos],toFCameraDevice->m_RGBDataBuffer[toFCameraDevice->m_FreePos]);
+        //Here we get also the PolyData, because the kinect V2 SDK offers an excellent
+        //default calibration and generates very nice, textured surfaces. The method
+        //GetAllData of MITK-ToF does not allow for passing the surface.
+        toFCameraDevice->m_PolyData = toFCameraDevice->m_Controller->GetVtkPolyData();
         toFCameraDevice->m_ImageMutex->Unlock();
 
         // call modified to indicate that cameraDevice was modified
@@ -297,10 +307,20 @@ namespace mitk
         capturedImageSequence = requiredImageSequence;
         pos = (this->m_CurrentPos + (10-(this->m_ImageSequence - requiredImageSequence))) % this->m_BufferSize;
       }
-      //// write image data to arrays
+      // write image data to arrays
+      m_ImageMutex->Lock();
       memcpy(distanceArray, this->m_DistanceDataBuffer[pos], this->m_DepthBufferSize);
       memcpy(amplitudeArray, this->m_AmplitudeDataBuffer[pos], this->m_DepthBufferSize);
       memcpy(rgbDataArray, this->m_RGBDataBuffer[pos], this->m_RGBBufferSize);
+      vtkSmartPointer<vtkPolyData> deepCopyOfPoly = vtkSmartPointer<vtkPolyData>::New();
+      deepCopyOfPoly->DeepCopy(this->m_PolyData);
+      m_ImageMutex->Unlock();
+
+      //Since the standard method GetAllImages does not allow transfering a surface,
+      //we use a property to pass the surface to the workbench.
+      mitk::Surface::Pointer surface = mitk::Surface::New();
+      surface->SetVtkPolyData( deepCopyOfPoly );
+      this->SetProperty("ToFSurface", mitk::SmartPointerProperty::New( surface ));
 
       this->Modified();
     }

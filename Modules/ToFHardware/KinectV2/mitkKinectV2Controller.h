@@ -23,6 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+
 namespace mitk
 {
   /**
@@ -70,6 +73,9 @@ namespace mitk
     void GetDistances(float* distances);
     void GetAmplitudes(float* amplitudes);
     void GetIntensities(float* intensities);
+
+    vtkSmartPointer<vtkPolyData> GetVtkPolyData();
+
     /*!
     \brief acquire new rgb data from the Kinect camera
     \param rgb pointer to memory location where rgb information should be stored

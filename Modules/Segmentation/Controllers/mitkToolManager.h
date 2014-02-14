@@ -184,6 +184,13 @@ class Segmentation_EXPORT ToolManager : public itk::Object
     */
     void SetRoiData(DataNode*);
 
+    /**
+      * If set to true the mitk::GlobalInteraction just informs
+      * the active tool about new mitk::StateEvent but no other
+      * Interactor or Statemachine
+      */
+    void ActivateExclusiveStateEventPolicy(bool);
+
     /*
       \brief Get the list of reference data.
     */
@@ -282,6 +289,8 @@ class Segmentation_EXPORT ToolManager : public itk::Object
     int m_RegisteredClients;
 
     WeakPointer<DataStorage> m_DataStorage;
+
+    bool m_ExclusiveStateEventPolicy;
 
     /// \brief Callback for NodeRemove events
     void OnNodeRemoved(const mitk::DataNode* node);

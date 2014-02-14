@@ -537,9 +537,9 @@ struct mitkImageStatisticsHotspotTestClass
 
   static void ValidateStatisticsItem(const std::string& label, const vnl_vector<int>& testvalue, const vnl_vector<int>& reference)
   {
-    double diffX = ::fabs(testvalue[0] - reference[0]);
-    double diffY = ::fabs(testvalue[1] - reference[1]);
-    double diffZ = ::fabs(testvalue[2] - reference[2]);
+    double diffX = ::fabs(double(testvalue[0] - reference[0]));
+    double diffY = ::fabs(double(testvalue[1] - reference[1]));
+    double diffZ = ::fabs(double(testvalue[2] - reference[2]));
 
     std::stringstream testPosition;
     testPosition << testvalue[0] << "," << testvalue[1] << "," << testvalue[2];

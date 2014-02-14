@@ -47,11 +47,11 @@ namespace mitk
     KinectV2ControllerPrivate();
     ~KinectV2ControllerPrivate();
 
-    bool ErrorText(unsigned int error);
-    IKinectSensor* m_pKinectSensor;
-    IMultiSourceFrameReader*m_pMultiSourceFrameReader;
-    ICoordinateMapper* m_pCoordinateMapper;
-    RGBQUAD* m_pColorRGBX;
+    //bool ErrorText(unsigned int error);
+    IKinectSensor* m_pKinectSensor;///<Kinect V2 sensor object
+    IMultiSourceFrameReader* m_pMultiSourceFrameReader;///< Multiframe reader to read all frames at once
+    ICoordinateMapper* m_pCoordinateMapper;///< Coordinate mapper allows for computation of wolrd coordinates and texture mapping
+    RGBQUAD* m_pColorRGBX; ///< RGBX color format, to copy the color image
 
     bool m_ConnectionCheck; ///< check if camera is connected or not
 
@@ -63,10 +63,9 @@ namespace mitk
     size_t m_RGBBufferSize;///< Size of the RGB buffer in byte (one unsigned char per color per pixel)
     size_t m_DepthBufferSize; ///< Size of the depth buffer in byte (one float per pixel)
 
-    CameraSpacePoint* m_CameraCoordinates;
-    vtkSmartPointer<vtkPolyData> m_PolyData;
-
-    ColorSpacePoint* m_ColorPoints;
+    CameraSpacePoint* m_CameraCoordinates; ///< 3D world coordinate points of the Kinect V2 SDK
+    ColorSpacePoint* m_ColorPoints;///< Texture coordinates of the Kinect V2 SDK
+    vtkSmartPointer<vtkPolyData> m_PolyData;///< Conversion of m_CameraCoordinates to vtkPolyData
   };
 
   KinectV2Controller::KinectV2ControllerPrivate::KinectV2ControllerPrivate():
@@ -82,25 +81,20 @@ namespace mitk
     m_RGBBufferSize(1920*1080*3),
     m_DepthBufferSize(sizeof(float)*512*424),
     m_CameraCoordinates(NULL),
-    m_PolyData(NULL),
-    m_ColorPoints(NULL)
+    m_ColorPoints(NULL),
+    m_PolyData(NULL)
   {
     // create heap storage for color pixel data in RGBX format
     m_pColorRGBX = new RGBQUAD[m_RGBCaptureWidth * m_RGBCaptureHeight];
-
+    //initialize 3D world coordinates and texture coordinates
     m_CameraCoordinates = new CameraSpacePoint[m_DepthCaptureWidth * m_DepthCaptureHeight];
-    m_PolyData = vtkSmartPointer<vtkPolyData>::New();
     m_ColorPoints = new ColorSpacePoint[m_DepthCaptureWidth * m_DepthCaptureHeight];
+    m_PolyData = vtkSmartPointer<vtkPolyData>::New();
   }
 
   KinectV2Controller::KinectV2ControllerPrivate::~KinectV2ControllerPrivate()
   {
     MITK_INFO << "~KinectV2ControllerPrivate";
-  }
-
-  bool KinectV2Controller::KinectV2ControllerPrivate::ErrorText(unsigned int error)
-  {
-    return true;
   }
 
   KinectV2Controller::KinectV2Controller(): d(new KinectV2ControllerPrivate)
@@ -190,17 +184,177 @@ namespace mitk
 
   bool KinectV2Controller::UpdateCamera()
   {
+    //Acquire lastest frame updates the camera and for
+    //unknown reasons I cannot use it here in UpdateCamera()
+    //without resulting in random crashes of the app.
    return true;
   }
 
   void KinectV2Controller::GetDistances(float* distances)
   {
-    //memcpy(distances, d->m_Distances, d->m_DepthBufferSize);
+    if(!InitializeMultiFrameReader())
+    {
+      MITK_ERROR << "Unable to initialize MultiFrameReader";
+      return;
+    }
+    IMultiSourceFrame* pMultiSourceFrame = NULL;
+    IDepthFrame* pDepthFrame = NULL;
+
+    HRESULT hr = -1; //SDK error format
+
+    static DWORD lastTime = 0;
+    DWORD currentTime = GetTickCount();
+    //Check if we do not request data faster than 30 FPS. Kinect V2 can only deliver 30 FPS.
+    if( unsigned int(currentTime - lastTime) > 33 )
+    {
+      hr = d->m_pMultiSourceFrameReader->AcquireLatestFrame(&pMultiSourceFrame);
+      lastTime = currentTime;
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      IDepthFrameReference* pDepthFrameReference = NULL;
+
+      hr = pMultiSourceFrame->get_DepthFrameReference(&pDepthFrameReference);
+      if (SUCCEEDED(hr))
+      {
+        hr = pDepthFrameReference->AcquireFrame(&pDepthFrame);
+      }
+      SafeRelease(pDepthFrameReference);
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      UINT nDepthBufferSize = 0;
+      UINT16 *pDepthBuffer = NULL;
+
+      if (SUCCEEDED(hr))
+      {
+        hr = pDepthFrame->AccessUnderlyingBuffer(&nDepthBufferSize, &pDepthBuffer);
+      }
+      if (SUCCEEDED(hr))
+      {
+        UINT pointCount = d->m_DepthCaptureWidth * d->m_DepthCaptureHeight;
+        d->m_pCoordinateMapper->MapDepthFrameToCameraSpace(pointCount, pDepthBuffer, pointCount, d->m_CameraCoordinates);
+        vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+        vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
+        vtkSmartPointer<vtkFloatArray> textureCoordinates = vtkSmartPointer<vtkFloatArray>::New();
+        textureCoordinates->SetNumberOfComponents(2);
+        textureCoordinates->Allocate(pointCount);
+
+        d->m_pCoordinateMapper->MapDepthFrameToColorSpace(pointCount, pDepthBuffer, pointCount, d->m_ColorPoints);
+
+        for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
+        {
+          vtkIdType id = points->InsertNextPoint(d->m_CameraCoordinates[i].X, d->m_CameraCoordinates[i].Y, d->m_CameraCoordinates[i].Z);
+          vertices->InsertNextCell(1);
+          vertices->InsertCellPoint(id);
+          distances[i] = static_cast<float>(*pDepthBuffer);
+          ++pDepthBuffer;
+
+          ColorSpacePoint colorPoint = d->m_ColorPoints[i];
+          // retrieve the depth to color mapping for the current depth pixel
+          int colorInDepthX = (int)(floor(colorPoint.X + 0.5));
+          int colorInDepthY = (int)(floor(colorPoint.Y + 0.5));
+
+          float xNorm = static_cast<float>(colorInDepthX)/d->m_RGBCaptureWidth;
+          float yNorm = static_cast<float>(colorInDepthY)/d->m_RGBCaptureHeight;
+
+          // make sure the depth pixel maps to a valid point in color space
+          if ( colorInDepthX >= 0 && colorInDepthX < d->m_RGBCaptureWidth && colorInDepthY >= 0 && colorInDepthY < d->m_RGBCaptureHeight )
+          {
+            textureCoordinates->InsertTuple2(id, xNorm, yNorm);
+          }
+        }
+        d->m_PolyData = vtkSmartPointer<vtkPolyData>::New();
+        d->m_PolyData->SetPoints(points);
+        d->m_PolyData->SetVerts(vertices);
+        d->m_PolyData->GetPointData()->SetTCoords(textureCoordinates);
+      }
+      else
+      {
+        MITK_ERROR << "AccessUnderlyingBuffer";
+      }
+    }
+    SafeRelease(pDepthFrame);
+    SafeRelease(pMultiSourceFrame);
+
+    if( hr != -1 && !SUCCEEDED(hr) )
+    {
+      //The thread gets here, if the data is requested faster than the device can deliver it.
+      //This may happen from time to time.
+      MITK_DEBUG << "HR result false in KinectV2Controller::GetDistances()";
+      return;
+    }
   }
 
   void KinectV2Controller::GetRgb(unsigned char* rgb)
   {
-    //memcpy(rgb, d->m_Colors, d->m_RGBBufferSize);
+    if(!InitializeMultiFrameReader())
+    {
+      MITK_ERROR << "Unable to initialize MultiFrameReader";
+      return;
+    }
+    IMultiSourceFrame* pMultiSourceFrame = NULL;
+    IColorFrame* pColorFrame = NULL;
+
+    HRESULT hr = -1;
+
+    static DWORD lastTime = 0;
+    DWORD currentTime = GetTickCount();
+    //Check if we do not request data faster than 30 FPS. Kinect V2 can only deliver 30 FPS.
+    if( unsigned int(currentTime - lastTime) > 33 )
+    {
+      hr = d->m_pMultiSourceFrameReader->AcquireLatestFrame(&pMultiSourceFrame);
+      lastTime = currentTime;
+    }
+
+    ColorImageFormat imageFormat = ColorImageFormat_None;
+    UINT nColorBufferSize = 0;
+    RGBQUAD *pColorBuffer = NULL;
+    // get color frame data
+    if (SUCCEEDED(hr))
+    {
+      hr = pColorFrame->get_RawColorImageFormat(&imageFormat);
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      if (imageFormat == ColorImageFormat_Bgra)
+      {
+        hr = pColorFrame->AccessRawUnderlyingBuffer(&nColorBufferSize, reinterpret_cast<BYTE**>(&pColorBuffer));
+      }
+      else if (d->m_pColorRGBX)
+      {
+        pColorBuffer = d->m_pColorRGBX;
+        nColorBufferSize = d->m_RGBCaptureWidth * d->m_RGBCaptureHeight * sizeof(RGBQUAD);
+        hr = pColorFrame->CopyConvertedFrameDataToArray(nColorBufferSize, reinterpret_cast<BYTE*>(pColorBuffer), ColorImageFormat_Bgra);
+      }
+      else
+      {
+        hr = E_FAIL;
+      }
+      if (SUCCEEDED(hr))
+      {
+        for(int i = 0; i < d->m_RGBBufferSize; i+=3)
+        {
+          //convert from BGR to RGB
+          rgb[i+0] = pColorBuffer->rgbRed;
+          rgb[i+1] = pColorBuffer->rgbGreen;
+          rgb[i+2] = pColorBuffer->rgbBlue;
+          ++pColorBuffer;
+        }
+      }
+    }
+    SafeRelease(pColorFrame);
+    SafeRelease(pMultiSourceFrame);
+
+    if( hr != -1 && !SUCCEEDED(hr) )
+    {
+      //The thread gets here, if the data is requested faster than the device can deliver it.
+      //This may happen from time to time.
+      MITK_DEBUG << "HR result false in KinectV2Controller::GetRgb()";
+    }
   }
 
   void KinectV2Controller::GetAllData(float* distances, float* amplitudes, unsigned char* rgb)
@@ -219,9 +373,7 @@ namespace mitk
     HRESULT hr = -1;
 
     static DWORD lastTime = 0;
-
     DWORD currentTime = GetTickCount();
-
     //Check if we do not request data faster than 30 FPS. Kinect V2 can only deliver 30 FPS.
     if( unsigned int(currentTime - lastTime) > 33 )
     {
@@ -269,7 +421,7 @@ namespace mitk
     {
       UINT nDepthBufferSize = 0;
       UINT16 *pDepthBuffer = NULL;
-      UINT16 *pIntraRedBuffer = NULL;
+      UINT16 *pInfraRedBuffer = NULL;
 
       ColorImageFormat imageFormat = ColorImageFormat_None;
       UINT nColorBufferSize = 0;
@@ -281,7 +433,7 @@ namespace mitk
       }
       if (SUCCEEDED(hr))
       {
-        hr = pInfraRedFrame->AccessUnderlyingBuffer(&nDepthBufferSize, &pIntraRedBuffer);
+        hr = pInfraRedFrame->AccessUnderlyingBuffer(&nDepthBufferSize, &pInfraRedBuffer);
       }
       if (SUCCEEDED(hr))
       {
@@ -301,9 +453,9 @@ namespace mitk
           vertices->InsertNextCell(1);
           vertices->InsertCellPoint(id);
           distances[i] = static_cast<float>(*pDepthBuffer);
-          amplitudes[i] = static_cast<float>(*pIntraRedBuffer);
+          amplitudes[i] = static_cast<float>(*pInfraRedBuffer);
           ++pDepthBuffer;
-          ++pIntraRedBuffer;
+          ++pInfraRedBuffer;
 
           ColorSpacePoint colorPoint = d->m_ColorPoints[i];
           // retrieve the depth to color mapping for the current depth pixel
@@ -375,13 +527,74 @@ namespace mitk
       //The thread gets here, if the data is requested faster than the device can deliver it.
       //This may happen from time to time.
       MITK_DEBUG << "HR result false in KinectV2Controller::GetAllData()";
-      return;
     }
   }
 
   void KinectV2Controller::GetAmplitudes( float* amplitudes )
   {
-    //memcpy( amplitudes, d->m_Amplitudes, d->m_DepthBufferSize);
+    if(!InitializeMultiFrameReader())
+    {
+      MITK_ERROR << "Unable to initialize MultiFrameReader";
+      return;
+    }
+
+    IMultiSourceFrame* pMultiSourceFrame = NULL;
+    IInfraredFrame* pInfraRedFrame = NULL;
+
+    HRESULT hr = -1;
+
+    static DWORD lastTime = 0;
+    DWORD currentTime = GetTickCount();
+    //Check if we do not request data faster than 30 FPS. Kinect V2 can only deliver 30 FPS.
+    if( unsigned int(currentTime - lastTime) > 33 )
+    {
+      hr = d->m_pMultiSourceFrameReader->AcquireLatestFrame(&pMultiSourceFrame);
+      lastTime = currentTime;
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      IInfraredFrameReference* pInfraredFrameReference = NULL;
+
+      hr = pMultiSourceFrame->get_InfraredFrameReference(&pInfraredFrameReference);
+      if (SUCCEEDED(hr))
+      {
+        hr = pInfraredFrameReference->AcquireFrame(&pInfraRedFrame);
+      }
+      SafeRelease(pInfraredFrameReference);
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      UINT nDepthBufferSize = 0;
+      UINT16 *pInfraRedBuffer = NULL;
+
+      if (SUCCEEDED(hr))
+      {
+        hr = pInfraRedFrame->AccessUnderlyingBuffer(&nDepthBufferSize, &pInfraRedBuffer);
+      }
+      if (SUCCEEDED(hr))
+      {
+        for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
+        {
+          amplitudes[i] = static_cast<float>(*pInfraRedBuffer);
+          ++pInfraRedBuffer;
+        }
+      }
+      else
+      {
+        MITK_ERROR << "AccessUnderlyingBuffer";
+      }
+    }
+    SafeRelease(pInfraRedFrame);
+    SafeRelease(pMultiSourceFrame);
+
+    if( hr != -1 && !SUCCEEDED(hr) )
+    {
+      //The thread gets here, if the data is requested faster than the device can deliver it.
+      //This may happen from time to time.
+      MITK_DEBUG << "HR result false in KinectV2Controller::GetAmplitudes()";
+    }
   }
 
   int KinectV2Controller::GetRGBCaptureWidth() const

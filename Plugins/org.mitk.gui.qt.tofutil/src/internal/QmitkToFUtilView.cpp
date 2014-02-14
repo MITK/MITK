@@ -490,22 +490,21 @@ void QmitkToFUtilView::OnUpdateCamera()
     // update surface
     m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
 
-    //get the colortransferfunction from the visualization widget
-    //this->m_ToFSurfaceVtkMapper3D->SetVtkScalarsToColors(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
+    bool hasSurface = false;
+    this->m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasSurface", hasSurface);
+    if(hasSurface)
+    {
+      mitk::SmartPointerProperty::Pointer surfaceProp = dynamic_cast< mitk::SmartPointerProperty * >(this->m_ToFImageGrabber->GetCameraDevice()->GetProperty("ToFSurface"));
+      this->m_Surface->SetVtkPolyData( dynamic_cast< mitk::Surface* >( surfaceProp->GetSmartPointer().GetPointer() )->GetVtkPolyData() );
+    }
 
     //update pipeline
-    mitk::SmartPointerProperty::Pointer surfaceProp = dynamic_cast< mitk::SmartPointerProperty * >(this->m_ToFImageGrabber->GetCameraDevice()->GetProperty("ToFSurface"));
-    this->m_Surface->SetVtkPolyData( dynamic_cast< mitk::Surface* >( surfaceProp->GetSmartPointer().GetPointer() )->GetVtkPolyData() );
-    this->m_Surface->Modified();
-
-    this->m_ToFImageGrabber->Modified();
     this->m_Surface->Update();
   }
   //##### End code for surface #####
   else
   {
     // update pipeline
-    this->m_ToFImageGrabber->Modified();
     this->m_MitkDistanceImage->Update();
   }
 

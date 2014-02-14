@@ -1146,7 +1146,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     for( int j = 0; j < imageDirection.ColumnDimensions; ++j )
     {
       double differenceDirection = imageDirection[i][j] - maskDirection[i][j];
-      if ( fabs( differenceDirection ) > mitk::eps )
+      if ( fabs( differenceDirection ) > 0.001 /*mitk::eps*/ ) // TODO: temp fix (bug 17121)
       {
         itkExceptionMacro( << "Mask needs to have same direction as image! (Image direction: " << imageDirection << "; Mask direction: " << maskDirection << ")" );
       }
@@ -1167,7 +1167,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   for ( unsigned int i = 0; i < ImageType::ImageDimension; ++i )
   {
     double misalignment = maskOriginContinousIndex[i] - floor( maskOriginContinousIndex[i] + 0.5 );
-    if ( fabs( misalignment ) > mitk::eps )
+    if ( fabs( misalignment ) > 0.001 /*mitk::eps*/ ) // TODO: temp fix, check for a better solution to allow 'small' alignment errors (bug 17121)
     {
       itkExceptionMacro( << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << misalignment << ")" );
     }

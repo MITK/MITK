@@ -31,12 +31,13 @@ class mitkToolInteractionTestSuite : public mitk::TestFixture
 
   CPPUNIT_TEST_SUITE(mitkToolInteractionTestSuite);
   MITK_TEST(AddToolInteractionTest);
+  MITK_TEST(AddToolInteraction_4D_Test);
   CPPUNIT_TEST_SUITE_END();
 
 
 private:
 //  mitk::DataNode::Pointer testPointSetNode;
-  mitk::InteractionTestHelper m_InteractionTestHelper;
+  mitk::InteractionTestHelper* m_InteractionTestHelper;
   mitk::DataStorage* m_DataStorage;
   mitk::ToolManager::Pointer m_ToolManager;
 
@@ -71,6 +72,8 @@ public:
     int toolID = GetToolIDFromToolName(toolName);
     mitk::Tool* tool = m_ToolManager->GetToolById(toolID);
 
+    CPPUNIT_ASSERT(tool != NULL);
+
     //Create empty segmentation working image
     mitk::DataNode::Pointer workingImageNode = mitk::DataNode::New();
     const std::string organName = "test";
@@ -80,9 +83,12 @@ public:
     color.SetBlue(0);
     workingImageNode = tool->CreateEmptySegmentationNode(patientImage, organName, color);
 
+    CPPUNIT_ASSERT(workingImageNode.IsNotNull());
+    CPPUNIT_ASSERT(workingImageNode->GetData() != NULL);
+
     //add images to datastorage
-    m_InteractionTestHelper.AddNodeToStorage(patientImageNode);
-    m_InteractionTestHelper.AddNodeToStorage(workingImageNode);
+    m_InteractionTestHelper->AddNodeToStorage(patientImageNode);
+    m_InteractionTestHelper->AddNodeToStorage(workingImageNode);
 
     //set reference and working image
     m_ToolManager->SetWorkingData(workingImageNode);
@@ -90,14 +96,20 @@ public:
 
     //load interaction events
     m_ToolManager->ActivateTool(toolID);
-    m_InteractionTestHelper.LoadInteraction(GetTestDataFilePath(interactionPattern));
+
+    CPPUNIT_ASSERT(m_ToolManager->GetActiveTool() != NULL);
+
+    //Load interaction pattern
+    m_InteractionTestHelper->LoadInteraction(GetTestDataFilePath(interactionPattern));
 
     //Start Interaction
-    m_InteractionTestHelper.PlaybackInteraction();
+    m_InteractionTestHelper->PlaybackInteraction();
 
     //load reference segmentation image
     mitk::Image::Pointer segmentationReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath(referenceSegmentationImage));
     mitk::Image* currentSegmentationImage = dynamic_cast<mitk::Image*>(workingImageNode->GetData());
+
+    CPPUNIT_ASSERT(currentSegmentationImage != NULL);
 
     //compare reference with interaction result
     MITK_ASSERT_EQUAL(segmentationReferenceImage.GetPointer(), currentSegmentationImage, "Reference equals interaction result." );
@@ -106,8 +118,8 @@ public:
   void setUp()
   {
     //Create test helper to initialize all necessary objects for interaction
-    m_InteractionTestHelper = mitk::InteractionTestHelper();
-    m_DataStorage = m_InteractionTestHelper.GetDataStorage().GetPointer();
+    m_InteractionTestHelper = new mitk::InteractionTestHelper();
+    m_DataStorage = m_InteractionTestHelper->GetDataStorage().GetPointer();
 
     //create ToolManager
     m_ToolManager = mitk::ToolManager::New(m_DataStorage);
@@ -120,11 +132,18 @@ public:
   {
     m_ToolManager->ActivateTool(-1);
     m_ToolManager = NULL;
+    delete m_InteractionTestHelper;
   }
 
   void AddToolInteractionTest()
   {
     RunTestWithParameters("Pic3D.nrrd", "Segmentation/ReferenceSegmentations/AddTool.nrrd", "AddContourTool", "Segmentation/InteractionPatterns/AddTool.xml");
+  }
+
+  void AddToolInteraction_4D_Test()
+  {
+    m_InteractionTestHelper->SetTimeStep(1);
+    RunTestWithParameters("US4DCyl.nrrd", "Segmentation/ReferenceSegmentations/AddTool_4D.nrrd", "AddContourTool", "Segmentation/InteractionPatterns/AddTool_4D.xml");
   }
 
 };

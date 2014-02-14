@@ -33,7 +33,8 @@ mitk::ToolManager::ToolManager(DataStorage* storage)
 :m_ActiveTool(NULL),
  m_ActiveToolID(-1),
  m_RegisteredClients(0),
- m_DataStorage(storage)
+ m_DataStorage(storage),
+ m_ExclusiveStateEventPolicy(true)
 {
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
   this->InitializeTools();
@@ -182,7 +183,7 @@ bool mitk::ToolManager::ActivateTool(int id)
         m_ActiveTool->Activated();
         GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
         //If a tool is activated set event notification policy to one
-        if (dynamic_cast<mitk::SegTool2D*>(m_ActiveTool))
+        if (m_ExclusiveStateEventPolicy && dynamic_cast<mitk::SegTool2D*>(m_ActiveTool))
           GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_ONE);
       }
     }
@@ -547,5 +548,10 @@ void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode* node)
     OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
     OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
   //}
+}
+
+void mitk::ToolManager::ActivateExclusiveStateEventPolicy(bool state)
+{
+  m_ExclusiveStateEventPolicy = state;
 }
 

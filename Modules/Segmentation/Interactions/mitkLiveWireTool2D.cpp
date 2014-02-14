@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkInteractionConst.h>
 #include <mitkGlobalInteraction.h>
+#include <mitkContourModelUtils.h>
 
 #include "mitkContourUtils.h"
 #include "mitkContour.h"
@@ -205,7 +206,6 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
   Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
   assert ( workingImage );
 
-  ContourUtils::Pointer contourUtils = mitk::ContourUtils::New();
 
   // for all contours in list (currently created by tool)
   std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itWorkingContours = this->m_WorkingContours.begin();
@@ -227,8 +227,8 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
           //get the segmentation image slice at current timestep
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(itWorkingContours->second, workingImage, currentTimestep);
 
-          mitk::ContourModel::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
-          contourUtils->FillContourInSlice(projectedContour, workingSlice, 1.0);
+          mitk::ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
+          mitk::ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, 1.0);
 
           //write back to image volume
           this->WriteBackSegmentationResult(itWorkingContours->second, workingSlice, currentTimestep);

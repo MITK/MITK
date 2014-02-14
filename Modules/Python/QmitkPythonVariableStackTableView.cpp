@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPythonVariableStackTableView.h"
 #include <usModuleContext.h>
 #include <usServiceReference.h>
-#include <mitkGetModuleContext.h>
+#include <usGetModuleContext.h>
 #include <mitkRenderingManager.h>
 #include <mitkSurface.h>
 
@@ -33,8 +33,8 @@ QmitkPythonVariableStackTableView::QmitkPythonVariableStackTableView(QWidget *pa
     this->setAcceptDrops(true);
     this->setModel( m_TableModel );
 
-    mitk::ModuleContext* context = mitk::GetModuleContext();
-    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::IPythonService>();
+    us::ModuleContext* context = us::GetModuleContext();
+    us::ServiceReference<mitk::IPythonService> serviceRef = context->GetServiceReference<mitk::IPythonService>();
     m_PythonService = context->GetService<mitk::IPythonService>(serviceRef);
 
     connect( this, SIGNAL(doubleClicked ( const QModelIndex& )), this, SLOT( OnVariableStackDoubleClicked(const QModelIndex&) ) );

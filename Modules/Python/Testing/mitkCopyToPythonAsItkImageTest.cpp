@@ -33,9 +33,9 @@ int mitkCopyToPythonAsItkImageTest(int /*argc*/, char* argv[])
 
   //get the context of the python module
   mitk::Module* module = mitk::ModuleRegistry::GetModule("mitkPython");
-  mitk::ModuleContext* context = module->GetModuleContext();
+  us::ModuleContext* context = module->GetModuleContext();
   //get the service which is generated in the PythonModuleActivator
-  mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::IPythonService>();
+  us::ServiceReference serviceRef = context->GetServiceReference<mitk::IPythonService>();
   mitk::PythonService* pythonService = dynamic_cast<mitk::PythonService*>( context->GetService<mitk::IPythonService>(serviceRef) );
   MITK_TEST_CONDITION(pythonService->IsItkPythonWrappingAvailable() == true, "Is Python available?");
 

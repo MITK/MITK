@@ -57,7 +57,7 @@ public:
 private:
   std::vector<mitk::PythonVariable> m_VariableStack;
   mitk::IPythonService* m_PythonService;
-  mitk::ServiceReference m_PythonServiceRef;
+  us::ServiceReference<mitk::IPythonService> m_PythonServiceRef;
 };
 
 #endif // QmitkPythonVariableStackTableModel_h

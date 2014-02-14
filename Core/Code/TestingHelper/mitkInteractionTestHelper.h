@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeFactory.h>
 #include <mitkDataStorage.h>
 #include <mitkXML2EventParser.h>
+#include <mitkMouseModeSwitcher.h>
 
 #include <MitkTestingHelperExports.h>
 
@@ -50,16 +51,10 @@ class MITK_TESTINGHELPER_EXPORT InteractionTestHelper
 {
 
 public:
-  /**
-    **/
+
   InteractionTestHelper();
 
-  /** Default destructor */
   ~InteractionTestHelper();
-
-  /** @brief Getter for the Renderer.
-    **/
-  BaseRenderer* GetRenderer();
 
   /** @brief Returns the datastorage, in order to modify the data inside a rendering test.
     **/
@@ -72,7 +67,7 @@ public:
   void AddNodeToStorage(mitk::DataNode::Pointer node);
 
   /**
-   * @brief PlaybackInteraction plays loaded interaction by passing events to the dispatcher.
+   * @brief PlaybackInteraction playback loaded interaction by passing events to the dispatcher.
    */
   void PlaybackInteraction();
 
@@ -82,12 +77,17 @@ public:
    */
   void LoadInteraction(std::string interactionXmlPath);
 
+  /**
+   * @brief SetTimeStep Sets timesteps of all SliceNavigationControllers to given timestep.
+   * @param newTimeStep new timestep
+   *
+   * Does the same as using ImageNavigators Time slider. Use this if your data was modified in a timestep other than 0.
+   */
+  void SetTimeStep(int newTimeStep);
+
 protected:
   /**
      * @brief Initialize Internal method to initialize the renderwindow and set the datastorage.
-     * @param width Height of renderwindow.
-     * @param height Width of renderwindow.
-     * @param interactionFilePath path to xml file containing interaction events.
      */
   void Initialize();
 
@@ -95,8 +95,11 @@ protected:
   mitk::XML2EventParser::EventContainerType m_Events; // List with loaded interaction events
 
   mitk::VtkPropRenderer::Pointer m_Renderer;
-  mitk::RenderWindow::Pointer m_RenderWindow;
+  mitk::RenderWindow::Pointer m_RenderWindowAxial;
+  mitk::RenderWindow::Pointer m_RenderWindowSagittal;
+  mitk::RenderWindow::Pointer m_RenderWindowFrontal;
   mitk::DataStorage::Pointer m_DataStorage;
+  mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
 
 };
 }//namespace mitk

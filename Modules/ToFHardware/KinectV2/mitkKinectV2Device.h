@@ -141,7 +141,7 @@ namespace mitk
     size_t m_DepthBufferSize; ///< Size of depth buffer (i.e. memory size of depth and infrared image)
     size_t m_RGBBufferSize; ///< Size of RGB buffer (i.e. memory size of RGB image)
 
-    vtkSmartPointer<vtkPolyData> m_PolyData;
+    vtkSmartPointer<vtkPolyData> m_PolyData; ///< Surface generated via the Kinect V2 SDK with default/unknown calibration.
   };
 } //END mitk namespace
 #endif

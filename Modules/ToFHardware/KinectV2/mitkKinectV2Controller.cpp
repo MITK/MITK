@@ -14,10 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkKinectV2Controller.h"
-#include <Kinect.h>
-#include <mitkToFDebugHelper.h>
-#include <mitkSurface.h>
 
+//Kinect V2 SDK
+#include <Kinect.h>
+
+//VTK
 #include <vtkPolyData.h>
 #include <vtkCellArray.h>
 #include <vtkPoints.h>
@@ -54,18 +55,14 @@ namespace mitk
 
     bool m_ConnectionCheck; ///< check if camera is connected or not
 
-    int m_DepthCaptureWidth;
-    int m_DepthCaptureHeight;
+    int m_DepthCaptureWidth; ///< Width of the depth image
+    int m_DepthCaptureHeight; ///< Height of the depth image
 
-    int m_RGBCaptureWidth;
-    int m_RGBCaptureHeight;
-    float* m_Distances;
-    float* m_Amplitudes;
-    unsigned char* m_Colors;
-    size_t m_RGBBufferSize;
-    size_t m_DepthBufferSize;
+    int m_RGBCaptureWidth;///< Width of the RGB image
+    int m_RGBCaptureHeight;///< Height of the RGB image
+    size_t m_RGBBufferSize;///< Size of the RGB buffer in byte (one unsigned char per color per pixel)
+    size_t m_DepthBufferSize; ///< Size of the depth buffer in byte (one float per pixel)
 
-    //mitk::Surface::Pointer m_Surface;
     CameraSpacePoint* m_CameraCoordinates;
     vtkSmartPointer<vtkPolyData> m_PolyData;
 
@@ -82,23 +79,15 @@ namespace mitk
     m_DepthCaptureHeight(424),
     m_RGBCaptureWidth(1920),
     m_RGBCaptureHeight(1080),
-    m_Distances(NULL),
-    m_Amplitudes(NULL),
-    m_Colors(NULL),
     m_RGBBufferSize(1920*1080*3),
     m_DepthBufferSize(sizeof(float)*512*424),
-    //m_Surface(NULL),
     m_CameraCoordinates(NULL),
     m_PolyData(NULL),
     m_ColorPoints(NULL)
   {
     // create heap storage for color pixel data in RGBX format
     m_pColorRGBX = new RGBQUAD[m_RGBCaptureWidth * m_RGBCaptureHeight];
-    m_Distances = new float[m_DepthCaptureWidth * m_DepthCaptureHeight];
-    m_Amplitudes = new float[m_DepthCaptureWidth * m_DepthCaptureHeight];
-    m_Colors = new unsigned char[m_RGBBufferSize];
 
-    //m_Surface = mitk::Surface::New();
     m_CameraCoordinates = new CameraSpacePoint[m_DepthCaptureWidth * m_DepthCaptureHeight];
     m_PolyData = vtkSmartPointer<vtkPolyData>::New();
     m_ColorPoints = new ColorSpacePoint[m_DepthCaptureWidth * m_DepthCaptureHeight];
@@ -206,196 +195,193 @@ namespace mitk
 
   void KinectV2Controller::GetDistances(float* distances)
   {
-    memcpy(distances, d->m_Distances, d->m_DepthBufferSize);
+    //memcpy(distances, d->m_Distances, d->m_DepthBufferSize);
   }
 
   void KinectV2Controller::GetRgb(unsigned char* rgb)
   {
-    memcpy(rgb, d->m_Colors, d->m_RGBBufferSize);
+    //memcpy(rgb, d->m_Colors, d->m_RGBBufferSize);
   }
 
   void KinectV2Controller::GetAllData(float* distances, float* amplitudes, unsigned char* rgb)
   {
-    if(InitializeMultiFrameReader())
+    if(!InitializeMultiFrameReader())
     {
+      MITK_ERROR << "Unable to initialize MultiFrameReader";
+      return;
+    }
 
-      IMultiSourceFrame* pMultiSourceFrame = NULL;
-      IDepthFrame* pDepthFrame = NULL;
-      IColorFrame* pColorFrame = NULL;
-      IInfraredFrame* pInfraRedFrame = NULL;
+    IMultiSourceFrame* pMultiSourceFrame = NULL;
+    IDepthFrame* pDepthFrame = NULL;
+    IColorFrame* pColorFrame = NULL;
+    IInfraredFrame* pInfraRedFrame = NULL;
 
-      HRESULT hr = -1;
+    HRESULT hr = -1;
 
-      static DWORD lastTime = 0;
+    static DWORD lastTime = 0;
 
-      DWORD currentTime = GetTickCount();
+    DWORD currentTime = GetTickCount();
 
-      //Check if we do not request data faster than 30 FPS. Kinect V2 can only deliver 30 FPS.
-      if( unsigned int(currentTime - lastTime) > 33 )
+    //Check if we do not request data faster than 30 FPS. Kinect V2 can only deliver 30 FPS.
+    if( unsigned int(currentTime - lastTime) > 33 )
+    {
+      hr = d->m_pMultiSourceFrameReader->AcquireLatestFrame(&pMultiSourceFrame);
+      lastTime = currentTime;
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      IDepthFrameReference* pDepthFrameReference = NULL;
+
+      hr = pMultiSourceFrame->get_DepthFrameReference(&pDepthFrameReference);
+      if (SUCCEEDED(hr))
       {
-        hr = d->m_pMultiSourceFrameReader->AcquireLatestFrame(&pMultiSourceFrame);
-        lastTime = currentTime;
+        hr = pDepthFrameReference->AcquireFrame(&pDepthFrame);
       }
+      SafeRelease(pDepthFrameReference);
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      IColorFrameReference* pColorFrameReference = NULL;
+
+      hr = pMultiSourceFrame->get_ColorFrameReference(&pColorFrameReference);
+      if (SUCCEEDED(hr))
+      {
+        hr = pColorFrameReference->AcquireFrame(&pColorFrame);
+      }
+      SafeRelease(pColorFrameReference);
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      IInfraredFrameReference* pInfraredFrameReference = NULL;
+
+      hr = pMultiSourceFrame->get_InfraredFrameReference(&pInfraredFrameReference);
+      if (SUCCEEDED(hr))
+      {
+        hr = pInfraredFrameReference->AcquireFrame(&pInfraRedFrame);
+      }
+      SafeRelease(pInfraredFrameReference);
+    }
+
+    if (SUCCEEDED(hr))
+    {
+      UINT nDepthBufferSize = 0;
+      UINT16 *pDepthBuffer = NULL;
+      UINT16 *pIntraRedBuffer = NULL;
+
+      ColorImageFormat imageFormat = ColorImageFormat_None;
+      UINT nColorBufferSize = 0;
+      RGBQUAD *pColorBuffer = NULL;
 
       if (SUCCEEDED(hr))
       {
-        IDepthFrameReference* pDepthFrameReference = NULL;
-
-        hr = pMultiSourceFrame->get_DepthFrameReference(&pDepthFrameReference);
-        if (SUCCEEDED(hr))
-        {
-          hr = pDepthFrameReference->AcquireFrame(&pDepthFrame);
-        }
-
-        SafeRelease(pDepthFrameReference);
+        hr = pDepthFrame->AccessUnderlyingBuffer(&nDepthBufferSize, &pDepthBuffer);
       }
-
       if (SUCCEEDED(hr))
       {
-        IColorFrameReference* pColorFrameReference = NULL;
-
-        hr = pMultiSourceFrame->get_ColorFrameReference(&pColorFrameReference);
-        if (SUCCEEDED(hr))
-        {
-          hr = pColorFrameReference->AcquireFrame(&pColorFrame);
-        }
-
-        SafeRelease(pColorFrameReference);
+        hr = pInfraRedFrame->AccessUnderlyingBuffer(&nDepthBufferSize, &pIntraRedBuffer);
       }
-
       if (SUCCEEDED(hr))
       {
-        IInfraredFrameReference* pInfraredFrameReference = NULL;
+        UINT pointCount = d->m_DepthCaptureWidth * d->m_DepthCaptureHeight;
+        d->m_pCoordinateMapper->MapDepthFrameToCameraSpace(pointCount, pDepthBuffer, pointCount, d->m_CameraCoordinates);
+        vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+        vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
+        vtkSmartPointer<vtkFloatArray> textureCoordinates = vtkSmartPointer<vtkFloatArray>::New();
+        textureCoordinates->SetNumberOfComponents(2);
+        textureCoordinates->Allocate(pointCount);
 
-        hr = pMultiSourceFrame->get_InfraredFrameReference(&pInfraredFrameReference);
-        if (SUCCEEDED(hr))
+        d->m_pCoordinateMapper->MapDepthFrameToColorSpace(pointCount, pDepthBuffer, pointCount, d->m_ColorPoints);
+
+        for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
         {
-          hr = pInfraredFrameReference->AcquireFrame(&pInfraRedFrame);
-        }
+          vtkIdType id = points->InsertNextPoint(d->m_CameraCoordinates[i].X, d->m_CameraCoordinates[i].Y, d->m_CameraCoordinates[i].Z);
+          vertices->InsertNextCell(1);
+          vertices->InsertCellPoint(id);
+          distances[i] = static_cast<float>(*pDepthBuffer);
+          amplitudes[i] = static_cast<float>(*pIntraRedBuffer);
+          ++pDepthBuffer;
+          ++pIntraRedBuffer;
 
-        SafeRelease(pInfraredFrameReference);
-      }
+          ColorSpacePoint colorPoint = d->m_ColorPoints[i];
+          // retrieve the depth to color mapping for the current depth pixel
+          int colorInDepthX = (int)(floor(colorPoint.X + 0.5));
+          int colorInDepthY = (int)(floor(colorPoint.Y + 0.5));
 
-      if (SUCCEEDED(hr))
-      {
-        UINT nDepthBufferSize = 0;
-        UINT16 *pDepthBuffer = NULL;
-        UINT16 *pIntraRedBuffer = NULL;
+          float xNorm = static_cast<float>(colorInDepthX)/d->m_RGBCaptureWidth;
+          float yNorm = static_cast<float>(colorInDepthY)/d->m_RGBCaptureHeight;
 
-        ColorImageFormat imageFormat = ColorImageFormat_None;
-        UINT nColorBufferSize = 0;
-        RGBQUAD *pColorBuffer = NULL;
-
-        if (SUCCEEDED(hr))
-        {
-          hr = pDepthFrame->AccessUnderlyingBuffer(&nDepthBufferSize, &pDepthBuffer);
-        }
-        if (SUCCEEDED(hr))
-        {
-          hr = pInfraRedFrame->AccessUnderlyingBuffer(&nDepthBufferSize, &pIntraRedBuffer);
-        }
-        if (SUCCEEDED(hr))
-        {
-          UINT pointCount = d->m_DepthCaptureWidth * d->m_DepthCaptureHeight;
-          d->m_pCoordinateMapper->MapDepthFrameToCameraSpace(pointCount, pDepthBuffer, pointCount, d->m_CameraCoordinates);
-          vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-          vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
-          vtkSmartPointer<vtkFloatArray> textureCoordinates = vtkSmartPointer<vtkFloatArray>::New();
-          textureCoordinates->SetNumberOfComponents(2);
-          textureCoordinates->Allocate(pointCount);
-
-          d->m_pCoordinateMapper->MapDepthFrameToColorSpace(pointCount, pDepthBuffer, pointCount, d->m_ColorPoints);
-
-          for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
+          // make sure the depth pixel maps to a valid point in color space
+          if ( colorInDepthX >= 0 && colorInDepthX < d->m_RGBCaptureWidth && colorInDepthY >= 0 && colorInDepthY < d->m_RGBCaptureHeight )
           {
-            vtkIdType id = points->InsertNextPoint(d->m_CameraCoordinates[i].X, d->m_CameraCoordinates[i].Y, d->m_CameraCoordinates[i].Z);
-            vertices->InsertNextCell(1);
-            vertices->InsertCellPoint(id);
-            distances[i] = static_cast<float>(*pDepthBuffer);
-            amplitudes[i] = static_cast<float>(*pIntraRedBuffer);
-            ++pDepthBuffer;
-            ++pIntraRedBuffer;
-
-            ColorSpacePoint colorPoint = d->m_ColorPoints[i];
-            // retrieve the depth to color mapping for the current depth pixel
-            int colorInDepthX = (int)(floor(colorPoint.X + 0.5));
-            int colorInDepthY = (int)(floor(colorPoint.Y + 0.5));
-
-            float xNorm = static_cast<float>(colorInDepthX)/d->m_RGBCaptureWidth;
-            float yNorm = static_cast<float>(colorInDepthY)/d->m_RGBCaptureHeight;
-
-            // make sure the depth pixel maps to a valid point in color space
-            if ( colorInDepthX >= 0 && colorInDepthX < d->m_RGBCaptureWidth && colorInDepthY >= 0 && colorInDepthY < d->m_RGBCaptureHeight )
-            {
-              textureCoordinates->InsertTuple2(id, xNorm, yNorm);
-            }
+            textureCoordinates->InsertTuple2(id, xNorm, yNorm);
           }
-          d->m_PolyData = vtkSmartPointer<vtkPolyData>::New();
-          d->m_PolyData->SetPoints(points);
-          d->m_PolyData->SetVerts(vertices);
-          d->m_PolyData->GetPointData()->SetTCoords(textureCoordinates);
-          d->m_PolyData->Modified();
+        }
+        d->m_PolyData = vtkSmartPointer<vtkPolyData>::New();
+        d->m_PolyData->SetPoints(points);
+        d->m_PolyData->SetVerts(vertices);
+        d->m_PolyData->GetPointData()->SetTCoords(textureCoordinates);
+      }
+      else
+      {
+        MITK_ERROR << "AccessUnderlyingBuffer";
+      }
+
+      // get color frame data
+      if (SUCCEEDED(hr))
+      {
+        hr = pColorFrame->get_RawColorImageFormat(&imageFormat);
+      }
+
+      if (SUCCEEDED(hr))
+      {
+        if (imageFormat == ColorImageFormat_Bgra)
+        {
+          hr = pColorFrame->AccessRawUnderlyingBuffer(&nColorBufferSize, reinterpret_cast<BYTE**>(&pColorBuffer));
+        }
+        else if (d->m_pColorRGBX)
+        {
+          pColorBuffer = d->m_pColorRGBX;
+          nColorBufferSize = d->m_RGBCaptureWidth * d->m_RGBCaptureHeight * sizeof(RGBQUAD);
+          hr = pColorFrame->CopyConvertedFrameDataToArray(nColorBufferSize, reinterpret_cast<BYTE*>(pColorBuffer), ColorImageFormat_Bgra);
         }
         else
         {
-          MITK_ERROR << "AccessUnderlyingBuffer";
+          hr = E_FAIL;
         }
-
-        // get color frame data
         if (SUCCEEDED(hr))
         {
-          hr = pColorFrame->get_RawColorImageFormat(&imageFormat);
-        }
-
-        if (SUCCEEDED(hr))
-        {
-          if (imageFormat == ColorImageFormat_Bgra)
+          for(int i = 0; i < d->m_RGBBufferSize; i+=3)
           {
-            hr = pColorFrame->AccessRawUnderlyingBuffer(&nColorBufferSize, reinterpret_cast<BYTE**>(&pColorBuffer));
-          }
-          else if (d->m_pColorRGBX)
-          {
-            pColorBuffer = d->m_pColorRGBX;
-            nColorBufferSize = d->m_RGBCaptureWidth * d->m_RGBCaptureHeight * sizeof(RGBQUAD);
-            hr = pColorFrame->CopyConvertedFrameDataToArray(nColorBufferSize, reinterpret_cast<BYTE*>(pColorBuffer), ColorImageFormat_Bgra);
-          }
-          else
-          {
-            hr = E_FAIL;
-          }
-          if (SUCCEEDED(hr))
-          {
-            for(int i = 0; i < d->m_RGBBufferSize; i+=3)
-            {
-              //convert from BGR to RGB
-              rgb[i+0] = pColorBuffer->rgbRed;
-              rgb[i+1] = pColorBuffer->rgbGreen;
-              rgb[i+2] = pColorBuffer->rgbBlue;
-              ++pColorBuffer;
-            }
+            //convert from BGR to RGB
+            rgb[i+0] = pColorBuffer->rgbRed;
+            rgb[i+1] = pColorBuffer->rgbGreen;
+            rgb[i+2] = pColorBuffer->rgbBlue;
+            ++pColorBuffer;
           }
         }
       }
+    }
 
-      SafeRelease(pDepthFrame);
-      SafeRelease(pColorFrame);
-      SafeRelease(pInfraRedFrame);
-      SafeRelease(pMultiSourceFrame);
+    SafeRelease(pDepthFrame);
+    SafeRelease(pColorFrame);
+    SafeRelease(pInfraRedFrame);
+    SafeRelease(pMultiSourceFrame);
 
-      if( hr != -1 && !SUCCEEDED(hr) )
-      {
-        //The thread gets here, if the data is requested faster than the device can deliver it.
-        //This may happen from time to time.
-        return;
-      }
+    if( hr != -1 && !SUCCEEDED(hr) )
+    {
+      //The thread gets here, if the data is requested faster than the device can deliver it.
+      //This may happen from time to time.
+      MITK_DEBUG << "HR result false in KinectV2Controller::GetAllData()";
       return;
     }
-    MITK_ERROR << "Unable to initialize MultiFrameReader";
   }
 
   void KinectV2Controller::GetAmplitudes( float* amplitudes )
   {
-    memcpy( amplitudes, d->m_Amplitudes, d->m_DepthBufferSize);
+    //memcpy( amplitudes, d->m_Amplitudes, d->m_DepthBufferSize);
   }
 
   int KinectV2Controller::GetRGBCaptureWidth() const

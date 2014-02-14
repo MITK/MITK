@@ -467,7 +467,7 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
     vtkCamera* camera3d = GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
     //1m distance to camera should be a nice default value for most cameras
     camera3d->SetPosition(0,0,0);
-    camera3d->SetViewUp(0,-1,0);
+    camera3d->SetViewUp(0,1,0);
     camera3d->SetFocalPoint(0,0,1);
     if (this->m_CameraIntrinsics.IsNotNull())
     {
@@ -478,7 +478,7 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
     {
       camera3d->SetViewAngle(45);
     }
-    camera3d->SetClippingRange(1, 10000);
+    GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->ResetCameraClippingRange();
   }
 }
 

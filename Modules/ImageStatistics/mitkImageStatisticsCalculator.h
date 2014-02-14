@@ -479,8 +479,8 @@ protected:
 
   /** \brief Convolves image with spherical kernel image. Used for hotspot calculation.   */
   template <typename TPixel, unsigned int VImageDimension>
-  void
-  InternalUpdateConvolutionImage( itk::Image<TPixel, VImageDimension>* inputImage );
+  itk::SmartPointer< itk::Image<TPixel, VImageDimension> >
+  InternalUpdateConvolutionImage( const itk::Image<TPixel, VImageDimension>* inputImage );
 
   /** \brief Fills pixels of the spherical hotspot mask. */
   template < typename TPixel, unsigned int VImageDimension>
@@ -531,8 +531,6 @@ protected:
   double m_IgnorePixelValue;
   bool m_DoIgnorePixelValue;
   bool m_IgnorePixelValueChanged;
-
-  itk::Object::Pointer m_HotspotSearchConvolutionImage; // itk::Image<TPixel, VImageDimension>
 
   unsigned int m_PlanarFigureAxis;    // Normal axis for PlanarFigure
   unsigned int m_PlanarFigureSlice;   // Slice which contains PlanarFigure

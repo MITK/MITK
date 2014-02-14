@@ -887,46 +887,6 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
           m_InternalImageMask2D.GetPointer() );
     }
   }
-
-  MITK_DEBUG << "Update of convolution image required?\n  m_CalculateHotspot: " << m_CalculateHotspot
-            << "\n  m_HotspotSearchConvolutionImage: " << (void*) m_HotspotSearchConvolutionImage.GetPointer()
-            << "\n  m_ImageStatisticsCalculationTriggerVector["<<timeStep<<"]: " << m_ImageStatisticsCalculationTriggerVector[timeStep]
-            << "\n m_HotspotRadiusInMMChanged" << m_HotspotRadiusInMMChanged
-            << "\n  m_InternalImage::MTime: " << m_InternalImage->GetMTime()
-            << "\n  ImageStatistics::MTime: " << this->GetMTime()
-            << "\n  m_Image->GetMTime(): " << m_Image->GetMTime();
-
-  if( m_CalculateHotspot
-      &&
-      (
-        m_HotspotSearchConvolutionImage.IsNull()
-        ||
-        m_Image->GetMTime() > this->GetMTime()
-        ||
-        m_HotspotRadiusInMMChanged == true
-      )
-    )
-  {
-    //MITK_INFO <<"  --> Update required.";
-    if ( m_InternalImage->GetDimension() == 3 )
-    {
-      AccessFixedDimensionByItk(
-          m_InternalImage,
-          InternalUpdateConvolutionImage,
-          3 );
-    }
-    else if ( m_InternalImage->GetDimension() == 2 )
-    {
-      AccessFixedDimensionByItk(
-          m_InternalImage,
-          InternalUpdateConvolutionImage,
-          2 );
-    }
-  }
-  else
-  {
-    MITK_DEBUG <<"No convolution required.";
-  }
 }
 
 
@@ -1619,8 +1579,8 @@ ImageStatisticsCalculator
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void
-ImageStatisticsCalculator::InternalUpdateConvolutionImage( itk::Image<TPixel, VImageDimension>* inputImage )
+itk::SmartPointer<itk::Image<TPixel, VImageDimension> >
+ImageStatisticsCalculator::InternalUpdateConvolutionImage( const itk::Image<TPixel, VImageDimension>* inputImage )
 {
   double mmPerPixel[VImageDimension];
   for (unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
@@ -1659,9 +1619,8 @@ ImageStatisticsCalculator::InternalUpdateConvolutionImage( itk::Image<TPixel, VI
   typename ConvolutionImageType::Pointer convolutionImage = convolutionFilter->GetOutput();
   convolutionImage->SetSpacing( inputImage->GetSpacing() ); // only workaround because convolution filter seems to ignore spacing of input image
 
-  m_HotspotSearchConvolutionImage = convolutionImage.GetPointer();
-
   m_HotspotRadiusInMMChanged = false;
+  return convolutionImage;
 }
 
 template < typename TPixel, unsigned int VImageDimension>
@@ -1700,7 +1659,9 @@ ImageStatisticsCalculator::CalculateHotspotStatistics(
   typedef itk::Image< TPixel, VImageDimension > ConvolutionImageType;
   typedef itk::Image< float, VImageDimension > KernelImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
-  typename ConvolutionImageType::Pointer convolutionImage = dynamic_cast<ConvolutionImageType*>(m_HotspotSearchConvolutionImage.GetPointer());
+
+  //typename ConvolutionImageType::Pointer convolutionImage = dynamic_cast<ConvolutionImageType*>(this->InternalUpdateConvolutionImage(inputImage));
+  typename ConvolutionImageType::Pointer convolutionImage = this->InternalUpdateConvolutionImage(inputImage);
 
   if (convolutionImage.IsNull())
   {

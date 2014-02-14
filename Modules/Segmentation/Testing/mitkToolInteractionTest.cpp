@@ -75,11 +75,12 @@ public:
     mitk::DataNode::Pointer workingImageNode = mitk::DataNode::New();
     const std::string organName = "test";
     mitk::Color color;//actually it dosn't matter which color we are using
-    color.SetRed(1);
+    color.SetRed(1);  //but CreateEmptySegmentationNode expects a color parameter
     color.SetGreen(0);
     color.SetBlue(0);
     workingImageNode = tool->CreateEmptySegmentationNode(patientImage, organName, color);
 
+    //add images to datastorage
     m_InteractionTestHelper.AddNodeToStorage(patientImageNode);
     m_InteractionTestHelper.AddNodeToStorage(workingImageNode);
 
@@ -90,15 +91,16 @@ public:
     //load interaction events
     m_ToolManager->ActivateTool(toolID);
     m_InteractionTestHelper.LoadInteraction(GetTestDataFilePath(interactionPattern));
+
     //Start Interaction
     m_InteractionTestHelper.PlaybackInteraction();
 
     //load reference segmentation image
     mitk::Image::Pointer segmentationReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath(referenceSegmentationImage));
-
     mitk::Image* currentSegmentationImage = dynamic_cast<mitk::Image*>(workingImageNode->GetData());
-    mitk::IOUtil::SaveImage(currentSegmentationImage, "/Users/fetzer/temp.nrrd");
-    MITK_ASSERT_EQUAL(segmentationReferenceImage.GetPointer(), currentSegmentationImage, "" );
+
+    //compare reference with interaction result
+    MITK_ASSERT_EQUAL(segmentationReferenceImage.GetPointer(), currentSegmentationImage, "Reference equals interaction result." );
   }
 
   void setUp()
@@ -108,17 +110,16 @@ public:
     m_DataStorage = m_InteractionTestHelper.GetDataStorage().GetPointer();
 
     //create ToolManager
-//    mitk::GlobalInteraction::GetInstance()->Initialize("global");
     m_ToolManager = mitk::ToolManager::New(m_DataStorage);
     m_ToolManager->InitializeTools();
-
+    m_ToolManager->RegisterClient();//This is needed because there must be at least one registered. Otherwise tools can't be activated.
 
   }
 
   void tearDown()
   {
+    m_ToolManager->ActivateTool(-1);
     m_ToolManager = NULL;
-    m_DataStorage = NULL;
   }
 
   void AddToolInteractionTest()

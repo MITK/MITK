@@ -443,14 +443,6 @@ namespace mitk {
     }
 
     //##Documentation
-    //## @brief Get the spacing as a float[3] array.
-    const float* GetFloatSpacing() const;
-
-    //##Documentation
-    //## @brief Set the spacing (m_Spacing)
-    virtual void SetSpacing(const mitk::Vector3D& aSpacing);
-
-    //##Documentation
     //## @brief Copy the VTK transform
     //## to the ITK transform (m_IndexToWorldTransform)
     //## \sa SetIndexToWorldTransform
@@ -593,38 +585,6 @@ namespace mitk {
   * @return True, if all comparison are true. False in any other case.
   */
   MITK_CORE_EXPORT bool Equal(const mitk::Geometry3D* leftHandSide, const mitk::Geometry3D* rightHandSide, ScalarType eps, bool verbose);
-
-  /**
-  * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
-  *
-  * @ingroup MITKTestingAPI
-  *
-  * The function compares the IndexToWorldTransform (elementwise).
-  *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
-  * @param rightHandSide Compare this against leftHandSide.
-  * @param leftHandSide Compare this against rightHandSide.
-  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
-  * @param verbose Flag indicating if the user wants detailed console output or not.
-  * @return True, if all comparison are true. False in any other case.
-  */
-  MITK_CORE_EXPORT bool Equal(const mitk::Geometry3D::TransformType *leftHandSide, const mitk::Geometry3D::TransformType *rightHandSide, ScalarType eps, bool verbose);
-
-  /**
-  * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
-  *
-  * @ingroup MITKTestingAPI
-  *
-  * The function compares the bounds (elementwise).
-  *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
-  * @param rightHandSide Compare this against leftHandSide.
-  * @param leftHandSide Compare this against rightHandSide.
-  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
-  * @param verbose Flag indicating if the user wants detailed console output or not.
-  * @return True, if all comparison are true. False in any other case.
-  */
-  MITK_CORE_EXPORT bool Equal( const  mitk::Geometry3D::BoundingBoxType *leftHandSide, const mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose);
 } // namespace mitk
 
 #endif /* GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD */

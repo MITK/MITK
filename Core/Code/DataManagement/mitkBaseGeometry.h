@@ -86,6 +86,10 @@ namespace mitk {
     //## @brief Get the spacing as a float[3] array.
     const float* GetFloatSpacing() const;
 
+    //##Documentation
+    //## @brief Set the spacing (m_Spacing)
+    virtual void SetSpacing(const mitk::Vector3D& aSpacing);
+
     // ********************************** other functions **********************************
 
     //##Documentation
@@ -204,6 +208,8 @@ namespace mitk {
     BaseGeometry(const BaseGeometry& other);
     virtual ~BaseGeometry();
 
+    //itkGetConstMacro(IndexToWorldTransformLastModified, unsigned long);
+
     // ********************************** Variables **********************************
 
     AffineTransform3D::Pointer m_IndexToWorldTransform;
@@ -242,66 +248,66 @@ namespace mitk {
 
     //    DEPRECATED(VnlQuaternionType m_RotationQuaternion); //this was private
   };
+
+  // ********************************** Equal Functions **********************************
+
+  //
+  // Static compare functions mainly for testing
+  //
+
+  /**
+  * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
+  *
+  * @ingroup MITKTestingAPI
+  *
+  * The function compares the bounds (elementwise).
+  *
+  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+  * @param rightHandSide Compare this against leftHandSide.
+  * @param leftHandSide Compare this against rightHandSide.
+  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+  * @param verbose Flag indicating if the user wants detailed console output or not.
+  * @return True, if all comparison are true. False in any other case.
+  */
+  MITK_CORE_EXPORT bool Equal( const  mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, mitk::ScalarType eps, bool verbose); //ToDo
+
+  //
+  // Static compare functions mainly for testing
+  //
+  /**
+  * @brief Equal A function comparing two geometries for beeing identical.
+  *
+  * @ingroup MITKTestingAPI
+  *
+  * The function compares the spacing, origin, axisvectors, extents, the matrix of the
+  * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
+  *
+  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+  * If you want to use different tolarance values for different parts of the geometry, feel free to use
+  * the other comparison methods and write your own implementation of Equal.
+  * @param rightHandSide Compare this against leftHandSide.
+  * @param leftHandSide Compare this against rightHandSide.
+  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+  * @param verbose Flag indicating if the user wants detailed console output or not.
+  * @return True, if all comparison are true. False in any other case.
+  */
+  MITK_CORE_EXPORT bool Equal(const mitk::BaseGeometry* leftHandSide, const mitk::BaseGeometry* rightHandSide, mitk::ScalarType eps, bool verbose); //ToDo
+
+  /**
+  * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
+  *
+  * @ingroup MITKTestingAPI
+  *
+  * The function compares the IndexToWorldTransform (elementwise).
+  *
+  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+  * @param rightHandSide Compare this against leftHandSide.
+  * @param leftHandSide Compare this against rightHandSide.
+  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+  * @param verbose Flag indicating if the user wants detailed console output or not.
+  * @return True, if all comparison are true. False in any other case.
+  */
+  MITK_CORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType *leftHandSide, const mitk::BaseGeometry::TransformType *rightHandSide, mitk::ScalarType eps, bool verbose); //ToDo
 } // namespace mitk
-
-// ********************************** Equal Functions **********************************
-
-//
-// Static compare functions mainly for testing
-//
-
-/**
-* @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
-*
-* @ingroup MITKTestingAPI
-*
-* The function compares the bounds (elementwise).
-*
-* The parameter eps is a tolarence value for all methods which are internally used for comparion.
-* @param rightHandSide Compare this against leftHandSide.
-* @param leftHandSide Compare this against rightHandSide.
-* @param eps Tolarence for comparison. You can use mitk::eps in most cases.
-* @param verbose Flag indicating if the user wants detailed console output or not.
-* @return True, if all comparison are true. False in any other case.
-*/
-MITK_CORE_EXPORT bool Equal( const  mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, mitk::ScalarType eps, bool verbose); //ToDo
-
-//
-// Static compare functions mainly for testing
-//
-/**
-* @brief Equal A function comparing two geometries for beeing identical.
-*
-* @ingroup MITKTestingAPI
-*
-* The function compares the spacing, origin, axisvectors, extents, the matrix of the
-* IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
-*
-* The parameter eps is a tolarence value for all methods which are internally used for comparion.
-* If you want to use different tolarance values for different parts of the geometry, feel free to use
-* the other comparison methods and write your own implementation of Equal.
-* @param rightHandSide Compare this against leftHandSide.
-* @param leftHandSide Compare this against rightHandSide.
-* @param eps Tolarence for comparison. You can use mitk::eps in most cases.
-* @param verbose Flag indicating if the user wants detailed console output or not.
-* @return True, if all comparison are true. False in any other case.
-*/
-MITK_CORE_EXPORT bool Equal(const mitk::BaseGeometry* leftHandSide, const mitk::BaseGeometry* rightHandSide, mitk::ScalarType eps, bool verbose); //ToDo
-
-/**
-* @brief Equal A function comparing two transforms (TransformType) for beeing identical.
-*
-* @ingroup MITKTestingAPI
-*
-* The function compares the IndexToWorldTransform (elementwise).
-*
-* The parameter eps is a tolarence value for all methods which are internally used for comparion.
-* @param rightHandSide Compare this against leftHandSide.
-* @param leftHandSide Compare this against rightHandSide.
-* @param eps Tolarence for comparison. You can use mitk::eps in most cases.
-* @param verbose Flag indicating if the user wants detailed console output or not.
-* @return True, if all comparison are true. False in any other case.
-*/
-MITK_CORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType *leftHandSide, const mitk::BaseGeometry::TransformType *rightHandSide, mitk::ScalarType eps, bool verbose); //ToDo
 
 #endif /* BaseGeometry_H_HEADER_INCLUDED */

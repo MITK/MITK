@@ -39,14 +39,6 @@ mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), m_Par
   //  DEPRECATED(m_RotationQuaternion = other.m_RotationQuaternion);
   // AffineGeometryFrame
   SetBounds(other.GetBounds());
-  //SetIndexToObjectTransform(other.GetIndexToObjectTransform());
-  //SetObjectToNodeTransform(other.GetObjectToNodeTransform());
-  //SetIndexToWorldTransform(other.GetIndexToWorldTransform());
-  // this is not used in AffineGeometryFrame of ITK, thus there are not Get and Set methods
-  // m_IndexToNodeTransform = other.m_IndexToNodeTransform;
-  // m_InvertedTransform = TransformType::New();
-  // m_InvertedTransform = TransformType::New();
-  // m_InvertedTransform->DeepCopy(other.m_InvertedTransform);
   m_VtkMatrix = vtkMatrix4x4::New();
   m_VtkMatrix->DeepCopy(other.m_VtkMatrix);
   if (other.m_ParametricBoundingBox.IsNotNull())
@@ -203,4 +195,171 @@ const  mitk::BaseGeometry::BoundsArrayType  mitk::BaseGeometry::GetBounds() cons
 bool mitk::BaseGeometry::IsValid() const
 {
   return m_Valid;
+}
+
+const float* mitk::BaseGeometry::GetFloatSpacing() const
+{
+  return m_FloatSpacing;
+}
+
+bool mitk::Equal(const BaseGeometry::TransformType *leftHandSide, const BaseGeometry::TransformType *rightHandSide, ScalarType eps, bool verbose )
+{
+  //Compare IndexToWorldTransform Matrix
+  if( !mitk::MatrixEqualElementWise(  leftHandSide->GetMatrix(),
+    rightHandSide->GetMatrix() ) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( BaseGeometry::TransformType )] Index to World Transformation matrix differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetMatrix() << " : leftHandSide is " << leftHandSide->GetMatrix() << " and tolerance is " << eps;
+    }
+    return false;
+  }
+  return true;
+}
+
+bool mitk::Equal( const mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose )
+{
+  bool result = true;
+  if( rightHandSide == NULL )
+  {
+    if(verbose)
+      MITK_INFO << "[( BaseGeometry::BoundingBoxType )] rightHandSide NULL.";
+    return false;
+  }
+  if( leftHandSide == NULL )
+  {
+    if(verbose)
+      MITK_INFO << "[( BaseGeometry::BoundingBoxType )] leftHandSide NULL.";
+    return false;
+  }
+
+  BaseGeometry::BoundsArrayType rightBounds = rightHandSide->GetBounds();
+  BaseGeometry::BoundsArrayType leftBounds = leftHandSide->GetBounds();
+  BaseGeometry::BoundsArrayType::Iterator itLeft = leftBounds.Begin();
+  for( BaseGeometry::BoundsArrayType::Iterator itRight = rightBounds.Begin(); itRight != rightBounds.End(); ++itRight)
+  {
+    if(( !mitk::Equal( *itLeft, *itRight, eps )) )
+    {
+      if(verbose)
+      {
+        MITK_INFO << "[( BaseGeometry::BoundingBoxType )] bounds are not equal.";
+        MITK_INFO << "rightHandSide is " << setprecision(12) << *itRight << " : leftHandSide is " << *itLeft << " and tolerance is " << eps;
+      }
+      result = false;
+    }
+    itLeft++;
+  }
+  return result;
+}
+
+bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometry *rightHandSide, ScalarType eps, bool verbose)
+{
+  bool result = true;
+
+  if( rightHandSide == NULL )
+  {
+    if(verbose)
+      MITK_INFO << "[( BaseGeometry )] rightHandSide NULL.";
+    return false;
+  }
+  if( leftHandSide == NULL)
+  {
+    if(verbose)
+      MITK_INFO << "[( BaseGeometry )] leftHandSide NULL.";
+    return false;
+  }
+
+  //Compare spacings
+  if( !mitk::Equal( leftHandSide->GetSpacing(), rightHandSide->GetSpacing(), eps ) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( BaseGeometry )] Spacing differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetSpacing() << " : leftHandSide is " << leftHandSide->GetSpacing() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  //Compare Origins
+  if( !mitk::Equal( leftHandSide->GetOrigin(), rightHandSide->GetOrigin(), eps ) )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( BaseGeometry )] Origin differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetOrigin() << " : leftHandSide is " << leftHandSide->GetOrigin() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  //Compare Axis and Extents
+/* xxxxxxxxxxxxxxx Funktionen noch nciht umgezogen!
+
+for( unsigned int i=0; i<3; ++i)
+  {
+    if( !mitk::Equal( leftHandSide->GetAxisVector(i), rightHandSide->GetAxisVector(i), eps))
+    {
+      if(verbose)
+      {
+        MITK_INFO << "[( BaseGeometry )] AxisVector #" << i << " differ";
+        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetAxisVector(i) << " : leftHandSide is " << leftHandSide->GetAxisVector(i) << " and tolerance is " << eps;
+      }
+      result =  false;
+    }
+
+    if( !mitk::Equal( leftHandSide->GetExtent(i), rightHandSide->GetExtent(i), eps) )
+    {
+      if(verbose)
+      {
+        MITK_INFO << "[( BaseGeometry )] Extent #" << i << " differ";
+        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetExtent(i) << " : leftHandSide is " << leftHandSide->GetExtent(i) << " and tolerance is " << eps;
+      }
+      result = false;
+    }
+  }
+
+*/
+
+  //Compare BoundingBoxes
+  if( !mitk::Equal( leftHandSide->GetBoundingBox(), rightHandSide->GetBoundingBox(), eps, verbose) )
+  {
+    result = false;
+  }
+
+  //Compare IndexToWorldTransform Matrix
+  if( !mitk::Equal( leftHandSide->GetIndexToWorldTransform(), rightHandSide->GetIndexToWorldTransform(), eps, verbose) )
+  {
+    result = false;
+  }
+  return result;
+}
+
+void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing)
+{
+  if(mitk::Equal(m_Spacing, aSpacing) == false)
+  {
+    assert(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0);
+
+    m_Spacing = aSpacing;
+
+    AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
+
+    vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
+
+    mitk::VnlVector col;
+    col = vnlmatrix.get_column(0); col.normalize(); col*=aSpacing[0]; vnlmatrix.set_column(0, col);
+    col = vnlmatrix.get_column(1); col.normalize(); col*=aSpacing[1]; vnlmatrix.set_column(1, col);
+    col = vnlmatrix.get_column(2); col.normalize(); col*=aSpacing[2]; vnlmatrix.set_column(2, col);
+
+    Matrix3D matrix;
+    matrix = vnlmatrix;
+
+    AffineTransform3D::Pointer transform = AffineTransform3D::New();
+    transform->SetMatrix(matrix);
+    transform->SetOffset(m_IndexToWorldTransform->GetOffset());
+
+    SetIndexToWorldTransform(transform.GetPointer());
+
+    itk2vtk(m_Spacing, m_FloatSpacing);
+  }
 }

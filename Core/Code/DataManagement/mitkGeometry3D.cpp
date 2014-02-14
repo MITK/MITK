@@ -392,41 +392,6 @@ void mitk::Geometry3D::BackTransform(const mitk::Vector3D& in, mitk::Vector3D& o
   }
 }
 
-const float* mitk::Geometry3D::GetFloatSpacing() const
-{
-  return m_FloatSpacing;
-}
-
-void mitk::Geometry3D::SetSpacing(const mitk::Vector3D& aSpacing)
-{
-  if(mitk::Equal(m_Spacing, aSpacing) == false)
-  {
-    assert(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0);
-
-    m_Spacing = aSpacing;
-
-    AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
-
-    vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
-
-    mitk::VnlVector col;
-    col = vnlmatrix.get_column(0); col.normalize(); col*=aSpacing[0]; vnlmatrix.set_column(0, col);
-    col = vnlmatrix.get_column(1); col.normalize(); col*=aSpacing[1]; vnlmatrix.set_column(1, col);
-    col = vnlmatrix.get_column(2); col.normalize(); col*=aSpacing[2]; vnlmatrix.set_column(2, col);
-
-    Matrix3D matrix;
-    matrix = vnlmatrix;
-
-    AffineTransform3D::Pointer transform = AffineTransform3D::New();
-    transform->SetMatrix(matrix);
-    transform->SetOffset(m_IndexToWorldTransform->GetOffset());
-
-    SetIndexToWorldTransform(transform.GetPointer());
-
-    itk2vtk(m_Spacing, m_FloatSpacing);
-  }
-}
-
 void mitk::Geometry3D::Translate(const Vector3D & vector)
 {
   if((vector[0] != 0) || (vector[1] != 0) || (vector[2] != 0))
@@ -675,41 +640,6 @@ bool mitk::Geometry3D::Is2DConvertable()
   return isConvertableWithoutLoss;
 }
 
-bool mitk::Equal( const mitk::Geometry3D::BoundingBoxType *leftHandSide, const mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose )
-{
-  bool result = true;
-  if( rightHandSide == NULL )
-  {
-    if(verbose)
-      MITK_INFO << "[( Geometry3D::BoundingBoxType )] rightHandSide NULL.";
-    return false;
-  }
-  if( leftHandSide == NULL )
-  {
-    if(verbose)
-      MITK_INFO << "[( Geometry3D::BoundingBoxType )] leftHandSide NULL.";
-    return false;
-  }
-
-  Geometry3D::BoundsArrayType rightBounds = rightHandSide->GetBounds();
-  Geometry3D::BoundsArrayType leftBounds = leftHandSide->GetBounds();
-  Geometry3D::BoundsArrayType::Iterator itLeft = leftBounds.Begin();
-  for( Geometry3D::BoundsArrayType::Iterator itRight = rightBounds.Begin(); itRight != rightBounds.End(); ++itRight)
-  {
-    if(( !mitk::Equal( *itLeft, *itRight, eps )) )
-    {
-      if(verbose)
-      {
-        MITK_INFO << "[( Geometry3D::BoundingBoxType )] bounds are not equal.";
-        MITK_INFO << "rightHandSide is " << setprecision(12) << *itRight << " : leftHandSide is " << *itLeft << " and tolerance is " << eps;
-      }
-      result = false;
-    }
-    itLeft++;
-  }
-  return result;
-}
-
 bool mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType eps, bool verbose)
 {
   bool result = true;
@@ -796,20 +726,4 @@ bool mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *r
     result = false;
   }
   return result;
-}
-
-bool mitk::Equal(const Geometry3D::TransformType *leftHandSide, const Geometry3D::TransformType *rightHandSide, ScalarType eps, bool verbose )
-{
-  //Compare IndexToWorldTransform Matrix
-  if( !mitk::MatrixEqualElementWise(  leftHandSide->GetMatrix(),
-    rightHandSide->GetMatrix() ) )
-  {
-    if(verbose)
-    {
-      MITK_INFO << "[( Geometry3D::TransformType )] Index to World Transformation matrix differs.";
-      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetMatrix() << " : leftHandSide is " << leftHandSide->GetMatrix() << " and tolerance is " << eps;
-    }
-    return false;
-  }
-  return true;
 }

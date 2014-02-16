@@ -663,7 +663,12 @@ void QmitkDataManagerView::ColormapMenuAboutToShow()
   mitk::LookupTableProperty::Pointer lookupTableProperty =
     dynamic_cast<mitk::LookupTableProperty*>(node->GetProperty("LookupTable"));
   if (!lookupTableProperty)
-    return;
+  {
+    mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+    lookupTableProperty = mitk::LookupTableProperty::New();
+    lookupTableProperty->SetLookupTable(mitkLut);
+    node->SetProperty("LookupTable", lookupTableProperty);
+  }
 
   mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
   if (!lookupTable)

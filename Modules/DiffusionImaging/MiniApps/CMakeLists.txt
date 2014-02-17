@@ -41,6 +41,7 @@ IF(BUILD_DiffusionMiniApps)
     MultishellMethods.cpp
     FiberFoxProcessing.cpp
     ExportShImage.cpp
+    DwiDenoising.cpp
   )
 
   # deprecated

@@ -66,7 +66,7 @@ int DwiDenoising(int argc, char* argv[])
   parser.addArgument("mask", "m", ctkCommandLineParser::String, "brainmask for input image", us::Any(), false);
   parser.addArgument("search", "s", ctkCommandLineParser::Int, "search radius", us::Any(), false);
   parser.addArgument("compare", "c", ctkCommandLineParser::Int, "compare radius", us::Any(), false);
-  parser.addArgument("channels", "ch", ctkCommandLineParser::Int, "compared channels (optional)", us::Any(), true);
+  parser.addArgument("channels", "ch", ctkCommandLineParser::Int, "radius of used channels", us::Any(), true);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -100,7 +100,7 @@ int DwiDenoising(int argc, char* argv[])
       filter->SetInputImage(dwi->GetVectorImage());
       filter->SetInputMask(itkMask);
 
-      if (channel == 0)
+      if (channels == 0)
       {
         MITK_INFO << "Denoising with: s = " << search << "; c = " << compare;
 
@@ -128,7 +128,7 @@ int DwiDenoising(int argc, char* argv[])
 
       else
       {
-        MITK_INFO << "Denoising with: s = " << search << "; c = " << compare << "; n = " << channels;
+        MITK_INFO << "Denoising with: s = " << search << "; c = " << compare << "; ch = " << channels;
         filter->SetUseJointInformation(true);
         filter->SetSearchRadius(search);
         filter->SetComparisonRadius(compare);

@@ -22,9 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPythonService.h>
 #include <mitkIOUtil.h>
 
-#include <mitkModuleRegistry.h>
-#include <mitkModule.h>
-#include <mitkServiceReference.h>
+#include <usModuleRegistry.h>
+#include <usModule.h>
+#include <usServiceReference.h>
 #include <mitkImagePixelReadAccessor.h>
 
 int mitkCopyToPythonAsItkImageTest(int /*argc*/, char* argv[])
@@ -32,11 +32,11 @@ int mitkCopyToPythonAsItkImageTest(int /*argc*/, char* argv[])
   MITK_TEST_BEGIN("mitkCopyToPythonAsItkImageTest")
 
   //get the context of the python module
-  mitk::Module* module = mitk::ModuleRegistry::GetModule("mitkPython");
+  us::Module* module = us::ModuleRegistry::GetModule("mitkPython");
   us::ModuleContext* context = module->GetModuleContext();
   //get the service which is generated in the PythonModuleActivator
-  us::ServiceReference serviceRef = context->GetServiceReference<mitk::IPythonService>();
-  mitk::PythonService* pythonService = dynamic_cast<mitk::PythonService*>( context->GetService<mitk::IPythonService>(serviceRef) );
+  us::ServiceReference<mitk::IPythonService> serviceRef = context->GetServiceReference<mitk::IPythonService>();
+  mitk::PythonService* pythonService = dynamic_cast<mitk::PythonService*>( context->GetService(serviceRef) );
   MITK_TEST_CONDITION(pythonService->IsItkPythonWrappingAvailable() == true, "Is Python available?");
 
   mitk::Image::Pointer testImage = mitk::IOUtil::LoadImage(std::string(argv[1]));

@@ -125,6 +125,10 @@ protected:
   @TODO: should be moved outside the class, to be available for other classes at well.*/
   void ActualizeDisplayStyleForAllDoseDataNodes();
 
+  void UpdatePolyData(int num, int min, int max);
+  mitk::Image::Pointer GetExtractedSlice(mitk::Image::Pointer image);
+  const mitk::Geometry2D* GetGeometry2D(char* dim);
+
   Ui::RTDoseVisualizerControls m_Controls;
   mitk::DataNode::Pointer m_selectedNode;
   mitk::IsoDoseLevelVector::Pointer m_freeIsoValues;
@@ -134,6 +138,8 @@ protected:
   mitk::IsoDoseLevelSet::Pointer m_selectedNodeIsoSet;
   mitk::rt::PresetMapType m_Presets;
   std::string m_selectedPresetName;
+
+  mitk::DataNode::Pointer m_FreeIsoline;
 
   /** Prescribed Dose of the selected data.*/
   mitk::DoseValueAbs m_PrescribedDose_Data;

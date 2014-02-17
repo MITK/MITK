@@ -81,6 +81,16 @@ public:
 protected slots:
 
   /*!
+    \brief Slot trigged from the triangulation checkbox to decide if the mesh is triangulated or not.
+    */
+  void OnTriangulationCheckBoxChanged();
+
+  /*!
+    \brief Slot trigged from the triangulation threshold spin box. Changed the threshold for connecting a vertex during triangulation.
+    */
+  void OnTriangulationThresholdSpinBoxChanged();
+
+  /*!
     \brief Slot triggered from the timer to update the images and visualization
     */
   void OnUpdateCamera();

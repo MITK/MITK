@@ -90,9 +90,12 @@
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QCheckBox" name="m_TriangulationCheckBox">
+       <widget class="QCheckBox" name="m_GenerateTriangularMeshCheckBox">
         <property name="text">
          <string>Triangulation</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

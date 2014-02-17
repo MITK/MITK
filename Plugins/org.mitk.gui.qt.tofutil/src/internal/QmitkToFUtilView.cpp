@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIRenderWindowPart.h>
 #include <mitkILinkedRenderWindowPart.h>
 
-
 // Qmitk
 #include "QmitkToFUtilView.h"
 #include <QmitkStdMultiWidget.h>
@@ -27,8 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QMessageBox>
 #include <QString>
-
-//QT headers
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 #include <qcombobox.h>
@@ -39,15 +36,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFDistanceImageToPointSetFilter.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
-
 #include <mitkToFDeviceFactoryManager.h>
 #include <mitkToFCameraDevice.h>
 #include <mitkCameraIntrinsicsProperty.h>
-
 #include <mitkSmartPointerProperty.h>
-
-//itk headers
-#include <itksys/SystemTools.hxx>
+#include <mitkRenderingModeProperty.h>
+#include <mitkVtkScalarModeProperty.h>
 
 // VTK
 #include <vtkCamera.h>
@@ -56,9 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ITK
 #include <itkCommand.h>
-#include <mitkRenderingModeProperty.h>
-#include <mitkSmartPointerProperty.h>
-#include <mitkVtkScalarModeProperty.h>
+#include <itksys/SystemTools.hxx>
 
 const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 
@@ -114,7 +106,8 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_SurfaceCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnSurfaceCheckboxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_KinectTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnKinectRGBTextureCheckBoxChecked(bool)) );
-
+    connect( (QObject*)(m_Controls->m_GenerateTriangularMeshCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTriangulationCheckBoxChanged()) );
+    connect( (QObject*)(m_Controls->m_TriangulationThreshold), SIGNAL(valueChanged(double)), this, SLOT(OnTriangulationThresholdSpinBoxChanged()) );
   }
 }
 
@@ -448,6 +441,18 @@ void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
   }
 }
 
+void QmitkToFUtilView::OnTriangulationThresholdSpinBoxChanged()
+{
+  this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThreshold->value() );
+  this->m_ToFImageGrabber->GetCameraDevice()->SetFloatProperty("TriangulationThreshold", this->m_Controls->m_TriangulationThreshold->value());
+}
+
+void QmitkToFUtilView::OnTriangulationCheckBoxChanged()
+{
+  this->m_ToFDistanceImageToSurfaceFilter->SetGenerateTriangularMesh(this->m_Controls->m_GenerateTriangularMeshCheckBox->isChecked());
+  this->m_ToFImageGrabber->GetCameraDevice()->SetBoolProperty("GenerateTriangularMesh", this->m_Controls->m_GenerateTriangularMeshCheckBox->isChecked());
+}
+
 void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
 {
   if(checked)
@@ -455,12 +460,11 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
     //initialize the surface once
     MITK_DEBUG << "OnSurfaceCheckboxChecked true";
     this->m_SurfaceNode->SetData(this->m_Surface);
-    //this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D);
 
     this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThreshold->value() );
     this->m_ToFImageGrabber->GetCameraDevice()->SetFloatProperty("TriangulationThreshold", this->m_Controls->m_TriangulationThreshold->value());
-    this->m_ToFDistanceImageToSurfaceFilter->SetGenerateTriangularMesh(this->m_Controls->m_TriangulationCheckBox->isChecked());
-    this->m_ToFImageGrabber->GetCameraDevice()->SetBoolProperty("GenerateTriangularMesh", this->m_Controls->m_TriangulationCheckBox->isChecked());
+    this->m_ToFDistanceImageToSurfaceFilter->SetGenerateTriangularMesh(this->m_Controls->m_GenerateTriangularMeshCheckBox->isChecked());
+    this->m_ToFImageGrabber->GetCameraDevice()->SetBoolProperty("GenerateTriangularMesh", this->m_Controls->m_GenerateTriangularMeshCheckBox->isChecked());
 
     //we need to initialize (reinit) the surface, to make it fit into the renderwindow
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(

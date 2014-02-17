@@ -126,7 +126,7 @@ void QtMainWindowControl::closeEvent(QCloseEvent* event)
   {
     (*listener)->Execute(shellEvent);
     if (!shellEvent->doit) {
-      event->accept();
+      event->ignore();
       return;
     }
   }

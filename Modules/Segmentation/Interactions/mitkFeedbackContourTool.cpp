@@ -28,8 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
 :SegTool2D(type),
- m_FeedbackContourVisible(false),
- m_ContourUtils(ContourUtils::New())
+ m_FeedbackContourVisible(false)
 {
   m_FeedbackContour = ContourModel::New();
   m_FeedbackContour->SetClosed(true);
@@ -102,12 +101,12 @@ void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
 
 mitk::ContourModel::Pointer mitk::FeedbackContourTool::ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, bool correctionForIpSegmentation, bool constrainToInside)
 {
-  return m_ContourUtils->ProjectContourTo2DSlice(slice, contourIn3D, correctionForIpSegmentation, constrainToInside);
+  return mitk::ContourModelUtils::ProjectContourTo2DSlice(slice, contourIn3D, correctionForIpSegmentation, constrainToInside);
 }
 
 mitk::ContourModel::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation)
 {
-  return m_ContourUtils->BackProjectContourFrom2DSlice(sliceGeometry, contourIn2D, correctionForIpSegmentation);
+  return mitk::ContourModelUtils::BackProjectContourFrom2DSlice(sliceGeometry, contourIn2D, correctionForIpSegmentation);
 }
 
 void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedContour, Image* sliceImage, int paintingPixelValue )
@@ -117,7 +116,7 @@ void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedConto
 
 void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue )
 {
-  m_ContourUtils->FillContourInSlice(projectedContour, timeStep, sliceImage, paintingPixelValue);
+  mitk::ContourModelUtils::FillContourInSlice(projectedContour, timeStep, sliceImage, paintingPixelValue);
 }
 
 void mitk::FeedbackContourTool::Disable3dRendering()

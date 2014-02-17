@@ -1459,6 +1459,18 @@ WorkbenchWindowConfigurer::Pointer WorkbenchWindow::GetWindowConfigurer()
   return windowConfigurer;
 }
 
+bool WorkbenchWindow::CanHandleShellCloseEvent()
+{
+  if (!Window::CanHandleShellCloseEvent())
+  {
+    return false;
+  }
+
+  // let the advisor or other interested parties
+  // veto the user's explicit request to close the window
+  return FireWindowShellClosing();
+}
+
 void WorkbenchWindow::ConfigureShell(Shell::Pointer shell)
 {
   Window::ConfigureShell(shell);

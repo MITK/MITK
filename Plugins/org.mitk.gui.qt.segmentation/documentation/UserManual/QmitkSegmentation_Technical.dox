@@ -3,7 +3,7 @@
 \page QmitkSegmentationTechnicalPage Technical design of QmitkSegmentation
 
 \li \ref QmitkSegmentationTechnicalPage2
-\li \ref QmitkSegmentationTechnicalPage3 
+\li \ref QmitkSegmentationTechnicalPage3
 \li \ref QmitkSegmentationTechnicalPage4
 
 \section QmitkSegmentationTechnicalPage2 Introduction
@@ -42,7 +42,7 @@ all the segmentations in a volume and generate suggestions for missing slices.
 This should be possible in all three orthogonal slice direction.
 <li> <b>Undo</b>: Slice manipulations should be undoable, no matter whether a
 tool or the interpolation mechanism changed something.
-<li> <b>GUI</b>: Integration of everything. 
+<li> <b>GUI</b>: Integration of everything.
 </ol>
 
 
@@ -51,7 +51,7 @@ tool or the interpolation mechanism changed something.
 The above blocks correspond to a number of classes. Here is an overview of all
 related classes with their responsibilities and relations:
 
-\image html interactive_segmentation_classes.png
+\image html QmitkSegmentation_InteractiveSegmentationClasses.png
 
 <ol>
 <li> <b>Management of images</b>: mitk::ToolManager has a set of reference
@@ -87,7 +87,7 @@ class also performs this interpolation for single slices on demand.
 Again, we have a second class responsible for the GUI:
 QmitkSlicesInterpolator enables/disables interpolation and offers to
 accept interpolations for one or all slices.
-<li> <b>Undo</b>: Undo functionality is implemented in mitk::OverwriteSliceImageFilter, 
+<li> <b>Undo</b>: Undo functionality is implemented in mitk::OverwriteSliceImageFilter,
 since this is the central place where all image modifications are made. The filter stores a binary difference image
 to the undo stack as a mitk::ApplyDiffImageOperation. When the user requests undo, this ApplyDiffImageOperation
 will be executed by a singleton class DiffImageApplier. The operation itself observes the image, which it refers to,

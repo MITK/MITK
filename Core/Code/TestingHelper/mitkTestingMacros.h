@@ -258,8 +258,7 @@ namespace mitk {
   {                                                          \
     CppUnit::TextUi::TestRunner runner;                      \
     runner.addTest(TESTSUITE_NAME ## TestSuite::suite());    \
-    runner.run();                                            \
-    return EXIT_SUCCESS;                                     \
+    return runner.run() ? 0 : 1;                             \
   }
 
 /**

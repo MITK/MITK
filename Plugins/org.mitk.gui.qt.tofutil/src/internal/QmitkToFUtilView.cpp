@@ -458,6 +458,9 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
     //this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D);
 
     this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThreshold->value() );
+    this->m_ToFImageGrabber->GetCameraDevice()->SetFloatProperty("TriangulationThreshold", this->m_Controls->m_TriangulationThreshold->value());
+    this->m_ToFDistanceImageToSurfaceFilter->SetGenerateTriangularMesh(this->m_Controls->m_TriangulationCheckBox->isChecked());
+    this->m_ToFImageGrabber->GetCameraDevice()->SetBoolProperty("GenerateTriangularMesh", this->m_Controls->m_TriangulationCheckBox->isChecked());
 
     //we need to initialize (reinit) the surface, to make it fit into the renderwindow
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(

@@ -16,7 +16,8 @@ To use the geometry classes in the right way you have to understand the three di
 \image html CoordinateTypes.png
 <center><b>The different coordinate types\n\n</b></center>\n
 	-# World coordinates:
-	    	- World coordinates are describing the actual spacial position of all MITK objects regarding a global coordinate system, normally specified by the imaging modality 
+		- World coordinates are describing the actual spacial position of all MITK objects regarding a global coordinate system, normally specified by the imaging modality 
+		- World coordinates are represented by  mitk::Point3D objects.
 		- The geometry defines the offset, orientation, and scale of the considered data objects in reference to the world coordinate systems.
 		- World coordinates are always measured in mm
 		- If you are dealing with an image geometry, the origin of an image is pointing to the CENTER of the bottom-left-back voxel.\n 
@@ -30,14 +31,27 @@ To use the geometry classes in the right way you have to understand the three di
 	-# Continuous index coordinates:
 		- Dividing world coordinates through the pixel spacing and simultanously taking the offset into account leads to continuous index coordinates inside your dataobject.\n
 		  So continuous coordinates can be float values!
+		- Continuous index coordinates are represented by  mitk::Point3D objects.
 		- They can be obtained by calling Geometry3D::WorldToIndex(), where &pt_mm is a point in worldcoordinates.\n 		
 	-# Index coordinate system:
 		- Index coordinates are discrete values that address voxels of a data object explicitly.
+		- Index coordinates are represented by  mitk::Index3D objects.
 		- Basically they are continuous index coordinates which are rounded from half integer up.
 		- E.g. (0,0) specifies the very first pixel of a 2D image, (0,1) the pixel of the next column in the same row
 		- If you have world coordinates, they can be converted to discrete index coordinates by calling
           Geometry3D::WorldToIndex()\n\n  
 
+\section GeometryOverviewPage_PointsAndVector Difference between Points and Vectors
+
+Like ITK, MITK differenciate between points and vectors. A point defines a position in a coordinate system while a 
+vector is the distance between two points. Therefore points and vectors behave different if a coordinate transformation
+is applied. An offest in a coordinate transformation will affect a transformed point but not a vector. 
+
+An Example:\n
+If two systems are given, which differ by a offset of (1,0,0). The point A(2,2,2) in system one will correspont to point A'(3,2,2) in the second system. 
+But a vector a(2,2,2) will correspond to the vector a'(2,2,2). 
+
+          
 \section GeometryOverviewPage_Concept The Geometry Concept
 
 As the superclass of all MITK geometries Geometry3D holds:

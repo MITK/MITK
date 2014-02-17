@@ -215,6 +215,8 @@ protected:
    */
   WorkbenchWindowConfigurer::Pointer GetWindowConfigurer();
 
+  bool CanHandleShellCloseEvent();
+
   /*
    * @see berry::Window#configureShell(Shell::Pointer)
    */

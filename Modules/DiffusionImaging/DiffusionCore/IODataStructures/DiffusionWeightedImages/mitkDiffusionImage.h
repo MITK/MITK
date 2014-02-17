@@ -54,7 +54,7 @@ public:
 
   mitkClassMacro( DiffusionImage, Image )
   itkNewMacro(Self)
-
+  //mitkCloneMacro( Self )
 
   void AverageRedundantGradients(double precision);
 
@@ -83,7 +83,7 @@ public:
 
   bool AreAlike(GradientDirectionType g1, GradientDirectionType g2, double precision);
   int GetNumDirections();
-  int GetNumB0();
+  int GetNumB0(){return m_B_ValueMap[0].size();}
 
   float GetB_Value(unsigned int i);
   bool IsMultiBval();
@@ -105,16 +105,37 @@ protected:
 
   void ApplyMeasurementFrame();
 
+
   typename ImageType::Pointer               m_VectorImage;
-  GradientDirectionContainerType::Pointer   m_Directions;
-  GradientDirectionContainerType::Pointer   m_OriginalDirections;
   float                                     m_B_Value;
-  typename AdaptorType::Pointer             m_VectorImageAdaptor;
-  int                                       m_DisplayIndex;
   MeasurementFrameType                      m_MeasurementFrame;
+  GradientDirectionContainerType::Pointer   m_OriginalDirections;
+  GradientDirectionContainerType::Pointer   m_Directions;
+  int                                       m_DisplayIndex;
   BValueMap                                 m_B_ValueMap;
-  unsigned long    m_DirectionsObserverTag;
 };
+
+/**
+* @brief Equal A function comparing two images for beeing equal in meta- and imagedata
+*
+* @ingroup MITKTestingAPI
+*
+* Following aspects are tested for equality:
+*  - mitk image equal test
+*  - gradient direction container
+*  - measurement frame
+*  - reference BValue
+*  - BValue map
+*  - itk vector image
+*
+* @param rightHandSide An image to be compared
+* @param leftHandSide An image to be compared
+* @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+* @param verbose Flag indicating if the user wants detailed console output or not.
+* @return true, if all subsequent comparisons are true, false otherwise
+*/
+//template<class TPixelType>
+//bool Equal( const mitk::DiffusionImage<TPixelType>* leftHandSide, const mitk::DiffusionImage<TPixelType>* rightHandSide, ScalarType eps, bool verbose );
 
 } // namespace mitk
 

@@ -42,7 +42,7 @@ void mitk::XML2EventParser::StartElement(const char* elementName, const char **a
   {
     //
   }
-    else if (name == InteractionEventConst::xmlTagEventVariant())
+  else if (name == InteractionEventConst::xmlTagEventVariant())
   {
     std::string eventClass = ReadXMLStringAttribute(InteractionEventConst::xmlParameterEventClass(), atts);
     // New list in which all parameters are stored that are given within the <input/> tag

@@ -28,6 +28,16 @@ namespace mitk
    *@brief Observer that enables recoding of all user interaction with the render windows and storing it in an XML file.
    *
    * @ingroup Interaction
+   *
+   * XML file will look like
+   *
+   *  <?xml version="1.0"?>
+   *  <interactions>
+   *   <config>
+   *   </config>
+   *   <events>
+   *   </events>
+   *  </interactions>
    **/
 class MITK_CORE_EXPORT EventRecorder: public InteractionEventObserver
 {

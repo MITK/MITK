@@ -85,7 +85,7 @@ void test_vprintf(const char *format, ...)
 
 int main()
 {
-  test_vprintf("%d %s\n", 42, "forty-two");
+  test_vprintf(\"%d %s\\n\", 42, \"forty-two\");
   return 0;
 }
 ")
@@ -101,7 +101,7 @@ if(NOT VPRINTF)
 int main()
 {
   int args[] = { 23, 42 };
-  _doprnt("%d %d\n", args, stdout);
+  _doprnt(\"%d %d\\n\", args, stdout);
   return 0;
 }
 ")
@@ -126,7 +126,7 @@ void test_vfprintf(FILE *stream, const char *format, ...)
 
 int main()
 {
-  test_vfprintf(stdout, "%d %s\n", 42, "forty-two");
+  test_vfprintf(stdout, \"%d %s\\n\", 42, \"forty-two\");
   return 0;
 }
 ")
@@ -301,6 +301,7 @@ set(freeglut_HEADERS
 )
 
 set(freeglut_SOURCES
+  src/freeglut_callbacks.c
   src/freeglut_cursor.c
   src/freeglut_display.c
   src/freeglut_ext.c
@@ -326,9 +327,7 @@ set(freeglut_SOURCES
   src/freeglut_window.c
 )
 
-if(MSVC)
-  list(APPEND freeglut_SOURCES src/freeglut_callbacks.c)
-elseif(UNIX)
+if(UNIX)
   list(APPEND freeglut_SOURCES src/freeglut_xinput.c)
 endif()
 

@@ -21,22 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionCoreObjectFactory.h>
 #include "ctkCommandLineParser.h"
 #include <boost/algorithm/string.hpp>
-
 #include <DiffusionWeightedImages/mitkDiffusionImage.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
 #include <mitkNrrdDiffusionImageWriter.h>
-#include <itkDiscreteGaussianImageFilter.h>
-#include <itkVectorImageToImageFilter.h>
-#include <itkComposeImageFilter.h>
 #include <itkImage.h>
-#include <itkSubtractImageFilter.h>
 
 typedef mitk::DiffusionImage<short> DiffusionImageType;
 typedef itk::Image<short, 3> ImageType;
-typedef itk::DiscreteGaussianImageFilter<ImageType, ImageType> GaussianFilterType;
-typedef itk::ComposeImageFilter<ImageType> ComposeFilterType;
-typedef itk::SubtractImageFilter<ImageType, ImageType, ImageType> SubtractFilterType;
-typedef itk::VectorImageToImageFilter<short> ExtractFilterType;
 
 mitk::BaseData::Pointer LoadFile(std::string filename)
 {

@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGlobalInteraction.h>
 #include <mitkIOUtil.h>
 
+//us
+#include <usGetModuleContext.h>
+
 
 
 mitk::InteractionTestHelper::InteractionTestHelper()
@@ -31,18 +34,69 @@ mitk::InteractionTestHelper::InteractionTestHelper()
 void mitk::InteractionTestHelper::Initialize()
 {
   // Global interaction must(!) be initialized
-  mitk::GlobalInteraction::GetInstance()->Initialize("global");
+  if(! mitk::GlobalInteraction::GetInstance()->IsInitialized())
+    mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
+  mitk::RenderingManager* rm = mitk::RenderingManager::GetInstance();
+
+  //########### setup axial renderwindow ##################
   //create renderWindow, renderer and dispatcher
-  m_RenderWindow = mitk::RenderWindow::New();
+  m_RenderWindowAxial = mitk::RenderWindow::New(NULL, "stdmulti.widget1", rm); //VtkRenderWindow is created within constructor if NULL
   //create data storage
   m_DataStorage = mitk::StandaloneDataStorage::New();
   //set storage of renderer
-  m_RenderWindow->GetRenderer()->SetDataStorage(m_DataStorage);
+  m_RenderWindowAxial->GetRenderer()->SetDataStorage(m_DataStorage);
+
+  //set view direction to axial
+  m_RenderWindowAxial->GetSliceNavigationController()->SetDefaultViewDirection( mitk::SliceNavigationController::Axial );
+
+  //set renderer to render 2D
+  m_RenderWindowAxial->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
+
+  //########### setup sagittal renderwindow ##################
+  //create renderWindow, renderer and dispatcher
+  m_RenderWindowSagittal = mitk::RenderWindow::New(NULL, "stdmulti.widget2", rm); //VtkRenderWindow is created within constructor if NULL
+  //create data storage
+  m_DataStorage = mitk::StandaloneDataStorage::New();
+  //set storage of renderer
+  m_RenderWindowSagittal->GetRenderer()->SetDataStorage(m_DataStorage);
+
+  //set view direction to axial
+  m_RenderWindowSagittal->GetSliceNavigationController()->SetDefaultViewDirection( mitk::SliceNavigationController::Sagittal );
+
+  //set renderer to render 2D
+  m_RenderWindowSagittal->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
+
+  //########### setup frontal renderwindow ##################
+  //create renderWindow, renderer and dispatcher
+  m_RenderWindowFrontal = mitk::RenderWindow::New(NULL, "stdmulti.widget3", rm); //VtkRenderWindow is created within constructor if NULL
+  //create data storage
+  m_DataStorage = mitk::StandaloneDataStorage::New();
+  //set storage of renderer
+  m_RenderWindowFrontal->GetRenderer()->SetDataStorage(m_DataStorage);
+
+  //set view direction to axial
+  m_RenderWindowFrontal->GetSliceNavigationController()->SetDefaultViewDirection( mitk::SliceNavigationController::Frontal );
+
+  //set renderer to render 2D
+  m_RenderWindowFrontal->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
+
+  //########### register display interactor to handle scroll events ##################
+  //use MouseModeSwitcher to ensure that the statemachine of DisplayInteractor is loaded correctly
+  m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
+
+
+  //########### connect SliceNavigationControllers to timestep changed event of TimeNavigationController #############
+  m_RenderWindowAxial->GetSliceNavigationController()->ConnectGeometryTimeEvent(mitk::RenderingManager::GetInstance()->GetTimeNavigationController(), false);
+  m_RenderWindowSagittal->GetSliceNavigationController()->ConnectGeometryTimeEvent(mitk::RenderingManager::GetInstance()->GetTimeNavigationController(), false);
+  m_RenderWindowFrontal->GetSliceNavigationController()->ConnectGeometryTimeEvent(mitk::RenderingManager::GetInstance()->GetTimeNavigationController(), false);
 }
 
 mitk::InteractionTestHelper::~InteractionTestHelper()
 {
+  mitk::BaseRenderer::RemoveInstance(m_RenderWindowAxial->GetVtkRenderWindow());
+  mitk::BaseRenderer::RemoveInstance(m_RenderWindowSagittal->GetVtkRenderWindow());
+  mitk::BaseRenderer::RemoveInstance(m_RenderWindowFrontal->GetVtkRenderWindow());
 }
 
 
@@ -51,16 +105,13 @@ mitk::DataStorage::Pointer mitk::InteractionTestHelper::GetDataStorage()
   return m_DataStorage;
 }
 
-mitk::BaseRenderer* mitk::InteractionTestHelper::GetRenderer()
-{
-  return m_Renderer;
-}
+
 
 
 void mitk::InteractionTestHelper::AddNodeToStorage(mitk::DataNode::Pointer node)
 {
   this->m_DataStorage->Add(node);
-  mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
 }
 
 
@@ -80,4 +131,15 @@ void mitk::InteractionTestHelper::LoadInteraction(std::string interactionXmlPath
   mitk::XML2EventParser parser(xmlStream);
   m_Events = parser.GetInteractions();
   xmlStream.close();
+}
+
+
+void mitk::InteractionTestHelper::SetTimeStep(int newTimeStep)
+{
+  bool timeStepIsvalid = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetCreatedWorldGeometry()->IsValidTimeStep(newTimeStep);
+
+  if(timeStepIsvalid)
+  {
+    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(newTimeStep);
+  }
 }

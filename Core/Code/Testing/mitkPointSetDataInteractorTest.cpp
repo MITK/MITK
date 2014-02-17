@@ -36,7 +36,7 @@ private:
   mitk::DataNode::Pointer testPointSetNode;
   mitk::PointSetDataInteractor::Pointer dataInteractor;
   mitk::PointSet::Pointer testPointSet;
-  mitk::InteractionTestHelper interactionTestHelper;
+  mitk::InteractionTestHelper* interactionTestHelper;
 
 public:
 
@@ -54,15 +54,14 @@ public:
     // set the DataNode (which already is added to the DataStorage)
     dataInteractor->SetDataNode(testPointSetNode);
 
-    //Create test helper to initialize all necessary objects for interaction
-    interactionTestHelper = mitk::InteractionTestHelper();
-    //Add our test node to the DataStorage of our test helper
-    interactionTestHelper.AddNodeToStorage(testPointSetNode);
-
-
     //Create new PointSet which will receive the interaction input
     testPointSet = mitk::PointSet::New();
     testPointSetNode->SetData(testPointSet);
+
+    //Create test helper to initialize all necessary objects for interaction
+    interactionTestHelper = new mitk::InteractionTestHelper();
+    //Add our test node to the DataStorage of our test helper
+    interactionTestHelper->AddNodeToStorage(testPointSetNode);
   }
 
   void tearDown()
@@ -70,6 +69,7 @@ public:
     testPointSetNode = NULL;
     testPointSet = NULL;
     dataInteractor = NULL;
+    delete interactionTestHelper;
   }
 
   void AddPointInteraction()
@@ -81,9 +81,9 @@ public:
     std::string interactionXmlPath = "/Users/schroedt/Desktop/pointsetTest.xml";
 
     //load interaction events
-    interactionTestHelper.LoadInteraction(interactionXmlPath);
+    interactionTestHelper->LoadInteraction(interactionXmlPath);
     //Start Interaction
-    interactionTestHelper.PlaybackInteraction();
+    interactionTestHelper->PlaybackInteraction();
 
     //Load the reference PointSet
     mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::LoadPointSet(referencePointSetPath);

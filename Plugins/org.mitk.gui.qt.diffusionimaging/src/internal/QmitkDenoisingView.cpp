@@ -265,7 +265,7 @@ void QmitkDenoisingView::SelectFilter(int filter)
       m_Controls->m_LabelParameter_2->setEnabled(true);
       m_Controls->m_LabelParameter_2->setText("Comparision Radius:");
       m_Controls->m_SpinBoxParameter1->setEnabled(true);
-      m_Controls->m_SpinBoxParameter1->setValue(3);
+      m_Controls->m_SpinBoxParameter1->setValue(1);
       m_Controls->m_SpinBoxParameter2->setEnabled(true);
       m_Controls->m_SpinBoxParameter2->setValue(1);
 
@@ -282,12 +282,12 @@ void QmitkDenoisingView::SelectFilter(int filter)
       m_Controls->m_LabelParameter_3->setEnabled(true);
       m_Controls->m_LabelParameter_3->setText("Number of neighboring gradients:");
       m_Controls->m_SpinBoxParameter1->setEnabled(true);
-      m_Controls->m_SpinBoxParameter1->setValue(3);
+      m_Controls->m_SpinBoxParameter1->setValue(1);
       m_Controls->m_SpinBoxParameter2->setEnabled(true);
       m_Controls->m_SpinBoxParameter2->setValue(1);
       m_Controls->m_SpinBoxParameter3->show();
       m_Controls->m_SpinBoxParameter3->setEnabled(true);
-      m_Controls->m_SpinBoxParameter3->setValue(3);
+      m_Controls->m_SpinBoxParameter3->setValue(1);
 
       break;
     }

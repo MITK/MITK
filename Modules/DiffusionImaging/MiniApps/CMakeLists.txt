@@ -36,6 +36,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     ExportShImage.cpp
     NetworkCreation.cpp
     NetworkStatistics.cpp
+    DwiDenoising.cpp
   )
 
   # deprecated

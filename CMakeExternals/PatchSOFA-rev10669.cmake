@@ -15,6 +15,22 @@ file(STRINGS "modules/sofa/simulation/common/CMakeLists.txt" CMakeLists_txt NEWL
 string(REPLACE "tinyxml" "SofaTinyXml" CMakeLists_txt "${CMakeLists_txt}")
 file(WRITE "modules/sofa/simulation/common/CMakeLists.txt" "${CMakeLists_txt}")
 
+file(STRINGS "extlibs/csparse/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "extlibs/csparse/CMakeLists.txt" "${CMakeLists_txt}")
+
+file(STRINGS "extlibs/metis-5.1.0/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "extlibs/metis-5.1.0/CMakeLists.txt" "${CMakeLists_txt}")
+
+file(STRINGS "extlibs/miniFlowVR/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "extlibs/miniFlowVR/CMakeLists.txt" "${CMakeLists_txt}")
+
+file(STRINGS "extlibs/newmat/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "extlibs/newmat/CMakeLists.txt" "${CMakeLists_txt}")
+
 file(REMOVE "cmake/Modules/FindGLEW.cmake")
 
 file(STRINGS "cmake/externals.cmake" externals_cmake NEWLINE_CONSUME)

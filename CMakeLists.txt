@@ -248,11 +248,6 @@ if(MITK_USE_SOFA)
     set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
     message(WARNING "Switched off MITK_USE_SOFA\n  Minimum required CMake version: ${SOFA_CMAKE_VERSION}\n  Installed CMake version: ${CMAKE_VERSION}")
   endif()
-  # SOFA doesn't support Clang
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
-    message(WARNING "Switched off MITK_USE_SOFA\n  Clang is not supported, use GCC instead.")
-  endif()
   # SOFA/ITK combination requires at least MSVC 2010
   if(MSVC_VERSION AND MSVC_VERSION LESS 1600)
     set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)

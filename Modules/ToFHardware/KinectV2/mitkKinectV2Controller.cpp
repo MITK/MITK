@@ -89,7 +89,7 @@ namespace mitk
     m_CameraCoordinates(NULL),
     m_ColorPoints(NULL),
     m_PolyData(NULL),
-    m_TriangulationThreshold(10.0*10.0),
+    m_TriangulationThreshold(0.0),
     m_GenerateTriangularMesh(false)
   {
     // create heap storage for color pixel data in RGBX format
@@ -547,6 +547,7 @@ namespace mitk
                     points->GetPoint(xy_1V, pointXY_1);
                     points->GetPoint(x_1y_1V, pointX_1Y_1);
 
+
                     if( (mitk::Equal(d->m_TriangulationThreshold, 0.0)) || ((vtkMath::Distance2BetweenPoints(pointXY, pointX_1Y) <= d->m_TriangulationThreshold)
                       && (vtkMath::Distance2BetweenPoints(pointXY, pointXY_1) <= d->m_TriangulationThreshold)
                       && (vtkMath::Distance2BetweenPoints(pointX_1Y, pointX_1Y_1) <= d->m_TriangulationThreshold)
@@ -740,6 +741,6 @@ namespace mitk
 
   void KinectV2Controller::SetTriangulationThreshold(double triangulationThreshold)
   {
-    this->d->m_TriangulationThreshold = triangulationThreshold*triangulationThreshold;
+    this->d->m_TriangulationThreshold = triangulationThreshold / 100000;
   }
 }

@@ -219,7 +219,7 @@ namespace mitk
         toFCameraDevice->m_Controller->SetGenerateTriangularMesh(generateTriangularMesh);
 
         float triangulationThreshold = static_cast<mitk::FloatProperty*>(toFCameraDevice->GetProperty("TriangulationThreshold"))->GetValue();
-        toFCameraDevice->m_Controller->SetGenerateTriangularMesh(triangulationThreshold);
+        toFCameraDevice->m_Controller->SetTriangulationThreshold(triangulationThreshold);
 
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;

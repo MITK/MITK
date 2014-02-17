@@ -267,16 +267,6 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
                 vertices->InsertCellPoint(xyV);
               }
             }
-
-            //Scalar values are necessary for mapping colors/texture onto the surface
-            if (scalarFloatData)
-            {
-              scalarArray->InsertTuple1(m_VertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
-            }
-            //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
-            float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
-            float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
-            textureCoords->InsertTuple2(m_VertexIdList->GetId(pixelID), xNorm, yNorm);
           }
         }
         else
@@ -285,6 +275,15 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
           vertices->InsertNextCell(1);
           vertices->InsertCellPoint(m_VertexIdList->GetId(pixelID));
         }
+        //Scalar values are necessary for mapping colors/texture onto the surface
+        if (scalarFloatData)
+        {
+          scalarArray->InsertTuple1(m_VertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
+        }
+        //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
+        float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
+        float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
+        textureCoords->InsertTuple2(m_VertexIdList->GetId(pixelID), xNorm, yNorm);
       }
     }
   }

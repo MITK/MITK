@@ -71,6 +71,7 @@ namespace mitk
     vtkSmartPointer<vtkPolyData> m_PolyData;///< Conversion of m_CameraCoordinates to vtkPolyData
 
     double m_TriangulationThreshold; ///< Threshold to cut off vertices from triangulation
+    bool m_GenerateTriangularMesh; ///< Apply triangulation or not
   };
 
   KinectV2Controller::KinectV2ControllerPrivate::KinectV2ControllerPrivate():
@@ -88,7 +89,8 @@ namespace mitk
     m_CameraCoordinates(NULL),
     m_ColorPoints(NULL),
     m_PolyData(NULL),
-    m_TriangulationThreshold(10.0*10.0)
+    m_TriangulationThreshold(10.0*10.0),
+    m_GenerateTriangularMesh(false)
   {
     // create heap storage for color pixel data in RGBX format
     m_pColorRGBX = new RGBQUAD[m_RGBCaptureWidth * m_RGBCaptureHeight];
@@ -469,31 +471,6 @@ namespace mitk
 
         d->m_pCoordinateMapper->MapDepthFrameToColorSpace(pointCount, pDepthBuffer, pointCount, d->m_ColorPoints);
 
-        //for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
-        //{
-        //  vtkIdType id = points->InsertNextPoint(d->m_CameraCoordinates[i].X, d->m_CameraCoordinates[i].Y, d->m_CameraCoordinates[i].Z);
-        //  vertices->InsertNextCell(1);
-        //  vertices->InsertCellPoint(id);
-        //  distances[i] = static_cast<float>(*pDepthBuffer);
-        //  amplitudes[i] = static_cast<float>(*pInfraRedBuffer);
-        //  ++pDepthBuffer;
-        //  ++pInfraRedBuffer;
-
-        //  ColorSpacePoint colorPoint = d->m_ColorPoints[i];
-        //  // retrieve the depth to color mapping for the current depth pixel
-        //  int colorInDepthX = (int)(floor(colorPoint.X + 0.5));
-        //  int colorInDepthY = (int)(floor(colorPoint.Y + 0.5));
-
-        //  float xNorm = static_cast<float>(colorInDepthX)/d->m_RGBCaptureWidth;
-        //  float yNorm = static_cast<float>(colorInDepthY)/d->m_RGBCaptureHeight;
-
-        //  // make sure the depth pixel maps to a valid point in color space
-        //  if ( colorInDepthX >= 0 && colorInDepthX < d->m_RGBCaptureWidth && colorInDepthY >= 0 && colorInDepthY < d->m_RGBCaptureHeight )
-        //  {
-        //    textureCoordinates->InsertTuple2(id, xNorm, yNorm);
-        //  }
-        //}
-
         for(int j = 0; j < d->m_DepthCaptureHeight; ++j)
         {
           for(int i = 0; i < d->m_DepthCaptureWidth; ++i)
@@ -534,7 +511,7 @@ namespace mitk
                 textureCoordinates->InsertTuple2(vertexIdList->GetId(pixelID), xNorm, yNorm);
               }
 
-              if (true)
+              if (d->m_GenerateTriangularMesh)
               {
                 if((i >= 1) && (j >= 1))
                 {
@@ -754,5 +731,15 @@ namespace mitk
   vtkSmartPointer<vtkPolyData> KinectV2Controller::GetVtkPolyData()
   {
     return d->m_PolyData;
+  }
+
+  void KinectV2Controller::SetGenerateTriangularMesh(bool flag)
+  {
+    d->m_GenerateTriangularMesh = flag;
+  }
+
+  void KinectV2Controller::SetTriangulationThreshold(double triangulationThreshold)
+  {
+    this->d->m_TriangulationThreshold = triangulationThreshold*triangulationThreshold;
   }
 }

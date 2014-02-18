@@ -37,7 +37,7 @@ class mitkToolInteractionTestSuite : public mitk::TestFixture
 
 private:
 //  mitk::DataNode::Pointer testPointSetNode;
-  mitk::InteractionTestHelper* m_InteractionTestHelper;
+  mitk::InteractionTestHelper::Pointer m_InteractionTestHelper;
   mitk::DataStorage* m_DataStorage;
   mitk::ToolManager::Pointer m_ToolManager;
 
@@ -59,9 +59,22 @@ public:
     return -1;
   }
 
-  void RunTestWithParameters(const std::string& patientImagePath, const std::string& referenceSegmentationImage,
-                             const std::string& toolName, const std::string& interactionPattern)
+  void RunTestWithParameters(const std::string& patientImagePath,
+                             const std::string& referenceSegmentationImage,
+                             const std::string& toolName,
+                             const std::string& interactionPattern)
   {
+    //Create test helper to initialize all necessary objects for interaction
+    m_InteractionTestHelper = mitk::InteractionTestHelper::New(GetTestDataFilePath(interactionPattern));
+
+    //Use data storage of test helper
+    m_DataStorage = m_InteractionTestHelper->GetDataStorage().GetPointer();
+
+    //create ToolManager
+    m_ToolManager = mitk::ToolManager::New(m_DataStorage);
+    m_ToolManager->InitializeTools();
+    m_ToolManager->RegisterClient();//This is needed because there must be at least one registered. Otherwise tools can't be activated.
+
     //Load patient image
     mitk::Image::Pointer patientImage = mitk::IOUtil::LoadImage(GetTestDataFilePath(patientImagePath));
     CPPUNIT_ASSERT(patientImage.IsNotNull());
@@ -99,9 +112,6 @@ public:
 
     CPPUNIT_ASSERT(m_ToolManager->GetActiveTool() != NULL);
 
-    //Load interaction pattern
-    m_InteractionTestHelper->LoadInteraction(GetTestDataFilePath(interactionPattern));
-
     //Start Interaction
     m_InteractionTestHelper->PlaybackInteraction();
 
@@ -117,22 +127,13 @@ public:
 
   void setUp()
   {
-    //Create test helper to initialize all necessary objects for interaction
-    m_InteractionTestHelper = new mitk::InteractionTestHelper();
-    m_DataStorage = m_InteractionTestHelper->GetDataStorage().GetPointer();
-
-    //create ToolManager
-    m_ToolManager = mitk::ToolManager::New(m_DataStorage);
-    m_ToolManager->InitializeTools();
-    m_ToolManager->RegisterClient();//This is needed because there must be at least one registered. Otherwise tools can't be activated.
-
   }
 
   void tearDown()
   {
     m_ToolManager->ActivateTool(-1);
     m_ToolManager = NULL;
-    delete m_InteractionTestHelper;
+    m_InteractionTestHelper = NULL;
   }
 
   void AddToolInteractionTest()

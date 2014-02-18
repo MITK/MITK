@@ -20,83 +20,89 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandaloneDataStorage.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkIOUtil.h>
+#include <mitkInteractionEventConst.h>
 
 //us
 #include <usGetModuleContext.h>
 
+#include <tinyxml.h>
 
 
-mitk::InteractionTestHelper::InteractionTestHelper()
+
+mitk::InteractionTestHelper::InteractionTestHelper(const std::string &interactionXmlFilePath)
+  : m_InteractionFilePath(interactionXmlFilePath)
 {
-  this->Initialize();
+  this->Initialize(interactionXmlFilePath);
 }
 
-void mitk::InteractionTestHelper::Initialize()
+void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFilePath)
 {
-  // Global interaction must(!) be initialized
-  if(! mitk::GlobalInteraction::GetInstance()->IsInitialized())
-    mitk::GlobalInteraction::GetInstance()->Initialize("global");
+  //TiXmlDocument document(interactionXmlPath.c_str());
+  TiXmlDocument document(interactionXmlFilePath);
+  bool loadOkay = document.LoadFile();
+  if (loadOkay)
+  {
+    // Global interaction must(!) be initialized
+    if(! mitk::GlobalInteraction::GetInstance()->IsInitialized())
+      mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
-  mitk::RenderingManager* rm = mitk::RenderingManager::GetInstance();
+    //get RenderingManager instance
+    mitk::RenderingManager* rm = mitk::RenderingManager::GetInstance();
 
-  //########### setup axial renderwindow ##################
-  //create renderWindow, renderer and dispatcher
-  m_RenderWindowAxial = mitk::RenderWindow::New(NULL, "stdmulti.widget1", rm); //VtkRenderWindow is created within constructor if NULL
-  //create data storage
-  m_DataStorage = mitk::StandaloneDataStorage::New();
-  //set storage of renderer
-  m_RenderWindowAxial->GetRenderer()->SetDataStorage(m_DataStorage);
+    //create data storage
+    m_DataStorage = mitk::StandaloneDataStorage::New();
 
-  //set view direction to axial
-  m_RenderWindowAxial->GetSliceNavigationController()->SetDefaultViewDirection( mitk::SliceNavigationController::Axial );
+    //for each renderer found create a render window and configure
+    for( TiXmlElement* element = document.FirstChildElement(mitk::InteractionEventConst::xmlTagInteractions())->FirstChildElement(mitk::InteractionEventConst::xmlTagConfigRoot())->FirstChildElement(mitk::InteractionEventConst::xmlTagRenderer());
+         element != NULL;
+         element = element->NextSiblingElement(mitk::InteractionEventConst::xmlTagRenderer()) )
+    {
+      //get name of renderer
+      const char* rendererName = element->Attribute(mitk::InteractionEventConst::xmlEventPropertyRendererName().c_str());
 
-  //set renderer to render 2D
-  m_RenderWindowAxial->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
+      //get view direction
+      int viewDirectionNum = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyViewDirection())->c_str());
+      mitk::SliceNavigationController::ViewDirection viewDirection = static_cast<mitk::SliceNavigationController::ViewDirection>(viewDirectionNum);
 
-  //########### setup sagittal renderwindow ##################
-  //create renderWindow, renderer and dispatcher
-  m_RenderWindowSagittal = mitk::RenderWindow::New(NULL, "stdmulti.widget2", rm); //VtkRenderWindow is created within constructor if NULL
-  //create data storage
-  m_DataStorage = mitk::StandaloneDataStorage::New();
-  //set storage of renderer
-  m_RenderWindowSagittal->GetRenderer()->SetDataStorage(m_DataStorage);
+      //create renderWindow, renderer and dispatcher
+      mitk::RenderWindow::Pointer rw = mitk::RenderWindow::New(NULL, rendererName, rm); //VtkRenderWindow is created within constructor if NULL
 
-  //set view direction to axial
-  m_RenderWindowSagittal->GetSliceNavigationController()->SetDefaultViewDirection( mitk::SliceNavigationController::Sagittal );
+      //set storage of renderer
+      rw->GetRenderer()->SetDataStorage(m_DataStorage);
 
-  //set renderer to render 2D
-  m_RenderWindowSagittal->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
+      //set view direction to axial
+      rw->GetSliceNavigationController()->SetDefaultViewDirection( viewDirection );
 
-  //########### setup frontal renderwindow ##################
-  //create renderWindow, renderer and dispatcher
-  m_RenderWindowFrontal = mitk::RenderWindow::New(NULL, "stdmulti.widget3", rm); //VtkRenderWindow is created within constructor if NULL
-  //create data storage
-  m_DataStorage = mitk::StandaloneDataStorage::New();
-  //set storage of renderer
-  m_RenderWindowFrontal->GetRenderer()->SetDataStorage(m_DataStorage);
+      //set renderer to render 2D
+      rw->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
 
-  //set view direction to axial
-  m_RenderWindowFrontal->GetSliceNavigationController()->SetDefaultViewDirection( mitk::SliceNavigationController::Frontal );
+      //connect SliceNavigationControllers to timestep changed event of TimeNavigationController
+      rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController(), false);
 
-  //set renderer to render 2D
-  m_RenderWindowFrontal->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
+      //add to list of kown render windows
+      m_RenderWindowList.push_back(rw);
+    }
 
-  //########### register display interactor to handle scroll events ##################
-  //use MouseModeSwitcher to ensure that the statemachine of DisplayInteractor is loaded correctly
-  m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
-
-
-  //########### connect SliceNavigationControllers to timestep changed event of TimeNavigationController #############
-  m_RenderWindowAxial->GetSliceNavigationController()->ConnectGeometryTimeEvent(mitk::RenderingManager::GetInstance()->GetTimeNavigationController(), false);
-  m_RenderWindowSagittal->GetSliceNavigationController()->ConnectGeometryTimeEvent(mitk::RenderingManager::GetInstance()->GetTimeNavigationController(), false);
-  m_RenderWindowFrontal->GetSliceNavigationController()->ConnectGeometryTimeEvent(mitk::RenderingManager::GetInstance()->GetTimeNavigationController(), false);
+    //########### register display interactor to handle scroll events ##################
+    //use MouseModeSwitcher to ensure that the statemachine of DisplayInteractor is loaded correctly
+    m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
+  }
+  else
+  {
+    mitkThrow() << "Can not load interaction xml file <" << m_InteractionFilePath << ">";
+  }
 }
 
 mitk::InteractionTestHelper::~InteractionTestHelper()
 {
-  mitk::BaseRenderer::RemoveInstance(m_RenderWindowAxial->GetVtkRenderWindow());
-  mitk::BaseRenderer::RemoveInstance(m_RenderWindowSagittal->GetVtkRenderWindow());
-  mitk::BaseRenderer::RemoveInstance(m_RenderWindowFrontal->GetVtkRenderWindow());
+  //unregister renderers
+  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
+  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+
+  for(; it != end; it++)
+  {
+    mitk::BaseRenderer::RemoveInstance((*it)->GetVtkRenderWindow());
+  }
 }
 
 
@@ -117,17 +123,23 @@ void mitk::InteractionTestHelper::AddNodeToStorage(mitk::DataNode::Pointer node)
 
 void mitk::InteractionTestHelper::PlaybackInteraction()
 {
+  //load events if not loaded yet
+  if(m_Events.empty())
+    this->LoadInteraction();
+
+  //playback all events in queue
   for (unsigned long i=0; i < m_Events.size(); ++i)
   {
+    //let dispatcher of sending renderer process the event
     m_Events.at(i)->GetSender()->GetDispatcher()->ProcessEvent(m_Events.at(i));
   }
 }
 
 
-void mitk::InteractionTestHelper::LoadInteraction(std::string interactionXmlPath)
+void mitk::InteractionTestHelper::LoadInteraction()
 {
-  //load interaction pattern
-  std::ifstream xmlStream(interactionXmlPath.c_str());
+  //load interaction pattern from xml file
+  std::ifstream xmlStream(m_InteractionFilePath.c_str());
   mitk::XML2EventParser parser(xmlStream);
   m_Events = parser.GetInteractions();
   xmlStream.close();

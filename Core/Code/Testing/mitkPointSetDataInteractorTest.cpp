@@ -57,11 +57,6 @@ public:
     //Create new PointSet which will receive the interaction input
     testPointSet = mitk::PointSet::New();
     testPointSetNode->SetData(testPointSet);
-
-    //Create test helper to initialize all necessary objects for interaction
-    interactionTestHelper = new mitk::InteractionTestHelper();
-    //Add our test node to the DataStorage of our test helper
-    interactionTestHelper->AddNodeToStorage(testPointSetNode);
   }
 
   void tearDown()
@@ -80,8 +75,12 @@ public:
     //Path to the interaction xml file
     std::string interactionXmlPath = "/Users/schroedt/Desktop/pointsetTest.xml";
 
-    //load interaction events
-    interactionTestHelper->LoadInteraction(interactionXmlPath);
+    //Create test helper to initialize all necessary objects for interaction
+    interactionTestHelper = new mitk::InteractionTestHelper(interactionXmlPath);
+
+    //Add our test node to the DataStorage of our test helper
+    interactionTestHelper->AddNodeToStorage(testPointSetNode);
+
     //Start Interaction
     interactionTestHelper->PlaybackInteraction();
 

@@ -52,7 +52,7 @@ class MITK_TESTINGHELPER_EXPORT InteractionTestHelper
 
 public:
 
-  InteractionTestHelper();
+  InteractionTestHelper(const std::string &interactionXmlFilePath);
 
   ~InteractionTestHelper();
 
@@ -72,12 +72,6 @@ public:
   void PlaybackInteraction();
 
   /**
-   * @brief LoadInteraction loads events from xml file.
-   * @param interactionXmlPath path to xml file with interaction events.
-   */
-  void LoadInteraction(std::string interactionXmlPath);
-
-  /**
    * @brief SetTimeStep Sets timesteps of all SliceNavigationControllers to given timestep.
    * @param newTimeStep new timestep
    *
@@ -85,16 +79,27 @@ public:
    */
   void SetTimeStep(int newTimeStep);
 
+  typedef std::vector<mitk::RenderWindow::Pointer> RenderWindowListType;
+
 protected:
   /**
      * @brief Initialize Internal method to initialize the renderwindow and set the datastorage.
+     * @throws mitk::Exception if interaction xml file can not be loaded.
      */
-  void Initialize();
+  void Initialize(const std::string &interactionXmlFilePath);
+
+  /**
+   * @brief LoadInteraction loads events from xml file.
+   * @param interactionXmlPath path to xml file with interaction events.
+   */
+  void LoadInteraction();
 
 
   mitk::XML2EventParser::EventContainerType m_Events; // List with loaded interaction events
 
-  mitk::VtkPropRenderer::Pointer m_Renderer;
+  std::string m_InteractionFilePath;
+
+  RenderWindowListType m_RenderWindowList;
   mitk::RenderWindow::Pointer m_RenderWindowAxial;
   mitk::RenderWindow::Pointer m_RenderWindowSagittal;
   mitk::RenderWindow::Pointer m_RenderWindowFrontal;

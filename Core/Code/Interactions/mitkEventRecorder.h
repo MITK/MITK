@@ -34,8 +34,16 @@ namespace mitk
    *  <?xml version="1.0"?>
    *  <interactions>
    *   <config>
+   *    <renderer RendererName="stdmulti.widget1" ViewDirection="0"/>
+   *    <renderer RendererName="stdmulti.widget2" ViewDirection="1"/>
+   *    <renderer RendererName="stdmulti.widget3" ViewDirection="2"/>
    *   </config>
    *   <events>
+   *    <event_variant class="MOUSEMOVEEVENT" >
+   *     <attribute name="PositionOnScreen" value="491,388"/>
+   *     <attribute name="PositionInWorld" value="128,235.771,124.816"/>
+   *     <attribute name="RendererName" value="stdmulti.widget2"/>
+   *    </event_variant>
    *   </events>
    *  </interactions>
    **/

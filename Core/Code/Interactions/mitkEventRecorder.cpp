@@ -136,8 +136,9 @@ void mitk::EventRecorder::StartRecording()
   // <?xml version="1.0"?>
   //  <interactions>
   //   <config>
-  //      .
-  //      .
+  //    <renderer RendererName="stdmulti.widget2" ViewDirection="1"/>
+  //    <renderer RendererName="stdmulti.widget1" ViewDirection="0"/>
+  //     ...
   //   </config>
   //   <events>
   WriteEventXMLHeader(m_FileStream);

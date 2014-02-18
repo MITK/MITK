@@ -17,6 +17,72 @@
 #include "mitkEventRecorder.h"
 #include "mitkEventFactory.h"
 #include "mitkInteractionEvent.h"
+#include "mitkInteractionEventConst.h"
+
+#include "mitkBaseRenderer.h"
+
+
+static void WriteEventXMLHeader(std::ofstream& stream)
+{
+  stream << mitk::InteractionEventConst::xmlHead() << "\n";
+}
+
+
+static void WriteEventXMLConfig(std::ofstream& stream)
+{
+  // <config>
+  stream << " <" << mitk::InteractionEventConst::xmlTagConfigRoot() << ">\n";
+
+  //write renderer config
+  //for all registered 2D renderers write name and viewdirection.
+  mitk::BaseRenderer::BaseRendererMapType::iterator rendererIterator = mitk::BaseRenderer::baseRendererMap.begin();
+  mitk::BaseRenderer::BaseRendererMapType::iterator end = mitk::BaseRenderer::baseRendererMap.end();
+
+  for(; rendererIterator != end; rendererIterator++)
+  {
+    if((*rendererIterator).second->GetMapperID() == mitk::BaseRenderer::Standard2D)
+    {
+      std::string rendererName = (*rendererIterator).second->GetName();
+      mitk::SliceNavigationController::ViewDirection viewDirection = (*rendererIterator).second->GetSliceNavigationController()->GetDefaultViewDirection();
+
+      //  <renderer RendererName="stdmulti.widget2" ViewDirection="1"/>
+      stream << "  <" << mitk::InteractionEventConst::xmlTagRenderer() << " " << mitk::InteractionEventConst::xmlEventPropertyRendererName() << "=\"" <<  rendererName << "\" " << mitk::InteractionEventConst::xmlEventPropertyViewDirection() << "=\"" << viewDirection << "\"/>\n";
+    }
+  }
+
+  // </config>
+  stream << " </" << mitk::InteractionEventConst::xmlTagConfigRoot() << ">\n";
+}
+
+static void WriteEventXMLEventsOpen(std::ofstream& stream)
+{
+  stream << " <" << mitk::InteractionEventConst::xmlTagEvents() << ">\n";
+}
+
+
+static void WriteEventXMLEventsClose(std::ofstream& stream)
+{
+  stream << " </" << mitk::InteractionEventConst::xmlTagEvents() << ">\n";
+}
+
+
+static void WriteEventXMLInteractionsOpen(std::ofstream& stream)
+{
+  stream << "<" << mitk::InteractionEventConst::xmlTagInteractions() << ">\n";
+}
+
+
+static void WriteEventXMLInteractionsClose(std::ofstream& stream)
+{
+  stream << "</" << mitk::InteractionEventConst::xmlTagInteractions() << ">";
+}
+
+
+static void WriteEventXMLClose(std::ofstream& stream)
+{
+  WriteEventXMLEventsClose(stream);
+  WriteEventXMLInteractionsClose(stream);
+}
 
 
 mitk::EventRecorder::EventRecorder()
@@ -63,11 +129,22 @@ void mitk::EventRecorder::StartRecording()
   {
     MITK_ERROR << "File " << m_FileName << " could not be opened!";
     m_FileStream.close();
-    return ;
+    return;
   }
 
-  //write open tag
-  m_FileStream << "<events>\n";
+  //write head and config
+  // <?xml version="1.0"?>
+  //  <interactions>
+  //   <config>
+  //    <renderer RendererName="stdmulti.widget2" ViewDirection="1"/>
+  //    <renderer RendererName="stdmulti.widget1" ViewDirection="0"/>
+  //     ...
+  //   </config>
+  //   <events>
+  WriteEventXMLHeader(m_FileStream);
+  WriteEventXMLInteractionsOpen(m_FileStream);
+  WriteEventXMLConfig(m_FileStream);
+  WriteEventXMLEventsOpen(m_FileStream);
 }
 
 void mitk::EventRecorder::StopRecording()
@@ -75,7 +152,9 @@ void mitk::EventRecorder::StopRecording()
   if (m_FileStream.is_open())
   {
     //write end tag
-    m_FileStream << "</events>\n";
+    //  </events>
+    // </interactions>
+    WriteEventXMLClose(m_FileStream);
 
     m_FileStream.flush();
     m_FileStream.close();

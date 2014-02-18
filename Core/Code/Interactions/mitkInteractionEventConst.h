@@ -28,11 +28,16 @@ namespace mitk
  */
 struct MITK_CORE_EXPORT InteractionEventConst
 {
+  static const std::string xmlHead(); // = "<?xml version='1.0'?>";
+
   // XML Tags
   static const std::string xmlTagConfigRoot(); // = "config";
+  static const std::string xmlTagEvents(); // = "events";
+  static const std::string xmlTagInteractions(); // = "interactions";
   static const std::string xmlTagParam(); // = "param";
   static const std::string xmlTagEventVariant(); // = "event_variant";
   static const std::string xmlTagAttribute(); // = "attribute";
+  static const std::string xmlTagRenderer(); // = "renderer";
 
   // XML Param
   static const std::string xmlParameterName(); // = "name";
@@ -51,6 +56,7 @@ struct MITK_CORE_EXPORT InteractionEventConst
   static const std::string xmlEventPropertyWheelDelta(); // = "WheelDelta";
   static const std::string xmlEventPropertySignalName(); // = "SignalName";
   static const std::string xmlEventPropertyRendererName(); // = "RendererName";
+  static const std::string xmlEventPropertyViewDirection(); // = "ViewDirection";
 };
 
 }     //namespace mitk

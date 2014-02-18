@@ -18,17 +18,40 @@
 
 namespace mitk {
 
+const std::string InteractionEventConst::xmlHead()
+{
+  static const std::string xmlHead = "<?xml version='1.0'?>";
+  return xmlHead;
+}
+
 const std::string InteractionEventConst::xmlTagConfigRoot()
 {
   static const std::string xmlTagConfigRoot = "config";
   return xmlTagConfigRoot;
 }
 
+const std::string InteractionEventConst::xmlTagEvents()
+{
+  static const std::string xmlTagEvents = "events";
+  return xmlTagEvents;
+}
+
+const std::string InteractionEventConst::xmlTagInteractions()
+{
+  static const std::string xmlTagInteractions = "interactions";
+  return xmlTagInteractions;
+}
+
+const std::string InteractionEventConst::xmlTagRenderer()
+{
+  static const std::string xmlTagRenderer = "renderer";
+  return xmlTagRenderer;
+}
+
 const std::string InteractionEventConst::xmlTagParam()
 {
   static const std::string xmlTagParam = "param";
   return xmlTagParam;
-
 }
 
 const std::string InteractionEventConst::xmlTagEventVariant()
@@ -127,5 +150,10 @@ const std::string InteractionEventConst::xmlEventPropertyRendererName()
   return xmlEventPropertyRendererName;
 }
 
+const std::string InteractionEventConst::xmlEventPropertyViewDirection()
+{
+  static const std::string xmlEventPropertyViewDirection = "ViewDirection";
+  return xmlEventPropertyViewDirection;
+}
 
 }

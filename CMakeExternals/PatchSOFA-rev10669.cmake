@@ -1,59 +1,100 @@
-file(STRINGS "cmake/dependencies.cmake" dependencies_cmake NEWLINE_CONSUME)
-string(REPLACE "\"tinyxml\"" "\"SofaTinyXml\"" dependencies_cmake "${dependencies_cmake}")
-string(REPLACE "add_subdirectory(\"\${SOFA_A" "#add_subdirectory(\"\${SOFA_A" dependencies_cmake "${dependencies_cmake}")
-file(WRITE "cmake/dependencies.cmake" "${dependencies_cmake}")
+# Changes of cmake/dependencies.cmake are commented separately below
 
-file(STRINGS "modules/sofa/component/SofaBaseVisual/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
-string(REPLACE "tinyxml" "SofaTinyXml" CMakeLists_txt "${CMakeLists_txt}")
-file(WRITE "modules/sofa/component/SofaBaseVisual/CMakeLists.txt" "${CMakeLists_txt}")
+set(path "cmake/dependencies.cmake")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
 
-file(STRINGS "modules/sofa/component/SofaLoader/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
-string(REPLACE "tinyxml" "SofaTinyXml" CMakeLists_txt "${CMakeLists_txt}")
-file(WRITE "modules/sofa/component/SofaLoader/CMakeLists.txt" "${CMakeLists_txt}")
+# Comment out add_subdirectory() commands that reference the SOFA applications
+# directory
 
-file(STRINGS "modules/sofa/simulation/common/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
-string(REPLACE "tinyxml" "SofaTinyXml" CMakeLists_txt "${CMakeLists_txt}")
-file(WRITE "modules/sofa/simulation/common/CMakeLists.txt" "${CMakeLists_txt}")
+string(REPLACE "add_subdirectory(\"\${SOFA_A" "#add_subdirectory(\"\${SOFA_A" CONTENTS ${CONTENTS})
 
-file(STRINGS "extlibs/csparse/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
-string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CMakeLists_txt "${CMakeLists_txt}")
-file(WRITE "extlibs/csparse/CMakeLists.txt" "${CMakeLists_txt}")
+# Rename tinyxml to SofaTinyXml since MITK has its own version of tinyxml and
+# the same name lead to linker or runtime errors in the past
 
-file(STRINGS "extlibs/metis-5.1.0/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
-string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CMakeLists_txt "${CMakeLists_txt}")
-file(WRITE "extlibs/metis-5.1.0/CMakeLists.txt" "${CMakeLists_txt}")
+string(REPLACE "\"tinyxml\"" "\"SofaTinyXml\"" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
-file(STRINGS "extlibs/miniFlowVR/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
-string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CMakeLists_txt "${CMakeLists_txt}")
-file(WRITE "extlibs/miniFlowVR/CMakeLists.txt" "${CMakeLists_txt}")
+# Adjust tinyxml references (see above)
 
-file(STRINGS "extlibs/newmat/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
-string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CMakeLists_txt "${CMakeLists_txt}")
-file(WRITE "extlibs/newmat/CMakeLists.txt" "${CMakeLists_txt}")
+set(path "modules/sofa/component/SofaBaseVisual/CMakeLists.txt")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "tinyxml" "SofaTinyXml" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+set(path "modules/sofa/component/SofaLoader/CMakeLists.txt")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "tinyxml" "SofaTinyXml" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+set(path "modules/sofa/simulation/common/CMakeLists.txt")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "tinyxml" "SofaTinyXml" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+# Add -fPIC compiler flag for static libraries also if Clang is used
+
+set(path "extlibs/csparse/CMakeLists.txt")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+set(path "extlibs/metis-5.1.0/CMakeLists.txt")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+set(path "extlibs/miniFlowVR/CMakeLists.txt")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+set(path "extlibs/newmat/CMakeLists.txt")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "\${CMAKE_COMPILER_IS_GNUCC}" "\"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"GNU\" OR \"\${CMAKE_CXX_COMPILER_ID}\" STREQUAL \"Clang\"" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+# Remove SOFA's FindGLEW.cmake since we need the official FindGLEW.cmake to
+# inject the MITK superbuild version of GLEW into SOFA
 
 file(REMOVE "cmake/Modules/FindGLEW.cmake")
 
-file(STRINGS "cmake/externals.cmake" externals_cmake NEWLINE_CONSUME)
-string(REPLACE "graph " "" externals_cmake "${externals_cmake}")
-string(REPLACE "set(GLUT_LIBRARIES \"freeglut\")" "find_package(GLUT REQUIRED)" externals_cmake "${externals_cmake}")
-string(REPLACE "set(GLEW_LIBRARIES \"glew32\")" "find_package(GLEW REQUIRED)" externals_cmake "${externals_cmake}")
-string(REPLACE "else()\n    set(O" "    list(APPEND GLOBAL_INCLUDE_DIRECTORIES \"\${GLUT_INCLUDE_DIRS}\" \"\${GLEW_INCLUDE_DIRS}\")\nelse()\n    set(O" externals_cmake "${externals_cmake}")
-string(REPLACE "GLUT REQUIRED" "GLUT REQUIRED CONFIG" externals_cmake "${externals_cmake}")
-string(REPLACE "GLEW REQUIRED" "GLEW REQUIRED CONFIG" externals_cmake "${externals_cmake}")
-file(WRITE "cmake/externals.cmake" "${externals_cmake}")
+# Changes of cmake/externals.cmake are commented separately below
 
-file(APPEND "cmake/externals.cmake" "\nif(SOFA-EXTERNAL_TINYXML)\n    list(APPEND GLOBAL_INCLUDE_DIRECTORIES \"\${TINYXML_INCLUDE_DIRS}\")\nendif()\n")
+set(path "cmake/externals.cmake")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
 
-file(STRINGS "cmake/preProject.cmake" preProject_cmake NEWLINE_CONSUME)
-string(REPLACE "DEBUG \"\${SOFA_BIN_DIR}" "DEBUG \"\${SOFA_BIN_DIR}/Debug" preProject_cmake "${preProject_cmake}")
-string(REPLACE "RELEASE \"\${SOFA_BIN_DIR}" "RELEASE \"\${SOFA_BIN_DIR}/Release" preProject_cmake "${preProject_cmake}")
-string(REPLACE "RELWITHDEBINFO \"\${SOFA_BIN_DIR}" "RELWITHDEBINFO \"\${SOFA_BIN_DIR}/RelWithDebInfo" preProject_cmake "${preProject_cmake}")
-string(REPLACE "MINSIZEREL \"\${SOFA_BIN_DIR}" "MINSIZEREL \"\${SOFA_BIN_DIR}/MinSizeRel" preProject_cmake "${preProject_cmake}")
-string(REPLACE "DEBUG \"\${SOFA_LIB_DIR}" "DEBUG \"\${SOFA_LIB_DIR}/Debug" preProject_cmake "${preProject_cmake}")
-string(REPLACE "RELEASE \"\${SOFA_LIB_DIR}" "RELEASE \"\${SOFA_LIB_DIR}/Release" preProject_cmake "${preProject_cmake}")
-string(REPLACE "RELWITHDEBINFO \"\${SOFA_LIB_DIR}" "RELWITHDEBINFO \"\${SOFA_LIB_DIR}/RelWithDebInfo" preProject_cmake "${preProject_cmake}")
-string(REPLACE "MINSIZEREL \"\${SOFA_LIB_DIR}" "MINSIZEREL \"\${SOFA_LIB_DIR}/MinSizeRel" preProject_cmake "${preProject_cmake}")
-file(WRITE "cmake/preProject.cmake" "${preProject_cmake}")
+# Enhance GLUT and GLEW finding routine to regard externally injected GLUT and
+# GLEW libraries
+
+string(REPLACE "set(GLUT_LIBRARIES \"freeglut\")" "find_package(GLUT REQUIRED)" CONTENTS ${CONTENTS})
+string(REPLACE "set(GLEW_LIBRARIES \"glew32\")" "find_package(GLEW REQUIRED)" CONTENTS ${CONTENTS})
+string(REPLACE "else()\n    set(O" "    list(APPEND GLOBAL_INCLUDE_DIRECTORIES \"\${GLUT_INCLUDE_DIRS}\" \"\${GLEW_INCLUDE_DIRS}\")\nelse()\n    set(O" CONTENTS ${CONTENTS})
+string(REPLACE "GLUT REQUIRED" "GLUT REQUIRED CONFIG" CONTENTS ${CONTENTS})
+string(REPLACE "GLEW REQUIRED" "GLEW REQUIRED CONFIG" CONTENTS ${CONTENTS})
+
+# Remove Boost binary graph dependency because it is not straight forward to
+# compile on all plattforms and its header-only part is enough
+
+string(REPLACE "graph " "" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+# Place binaries and libraries in different subfolders according to the build
+# configuration
+
+set(path "cmake/preProject.cmake")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "DEBUG \"\${SOFA_BIN_DIR}" "DEBUG \"\${SOFA_BIN_DIR}/Debug" CONTENTS ${CONTENTS})
+string(REPLACE "RELEASE \"\${SOFA_BIN_DIR}" "RELEASE \"\${SOFA_BIN_DIR}/Release" CONTENTS ${CONTENTS})
+string(REPLACE "RELWITHDEBINFO \"\${SOFA_BIN_DIR}" "RELWITHDEBINFO \"\${SOFA_BIN_DIR}/RelWithDebInfo" CONTENTS ${CONTENTS})
+string(REPLACE "MINSIZEREL \"\${SOFA_BIN_DIR}" "MINSIZEREL \"\${SOFA_BIN_DIR}/MinSizeRel" CONTENTS ${CONTENTS})
+string(REPLACE "DEBUG \"\${SOFA_LIB_DIR}" "DEBUG \"\${SOFA_LIB_DIR}/Debug" CONTENTS ${CONTENTS})
+string(REPLACE "RELEASE \"\${SOFA_LIB_DIR}" "RELEASE \"\${SOFA_LIB_DIR}/Release" CONTENTS ${CONTENTS})
+string(REPLACE "RELWITHDEBINFO \"\${SOFA_LIB_DIR}" "RELWITHDEBINFO \"\${SOFA_LIB_DIR}/RelWithDebInfo" CONTENTS ${CONTENTS})
+string(REPLACE "MINSIZEREL \"\${SOFA_LIB_DIR}" "MINSIZEREL \"\${SOFA_LIB_DIR}/MinSizeRel" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+# Create SOFAConfig.cmake.in file to make SOFA findable through the config mode
+# of find_package()
 
 file(APPEND "CMakeLists.txt" "\nconfigure_file(SOFAConfig.cmake.in SOFAConfig.cmake @ONLY)\n")
 

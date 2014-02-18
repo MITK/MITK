@@ -39,22 +39,24 @@ namespace mitk
   * The user of this class is responsible to add the data object to interact with to the data storage
   * of InteractionTestHelper. And must also make sure that a proper data interactor is associated with the data object.
   *
-  * To test PointSet interaction for instance make sure you have a PointSet node and a PointSetDataInteractor.
+  * To test a PointSet interaction for instance make sure you have a PointSet node and a PointSetDataInteractor.
   * Then just add the node to the storage of the your InteractionTestHelper by calling InteractionTestHelper::AddNodeToStorage.
-  * Use InteractionTestHelper::PlaybackInteraction to execute.
+  * Use InteractionTestHelper::PlaybackInteraction to execute. The result can afterwards be compared to a reference object.
+  *
+  * Make sure to destroy the test helper instance after each test, since all render windows and its renderers have to be unregistered.
   *
   * \sa XML2EventParser
   * \sa EventFactory
   * \sa EventRecorder
 */
-class MITK_TESTINGHELPER_EXPORT InteractionTestHelper
+class MITK_TESTINGHELPER_EXPORT InteractionTestHelper : public itk::LightObject
 {
 
 public:
 
-  InteractionTestHelper(const std::string &interactionXmlFilePath);
+  mitkClassMacro(InteractionTestHelper, LightObject);
+  mitkNewMacro1Param(InteractionTestHelper, const std::string &);
 
-  ~InteractionTestHelper();
 
   /** @brief Returns the datastorage, in order to modify the data inside a rendering test.
     **/
@@ -82,6 +84,16 @@ public:
   typedef std::vector<mitk::RenderWindow::Pointer> RenderWindowListType;
 
 protected:
+
+  /**
+   * @brief InteractionTestHelper set up all neseccary objects by calling Initialize.
+   * @param interactionXmlFilePath path to xml file containing events and configuration information for the render windows.
+   */
+  InteractionTestHelper(const std::string &interactionXmlFilePath);
+
+  //unregisters all render windows and its renderers.
+  virtual ~InteractionTestHelper();
+
   /**
      * @brief Initialize Internal method to initialize the renderwindow and set the datastorage.
      * @throws mitk::Exception if interaction xml file can not be loaded.
@@ -100,9 +112,6 @@ protected:
   std::string m_InteractionFilePath;
 
   RenderWindowListType m_RenderWindowList;
-  mitk::RenderWindow::Pointer m_RenderWindowAxial;
-  mitk::RenderWindow::Pointer m_RenderWindowSagittal;
-  mitk::RenderWindow::Pointer m_RenderWindowFrontal;
   mitk::DataStorage::Pointer m_DataStorage;
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
 

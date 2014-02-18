@@ -36,7 +36,7 @@ private:
   mitk::DataNode::Pointer testPointSetNode;
   mitk::PointSetDataInteractor::Pointer dataInteractor;
   mitk::PointSet::Pointer testPointSet;
-  mitk::InteractionTestHelper* interactionTestHelper;
+  mitk::InteractionTestHelper::Pointer interactionTestHelper;
 
 public:
 
@@ -61,10 +61,12 @@ public:
 
   void tearDown()
   {
+    //destroy all objects
     testPointSetNode = NULL;
     testPointSet = NULL;
     dataInteractor = NULL;
-    delete interactionTestHelper;
+    //make sure to destroy the test helper object after each test
+    interactionTestHelper = NULL;
   }
 
   void AddPointInteraction()
@@ -76,7 +78,7 @@ public:
     std::string interactionXmlPath = "/Users/schroedt/Desktop/pointsetTest.xml";
 
     //Create test helper to initialize all necessary objects for interaction
-    interactionTestHelper = new mitk::InteractionTestHelper(interactionXmlPath);
+    interactionTestHelper = mitk::InteractionTestHelper::New(interactionXmlPath);
 
     //Add our test node to the DataStorage of our test helper
     interactionTestHelper->AddNodeToStorage(testPointSetNode);

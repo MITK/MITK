@@ -50,7 +50,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::TensorImage::Pointer testImage = mitk::TensorImage::New();
             testImage->InitializeByItk( filter->GetOutput() );
             testImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
-            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(testImage, tensorImage, 0.0001, true), "tensor reconstruction test.");
+            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(*testImage, *tensorImage, 0.0001, true), "tensor reconstruction test.");
         }
 
         {
@@ -65,7 +65,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::QBallImage::Pointer testImage = mitk::QBallImage::New();
             testImage->InitializeByItk( filter->GetOutput() );
             testImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
-            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(testImage, qballImage, 0.0001, true), "Numerical Q-ball reconstruction test.");
+            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(*testImage, *qballImage, 0.0001, true), "Numerical Q-ball reconstruction test.");
         }
 
         {
@@ -81,7 +81,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::QBallImage::Pointer testImage = mitk::QBallImage::New();
             testImage->InitializeByItk( filter->GetOutput() );
             testImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
-            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(testImage, qballImage, 0.0001, true), "Standard Q-ball reconstruction test.");
+            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(*testImage, *qballImage, 0.0001, true), "Standard Q-ball reconstruction test.");
         }
 
         {
@@ -97,7 +97,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::QBallImage::Pointer testImage = mitk::QBallImage::New();
             testImage->InitializeByItk( filter->GetOutput() );
             testImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
-            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(testImage, qballImage, 0.0001, true), "CSA Q-ball reconstruction test.");
+            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(*testImage, *qballImage, 0.0001, true), "CSA Q-ball reconstruction test.");
         }
 
         {
@@ -113,7 +113,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::QBallImage::Pointer testImage = mitk::QBallImage::New();
             testImage->InitializeByItk( filter->GetOutput() );
             testImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
-            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(testImage, qballImage, 0.0001, true), "ADC profile reconstruction test.");
+            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(*testImage, *qballImage, 0.0001, true), "ADC profile reconstruction test.");
         }
 
         {
@@ -129,7 +129,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             mitk::QBallImage::Pointer testImage = mitk::QBallImage::New();
             testImage->InitializeByItk( filter->GetOutput() );
             testImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
-            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(testImage, qballImage, 0.0001, true), "Raw signal modeling test.");
+            MITK_TEST_CONDITION_REQUIRED(mitk::Equal(*testImage, *qballImage, 0.0001, true), "Raw signal modeling test.");
         }
     }
     catch (itk::ExceptionObject e)

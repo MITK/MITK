@@ -65,7 +65,7 @@ int mitkTbssSkeletonizationTest(int argc , char* argv[])
   mitkRefSkeleton->InitializeByItk(controlSkeleton.GetPointer());
 
 
-  MITK_TEST_CONDITION(mitk::Equal(mitkSkeleton, mitkRefSkeleton, 0.001, true), "Check correctness of the skeleton");
+  MITK_TEST_CONDITION(mitk::Equal(*mitkSkeleton, *mitkRefSkeleton, 0.001, true), "Check correctness of the skeleton");
 
 
   // Test the projection filter

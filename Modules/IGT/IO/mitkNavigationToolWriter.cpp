@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //Poco headers
-#include "Poco/Zip/Compress.h"
-#include "Poco/Path.h"
+#include <Poco/Zip/Compress.h>
+#include <Poco/Path.h>
 
 //mitk headers
 #include "mitkNavigationToolWriter.h"
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkSceneIO.h>
 #include <mitkPointSet.h>
-#include <mitkStandardFileLocations.h>
+#include <mitkIOUtil.h>
 
 //std headers
 #include <stdio.h>
@@ -47,7 +47,7 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
   saveStorage->Add(thisTool);
 
   //use SceneSerialization to save the DataStorage
-  std::string DataStorageFileName = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + GetFileWithoutPath(FileName) + ".storage";
+  std::string DataStorageFileName = mitk::IOUtil::CreateTemporaryDirectory() + Poco::Path::separator() + GetFileWithoutPath(FileName) + ".storage";
   mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
   mySceneIO->SaveScene(saveStorage->GetAll(),saveStorage,DataStorageFileName);
 
@@ -111,11 +111,8 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
 
 std::string mitk::NavigationToolWriter::GetFileWithoutPath(std::string FileWithPath)
   {
-  std::string returnValue = "";
-  returnValue = FileWithPath.substr(FileWithPath.rfind("/")+1, FileWithPath.length());
-  //dirty hack: Windows path seperators
-  if (returnValue.size() == FileWithPath.size()) returnValue = FileWithPath.substr(FileWithPath.rfind("\\")+1, FileWithPath.length());
-  return returnValue;
+  Poco::Path myFile(FileWithPath.c_str());
+  return myFile.getFileName();
   }
 
 std::string mitk::NavigationToolWriter::ConvertPointSetToString(mitk::PointSet::Pointer pointSet)

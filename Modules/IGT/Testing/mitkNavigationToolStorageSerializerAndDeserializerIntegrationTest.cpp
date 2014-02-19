@@ -57,18 +57,20 @@ public:
   /**@brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).*/
   void setUp()
   {
-  m_Serializer = mitk::NavigationToolStorageSerializer::New();
-  mitk::DataStorage::Pointer DataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
-  m_Deserializer = mitk::NavigationToolStorageDeserializer::New(DataStorage);
-  try
-    {
+  try {
       m_FileName1 = mitk::IOUtil::CreateTemporaryFile();
+      std::ofstream file;
+      file.open(m_FileName1.c_str());
+      if (!file.good()) {MITK_ERROR <<"Could not create a valid file during setUp() method.";}
+      file.close();
     }
-    catch (std::exception& e)
-    {
+    catch (std::exception& e) {
       MITK_ERROR << "File access Exception: " << e.what();
       MITK_ERROR <<"Could not create filename during setUp() method.";
     }
+  m_Serializer = mitk::NavigationToolStorageSerializer::New();
+  mitk::DataStorage::Pointer DataStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
+  m_Deserializer = mitk::NavigationToolStorageDeserializer::New(DataStorage);
   }
 
   void tearDown()

@@ -34,12 +34,12 @@ This classes makes it easy to e.g. simply filter all logging messages only for r
 \section LoggingPageSection3 Logging Levels
 MITK offers different logging levels. You may mostly want to use MITK_INFO, but please consider using the other levels,  e.g. when logging debug information or errors.
 
-<b>Debug (MITK_DEBUG)</b>: These messages are designed for debug output, used to debug your source code. They are only displayed if you turn the CMake-Variable MBILOG_ENABLE_DEBUG_MESSAGES on. You can also use the debug message in release mode, output only depends on the CMake-Variable.
-
-Example: 
+<b>Debug (MITK_DEBUG)</b>: These messages are designed for debug output, used to debug your source code. Example:
 \code
 MITK_DEBUG << "Result of method LoadPicture(): true."
 \endcode
+
+These messages are only displayed if you turn the CMake-Variable MBILOG_ENABLE_DEBUG_MESSAGES on. You can also use the debug message in release mode, output only depends on the CMake-Variable. If you want to enable the debug messages only for a single class / module / plugin you can also simply define the variable in your source code for the time you want to see the messages. Therefore you add a line "#define MBILOG_ENABLE_DEBUG" in the beginning of your cpp file. But don't forget to remove the definition before commiting the source code.
 
 <b>Info (MITK_INFO)</b>: For standard information messages that inform about expected changes/results in the program flow. Info messages should be important and understandable for the users of the program.
 
@@ -48,7 +48,7 @@ Example:
 MITK_INFO << "The picture test.pic has been loaded successfully."
 \endcode
 
-<b>Warning (MITK_WARN)</b>: Warning messages should inform about unexpected or potentially problematic states in the program flow that do not lead directly to an error. Thus, after a warning the program should be able continue without errors and in a clear state. 
+<b>Warning (MITK_WARN)</b>: Warning messages should inform about unexpected or potentially problematic states in the program flow that do not lead directly to an error. Thus, after a warning the program should be able continue without errors and in a clear state.
 
 Example:
 \code
@@ -64,7 +64,7 @@ MITK_ERROR << "Error while adding test.pic to the data storage, aborting."
 
 <b>Fatal (MITK_FATAL)</b>: Fatal messages report corrupt states in the program flow that lead directly to a crash of the program.
 
-Example: 
+Example:
 \code
 MITK_FATAL << "Memory allocation error during instantiation of image object."
 \endcode

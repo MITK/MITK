@@ -1,4 +1,17 @@
 set(MODULE_TESTS
+   # IMPORTANT: If you plan to deactivate / comment out a test please write a bug number to the commented out line of code.
+   #
+   #     Example: #mitkMyTest #this test is commented out because of bug 12345
+   #
+   # It is important that the bug is open and that the test will be activated again before the bug is closed. This assures that
+   # no test is forgotten after it was commented out. If there is no bug for your current problem, please add a new one and
+   # mark it as critical.
+
+   ################## DISABLED TESTS #################################################
+   #mitkNavigationToolStorageSerializerTest.cpp # deactivated because of bug 17199
+   #mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # deactivated because of bug 17199
+
+   ################# RUNNING TESTS ###################################################
    mitkCameraVisualizationTest.cpp
    mitkClaronInterfaceTest.cpp
    mitkClaronToolTest.cpp
@@ -29,14 +42,11 @@ set(MODULE_TESTS
    mitkTrackingDeviceSourceConfiguratorTest.cpp
    mitkNavigationDataEvaluationFilterTest.cpp
    mitkTrackingTypesTest.cpp
-
    # ------------------ Navigation Tool Management Tests -------------------
    mitkNavigationToolStorageTest.cpp
    mitkNavigationToolTest.cpp
    mitkNavigationToolReaderAndWriterTest.cpp
-   #mitkNavigationToolStorageSerializerTest.cpp # deactivated because of bug 17199
    mitkNavigationToolStorageDeserializerTest.cpp
-   #mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # deactivated because of bug 17199
    # -----------------------------------------------------------------------
 )
 

@@ -4,7 +4,6 @@
 
 set(US_ENABLE_AUTOLOADING_SUPPORT ON)
 set(US_ENABLE_THREADING_SUPPORT ON)
-set(US_IS_EMBEDDED OFF)
 
 # Don't create a "doc" target and don't install the documentation files
 set(US_NO_DOCUMENTATION ON)

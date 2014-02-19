@@ -1,5 +1,5 @@
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/mitk.ico )
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/mitk.bmp )
+MITK_INSTALL(FILES "${MITK_SOURCE_DIR}/mitk.ico")
+MITK_INSTALL(FILES "${MITK_SOURCE_DIR}/mitk.bmp")
 
 # Install CTK Qt (designer) plugins
 if(MITK_USE_CTK)
@@ -23,12 +23,12 @@ if(MITK_USE_CTK)
     endif()
 
     foreach(_qtplugin_install_dir ${_qtplugin_install_destinations})
-      install(DIRECTORY ${CTK_QTDESIGNERPLUGINS_DIR}/designer/
+      install(DIRECTORY "${CTK_QTDESIGNERPLUGINS_DIR}/designer/"
               DESTINATION ${_qtplugin_install_dir}
               CONFIGURATIONS Release
               ${_matching_pattern_release}
               )
-      install(DIRECTORY ${CTK_QTDESIGNERPLUGINS_DIR}/designer/
+      install(DIRECTORY "${CTK_QTDESIGNERPLUGINS_DIR}/designer/"
               DESTINATION ${_qtplugin_install_dir}
               CONFIGURATIONS Debug
               ${_matching_pattern_debug}
@@ -57,11 +57,11 @@ if(WIN32)
   # can only use variables which are made available through MITKConfig.cmake
   if(MITK_USE_BLUEBERRY)
     if(MINGW)
-      MITK_INSTALL(FILES ${MITK_BINARY_DIR}/bin/plugins/liborg_blueberry_osgi.dll)
+      MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/liborg_blueberry_osgi.dll")
     else()
       if(NOT APPLE)
-        MITK_INSTALL(FILES ${MITK_BINARY_DIR}/bin/plugins/debug/liborg_blueberry_osgi.dll CONFIGURATIONS Debug)
-        MITK_INSTALL(FILES ${MITK_BINARY_DIR}/bin/plugins/release/liborg_blueberry_osgi.dll CONFIGURATIONS Release)
+        MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/debug/liborg_blueberry_osgi.dll" CONFIGURATIONS Debug)
+        MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/release/liborg_blueberry_osgi.dll" CONFIGURATIONS Release)
       endif(NOT APPLE)
     endif()
   endif()

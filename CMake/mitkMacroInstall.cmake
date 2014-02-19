@@ -156,10 +156,15 @@ macro(_fixup_target)
 
     set(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
 
-    set(DIRS ${_search_paths} ${_install_LIBRARY_DIRS})
+    set(DIRS \"${_search_paths}\")
+
+    set(_additional_search_paths ${_install_LIBRARY_DIRS})
+    if(_additional_search_paths)
+      set(DIRS \"\${DIRS};\${_additional_search_paths}\")
+    endif()
     foreach(_plugin \${PLUGINS})
       get_filename_component(_pluginpath \${_plugin} PATH)
-      list(APPEND DIRS \${_pluginpath})
+      list(APPEND DIRS \"\${_pluginpath}\")
     endforeach(_plugin)
 
     list(REMOVE_DUPLICATES DIRS)

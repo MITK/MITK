@@ -94,6 +94,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_NavigationToolCreationWidget, SIGNAL(NavigationToolFinished()), this, SLOT(OnAddSingleToolFinished()));
     connect( m_Controls->m_NavigationToolCreationWidget, SIGNAL(Canceled()), this, SLOT(OnAddSingleToolCanceled()));
 
+    connect( m_Controls->m_csvFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
+    connect( m_Controls->m_xmlFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
     //initialize widgets
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
     m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
@@ -555,8 +557,40 @@ void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
   QString filename = QFileDialog::getSaveFileName(NULL,tr("Choose Logging File"), currentPath.absolutePath(), "*.*");
   if (filename == "") return;
   this->m_Controls->m_LoggingFileName->setText(filename);
+  this->OnToggleFileExtension();
+  }
+void QmitkMITKIGTTrackingToolboxView::OnToggleFileExtension()
+{
+
+  QString temp = this->m_Controls->m_LoggingFileName->text();
+  if(this->m_Controls->m_csvFormat->isChecked())
+  {
+    if(temp.contains('.'))
+    {
+      this->m_Controls->m_LoggingFileName->setText(temp.replace(temp.indexOf('.'),temp.size() - temp.indexOf("."),".csv"));
+    }
+    else
+    {
+      this->m_Controls->m_LoggingFileName->setText("C:/logfile.csv");
+    }
+    //this->m_Controls->m_LoggingFileName->setText()
+  }
+  else if(this->m_Controls->m_xmlFormat->isChecked())
+  {
+    if(temp.contains('.'))
+    {
+      this->m_Controls->m_LoggingFileName->setText(temp.replace(temp.indexOf('.'),temp.size() - temp.indexOf("."),".xml"));
+    }
+    else
+    {
+      this->m_Controls->m_LoggingFileName->setText("C:/logfile.xml");
+    }
+
   }
 
+
+
+}
 
 void QmitkMITKIGTTrackingToolboxView::StartLogging()
   {

@@ -61,6 +61,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
   protected slots:
 
+    /** @brief changes name of the filename when switching fileextension by radio button */
+    void OnToggleFileExtension();
     /** @brief This slot is called if the user wants to load a new tool file. A new window opens where the user can choose a file. If the chosen file is
                corrupt or not valid the user gets an error message. If the file was loaded successfully the tools are show in the tool status widget. */
     void OnLoadTools();
@@ -138,6 +140,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     /** @brief reinits the view globally. */
     void GlobalReinit();
+
+
 
    //members for the filter pipeline
    mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource; ///> member for the source of the IGT pipeline

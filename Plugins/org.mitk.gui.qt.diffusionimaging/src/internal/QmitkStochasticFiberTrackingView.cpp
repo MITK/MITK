@@ -171,7 +171,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
         {  //set 0-Gradient to bValue 0
             vecCont->InsertElement(i,0);
         }else{
-            vecCont->InsertElement(i,m_DiffusionImage->GetB_Value());
+            vecCont->InsertElement(i,m_DiffusionImage->GetReferenceBValue());
         }
     }
 

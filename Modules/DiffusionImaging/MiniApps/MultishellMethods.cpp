@@ -85,16 +85,16 @@ int MultishellMethods(int argc, char* argv[])
 
       CorrectionFilterType::Pointer roundfilter = CorrectionFilterType::New();
       roundfilter->SetRoundingValue( 1000 );
-      roundfilter->SetReferenceBValue(dwi->GetB_Value());
+      roundfilter->SetReferenceBValue(dwi->GetReferenceBValue());
       roundfilter->SetReferenceGradientDirectionContainer(dwi->GetDirections());
       roundfilter->Update();
 
-      dwi->SetB_Value( roundfilter->GetNewBValue() );
+      dwi->SetReferenceBValue( roundfilter->GetNewBValue() );
       dwi->SetDirections( roundfilter->GetOutputGradientDirectionContainer());
 
       // filter input parameter
       const mitk::DiffusionImage<short>::BValueMap
-          &originalShellMap  = dwi->GetB_ValueMap();
+          &originalShellMap  = dwi->GetBValueMap();
 
       const mitk::DiffusionImage<short>::ImageType
           *vectorImage       = dwi->GetVectorImage();
@@ -103,7 +103,7 @@ int MultishellMethods(int argc, char* argv[])
           gradientContainer = dwi->GetDirections();
 
       const unsigned int
-          &bValue            = dwi->GetB_Value();
+          &bValue            = dwi->GetReferenceBValue();
 
       // filter call
 
@@ -140,7 +140,7 @@ int MultishellMethods(int argc, char* argv[])
         // create new DWI image
         mitk::DiffusionImage<short>::Pointer outImage = mitk::DiffusionImage<short>::New();
         outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetB_Value( targetBValue );
+        outImage->SetReferenceBValue( targetBValue );
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
@@ -166,7 +166,7 @@ int MultishellMethods(int argc, char* argv[])
         // create new DWI image
         mitk::DiffusionImage<short>::Pointer outImage = mitk::DiffusionImage<short>::New();
         outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetB_Value( targetBValue );
+        outImage->SetReferenceBValue( targetBValue );
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
@@ -192,7 +192,7 @@ int MultishellMethods(int argc, char* argv[])
         // create new DWI image
         mitk::DiffusionImage<short>::Pointer outImage = mitk::DiffusionImage<short>::New();
         outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetB_Value( targetBValue );
+        outImage->SetReferenceBValue( targetBValue );
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 

@@ -152,7 +152,7 @@ void QmitkFiberfoxView::AfterThread()
         parameters = m_TractsToDwiFilter->GetParameters();
 
         mitkImage->SetVectorImage( m_TractsToDwiFilter->GetOutput() );
-        mitkImage->SetB_Value(parameters.m_Bvalue);
+        mitkImage->SetReferenceBValue(parameters.m_Bvalue);
         mitkImage->SetDirections(parameters.GetGradientDirections());
         mitkImage->InitializeFromVectorImage();
         parameters.m_ResultNode->SetData( mitkImage );
@@ -203,7 +203,7 @@ void QmitkFiberfoxView::AfterThread()
         mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(parameters.m_ParentNode->GetData());
         mitkImage = mitk::DiffusionImage<short>::New();
         mitkImage->SetVectorImage( m_ArtifactsToDwiFilter->GetOutput() );
-        mitkImage->SetB_Value(diffImg->GetB_Value());
+        mitkImage->SetReferenceBValue(diffImg->GetReferenceBValue());
         mitkImage->SetDirections(diffImg->GetDirections());
         mitkImage->InitializeFromVectorImage();
         parameters.m_ResultNode->SetData( mitkImage );
@@ -394,7 +394,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_ImageSpacing = dwi->GetVectorImage()->GetSpacing();
         parameters.m_ImageOrigin = dwi->GetVectorImage()->GetOrigin();
         parameters.m_ImageDirection = dwi->GetVectorImage()->GetDirection();
-        parameters.m_Bvalue = dwi->GetB_Value();
+        parameters.m_Bvalue = dwi->GetReferenceBValue();
         parameters.SetGradienDirections(dwi->GetDirections());
     }
     else if (m_SelectedImage.IsNotNull())   // use geometry of selected image

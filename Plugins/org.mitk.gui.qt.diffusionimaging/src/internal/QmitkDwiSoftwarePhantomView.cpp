@@ -251,7 +251,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
 
     mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
     image->SetVectorImage( filter->GetOutput() );
-    image->SetB_Value(bVal);
+    image->SetReferenceBValue(bVal);
     image->SetDirections(gradientList);
     image->InitializeFromVectorImage();
     mitk::DataNode::Pointer node = mitk::DataNode::New();

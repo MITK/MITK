@@ -332,7 +332,7 @@ void QmitkDenoisingView::AfterThread()
     {
       DiffusionImageType::Pointer image = DiffusionImageType::New();
       image->SetVectorImage(m_NonLocalMeansFilter->GetOutput());
-      image->SetB_Value(m_InputImage->GetB_Value());
+      image->SetReferenceBValue(m_InputImage->GetReferenceBValue());
       image->SetDirections(m_InputImage->GetDirections());
       image->InitializeFromVectorImage();
       mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
@@ -348,7 +348,7 @@ void QmitkDenoisingView::AfterThread()
     {
       DiffusionImageType::Pointer image = DiffusionImageType::New();
       image->SetVectorImage(m_NonLocalMeansFilter->GetOutput());
-      image->SetB_Value(m_InputImage->GetB_Value());
+      image->SetReferenceBValue(m_InputImage->GetReferenceBValue());
       image->SetDirections(m_InputImage->GetDirections());
       image->InitializeFromVectorImage();
       mitk::DataNode::Pointer imageNode = mitk::DataNode::New();

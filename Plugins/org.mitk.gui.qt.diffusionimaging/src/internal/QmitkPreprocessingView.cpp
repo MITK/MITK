@@ -140,13 +140,13 @@ void QmitkPreprocessingView::DoLengthCorrection()
 
   FilterType::Pointer filter = FilterType::New();
   filter->SetRoundingValue( m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
-  filter->SetReferenceBValue(m_DiffusionImage->GetB_Value());
+  filter->SetReferenceBValue(m_DiffusionImage->GetReferenceBValue());
   filter->SetReferenceGradientDirectionContainer(m_DiffusionImage->GetDirections());
   filter->Update();
 
   DiffusionImageType::Pointer image = DiffusionImageType::New();
   image->SetVectorImage( m_DiffusionImage->GetVectorImage());
-  image->SetB_Value( filter->GetNewBValue() );
+  image->SetReferenceBValue( filter->GetNewBValue() );
   image->SetDirections( filter->GetOutputGradientDirectionContainer());
   image->InitializeFromVectorImage();
 
@@ -162,7 +162,7 @@ void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
 {
   if (m_DiffusionImage.IsNull())
     return;
-  m_DiffusionImage->UpdateBValueMap();
+  //m_DiffusionImage->UpdateBValueMap();
   UpdateBValueTableWidget(i);
 }
 
@@ -172,7 +172,7 @@ void QmitkPreprocessingView::CallMultishellToSingleShellFilter(itk::DWIVoxelFunc
 
   // filter input parameter
   const mitk::DiffusionImage<DiffusionPixelType>::BValueMap
-      &originalShellMap  = ImPtr->GetB_ValueMap();
+      &originalShellMap  = ImPtr->GetBValueMap();
 
   const mitk::DiffusionImage<DiffusionPixelType>::ImageType
       *vectorImage       = ImPtr->GetVectorImage();
@@ -181,7 +181,7 @@ void QmitkPreprocessingView::CallMultishellToSingleShellFilter(itk::DWIVoxelFunc
       gradientContainer = ImPtr->GetDirections();
 
   const unsigned int
-      &bValue            = ImPtr->GetB_Value();
+      &bValue            = ImPtr->GetReferenceBValue();
 
   mitk::DataNode::Pointer imageNode = 0;
 
@@ -197,7 +197,7 @@ void QmitkPreprocessingView::CallMultishellToSingleShellFilter(itk::DWIVoxelFunc
   // create new DWI image
   mitk::DiffusionImage<DiffusionPixelType>::Pointer outImage = mitk::DiffusionImage<DiffusionPixelType>::New();
   outImage->SetVectorImage( filter->GetOutput() );
-  outImage->SetB_Value( m_Controls->m_targetBValueSpinBox->value() );
+  outImage->SetReferenceBValue( m_Controls->m_targetBValueSpinBox->value() );
   outImage->SetDirections( filter->GetTargetGradientDirections() );
   outImage->InitializeFromVectorImage();
 
@@ -231,7 +231,7 @@ void QmitkPreprocessingView::DoBiExpFit()
 
     QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
 
-    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & originalShellMap = inImage->GetB_ValueMap();
+    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & originalShellMap = inImage->GetBValueMap();
     mitk::DiffusionImage<DiffusionPixelType>::BValueMap::const_iterator it = originalShellMap.begin();
     ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
     vnl_vector<double> bValueList(originalShellMap.size()-1);
@@ -256,7 +256,7 @@ void QmitkPreprocessingView::DoAKCFit()
 
     QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
 
-    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & originalShellMap = inImage->GetB_ValueMap();
+    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & originalShellMap = inImage->GetBValueMap();
     mitk::DiffusionImage<DiffusionPixelType>::BValueMap::const_iterator it = originalShellMap.begin();
     ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
     vnl_vector<double> bValueList(originalShellMap.size()-1);
@@ -286,7 +286,7 @@ void QmitkPreprocessingView::DoADCAverage()
 
     QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
 
-    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & originalShellMap = inImage->GetB_ValueMap();
+    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & originalShellMap = inImage->GetBValueMap();
     mitk::DiffusionImage<DiffusionPixelType>::BValueMap::const_iterator it = originalShellMap.begin();
     ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
     vnl_vector<double> bValueList(originalShellMap.size()-1);
@@ -315,7 +315,7 @@ void QmitkPreprocessingView::DoAdcCalculation()
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput(inImage->GetVectorImage());
     filter->SetGradientDirections(inImage->GetDirections());
-    filter->SetB_value(inImage->GetB_Value());
+    filter->SetB_value(inImage->GetReferenceBValue());
     filter->Update();
 
     mitk::Image::Pointer image = mitk::Image::New();
@@ -363,14 +363,7 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
 
     BValueMapIterator it;
 
-    BValueMap roundedBValueMap;
-    GradientDirectionContainerType::ConstIterator gdcit;
-    for( gdcit = m_DiffusionImage->GetDirections()->Begin(); gdcit != m_DiffusionImage->GetDirections()->End(); ++gdcit)
-    {
-      float currentBvalue = std::floor(m_DiffusionImage->GetB_Value(gdcit.Index()));
-      unsigned int rounded = int((currentBvalue + 0.5 * i)/i)*i;
-      roundedBValueMap[rounded].push_back(gdcit.Index());
-    }
+    BValueMap roundedBValueMap = m_DiffusionImage->GetBValueMap();
 
     m_Controls->m_B_ValueMap_TableWidget->clear();
     m_Controls->m_B_ValueMap_TableWidget->setRowCount(roundedBValueMap.size() );
@@ -468,7 +461,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
         m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
       }
     //calculate target bValue for MultishellToSingleShellfilter
-    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & bValMap = m_DiffusionImage->GetB_ValueMap();
+    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & bValMap = m_DiffusionImage->GetBValueMap();
     mitk::DiffusionImage<DiffusionPixelType>::BValueMap::const_iterator it = bValMap.begin();
     unsigned int targetBVal = 0;
     while(it != bValMap.end())
@@ -553,7 +546,7 @@ void QmitkPreprocessingView::DoShowGradientDirections()
 
   typedef mitk::DiffusionImage<short*>::BValueMap BValueMap;
   typedef mitk::DiffusionImage<short*>::BValueMap::iterator BValueMapIterator;
-  BValueMap bValMap =  m_DiffusionImage->GetB_ValueMap();
+  BValueMap bValMap =  m_DiffusionImage->GetBValueMap();
 
   GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();
   mitk::Geometry3D::Pointer geometry = m_DiffusionImage->GetGeometry();
@@ -628,7 +621,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
 
   // GetShellSelection from GUI
   BValueMap shellSlectionMap;
-  BValueMap originalShellMap = m_DiffusionImage->GetB_ValueMap();
+  BValueMap originalShellMap = m_DiffusionImage->GetBValueMap();
   std::vector<unsigned int> newNumGradientDirections;
   int shellCounter = 0;
 
@@ -657,7 +650,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
 
   DiffusionImageType::Pointer image = DiffusionImageType::New();
   image->SetVectorImage( filter->GetOutput() );
-  image->SetB_Value(m_DiffusionImage->GetB_Value());
+  image->SetReferenceBValue(m_DiffusionImage->GetReferenceBValue());
   image->SetDirections(filter->GetGradientDirections());
   image->SetMeasurementFrame(m_DiffusionImage->GetMeasurementFrame());
   image->InitializeFromVectorImage();
@@ -713,7 +706,7 @@ void QmitkPreprocessingView::MergeDwis()
     {
       imageContainer.push_back(dwi->GetVectorImage());
       gradientListContainer.push_back(dwi->GetDirections());
-      bValueContainer.push_back(dwi->GetB_Value());
+      bValueContainer.push_back(dwi->GetReferenceBValue());
       if (i>0)
       {
         name += "+";
@@ -732,7 +725,7 @@ void QmitkPreprocessingView::MergeDwis()
   vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
   DiffusionImageType::Pointer image = DiffusionImageType::New();
   image->SetVectorImage( filter->GetOutput() );
-  image->SetB_Value(filter->GetB_Value());
+  image->SetReferenceBValue(filter->GetB_Value());
   image->SetDirections(filter->GetOutputGradients());
   image->SetMeasurementFrame(mf);
   image->InitializeFromVectorImage();

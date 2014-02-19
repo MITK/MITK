@@ -62,7 +62,7 @@ int TensorReconstruction(int argc, char* argv[])
         typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
         TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
         filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-        filter->SetBValue(dwi->GetB_Value());
+        filter->SetBValue(dwi->GetReferenceBValue());
         filter->SetThreshold(threshold);
         filter->Update();
 

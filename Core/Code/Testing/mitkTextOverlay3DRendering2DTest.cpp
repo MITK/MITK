@@ -75,10 +75,10 @@ int mitkTextOverlay3DRendering2DTest(int argc, char* argv[])
   renderingHelper.Render();
 
   //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = false;
+  bool generateReferenceScreenshot = true;
   if(generateReferenceScreenshot)
   {
-    renderingHelper.SaveReferenceScreenShot("/home/christoph/Pictures/RenderingTestData/mitkTextOverlay3DRendering2DTest_ball.png");
+    renderingHelper.SaveReferenceScreenShot("d:/tmp/mitkTextOverlay3DRendering2DTest_ball.png");
   }
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper

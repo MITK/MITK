@@ -207,14 +207,16 @@ void mitk::ProportionalTimeGeometry::Initialize (Geometry3D* geometry, TimeStepT
   timeSteps = (timeSteps > 0) ? timeSteps : 1;
   m_FirstTimePoint = 0.0;
   m_StepDuration = 1.0;
+  if (timeSteps < 2)
+  {
+    m_FirstTimePoint = -std::numeric_limits<mitk::TimePointType>().max();
+    m_StepDuration = std::numeric_limits<mitk::TimePointType>().infinity();
+  }
+
   this->ReserveSpaceForGeometries(timeSteps);
   try{
   for (TimeStepType currentStep = 0; currentStep < timeSteps; ++currentStep)
   {
-    mitk::TimeBounds timeBounds;
-    timeBounds[0] = m_FirstTimePoint + currentStep * m_StepDuration;
-    timeBounds[1] = m_FirstTimePoint + (currentStep+1) * m_StepDuration;
-
     Geometry3D::Pointer clonedGeometry = geometry->Clone();
     this->SetTimeStepGeometry(clonedGeometry.GetPointer(), currentStep);
   }

@@ -387,7 +387,6 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
 
 void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, mitk::BaseRenderer*  /*renderer*/, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing )
 {
-
   vtkPoints * points = glyphs->GetPoints();
   vtkPointData * vpointdata = glyphs->GetPointData();
   vtkDataArray* vpointscalars = vpointdata->GetArray("vectorMagnitudes");
@@ -473,9 +472,6 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2
         //std::cout <<  idList->GetId( pointNr )<< ": " << p2d[0]<< " "<< p2d[1] << std::endl;
         //draw the line
         glVertex2f( p2d[ 0 ], p2d[ 1 ] );
-
-
-
       }
       glEnd ();
     }
@@ -519,10 +515,7 @@ int mitk::VectorImageMapper2D::GetCurrentTimeStep( mitk::BaseData* data, mitk::B
   //
   // get the world time
   //
-  Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  assert( worldGeometry.IsNotNull() );
-  ScalarType time = worldGeometry->GetTimeBounds() [ 0 ];
-
+  ScalarType time = renderer->GetTime();
   //
   // convert the world time to time steps of the input object
   //

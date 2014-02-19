@@ -163,10 +163,13 @@ namespace mitk {
 
       //##Documentation
       //## @brief Get the time bounds (in ms)
-      itkGetConstReferenceMacro(TimeBounds, TimeBounds);
+
+      //itkGetConstReferenceMacro(TimeBounds, TimeBounds);
+
       //##Documentation
       //## @brief Set the time bounds (in ms)
-      virtual void SetTimeBounds(const TimeBounds& timebounds);
+
+      //virtual void SetTimeBounds(const TimeBounds& timebounds);
 
       //##Documentation
       //## @brief Get the position of the corner number \a id (in world coordinates)

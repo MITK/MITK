@@ -323,7 +323,7 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
               if (spacing[axis] < minSpacing[axis]) minSpacing[axis] = spacing[axis];
             }
 
-            const TimeBounds & curTimeBounds = node->GetData()->GetGeometry(i)->GetTimeBounds();
+            const TimeBounds & curTimeBounds = node->GetData()->GetTimeGeometry()->GetTimeBounds(i);
             // get the minimal time of all objects in the DataStorage
             if ((curTimeBounds[0]<minimalTime)&&(curTimeBounds[0]>stmin))
             {
@@ -353,18 +353,15 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
   result->SetPoints(pointscontainer);
   result->ComputeBoundingBox();
 
-  // minimal time bounds of a single time step for all geometries
-  TimeBounds minTimeBounds;
-  minTimeBounds[0] = 0;
-  minTimeBounds[1] = 1;
   // compute the number of time steps
   unsigned int numberOfTimeSteps = 1;
-  if (maximalTime!=0) // make sure that there is at least one time sliced geometry in the data storage
+  if (maximalTime==0) // make sure that there is at least one time sliced geometry in the data storage
   {
-    minTimeBounds[0] = minimalTime;
-    minTimeBounds[1] = minimalTime + minimalIntervallSize;
-    numberOfTimeSteps = static_cast<unsigned int>((maximalTime-minimalTime)/minimalIntervallSize);
+    minimalTime = 0;
+    maximalTime = 1;
+    minimalIntervallSize = 1;
   }
+  numberOfTimeSteps = static_cast<unsigned int>((maximalTime-minimalTime)/minimalIntervallSize);
 
   TimeGeometry::Pointer timeGeometry = NULL;
   if ( result->GetPoints()->Size()>0 )
@@ -382,10 +379,11 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
     }
     geometry->SetBounds(bounds);
     geometry->SetSpacing(minSpacing);
-    geometry->SetTimeBounds(minTimeBounds);
     // Initialize the time sliced geometry
     timeGeometry = ProportionalTimeGeometry::New();
     dynamic_cast<ProportionalTimeGeometry*>(timeGeometry.GetPointer())->Initialize(geometry,numberOfTimeSteps);
+    dynamic_cast<ProportionalTimeGeometry*>(timeGeometry.GetPointer())->SetFirstTimePoint(minimalTime);
+    dynamic_cast<ProportionalTimeGeometry*>(timeGeometry.GetPointer())->SetStepDuration(minimalIntervallSize);
   }
   return timeGeometry;
 }

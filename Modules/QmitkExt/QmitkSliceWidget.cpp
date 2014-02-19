@@ -70,7 +70,6 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name,
       "navigation");
 
   SetLevelWindowEnabled(true);
-
 }
 
 mitk::VtkPropRenderer* QmitkSliceWidget::GetRenderer()
@@ -196,23 +195,6 @@ void QmitkSliceWidget::InitWidget(
       m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
   if (boundingbox->GetPoints()->Size() > 0)
   {
-    ////geometry = mitk::Geometry3D::New();
-    ////geometry->Initialize();
-    //geometry->SetBounds(boundingbox->GetBounds());
-    //geometry->SetSpacing(correctGeometry->GetSpacing());
-
-    //let's see if we have data with a limited live-span ...
-    mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(
-        GetRenderer(), NULL);
-
-    if (timebounds[1] < mitk::ScalarTypeNumericTraits::max())
-    {
-      mitk::ScalarType duration = timebounds[1] - timebounds[0];
-
-      timebounds[1] = timebounds[0] + 1.0f;
-      geometry->SetTimeBounds(timebounds);
-    }
-
     mitk::ProportionalTimeGeometry::Pointer timeGeometry = mitk::ProportionalTimeGeometry::New();
     timeGeometry->Initialize(geometry,1);
 
@@ -227,11 +209,6 @@ void QmitkSliceWidget::InitWidget(
   GetRenderer()->GetDisplayGeometry()->Fit();
   mitk::RenderingManager::GetInstance()->RequestUpdate(
       GetRenderer()->GetRenderWindow());
-  //int w=vtkObject::GetGlobalWarningDisplay();
-  //vtkObject::GlobalWarningDisplayOff();
-  //vtkRenderer * vtkrenderer = ((mitk::OpenGLRenderer*)(GetRenderer()))->GetVtkRenderer();
-  //if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
-  //vtkObject::SetGlobalWarningDisplay(w);
 }
 
 void QmitkSliceWidget::UpdateGL()

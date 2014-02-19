@@ -38,15 +38,15 @@ unsigned long mitk::DisplayGeometry::GetMTime() const
   return Geometry2D::GetMTime();
 }
 
-const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
-{
-  if(m_WorldGeometry.IsNull())
-  {
-    return m_TimeBounds;
-  }
-
-  return m_WorldGeometry->GetTimeBounds();
-}
+//const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
+//{
+//  if(m_WorldGeometry.IsNull())
+//  {
+//    return m_TimeBounds;
+//  }
+//
+//  return m_WorldGeometry->GetTimeBounds();
+//}
 
 
 
@@ -597,7 +597,6 @@ if ( zoomXtooSmall && zoomYtooSmall )
       newOrigin[1] = 0;
       correctPanning = true;
     }
-
   }
 
  if (correctPanning)
@@ -634,4 +633,3 @@ void mitk::DisplayGeometry::PrintSelf(std::ostream& os, itk::Indent indent) cons
 
   Superclass::PrintSelf(os,indent);
 }
-

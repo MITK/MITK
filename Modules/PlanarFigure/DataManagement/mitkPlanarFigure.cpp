@@ -33,8 +33,6 @@ mitk::PlanarFigure::PlanarFigure()
   m_FeaturesUpToDate(false),
   m_FeaturesMTime( 0 )
 {
-
-
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
 
   m_DisplaySize.first = 0.0;
@@ -469,7 +467,6 @@ bool mitk::PlanarFigure::VerifyRequestedRegion()
 
 void mitk::PlanarFigure::SetRequestedRegion(const itk::DataObject * /*data*/ )
 {
-
 }
 
 
@@ -562,12 +559,6 @@ void mitk::PlanarFigure::InitializeTimeGeometry( unsigned int timeSteps )
 {
   mitk::Geometry2D::Pointer geometry2D = mitk::Geometry2D::New();
   geometry2D->Initialize();
-
-  if ( timeSteps > 1 )
-  {
-    mitk::ScalarType timeBounds[] = {0.0, 1.0};
-    geometry2D->SetTimeBounds( timeBounds );
-  }
 
   // The geometry is propagated automatically to all time steps,
   // if EvenlyTimed is true...
@@ -727,4 +718,3 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
     MITK_ERROR << "Tried to add point to HelperPolyLine " << index+1 << ", although only " << m_HelperPolyLines.size() << " exists";
   }
 }
-

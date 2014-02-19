@@ -358,10 +358,13 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
   //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
   //@fixme!!! will not work for not evenly timed data!
-  output->GetSlicedGeometry()->SetTimeBounds(input->GetSlicedGeometry()->GetTimeBounds());
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(output->GetSlicedGeometry(), output->GetTimeGeometry()->CountTimeSteps());
+  timeGeometry->Initialize(output->GetSlicedGeometry(),  output->GetTimeGeometry()->CountTimeSteps());
+  timeGeometry->SetFirstTimePoint(input->GetTimeGeometry()->GetMinimumTimePoint());
+  TimePointType stepDuration = input->GetTimeGeometry()->GetMaximumTimePoint(0) -input->GetTimeGeometry()->GetMinimumTimePoint(0);
+  timeGeometry->SetStepDuration(stepDuration);
   output->SetTimeGeometry(timeGeometry);
 
   output->SetPropertyList(input->GetPropertyList()->Clone());

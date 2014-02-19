@@ -128,7 +128,6 @@ bool mitk::PicHelper::GetSpacing(const mitkIpPicDescriptor* aPic, Vector3D & spa
 
 bool mitk::PicHelper::GetTimeSpacing(const mitkIpPicDescriptor* aPic, float& timeSpacing)
 {
-
   mitkIpPicDescriptor* pic = const_cast<mitkIpPicDescriptor*>(aPic);
 
   mitkIpPicTSV_t *tsv;
@@ -211,16 +210,6 @@ void mitk::PicHelper::InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, uns
     planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], spacing);
     slicedgeometry->InitializeEvenlySpaced(planegeometry, spacing[2], slices);
   }
-
-  if(pic->dim>=4)
-  {
-    float ts = 0;
-    GetTimeSpacing(pic, ts);
-    TimeBounds timebounds;
-    timebounds[0] = 0.0;
-    timebounds[1] = ts;
-    slicedgeometry->SetTimeBounds(timebounds);
-  }
 }
 
 bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, SlicedGeometry3D* slicedgeometry)
@@ -277,7 +266,6 @@ bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, Slic
 
         zPosition += pixelSize[2] / 2.0f;  // second half slice thickness
       }
-
     }
     else
     {

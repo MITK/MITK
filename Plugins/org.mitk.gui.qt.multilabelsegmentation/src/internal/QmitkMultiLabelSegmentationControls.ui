@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>191</width>
-    <height>654</height>
+    <height>434</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -36,7 +36,7 @@
   <property name="windowTitle">
    <string>QmitkSegmentation</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="sizePolicy">
@@ -363,100 +363,121 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="m_cbInterpolation">
-     <item>
-      <property name="text">
-       <string>Disabled</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>2D Interpolation</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>3D Interpolation</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item>
-    <widget class="QStackedWidget" name="m_swInterpolation">
+    <widget class="QGroupBox" name="groupBox_2">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="currentIndex">
-      <number>0</number>
+     <property name="title">
+      <string>Interpolation</string>
      </property>
-     <widget class="QWidget" name="page_2">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="spacing">
+       <number>2</number>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <widget class="QmitkSliceBasedInterpolatorWidget" name="m_SliceBasedInterpolatorWidget" native="true">
+      <property name="margin">
+       <number>2</number>
+      </property>
+      <item>
+       <widget class="QComboBox" name="m_cbInterpolation">
+        <item>
+         <property name="text">
+          <string>Disabled</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2D Interpolation</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>3D Interpolation</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QStackedWidget" name="m_swInterpolation">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="currentIndex">
+         <number>2</number>
+        </property>
+        <widget class="QWidget" name="page_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QmitkSliceBasedInterpolatorWidget" name="m_SliceBasedInterpolatorWidget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_3">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QmitkSurfaceBasedInterpolatorWidget" name="m_SurfaceBasedInterpolatorWidget" native="true">
+        <widget class="QWidget" name="page_3">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QmitkSurfaceBasedInterpolatorWidget" name="m_SurfaceBasedInterpolatorWidget" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page"/>
+        <widget class="QWidget" name="page"/>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -480,9 +501,8 @@
   <zorder>m_LabelSetWidget</zorder>
   <zorder>groupBox</zorder>
   <zorder>m_tw2DTools</zorder>
-  <zorder>m_cbInterpolation</zorder>
-  <zorder>m_swInterpolation</zorder>
   <zorder>verticalSpacer</zorder>
+  <zorder>groupBox_2</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

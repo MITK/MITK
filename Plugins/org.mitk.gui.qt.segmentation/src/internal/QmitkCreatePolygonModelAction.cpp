@@ -48,97 +48,66 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
   Image::Pointer image = dynamic_cast<mitk::Image *>(selectedNode->GetData());
 
   if (image.IsNull())
+  {
     return;
+  }
 
   try
   {
-    if (!m_IsSmoothed)
+
+    // Get preference properties for smoothing and decimation
+    IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
+    IPreferences::Pointer segPref = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+
+    bool smoothingHint = segPref->GetBool("smoothing hint", true);
+    ScalarType smoothing = segPref->GetDouble("smoothing value", 1.0);
+    ScalarType decimation = segPref->GetDouble("decimation rate", 0.5);
+
+    if (smoothingHint)
     {
-      ShowSegmentationAsSurface::Pointer surfaceFilter = ShowSegmentationAsSurface::New();
+      smoothing = 0.0;
+      Vector3D spacing = image->GetGeometry()->GetSpacing();
 
-      itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::Pointer successCommand = itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::New();
-      successCommand->SetCallbackFunction(this, &QmitkCreatePolygonModelAction::OnSurfaceCalculationDone);
-      surfaceFilter->AddObserver(ResultAvailable(), successCommand);
+      for (Vector3D::Iterator iter = spacing.Begin(); iter != spacing.End(); ++iter)
+        smoothing = max(smoothing, *iter);
+    }
 
-      itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::Pointer errorCommand = itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::New();
-      errorCommand->SetCallbackFunction(this, &QmitkCreatePolygonModelAction::OnSurfaceCalculationDone);
-      surfaceFilter->AddObserver(ProcessingError(), errorCommand);
+    ShowSegmentationAsSurface::Pointer surfaceFilter = ShowSegmentationAsSurface::New();
 
-      surfaceFilter->SetDataStorage(*m_DataStorage);
-      surfaceFilter->SetPointerParameter("Input", image);
-      surfaceFilter->SetPointerParameter("Group node", selectedNode);
-      surfaceFilter->SetParameter("Show result", true);
-      surfaceFilter->SetParameter("Sync visibility", false);
-      surfaceFilter->SetParameter("Smooth", false);
-      surfaceFilter->SetParameter("Apply median", false);
-      surfaceFilter->SetParameter("Median kernel size", 3u);
-      surfaceFilter->SetParameter("Gaussian SD", 1.5f);
-      surfaceFilter->SetParameter("Decimate mesh", m_IsDecimated);
-      surfaceFilter->SetParameter("Decimation rate", 0.8f);
+    // Activate callback functions
+    itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::Pointer successCommand = itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::New();
+    successCommand->SetCallbackFunction(this, &QmitkCreatePolygonModelAction::OnSurfaceCalculationDone);
+    surfaceFilter->AddObserver(ResultAvailable(), successCommand);
 
-      StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
+    itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::Pointer errorCommand = itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::New();
+    errorCommand->SetCallbackFunction(this, &QmitkCreatePolygonModelAction::OnSurfaceCalculationDone);
+    surfaceFilter->AddObserver(ProcessingError(), errorCommand);
 
-      surfaceFilter->StartAlgorithm();
+    // set filter parameter
+    surfaceFilter->SetDataStorage(*m_DataStorage);
+    surfaceFilter->SetPointerParameter("Input", image);
+    surfaceFilter->SetPointerParameter("Group node", selectedNode);
+    surfaceFilter->SetParameter("Show result", true);
+    surfaceFilter->SetParameter("Sync visibility", false);
+    surfaceFilter->SetParameter("Median kernel size", 3u);
+    surfaceFilter->SetParameter("Decimate mesh", m_IsDecimated);
+    surfaceFilter->SetParameter("Decimation rate", (float) decimation);
+
+    if (m_IsSmoothed)
+    {
+      surfaceFilter->SetParameter("Apply median", true);
+      surfaceFilter->SetParameter("Smooth", true);
+      surfaceFilter->SetParameter("Gaussian SD", sqrtf(smoothing)); // use sqrt to account for setting of variance in preferences
+      StatusBar::GetInstance()->DisplayText("Smoothed surface creation started in background...");
     }
     else
     {
-      ShowSegmentationAsSmoothedSurface::Pointer surfaceFilter = ShowSegmentationAsSmoothedSurface::New();
-
-      itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::Pointer successCommand = itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::New();
-      successCommand->SetCallbackFunction(this, &QmitkCreatePolygonModelAction::OnSurfaceCalculationDone);
-      surfaceFilter->AddObserver(mitk::ResultAvailable(), successCommand);
-
-      itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::Pointer errorCommand = itk::SimpleMemberCommand<QmitkCreatePolygonModelAction>::New();
-      errorCommand->SetCallbackFunction(this, &QmitkCreatePolygonModelAction::OnSurfaceCalculationDone);
-      surfaceFilter->AddObserver(mitk::ProcessingError(), errorCommand);
-
-      surfaceFilter->SetDataStorage(*m_DataStorage);
-      surfaceFilter->SetPointerParameter("Input", image);
-      surfaceFilter->SetPointerParameter("Group node", selectedNode);
-
-      berry::IWorkbenchPart::Pointer activePart =
-          berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->GetActivePart();
-      mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(activePart.GetPointer());
-      mitk::SliceNavigationController* timeNavController = 0;
-      if (renderPart != 0)
-      {
-        timeNavController = renderPart->GetRenderingManager()->GetTimeNavigationController();
-      }
-
-      int timeNr = timeNavController != 0 ? timeNavController->GetTime()->GetPos() : 0;
-      surfaceFilter->SetParameter("TimeNr", timeNr);
-
-      IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
-      IPreferences::Pointer segPref = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
-
-      bool smoothingHint = segPref->GetBool("smoothing hint", true);
-      ScalarType smoothing = segPref->GetDouble("smoothing value", 1.0);
-      ScalarType decimation = segPref->GetDouble("decimation rate", 0.5);
-      ScalarType closing = segPref->GetDouble("closing ratio", 0.0);
-
-      if (smoothingHint)
-      {
-        smoothing = 0.0;
-        Vector3D spacing = image->GetGeometry()->GetSpacing();
-
-        for (Vector3D::Iterator iter = spacing.Begin(); iter != spacing.End(); ++iter)
-          smoothing = max(smoothing, *iter);
-      }
-
-      surfaceFilter->SetParameter("Smoothing", smoothing);
-      surfaceFilter->SetParameter("Decimation", decimation);
-      surfaceFilter->SetParameter("Closing", closing);
-
-      ProgressBar::GetInstance()->AddStepsToDo(8);
-      StatusBar::GetInstance()->DisplayText("Smoothed surface creation started in background...");
-
-      try {
-        surfaceFilter->StartAlgorithm();
-      } catch (...)
-      {
-        MITK_ERROR<<"Error creating smoothed polygon model: Not enough memory!";
-      }
+      surfaceFilter->SetParameter("Apply median", false);
+      surfaceFilter->SetParameter("Smooth", false);
+      StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
     }
+
+    surfaceFilter->StartAlgorithm();
   }
   catch(...)
   {

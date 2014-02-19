@@ -106,12 +106,11 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   surfaceFilter->SetThreshold( 1 ); //expects binary image with zeros and ones
 
   surfaceFilter->SetUseGaussianImageSmooth(smooth); // apply gaussian to thresholded image ?
+  surfaceFilter->SetSmooth(smooth);
   if (smooth)
   {
     surfaceFilter->InterpolationOn();
     surfaceFilter->SetGaussianStandardDeviation( gaussianSD );
-    //surfaceFilter->SetGaussianStandardDeviation( 3 );
-    //surfaceFilter->SetUseGaussianImageSmooth(true);
   }
 
   surfaceFilter->SetMedianFilter3D(applyMedian); // apply median to segmentation before marching cubes ?

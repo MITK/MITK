@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIDataStorageService.h"
 #include "mitkIRenderingManager.h"
 #include "mitkImageCast.h"
-//#include "mitkLabelSetImage.h"
+#include "mitkRenderingModeProperty.h"
 #include "mitkDataNodeObject.h"
 #include "mitkIContextMenuAction.h"
 
@@ -650,7 +650,7 @@ void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
   lookupTableProperty->SetValue(lookupTable);
   mitk::RenderingModeProperty::Pointer renderingMode =
     dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty("Image Rendering.Mode"));
-  renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+  renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

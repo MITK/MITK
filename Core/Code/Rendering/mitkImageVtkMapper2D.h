@@ -187,8 +187,8 @@ public:
     /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
     mitk::ScalarType* m_mmPerPixel;
 
-    /** \brief Currently active color map. */
-    unsigned int m_ColorMap;
+    /** \brief Currently active lookuptable. */
+   // unsigned int m_LookupTableType;
 
     /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
     vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;

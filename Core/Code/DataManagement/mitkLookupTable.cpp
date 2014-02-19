@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
-#include <mitkColormapProperty.h>
-
-
 #include <mitkLookupTableProperty.h>
 #include <Colortables/Jet.h>
 #include <Colortables/HotIron.h>

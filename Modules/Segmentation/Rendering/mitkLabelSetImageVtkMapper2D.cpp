@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkPixelType.h>
 #include <mitkTransferFunctionProperty.h>
-#include <mitkColormapProperty.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkPlaneClipping.h>
 
@@ -618,9 +617,6 @@ void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, 
 
   mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New( RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW );
   node->SetProperty( "Image Rendering.Mode", renderingModeProperty, renderer );
-
-  mitk::ColormapProperty::Pointer colormapProperty = mitk::ColormapProperty::New(ColormapProperty::CM_MULTILABEL);
-  node->SetProperty( "colormap", colormapProperty, renderer );
 
   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   mitk::LevelWindow levelwindow;

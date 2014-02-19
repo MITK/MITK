@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkLabelSet.h"
-#include "mitkColormapProperty.h"
 
 #include "itkProcessObject.h"
 #include <algorithm>
@@ -26,13 +25,13 @@ m_Layer(0),
 m_ActiveLabel(NULL)
 {
   m_LookupTable = mitk::LookupTable::New();
-  m_LookupTable->SetActiveColormap(mitk::ColormapProperty::CM_MULTILABEL);
+  m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
 }
 
 void mitk::LabelSet::Initialize(const LabelSet* other)
 {
   if (!other)
-    mitkThrow() << "Trying to initialize with NULL labelset.";
+    mitkThrow() << "Trying to initialize with NULL input.";
   m_LabelContainer = other->m_LabelContainer;
   m_ActiveLabel = m_LabelContainer[other->GetActiveLabelIndex()];
 }

@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkPixelType.h>
 #include <mitkTransferFunctionProperty.h>
-#include <mitkColormapProperty.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkPlaneClipping.h>
 
@@ -535,27 +534,23 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
     {
       renderingMode = rmProp->GetRenderingMode();
     }
-
+    /*
     mitk::LookupTableProperty* lutProp =
       dynamic_cast<mitk::LookupTableProperty*> (this->GetDataNode()->GetProperty("LookupTable"));
 
-    mitk::EnumerationProperty* cmProp =
-      dynamic_cast<mitk::EnumerationProperty*> (this->GetDataNode()->GetProperty("colormap"));
+//    mitk::EnumerationProperty* cmProp =
+//      dynamic_cast<mitk::EnumerationProperty*> (this->GetDataNode()->GetProperty("colormap"));
 
-    if ( cmProp && lutProp )
+    if ( lutProp )
     {
-      if (cmProp->GetValueAsId() != localStorage->m_ColorMap)
+      if (lutProp->GetValue() != localStorage->m_ColorMap)
       {
-        lutProp->GetLookupTable()->SetActiveColormap( cmProp->GetValueAsId() );
-/*
-        mitk::LevelWindow lw;
-        lw.SetAuto( static_cast<mitk::Image*>(this->GetDataNode()->GetData()), false, true );
-        this->GetDataNode()->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
-*/
+        lutProp->GetLookupTable()->SetType(>BuildHotIronLookupTable( cmProp->GetValueAsId() );
+
         localStorage->m_ColorMap = cmProp->GetValueAsId();
       }
     }
-
+*/
     switch(renderingMode)
     {
       case mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW:
@@ -587,13 +582,6 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
 void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
-
-  int colormap = mitk::ColormapProperty::CM_BW;
-  mitk::ColormapProperty::Pointer cmProp = dynamic_cast<mitk::ColormapProperty*>(this->GetDataNode()->GetProperty( "colormap", renderer ));
-  if(cmProp.IsNotNull())
-  {
-    colormap = cmProp->GetColormap();
-  }
 
   mitk::LookupTableProperty::Pointer lutProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable"));
   if( lutProp.IsNotNull() )
@@ -776,7 +764,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     node->AddProperty( "binaryimage.hoveringannotationcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binary", BoolProperty::New( true ), renderer, overwrite );
     node->AddProperty( "layer", IntProperty::New(10), renderer, overwrite);
-    colormapProperty->SetValue( ColormapProperty::CM_LEGACYBINARY );
+    mitkLut->SetType(mitk::LookupTable::LEGACY_BINARY);
   }
   else  // or regular image
   {
@@ -784,7 +772,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
     node->AddProperty( "binary", BoolProperty::New( false ), renderer, overwrite );
     node->AddProperty( "layer", IntProperty::New(0), renderer, overwrite );
-    colormapProperty->SetValue( ColormapProperty::CM_BW );
+    mitkLut->SetType(mitk::LookupTable::GRAYSCALE);
 
     // initialize level/window from DICOM tags
     std::string sLevel;
@@ -1063,25 +1051,25 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
 
-  m_ColorMap = 0;
+ // m_ColorMap = 0;
 
   //the following actions are always the same and thus can be performed
   //in the constructor for each image (i.e. the image-corresponding local storage)
   m_TSFilter->ReleaseDataFlagOn();
 
-  mitk::LookupTable::Pointer mitkLUT = mitk::LookupTable::New();
+ // mitk::LookupTable::Pointer mitkLUT = mitk::LookupTable::New();
   //built a default lookuptable
-  mitkLUT->SetType(mitk::LookupTable::GRAYSCALE);
-  m_DefaultLookupTable = mitkLUT->GetVtkLookupTable();
+ // mitkLUT->SetType(mitk::LookupTable::GRAYSCALE);
+ // m_DefaultLookupTable = mitkLUT->GetVtkLookupTable();
 
-  mitkLUT->SetType(mitk::LookupTable::LEGACY_BINARY);
-  m_BinaryLookupTable = mitkLUT->GetVtkLookupTable();
+ // mitkLUT->SetType(mitk::LookupTable::LEGACY_BINARY);
+ // m_BinaryLookupTable = mitkLUT->GetVtkLookupTable();
 
   // add a default rainbow lookup table for color mapping
-  m_ColorLookupTable->SetRampToLinear();
-  m_ColorLookupTable->SetHueRange(0.6667, 0.0);
-  m_ColorLookupTable->SetTableRange(0.0, 20.0);
-  m_ColorLookupTable->Build();
+//  m_ColorLookupTable->SetRampToLinear();
+//  m_ColorLookupTable->SetHueRange(0.6667, 0.0);
+//  m_ColorLookupTable->SetTableRange(0.0, 20.0);
+//  m_ColorLookupTable->Build();
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();

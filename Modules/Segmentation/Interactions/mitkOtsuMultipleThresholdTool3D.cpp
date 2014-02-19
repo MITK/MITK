@@ -24,9 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkToolManager.h"
 #include "mitkImageCast.h"
-#include "mitkColormapProperty.h"
 #include "mitkRenderingModeProperty.h"
 #include "mitkLevelWindowProperty.h"
+#include "mitkLookupTableProperty.h"
 
 // itk
 #include <itkOtsuMultipleThresholdsImageFilter.h>
@@ -121,11 +121,16 @@ void mitk::OtsuMultipleThresholdTool3D::Activated()
   m_MultiLabelNode->SetOpacity(0.7);
   m_MultiLabelNode->SetColor(1.0, 1.0, 1.0);
   m_MultiLabelNode->SetProperty( "Image Rendering.Mode", RenderingModeProperty::New( RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW) );
-  m_MultiLabelNode->SetProperty( "colormap", ColormapProperty::New(ColormapProperty::CM_MULTILABEL) );
   m_MultiLabelNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
   m_MultiLabelNode->SetProperty( "layer", IntProperty::New(100) );
   m_MultiLabelNode->SetProperty( "binary", BoolProperty::New(false) );
   m_MultiLabelNode->SetProperty( "helper object", BoolProperty::New(true) );
+
+  mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+  mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+  mitkLutProp->SetLookupTable(mitkLut);
+  mitkLut->SetType(mitk::LookupTable::MULTILABEL);
+  m_MultiLabelNode->SetProperty("LookupTable", mitkLutProp);
 
   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   mitk::LevelWindow levelwindow;

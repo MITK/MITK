@@ -243,8 +243,6 @@ protected:
   /// Lookuptable selection action
   QAction* m_ColormapAction;
 
-  QAction* m_ColormapAction;
-
   /// Maps "Show in" actions to editor ids
   QSignalMapper* m_ShowInMapper;
 

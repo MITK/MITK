@@ -94,6 +94,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_NavigationToolCreationWidget, SIGNAL(NavigationToolFinished()), this, SLOT(OnAddSingleToolFinished()));
     connect( m_Controls->m_NavigationToolCreationWidget, SIGNAL(Canceled()), this, SLOT(OnAddSingleToolCanceled()));
 
+    connect( m_Controls->m_csvFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
+    connect( m_Controls->m_xmlFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
     //initialize widgets
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
     m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
@@ -130,7 +132,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_toolStorage->RegisterAsMicroservice("no tracking device");
 
     //set home directory as default path for logfile
-    m_Controls->m_LoggingFileName->setText(QDir::homePath() + QDir::separator() + "logfile.csv");
+    m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(QDir::homePath()) + QDir::separator() + "logfile.csv");
   }
 }
 
@@ -555,8 +557,56 @@ void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
   QString filename = QFileDialog::getSaveFileName(NULL,tr("Choose Logging File"), currentPath.absolutePath(), "*.*");
   if (filename == "") return;
   this->m_Controls->m_LoggingFileName->setText(filename);
+  this->OnToggleFileExtension();
+  }
+// bug-16470: toggle file extension after clicking on radio button
+void QmitkMITKIGTTrackingToolboxView::OnToggleFileExtension()
+{
+
+  QString currentInputText = this->m_Controls->m_LoggingFileName->text();
+  QString currentFile = QFileInfo(currentInputText).baseName();
+  QDir currentPath = QFileInfo(currentInputText).dir();
+  if(currentFile.isEmpty())
+  {
+    currentFile = "logfile";
+  }
+  // Setting currentPath to default home path when currentPath is empty or it does not exist
+  if(currentPath == QDir() || !currentPath.exists())
+  {
+    currentPath = QDir::homePath();
+  }
+  // check if csv radio button is clicked
+  if(this->m_Controls->m_csvFormat->isChecked())
+  {
+    // you needn't add a seperator to the input text when currentpath is the rootpath
+    if(currentPath.isRoot())
+    {
+      this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + currentFile + ".csv");
+    }
+
+    else
+    {
+      this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + QDir::separator() + currentFile + ".csv");
+    }
+  }
+  // check if xml radio button is clicked
+  else if(this->m_Controls->m_xmlFormat->isChecked())
+  {
+    // you needn't add a seperator to the input text when currentpath is the rootpath
+    if(currentPath.isRoot())
+    {
+      this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + currentFile + ".xml");
+    }
+    else
+    {
+      this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + QDir::separator() + currentFile + ".xml");
+    }
+
   }
 
+
+
+}
 
 void QmitkMITKIGTTrackingToolboxView::StartLogging()
   {

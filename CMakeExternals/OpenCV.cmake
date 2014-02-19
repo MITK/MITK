@@ -15,7 +15,10 @@ if(MITK_USE_OpenCV)
 
   if(NOT DEFINED OpenCV_DIR)
 
-    set(additional_cmake_args )
+    set(additional_cmake_args
+      -DBUILD_opencv_java:BOOL=OFF
+    )
+
     if(MITK_USE_Python)
       #message(STATUS "PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
       #message(STATUS "PYTHON_DEBUG_LIBRARY: ${PYTHON_DEBUG_LIBRARY}")
@@ -50,6 +53,9 @@ if(MITK_USE_OpenCV)
           )
     endif()
 
+    set(OpenCV_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchOpenCV-2.4.6.1.cmake)
+
+
     set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-2.4.6.1.tar.gz)
     set(opencv_url_md5 d756bfa460891697571d5c90050e1cfe)
 
@@ -60,6 +66,7 @@ if(MITK_USE_OpenCV)
       URL ${opencv_url}
       URL_MD5 ${opencv_url_md5}
       INSTALL_COMMAND ""
+      PATCH_COMMAND ${OpenCV_PATCH_COMMAND}
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}

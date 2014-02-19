@@ -44,6 +44,7 @@ set(module_dirs
     ToFUI
     US
     ClippingTools
+    TubeGraph
     USUI
     DicomUI
     Simulation

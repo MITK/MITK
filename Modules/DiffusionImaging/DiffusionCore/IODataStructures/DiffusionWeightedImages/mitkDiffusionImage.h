@@ -122,7 +122,8 @@ public:
   */
   void SetMeasurementFrame( const MeasurementFrameType & mFrame )
   {
-    m_MeasurementFrame = mFrame; ApplyMeasurementFrame();
+    m_MeasurementFrame = mFrame;
+    ApplyMeasurementFrame();
   }
 
   /**
@@ -151,13 +152,7 @@ public:
   void AverageRedundantGradients(double precision);
   void SetDisplayIndexForRendering(int displayIndex);
 
-  /**
-  * \brief Update the BValueMap (m_B_ValueMap) using the current gradient directions (m_Directions)
-  *
-  * \warning Have to be called after each manipulation on the GradientDirectionContainer
-  * !especially after manipulation of the m_Directions (GetDirections()) container via pointer access!
-  */
-  void UpdateBValueMap();
+
 
 protected:
   DiffusionImage();
@@ -174,6 +169,14 @@ protected:
   * \warning first set the MeasurmentFrame
   */
   void ApplyMeasurementFrame();
+
+  /**
+  * \brief Update the BValueMap (m_B_ValueMap) using the current gradient directions (m_Directions)
+  *
+  * \warning Have to be called after each manipulation on the GradientDirectionContainer
+  * !especially after manipulation of the m_Directions (GetDirections()) container via pointer access!
+  */
+  void UpdateBValueMap();
 
   typename ImageType::Pointer               m_VectorImage;
   float                                     m_B_Value;

@@ -334,8 +334,6 @@ void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
     m_Directions->InsertElement(c, vec);
     c++;
   }
-
-  UpdateBValueMap();
 }
 
 template<typename TPixelType>
@@ -378,6 +376,7 @@ void mitk::DiffusionImage<TPixelType>::SetDirections( GradientDirectionContainer
 {
   this->m_OriginalDirections = directions;
   ApplyMeasurementFrame();
+  UpdateBValueMap();
 }
 
 template<typename TPixelType>

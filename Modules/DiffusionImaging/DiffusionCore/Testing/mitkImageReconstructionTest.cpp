@@ -45,7 +45,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
             TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->Update();
             mitk::TensorImage::Pointer testImage = mitk::TensorImage::New();
             testImage->InitializeByItk( filter->GetOutput() );
@@ -59,7 +59,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             typedef itk::DiffusionQballReconstructionImageFilter<short, short, float, QBALL_ODFSIZE> QballReconstructionImageFilterType;
             QballReconstructionImageFilterType::Pointer filter = QballReconstructionImageFilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetNormalizationMethod(QballReconstructionImageFilterType::QBR_STANDARD);
             filter->Update();
             mitk::QBallImage::Pointer testImage = mitk::QBallImage::New();
@@ -74,7 +74,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetLambda(0.006);
             filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
             filter->Update();
@@ -90,7 +90,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetLambda(0.006);
             filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
             filter->Update();
@@ -106,7 +106,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetLambda(0.006);
             filter->SetNormalizationMethod(FilterType::QBAR_ADC_ONLY);
             filter->Update();
@@ -122,7 +122,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetLambda(0.006);
             filter->SetNormalizationMethod(FilterType::QBAR_RAW_SIGNAL);
             filter->Update();

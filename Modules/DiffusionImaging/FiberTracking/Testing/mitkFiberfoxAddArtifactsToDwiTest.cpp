@@ -67,7 +67,7 @@ public:
         m_Parameters.m_ImageSpacing = m_InputDwi->GetVectorImage()->GetSpacing();
         m_Parameters.m_ImageOrigin = m_InputDwi->GetVectorImage()->GetOrigin();
         m_Parameters.m_ImageDirection = m_InputDwi->GetVectorImage()->GetDirection();
-        m_Parameters.m_Bvalue = m_InputDwi->GetB_Value();
+        m_Parameters.m_Bvalue = m_InputDwi->GetReferenceBValue();
         m_Parameters.SetGradienDirections(m_InputDwi->GetDirections());
     }
 
@@ -106,7 +106,7 @@ public:
 
         mitk::DiffusionImage<short>::Pointer testImage = mitk::DiffusionImage<short>::New();
         testImage->SetVectorImage( artifactsToDwiFilter->GetOutput() );
-        testImage->SetB_Value(m_Parameters.m_Bvalue);
+        testImage->SetReferenceBValue(m_Parameters.m_Bvalue);
         testImage->SetDirections(m_Parameters.GetGradientDirections());
         testImage->InitializeFromVectorImage();
 

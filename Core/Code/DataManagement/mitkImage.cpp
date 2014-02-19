@@ -1290,68 +1290,65 @@ unsigned int mitk::Image::GetCountOfMinValuedVoxelsNoRecompute( unsigned int t )
   return m_ImageStatistics->GetCountOfMinValuedVoxelsNoRecompute(t);
 }
 
-bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const mitk::Image* leftHandSide, const mitk::Image* rightHandSide, ScalarType eps, bool verbose)
+{
+  if((leftHandSide == NULL)  || (rightHandSide == NULL))
+  {
+    MITK_ERROR << "mitk::Equal(const mitk::Image* leftHandSide, const mitk::Image* rightHandSide, ScalarType eps, bool verbose) does not work with NULL pointer input.";
+    return false;
+  }
+  return mitk::Equal( *leftHandSide, *rightHandSide, eps, verbose);
+}
+
+bool mitk::Equal(const mitk::Image& leftHandSide, const mitk::Image& rightHandSide, ScalarType eps, bool verbose)
 {
   bool returnValue = true;
-  if( rightHandSide == NULL )
-  {
-    if(verbose)
-      MITK_INFO << "[( Image )] rightHandSide is NULL.";
-    return false;
-  }
-
-  if( leftHandSide == NULL )
-  {
-    if(verbose)
-      MITK_INFO << "[( Image )] leftHandSide is NULL.";
-    return false;
-  }
 
   // Dimensionality
-  if( rightHandSide->GetDimension() != leftHandSide->GetDimension() )
+  if( rightHandSide.GetDimension() != leftHandSide.GetDimension() )
   {
     if(verbose)
     {
       MITK_INFO << "[( Image )] Dimensionality differs.";
-      MITK_INFO << "rightHandSide is " << rightHandSide->GetDimension()
-                << "leftHandSide is " << leftHandSide->GetDimension();
+      MITK_INFO << "leftHandSide is " << leftHandSide.GetDimension()
+       << "rightHandSide is " << rightHandSide.GetDimension();
     }
     returnValue = false;
   }
 
   // Pair-wise dimension (size) comparison
-  unsigned int minDimensionality = std::min(rightHandSide->GetDimension(),leftHandSide->GetDimension());
+  unsigned int minDimensionality = std::min(rightHandSide.GetDimension(),leftHandSide.GetDimension());
   for( unsigned int i=0; i< minDimensionality; ++i)
   {
-    if( rightHandSide->GetDimension(i) != leftHandSide->GetDimension(i) )
+    if( rightHandSide.GetDimension(i) != leftHandSide.GetDimension(i) )
     {
       returnValue = false;
       if(verbose)
       {
         MITK_INFO << "[( Image )] dimension differs.";
-        MITK_INFO << "rightHandSide->GetDimension("<<i<<") is " << rightHandSide->GetDimension(i)
-                  << "leftHandSide->GetDimension("<<i<<") is " << leftHandSide->GetDimension(i);
+        MITK_INFO << "leftHandSide->GetDimension("<<i<<") is " << leftHandSide.GetDimension(i)
+         << "rightHandSide->GetDimension("<<i<<") is " << rightHandSide.GetDimension(i);
       }
     }
   }
 
   // Pixeltype
-  mitk::PixelType pixelTypeRightHandSide = rightHandSide->GetPixelType();
-  mitk::PixelType pixelTypeLeftHandSide = leftHandSide->GetPixelType();
+  mitk::PixelType pixelTypeRightHandSide = rightHandSide.GetPixelType();
+  mitk::PixelType pixelTypeLeftHandSide = leftHandSide.GetPixelType();
   if( !( pixelTypeRightHandSide == pixelTypeLeftHandSide ) )
   {
     if(verbose)
     {
       MITK_INFO << "[( Image )] PixelType differs.";
-      MITK_INFO << "rightHandSide is " << pixelTypeRightHandSide.GetTypeAsString()
-                << "leftHandSide is " << pixelTypeLeftHandSide.GetTypeAsString();
+      MITK_INFO << "leftHandSide is " << pixelTypeLeftHandSide.GetTypeAsString()
+       << "rightHandSide is " << pixelTypeRightHandSide.GetTypeAsString();
     }
     returnValue = false;
   }
 
   // Geometries
-  if( !mitk::Equal(  leftHandSide->GetGeometry(),
-                     rightHandSide->GetGeometry(), eps, verbose) )
+  if( !mitk::Equal(  leftHandSide.GetGeometry(),
+                     rightHandSide.GetGeometry(), eps, verbose) )
   {
     if(verbose)
     {
@@ -1365,8 +1362,9 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
   if( returnValue )
   {
     mitk::CompareImageDataFilter::Pointer compareFilter = mitk::CompareImageDataFilter::New();
-    compareFilter->SetInput(0, rightHandSide);
-    compareFilter->SetInput(1, leftHandSide);
+
+    compareFilter->SetInput(0, &rightHandSide);
+    compareFilter->SetInput(1, &leftHandSide);
     compareFilter->SetTolerance(eps);
     compareFilter->Update();
 
@@ -1380,5 +1378,6 @@ bool mitk::Equal(const mitk::Image* rightHandSide, const mitk::Image* leftHandSi
       }
     }
   }
+
   return returnValue;
 }

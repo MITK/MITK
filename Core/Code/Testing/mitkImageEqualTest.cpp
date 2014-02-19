@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageGenerator.h"
 #include "mitkTestingMacros.h"
 #include "mitkImageSliceSelector.h"
-
 #include "mitkTestFixture.h"
 
 class mitkImageEqualTestSuite : public mitk::TestFixture
@@ -26,7 +25,6 @@ class mitkImageEqualTestSuite : public mitk::TestFixture
 
   CPPUNIT_TEST_SUITE(mitkImageEqualTestSuite);
   MITK_TEST(Equal_CloneAndOriginal_ReturnsTrue);
-  MITK_TEST(Equal_InputIsNull_ReturnsFalse);
   MITK_TEST(Equal_DifferentImageGeometry_ReturnsFalse);
   MITK_TEST(Equal_DifferentPixelTypes_ReturnsFalse);
   MITK_TEST(Equal_DifferentDimensions_ReturnsFalse);
@@ -61,12 +59,6 @@ public:
   void Equal_CloneAndOriginal_ReturnsTrue()
   {
     MITK_ASSERT_EQUAL( m_Image, m_Image->Clone(), "A clone should be equal to its original.");
-  }
-
-  void Equal_InputIsNull_ReturnsFalse()
-  {
-    mitk::Image::Pointer image = NULL;
-    MITK_ASSERT_NOT_EQUAL( image, image, "Input is NULL. Result should be false.");
   }
 
   void Equal_DifferentImageGeometry_ReturnsFalse()
@@ -121,8 +113,8 @@ public:
     m_Image = mitk::ImageGenerator::GenerateRandomImage<double>(10, 10);
     m_AnotherImage = m_Image->Clone();
 
-    MITK_TEST_CONDITION_REQUIRED(!mitk::Equal(m_Image, m_AnotherImage, 0, false), "Epsilon = 0.0 --> double images should not be regarded as equal");
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(m_Image, m_AnotherImage, 0.001, false), "Epsilon = 0.001 --> double images should be regarded as equal");
+    CPPUNIT_ASSERT_MESSAGE("Epsilon = 0.0 --> double images should not be regarded as equal", !mitk::Equal(*m_Image, *m_AnotherImage, 0, true));
+    CPPUNIT_ASSERT_MESSAGE("Epsilon = 0.001 --> double images should be regarded as equal", mitk::Equal(*m_Image, *m_AnotherImage, 0.001, true));
   }
 };
 

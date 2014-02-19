@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMacro.h>
 #include <mitkTestManager.h>
 #include <mitkTestCaller.h>
+#include <mitkException.h>
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/ui/text/TestRunner.h>
@@ -205,9 +206,13 @@ namespace mitk {
  * @param EXPECTED First object.
  * @param ACTUAL Second object.
  * @param MSG Message to appear with the test.
+ * @throw Throws mitkException if a NULL pointer is given as input.
  */
 #define MITK_ASSERT_EQUAL(EXPECTED, ACTUAL, MSG) \
-  CPPUNIT_ASSERT_MESSAGE(MSG, mitk::Equal(EXPECTED, ACTUAL, mitk::eps, true))
+  if(((EXPECTED).IsNull()) || ((ACTUAL).IsNull())) { \
+    mitkThrow() << "mitk::Equal does not work with NULL pointer input."; \
+  } \
+  CPPUNIT_ASSERT_MESSAGE(MSG, mitk::Equal(*(EXPECTED), *(ACTUAL), mitk::eps, true))
 
 /**
  * @brief Testing macro to test if two objects are not equal.
@@ -226,7 +231,7 @@ namespace mitk {
  * \sa MITK_TEST_EQUAL
  */
 #define MITK_TEST_NOT_EQUAL(OBJ1,OBJ2,MSG) \
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(OBJ1, OBJ2, mitk::eps, true)==false, MSG)
+  CPPUNIT_ASSERT_MESSAGE(MSG, !mitk::Equal(*(OBJ1), *(OBJ2), mitk::eps, true))
 
 /**
  * @brief Testing macro to test if two objects are not equal.
@@ -239,11 +244,15 @@ namespace mitk {
  * @param OBJ1 First object.
  * @param OBJ2 Second object.
  * @param MSG Message to appear with the test.
+ * @throw Throws mitkException if a NULL pointer is given as input.
  *
  * \sa MITK_ASSERT_EQUAL
  */
 #define MITK_ASSERT_NOT_EQUAL(OBJ1, OBJ2, MSG) \
-  CPPUNIT_ASSERT_MESSAGE(MSG, !mitk::Equal(OBJ1, OBJ2, mitk::eps, true))
+  if(((OBJ1).IsNull()) || ((OBJ2).IsNull())) { \
+    mitkThrow() << "mitk::Equal does not work with NULL pointer input."; \
+  } \
+  CPPUNIT_ASSERT_MESSAGE(MSG, !mitk::Equal(*(OBJ1), *(OBJ2), mitk::eps, true))
 
 /**
  * @brief Registers the given test suite.

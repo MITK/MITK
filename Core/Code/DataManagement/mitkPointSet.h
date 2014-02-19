@@ -272,6 +272,7 @@ protected:
 
 /**
  * @brief Equal A function comparing two pointsets for beeing identical.
+ * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::PointSet& p1, const mitk::PointSet& p2) instead.
  *
  * @ingroup MITKTestingAPI
  *
@@ -284,7 +285,23 @@ protected:
  * @param verbose Flag indicating if the user wants detailed console output or not.
  * @return True, if all subsequent comparisons are true, false otherwise
  */
-MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose );
+DEPRECATED( MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose ));
+
+/**
+ * @brief Equal A function comparing two pointsets for beeing identical.
+ *
+ * @ingroup MITKTestingAPI
+ *
+ * The function compares the Geometry, the size and all points element-wise.
+ * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+ *
+ * @param rightHandSide Compare this against leftHandSide.
+ * @param leftHandSide Compare this against rightHandSide.
+ * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+ * @param verbose Flag indicating if the user wants detailed console output or not.
+ * @return True, if all subsequent comparisons are true, false otherwise
+ */
+MITK_CORE_EXPORT bool Equal( const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose );
 
 #pragma GCC visibility push(default)
 itkEventMacro( PointSetEvent, itk::AnyEvent );

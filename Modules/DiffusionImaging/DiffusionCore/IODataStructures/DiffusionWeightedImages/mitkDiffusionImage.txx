@@ -324,6 +324,12 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
 template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
 {
+  if(m_OriginalDirections.IsNull())
+  {
+    // original direction container was not set
+    return;
+  }
+
   m_Directions = GradientDirectionContainerType::New();
   int c = 0;
   for(GradientDirectionContainerType::ConstIterator gdcit = m_OriginalDirections->Begin();

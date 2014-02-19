@@ -49,6 +49,10 @@ public:
   {
     try {
       m_FileName1 = mitk::IOUtil::CreateTemporaryFile();
+      std::ofstream file;
+      file.open(m_FileName1.c_str());
+      if (!file.good()) {MITK_ERROR <<"Could not create a valid file during setUp() method.";}
+      file.close();
     }
     catch (std::exception& e) {
       MITK_ERROR << "File access Exception: " << e.what();

@@ -1,14 +1,13 @@
 /**
 \page PersistenceConceptPage Persistence Concept
 
-In general, persistence referes to the capability of an application to permanently store data, settings, states, etc. so that they outlive a restart. Normal data objects, such as images, surfaces, etc., which are visible in the data storage of MITK can be saved easily by the save/load functions, see \ref DataManagementPage for more details. This page focus on the persistence of settings, configurations, object states and parameters of the application. Depending on the component, e.g. plugin, module, etc., where you want to store your settings, MITK together offers multiple ways to do so:
--# For code inside UI independet modules with low dependiencies to other libraries the mitk::PersistenceService inside the MITK persistence module can be used to  store prameters by using the mitk::PropertyList class: \ref PersistenceMITKService
+In general, persistence referes to the capability of an application to permanently store data, settings, states, etc. so that they outlive a restart. Normal data objects, such as images, surfaces, etc., which are visible in the data storage of MITK can be saved easily by the save/load functions, see \ref DataManagementPage for more details. This page focus on the persistence of settings, configurations, object states and parameters of the application. Depending on the component, e.g. plugin, module, etc., where you want to store your settings, MITK offers various ways to do so:
+-# For code inside UI independent modules with low dependencies to other libraries the mitk::PersistenceService inside the MITK persistence module can be used to store parameters by using the mitk::PropertyList class: \ref PersistenceMITKService
 -# UI dependent code where the Qt library is available can use QSettings: \ref PersistenceQTSetting
--# If the UI setting of Plugins should be stored permanentely, the TODO of blueberry can be used: \ref PersistenceBlueberry
+-# If the UI setting of Plugins should be stored permanently, the persistence features of blueberry can be used: \ref PersistenceBlueberry
 -# Extended features, which include persistence, are provided by the configuration service. \ref PersistenceConfigurationService
-
 \section PersistenceMITKService MITK Persistence Service
-For persistence of member variables and parameters, the interface mitk::IPersistenceService in the MITK core provides an API to store variables permanentely by means of mitk::PropertyList objects. These properties can be stored inside a MITK scene together with the data so that the user loads data and restores the application state at once. The current actual implementation of this interface can be found in the module Persistence. the class mitk::PersistenceService offers a rather simple way to store variables permanently.
+For persistence of member variables and parameters, the interface mitk::IPersistenceService in the MITK core provides an API to store variables permanently by means of mitk::PropertyList objects. These properties can be stored inside a MITK scene together with the data so that the user loads data and restores the application state at once. The current actual implementation of this interface can be found in the module Persistence. The class mitk::PersistenceService offers a rather simple way to store variables permanently.
 
 To enable MITK persistence inside your class, simply include the persistence interface and use PERSISTENCE_GET_SERVICE_METHOD_MACRO in the private part of your class, as shown in the next code snippet:
 
@@ -19,7 +18,7 @@ private:
   PERSISTENCE_GET_SERVICE_METHOD_MACRO
 \endcode
 
-You can then access a persistent property list by using a unique id, e.g. the name of your plugin. Variables can be added to this propertylist and will be available after restarting the application.
+You can then access a persistent property list by using a unique id, e.g. the name of your plugin. Variables can be added to this property list and will be available after restarting the application.
 \code
 mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList("org.mitk.myUniqueModule");
 //set a variable:
@@ -37,7 +36,7 @@ this->GetPeristenceService()->AddPropertyListReplacedObserver(this);
 An example implementation for the use of the mitk::PersistenceService can be found in the module OpenCVVideoSupport (class QmitkOpenCVVideoControls) and in the corresponding unit test mitkPersistenceTest in the Persistence module.
 
 \section PersistenceQTSetting Qt Settings
-Within the UI dependet modules inside MITK, the Qt::settings class can also be used to store variables permanentely. The following code snippet shows an example:
+Within the UI dependent modules inside MITK, the Qt::settings class can also be used to store variables permanently. The following code snippet shows an example:
 \code
 //in the header:
   #include <QSettings>
@@ -45,7 +44,7 @@ Within the UI dependet modules inside MITK, the Qt::settings class can also be u
   QSettings m_MySettings;
 
 //in the cpp file:
-  //initialize the settings object (e.g. constructuor):
+  //initialize the settings object (e.g. constructor):
   m_MySettings("MyClass","MyDescription")
   //store settings:
   m_MySettings.setValue("identifier",value);
@@ -54,8 +53,11 @@ Within the UI dependet modules inside MITK, the Qt::settings class can also be u
 \endcode
 However, integration into a MITK scene file is not possible with Qt::settings.
 
-\section PersistenceBlueberry TODO
+\section PersistenceBlueberry Persistence Features of Blueberry
 
-\section PersistenceConfigurationService TODO
+In blueberry, the view states can be saved and restored which is described here: <a href="http://mitk.org/Article_Save_and_Restore_your_View_State">MITK.org: Save and Restore your View State</a>. Additionally, there is a possibility to make the preferences of a view persistent, which is documented in the <a href="http://docs.mitk.org/nightly-qt4/structberry_1_1IPreferencesService.html">class API documentation of the persistence service</a>.
 
+\section PersistenceConfigurationService Configuration Service
+
+An implementation of a configuration service is planned for MITK in near future but not available yet.
 */

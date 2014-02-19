@@ -54,19 +54,19 @@ public:
   /**
   * \brief Return the itkVectorImage as pointer
   */
-  typename ImageType::Pointer GetVectorImage() { return m_VectorImage; }
+  typename ImageType::Pointer GetVectorImage();
 
   /**
   * \brief Return the itkVectorImage as const pointer
   */
-  const typename ImageType::Pointer GetVectorImage() const { return m_VectorImage; }
+  const typename ImageType::Pointer GetVectorImage() const;
 
   /**
   * \brief Set the itkVectorImage
   *
   * \param SmartPointer ofitk::VectorImage
   */
-  void SetVectorImage(typename ImageType::Pointer image ) { m_VectorImage = image; }
+  void SetVectorImage(typename ImageType::Pointer image );
 
   /**
   * \brief Initialize the mitkImage (base-class) using the first b-zero value of the itkVectorImage
@@ -81,14 +81,14 @@ public:
   *
   * \warning MeasurementFrame already applied
   */
-  const GradientDirectionContainerType::Pointer GetDirections() const { return m_Directions; }
+  const GradientDirectionContainerType::Pointer GetDirections() const;
 
   /**
   * \brief Return the directions as GradientDirectionContainer const pointer
   *
   * \warning no MeasurmentFrame applied
   */
-  const GradientDirectionContainerType::Pointer GetDirectionsWithoutMeasurementFrame() const { return m_OriginalDirections; }
+  const GradientDirectionContainerType::Pointer GetDirectionsWithoutMeasurementFrame() const;
 
   /**
   * \brief Set the original and current GradientDirectionContainer
@@ -113,40 +113,35 @@ public:
   /**
   * \brief Return a copy of the MeasurmentFrame (m_MeasurementFrame)
   */
-  MeasurementFrameType GetMeasurementFrame() const { return m_MeasurementFrame; }
+  MeasurementFrameType GetMeasurementFrame() const;
 
   /**
   * \brief Set the MeasurementFrame
   *
   * \param Const reference of MeasurementFrameType
   */
-  void SetMeasurementFrame( const MeasurementFrameType & mFrame )
-  {
-    m_MeasurementFrame = mFrame;
-    ApplyMeasurementFrame();
-  }
+  void SetMeasurementFrame( const MeasurementFrameType & mFrame );
 
   /**
   * \brief Return true if gradients of with diffrent b-values exist
   */
-  bool GetNumberOfBValues() const { return m_B_ValueMap.size();}
-  // wirds benoenigt ?
+  bool GetNumberOfBValues() const;
 
   /**
   * \brief Return a BValueMap (key: b value, Value: IndicesVector of the GradientDirectionContainer)
   */
-  const BValueMap & GetBValueMap() const { return m_B_ValueMap; }
+  const BValueMap & GetBValueMap() const;
 
   /**
   * \brief Return the reference b value
   * GradientsLength * referenceBValue encoding the true b value of the corresponding GradientDirection
   */
-  float GetReferenceBValue() const {return m_B_Value;}
+  float GetReferenceBValue() const;
 
   /**
   * \brief Set the reference b value s
   */
-  void SetReferenceBValue( float val ) {m_B_Value = val;}
+  void SetReferenceBValue( float val );
 
   GradientDirectionContainerType::Pointer CalcAveragedDirectionSet(double precision, GradientDirectionContainerType::Pointer directions);
   void AverageRedundantGradients(double precision);

@@ -388,29 +388,75 @@ void mitk::DiffusionImage<TPixelType>::SetDirections(const std::vector<itk::Vect
   SetDirections(tempContainer);
 }
 
-//template<typename TPixelType>
-//void mitk::DiffusionImage<TPixelType>::AddObserver()
-//{
-//  typedef DiffusionImage< TPixelType > Self;
-//  typedef itk::SimpleMemberCommand< Self >  DCCommand ;
-//  typename DCCommand::Pointer command = DCCommand::New();
-//  command->SetCallbackFunction(this, &Self::UpdateBValueMap);
-//  m_DeleteObserverTag = m_Directions->AddObserver(itk::ModifiedEvent(), command);
-//}
+template<typename TPixelType>
+typename mitk::DiffusionImage<TPixelType>::MeasurementFrameType mitk::DiffusionImage<TPixelType>::GetMeasurementFrame() const
+{
+  return m_MeasurementFrame;
+}
 
-//template<typename TPixelType>
-//void mitk::DiffusionImage<TPixelType>::RemoveObserver()
-//{
-//  if(m_Directions){
-//    m_Directions->RemoveObserver(m_DeleteObserverTag);
-//  }
-//}
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>::SetMeasurementFrame( const MeasurementFrameType & mFrame )
+{
+  m_MeasurementFrame = mFrame;
+  ApplyMeasurementFrame();
+}
 
-//#pragma clang diagnostic push
-//#pragma clang diagnostic ignored "-Wunused-function"
+template<typename TPixelType>
+bool mitk::DiffusionImage<TPixelType>::GetNumberOfBValues() const
+{
+  return m_B_ValueMap.size();
+}
+
+template<typename TPixelType>
+const typename mitk::DiffusionImage<TPixelType>::BValueMap & mitk::DiffusionImage<TPixelType>::GetBValueMap() const
+{
+  return m_B_ValueMap;
+}
+
+template<typename TPixelType>
+float mitk::DiffusionImage<TPixelType>::GetReferenceBValue() const
+{
+  return m_B_Value;
+}
+
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>::SetReferenceBValue( float val )
+{
+  m_B_Value = val;
+}
+
+template<typename TPixelType>
+const mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer mitk::DiffusionImage<TPixelType>::GetDirections() const
+{
+  return m_Directions;
+}
+
+template<typename TPixelType>
+const mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer mitk::DiffusionImage<TPixelType>::GetDirectionsWithoutMeasurementFrame() const
+{
+  return m_OriginalDirections;
+}
+
+template<typename TPixelType>
+typename mitk::DiffusionImage<TPixelType>::ImageType::Pointer mitk::DiffusionImage<TPixelType>::GetVectorImage()
+{
+  return m_VectorImage;
+}
+
+template<typename TPixelType>
+const typename mitk::DiffusionImage<TPixelType>::ImageType::Pointer mitk::DiffusionImage<TPixelType>::GetVectorImage() const
+{
+  return m_VectorImage;
+}
+
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>::SetVectorImage(typename ImageType::Pointer image )
+{
+  m_VectorImage = image;
+}
+
 template<class TPixelType>
 inline bool mitk::Equal(mitk::DiffusionImage<TPixelType> *leftHandSide, mitk::DiffusionImage<TPixelType> *rightHandSide, ScalarType eps, bool verbose )
-//#pragma clang diagnostic pop
 {
 
   verbose = true;

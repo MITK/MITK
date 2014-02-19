@@ -364,7 +364,7 @@ void QmitkLabelSetWidget::OnAddLayer()
   QmitkNewSegmentationDialog dialog(this);
   dialog.setWindowTitle("New Label");
   dialog.SetSuggestionList( m_OrganColors );
-  dialog.SetSegmentationName("no_name");
+  dialog.SetSegmentationName("unnamed");
 
   int dialogReturnValue = dialog.exec();
 

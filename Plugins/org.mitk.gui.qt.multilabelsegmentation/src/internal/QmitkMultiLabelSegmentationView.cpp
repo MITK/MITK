@@ -385,7 +385,7 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
   color.SetRed(1.0);
   color.SetGreen(0.0);
   color.SetBlue(0.0);
-  workingImage->AddLabel("no_name", color);
+  workingImage->AddLabel("unnamed", color);
 
   this->WaitCursorOff();
 

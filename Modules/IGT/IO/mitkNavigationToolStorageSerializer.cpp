@@ -59,10 +59,10 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
   mitk::NavigationToolWriter::Pointer myToolWriter = mitk::NavigationToolWriter::New();
   for(int i=0; i<storage->GetToolCount();i++)
   {
-    std::string fileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
-    if (!myToolWriter->DoWrite(fileName,storage->GetTool(i)))
+    std::string tempFileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
+    if (!myToolWriter->DoWrite(tempFileName,storage->GetTool(i)))
       {
-        mitkThrowException(mitk::IGTIOException) << "Could not write tool to tempory directory: " << filename;
+        mitkThrowException(mitk::IGTIOException) << "Could not write tool to tempory directory: " << tempFileName;
       }
   }
   //add all files to zip archive
@@ -72,8 +72,8 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
     //first: clean up
     for (int i=0; i<storage->GetToolCount();i++)
     {
-      std::string fileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
-      std::remove(fileName.c_str());
+      std::string tempFileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
+      std::remove(tempFileName.c_str());
     }
     //then: throw an exception
     mitkThrowException(mitk::IGTIOException) << "Could not open a file for writing: " << filename;

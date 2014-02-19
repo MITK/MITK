@@ -52,8 +52,13 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
   {
     ProgressBar::GetInstance()->AddStepsToDo( 7 * (tmax - tstart)  );
   }
+  else
+  {
+    ProgressBar::GetInstance()->AddStepsToDo(7);
+  }
 
-  for( int t=tstart; t<tmax; t++ )
+
+  for( int t=tstart; t<tmax; ++t )
   {
 
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);

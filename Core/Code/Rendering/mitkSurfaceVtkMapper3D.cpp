@@ -502,12 +502,3 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::
 
     Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
-
-
-void mitk::SurfaceVtkMapper3D::SetImmediateModeRenderingOn(int  /*on*/)
-{
-    /*
-  if (m_VtkPolyDataMapper != NULL)
-    m_VtkPolyDataMapper->SetImmediateModeRendering(on);
-*/
-}

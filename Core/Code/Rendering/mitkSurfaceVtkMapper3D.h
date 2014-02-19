@@ -62,6 +62,8 @@ namespace mitk {
   *   - \b "material.representation": (VtkRepresentationProperty*) Representation
   *   - \b "material.wireframeLineWidth": (FloatProperty) Width in pixels of the lines drawn.
   *   - \b "scalar visibility": (BoolProperty) If the scarlars of the surface are visible
+  *   - \b "Surface.TransferFunction (TransferFunctionProperty) Set a transferfunction for coloring the surface
+  *   - \b "LookupTable (LookupTableProperty) LookupTable
 
   * Properties to look for are:
   *
@@ -89,12 +91,6 @@ public:
 
   itkGetMacro(GenerateNormals, bool);
 
-  //enable ImmediateModeRendering for vtkMapping
-  //yet to solve bug 1398
-  void SetImmediateModeRenderingOn(int on = 1);
-
-  itkGetMacro(ImmediateModeRenderingOn, int);
-
   virtual const mitk::Surface* GetInput();
 
   virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
@@ -117,9 +113,6 @@ protected:
   virtual void CheckForClippingProperty( mitk::BaseRenderer* renderer, mitk::BaseProperty *property );
 
   bool m_GenerateNormals;
-
-  //enable ImmediateModeRendering for the vtkMapper
-  int m_ImmediateModeRenderingOn;
 
 public:
 

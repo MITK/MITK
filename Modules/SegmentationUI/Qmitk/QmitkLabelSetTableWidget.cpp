@@ -113,7 +113,7 @@ void QmitkLabelSetTableWidget::Initialize()
   this->setColumnWidth(LOCKED_COL,25);
   this->setColumnWidth(COLOR_COL,25);
   this->setColumnWidth(VISIBLE_COL,25);
-  //this->horizontalHeader()->setResizeMode( 0, QHeaderView::Stretch );
+  this->horizontalHeader()->setResizeMode( 0, QHeaderView::Stretch );
   this->setStyleSheet("QTableView {selection-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #3257bf, stop: 1 white);}");
 //  this->setStyleSheet("QTableView {selection-background-color: #5151cd; selection-color: #ffffff;}");
  // this->setStyleSheet("background: rgb(255,255,255);color:rgb(0,0,0); font-family:Arial Narrow;font-size:18px;"

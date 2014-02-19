@@ -151,17 +151,17 @@ if(MITK_TOF_MESASR4000_AVAILABLE AND NOT ${PROJECT_NAME} STREQUAL "MITK")
 endif()
 
 if(MITK_USE_IGT)
-  #include(${MITK_DIR}/mitkIGTConfig.cmake)
+  #include("${MITK_DIR}/mitkIGTConfig.cmake")
 endif()
 
 # Install rules for ToF libraries loaded at runtime
-include(@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake)
+include("@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake")
 
 if(NOT MITK_EXPORTS_FILE_INCLUDED)
   if(EXISTS "@MITK_EXPORTS_FILE@")
     set(MITK_EXPORTS_FILE_INCLUDED 1)
     include("@MITK_EXPORTS_FILE@")
-  endif(EXISTS "@MITK_EXPORTS_FILE@")
+  endif()
 endif()
 
 # BlueBerry support
@@ -176,12 +176,12 @@ if(MITK_USE_BLUEBERRY)
 
   if(NOT BlueBerry_FOUND)
     message(SEND_ERROR "MITK does not seem to be configured with BlueBerry support. Set MITK_USE_BLUEBERRY to ON in your MITK build configuration.")
-  endif(NOT BlueBerry_FOUND)
+  endif()
 
-  set(MITK_PLUGIN_USE_FILE @MITK_PLUGIN_USE_FILE@)
+  set(MITK_PLUGIN_USE_FILE "@MITK_PLUGIN_USE_FILE@")
   if(MITK_PLUGIN_USE_FILE)
-    if(EXISTS ${MITK_PLUGIN_USE_FILE})
-      include(${MITK_PLUGIN_USE_FILE})
+    if(EXISTS "${MITK_PLUGIN_USE_FILE}")
+      include("${MITK_PLUGIN_USE_FILE}")
     endif()
   endif()
 
@@ -190,7 +190,7 @@ if(MITK_USE_BLUEBERRY)
       "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
       "${MITK_PLUGIN_PROVISIONING_FILE}")
 
-endif(MITK_USE_BLUEBERRY)
+endif()
 
 # Set properties on exported targets
 @MITK_EXPORTED_TARGET_PROPERTIES@

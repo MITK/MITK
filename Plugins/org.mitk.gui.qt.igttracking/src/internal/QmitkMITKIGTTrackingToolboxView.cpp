@@ -132,7 +132,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_toolStorage->RegisterAsMicroservice("no tracking device");
 
     //set home directory as default path for logfile
-    m_Controls->m_LoggingFileName->setText(QDir::homePath() + QDir::separator() + "logfile.csv");
+    m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(QDir::homePath()) + QDir::separator() + "logfile.csv");
   }
 }
 
@@ -559,31 +559,47 @@ void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
   this->m_Controls->m_LoggingFileName->setText(filename);
   this->OnToggleFileExtension();
   }
+// bug-16470: toggle file extension after clicking on radio button
 void QmitkMITKIGTTrackingToolboxView::OnToggleFileExtension()
 {
 
-  QString temp = this->m_Controls->m_LoggingFileName->text();
+  QString currentInputText = this->m_Controls->m_LoggingFileName->text();
+  QString currentFile = QFileInfo(currentInputText).baseName();
+  QDir currentPath = QFileInfo(currentInputText).dir();
+  if(currentFile.isEmpty())
+  {
+    currentFile = "logfile";
+  }
+  // Setting currentPath to default home path when currentPath is empty or it does not exist
+  if(currentPath == QDir() || !currentPath.exists())
+  {
+    currentPath = QDir::homePath();
+  }
+  // check if csv radio button is clicked
   if(this->m_Controls->m_csvFormat->isChecked())
   {
-    if(temp.contains('.'))
+    // you needn't add a seperator to the input text when currentpath is the rootpath
+    if(currentPath.isRoot())
     {
-      this->m_Controls->m_LoggingFileName->setText(temp.replace(temp.indexOf('.'),temp.size() - temp.indexOf("."),".csv"));
+      this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + currentFile + ".csv");
     }
+
     else
     {
-      this->m_Controls->m_LoggingFileName->setText("C:/logfile.csv");
+      this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + QDir::separator() + currentFile + ".csv");
     }
-    //this->m_Controls->m_LoggingFileName->setText()
   }
+  // check if xml radio button is clicked
   else if(this->m_Controls->m_xmlFormat->isChecked())
   {
-    if(temp.contains('.'))
+    // you needn't add a seperator to the input text when currentpath is the rootpath
+    if(currentPath.isRoot())
     {
-      this->m_Controls->m_LoggingFileName->setText(temp.replace(temp.indexOf('.'),temp.size() - temp.indexOf("."),".xml"));
+      this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + currentFile + ".xml");
     }
     else
     {
-      this->m_Controls->m_LoggingFileName->setText("C:/logfile.xml");
+      this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + QDir::separator() + currentFile + ".xml");
     }
 
   }

@@ -107,6 +107,8 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget* parent)
   m_Controls.m_btDeleteLayer->setEnabled(false);
   m_Controls.m_btPreviousLayer->setEnabled(false);
   m_Controls.m_btNextLayer->setEnabled(false);
+
+  m_Controls.m_lblCaption->setText("");
 }
 
 QmitkLabelSetWidget::~QmitkLabelSetWidget()
@@ -422,6 +424,10 @@ void QmitkLabelSetWidget::UpdateControls()
 
   QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
   completeModel->setStringList(m_Controls.m_LabelSetTableWidget->GetLabelStringList());
+
+  std::stringstream captionText;
+  captionText << "Number of labels: " << workingImage->GetNumberOfLabels() - 1;
+  m_Controls.m_lblCaption->setText(captionText.str().c_str());
 }
 
 void QmitkLabelSetWidget::OnActiveLabelChanged(int activeLabel)

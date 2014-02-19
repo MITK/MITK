@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPythonVariableStackTableModel.h"
 #include <QMimeData>
-#include <mitkModuleContext.h>
+#include <usModuleContext.h>
 #include <mitkDataNode.h>
-#include <mitkGetModuleContext.h>
+#include <usGetModuleContext.h>
 #include <QStringList>
 #include <QMessageBox>
 
@@ -28,7 +28,7 @@ const QString QmitkPythonVariableStackTableModel::MITK_SURFACE_VAR_NAME = "mitkS
 QmitkPythonVariableStackTableModel::QmitkPythonVariableStackTableModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
-    mitk::ModuleContext* context = mitk::GetModuleContext();
+    us::ModuleContext* context = us::GetModuleContext();
     m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();
     m_PythonService = context->GetService<mitk::IPythonService>(m_PythonServiceRef);
     m_PythonService->AddPythonCommandObserver( this );
@@ -36,7 +36,7 @@ QmitkPythonVariableStackTableModel::QmitkPythonVariableStackTableModel(QObject *
 
 QmitkPythonVariableStackTableModel::~QmitkPythonVariableStackTableModel()
 {
-  mitk::ModuleContext* context = mitk::GetModuleContext();
+  us::ModuleContext* context = us::GetModuleContext();
   context->UngetService( m_PythonServiceRef );
   m_PythonService->RemovePythonCommandObserver( this );
 }

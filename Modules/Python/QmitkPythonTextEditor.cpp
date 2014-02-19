@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileInfo>
 #include <QUrl>
 #include <QtGui>
-#include <mitkModuleContext.h>
+#include <usModuleContext.h>
 #include <usServiceReference.h>
 #include <mitkDataNode.h>
-#include <mitkGetModuleContext.h>
+#include <usGetModuleContext.h>
 #include <mitkIPythonService.h>
 #include "QmitkPythonScriptEditorHighlighter.h"
 
@@ -40,7 +40,7 @@ struct QmitkPythonTextEditorData
 
   QGridLayout* m_Layout;
   mitk::IPythonService* m_PythonService;
-  mitk::ServiceReference m_PythonServiceRef;
+  us::ServiceReference<mitk::IPythonService> m_PythonServiceRef;
 
   QString m_FileName;
 };
@@ -48,7 +48,7 @@ struct QmitkPythonTextEditorData
 QmitkPythonTextEditor::QmitkPythonTextEditor(QWidget *parent)
   :QWidget(parent), d(new QmitkPythonTextEditorData)
 {
-  mitk::ModuleContext* context = mitk::GetModuleContext();
+  us::ModuleContext* context = us::GetModuleContext();
   d->m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();
   d->m_PythonService = context->GetService<mitk::IPythonService>( d->m_PythonServiceRef );
 
@@ -95,7 +95,7 @@ QmitkPythonTextEditor::QmitkPythonTextEditor(QWidget *parent)
 
 QmitkPythonTextEditor::~QmitkPythonTextEditor()
 {
-  mitk::ModuleContext* context = mitk::GetModuleContext();
+  us::ModuleContext* context = us::GetModuleContext();
   context->UngetService( d->m_PythonServiceRef );
 
   delete d;
@@ -135,7 +135,7 @@ QString QmitkPythonTextEditor::ReadFile(const QString& filename)
   QFile file(filename);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
   {
-    MITK_ERROR << "Could not open file " << filename;
+    MITK_ERROR << "Could not open file " << filename.toStdString();
     return NULL;
   }
 

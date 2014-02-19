@@ -1,5 +1,25 @@
 # tests with no extra command line parameter
 set(MODULE_TESTS
+  # IMPORTANT: If you plan to deactivate / comment out a test please write a bug number to the commented out line of code.
+  #
+  #     Example: #mitkMyTest #this test is commented out because of bug 12345
+  #
+  # It is important that the bug is open and that the test will be activated again before the bug is closed. This assures that
+  # no test is forgotten after it was commented out. If there is no bug for your current problem, please add a new one and
+  # mark it as critical.
+
+  ################## DISABLED TESTS #################################################
+  #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more
+  #mitkStateMachineContainerTest.cpp #rewrite test, indirect since no longer exported Bug 14529
+  #mitkRegistrationBaseTest.cpp #tested class  mitkRegistrationBase doesn't exist any more
+  #mitkSegmentationInterpolationTest.cpp #file doesn't exist!
+  #mitkPipelineSmartPointerCorrectnessTest.cpp #file doesn't exist!
+  #mitkITKThreadingTest.cpp #test outdated because itk::Semaphore was removed from ITK
+  #mitkAbstractTransformPlaneGeometryTest.cpp #mitkVtkAbstractTransformPlaneGeometry doesn't exist any more
+  #mitkTestUtilSharedLibrary.cpp #Linker problem with this test...
+  #mitkTextOverlay2DSymbolsRenderingTest.cpp #Implementation of the tested feature is not finished yet. Ask Christoph or see bug 15104 for details.
+
+  ################# RUNNING TESTS ###################################################
   mitkAccessByItkTest.cpp
   mitkCoreObjectFactoryTest.cpp
   mitkMaterialTest.cpp
@@ -74,17 +94,6 @@ set(MODULE_TESTS
   mitkInteractionEventTest.cpp
   mitkLookupTableTest.cpp
   mitkSTLFileReaderTest.cpp
-
-  ################## DISABLED TESTS #################################################
-  #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more
-  #mitkStateMachineContainerTest.cpp #rewrite test, indirect since no longer exported Bug 14529
-  #mitkRegistrationBaseTest.cpp #tested class  mitkRegistrationBase doesn't exist any more
-  #mitkSegmentationInterpolationTest.cpp #file doesn't exist!
-  #mitkPipelineSmartPointerCorrectnessTest.cpp #file doesn't exist!
-  #mitkITKThreadingTest.cpp #test outdated because itk::Semaphore was removed from ITK
-  #mitkAbstractTransformPlaneGeometryTest.cpp #mitkVtkAbstractTransformPlaneGeometry doesn't exist any more
-  #mitkTestUtilSharedLibrary.cpp #Linker problem with this test...
-  #mitkTextOverlay2DSymbolsRenderingTest.cpp #Implementation of the tested feature is not finished yet. Ask Christoph or see bug 15104 for details.
 )
 
 # test with image filename as an extra command line parameter

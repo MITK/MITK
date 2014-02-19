@@ -31,7 +31,6 @@ class mitkPointSetEqualTestSuite : public mitk::TestFixture
   MITK_TEST(Equal_DifferentGeometries_ReturnsFalse);
   MITK_TEST(Equal_DifferentNumberOfPoints_ReturnsFalse);
   MITK_TEST(Equal_DifferentPoints_ReturnsFalse);
-  MITK_TEST(Equal_InputIsNull_ReturnsFalse);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -72,12 +71,6 @@ public:
     m_AnotherPointSet->GetGeometry()->SetOrigin(origin);
 
     MITK_ASSERT_NOT_EQUAL( m_PointSet, m_AnotherPointSet, "Origin was modified. Result should be false.");
-  }
-
-  void Equal_InputIsNull_ReturnsFalse()
-  {
-    mitk::PointSet::Pointer pointSet = NULL;
-    MITK_ASSERT_NOT_EQUAL( pointSet, pointSet, "Input is NULL. Result should be false.");
   }
 
   void Equal_DifferentNumberOfPoints_ReturnsFalse()

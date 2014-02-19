@@ -78,6 +78,7 @@ namespace mitk
 
   /**
   * @brief Equal Compare two surfaces for equality, returns true if found equal.
+  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::Surface& s1, const mitk::Surface& s2) instead
   * @ingroup MITKTestingAPI
   * @param rightHandSide Surface to compare.
   * @param leftHandSide Surface to compare.
@@ -85,10 +86,22 @@ namespace mitk
   * @param verbose Flag indicating if the method should give a detailed console output.
   * @return True if every comparison is true, false in any other case.
   */
-MITK_CORE_EXPORT bool Equal( mitk::Surface* leftHandSide, mitk::Surface* rightHandSide, mitk::ScalarType eps, bool verbose);
+DEPRECATED( MITK_CORE_EXPORT bool Equal( mitk::Surface* leftHandSide, mitk::Surface* rightHandSide, mitk::ScalarType eps, bool verbose));
+
+/**
+* @brief Equal Compare two surfaces for equality, returns true if found equal.
+* @ingroup MITKTestingAPI
+* @param rightHandSide Surface to compare.
+* @param leftHandSide Surface to compare.
+* @param eps Epsilon to use for floating point comparison. Most of the time mitk::eps will be sufficient.
+* @param verbose Flag indicating if the method should give a detailed console output.
+* @return True if every comparison is true, false in any other case.
+*/
+MITK_CORE_EXPORT bool Equal( mitk::Surface& leftHandSide, mitk::Surface& rightHandSide, mitk::ScalarType eps, bool verbose);
 
   /**
   * @brief Equal Compare two vtk PolyDatas for equality, returns true if found equal.
+  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const vtkPolyData& p1, const vtkPolyData& p2) instead
   * @ingroup MITKTestingAPI
   * @param rightHandSide Surface to compare.
   * @param leftHandSide Surface to compare.
@@ -100,7 +113,22 @@ MITK_CORE_EXPORT bool Equal( mitk::Surface* leftHandSide, mitk::Surface* rightHa
   * all the two poly datas have the same number of points with the same coordinates. It is not checked whether
   * all points are correctly connected.
   */
-MITK_CORE_EXPORT bool Equal( vtkPolyData* leftHandSide, vtkPolyData* rightHandSide, mitk::ScalarType eps, bool verbose);
+DEPRECATED( MITK_CORE_EXPORT bool Equal( vtkPolyData* leftHandSide, vtkPolyData* rightHandSide, mitk::ScalarType eps, bool verbose));
+
+/**
+* @brief Equal Compare two vtk PolyDatas for equality, returns true if found equal.
+* @ingroup MITKTestingAPI
+* @param rightHandSide Surface to compare.
+* @param leftHandSide Surface to compare.
+* @param eps Epsilon to use for floating point comparison. Most of the time mitk::eps will be sufficient.
+* @param verbose Flag indicating if the method should give a detailed console output.
+* @return True if every comparison is true, false in any other case.
+*
+* This will only check if the number of cells, vertices, polygons, stripes and lines is the same and whether
+* all the two poly datas have the same number of points with the same coordinates. It is not checked whether
+* all points are correctly connected.
+*/
+MITK_CORE_EXPORT bool Equal( vtkPolyData& leftHandSide, vtkPolyData& rightHandSide, mitk::ScalarType eps, bool verbose);
 }
 
 #endif

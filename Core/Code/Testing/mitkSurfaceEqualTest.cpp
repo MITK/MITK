@@ -16,15 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSurface.h"
 #include "mitkTestingMacros.h"
+#include "mitkTestFixture.h"
 
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkPolygon.h>
 #include <vtkPolyLine.h>
 #include <vtkCellArray.h>
-
-#include "mitkTestFixture.h"
-
 
 /**
  * @brief mitkPointSetEqualTestSuite A test class for Equal methods in mitk::PointSet.
@@ -33,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkSurfaceEqualTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSurfaceEqualTestSuite);
-  MITK_TEST(Equal_InputIsNull_ReturnsFalse);
   MITK_TEST(Equal_CloneAndOriginalOneTimestep_ReturnsTrue);
   MITK_TEST(Equal_CloneAndOriginalTwoTimesteps_ReturnsTrue);
   MITK_TEST(Equal_OneTimeStepVSTwoTimeStep_ReturnsFalse);
@@ -120,12 +117,6 @@ public:
     m_PolygonArrayTwo = NULL;
     m_PointsOne = NULL;
     m_PointsTwo = NULL;
-  }
-
-  void Equal_InputIsNull_ReturnsFalse()
-  {
-    mitk::Surface::Pointer surface = NULL;
-    MITK_ASSERT_NOT_EQUAL( surface, surface, "Input is NULL. Result should be false.");
   }
 
   void Equal_CloneAndOriginalOneTimestep_ReturnsTrue()

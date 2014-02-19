@@ -26,7 +26,6 @@ class mitkGeometry3DEqualTestSuite : public mitk::TestFixture
   MITK_TEST(Equal_DifferentOrigin_ReturnsFalse);
   MITK_TEST(Equal_DifferentIndexToWorldTransform_ReturnsFalse);
   MITK_TEST(Equal_DifferentSpacing_ReturnsFalse);
-  MITK_TEST(Equal_InputIsNull_ReturnsFalse);
   MITK_TEST(Equal_DifferentImageGeometry_ReturnsFalse);
   MITK_TEST(Equal_DifferentBoundingBox_ReturnsFalse);
   CPPUNIT_TEST_SUITE_END();
@@ -96,12 +95,6 @@ public:
     m_AnotherGeometry3D->SetSpacing(differentSpacing);
 
     MITK_ASSERT_NOT_EQUAL( m_Geometry3D, m_AnotherGeometry3D, "Spacing was modified. Result should be false.");
-  }
-
-  void Equal_InputIsNull_ReturnsFalse()
-  {
-    mitk::Geometry3D::Pointer geometry3D = NULL;
-    MITK_ASSERT_NOT_EQUAL( geometry3D, geometry3D, "Input is NULL. Result should be false.");
   }
 
   void Equal_DifferentImageGeometry_ReturnsFalse()

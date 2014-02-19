@@ -139,7 +139,7 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
   m_MultiLabelResultNode->SetProperty("Image Rendering.Mode", renderingMode);
   mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
   mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
-  vtkLookupTable *lookupTable = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
   lookupTable->SetHueRange(1.0, 0.0);
   lookupTable->SetSaturationRange(1.0, 1.0);
   lookupTable->SetValueRange(1.0, 1.0);

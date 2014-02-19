@@ -72,6 +72,11 @@ set(H_FILES
   Interfaces/mitkIDataNodeReader.h
 
   Rendering/mitkLocalStorageHandler.h
+  Rendering/Colortables/HotIron.h
+  Rendering/Colortables/Jet.h
+  Rendering/Colortables/PET20.h
+  Rendering/Colortables/PETColor.h
+
 
   IO/mitkPixelTypeTraits.h
 )

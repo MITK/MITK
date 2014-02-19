@@ -19,8 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <mitkCommon.h>
 #include "vtkLookupTable.h"
+#include "vtkSmartPointer.h"
 #include <itkDataObject.h>
 #include <itkObjectFactory.h>
+
 
 class vtkColorTransferFunction;
 class vtkPiecewiseFunction;
@@ -55,15 +57,26 @@ public:
     /**
      * @returns the associated vtkLookupTable
      */
-    virtual vtkLookupTable* GetVtkLookupTable() const;
+    virtual vtkSmartPointer<vtkLookupTable> GetVtkLookupTable() const;
 
     virtual RawLookupTableType * GetRawLookupTable() const;
 
-    virtual void SetVtkLookupTable( vtkLookupTable* lut );
+    virtual void SetVtkLookupTable( vtkSmartPointer<vtkLookupTable> lut );
 
     virtual void ChangeOpacityForAll( float opacity );
 
     virtual void ChangeOpacity(int index, float opacity );
+
+    virtual void GetColor(int, double rgb[3]);
+
+    virtual void GetTableValue(int, double rgba[4]);
+
+    virtual void SetTableValue(int, double rgba[4]);
+
+
+    itkSetMacro(Window, float);
+    itkSetMacro(Level, float);
+    itkSetMacro(Opacity, float);
 
 
     /*!
@@ -122,13 +135,62 @@ public:
     void CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction);
     void CreateGradientTransferFunction(vtkPiecewiseFunction*& gradientFunction);
 
+    enum LookupTableType
+    {
+       GRAYSCALE,
+       INVERSE_GRAYSCALE,
+       HOT_IRON,
+       JET,
+       LEGACY_BINARY,
+       MULTILABEL,
+       PET_COLOR,
+       PET_20
+    };
+
+    static const char* const typenameList[];
+
+    /*!
+     *  \brief Set the look-up table type by enum (or integer).
+     *  \details Returns if the given type doesn't exist. Only changes the type if it is different
+     *           from the current one.
+     */
+    virtual void SetType(const LookupTableType type);
+
+    /*!
+     *  \brief Set the look-up table type by string.
+     *  \details Returns if the given type doesn't exist. Only changes the type if it is different
+     *           from the current one.
+     */
+    virtual void SetType(const std::string& typeName);
+
+    /*!
+     *  \brief Return the current look-up table type as a string.
+     */
+    virtual const std::string GetActiveTypeAsString();
 protected:
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const;
 
     LookupTable(const LookupTable& other);
 
-    vtkLookupTable* m_LookupTable;
+    virtual void BuildGrayScaleLookupTable();
+    virtual void BuildLegacyBinaryLookupTable();
+    virtual void BuildInverseGrayScaleLookupTable();
+    virtual void BuildHotIronLookupTable();
+    virtual void BuildJetLookupTable();
+    virtual void BuildPETColorLookupTable();
+    virtual void BuildPET20LookupTable();
+    virtual void BuildMultiLabelLookupTable();
+
+    vtkSmartPointer<vtkLookupTable> m_LookupTable;
+
+    float m_Window;
+
+    float m_Level;
+
+    float m_Opacity;
+
+    LookupTableType m_type;
 
 private:
 

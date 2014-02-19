@@ -205,7 +205,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     double* scalarLimits = m_LUT->GetTableRange();
     double scalarsMin = scalarLimits[0], scalarsMax = scalarLimits[1];
 
-    vtkLookupTable *lut;// = vtkLookupTable::New();
+    vtkLookupTable *lut;
 
     LookupTableProperty::Pointer lookupTableProp;
     this->GetDataNode()->GetProperty(lookupTableProp, "LookupTable", renderer);

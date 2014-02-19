@@ -689,26 +689,25 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New();
   node->AddProperty( "Image Rendering.Mode", renderingModeProperty);
 
+  // Set default grayscale look-up table
+  mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+  mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+  mitkLutProp->SetLookupTable(mitkLut);
+  node->SetProperty("LookupTable", mitkLutProp);
+
   std::string photometricInterpretation; // DICOM tag telling us how pixel values should be displayed
   if ( node->GetStringProperty( "dicom.pixel.PhotometricInterpretation", photometricInterpretation ) )
   {
     // modality provided by DICOM or other reader
     if ( photometricInterpretation.find("MONOCHROME1") != std::string::npos ) // meaning: display MINIMUM pixels as WHITE
     {
-      // generate LUT (white to black)
-      mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-      vtkLookupTable* bwLut = mitkLut->GetVtkLookupTable();
-      bwLut->SetTableRange (0, 1);
-      bwLut->SetSaturationRange (0, 0);
-      bwLut->SetHueRange (0, 0);
-      bwLut->SetValueRange (1, 0);
-      bwLut->SetAlphaRange (1, 1);
-      bwLut->SetRampToLinear();
-      bwLut->Build();
-      mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+      // Set inverse grayscale look-up table
+      mitkLut->SetType(mitk::LookupTable::INVERSE_GRAYSCALE);
       mitkLutProp->SetLookupTable(mitkLut);
-      node->SetProperty( "LookupTable", mitkLutProp );
+      node->SetProperty("LookupTable", mitkLutProp);
     }
+    // Otherwise do nothing - the default grayscale look-up table has already been set
+    /*
     else
       if ( photometricInterpretation.find("MONOCHROME2") != std::string::npos ) // meaning: display MINIMUM pixels as BLACK
       {
@@ -716,6 +715,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
         node->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ), renderer );
       }
     // PALETTE interpretation should be handled ok by RGB loading
+    */
   }
 
   bool isBinaryImage(false);
@@ -1059,31 +1059,19 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   //in the constructor for each image (i.e. the image-corresponding local storage)
   m_TSFilter->ReleaseDataFlagOn();
 
+  mitk::LookupTable::Pointer mitkLUT = mitk::LookupTable::New();
   //built a default lookuptable
-  m_DefaultLookupTable->SetRampToLinear();
-  m_DefaultLookupTable->SetSaturationRange( 0.0, 0.0 );
-  m_DefaultLookupTable->SetHueRange( 0.0, 0.0 );
-  m_DefaultLookupTable->SetValueRange( 0.0, 1.0 );
-  m_DefaultLookupTable->Build();
+  mitkLUT->SetType(mitk::LookupTable::GRAYSCALE);
+  m_DefaultLookupTable = mitkLUT->GetVtkLookupTable();
 
-  m_BinaryLookupTable->SetRampToLinear();
-  m_BinaryLookupTable->SetSaturationRange( 0.0, 0.0 );
-  m_BinaryLookupTable->SetHueRange( 0.0, 0.0 );
-  m_BinaryLookupTable->SetValueRange( 0.0, 1.0 );
-  m_BinaryLookupTable->SetRange(0.0, 1.0);
-  m_BinaryLookupTable->Build();
+  mitkLUT->SetType(mitk::LookupTable::LEGACY_BINARY);
+  m_BinaryLookupTable = mitkLUT->GetVtkLookupTable();
 
   // add a default rainbow lookup table for color mapping
   m_ColorLookupTable->SetRampToLinear();
   m_ColorLookupTable->SetHueRange(0.6667, 0.0);
   m_ColorLookupTable->SetTableRange(0.0, 20.0);
   m_ColorLookupTable->Build();
-  // make first value transparent
-  {
-    double rgba[4];
-    m_BinaryLookupTable->GetTableValue(0, rgba);
-    m_BinaryLookupTable->SetTableValue(0, rgba[0], rgba[1], rgba[2], 0.0); // background to 0
-  }
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();

@@ -351,7 +351,7 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
   planeNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
 
   // Set lookup table for plane surface visualization
-  vtkLookupTable *lookupTable = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
   lookupTable->SetHueRange(0.6, 0.0);
   lookupTable->SetSaturationRange(1.0, 1.0);
   lookupTable->SetValueRange(1.0, 1.0);

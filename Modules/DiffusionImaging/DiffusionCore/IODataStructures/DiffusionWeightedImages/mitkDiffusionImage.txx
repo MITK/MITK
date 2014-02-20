@@ -432,13 +432,13 @@ void mitk::DiffusionImage<TPixelType>::SetReferenceBValue( float val )
 }
 
 template<typename TPixelType>
-const typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer mitk::DiffusionImage<TPixelType>::GetDirections() const
+typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerTypePointer mitk::DiffusionImage<TPixelType>::GetDirections() const
 {
   return m_Directions;
 }
 
 template<typename TPixelType>
-const typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer mitk::DiffusionImage<TPixelType>::GetDirectionsWithoutMeasurementFrame() const
+typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerTypePointer mitk::DiffusionImage<TPixelType>::GetDirectionsWithoutMeasurementFrame() const
 {
   return m_OriginalDirections;
 }

@@ -152,7 +152,7 @@ public:
 
 protected:
   DiffusionImage();
-  DiffusionImage(const mitk::DiffusionImage<TPixelType> &);
+  DiffusionImage(const DiffusionImage<TPixelType> &);
   virtual ~DiffusionImage();
 
   // Helper Methods

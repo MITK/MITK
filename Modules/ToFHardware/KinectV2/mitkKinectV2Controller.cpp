@@ -451,6 +451,8 @@ namespace mitk
         vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
         vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
 
+        const double meterfactor = 1000.0;
+
         vtkSmartPointer<vtkFloatArray> textureCoordinates = vtkSmartPointer<vtkFloatArray>::New();
         vtkSmartPointer<vtkIdList> vertexIdList = vtkSmartPointer<vtkIdList>::New();
         vertexIdList->Allocate(pointCount);
@@ -495,7 +497,9 @@ namespace mitk
               //If we use points->InsertNextPoint(...) instead, the ID's do not
               //correspond to the image pixel ID's. Thus, we have to save them
               //in the vertexIdList.
-              vertexIdList->SetId(pixelID, points->InsertNextPoint(d->m_CameraCoordinates[pixelID].X, d->m_CameraCoordinates[pixelID].Y, d->m_CameraCoordinates[pixelID].Z));
+              //Kinect SDK delivers world coordinates in meters, so we have to
+              //convert to mm for MITK.
+              vertexIdList->SetId(pixelID, points->InsertNextPoint(d->m_CameraCoordinates[pixelID].X*meterfactor, d->m_CameraCoordinates[pixelID].Y*meterfactor, d->m_CameraCoordinates[pixelID].Z*meterfactor));
 
               ColorSpacePoint colorPoint = d->m_ColorPoints[pixelID];
               // retrieve the depth to color mapping for the current depth pixel
@@ -741,6 +745,6 @@ namespace mitk
 
   void KinectV2Controller::SetTriangulationThreshold(double triangulationThreshold)
   {
-    this->d->m_TriangulationThreshold = triangulationThreshold / 100000;
+    this->d->m_TriangulationThreshold = triangulationThreshold * triangulationThreshold;
   }
 }

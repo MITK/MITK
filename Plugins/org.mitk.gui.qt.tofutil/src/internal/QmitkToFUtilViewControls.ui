@@ -77,6 +77,15 @@
         <property name="toolTip">
          <string>If this value is &gt;0.0, a triangulation will only be applied for vertices within this threshold distance (in mm).</string>
         </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="maximum">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item row="1" column="1">

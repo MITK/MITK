@@ -26,7 +26,6 @@ class mitkDiffusionImageEqualTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkDiffusionImageEqualTestSuite);
   MITK_TEST(Equal_CloneAndOriginal_ReturnsTrue);
   MITK_TEST(Equal_DifferentGradientContainerElements_ReturnsFalse);
-  MITK_TEST(Equal_DifferentGradientContainerSize_ReturnsFalse);
   MITK_TEST(Equal_DifferentBValue_ReturnsFalse);
   MITK_TEST(Equal_DifferentVectorImagePixel_ReturnFalse);
   MITK_TEST(Equal_GetNumberOfBValues_ReturnFalse);
@@ -73,14 +72,6 @@ public:
     mitk::DiffusionImage<short>::GradientDirectionContainerType::ElementIdentifier mid_pos(m_AnotherImage->GetDirections()->Size()*0.5);
     m_AnotherImage->GetDirections()->SetElement(mid_pos, dummyVec);
     MITK_ASSERT_NOT_EQUAL( m_Image, m_AnotherImage, "GradientDirectionContainer Elements are not equal.");
-  }
-
-  void Equal_DifferentGradientContainerSize_ReturnsFalse()
-  {
-    mitk::DiffusionImage<short>::GradientDirectionContainerType::ElementIdentifier mid_pos(m_AnotherImage->GetDirections()->Size()*0.5);
-    m_AnotherImage->GetDirections()->DeleteIndex(mid_pos);
-    m_AnotherImage->GetDirections()->Squeeze();
-    MITK_ASSERT_NOT_EQUAL( m_Image, m_AnotherImage, "GradientDirectionContainer Size is not equal.");
   }
 
   void Equal_DifferentBValue_ReturnsFalse()

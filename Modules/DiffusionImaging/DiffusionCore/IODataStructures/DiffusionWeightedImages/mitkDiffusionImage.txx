@@ -481,21 +481,6 @@ inline bool mitk::Equal(const mitk::DiffusionImage<TPixelType>& leftHandSide, co
     returnValue = false;
   }
 
-  if(leftHandSide.GetDirectionsWithoutMeasurementFrame()->Size() != rightHandSide.GetDirectionsWithoutMeasurementFrame()->Size())
-  {
-    if(verbose)
-      MITK_INFO << "[( DiffusionImage )] OriginalGradientDirectionContainer size is not Equal.";
-    returnValue = false;
-  }
-
-  if(leftHandSide.GetDirections()->Size() != rightHandSide.GetDirections()->Size())
-  {
-    if(verbose)
-      MITK_INFO << "[( DiffusionImage )] GradientDirectionContainer size is not Equal.";
-    returnValue = false;
-  }
-
-
   if(leftHandSide.GetBValueMap().size() != rightHandSide.GetBValueMap().size())
   {
     if(verbose)

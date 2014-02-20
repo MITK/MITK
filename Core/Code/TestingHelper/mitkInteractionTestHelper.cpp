@@ -112,8 +112,6 @@ mitk::DataStorage::Pointer mitk::InteractionTestHelper::GetDataStorage()
 }
 
 
-
-
 void mitk::InteractionTestHelper::AddNodeToStorage(mitk::DataNode::Pointer node)
 {
   this->m_DataStorage->Add(node);

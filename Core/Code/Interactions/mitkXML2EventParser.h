@@ -36,6 +36,7 @@ namespace mitk
    * \class InteractionEventList
    * \brief Generates a list of InteractionEvents based on an XML file-
    *
+   * @sa EventRecorder
    * @ingroup Interaction
    **/
 class XML2EventParser : public vtkXMLParser

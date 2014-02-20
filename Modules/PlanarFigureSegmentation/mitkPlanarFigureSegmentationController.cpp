@@ -89,6 +89,11 @@ void mitk::PlanarFigureSegmentationController::AddPlanarFigure( mitk::PlanarFigu
     m_SurfaceList.at(indexOfFigure) = figureAsSurface;
   }
 
+  if ( m_ReduceFilter.IsNull() )
+  {
+    InitializeFilters();
+  }
+
   m_ReduceFilter->SetInput( indexOfFigure, figureAsSurface );
 
   m_NormalsFilter->SetInput( indexOfFigure, m_ReduceFilter->GetOutput( indexOfFigure ) );

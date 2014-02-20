@@ -81,14 +81,14 @@ public:
   *
   * \warning MeasurementFrame already applied
   */
-  const GradientDirectionContainerType::Pointer GetDirections() const;
+  const typename GradientDirectionContainerType::Pointer GetDirections() const;
 
   /**
   * \brief Return the directions as GradientDirectionContainer const pointer
   *
   * \warning no MeasurmentFrame applied
   */
-  const GradientDirectionContainerType::Pointer GetDirectionsWithoutMeasurementFrame() const;
+  const typename GradientDirectionContainerType::Pointer GetDirectionsWithoutMeasurementFrame() const;
 
   /**
   * \brief Set the original and current GradientDirectionContainer

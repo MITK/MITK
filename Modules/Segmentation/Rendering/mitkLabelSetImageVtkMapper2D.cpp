@@ -207,8 +207,19 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 
     if (lidx == activeLayer)
     {
-      //generate contours/outlines
-      localStorage->m_OutlinePolyData = this->CreateOutlinePolyData( renderer, localStorage->m_ReslicedImageVector[lidx], activeLabel );
+      if (activeLabel)
+      {
+        //generate contours/outlines
+        localStorage->m_OutlinePolyData = this->CreateOutlinePolyData( renderer, localStorage->m_ReslicedImageVector[lidx], activeLabel );
+        localStorage->m_OutlineActor->SetVisibility(true);
+        localStorage->m_OutlineShadowActor->SetVisibility(true);
+      }
+      else
+      {
+        localStorage->m_OutlineActor->SetVisibility(false);
+        localStorage->m_OutlineShadowActor->SetVisibility(false);
+      }
+    }
 /*
       bool contourAll = false;
       node->GetBoolProperty( "labelset.contour.all", contourAll, renderer );
@@ -227,7 +238,6 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
         localStorage->m_ReslicedImage = localStorage->m_LabelOutline->GetOutput();
       }
 */
-    }
 
     const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
 
@@ -255,9 +265,6 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 
     localStorage->m_OutlineActor->GetProperty()->SetLineWidth(contourWidth);
     localStorage->m_OutlineShadowActor->GetProperty()->SetLineWidth(contourWidth * 1.5);
-
-    localStorage->m_OutlineActor->SetVisibility(true);
-    localStorage->m_OutlineShadowActor->SetVisibility(true);
 
     localStorage->m_LevelWindowFilterVector[lidx]->SetLookupTable( image->GetLookupTable(lidx)->GetVtkLookupTable() );
 

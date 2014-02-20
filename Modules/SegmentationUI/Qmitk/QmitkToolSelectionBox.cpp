@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleResourceStream.h"
 
 #include "mitkToolManagerProvider.h"
+#include "mitkLabelSetImage.h"
 
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
@@ -75,6 +76,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
   m_ToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerToolModified );
   m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->WorkingDataModified += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
 
   // show active tool
   SetOrUnsetButtonForActiveTool();
@@ -87,7 +89,7 @@ QmitkToolSelectionBox::~QmitkToolSelectionBox()
   m_ToolManager->ActiveToolChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerToolModified );
   m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
   m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
-
+  m_ToolManager->WorkingDataModified -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
 }
 
 void QmitkToolSelectionBox::SetEnabledMode(EnabledMode mode)
@@ -102,6 +104,7 @@ void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no 
   m_ToolManager->ActiveToolChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerToolModified );
   m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
   m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->WorkingDataModified -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
 
   if ( QWidget::isEnabled() )
   {
@@ -115,6 +118,7 @@ void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no 
   m_ToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerToolModified );
   m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->WorkingDataModified += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
 
   if ( QWidget::isEnabled() )
   {
@@ -293,16 +297,17 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 {
   mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  /*
-  int hasLabels = false;
+
+  bool hasLabels = false;
+  bool hasSelection = false;
   if (workingNode)
   {
     mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
     assert(workingImage);
-    int activeLayer = workingImage->GetActiveLayer();
-    hasLabels = workingImage->GetNumberOfLabels(activeLayer) > 1;
+    hasLabels = workingImage->GetNumberOfLabels() > 1;
+    hasSelection = workingImage->GetActiveLabelIndex() > 0;
   }
-*/
+
   //MITK_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
 
   bool enabled = true;
@@ -311,7 +316,7 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   {
     default:
     case EnabledWithReferenceAndWorkingData:
-      enabled = referenceNode && workingNode && isVisible();// && hasLabels;
+      enabled = referenceNode && workingNode && isVisible() && hasLabels && hasSelection;
       break;
     case EnabledWithReferenceData:
       enabled = referenceNode && isVisible();

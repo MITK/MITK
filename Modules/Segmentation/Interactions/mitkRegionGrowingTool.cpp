@@ -424,6 +424,7 @@ bool mitk::RegionGrowingTool::OnChangeActiveLabel ( StateMachineAction*, Interac
 
   int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
   workingImage->SetActiveLabel(pixelValue);
+  m_ToolManager->WorkingDataModified.Send();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

@@ -194,6 +194,7 @@ void QmitkLabelSetTableWidget::SetActiveLabel(int index)
   if ( (index >= 0) && (index < this->rowCount()) )
   {
     m_LabelSetImage->SetActiveLabel(index);
+    m_ToolManager->WorkingDataModified.Send();
 
     QTableWidgetItem* nameItem = this->item(index,NAME_COL);
     if (!nameItem) return;
@@ -213,6 +214,7 @@ void QmitkLabelSetTableWidget::SetActiveLabel(const std::string& text)
   if (index >= 0 && index < this->rowCount())
   {
     this->SetActiveLabel(index);
+    m_ToolManager->WorkingDataModified.Send();
     this->WaitCursorOn();
     int activeLabel = m_LabelSetImage->GetActiveLabelIndex();
     const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(activeLabel, true);
@@ -399,6 +401,7 @@ void QmitkLabelSetTableWidget::OnItemClicked(QTableWidgetItem *item)
   {
     m_BlockEvents = true;
     m_LabelSetImage->SetActiveLabel(row);
+    m_ToolManager->WorkingDataModified.Send();
     emit activeLabelChanged(row);
     m_BlockEvents = false;
   }
@@ -413,6 +416,7 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   if (row >= 0 && row < this->rowCount())
   {
     m_LabelSetImage->SetActiveLabel(row);
+    m_ToolManager->WorkingDataModified.Send();
     emit activeLabelChanged(row);
     this->WaitCursorOn();
     const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(row, true);
@@ -493,6 +497,7 @@ void QmitkLabelSetTableWidget::InsertItem()
   this->setCellWidget(row, 3, pbVisible);
   this->selectRow(row);
   m_LabelSetImage->SetActiveLabel(row);
+  m_ToolManager->WorkingDataModified.Send();
   emit activeLabelChanged(row);
 
   if (row == 0)

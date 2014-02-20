@@ -77,6 +77,8 @@ bool mitk::SetRegionTool::OnChangeActiveLabel (mitk::StateMachineAction*, mitk::
 
   workingImage->SetActiveLabel(pixelValue);
 
+  m_ToolManager->WorkingDataModified.Send();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;

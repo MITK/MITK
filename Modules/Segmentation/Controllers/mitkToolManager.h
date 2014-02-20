@@ -101,6 +101,7 @@ class Segmentation_EXPORT ToolManager : public itk::Object
     Message<> ActiveToolChanged;
     Message<> ReferenceDataChanged;
     Message<> WorkingDataChanged;
+    Message<> WorkingDataModified;
     Message<> RoiDataChanged;
 
     Message1<std::string> ToolErrorMessage;

@@ -37,6 +37,7 @@ public:
   typedef typename itk::VectorImage<TPixelType, 3>                    ImageType;
   typedef vnl_vector_fixed< double, 3 >                               GradientDirectionType;
   typedef itk::VectorContainer< unsigned int,GradientDirectionType >  GradientDirectionContainerType;
+  typedef GradientDirectionContainerType::Pointer                     GradientDirectionContainerTypePointer;
   typedef vnl_matrix_fixed< double, 3, 3 >                            MeasurementFrameType;
   typedef std::vector< unsigned int >                                 IndicesVector;
 
@@ -81,14 +82,14 @@ public:
   *
   * \warning MeasurementFrame already applied
   */
-  const typename GradientDirectionContainerType::Pointer GetDirections() const;
+  GradientDirectionContainerType::Pointer GetDirections() const;
 
   /**
   * \brief Return the directions as GradientDirectionContainer const pointer
   *
   * \warning no MeasurmentFrame applied
   */
-  const typename GradientDirectionContainerType::Pointer GetDirectionsWithoutMeasurementFrame() const;
+  GradientDirectionContainerType::Pointer GetDirectionsWithoutMeasurementFrame() const;
 
   /**
   * \brief Set the original and current GradientDirectionContainer

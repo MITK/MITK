@@ -38,7 +38,7 @@ mitk::DiffusionImage<TPixelType>::DiffusionImage()
 }
 
 template<typename TPixelType>
-mitk::DiffusionImage<TPixelType>::DiffusionImage(const mitk::DiffusionImage<TPixelType> & orig)
+mitk::DiffusionImage<TPixelType>::DiffusionImage(const DiffusionImage<TPixelType> & orig)
   : mitk::Image(orig),
     m_VectorImage( 0 ),
     m_B_Value(0),

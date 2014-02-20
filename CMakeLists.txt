@@ -271,6 +271,9 @@ if(MITK_USE_SOFA)
     list(APPEND MITK_USE_Boost_LIBRARIES thread)
   endif()
   set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "" FORCE)
+  # Allow setting external SOFA plugins directory and SOFA plugins
+  set(MITK_USE_SOFA_PLUGINS_DIR ${MITK_USE_SOFA_PLUGINS_DIR} CACHE PATH "External SOFA plugins directory" FORCE)
+  set(MITK_USE_SOFA_PLUGINS ${MITK_USE_SOFA_PLUGINS} CACHE PATH "List of semicolon-separated plugin names" FORCE)
 endif()
 
 # Customize the default pixel types for multiplex macros

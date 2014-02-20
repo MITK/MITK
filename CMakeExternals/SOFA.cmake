@@ -52,6 +52,19 @@ if(MITK_USE_SOFA)
     )
   endif()
 
+  if(MITK_USE_SOFA_PLUGINS_DIR)
+    list(APPEND preconfigure_cmake_args
+      -DSOFA_APPLICATIONS_PLUGINS_DIR:PATH=${MITK_USE_SOFA_PLUGINS_DIR}
+    )
+
+    foreach(plugin ${MITK_USE_SOFA_PLUGINS})
+      string(TOUPPER ${plugin} plugin)
+      list(APPEND preconfigure_cmake_args
+        -DSOFA-PLUGIN_${plugin}:BOOL=ON
+      )
+    endforeach()
+  endif()
+
   set(rev "10669")
 
   set(SOFA_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSOFA-rev${rev}.cmake)

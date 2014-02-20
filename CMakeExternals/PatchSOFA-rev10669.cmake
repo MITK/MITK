@@ -31,6 +31,28 @@ file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
 string(REPLACE "tinyxml" "SofaTinyXml" CONTENTS ${CONTENTS})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
+# Allow setting SOFA_APPLICATIONS_PLUGINS_DIR from outside
+
+set(path "cmake/environment.cmake")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "S_DIR}/plugins\" CACHE INTERNAL" "S_DIR}/plugins\" CACHE PATH" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+# Binary directories in add_subdirectory() regarding external plugins have to be explicitly specified
+
+set(path "cmake/functions.cmake")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "add_subdirectory(\"\${GLOBAL_PROJECT_PATH_\${projectName}}\")"
+"if(\${GLOBAL_PROJECT_PATH_\${projectName}} MATCHES ^\${CMAKE_SOURCE_DIR}.*)
+                      add_subdirectory(\"\${GLOBAL_PROJECT_PATH_\${projectName}}\")
+                    else()
+                      string(LENGTH \"\${SOFA_APPLICATIONS_PLUGINS_DIR}\" begin)
+                      string(SUBSTRING \"\${GLOBAL_PROJECT_PATH_\${projectName}}\" \${begin} -1 subdir)
+                      add_subdirectory(\"\${GLOBAL_PROJECT_PATH_\${projectName}}\" \"\${CMAKE_BINARY_DIR}/applications/plugins\${subdir}\")
+                    endif()"
+CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
 # Add -fPIC compiler flag for static libraries also if Clang is used
 
 set(path "extlibs/csparse/CMakeLists.txt")

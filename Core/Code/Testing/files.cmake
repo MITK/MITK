@@ -94,6 +94,7 @@ set(MODULE_TESTS
   mitkInteractionEventTest.cpp
   mitkLookupTableTest.cpp
   mitkSTLFileReaderTest.cpp
+  mitkSurfaceToImageFilterTest.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -162,6 +163,7 @@ set(MODULE_CUSTOM_TESTS
     mitkMultiComponentImageDataComparisonFilterTest.cpp
     mitkImageToItkTest.cpp
     mitkImageSliceSelectorTest.cpp
+    mitkImageToSurfaceFilterTest.cpp
 )
 
 set(MODULE_RESOURCE_FILES

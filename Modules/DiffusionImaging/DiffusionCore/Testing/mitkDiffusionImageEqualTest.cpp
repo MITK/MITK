@@ -79,6 +79,7 @@ public:
   {
     mitk::DiffusionImage<short>::GradientDirectionContainerType::ElementIdentifier mid_pos(m_AnotherImage->GetDirections()->Size()*0.5);
     m_AnotherImage->GetDirections()->DeleteIndex(mid_pos);
+    m_AnotherImage->GetDirections()->Squeeze();
     MITK_ASSERT_NOT_EQUAL( m_Image, m_AnotherImage, "GradientDirectionContainer Size is not equal.");
   }
 

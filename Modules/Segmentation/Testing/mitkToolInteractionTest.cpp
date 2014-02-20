@@ -36,8 +36,7 @@ class mitkToolInteractionTestSuite : public mitk::TestFixture
 
 
 private:
-//  mitk::DataNode::Pointer testPointSetNode;
-  mitk::InteractionTestHelper::Pointer m_InteractionTestHelper;
+
   mitk::DataStorage* m_DataStorage;
   mitk::ToolManager::Pointer m_ToolManager;
 
@@ -65,10 +64,10 @@ public:
                              const std::string& interactionPattern)
   {
     //Create test helper to initialize all necessary objects for interaction
-    m_InteractionTestHelper = mitk::InteractionTestHelper::New(GetTestDataFilePath(interactionPattern));
+    mitk::InteractionTestHelper m_InteractionTestHelper(GetTestDataFilePath(interactionPattern));
 
     //Use data storage of test helper
-    m_DataStorage = m_InteractionTestHelper->GetDataStorage().GetPointer();
+    m_DataStorage = m_InteractionTestHelper.GetDataStorage().GetPointer();
 
     //create ToolManager
     m_ToolManager = mitk::ToolManager::New(m_DataStorage);
@@ -100,8 +99,8 @@ public:
     CPPUNIT_ASSERT(workingImageNode->GetData() != NULL);
 
     //add images to datastorage
-    m_InteractionTestHelper->AddNodeToStorage(patientImageNode);
-    m_InteractionTestHelper->AddNodeToStorage(workingImageNode);
+    m_InteractionTestHelper.AddNodeToStorage(patientImageNode);
+    m_InteractionTestHelper.AddNodeToStorage(workingImageNode);
 
     //set reference and working image
     m_ToolManager->SetWorkingData(workingImageNode);
@@ -113,7 +112,7 @@ public:
     CPPUNIT_ASSERT(m_ToolManager->GetActiveTool() != NULL);
 
     //Start Interaction
-    m_InteractionTestHelper->PlaybackInteraction();
+    m_InteractionTestHelper.PlaybackInteraction();
 
     //load reference segmentation image
     mitk::Image::Pointer segmentationReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath(referenceSegmentationImage));
@@ -133,7 +132,6 @@ public:
   {
     m_ToolManager->ActivateTool(-1);
     m_ToolManager = NULL;
-    m_InteractionTestHelper = NULL;
   }
 
   void AddToolInteractionTest()

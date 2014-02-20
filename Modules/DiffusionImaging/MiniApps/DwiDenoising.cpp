@@ -100,7 +100,7 @@ int DwiDenoising(int argc, char* argv[])
 
         DiffusionImageType::Pointer output = DiffusionImageType::New();
         output->SetVectorImage(filter->GetOutput());
-        output->SetB_Value(dwi->GetB_Value());
+        output->SetReferenceBValue(dwi->GetReferenceBValue());
         output->SetDirections(dwi->GetDirections());
         output->InitializeFromVectorImage();
 
@@ -126,7 +126,7 @@ int DwiDenoising(int argc, char* argv[])
 
         DiffusionImageType::Pointer output = DiffusionImageType::New();
         output->SetVectorImage(filter->GetOutput());
-        output->SetB_Value(dwi->GetB_Value());
+        output->SetReferenceBValue(dwi->GetReferenceBValue());
         output->SetDirections(dwi->GetDirections());
         output->InitializeFromVectorImage();
 

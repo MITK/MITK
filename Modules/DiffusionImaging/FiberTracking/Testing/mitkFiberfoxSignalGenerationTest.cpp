@@ -65,7 +65,7 @@ void StartSimulation(FiberfoxParameters<double> parameters, FiberBundleX::Pointe
 
     mitk::DiffusionImage<short>::Pointer testImage = mitk::DiffusionImage<short>::New();
     testImage->SetVectorImage( tractsToDwiFilter->GetOutput() );
-    testImage->SetB_Value(parameters.m_Bvalue);
+    testImage->SetReferenceBValue(parameters.m_Bvalue);
     testImage->SetDirections(parameters.GetGradientDirections());
     testImage->InitializeFromVectorImage();
 
@@ -127,7 +127,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     parameters.m_ImageSpacing = stickBall->GetVectorImage()->GetSpacing();
     parameters.m_ImageOrigin = stickBall->GetVectorImage()->GetOrigin();
     parameters.m_ImageDirection = stickBall->GetVectorImage()->GetDirection();
-    parameters.m_Bvalue = stickBall->GetB_Value();
+    parameters.m_Bvalue = stickBall->GetReferenceBValue();
     parameters.SetGradienDirections(stickBall->GetDirections());
 
     // intra and inter axonal compartments

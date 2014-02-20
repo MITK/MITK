@@ -64,15 +64,14 @@ void mitk::ImageToDiffusionImageSource<TPixelType>
   // already pass in the meta-data
   typename OutputType::Pointer metaImage = OutputType::New();
 
-  // set directions and bvalue
-  metaImage->SetDirections(this->m_GradientDirections);
-  metaImage->SetB_Value(this->m_BValue);
-
   // set identity as measurement frame
   vnl_matrix_fixed< double, 3, 3 > measurement_frame;
   measurement_frame.set_identity();
   metaImage->SetMeasurementFrame( measurement_frame );
 
+  // set directions and bvalue
+  metaImage->SetDirections(this->m_GradientDirections);
+  metaImage->SetReferenceBValue(this->m_BValue);
 
   m_OutputCache = metaImage;
   m_CacheTime.Modified();
@@ -130,11 +129,11 @@ void mitk::ImageToDiffusionImageSource<TPixelType>
   static_cast<OutputType*>(this->GetOutput())
       ->SetVectorImage(m_OutputCache->GetVectorImage());
   static_cast<OutputType*>(this->GetOutput())
-      ->SetB_Value(m_OutputCache->GetB_Value());
-  static_cast<OutputType*>(this->GetOutput())
-      ->SetDirections(m_OutputCache->GetDirections());
+      ->SetReferenceBValue(m_OutputCache->GetReferenceBValue());
   static_cast<OutputType*>(this->GetOutput())
       ->SetMeasurementFrame(m_OutputCache->GetMeasurementFrame());
+  static_cast<OutputType*>(this->GetOutput())
+      ->SetDirections(m_OutputCache->GetDirections());
   static_cast<OutputType*>(this->GetOutput())
       ->InitializeFromVectorImage();
 

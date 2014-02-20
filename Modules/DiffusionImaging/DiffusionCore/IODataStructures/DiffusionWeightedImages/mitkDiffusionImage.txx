@@ -18,9 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageRegionConstIterator.h"
 #include "mitkImageCast.h"
 
-#include "itkTestingComparisonImageFilter.h"
 #include "mitkDiffusionImage.h"
+
 #include "itkImageDuplicator.h"
+#include "itkTestingComparisonImageFilter.h"
+
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::DiffusionImage()
@@ -35,12 +37,63 @@ mitk::DiffusionImage<TPixelType>::DiffusionImage()
   m_MeasurementFrame = mf;
 }
 
+template<typename TPixelType>
+mitk::DiffusionImage<TPixelType>::DiffusionImage(const mitk::DiffusionImage<TPixelType> & orig)
+  : mitk::Image(orig),
+    m_VectorImage( 0 ),
+    m_B_Value(0),
+    m_OriginalDirections(0),
+    m_Directions(0)
+{
+  // Deep copy VectorImage
+  typename itk::ImageDuplicator<ImageType>::Pointer duplicator = itk::ImageDuplicator<ImageType>::New();
+  duplicator->SetInputImage( orig.m_VectorImage );
+  duplicator->Update();
+
+  GradientDirectionContainerType::ConstIterator origIt;
+  GradientDirectionContainerType::ConstIterator origItEnd;
+
+  // Deep Copy OrignalDirectioncontainer
+  GradientDirectionContainerType::Pointer OriginalDirectionscontainer = GradientDirectionContainerType::New();
+  origIt = orig.GetDirectionsWithoutMeasurementFrame()->Begin();
+  origItEnd = orig.GetDirectionsWithoutMeasurementFrame()->End();
+
+  for(;origIt != origItEnd; ++origIt)
+    OriginalDirectionscontainer->push_back(origIt.Value());
+
+  // Deep Copy Directioncontainer
+  GradientDirectionContainerType::Pointer DirectionsContainer = GradientDirectionContainerType::New();
+  origIt = orig.GetDirections()->Begin();
+  origItEnd = orig.GetDirections()->End();
+
+  for(;origIt != origItEnd; ++origIt)
+    DirectionsContainer->push_back(origIt.Value());
+
+  // Set member of the new clone
+  m_VectorImage = duplicator->GetOutput();
+  m_B_Value = orig.GetReferenceBValue();
+  m_OriginalDirections = OriginalDirectionscontainer;
+  m_Directions = DirectionsContainer;
+  m_MeasurementFrame = orig.GetMeasurementFrame();
+  ApplyMeasurementFrame();
+  UpdateBValueMap();
+  InitializeFromVectorImage();
+
+  //  m_VectorImage = duplicator->GetOutput();
+  //  m_B_Value = orig.GetB_Value();
+  //  m_MeasurementFrame = orig.GetMeasurementFrame();
+  //  m_Directions = copyInContainer;
+  //  m_OriginalDirections = copyInContainer;
+
+
+}
+
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::~DiffusionImage()
 {
   // Remove Observer for m_Directions
-  RemoveDirectionsContainerObserver();
+  //RemoveObserver();
 }
 
 template<typename TPixelType>
@@ -50,6 +103,7 @@ void mitk::DiffusionImage<TPixelType>
   if(!m_VectorImage || !m_Directions || m_B_Value==-1.0)
   {
     MITK_INFO << "DiffusionImage could not be initialized. Set all members first!" << std::endl;
+    // Fehjlermedlung updaten
     return;
   }
 
@@ -136,33 +190,6 @@ bool mitk::DiffusionImage<TPixelType>::AreAlike(GradientDirectionType g1,
   return diff.two_norm() < precision || diff2.two_norm() < precision;
 }
 
-template<typename TPixelType>
-void mitk::DiffusionImage<TPixelType>::CorrectDKFZBrokenGradientScheme(double precision)
-{
-  GradientDirectionContainerType::Pointer directionSet = CalcAveragedDirectionSet(precision, m_Directions);
-  if(directionSet->size() < 7)
-  {
-    MITK_INFO << "Too few directions, assuming and correcting DKFZ-bogus sequence details.";
-
-    double v [7][3] =
-    {{ 0,         0,         0        },
-     {-0.707057,  0,         0.707057 },
-     { 0.707057,  0,         0.707057 },
-     { 0,         0.707057,  0.707057 },
-     { 0,         0.707057, -0.707057 },
-     {-0.707057,  0.707057,  0        },
-     { 0.707057,  0.707057,  0        } };
-
-    int i=0;
-
-    for(GradientDirectionContainerType::Iterator it = m_OriginalDirections->Begin();
-        it != m_OriginalDirections->End(); ++it)
-    {
-      it.Value().set(v[i++%7]);
-    }
-    ApplyMeasurementFrame();
-  }
-}
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer
@@ -297,7 +324,11 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
 template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
 {
-  RemoveDirectionsContainerObserver();
+  if(m_OriginalDirections.IsNull())
+  {
+    // original direction container was not set
+    return;
+  }
 
   m_Directions = GradientDirectionContainerType::New();
   int c = 0;
@@ -309,53 +340,13 @@ void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
     m_Directions->InsertElement(c, vec);
     c++;
   }
-
-  UpdateBValueMap();
-  AddDirectionsContainerObserver();
-}
-
-// returns number of gradients
-template<typename TPixelType>
-int mitk::DiffusionImage<TPixelType>::GetNumDirections()
-{
-  int gradients = m_OriginalDirections->Size();
-  for (int i=0; i<m_OriginalDirections->Size(); i++)
-    if (GetB_Value(i)<=0)
-    {
-      gradients--;
-    }
-  return gradients;
-}
-
-
-// returns a list of indices belonging to the not diffusion weighted images
-template<typename TPixelType>
-typename mitk::DiffusionImage<TPixelType>::IndicesVector mitk::DiffusionImage<TPixelType>::GetB0Indices()
-{
-  IndicesVector indices;
-  for (unsigned int i=0; i<m_OriginalDirections->Size(); i++)
-    if (GetB_Value(i)<=0)
-    {
-      indices.push_back(i);
-    }
-  return indices;
-}
-
-template<typename TPixelType>
-bool mitk::DiffusionImage<TPixelType>::IsMultiBval()
-{
-  int gradients = m_OriginalDirections->Size();
-
-  for (int i=0; i<gradients; i++)
-    if (GetB_Value(i)>0 && std::fabs(m_B_Value-GetB_Value(i))>50)
-      return true;
-  return false;
 }
 
 template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>::UpdateBValueMap()
 {
-  m_B_ValueMap.clear();
+  if(!m_B_ValueMap.empty())
+    m_B_ValueMap.clear();
 
   GradientDirectionContainerType::ConstIterator gdcit;
   for( gdcit = this->m_Directions->Begin(); gdcit != this->m_Directions->End(); ++gdcit)
@@ -387,166 +378,268 @@ float mitk::DiffusionImage<TPixelType>::GetB_Value(unsigned int i)
 }
 
 template<typename TPixelType>
-void mitk::DiffusionImage<TPixelType>::SetDirections(const std::vector<itk::Vector<double,3> > directions)
+void mitk::DiffusionImage<TPixelType>::SetDirections( GradientDirectionContainerType::Pointer directions )
 {
-  m_OriginalDirections = GradientDirectionContainerType::New();
+  this->m_OriginalDirections = directions;
+  ApplyMeasurementFrame();
+  UpdateBValueMap();
+}
+
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>::SetDirections(const std::vector<itk::Vector<double, 3> > &directions)
+{
+  GradientDirectionContainerType::Pointer tempContainer = GradientDirectionContainerType::New();
   for(unsigned int i=0; i<directions.size(); i++)
-  {
-    m_OriginalDirections->InsertElement( i, directions[i].GetVnlVector() );
-  }
-  this->ApplyMeasurementFrame();
+    tempContainer->InsertElement( i, directions[i].GetVnlVector() );
+  SetDirections(tempContainer);
 }
 
 template<typename TPixelType>
-void mitk::DiffusionImage<TPixelType>::AddDirectionsContainerObserver()
+typename mitk::DiffusionImage<TPixelType>::MeasurementFrameType mitk::DiffusionImage<TPixelType>::GetMeasurementFrame() const
 {
-  // Add Modified Observer to invoke an UpdateBValueList by modifieng the DirectionsContainer (m_Directions)
-  typedef DiffusionImage< TPixelType > Self;
-  typedef itk::SimpleMemberCommand< Self >  DCCommand ;
-  typename DCCommand::Pointer command = DCCommand::New();
-  command->SetCallbackFunction(this, &Self::UpdateBValueMap);
+  return m_MeasurementFrame;
 }
 
 template<typename TPixelType>
-void mitk::DiffusionImage<TPixelType>::RemoveDirectionsContainerObserver()
+void mitk::DiffusionImage<TPixelType>::SetMeasurementFrame( const MeasurementFrameType & mFrame )
 {
-  if(m_Directions){
-    m_Directions->RemoveAllObservers();
-  }
+  m_MeasurementFrame = mFrame;
+  ApplyMeasurementFrame();
 }
 
+template<typename TPixelType>
+bool mitk::DiffusionImage<TPixelType>::GetNumberOfBValues() const
+{
+  return m_B_ValueMap.size();
+}
 
-/*template<typename TPixelType>
-bool mitk::Equal(const mitk::DiffusionImage<TPixelType>* rightHandSide, const mitk::DiffusionImage<TPixelType>* leftHandSide, ScalarType eps, bool verbose)
+template<typename TPixelType>
+const typename mitk::DiffusionImage<TPixelType>::BValueMap & mitk::DiffusionImage<TPixelType>::GetBValueMap() const
+{
+  return m_B_ValueMap;
+}
+
+template<typename TPixelType>
+float mitk::DiffusionImage<TPixelType>::GetReferenceBValue() const
+{
+  return m_B_Value;
+}
+
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>::SetReferenceBValue( float val )
+{
+  m_B_Value = val;
+}
+
+template<typename TPixelType>
+const typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer mitk::DiffusionImage<TPixelType>::GetDirections() const
+{
+  return m_Directions;
+}
+
+template<typename TPixelType>
+const typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer mitk::DiffusionImage<TPixelType>::GetDirectionsWithoutMeasurementFrame() const
+{
+  return m_OriginalDirections;
+}
+
+template<typename TPixelType>
+typename mitk::DiffusionImage<TPixelType>::ImageType::Pointer mitk::DiffusionImage<TPixelType>::GetVectorImage()
+{
+  return m_VectorImage;
+}
+
+template<typename TPixelType>
+const typename mitk::DiffusionImage<TPixelType>::ImageType::Pointer mitk::DiffusionImage<TPixelType>::GetVectorImage() const
+{
+  return m_VectorImage;
+}
+
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>::SetVectorImage(typename ImageType::Pointer image )
+{
+  m_VectorImage = image;
+}
+
+template<class TPixelType>
+inline bool mitk::Equal(const mitk::DiffusionImage<TPixelType>& leftHandSide, const mitk::DiffusionImage<TPixelType> &rightHandSide, ScalarType eps, bool verbose )
 {
 
-  // Fast testing area
-  MITK_INFO << "[( DiffusionImage )] EQUAL METHOD.";
   bool returnValue = true;
-  if( rightHandSide == NULL )
-  {
-    if(verbose)
-      MITK_INFO << "[( DiffusionImage )] rightHandSide is NULL.";
-    return false;
-  }
 
-  if( leftHandSide == NULL )
-  {
-    if(verbose)
-      MITK_INFO << "[( DiffusionImage )] leftHandSide is NULL.";
-    return false;
-  }
-
-  if(leftHandSide->IsMultiBval() != rightHandSide->IsMultiBval())
-  {
-    if(verbose)
-      MITK_INFO << "[( DiffusionImage )] IsMultiBval properie is not Equal.";
-    return false;
-  }
-
-  if(leftHandSide->GetNumB0() != rightHandSide->GetNumB0())
-  {
-    if(verbose)
-      MITK_INFO << "[( DiffusionImage )] Number of B0Values is not Equal.";
-    return false;
-  }
-
-  if(leftHandSide->GetB_Value() != rightHandSide->GetB_Value())
+  if(leftHandSide.GetReferenceBValue() != rightHandSide.GetReferenceBValue())
   {
     if(verbose)
       MITK_INFO << "[( DiffusionImage )] Reference BValue is not Equal.";
-    return false;
+    returnValue = false;
   }
 
-  if(leftHandSide->GetMeasurementFrame() != rightHandSide->GetMeasurementFrame())
+  if(leftHandSide.GetMeasurementFrame() != rightHandSide.GetMeasurementFrame())
   {
     if(verbose)
       MITK_INFO << "[( DiffusionImage )] MeasurementFrame is not Equal.";
-    return false;
+    returnValue = false;
   }
 
-  if(leftHandSide->GetDirections()->Size() != rightHandSide->GetDirections()->Size())
+  if(leftHandSide.GetDirectionsWithoutMeasurementFrame()->Size() != rightHandSide.GetDirectionsWithoutMeasurementFrame()->Size())
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] OriginalGradientDirectionContainer size is not Equal.";
+    returnValue = false;
+  }
+
+  if(leftHandSide.GetDirections()->Size() != rightHandSide.GetDirections()->Size())
   {
     if(verbose)
       MITK_INFO << "[( DiffusionImage )] GradientDirectionContainer size is not Equal.";
-    return false;
+    returnValue = false;
   }
 
 
-  if(leftHandSide->GetB_ValueMap().size() != rightHandSide->GetB_ValueMap().size())
+  if(leftHandSide.GetBValueMap().size() != rightHandSide.GetBValueMap().size())
   {
     if(verbose)
       MITK_INFO << "[( DiffusionImage )] BValue Map: Size is not Equal.";
-    return false;
+    returnValue = false;
+  }
+
+  if(leftHandSide.GetNumberOfBValues() != rightHandSide.GetNumberOfBValues())
+  {
+    if(verbose)
+      MITK_INFO << "[( DiffusionImage )] BValue Map (GetNumberOfBValues): Size is not Equal.";
+    returnValue = false;
   }
 
   // Slow testing area
 
-  if(mitk::Equal(static_cast<mitk::Image*>(rightHandSide),static_cast<mitk::Image*>(leftHandSide),eps,verbose) == false)
+  const mitk::Image* img1 = dynamic_cast<const mitk::Image*>(&leftHandSide);
+  const mitk::Image* img2 = dynamic_cast<const mitk::Image*>(&rightHandSide);
+
+  if(mitk::Equal(*img1,*img2,eps,verbose) == false)
   {
     if(verbose)
       MITK_INFO << "[( DiffusionImage )] Base-Class (mitk::Image) is not Equal.";
-    return false;
+    returnValue = false;
   }
 
-  typename itk::Testing::ComparisonImageFilter<TPixelType,TPixelType>::Pointer EqualFilter = itk::Testing::ComparisonImageFilter<TPixelType, TPixelType>::New();
-  EqualFilter->SetInput(rightHandSide->GetVectorImage());
-  EqualFilter->SetInput(leftHandSide->GetVectorImage());
-  EqualFilter->Update();
+  {
+    typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Iterator lhsIt = leftHandSide.GetDirectionsWithoutMeasurementFrame()->Begin();
+    typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Iterator lhsItEnd = leftHandSide.GetDirectionsWithoutMeasurementFrame()->End();
+    typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Iterator rhsIt = rightHandSide.GetDirectionsWithoutMeasurementFrame()->Begin();
 
-  if(EqualFilter->GetNumberOfPixelsWithDifferences() != 0)
+    for(;lhsIt != lhsItEnd;)
+    {
+      bool vectorNotEqual = false;
+      for(unsigned int i = 0 ; i < lhsIt.Value().size(); i++)
+          vectorNotEqual |= !mitk::Equal(lhsIt.Value().get(i),rhsIt.Value().get(i),0.0001);
+
+      if(vectorNotEqual)
+      {
+        if(verbose)
+          MITK_INFO << "[( DiffusionImage )] Original GradientDirections are not Equal.";
+        returnValue = false;
+        break;
+      }
+      ++rhsIt;
+      ++lhsIt;
+    }
+  }
+
+  {
+    typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Iterator lhsIt = leftHandSide.GetDirections()->Begin();
+    typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Iterator lhsItEnd = leftHandSide.GetDirections()->End();
+    typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Iterator rhsIt = rightHandSide.GetDirections()->Begin();
+
+    for(;lhsIt != lhsItEnd;)
+    {
+      bool vectorNotEqual = false;
+      for(unsigned int i = 0 ; i < lhsIt.Value().size(); i++)
+          vectorNotEqual |= !mitk::Equal(lhsIt.Value().get(i),rhsIt.Value().get(i),0.0001);
+
+      if(vectorNotEqual)
+      {
+        if(verbose)
+          MITK_INFO << "[( DiffusionImage )] GradientDirections are not Equal.";
+        returnValue = false;
+        break;
+      }
+      ++rhsIt;
+      ++lhsIt;
+    }
+  }
+
+  {
+
+    typename mitk::DiffusionImage<TPixelType>::BValueMap rhsMap = rightHandSide.GetBValueMap();
+    typename mitk::DiffusionImage<TPixelType>::BValueMap lhsMap = leftHandSide.GetBValueMap();
+    typename mitk::DiffusionImage<TPixelType>::BValueMap::const_iterator lhsIt = lhsMap.begin();
+    typename mitk::DiffusionImage<TPixelType>::BValueMap::const_iterator lhsItEnd = lhsMap.end();
+    typename mitk::DiffusionImage<TPixelType>::BValueMap::const_iterator rhsIt = rhsMap.begin();
+
+    for(;lhsIt != lhsItEnd;)
+    {
+      if(lhsIt->first != rhsIt->first)
+      {
+        if(verbose)
+          MITK_INFO << "[( DiffusionImage )] BValue Map: lhsKey " <<  lhsIt->first << " != rhsKey " << rhsIt->first << " is not Equal.";
+        returnValue = false;
+        break;
+      }
+
+      if(lhsIt->second.size() != rhsIt->second.size())
+      {
+        if(verbose)
+          MITK_INFO << "[( DiffusionImage )] BValue Map: Indices vector size is not Equal. (Key: " << lhsIt->first <<")";
+        returnValue = false;
+        break;
+      }
+
+
+      typename mitk::DiffusionImage<TPixelType>::IndicesVector::const_iterator lhsIndVecIt = lhsIt->second.begin();
+      typename mitk::DiffusionImage<TPixelType>::IndicesVector::const_iterator lhsIndVecItEnd = lhsIt->second.end();
+      typename mitk::DiffusionImage<TPixelType>::IndicesVector::const_iterator rhsIndVecIt = rhsIt->second.begin();
+
+      for(;lhsIndVecIt != lhsIndVecItEnd;)
+      {
+        if(*lhsIndVecIt != *rhsIndVecIt)
+        {
+          if(verbose)
+            MITK_INFO << "[( DiffusionImage )] BValue Map: Indices are not Equal. (Key: " << lhsIt->first <<")";
+          returnValue = false;
+          break;
+        }
+        ++rhsIndVecIt;
+        ++lhsIndVecIt;
+      }
+
+      lhsIt++;
+      rhsIt++;
+    }
+  }
+
+
+  try{
+    itk::ImageRegionIterator< itk::VectorImage< TPixelType, 3 > > it1(leftHandSide.GetVectorImage(), leftHandSide.GetVectorImage()->GetLargestPossibleRegion());
+    itk::ImageRegionIterator< itk::VectorImage< TPixelType, 3 > > it2(rightHandSide.GetVectorImage(), rightHandSide.GetVectorImage()->GetLargestPossibleRegion());
+    while(!it1.IsAtEnd())
+    {
+      if (it1.Get()!=it2.Get()){
+        if(verbose)
+          MITK_INFO << "[( DiffusionImage )] Capsulated itk::VectorImage is not Equal.";
+        returnValue = false;
+        break;
+      }
+      ++it1;
+      ++it2;
+    }
+  }
+  catch(...)
   {
     if(verbose)
-      MITK_INFO << "[( DiffusionImage )] Capsulated itk::VectorImage is not Equal.";
-    return false;
-  }
-
-
-  if(!std::equal(leftHandSide->GetDirections()->Begin(),leftHandSide->GetDirections()->End(),rightHandSide->GetDirections()->Begin()))
-  {
-    if(verbose)
-      MITK_INFO << "[( DiffusionImage )] GradientDirections are not Equal.";
-    return false;
-  }
-
-  if(!std::equal(leftHandSide->GetB0Indices().begin(), leftHandSide->GetB0Indices().end(), rightHandSide->GetB0Indices().begin()))
-  {
-    if(verbose)
-      MITK_INFO << "[( DiffusionImage )] Number of B0Values is not Equal.";
-    return false;
-  }
-
-
-  std::map<unsigned int, std::vector<unsigned int> >::const_iterator rhsBValueMapIterator = rightHandSide->GetB_ValueMap().begin();
-  std::map<unsigned int, std::vector<unsigned int> >::const_iterator lhsBValueMapIterator = leftHandSide->GetB_ValueMap().begin();
-  std::map<unsigned int, std::vector<unsigned int> >::const_iterator lhsBValueMapIteratorEnd = leftHandSide->GetB_ValueMap().end();
-  for(;lhsBValueMapIterator != lhsBValueMapIteratorEnd;)
-  {
-    if(lhsBValueMapIterator->first != rhsBValueMapIterator->first)
-    {
-      if(verbose)
-        MITK_INFO << "[( DiffusionImage )] BValue Map: lhsKey " <<  lhsBValueMapIterator->first << " != rhsKey " << rhsBValueMapIterator->first << " is not Equal.";
-      return false;
-    }
-
-    if(lhsBValueMapIterator->second.size() != rhsBValueMapIterator->second.size())
-    {
-      if(verbose)
-        MITK_INFO << "[( DiffusionImage )] BValue Map: Indices vector size is not Equal. (Key: " << lhsBValueMapIterator->first <<")";
-      return false;
-    }
-
-    if(!std::equal(lhsBValueMapIterator->second.begin(),lhsBValueMapIterator->second.end(), rhsBValueMapIterator->second.begin()))
-    {
-      if(verbose)
-        MITK_INFO << "[( DiffusionImage )] BValue Map: Indices are not Equal. (Key: " << lhsBValueMapIterator->first <<")";
-      return false;
-    }
-
-    rhsBValueMapIterator++;
-    lhsBValueMapIterator++;
+      MITK_INFO << "[( DiffusionImage )] Comparision of itk Vector image abort by exception.";
+    returnValue = false;
   }
 
   return returnValue;
-}*/
+}
 

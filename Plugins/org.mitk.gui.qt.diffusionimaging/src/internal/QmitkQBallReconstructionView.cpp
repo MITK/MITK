@@ -89,7 +89,7 @@ struct QbrShellSelection
 
   void GenerateCheckboxes()
   {
-    BValueMap origMap = m_Image->GetB_ValueMap();
+    BValueMap origMap = m_Image->GetBValueMap();
     BValueMap::iterator itStart = origMap.begin();
     itStart++;
     BValueMap::iterator itEnd = origMap.end();
@@ -120,7 +120,7 @@ struct QbrShellSelection
 
   BValueMap GetBValueSelctionMap()
   {
-    BValueMap inputMap = m_Image->GetB_ValueMap();
+    BValueMap inputMap = m_Image->GetBValueMap();
     BValueMap outputMap;
 
     unsigned int val = 0;
@@ -547,7 +547,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
       QballReconstructionImageFilterType::Pointer filter =
           QballReconstructionImageFilterType::New();
       filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
-      filter->SetBValue(vols->GetB_Value());
+      filter->SetBValue(vols->GetReferenceBValue());
       filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
 
       switch(normalization)
@@ -728,7 +728,7 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
       <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,QBALL_ODFSIZE> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
   filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
-  filter->SetBValue(vols->GetB_Value());
+  filter->SetBValue(vols->GetReferenceBValue());
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
 
@@ -929,7 +929,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
   dataNodePointer->GetStringProperty("name",nodename);
 
   filter->SetBValueMap(m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap());
-  filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage(), vols->GetB_Value() );
+  filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage(), vols->GetReferenceBValue() );
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
 

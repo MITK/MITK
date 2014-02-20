@@ -96,7 +96,7 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -116,7 +116,7 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,6,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -136,7 +136,7 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,8,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -156,7 +156,7 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,10,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);
@@ -176,7 +176,7 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,12,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             if (normalization==0)
@@ -196,7 +196,7 @@ int QballReconstruction(int argc, char* argv[])
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,QBALL_ODFSIZE> FilterType;
             FilterType::Pointer filter = FilterType::New();
             filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
-            filter->SetBValue(dwi->GetB_Value());
+            filter->SetBValue(dwi->GetReferenceBValue());
             filter->SetThreshold( threshold );
             filter->SetLambda(lambda);
             filter->SetUseMrtrixBasis(mrTrix);

@@ -544,8 +544,8 @@ void QmitkPreprocessingView::DoShowGradientDirections()
   mitk::Point3D origin = m_DiffusionImage->GetGeometry()->GetOrigin();
   mitk::PointSet::Pointer originSet = mitk::PointSet::New();
 
-  typedef mitk::DiffusionImage<short*>::BValueMap BValueMap;
-  typedef mitk::DiffusionImage<short*>::BValueMap::iterator BValueMapIterator;
+  typedef mitk::DiffusionImage<short>::BValueMap BValueMap;
+  typedef mitk::DiffusionImage<short>::BValueMap::iterator BValueMapIterator;
   BValueMap bValMap =  m_DiffusionImage->GetBValueMap();
 
   GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();

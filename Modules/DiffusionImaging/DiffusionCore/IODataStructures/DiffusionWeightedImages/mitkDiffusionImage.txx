@@ -432,25 +432,25 @@ void mitk::DiffusionImage<TPixelType>::SetReferenceBValue( float val )
 }
 
 template<typename TPixelType>
-const typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer mitk::DiffusionImage<TPixelType>::GetDirections() const
+const mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer mitk::DiffusionImage<TPixelType>::GetDirections() const
 {
   return m_Directions;
 }
 
 template<typename TPixelType>
-const typename mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer mitk::DiffusionImage<TPixelType>::GetDirectionsWithoutMeasurementFrame() const
+const mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer mitk::DiffusionImage<TPixelType>::GetDirectionsWithoutMeasurementFrame() const
 {
   return m_OriginalDirections;
 }
 
 template<typename TPixelType>
-typename mitk::DiffusionImage<TPixelType>::ImageType::Pointer mitk::DiffusionImage<TPixelType>::GetVectorImage()
+typename itk::VectorImage<TPixelType, 3>::Pointer mitk::DiffusionImage<TPixelType>::GetVectorImage()
 {
   return m_VectorImage;
 }
 
 template<typename TPixelType>
-const typename mitk::DiffusionImage<TPixelType>::ImageType::Pointer mitk::DiffusionImage<TPixelType>::GetVectorImage() const
+const typename itk::VectorImage<TPixelType, 3>::Pointer mitk::DiffusionImage<TPixelType>::GetVectorImage() const
 {
   return m_VectorImage;
 }

@@ -240,7 +240,7 @@ protected:
   QAction* m_ActionCenterRotation;
   /// SurfaceRepresentation action
   QAction* m_SurfaceRepresentation;
-  /// Lookuptable selection action
+  /// colormap selection action
   QAction* m_ColormapAction;
 
   /// Maps "Show in" actions to editor ids

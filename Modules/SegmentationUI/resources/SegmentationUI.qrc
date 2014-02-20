@@ -22,5 +22,7 @@
     <file>ClearSeeds_48x48.png</file>
     <file>Start.png</file>
     <file>Stop.png</file>
+    <file>Help_48x48.png</file>
+    <file>AdvancedTools.png</file>
   </qresource>
 </RCC>

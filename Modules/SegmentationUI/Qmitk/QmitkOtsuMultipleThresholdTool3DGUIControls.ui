@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>309</width>
-    <height>659</height>
+    <width>330</width>
+    <height>512</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,6 +29,12 @@
    <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <property name="margin">
+    <number>3</number>
+   </property>
    <item>
     <widget class="QLabel" name="label">
      <property name="font">
@@ -52,7 +58,7 @@
         <bool>true</bool>
        </property>
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -88,12 +94,53 @@
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="m_pbAcceptPreview">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Replace active label with the current preview result</string>
+       </property>
+       <property name="text">
+        <string>Accept</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/SegmentationUI.qrc">
+         <normaloff>:/Qmitk/Accept_48x48.png</normaloff>:/Qmitk/Accept_48x48.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+       <property name="arrowType">
+        <enum>Qt::NoArrow</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="m_pbCancel">
        <property name="enabled">
         <bool>true</bool>
        </property>
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -223,9 +270,49 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
-      <spacer name="horizontalSpacer">
+      <widget class="QToolButton" name="m_pbShowInformation">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/SegmentationUI.qrc">
+         <normaloff>:/Qmitk/Help_48x48.png</normaloff>:/Qmitk/Help_48x48.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="m_pbAdvancedTools">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/SegmentationUI.qrc">
+         <normaloff>:/Qmitk/AdvancedTools.png</normaloff>:/Qmitk/AdvancedTools.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -237,55 +324,7 @@
        </property>
       </spacer>
      </item>
-     <item>
-      <widget class="QToolButton" name="m_pbAcceptPreview">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="toolTip">
-        <string>Replace active label with the current preview result</string>
-       </property>
-       <property name="text">
-        <string>Accept</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/SegmentationUI.qrc">
-         <normaloff>:/Qmitk/Accept_48x48.png</normaloff>:/Qmitk/Accept_48x48.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>24</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextUnderIcon</enum>
-       </property>
-       <property name="arrowType">
-        <enum>Qt::NoArrow</enum>
-       </property>
-      </widget>
-     </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="m_cbShowInformation">
-     <property name="text">
-      <string>usage information</string>
-     </property>
-    </widget>
    </item>
    <item>
     <widget class="QWidget" name="m_InformationWidget" native="true">
@@ -326,22 +365,6 @@ p, li { white-space: pre-wrap; }
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Preferred</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>5</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

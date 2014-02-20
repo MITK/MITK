@@ -37,7 +37,7 @@ QmitkOtsuMultipleThresholdTool3DGUI::QmitkOtsuMultipleThresholdTool3DGUI() : Qmi
   connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
 //  connect( m_Controls.m_sbNumberOfRegions, SIGNAL(valueChanged(int)), this, SLOT(OnNumberOfRegionsChanged(int)) );
-  connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  connect( m_Controls.m_pbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
   connect(m_Controls.m_SelectionListWidget, SIGNAL(itemClicked(QListWidgetItem*)),
           this, SLOT(OnItemSelectionChanged(QListWidgetItem*)));

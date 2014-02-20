@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>324</width>
-    <height>182</height>
+    <width>334</width>
+    <height>176</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -23,7 +23,7 @@
    <item>
     <widget class="QLabel" name="m_lblCaption">
      <property name="text">
-      <string>TextLabel</string>
+      <string>Caption</string>
      </property>
     </widget>
    </item>
@@ -180,7 +180,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>40</width>
+         <width>50</width>
          <height>30</height>
         </size>
        </property>
@@ -255,19 +255,6 @@
       </sizepolicy>
      </property>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

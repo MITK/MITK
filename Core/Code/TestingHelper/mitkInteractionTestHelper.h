@@ -49,14 +49,19 @@ namespace mitk
   * \sa EventFactory
   * \sa EventRecorder
 */
-class MITK_TESTINGHELPER_EXPORT InteractionTestHelper : public itk::LightObject
+class MITK_TESTINGHELPER_EXPORT InteractionTestHelper
 {
 
 public:
 
-  mitkClassMacro(InteractionTestHelper, LightObject);
-  mitkNewMacro1Param(InteractionTestHelper, const std::string &);
+  /**
+   * @brief InteractionTestHelper set up all neseccary objects by calling Initialize.
+   * @param interactionXmlFilePath path to xml file containing events and configuration information for the render windows.
+   */
+  InteractionTestHelper(const std::string &interactionXmlFilePath);
 
+  //unregisters all render windows and its renderers.
+  virtual ~InteractionTestHelper();
 
   /** @brief Returns the datastorage, in order to modify the data inside a rendering test.
     **/
@@ -85,14 +90,6 @@ public:
 
 protected:
 
-  /**
-   * @brief InteractionTestHelper set up all neseccary objects by calling Initialize.
-   * @param interactionXmlFilePath path to xml file containing events and configuration information for the render windows.
-   */
-  InteractionTestHelper(const std::string &interactionXmlFilePath);
-
-  //unregisters all render windows and its renderers.
-  virtual ~InteractionTestHelper();
 
   /**
      * @brief Initialize Internal method to initialize the renderwindow and set the datastorage.

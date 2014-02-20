@@ -358,8 +358,8 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
     m_Controls->m_B_ValueMap_TableWidget->setItem(0,1,new QTableWidgetItem("-"));
   }else{
 
-    typedef mitk::DiffusionImage<short*>::BValueMap BValueMap;
-    typedef mitk::DiffusionImage<short*>::BValueMap::iterator BValueMapIterator;
+    typedef mitk::DiffusionImage<short>::BValueMap BValueMap;
+    typedef mitk::DiffusionImage<short>::BValueMap::iterator BValueMapIterator;
 
     BValueMapIterator it;
 

@@ -3,6 +3,7 @@ set(SRC_CPP_FILES
   QmitkExtWorkbenchWindowAdvisor.cpp
   QmitkExtFileSaveProjectAction.cpp
   QmitkOpenDicomEditorAction.cpp
+  QmitkOpenXnatEditorAction.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -26,6 +27,7 @@ set(MOC_H_FILES
   src/internal/QmitkInputDevicesPrefPage.h
   src/internal/QmitkModuleView.h
   src/QmitkOpenDicomEditorAction.h
+  src/QmitkOpenXnatEditorAction.h
 )
 
 set(CACHED_RESOURCE_FILES

@@ -45,6 +45,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.ultrasound:OFF
   org.mitk.gui.qt.volumevisualization:OFF
+  org.mitk.gui.qt.xnat:OFF
 )
 
 else()

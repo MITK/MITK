@@ -29,12 +29,11 @@ namespace mitk
     mitkClassMacro(PixelManipulationTool, Tool);
     itkNewMacro(PixelManipulationTool);
 
-    itkSetMacro(Value, int);
-    itkGetMacro(Value, int);
+    void SetValue( int value );
+    int GetValue();
 
-    itkSetMacro(FixedValue, bool);
-    itkGetMacro(FixedValue, bool);
-    itkBooleanMacro(FixedValue);
+    void SetFixedValue( int value );
+    int GetFixedValue();
 
     virtual const char* GetName() const;
     virtual const char** GetXPM() const;

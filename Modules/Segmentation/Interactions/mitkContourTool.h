@@ -25,6 +25,8 @@ namespace mitk
 {
 
 class Image;
+class StateMachineAction;
+class InteractionEvent;
 
 /**
   \brief Simple contour filling tool.
@@ -61,11 +63,12 @@ class Segmentation_EXPORT ContourTool : public FeedbackContourTool
     virtual void Activated();
     virtual void Deactivated();
 
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-    virtual bool OnMouseMoved   (Action*, const StateEvent*);
-    virtual bool OnMouseReleased(Action*, const StateEvent*);
-    virtual bool OnInvertLogic  (Action*, const StateEvent*);
+    virtual bool OnMousePressed( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual bool OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent );
 
+    void ConnectActionsAndFunctions();
 
     int m_PaintingPixelValue;
 };

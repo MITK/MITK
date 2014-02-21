@@ -33,13 +33,6 @@ mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
  m_PaintingPixelValue(paintingPixelValue),
  m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
 {
-  // great magic numbers
-  CONNECT_ACTION( 80, OnMousePressed );
-  CONNECT_ACTION( 90, OnMouseMoved );
-  CONNECT_ACTION( 42, OnMouseReleased );
-  CONNECT_ACTION( 49014, OnInvertLogic );
-
-
   m_MasterContour = ContourModel::New();
   m_MasterContour->Initialize();
   m_CurrentPlane = NULL;
@@ -51,6 +44,14 @@ mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
 
 mitk::PaintbrushTool::~PaintbrushTool()
 {
+}
+
+void mitk::PaintbrushTool::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
+  CONNECT_FUNCTION( "Move", OnMouseMoved);
+  CONNECT_FUNCTION( "Release", OnMouseReleased);
+  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);
 }
 
 void mitk::PaintbrushTool::Activated()
@@ -85,11 +86,12 @@ mitk::Point2D mitk::PaintbrushTool::upperLeft(mitk::Point2D p)
 }
 
 
-void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
+void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positionEvent)
 {
   //MITK_INFO<<"Update...";
   // examine stateEvent and create a contour that matches the pixel mask that we are going to draw
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  //mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return;
 
   // Get Spacing of current Slice
@@ -277,9 +279,10 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 /**
   Just show the contour, get one point as the central point and add surrounding points to the contour.
   */
-bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+bool mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   m_LastEventSender = positionEvent->GetSender();
@@ -287,33 +290,34 @@ bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* sta
 
   m_MasterContour->SetClosed(true);
 
-  return this->OnMouseMoved(action, stateEvent);
+  return this->OnMouseMoved( NULL, interactionEvent);
 }
 
 
 /**
   Insert the point to the feedback contour,finish to build the contour and at the same time the painting function
   */
-bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const StateEvent* stateEvent)
+bool mitk::PaintbrushTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
 
-  CheckIfCurrentSliceHasChanged(positionEvent);
+  CheckIfCurrentSliceHasChanged( positionEvent );
 
   if ( m_LastContourSize != m_Size )
   {
-    UpdateContour( stateEvent );
+    UpdateContour( positionEvent );
     m_LastContourSize = m_Size;
   }
 
-  bool leftMouseButtonPressed(
-    stateEvent->GetId() == 530
-    || stateEvent->GetId() == 534
-    || stateEvent->GetId() == 1
-    || stateEvent->GetId() == 5
-    );
+  bool leftMouseButtonPressed( true );
+//     stateEvent->GetId() == 530
+//     || stateEvent->GetId() == 534
+//     || stateEvent->GetId() == 1
+//     || stateEvent->GetId() == 5
+//     );
 
-  Point3D worldCoordinates = positionEvent->GetWorldPosition();
+  Point3D worldCoordinates = positionEvent->GetPositionInWorld();
   Point3D indexCoordinates;
 
   m_WorkingSlice->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
@@ -403,12 +407,14 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 }
 
 
-bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent* stateEvent)
+bool mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
     //When mouse is released write segmentationresult back into image
-    const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-    if (!positionEvent) return false;
-    this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent) return false;
+
+  this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 
   return true;
 }
@@ -416,7 +422,7 @@ bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent*
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
   */
-bool mitk::PaintbrushTool::OnInvertLogic(Action* itkNotUsed(action), const StateEvent* /*stateEvent*/)
+bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
 {
     // Inversion only for 0 and 1 as painting values
     if (m_PaintingPixelValue == 1)
@@ -433,7 +439,7 @@ bool mitk::PaintbrushTool::OnInvertLogic(Action* itkNotUsed(action), const State
     return true;
 }
 
-void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const PositionEvent *event)
+void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
     const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldGeometry2D() ) );
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );

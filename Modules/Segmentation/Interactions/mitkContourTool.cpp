@@ -23,22 +23,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 //#include "mitkProperties.h"
-#include "mitkPlanarCircle.h"
+//#include "mitkPlanarCircle.h"
 
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
 
 mitk::ContourTool::ContourTool(int paintingPixelValue)
 :FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
  m_PaintingPixelValue(paintingPixelValue)
 {
-  // great magic numbers
-  CONNECT_ACTION( 80, OnMousePressed );
-  CONNECT_ACTION( 90, OnMouseMoved );
-  CONNECT_ACTION( 42, OnMouseReleased );
-  CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::ContourTool::~ContourTool()
 {
+}
+
+void mitk::ContourTool::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
+  CONNECT_FUNCTION( "Move", OnMouseMoved);
+  CONNECT_FUNCTION( "Release", OnMouseReleased);
+  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);
 }
 
 void mitk::ContourTool::Activated()
@@ -54,15 +59,16 @@ void mitk::ContourTool::Deactivated()
 /**
  Just show the contour, insert the first point.
 */
-bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+bool mitk::ContourTool::OnMousePressed( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(interactionEvent->GetEvent());
   if (!positionEvent) return false;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+//  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
@@ -74,7 +80,7 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
   //draw as a closed contour
   contour->SetClosed(true,timestep);
   //add first mouse position
-  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
+  contour->AddVertex( static_cast<mitk::Point3D>(positionEvent->GetPositionInWorld()), timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -86,17 +92,18 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
 /**
  Insert the point to the feedback contour.
 */
-bool mitk::ContourTool::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
+bool mitk::ContourTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  //if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
+  contour->AddVertex( static_cast<mitk::Point3D>(positionEvent->GetPositionInWorld()), timestep );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -107,18 +114,19 @@ bool mitk::ContourTool::OnMouseMoved   (Action* action, const StateEvent* stateE
 /**
   Close the contour, project it to the image slice and fill it in 2D.
 */
-bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
+bool mitk::ContourTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  //if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
@@ -156,9 +164,9 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
 */
-bool mitk::ContourTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+bool mitk::ContourTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+ // if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   // Inversion only for 0 and 1 as painting values
   if (m_PaintingPixelValue == 1)

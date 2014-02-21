@@ -29,6 +29,8 @@ namespace mitk
 {
 
 class Image;
+class StateMachineAction;
+class InteractionEvent;
 
 /**
   \brief Corrector tool for 2D binary segmentations
@@ -68,13 +70,14 @@ class Segmentation_EXPORT CorrectorTool2D : public FeedbackContourTool
     CorrectorTool2D(int paintingPixelValue = 1); // purposely hidden
     virtual ~CorrectorTool2D();
 
+    void ConnectActionsAndFunctions();
+
     virtual void Activated();
     virtual void Deactivated();
 
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-    virtual bool OnMouseMoved   (Action*, const StateEvent*);
-    virtual bool OnMouseReleased(Action*, const StateEvent*);
-
+    virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
+    virtual bool OnMouseMoved   ( StateMachineAction*, InteractionEvent* );
+    virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );
     int m_PaintingPixelValue;
 
     Image::Pointer m_WorkingSlice;

@@ -47,9 +47,6 @@ m_Alpha(-0.5),
 m_Beta(3.0),
 m_PositionEvent(0)
 {
-  CONNECT_ACTION( AcADDPOINTRMB, OnAddPoint );
-  CONNECT_ACTION( AcADDPOINT, OnAddPoint );
-  CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
 }
 
 mitk::FastMarchingTool::~FastMarchingTool()
@@ -67,19 +64,27 @@ mitk::FastMarchingTool::~FastMarchingTool()
       this->m_FastMarchingFilter->RemoveAllObservers();
 }
 
-
-float mitk::FastMarchingTool::CanHandleEvent( StateEvent const *stateEvent) const
+void mitk::FastMarchingTool::ConnectActionsAndFunctions()
 {
-  float returnValue = Superclass::CanHandleEvent(stateEvent);
-
-  //we can handle delete
-  if(stateEvent->GetId() == 12 )
-  {
-    returnValue = 1.0;
-  }
-
-  return returnValue;
+  CONNECT_FUNCTION( "ShiftSecondaryButtonPressed", OnAddPoint);
+  CONNECT_FUNCTION( "ShiftPrimaryButtonPressed", OnAddPoint);
+  CONNECT_FUNCTION( "DeletePoint", OnDelete);
 }
+
+
+
+// float mitk::FastMarchingTool::CanHandleEvent( StateEvent const *stateEvent) const
+// {
+//   float returnValue = Superclass::CanHandleEvent(stateEvent);
+//
+//   //we can handle delete
+//   if(stateEvent->GetId() == 12 )
+//   {
+//     returnValue = 1.0;
+//   }
+//
+//   return returnValue;
+// }
 
 
 const char** mitk::FastMarchingTool::GetXPM() const
@@ -328,15 +333,18 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
 }
 
 
-bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateEvent)
+bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   // Add a new seed point for FastMarching algorithm
-  const PositionEvent* p = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!p) return false;
+  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  //const PositionEvent* p = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if ( positionEvent == NULL ) return false;
 
-  if (m_PositionEvent != NULL)
-      delete m_PositionEvent;
-  m_PositionEvent = new PositionEvent(p->GetSender(), p->GetType(), p->GetButton(), p->GetButtonState(), p->GetKey(), p->GetDisplayPosition(), p->GetWorldPosition() );
+  if ( m_PositionEvent.IsNotNull() )
+      m_PositionEvent = NULL;
+
+  m_PositionEvent = InteractionPositionEvent::New( positionEvent->GetSender(),
+                                                   positionEvent->GetPointerPositionOnScreen() );
 
   //if click was on another renderwindow or slice then reset pipeline and preview
   if( (m_LastEventSender != m_PositionEvent->GetSender()) || (m_LastEventSlice != m_PositionEvent->GetSender()->GetSlice()) )
@@ -350,7 +358,7 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 
   mitk::Point3D clickInIndex;
 
-  m_ReferenceImageSlice->GetGeometry()->WorldToIndex(m_PositionEvent->GetWorldPosition(), clickInIndex);
+  m_ReferenceImageSlice->GetGeometry()->WorldToIndex(m_PositionEvent->GetPositionInWorld(), clickInIndex);
   itk::Index<2> seedPosition;
   seedPosition[0] = clickInIndex[0];
   seedPosition[1] = clickInIndex[1];
@@ -362,7 +370,7 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   this->m_SeedContainer->InsertElement(this->m_SeedContainer->Size(), node);
   m_FastMarchingFilter->Modified();
 
-  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), m_PositionEvent->GetWorldPosition());
+  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), m_PositionEvent->GetPositionInWorld());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
@@ -376,7 +384,7 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 }
 
 
-bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEvent)
+bool mitk::FastMarchingTool::OnDelete( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   // delete last seed point
   if(!(this->m_SeedContainer->empty()))

@@ -37,6 +37,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <itkObject.h>
 
+#include "mitkInteractionEventObserver.h"
+#include "mitkEventStateMachine.h"
+
+
 namespace us {
 class ModuleResource;
 }
@@ -76,7 +80,8 @@ namespace mitk
 
   $Author$
   */
-  class Segmentation_EXPORT Tool : public StateMachine
+  class Segmentation_EXPORT Tool : public EventStateMachine
+                                 , public InteractionEventObserver
   {
   public:
 
@@ -102,7 +107,7 @@ namespace mitk
     */
     Message1<std::string> GeneralMessage;
 
-    mitkClassMacro(Tool, StateMachine);
+    mitkClassMacro(Tool, EventStateMachine);
 
     // no New(), there should only be subclasses
 
@@ -149,6 +154,8 @@ namespace mitk
     */
     virtual const char* GetGroup() const;
 
+    virtual void InitializeStateMachine();
+
     /**
     * \brief Interface for GUI creation.
     *
@@ -176,16 +183,13 @@ namespace mitk
     DataNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color );
     DataNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organName, const mitk::Color& color );
 
-    itkGetMacro(SupportRoi, bool);
-    itkSetMacro(SupportRoi, bool);
-    itkBooleanMacro(SupportRoi);
-
-
   protected:
 
     friend class ToolManager;
 
     virtual void SetToolManager(ToolManager*);
+
+    void ConnectActionsAndFunctions();
 
     /**
     \brief Called when the tool gets activated (registered to mitk::GlobalInteraction).
@@ -205,9 +209,11 @@ namespace mitk
     Tool( const char*); // purposely hidden
     virtual ~Tool();
 
-    ToolManager* m_ToolManager;
+    virtual void Notify( InteractionEvent* interactionEvent,bool isHandled );
 
-    bool m_SupportRoi;
+    bool FilterEvents(InteractionEvent* , DataNode* );
+
+    ToolManager* m_ToolManager;
 
   private:
 
@@ -235,6 +241,8 @@ namespace mitk
 
     // for working data
     NodePredicateAnd::Pointer m_IsSegmentationPredicate;
+
+    std::string m_InteractorType;
 
   };
 

@@ -34,9 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NavigationToolStorageSerializer::NavigationToolStorageSerializer()
 {
   //create temp directory
-  m_tempDirectory = mitk::IOUtil::CreateTemporaryDirectory();
-  //Poco::File myFile(m_tempDirectory);
-  //myFile.createDirectory();
+  m_tempDirectory = mitk::IOUtil::CreateTemporaryDirectory("NavigationToolStorageSerializerTmp_XXXXXX",mitk::IOUtil::GetProgramPath());
 }
 
 mitk::NavigationToolStorageSerializer::~NavigationToolStorageSerializer()

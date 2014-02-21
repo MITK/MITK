@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //QT headers
 #include <QPlastiqueStyle>
 #include <QString>
+#include <mitkTransferFunctionProperty.h>
+#include <mitkTransferFunction.h>
 
 const std::string QmitkToFVisualisationSettingsWidget::VIEW_ID = "org.mitk.views.qmitktofvisualisationsettingswidget";
 
@@ -70,6 +72,7 @@ void QmitkToFVisualisationSettingsWidget::CreateConnections()
     connect(m_Controls->m_RangeSliderMinEdit, SIGNAL(returnPressed()), this, SLOT(OnRangeSliderMinChanged()));
     connect(m_Controls->m_RangeSliderReset, SIGNAL(pressed()), this, SLOT(OnResetSlider()));
     connect(m_Controls->m_RangeSlider, SIGNAL(spanChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
+    connect(m_Controls->m_AdvancedOptionsCheckbox, SIGNAL(toggled(bool)  ),this, SLOT( OnShowAdvancedOptionsCheckboxChecked(bool) ));
 
     QPlastiqueStyle *sliderStyle = new QPlastiqueStyle();
     m_Controls->m_RangeSlider->setMaximum(2048);
@@ -79,6 +82,8 @@ void QmitkToFVisualisationSettingsWidget::CreateConnections()
 
     m_Controls->m_ColorTransferFunctionCanvas->SetQLineEdits(m_Controls->m_XEditColor, 0);
     m_Controls->m_ColorTransferFunctionCanvas->SetTitle(""/*"Value -> Grayscale/Color"*/);
+
+    this->OnShowAdvancedOptionsCheckboxChecked(false);
   }
 }
 
@@ -126,11 +131,13 @@ void QmitkToFVisualisationSettingsWidget::UpdateRanges()
   m_Controls->m_ColorTransferFunctionCanvas->SetMax(upper);
 }
 
-void QmitkToFVisualisationSettingsWidget::Initialize(mitk::DataNode* distanceImageNode, mitk::DataNode* amplitudeImageNode, mitk::DataNode* intensityImageNode)
+void QmitkToFVisualisationSettingsWidget::Initialize(mitk::DataNode* distanceImageNode, mitk::DataNode* amplitudeImageNode,
+                                                     mitk::DataNode* intensityImageNode, mitk::DataNode* surfaceNode)
 {
   this->m_MitkDistanceImageNode = distanceImageNode;
   this->m_MitkAmplitudeImageNode = amplitudeImageNode;
   this->m_MitkIntensityImageNode = intensityImageNode;
+  this->m_MitkSurfaceNode = surfaceNode;
 
   // Initialize transfer functions for image DataNodes such that:
   // Widget1 (Distance): color from red (2nd min) to blue (max)
@@ -175,6 +182,11 @@ void QmitkToFVisualisationSettingsWidget::UpdateCanvas()
   m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->GetSelectedColorTransferFunction() );
   UpdateRanges();
   m_Controls->m_ColorTransferFunctionCanvas->update();
+
+  mitk::TransferFunction::Pointer transferFunction = mitk::TransferFunction::New();
+  transferFunction->SetColorTransferFunction(this->GetSelectedColorTransferFunction());
+
+  this->m_MitkSurfaceNode->SetProperty("Surface.TransferFunction", mitk::TransferFunctionProperty::New(transferFunction));
 }
 
 void QmitkToFVisualisationSettingsWidget::OnTransferFunctionTypeSelected(int index)
@@ -196,6 +208,14 @@ void QmitkToFVisualisationSettingsWidget::OnTransferFunctionTypeSelected(int ind
   {
     return;
   }
+}
+
+void QmitkToFVisualisationSettingsWidget::OnShowAdvancedOptionsCheckboxChecked(bool checked)
+{
+  this->m_Controls->m_MappingGroupBox->setShown(checked);
+  this->m_Controls->m_SelectTransferFunctionTypeCombobox->setShown(checked);
+  this->m_Controls->m_SelectWidgetCombobox->setShown(checked);
+  this->m_Controls->m_TransferFunctionResetButton->setShown(checked);
 }
 
 void QmitkToFVisualisationSettingsWidget::OnWidgetSelected(int index)

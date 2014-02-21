@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>482</width>
-    <height>227</height>
+    <height>230</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>QmitkToFVisualisationSettings</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_3">
+  <layout class="QFormLayout" name="formLayout">
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="font">
@@ -32,8 +32,15 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
+   <item row="0" column="1">
+    <widget class="QCheckBox" name="m_AdvancedOptionsCheckbox">
+     <property name="text">
+      <string>Show advanced options</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="m_AdvancedLayout">
      <item>
       <widget class="QComboBox" name="m_SelectWidgetCombobox">
        <property name="sizePolicy">
@@ -198,7 +205,7 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
+   <item row="2" column="0" colspan="2">
     <widget class="QGroupBox" name="m_MappingGroupBox">
      <property name="title">
       <string>Gray value/color mapping</string>

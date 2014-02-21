@@ -1683,81 +1683,59 @@ ImageStatisticsCalculator::CalculateHotspotStatistics(
   }
   else
   {
-/*
-    TODO: Currently following part is not working. Problem here is that with the itk::ExtractImageFilter (line 1213) we have adapted the input image to the size of the mask image. The ExtractImageFilter only modifies the region of the input image so that the region starts at the starting index provided by the ExtractRegion parameter. The origin is the same as the origin of the input image.
-    In the following part a sphere is created from the found hotspot with the same dimensions and the statistics should be calculated for the sphere. While converting the itkImage to a mitkImage the regions are reseted and the starting index is again at (0,0,0).
+    // create a binary mask around the "hotspot" region, fill the shape of a sphere around our hotspot center
+    typedef itk::ImageDuplicator< InputImageType > DuplicatorType;
+    typename DuplicatorType::Pointer copyMachine = DuplicatorType::New();
+    copyMachine->SetInputImage(inputImage);
+    copyMachine->Update();
 
+    typedef itk::CastImageFilter< InputImageType, MaskImageType > CastFilterType;
+    typename CastFilterType::Pointer caster = CastFilterType::New();
+    caster->SetInput( copyMachine->GetOutput() );
+    caster->Update();
+    typename MaskImageType::Pointer hotspotMaskITK = caster->GetOutput();
 
-    double spacing[VImageDimension];
-    for (unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
-    {
-      spacing[dimension] = inputImage->GetSpacing()[dimension];
-    }
-
-    typedef typename ConvolutionImageType::SizeType SizeType;
-    SizeType maskSize = this->CalculateConvolutionKernelSize<VImageDimension>(spacing, radiusInMM);
-
-    typedef typename ConvolutionImageType::IndexType IndexType;
-    IndexType maskIndex; maskIndex.Fill(0);
-
-    for (unsigned int dimension = 0; dimension < VImageDimension; ++dimension)
-    {
-      maskIndex[dimension] = convolutionImageInformation.MaxIndex[dimension] - (maskSize[dimension]-1)/2; // maskSize is always odd (size of 5 --> shift -2 required
-      if (maskIndex[dimension] < 0)
-      {
-        maskIndex[dimension] = 0;
-      }
-
-      int maskPixelOutsideOfInputImage = maskIndex[dimension] + maskSize[dimension] - ( inputImage->GetRequestedRegion().GetIndex()[dimension] + inputImage->GetRequestedRegion().GetSize()[dimension] );
-//      if (maskIndex[dimension] + maskSize[dimension] > inputImage->GetRequestedRegion().GetIndex()[dimension] + inputImage->GetRequestedRegion().GetSize()[dimension] )
-      if ( maskPixelOutsideOfInputImage > 0 )
-      {
-        maskSize[dimension] -= maskPixelOutsideOfInputImage;
-      }
-    }
-
-    MITK_DEBUG << "Hotspot statistics mask corrected as region of size ["<<maskSize[0]<<"x"<<maskSize[1]<<"x"<<maskSize[2]<<"] at ["<<maskIndex[0]<<","<<maskIndex[1]<<","<<maskIndex[2]<<"]";
-
-    typename ConvolutionImageType::Pointer hotspotMaskITK = ConvolutionImageType::New();
-    // copy origin and spacing of maskImage
-    hotspotMaskITK->CopyInformation( inputImage ); // type not optimal, but image grid is good
-
-    typedef typename ConvolutionImageType::RegionType RegionType;
-    RegionType hotspotMaskRegion;
-    IndexType start; start.Fill(0);
-    hotspotMaskRegion.SetIndex( start );
-    hotspotMaskRegion.SetSize( maskSize );
-
-    hotspotMaskITK->SetRegions( hotspotMaskRegion );
-    hotspotMaskITK->Allocate();
-
-    typename ConvolutionImageType::PointType maskOrigin;
-    inputImage->TransformIndexToPhysicalPoint(maskIndex,maskOrigin);
-    MITK_DEBUG << "Mask origin at: " << maskOrigin;
-    hotspotMaskITK->SetOrigin(maskOrigin);
-
+    typedef typename InputImageType::IndexType IndexType;
     IndexType maskCenterIndex;
     for (unsigned int d =0; d< VImageDimension;++d) maskCenterIndex[d]=convolutionImageInformation.MaxIndex[d];
     typename ConvolutionImageType::PointType maskCenter;
     inputImage->TransformIndexToPhysicalPoint(maskCenterIndex,maskCenter);
-    MITK_DEBUG << "Mask center in input image: " << maskCenter;
 
     this->FillHotspotMaskPixels(hotspotMaskITK.GetPointer(), maskCenter, radiusInMM);
-    Image::Pointer hotspotMaskMITK = ImportItkImage( hotspotMaskITK );
-    Image::Pointer hotspotInputMITK = ImportItkImage( inputImage );
 
-    // use second instance of ImageStatisticsCalculator to calculate hotspot statistics
-    ImageStatisticsCalculator::Pointer calculator = ImageStatisticsCalculator::New();
-    calculator->SetImage( hotspotInputMITK );
-    calculator->SetMaskingModeToImage();
-    calculator->SetImageMask( hotspotMaskMITK );
-    calculator->SetCalculateHotspot( false );
-    calculator->ComputeStatistics(0); // timestep 0, because inputImage already IS the image of timestep N (from perspective of ImageStatisticsCalculator caller)
-    Statistics hotspotStatistics = calculator->GetStatistics(0);
-*/
+    // calculate statistics within the binary mask
+    typedef itk::LabelStatisticsImageFilter< InputImageType, MaskImageType> LabelStatisticsFilterType;
+    typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
+    labelStatisticsFilter = LabelStatisticsFilterType::New();
+    labelStatisticsFilter->SetInput( inputImage );
+    labelStatisticsFilter->SetLabelInput( hotspotMaskITK );
+    labelStatisticsFilter->Update();
+
     Statistics hotspotStatistics;
     hotspotStatistics.SetHotspotIndex(convolutionImageInformation.MaxIndex);
     hotspotStatistics.SetMean(convolutionImageInformation.Max);
+
+    if ( labelStatisticsFilter->HasLabel( 1 ) )
+    {
+      hotspotStatistics.SetLabel (1);
+      hotspotStatistics.SetN(labelStatisticsFilter->GetCount(1));
+      hotspotStatistics.SetMin(labelStatisticsFilter->GetMinimum(1));
+      hotspotStatistics.SetMax(labelStatisticsFilter->GetMaximum(1));
+      hotspotStatistics.SetMedian(labelStatisticsFilter->GetMedian(1));
+      hotspotStatistics.SetSigma(labelStatisticsFilter->GetSigma(1));
+      hotspotStatistics.SetRMS(sqrt( hotspotStatistics.GetMean() * hotspotStatistics.GetMean()
+            + hotspotStatistics.GetSigma() * hotspotStatistics.GetSigma() ));
+
+      MITK_DEBUG << "Statistics for inside hotspot: Mean " << hotspotStatistics.GetMean()
+        << ", SD " << hotspotStatistics.GetSigma()
+        << ", Max " << hotspotStatistics.GetMax()
+        << ", Min " << hotspotStatistics.GetMin();
+    }
+    else
+    {
+      MITK_ERROR << "Uh oh! Unable to calculate statistics for hotspot region...";
+      return m_EmptyStatistics;
+    }
 
     return hotspotStatistics;
   }

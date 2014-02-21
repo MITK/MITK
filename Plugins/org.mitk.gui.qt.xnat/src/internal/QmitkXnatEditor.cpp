@@ -43,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkIOUtil.h>
 
-const std::string QmitkXnatEditor::EDITOR_ID = "org.mitk.editors.qmitkxnateditor";
+const std::string QmitkXnatEditor::EDITOR_ID = "org.mitk.editors.xnat.browser";
 
 QmitkXnatEditor::QmitkXnatEditor() :
   m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),

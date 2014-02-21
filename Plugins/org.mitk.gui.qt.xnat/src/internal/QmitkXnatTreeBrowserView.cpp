@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // CTK XNAT Core
 #include "ctkXnatFile.h"
 
-const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.qmitkxnattreebrowserview";
+const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
 
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView():
   m_Session(0),

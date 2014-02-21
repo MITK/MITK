@@ -16,27 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkOpenXnatEditorAction.h"
 
-#include <QFileDialog>
-#include <QFileInfo>
-#include <mitkDataNodeFactory.h>
-
-#include "mitkCoreObjectFactory.h"
-#include "mitkSceneIO.h"
-#include "mitkProgressBar.h"
-
-#include <mitkCoreExtObjectFactory.h>
-#include <mitkDataStorageEditorInput.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
 #include <berryIWorkbench.h>
 #include <berryPlatform.h>
 #include <berryFileEditorInput.h>
-
-#include "mitkProperties.h"
-#include "mitkNodePredicateData.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateProperty.h"
 
 QmitkOpenXnatEditorAction::QmitkOpenXnatEditorAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
@@ -79,13 +64,13 @@ void QmitkOpenXnatEditorAction::Run()
 
   std::vector<berry::IEditorReference::Pointer> editors =
     m_Window->GetActivePage()->FindEditors(berry::IEditorInput::Pointer(0),
-    "org.mitk.editors.qmitkxnateditor", berry::IWorkbenchPage::MATCH_ID);
+    "org.mitk.editors.xnat.browser", berry::IWorkbenchPage::MATCH_ID);
 
   if (editors.empty())
   {
     // no XnatEditor is currently open, create a new one
     berry::IEditorInput::Pointer editorInput(new berry::FileEditorInput(Poco::Path()));
-    m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.qmitkxnateditor");
+    m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.xnat.browser");
   }
   else
   {

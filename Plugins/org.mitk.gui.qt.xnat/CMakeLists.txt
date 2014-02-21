@@ -1,7 +1,7 @@
-project(org_mitk_gui_qt_xnatinterface)
+project(org_mitk_gui_qt_xnat)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
-  EXPORT_DIRECTIVE XNATINTERFACE_EXPORT
+  EXPORT_DIRECTIVE XNAT_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDENCIES QmitkExt
 )

@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //Poco headers
-#include "Poco/Zip/Decompress.h"
-#include "Poco/Path.h"
+#include <Poco/Zip/Decompress.h>
+#include <Poco/Path.h>
 
 //mitk headers
 #include "mitkNavigationToolReader.h"
@@ -146,11 +146,8 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
 
 std::string mitk::NavigationToolReader::GetFileWithoutPath(std::string FileWithPath)
   {
-  std::string returnValue = "";
-  returnValue = FileWithPath.substr(FileWithPath.rfind("/")+1, FileWithPath.length());
-  //dirty hack: Windows path seperators
-  if (returnValue.size() == FileWithPath.size()) returnValue = FileWithPath.substr(FileWithPath.rfind("\\")+1, FileWithPath.length());
-  return returnValue;
+  Poco::Path myFile(FileWithPath.c_str());
+  return myFile.getFileName();
   }
 
 mitk::PointSet::Pointer mitk::NavigationToolReader::ConvertStringToPointSet(std::string string)

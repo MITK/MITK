@@ -42,7 +42,7 @@ private:
 
 public:
 
-  int GetToolIDFromToolName (const std::string& toolName)
+  int GetToolIdByToolName (const std::string& toolName)
   {
     //find tool from toolname
     int numberOfTools = m_ToolManager->GetTools().size();
@@ -64,10 +64,10 @@ public:
                              const std::string& interactionPattern)
   {
     //Create test helper to initialize all necessary objects for interaction
-    mitk::InteractionTestHelper m_InteractionTestHelper(GetTestDataFilePath(interactionPattern));
+    mitk::InteractionTestHelper interactionTestHelper(GetTestDataFilePath(interactionPattern));
 
     //Use data storage of test helper
-    m_DataStorage = m_InteractionTestHelper.GetDataStorage().GetPointer();
+    m_DataStorage = interactionTestHelper.GetDataStorage().GetPointer();
 
     //create ToolManager
     m_ToolManager = mitk::ToolManager::New(m_DataStorage);
@@ -81,7 +81,7 @@ public:
     patientImageNode->SetData(patientImage);
 
     //Activate tool to work with
-    int toolID = GetToolIDFromToolName(toolName);
+    int toolID = GetToolIdByToolName(toolName);
     mitk::Tool* tool = m_ToolManager->GetToolById(toolID);
 
     CPPUNIT_ASSERT(tool != NULL);
@@ -99,8 +99,8 @@ public:
     CPPUNIT_ASSERT(workingImageNode->GetData() != NULL);
 
     //add images to datastorage
-    m_InteractionTestHelper.AddNodeToStorage(patientImageNode);
-    m_InteractionTestHelper.AddNodeToStorage(workingImageNode);
+    interactionTestHelper.AddNodeToStorage(patientImageNode);
+    interactionTestHelper.AddNodeToStorage(workingImageNode);
 
     //set reference and working image
     m_ToolManager->SetWorkingData(workingImageNode);
@@ -112,7 +112,7 @@ public:
     CPPUNIT_ASSERT(m_ToolManager->GetActiveTool() != NULL);
 
     //Start Interaction
-    m_InteractionTestHelper.PlaybackInteraction();
+    interactionTestHelper.PlaybackInteraction();
 
     //load reference segmentation image
     mitk::Image::Pointer segmentationReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath(referenceSegmentationImage));

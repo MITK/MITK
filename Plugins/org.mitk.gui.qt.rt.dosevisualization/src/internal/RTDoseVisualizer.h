@@ -38,6 +38,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIShaderRepository.h>
 #include <mitkShaderProperty.h>
 
+#include <vtkContourFilter.h>
+
 /*forward declarations*/
 class QmitkIsoDoseLevelSetModel;
 class QmitkDoseColorDelegate;
@@ -91,6 +93,8 @@ public:
 
     void OnHandleCTKEventPresetsChanged(const ctkEvent& event);
 
+    void UpdateFreeIsoLine(mitk::IsoDoseLevel*level, mitk::DoseValueRel old);
+
 protected:
 
   virtual void CreateQtPartControl(QWidget *parent);
@@ -125,7 +129,7 @@ protected:
   @TODO: should be moved outside the class, to be available for other classes at well.*/
   void ActualizeDisplayStyleForAllDoseDataNodes();
 
-  void UpdatePolyData(int num, int min, int max);
+  void UpdatePolyData(int num, double min, double max);
   mitk::Image::Pointer GetExtractedSlice(mitk::Image::Pointer image);
   const mitk::Geometry2D* GetGeometry2D(char* dim);
 
@@ -148,6 +152,8 @@ protected:
   QmitkDoseColorDelegate* m_DoseColorDelegate;
   QmitkDoseValueDelegate* m_DoseValueDelegate;
   QmitkDoseVisualStyleDelegate* m_DoseVisualDelegate;
+
+  vtkSmartPointer<vtkContourFilter> m_freeIsoFilter;
 
 
   bool m_internalUpdate;

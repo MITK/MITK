@@ -21,14 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk headers
 #include "mitkNavigationToolReader.h"
 #include "mitkTrackingTypes.h"
-#include <mitkStandardFileLocations.h>
+#include <mitkIOUtil.h>
 #include <mitkSceneIO.h>
-
-
 
 mitk::NavigationToolReader::NavigationToolReader()
   {
-
+    //TODO: maybe replace program path by a valid temp directory if there is one. See bug 17310 for the current problems.
+    m_ToolfilePath = mitk::IOUtil::GetProgramPath() + Poco::Path::separator() + "IGT_Toolfiles" + Poco::Path::separator();
   }
 
 mitk::NavigationToolReader::~NavigationToolReader()
@@ -46,7 +45,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
     return NULL;
     }
 
-  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "toolFilesByNavigationToolReader" + Poco::Path::separator() + GetFileWithoutPath(filename);
+  std::string tempDirectory = m_ToolfilePath + GetFileWithoutPath(filename);
   Poco::Zip::Decompress unzipper( file, Poco::Path( tempDirectory ) );
   unzipper.decompressAllFiles();
 

@@ -8,7 +8,8 @@ set(MODULE_TESTS
    # mark it as critical.
 
    ################## DISABLED TESTS #################################################
-   # <none>
+   # mitkNavigationToolStorageDeserializerTest.cpp # disabled because of bug 17303
+   # mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # disabled because of bug 17181
 
    ################# RUNNING TESTS ###################################################
    mitkCameraVisualizationTest.cpp
@@ -45,9 +46,7 @@ set(MODULE_TESTS
    mitkNavigationToolStorageTest.cpp
    mitkNavigationToolTest.cpp
    mitkNavigationToolReaderAndWriterTest.cpp
-   mitkNavigationToolStorageDeserializerTest.cpp
    mitkNavigationToolStorageSerializerTest.cpp
-   mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp
    # -----------------------------------------------------------------------
 )
 

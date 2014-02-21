@@ -142,6 +142,8 @@ namespace mitk
  * Once the hotspot location is found, statistics for the region are calculated
  * by simply iterating the input image and regarding all pixel centers inside the
  * hotspot-sphere for statistics.
+ * \warning Index positions of maximum/minimum are not provided, because they are not necessarily unique
+ * \todo If index positions of maximum/minimum are required, output needs to be changed to multiple positions / regions, etc.
  *
  * \subsection HotspotStatistics_tests Tests
  *
@@ -390,9 +392,9 @@ protected:
     vnl_vector<int> MinIndex;
 
     ImageExtrema()
-    :Max(itk::NumericTraits<double>::min())
+    :Defined(false)
+    ,Max(itk::NumericTraits<double>::min())
     ,Min(itk::NumericTraits<double>::max())
-    ,Defined(false)
     {
     }
   };
@@ -480,7 +482,7 @@ protected:
   /** \brief Convolves image with spherical kernel image. Used for hotspot calculation.   */
   template <typename TPixel, unsigned int VImageDimension>
   itk::SmartPointer< itk::Image<TPixel, VImageDimension> >
-  InternalUpdateConvolutionImage( const itk::Image<TPixel, VImageDimension>* inputImage );
+  GenerateConvolutionImage( const itk::Image<TPixel, VImageDimension>* inputImage );
 
   /** \brief Fills pixels of the spherical hotspot mask. */
   template < typename TPixel, unsigned int VImageDimension>

@@ -572,23 +572,10 @@ struct mitkImageStatisticsHotspotTestClass
     referenceHotspotCenterIndex[2] = testParameters.m_HotspotIndexZ[label];
     ValidateStatisticsItem("Hotspot center position", statistics.GetHotspotStatistics().GetHotspotIndex(), referenceHotspotCenterIndex);
 
-    vnl_vector<int> referenceHotspotMaxIndex; referenceHotspotMaxIndex.set_size(3);
-    referenceHotspotMaxIndex[0] = testParameters.m_HotspotMaxIndexX[label];
-    referenceHotspotMaxIndex[1] = testParameters.m_HotspotMaxIndexY[label];
-    referenceHotspotMaxIndex[2] = testParameters.m_HotspotMaxIndexZ[label];
     // TODO we do not test minimum/maximum positions within the peak/hotspot region, because
     //      these positions are not unique, i.e. there are multiple valid minima/maxima positions.
     //      One solution would be to modify the test cases in order to achive clear positions.
-    ValidateStatisticsItem("Hotspot maximum position", statistics.GetHotspotStatistics().GetMaxIndex(), referenceHotspotMaxIndex);
-
-    vnl_vector<int> referenceHotspotMinIndex; referenceHotspotMinIndex.set_size(3);
-    referenceHotspotMinIndex[0] = testParameters.m_HotspotMinIndexX[label];
-    referenceHotspotMinIndex[1] = testParameters.m_HotspotMinIndexY[label];
-    referenceHotspotMinIndex[2] = testParameters.m_HotspotMinIndexZ[label];
-    // TODO we do not test minimum/maximum positions within the peak/hotspot region, because
-    //      these positions are not unique, i.e. there are multiple valid minima/maxima positions
-    //      One solution would be to modify the test cases in order to achive clear positions.
-    //ValidateStatisticsItem("Hotspot minimum position", statistics.GetHotspotStatistics().GetMinIndex(), referenceHotspotMinIndex);
+    //      The BETTER/CORRECT solution would be to change the singular position into a set of positions / a region
   }
 };
 /**
@@ -619,6 +606,11 @@ int mitkImageStatisticsHotspotTest(int argc, char* argv[])
   catch (std::exception& e)
   {
     std::cout << "Error: " <<  e.what() << std::endl;
+    MITK_TEST_CONDITION_REQUIRED( false, "Exception occurred during test execution: " << e.what() );
+  }
+  catch(...)
+  {
+    MITK_TEST_CONDITION_REQUIRED( false, "Exception occurred during test execution." );
   }
 
 

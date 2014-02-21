@@ -61,7 +61,8 @@ public:
   void RunTestWithParameters(const std::string& patientImagePath,
                              const std::string& referenceSegmentationImage,
                              const std::string& toolName,
-                             const std::string& interactionPattern)
+                             const std::string& interactionPattern,
+                             unsigned int timestep=0)
   {
     //Create test helper to initialize all necessary objects for interaction
     mitk::InteractionTestHelper interactionTestHelper(GetTestDataFilePath(interactionPattern));
@@ -111,6 +112,9 @@ public:
 
     CPPUNIT_ASSERT(m_ToolManager->GetActiveTool() != NULL);
 
+    //set time step
+    interactionTestHelper.SetTimeStep(timestep);
+
     //Start Interaction
     interactionTestHelper.PlaybackInteraction();
 
@@ -141,8 +145,7 @@ public:
 
   void AddToolInteraction_4D_Test()
   {
-    m_InteractionTestHelper->SetTimeStep(1);
-    RunTestWithParameters("US4DCyl.nrrd", "Segmentation/ReferenceSegmentations/AddTool_4D.nrrd", "AddContourTool", "Segmentation/InteractionPatterns/AddTool_4D.xml");
+    RunTestWithParameters("US4DCyl.nrrd", "Segmentation/ReferenceSegmentations/AddTool_4D.nrrd", "AddContourTool", "Segmentation/InteractionPatterns/AddTool_4D.xml", 1);
   }
 
 };

@@ -78,7 +78,11 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
 bool mitk::PlanarFigureInteractor::CheckFigurePlaced( const InteractionEvent* /*interactionEvent*/ )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
-  return planarFigure->IsPlaced();
+
+  bool isFigureFinished = false;
+  planarFigure->GetPropertyList()->GetBoolProperty( "initiallyplaced", isFigureFinished );
+
+  return planarFigure->IsPlaced() && isFigureFinished;
 }
 
 bool mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction*, InteractionEvent* interactionEvent)

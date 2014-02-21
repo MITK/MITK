@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationToolStorageDeserializer.h"
 #include <mitkSceneIO.h>
-#include <mitkStandardFileLocations.h>
+#include <mitkIOUtil.h>
 #include "mitkNavigationToolReader.h"
 
 //POCO
@@ -36,9 +36,8 @@ mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer(mitk:
   {
   m_DataStorage = dataStorage;
   //create temp directory for this reader
-  m_tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "tempNavigationToolDeserializer";
-  Poco::File myFile(m_tempDirectory);
-  myFile.createDirectory();
+  m_tempDirectory = mitk::IOUtil::CreateTemporaryDirectory();
+  MITK_INFO << "TEMP DIRECTORY: " << m_tempDirectory;
   }
 
 mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()

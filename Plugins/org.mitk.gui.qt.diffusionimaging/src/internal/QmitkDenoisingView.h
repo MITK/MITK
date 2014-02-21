@@ -23,10 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkDenoisingViewControls.h"
 
-//#include <itkVectorImage.h>
-//#include <itkImage.h>
+#include <itkVectorImage.h>
+#include <itkImage.h>
 #include <mitkDiffusionImage.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
+#include <itkDiscreteGaussianImageFilter.h>
+#include <itkVectorImageToImageFilter.h>
+#include <itkComposeImageFilter.h>
 #include <QThread>
 #include <QTimer>
 
@@ -73,6 +76,10 @@ public:
   typedef mitk::DiffusionImage< DiffusionPixelType > DiffusionImageType;
   typedef mitk::Image MaskImageType;
   typedef itk::NonLocalMeansDenoisingFilter< DiffusionPixelType > NonLocalMeansDenoisingFilterType;
+  typedef itk::DiscreteGaussianImageFilter < itk::Image< DiffusionPixelType, 3>, itk::Image< DiffusionPixelType, 3> > GaussianFilterType;
+  typedef itk::VectorImageToImageFilter < DiffusionPixelType > ExtractFilterType;
+  typedef itk::ComposeImageFilter < itk::Image<DiffusionPixelType, 3> > ComposeFilterType;
+
   virtual void CreateQtPartControl(QWidget *parent);
 
   /// \brief Creation of the connections of main and control widget
@@ -101,6 +108,7 @@ private:
   QThread m_DenoisingThread;
   bool m_ThreadIsRunning;
   NonLocalMeansDenoisingFilterType::Pointer m_NonLocalMeansFilter;
+  GaussianFilterType::Pointer m_GaussianFilter;
   DiffusionImageType::Pointer m_InputImage;
   MaskImageType::Pointer m_ImageMask;
   QTimer* m_DenoisingTimer;
@@ -110,7 +118,8 @@ private:
   enum FilterType {
     NOFILTERSELECTED,
     NLMR,
-    NLMV
+    NLMV,
+    GAUSS
   }m_SelectedFilter;
 
   friend class QmitkDenoisingWorker;

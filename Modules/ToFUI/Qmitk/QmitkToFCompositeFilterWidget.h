@@ -86,9 +86,14 @@ class mitkTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
 
     void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
-  signals:
+signals:
 
   protected slots:
+    /**
+     * @brief OnShowAdvancedOptionsCheckboxChecked Show/hide advanced options.
+     * @param checked show/hide
+     */
+    void OnShowAdvancedOptionsCheckboxChecked(bool checked);
     /*!
     \brief slot en-/disabling temporal median filter in internal ToFCompositeFilter
     */

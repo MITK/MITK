@@ -93,10 +93,6 @@ protected slots:
     */
   void OnToFCameraDisconnected();
   /*!
-    \brief Slot called when the camera selection in the ConnectionWidget has changed
-    */
-  void OnToFCameraSelected(const QString selected);
-  /*!
     \brief Slot called when the "Start" button of the RecorderWidget is pressed
     */
   void OnToFCameraStarted();
@@ -104,20 +100,7 @@ protected slots:
     \brief Slot called when the "Stop" button of the RecorderWidget is pressed
     */
   void OnToFCameraStopped();
-  /*!
-    \brief Slot invoked when the texture checkbox is checked. Enables the scalar visibility of the surface
-    */
-  /**
-     * @brief OnSurfaceCheckboxChecked Slot beeing called, if the "surface"-checkbox is clicked. This method initializes the surface once, if it is necessary.
-     * @param checked Is it checked or not?
-     */
-  void OnSurfaceCheckboxChecked(bool checked);
 
-  void OnTextureCheckBoxChecked(bool checked);
-  /*!
-    \brief Slot invoked when the video texture checkbox is checked. Enables the texture of the surface
-    */
-  void OnKinectRGBTextureCheckBoxChecked(bool checked);
   /*!
     \brief Slot invoked when user alters the coronal window input from RGB to Intensity or vice versa.
     */

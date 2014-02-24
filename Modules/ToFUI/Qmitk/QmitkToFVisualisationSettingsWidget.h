@@ -58,7 +58,8 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     \param amplitudeImageNode image holding the amplitude image of a ToF camera
     \param intensityImageNode image holding the intensity image of a ToF camera
     */
-    void Initialize(mitk::DataNode* distanceImageNode=NULL, mitk::DataNode* amplitudeImageNode=NULL, mitk::DataNode* intensityImageNode=NULL);
+    void Initialize(mitk::DataNode* distanceImageNode=NULL, mitk::DataNode* amplitudeImageNode=NULL,
+                    mitk::DataNode* intensityImageNode=NULL, mitk::DataNode* surfaceNode=NULL);
 
     /*!
     \brief Access the color transfer function of widget 1 (distance image)
@@ -85,7 +86,8 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     */
     int GetSelectedImageIndex();
 
-  protected slots:
+protected slots:
+    void OnShowAdvancedOptionsCheckboxChecked(bool checked);
 
     void OnSetXValueColor();
     /*!
@@ -136,6 +138,7 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     mitk::DataNode::Pointer m_MitkDistanceImageNode; ///< DataNode holding the range image of the ToF camera as set by Initialize()
     mitk::DataNode::Pointer m_MitkAmplitudeImageNode; ///< DataNode holding the amplitude image of the ToF camera as set by Initialize()
     mitk::DataNode::Pointer m_MitkIntensityImageNode; ///< DataNode holding the intensity image of the ToF camera as set by Initialize()
+    mitk::DataNode::Pointer m_MitkSurfaceNode; ///< DataNode holding the surface
 
     vtkColorTransferFunction* m_Widget1ColorTransferFunction; ///< vtkColorTransferFunction of widget 1 (distance) that can be used to define a TransferFunctionProperty
     vtkColorTransferFunction* m_Widget2ColorTransferFunction; ///< vtkColorTransferFunction of widget 2 (amplitude) that can be used to define a TransferFunctionProperty
@@ -146,6 +149,12 @@ class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     int m_Widget3TransferFunctionType; ///< member holding the type of the transfer function applied to the image shown in widget 3 (intensity image): 0 = gray scale, 1 = color
 
   private:
+
+    /**
+     * @brief UpdateSurfaceProperty Private helper method to update the surface property color transfer function.
+     */
+    void UpdateSurfaceProperty();
+
 
     /*!
     \brief Reset the color transfer function to the given type and range

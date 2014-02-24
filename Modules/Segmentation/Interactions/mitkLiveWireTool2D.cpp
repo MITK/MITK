@@ -511,7 +511,7 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( StateMachineAction*, Interaction
     m_Contour = mitk::ContourModel::New();
     m_ContourModelNode->SetData( m_Contour );
     m_LiveWireContourNode->SetData( m_LiveWireContour );
-    Superclass::Deactivated(); //go to start state
+    this->ResetToStartState(); //go to start state
   }
   else //remove last segment from contour and reset livewire contour
   {

@@ -78,11 +78,17 @@ Global variant    Event class   Button/Key      Modifiers
   </event_variant>
   
   <!-- Key Events -->
-  <event_variant class="InteractionKeyEvent" name="KeyDelete">
+  <!--<event_variant class="InteractionKeyEvent" name="KeyDelete">
     <attribute name="Key" value="DEL"/>
   </event_variant>
   <event_variant class="InteractionKeyEvent" name="KeyEscape">
     <attribute name="Key" value="ESC"/>
+  </event_variant>-->
+  <event_variant class="InteractionKeyEvent" name="KeyDelete">
+      <attribute name="Key" value="Delete"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="KeyEscape">
+      <attribute name="Key" value="Escape"/>
   </event_variant>
   <!-- ... -->
 </config>

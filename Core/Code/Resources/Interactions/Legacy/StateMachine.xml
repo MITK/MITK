@@ -3368,7 +3368,7 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="CurveModelInteractor">
+  <stateMachine NAME="MitralModelInteractor">
     <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
     <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="918" Y_POS="441" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="43">

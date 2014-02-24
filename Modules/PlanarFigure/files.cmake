@@ -1,10 +1,12 @@
 set(CPP_FILES
+  Algorithms/mitkExtrudePlanarFigureFilter.cpp
   Algorithms/mitkImageToPlanarFigureFilter.cpp
   Algorithms/mitkPlanarFigureObjectFactory.cpp
   Algorithms/mitkPlanarFigureSource.cpp
   Algorithms/mitkPlanarFigureToPlanarFigureFilter.cpp
   DataManagement/mitkPlanarAngle.cpp
   DataManagement/mitkPlanarCircle.cpp
+  DataManagement/mitkPlanarDoubleEllipse.cpp
   DataManagement/mitkPlanarEllipse.cpp
   DataManagement/mitkPlanarCross.cpp
   DataManagement/mitkPlanarFigure.cpp

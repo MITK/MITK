@@ -107,13 +107,13 @@ public:
     m_ToolManager->SetWorkingData(workingImageNode);
     m_ToolManager->SetReferenceData(patientImageNode);
 
+    //set time step
+    interactionTestHelper.SetTimeStep(timestep);
+
     //load interaction events
     m_ToolManager->ActivateTool(toolID);
 
     CPPUNIT_ASSERT(m_ToolManager->GetActiveTool() != NULL);
-
-    //set time step
-    interactionTestHelper.SetTimeStep(timestep);
 
     //Start Interaction
     interactionTestHelper.PlaybackInteraction();

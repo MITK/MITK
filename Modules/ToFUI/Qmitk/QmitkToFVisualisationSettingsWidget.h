@@ -150,6 +150,12 @@ protected slots:
 
   private:
 
+    /**
+     * @brief UpdateSurfaceProperty Private helper method to update the surface property color transfer function.
+     */
+    void UpdateSurfaceProperty();
+
+
     /*!
     \brief Reset the color transfer function to the given type and range
     \param colorTransferFunction vtkColorTransferfunction to be resetted

@@ -60,9 +60,10 @@ void QmitkToFSurfaceGenerationWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_Compute3DDataCheckbox), SIGNAL(toggled(bool)), this, SLOT(OnCompute3DDataCheckboxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_DistanceColorMapCheckbox), SIGNAL(toggled(bool)), this, SLOT(OnDistanceColorMapCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_RGBTextureCheckbox), SIGNAL(toggled(bool)), this, SLOT(OnRGBTextureCheckBoxChecked(bool)) );
-    connect( (QObject*)(m_Controls->m_TriangulationCheckbox), SIGNAL(toggled(bool)), this, SLOT(OnTriangulationCheckBoxChanged()) );
     connect( (QObject*)(m_Controls->m_TriangulationThresholdSpinbox), SIGNAL(valueChanged(double)), this, SLOT(OnTriangulationThresholdSpinBoxChanged()) );
     connect( (QObject*)(m_Controls->m_ShowAdvancedOptionsCheckbox), SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedOptionsCheckboxChecked(bool)) );
+    connect( (QObject*)(m_Controls->m_RepresentationCombobox), SIGNAL(currentIndexChanged(int)),(QObject*) this, SLOT(OnRepresentationChanged(int)) );
+    connect( (QObject*)(m_Controls->m_ReconstructionCombobox), SIGNAL(currentIndexChanged(int)),(QObject*) this, SLOT(OnReconstructionChanged(int)) );
   }
 }
 
@@ -74,7 +75,6 @@ mitk::ToFDistanceImageToSurfaceFilter::Pointer QmitkToFSurfaceGenerationWidget::
 void QmitkToFSurfaceGenerationWidget::OnShowAdvancedOptionsCheckboxChecked(bool checked)
 {
   this->m_Controls->m_TextureGroupBox->setShown(checked);
-  this->m_Controls->m_TriangulationCheckbox->setShown(checked);
   this->m_Controls->m_TriangulationThresholdSpinbox->setShown(checked);
   this->m_Controls->m_ReconstructionCombobox->setShown(checked);
   this->m_Controls->m_RepresentationCombobox->setShown(checked);
@@ -87,7 +87,8 @@ void QmitkToFSurfaceGenerationWidget::Initialize(mitk::ToFDistanceImageToSurface
                                                  mitk::ToFImageGrabber::Pointer grabber,
                                                  mitk::CameraIntrinsics::Pointer intrinsics,
                                                  mitk::DataNode::Pointer surface,
-                                                 vtkSmartPointer<vtkCamera> camera)
+                                                 vtkSmartPointer<vtkCamera> camera,
+                                                 bool showAdvancedOptions)
 {
   m_ToFDistanceImageToSurfaceFilter = filter;
   m_ToFImageGrabber = grabber;
@@ -110,6 +111,8 @@ void QmitkToFSurfaceGenerationWidget::Initialize(mitk::ToFDistanceImageToSurface
   m_SurfaceNode->SetData(m_Surface);
 
   this->FindReconstructionModeProperty();
+  m_Controls->m_ShowAdvancedOptionsCheckbox->setChecked(showAdvancedOptions);
+  this->OnShowAdvancedOptionsCheckboxChecked(showAdvancedOptions);
 }
 
 bool QmitkToFSurfaceGenerationWidget::IsActive()
@@ -130,12 +133,53 @@ void QmitkToFSurfaceGenerationWidget::OnTriangulationThresholdSpinBoxChanged()
   }
 }
 
-void QmitkToFSurfaceGenerationWidget::OnTriangulationCheckBoxChanged()
+void QmitkToFSurfaceGenerationWidget::OnReconstructionChanged(int index)
 {
   if(IsActive())
   {
-      this->m_ToFDistanceImageToSurfaceFilter->SetGenerateTriangularMesh(this->m_Controls->m_TriangulationCheckbox->isChecked());
-      this->m_ToFImageGrabber->GetCameraDevice()->SetBoolProperty("GenerateTriangularMesh", this->m_Controls->m_TriangulationCheckbox->isChecked());
+    mitk::ToFDistanceImageToSurfaceFilter::ReconstructionModeType type = mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance;
+    switch (index)
+    {
+    case 0:
+    {
+      type = mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance;
+      break;
+    }
+    case 1:
+    {
+      type = mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance;
+      break;
+    }
+    case 2:
+    {
+      type = mitk::ToFDistanceImageToSurfaceFilter::Kinect;
+      break;
+    }
+    default:
+    {
+      MITK_ERROR << "ReconstructionModeType does not exist or is not known in QmitkToFSurfaceGenerationWidget.";
+      break;
+    }
+    }
+    this->m_ToFDistanceImageToSurfaceFilter->SetReconstructionMode( type );
+  }
+}
+
+void QmitkToFSurfaceGenerationWidget::OnRepresentationChanged(int index)
+{
+  if(IsActive())
+  {
+    bool generateTriangularMesh = false; //PointCloud case
+    if( index == 0) //Surface case
+    {
+      generateTriangularMesh = true;
+    }
+    this->m_ToFDistanceImageToSurfaceFilter->SetGenerateTriangularMesh(generateTriangularMesh);
+    this->m_ToFImageGrabber->GetCameraDevice()->SetBoolProperty("GenerateTriangularMesh", generateTriangularMesh);
+
+    this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThresholdSpinbox->value() );
+    this->m_ToFImageGrabber->GetCameraDevice()->SetFloatProperty("TriangulationThreshold", this->m_Controls->m_TriangulationThresholdSpinbox->value());
+    this->m_Controls->m_TriangulationThresholdSpinbox->setEnabled(generateTriangularMesh);
   }
 }
 
@@ -201,10 +245,7 @@ void QmitkToFSurfaceGenerationWidget::OnCompute3DDataCheckboxChecked(bool checke
     MITK_DEBUG << "OnSurfaceCheckboxChecked true";
     this->m_SurfaceNode->SetData(this->m_Surface);
 
-    this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThresholdSpinbox->value() );
-    this->m_ToFImageGrabber->GetCameraDevice()->SetFloatProperty("TriangulationThreshold", this->m_Controls->m_TriangulationThresholdSpinbox->value());
-    this->m_ToFDistanceImageToSurfaceFilter->SetGenerateTriangularMesh(this->m_Controls->m_TriangulationCheckbox->isChecked());
-    this->m_ToFImageGrabber->GetCameraDevice()->SetBoolProperty("GenerateTriangularMesh", this->m_Controls->m_TriangulationCheckbox->isChecked());
+    this->OnRepresentationChanged(m_Controls->m_RepresentationCombobox->currentIndex());
 
     //we need to initialize (reinit) the surface, to make it fit into the renderwindow
     mitk::RenderingManager::GetInstance()->InitializeViews(

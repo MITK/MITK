@@ -208,7 +208,6 @@ void QmitkToFUtilView::OnToFCameraConnected()
 
   // initialize measurement widget
   m_Controls->m_ToFMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
-//  m_Controls->m_ToFSurfaceGenerationWidget->Initialize(m_ToFDistanceImageToSurfaceFilter, m_ToFImageGrabber, m_CameraIntrinsics, m_SurfaceNode);
 
   this->m_RealTimeClock = mitk::RealTimeClock::New();
   this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
@@ -362,7 +361,8 @@ void QmitkToFUtilView::OnToFCameraStarted()
     // initialize visualization widget
     m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode,
                                                              this->m_AmplitudeImageNode,
-                                                             this->m_IntensityImageNode);
+                                                             this->m_IntensityImageNode,
+                                                             this->m_SurfaceNode);
     m_Controls->m_ToFSurfaceGenerationWidget->Initialize(m_ToFDistanceImageToSurfaceFilter,
                                                          m_ToFImageGrabber,
                                                          m_CameraIntrinsics,

@@ -131,6 +131,17 @@ void QmitkToFVisualisationSettingsWidget::UpdateRanges()
   m_Controls->m_ColorTransferFunctionCanvas->SetMax(upper);
 }
 
+void QmitkToFVisualisationSettingsWidget::UpdateSurfaceProperty()
+{
+  if(this->m_MitkSurfaceNode.IsNotNull())
+  {
+    mitk::TransferFunction::Pointer transferFunction = mitk::TransferFunction::New();
+    transferFunction->SetColorTransferFunction(this->GetSelectedColorTransferFunction());
+
+    this->m_MitkSurfaceNode->SetProperty("Surface.TransferFunction", mitk::TransferFunctionProperty::New(transferFunction));
+  }
+}
+
 void QmitkToFVisualisationSettingsWidget::Initialize(mitk::DataNode* distanceImageNode, mitk::DataNode* amplitudeImageNode,
                                                      mitk::DataNode* intensityImageNode, mitk::DataNode* surfaceNode)
 {
@@ -182,11 +193,6 @@ void QmitkToFVisualisationSettingsWidget::UpdateCanvas()
   m_Controls->m_ColorTransferFunctionCanvas->SetColorTransferFunction( this->GetSelectedColorTransferFunction() );
   UpdateRanges();
   m_Controls->m_ColorTransferFunctionCanvas->update();
-
-  mitk::TransferFunction::Pointer transferFunction = mitk::TransferFunction::New();
-  transferFunction->SetColorTransferFunction(this->GetSelectedColorTransferFunction());
-
-  this->m_MitkSurfaceNode->SetProperty("Surface.TransferFunction", mitk::TransferFunctionProperty::New(transferFunction));
 }
 
 void QmitkToFVisualisationSettingsWidget::OnTransferFunctionTypeSelected(int index)
@@ -208,6 +214,7 @@ void QmitkToFVisualisationSettingsWidget::OnTransferFunctionTypeSelected(int ind
   {
     return;
   }
+  this->UpdateSurfaceProperty();
 }
 
 void QmitkToFVisualisationSettingsWidget::OnShowAdvancedOptionsCheckboxChecked(bool checked)
@@ -220,7 +227,7 @@ void QmitkToFVisualisationSettingsWidget::OnShowAdvancedOptionsCheckboxChecked(b
 
 void QmitkToFVisualisationSettingsWidget::OnWidgetSelected(int index)
 {
-  int currentWidgetIndex = m_Controls->m_SelectWidgetCombobox->currentIndex();
+  int currentWidgetIndex = index;
 
   double valMin[6];
   double valMax[6];
@@ -266,6 +273,7 @@ void QmitkToFVisualisationSettingsWidget::OnWidgetSelected(int index)
   m_Controls->m_RangeSlider->setSpan( m_RangeSliderMin, m_RangeSliderMax);
   UpdateRanges();
   m_Controls->m_ColorTransferFunctionCanvas->update();
+  this->UpdateSurfaceProperty();
 }
 
 void QmitkToFVisualisationSettingsWidget::ResetTransferFunction(vtkColorTransferFunction* colorTransferFunction, int type, double min, double max)
@@ -352,6 +360,7 @@ void QmitkToFVisualisationSettingsWidget::ReinitTransferFunction(int widget, int
   default:
     break;
   }
+  this->UpdateSurfaceProperty();
 }
 
 void QmitkToFVisualisationSettingsWidget::OnTransferFunctionReset()
@@ -369,7 +378,7 @@ void QmitkToFVisualisationSettingsWidget::OnTransferFunctionReset()
   m_Controls->m_RangeSlider->setSpan( m_RangeSliderMin, m_RangeSliderMax);
   UpdateRanges();
   m_Controls->m_ColorTransferFunctionCanvas->update();
-
+  this->UpdateSurfaceProperty();
 }
 
 vtkColorTransferFunction* QmitkToFVisualisationSettingsWidget::GetWidget1ColorTransferFunction()

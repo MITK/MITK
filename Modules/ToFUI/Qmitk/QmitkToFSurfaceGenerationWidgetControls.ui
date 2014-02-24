@@ -26,6 +26,9 @@
       <string>Surface</string>
      </property>
      <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
       <item row="0" column="0">
        <widget class="QCheckBox" name="m_Compute3DDataCheckbox">
         <property name="text">
@@ -33,20 +36,17 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label">
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="m_ShowAdvancedOptionsCheckbox">
         <property name="text">
-         <string>Triangulation Threshold</string>
+         <string>Show Advanced Options</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QDoubleSpinBox" name="m_TriangulationThresholdSpinbox">
-        <property name="decimals">
-         <number>4</number>
-        </property>
-        <property name="maximum">
-         <double>1000.000000000000000</double>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Representation</string>
         </property>
        </widget>
       </item>
@@ -62,6 +62,13 @@
           <string>Point Cloud</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Reconstruction</string>
+        </property>
        </widget>
       </item>
       <item row="2" column="1">
@@ -83,34 +90,20 @@
         </item>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
+      <item row="3" column="0">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>Reconstruction</string>
+         <string>Triangulation Threshold</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Representation</string>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="m_TriangulationThresholdSpinbox">
+        <property name="decimals">
+         <number>4</number>
         </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QCheckBox" name="m_TriangulationCheckbox">
-        <property name="text">
-         <string>Triangulate Surface</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="m_ShowAdvancedOptionsCheckbox">
-        <property name="text">
-         <string>Show Advanced Options</string>
+        <property name="maximum">
+         <double>1000.000000000000000</double>
         </property>
        </widget>
       </item>

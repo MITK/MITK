@@ -499,21 +499,7 @@ namespace mitk
               //in the vertexIdList.
               //Kinect SDK delivers world coordinates in meters, so we have to
               //convert to mm for MITK.
-              vertexIdList->SetId(pixelID, points->InsertNextPoint(d->m_CameraCoordinates[pixelID].X*meterfactor, d->m_CameraCoordinates[pixelID].Y*meterfactor, d->m_CameraCoordinates[pixelID].Z*meterfactor));
-
-              ColorSpacePoint colorPoint = d->m_ColorPoints[pixelID];
-              // retrieve the depth to color mapping for the current depth pixel
-              int colorInDepthX = (int)(floor(colorPoint.X + 0.5));
-              int colorInDepthY = (int)(floor(colorPoint.Y + 0.5));
-
-              float xNorm = static_cast<float>(colorInDepthX)/d->m_RGBCaptureWidth;
-              float yNorm = static_cast<float>(colorInDepthY)/d->m_RGBCaptureHeight;
-
-              // make sure the depth pixel maps to a valid point in color space
-              if ( colorInDepthX >= 0 && colorInDepthX < d->m_RGBCaptureWidth && colorInDepthY >= 0 && colorInDepthY < d->m_RGBCaptureHeight )
-              {
-                textureCoordinates->InsertTuple2(vertexIdList->GetId(pixelID), xNorm, yNorm);
-              }
+              vertexIdList->SetId(pixelID, points->InsertNextPoint(-d->m_CameraCoordinates[pixelID].X*meterfactor, -d->m_CameraCoordinates[pixelID].Y*meterfactor, d->m_CameraCoordinates[pixelID].Z*meterfactor));
 
               if (d->m_GenerateTriangularMesh)
               {
@@ -582,6 +568,24 @@ namespace mitk
                 vertices->InsertNextCell(1);
                 vertices->InsertCellPoint(vertexIdList->GetId(pixelID));
               }
+
+              ColorSpacePoint colorPoint = d->m_ColorPoints[pixelID];
+              // retrieve the depth to color mapping for the current depth pixel
+              int colorInDepthX = (int)(floor(colorPoint.X + 0.5));
+              int colorInDepthY = (int)(floor(colorPoint.Y + 0.5));
+
+              float xNorm = -static_cast<float>(colorInDepthX)/d->m_RGBCaptureWidth;
+              float yNorm = static_cast<float>(colorInDepthY)/d->m_RGBCaptureHeight;
+
+              // make sure the depth pixel maps to a valid point in color space
+              if ( colorInDepthX >= 0 && colorInDepthX < d->m_RGBCaptureWidth && colorInDepthY >= 0 && colorInDepthY < d->m_RGBCaptureHeight )
+              {
+                textureCoordinates->InsertTuple2(vertexIdList->GetId(pixelID), xNorm, yNorm);
+              }
+              else
+              {
+                textureCoordinates->InsertTuple2(vertexIdList->GetId(pixelID), 0, 0);
+              }
             }
           }
         }
@@ -621,13 +625,19 @@ namespace mitk
         }
         if (SUCCEEDED(hr))
         {
-          for(int i = 0; i < d->m_RGBBufferSize; i+=3)
+          for(int j = 0; j < d->m_RGBCaptureHeight; ++j)
           {
-            //convert from BGR to RGB
-            rgb[i+0] = pColorBuffer->rgbRed;
-            rgb[i+1] = pColorBuffer->rgbGreen;
-            rgb[i+2] = pColorBuffer->rgbBlue;
-            ++pColorBuffer;
+            for(int i = 0; i < d->m_RGBCaptureWidth; ++i)
+            {
+              //the buffer has the size of 3*ResolutionX/Y (one for each color value)
+              //thats why die id is multiplied by 3.
+              unsigned int id = ((d->m_RGBCaptureWidth - i - 1) + j*d->m_RGBCaptureWidth)*3;
+              //convert from BGR to RGB
+              rgb[id+0] = pColorBuffer->rgbRed;
+              rgb[id+1] = pColorBuffer->rgbGreen;
+              rgb[id+2] = pColorBuffer->rgbBlue;
+              ++pColorBuffer;
+            }
           }
         }
       }

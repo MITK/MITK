@@ -78,6 +78,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
 
       //connect SliceNavigationControllers to timestep changed event of TimeNavigationController
       rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController(), false);
+      rm->GetTimeNavigationController()->ConnectGeometryTimeEvent(rw->GetSliceNavigationController(), false);
 
       //add to list of kown render windows
       m_RenderWindowList.push_back(rw);

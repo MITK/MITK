@@ -94,7 +94,8 @@ void mitk::SurfaceToImageFilter::GenerateData()
     int t;
     for(t=tstart;t<tmax;++t)
     {
-      Stencil3DImage( t );
+      if(( (mitk::Surface*)GetInput() )->GetVtkPolyData( t ))
+        Stencil3DImage( t );
     }
   }
   else

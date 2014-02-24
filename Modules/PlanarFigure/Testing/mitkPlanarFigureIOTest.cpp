@@ -65,6 +65,7 @@ public:
     planarAngle->PlaceFigure( p0 );
     planarAngle->SetCurrentControlPoint( p1 );
     planarAngle->AddControlPoint( p2 );
+    planarAngle->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarAngle.GetPointer() );
 
     // Create PlanarCircle
@@ -72,6 +73,7 @@ public:
     planarCircle->SetGeometry2D( planeGeometry );
     planarCircle->PlaceFigure( p0 );
     planarCircle->SetCurrentControlPoint( p1 );
+    planarCircle->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarCircle.GetPointer() );
 
     // Create PlanarCross
@@ -82,6 +84,7 @@ public:
     planarCross->SetCurrentControlPoint( p1 );
     planarCross->AddControlPoint( p2 );
     planarCross->AddControlPoint( p3 );
+    planarCross->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarCross.GetPointer() );
 
     // Create PlanarFourPointAngle
@@ -91,6 +94,7 @@ public:
     planarFourPointAngle->SetCurrentControlPoint( p1 );
     planarFourPointAngle->AddControlPoint( p2 );
     planarFourPointAngle->AddControlPoint( p3 );
+    planarFourPointAngle->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarFourPointAngle.GetPointer() );
 
     // Create PlanarLine
@@ -98,6 +102,7 @@ public:
     planarLine->SetGeometry2D( planeGeometry );
     planarLine->PlaceFigure( p0 );
     planarLine->SetCurrentControlPoint( p1 );
+    planarLine->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarLine.GetPointer() );
 
     // Create PlanarPolygon
@@ -108,6 +113,7 @@ public:
     planarPolygon->SetCurrentControlPoint( p1 );
     planarPolygon->AddControlPoint( p2 );
     planarPolygon->AddControlPoint( p3 );
+    planarPolygon->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarPolygon.GetPointer() );
 
     // Create PlanarSubdivisionPolygon
@@ -118,6 +124,7 @@ public:
     planarSubdivisionPolygon->SetCurrentControlPoint( p1 );
     planarSubdivisionPolygon->AddControlPoint( p2 );
     planarSubdivisionPolygon->AddControlPoint( p3 );
+    planarSubdivisionPolygon->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarSubdivisionPolygon.GetPointer() );
 
     // Create PlanarRectangle
@@ -125,6 +132,7 @@ public:
     planarRectangle->SetGeometry2D( planeGeometry );
     planarRectangle->PlaceFigure( p0 );
     planarRectangle->SetCurrentControlPoint( p1 );
+    planarRectangle->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarRectangle.GetPointer() );
 
     //create preciseGeometry which is using float coordinates
@@ -160,6 +168,7 @@ public:
     nochncross->SetCurrentControlPoint( p1precise );
     nochncross->AddControlPoint( p2precise );
     nochncross->AddControlPoint( p3precise );
+    nochncross->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( nochncross.GetPointer() );
 
     // Create PlanarAngle
@@ -168,6 +177,7 @@ public:
     planarAnglePrecise->PlaceFigure( p0precise );
     planarAnglePrecise->SetCurrentControlPoint( p1precise );
     planarAnglePrecise->AddControlPoint( p2precise );
+    planarAnglePrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarAnglePrecise.GetPointer() );
 
     // Create PlanarCircle
@@ -175,6 +185,7 @@ public:
     planarCirclePrecise->SetGeometry2D( preciseGeometry );
     planarCirclePrecise->PlaceFigure( p0precise );
     planarCirclePrecise->SetCurrentControlPoint( p1precise );
+    planarCirclePrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarCirclePrecise.GetPointer() );
 
     // Create PlanarFourPointAngle
@@ -184,6 +195,7 @@ public:
     planarFourPointAnglePrecise->SetCurrentControlPoint( p1precise );
     planarFourPointAnglePrecise->AddControlPoint( p2precise );
     planarFourPointAnglePrecise->AddControlPoint( p3precise );
+    planarFourPointAnglePrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarFourPointAnglePrecise.GetPointer() );
 
     // Create PlanarLine
@@ -191,6 +203,7 @@ public:
     planarLinePrecise->SetGeometry2D( preciseGeometry );
     planarLinePrecise->PlaceFigure( p0precise );
     planarLinePrecise->SetCurrentControlPoint( p1precise );
+    planarLinePrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarLinePrecise.GetPointer() );
 
     // Create PlanarPolygon
@@ -201,6 +214,7 @@ public:
     planarPolygonPrecise->SetCurrentControlPoint( p1precise );
     planarPolygonPrecise->AddControlPoint( p2precise );
     planarPolygonPrecise->AddControlPoint( p3precise );
+    planarPolygonPrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarPolygonPrecise.GetPointer() );
 
     // Create PlanarSubdivisionPolygon
@@ -211,6 +225,7 @@ public:
     planarSubdivisionPolygonPrecise->SetCurrentControlPoint( p1precise );
     planarSubdivisionPolygonPrecise->AddControlPoint( p2precise );
     planarSubdivisionPolygonPrecise->AddControlPoint( p3precise );
+    planarSubdivisionPolygonPrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarSubdivisionPolygonPrecise.GetPointer() );
 
     // Create PlanarRectangle
@@ -218,6 +233,7 @@ public:
     planarRectanglePrecise->SetGeometry2D( preciseGeometry );
     planarRectanglePrecise->PlaceFigure( p0precise );
     planarRectanglePrecise->SetCurrentControlPoint( p1precise );
+    planarRectanglePrecise->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
     planarFigures.push_back( planarRectanglePrecise.GetPointer() );
 
     return planarFigures;

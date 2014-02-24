@@ -98,17 +98,11 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(KinectAcquisitionModeChanged()), this, SLOT(OnKinectAcquisitionModeChanged()) ); // Todo in Widget2
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
-    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(const QString)), this, SLOT(OnToFCameraSelected(const QString)) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStarted()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(RecordingStopped()), this, SLOT(OnToFCameraStarted()) );
-    connect( (QObject*)(m_Controls->m_SurfaceCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnSurfaceCheckboxChecked(bool)) );
-    connect( (QObject*)(m_Controls->m_TextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTextureCheckBoxChecked(bool)) );
-    connect( (QObject*)(m_Controls->m_KinectTextureCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnKinectRGBTextureCheckBoxChecked(bool)) );
-    connect( (QObject*)(m_Controls->m_GenerateTriangularMeshCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnTriangulationCheckBoxChanged()) );
-    connect( (QObject*)(m_Controls->m_TriangulationThreshold), SIGNAL(valueChanged(double)), this, SLOT(OnTriangulationThresholdSpinBoxChanged()) );
-  }
+}
 }
 
 //SetFocus-Method -> actually seting Focus to the Recorder
@@ -157,8 +151,8 @@ void QmitkToFUtilView::Activated()
       m_Controls->m_ToFRecorderWidget->setEnabled(false);
       m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
       m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
-      m_Controls->tofMeasurementWidget->setEnabled(false);
-      m_Controls->SurfacePropertiesBox->setEnabled(false);
+      m_Controls->m_ToFMeasurementWidget->setEnabled(false);
+      m_Controls->m_ToFSurfaceGenerationWidget->setEnabled(false);
     }
   }
 }
@@ -213,7 +207,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
   }
 
   // initialize measurement widget
-  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
+  m_Controls->m_ToFMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
 
   this->m_RealTimeClock = mitk::RealTimeClock::New();
   this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
@@ -254,10 +248,10 @@ void QmitkToFUtilView::OnToFCameraDisconnected()
   m_Controls->m_ToFRecorderWidget->OnStop();
   m_Controls->m_ToFRecorderWidget->setEnabled(false);
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
-  m_Controls->tofMeasurementWidget->setEnabled(false);
-  m_Controls->SurfacePropertiesBox->setEnabled(false);
+  m_Controls->m_ToFMeasurementWidget->setEnabled(false);
+  m_Controls->m_ToFSurfaceGenerationWidget->setEnabled(false);
   //clean up measurement widget
-  m_Controls->tofMeasurementWidget->CleanUpWidget();
+  m_Controls->m_ToFMeasurementWidget->CleanUpWidget();
 }
 
 void QmitkToFUtilView::OnKinectAcquisitionModeChanged()
@@ -327,18 +321,6 @@ void QmitkToFUtilView::OnToFCameraStarted()
     bool hasAmplitudeImage = false;
     m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasAmplitudeImage",hasAmplitudeImage);
 
-    bool KinectReconstructionMode = false;
-    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("KinectReconstructionMode",KinectReconstructionMode);
-    if(KinectReconstructionMode)
-    {
-      //set the reconstruction mode for kinect
-      this->m_ToFDistanceImageToSurfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::Kinect);
-    }
-
-    if (m_CameraIntrinsics.IsNotNull())
-    {
-      m_ToFDistanceImageToSurfaceFilter->SetCameraIntrinsics(m_CameraIntrinsics);
-    }
 
     if(hasRGBImage || (rgbFileName!=""))
     {
@@ -372,144 +354,43 @@ void QmitkToFUtilView::OnToFCameraStarted()
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
     this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
 
-    bool hasSurface = false;
-    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasSurface", hasSurface);
-    if(hasSurface)
-    {
-      this->m_Surface = mitk::Surface::New();
-    }
-    else
-    {
-      this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
-    }
-    this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
-
     this->UseToFVisibilitySettings(true);
 
+    this->m_SurfaceNode = ReplaceNodeData("Surface", NULL);
     m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
     // initialize visualization widget
-    m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
+    m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode,
+                                                             this->m_AmplitudeImageNode,
+                                                             this->m_IntensityImageNode,
+                                                             this->m_SurfaceNode);
+    m_Controls->m_ToFSurfaceGenerationWidget->Initialize(m_ToFDistanceImageToSurfaceFilter,
+                                                         m_ToFImageGrabber,
+                                                         m_CameraIntrinsics,
+                                                         m_SurfaceNode,
+                                                         GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera());
     // set distance image to measurement widget
-    m_Controls->tofMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
+    m_Controls->m_ToFMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
 
     this->m_Frametimer->start(0);
 
     m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
     m_Controls->m_ToFCompositeFilterWidget->setEnabled(true);
-    m_Controls->tofMeasurementWidget->setEnabled(true);
-    m_Controls->SurfacePropertiesBox->setEnabled(true);
-
-    if (m_Controls->m_TextureCheckBox->isChecked())
-    {
-      OnTextureCheckBoxChecked(true);
-    }
-    if (m_Controls->m_KinectTextureCheckBox->isChecked())
-    {
-      OnKinectRGBTextureCheckBoxChecked(true);
-    }
+    m_Controls->m_ToFMeasurementWidget->setEnabled(true);
+    m_Controls->m_ToFSurfaceGenerationWidget->setEnabled(true);
   }
-  m_Controls->m_TextureCheckBox->setEnabled(true);
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()
 {
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
   m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
-  m_Controls->SurfacePropertiesBox->setEnabled(false);
 
   this->m_Frametimer->stop();
 }
 
-void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
-{
-  m_SelectedCamera = selected;
-  if (selected.contains("O3D"))
-  {
-    MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
-    this->m_Controls->m_SurfaceCheckBox->setEnabled(false);
-    this->m_Controls->m_TextureCheckBox->setEnabled(false);
-    this->m_Controls->m_KinectTextureCheckBox->setEnabled(false);
-    this->m_Controls->m_SurfaceCheckBox->setChecked(false);
-    this->m_Controls->m_TextureCheckBox->setChecked(false);
-    this->m_Controls->m_KinectTextureCheckBox->setChecked(false);
-  }
-  else
-  {
-    this->m_Controls->m_SurfaceCheckBox->setEnabled(true);
-    this->m_Controls->m_TextureCheckBox->setEnabled(true);
-    this->m_Controls->m_KinectTextureCheckBox->setEnabled(true);
-  }
-}
-
-void QmitkToFUtilView::OnTriangulationThresholdSpinBoxChanged()
-{
-  this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThreshold->value() );
-  this->m_ToFImageGrabber->GetCameraDevice()->SetFloatProperty("TriangulationThreshold", this->m_Controls->m_TriangulationThreshold->value());
-}
-
-void QmitkToFUtilView::OnTriangulationCheckBoxChanged()
-{
-  this->m_ToFDistanceImageToSurfaceFilter->SetGenerateTriangularMesh(this->m_Controls->m_GenerateTriangularMeshCheckBox->isChecked());
-  this->m_ToFImageGrabber->GetCameraDevice()->SetBoolProperty("GenerateTriangularMesh", this->m_Controls->m_GenerateTriangularMeshCheckBox->isChecked());
-}
-
-void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
-{
-  if(checked)
-  {
-    //initialize the surface once
-    MITK_DEBUG << "OnSurfaceCheckboxChecked true";
-    this->m_SurfaceNode->SetData(this->m_Surface);
-
-    this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThreshold->value() );
-    this->m_ToFImageGrabber->GetCameraDevice()->SetFloatProperty("TriangulationThreshold", this->m_Controls->m_TriangulationThreshold->value());
-    this->m_ToFDistanceImageToSurfaceFilter->SetGenerateTriangularMesh(this->m_Controls->m_GenerateTriangularMeshCheckBox->isChecked());
-    this->m_ToFImageGrabber->GetCameraDevice()->SetBoolProperty("GenerateTriangularMesh", this->m_Controls->m_GenerateTriangularMeshCheckBox->isChecked());
-
-    //we need to initialize (reinit) the surface, to make it fit into the renderwindow
-    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
-      this->m_Surface->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
-
-    // correctly place the vtk camera for appropriate surface rendering
-    vtkCamera* camera3d = GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
-    //1m distance to camera should be a nice default value for most cameras
-    camera3d->SetPosition(0,0,0);
-    camera3d->SetViewUp(0,-1,0);
-    camera3d->SetFocalPoint(0,0,1);
-    if (this->m_CameraIntrinsics.IsNotNull())
-    {
-      // compute view angle from camera intrinsics
-      camera3d->SetViewAngle(mitk::ToFProcessingCommon::CalculateViewAngle(m_CameraIntrinsics,m_ToFImageGrabber->GetCaptureWidth()));
-    }
-    else
-    {
-      camera3d->SetViewAngle(45);
-    }
-    GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->ResetCameraClippingRange();
-  }
-}
-
 void QmitkToFUtilView::OnUpdateCamera()
 {
-  //##### Code for surface #####
-  if (m_Controls->m_SurfaceCheckBox->isChecked())
-  {
-    // update surface
-    m_ToFDistanceImageToSurfaceFilter->SetTextureIndex(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedImageIndex());
-
-    bool hasSurface = false;
-    this->m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasSurface", hasSurface);
-    if(hasSurface)
-    {
-      mitk::SmartPointerProperty::Pointer surfaceProp = dynamic_cast< mitk::SmartPointerProperty * >(this->m_ToFImageGrabber->GetCameraDevice()->GetProperty("ToFSurface"));
-      this->m_Surface->SetVtkPolyData( dynamic_cast< mitk::Surface* >( surfaceProp->GetSmartPointer().GetPointer() )->GetVtkPolyData() );
-    }
-
-    //update pipeline
-    this->m_Surface->Update();
-  }
-  //##### End code for surface #####
-  else
+  if(!m_Controls->m_ToFSurfaceGenerationWidget->UpdateSurface())
   {
     // update pipeline
     this->m_MitkDistanceImage->Update();
@@ -523,40 +404,6 @@ void QmitkToFUtilView::OnUpdateCamera()
     this->m_2DTimeAfter = this->m_RealTimeClock->GetCurrentStamp() - this->m_2DTimeBefore;
     MITK_INFO << " 2D-Display-framerate (fps): " << this->m_StepsForFramerate / (this->m_2DTimeAfter/1000);
     this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
-  }
-}
-
-void QmitkToFUtilView::OnTextureCheckBoxChecked(bool checked)
-{
-  if(m_SurfaceNode.IsNotNull())
-  {
-    if (checked)
-    {
-      mitk::TransferFunction::Pointer transferFunction = mitk::TransferFunction::New();
-      transferFunction->SetColorTransferFunction(m_Controls->m_ToFVisualisationSettingsWidget->GetSelectedColorTransferFunction());
-
-      this->m_SurfaceNode->SetProperty("Surface.TransferFunction", mitk::TransferFunctionProperty::New(transferFunction));
-      this->m_SurfaceNode->SetBoolProperty("scalar visibility", true);
-    }
-    else
-    {
-      this->m_SurfaceNode->SetBoolProperty("scalar visibility", false);
-    }
-  }
-}
-
-void QmitkToFUtilView::OnKinectRGBTextureCheckBoxChecked(bool checked)
-{
-  if((m_SelectedCamera.contains("Kinect")) && (m_ToFImageGrabber->GetBoolProperty("RGB")))
-  {
-    if (checked)
-    {
-      // enable texture
-      this->m_SurfaceNode->SetProperty("Surface.Texture",mitk::SmartPointerProperty::New(this->m_ToFImageGrabber->GetOutput(3)));
-    } else {
-      // disable texture
-      this->m_SurfaceNode->GetPropertyList()->DeleteProperty("Surface.Texture");
-    }
   }
 }
 
@@ -583,7 +430,6 @@ void QmitkToFUtilView::OnChangeCoronalWindowOutput(int index)
 
 mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName, mitk::BaseData* data )
 {
-
   mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode(nodeName);
   if (node.IsNull())
   {

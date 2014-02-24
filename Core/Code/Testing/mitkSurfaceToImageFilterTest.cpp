@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
 
@@ -24,9 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestFixture.h"
 
 
-class mitkSurfaceToImageFilterTest : public mitk::TestFixture
+class mitkSurfaceToImageFilterTestSuite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkSTLFileReaderTestSuite);
+  CPPUNIT_TEST_SUITE(mitkSurfaceToImageFilterTestSuite);
   MITK_TEST(testReadFile);
   CPPUNIT_TEST_SUITE_END();
 
@@ -65,10 +64,6 @@ public:
      surfaceToImageFilter->Update();
 
      CPPUNIT_ASSERT_MESSAGE("SurfaceToImageFilter_AnyInputImageAndModeSetToBinary_ResultIsImageWithUCHARPixelType", surfaceToImageFilter->GetOutput()->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR);
-
-
-//    CPPUNIT_ASSERT_MESSAGE("Number of Points in VtkPolyData",(n == m));
-
   }
 
   void test4DSurface()
@@ -78,12 +73,3 @@ public:
 
 };
 MITK_TEST_SUITE_REGISTRATION(mitkSurfaceToImageFilter)
-
-
-/*
-  MITK_TEST_BEGIN( "mitkSurfaceToImageFilterTest");
-
-  MITK_TEST_END();
-  */
-
-

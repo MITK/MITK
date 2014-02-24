@@ -328,11 +328,16 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
     eventXML += GetPositionInWorld(event);
     eventXML += "\"/>\n";
   }
-  // TODO Implement Key Events!!
-  //  else if (eventClass == "INTERACTIONKEYEVENT")
-  //  {
-  //    event = InteractionKeyEvent::New(NULL, key, modifiers);
-  //  }
+  else if (eventClass == "INTERACTIONKEYEVENT")
+  {
+    mitk::InteractionKeyEvent* ke = dynamic_cast<mitk::InteractionKeyEvent*>(event);
+
+    // key
+    eventXML += " <" + InteractionEventConst::xmlTagAttribute() +" " + InteractionEventConst::xmlParameterName() + "=\"" + InteractionEventConst::xmlEventPropertyKey() + "\" ";
+    eventXML += InteractionEventConst::xmlParameterValue() + "=\"";
+    eventXML += ke->GetKey();
+    eventXML += "\"/>\n";
+  }
   else
   {
     MITK_WARN << "Event not recognized, discarding event of type " << event->GetNameOfClass();

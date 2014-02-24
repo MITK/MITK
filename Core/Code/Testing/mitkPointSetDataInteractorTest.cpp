@@ -75,13 +75,13 @@ public:
     std::string interactionXmlPath = "/Users/schroedt/Desktop/pointsetTest.xml";
 
     //Create test helper to initialize all necessary objects for interaction
-    mitk::InteractionTestHelper m_InteractionTestHelper(interactionXmlPath);
+    mitk::InteractionTestHelper interactionTestHelper(interactionXmlPath);
 
     //Add our test node to the DataStorage of our test helper
-    m_InteractionTestHelper.AddNodeToStorage(m_TestPointSetNode);
+    interactionTestHelper.AddNodeToStorage(m_TestPointSetNode);
 
     //Start Interaction
-    m_InteractionTestHelper.PlaybackInteraction();
+    interactionTestHelper.PlaybackInteraction();
 
     //Load the reference PointSet
     mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::LoadPointSet(referencePointSetPath);

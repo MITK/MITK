@@ -78,6 +78,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
 
       //connect SliceNavigationControllers to timestep changed event of TimeNavigationController
       rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController(), false);
+      rm->GetTimeNavigationController()->ConnectGeometryTimeEvent(rw->GetSliceNavigationController(), false);
 
       //add to list of kown render windows
       m_RenderWindowList.push_back(rw);
@@ -151,5 +152,48 @@ void mitk::InteractionTestHelper::SetTimeStep(int newTimeStep)
   if(timeStepIsvalid)
   {
     mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(newTimeStep);
+  }
+}
+
+
+mitk::RenderWindow* mitk::InteractionTestHelper::GetRenderWindowByName(const std::string &name)
+{
+  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
+  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+
+  for(; it != end; it++)
+  {
+    if( name.compare( (*it)->GetRenderer()->GetName() ) == 0)
+      return (*it).GetPointer();
+  }
+
+  return NULL;
+}
+
+
+mitk::RenderWindow* mitk::InteractionTestHelper::GetRenderWindowByDefaultViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection)
+{
+  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
+  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+
+  for(; it != end; it++)
+  {
+    if( viewDirection == (*it)->GetSliceNavigationController()->GetDefaultViewDirection() )
+      return (*it).GetPointer();
+  }
+
+  return NULL;
+}
+
+
+mitk::RenderWindow* mitk::InteractionTestHelper::GetRenderWindow(unsigned int index)
+{
+  if( index < m_RenderWindowList.size() )
+  {
+    return m_RenderWindowList.at(index).GetPointer();
+  }
+  else
+  {
+    return NULL;
   }
 }

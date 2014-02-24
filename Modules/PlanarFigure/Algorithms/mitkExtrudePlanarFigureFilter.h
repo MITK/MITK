@@ -55,6 +55,7 @@ namespace mitk
     itkSetMacro(FlipNormals, bool);
 
     virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
+    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType& name);
 
     using Superclass::SetInput;
     void SetInput(mitk::PlanarFigure* planarFigure);

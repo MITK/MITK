@@ -293,6 +293,13 @@ itk::ProcessObject::DataObjectPointer mitk::ExtrudePlanarFigureFilter::MakeOutpu
     : NULL;
 }
 
+itk::ProcessObject::DataObjectPointer mitk::ExtrudePlanarFigureFilter::MakeOutput(const DataObjectIdentifierType& name)
+{
+  return this->IsIndexedOutputName(name)
+    ? this->MakeOutput(this->MakeIndexFromOutputName(name))
+    : NULL;
+}
+
 void mitk::ExtrudePlanarFigureFilter::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os, indent);

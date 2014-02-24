@@ -26,23 +26,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 const mitk::ScalarType PI = 3.14159265359;
 
 mitk::SlicedGeometry3D::SlicedGeometry3D()
-: m_EvenlySpaced( true ),
+  : m_EvenlySpaced( true ),
   m_Slices( 0 ),
   m_ReferenceGeometry( NULL ),
   m_SliceNavigationController( NULL )
 {
-   m_DirectionVector.Fill(0);
+  m_DirectionVector.Fill(0);
   this->InitializeSlicedGeometry( m_Slices );
 }
 
 mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D& other)
-: Superclass(other),
+  : Superclass(other),
   m_EvenlySpaced( other.m_EvenlySpaced ),
   m_Slices( other.m_Slices ),
   m_ReferenceGeometry( other.m_ReferenceGeometry ),
   m_SliceNavigationController( other.m_SliceNavigationController )
 {
-   m_DirectionVector.Fill(0);
+  m_DirectionVector.Fill(0);
   SetSpacing( other.GetSpacing() );
   SetDirectionVector( other.GetDirectionVector() );
 
@@ -77,9 +77,8 @@ mitk::SlicedGeometry3D::~SlicedGeometry3D()
 {
 }
 
-
 mitk::Geometry2D *
-mitk::SlicedGeometry3D::GetGeometry2D( int s ) const
+  mitk::SlicedGeometry3D::GetGeometry2D( int s ) const
 {
   mitk::Geometry2D::Pointer geometry2D = NULL;
 
@@ -130,15 +129,14 @@ mitk::SlicedGeometry3D::GetGeometry2D( int s ) const
 }
 
 const mitk::BoundingBox *
-mitk::SlicedGeometry3D::GetBoundingBox() const
+  mitk::SlicedGeometry3D::GetBoundingBox() const
 {
   assert(m_BoundingBox.IsNotNull());
   return m_BoundingBox.GetPointer();
 }
 
-
 bool
-mitk::SlicedGeometry3D::SetGeometry2D( mitk::Geometry2D *geometry2D, int s )
+  mitk::SlicedGeometry3D::SetGeometry2D( mitk::Geometry2D *geometry2D, int s )
 {
   if ( this->IsValidSlice(s) )
   {
@@ -149,9 +147,8 @@ mitk::SlicedGeometry3D::SetGeometry2D( mitk::Geometry2D *geometry2D, int s )
   return false;
 }
 
-
 void
-mitk::SlicedGeometry3D::InitializeSlicedGeometry( unsigned int slices )
+  mitk::SlicedGeometry3D::InitializeSlicedGeometry( unsigned int slices )
 {
   Superclass::Initialize();
   m_Slices = slices;
@@ -166,9 +163,8 @@ mitk::SlicedGeometry3D::InitializeSlicedGeometry( unsigned int slices )
   m_DirectionVector.Fill( 0 );
 }
 
-
 void
-mitk::SlicedGeometry3D::InitializeEvenlySpaced(
+  mitk::SlicedGeometry3D::InitializeEvenlySpaced(
   mitk::Geometry2D* geometry2D, unsigned int slices, bool flipped )
 {
   assert( geometry2D != NULL );
@@ -177,9 +173,8 @@ mitk::SlicedGeometry3D::InitializeEvenlySpaced(
     slices, flipped );
 }
 
-
 void
-mitk::SlicedGeometry3D::InitializeEvenlySpaced(
+  mitk::SlicedGeometry3D::InitializeEvenlySpaced(
   mitk::Geometry2D* geometry2D, mitk::ScalarType zSpacing,
   unsigned int slices, bool flipped )
 {
@@ -252,7 +247,7 @@ mitk::SlicedGeometry3D::InitializeEvenlySpaced(
   this->SetTimeBounds( geometry2D->GetTimeBounds() );
 
   assert(m_IndexToWorldTransform.GetPointer()
-         != geometry2D->GetIndexToWorldTransform()); // (**) see above.
+    != geometry2D->GetIndexToWorldTransform()); // (**) see above.
 
   this->SetFrameOfReferenceID( geometry2D->GetFrameOfReferenceID() );
   this->SetImageGeometry( geometry2D->GetImageGeometry() );
@@ -260,9 +255,8 @@ mitk::SlicedGeometry3D::InitializeEvenlySpaced(
   geometry2D->UnRegister();
 }
 
-
 void
-mitk::SlicedGeometry3D::InitializePlanes(
+  mitk::SlicedGeometry3D::InitializePlanes(
   const mitk::Geometry3D *geometry3D,
   mitk::PlaneGeometry::PlaneOrientation planeorientation,
   bool top, bool frontside, bool rotated )
@@ -278,30 +272,29 @@ mitk::SlicedGeometry3D::InitializePlanes(
 
   switch ( planeorientation )
   {
-    case PlaneGeometry::Axial:
-      viewSpacing = geometry3D->GetSpacing()[2];
-      slices = (unsigned int) geometry3D->GetExtent( 2 );
-      break;
+  case PlaneGeometry::Axial:
+    viewSpacing = geometry3D->GetSpacing()[2];
+    slices = (unsigned int) geometry3D->GetExtent( 2 );
+    break;
 
-    case PlaneGeometry::Frontal:
-      viewSpacing = geometry3D->GetSpacing()[1];
-      slices = (unsigned int) geometry3D->GetExtent( 1 );
-      break;
+  case PlaneGeometry::Frontal:
+    viewSpacing = geometry3D->GetSpacing()[1];
+    slices = (unsigned int) geometry3D->GetExtent( 1 );
+    break;
 
-    case PlaneGeometry::Sagittal:
-      viewSpacing = geometry3D->GetSpacing()[0];
-      slices = (unsigned int) geometry3D->GetExtent( 0 );
-      break;
+  case PlaneGeometry::Sagittal:
+    viewSpacing = geometry3D->GetSpacing()[0];
+    slices = (unsigned int) geometry3D->GetExtent( 0 );
+    break;
 
-    default:
-      itkExceptionMacro("unknown PlaneOrientation");
+  default:
+    itkExceptionMacro("unknown PlaneOrientation");
   }
 
   mitk::Vector3D normal = this->AdjustNormal( planeGeometry->GetNormal() );
 
-
   ScalarType directedExtent =
-      std::abs( m_ReferenceGeometry->GetExtentInMM( 0 ) * normal[0] )
+    std::abs( m_ReferenceGeometry->GetExtentInMM( 0 ) * normal[0] )
     + std::abs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
     + std::abs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
 
@@ -328,10 +321,9 @@ mitk::SlicedGeometry3D::InitializePlanes(
   this->InitializeEvenlySpaced( planeGeometry, viewSpacing, slices, flipped );
 }
 
-
 void
-mitk::SlicedGeometry3D
-::ReinitializePlanes( const Point3D &center, const Point3D &referencePoint )
+  mitk::SlicedGeometry3D
+  ::ReinitializePlanes( const Point3D &center, const Point3D &referencePoint )
 {
   // Need a reference frame to align the rotated planes
   if ( !m_ReferenceGeometry )
@@ -367,14 +359,13 @@ mitk::SlicedGeometry3D
 
   Superclass::SetSpacing( spacing );
 
-
   // Now we need to calculate the number of slices in the plane's normal
   // direction, so that the entire volume is covered. This is done by first
   // calculating the dot product between the volume diagonal (the maximum
   // distance inside the volume) and the normal, and dividing this value by
   // the directed spacing calculated above.
   ScalarType directedExtent =
-      std::abs( m_ReferenceGeometry->GetExtentInMM( 0 ) * normal[0] )
+    std::abs( m_ReferenceGeometry->GetExtentInMM( 0 ) * normal[0] )
     + std::abs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
     + std::abs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
 
@@ -398,14 +389,14 @@ mitk::SlicedGeometry3D
   {
     firstPlane->SetOrigin( firstPlane->GetOrigin()
       + normal * (centerOfRotationDistance - directedExtent / 2.0)
-    );
+      );
     m_DirectionVector = normal;
   }
   else
   {
     firstPlane->SetOrigin( firstPlane->GetOrigin()
       + normal * (directedExtent / 2.0 + centerOfRotationDistance)
-    );
+      );
     m_DirectionVector = -normal;
   }
 
@@ -424,7 +415,6 @@ mitk::SlicedGeometry3D
   firstPlane->SetOrigin(
     firstPlane->GetOrigin() + normal * alignmentValue * spacing[2] );
 
-
   // Finally, we can clear the previous geometry stack and initialize it with
   // our re-initialized "first plane".
   m_Geometry2Ds.assign( m_Slices, Geometry2D::Pointer( NULL ) );
@@ -440,18 +430,17 @@ mitk::SlicedGeometry3D
   this->Modified();
 }
 
-
 double
-mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D &d ) const
+  mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D &d ) const
 {
-   // Need the spacing of the underlying dataset / geometry
-   if ( !m_ReferenceGeometry )
-   {
-      return 1.0;
-   }
+  // Need the spacing of the underlying dataset / geometry
+  if ( !m_ReferenceGeometry )
+  {
+    return 1.0;
+  }
 
-   const mitk::Vector3D &spacing = m_ReferenceGeometry->GetSpacing();
-   return SlicedGeometry3D::CalculateSpacing( spacing, d );
+  const mitk::Vector3D &spacing = m_ReferenceGeometry->GetSpacing();
+  return SlicedGeometry3D::CalculateSpacing( spacing, d );
 }
 
 double mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D spacing, const mitk::Vector3D &d )
@@ -473,7 +462,7 @@ double mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D spacing, c
 }
 
 mitk::Vector3D
-mitk::SlicedGeometry3D::AdjustNormal( const mitk::Vector3D &normal ) const
+  mitk::SlicedGeometry3D::AdjustNormal( const mitk::Vector3D &normal ) const
 {
   TransformType::Pointer inverse = TransformType::New();
   m_ReferenceGeometry->GetIndexToWorldTransform()->GetInverse( inverse );
@@ -484,9 +473,8 @@ mitk::SlicedGeometry3D::AdjustNormal( const mitk::Vector3D &normal ) const
   return transformedNormal;
 }
 
-
 void
-mitk::SlicedGeometry3D::SetImageGeometry( const bool isAnImageGeometry )
+  mitk::SlicedGeometry3D::SetImageGeometry( const bool isAnImageGeometry )
 {
   Superclass::SetImageGeometry( isAnImageGeometry );
 
@@ -504,7 +492,7 @@ mitk::SlicedGeometry3D::SetImageGeometry( const bool isAnImageGeometry )
 }
 
 void
-mitk::SlicedGeometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry )
+  mitk::SlicedGeometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry )
 {
   mitk::Geometry3D* geometry;
 
@@ -521,15 +509,14 @@ mitk::SlicedGeometry3D::ChangeImageGeometryConsideringOriginOffset( const bool i
   Superclass::ChangeImageGeometryConsideringOriginOffset( isAnImageGeometry );
 }
 
-
 bool
-mitk::SlicedGeometry3D::IsValidSlice( int s ) const
+  mitk::SlicedGeometry3D::IsValidSlice( int s ) const
 {
   return ((s >= 0) && (s < (int)m_Slices));
 }
 
 void
-mitk::SlicedGeometry3D::SetReferenceGeometry( Geometry3D *referenceGeometry )
+  mitk::SlicedGeometry3D::SetReferenceGeometry( Geometry3D *referenceGeometry )
 {
   m_ReferenceGeometry = referenceGeometry;
 
@@ -542,7 +529,7 @@ mitk::SlicedGeometry3D::SetReferenceGeometry( Geometry3D *referenceGeometry )
 }
 
 void
-mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
+  mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
 {
   bool hasEvenlySpacedPlaneGeometry = false;
   mitk::Point3D origin;
@@ -613,23 +600,21 @@ mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
   this->Modified();
 }
 
-
 void
-mitk::SlicedGeometry3D
-::SetSliceNavigationController( SliceNavigationController *snc )
+  mitk::SlicedGeometry3D
+  ::SetSliceNavigationController( SliceNavigationController *snc )
 {
   m_SliceNavigationController = snc;
 }
 
-
 mitk::SliceNavigationController *
-mitk::SlicedGeometry3D::GetSliceNavigationController()
+  mitk::SlicedGeometry3D::GetSliceNavigationController()
 {
   return m_SliceNavigationController;
 }
 
 void
-mitk::SlicedGeometry3D::SetEvenlySpaced(bool on)
+  mitk::SlicedGeometry3D::SetEvenlySpaced(bool on)
 {
   if(m_EvenlySpaced!=on)
   {
@@ -638,23 +623,21 @@ mitk::SlicedGeometry3D::SetEvenlySpaced(bool on)
   }
 }
 
-
 void
-mitk::SlicedGeometry3D
-::SetDirectionVector( const mitk::Vector3D& directionVector )
+  mitk::SlicedGeometry3D
+  ::SetDirectionVector( const mitk::Vector3D& directionVector )
 {
-   Vector3D newDir = directionVector;
-   newDir.Normalize();
-   if ( newDir != m_DirectionVector )
+  Vector3D newDir = directionVector;
+  newDir.Normalize();
+  if ( newDir != m_DirectionVector )
   {
-      m_DirectionVector = newDir;
+    m_DirectionVector = newDir;
     this->Modified();
   }
 }
 
-
 void
-mitk::SlicedGeometry3D::SetTimeBounds( const mitk::TimeBounds& timebounds )
+  mitk::SlicedGeometry3D::SetTimeBounds( const mitk::TimeBounds& timebounds )
 {
   Superclass::SetTimeBounds( timebounds );
 
@@ -669,9 +652,8 @@ mitk::SlicedGeometry3D::SetTimeBounds( const mitk::TimeBounds& timebounds )
   m_TimeBounds = timebounds;
 }
 
-
 itk::LightObject::Pointer
-mitk::SlicedGeometry3D::InternalClone() const
+  mitk::SlicedGeometry3D::InternalClone() const
 {
   Self::Pointer newGeometry = new SlicedGeometry3D(*this);
   newGeometry->UnRegister();
@@ -679,7 +661,7 @@ mitk::SlicedGeometry3D::InternalClone() const
 }
 
 void
-mitk::SlicedGeometry3D::PrintSelf( std::ostream& os, itk::Indent indent ) const
+  mitk::SlicedGeometry3D::PrintSelf( std::ostream& os, itk::Indent indent ) const
 {
   Superclass::PrintSelf(os,indent);
   os << indent << " EvenlySpaced: " << m_EvenlySpaced << std::endl;
@@ -702,7 +684,7 @@ mitk::SlicedGeometry3D::PrintSelf( std::ostream& os, itk::Indent indent ) const
 }
 
 void
-mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
+  mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
 {
   switch ( operation->GetOperationType() )
   {
@@ -734,7 +716,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
           center,
           rotOp->GetVectorOfRotation(),
           rotOp->GetAngleOfRotation()
-        );
+          );
 
         // Rotate first slice
         geometry2D->ExecuteOperation( &centeredRotation );
@@ -760,31 +742,30 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // we also have to consider the case, that there is no reference geometry available.
         if ( m_Geometry2Ds.size() > 0 )
         {
-           // Reach through to all slices in my container
-           for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
-              iter != m_Geometry2Ds.end();
-              ++iter)
-           {
-              // Test for empty slices, which can happen if evenly spaced geometry
-              if ((*iter).IsNotNull())
-              {
-                (*iter)->ExecuteOperation(operation);
-              }
-           }
+          // Reach through to all slices in my container
+          for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
+            iter != m_Geometry2Ds.end();
+            ++iter)
+          {
+            // Test for empty slices, which can happen if evenly spaced geometry
+            if ((*iter).IsNotNull())
+            {
+              (*iter)->ExecuteOperation(operation);
+            }
+          }
 
           // rotate overall geometry
           RotationOperation *rotOp = dynamic_cast< RotationOperation * >( operation );
           Geometry3D::ExecuteOperation( rotOp);
         }
-
       }
     }
     else
     {
       // Reach through to all slices
       for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
-          iter != m_Geometry2Ds.end();
-          ++iter)
+        iter != m_Geometry2Ds.end();
+        ++iter)
       {
         (*iter)->ExecuteOperation(operation);
       }
@@ -794,7 +775,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
   case OpORIENT:
     if ( m_EvenlySpaced )
     {
-       // get operation data
+      // get operation data
       PlaneOperation *planeOp = dynamic_cast< PlaneOperation * >( operation );
 
       // Get first slice
@@ -806,7 +787,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       // carry out the re-orientation. If not all avaialble, stop here
       if ( !m_ReferenceGeometry || !planeGeometry || !planeOp )
       {
-         break;
+        break;
       }
 
       // General Behavior:
@@ -821,13 +802,13 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       mitk::Vector3D newNormal;
       if (planeOp->AreAxisDefined())
       {
-         // If planeOp was defined by one centerpoint and two axis vectors
-         newNormal = CrossProduct(planeOp->GetAxisVec0(), planeOp->GetAxisVec1());
+        // If planeOp was defined by one centerpoint and two axis vectors
+        newNormal = CrossProduct(planeOp->GetAxisVec0(), planeOp->GetAxisVec1());
       }
       else
       {
-         // If planeOp was defined by one centerpoint and one normal vector
-         newNormal = planeOp->GetNormal();
+        // If planeOp was defined by one centerpoint and one normal vector
+        newNormal = planeOp->GetNormal();
       }
 
       // Get Rotation axis und angle
@@ -839,23 +820,23 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       Vector3D rotationAxis = itk::CrossProduct( currentNormal, newNormal );
       if (std::abs(rotationAngle-180) < mitk::eps )
       {
-         // current Normal and desired normal are not linear independent!!(e.g 1,0,0 and -1,0,0).
-         // Rotation Axis should be ANY vector that is 90� to current Normal
-         mitk::Vector3D helpNormal;
-         helpNormal = currentNormal;
-         helpNormal[0] += 1;
-         helpNormal[1] -= 1;
-         helpNormal[2] += 1;
-         helpNormal.Normalize();
-         rotationAxis = itk::CrossProduct( helpNormal, currentNormal );
+        // current Normal and desired normal are not linear independent!!(e.g 1,0,0 and -1,0,0).
+        // Rotation Axis should be ANY vector that is 90� to current Normal
+        mitk::Vector3D helpNormal;
+        helpNormal = currentNormal;
+        helpNormal[0] += 1;
+        helpNormal[1] -= 1;
+        helpNormal[2] += 1;
+        helpNormal.Normalize();
+        rotationAxis = itk::CrossProduct( helpNormal, currentNormal );
       }
 
       RotationOperation centeredRotation(
-         mitk::OpROTATE,
-         center,
-         rotationAxis,
-         rotationAngle
-         );
+        mitk::OpROTATE,
+        center,
+        rotationAxis,
+        rotationAngle
+        );
 
       // Rotate first slice
       geometry2D->ExecuteOperation( &centeredRotation );
@@ -863,15 +844,15 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       // Reinitialize planes and select slice, if my rotations are all done.
       if (!planeOp->AreAxisDefined())
       {
-         // Clear the slice stack and adjust it according to the center of
-         // rotation and plane position (see documentation of ReinitializePlanes)
-         this->ReinitializePlanes( center, planeOp->GetPoint() );
+        // Clear the slice stack and adjust it according to the center of
+        // rotation and plane position (see documentation of ReinitializePlanes)
+        this->ReinitializePlanes( center, planeOp->GetPoint() );
 
-         if ( m_SliceNavigationController )
-         {
-            m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
-            m_SliceNavigationController->AdjustSliceStepperRange();
-         }
+        if ( m_SliceNavigationController )
+        {
+          m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
+          m_SliceNavigationController->AdjustSliceStepperRange();
+        }
       }
 
       // Also apply rotation on the slicedGeometry - Geometry3D (Bounding geometry)
@@ -883,49 +864,49 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
 
       if (planeOp->AreAxisDefined())
       {
-         mitk::Vector3D vecAxixNew = planeOp->GetAxisVec0();
-         vecAxixNew.Normalize();
-         mitk::Vector3D VecAxisCurr = geometry2D->GetAxisVector(0);
-         VecAxisCurr.Normalize();
+        mitk::Vector3D vecAxixNew = planeOp->GetAxisVec0();
+        vecAxixNew.Normalize();
+        mitk::Vector3D VecAxisCurr = geometry2D->GetAxisVector(0);
+        VecAxisCurr.Normalize();
 
-         ScalarType rotationAngle = angle(VecAxisCurr.GetVnlVector(),vecAxixNew.GetVnlVector());
-         rotationAngle = rotationAngle * 180 / PI; // Rad to Deg
+        ScalarType rotationAngle = angle(VecAxisCurr.GetVnlVector(),vecAxixNew.GetVnlVector());
+        rotationAngle = rotationAngle * 180 / PI; // Rad to Deg
 
-         // we rotate around the normal of the plane, but we do not know, if we need to rotate clockwise
-         // or anti-clockwise. So we rotate around the crossproduct of old and new Axisvector.
-         // Since both axis vectors lie in the plane, the crossproduct is the planes normal or the negative planes normal
+        // we rotate around the normal of the plane, but we do not know, if we need to rotate clockwise
+        // or anti-clockwise. So we rotate around the crossproduct of old and new Axisvector.
+        // Since both axis vectors lie in the plane, the crossproduct is the planes normal or the negative planes normal
 
-         rotationAxis = itk::CrossProduct( VecAxisCurr, vecAxixNew  );
-         if (std::abs(rotationAngle-180) < mitk::eps )
-         {
-            // current axisVec and desired axisVec are not linear independent!!(e.g 1,0,0 and -1,0,0).
-            // Rotation Axis can be just plane Normal. (have to rotate by 180�)
-            rotationAxis = newNormal;
-         }
+        rotationAxis = itk::CrossProduct( VecAxisCurr, vecAxixNew  );
+        if (std::abs(rotationAngle-180) < mitk::eps )
+        {
+          // current axisVec and desired axisVec are not linear independent!!(e.g 1,0,0 and -1,0,0).
+          // Rotation Axis can be just plane Normal. (have to rotate by 180�)
+          rotationAxis = newNormal;
+        }
 
-         // Perfom Rotation
-         mitk::RotationOperation op(mitk::OpROTATE, center, rotationAxis, rotationAngle);
-         geometry2D->ExecuteOperation( &op );
+        // Perfom Rotation
+        mitk::RotationOperation op(mitk::OpROTATE, center, rotationAxis, rotationAngle);
+        geometry2D->ExecuteOperation( &op );
 
-         // Apply changes on first slice to whole slice stack
-         this->ReinitializePlanes( center, planeOp->GetPoint() );
+        // Apply changes on first slice to whole slice stack
+        this->ReinitializePlanes( center, planeOp->GetPoint() );
 
-         if ( m_SliceNavigationController )
-         {
-            m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
-            m_SliceNavigationController->AdjustSliceStepperRange();
-         }
+        if ( m_SliceNavigationController )
+        {
+          m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );
+          m_SliceNavigationController->AdjustSliceStepperRange();
+        }
 
-         // Also apply rotation on the slicedGeometry - Geometry3D (Bounding geometry)
-         Geometry3D::ExecuteOperation( &op );
+        // Also apply rotation on the slicedGeometry - Geometry3D (Bounding geometry)
+        Geometry3D::ExecuteOperation( &op );
       }
     }
     else
     {
       // Reach through to all slices
       for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
-          iter != m_Geometry2Ds.end();
-          ++iter)
+        iter != m_Geometry2Ds.end();
+        ++iter)
       {
         (*iter)->ExecuteOperation(operation);
       }
@@ -990,12 +971,12 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
           m_Slices = 1;
         }
 
-         m_Geometry2Ds.assign( m_Slices, Geometry2D::Pointer( NULL ) );
+        m_Geometry2Ds.assign( m_Slices, Geometry2D::Pointer( NULL ) );
 
-         if ( m_Slices > 0 )
-         {
-           m_Geometry2Ds[0] = geometry2D;
-         }
+        if ( m_Slices > 0 )
+        {
+          m_Geometry2Ds[0] = geometry2D;
+        }
 
         m_SliceNavigationController->GetSlice()->SetSteps( m_Slices );
 
@@ -1015,8 +996,8 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
     {
       // Reach through to all slices
       for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
-          iter != m_Geometry2Ds.end();
-          ++iter)
+        iter != m_Geometry2Ds.end();
+        ++iter)
       {
         (*iter)->ExecuteOperation(operation);
       }
@@ -1052,4 +1033,3 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
 
   this->Modified();
 }
-

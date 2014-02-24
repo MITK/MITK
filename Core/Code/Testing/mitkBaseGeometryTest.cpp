@@ -67,6 +67,10 @@ class mitkBaseGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestSetBounds);
   MITK_TEST(TestSetFloatBounds);
   MITK_TEST(TestSetFloatBoundsDouble);
+  MITK_TEST(TestSetFrameOfReferenceID);
+  MITK_TEST(TestSetIndexToWorldTransform);
+  MITK_TEST(TestSetSpacing);
+  MITK_TEST(TestTransferItkToVtkTransform);
   CPPUNIT_TEST_SUITE_END();
 
   // Used Variables
@@ -76,11 +80,13 @@ private:
   mitk::Vector3D aSpacing;
   mitk::AffineTransform3D::Pointer aTransform;
   BoundingBoxPointer aBoundingBox;
+  mitk::AffineTransform3D::MatrixType aMatrix;
 
   mitk::Point3D  anotherPoint;
   mitk::Vector3D anotherSpacing;
   BoundingBoxPointer anotherBoundingBox;
   mitk::AffineTransform3D::Pointer anotherTransform;
+  mitk::AffineTransform3D::MatrixType anotherMatrix;
 
 public:
 
@@ -96,10 +102,12 @@ public:
     aTransform->SetIdentity();
 
     anotherTransform = mitk::AffineTransform3D::New();
-    mitk::AffineTransform3D::MatrixType differentMatrix;
-    differentMatrix.SetIdentity();
-    differentMatrix(1,1) = 2;
-    anotherTransform->SetMatrix( differentMatrix );
+
+    aMatrix.SetIdentity();
+
+    anotherMatrix.SetIdentity();
+    anotherMatrix(1,1) = 2;
+    anotherTransform->SetMatrix( anotherMatrix );
 
     //Bounding Box
     float bounds[6] = {0,1,0,1,0,1};
@@ -142,66 +150,101 @@ public:
 
   void TestSetOrigin()
   {
-    DummyTestClass::Pointer dummy;
-    dummy = new DummyTestClass();
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetOrigin(anotherPoint);
     CPPUNIT_ASSERT(anotherPoint==dummy->GetOrigin());
 
     //undo changes, new and changed object need to be the same!
     dummy->SetOrigin(aPoint);
-    DummyTestClass::Pointer newDummy;
-    newDummy = new DummyTestClass();
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
   }
 
   void TestSetFloatBounds(){
     float bounds[6] = {0,11,0,12,0,13};
-    DummyTestClass::Pointer dummy;
-    dummy = new DummyTestClass();
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetFloatBounds(bounds);
     CPPUNIT_ASSERT(mitk::Equal( dummy->GetBoundingBox(), anotherBoundingBox, mitk::eps, true));
 
     //undo changes, new and changed object need to be the same!
     float originalBounds[6] = {0,1,0,1,0,1};
     dummy->SetFloatBounds(originalBounds);
-    DummyTestClass::Pointer newDummy;
-    newDummy = new DummyTestClass();
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
   }
 
   void TestSetBounds(){
-    DummyTestClass::Pointer dummy;
-    dummy = new DummyTestClass();
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetBounds(anotherBoundingBox->GetBounds());
     CPPUNIT_ASSERT(mitk::Equal( dummy->GetBoundingBox(), anotherBoundingBox, mitk::eps, true));
 
     //undo changes, new and changed object need to be the same!
     dummy->SetBounds(aBoundingBox->GetBounds());
-    DummyTestClass::Pointer newDummy;
-    newDummy = new DummyTestClass();
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
   }
 
   void TestSetFloatBoundsDouble(){
     double bounds[6] = {0,11,0,12,0,13};
-    DummyTestClass::Pointer dummy;
-    dummy = new DummyTestClass();
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
     dummy->SetFloatBounds(bounds);
     CPPUNIT_ASSERT(mitk::Equal( dummy->GetBoundingBox(), anotherBoundingBox, mitk::eps, true));
 
     //undo changes, new and changed object need to be the same!
     double originalBounds[6] = {0,1,0,1,0,1};
     dummy->SetFloatBounds(originalBounds);
-    DummyTestClass::Pointer newDummy;
-    newDummy = new DummyTestClass();
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+  }
+
+  void TestSetFrameOfReferenceID()
+  {
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+    dummy->SetFrameOfReferenceID(5);
+    CPPUNIT_ASSERT(dummy->GetFrameOfReferenceID()==5);
+
+    //undo changes, new and changed object need to be the same!
+    dummy->SetFrameOfReferenceID(0);
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
+    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+  }
+
+  void TestSetIndexToWorldTransform()
+  {
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+    dummy->SetIndexToWorldTransform(anotherTransform);
+    CPPUNIT_ASSERT(mitk::Equal(anotherTransform,dummy->GetIndexToWorldTransform(),mitk::eps,true));
+
+    //undo changes, new and changed object need to be the same!
+    dummy->SetIndexToWorldTransform(aTransform);
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
+    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+  }
+
+  void TestSetSpacing()
+  {
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+    dummy->SetSpacing(anotherSpacing);
+    CPPUNIT_ASSERT(anotherSpacing==dummy->GetSpacing());
+
+    //undo changes, new and changed object need to be the same!
+    dummy->SetSpacing(aSpacing);
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
+    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+  }
+
+  void TestTransferItkToVtkTransform()
+  {
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+    dummy->SetIndexToWorldTransform(anotherTransform); //calls TransferItkToVtkTransform
+    mitk::AffineTransform3D::Pointer dummyTransform = dummy->GetIndexToWorldTransform();
+    CPPUNIT_ASSERT(mitk::MatrixEqualElementWise( anotherMatrix, dummyTransform->GetMatrix() ));
   }
 
   void TestConstructors()
   {
     //test standard constructor
-    DummyTestClass::Pointer dummy1;
-    dummy1 = new DummyTestClass();
+    DummyTestClass::Pointer dummy1 = DummyTestClass::New();
     bool test = dummy1->IsValid();
     CPPUNIT_ASSERT(test == true);
     CPPUNIT_ASSERT(dummy1->GetFrameOfReferenceID() == 0);
@@ -219,8 +262,7 @@ public:
 
     CPPUNIT_ASSERT(mitk::Equal( dummy1->GetBoundingBox(), aBoundingBox, mitk::eps, true));
 
-    DummyTestClass::Pointer dummy2;
-    dummy2 = new DummyTestClass();
+    DummyTestClass::Pointer dummy2 = DummyTestClass::New();
     dummy2->SetOrigin(anotherPoint);
     float bounds[6] = {0,11,0,12,0,13};
     dummy2->SetFloatBounds(bounds);

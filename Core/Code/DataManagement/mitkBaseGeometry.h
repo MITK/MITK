@@ -75,7 +75,7 @@ namespace mitk {
     //##Documentation
     //## @brief Set the origin, i.e. the upper-left corner of the plane
     //##
-    virtual void SetOrigin(const Point3D& origin);
+    void SetOrigin(const Point3D& origin);
 
     //##Documentation
     //## @brief Get the spacing (size of a pixel).
@@ -138,7 +138,48 @@ namespace mitk {
     //## @brief Copy the ITK transform
     //## (m_IndexToWorldTransform) to the VTK transform
     //## \sa SetIndexToWorldTransform
-    virtual void TransferItkToVtkTransform();
+    void TransferItkToVtkTransform();
+
+    //##Documentation
+    //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates
+    //## \warning If you need (discrete) integer index coordinates (e.g., for iterating easily over an image),
+    //## use WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index).
+    //## For further information about coordinates types, please see the Geometry documentation
+    virtual void WorldToIndex(const mitk::Point3D& pt_mm, mitk::Point3D& pt_units) const;
+
+    //##Documentation
+    //## @brief Convert world coordinates (in mm) of a \em vector
+    //## \a vec_mm to (continuous!) index coordinates.
+    //## For further information about coordinates types, please see the Geometry documentation
+    virtual void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
+
+    //##Documentation
+    //## @brief Convert world coordinates (in mm) of a \em point to (discrete!) index coordinates.
+    //## This method rounds to integer indices!
+    //## For further information about coordinates types, please see the Geometry documentation
+    template <unsigned int VIndexDimension>
+    void WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index) const
+    {
+      typedef itk::Index<VIndexDimension> IndexType;
+      mitk::Point3D pt_units;
+      this->WorldToIndex(pt_mm, pt_units);
+      int i, dim=index.GetIndexDimension();
+      if(dim>3)
+      {
+        index.Fill(0);
+        dim=3;
+      }
+      for(i=0;i<dim;++i){
+        index[i]=itk::Math::RoundHalfIntegerUp<typename IndexType::IndexValueType>( pt_units[i] );
+      }
+    }
+
+    //##Documentation
+    //## @brief Convert world coordinates (in mm) of a \em vector
+    //## \a vec_mm to (continuous!) index coordinates.
+    //## @deprecated First parameter (Point3D) is not used. If possible, please use void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const.
+    //## For further information about coordinates types, please see the Geometry documentation
+    virtual void WorldToIndex(const mitk::Point3D& atPt3d_mm, const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
 
     // ********************************** BoundingBox **********************************
 
@@ -147,12 +188,6 @@ namespace mitk {
     //##
     //## See AbstractTransformGeometry for an example usage of this.
     itkGetConstObjectMacro(ParametricBoundingBox, BoundingBox);
-    //##Documentation
-    //## @brief Get the parametric bounds
-    //##
-    //## See AbstractTransformGeometry for an example usage of this.
-    // xx This was not vitrual!
-    //virtual const BoundingBox::BoundsArrayType& GetParametricBounds() const = 0 ; //ToDo
 
     /** Get the bounding box */
     itkGetConstObjectMacro(BoundingBox, BoundingBoxType);
@@ -160,8 +195,6 @@ namespace mitk {
     //##Documentation
     //## @brief Get the time bounds (in ms)
     itkGetConstReferenceMacro(TimeBounds, TimeBounds);
-
-    const BoundsArrayType GetBounds() const;
 
     // a bit of a misuse, but we want only doxygen to see the following:
 #ifdef DOXYGEN_SKIP
@@ -172,6 +205,7 @@ namespace mitk {
     //## @brief Get bounding box (in index/unit coordinates) as a BoundsArrayType
     const BoundsArrayType GetBounds() const;
 #endif
+    const BoundsArrayType GetBounds() const;
 
     //##Documentation
     //## \brief Set the bounding box (in index/unit coordinates)
@@ -182,14 +216,10 @@ namespace mitk {
 
     //##Documentation
     //## @brief Set the bounding box (in index/unit coordinates) via a float array
-    virtual void SetFloatBounds(const float bounds[6]);
+    void SetFloatBounds(const float bounds[6]);
     //##Documentation
     //## @brief Set the bounding box (in index/unit coordinates) via a double array
-    virtual void SetFloatBounds(const double bounds[6]);
-
-    //##Documentation
-    //## @brief Set the time bounds (in ms)
-    //virtual void SetTimeBounds(const TimeBounds& timebounds) = 0 ; //ToDo
+    void SetFloatBounds(const double bounds[6]);
 
     // ********************************** Geometry **********************************
 
@@ -201,6 +231,78 @@ namespace mitk {
     ScalarType GetExtent(unsigned int direction) const;
 #endif
 
+    /** Get the extent of the bounding box */
+    ScalarType GetExtent(unsigned int direction) const;
+
+    //##Documentation
+    //## @brief Get the extent of the bounding-box in the specified @a direction in mm
+    //##
+    //## Equals length of GetAxisVector(direction).
+    ScalarType GetExtentInMM(int direction) const;
+
+    //##Documentation
+    //## @brief Get vector along bounding-box in the specified @a direction in mm
+    //##
+    //## The length of the vector is the size of the bounding-box in the
+    //## specified @a direction in mm
+    //## \sa GetMatrixColumn
+    Vector3D GetAxisVector(unsigned int direction) const;
+
+    //##Documentation
+    //## @brief Checks, if the given geometry can be converted to 2D without information loss
+    //## e.g. when a 2D image is saved, the matrix is usually cropped to 2x2, and when you load it back to MITK
+    //## it will be filled with standard values. This function checks, if information would be lost during this
+    //## procedure
+    virtual bool Is2DConvertable();
+
+    //##Documentation
+    //## @brief Get the center of the bounding-box in mm
+    //##
+    Point3D GetCenter() const;
+
+    //##Documentation
+    //## @brief Get the squared length of the diagonal of the bounding-box in mm
+    //##
+    double GetDiagonalLength2() const;
+
+    //##Documentation
+    //## @brief Get the length of the diagonal of the bounding-box in mm
+    //##
+    double GetDiagonalLength() const;
+
+    //##Documentation
+    //## @brief Get the position of the corner number \a id (in world coordinates)
+    //##
+    //## See SetImageGeometry for how a corner is defined on images.
+    virtual Point3D GetCornerPoint(int id) const;
+
+    //##Documentation
+    //## @brief Get the position of a corner (in world coordinates)
+    //##
+    //## See SetImageGeometry for how a corner is defined on images.
+    virtual Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const;
+
+    //##Documentation
+    //## @brief Set the extent of the bounding-box in the specified @a direction in mm
+    //##
+    //## @note This changes the matrix in the transform, @a not the bounds, which are given in units!
+    virtual void SetExtentInMM(int direction, ScalarType extentInMM);
+
+    //##Documentation
+    //## @brief Test whether the point \a p (world coordinates in mm) is
+    //## inside the bounding box
+    bool IsInside(const mitk::Point3D& p) const;
+
+    //##Documentation
+    //## @brief Test whether the point \a p ((continous!)index coordinates in units) is
+    //## inside the bounding box
+    virtual bool IsIndexInside(const mitk::Point3D& index) const;
+
+    //##Documentation
+    //## @brief Convenience method for working with ITK indices
+    template <unsigned int VIndexDimension>
+    bool IsIndexInside(const itk::Index<VIndexDimension> &index) const;
+
   protected:
 
     // ********************************** Constructor **********************************
@@ -209,6 +311,15 @@ namespace mitk {
     virtual ~BaseGeometry();
 
     //itkGetConstMacro(IndexToWorldTransformLastModified, unsigned long);
+
+    virtual void BackTransform(const mitk::Point3D& in, mitk::Point3D& out) const;
+
+    //Without redundant parameter Point3D
+    virtual void BackTransform(const mitk::Vector3D& in, mitk::Vector3D& out) const;
+
+    //##Documentation
+    //## @brief Deprecated
+    virtual void BackTransform(const mitk::Point3D& at, const mitk::Vector3D& in, mitk::Vector3D& out) const;
 
     // ********************************** Variables **********************************
 

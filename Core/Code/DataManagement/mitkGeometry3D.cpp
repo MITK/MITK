@@ -126,36 +126,18 @@ itk::LightObject::Pointer mitk::Geometry3D::InternalClone() const
   newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }
-/*
+
 void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
 {
-Superclass::InitializeGeometry(newGeometry);
+  Superclass::InitializeGeometry(newGeometry);
 
-newGeometry->SetTimeBounds(m_TimeBounds);
+  newGeometry->SetTimeBounds(m_TimeBounds);
 
-//newGeometry->GetVtkTransform()->SetMatrix(m_VtkIndexToWorldTransform->GetMatrix()); IW
-//newGeometry->TransferVtkToItkTransform(); //MH
+  //newGeometry->GetVtkTransform()->SetMatrix(m_VtkIndexToWorldTransform->GetMatrix()); IW
+  //newGeometry->TransferVtkToItkTransform(); //MH
 
-newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
-newGeometry->m_ImageGeometry = m_ImageGeometry;
-}
-*/
-void mitk::Geometry3D::SetExtentInMM(int direction, ScalarType extentInMM)
-{
-  ScalarType len = GetExtentInMM(direction);
-  if(fabs(len - extentInMM)>=mitk::eps)
-  {
-    AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
-    vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
-    if(len>extentInMM)
-      vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)/len*extentInMM);
-    else
-      vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)*extentInMM/len);
-    Matrix3D matrix;
-    matrix = vnlmatrix;
-    m_IndexToWorldTransform->SetMatrix(matrix);
-    Modified();
-  }
+  newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
+  newGeometry->m_ImageGeometry = m_ImageGeometry;
 }
 
 mitk::BoundingBox::Pointer mitk::Geometry3D::CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform) const
@@ -608,36 +590,6 @@ void
   SetOrigin(originWorld);
 
   this->SetImageGeometry(isAnImageGeometry);
-}
-
-bool mitk::Geometry3D::Is2DConvertable()
-{
-  bool isConvertableWithoutLoss = true;
-  do
-  {
-    if (this->GetSpacing()[2] != 1)
-    {
-      isConvertableWithoutLoss = false;
-      break;
-    }
-    if (this->GetOrigin()[2] != 0)
-    {
-      isConvertableWithoutLoss = false;
-      break;
-    }
-    mitk::Vector3D col0, col1, col2;
-    col0.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
-    col1.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
-    col2.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
-
-    if ((col0[2] != 0) || (col1[2] != 0) || (col2[0] != 0) || (col2[1] != 0) || (col2[2] != 1))
-    {
-      isConvertableWithoutLoss = false;
-      break;
-    }
-  } while (0);
-
-  return isConvertableWithoutLoss;
 }
 
 bool mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType eps, bool verbose)

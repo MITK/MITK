@@ -107,13 +107,6 @@ namespace mitk {
     virtual void ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry );
 
     //##Documentation
-    //## @brief Checks, if the given geometry can be converted to 2D without information loss
-    //## e.g. when a 2D image is saved, the matrix is usually cropped to 2x2, and when you load it back to MITK
-    //## it will be filled with standard values. This function checks, if information would be lost during this
-    //## procedure
-    virtual bool Is2DConvertable();
-
-    //##Documentation
     //## @brief Set the time bounds (in ms)
     virtual void SetTimeBounds(const TimeBounds& timebounds);
 
@@ -129,45 +122,7 @@ namespace mitk {
     //## See SetImageGeometry for how a corner is defined on images.
     Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const;
 
-    //##Documentation
-    //## @brief Get vector along bounding-box in the specified @a direction in mm
-    //##
-    //## The length of the vector is the size of the bounding-box in the
-    //## specified @a direction in mm
-    //## \sa GetMatrixColumn
-    Vector3D GetAxisVector(unsigned int direction) const
-    {
-      Vector3D frontToBack;
-      frontToBack.SetVnlVector(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction));
-      frontToBack *= GetExtent(direction);
-      return frontToBack;
-    }
-
-    //##Documentation
-    //## @brief Get the center of the bounding-box in mm
-    //##
-    Point3D GetCenter() const
-    {
-      assert(m_BoundingBox.IsNotNull());
-      return m_IndexToWorldTransform->TransformPoint(m_BoundingBox->GetCenter());
-    }
-
-    //##Documentation
-    //## @brief Get the squared length of the diagonal of the bounding-box in mm
-    //##
-    double GetDiagonalLength2() const
-    {
-      Vector3D diagonalvector = GetCornerPoint()-GetCornerPoint(false, false, false);
-      return diagonalvector.GetSquaredNorm();
-    }
-
-    //##Documentation
-    //## @brief Get the length of the diagonal of the bounding-box in mm
-    //##
-    double GetDiagonalLength() const
-    {
-      return sqrt(GetDiagonalLength2());
-    }
+    virtual void InitializeGeometry(Self * newGeometry) const;
 
     //##Documentation
     //## @brief Get a VnlVector along bounding-box in the specified
@@ -178,29 +133,6 @@ namespace mitk {
     {
       return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction);
     }
-
-#ifdef DOXYGEN_SKIP
-    //##Documentation
-    //## @brief Get the extent of the bounding box (in index/unit coordinates)
-    //##
-    //## To access the extent in mm use GetExtentInMM
-    ScalarType GetExtent(unsigned int direction) const;
-#endif
-
-    //##Documentation
-    //## @brief Get the extent of the bounding-box in the specified @a direction in mm
-    //##
-    //## Equals length of GetAxisVector(direction).
-    ScalarType GetExtentInMM(int direction) const
-    {
-      return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction);
-    }
-
-    //##Documentation
-    //## @brief Set the extent of the bounding-box in the specified @a direction in mm
-    //##
-    //## @note This changes the matrix in the transform, @a not the bounds, which are given in units!
-    virtual void SetExtentInMM(int direction, ScalarType extentInMM);
 
     //##Documentation
     //## @brief Get the m_IndexToWorldTransform as a vtkLinearTransform
@@ -517,15 +449,6 @@ namespace mitk {
     //##@brief executes affine operations (translate, rotate, scale)
     virtual void ExecuteOperation(Operation* operation);
 
-    /** Get the extent of the bounding box */
-    ScalarType GetExtent(unsigned int direction) const
-    {
-      assert(m_BoundingBox.IsNotNull());
-      if (direction>=NDimensions)
-        mitkThrow() << "Direction is too big. This geometry is for 3D Data";
-      BoundsArrayType bounds = m_BoundingBox->GetBounds();
-      return bounds[direction*2+1]-bounds[direction*2];
-    }
   protected:
     Geometry3D();
     Geometry3D(const Geometry3D& other);

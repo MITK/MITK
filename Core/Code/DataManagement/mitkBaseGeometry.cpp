@@ -293,7 +293,6 @@ bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometr
   }
 
   //Compare Axis and Extents
-/* xxxxxxxxxxxxxxx Funktionen noch nciht umgezogen!
 
 for( unsigned int i=0; i<3; ++i)
   {
@@ -317,8 +316,6 @@ for( unsigned int i=0; i<3; ++i)
       result = false;
     }
   }
-
-*/
 
   //Compare BoundingBoxes
   if( !mitk::Equal( leftHandSide->GetBoundingBox(), rightHandSide->GetBoundingBox(), eps, verbose) )
@@ -362,4 +359,293 @@ void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing)
 
     itk2vtk(m_Spacing, m_FloatSpacing);
   }
+}
+
+mitk::Vector3D mitk::BaseGeometry::GetAxisVector(unsigned int direction) const
+{
+  Vector3D frontToBack;
+  frontToBack.SetVnlVector(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction));
+  frontToBack *= GetExtent(direction);
+  return frontToBack;
+}
+
+mitk::ScalarType mitk::BaseGeometry::GetExtent(unsigned int direction) const
+{
+  assert(m_BoundingBox.IsNotNull());
+  if (direction>=NDimensions)
+    mitkThrow() << "Direction is too big. This geometry is for 3D Data";
+  BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  return bounds[direction*2+1]-bounds[direction*2];
+}
+
+bool mitk::BaseGeometry::Is2DConvertable()
+{
+  bool isConvertableWithoutLoss = true;
+  do
+  {
+    if (this->GetSpacing()[2] != 1)
+    {
+      isConvertableWithoutLoss = false;
+      break;
+    }
+    if (this->GetOrigin()[2] != 0)
+    {
+      isConvertableWithoutLoss = false;
+      break;
+    }
+    mitk::Vector3D col0, col1, col2;
+    col0.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+    col1.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+    col2.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+
+    if ((col0[2] != 0) || (col1[2] != 0) || (col2[0] != 0) || (col2[1] != 0) || (col2[2] != 1))
+    {
+      isConvertableWithoutLoss = false;
+      break;
+    }
+  } while (0);
+
+  return isConvertableWithoutLoss;
+}
+
+mitk::Point3D mitk::BaseGeometry::GetCenter() const
+{
+  assert(m_BoundingBox.IsNotNull());
+  return m_IndexToWorldTransform->TransformPoint(m_BoundingBox->GetCenter());
+}
+
+double mitk::BaseGeometry::GetDiagonalLength2() const
+{
+  Vector3D diagonalvector = GetCornerPoint()-GetCornerPoint(false, false, false);
+  return diagonalvector.GetSquaredNorm();
+}
+
+//##Documentation
+//## @brief Get the length of the diagonal of the bounding-box in mm
+//##
+double mitk::BaseGeometry::GetDiagonalLength() const
+{
+  return sqrt(GetDiagonalLength2());
+}
+
+mitk::Point3D mitk::BaseGeometry::GetCornerPoint(int id) const
+{
+  assert(id >= 0);
+  assert(m_BoundingBox.IsNotNull());
+
+  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+
+  Point3D cornerpoint;
+  switch(id)
+  {
+  case 0: FillVector3D(cornerpoint, bounds[0],bounds[2],bounds[4]); break;
+  case 1: FillVector3D(cornerpoint, bounds[0],bounds[2],bounds[5]); break;
+  case 2: FillVector3D(cornerpoint, bounds[0],bounds[3],bounds[4]); break;
+  case 3: FillVector3D(cornerpoint, bounds[0],bounds[3],bounds[5]); break;
+  case 4: FillVector3D(cornerpoint, bounds[1],bounds[2],bounds[4]); break;
+  case 5: FillVector3D(cornerpoint, bounds[1],bounds[2],bounds[5]); break;
+  case 6: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[4]); break;
+  case 7: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[5]); break;
+  default:
+    {
+      itkExceptionMacro(<<"A cube only has 8 corners. These are labeled 0-7.");
+    }
+  }
+  return m_IndexToWorldTransform->TransformPoint(cornerpoint);
+}
+
+mitk::Point3D mitk::BaseGeometry::GetCornerPoint(bool xFront, bool yFront, bool zFront) const
+{
+  assert(m_BoundingBox.IsNotNull());
+  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+
+  Point3D cornerpoint;
+  cornerpoint[0] = (xFront ? bounds[0] : bounds[1]);
+  cornerpoint[1] = (yFront ? bounds[2] : bounds[3]);
+  cornerpoint[2] = (zFront ? bounds[4] : bounds[5]);
+
+  return m_IndexToWorldTransform->TransformPoint(cornerpoint);
+}
+
+mitk::ScalarType mitk::BaseGeometry::GetExtentInMM(int direction) const
+{
+  return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction);
+}
+
+void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
+{
+  ScalarType len = GetExtentInMM(direction);
+  if(fabs(len - extentInMM)>=mitk::eps)
+  {
+    AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
+    vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
+    if(len>extentInMM)
+      vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)/len*extentInMM);
+    else
+      vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)*extentInMM/len);
+    Matrix3D matrix;
+    matrix = vnlmatrix;
+    m_IndexToWorldTransform->SetMatrix(matrix);
+    Modified();
+  }
+}
+
+bool mitk::BaseGeometry::IsInside(const mitk::Point3D& p) const
+{
+  mitk::Point3D index;
+  WorldToIndex(p, index);
+  return IsIndexInside(index);
+}
+
+bool mitk::BaseGeometry::IsIndexInside(const mitk::Point3D& index) const
+{
+  bool inside = false;
+  //if it is an image geometry, we need to convert the index to discrete values
+  //this is done by applying the rounding function also used in WorldToIndex (see line 323)
+    inside = m_BoundingBox->IsInside(index);
+
+  return inside;
+}
+
+//##Documentation
+//## @brief Convenience method for working with ITK indices
+template <unsigned int VIndexDimension>
+bool mitk::BaseGeometry::IsIndexInside(const itk::Index<VIndexDimension> &index) const
+{
+  int i, dim=index.GetIndexDimension();
+  Point3D pt_index;
+  pt_index.Fill(0);
+  for ( i = 0; i < dim; ++i )
+  {
+    pt_index[i] = index[i];
+  }
+  return IsIndexInside(pt_index);
+}
+
+void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
+{
+  BackTransform(pt_mm, pt_units);
+}
+
+void mitk::BaseGeometry::WorldToIndex( const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
+{
+  BackTransform( vec_mm, vec_units);
+}
+
+void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
+{
+  MITK_WARN<<"Warning! Call of the deprecated function Geometry3D::WorldToIndex(point, vec, vec). Use Geometry3D::WorldToIndex(vec, vec) instead!";
+  //BackTransform(atPt3d_mm, vec_mm, vec_units);
+  this->WorldToIndex(vec_mm, vec_units);
+}
+
+void mitk::BaseGeometry::BackTransform(const mitk::Vector3D& in, mitk::Vector3D& out) const
+{
+  // Get WorldToIndex transform
+  if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
+  {
+    m_InvertedTransform = TransformType::New();
+    if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
+    {
+      itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
+    }
+    m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
+  }
+
+  // Check for valid matrix inversion
+  const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
+  if(inverse.GetVnlMatrix().has_nans())
+  {
+    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
+      << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
+      << inverse );
+  }
+
+  // Transform vector
+  for (unsigned int i = 0; i < 3; i++)
+  {
+    out[i] = 0.0;
+    for (unsigned int j = 0; j < 3; j++)
+    {
+      out[i] += inverse[i][j]*in[j];
+    }
+  }
+}
+
+void mitk::BaseGeometry::BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const
+{
+  ScalarType temp[3];
+  unsigned int i, j;
+  const TransformType::OffsetType& offset = m_IndexToWorldTransform->GetOffset();
+
+  // Remove offset
+  for (j = 0; j < 3; j++)
+  {
+    temp[j] = in[j] - offset[j];
+  }
+
+  // Get WorldToIndex transform
+  if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
+  {
+    m_InvertedTransform = TransformType::New();
+    if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
+    {
+      itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
+    }
+    m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
+  }
+
+  // Check for valid matrix inversion
+  const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
+  if(inverse.GetVnlMatrix().has_nans())
+  {
+    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
+      << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
+      << inverse );
+  }
+
+  // Transform point
+  for (i = 0; i < 3; i++)
+  {
+    out[i] = 0.0;
+    for (j = 0; j < 3; j++)
+    {
+      out[i] += inverse[i][j]*temp[j];
+    }
+  }
+}
+
+void mitk::BaseGeometry::BackTransform(const mitk::Point3D &/*at*/, const mitk::Vector3D &in, mitk::Vector3D& out) const
+{
+  MITK_INFO<<"Warning! Call of the deprecated function Geometry3D::BackTransform(point, vec, vec). Use Geometry3D::BackTransform(vec, vec) instead!";
+  //// Get WorldToIndex transform
+  //if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
+  //{
+  //  m_InvertedTransform = TransformType::New();
+  //  if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
+  //  {
+  //    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
+  //  }
+  //  m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
+  //}
+
+  //// Check for valid matrix inversion
+  //const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
+  //if(inverse.GetVnlMatrix().has_nans())
+  //{
+  //  itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
+  //    << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
+  //    << inverse );
+  //}
+
+  //// Transform vector
+  //for (unsigned int i = 0; i < 3; i++)
+  //{
+  //  out[i] = 0.0;
+  //  for (unsigned int j = 0; j < 3; j++)
+  //  {
+  //    out[i] += inverse[i][j]*in[j];
+  //  }
+  //}
+  this->BackTransform(in, out);
 }

@@ -119,7 +119,6 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
 
   if (m_SelectedFilter != NOFILTERSELECTED)
   {
-    m_Controls->m_InputData->setTitle("Please Select Input Data");
     m_Controls->m_InputImageLabel->setText("<font color='red'>mandatory</font>");
     m_Controls->m_InputBrainMaskLabel->setText("<font color='red'>mandatory</font>");
   }
@@ -157,7 +156,6 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
   // Preparation of GUI to start denoising if a filter is selected
   if (m_ImageNode.IsNotNull() && m_BrainMaskNode.IsNotNull())
   {
-    m_Controls->m_InputData->setTitle("Input Data");
     if(m_SelectedFilter != NOFILTERSELECTED)
     {
       m_Controls->m_ApplyButton->setEnabled(true);
@@ -177,6 +175,7 @@ void QmitkDenoisingView::StartDenoising()
     switch (m_SelectedFilter)
     {
       case NOFILTERSELECTED:
+      case GAUSS:
       {
         break;
       }
@@ -229,10 +228,6 @@ void QmitkDenoisingView::StartDenoising()
         // start denoising in detached thread
         m_DenoisingThread.start(QThread::HighestPriority);
 
-        break;
-      }
-      case GAUSS:
-      {
         break;
       }
     }

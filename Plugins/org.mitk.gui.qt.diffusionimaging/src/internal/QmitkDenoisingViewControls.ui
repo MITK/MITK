@@ -44,7 +44,7 @@
    <item>
     <widget class="QGroupBox" name="m_InputData">
      <property name="title">
-      <string>Please Select Input Data</string>
+      <string>Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">

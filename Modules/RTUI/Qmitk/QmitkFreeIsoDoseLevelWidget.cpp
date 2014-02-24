@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkFreeIsoDoseLevelWidget.h"
 
 
-QmitkFreeIsoDoseLevelWidget::QmitkFreeIsoDoseLevelWidget(QWidget*): m_ReferenceDose (30.0), m_InternalUpdate(false)
+QmitkFreeIsoDoseLevelWidget::QmitkFreeIsoDoseLevelWidget(QWidget*): m_ReferenceDose (40.0), m_InternalUpdate(false)
 {
   this->setupUi(this);
 

@@ -281,7 +281,11 @@ void RTDoseVisualizer::UpdateFreeIsoValues()
     item->setSizeHint(QSize(0,25));
     QmitkFreeIsoDoseLevelWidget* widget = new QmitkFreeIsoDoseLevelWidget;
 
+    float pref;
+    m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+
     widget->setIsoDoseLevel(pos->Value().GetPointer());
+    widget->setReferenceDose(pref);
     connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), widget, SLOT(setReferenceDose(double)));
     connect(widget,SIGNAL(ValueChanged(mitk::IsoDoseLevel*,mitk::DoseValueRel)), this, SLOT(UpdateFreeIsoLine(mitk::IsoDoseLevel*,mitk::DoseValueRel)));
 

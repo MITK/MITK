@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarRectangle.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPlanarEllipse.h"
+#include "mitkPlanarDoubleEllipse.h"
 
 #include "mitkBasePropertySerializer.h"
 
@@ -174,6 +175,10 @@ void mitk::PlanarFigureReader::GenerateData()
     else if (type == "PlanarArrow")
     {
       planarFigure = mitk::PlanarArrow::New();
+    }
+    else if (type == "PlanarDoubleEllipse")
+    {
+      planarFigure = mitk::PlanarDoubleEllipse::New();
     }
     else
     {

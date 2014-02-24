@@ -58,6 +58,9 @@ mitk::PlanarFigureActivator::start(ctkPluginContext* /*context*/)
   mitk::NodePredicateAnd::Pointer isPlanarPath = mitk::NodePredicateAnd::New(isNotClosedPolygon, isPlanarPolygon);
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarPath"), QString(":/QmitkExt/PlanarPath_48.png"), isPlanarPath, descriptorManager));
 
+  // Adding "PlanarDoubleEllipse"
+  mitk::NodePredicateDataType::Pointer isPlanarDoubleEllipse = mitk::NodePredicateDataType::New("PlanarDoubleEllipse");
+  descriptorManager->AddDescriptor(new QmitkNodeDescriptor("PlanarDoubleEllipse", ":/QmitkExt/PlanarDoubleEllipse_48.png", isPlanarDoubleEllipse, descriptorManager));
 }
 
 void

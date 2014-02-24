@@ -104,6 +104,15 @@
       <action name="add_new_point" ID="10" /> <!-- AcADDPOINT -->
     </transition>
 
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlacedByDrag" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="figure_is_selected" />
+      <condition name="point_is_valid" />
+      <condition name="figure_is_finished" />
+      <condition name="reset_on_point_select_needed" />
+      <action name="move_current_point" />
+    </transition>
+
     <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="HoveringOverFigure" > <!-- continue hovering -->
       <condition name="figure_is_on_current_slice" />
       <condition name="figure_is_selected" inverted="true" />
@@ -198,6 +207,7 @@
       <action name="move_current_point" ID="90" />
     </transition>
 
+    <!-- Transition for adding and moving points in existing ROIs -->
     <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="HoveringOverPoint" >
       <!-- we just put the point there, hovering by definition -->
       <condition name="point_is_valid" />
@@ -207,10 +217,11 @@
       <action name="end_interaction" />
     </transition>
 
+    <!-- Transition for adding and moving points in new PlanarFigures -->
     <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="HoveringOverPoint" >
       <!-- we just put the point there, hovering by definition -->
       <condition name="point_is_valid" />
-      <condition name="minimal_figure_is_finished" />
+      <condition name="figure_is_finished" />
       <condition name="figure_is_placed" inverted="true" />
       <action name="select_point" />
       <!--<action name="end_interaction" />-->

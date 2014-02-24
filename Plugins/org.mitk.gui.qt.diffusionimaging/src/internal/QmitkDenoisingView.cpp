@@ -36,6 +36,7 @@ void QmitkDenoisingWorker::run()
     switch (m_View->m_SelectedFilter)
     {
       case 0:
+      case 3:
       {
         break;
       }
@@ -108,6 +109,7 @@ void QmitkDenoisingView::Activated()
   m_Controls->m_SelectFilterComboBox->insertItem(NOFILTERSELECTED, QString( QApplication::translate("QmitkDenoisingView", "Please select a filter", 0, QApplication::UnicodeUTF8) ));
   m_Controls->m_SelectFilterComboBox->insertItem(NLMR, QString( QApplication::translate("QmitkDenoisingView", "Non local means filter", 0, QApplication::UnicodeUTF8) ));
   m_Controls->m_SelectFilterComboBox->insertItem(NLMV, QString( QApplication::translate("QmitkDenoisingView", "Non local means filter with joint information", 0, QApplication::UnicodeUTF8) ));
+  m_Controls->m_SelectFilterComboBox->insertItem(GAUSS, QString( QApplication::translate("QmitkDenoisingView", "Discrete gaussian filter", 0, QApplication::UnicodeUTF8) ));
 }
 
 void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
@@ -115,9 +117,15 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
   if (m_ThreadIsRunning)
     return;
 
-  m_Controls->m_InputData->setTitle("Please Select Input Data");
-  m_Controls->m_InputImageLabel->setText("<font color='red'>mandatory</font>");
-  m_Controls->m_InputBrainMaskLabel->setText("<font color='red'>mandatory</font>");
+  if (m_SelectedFilter != NOFILTERSELECTED)
+  {
+    m_Controls->m_InputImageLabel->setText("<font color='red'>mandatory</font>");
+    m_Controls->m_InputBrainMaskLabel->setText("<font color='red'>mandatory</font>");
+  }
+  else
+  {
+    m_Controls->m_InputImageLabel->setText("mandatory");
+  }
   m_Controls->m_ApplyButton->setEnabled(false);
 
   m_ImageNode = NULL;
@@ -148,22 +156,26 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
   // Preparation of GUI to start denoising if a filter is selected
   if (m_ImageNode.IsNotNull() && m_BrainMaskNode.IsNotNull())
   {
-    m_Controls->m_InputData->setTitle("Input Data");
     if(m_SelectedFilter != NOFILTERSELECTED)
     {
       m_Controls->m_ApplyButton->setEnabled(true);
     }
   }
+  else if (m_ImageNode.IsNotNull() && m_SelectedFilter == GAUSS)
+  {
+    m_Controls->m_ApplyButton->setEnabled(true);
+  }
 }
 
 void QmitkDenoisingView::StartDenoising()
 {
-  if (m_ImageNode.IsNotNull() && m_BrainMaskNode.IsNotNull())
+  if (m_ImageNode.IsNotNull() && m_BrainMaskNode.IsNotNull() && m_SelectedFilter != GAUSS)
   {
     m_LastProgressCount = 0;
     switch (m_SelectedFilter)
     {
       case NOFILTERSELECTED:
+      case GAUSS:
       {
         break;
       }
@@ -220,25 +232,57 @@ void QmitkDenoisingView::StartDenoising()
       }
     }
   }
+  else if(m_SelectedFilter == GAUSS && m_ImageNode.IsNotNull())
+  {
+    // initialize GAUSS
+    m_InputImage = dynamic_cast<DiffusionImageType*> (m_ImageNode->GetData());
+
+    ExtractFilterType::Pointer extractor = ExtractFilterType::New();
+    extractor->SetInput(m_InputImage->GetVectorImage());
+    ComposeFilterType::Pointer composer = ComposeFilterType::New();
+
+    for (unsigned int i = 0; i < m_InputImage->GetVectorImage()->GetVectorLength(); ++i)
+    {
+      extractor->SetIndex(i);
+      extractor->Update();
+
+      m_GaussianFilter = GaussianFilterType::New();
+      m_GaussianFilter->SetInput(extractor->GetOutput());
+      m_GaussianFilter->SetVariance(m_Controls->m_SpinBoxParameter1->value());
+      m_GaussianFilter->Update();
+
+      composer->SetInput(i, m_GaussianFilter->GetOutput());
+    }
+    composer->Update();
+
+
+    DiffusionImageType::Pointer image = DiffusionImageType::New();
+    image->SetVectorImage(composer->GetOutput());
+    image->SetReferenceBValue(m_InputImage->GetReferenceBValue());
+    image->SetDirections(m_InputImage->GetDirections());
+    image->InitializeFromVectorImage();
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_ImageNode->GetName().c_str();
+
+    imageNode->SetName((name+"_gauss_"+QString::number(m_Controls->m_SpinBoxParameter1->value())).toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode);
+  }
 }
 
 void QmitkDenoisingView::ResetParameterPanel()
 {
-  m_Controls->m_LabelParameter_1->setEnabled(false);
-  m_Controls->m_LabelParameter_1->setText("Parameter 1:");
-  m_Controls->m_LabelParameter_2->setEnabled(false);
-  m_Controls->m_LabelParameter_2->setText("Parameter 2:");
-  m_Controls->m_LabelParameter_3->setEnabled(false);
-  m_Controls->m_LabelParameter_3->setText("Parameter 3:");
+  m_Controls->m_DwiLabel->setEnabled(false);
+  m_Controls->m_InputImageLabel->setEnabled(false);
+  m_Controls->m_BrainMaskLabel->hide();
+  m_Controls->m_InputBrainMaskLabel->hide();
+  m_Controls->m_ParameterBox->hide();
+  m_Controls->m_LabelParameter_1->hide();
+  m_Controls->m_LabelParameter_2->hide();
   m_Controls->m_LabelParameter_3->hide();
-  m_Controls->m_SpinBoxParameter1->setEnabled(false);
-  m_Controls->m_SpinBoxParameter1->setValue(1);
-  m_Controls->m_SpinBoxParameter2->setEnabled(false);
-  m_Controls->m_SpinBoxParameter2->setValue(1);
-  m_Controls->m_SpinBoxParameter3->setEnabled(false);
-  m_Controls->m_SpinBoxParameter3->setValue(1);
+  m_Controls->m_SpinBoxParameter1->hide();
+  m_Controls->m_SpinBoxParameter2->hide();
   m_Controls->m_SpinBoxParameter3->hide();
-  m_Controls->m_ApplyButton->setEnabled(false);
 }
 
 void QmitkDenoisingView::SelectFilter(int filter)
@@ -260,13 +304,18 @@ void QmitkDenoisingView::SelectFilter(int filter)
     case 1:
     {
       m_SelectedFilter = NLMR;
-      m_Controls->m_LabelParameter_1->setEnabled(true);
+      m_Controls->m_DwiLabel->setEnabled(true);
+      m_Controls->m_InputImageLabel->setEnabled(true);
+      m_Controls->m_BrainMaskLabel->show();
+      m_Controls->m_InputBrainMaskLabel->show();
+      m_Controls->m_ParameterBox->show();
+      m_Controls->m_LabelParameter_1->show();
       m_Controls->m_LabelParameter_1->setText("Search Radius:");
-      m_Controls->m_LabelParameter_2->setEnabled(true);
+      m_Controls->m_LabelParameter_2->show();
       m_Controls->m_LabelParameter_2->setText("Comparision Radius:");
-      m_Controls->m_SpinBoxParameter1->setEnabled(true);
+      m_Controls->m_SpinBoxParameter1->show();
       m_Controls->m_SpinBoxParameter1->setValue(1);
-      m_Controls->m_SpinBoxParameter2->setEnabled(true);
+      m_Controls->m_SpinBoxParameter2->show();
       m_Controls->m_SpinBoxParameter2->setValue(1);
 
       break;
@@ -274,28 +323,71 @@ void QmitkDenoisingView::SelectFilter(int filter)
     case 2:
     {
       m_SelectedFilter = NLMV;
-      m_Controls->m_LabelParameter_1->setEnabled(true);
+      m_Controls->m_DwiLabel->setEnabled(true);
+      m_Controls->m_InputImageLabel->setEnabled(true);
+      m_Controls->m_BrainMaskLabel->show();
+      m_Controls->m_InputBrainMaskLabel->show();
+      m_Controls->m_ParameterBox->show();
+      m_Controls->m_LabelParameter_1->show();
       m_Controls->m_LabelParameter_1->setText("Search Radius:");
-      m_Controls->m_LabelParameter_2->setEnabled(true);
+      m_Controls->m_LabelParameter_2->show();
       m_Controls->m_LabelParameter_2->setText("Comparision Radius:");
       m_Controls->m_LabelParameter_3->show();
-      m_Controls->m_LabelParameter_3->setEnabled(true);
       m_Controls->m_LabelParameter_3->setText("Number of neighboring gradients:");
-      m_Controls->m_SpinBoxParameter1->setEnabled(true);
+      m_Controls->m_SpinBoxParameter1->show();
       m_Controls->m_SpinBoxParameter1->setValue(1);
-      m_Controls->m_SpinBoxParameter2->setEnabled(true);
+      m_Controls->m_SpinBoxParameter2->show();
       m_Controls->m_SpinBoxParameter2->setValue(1);
       m_Controls->m_SpinBoxParameter3->show();
-      m_Controls->m_SpinBoxParameter3->setEnabled(true);
       m_Controls->m_SpinBoxParameter3->setValue(1);
 
       break;
     }
+    case 3:
+    {
+      m_SelectedFilter = GAUSS;
+      m_Controls->m_DwiLabel->setEnabled(true);
+      m_Controls->m_InputImageLabel->setEnabled(true);
+      m_Controls->m_ParameterBox->show();
+      m_Controls->m_LabelParameter_1->show();
+      m_Controls->m_LabelParameter_1->setText("Variance:");
+      m_Controls->m_SpinBoxParameter1->show();
+      m_Controls->m_SpinBoxParameter1->setValue(2);
+      m_Controls->m_LabelParameter_2->hide();
+      m_Controls->m_SpinBoxParameter2->hide();
+    }
   }
 
-  if (m_ImageNode.IsNotNull() && m_BrainMaskNode.IsNotNull() && m_SelectedFilter != NOFILTERSELECTED)
+  if (m_ImageNode.IsNull())
   {
-    m_Controls->m_ApplyButton->setEnabled(true);
+    if (m_SelectedFilter != NOFILTERSELECTED)
+      m_Controls->m_InputImageLabel->setText("<font color='red'>mandatory</font>");
+    else
+      m_Controls->m_InputImageLabel->setText("mandatory");
+  }
+
+  if (m_ImageNode.IsNotNull())
+  {
+    m_Controls->m_ApplyButton->setEnabled(false);
+    switch(filter)
+    {
+      case NOFILTERSELECTED:
+      {
+        break;
+      }
+      case NLMR:
+      case NLMV:
+      {
+        if (m_BrainMaskNode.IsNotNull())
+          m_Controls->m_ApplyButton->setEnabled(true);
+        break;
+      }
+      case GAUSS:
+      {
+        m_Controls->m_ApplyButton->setEnabled(true);
+        break;
+      }
+    }
   }
 }
 
@@ -324,6 +416,7 @@ void QmitkDenoisingView::AfterThread()
   switch (m_SelectedFilter)
   {
     case NOFILTERSELECTED:
+    case GAUSS:
     {
       break;
     }
@@ -377,6 +470,7 @@ void QmitkDenoisingView::UpdateProgress()
   switch (m_SelectedFilter)
   {
     case NOFILTERSELECTED:
+    case GAUSS:
     {
       break;
     }

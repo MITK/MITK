@@ -27,13 +27,28 @@
     <number>9</number>
    </property>
    <item>
+    <widget class="QGroupBox" name="gridGroupBox">
+     <property name="title">
+      <string>Denoisingfilter</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="margin">
+       <number>9</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QComboBox" name="m_SelectFilterComboBox"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="m_InputData">
      <property name="title">
-      <string>Please Select Input Data</string>
+      <string>Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="m_DwiLabel">
         <property name="text">
          <string>DWI:</string>
         </property>
@@ -50,7 +65,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="m_BrainMaskLabel">
         <property name="text">
          <string>Brainmask:</string>
         </property>
@@ -62,21 +77,6 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="gridGroupBox">
-     <property name="title">
-      <string>Denoisingfilter</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="margin">
-       <number>9</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QComboBox" name="m_SelectFilterComboBox"/>
       </item>
      </layout>
     </widget>

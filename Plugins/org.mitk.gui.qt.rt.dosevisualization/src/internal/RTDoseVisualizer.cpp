@@ -55,6 +55,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRenderWindow.h"
 #include <mitkExtractSliceFilter.h>
 
+#include "mitkSurfaceGLMapper2D.h"
+#include "mitkPolyDataGLMapper2D.h"
+#include "mitkSurfaceVtkMapper3D.h"
+
 const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualization";
 
 RTDoseVisualizer::RTDoseVisualizer()
@@ -462,6 +466,10 @@ void RTDoseVisualizer::UpdatePolyData(int num, double min, double max)
 
   mitk::DataNode::Pointer isolineNode = mitk::DataNode::New();
   isolineNode->SetData(isoline);
+//  mitk::PolyDataGLMapper2D::Pointer mapper = mitk::PolyDataGLMapper2D::New();
+//  mitk::SurfaceGLMapper2D::Pointer mapper = mitk::SurfaceGLMapper2D::New();
+  mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
+  isolineNode->SetMapper(1, mapper);
   isolineNode->SetName("Isoline1");
   this->GetDataStorage()->Add(isolineNode);
 }

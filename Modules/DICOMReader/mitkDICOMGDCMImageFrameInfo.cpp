@@ -56,7 +56,14 @@ mitk::DICOMGDCMImageFrameInfo
     if (mappedValue->second != NULL)
     {
       std::string s(mappedValue->second);
-      return s.erase(s.find_last_not_of(" \n\r\t")+1);
+      try
+      {
+        return s.erase(s.find_last_not_of(" \n\r\t")+1);
+      }
+      catch(...)
+      {
+        return s;
+      }
     }
     else
     {

@@ -37,7 +37,8 @@ namespace mitk
  *
  */
 
-  class MITK_CORE_EXPORT InteractionPositionEvent : public InteractionEvent {
+  class MITK_CORE_EXPORT InteractionPositionEvent : public InteractionEvent
+  {
 
   public:
 

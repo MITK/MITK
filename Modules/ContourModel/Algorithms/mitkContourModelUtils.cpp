@@ -177,6 +177,7 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
 
       booleanOperation->SetInput2Data(sliceImage->GetVtkImageData());
       booleanOperation->SetOperationToOr();
+      booleanOperation->SetOutputTrueValue(1.0);
 
       if(paintingPixelValue == 1)
       {

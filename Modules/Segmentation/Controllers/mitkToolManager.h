@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 #include <map>
 
+#include "usServiceRegistration.h"
+
 namespace mitk
 {
 
@@ -276,6 +278,7 @@ class Segmentation_EXPORT ToolManager : public itk::Object
 
     Tool* m_ActiveTool;
     int m_ActiveToolID;
+    us::ServiceRegistration<InteractionEventObserver> m_ActiveToolRegistration;
 
     DataVectorType m_ReferenceData;
     NodeTagMapType  m_ReferenceDataObserverTags;

@@ -68,11 +68,7 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     LiveWireTool2D();
     virtual ~LiveWireTool2D();
 
-    /**
-    * \brief Calculates how good the data, this statemachine handles, is hit by the event.
-    *
-    */
-    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+    void ConnectActionsAndFunctions();
 
     virtual void Activated();
     virtual void Deactivated();
@@ -81,25 +77,25 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     virtual void ClearContours();
 
     /// \brief Initialize tool
-    virtual bool OnInitLiveWire (Action*, const StateEvent*);
+    virtual bool OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Add a control point and finish current segment
-    virtual bool OnAddPoint   (Action*, const StateEvent*);
+    virtual bool OnAddPoint   ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Actual LiveWire computation
-    virtual bool OnMouseMoved(Action*, const StateEvent*);
+    virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Check double click on first control point to finish the LiveWire tool
-    virtual bool OnCheckPoint(Action*, const StateEvent*);
+    virtual bool OnCheckPoint( const InteractionEvent* interactionEvent );
 
     /// \brief Finish LiveWire tool
-    virtual bool OnFinish(Action*, const StateEvent*);
+    virtual bool OnFinish( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Close the contour
-    virtual bool OnLastSegmentDelete(Action*, const StateEvent*);
+    virtual bool OnLastSegmentDelete( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Don't use dynamic cost map for LiveWire calculation
-    virtual bool OnMouseMoveNoDynamicCosts(Action*, const StateEvent*);
+    virtual bool OnMouseMoveNoDynamicCosts( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Finish contour interaction.
     void FinishTool();

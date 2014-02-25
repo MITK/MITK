@@ -31,7 +31,8 @@ namespace mitk
   public:
     mitkClassMacro(IntPropertyExtension, PropertyExtension);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro2Param(Self, int, int);
     mitkNewMacro3Param(Self, int, int, int);
 

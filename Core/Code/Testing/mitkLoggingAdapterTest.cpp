@@ -25,7 +25,8 @@ class ItkLoggingTestClass : public itk::Object
   public:
 
     mitkClassMacro( ItkLoggingTestClass , itk::Object );
-    itkNewMacro( ItkLoggingTestClass );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void TestItkWarningMessage()
       {

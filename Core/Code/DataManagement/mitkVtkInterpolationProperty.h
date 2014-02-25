@@ -39,7 +39,8 @@ public:
 
   mitkClassMacro( VtkInterpolationProperty, EnumerationProperty );
 
-  itkNewMacro(VtkInterpolationProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(VtkInterpolationProperty, const IdType&);
 

@@ -62,7 +62,8 @@ class MITK_CORE_EXPORT Geometry2DDataToSurfaceFilter : public SurfaceSource
 {
   public:
     mitkClassMacro(Geometry2DDataToSurfaceFilter, SurfaceSource);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual void GenerateOutputInformation();
 

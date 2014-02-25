@@ -33,7 +33,8 @@ namespace mitk {
     {
     public:
       mitkClassMacro(USImageMetadata, itk::Object);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
 
       //## getter and setter ##

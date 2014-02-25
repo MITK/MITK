@@ -71,7 +71,8 @@ namespace mitk
   public:
 
     mitkClassMacro(ExtractDirectedPlaneImageFilter, ImageToImageFilter);
-    itkNewMacro(ExtractDirectedPlaneImageFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetMacro( WorldGeometry, Geometry2D* );
 

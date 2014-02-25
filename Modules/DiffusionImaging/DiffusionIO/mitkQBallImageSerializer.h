@@ -28,7 +28,8 @@ class QBallImageSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( QBallImageSerializer, BaseDataSerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     virtual std::string Serialize();
   protected:
     QBallImageSerializer();

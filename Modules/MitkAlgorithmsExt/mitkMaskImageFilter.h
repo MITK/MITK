@@ -35,7 +35,8 @@ class MitkAlgorithmsExt_EXPORT MaskImageFilter : public ImageToImageFilter
 public:
   mitkClassMacro(MaskImageFilter, ImageToImageFilter);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void SetMask( const mitk::Image* mask );
   const mitk::Image* GetMask() const;

@@ -24,7 +24,8 @@ class FiberTrackingObjectFactory : public CoreObjectFactoryBase
 {
   public:
     mitkClassMacro(FiberTrackingObjectFactory,CoreObjectFactoryBase)
-    itkNewMacro(FiberTrackingObjectFactory)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     ~FiberTrackingObjectFactory();
 

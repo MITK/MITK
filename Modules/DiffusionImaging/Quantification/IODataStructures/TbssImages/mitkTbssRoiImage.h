@@ -41,7 +41,8 @@ namespace mitk
     //typedef typename std::vector <Index<3> > RoiType;
 
     mitkClassMacro( TbssRoiImage, Image )
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
 
     //void SetRequestedRegionToLargestPossibleRegion();

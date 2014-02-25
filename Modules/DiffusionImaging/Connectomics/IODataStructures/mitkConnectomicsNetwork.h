@@ -86,7 +86,8 @@ namespace mitk {
 
     // Macros
     mitkClassMacro( ConnectomicsNetwork, BaseData );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     ////////////////// Interface ///////////////////
     /** return whether an edge exists between the two given vertices */

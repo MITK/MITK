@@ -51,7 +51,8 @@ class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
   public:
 
     mitkClassMacro(CorrectorAlgorithm, ImageToImageFilter);
-    itkNewMacro(CorrectorAlgorithm);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * \brief User drawn contour

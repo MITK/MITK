@@ -44,7 +44,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(USImageVideoSource, itk::ProcessObject);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       * \brief Defines a region of interest by top left and bottom right corner.

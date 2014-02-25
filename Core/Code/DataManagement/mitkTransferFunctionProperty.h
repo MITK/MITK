@@ -45,7 +45,8 @@ public:
 
   mitkClassMacro(TransferFunctionProperty, BaseProperty);
 
-  itkNewMacro(TransferFunctionProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro1Param(TransferFunctionProperty, mitk::TransferFunction::Pointer);
 
   itkSetMacro(Value, mitk::TransferFunction::Pointer );

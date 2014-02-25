@@ -45,7 +45,8 @@ public:
 
   mitkClassMacro( GradientBackground, BaseData );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * Sets the renderwindow, in which the gradient background

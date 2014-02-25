@@ -56,7 +56,8 @@ public:
 
   mitkClassMacro( EnumerationProperty, BaseProperty );
 
-  itkNewMacro(EnumerationProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * Represents the unique id which is asigned to each enumeration value

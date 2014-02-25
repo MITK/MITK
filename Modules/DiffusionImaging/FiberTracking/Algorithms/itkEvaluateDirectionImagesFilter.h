@@ -44,7 +44,8 @@ public:
     typedef typename Superclass::OutputImageType        OutputImageType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(EvaluateDirectionImagesFilter, ImageToImageFilter)

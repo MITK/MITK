@@ -41,7 +41,8 @@ class Segmentation_EXPORT ShapeBasedInterpolationAlgorithm : public Segmentation
   public:
 
     mitkClassMacro(ShapeBasedInterpolationAlgorithm, SegmentationInterpolationAlgorithm);
-    itkNewMacro(ShapeBasedInterpolationAlgorithm);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     Image::Pointer Interpolate(Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
                                Image::ConstPointer upperSlice, unsigned int upperSliceIndex,

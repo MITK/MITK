@@ -38,7 +38,8 @@ namespace mitk
   public:
 
     mitkClassMacro( DicomDiffusionImageHeaderReader, itk::Object );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** En enum to distinguish in processing between the different vendoors */
     enum SupportedVendors{

@@ -40,8 +40,9 @@ class Connectomics_EXPORT classname ## Serializer : public EnumerationPropertySe
 { \
   public: \
      \
-    mitkClassMacro( classname ## Serializer, EnumerationPropertySerializer ); \
-    itkNewMacro(Self); \
+    mitkClassMacro( classname ## Serializer, EnumerationPropertySerializer ) \
+    itkFactorylessNewMacro(Self) \
+    itkCloneMacro(Self) \
  \
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) \
     { \

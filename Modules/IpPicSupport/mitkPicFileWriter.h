@@ -38,7 +38,8 @@ public:
 
     mitkClassMacro( PicFileWriter, mitk::FileWriter );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     mitkWriterMacro;
 

@@ -44,7 +44,8 @@ namespace mitk
     /*!
     * \brief Method for creation through the object factory.
     */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     * \brief Sets the number of iterations which will be performed during the registration process.

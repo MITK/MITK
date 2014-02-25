@@ -31,7 +31,8 @@ class SceneSerializationBase_EXPORT BoolLookupTablePropertySerializer : public B
   public:
 
     mitkClassMacro( BoolLookupTablePropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

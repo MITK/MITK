@@ -22,7 +22,8 @@ class RawDataDeviceHelperImpl : public mitk::ToFCameraPMDRawDataCamBoardDevice
 {
 public:
   mitkClassMacro(RawDataDeviceHelperImpl, mitk::ToFCameraPMDRawDataCamBoardDevice);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkSetMacro(CaptureWidth, int);
   itkSetMacro(CaptureHeight, int);

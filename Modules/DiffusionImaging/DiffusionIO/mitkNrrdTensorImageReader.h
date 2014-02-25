@@ -41,7 +41,8 @@ namespace mitk
     typedef itk::Matrix< float, 3, 3 > MeasurementFrameType;
 
     mitkClassMacro( NrrdTensorImageReader, DTImgSourceType );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     const char* GetFileName() const;
     void SetFileName(const char* aFileName);

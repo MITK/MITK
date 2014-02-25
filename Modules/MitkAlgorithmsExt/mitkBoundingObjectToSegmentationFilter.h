@@ -26,7 +26,8 @@ namespace mitk{
   {
   public:
     mitkClassMacro(BoundingObjectToSegmentationFilter, ImageToImageFilter);
-    itkNewMacro(BoundingObjectToSegmentationFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void SetBoundingObject(mitk::BoundingObject::Pointer boundingObject);
   protected:

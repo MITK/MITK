@@ -46,7 +46,8 @@ class Segmentation_EXPORT FillRegionTool : public SetRegionTool
   public:
 
     mitkClassMacro(FillRegionTool, SetRegionTool);
-    itkNewMacro(FillRegionTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual us::ModuleResource GetCursorIconResource() const;

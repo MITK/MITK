@@ -36,7 +36,8 @@ class PlanarFigure_EXPORT PlanarLine : public PlanarFigure
 public:
   mitkClassMacro( PlanarLine, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   /** \brief Place figure in its minimal configuration (a point at least)

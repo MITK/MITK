@@ -37,7 +37,8 @@ namespace mitk
 
     mitkClassMacro(DiffSliceOperationApplier, OperationActor);
 
-    //itkNewMacro(DiffSliceOperationApplier);
+    //itkFactorylessNewMacro(Self)
+    //itkCloneMacro(Self)
 
     /** \brief Returns an instance of the class */
     static DiffSliceOperationApplier* GetInstance();

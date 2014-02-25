@@ -31,7 +31,8 @@ class TDMouseVtkCameraController : public CameraController
 {
 public:
   mitkClassMacro(TDMouseVtkCameraController, CameraController);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual bool OnTDMouseEvent(mitk::Action* a, const mitk::StateEvent* e);
   virtual bool OnTDMouseKeyDown(mitk::Action* a, const mitk::StateEvent* e);

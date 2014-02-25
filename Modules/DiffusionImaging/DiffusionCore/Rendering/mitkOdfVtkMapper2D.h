@@ -67,7 +67,8 @@ class OdfVtkMapper2D : public VtkMapper
 public:
 
     mitkClassMacro(OdfVtkMapper2D,VtkMapper)
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
     bool IsVisibleOdfs(mitk::BaseRenderer* renderer);

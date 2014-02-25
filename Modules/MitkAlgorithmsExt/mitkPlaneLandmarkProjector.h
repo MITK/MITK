@@ -33,7 +33,8 @@ class MitkAlgorithmsExt_EXPORT PlaneLandmarkProjector : public LandmarkProjector
 public:
   mitkClassMacro(PlaneLandmarkProjector, LandmarkProjector);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   //##Documentation
   //## @brief Set the plane-geometry to project the target-landmarks on.

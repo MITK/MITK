@@ -39,7 +39,8 @@ class MitkExt_EXPORT ExternAbstractTransformGeometry : public AbstractTransformG
 public:
   mitkClassMacro(ExternAbstractTransformGeometry, AbstractTransformGeometry);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   //##Documentation
   //## @brief Set the vtkAbstractTransform (stored in m_VtkAbstractTransform)

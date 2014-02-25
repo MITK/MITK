@@ -44,7 +44,8 @@ namespace mitk
   public:
 
     mitkClassMacro(ClaronInterface, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     /**
     * \brief Initialization of claroninterface.
     * \param calibrationDir   The directory where the device can find the camera calibration file.

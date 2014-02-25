@@ -50,7 +50,8 @@ class MitkExt_EXPORT PlanesPerpendicularToLinesFilter : public GeometryDataSourc
 {
 public:
   mitkClassMacro(PlanesPerpendicularToLinesFilter, GeometryDataSource);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void GenerateOutputInformation();
 

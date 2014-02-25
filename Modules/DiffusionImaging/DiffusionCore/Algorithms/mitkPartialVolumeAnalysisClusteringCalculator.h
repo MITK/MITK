@@ -430,7 +430,8 @@ namespace mitk
     };
 
     mitkClassMacro( PartialVolumeAnalysisClusteringCalculator, itk::Object )
-        itkNewMacro( PartialVolumeAnalysisClusteringCalculator )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
         ParamsType *InitialGuess(HistType h) const;
 

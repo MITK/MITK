@@ -39,7 +39,8 @@ namespace mitk
 
     // only needed for smartpointer
     mitkClassMacro(KalmanFilter,itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     KalmanFilter();
     virtual ~KalmanFilter();

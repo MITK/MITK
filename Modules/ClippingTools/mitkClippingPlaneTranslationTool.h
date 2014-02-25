@@ -41,7 +41,8 @@ namespace mitk
   public:
 
     mitkClassMacro(ClippingPlaneTranslationTool, Tool);
-    itkNewMacro(ClippingPlaneTranslationTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;

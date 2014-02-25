@@ -48,7 +48,8 @@ class MitkIGT_EXPORT NavigationDataRecorder : public itk::ProcessObject
 public:
     mitkClassMacro( NavigationDataRecorder, itk::ProcessObject );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**Documentation
     * \brief Determines where the output is directed to

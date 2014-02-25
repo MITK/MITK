@@ -37,7 +37,8 @@ namespace mitk
     /** Method for creation through the object factory. */
 
     mitkClassMacro(ConnectomicsSimulatedAnnealingCostFunctionModularity, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     // Evaluate the network according to the set cost function
     double Evaluate( mitk::ConnectomicsNetwork::Pointer network, ToModuleMapType *vertexToModuleMap  ) const;

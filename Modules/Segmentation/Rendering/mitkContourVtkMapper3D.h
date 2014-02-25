@@ -42,7 +42,8 @@ class Segmentation_EXPORT ContourVtkMapper3D : public VtkMapper
 public:
   mitkClassMacro(ContourVtkMapper3D, VtkMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual const mitk::Contour* GetInput();
 

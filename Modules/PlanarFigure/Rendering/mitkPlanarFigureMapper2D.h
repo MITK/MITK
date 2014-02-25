@@ -112,7 +112,8 @@ public:
 
   mitkClassMacro(PlanarFigureMapper2D, GLMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
   * reimplemented from Baseclass

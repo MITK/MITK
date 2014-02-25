@@ -45,7 +45,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(FiberBundleXThreadMonitorMapper3D, VtkMapper);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     //========== essential implementation for 3D mapper ========
     const FiberBundleXThreadMonitor* GetInput();

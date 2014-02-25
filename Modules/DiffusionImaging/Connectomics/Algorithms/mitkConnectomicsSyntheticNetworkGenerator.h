@@ -41,7 +41,8 @@ namespace mitk
     /** Method for creation through the object factory. */
 
     mitkClassMacro(ConnectomicsSyntheticNetworkGenerator, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Create Synthetic Networks */
     mitk::ConnectomicsNetwork::Pointer CreateSyntheticNetwork(int networkTypeId, int paramterOne, double parameterTwo);

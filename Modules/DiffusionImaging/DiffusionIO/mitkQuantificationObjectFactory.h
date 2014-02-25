@@ -10,7 +10,8 @@ class QuantificationObjectFactory : public CoreObjectFactoryBase
 {
   public:
     mitkClassMacro(QuantificationObjectFactory,CoreObjectFactoryBase)
-    itkNewMacro(QuantificationObjectFactory)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     ~QuantificationObjectFactory();
 

@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 /**Documentation
-* NavigationDataEvaluationFilter has a protected constructor and a protected itkNewMacro
+* NavigationDataEvaluationFilter has a protected constructor and a protected itkFactorylessNewMacro
 * so that only it's friend class ClaronTrackingDevice is able to instantiate
 * tool objects. Therefore, we derive from NavigationDataEvaluationFilter and add a
-* public itkNewMacro, so that we can instantiate and test the class
+* public itkFactorylessNewMacro, so that we can instantiate and test the class
 */
 class NavigationDataEvaluationFilterTestClass : public mitk::NavigationDataEvaluationFilter
 {

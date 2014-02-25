@@ -31,7 +31,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(CopyImageMapper2D,ImageVtkMapper2D);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     friend class CompositeMapper;
   };
@@ -44,7 +45,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(CompositeMapper,VtkMapper);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual void MitkRenderOverlay(BaseRenderer* renderer)
     {

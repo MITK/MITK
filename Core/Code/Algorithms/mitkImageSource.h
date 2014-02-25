@@ -45,7 +45,8 @@ public:
   mitkClassMacro(ImageSource,BaseDataSource)
 
   /** @brief Method for creation through the object factory. */
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** @brief Some convenient typedefs. */
   typedef mitk::Image OutputImageType;

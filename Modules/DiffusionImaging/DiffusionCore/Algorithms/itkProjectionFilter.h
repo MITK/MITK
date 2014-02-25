@@ -72,7 +72,8 @@ public:
   typedef SmartPointer<const Self> ConstPointer;
 
   /** */
-  itkNewMacro( Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   /** \brief Does the actual projection */

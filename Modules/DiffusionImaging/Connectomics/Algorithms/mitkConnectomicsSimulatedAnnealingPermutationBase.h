@@ -40,7 +40,8 @@ namespace mitk
     /** Method for creation through the object factory. */
 
     mitkClassMacro(ConnectomicsSimulatedAnnealingPermutationBase, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     // Set the cost function
     void SetCostFunction( mitk::ConnectomicsSimulatedAnnealingCostFunctionBase::Pointer costFunction );

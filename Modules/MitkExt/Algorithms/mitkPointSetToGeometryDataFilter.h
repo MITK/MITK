@@ -36,7 +36,8 @@ public:
    */
   mitkClassMacro( PointSetToGeometryDataFilter, GeometryDataSource );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * Common typdedefs for the input type and corresponding pointers

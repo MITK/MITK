@@ -59,7 +59,8 @@ namespace itk{
     typedef ImageSource< Image< vcl_complex< TPixelType >, 2 > > Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(KspaceImageFilter, ImageToImageFilter)

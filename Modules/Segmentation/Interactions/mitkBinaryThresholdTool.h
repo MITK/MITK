@@ -48,7 +48,8 @@ namespace mitk
     Message1<double>     ThresholdingValueChanged;
 
     mitkClassMacro(BinaryThresholdTool, AutoSegmentationTool);
-    itkNewMacro(BinaryThresholdTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     us::ModuleResource GetIconResource() const;

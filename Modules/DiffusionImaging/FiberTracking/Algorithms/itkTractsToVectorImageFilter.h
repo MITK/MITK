@@ -44,7 +44,8 @@ public:
 
     typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
 
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     itkTypeMacro( TractsToVectorImageFilter, ImageSource )
 
     itkSetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold

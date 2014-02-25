@@ -41,7 +41,8 @@ class MitkExt_EXPORT CylindricToCartesianFilter : public ImageToImageFilter
 public:
   mitkClassMacro(CylindricToCartesianFilter, ImageToImageFilter);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   //##Documentation
   //## @brief Set background grey level

@@ -33,7 +33,8 @@ class MITK_CORE_EXPORT GeometryData : public BaseData
 public:
   mitkClassMacro(GeometryData, BaseData);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void UpdateOutputInformation();
 

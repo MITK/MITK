@@ -103,7 +103,8 @@ namespace mitk
     typedef itk::Image< float, 2 > InternalImage2DType;
 
     mitkClassMacro( PartialVolumeAnalysisHistogramCalculator, itk::Object )
-    itkNewMacro( PartialVolumeAnalysisHistogramCalculator )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** \brief Set image from which to compute statistics. */
     void SetImage( const mitk::Image *image );
@@ -246,7 +247,7 @@ namespace mitk
 
 
     /** \brief If the passed vector matches any of the three principal axes
-   * of the passed geometry, the ínteger value corresponding to the axis
+   * of the passed geometry, the Ã­nteger value corresponding to the axis
    * is set and true is returned. */
     bool GetPrincipalAxis( const Geometry3D *geometry, Vector3D vector,
                            unsigned int &axis );

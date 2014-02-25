@@ -253,7 +253,8 @@ namespace itk{
       Image< TOutputPixelType,3 > >                 Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(DiffusionIntravoxelIncoherentMotionReconstructionImageFilter,

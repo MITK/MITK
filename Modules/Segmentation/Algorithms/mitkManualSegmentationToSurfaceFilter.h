@@ -57,7 +57,8 @@ namespace mitk {
        * does not need a manual call since we use Update().
        */
       virtual void GenerateData();
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
 
       /**

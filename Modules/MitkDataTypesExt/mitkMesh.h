@@ -58,7 +58,8 @@ class MitkDataTypesExt_EXPORT Mesh : public PointSet
 public:
   mitkClassMacro(Mesh, PointSet);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef Superclass::DataType::CellType CellType;
   typedef CellType::CellAutoPointer CellAutoPointer;

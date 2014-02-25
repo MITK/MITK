@@ -49,7 +49,8 @@ class Segmentation_EXPORT DrawPaintbrushTool : public PaintbrushTool
   public:
 
     mitkClassMacro(DrawPaintbrushTool, PaintbrushTool);
-    itkNewMacro(DrawPaintbrushTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual us::ModuleResource GetCursorIconResource() const;

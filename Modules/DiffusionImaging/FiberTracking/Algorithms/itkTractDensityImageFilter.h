@@ -39,7 +39,8 @@ public:
 
   typedef typename OutputImageType::PixelType OutPixelType;
 
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   itkTypeMacro( TractDensityImageFilter, ImageSource )
 
   itkSetMacro( UpsamplingFactor, float)                         ///< use higher resolution for ouput image

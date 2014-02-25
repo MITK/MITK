@@ -51,7 +51,8 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
     static Image::Pointer ConvertIplToMitkImage( const IplImage * input, bool copyBuffer=true );
 
     mitkClassMacro(OpenCVToMitkImageFilter, ImageSource);
-    itkNewMacro(OpenCVToMitkImageFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     ///
     /// sets an iplimage as input

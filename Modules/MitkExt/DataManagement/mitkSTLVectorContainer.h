@@ -34,7 +34,8 @@ public:
     typedef itk::SmartPointer<Self> Pointer;
     typedef itk::SmartPointer<const Self>  ConstPointer;
     itkTypeMacro(STLVectorContainer,itk::SimpleDataObjectDecorator)
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef T ValueType;
 

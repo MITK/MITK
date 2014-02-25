@@ -48,7 +48,8 @@ public:
 
   mitkClassMacro( PointLocator, Object );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef int IdType;
   typedef ScalarType DistanceType;

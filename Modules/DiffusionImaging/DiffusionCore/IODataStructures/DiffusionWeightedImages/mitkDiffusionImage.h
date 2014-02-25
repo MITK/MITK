@@ -49,7 +49,8 @@ public:
   typedef std::map< unsigned int , IndicesVector >                    BValueMap;
 
   mitkClassMacro( DiffusionImage, Image )
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkCloneMacro( Self )
 
   /**

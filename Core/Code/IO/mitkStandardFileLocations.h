@@ -94,7 +94,8 @@ namespace mitk
 
   protected:
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef std::vector<std::string> FileSearchVectorType;
     FileSearchVectorType  m_SearchDirectories;

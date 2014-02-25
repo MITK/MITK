@@ -29,7 +29,8 @@ class SceneSerialization_EXPORT PointSetSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( PointSetSerializer, BaseDataSerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     virtual std::string Serialize();
   protected:
     PointSetSerializer();

@@ -38,7 +38,8 @@ class MitkExt_EXPORT SphereLandmarkProjector : public LandmarkProjector
 public:
   mitkClassMacro(SphereLandmarkProjector, LandmarkProjector);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void ProjectLandmarks(const mitk::PointSet::DataType::PointsContainer* targetLandmarks);
 protected:

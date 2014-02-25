@@ -54,7 +54,8 @@ class ImageExtraction_EXPORT ExtractImageFilter : public ImageToImageFilter
   public:
 
     mitkClassMacro(ExtractImageFilter, ImageToImageFilter);
-    itkNewMacro(ExtractImageFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Which slice to extract (first one has index 0).

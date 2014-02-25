@@ -71,7 +71,8 @@ public:
   itkTypeMacro(IntelligentBinaryClosingFilter, ImageToImageFilter);
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Standard process object method.  This filter is not multithreaded. */
   void GenerateData();

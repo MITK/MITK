@@ -63,7 +63,8 @@ public:
 
   mitkClassMacro(AutoCropImageFilter, SubImageSelector);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkGetConstMacro(BackgroundValue,float);
   itkSetMacro(BackgroundValue,float);

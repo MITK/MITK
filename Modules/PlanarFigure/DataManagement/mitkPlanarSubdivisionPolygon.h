@@ -36,7 +36,8 @@ class PlanarFigure_EXPORT PlanarSubdivisionPolygon : public PlanarPolygon
 public:
   mitkClassMacro( PlanarSubdivisionPolygon, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** \brief Subdivision Polygon has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const

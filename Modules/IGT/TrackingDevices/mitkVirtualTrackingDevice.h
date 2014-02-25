@@ -41,7 +41,8 @@ namespace mitk
   public:
 
     mitkClassMacro(VirtualTrackingDevice, TrackingDevice);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
 
     /**

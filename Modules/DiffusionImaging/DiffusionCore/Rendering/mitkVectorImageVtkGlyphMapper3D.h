@@ -36,7 +36,8 @@ class DiffusionCore_EXPORT VectorImageVtkGlyphMapper3D : public VtkMapper
 public:
     mitkClassMacro( VectorImageVtkGlyphMapper3D, VtkMapper );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     enum GlyphType {LineGlyph, ArrowGlyph};
 

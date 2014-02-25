@@ -35,7 +35,8 @@ public:
     mitkClassMacro(RawImageFileReader, FileReader);
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetMacro(FileName, std::string);
     itkSetStringMacro(FileName);

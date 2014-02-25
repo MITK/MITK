@@ -37,7 +37,8 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
   public:
 
     mitkClassMacro(ContourUtils, itk::Object);
-    itkNewMacro(ContourUtils);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Projects a contour onto an image point by point. Converts from world to index coordinates.

@@ -34,7 +34,8 @@ namespace mitk
   public:
 
     mitkClassMacro(ClippingPlaneDeformationTool, Tool);
-    itkNewMacro(ClippingPlaneDeformationTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;

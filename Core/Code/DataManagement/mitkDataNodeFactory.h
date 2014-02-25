@@ -46,7 +46,8 @@ public:
 
   mitkClassMacro( DataNodeFactory, DataNodeSource );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
   * Sets the filename of the file to read.

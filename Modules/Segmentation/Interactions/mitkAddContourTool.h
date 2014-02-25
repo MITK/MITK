@@ -51,7 +51,8 @@ class Segmentation_EXPORT AddContourTool : public ContourTool
   public:
 
     mitkClassMacro(AddContourTool, ContourTool);
-    itkNewMacro(AddContourTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual us::ModuleResource GetCursorIconResource() const;

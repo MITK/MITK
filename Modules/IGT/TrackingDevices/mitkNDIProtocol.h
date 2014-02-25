@@ -39,7 +39,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(NDIProtocol, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetObjectMacro(TrackingDevice, NDITrackingDevice);
 

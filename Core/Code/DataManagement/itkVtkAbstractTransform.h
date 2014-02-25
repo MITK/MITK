@@ -47,7 +47,8 @@ public:
   typedef typename Superclass::JacobianType JacobianType;
 
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   //##Documentation
   //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)

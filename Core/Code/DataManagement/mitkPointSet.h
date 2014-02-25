@@ -83,7 +83,8 @@ class MITK_CORE_EXPORT PointSet : public BaseData
 public:
   mitkClassMacro(PointSet, BaseData);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkCloneMacro(PointSet);
   typedef mitk::ScalarType CoordinateType;

@@ -45,7 +45,8 @@ class MitkOcl_EXPORT OclImageFormats : public itk::LightObject
 {
 public:
     mitkClassMacro(OclImageFormats, itk::LightObject);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** @brief Checks if format supported.
       @param format The image format to be checked for support.

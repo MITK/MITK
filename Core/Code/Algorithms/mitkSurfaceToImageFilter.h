@@ -55,7 +55,8 @@ class MITK_CORE_EXPORT SurfaceToImageFilter : public ImageSource
 {
 public:
   mitkClassMacro(SurfaceToImageFilter, ImageSource);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkSetMacro(MakeOutputBinary, bool);
   itkGetMacro(MakeOutputBinary, bool);

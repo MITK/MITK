@@ -43,7 +43,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(OptimizerParameters,::itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
     \brief Unique integer value for every optimizer.

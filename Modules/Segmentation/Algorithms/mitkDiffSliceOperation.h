@@ -51,7 +51,8 @@ namespace mitk
 
     mitkClassMacro(DiffSliceOperation, OperationActor);
 
-    //itkNewMacro(DiffSliceOperation);
+    //itkFactorylessNewMacro(Self)
+    //itkCloneMacro(Self)
 
     //mitkNewMacro4Param(DiffSliceOperation,mitk::Image,mitk::Image,unsigned int, mitk::Geometry2D);
 

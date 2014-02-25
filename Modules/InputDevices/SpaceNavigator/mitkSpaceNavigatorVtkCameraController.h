@@ -39,7 +39,8 @@ namespace mitk {
 
     //SmartPointer Macros
     mitkClassMacro(SpaceNavigatorVtkCameraController, CameraController);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual bool OnSpaceNavigatorEvent(mitk::Action* a, const mitk::StateEvent* e);
     virtual bool OnSpaceNavigatorKeyDown(mitk::Action* a, const mitk::StateEvent* e);

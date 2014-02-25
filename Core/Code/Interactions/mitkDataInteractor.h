@@ -64,7 +64,8 @@ namespace mitk
   public:
     typedef itk::SmartPointer<DataNode> NodeType;
     mitkClassMacro(DataInteractor, EventStateMachine)
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * Set/Change the DataNode of the DataInteractor

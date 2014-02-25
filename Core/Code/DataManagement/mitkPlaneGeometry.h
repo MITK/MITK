@@ -42,7 +42,8 @@ public:
   mitkClassMacro(PlaneGeometry,Geometry2D);
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   enum PlaneOrientation
   {

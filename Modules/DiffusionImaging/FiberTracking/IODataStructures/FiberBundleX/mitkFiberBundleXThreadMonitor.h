@@ -44,7 +44,8 @@ namespace mitk {
     //=======================================
 
     mitkClassMacro( FiberBundleXThreadMonitor, BaseData );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
 
     void setTextL1(QString);

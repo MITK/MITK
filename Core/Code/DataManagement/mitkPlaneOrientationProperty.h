@@ -46,7 +46,8 @@ public:
 
   mitkClassMacro( PlaneOrientationProperty, EnumerationProperty );
 
-  itkNewMacro(PlaneOrientationProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(PlaneOrientationProperty, const IdType&);
 

@@ -34,7 +34,8 @@ namespace mitk
   public:
     mitkClassMacro( GroupDiffusionHeadersFilter, BaseProcess );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::DiffusionImageHeaderInformation HeaderType;
     typedef HeaderType::Pointer HeaderPointer;

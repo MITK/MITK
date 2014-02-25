@@ -45,7 +45,8 @@ namespace mitk
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
     mitkClassMacro(SimulationVtkMapper3D, VtkMapper);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void ApplyColorAndOpacityProperties(vtkActor*, BaseRenderer*);
     void ApplySimulationProperties(BaseRenderer* renderer);

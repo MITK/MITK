@@ -56,7 +56,8 @@ class SurfaceInterpolation_EXPORT ComputeContourSetNormalsFilter : public Surfac
 public:
 
   mitkClassMacro(ComputeContourSetNormalsFilter,SurfaceToSurfaceFilter);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkSetMacro(SegmentationBinaryImage, mitk::Image::Pointer);
 

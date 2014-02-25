@@ -41,7 +41,8 @@ class DiffusionCore_EXPORT OdfScaleByProperty : public EnumerationProperty
 public:
 
   mitkClassMacro( OdfScaleByProperty, EnumerationProperty );
-  itkNewMacro(OdfScaleByProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(OdfScaleByProperty, const IdType&);
 
@@ -90,7 +91,8 @@ class DiffusionCore_EXPORT OdfScaleByPropertySerializer : public EnumerationProp
   public:
 
     mitkClassMacro( OdfScaleByPropertySerializer, EnumerationPropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
     {

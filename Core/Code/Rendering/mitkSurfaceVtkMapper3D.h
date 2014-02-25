@@ -85,7 +85,8 @@ public:
 
   mitkClassMacro(SurfaceVtkMapper3D, VtkMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkSetMacro(GenerateNormals, bool);
 

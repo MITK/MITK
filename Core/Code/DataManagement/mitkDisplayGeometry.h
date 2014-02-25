@@ -71,7 +71,8 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     mitkClassMacro(DisplayGeometry,Geometry2D);
 
     /// Method for creation through the object factory.
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /// \brief duplicates the geometry, NOT useful for this sub-class
     virtual itk::LightObject::Pointer InternalClone() const;

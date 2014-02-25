@@ -43,7 +43,8 @@ class MITK_EXPORT ITKImageImport : public ImageSource
 public:
 
   mitkClassMacro(ITKImageImport,ImageSource)
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   ///  \brief The type of the input image.
   typedef TInputImage InputImageType;

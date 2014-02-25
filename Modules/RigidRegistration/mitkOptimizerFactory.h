@@ -46,7 +46,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(OptimizerFactory, Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef itk::SingleValuedNonLinearOptimizer OptimizerType;
 

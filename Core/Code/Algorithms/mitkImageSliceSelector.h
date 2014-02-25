@@ -35,7 +35,8 @@ class MITK_CORE_EXPORT ImageSliceSelector : public SubImageSelector
 
   mitkClassMacro(ImageSliceSelector,SubImageSelector);
 
-    itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkGetConstMacro(SliceNr,int);
   itkSetMacro(SliceNr,int);

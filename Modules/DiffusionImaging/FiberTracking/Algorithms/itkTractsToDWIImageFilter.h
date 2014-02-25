@@ -52,7 +52,8 @@ public:
     typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType   ComplexSliceType;
     typedef itk::Vector< double,3>                                      VectorType;
 
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     itkTypeMacro( TractsToDWIImageFilter, ImageSource )
 
     /** Input */

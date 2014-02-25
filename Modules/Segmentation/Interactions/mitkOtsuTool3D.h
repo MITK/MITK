@@ -29,7 +29,8 @@ namespace mitk{
     public:
 
     mitkClassMacro(OtsuTool3D, AutoSegmentationTool);
-    itkNewMacro(OtsuTool3D);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
       virtual const char* GetName() const;
       virtual const char** GetXPM() const;

@@ -45,7 +45,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(TransformParameters, ::itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Unique integer value for every transform.

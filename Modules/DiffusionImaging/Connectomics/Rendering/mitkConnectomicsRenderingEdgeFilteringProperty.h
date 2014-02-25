@@ -37,7 +37,8 @@ public:
 
   mitkClassMacro( ConnectomicsRenderingEdgeFilteringProperty, EnumerationProperty );
 
-  itkNewMacro(ConnectomicsRenderingEdgeFilteringProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(ConnectomicsRenderingEdgeFilteringProperty, const IdType&);
 

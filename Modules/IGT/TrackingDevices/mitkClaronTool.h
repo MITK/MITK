@@ -71,7 +71,8 @@ namespace mitk
     claronToolHandle GetToolHandle();
 
   protected:
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     ClaronTool();
     virtual ~ClaronTool();
     /** \brief Tool handle variable from tracking device */

@@ -45,7 +45,8 @@ class MitkMapperExt_EXPORT VectorImageMapper2D : public GLMapper
 public:
     mitkClassMacro( VectorImageMapper2D, GLMapper );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     typedef double vtkScalarType;
 
     /**

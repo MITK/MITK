@@ -45,7 +45,8 @@ public:
     typedef Image< Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 > InputImageType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(ShCoefficientImageExporter, ProcessObject)

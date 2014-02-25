@@ -37,7 +37,8 @@ namespace mitk {
     {
     public:
       mitkClassMacro(USDeviceService,itk::Object);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
 
 

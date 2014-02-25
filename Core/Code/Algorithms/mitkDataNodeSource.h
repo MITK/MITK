@@ -39,7 +39,8 @@ class MITK_CORE_EXPORT DataNodeSource : public itk::ProcessObject
 public:
     mitkClassMacro( DataNodeSource, itk::ProcessObject )
 
-    itkNewMacro( Self )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::DataNode OutputType;
 

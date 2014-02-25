@@ -51,7 +51,8 @@ public:
 
     mitkClassMacro( UnstructuredGridMapper2D, GLMapper );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * Renders a cut through a pointset by cutting trough the n-cells,

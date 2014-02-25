@@ -60,7 +60,8 @@ class Segmentation_EXPORT FastMarchingTool3D : public AutoSegmentationTool
   public:
 
     mitkClassMacro(FastMarchingTool3D, AutoSegmentationTool)
-    itkNewMacro(FastMarchingTool3D)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /* typedefs for itk pipeline */
     typedef float                                     InternalPixelType;

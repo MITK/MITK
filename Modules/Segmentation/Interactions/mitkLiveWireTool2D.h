@@ -52,7 +52,8 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
   public:
 
     mitkClassMacro(LiveWireTool2D, SegTool2D);
-    itkNewMacro(LiveWireTool2D);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual us::ModuleResource GetCursorIconResource() const;

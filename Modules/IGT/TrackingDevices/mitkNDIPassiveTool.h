@@ -62,7 +62,8 @@ namespace mitk
     itkGetStringMacro(File);          ///< get file from which this tool was loaded
 
   protected:
-    itkNewMacro(Self);  // only the friend class NDITrackingDevice is allowed to instantiate NDIPassiveTools
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     NDIPassiveTool();
     virtual ~NDIPassiveTool();
 

@@ -28,7 +28,8 @@ class QmitkPixelManipulationToolGUI : public QmitkToolGUI
 public:
 
   mitkClassMacro(QmitkPixelManipulationToolGUI, QmitkToolGUI);
-  itkNewMacro(QmitkPixelManipulationToolGUI);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   protected slots:
 

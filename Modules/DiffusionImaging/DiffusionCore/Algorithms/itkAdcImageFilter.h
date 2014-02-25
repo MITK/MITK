@@ -45,7 +45,8 @@ public:
     typedef mitk::DiffusionImage< short >::GradientDirectionContainerType::Pointer GradientContainerType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(AdcImageFilter, ImageToImageFilter)

@@ -40,7 +40,8 @@ public:
   typedef typename OutputImageType::PixelType OutPixelType;
   typedef itk::Image<unsigned char, 3> InputImageType;
 
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   itkTypeMacro( TractsToRgbaImageFilter, ImageSource )
 
   /** Upsampling factor **/

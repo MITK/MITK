@@ -49,7 +49,8 @@ public:
   mitkClassMacro( DWIHeadMotionCorrectionFilter,
                   DiffusionImageToDiffusionImageFilter<DiffusionPixelType> )
 
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkGetMacro( Steps, unsigned long )
   itkGetMacro( CurrentStep, unsigned long )

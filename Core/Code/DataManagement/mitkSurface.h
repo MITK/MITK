@@ -34,7 +34,8 @@ namespace mitk
     typedef itk::ImageRegion<5> RegionType;
 
     mitkClassMacro(Surface, BaseData);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkCloneMacro(Surface);
 
     void CalculateBoundingBox();

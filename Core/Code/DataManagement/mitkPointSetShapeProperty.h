@@ -52,7 +52,8 @@ public:
 
   mitkClassMacro( PointSetShapeProperty, EnumerationProperty );
 
-  itkNewMacro(PointSetShapeProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(PointSetShapeProperty, const IdType&);
 

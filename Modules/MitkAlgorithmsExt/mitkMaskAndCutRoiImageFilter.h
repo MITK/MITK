@@ -43,7 +43,8 @@ namespace mitk
 
   public:
     mitkClassMacro(MaskAndCutRoiImageFilter, ImageToImageFilter);
-    itkNewMacro(MaskAndCutRoiImageFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkGetMacro(MaxValue, mitk::ScalarType);
     itkGetMacro(MinValue, mitk::ScalarType);

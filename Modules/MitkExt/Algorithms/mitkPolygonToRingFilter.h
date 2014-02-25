@@ -39,7 +39,8 @@ class MitkExt_EXPORT PolygonToRingFilter : public SurfaceSource
 {
 public:
   mitkClassMacro(PolygonToRingFilter, SurfaceSource);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void GenerateOutputInformation();
 

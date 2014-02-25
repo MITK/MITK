@@ -41,7 +41,8 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
   public:
     mitkClassMacro(SmartPointerProperty, BaseProperty);
 
-    itkNewMacro(SmartPointerProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(SmartPointerProperty, itk::Object*);
 
     typedef itk::Object::Pointer ValueType;

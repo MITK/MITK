@@ -34,7 +34,8 @@ namespace mitk {
 
     mitkClassMacro(BaseDataTestImplementation, BaseData);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkCloneMacro(BaseDataTestImplementation);
 
     virtual void InitializeTimeGeometry( unsigned int timeSteps /* = 1 */ )

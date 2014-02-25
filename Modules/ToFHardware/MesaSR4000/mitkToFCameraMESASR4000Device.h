@@ -41,7 +41,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraMESASR4000Device , ToFCameraMESADevice );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief set a BaseProperty

@@ -41,7 +41,8 @@ public:
   typedef std::map<const BaseRenderer*,LayouterMap > LayouterRendererMap;
 
   mitkClassMacro(OverlayManager, itk::LightObject);
-  itkNewMacro(OverlayManager);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void AddOverlay(const Overlay::Pointer& overlay);
   void AddOverlay(const Overlay::Pointer& overlay, BaseRenderer* renderer);

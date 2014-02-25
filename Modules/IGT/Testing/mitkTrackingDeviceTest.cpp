@@ -31,7 +31,8 @@ class TrackingDeviceTestClass : public mitk::TrackingDevice
 public:
 
   mitkClassMacro(TrackingDeviceTestClass, mitk::TrackingDevice);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual bool OpenConnection(){return true;};
   virtual bool CloseConnection(){return true;};

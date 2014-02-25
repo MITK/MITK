@@ -67,7 +67,8 @@ namespace mitk {
     public:
 
       mitkClassMacro( PlaneFit, GeometryDataSource);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
       typedef mitk::PointSet::PointDataType PointDataType;
       typedef mitk::PointSet::PointDataIterator PointDataIterator;

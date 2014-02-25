@@ -26,7 +26,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlanarDoubleEllipse, PlanarFigure);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);

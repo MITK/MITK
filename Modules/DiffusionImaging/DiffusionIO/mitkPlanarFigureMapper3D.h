@@ -42,7 +42,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(PlanarFigureMapper3D, VtkMapper)
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     const mitk::PlanarFigure* GetInput();
 

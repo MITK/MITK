@@ -132,8 +132,6 @@ class SegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// \brief Set the LabelSetImage the widget should listen to.
     void SetActiveLabelSetImage(mitk::LabelSetImage* image);
 
-  protected:
-
     /// \brief Inserts a new label at the end of the table.
     virtual void InsertItem();
 

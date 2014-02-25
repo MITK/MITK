@@ -424,9 +424,24 @@ mitk::DICOMImageBlockDescriptor
 {
   double d;
   std::string trimmedstring(str);
-  trimmedstring = trimmedstring.erase(trimmedstring.find_last_not_of(" \n\r\t")+1);
+  try
+  {
+    trimmedstring = trimmedstring.erase(trimmedstring.find_last_not_of(" \n\r\t")+1);
+  }
+  catch(...)
+  {
+    // no last not of
+  }
 
-  std::string firstcomponent = trimmedstring.erase(trimmedstring.find_first_of("\\"));
+  std::string firstcomponent(trimmedstring);
+  try
+  {
+    firstcomponent = trimmedstring.erase(trimmedstring.find_first_of("\\"));
+  }
+  catch(...)
+  {
+    // no last not of
+  }
 
   std::istringstream converter(firstcomponent);
   if ( !firstcomponent.empty() && (converter >> d) && converter.eof() )

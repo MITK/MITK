@@ -31,7 +31,6 @@ if(NOT DEFINED ITK_DIR)
 
     list(APPEND additional_cmake_args
          -DITK_WRAPPING:BOOL=ON
-         #-DITK_USE_REVIEW:BOOL=ON
          -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
          -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
          -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
@@ -63,6 +62,12 @@ if(NOT DEFINED ITK_DIR)
          -DOpenCV_DIR:PATH=${OpenCV_DIR}
         )
   endif()
+
+  # Keep the behaviour of ITK 4.3 which by default turned on ITK Review
+  # see MITK bug #17338
+  list(APPEND additional_cmake_args
+    -DModule_ITKReview:BOOL=ON
+  )
 
   set(ITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-4.5.1.cmake)
 

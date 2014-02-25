@@ -1573,7 +1573,6 @@ ImageStatisticsCalculator
 template <typename TPixel, unsigned int VImageDimension>
 itk::SmartPointer<itk::Image<TPixel, VImageDimension> >
 ImageStatisticsCalculator::GenerateConvolutionImage( const itk::Image<TPixel, VImageDimension>* inputImage )
-// TODO rename: CalculateConvolutionImage or similar
 {
   double mmPerPixel[VImageDimension];
   for (unsigned int dimension = 0; dimension < VImageDimension; ++dimension)

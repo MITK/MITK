@@ -97,8 +97,8 @@ if(MITK_USE_Boost)
       # Boost needs in-source builds
       BINARY_DIR ${proj}-src
       PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_54_0.tar.bz2
-      URL_MD5 15cb8c0803064faef0c4ddf5bc5ca279
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_55_0.tar.bz2
+      URL_MD5 d6eef4b4cacb2183f2bf265a5a03a354
       INSTALL_DIR ${proj}-install
       CONFIGURE_COMMAND "${_boost_cfg_cmd}"
       BUILD_COMMAND "${_boost_build_cmd}"

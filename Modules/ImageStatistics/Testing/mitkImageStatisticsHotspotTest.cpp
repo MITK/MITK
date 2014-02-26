@@ -58,36 +58,43 @@ struct mitkImageStatisticsHotspotTestClass
     int m_NumberOfGaussian;
 
     /** \brief  XML-Tags "spacingX", "spacingY", "spacingZ": spacing of image in every direction */
-    float m_Spacing[3];
+    double m_Spacing[3];
 
     /** \brief XML-Tag "entireHotSpotInImage" */
     unsigned int m_EntireHotspotInImage;
 
     // XML-Tag <gaussian>
 
-    /** \brief  XML-Tag "centerIndexX: gaussian parameter*/
-    std::vector<int> m_CenterX;
-    /** \brief  XML-Tag "centerIndexY: gaussian parameter */
-    std::vector<int> m_CenterY;
-    /** \brief  XML-Tag "centerIndexZ: gaussian parameter */
-    std::vector<int> m_CenterZ;
+    /**
+      \brief  XML-Tag "centerIndexX: gaussian parameter
+      \warning This parameter READS the centerIndexX parameter from file and is THEN MISUSED to calculate some position in world coordinates, so we require double.
+     */
+    std::vector<double> m_CenterX;
+    /** \brief  XML-Tag "centerIndexY: gaussian parameter
+      \warning This parameter READS the centerIndexX parameter from file and is THEN MISUSED to calculate some position in world coordinates, so we require double.
+     */
+    std::vector<double> m_CenterY;
+    /** \brief  XML-Tag "centerIndexZ: gaussian parameter
+      \warning This parameter READS the centerIndexX parameter from file and is THEN MISUSED to calculate some position in world coordinates, so we require double.
+     */
+    std::vector<double> m_CenterZ;
 
     /** \brief  XML-Tag "deviationX: gaussian parameter  */
-    std::vector<int> m_SigmaX;
+    std::vector<double> m_SigmaX;
     /** \brief  XML-Tag "deviationY: gaussian parameter  */
-    std::vector<int> m_SigmaY;
+    std::vector<double> m_SigmaY;
     /** \brief  XML-Tag "deviationZ: gaussian parameter  */
-    std::vector<int> m_SigmaZ;
+    std::vector<double> m_SigmaZ;
 
     /** \brief  XML-Tag "altitude: gaussian parameter  */
-    std::vector<int> m_Altitude;
+    std::vector<double> m_Altitude;
 
     // XML-Tag <segmentation>
 
     /** \brief  XML-Tag "numberOfLabels": number of different labels which appear in the mask */
     unsigned int m_NumberOfLabels;
     /** \brief  XML-Tag "hotspotRadiusInMM": radius of hotspot */
-    float m_HotspotRadiusInMM;
+    double m_HotspotRadiusInMM;
 
     // XML-Tag <roi>
 
@@ -271,19 +278,19 @@ struct mitkImageStatisticsHotspotTestClass
         result.m_CenterY[i] = GetIntegerAttribute(gaussian, "centerIndexY");
         result.m_CenterZ[i] = GetIntegerAttribute(gaussian, "centerIndexZ");
 
-        result.m_SigmaX[i] = GetIntegerAttribute(gaussian, "deviationX");
-        result.m_SigmaY[i] = GetIntegerAttribute(gaussian, "deviationY");
-        result.m_SigmaZ[i] = GetIntegerAttribute(gaussian, "deviationZ");
+        result.m_SigmaX[i] = GetDoubleAttribute(gaussian, "deviationX");
+        result.m_SigmaY[i] = GetDoubleAttribute(gaussian, "deviationY");
+        result.m_SigmaZ[i] = GetDoubleAttribute(gaussian, "deviationZ");
 
-        result.m_Altitude[i] = GetIntegerAttribute(gaussian, "altitude");
+        result.m_Altitude[i] = GetDoubleAttribute(gaussian, "altitude");
 
-        result.m_CenterX[i] *= result.m_Spacing[0];
-        result.m_CenterY[i] *= result.m_Spacing[1];
-        result.m_CenterZ[i] *= result.m_Spacing[2];
+        result.m_CenterX[i] = result.m_CenterX[i] * result.m_Spacing[0];
+        result.m_CenterY[i] = result.m_CenterY[i] * result.m_Spacing[1];
+        result.m_CenterZ[i] = result.m_CenterZ[i] * result.m_Spacing[2];
 
-        result.m_SigmaX[i] *= result.m_Spacing[0];
-        result.m_SigmaY[i] *= result.m_Spacing[1];
-        result.m_SigmaZ[i] *= result.m_Spacing[2];
+        result.m_SigmaX[i] = result.m_SigmaX[i] * result.m_Spacing[0];
+        result.m_SigmaY[i] = result.m_SigmaY[i] * result.m_Spacing[1];
+        result.m_SigmaZ[i] = result.m_SigmaZ[i] * result.m_Spacing[2];
       }
 
       NodeList segmentations;

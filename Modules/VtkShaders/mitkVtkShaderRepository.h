@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 class vtkXMLDataElement;
 class vtkXMLMaterial;
 class vtkProperty;
-class vtkPropertyXMLParser;
 
 namespace mitk {
 
@@ -111,7 +110,7 @@ protected:
 
     friend class VtkShaderRepository;
 
-    void LoadProperties(vtkPropertyXMLParser* prop);
+//    void LoadProperties(vtkPropertyXMLParser* prop);
     void LoadProperties(std::istream& stream);
 
   };
@@ -158,11 +157,10 @@ private:
 
   bool UnloadShader(int id);
 
-  vtkShaderProgram2* GetShaderProgram(mitk::DataNode* node, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const;
-
   vtkXMLMaterial* GetXMLMaterial(mitk::DataNode* node, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const;
 
   void ApplyShaderProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, vtkXMLMaterial* xmlMaterial, itk::TimeStamp& MTime);
+  mitk::IShaderRepository::ShaderProgram::Pointer GetShaderProgramAndApplyProperties(DataNode* node, BaseRenderer* renderer, itk::TimeStamp& MTime) const;
 };
 
 } //end of namespace mitk

@@ -4,6 +4,7 @@ SET(CPP_FILES
   vtkXMLShader.cxx
   mitkVtkShaderRepository.cpp
   mitkVtkShadersActivator.cpp
+  mitkVtkShaderProgram.cpp
 )
 
 SET(H_FILES
@@ -11,6 +12,7 @@ SET(H_FILES
   vtkXMLMaterialParser.h
   vtkXMLShader.h
   mitkVtkShaderRepository.h
+  mitkVtkShaderProgram
 )
 
 set(RESOURCE_FILES

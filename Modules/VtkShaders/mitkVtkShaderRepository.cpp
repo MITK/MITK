@@ -41,7 +41,7 @@ mitk::VtkShaderRepository::VtkShaderRepository()
   LoadShaders();
 }
 
-mitk::VtkShaderRepository::~ShaderRepository()
+mitk::VtkShaderRepository::~VtkShaderRepository()
 {
 }
 
@@ -126,7 +126,7 @@ mitk::VtkShaderRepository::Shader::~Shader()
 {
 }
 
-void mitk::VtkShaderRepository::Shader::LoadProperties(vtkPropertyXMLParser* p)
+/*void mitk::VtkShaderRepository::Shader::LoadProperties(vtkPropertyXMLParser* p)
 {
   vtkXMLMaterial *m=p->GetMaterial();
   if (m == NULL) return;
@@ -170,7 +170,7 @@ void mitk::VtkShaderRepository::Shader::LoadProperties(vtkPropertyXMLParser* p)
       }
     }
   }
-}
+}*/
 
 void mitk::VtkShaderRepository::Shader::LoadProperties(std::istream& stream)
 {
@@ -187,10 +187,10 @@ void mitk::VtkShaderRepository::Shader::LoadProperties(std::istream& stream)
 
   this->SetMaterialXml(content);
 
-  vtkPropertyXMLParser *p = vtkPropertyXMLParser::New();
-  p->LoadMaterialFromString(content.c_str());
-  LoadProperties(p);
-  p->Delete();
+//  vtkPropertyXMLParser *p = vtkPropertyXMLParser::New(); SHADERTODO (move parsercode to here)
+//  p->LoadMaterialFromString(content.c_str());
+//  LoadProperties(p);
+//  p->Delete();
 }
 
 mitk::VtkShaderRepository::Shader::Uniform::Uniform()
@@ -390,14 +390,9 @@ void mitk::VtkShaderRepository::ApplyShaderProperties(mitk::DataNode* node, mitk
    MTime.Modified();
 }
 
-vtkShaderProgram2* mitk::VtkShaderRepository::GetShaderProgram(mitk::DataNode* node, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const
-{
-  vtkXMLMaterial* xmlMaterial = GetXMLMaterial(node,renderer,MTime);
-
-}
-
 vtkXMLMaterial* mitk::VtkShaderRepository::GetXMLMaterial(mitk::DataNode* node, mitk::BaseRenderer* renderer, itk::TimeStamp& MTime) const
 {
+  /* SHADERTODO invoke parser here
   bool setMTime = false;
 
   vtkPropertyXMLParser* property = new vtkPropertyXMLParser();
@@ -437,7 +432,7 @@ vtkXMLMaterial* mitk::VtkShaderRepository::GetXMLMaterial(mitk::DataNode* node, 
     setMTime = true;
     return 0;
   }
-
+*/
 }
 
 std::list<mitk::IShaderRepository::Shader::Pointer> mitk::VtkShaderRepository::GetShaders() const
@@ -469,4 +464,10 @@ mitk::IShaderRepository::Shader::Pointer mitk::VtkShaderRepository::GetShader(in
     if ((*i)->GetId() == id) return i->GetPointer();
   }
   return IShaderRepository::Shader::Pointer();
+}
+
+mitk::IShaderRepository::ShaderProgram::Pointer mitk::VtkShaderRepository::GetShaderProgramAndApplyProperties(DataNode* node, BaseRenderer* renderer, itk::TimeStamp& MTime) const
+{
+  vtkXMLMaterial* xmlMaterial = GetXMLMaterial(node,renderer,MTime);
+  //SHADERTODO
 }

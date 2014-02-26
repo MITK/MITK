@@ -16,6 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkMapper.h"
 
+#include <mitkIShaderRepository.h>
+#include <mitkCoreServices.h>
+
 mitk::VtkMapper::VtkMapper()
 {
 }
@@ -63,7 +66,9 @@ void mitk::VtkMapper::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
+    //activate shader (set uniforms + call use) SHADERTODO
     GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+    //deactivate shader
   }
 }
 
@@ -77,6 +82,17 @@ void mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
   {
     GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
   }
+}
+
+void mitk::VtkMapper::ApplyShaderProperties(mitk::BaseRenderer* renderer)
+{
+  //VtkMapperLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+  shaderRepo->( )
+
+
+  shaderRepo->UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer &,this->GetDataNode(),renderer, GetMTime()); //SHADERTODO
+  //
 }
 
 void mitk::VtkMapper::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
@@ -128,3 +144,5 @@ void mitk::VtkMapper::ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtk
   actor->GetProperty()->SetColor(drgba);
   actor->GetProperty()->SetOpacity(drgba[3]);
 }
+
+

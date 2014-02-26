@@ -58,7 +58,6 @@ public:
   // Extract contours from an empty slice
   void TestExtractContoursFromAnEmptySlice()
   {
-//    MITK_INFO<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@#############################";
     m_ContourExtractor->SetInput(m_EmptySlice);
     m_ContourExtractor->Update();
     mitk::Surface::Pointer emptyContour = m_ContourExtractor->GetOutput();
@@ -80,19 +79,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Extracted contour has wrong number of points!", contour->GetVtkPolyData()->GetNumberOfPoints() ==
                            referenceContour->GetVtkPolyData()->GetNumberOfPoints());
 
-    // TODO: Looks like surface cannot be compared after IO
-    MITK_INFO<<"\n\n########################################################\n\n";
-    for (int i = 0; i < contour->GetVtkPolyData()->GetNumberOfPoints(); ++i)
-    {
-      MITK_INFO<<std::setprecision(10)<<"[Contour Point]: ("<<contour->GetVtkPolyData()->GetPoint(i)[0]<<","<<contour->GetVtkPolyData()->GetPoint(i)[1]<<","<<contour->GetVtkPolyData()->GetPoint(i)[2]
-              <<")  ----  [Reference Point]: ("<<referenceContour->GetVtkPolyData()->GetPoint(i)[0]<<","<<referenceContour->GetVtkPolyData()->GetPoint(i)[1]
-              <<","<<referenceContour->GetVtkPolyData()->GetPoint(i)[2]<<")";
-    }
-    MITK_INFO<<"\n\n########################################################\n\n";
-
     CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(contour->GetVtkPolyData(), referenceContour->GetVtkPolyData(), 0.000001, true));
-
-
   }
 
   // Extract multiple contours from a single slice
@@ -100,7 +87,9 @@ public:
   {
     m_ContourExtractor->SetInput(m_SliceWithTwoContours);
     m_ContourExtractor->Update();
+
     CPPUNIT_ASSERT_MESSAGE("ImageToContourFilter has wrong number of outputs!", m_ContourExtractor->GetNumberOfOutputs() == 1);
+
     mitk::Surface::Pointer contour = m_ContourExtractor->GetOutput(0);
     mitk::Surface::Pointer referenceContour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/SliceWithTwoContours_Reference.vtk"));
 
@@ -110,7 +99,6 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Extracted contour1 has wrong number of points!", contour->GetVtkPolyData()->GetNumberOfPolys() ==
                            referenceContour->GetVtkPolyData()->GetNumberOfPolys());
 
-    // TODO: Looks like surface cannot be compared after IO
      CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(contour->GetVtkPolyData(), referenceContour->GetVtkPolyData(), 0.000001, true));
 
   }

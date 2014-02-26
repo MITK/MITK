@@ -90,5 +90,11 @@ Global variant    Event class   Button/Key      Modifiers
   <event_variant class="InteractionKeyEvent" name="KeyEscape">
       <attribute name="Key" value="Escape"/>
   </event_variant>
+  <event_variant class="InteractionKeyEvent" name="KeyPlus">
+      <attribute name="Key" value="+"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="KeyMinus">
+      <attribute name="Key" value="-"/>
+  </event_variant>
   <!-- ... -->
 </config>

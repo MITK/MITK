@@ -71,7 +71,7 @@ mitk::OptitrackTrackingDevice::~OptitrackTrackingDevice()
     else
   {
       MITK_INFO << "Error during Stopping";
-      mitkThrowException(mitk::IGTException) << GetOptitrackErrorMessage(result);
+      mitkThrowException(mitk::IGTException) << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(result);
     }
   }
 
@@ -88,7 +88,7 @@ mitk::OptitrackTrackingDevice::~OptitrackTrackingDevice()
     else
     {
       MITK_DEBUG << "Error during Closing Connection";
-      mitkThrowException(mitk::IGTException) << GetOptitrackErrorMessage(result);
+      mitkThrowException(mitk::IGTException) << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(result);
     }
   }
 
@@ -152,10 +152,10 @@ bool mitk::OptitrackTrackingDevice::InitializeCameras()
   }
   else
   {
-    MITK_DEBUG << GetOptitrackErrorMessage(result);
+    MITK_DEBUG << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(result);
   // If not succeed after OPTITRACK_ATTEMPTS times launch exception
-  MITK_INFO << "Optitrack Tracking System cannot be initialized \n" << GetOptitrackErrorMessage(result);
-  mitkThrowException(mitk::IGTException) << "Optitrack Tracking System cannot be initialized \n" << GetOptitrackErrorMessage(result);
+  MITK_INFO << "Optitrack Tracking System cannot be initialized \n" << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(result);
+  mitkThrowException(mitk::IGTException) << "Optitrack Tracking System cannot be initialized \n" << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(result);
   return false;
   }
 }
@@ -185,7 +185,7 @@ bool mitk::OptitrackTrackingDevice::LoadCalibration()
 
       if(resultLoadCalibration != NPRESULT_SUCCESS)
       {
-        MITK_DEBUG << mitk::GetOptitrackErrorMessage(resultLoadCalibration);
+        MITK_DEBUG << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(resultLoadCalibration);
         MITK_DEBUG << "Trying again...";
       }
       else
@@ -269,7 +269,7 @@ bool mitk::OptitrackTrackingDevice::CloseConnection()
     }
 
     MITK_INFO << "System cannot ShutDown now";
-    mitkThrowException(mitk::IGTException) << mitk::GetOptitrackErrorMessage(resultShutdown);
+    mitkThrowException(mitk::IGTException) << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(resultShutdown);
     return false;
  }
  else
@@ -517,7 +517,7 @@ bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold 
       }
       else
       {
-        MITK_DEBUG << GetOptitrackErrorMessage(resultUpdate);
+        MITK_DEBUG << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(resultUpdate);
         MITK_DEBUG << "Trying again...";
         Sleep(30);
       }
@@ -549,14 +549,14 @@ bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold 
           }
           else
           {
-            MITK_DEBUG << GetOptitrackErrorMessage(resultSetCameraSettings);
+            MITK_DEBUG << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(resultSetCameraSettings);
             if(i == 1)
-            mitkThrowException(mitk::IGTException) << "Camera number " << cam << " failed during setting the params. Error: " << GetOptitrackErrorMessage(resultSetCameraSettings);
+            mitkThrowException(mitk::IGTException) << "Camera number " << cam << " failed during setting the params. Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(resultSetCameraSettings);
           }
         }
         else
         {
-          MITK_DEBUG << GetOptitrackErrorMessage(resultUpdate);
+          MITK_DEBUG << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(resultUpdate);
           MITK_DEBUG << "Update: Trying again...";
         }
       }
@@ -633,7 +633,7 @@ mitk::OptitrackTrackingDevice::OptitrackTrackingDevice()
     : mitk::TrackingDevice(),
       m_initialized(false)
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
 }
 
 //=======================================================
@@ -641,7 +641,7 @@ mitk::OptitrackTrackingDevice::OptitrackTrackingDevice()
 //=======================================================
 mitk::OptitrackTrackingDevice::~OptitrackTrackingDevice()
 {
- MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+ MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
 }
 
 //=======================================================
@@ -649,7 +649,7 @@ mitk::OptitrackTrackingDevice::~OptitrackTrackingDevice()
 //=======================================================
 bool mitk::OptitrackTrackingDevice::OpenConnection()
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return false;
 }
 
@@ -658,7 +658,7 @@ bool mitk::OptitrackTrackingDevice::OpenConnection()
 //=======================================================
 bool mitk::OptitrackTrackingDevice::InitializeCameras()
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return false;
 }
 
@@ -667,7 +667,7 @@ bool mitk::OptitrackTrackingDevice::InitializeCameras()
 //=======================================================
 bool mitk::OptitrackTrackingDevice::LoadCalibration()
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return false;
 }
 
@@ -676,7 +676,7 @@ bool mitk::OptitrackTrackingDevice::LoadCalibration()
 //=======================================================
 void mitk::OptitrackTrackingDevice::SetcalibrationPath(std::string calibrationPath)
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
 }
 
 //=======================================================
@@ -684,7 +684,7 @@ void mitk::OptitrackTrackingDevice::SetcalibrationPath(std::string calibrationPa
 //=======================================================
 bool mitk::OptitrackTrackingDevice::CloseConnection()
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return false;
 }
 
@@ -693,7 +693,7 @@ bool mitk::OptitrackTrackingDevice::CloseConnection()
 //=======================================================
 bool mitk::OptitrackTrackingDevice::StartTracking()
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return false;
 }
 
@@ -702,7 +702,7 @@ bool mitk::OptitrackTrackingDevice::StartTracking()
 //=======================================================
 bool mitk::OptitrackTrackingDevice::StopTracking()
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return false;
 }
 
@@ -711,7 +711,7 @@ bool mitk::OptitrackTrackingDevice::StopTracking()
 //=======================================================
 ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* pInfoStruct)
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return NULL;
 }
 
@@ -720,7 +720,7 @@ ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* 
 //=======================================================
 mitk::OptitrackTrackingTool* mitk::OptitrackTrackingDevice::GetOptitrackTool( unsigned int toolNumber) const
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return NULL;
 }
 
@@ -729,7 +729,7 @@ mitk::OptitrackTrackingTool* mitk::OptitrackTrackingDevice::GetOptitrackTool( un
 //=======================================================
  unsigned int mitk::OptitrackTrackingDevice::GetToolCount() const
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return 0;
 }
 
@@ -738,7 +738,7 @@ mitk::OptitrackTrackingTool* mitk::OptitrackTrackingDevice::GetOptitrackTool( un
 //=======================================================
 void mitk::OptitrackTrackingDevice::TrackTools()
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
 }
 
 //=======================================================
@@ -746,7 +746,7 @@ void mitk::OptitrackTrackingDevice::TrackTools()
 //=======================================================
 bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold , int intensity, int videoType )
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return false;
 }
 
@@ -755,7 +755,7 @@ bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold 
 //=======================================================
 mitk::TrackingTool* mitk::OptitrackTrackingDevice::GetTool(unsigned int toolNumber) const
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return NULL;
 }
 
@@ -764,7 +764,7 @@ mitk::TrackingTool* mitk::OptitrackTrackingDevice::GetTool(unsigned int toolNumb
 //=======================================================
 bool mitk::OptitrackTrackingDevice::AddToolByDefinitionFile(std::string fileName)
 {
-  MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
+  MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
   return false;
 }
 

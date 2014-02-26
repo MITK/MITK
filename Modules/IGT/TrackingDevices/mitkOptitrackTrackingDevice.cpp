@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkOptitrackTrackingDevice.h"
+#include <mitkOptitrackErrorMessages.h>
 
 #ifdef MITK_USE_OPTITRACK_TRACKER
 

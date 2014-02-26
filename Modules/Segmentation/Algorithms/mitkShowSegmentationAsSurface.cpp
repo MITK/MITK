@@ -198,7 +198,7 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
 
   BaseProperty* colorProp = groupNode->GetProperty("color");
   if (colorProp)
-    m_Node->ReplaceProperty("color", colorProp);
+    m_Node->ReplaceProperty("color", colorProp->Clone());
   else
     m_Node->SetProperty("color", ColorProperty::New(1.0, 1.0, 0.0));
 
@@ -217,7 +217,7 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
 
   BaseProperty* visibleProp = groupNode->GetProperty("visible");
   if (visibleProp && syncVisibility)
-    m_Node->ReplaceProperty("visible", visibleProp);
+    m_Node->ReplaceProperty("visible", visibleProp->Clone());
   else
     m_Node->SetProperty("visible", BoolProperty::New(showResult));
 

@@ -481,7 +481,7 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
   BaseProperty *colorProperty = groupNode->GetProperty("color");
 
   if (colorProperty != NULL)
-    node->ReplaceProperty("color", colorProperty);
+    node->ReplaceProperty("color", colorProperty->Clone());
   else
     node->SetProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f));
 
@@ -502,7 +502,7 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
   BaseProperty *visibleProperty = groupNode->GetProperty("visible");
 
   if (visibleProperty != NULL && syncVisibility)
-    node->ReplaceProperty("visible", visibleProperty);
+    node->ReplaceProperty("visible", visibleProperty->Clone());
   else
     node->SetProperty("visible", BoolProperty::New(showResult));
 

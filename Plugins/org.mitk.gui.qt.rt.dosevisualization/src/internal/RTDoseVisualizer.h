@@ -129,13 +129,16 @@ protected:
   @TODO: should be moved outside the class, to be available for other classes at well.*/
   void ActualizeDisplayStyleForAllDoseDataNodes();
 
-  void UpdatePolyData(int num, double min, double max);
+  mitk::DataNode::Pointer UpdatePolyData(int num, double min, double max);
+  void UpdateStdIsolines();
+  void HideIsoline();
   mitk::Image::Pointer GetExtractedSlice(mitk::Image::Pointer image);
   const mitk::Geometry2D* GetGeometry2D(char* dim);
 
   Ui::RTDoseVisualizerControls m_Controls;
   mitk::DataNode::Pointer m_selectedNode;
   mitk::IsoDoseLevelVector::Pointer m_freeIsoValues;
+  std::vector<mitk::DataNode::Pointer> m_FreeIsoLines;
   /** Iso level set of the current node. Should normaly be a clone of the
   * current iso preset. It held as own member because visibility
   * settings may differ.*/
@@ -154,6 +157,7 @@ protected:
   QmitkDoseVisualStyleDelegate* m_DoseVisualDelegate;
 
   vtkSmartPointer<vtkContourFilter> m_freeIsoFilter;
+  std::vector< vtkSmartPointer<vtkContourFilter> > m_Filters;
 
 
   bool m_internalUpdate;

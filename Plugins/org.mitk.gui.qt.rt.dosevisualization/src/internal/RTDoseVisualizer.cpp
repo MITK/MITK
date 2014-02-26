@@ -116,6 +116,8 @@ void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
   this->m_Controls.isoLevelSetView->setItemDelegateForColumn(3,m_DoseVisualDelegate);
   this->m_Controls.isoLevelSetView->setContextMenuPolicy(Qt::CustomContextMenu);
 
+  this->m_Controls.btnRemoveFreeValue->setDisabled(true);
+
   connect(m_Controls.btnConvert, SIGNAL(clicked()), this, SLOT(OnConvertButtonClicked()));
   connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), this, SLOT(OnReferenceDoseChanged(double)));
   connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), m_LevelSetModel, SLOT(setReferenceDose(double)));
@@ -208,17 +210,32 @@ void RTDoseVisualizer::OnAddFreeValueClicked()
   //number of already existing free iso lines.
   newColor.setHsv((m_freeIsoValues->Size()*85)%360,255,255);
 
+  mitk::DataNode::Pointer isoNode = this->UpdatePolyData(1,m_Controls.spinReferenceDose->value()*0.5,m_Controls.spinReferenceDose->value()*0.5);
+  m_FreeIsoLines.push_back(isoNode);
+
   mitk::IsoDoseLevel::ColorType color;
   color[0] = newColor.redF();
   color[1] = newColor.greenF();
   color[2] = newColor.blueF();
   m_freeIsoValues->push_back(mitk::IsoDoseLevel::New(0.5,color,true,false));
   UpdateFreeIsoValues();
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+  if(m_FreeIsoLines.size()>=3)
+    this->m_Controls.btnAddFreeValue->setDisabled(true);
+  this->m_Controls.btnRemoveFreeValue->setEnabled(true);
 }
 
 void RTDoseVisualizer::OnRemoveFreeValueClicked()
 {
   m_freeIsoValues->pop_back();
+  mitk::DataNode::Pointer isoNode = m_FreeIsoLines.at(m_FreeIsoLines.size()-1);
+  m_FreeIsoLines.pop_back();
+  m_Filters.pop_back();
+  if(m_FreeIsoLines.empty())
+    this->m_Controls.btnRemoveFreeValue->setDisabled(true);
+  if(m_FreeIsoLines.size()<3)
+    this->m_Controls.btnAddFreeValue->setEnabled(true);
+  this->GetDataStorage()->Remove(isoNode);
   UpdateFreeIsoValues();
 }
 
@@ -306,19 +323,9 @@ void RTDoseVisualizer::UpdateFreeIsoLine(mitk::IsoDoseLevel * level, mitk::DoseV
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
   mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
 
-  m_freeIsoFilter->SetInput(slicedImage->GetVtkImageData());
-  m_freeIsoFilter->GenerateValues(1,level->GetDoseValue()*pref,level->GetDoseValue()*pref);
-  m_freeIsoFilter->Update();
-
-//  mitk::DataNode::Pointer isoNode = GetDataStorage()->GetNamedNode("Isoline1");
-//  mitk::Surface::Pointer isoSurface = mitk::Surface::New();
-//  isoSurface->SetVtkPolyData(dynamic_cast<vtkPolyData*>(isoNode->GetData()));
-//  isoSurface->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial"))->Clone());
-//  mitk::Vector3D spacing;
-//  spacing.Fill(1);
-//  isoSurface->GetGeometry()->SetSpacing(spacing);
-//  isoSurface->SetOrigin(slicedImage->GetGeometry()->GetOrigin());
-//  isoNode->SetColor(1,0,0);
+  m_Filters.at(0)->SetInput(slicedImage->GetVtkImageData());
+  m_Filters.at(0)->GenerateValues(1,level->GetDoseValue()*pref,level->GetDoseValue()*pref);
+  m_Filters.at(0)->Update();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -345,6 +352,15 @@ void RTDoseVisualizer::OnGlobalVisIsoLineToggled(bool showIsoLines)
   if (m_selectedNode.IsNotNull())
   {
     m_selectedNode->SetBoolProperty(mitk::rt::Constants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsoLines);
+    mitk::NodePredicateProperty::Pointer isoProp = mitk::NodePredicateProperty::
+        New(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(true));
+    mitk::DataStorage::SetOfObjects::ConstPointer isoSet =  this->GetDataStorage()->GetSubset(isoProp);
+    for(mitk::DataStorage::SetOfObjects::ConstIterator iso = isoSet->Begin(); iso!=isoSet->End(); ++iso)
+    {
+      mitk::DataNode::Pointer node = iso.Value();
+      node->SetVisibility(showIsoLines);
+    }
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
 }
 
@@ -383,17 +399,27 @@ void RTDoseVisualizer::OnConvertButtonClicked()
     mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = this->m_Presets[this->m_selectedPresetName];
 
     MITK_INFO << "FUNCTION PRESCRIBE " << prescribed << endl;
+
+
+    float pref;
+    m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+    mitk::Image::Pointer reslicedImage = this->GetExtractedSlice(image);
+
+    //Generating the Colorwash
     for(mitk::IsoDoseLevelSet::ConstIterator setIT = isoDoseLevelSet->Begin(); setIT != isoDoseLevelSet->End(); ++setIT)
     {
-      float pref;
-      selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
       float *hsv = new float[3];
+      //used for transfer rgb to hsv
       vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
       if(setIT->GetVisibleColorWash()){
         cCalc->RGBToHSV(setIT->GetColor()[0],setIT->GetColor()[1],setIT->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
         transferFunction->AddHSVPoint(setIT->GetDoseValue()*pref,hsv[0],hsv[1],hsv[2],1.0,1.0);
       }
     }
+
+    //Generating the standard isolines
+    this->UpdateStdIsolines();
 
     mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
     mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
@@ -405,8 +431,6 @@ void RTDoseVisualizer::OnConvertButtonClicked()
 
     selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
     selectedNode->SetProperty("Image Rendering.Mode", renderingMode);
-
-    this->UpdatePolyData(1,12,12);
 
     mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
     mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);
@@ -441,22 +465,19 @@ mitk::Image::Pointer RTDoseVisualizer::GetExtractedSlice(mitk::Image::Pointer im
   return reslicedImage;
 }
 
-void RTDoseVisualizer::UpdatePolyData(int num, double min, double max)
+mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, double max)
 {
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
   mitk::Image::Pointer reslicedImage = this->GetExtractedSlice(image);
 
-//  vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
-//  contourFilter->SetInput(reslicedImage->GetVtkImageData());
-//  contourFilter->GenerateValues(num,min,max);
-//  contourFilter->Update();
-  m_freeIsoFilter->SetInput(reslicedImage->GetVtkImageData());
-  m_freeIsoFilter->GenerateValues(num,min,max);
-  m_freeIsoFilter->Update();
+  vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
+  m_Filters.push_back(contourFilter);
+  contourFilter->SetInput(reslicedImage->GetVtkImageData());
+  contourFilter->GenerateValues(num,min,max);
+  contourFilter->Update();
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-//  polyData = contourFilter->GetOutput();
-  polyData =m_freeIsoFilter->GetOutput();
-  polyData->Print(std::cout);
+  polyData =contourFilter->GetOutput();
+//  polyData->Print(std::cout);
 
   mitk::Surface::Pointer isoline = mitk::Surface::New();
   isoline->SetVtkPolyData(polyData);
@@ -471,8 +492,61 @@ void RTDoseVisualizer::UpdatePolyData(int num, double min, double max)
   mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
   isolineNode->SetMapper(1, mapper);
   isolineNode->SetName("Isoline1");
+  isolineNode->SetBoolProperty(mitk::rt::Constants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(),true);
   this->GetDataStorage()->Add(isolineNode);
+  return isolineNode;
 }
+
+void RTDoseVisualizer::UpdateStdIsolines()
+{
+  mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = this->m_Presets[this->m_selectedPresetName];
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+  mitk::Image::Pointer reslicedImage = this->GetExtractedSlice(image);
+
+  float pref;
+  m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+
+  for(mitk::IsoDoseLevelSet::ConstIterator doseIT = isoDoseLevelSet->Begin(); doseIT!=isoDoseLevelSet->End();++doseIT)
+  {
+    if(doseIT->GetVisibleIsoLine()){
+      vtkSmartPointer<vtkContourFilter> isolineFilter = vtkSmartPointer<vtkContourFilter>::New();
+      isolineFilter->SetInput(reslicedImage->GetVtkImageData());
+      isolineFilter->GenerateValues(1,doseIT->GetDoseValue()*pref,doseIT->GetDoseValue()*pref);
+      isolineFilter->Update();
+
+      vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+      polyData=isolineFilter->GetOutput();
+
+      mitk::Surface::Pointer surface = mitk::Surface::New();
+      surface->SetVtkPolyData(polyData);
+      surface->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial"))->Clone());
+      surface->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing());
+      surface->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
+
+      mitk::DataNode::Pointer isoNode = mitk::DataNode::New();
+      isoNode->SetData(surface);
+      mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
+      mitk::Color color;
+      color[0]=doseIT->GetColor()[0];color[1]=doseIT->GetColor()[1];color[2]=doseIT->GetColor()[2];
+      isoNode->SetMapper(1,mapper);
+      isoNode->SetColor(color);
+      isoNode->SetName("StdIsoline");
+      isoNode->SetBoolProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),true);
+      this->GetDataStorage()->Add(isoNode);
+    }
+  }
+}
+
+void RTDoseVisualizer::HideIsoline()
+{
+  mitk::NodePredicateProperty::Pointer isoProp = mitk::NodePredicateProperty::
+      New(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(true));
+  mitk::DataStorage::SetOfObjects::ConstPointer isoSet =  this->GetDataStorage()->GetSubset(isoProp);
+  for(mitk::DataStorage::SetOfObjects::ConstIterator iso = isoSet->Begin(); iso!=isoSet->End(); ++iso)
+  {
+  }
+}
+
 //######################################################################################################
 void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
   const QList<mitk::DataNode::Pointer>& nodes )

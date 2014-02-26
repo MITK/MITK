@@ -5,10 +5,7 @@
 
 \note This article requires a basic knowledge of DICOM.
 
-Available sections:
-  - \ref org_mitk_gui_qt_dicomOverview
-  - \ref org_mitk_gui_qt_dicomDataHandling
-  - \ref org_mitk_gui_qt_dicomQueryRetrieve
+\tableofcontents
 
 \section org_mitk_gui_qt_dicomOverview Overview
 

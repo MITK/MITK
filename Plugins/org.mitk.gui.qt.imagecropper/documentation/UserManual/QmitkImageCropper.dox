@@ -3,11 +3,7 @@
 
 \image html QmitkImageCropper_Icon.png "Icon of the Plugin"
 
-Available sections:
-  - \ref QmitkImageCropperUserManualOverview
-  - \ref QmitkImageCropperUserManualFeatures
-  - \ref QmitkImageCropperUserManualUsage
-  - \ref QmitkImageCropperUserManualTroubleshooting
+\tableofcontents
 
 \section QmitkImageCropperUserManualOverview Overview
 

@@ -4,23 +4,13 @@
 
 \image html QmitkDatamanager_Icon.png "Icon of the Module"
 
+\tableofcontents
+
 \section QmitkDataManagerIntroduction Introduction
 
 The Datamanager is the central componenent to manage medical data like images, surfaces, etc.. 
 After loading one or more data into the Datamanager the data are shown in the four-view window, the so called Standard View.
 The user can now start working on the data by just clicking  into the standard view or by using the MITK-modules such as "Segmentation" or "Basic Image Processing".
-
-Available sections:
-  - \ref QmitkDataManagerIntroduction 
-  - \ref QmitkDataManagerLoading
-  - \ref QmitkDataManagerSaving
-  - \ref QmitkDataManagerProperties
-  - \ref QmitkDataManagerPropertiesList
-  - \ref QmitkDataManagerPropertiesVisibility
-  - \ref QmitkDataManagerPropertiesRepresentation
-  - \ref QmitkDataManagerPropertiesPreferences
-  - \ref QmitkDataManagerPropertyList
-
 
 \image html QmitkDatamanager_Overview.png "How MITK looks when started"
 

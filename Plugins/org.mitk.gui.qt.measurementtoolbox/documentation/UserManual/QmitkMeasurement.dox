@@ -7,21 +7,7 @@
 
 The Measurement view enables the user to interact with 2D images or single slices of 3D image stacks and planar figure data types. It allows to measure distances, angels, pathes and several geometric figures on a dataset. 
 
-Available Sections:
-- \ref QmitkMeasurementUserManualOverview
-- \ref QmitkMeasurementUserManualFeatures
-  - \ref SubOne
-  - \ref SubTwo
-  - \ref SubThree
-  - \ref SubFour
-  - \ref SubFive
-  - \ref SubSix
-  - \ref SubSeven
-- \ref QmitkMeasurementUserManualUsage
-  - \ref One
-  - \ref Two
-  - \ref Three
-  - \ref Four
+\tableofcontents
 
 The workflow to use this view is:
 

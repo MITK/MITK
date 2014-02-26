@@ -3,10 +3,7 @@
 
 \image html cmdlinemodules_Icon.png "Icon of the Command Line Modules View"
 
-\li \ref CLIIntroduction
-\li \ref CLIPreferences
-\li \ref CLIUsage
-\li \ref CLITechnicalNotes
+\tableofcontents
 
 \section CLIPrefix Contribution
 

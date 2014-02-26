@@ -3,11 +3,7 @@
 
 This view provides the user interface for the Gibbs Tracking algorithm, a global fiber tracking algorithm, originally proposed by Reisert et.al. [1].
 
-Available sections:
-  - \ref QmitkGibbsTrackingUserManualInputData
-  - \ref QmitkGibbsTrackingUserManualParameters
-  - \ref QmitkGibbsTrackingUserManualTrackingSurveillance
-  - \ref QmitkGibbsTrackingUserManualReferences
+\tableofcontents
 
 \image html gibbstrackingview.png The Gibbs Tracking View
 

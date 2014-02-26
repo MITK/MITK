@@ -74,7 +74,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("ImageToContourFilter has wrong number of outputs!", m_ContourExtractor->GetNumberOfOutputs() == 1);
 
     mitk::Surface::Pointer contour = m_ContourExtractor->GetOutput();
-    mitk::Surface::Pointer referenceContour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/SliceWithSingleContour_Reference.vtk"));
+    mitk::Surface::Pointer referenceContour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/SingleContour_Reference.vtk"));
 
     CPPUNIT_ASSERT_MESSAGE("Extracted contour has wrong number of points!", contour->GetVtkPolyData()->GetNumberOfPoints() ==
                            referenceContour->GetVtkPolyData()->GetNumberOfPoints());
@@ -91,7 +91,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("ImageToContourFilter has wrong number of outputs!", m_ContourExtractor->GetNumberOfOutputs() == 1);
 
     mitk::Surface::Pointer contour = m_ContourExtractor->GetOutput(0);
-    mitk::Surface::Pointer referenceContour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/SliceWithTwoContours_Reference.vtk"));
+    mitk::Surface::Pointer referenceContour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/TwoContours_Reference.vtk"));
 
     CPPUNIT_ASSERT_MESSAGE("Extracted contour1 has wrong number of points!", contour->GetVtkPolyData()->GetNumberOfPoints() ==
                            referenceContour->GetVtkPolyData()->GetNumberOfPoints());

@@ -70,7 +70,6 @@ set(MODULE_TESTS
   mitkWeakPointerTest.cpp
   mitkTransferFunctionTest.cpp
   mitkStepperTest.cpp
-  itkTotalVariationDenoisingImageFilterTest.cpp
   mitkRenderingManagerTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
   mitkNodePredicateSourceTest.cpp

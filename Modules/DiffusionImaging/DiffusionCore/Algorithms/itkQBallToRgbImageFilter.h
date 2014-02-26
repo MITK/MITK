@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkUnaryFunctorImageFilter.h"
 #include "itkOrientationDistributionFunction.h"
 #include "itkRGBAPixel.h"
+#include "itkImageRegionConstIterator.h"
+#include "itkImageRegionIterator.h"
 
 namespace itk
 {

@@ -3,8 +3,11 @@
 if(UNIX)
   mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unused-variable" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
   mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unneeded-internal-declaration" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
-  # there are additional warnings in boost headers in Release mode with special gcc versions
-  if(CMAKE_BUILD_TYPE STREQUAL "Release" AND ${GCC_VERSION} VERSION_GREATER "4.8.1" AND ${GCC_VERSION} VERSION_LESS "4.9.0")
+endif()
+
+# there are additional warnings in boost headers in Release mode with special gcc versions
+if(CMAKE_COMPILER_IS_GNUCXX)
+  if (CMAKE_BUILD_TYPE STREQUAL "Release" AND ${GCC_VERSION} VERSION_GREATER "4.8.1" AND ${GCC_VERSION} VERSION_LESS "4.9.0")
     mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=maybe-uninitialized" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
     mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unused-parameter" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
   endif()

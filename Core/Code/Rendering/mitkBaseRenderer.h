@@ -320,7 +320,7 @@ namespace mitk
     //## @brief Get timestamp of last call of SetDisplayGeometry
     unsigned long GetDisplayGeometryUpdateTime()
     {
-      return m_CurrentWorldGeometry2DUpdateTime;
+      return m_DisplayGeometryUpdateTime;
     }
     //##Documentation
     //## @brief Get timestamp of last change of current TimeStep

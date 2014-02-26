@@ -287,7 +287,7 @@ void mitk::ImageWriter::GenerateData()
         }
         else
         {
-          itkWarningMacro(<<"Error on write: TimeGeometry invalid of image " << filename << ".");
+          itkWarningMacro(<<"Error on write: TimeGeometry invalid of image " << filename.str() << ".");
           filename <<  m_FileNameWithoutExtension << "_T" << t << m_Extension;
         }
         if ( vti )

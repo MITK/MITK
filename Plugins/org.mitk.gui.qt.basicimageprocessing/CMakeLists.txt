@@ -6,6 +6,6 @@ project(org_mitk_gui_qt_basicimageprocessing)
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE BASICIMAGEPROCESSING_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS QmitkExt MitkMapperExt
+  MODULE_DEPENDS QmitkExt MitkMapperExt ImageDenoising
   PACKAGE_DEPENDS ITK|ITKMathematicalMorphology
 )

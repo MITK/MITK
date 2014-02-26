@@ -46,7 +46,8 @@ public:
   };
 
   mitkClassMacro(ScaleLegendOverlay, mitk::VtkOverlay);
-  itkNewMacro(ScaleLegendOverlay);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void SetRightAxisVisibility(bool visibility);
   bool GetRightAxisVisibility() const;

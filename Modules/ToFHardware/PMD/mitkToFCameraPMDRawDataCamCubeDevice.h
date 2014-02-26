@@ -35,7 +35,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDRawDataCamCubeDevice , ToFCameraPMDRawDataDevice );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual void SetProperty( const char *propertyKey, BaseProperty* propertyValue );
 

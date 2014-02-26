@@ -30,7 +30,8 @@ class MITK_CORE_EXPORT CameraRotationController : public BaseController
 {
 public:
   mitkClassMacro(CameraRotationController,BaseController);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro1Param(Self, const char *);
 
   void RotateCamera();

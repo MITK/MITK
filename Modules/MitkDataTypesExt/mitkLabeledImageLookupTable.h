@@ -46,7 +46,8 @@ public:
   /**
    * Make this object constructable by the ::New() Method.
    */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * The data type for a label. Currently only images with labels

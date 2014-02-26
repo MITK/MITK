@@ -49,7 +49,8 @@ namespace mitk
 
     mitkClassMacro( ToFImageRecorder , itk::Object );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkGetMacro( DistanceImageFileName, std::string );
     itkGetMacro( AmplitudeImageFileName, std::string );

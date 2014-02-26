@@ -31,7 +31,8 @@ class PropertyListsXmlFileReaderAndWriter : public itk::Object
     static const std::string PROPERTY_LIST_ID_ELEMENT_NAME;
 
     mitkClassMacro( PropertyListsXmlFileReaderAndWriter, itk::Object );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     bool WriteLists( const std::string& fileName, const std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists ) const;
     bool ReadLists( const std::string& fileName, std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists ) const;

@@ -31,7 +31,8 @@ class SceneSerializationBase_EXPORT FloatPropertySerializer : public BasePropert
   public:
 
     mitkClassMacro( FloatPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

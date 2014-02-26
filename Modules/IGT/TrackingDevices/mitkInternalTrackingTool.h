@@ -62,7 +62,8 @@ namespace mitk {
     virtual void SetToolTip(Point3D toolTipPosition, Quaternion orientation = Quaternion(0,0,0,1), ScalarType eps=0.0); ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
 
   protected:
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     InternalTrackingTool();
     virtual ~InternalTrackingTool();
 

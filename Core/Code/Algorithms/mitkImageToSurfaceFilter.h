@@ -62,7 +62,8 @@ namespace mitk {
       enum DecimationType {NoDecimation,DecimatePro,QuadricDecimation};
 
       mitkClassMacro(ImageToSurfaceFilter, SurfaceSource);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
       /**
        * For each image time slice a surface will be created. This method is

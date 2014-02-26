@@ -36,7 +36,8 @@ class Segmentation_EXPORT ContourSet : public BaseData
 public:
   mitkClassMacro(ContourSet, BaseData);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef std::map<unsigned long,Contour::Pointer>              ContourVectorType;
   typedef ContourVectorType::iterator                           ContourIterator;

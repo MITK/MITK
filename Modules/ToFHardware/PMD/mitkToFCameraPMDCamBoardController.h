@@ -37,7 +37,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDCamBoardController , ToFCameraPMDController );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief opens a connection to the ToF camera and initializes the hardware specific members
@@ -85,7 +86,7 @@ namespace mitk
     ~ToFCameraPMDCamBoardController();
 
     /*
-    \brief Transform the output of the camera, i.e. cut invalid pixels, and rotate 90°
+    \brief Transform the output of the camera, i.e. cut invalid pixels, and rotate 90Â°
            counterclockwise
     \param input data array of original size (207x204)
     \param rotated output data array of reduced size (200x200)

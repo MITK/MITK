@@ -41,7 +41,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDPlayerDevice , ToFCameraPMDDevice );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
 
     /*!

@@ -32,7 +32,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(TbssImageMapper,ImageVtkMapper2D);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void GenerateDataForRenderer( mitk::BaseRenderer *renderer );
 

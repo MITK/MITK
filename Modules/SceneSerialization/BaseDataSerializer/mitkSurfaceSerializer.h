@@ -32,7 +32,8 @@ class SceneSerialization_EXPORT SurfaceSerializer : public BaseDataSerializer
   public:
 
     mitkClassMacro( SurfaceSerializer, BaseDataSerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual std::string Serialize();
 

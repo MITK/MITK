@@ -35,7 +35,8 @@ class MitkDataTypesExt_EXPORT AffineDataInteractor3D: public DataInteractor
 
 public:
   mitkClassMacro(AffineDataInteractor3D, DataInteractor);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 protected:
   AffineDataInteractor3D();

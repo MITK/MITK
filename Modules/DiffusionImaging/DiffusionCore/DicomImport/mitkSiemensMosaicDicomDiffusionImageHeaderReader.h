@@ -30,7 +30,8 @@ namespace mitk
   {
   public:
     mitkClassMacro( SiemensMosaicDicomDiffusionImageHeaderReader, DicomDiffusionImageHeaderReader );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Extracts the information stored under the key nameString in the tagString */
     int ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray );

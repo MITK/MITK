@@ -87,7 +87,8 @@ class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public VtkMapper
 public:
   mitkClassMacro(Geometry2DDataVtkMapper3D, VtkMapper);
 
-  itkNewMacro(Geometry2DDataVtkMapper3D);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * Overloaded since the displayed color-frame of the image mustn't be

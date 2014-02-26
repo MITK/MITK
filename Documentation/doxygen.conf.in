@@ -1609,6 +1609,8 @@ PREDEFINED             = itkNotUsed(x)= \
                          "itkSetVectorMacro(name,type,count)=                   virtual void Set##name(type data[]);" \
                          "itkGetVectorMacro(name,type,count)=                   virtual type* Get##name () const;" \
                          "itkNewMacro(type)=                   static Pointer New();" \
+                         "itkFactorylessNewMacro(type)=        static Pointer New();" \
+                         "itkCloneMacro(type)=                 Pointer Clone() const;" \
                          "itkTypeMacro(thisClass,superclass)=                   virtual const char *GetClassName() const;" \
                          "itkConceptMacro(name,concept)=                   enum { name = 0 };" \
                          "ITK_NUMERIC_LIMITS=                   std::numeric_limits" \

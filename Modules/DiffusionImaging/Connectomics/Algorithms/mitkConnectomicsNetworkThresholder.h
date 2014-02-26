@@ -39,7 +39,8 @@ namespace mitk
     /** Method for creation through the object factory. */
 
     mitkClassMacro(ConnectomicsNetworkThresholder, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     // Typedefs
     typedef mitk::ConnectomicsNetwork::NetworkType NetworkType;

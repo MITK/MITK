@@ -74,7 +74,8 @@ namespace itk
     itkStaticConstMacro (ImageDimension, unsigned int,
       OutputImageType::ImageDimension);
 
-    itkNewMacro (Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void SetSecondDiffusionImage(typename InputImageType::Pointer diffImage)
     {

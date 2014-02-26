@@ -46,7 +46,8 @@ class MitkExt_EXPORT InterpolateLinesFilter : public SurfaceSource
 {
 public:
   mitkClassMacro(InterpolateLinesFilter, SurfaceSource);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void GenerateOutputInformation();
 

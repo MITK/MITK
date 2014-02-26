@@ -53,7 +53,8 @@ protected:
 public:
     mitkClassMacro(LevelWindowProperty, BaseProperty);
 
-    itkNewMacro(LevelWindowProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(LevelWindowProperty, const mitk::LevelWindow&);
 
     typedef LevelWindow ValueType;

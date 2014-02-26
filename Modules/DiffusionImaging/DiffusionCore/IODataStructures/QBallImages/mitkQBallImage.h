@@ -49,7 +49,8 @@ namespace mitk
   public:
 
     mitkClassMacro( QBallImage, Image );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual ImageVtkAccessor* GetNonRgbVtkImageData(int t = 0, int n = 0);
 

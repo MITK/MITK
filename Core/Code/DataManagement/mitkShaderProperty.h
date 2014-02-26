@@ -41,7 +41,8 @@ public:
 
   mitkClassMacro( ShaderProperty, EnumerationProperty );
 
-  itkNewMacro(ShaderProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   mitkNewMacro1Param(ShaderProperty, const IdType&);

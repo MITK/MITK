@@ -46,7 +46,8 @@ class Segmentation_EXPORT ExtrudedContour : public BoundingObject
 {
 public:
   mitkClassMacro(ExtrudedContour, BoundingObject);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual mitk::ScalarType GetVolume();
   virtual bool IsInside(const Point3D& p) const;

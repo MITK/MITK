@@ -49,7 +49,8 @@ public:
   };
 
   mitkClassMacro(TextOverlay2D, mitk::VtkOverlay2D);
-  itkNewMacro(TextOverlay2D);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const;
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds);

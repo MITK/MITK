@@ -35,7 +35,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(SurfaceInteractor,AffineInteractor);
-    //  itkNewMacro(Self);
+    //  itkFactorylessNewMacro(Self)
+    //  itkCloneMacro(Self)
     mitkNewMacro2Param(Self, const char*, DataNode*);
 
   protected:

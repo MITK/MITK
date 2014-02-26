@@ -40,7 +40,8 @@ public:
 
   typedef std::string ValueType;
 
-  itkNewMacro( AnnotationProperty );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro2Param( AnnotationProperty,
     const char *, const Point3D & );
   mitkNewMacro2Param( AnnotationProperty,

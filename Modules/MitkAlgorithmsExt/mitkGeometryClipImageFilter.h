@@ -47,7 +47,8 @@ class MitkAlgorithmsExt_EXPORT GeometryClipImageFilter : public ImageToImageFilt
 public:
   mitkClassMacro(GeometryClipImageFilter, ImageToImageFilter);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
   * Set the geometry to be used for clipping

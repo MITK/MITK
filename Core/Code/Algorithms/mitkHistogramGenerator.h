@@ -32,7 +32,8 @@ class MITK_CORE_EXPORT HistogramGenerator : public itk::Object
 public:
   mitkClassMacro(HistogramGenerator,itk::Object);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   typedef itk::Statistics::Histogram<double> HistogramType;
 
   itkSetMacro(Image,mitk::Image::ConstPointer);

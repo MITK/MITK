@@ -46,7 +46,8 @@ public:
     typedef itk::ImageRegion<3>                     OutputImageRegionType;
     typedef itk::Matrix<double, 3, 3>               MatrixType;
 
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     itkTypeMacro( FieldmapGeneratorFilter, ImageSource )
 
     /** Output image parameters. */

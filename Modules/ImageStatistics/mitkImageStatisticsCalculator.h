@@ -109,7 +109,8 @@ public:
 
 
   mitkClassMacro( ImageStatisticsCalculator, itk::Object );
-  itkNewMacro( ImageStatisticsCalculator );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** \brief Set image from which to compute statistics. */
   void SetImage( const mitk::Image *image );
@@ -204,7 +205,7 @@ protected:
 
 
   /** \brief If the passed vector matches any of the three principal axes
-   * of the passed geometry, the ínteger value corresponding to the axis
+   * of the passed geometry, the Ã­nteger value corresponding to the axis
    * is set and true is returned. */
   bool GetPrincipalAxis( const Geometry3D *geometry, Vector3D vector,
     unsigned int &axis );

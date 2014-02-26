@@ -301,7 +301,8 @@ class MitkExt_EXPORT PACSPlugin : public itk::Object
   protected:
 
     // All this is hidden, should be instantiated through the GetInstance() method.
-    itkNewMacro( PACSPlugin );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     PACSPlugin();
     virtual ~PACSPlugin();
 

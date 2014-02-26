@@ -51,7 +51,8 @@ class MITK_CORE_EXPORT AbstractTransformGeometry : public Geometry2D
 public:
   mitkClassMacro(AbstractTransformGeometry, Geometry2D);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   //##Documentation
   //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)

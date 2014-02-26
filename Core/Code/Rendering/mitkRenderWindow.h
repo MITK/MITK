@@ -40,7 +40,8 @@ class MITK_CORE_EXPORT RenderWindow: public mitk::RenderWindowBase, public itk::
 
 public:
   mitkClassMacro(RenderWindow, itk::Object);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro1Param(Self, vtkRenderWindow*);
   mitkNewMacro2Param(Self, vtkRenderWindow*, const char*);
   mitkNewMacro3Param(Self, vtkRenderWindow*, const char*, mitk::RenderingManager*);

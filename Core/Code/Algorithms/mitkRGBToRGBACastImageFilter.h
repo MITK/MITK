@@ -38,7 +38,8 @@ class MITK_CORE_EXPORT RGBToRGBACastImageFilter : public ImageToImageFilter
 public:
   mitkClassMacro(RGBToRGBACastImageFilter, ImageToImageFilter);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   /** Static convenience method to check if the passed mitk::Image is

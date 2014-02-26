@@ -34,7 +34,8 @@ class MitkExt_EXPORT NativeRenderWindowInteractor : public itk::Object
 public:
   mitkClassMacro(NativeRenderWindowInteractor, itk::Object);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void Start();
 

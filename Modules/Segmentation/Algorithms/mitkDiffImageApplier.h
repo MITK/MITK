@@ -41,7 +41,8 @@ class Segmentation_EXPORT DiffImageApplier : public itk::Object, public Operatio
   public:
 
     mitkClassMacro(DiffImageApplier, Object);
-    itkNewMacro(DiffImageApplier);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual void ExecuteOperation( Operation* operation );
 

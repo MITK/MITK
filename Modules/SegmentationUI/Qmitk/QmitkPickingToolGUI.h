@@ -44,7 +44,8 @@ class SegmentationUI_EXPORT QmitkPickingToolGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkPickingToolGUI, QmitkToolGUI);
-  itkNewMacro(QmitkPickingToolGUI);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   protected slots:
 

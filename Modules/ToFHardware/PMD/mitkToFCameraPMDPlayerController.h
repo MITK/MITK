@@ -36,7 +36,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDPlayerController , ToFCameraPMDController );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetMacro(PMDFileName, std::string);
 

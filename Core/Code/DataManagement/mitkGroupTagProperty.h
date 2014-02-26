@@ -39,7 +39,8 @@ class MITK_CORE_EXPORT GroupTagProperty : public BaseProperty
 {
   public:
     mitkClassMacro(GroupTagProperty, BaseProperty);
-    itkNewMacro(GroupTagProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     using BaseProperty::operator=;
 

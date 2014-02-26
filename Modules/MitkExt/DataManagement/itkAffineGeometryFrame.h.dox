@@ -45,7 +45,8 @@ public:
   typedef typename BoundingBoxType::Pointer                 BoundingBoxPointer;
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** \brief Method for creation through the object factory. */
   itkTypeMacro(AffineGeometryFrame, Object);

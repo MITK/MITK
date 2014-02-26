@@ -30,7 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
     public:
       mitkClassMacro(TestUSFilter, mitk::USImageToUSImageFilter);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
     virtual void GenerateOutputInformation()
       {

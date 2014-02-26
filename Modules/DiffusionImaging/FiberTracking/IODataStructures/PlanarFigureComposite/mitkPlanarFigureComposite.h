@@ -53,7 +53,8 @@ namespace mitk {
 
   public:
     mitkClassMacro(PlanarFigureComposite, PlanarFigure);
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     // ///MUST HAVE IMPLEMENTATION//////
     bool SetControlPoint(unsigned int, const Point2D &, bool);

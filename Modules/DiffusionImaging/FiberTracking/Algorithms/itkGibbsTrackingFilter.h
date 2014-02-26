@@ -46,7 +46,8 @@ public:
     typedef SmartPointer< Self > Pointer;
     typedef SmartPointer< const Self > ConstPointer;
 
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     itkTypeMacro( GibbsTrackingFilter, ProcessObject )
 
     typedef Image< DiffusionTensor3D<float>, 3 >    ItkTensorImage;

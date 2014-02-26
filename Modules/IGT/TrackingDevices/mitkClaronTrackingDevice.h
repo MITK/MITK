@@ -44,7 +44,8 @@ namespace mitk
   public:
 
     mitkClassMacro(ClaronTrackingDevice, TrackingDevice);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
     * @returns Returns true if the MicronTracker is installed on this build (means activated in CMAKE). False if not.

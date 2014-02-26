@@ -39,7 +39,8 @@ class MitkExt_EXPORT MeshSource : public itk::ProcessObject
 public:
     mitkClassMacro( MeshSource, itk::ProcessObject );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::Mesh OutputType;
 

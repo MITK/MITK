@@ -44,7 +44,8 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
   public:
 
     mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
-    itkNewMacro(QmitkBinaryThresholdToolGUI);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
     void OnThresholdingValueChanged(double current);

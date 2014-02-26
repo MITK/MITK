@@ -68,7 +68,8 @@ namespace itk
     itkStaticConstMacro (ImageDimension, unsigned int,
       OutputImageType::ImageDimension);
 
-    itkNewMacro (Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
 
   protected:

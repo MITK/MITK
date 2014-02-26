@@ -38,7 +38,8 @@ class MitkExt_EXPORT ProbeFilter : public SurfaceSource
 {
 public:
   mitkClassMacro(ProbeFilter, SurfaceSource);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void GenerateOutputInformation();
   virtual void GenerateInputRequestedRegion();

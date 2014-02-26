@@ -66,7 +66,8 @@ public:
 
   mitkClassMacro(TransferFunction, itk::DataObject);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** \brief Get/Set min/max of transfer function range for initialization. */
   itkSetMacro(Min,int);

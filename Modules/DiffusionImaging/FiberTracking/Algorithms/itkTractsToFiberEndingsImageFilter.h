@@ -39,7 +39,8 @@ public:
 
   typedef typename OutputImageType::PixelType OutPixelType;
 
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   itkTypeMacro( TractsToFiberEndingsImageFilter, ImageSource )
 
   /** Upsampling factor **/

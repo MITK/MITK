@@ -40,7 +40,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraMITKPlayerDevice , ToFCameraDevice );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief opens a connection to the ToF camera

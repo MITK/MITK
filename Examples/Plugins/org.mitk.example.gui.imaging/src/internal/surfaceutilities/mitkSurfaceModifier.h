@@ -38,7 +38,8 @@ class SurfaceModifier : public itk::Object
   {
   public:
     mitkClassMacro(SurfaceModifier, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** @brief Adds gaussian noise to a surface (means to all vertexes).
       * @param maxNoiseVectorLenght Limits the length of the noise vector of each vertex. Value -1 disables the limit. Default value is also -1.

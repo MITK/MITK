@@ -44,7 +44,8 @@ class DiffusionImageSource : public ImageSource
 {
 public:
   mitkClassMacro(DiffusionImageSource, BaseDataSource);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef DiffusionImage<TPixelType> OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;

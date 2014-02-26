@@ -28,7 +28,8 @@ class TensorImageSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( TensorImageSerializer, BaseDataSerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     virtual std::string Serialize();
   protected:
     TensorImageSerializer();

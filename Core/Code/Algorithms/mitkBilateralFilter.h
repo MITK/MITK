@@ -30,7 +30,8 @@ namespace mitk
   public:
 
     mitkClassMacro( BilateralFilter , ImageToImageFilter );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetMacro(DomainSigma,float);
     itkSetMacro(RangeSigma,float);

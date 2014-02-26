@@ -31,7 +31,8 @@ class SceneSerializationBase_EXPORT ColorPropertySerializer : public BasePropert
   public:
 
     mitkClassMacro( ColorPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

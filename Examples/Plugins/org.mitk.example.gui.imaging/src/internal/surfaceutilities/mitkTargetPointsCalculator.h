@@ -36,7 +36,8 @@ namespace mitk
     {
     public:
     mitkClassMacro(TargetPointsCalculator, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** @brief identifier for target point calculation method */
     enum TargetPointCalculationMethod

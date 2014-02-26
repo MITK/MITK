@@ -29,7 +29,8 @@ namespace mitk
   public:
 
     mitkClassMacro( PhilipsDicomDiffusionImageHeaderReader, DicomDiffusionImageHeaderReader );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** read in the data */
     virtual void Update();

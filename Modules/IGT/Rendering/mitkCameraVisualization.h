@@ -33,7 +33,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(CameraVisualization, NavigationDataToNavigationDataFilter);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
     * \brief sets the direction of projection of the camera of the renderer in tool coordinates

@@ -47,7 +47,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(NavigationDataLandmarkTransformFilter, NavigationDataToNavigationDataFilter);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef std::vector<mitk::ScalarType> ErrorVector;
     typedef itk::VersorRigid3DTransform< double > LandmarkTransformType;

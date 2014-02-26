@@ -33,7 +33,8 @@ public:
   mitkClassMacro(ImageToImageFilter,ImageSource);
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Superclass typedefs. */
   typedef Superclass::OutputImageRegionType OutputImageRegionType;

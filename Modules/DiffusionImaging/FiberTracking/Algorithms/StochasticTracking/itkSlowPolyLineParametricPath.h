@@ -105,7 +105,8 @@ public:
 
 
   /** New() method for dynamic construction */
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
 protected:

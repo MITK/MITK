@@ -140,7 +140,7 @@ public:
   /**
     * \brief Property key for the class name of corresponding us device object.
     */
-  static const std::string US_DEVICE_PROPKEY_CLASS;
+  static std::string US_DEVICE_PROPKEY_CLASS();
 
 private:
 

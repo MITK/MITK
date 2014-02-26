@@ -55,7 +55,8 @@ public:
     typedef ImageSource< itk::VectorImage<TOutputScalarType,3> > Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(DwiPhantomGenerationFilter, ImageSource)

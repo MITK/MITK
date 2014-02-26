@@ -34,7 +34,8 @@ public:
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   mitkClassMacro(QBallImageSource,ImageSource);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * Allocates a new output object and returns it. Currently the

@@ -37,7 +37,8 @@ public:
 
   mitkClassMacro( ConnectomicsRenderingNodeRadiusParameterProperty, EnumerationProperty );
 
-  itkNewMacro(ConnectomicsRenderingNodeRadiusParameterProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(ConnectomicsRenderingNodeRadiusParameterProperty, const IdType&);
 

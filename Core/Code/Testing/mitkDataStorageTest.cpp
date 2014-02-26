@@ -50,7 +50,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(TestStandaloneDataStorage, mitk::DataStorage);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     std::map<const mitk::DataNode*, unsigned long>
         GetModifiedObserverTags() const {return m_NodeModifiedObserverTags;}
     std::map<const mitk::DataNode*, unsigned long>

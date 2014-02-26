@@ -44,7 +44,8 @@ public:
 
   mitkClassMacro(ItkImageToImageFilterAdapter,ImageSource);
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkSetObjectMacro(FirstFilter, ImageToImageFilterType);
   itkGetObjectMacro(FirstFilter, ImageToImageFilterType);

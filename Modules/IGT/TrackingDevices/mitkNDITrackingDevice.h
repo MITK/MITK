@@ -59,7 +59,8 @@ namespace mitk
     typedef mitk::NDIPassiveTool::TrackingPriority TrackingPriority; ///< Tracking priority used for tracking a tool
 
     mitkClassMacro(NDITrackingDevice, TrackingDevice);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
     * \brief Set the type of the NDI Tracking Device because it can not jet handle this itself

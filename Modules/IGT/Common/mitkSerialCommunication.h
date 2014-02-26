@@ -48,7 +48,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(SerialCommunication, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     enum PortNumber
     {

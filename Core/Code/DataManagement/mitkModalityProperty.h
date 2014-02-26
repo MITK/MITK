@@ -39,7 +39,8 @@ class MITK_CORE_EXPORT ModalityProperty : public EnumerationProperty
   public:
 
     mitkClassMacro(ModalityProperty, EnumerationProperty);
-    itkNewMacro(ModalityProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(ModalityProperty, const IdType&);
     mitkNewMacro1Param(ModalityProperty, const std::string&);
 

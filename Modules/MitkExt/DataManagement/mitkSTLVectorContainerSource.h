@@ -32,7 +32,8 @@ public:
 
     mitkClassMacro( STLVectorContainerSource, BaseProcess );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::STLVectorContainer<T> OutputType;
 

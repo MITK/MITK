@@ -45,7 +45,8 @@ namespace mitk
     typedef itk::VectorImage<float,3> DataImageType;
 
     mitkClassMacro( TbssImporter, Object )
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** \brief Converts the FSL Nifty to NRRD and adds the meta data */
     mitk::TbssImage::Pointer Import();

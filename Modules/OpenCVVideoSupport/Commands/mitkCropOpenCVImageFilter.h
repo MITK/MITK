@@ -31,7 +31,8 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT CropOpenCVImageFilter : public AbstractOpen
 
 public:
   mitkClassMacro(CropOpenCVImageFilter, AbstractOpenCVImageFilter);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   CropOpenCVImageFilter( );
 

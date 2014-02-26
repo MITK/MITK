@@ -42,7 +42,8 @@ public:
 
   mitkClassMacro( GridRepresentationProperty, EnumerationProperty );
 
-  itkNewMacro(GridRepresentationProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(GridRepresentationProperty, const IdType& );
 

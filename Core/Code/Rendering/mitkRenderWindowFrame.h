@@ -45,7 +45,8 @@ class MITK_CORE_EXPORT RenderWindowFrame : public BaseData
 public:
 
   mitkClassMacro( RenderWindowFrame, BaseData );
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * Sets the renderwindow, in which colored rectangle boarders will be shown.

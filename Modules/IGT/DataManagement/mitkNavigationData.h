@@ -41,7 +41,8 @@ namespace mitk {
     {
     public:
       mitkClassMacro(NavigationData, itk::DataObject);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
       mitkNewMacro2Param(Self, mitk::AffineTransform3D::Pointer, const bool);
       mitkNewMacro1Param(Self, mitk::AffineTransform3D::Pointer);
       mitkCloneMacro(NavigationData);

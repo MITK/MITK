@@ -93,7 +93,8 @@ namespace mitk {
 
 
     mitkClassMacro(CreateDistanceImageFromSurfaceFilter,ImageSource);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     using Superclass::SetInput;
 

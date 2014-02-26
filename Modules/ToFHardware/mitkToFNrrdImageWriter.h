@@ -36,7 +36,8 @@ namespace mitk
   {
   public:
     mitkClassMacro( ToFNrrdImageWriter , ToFImageWriter );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief Open file(s) for writing

@@ -54,7 +54,8 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
   itkTypeMacro( QBallToRgbImageFilter, ImageToImageFilter )
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Print internal ivars */
   void PrintSelf(std::ostream& os, Indent indent) const

@@ -36,7 +36,8 @@ public:
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   mitkClassMacro(QBallImageSource,ImageSource);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 

@@ -38,7 +38,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(mitk::LinuxRealTimeClock, mitk::RealTimeClock);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
     * \brief basic contructor

@@ -37,7 +37,8 @@ public:
    */
   mitkClassMacro ( PointSetToCurvedGeometryFilter, PointSetToGeometryDataFilter );
 
-  itkNewMacro ( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * Defines the geometry, onto which the input landmarks are

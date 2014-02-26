@@ -35,7 +35,8 @@ class MitkDataTypesExt_EXPORT SurfaceDeformationDataInteractor3D: public DataInt
 
 public:
   mitkClassMacro(SurfaceDeformationDataInteractor3D, DataInteractor);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 protected:
   SurfaceDeformationDataInteractor3D();

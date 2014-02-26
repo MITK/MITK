@@ -27,7 +27,8 @@ class IOExtObjectFactory : public CoreObjectFactoryBase
 public:
 
   mitkClassMacro(IOExtObjectFactory,CoreObjectFactoryBase)
-  itkNewMacro(IOExtObjectFactory)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
   virtual void SetDefaultProperties(mitk::DataNode* node);

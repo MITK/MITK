@@ -41,7 +41,8 @@ class MitkAlgorithmsExt_EXPORT BoundingObjectCutter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(BoundingObjectCutter, ImageToImageFilter);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void SetBoundingObject( const mitk::BoundingObject* boundingObject );
   const mitk::BoundingObject* GetBoundingObject() const;

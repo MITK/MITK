@@ -43,7 +43,8 @@ namespace mitk {
     typedef itk::VersorRigid3DTransform< double > TransformType;
 
     mitkClassMacro(NavigationDataTransformFilter, NavigationDataToNavigationDataFilter);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**Documentation
     * \brief Set the rigid transform used to transform the input navigation data.

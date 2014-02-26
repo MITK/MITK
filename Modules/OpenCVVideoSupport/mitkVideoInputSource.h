@@ -31,7 +31,8 @@ namespace mitk
   {
     public:
     mitkClassMacro( VideoInputSource, OpenCVVideoSource );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     ////##Documentation
     ////## @brief All functions behave like OpenCVVideoSource to the outside.

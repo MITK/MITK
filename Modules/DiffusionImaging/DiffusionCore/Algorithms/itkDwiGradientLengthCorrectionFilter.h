@@ -38,7 +38,8 @@ public:
     typedef itk::VectorContainer< unsigned int, GradientDirectionType >                                 GradientDirectionContainerType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     itkTypeMacro(DwiGradientLengthCorrectionFilter,ProcessObject)
 
     void GenerateData();

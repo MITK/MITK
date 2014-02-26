@@ -49,7 +49,8 @@ namespace mitk {
     mitkClassMacro(TransformFactory, itk::Object);
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
     typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;

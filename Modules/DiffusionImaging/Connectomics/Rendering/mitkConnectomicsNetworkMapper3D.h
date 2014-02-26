@@ -69,7 +69,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(ConnectomicsNetworkMapper3D, VtkMapper);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like deprecated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );

@@ -61,7 +61,8 @@ class MitkMapperExt_EXPORT GPUVolumeMapper3D : public VtkMapper
 public:
   mitkClassMacro(GPUVolumeMapper3D, VtkMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual const mitk::Image* GetInput();
 

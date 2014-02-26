@@ -50,7 +50,8 @@ public:
     typedef Image< Vector< PixelType, QBALL_ODFSIZE >, 3 > QballImageType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(ShCoefficientImageImporter, ProcessObject)

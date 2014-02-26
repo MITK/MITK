@@ -75,7 +75,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(GlobalInteraction, StateMachine);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef std::vector<StateMachine::Pointer>  StateMachineList;
     typedef std::vector<StateMachine*>  StateMachineCPointerList;

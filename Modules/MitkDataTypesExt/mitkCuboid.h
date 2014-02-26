@@ -30,7 +30,8 @@ class MitkDataTypesExt_EXPORT Cuboid : public BoundingObject
 {
 public:
   mitkClassMacro(Cuboid, BoundingObject);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual mitk::ScalarType GetVolume();
   virtual bool IsInside(const Point3D& p)  const;

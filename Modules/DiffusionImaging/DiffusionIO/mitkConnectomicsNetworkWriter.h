@@ -57,7 +57,8 @@ namespace mitk
       Write();
     }
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::ConnectomicsNetwork InputType;
     typedef std::vector< std::pair< std::pair<

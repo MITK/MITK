@@ -42,7 +42,8 @@ namespace itk
     typedef itk::Image<float,3> FloatImageType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Run-time type information (and related methods). */
     itkTypeMacro(Self, Superclass);

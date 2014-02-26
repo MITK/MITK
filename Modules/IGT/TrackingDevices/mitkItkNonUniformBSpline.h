@@ -77,7 +77,8 @@ public:
   typedef std::vector<double>                          ChordLengthListType;
 
   /** Method for creation through the object factory. */
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Method for creation through the object factory. */
   itkTypeMacro( NonUniformBSpline, Object );

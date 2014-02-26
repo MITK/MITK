@@ -42,7 +42,8 @@ public:
 
   mitkClassMacro( PlanarFigureControlPointStyleProperty, EnumerationProperty );
 
-  itkNewMacro(PlanarFigureControlPointStyleProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(PlanarFigureControlPointStyleProperty, const IdType&);
 

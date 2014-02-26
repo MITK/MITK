@@ -44,7 +44,8 @@ namespace mitk {
     mitkClassMacro( ContourModelMapper3D,VtkMapper );
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     const mitk::ContourModel* GetInput(void);
 

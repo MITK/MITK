@@ -37,7 +37,8 @@ namespace mitk
   {
   public:
     mitkClassMacro( ToFCameraPMDControllerTest, ToFCameraPMDController);
-    itkNewMacro( ToFCameraPMDControllerTest );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     inline bool OpenCameraConnection(){return true;};
 

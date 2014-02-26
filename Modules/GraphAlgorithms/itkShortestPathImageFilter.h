@@ -81,7 +81,8 @@ namespace itk
 
 
       // New Macro for smartpointer instantiation
-      itkNewMacro(Self)
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
       // Run-time type information
       itkTypeMacro(ShortestPathImageFilter, ImageToImageFilter)

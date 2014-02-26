@@ -70,7 +70,8 @@ public:
   mitkClassMacro(SlicedGeometry3D, Geometry3D);
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * \brief Returns the Geometry2D of the slice (\a s).

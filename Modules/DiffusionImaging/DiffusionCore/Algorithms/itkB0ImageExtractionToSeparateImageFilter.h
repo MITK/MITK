@@ -59,7 +59,8 @@ public:
   typedef typename GradientDirectionContainerType::Iterator GradContainerIteratorType;
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Runtime information support. */
   itkTypeMacro(B0ImageExtractionToSeparateImageFilter,

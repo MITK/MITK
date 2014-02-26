@@ -57,7 +57,8 @@ class ImageExtraction_EXPORT ExtractDirectedPlaneImageFilterNew : public ImageTo
 public:
 
     mitkClassMacro(ExtractDirectedPlaneImageFilterNew, ImageToImageFilter);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Set macro for the current worldgeometry

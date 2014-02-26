@@ -34,7 +34,8 @@ public:
     mitkClassMacro( StlVolumeTimeSeriesReader, FileReader );
 
     /** Method for creation through the object factory. */
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetStringMacro(FileName);
     itkGetStringMacro(FileName);

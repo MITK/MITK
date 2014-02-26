@@ -30,7 +30,8 @@ class MitkDataTypesExt_EXPORT Cylinder : public BoundingObject
 {
 public:
   mitkClassMacro(Cylinder, BoundingObject);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual mitk::ScalarType GetVolume();
   virtual bool IsInside(const Point3D& p) const;

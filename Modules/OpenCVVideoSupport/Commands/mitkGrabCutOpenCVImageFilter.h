@@ -65,7 +65,8 @@ public:
   typedef std::vector<itk::Index<2> > ModelPointsList;
 
   mitkClassMacro(GrabCutOpenCVImageFilter, AbstractOpenCVImageFilter)
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   GrabCutOpenCVImageFilter();
   virtual ~GrabCutOpenCVImageFilter();

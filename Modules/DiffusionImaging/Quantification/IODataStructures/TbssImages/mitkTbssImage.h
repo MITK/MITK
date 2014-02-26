@@ -43,7 +43,8 @@ namespace mitk
     //typedef typename std::vector <Index<3> > RoiType;
 
     mitkClassMacro( TbssImage, Image )
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
 
     ImageType::Pointer GetImage()

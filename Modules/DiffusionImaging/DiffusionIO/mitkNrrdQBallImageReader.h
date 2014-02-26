@@ -39,7 +39,8 @@ namespace mitk
     typedef mitk::QBallImageSource QBImgSourceType;
 
     mitkClassMacro( NrrdQBallImageReader, QBImgSourceType );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     const char* GetFileName() const;
     void SetFileName(const char* aFileName);

@@ -31,7 +31,8 @@ class ExceptionTestClass : public itk::Object
 {
 public:
   mitkClassMacro( ExceptionTestClass , itk::Object );
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void throwExceptionManually()
   //this method is ONLY to test the constructor and no code example

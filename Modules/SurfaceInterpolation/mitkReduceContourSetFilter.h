@@ -69,7 +69,8 @@ namespace mitk {
         };
 
         mitkClassMacro(ReduceContourSetFilter,SurfaceToSurfaceFilter);
-        itkNewMacro(Self);
+        itkFactorylessNewMacro(Self)
+        itkCloneMacro(Self)
 
         itkSetMacro(MinSpacing, double);
         itkSetMacro(MaxSpacing, double);

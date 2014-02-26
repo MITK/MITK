@@ -37,7 +37,8 @@ class Segmentation_EXPORT CreateSurfaceTool : public SegmentationsProcessingTool
   public:
 
     mitkClassMacro(CreateSurfaceTool, SegmentationsProcessingTool);
-    itkNewMacro(CreateSurfaceTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;

@@ -9,6 +9,7 @@ set(MODULE_TESTS
   #mitkContourModelTest.cpp
   #mitkContourModelIOTest.cpp
 #  mitkToolManagerTest.cpp
+  mitkReduceContourSetFilterTest.cpp
   mitkToolManagerProviderTest.cpp
 )
 

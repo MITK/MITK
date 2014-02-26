@@ -48,6 +48,7 @@ set(CPP_FILES
   TrackingDevices/mitkTrackingVolumeGenerator.cpp
   TrackingDevices/mitkVirtualTrackingDevice.cpp
   TrackingDevices/mitkVirtualTrackingTool.cpp
+  TrackingDevices/mitkOptitrackErrorMessages.cpp
   TrackingDevices/mitkOptitrackTrackingDevice.cpp
   TrackingDevices/mitkOptitrackTrackingTool.cpp
 )

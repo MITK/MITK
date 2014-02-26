@@ -42,6 +42,6 @@ namespace mitk
    * \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
    */
   static std::string GetOptitrackErrorMessage(int result);
-  }
+  };
 }
 #endif

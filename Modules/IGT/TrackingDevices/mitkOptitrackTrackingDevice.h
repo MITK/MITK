@@ -133,7 +133,7 @@ namespace mitk
     * no tool with this number.
     * @throw mitk::IGTException Throws an exception if there is the required tool does not exist.
     */
-    OptitrackTrackingTool* OptitrackTrackingDevice::GetOptitrackTool(unsigned int toolNumber) const;
+    OptitrackTrackingTool* GetOptitrackTool(unsigned int toolNumber) const;
 
     /**
     * \brief Returns the number of defined tools

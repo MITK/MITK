@@ -57,9 +57,8 @@ namespace mitk
   */
   class MitkIGT_EXPORT OptitrackTrackingTool : public InternalTrackingTool
   {
-    friend class OptitrackTrackingDevice;
-
   public:
+    friend class OptitrackTrackingDevice;
     mitkClassMacro(mitk::OptitrackTrackingTool, mitk::InternalTrackingTool);
     itkNewMacro(Self);
 
@@ -98,13 +97,13 @@ namespace mitk
     * \brief Set the position to a given one
     * @throw mitk::IGTException Throws an exception if
     */
-    void SetPosition(mitk::Point3D position);
+    void SetPosition(mitk::Point3D position, ScalarType eps=0.0);
 
     /**
     * \brief Set the orientation to a given one using a quaternion nomenclature
     * @throw mitk::IGTException Throws an exception if
     */
-    void SetOrientation(mitk::Quaternion orientation);
+    void SetOrientation(mitk::Quaternion orientation, ScalarType eps=0.0);
 
     /**
     * \brief Get the position of the tool

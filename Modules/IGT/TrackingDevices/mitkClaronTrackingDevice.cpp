@@ -55,6 +55,12 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(): mitk::TrackingDevice()
   m_Device->Initialize(m_CalibrationDir, m_ToolfilesDir);
 }
 
+bool mitk::ClaronTrackingDevice::IsDeviceInstalled()
+{
+  mitk::ClaronInterface::Pointer tempInterface = mitk::ClaronInterface::New();
+  return tempInterface->IsMicronTrackerInstalled();
+}
+
 
 mitk::ClaronTrackingDevice::~ClaronTrackingDevice()
 {

@@ -54,7 +54,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     ~QmitkTrackingDeviceConfigurationWidget();
 
     /* @return Returns the current configurated tracking device. If the user didn't finished the
-     *         configuration process NULL is returned.
+     *         configuration process or if there is an error during configuration NULL is returned.
      */
     mitk::TrackingDevice::Pointer GetTrackingDevice();
 
@@ -126,6 +126,8 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 
     std::string m_MTCalibrationFile;
 
+    std::string m_OptitrackCalibrationFile;
+
     bool m_TrackingDeviceConfigurated;
 
     bool m_AdvancedUserControl;
@@ -176,6 +178,10 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      */
     mitk::TrackingDevice::Pointer ConfigureNDI6DTrackingDevice();
 
+    /* @return Returns a configured Optitrack tracking device.
+     *         The type (which means Aurora/Polaris/Optitrack) will not be set in the returnvalue. You have to this later.
+     */
+    mitk::TrackingDevice::Pointer ConfigureOptitrackTrackingDevice();
 
     /* @brief Scans the serial ports automatically for a connected tracking device. If the method finds a device
      *        it selects the right type and sets the corresponding port in the widget.
@@ -184,6 +190,9 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 
     /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_MTCalibrationFile.*/
     void SetMTCalibrationFileClicked();
+
+    /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_OptitrackCalibrationFile.*/
+    void SetOptitrackCalibrationFileClicked();
 
 };
 #endif

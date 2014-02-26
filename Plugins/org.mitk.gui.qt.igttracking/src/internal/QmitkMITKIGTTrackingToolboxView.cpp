@@ -368,7 +368,25 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
 
 void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
 {
-  mitk::TrackingDeviceType Type = m_Controls->m_configurationWidget->GetTrackingDevice()->GetType();
+  mitk::TrackingDeviceType Type;
+
+  if (m_Controls->m_configurationWidget->GetTrackingDevice().IsNotNull())
+    {
+      Type = m_Controls->m_configurationWidget->GetTrackingDevice()->GetType();
+      //enable controls because device is valid
+      m_Controls->m_TrackingToolsGoupBox->setEnabled(true);
+      m_Controls->m_TrackingControlsGroupBox->setEnabled(true);
+    }
+  else
+    {
+      Type = mitk::TrackingSystemNotSpecified;
+      MessageBox("Error: This tracking device is not included in this project. Please make sure that the device is installed and activated in your MITK build.");
+      m_Controls->m_TrackingToolsGoupBox->setEnabled(false);
+      m_Controls->m_TrackingControlsGroupBox->setEnabled(false);
+      return;
+    }
+
+
 
   // Code to enable/disable device specific buttons
   if (Type == mitk::NDIAurora) //Aurora

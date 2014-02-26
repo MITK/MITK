@@ -47,6 +47,11 @@ namespace mitk
     itkNewMacro(Self);
 
     /**
+    * @returns Returns true if the MicronTracker is installed on this build (means activated in CMAKE). False if not.
+    */
+    virtual bool IsDeviceInstalled();
+
+    /**
     * \brief Starts the tracking.
     * \return Returns true if the tracking is started. Throws an exception if an error occures.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error during start tracking.
@@ -100,8 +105,9 @@ namespace mitk
     /**
     * \return Returns whether the MicronTracker is installed (means whether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set),
     *         so returns false in this case.
+    * \deprecatedSince{2014_03} This method is deprecated, please use the static method IsDeviceInstalled() instead.
     */
-    bool IsMicronTrackerInstalled();
+    DEPRECATED(bool IsMicronTrackerInstalled();)
 
     /** @brief Sets the directory where the calibration file of the MicronTracker can be found. */
     itkSetMacro(CalibrationDir,std::string);

@@ -108,6 +108,8 @@ void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDevi
     m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
   case mitk::ClaronMicron:
     m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
+    case mitk::NPOptitrack:
+    m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
   default:
     m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
   }
@@ -162,6 +164,7 @@ void QmitkNavigationToolCreationWidget::OnFinished()
   if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Aurora") m_CreatedTool->SetTrackingDeviceType(mitk::NDIAurora);
   else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Polaris") m_CreatedTool->SetTrackingDeviceType(mitk::NDIPolaris);
   else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="Claron Technology Micron Tracker") m_CreatedTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NP Optitrack") m_CreatedTool->SetTrackingDeviceType(mitk::NPOptitrack);
   else m_CreatedTool->SetTrackingDeviceType(mitk::TrackingSystemNotSpecified);
 
   //ToolType
@@ -226,6 +229,8 @@ void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Poi
     m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
   case mitk::ClaronMicron:
     m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
+  case mitk::NPOptitrack:
+    m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
   default:
     m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
   }

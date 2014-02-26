@@ -146,6 +146,23 @@ namespace mitk {
        */
     void SetData(TrackingDeviceData data);
 
+    /**
+     * @return Returns true if the device is installed on this system an can be used.
+     *         Installed means activated in MITK, in some cases this means the MITK
+     *         installation / build has to know the installation path of the device
+     *         libraries on this system. This path is usually given as cmake variable
+     *         during the build configuration in devellopers mode. If the device should
+     *         be available for end users with an installer the libraries can be included
+     *         into the installer or the installer has to be adapted such that it asks
+     *         for the path.
+     *         Returns fals if the device is not installed. It cannot be used on this build
+     *         in this case.
+     *
+     *         Note that some tracking systems communicate via a standard interface (e.g., serial
+     *         port) and don't need any library or installation. These devices are always "installed".
+     */
+    virtual bool IsDeviceInstalled();
+
     protected:
 
       /**

@@ -91,7 +91,8 @@ namespace mitk
       AscensionMicroBird,        ///< Ascension microBird / PCIBird family
       VirtualTracker,            ///< Virtual Tracking device class that produces random tracking coordinates
       TrackingSystemNotSpecified,///< entry for not specified or initialized tracking system
-      TrackingSystemInvalid      ///< entry for invalid state (mainly for testing)
+      TrackingSystemInvalid,      ///< entry for invalid state (mainly for testing)
+    NPOptitrack               ///< NaturalPoint: Optitrack optical Tracking System
     };
 
 
@@ -146,6 +147,9 @@ namespace mitk
   static TrackingDeviceData DeviceDataSpectraExtendedPyramid = {NDIPolaris, "Polaris Spectra (Extended Pyramid)", "NDIPolarisSpectraExtendedPyramid.stl","5-3"};
   static TrackingDeviceData DeviceDataPolarisVicra = {NDIPolaris, "Polaris Vicra", "NDIPolarisVicra.stl","7"};
 
+  //############## NDI Polaris device data ############
+  static TrackingDeviceData DeviceDataNPOptitrack = {NPOptitrack, "Optitrack", "cube", "X"};
+
   //############## other device data ##################
   static TrackingDeviceData DeviceDataDaVinci = {IntuitiveDaVinci, "Intuitive DaVinci", "IntuitiveDaVinci.stl","X"};
   static TrackingDeviceData DeviceDataMicroBird = {AscensionMicroBird, "Ascension MicroBird", "", "X"};
@@ -157,7 +161,7 @@ namespace mitk
 
   //This list should hold all devices defined above!
   static TrackingDeviceData TrackingDeviceList[] = {DeviceDataAuroraPlanarCube, DeviceDataAuroraPlanarDome, DeviceDataAuroraCompact,
-  DeviceDataAuroraTabletop, DeviceDataMicronTrackerH40, DeviceDataPolarisSpectra, DeviceDataPolarisVicra,
+  DeviceDataAuroraTabletop, DeviceDataMicronTrackerH40, DeviceDataPolarisSpectra, DeviceDataPolarisVicra, DeviceDataNPOptitrack,
   DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataSpectraExtendedPyramid, DeviceDataInvalid, DeviceDataPolarisOldModel};
 
   /**

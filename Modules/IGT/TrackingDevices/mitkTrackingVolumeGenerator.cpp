@@ -53,6 +53,8 @@ void mitk::TrackingVolumeGenerator::GenerateData()
   std::string filepath = ""; // Full path to file (wil be resolved later)
   std::string filename = this->m_Data.VolumeModelLocation; // Name of the file or possibly a magic String, e.g. "cube"
 
+  MITK_INFO << "volume: " << filename;
+
   // See if filename matches a magic string.
   if (filename.compare("cube") == 0){
     vtkSmartPointer<vtkCubeSource> cubeSource = vtkSmartPointer<vtkCubeSource>::New();

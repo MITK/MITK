@@ -40,6 +40,14 @@ mitk::TrackingDevice::~TrackingDevice()
 {
 }
 
+bool mitk::TrackingDevice::IsDeviceInstalled()
+{
+return true;
+//this is the default for all tracking device
+//If a device needs installation please reimplement
+//this method in the subclass.
+}
+
 
 mitk::TrackingDevice::TrackingDeviceState mitk::TrackingDevice::GetState() const
 {

@@ -52,6 +52,11 @@
          <string>Claron Technology Micron Tracker</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>NP Optitrack</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>

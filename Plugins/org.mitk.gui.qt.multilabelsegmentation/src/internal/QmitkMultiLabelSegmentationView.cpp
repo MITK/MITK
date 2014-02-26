@@ -167,6 +167,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls.m_cbInterpolation, SIGNAL( activated (int) ), this, SLOT( OnInterpolationSelectionChanged(int) ) );
 
   m_Controls.m_cbInterpolation->setCurrentIndex(0);
+  m_Controls.m_swInterpolation->hide();
 
   this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
 
@@ -481,17 +482,20 @@ void QmitkMultiLabelSegmentationView::OnInterpolationSelectionChanged(int index)
   {
     m_Controls.m_SurfaceBasedInterpolatorWidget->m_Controls.m_btStart->setChecked(false);//OnToggleWidgetActivation(false);
     m_Controls.m_swInterpolation->setCurrentIndex(0);
+    m_Controls.m_swInterpolation->show();
   }
   else if (index == 2)
   {
     m_Controls.m_SliceBasedInterpolatorWidget->m_Controls.m_btStart->setChecked(false);
     m_Controls.m_swInterpolation->setCurrentIndex(1);
+    m_Controls.m_swInterpolation->show();
   }
   else
   {
     m_Controls.m_SurfaceBasedInterpolatorWidget->m_Controls.m_btStart->setChecked(false);
     m_Controls.m_SliceBasedInterpolatorWidget->m_Controls.m_btStart->setChecked(false);
     m_Controls.m_swInterpolation->setCurrentIndex(2);
+    m_Controls.m_swInterpolation->hide();
   }
 }
 

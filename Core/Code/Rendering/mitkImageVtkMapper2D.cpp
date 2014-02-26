@@ -525,8 +525,6 @@ void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
 
 void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
 {
-    LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
-
     //all other image types can make use of the rendering mode
     int renderingMode = mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW;
     mitk::RenderingModeProperty::Pointer rmProp = dynamic_cast<mitk::RenderingModeProperty*>(this->GetDataNode()->GetProperty( "Image Rendering.Mode", renderer ));

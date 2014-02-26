@@ -573,7 +573,7 @@ struct mitkImageStatisticsHotspotTestClass
   static void ValidateStatistics(const mitk::ImageStatisticsCalculator::Statistics& statistics, const Parameters& testParameters, unsigned int label)
   {
     // check all expected test result against actual results
-    double eps = 1.6;
+    double eps = 0.25; // value above the largest tested difference
 
     ValidateStatisticsItem("Hotspot mean", statistics.GetHotspotStatistics().GetMean(), testParameters.m_HotspotMean[label], eps);
     ValidateStatisticsItem("Hotspot maximum", statistics.GetHotspotStatistics().GetMax(), testParameters.m_HotspotMax[label], eps);

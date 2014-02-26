@@ -30,7 +30,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
  To see the different Hotspot-Testcases have a look at the \ref hotspottestdoc.
 
- */
+ Note from an intensive session of checking the test results:
+  - itk::MultiGaussianImageSource needs a review
+  - the test idea is ok, but the combination of XML files for parameters and MultiGaussianImageSource has serious flaws
+    - the XML file should contain exactly the parameters that MultiGaussianImageSource requires
+    - in contrast, now the XML file mentions index coordinates for gaussian centers while the MultiGaussianImageSource expects world coordinates
+      - this requires a transformation (index * spacing assuming no rotation) that was actually broken until recently
+*/
 
 struct mitkImageStatisticsHotspotTestClass
 {

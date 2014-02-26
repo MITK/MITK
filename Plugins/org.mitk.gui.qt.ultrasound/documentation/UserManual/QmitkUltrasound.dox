@@ -3,8 +3,7 @@
 
 \image html QmitkUltrasound_Icon.png "Icon of Ultrasound"
 
-Available sections:
-  - \ref org_mitk_gui_qt_ultrasoundOverview
+\tableofcontents
 
 \section org_mitk_gui_qt_ultrasoundOverview
 

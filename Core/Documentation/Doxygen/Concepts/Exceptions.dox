@@ -1,9 +1,7 @@
 /**
 \page ExceptionPage Error Handling and Exception Concept
 
-\ref ExceptionHandling "1. General Exception Handling"
-
-\ref SpecializedExceptionHandling "2. Defining and Using Specialized Exceptions"
+\tableofcontents
 
 \section ExceptionHandling General Exception Handling
 

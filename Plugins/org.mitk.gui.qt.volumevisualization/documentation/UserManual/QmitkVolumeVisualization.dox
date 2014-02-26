@@ -3,14 +3,7 @@
 
 \image html QmitkVolumeVisualization_Icon.png "Icon of the Plugin"
 
-Available sections:
-<ul>
-<li> \ref QVV_Overview
-<li> \ref QVV_EnableVRPage
-<li> \ref QVV_PresetPage
-<li> \ref QVV_ThresholdBell
-<li> \ref QVV_Editing
-</ul>
+\tableofcontents
 
 \section QVV_Overview Overview
 

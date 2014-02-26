@@ -1,6 +1,8 @@
 /**
 \page BuildInstructionsPage Build Instructions
 
+\tableofcontents
+
 \section BuildInstructions_Introduction Introduction
 
 The MITK build system (which is based on CMake) supports a "superbuild" process, meaning that it will download, configure, and build

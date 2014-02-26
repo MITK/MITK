@@ -1,13 +1,7 @@
 /**
 \page LoggingPage Logging Concept
 
-Available sections:
-
--# \ref LoggingPageSection1 "Basic Information on Logging"
--# \ref LoggingPageSection2 "Categorize your Logging Messages"
--# \ref LoggingPageSection3 "Logging Levels"
--# \ref LoggingPageSection4 "Conditional Logging"
-
+\tableofcontents
 
 \section LoggingPageSection1 Basic Information on Logging
 To use logging in MITK you can stream your messages into a logging stream, similar to the "std::cout" stream in standard c++. A simple example is shown next.

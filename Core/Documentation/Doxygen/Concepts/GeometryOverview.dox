@@ -2,12 +2,7 @@ namespace mitk{
 /**
 \page GeometryOverviewPage Geometry Overview
 
-Available sections:
-
--# \ref GeometryOverviewPage_Introduction "Introduction to Geometries"
--# \ref GeometryOverviewPage_Concept "The Geometry Concept"
-	-# \ref GeometryOverviewPage_Putting_Together "IMPORTANT: Putting it together for an Image"
--# \ref GeometryOverviewPage_Connection "Connection between MITK, ITK and VTK Geometries"\n\n
+\tableofcontents
 
 \section GeometryOverviewPage_Introduction Introduction to Geometries
 

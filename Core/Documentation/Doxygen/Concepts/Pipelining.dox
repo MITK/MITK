@@ -1,16 +1,7 @@
 /**
 \page PipelineingConceptPage Pipelining Concept
 
-Available Sections:
-
--# \ref PipelineingConceptPage_Introduction     "Introduction to Pipelining"
--# \ref PipelineingConceptPage_InMITK           "Pipelining in MITK"
-  -# \ref PipelineingConceptPage_Update         "The Update() Mechanism"
-  -# \ref PipelineingConceptPage_Hierarchy      "Pipeline Hierarchy"
--# \ref PipelineingConceptPage_WorkWith         "Working with Filter"
-  -# \ref PipelineingConceptPage_Setup            "Setting Up a Pipeline"
-  -# \ref PipelineingConceptPage_Implement      "Writing your own Filter"
-
+\tableofcontents
 
 \section PipelineingConceptPage_Introduction Introduction to Pipelining
 

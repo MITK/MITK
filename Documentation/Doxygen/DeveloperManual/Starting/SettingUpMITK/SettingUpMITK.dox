@@ -8,7 +8,7 @@ This section will get you started with your MITK Development environment.
   <li> \subpage BuildInstructionsPage </li>
   <li> \subpage thirdpartylibs </li>
   <li> \subpage HowToNewProject </li>
-  <li> \subpage Testing </li>
+  <li> \ref AboutTestingPage </li>
 </ul>
 
 */

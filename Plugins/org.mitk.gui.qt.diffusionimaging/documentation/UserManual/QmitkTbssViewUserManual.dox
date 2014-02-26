@@ -11,15 +11,7 @@ This document will tell you how to use this view, but it is assumed that you alr
 
 If you encounter problems using the view, please have a look at the \ref QmitkTractbasedSpatialStatisticsUserManualTrouble page.
 
-Sections:
-
-- \ref QmitkTractbasedSpatialStatisticsUserManualOverview 
-- \ref QmitkTractbasedSpatialStatisticsUserManualFSLImport
-- \ref QmitkTractbasedSpatialStatisticsUserManualRois
-- \ref QmitkTractbasedSpatialStatisticsUserManualProfiles
-- \ref QmitkTractbasedSpatialStatisticsUserManualFiberPlotting
-- \ref QmitkTractbasedSpatialStatisticsUserManualTroubleshooting
-- \ref QmitkTractbasedSpatialStatisticsUserManualReferences
+\tableofcontents
 
 \section QmitkTractbasedSpatialStatisticsUserManualOverview Overview
 

@@ -1,6 +1,8 @@
 /**
 \page PersistenceConceptPage Persistence Concept
 
+\tableofcontents
+
 In general, persistence referes to the capability of an application to permanently store data, settings, states, etc. so that they outlive a restart. Normal data objects, such as images, surfaces, etc., which are visible in the data storage of MITK can be saved easily by the save/load functions, see \ref DataManagementPage for more details. This page focus on the persistence of settings, configurations, object states and parameters of the application. Depending on the component, e.g. plugin, module, etc., where you want to store your settings, MITK offers various ways to do so:
 -# For code inside UI independent modules with low dependencies to other libraries the mitk::PersistenceService inside the MITK persistence module can be used to store parameters by using the mitk::PropertyList class: \ref PersistenceMITKService
 -# UI dependent code where the Qt library is available can use QSettings: \ref PersistenceQTSetting

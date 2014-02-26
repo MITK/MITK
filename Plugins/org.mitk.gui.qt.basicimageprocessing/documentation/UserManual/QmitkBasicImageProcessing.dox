@@ -3,23 +3,16 @@
 
 \image html QmitkBasicImageProcessing_ImageProcessing_48.png "Icon of the Plugin"
 
+\tableofcontents
+
 \section QmitkBasicImageProcessingUserManualSummary Summary
 
 This view provides an easy interface to fundamental image preprocessing and enhancement filters.
 It offers filter operations on 3D and 4D images in the areas of noise suppression, morphological operations, edge detection and image arithmetics, 
 as well as image inversion and downsampling.
 
-Please see \ref QmitkBasicImageProcessingUserManualDetails for more detailed information on usage and supported filters.
+Please see \ref QmitkBasicImageProcessingUserManualOverview for more detailed information on usage and supported filters.
 If you encounter problems using the view, please have a look at the \ref QmitkBasicImageProcessingUserManualTrouble page.
-
-\section QmitkBasicImageProcessingUserManualDetails Details
-
-Manual sections:
-
-- \ref QmitkBasicImageProcessingUserManualOverview 
-- \ref QmitkBasicImageProcessingUserManualFilters 
-- \ref QmitkBasicImageProcessingUserManualUsage
-- \ref QmitkBasicImageProcessingUserManualTrouble
 
 \section QmitkBasicImageProcessingUserManualOverview Overview
 

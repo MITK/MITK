@@ -1,6 +1,8 @@
 /**
 \page HowToNewProject Creating a new MITK project
 
+\tableofcontents
+
 This page is intended to give a comprehensive guide to setting up your own MITK based project. It will use the application framework provided by MITK and is probably the preferred way for most users.
 
 The first part of this document is a tutorial aimed at newcomers to MITK and possibly %CMake and tries to give as much help as possible on setting up your own project. If you are looking for more technical information about customizing MITK, the structure of the superbuild or packaging you might want to read the \ref HowToNewProjectAdvancedInformation.

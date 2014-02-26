@@ -212,9 +212,9 @@ bool mitk::OptitrackTrackingDevice::LoadCalibration()
 }
 
 //=======================================================
-// SetcalibrationPath
+// SetCalibrationPath
 //=======================================================
-void mitk::OptitrackTrackingDevice::SetcalibrationPath(std::string calibrationPath){
+void mitk::OptitrackTrackingDevice::SetCalibrationPath(std::string calibrationPath){
 
   MITK_DEBUG << "SetcalibrationPath";
   MITK_DEBUG << calibrationPath;

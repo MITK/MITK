@@ -153,7 +153,7 @@ namespace mitk
     itkGetMacro(Thr,int);
 
     /** @brief Sets the file where the calibration of the OptitrackTracker can be found. */
-  void SetcalibrationPath(std::string calibrationPath);
+   void SetCalibrationPath(std::string calibrationPath);
 
     /** @brief Gets the current calibration file. */
     itkGetMacro(calibrationPath,std::string);

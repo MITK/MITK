@@ -48,7 +48,7 @@ public:
   void setUp()
   {
     try {
-      m_FileName1 = mitk::IOUtil::CreateTemporaryFile();
+      m_FileName1 = mitk::IOUtil::CreateTemporaryFile("NavigationToolStorageSerializerTestTmp_XXXXXX.IGTToolStorage",mitk::IOUtil::GetProgramPath());
       std::ofstream file;
       file.open(m_FileName1.c_str());
       if (!file.good()) {MITK_ERROR <<"Could not create a valid file during setUp() method.";}

@@ -70,6 +70,8 @@ class Segmentation_EXPORT PaintbrushTool : public FeedbackContourTool
 
     virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
     virtual bool OnMouseMoved   ( StateMachineAction*, InteractionEvent* );
+    virtual bool OnPrimaryButtonPressedMoved( StateMachineAction*, InteractionEvent* );
+    virtual bool MouseMoved(mitk::InteractionEvent* interactionEvent, bool leftMouseButtonPressed);
     virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );
     virtual bool OnInvertLogic  ( StateMachineAction*, InteractionEvent* );
 

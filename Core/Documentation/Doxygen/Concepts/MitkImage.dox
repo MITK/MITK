@@ -1,21 +1,7 @@
 /**
 \page MitkImagePage MITK Image
 
-Available Sections:
-
--# \ref MitkImagePage_Introduction     "Introduction to MITK Image"
-  -# \ref MitkImagePage_SlicedData      "SlicedData and Geometry"
-  -# \ref MitkImagePage_ImageData       "ImageData"
-  -# \ref MitkImagePage_Properties      "Image Properties"
--# \ref MitkImagePage_AccessImageData  "Access image data"
-  -# \ref MitkImagePage_ImageAccessors  "Image accessors"
-  -# \ref MitkImagePage_HowToGetAccess  "How to get access"
-  -# \ref MitkImagePage_AdditionalProperties "Additional Properties"
--# \ref MitkImagePage_WorkingWith      "Working with MITK Image"
-  -# \ref MitkImagePage_Cloning         "Cloning a MITK Image"
-  -# \ref MitkImagePage_Inheriting      "Inheriting from MITK Image"
-
-
+\tableofcontents
 
 \section MitkImagePage_Introduction Introduction to MITK Image
 

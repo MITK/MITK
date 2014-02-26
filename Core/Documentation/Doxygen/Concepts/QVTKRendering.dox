@@ -2,6 +2,8 @@
 
 \page QVTKRendering Rendering Concept
 
+\tableofcontents
+
 The MITK rendering pipeline is derived from the VTK rendering pipeline.
 
 \section QVTKRendering_Pipeline_VTK VTK Rendering Pipeline

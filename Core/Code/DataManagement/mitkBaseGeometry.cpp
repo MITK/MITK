@@ -294,7 +294,7 @@ bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometr
 
   //Compare Axis and Extents
 
-for( unsigned int i=0; i<3; ++i)
+  for( unsigned int i=0; i<3; ++i)
   {
     if( !mitk::Equal( leftHandSide->GetAxisVector(i), rightHandSide->GetAxisVector(i), eps))
     {
@@ -502,7 +502,7 @@ bool mitk::BaseGeometry::IsIndexInside(const mitk::Point3D& index) const
   bool inside = false;
   //if it is an image geometry, we need to convert the index to discrete values
   //this is done by applying the rounding function also used in WorldToIndex (see line 323)
-    inside = m_BoundingBox->IsInside(index);
+  inside = m_BoundingBox->IsInside(index);
 
   return inside;
 }
@@ -648,4 +648,70 @@ void mitk::BaseGeometry::BackTransform(const mitk::Point3D &/*at*/, const mitk::
   //  }
   //}
   this->BackTransform(in, out);
+}
+
+mitk::VnlVector mitk::BaseGeometry::GetOriginVnl() const
+{
+  return const_cast<Self*>(this)->m_Origin.GetVnlVector();
+}
+
+vtkLinearTransform* mitk::BaseGeometry::GetVtkTransform() const
+{
+  return (vtkLinearTransform*)m_VtkIndexToWorldTransform;
+}
+
+void mitk::BaseGeometry::SetIdentity()
+{
+  m_IndexToWorldTransform->SetIdentity();
+  m_Origin.Fill(0);
+  Modified();
+  TransferItkToVtkTransform();
+}
+
+void mitk::BaseGeometry::TransferVtkToItkTransform()
+{
+  TransferVtkMatrixToItkTransform(m_VtkMatrix, m_IndexToWorldTransform.GetPointer());
+  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
+  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
+}
+
+void mitk::BaseGeometry::Compose( const mitk::BaseGeometry::TransformType * other, bool pre )
+{
+  m_IndexToWorldTransform->Compose(other, pre);
+  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
+  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
+  Modified();
+  TransferItkToVtkTransform();
+}
+
+void mitk::BaseGeometry::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
+{
+  mitk::BaseGeometry::TransformType::Pointer itkTransform = mitk::BaseGeometry::TransformType::New();
+  TransferVtkMatrixToItkTransform(vtkmatrix, itkTransform.GetPointer());
+  Compose(itkTransform, pre);
+}
+
+void mitk::BaseGeometry::Translate(const Vector3D & vector)
+{
+  if((vector[0] != 0) || (vector[1] != 0) || (vector[2] != 0))
+  {
+    this->SetOrigin(m_Origin + vector);
+  }
+}
+
+void mitk::BaseGeometry::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
+{
+  pt_mm = m_IndexToWorldTransform->TransformPoint(pt_units);
+}
+
+void mitk::BaseGeometry::IndexToWorld(const mitk::Point3D &/*atPt3d_units*/, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
+{
+  MITK_WARN<<"Warning! Call of the deprecated function Geometry3D::IndexToWorld(point, vec, vec). Use Geometry3D::IndexToWorld(vec, vec) instead!";
+  //vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
+  this->IndexToWorld(vec_units, vec_mm);
+}
+
+void mitk::BaseGeometry::IndexToWorld(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
+{
+  vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
 }

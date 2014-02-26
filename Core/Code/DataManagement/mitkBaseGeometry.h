@@ -90,6 +90,12 @@ namespace mitk {
     //## @brief Set the spacing (m_Spacing)
     virtual void SetSpacing(const mitk::Vector3D& aSpacing);
 
+    //##Documentation
+    //## @brief Get the origin as VnlVector
+    //##
+    //## \sa GetOrigin
+    VnlVector GetOriginVnl() const;
+
     // ********************************** other functions **********************************
 
     //##Documentation
@@ -111,7 +117,7 @@ namespace mitk {
     //## @brief Initialize the Geometry3D
     virtual void Initialize();
 
-    virtual void InitializeGeometry(Self * newGeometry) const;
+    void InitializeGeometry(Self * newGeometry) const;
 
     static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::Vector3D& spacing, float floatSpacing[3]);
 
@@ -132,6 +138,15 @@ namespace mitk {
     itkGetConstObjectMacro(IndexToWorldTransform, AffineTransform3D);
     itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
 
+    //##Documentation
+    //## @brief Get the m_IndexToWorldTransform as a vtkLinearTransform
+    vtkLinearTransform* GetVtkTransform() const;
+
+    //##Documentation
+    //## @brief Set the transform to identity and origin to 0
+    //##
+    virtual void SetIdentity();
+
     // ********************************** Transformations **********************************
 
     //##Documentation
@@ -139,6 +154,36 @@ namespace mitk {
     //## (m_IndexToWorldTransform) to the VTK transform
     //## \sa SetIndexToWorldTransform
     void TransferItkToVtkTransform();
+
+    //##Documentation
+    //## @brief Copy the VTK transform
+    //## to the ITK transform (m_IndexToWorldTransform)
+    //## \sa SetIndexToWorldTransform
+    void TransferVtkToItkTransform();
+
+    //##Documentation
+    //## @brief Compose new IndexToWorldTransform with a given transform.
+    //##
+    //## This method composes m_IndexToWorldTransform with another transform,
+    //## modifying self to be the composition of self and other.
+    //## If the argument pre is true, then other is precomposed with self;
+    //## that is, the resulting transformation consists of first applying
+    //## other to the source, followed by self. If pre is false or omitted,
+    //## then other is post-composed with self; that is the resulting
+    //## transformation consists of first applying self to the source,
+    //## followed by other.
+    void Compose( const BaseGeometry::TransformType * other, bool pre = 0 );
+
+    //##Documentation
+    //## @brief Compose new IndexToWorldTransform with a given vtkMatrix4x4.
+    //##
+    //## Converts the vtkMatrix4x4 into a itk-transform and calls the previous method.
+    void Compose( const vtkMatrix4x4 * vtkmatrix, bool pre = 0 );
+
+    //##Documentation
+    //## @brief Translate the origin by a vector
+    //##
+    void Translate(const Vector3D&  vector);
 
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates
@@ -180,6 +225,81 @@ namespace mitk {
     //## @deprecated First parameter (Point3D) is not used. If possible, please use void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const.
     //## For further information about coordinates types, please see the Geometry documentation
     virtual void WorldToIndex(const mitk::Point3D& atPt3d_mm, const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
+
+    //##Documentation
+    //## @brief Convert (continuous or discrete) index coordinates of a \em vector
+    //## \a vec_units to world coordinates (in mm)
+    //## @deprecated First parameter (Point3D) is not used. If possible, please use void IndexToWorld(const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const.
+    //## For further information about coordinates types, please see the Geometry documentation
+    virtual void IndexToWorld(const mitk::Point3D& atPt3d_units, const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
+
+    //##Documentation
+    //## @brief Convert (continuous or discrete) index coordinates of a \em vector
+    //## \a vec_units to world coordinates (in mm)
+    //## For further information about coordinates types, please see the Geometry documentation
+    virtual void IndexToWorld(const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
+
+    //##Documentation
+    //## @brief Convert (continuous or discrete) index coordinates of a \em point to world coordinates (in mm)
+    //## For further information about coordinates types, please see the Geometry documentation
+    virtual void IndexToWorld(const mitk::Point3D& pt_units, mitk::Point3D& pt_mm) const;
+
+    //##Documentation
+    //## @brief Convert (discrete) index coordinates of a \em point to world coordinates (in mm)
+    //## For further information about coordinates types, please see the Geometry documentation
+    template <unsigned int VIndexDimension>
+    void IndexToWorld(const itk::Index<VIndexDimension> &index, mitk::Point3D& pt_mm ) const
+    {
+      mitk::Point3D pt_units;
+      pt_units.Fill(0);
+      int i, dim=index.GetIndexDimension();
+      if(dim>3)
+      {
+        dim=3;
+      }
+      for(i=0;i<dim;++i)
+      {
+        pt_units[i] = index[i];
+      }
+
+      IndexToWorld(pt_units,pt_mm);
+    }
+
+    //##Documentation
+    //## @brief Deprecated for use with ITK version 3.10 or newer.
+    //## Convert world coordinates (in mm) of a \em point to
+    //## ITK physical coordinates (in mm, but without a possible rotation)
+    //##
+    //## This method is useful if you have want to access an mitk::Image
+    //## via an itk::Image. ITK v3.8 and older did not support rotated (tilted)
+    //## images, i.e., ITK images are always parallel to the coordinate axes.
+    //## When accessing a (possibly rotated) mitk::Image via an itk::Image
+    //## the rotational part of the transformation in the Geometry3D is
+    //## simply discarded; in other word: only the origin and spacing is
+    //## used by ITK, not the complete matrix available in MITK.
+    //## With WorldToItkPhysicalPoint you can convert an MITK world
+    //## coordinate (including the rotation) into a coordinate that
+    //## can be used with the ITK image as a ITK physical coordinate
+    //## (excluding the rotation).
+    template<class TCoordRep>
+    void WorldToItkPhysicalPoint(const mitk::Point3D& pt_mm,
+      itk::Point<TCoordRep, 3>& itkPhysicalPoint) const
+    {
+      mitk::vtk2itk(pt_mm, itkPhysicalPoint);
+    }
+
+    //##Documentation
+    //## @brief Deprecated for use with ITK version 3.10 or newer.
+    //## Convert ITK physical coordinates of a \em point (in mm,
+    //## but without a rotation) into MITK world coordinates (in mm)
+    //##
+    //## For more information, see WorldToItkPhysicalPoint.
+    template<class TCoordRep>
+    void ItkPhysicalPointToWorld(const itk::Point<TCoordRep, 3>& itkPhysicalPoint,
+      mitk::Point3D& pt_mm) const
+    {
+      mitk::vtk2itk(itkPhysicalPoint, pt_mm);
+    }
 
     // ********************************** BoundingBox **********************************
 

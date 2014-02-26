@@ -40,13 +40,6 @@ mitk::Geometry3D::~Geometry3D()
 {
 }
 
-void mitk::Geometry3D::TransferVtkToItkTransform()
-{
-  TransferVtkMatrixToItkTransform(m_VtkMatrix, m_IndexToWorldTransform.GetPointer());
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
-}
-
 void mitk::Geometry3D::SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix)
 {
   m_VtkMatrix->DeepCopy(vtkmatrix);
@@ -374,41 +367,6 @@ void mitk::Geometry3D::BackTransform(const mitk::Vector3D& in, mitk::Vector3D& o
   }
 }
 
-void mitk::Geometry3D::Translate(const Vector3D & vector)
-{
-  if((vector[0] != 0) || (vector[1] != 0) || (vector[2] != 0))
-  {
-    this->SetOrigin(m_Origin + vector);
-    //        m_IndexToWorldTransform->SetOffset(m_IndexToWorldTransform->GetOffset()+vector);
-    //        TransferItkToVtkTransform();
-    //        Modified();
-  }
-}
-
-void mitk::Geometry3D::SetIdentity()
-{
-  m_IndexToWorldTransform->SetIdentity();
-  m_Origin.Fill(0);
-  Modified();
-  TransferItkToVtkTransform();
-}
-
-void mitk::Geometry3D::Compose( const mitk::Geometry3D::TransformType * other, bool pre )
-{
-  m_IndexToWorldTransform->Compose(other, pre);
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing);
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
-  Modified();
-  TransferItkToVtkTransform();
-}
-
-void mitk::Geometry3D::Compose( const vtkMatrix4x4 * vtkmatrix, bool pre )
-{
-  mitk::Geometry3D::TransformType::Pointer itkTransform = mitk::Geometry3D::TransformType::New();
-  TransferVtkMatrixToItkTransform(vtkmatrix, itkTransform.GetPointer());
-  Compose(itkTransform, pre);
-}
-
 const std::string mitk::Geometry3D::GetTransformAsString( TransformType* transformType )
 {
   std::ostringstream out;
@@ -678,4 +636,11 @@ bool mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *r
     result = false;
   }
   return result;
+}
+
+void mitk::Geometry3D::Initialize()
+{
+  Superclass::Initialize();
+
+  m_ImageGeometry = false;
 }

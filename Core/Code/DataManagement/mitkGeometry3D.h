@@ -96,6 +96,8 @@ namespace mitk {
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
+    void Initialize();
+
     //##Documentation
     //## @brief Convenience method for setting the ITK transform
     //## (m_IndexToWorldTransform) via an vtkMatrix4x4
@@ -132,51 +134,6 @@ namespace mitk {
     VnlVector GetMatrixColumn(unsigned int direction) const
     {
       return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction);
-    }
-
-    //##Documentation
-    //## @brief Get the m_IndexToWorldTransform as a vtkLinearTransform
-    vtkLinearTransform* GetVtkTransform() const
-    {
-      return (vtkLinearTransform*)m_VtkIndexToWorldTransform;
-    }
-
-    //##Documentation
-    //## @brief Translate the origin by a vector
-    //##
-    virtual void Translate(const Vector3D&  vector);
-
-    //##Documentation
-    //## @brief Set the transform to identity and origin to 0
-    //##
-    virtual void SetIdentity();
-
-    //##Documentation
-    //## @brief Compose new IndexToWorldTransform with a given transform.
-    //##
-    //## This method composes m_IndexToWorldTransform with another transform,
-    //## modifying self to be the composition of self and other.
-    //## If the argument pre is true, then other is precomposed with self;
-    //## that is, the resulting transformation consists of first applying
-    //## other to the source, followed by self. If pre is false or omitted,
-    //## then other is post-composed with self; that is the resulting
-    //## transformation consists of first applying self to the source,
-    //## followed by other.
-    virtual void Compose( const Geometry3D::TransformType * other, bool pre = 0 );
-
-    //##Documentation
-    //## @brief Compose new IndexToWorldTransform with a given vtkMatrix4x4.
-    //##
-    //## Converts the vtkMatrix4x4 into a itk-transform and calls the previous method.
-    virtual void Compose( const vtkMatrix4x4 * vtkmatrix, bool pre = 0 );
-
-    //##Documentation
-    //## @brief Get the origin as VnlVector
-    //##
-    //## \sa GetOrigin
-    VnlVector GetOriginVnl() const
-    {
-      return const_cast<Self*>(this)->m_Origin.GetVnlVector();
     }
 
     //##Documentation
@@ -373,12 +330,6 @@ namespace mitk {
       }
       return IsIndexInside(pt_index);
     }
-
-    //##Documentation
-    //## @brief Copy the VTK transform
-    //## to the ITK transform (m_IndexToWorldTransform)
-    //## \sa SetIndexToWorldTransform
-    void TransferVtkToItkTransform();
 
     //##Documentation
     //## @brief Get the parametric bounding-box

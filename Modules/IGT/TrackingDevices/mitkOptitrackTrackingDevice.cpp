@@ -674,7 +674,7 @@ bool mitk::OptitrackTrackingDevice::LoadCalibration()
 //=======================================================
 // SetcalibrationPath
 //=======================================================
-void mitk::OptitrackTrackingDevice::SetcalibrationPath(std::string calibrationPath)
+void mitk::OptitrackTrackingDevice::SetCalibrationPath(std::string /*calibrationPath*/)
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
 }

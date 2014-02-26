@@ -107,7 +107,7 @@ namespace mitk
     *         so returns false in this case.
     * \deprecatedSince{2014_03} This method is deprecated, please use the static method IsDeviceInstalled() instead.
     */
-    DEPRECATED(bool IsMicronTrackerInstalled();)
+    DEPRECATED(bool IsMicronTrackerInstalled());
 
     /** @brief Sets the directory where the calibration file of the MicronTracker can be found. */
     itkSetMacro(CalibrationDir,std::string);

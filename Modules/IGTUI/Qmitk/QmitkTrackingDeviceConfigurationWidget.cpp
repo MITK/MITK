@@ -473,7 +473,7 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureO
   {
   mitk::OptitrackTrackingDevice::Pointer tempTrackingDevice = mitk::OptitrackTrackingDevice::New();
   // Set the calibration File
-  tempTrackingDevice->SetcalibrationPath(m_OptitrackCalibrationFile);
+  tempTrackingDevice->SetCalibrationPath(m_OptitrackCalibrationFile);
 
   //Set the camera parameters
   tempTrackingDevice->SetExp(m_Controls->m_OptitrackExp->value());

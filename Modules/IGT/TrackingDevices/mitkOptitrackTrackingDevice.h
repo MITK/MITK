@@ -37,19 +37,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTTimeStamp.h"
 #include "mitkIGTException.h"
 
-
-
-
-
 /**
 * \brief OptitrackTrackingTools
 */
 #include "mitkOptitrackTrackingTool.h"
 
-/**
-* \brief Function to get the Error messages from API
-*/
-#include <mitkOptitrackErrorMessages.h>
+
 
 /**
 * \brief MutexHolder to keep rest of Mutex

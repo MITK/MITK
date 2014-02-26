@@ -8,6 +8,7 @@ SET (H_FILES
   DataStructure/mitkTubeGraphEdge.h
   DataStructure/mitkTubeGraphVertex.h
   Interactions/mitkTubeGraphInteractor.h
+  Interactions/mitkTubeGraphDataInteractor.h
   Interactions/mitkTubeGraphPicker.h
   IODataStructures/mitkTubeGraphDefinitions.h
   IODataStructures/mitkTubeGraphIOFactory.h
@@ -27,6 +28,7 @@ SET(CPP_FILES
   DataStructure/mitkTubeGraphEdge.cpp
   DataStructure/mitkTubeGraphVertex.cpp
   Interactions/mitkTubeGraphInteractor.cpp
+  Interactions/mitkTubeGraphDataInteractor.cpp
   Interactions/mitkTubeGraphPicker.cpp
   IODataStructures/mitkTubeGraphDefinitions.cpp
   IODataStructures/mitkTubeGraphIOFactory.cpp

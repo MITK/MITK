@@ -9,6 +9,7 @@ set(module_dirs
     Qt4Qt5TestModule
     SceneSerializationBase
     PlanarFigure
+    ImageDenoising
     ImageExtraction
     ImageStatistics
     LegacyAdaptors

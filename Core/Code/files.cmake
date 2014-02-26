@@ -1,16 +1,8 @@
 set(H_FILES
   Algorithms/itkImportMitkImageContainer.h
   Algorithms/itkImportMitkImageContainer.txx
-  Algorithms/itkLocalVariationImageFilter.h
-  Algorithms/itkLocalVariationImageFilter.txx
   Algorithms/itkMITKScalarImageToHistogramGenerator.h
   Algorithms/itkMITKScalarImageToHistogramGenerator.txx
-  Algorithms/itkTotalVariationDenoisingImageFilter.h
-  Algorithms/itkTotalVariationDenoisingImageFilter.txx
-  Algorithms/itkTotalVariationSingleIterationImageFilter.h
-  Algorithms/itkTotalVariationSingleIterationImageFilter.txx
-  Algorithms/mitkBilateralFilter.h
-  Algorithms/mitkBilateralFilter.cpp
   Algorithms/mitkInstantiateAccessFunctions.h
   Algorithms/mitkPixelTypeList.h
   Algorithms/mitkPPArithmeticDec.h

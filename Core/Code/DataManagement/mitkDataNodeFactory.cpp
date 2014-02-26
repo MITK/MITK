@@ -141,10 +141,10 @@ void mitk::DataNodeFactory::GenerateData()
       }
       else
       {
-        std::string message("File does not exist, or cannot be read. Filename = ");
-        message += m_FileName;
-        MITK_ERROR << message;
-        itkExceptionMacro( << message );
+        std::string errorMessage("File does not exist, or cannot be read. Filename = ");
+        errorMessage += m_FileName;
+        MITK_ERROR << errorMessage;
+        itkExceptionMacro( << errorMessage );
       }
     }
   }

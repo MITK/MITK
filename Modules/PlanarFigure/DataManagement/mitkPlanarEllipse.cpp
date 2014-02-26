@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometry2D.h"
 #include "mitkProperties.h"
 
+#include <algorithm>
 
 mitk::PlanarEllipse::PlanarEllipse()
     : m_MinRadius(0),

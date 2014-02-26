@@ -31,12 +31,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define OPTITRACK_FRAME_RATE 10
 #endif
 
+#include <MitkIGTExports.h>
+
 namespace mitk
 {
+  class MitkIGT_EXPORT OptitrackErrorMessages
+  {
   /**
    * \brief Helper function to get the error messages from Optitrack API
    * \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
    */
   static std::string GetOptitrackErrorMessage(int result);
+  }
 }
 #endif

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOptitrackErrorMessages.h"
 
-std::string mitk::GetOptitrackErrorMessage(int result)
+std::string mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(int result)
   {
       std::string message = "";
       switch(result)

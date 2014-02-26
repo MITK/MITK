@@ -28,12 +28,11 @@ void mitk::TubeGraphGeometry3D::Initialize( mitk::TubeGraph* graph )
     return;
   }
 
+  Superclass::Initialize();
+
   m_TubeGraph = graph;
 
-  BoundingBox::ConstPointer        bb = this->GetBoundingBox();
-  BoundingBox::BoundsArrayType bounds = bb->GetBounds();
-
-  Superclass::Initialize();
+ this->GetBoundingBox();
 }
 
 

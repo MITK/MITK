@@ -262,6 +262,7 @@ void mitk::TubeGraphVtkMapper3D::GeneratePolyDataForFurcation(mitk::TubeGraphVer
   sphereSource->SetRadius(diameter / 2.0f);
   sphereSource->SetThetaResolution(12);
   sphereSource->SetPhiResolution(12);
+  sphereSource->Update();
 
   // generate a actor with a mapper for the sphere
   vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -655,7 +656,6 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex& vertex, con
     {
       //first clip the sphere with the cylinder
       vtkSmartPointer<vtkClipPolyData> clipperSphere = vtkSmartPointer<vtkClipPolyData>::New();
-      sphereMapper->Update();
       clipperSphere->SetInputData(sphereMapper->GetInput());
       clipperSphere->SetClipFunction(itClipStructure->second);
       clipperSphere->GenerateClippedOutputOn();

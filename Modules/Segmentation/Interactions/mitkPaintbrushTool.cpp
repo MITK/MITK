@@ -49,7 +49,8 @@ mitk::PaintbrushTool::~PaintbrushTool()
 void mitk::PaintbrushTool::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
-  CONNECT_FUNCTION( "Move", OnMouseMoved);
+  CONNECT_FUNCTION( "Move", OnPrimaryButtonPressedMoved);
+  CONNECT_FUNCTION( "MouseMove", OnMouseMoved);
   CONNECT_FUNCTION( "Release", OnMouseReleased);
   CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);
 }
@@ -293,11 +294,20 @@ bool mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEven
   return this->OnMouseMoved( NULL, interactionEvent);
 }
 
+bool mitk::PaintbrushTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
+{
+ return MouseMoved(interactionEvent, false);
+}
+
+bool mitk::PaintbrushTool::OnPrimaryButtonPressedMoved( StateMachineAction*, InteractionEvent* interactionEvent )
+{
+ return MouseMoved(interactionEvent, true);
+}
 
 /**
   Insert the point to the feedback contour,finish to build the contour and at the same time the painting function
   */
-bool mitk::PaintbrushTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
+bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, bool leftMouseButtonPressed)
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
@@ -310,7 +320,6 @@ bool mitk::PaintbrushTool::OnMouseMoved( StateMachineAction*, InteractionEvent* 
     m_LastContourSize = m_Size;
   }
 
-  bool leftMouseButtonPressed( true );
 //     stateEvent->GetId() == 530
 //     || stateEvent->GetId() == 534
 //     || stateEvent->GetId() == 1

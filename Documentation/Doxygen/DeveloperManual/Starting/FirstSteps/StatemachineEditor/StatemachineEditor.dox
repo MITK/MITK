@@ -1,13 +1,7 @@
 /**
 \page StatemachineEditor How to install and use the Statemachine-Editor
 
-Available sections:
-  - \ref StatemachineEditorOverview
-  - \ref StatemachineEditorInstallation 
-  - \ref StatemachineEditorManual
-  - \ref StatemachineEditorManual1 
-  - \ref StatemachineEditorManual2 
-  - \ref StatemachineEditorManual3
+\tableofcontents
 
 \section StatemachineEditorOverview Overview
 

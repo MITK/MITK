@@ -285,7 +285,7 @@ bool mitk::OptitrackTrackingTool::DeleteTrackable()
 //=======================================================
 // SetPosition
 //=======================================================
-void mitk::OptitrackTrackingTool::SetPosition(mitk::Point3D position)
+void mitk::OptitrackTrackingTool::SetPosition(mitk::Point3D position, ScalarType eps)
 {
   MITK_DEBUG << "SetPosition";
   // sets the position
@@ -297,7 +297,7 @@ void mitk::OptitrackTrackingTool::SetPosition(mitk::Point3D position)
 //=======================================================
 // SetOrientation
 //=======================================================
-void mitk::OptitrackTrackingTool::SetOrientation(mitk::Quaternion orientation)
+void mitk::OptitrackTrackingTool::SetOrientation(mitk::Quaternion orientation, ScalarType eps)
 {
   MITK_DEBUG << "SetOrientation";
   // sets the orientation as a quaternion
@@ -540,7 +540,7 @@ bool mitk::OptitrackTrackingTool::DeleteTrackable()
 //=======================================================
 // SetPosition
 //=======================================================
-void mitk::OptitrackTrackingTool::SetPosition(mitk::Point3D position)
+void mitk::OptitrackTrackingTool::SetPosition(mitk::Point3D position, ScalarType eps)
 {
   MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
 }
@@ -548,7 +548,7 @@ void mitk::OptitrackTrackingTool::SetPosition(mitk::Point3D position)
 //=======================================================
 // SetOrientation
 //=======================================================
-void mitk::OptitrackTrackingTool::SetOrientation(mitk::Quaternion orientation)
+void mitk::OptitrackTrackingTool::SetOrientation(mitk::Quaternion orientation, ScalarType eps)
 {
   MITK_WARN("IGT") << "Error: " << GetOptitrackErrorMessage(100);
 }

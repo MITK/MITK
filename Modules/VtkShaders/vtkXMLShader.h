@@ -29,7 +29,7 @@
 
 class vtkXMLDataElement;
 
-class VTKRENDERINGCORE_EXPORT vtkXMLShader : public vtkObject
+class vtkXMLShader : public vtkObject
 {
 public:
   static vtkXMLShader* New();

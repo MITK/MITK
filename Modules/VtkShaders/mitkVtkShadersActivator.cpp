@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkShaderRepository.h>
+#include <mitkVtkShaderRepository.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <usModuleEvent.h>
@@ -25,40 +25,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class ShadersActivator : public us::ModuleActivator
+  class VtkShadersActivator : public us::ModuleActivator
   {
   public:
-    ShadersActivator()
+    VtkShadersActivator()
     {
     }
 
-    ~ShadersActivator()
+    ~VtkShadersActivator()
     {
     }
 
     void Load(us::ModuleContext* context)
     {
-      m_ShaderRepository.reset(new ShaderRepository);
-      context->RegisterService<IShaderRepository>(m_ShaderRepository.get());
-      context->AddModuleListener(this, &ShadersActivator::HandleModuleEvent);
+      m_VtkShaderRepository.reset(new VtkShaderRepository);
+      context->RegisterService<IShaderRepository>(m_VtkShaderRepository.get());
+      context->AddModuleListener(this, &VtkShadersActivator::HandleModuleEvent);
     }
 
     void Unload(us::ModuleContext*)
     {
-      m_ShaderRepository.reset(NULL);
+      m_VtkShaderRepository.reset(NULL);
     }
 
   private:
-    ShadersActivator(const ShadersActivator&);
-    ShadersActivator& operator=(const ShadersActivator&);
+    VtkShadersActivator(const VtkShadersActivator&);
+    VtkShadersActivator& operator=(const VtkShadersActivator&);
 
     void HandleModuleEvent(const us::ModuleEvent moduleEvent);
     std::map<long, std::vector<int> > moduleIdToShaderIds;
 
-    std::auto_ptr<ShaderRepository> m_ShaderRepository;
+    std::auto_ptr<VtkShaderRepository> m_VtkShaderRepository;
   };
 
-  void ShadersActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
+  void VtkShadersActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
   {
     if (moduleEvent.GetType() == us::ModuleEvent::LOADED)
     {
@@ -71,7 +71,7 @@ namespace mitk
         if (*i)
         {
           us::ModuleResourceStream rs(*i);
-          int id = m_ShaderRepository->LoadShader(rs, i->GetBaseName());
+          int id = m_VtkShaderRepository->LoadShader(rs, i->GetBaseName());
           if (id >= 0)
           {
             moduleIdToShaderIds[moduleEvent.GetModule()->GetModuleId()].push_back(id);
@@ -88,7 +88,7 @@ namespace mitk
         for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin();
              idIter != shaderIdsIter->second.end(); ++idIter)
         {
-          m_ShaderRepository->UnloadShader(*idIter);
+          m_VtkShaderRepository->UnloadShader(*idIter);
         }
         moduleIdToShaderIds.erase(shaderIdsIter);
       }
@@ -98,4 +98,4 @@ namespace mitk
   }
 }
 
-US_EXPORT_MODULE_ACTIVATOR(Shaders, mitk::ShadersActivator);
+US_EXPORT_MODULE_ACTIVATOR(VtkShaders, mitk::VtkShadersActivator);

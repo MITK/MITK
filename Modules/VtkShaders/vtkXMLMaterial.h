@@ -31,7 +31,7 @@ class vtkXMLDataElement;
 class vtkXMLMaterialInternals;
 class vtkXMLShader;
 
-class VTKRENDERINGCORE_EXPORT vtkXMLMaterial : public vtkObject
+class vtkXMLMaterial : public vtkObject
 {
 public:
   static vtkXMLMaterial* New();

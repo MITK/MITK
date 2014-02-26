@@ -49,6 +49,7 @@ void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer* renderer)
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
+//    repository->act //SHADERTODO
     GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
   }
 }

@@ -14,10 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITKSHADERREPOSITORY_H_
-#define _MITKSHADERREPOSITORY_H_
+#ifndef _MITKVTKSHADERREPOSITORY_H_
+#define _MITKVTKSHADERREPOSITORY_H_
 
 #include "mitkIShaderRepository.h"
+#include <vtkShaderProgram2.h>
 
 
 class vtkXMLDataElement;
@@ -36,7 +37,7 @@ namespace mitk {
  * Additionally, it provides a utility function for applying properties for shaders
  * in mappers.
  */
-class ShaderRepository : public IShaderRepository
+class VtkShaderRepository : public IShaderRepository
 {
 
 protected:
@@ -108,7 +109,7 @@ protected:
 
   private:
 
-    friend class ShaderRepository;
+    friend class VtkShaderRepository;
 
     void LoadProperties(vtkPropertyXMLParser* prop);
     void LoadProperties(std::istream& stream);
@@ -131,12 +132,12 @@ private:
   /**
    * Constructor
    */
-  ShaderRepository();
+  VtkShaderRepository();
 
   /**
    * Destructor
    */
-  ~ShaderRepository();
+  ~VtkShaderRepository();
 
   std::list<IShaderRepository::Shader::Pointer> GetShaders() const;
 
@@ -152,13 +153,16 @@ private:
   /** \brief Applies shader and shader specific variables of the specified DataNode
    * to the VTK object by updating the shader variables of its vtkProperty.
    */
-  void ApplyProperties(mitk::DataNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const;
 
   int LoadShader(std::istream& stream, const std::string& name);
 
   bool UnloadShader(int id);
 
+  vtkShaderProgram2* GetShaderProgram(mitk::DataNode* node, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const;
 
+  vtkXMLMaterial* GetXMLMaterial(mitk::DataNode* node, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const;
+
+  void ApplyShaderProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, vtkXMLMaterial* xmlMaterial, itk::TimeStamp& MTime);
 };
 
 } //end of namespace mitk

@@ -81,7 +81,6 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
     ls->m_Actor->VisibilityOff();
     return;
   }
-
   if ( m_GenerateNormals )
   {
     ls->m_VtkPolyDataNormals->SetInputData( polydata );
@@ -252,9 +251,6 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
     Superclass::ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
     // VTK Properties
     ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
-    // Shaders
-    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
-    shaderRepo->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
 
     mitk::LookupTableProperty::Pointer lookupTableProp;
     this->GetDataNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
@@ -461,10 +457,6 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
         node->AddProperty( "material.representation"      , mitk::VtkRepresentationProperty::New()  , renderer, overwrite );
         node->AddProperty( "material.interpolation"       , mitk::VtkInterpolationProperty::New()   , renderer, overwrite );
     }
-
-    // Shaders
-    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
-    shaderRepo->AddDefaultProperties(node,renderer,overwrite);
 }
 
 

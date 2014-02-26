@@ -18,14 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define SR_WARN MITK_WARN("shader.repository")
 #define SR_ERROR MITK_ERROR("shader.repository")
 
-#include "mitkShaderRepository.h"
+#include "mitkVtkShaderRepository.h"
 #include "mitkShaderProperty.h"
 #include "mitkProperties.h"
 #include "mitkDataNode.h"
 
 #include <vtkActor.h>
 #include <vtkProperty.h>
-#include <vtkPropertyXMLParser.h>
 #include <vtkXMLMaterial.h>
 #include <vtkXMLShader.h>
 #include <vtkXMLDataElement.h>
@@ -34,19 +33,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDirectory.h>
 #include <itksys/SystemTools.hxx>
 
-int mitk::ShaderRepository::shaderId = 0;
-const bool mitk::ShaderRepository::debug = false;
+int mitk::VtkShaderRepository::shaderId = 0;
+const bool mitk::VtkShaderRepository::debug = false;
 
-mitk::ShaderRepository::ShaderRepository()
+mitk::VtkShaderRepository::VtkShaderRepository()
 {
   LoadShaders();
 }
 
-mitk::ShaderRepository::~ShaderRepository()
+mitk::VtkShaderRepository::~ShaderRepository()
 {
 }
 
-void mitk::ShaderRepository::LoadShaders()
+void mitk::VtkShaderRepository::LoadShaders()
 {
   itk::Directory::Pointer dir = itk::Directory::New();
 
@@ -79,7 +78,7 @@ void mitk::ShaderRepository::LoadShaders()
   }
 }
 
-mitk::ShaderRepository::Shader::Pointer mitk::ShaderRepository::GetShaderImpl(const std::string &name) const
+mitk::VtkShaderRepository::Shader::Pointer mitk::VtkShaderRepository::GetShaderImpl(const std::string &name) const
 {
   std::list<Shader::Pointer>::const_iterator i = shaders.begin();
 
@@ -94,7 +93,7 @@ mitk::ShaderRepository::Shader::Pointer mitk::ShaderRepository::GetShaderImpl(co
   return Shader::Pointer();
 }
 
-int mitk::ShaderRepository::LoadShader(std::istream& stream, const std::string& filename)
+int mitk::VtkShaderRepository::LoadShader(std::istream& stream, const std::string& filename)
 {
   Shader::Pointer element=Shader::New();
   element->SetName(filename);
@@ -105,7 +104,7 @@ int mitk::ShaderRepository::LoadShader(std::istream& stream, const std::string& 
   return element->GetId();
 }
 
-bool mitk::ShaderRepository::UnloadShader(int id)
+bool mitk::VtkShaderRepository::UnloadShader(int id)
 {
   for (std::list<Shader::Pointer>::iterator i = shaders.begin();
        i != shaders.end(); ++i)
@@ -119,15 +118,15 @@ bool mitk::ShaderRepository::UnloadShader(int id)
   return false;
 }
 
-mitk::ShaderRepository::Shader::Shader()
+mitk::VtkShaderRepository::Shader::Shader()
 {
 }
 
-mitk::ShaderRepository::Shader::~Shader()
+mitk::VtkShaderRepository::Shader::~Shader()
 {
 }
 
-void mitk::ShaderRepository::Shader::LoadProperties(vtkPropertyXMLParser* p)
+void mitk::VtkShaderRepository::Shader::LoadProperties(vtkPropertyXMLParser* p)
 {
   vtkXMLMaterial *m=p->GetMaterial();
   if (m == NULL) return;
@@ -173,7 +172,7 @@ void mitk::ShaderRepository::Shader::LoadProperties(vtkPropertyXMLParser* p)
   }
 }
 
-void mitk::ShaderRepository::Shader::LoadProperties(std::istream& stream)
+void mitk::VtkShaderRepository::Shader::LoadProperties(std::istream& stream)
 {
   std::string content;
   content.reserve(2048);
@@ -194,15 +193,15 @@ void mitk::ShaderRepository::Shader::LoadProperties(std::istream& stream)
   p->Delete();
 }
 
-mitk::ShaderRepository::Shader::Uniform::Uniform()
+mitk::VtkShaderRepository::Shader::Uniform::Uniform()
 {
 }
 
-mitk::ShaderRepository::Shader::Uniform::~Uniform()
+mitk::VtkShaderRepository::Shader::Uniform::~Uniform()
 {
 }
 
-void mitk::ShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
+void mitk::VtkShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
 {
   //MITK_INFO << "found uniform '" << y->GetAttribute("name") << "' type=" << y->GetAttribute("type");// << " default=" << y->GetAttribute("value");
 
@@ -259,7 +258,7 @@ void mitk::ShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
   */
 }
 
-void mitk::ShaderRepository::AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite) const
+void mitk::VtkShaderRepository::AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite) const
 {
   node->AddProperty( "shader", mitk::ShaderProperty::New(), renderer, overwrite );
 
@@ -316,11 +315,92 @@ void mitk::ShaderRepository::AddDefaultProperties(mitk::DataNode* node, mitk::Ba
 
 }
 
-void mitk::ShaderRepository::ApplyProperties(mitk::DataNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const
+void mitk::VtkShaderRepository::ApplyShaderProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, vtkXMLMaterial* xmlMaterial, itk::TimeStamp& MTime)
+{
+  bool setMTime = false;
+  mitk::ShaderProperty *sep= dynamic_cast<mitk::ShaderProperty*>(node->GetProperty("shader",renderer));
+
+  std::string shader=sep->GetValueAsString();
+  if(shader.compare("fixed")!=0)
+ {
+   Shader::Pointer s=GetShaderImpl(shader);
+
+   if(s.IsNull())
+     return;
+
+   std::list<Shader::Uniform::Pointer>::const_iterator j = s->uniforms.begin();
+
+   while( j != s->uniforms.end() )
+   {
+     std::string propertyName = "shader." + s->GetName() + "." + (*j)->name;
+
+   //  MITK_INFO << "querying property: " << propertyName;
+
+   //  mitk::BaseProperty *p = node->GetProperty( propertyName.c_str(), renderer );
+
+   //  if( p && p->GetMTime() > MTime.GetMTime() )
+     {
+       float fval[4];
+
+      // MITK_INFO << "copying property " << propertyName << " ->->- " << (*j)->name << " type=" << (*j)->type ;
+
+
+ /*      switch( (*j)->type )
+       {
+         case Shader::Uniform::glsl_float:
+           node->GetFloatProperty( propertyName.c_str(), fval[0], renderer );
+           property->AddShaderVariable( (*j)->name.c_str(), 1 , fval );
+           break;
+
+         case Shader::Uniform::glsl_vec2:
+           node->GetFloatProperty( (propertyName+".x").c_str(), fval[0], renderer );
+           node->GetFloatProperty( (propertyName+".y").c_str(), fval[1], renderer );
+           property->AddShaderVariable( (*j)->name.c_str(), 2 , fval );
+           break;
+
+         case Shader::Uniform::glsl_vec3:
+           node->GetFloatProperty( (propertyName+".x").c_str(), fval[0], renderer );
+           node->GetFloatProperty( (propertyName+".y").c_str(), fval[1], renderer );
+           node->GetFloatProperty( (propertyName+".z").c_str(), fval[2], renderer );
+
+           property->AddShaderVariable( (*j)->name.c_str(), 3 , fval );
+           break;
+
+        case Shader::Uniform::glsl_vec4:
+           node->GetFloatProperty( (propertyName+".x").c_str(), fval[0], renderer );
+           node->GetFloatProperty( (propertyName+".y").c_str(), fval[1], renderer );
+           node->GetFloatProperty( (propertyName+".z").c_str(), fval[2], renderer );
+           node->GetFloatProperty( (propertyName+".w").c_str(), fval[3], renderer );
+           property->AddShaderVariable( (*j)->name.c_str(), 4 , fval );
+           break;
+
+        default:
+         break;
+
+       }*/
+
+       //setMTime=true;
+     }
+
+     j++;
+   }
+ }
+
+ if(setMTime)
+   MTime.Modified();
+}
+
+vtkShaderProgram2* mitk::VtkShaderRepository::GetShaderProgram(mitk::DataNode* node, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const
+{
+  vtkXMLMaterial* xmlMaterial = GetXMLMaterial(node,renderer,MTime);
+
+}
+
+vtkXMLMaterial* mitk::VtkShaderRepository::GetXMLMaterial(mitk::DataNode* node, mitk::BaseRenderer* renderer, itk::TimeStamp& MTime) const
 {
   bool setMTime = false;
 
-  vtkProperty* property = actor->GetProperty();
+  vtkPropertyXMLParser* property = new vtkPropertyXMLParser();
 
   unsigned long ts = MTime.GetMTime();
 
@@ -329,7 +409,7 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataNode* node, vtkActor *act
   if(!sep)
   {
     property->ShadingOff();
-    return;
+    return 0;
   }
 
   std::string shader=sep->GetValueAsString();
@@ -341,6 +421,7 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataNode* node, vtkActor *act
     {
       //MITK_INFO << "disabling shader";
       property->ShadingOff();
+      return 0;
     }
     else
     {
@@ -349,82 +430,17 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataNode* node, vtkActor *act
       {
         //MITK_INFO << "enabling shader";
         property->ShadingOn();
-//        property->LoadMaterialFromString(s->GetMaterialXml().c_str());
+        setMTime = true;
+        return property->LoadMaterialFromString(s->GetMaterialXml().c_str());
       }
     }
     setMTime = true;
+    return 0;
   }
 
-   if(shader.compare("fixed")!=0)
-  {
-    Shader::Pointer s=GetShaderImpl(shader);
-
-    if(s.IsNull())
-      return;
-
-    std::list<Shader::Uniform::Pointer>::const_iterator j = s->uniforms.begin();
-
-    while( j != s->uniforms.end() )
-    {
-      std::string propertyName = "shader." + s->GetName() + "." + (*j)->name;
-
-    //  MITK_INFO << "querying property: " << propertyName;
-
-    //  mitk::BaseProperty *p = node->GetProperty( propertyName.c_str(), renderer );
-
-    //  if( p && p->GetMTime() > MTime.GetMTime() )
-      {
-        float fval[4];
-
-       // MITK_INFO << "copying property " << propertyName << " ->->- " << (*j)->name << " type=" << (*j)->type ;
-
-
-        switch( (*j)->type )
-        {
-          case Shader::Uniform::glsl_float:
-            node->GetFloatProperty( propertyName.c_str(), fval[0], renderer );
-            property->AddShaderVariable( (*j)->name.c_str(), 1 , fval );
-            break;
-
-          case Shader::Uniform::glsl_vec2:
-            node->GetFloatProperty( (propertyName+".x").c_str(), fval[0], renderer );
-            node->GetFloatProperty( (propertyName+".y").c_str(), fval[1], renderer );
-            property->AddShaderVariable( (*j)->name.c_str(), 2 , fval );
-            break;
-
-          case Shader::Uniform::glsl_vec3:
-            node->GetFloatProperty( (propertyName+".x").c_str(), fval[0], renderer );
-            node->GetFloatProperty( (propertyName+".y").c_str(), fval[1], renderer );
-            node->GetFloatProperty( (propertyName+".z").c_str(), fval[2], renderer );
-
-            property->AddShaderVariable( (*j)->name.c_str(), 3 , fval );
-            break;
-
-         case Shader::Uniform::glsl_vec4:
-            node->GetFloatProperty( (propertyName+".x").c_str(), fval[0], renderer );
-            node->GetFloatProperty( (propertyName+".y").c_str(), fval[1], renderer );
-            node->GetFloatProperty( (propertyName+".z").c_str(), fval[2], renderer );
-            node->GetFloatProperty( (propertyName+".w").c_str(), fval[3], renderer );
-            property->AddShaderVariable( (*j)->name.c_str(), 4 , fval );
-            break;
-
-         default:
-          break;
-
-        }
-
-        //setMTime=true;
-      }
-
-      j++;
-    }
-  }
-
-  if(setMTime)
-    MTime.Modified();
 }
 
-std::list<mitk::IShaderRepository::Shader::Pointer> mitk::ShaderRepository::GetShaders() const
+std::list<mitk::IShaderRepository::Shader::Pointer> mitk::VtkShaderRepository::GetShaders() const
 {
   std::list<mitk::IShaderRepository::Shader::Pointer> result;
   for (std::list<Shader::Pointer>::const_iterator i = shaders.begin();
@@ -435,7 +451,7 @@ std::list<mitk::IShaderRepository::Shader::Pointer> mitk::ShaderRepository::GetS
   return result;
 }
 
-mitk::IShaderRepository::Shader::Pointer mitk::ShaderRepository::GetShader(const std::string& name) const
+mitk::IShaderRepository::Shader::Pointer mitk::VtkShaderRepository::GetShader(const std::string& name) const
 {
   for (std::list<Shader::Pointer>::const_iterator i = shaders.begin();
        i != shaders.end(); ++i)
@@ -445,7 +461,7 @@ mitk::IShaderRepository::Shader::Pointer mitk::ShaderRepository::GetShader(const
   return IShaderRepository::Shader::Pointer();
 }
 
-mitk::IShaderRepository::Shader::Pointer mitk::ShaderRepository::GetShader(int id) const
+mitk::IShaderRepository::Shader::Pointer mitk::VtkShaderRepository::GetShader(int id) const
 {
   for (std::list<Shader::Pointer>::const_iterator i = shaders.begin();
        i != shaders.end(); ++i)

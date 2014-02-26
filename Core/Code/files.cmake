@@ -63,6 +63,7 @@ set(H_FILES
   DataManagement/mitkITKImageImport.h
   DataManagement/mitkITKImageImport.txx
   DataManagement/mitkImageToItk.h
+  DataManagement/mitkShaderProperty.h
   DataManagement/mitkImageToItk.txx
   DataManagement/mitkTimeSlicedGeometry.h # Deprecated, empty for compatibilty reasons.
 
@@ -222,6 +223,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyDescriptions.cpp
   DataManagement/mitkPropertyExtensions.cpp
   DataManagement/mitkPropertyFilters.cpp
+  DataManagement/mitkShaderProperty.cpp
 
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp

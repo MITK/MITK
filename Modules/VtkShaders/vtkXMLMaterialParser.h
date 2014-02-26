@@ -74,7 +74,7 @@
 class vtkXMLMaterial;
 class vtkXMLMaterialParserInternals;
 
-class VTKRENDERINGCORE_EXPORT vtkXMLMaterialParser : public vtkXMLParser
+class vtkXMLMaterialParser : public vtkXMLParser
 {
 public:
   static vtkXMLMaterialParser *New();

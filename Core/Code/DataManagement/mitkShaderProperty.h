@@ -58,7 +58,6 @@ public:
   void SetShader(const std::string& i);
 
   using BaseProperty::operator=;
-
 protected:
 
   std::list<Element> shaderList;

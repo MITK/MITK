@@ -30,6 +30,7 @@ namespace mitk {
 
 class DataNode;
 class BaseRenderer;
+class vtkShaderProgram2;
 
 /**
  * \brief Management class for vtkShader XML descriptions.
@@ -107,8 +108,7 @@ struct MITK_CORE_EXPORT IShaderRepository
   /** \brief Applies shader and shader specific variables of the specified DataNode
    * to the VTK object by updating the shader variables of its vtkProperty.
    */
-  virtual void ApplyProperties(mitk::DataNode* node, vtkActor* actor,
-                               mitk::BaseRenderer* renderer, itk::TimeStamp& MTime) const = 0;
+  virtual vtkShaderProgram2* GetShaderProgram(mitk::DataNode* node, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const = 0;
 
   /** \brief Loads a shader from a given file. Make sure that this stream is in the XML shader format.
    *

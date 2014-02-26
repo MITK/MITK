@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 #include <MitkIGTExports.h>
+#include <string>
 
 namespace mitk
 {

@@ -69,10 +69,10 @@ public:
   void AddPointInteraction()
   {
     //Path to the reference PointSet
-    std::string referencePointSetPath = "/Users/schroedt/Desktop/pointsetTestRef.mps";
+    std::string referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/PointSetDataInteractor_add_points_in_2D_ref.mps");
 
     //Path to the interaction xml file
-    std::string interactionXmlPath = "/Users/schroedt/Desktop/pointsetTest.xml";
+    std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PointSetDataInteractor_add_points_in_2D.xml");
 
     //Create test helper to initialize all necessary objects for interaction
     mitk::InteractionTestHelper interactionTestHelper(interactionXmlPath);
@@ -87,7 +87,7 @@ public:
     mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::LoadPointSet(referencePointSetPath);
 
     //Compare reference with the result of the interaction
-    MITK_ASSERT_EQUAL(m_TestPointSet.GetPointer(), referencePointSet.GetPointer(), "");
+    MITK_ASSERT_EQUAL(m_TestPointSet, referencePointSet, "");
   }
 
 };

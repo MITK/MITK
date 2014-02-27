@@ -265,7 +265,7 @@ mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher() const
   return m_BindDispatcherInteractor->GetDispatcher();
 }
 
-mitk::Point3D mitk::BaseRenderer::Map2DRendererPositionTo3DWorldPosition(const Point2D mousePosition) const
+mitk::Point3D mitk::BaseRenderer::Map2DRendererPositionTo3DWorldPosition(const Point2D& mousePosition) const
 {
   Point2D p_mm;
   Point3D position;

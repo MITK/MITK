@@ -53,7 +53,6 @@ set(MODULE_TESTS
   mitkPointSetWriterTest.cpp
   mitkPointSetReaderTest.cpp
   mitkPointSetInteractorTest.cpp
-  mitkPointSetDataInteractorTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
   mitkSlicedGeometry3DTest.cpp
@@ -95,6 +94,15 @@ set(MODULE_TESTS
   mitkLookupTableTest.cpp
   mitkSTLFileReaderTest.cpp
 )
+
+if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
+set(MODULE_TESTS
+  ${MODULE_TESTS}
+  mitkPointSetDataInteractorTest.cpp
+)
+endif()
+
+message (${MODULE_TESTS})
 
 # test with image filename as an extra command line parameter
 set(MODULE_IMAGE_TESTS

@@ -265,20 +265,19 @@ mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher() const
   return m_BindDispatcherInteractor->GetDispatcher();
 }
 
-mitk::Point3D mitk::BaseRenderer::Map2DRendererPositionTo3DWorldPosition(Point2D* mousePosition) const
+mitk::Point3D mitk::BaseRenderer::Map2DRendererPositionTo3DWorldPosition(const Point2D& mousePosition) const
 {
   Point2D p_mm;
   Point3D position;
+
   if (m_MapperID == 1)
   {
-    GetDisplayGeometry()->ULDisplayToDisplay(*mousePosition, *mousePosition);
-    GetDisplayGeometry()->DisplayToWorld(*mousePosition, p_mm);
+    GetDisplayGeometry()->DisplayToWorld(mousePosition, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
   }
   else if (m_MapperID == 2)
   {
-    GetDisplayGeometry()->ULDisplayToDisplay(*mousePosition, *mousePosition);
-    PickWorldPoint(*mousePosition, position);
+    PickWorldPoint(mousePosition, position);
   }
   return position;
 }

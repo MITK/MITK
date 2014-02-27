@@ -76,15 +76,11 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
 
     void ConnectActionsAndFunctions();
 
-    //virtual void Activated();
-    //virtual void Deactivated();
-
     virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMousePressedInside ( StateMachineAction*, InteractionEvent* interactionEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset);
     virtual bool OnMousePressedOutside ( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMouseMoved ( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
-    virtual bool OnChangeActiveLabel( StateMachineAction*, InteractionEvent* interactionEvent );
     mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour(int timestep=0);
 
     Image::Pointer m_ReferenceSlice;

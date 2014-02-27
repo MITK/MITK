@@ -42,7 +42,6 @@ void mitk::ContourTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
   CONNECT_FUNCTION( "Move", OnMouseMoved);
   CONNECT_FUNCTION( "Release", OnMouseReleased);
-  CONNECT_FUNCTION( "ShiftPrimaryButtonPressed", OnChangeActiveLabel );
 }
 
 void mitk::ContourTool::Activated()
@@ -54,25 +53,6 @@ void mitk::ContourTool::Activated()
 void mitk::ContourTool::Deactivated()
 {
   Superclass::Deactivated();
-}
-
-bool mitk::ContourTool::OnChangeActiveLabel (StateMachineAction*, InteractionEvent* interactionEvent)
-{
-  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
-
-  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return false;
-
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
-  assert(workingImage);
-
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
-  workingImage->SetActiveLabel(pixelValue);
-  m_ToolManager->WorkingDataModified.Send();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  return true;
 }
 
 bool mitk::ContourTool::OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent)

@@ -58,32 +58,6 @@ void mitk::SetRegionTool::Deactivated()
   Superclass::Deactivated();
 }
 
-bool mitk::SetRegionTool::OnChangeActiveLabel (mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
-{
-  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
-
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert(workingNode);
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  assert(workingImage);
-
-  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return false;
-
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-
-  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
-
-  workingImage->SetActiveLabel(pixelValue);
-
-  m_ToolManager->WorkingDataModified.Send();
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  return true;
-}
-
 bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );

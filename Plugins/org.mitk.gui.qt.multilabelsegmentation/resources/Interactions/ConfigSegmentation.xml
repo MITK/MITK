@@ -49,6 +49,6 @@
   <!-- Label selection -->
   <event_variant class="MousePressEvent" name="SelectLabel">
     <attribute name="EventButton" value="LeftMouseButton"/>
-    <attribute name="Modifiers" value="ctrl"/>
+    <attribute name="Modifiers" value="shift"/>
   </event_variant>
 </config>

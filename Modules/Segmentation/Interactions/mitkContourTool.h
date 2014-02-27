@@ -63,16 +63,9 @@ class Segmentation_EXPORT ContourTool : public FeedbackContourTool
     virtual void Activated();
     virtual void Deactivated();
 
-    /**
-     Set the label under clicked position as the active one.
-    */
-   // virtual bool OnChangeActiveLabel(StateMachineAction*, InteractionEvent* interactionEvent );
-
     virtual bool OnMousePressed( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
-    virtual bool OnChangeActiveLabel (StateMachineAction*, InteractionEvent* interactionEvent);
-//    virtual bool OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent );
 
     virtual void ConnectActionsAndFunctions();
 

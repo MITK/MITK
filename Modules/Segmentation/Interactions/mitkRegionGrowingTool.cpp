@@ -69,7 +69,6 @@ void mitk::RegionGrowingTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
   CONNECT_FUNCTION( "Move", OnMouseMoved);
   CONNECT_FUNCTION( "Release", OnMouseReleased);
-  CONNECT_FUNCTION( "ShiftPrimaryButtonPressed", OnChangeActiveLabel );
 }
 
 const char** mitk::RegionGrowingTool::GetXPM() const
@@ -406,27 +405,6 @@ bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionE
   m_ReferenceSlice = NULL; // don't leak
   m_WorkingSlice = NULL;
   m_OriginalPicSlice = NULL;
-
-  return true;
-}
-
-bool mitk::RegionGrowingTool::OnChangeActiveLabel ( StateMachineAction*, InteractionEvent* interactionEvent )
-{
-  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
-
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
-  assert (workingImage);
-
-  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return false;
-
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-
-  int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
-  workingImage->SetActiveLabel(pixelValue);
-  m_ToolManager->WorkingDataModified.Send();
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
 }

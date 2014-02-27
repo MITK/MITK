@@ -62,7 +62,6 @@ class Segmentation_EXPORT SetRegionTool : public FeedbackContourTool
 
     virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
     virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );
-    virtual bool OnChangeActiveLabel( StateMachineAction*, InteractionEvent* );
 
     bool m_LogicInverted;
 

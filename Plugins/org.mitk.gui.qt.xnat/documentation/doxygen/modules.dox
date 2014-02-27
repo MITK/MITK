@@ -1,0 +1,21 @@
+/**
+  \defgroup org_mitk_gui_qt_xnat org.mitk.gui.qt.xnat
+  \ingroup MITKPlugins
+
+  \brief This plug-in is a new possibility of communication with a XNAT server in MITK.
+  It takes data from the server, shows it as hierarchy in the main window of the plug-in
+  as editor and it works like a normal browser.
+  There is also a view, where the XNAT hierarchy is displayed as tree structure.
+  Editor and view can communicate with each other, so the editor updates for a selection in the view.
+  The session data must be written in Preferences -> XNAT Session.
+
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_xnat_internal Internal
+  \ingroup org_mitk_gui_qt_xnat
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.xnat plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

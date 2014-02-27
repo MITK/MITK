@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include "mitkDisplayInteractor.h"
 
-#include "mitkEventRecorder.h"
 
 namespace mitk {
 

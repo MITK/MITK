@@ -132,6 +132,8 @@ void mitk::EventRecorder::StartRecording()
     return;
   }
 
+  m_Active = true;
+
   //write head and config
   // <?xml version="1.0"?>
   //  <interactions>
@@ -158,5 +160,7 @@ void mitk::EventRecorder::StopRecording()
 
     m_FileStream.flush();
     m_FileStream.close();
+
+    m_Active =false;
   }
 }

@@ -66,6 +66,8 @@ public:
   void StartRecording();
   void StopRecording();
 
+  bool IsActive(){ return m_Active; }
+
   void SetOutputFile(std::string filename)
   {
     m_FileName = filename;

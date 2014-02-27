@@ -1,4 +1,1 @@
 MITK_CREATE_MODULE_TESTS()
-
-mitkAddCustomModuleTest(mitkImageToSurfaceFilterTest_BinaryBall  mitkImageToSurfaceFilterTest ${MITK_DATA_DIR}/BallBinary30x30x30.nrrd)
-

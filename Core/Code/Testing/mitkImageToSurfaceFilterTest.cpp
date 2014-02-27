@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToSurfaceFilter.h"
 #include "mitkItkImageFileReader.h"
 #include "mitkException.h"
+#include "mitkTestFixture.h"
+
+#include <mitkIOUtil.h>
 
 bool CompareSurfacePointPositions(mitk::Surface::Pointer s1, mitk::Surface::Pointer s2)
 {
@@ -38,64 +41,120 @@ bool CompareSurfacePointPositions(mitk::Surface::Pointer s1, mitk::Surface::Poin
   return false;
 }
 
-int mitkImageToSurfaceFilterTest(int argc, char* argv[])
+class mitkImageToSurfaceFilterTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("ImageToSurfaceFilterTest");
-  mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
-  MITK_TEST_CONDITION_REQUIRED(testObject.IsNotNull(), "Testing instantiation of test object");
+  CPPUNIT_TEST_SUITE(mitkImageToSurfaceFilterTestSuite);
+  MITK_TEST(testImageToSurfaceFilterInitialization);
+  MITK_TEST(testInput);
+  MITK_TEST(testSurfaceGeneration);
+  MITK_TEST(testDecimatePromeshDecimation);
+  MITK_TEST(testQuadricDecimation);
+  MITK_TEST(testSmoothingOfSurface);
+  CPPUNIT_TEST_SUITE_END();
 
-  mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
-  reader->SetFileName(argv[1]);
-  reader->Update();
-  mitk::Image::Pointer tImage = reader->GetOutput();
+private:
 
-  // testing initialization of member variables!
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetThreshold() == 1.0f, "Testing initialization of threshold member variable");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetSmooth() == false, "Testing initialization of smooth member variable");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetDecimate() == mitk::ImageToSurfaceFilter::NoDecimation, "Testing initialization of decimate member variable");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetTargetReduction() == 0.95f, "Testing initialization of target reduction member variable");
+  /** Members used inside the different test methods. All members are initialized via setUp().*/
+  mitk::Image::Pointer m_BallImage;
 
-  // test cases excluded until bug 14530 is fixed, since wrong exception is caught!!
-  //MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception)
-  //testObject->Update();
-  //MITK_TEST_FOR_EXCEPTION_END(mitk::Exception)
+public:
 
-  //mitk::Image::Pointer emptyImage = mitk::Image::New();
-  //testObject->SetInput(emptyImage);
-  //MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception)
-  //testObject->Update();
-  //MITK_TEST_FOR_EXCEPTION_END(mitk::Exception)
+  /**
+   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+   */
+  void setUp()
+  {
+    m_BallImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("BallBinary30x30x30.nrrd"));
+  }
 
-  testObject->SetInput(tImage);
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetInput() == tImage, "Testing set / get input!");
+  void tearDown()
+  {
+  }
 
-  testObject->Update();
-  mitk::Surface::Pointer resultSurface = NULL;
-  resultSurface = testObject->GetOutput();
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetOutput() != NULL, "Testing surface generation!");
 
-  mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();
+  void testImageToSurfaceFilterInitialization()
+  {
+    mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
+    CPPUNIT_ASSERT_MESSAGE("Testing instantiation of test object", testObject.IsNotNull());
 
-  testObject->SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro);
-  testObject->SetTargetReduction(0.5f);
-  testObject->Update();
-  mitk::Surface::Pointer testSurface2 = testObject->GetOutput()->Clone();
+    // testing initialization of member variables!
+    CPPUNIT_ASSERT_MESSAGE("Testing initialization of threshold member variable",testObject->GetThreshold() == 1.0f);
+    CPPUNIT_ASSERT_MESSAGE("Testing initialization of smooth member variable", testObject->GetSmooth() == false);
+    CPPUNIT_ASSERT_MESSAGE("Testing initialization of decimate member variable", testObject->GetDecimate() == mitk::ImageToSurfaceFilter::NoDecimation);
+    CPPUNIT_ASSERT_MESSAGE("Testing initialization of target reduction member variable", testObject->GetTargetReduction() == 0.95f);
+  }
 
-  MITK_TEST_CONDITION_REQUIRED(testSurface1->GetVtkPolyData()->GetPoints()->GetNumberOfPoints() > testSurface2->GetVtkPolyData()->GetPoints()->GetNumberOfPoints() , "Testing DecimatePro mesh decimation!");
+  void testInput()
+  {
+    mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
+    testObject->SetInput(m_BallImage);
+    CPPUNIT_ASSERT_MESSAGE("Testing set / get input!", testObject->GetInput() == m_BallImage);
+  }
 
-  testObject->SetDecimate(mitk::ImageToSurfaceFilter::QuadricDecimation);
-  testObject->SetTargetReduction(0.5f);
-  testObject->Update();
-  mitk::Surface::Pointer testSurface3 = testObject->GetOutput()->Clone();
+  void testSurfaceGeneration()
+  {
+    mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
+    testObject->SetInput(m_BallImage);
+    testObject->Update();
+    mitk::Surface::Pointer resultSurface = NULL;
+    resultSurface = testObject->GetOutput();
+    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testObject->GetOutput() != NULL);
+  }
 
-  MITK_TEST_CONDITION_REQUIRED(testSurface1->GetVtkPolyData()->GetPoints()->GetNumberOfPoints() > testSurface3->GetVtkPolyData()->GetPoints()->GetNumberOfPoints() , "Testing QuadricDecimation mesh decimation!");
+  void testDecimatePromeshDecimation()
+  {
+    mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
+    testObject->SetInput(m_BallImage);
+    testObject->Update();
+    mitk::Surface::Pointer resultSurface = NULL;
+    resultSurface = testObject->GetOutput();
 
-  testObject->SetSmooth(true);
-  testObject->SetDecimate(mitk::ImageToSurfaceFilter::NoDecimation);
-  testObject->Update();
-  mitk::Surface::Pointer testSurface4 = testObject->GetOutput()->Clone();
-  MITK_TEST_CONDITION_REQUIRED( CompareSurfacePointPositions(testSurface1, testSurface4), "Testing smoothing of surface changes point data!");
+    mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();
 
-  // thats it folks
-  MITK_TEST_END();
-}
+    testObject->SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro);
+    testObject->SetTargetReduction(0.5f);
+    testObject->Update();
+    mitk::Surface::Pointer testSurface2 = testObject->GetOutput()->Clone();
+
+    CPPUNIT_ASSERT_MESSAGE("Testing DecimatePro mesh decimation!", testSurface1->GetVtkPolyData()->GetPoints()->GetNumberOfPoints() > testSurface2->GetVtkPolyData()->GetPoints()->GetNumberOfPoints());
+  }
+
+  void testQuadricDecimation()
+  {
+    mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
+    testObject->SetInput(m_BallImage);
+    testObject->Update();
+    mitk::Surface::Pointer resultSurface = NULL;
+    resultSurface = testObject->GetOutput();
+
+    mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();
+
+    testObject->SetDecimate(mitk::ImageToSurfaceFilter::QuadricDecimation);
+    testObject->SetTargetReduction(0.5f);
+    testObject->Update();
+    mitk::Surface::Pointer testSurface3 = testObject->GetOutput()->Clone();
+
+    CPPUNIT_ASSERT_MESSAGE("Testing QuadricDecimation mesh decimation!", testSurface1->GetVtkPolyData()->GetPoints()->GetNumberOfPoints() > testSurface3->GetVtkPolyData()->GetPoints()->GetNumberOfPoints());
+
+  }
+
+  void testSmoothingOfSurface()
+  {
+    mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
+    testObject->SetInput(m_BallImage);
+    testObject->Update();
+    mitk::Surface::Pointer resultSurface = NULL;
+    resultSurface = testObject->GetOutput();
+
+    mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();
+
+    testObject->SetSmooth(true);
+    testObject->SetDecimate(mitk::ImageToSurfaceFilter::NoDecimation);
+    testObject->Update();
+    mitk::Surface::Pointer testSurface4 = testObject->GetOutput()->Clone();
+    CPPUNIT_ASSERT_MESSAGE("Testing smoothing of surface changes point data!", CompareSurfacePointPositions(testSurface1, testSurface4));
+  }
+
+};
+
+MITK_TEST_SUITE_REGISTRATION(mitkImageToSurfaceFilter)

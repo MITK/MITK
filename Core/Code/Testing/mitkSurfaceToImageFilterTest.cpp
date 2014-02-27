@@ -88,9 +88,6 @@ public:
     surfaceToImageFilter->SetImage(additionalInputImage);
     surfaceToImageFilter->Update();
 
-    mitk::Image::Pointer output = surfaceToImageFilter->GetOutput();
-    mitk::IOUtil::SaveImage(output,"/home/christoph/3DBall.nrrd");
-
     mitk::ImagePixelReadAccessor<unsigned char,3> outputReader(surfaceToImageFilter->GetOutput());
     itk::Index<3> idx;
     bool valuesCorrect = true;
@@ -143,10 +140,6 @@ public:
     surfaceToImageFilter->SetImage(additionalInputImage);
 
     surfaceToImageFilter->Update();
-
-    mitk::Image::Pointer output = surfaceToImageFilter->GetOutput();
-
-    mitk::IOUtil::SaveImage(output,"/home/christoph/4DBall.nrrd");
 
     mitk::ImagePixelReadAccessor<unsigned char,4> outputReader(surfaceToImageFilter->GetOutput());
     itk::Index<4> idx;

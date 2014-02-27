@@ -344,7 +344,8 @@ bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* 
       m_PositionEvent = NULL;
 
   m_PositionEvent = InteractionPositionEvent::New( positionEvent->GetSender(),
-                                                   positionEvent->GetPointerPositionOnScreen() );
+                                                   positionEvent->GetPointerPositionOnScreen(),
+                                                   positionEvent->GetPositionInWorld() );
 
   //if click was on another renderwindow or slice then reset pipeline and preview
   if( (m_LastEventSender != m_PositionEvent->GetSender()) || (m_LastEventSlice != m_PositionEvent->GetSender()->GetSlice()) )

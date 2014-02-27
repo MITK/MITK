@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkColorProperty.h"
 #include "mitkTubeGraph.h"
 #include "mitkTubeGraphProperty.h"
-#include "mitkTubeGraphInteractor.h"
+#include "mitkTubeGraphDataInteractor.h"
 
 #include <QCheckBox>
 #include <QSignalMapper>
@@ -39,7 +39,7 @@ class QmitkTubeGraphView: public QmitkAbstractView
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
-    typedef  mitk::TubeGraphProperty::LabelGroup  LabelGroupType;
+  typedef  mitk::TubeGraphProperty::LabelGroup  LabelGroupType;
   typedef LabelGroupType::Label                 LabelType;
 
 public:
@@ -91,7 +91,7 @@ public:
 
 protected:
 
-  mitk::TubeGraphInteractor::ActivationMode GetActivationMode();
+  mitk::TubeGraphDataInteractor::ActivationMode GetActivationMode();
   virtual void SetFocus();
   virtual void NodeRemoved(const mitk::DataNode* node);
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
@@ -111,10 +111,10 @@ private:
   void SelectionInformationChanged();
   void UpdateGraphInformation();
 
-  mitk::TubeGraph::Pointer                  m_ActiveTubeGraph;
-  mitk::TubeGraphProperty::Pointer          m_ActiveProperty;
-  mitk::TubeGraphInteractor::Pointer        m_ActiveInteractor;
-  mitk::TubeGraphInteractor::ActivationMode m_ActivationMode;
+  mitk::TubeGraph::Pointer                      m_ActiveTubeGraph;
+  mitk::TubeGraphProperty::Pointer              m_ActiveProperty;
+  mitk::TubeGraphDataInteractor::Pointer        m_ActiveInteractor;
+  mitk::TubeGraphDataInteractor::ActivationMode m_ActivationMode;
 
   /* std::vector<QString> m_LabelGroupName;
   std::vector<QString> m_LabelName;*/

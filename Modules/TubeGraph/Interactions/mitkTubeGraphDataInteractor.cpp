@@ -45,8 +45,8 @@ void mitk::TubeGraphDataInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION("isOverTube", CheckOverTube);
 
   // **Function** in the statmachine patterns also referred to as **Actions**
-  CONNECT_FUNCTION("selectObject",SelectObject);
-  CONNECT_FUNCTION("deselectObject",DeselectObject);
+  CONNECT_FUNCTION("selectTube",SelectTube);
+  CONNECT_FUNCTION("deselectTube",DeselectTube);
 }
 
 void mitk::TubeGraphDataInteractor::DataNodeChanged()
@@ -88,7 +88,7 @@ bool mitk::TubeGraphDataInteractor::CheckOverTube(const InteractionEvent* intera
     return false;
 }
 
-bool mitk::TubeGraphDataInteractor::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   if (m_TubeGraph.IsNull())
     return false;
@@ -109,7 +109,7 @@ bool mitk::TubeGraphDataInteractor::SelectObject(StateMachineAction*, Interactio
   return true;
 }
 
-bool mitk::TubeGraphDataInteractor::DeselectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::TubeGraphDataInteractor::DeselectTube(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   if (m_TubeGraph.IsNull())
     return false;

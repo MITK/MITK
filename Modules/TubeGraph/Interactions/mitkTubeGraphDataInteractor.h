@@ -98,8 +98,8 @@ namespace mitk
     * Initializes the movement, stores starting position.
     */
     virtual bool CheckOverTube (const InteractionEvent *);
-    virtual bool SelectObject (StateMachineAction*, InteractionEvent*);
-    virtual bool DeselectObject (StateMachineAction*, InteractionEvent*);
+    virtual bool SelectTube (StateMachineAction*, InteractionEvent*);
+    virtual bool DeselectTube (StateMachineAction*, InteractionEvent*);
 
     void SelectTubesByActivationModus();
     void UpdateActivation();

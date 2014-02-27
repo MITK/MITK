@@ -1,4 +1,4 @@
-SET (H_FILES
+set (H_FILES
   #Algorithms/mitkTubeGraphConverter.h
   DataStructure/mitkUndirectedGraph.h
   DataStructure/mitkUndirectedGraph.txx
@@ -7,7 +7,7 @@ SET (H_FILES
   DataStructure/mitkTubeGraph.h
   DataStructure/mitkTubeGraphEdge.h
   DataStructure/mitkTubeGraphVertex.h
-  Interactions/mitkTubeGraphInteractor.h
+  #Interactions/mitkTubeGraphInteractor.h
   Interactions/mitkTubeGraphDataInteractor.h
   Interactions/mitkTubeGraphPicker.h
   IODataStructures/mitkTubeGraphDefinitions.h
@@ -21,13 +21,13 @@ SET (H_FILES
   Rendering/mitkTubeGraphProperty.h
   Rendering/mitkTubeGraphVtkMapper3D.h
 )
-SET(CPP_FILES
+set(CPP_FILES
   #Algorithms/mitkTubeGraphConverter.cpp
   DataStructure/mitkCircularProfileTubeElement.cpp
   DataStructure/mitkTubeGraph.cpp
   DataStructure/mitkTubeGraphEdge.cpp
   DataStructure/mitkTubeGraphVertex.cpp
-  Interactions/mitkTubeGraphInteractor.cpp
+  #Interactions/mitkTubeGraphInteractor.cpp
   Interactions/mitkTubeGraphDataInteractor.cpp
   Interactions/mitkTubeGraphPicker.cpp
   IODataStructures/mitkTubeGraphDefinitions.cpp
@@ -40,4 +40,8 @@ SET(CPP_FILES
   Rendering/mitkTubeGraphGeometry3D.cpp
   Rendering/mitkTubeGraphProperty.cpp
   Rendering/mitkTubeGraphVtkMapper3D.cpp
+)
+set(RESOURCE_FILES
+ Interactions/TubeGraphConfig.xml
+ Interactions/TubeGraphInteraction.xml
 )

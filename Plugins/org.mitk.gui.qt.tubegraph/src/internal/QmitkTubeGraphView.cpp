@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGlobalInteraction.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkTubeGraphObjectFactory.h"
+#include "usModuleRegistry.h"
 #include "QmitkTubeGraphLabelGroupWidget.h"
 #include "QmitkTubeGraphDeleteLabelGroupDialog.h"
 #include "QmitkTubeGraphNewLabelGroupDialog.h"
@@ -31,10 +32,10 @@ const std::string QmitkTubeGraphView::VIEW_ID = "org.mitk.views.tubegraph";
 
 
 QmitkTubeGraphView::QmitkTubeGraphView()
-:QmitkAbstractView(),
-m_ActiveTubeGraph(),
-m_ActiveProperty(),
-m_ActivationMode(mitk::TubeGraphInteractor::None)
+  :QmitkAbstractView(),
+  m_ActiveTubeGraph(),
+  m_ActiveProperty(),
+  m_ActivationMode(mitk::TubeGraphDataInteractor::None)
 {
   // Has to be called to register Reader/Writer/Renderer etc .. for TubeGraph
   RegisterTubeGraphObjectFactory();
@@ -43,11 +44,11 @@ m_ActivationMode(mitk::TubeGraphInteractor::None)
 QmitkTubeGraphView::~QmitkTubeGraphView()
 {
   delete m_Parent;
-  m_ActivationMode.mitk::TubeGraphInteractor::ActivationMode::~ActivationMode();
+  m_ActivationMode.mitk::TubeGraphDataInteractor::ActivationMode::~ActivationMode();
 
   //remove observer
-  if (m_ActiveInteractor.IsNotNull())
-    m_ActiveInteractor->RemoveObserver(m_InformationChangedObserverTag);
+  //if (m_ActiveInteractor.IsNotNull())
+  //m_ActiveInteractor->RemoveObserver(m_InformationChangedObserverTag);
 
 }
 
@@ -68,8 +69,9 @@ void QmitkTubeGraphView::NodeRemoved(const mitk::DataNode* node)
 {
   if (dynamic_cast<mitk::TubeGraph*> (node->GetData()))
   {
-    node->GetInteractor()->RemoveAllObservers();
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(node->GetInteractor());
+    //node->GetDataInteractor()->RemoveAllObservers();
+
+    //mitk::GlobalInteraction::GetInstance()->RemoveInteractor(node->GetInteractor());
   }
 }
 
@@ -166,35 +168,40 @@ void QmitkTubeGraphView::UpdateActiveTubeGraphInInteractors()
     ++it)
   {
     mitk::DataNode::Pointer node = it.Value().GetPointer();
-    if ( node->GetInteractor() == NULL )
+    if ( node->GetDataInteractor().IsNull() )
     {
-      mitk::TubeGraphInteractor::Pointer tubeGraphInteractor = mitk::TubeGraphInteractor::New( "TubeGraphInteraction", node );
-      node->SetInteractor( tubeGraphInteractor );
-      tubeGraphInteractor->SetCurrentSelectedDataNode(m_Controls.activeGraphComboBox->GetSelectedNode());
+      mitk::TubeGraphDataInteractor::Pointer tubeGraphInteractor = mitk::TubeGraphDataInteractor::New();
+      tubeGraphInteractor->LoadStateMachine("TubeGraphInteraction.xml", us::ModuleRegistry::GetModule("MitkTubeGraph"));
+      tubeGraphInteractor->SetEventConfig("TubeGraphConfig.xml", us::ModuleRegistry::GetModule("MitkTubeGraph"));
       tubeGraphInteractor->SetActivationMode(m_ActivationMode);
-      mitk::GlobalInteraction::GetInstance()->AddInteractor(tubeGraphInteractor);
+      tubeGraphInteractor->SetDataNode(node);
+
+      /*node->SetInteractor( tubeGraphInteractor );
+      tubeGraphInteractor->SetCurrentSelectedDataNode(m_Controls.activeGraphComboBox->GetSelectedNode());
+      mitk::GlobalInteraction::GetInstance()->AddInteractor(tubeGraphInteractor);*/
     }
   }
 
   if (m_ActiveTubeGraph.IsNotNull())
   {
     //remove old observer
-    if (m_ActiveInteractor.IsNotNull())
-      m_ActiveInteractor->RemoveObserver(m_InformationChangedObserverTag);
+   // if (m_ActiveInteractor.IsNotNull())
+      //  m_ActiveInteractor->RemoveObserver(m_InformationChangedObserverTag);
 
-    mitk::DataNode::Pointer node = m_Controls.activeGraphComboBox->GetSelectedNode();
+        mitk::DataNode::Pointer node = m_Controls.activeGraphComboBox->GetSelectedNode();
     //set active interactor to interactor from selected node
-    m_ActiveInteractor = dynamic_cast< mitk::TubeGraphInteractor*> (node->GetInteractor());
+    m_ActiveInteractor = dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer());
+
     m_ActiveInteractor->SetActivationMode(m_ActivationMode);
 
     //add observer to activeInteractor
     typedef itk::SimpleMemberCommand< QmitkTubeGraphView > SimpleCommandType;
     SimpleCommandType::Pointer changeInformationCommand = SimpleCommandType::New();
     changeInformationCommand->SetCallbackFunction(this, &QmitkTubeGraphView::SelectionInformationChanged);
-    m_InformationChangedObserverTag = m_ActiveInteractor->AddObserver(mitk::SelectionChangedTubeGraphEvent(), changeInformationCommand);
+    //m_InformationChangedObserverTag = m_ActiveInteractor->AddObserver(mitk::SelectionChangedTubeGraphEvent(), changeInformationCommand);
 
-    //Add selected node to all tube graph interactors as current node
-    mitk::TubeGraphInteractor::SetCurrentSelectedDataNode( node );
+    ////Add selected node to all tube graph interactors as current node
+    //mitk::TubeGraphDataInteractor::SetCurrentSelectedDataNode( node );
 
     if (m_ActiveProperty.IsNull())
     {
@@ -225,24 +232,24 @@ void QmitkTubeGraphView::UpdateLabelGroups()
 void QmitkTubeGraphView::OnActivationModeChanged()
 {
   if (m_Controls.noneModeRadioButton->isChecked())
-    m_ActivationMode = mitk::TubeGraphInteractor::None;
+    m_ActivationMode = mitk::TubeGraphDataInteractor::None;
   else if (m_Controls.singleModeRadioButton->isChecked())
-    m_ActivationMode = mitk::TubeGraphInteractor::Single;
+    m_ActivationMode = mitk::TubeGraphDataInteractor::Single;
   else if (m_Controls.multipleModeRadioButton->isChecked())
-    m_ActivationMode = mitk::TubeGraphInteractor::Multiple;
+    m_ActivationMode = mitk::TubeGraphDataInteractor::Multiple;
   else if (m_Controls.rootModeRadioButton->isChecked())
-    m_ActivationMode = mitk::TubeGraphInteractor::ToRoot;
+    m_ActivationMode = mitk::TubeGraphDataInteractor::ToRoot;
   else if (m_Controls.peripheryModeRadioButton->isChecked())
-    m_ActivationMode = mitk::TubeGraphInteractor::ToPeriphery;
+    m_ActivationMode = mitk::TubeGraphDataInteractor::ToPeriphery;
   else if (m_Controls.pointModeRadioButton->isChecked())
-    m_ActivationMode = mitk::TubeGraphInteractor::Points;
+    m_ActivationMode = mitk::TubeGraphDataInteractor::Points;
   else //normally not possible, but.... set to single mode
-    m_ActivationMode = mitk::TubeGraphInteractor::Single;
+    m_ActivationMode = mitk::TubeGraphDataInteractor::Single;
 
   mitk::DataNode::Pointer node = m_Controls.activeGraphComboBox->GetSelectedNode();
   if(node.IsNotNull() && m_ActiveProperty.IsNotNull())
   {
-    dynamic_cast< mitk::TubeGraphInteractor*>(node->GetInteractor())->SetActivationMode(m_ActivationMode);
+    dynamic_cast< mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer())->SetActivationMode(m_ActivationMode);
 
     //m_ActiveTubeGraph->Modified();
     // render new selection
@@ -250,7 +257,7 @@ void QmitkTubeGraphView::OnActivationModeChanged()
   }
 }
 
-mitk::TubeGraphInteractor::ActivationMode QmitkTubeGraphView::GetActivationMode ()
+mitk::TubeGraphDataInteractor::ActivationMode QmitkTubeGraphView::GetActivationMode ()
 {
   return m_ActivationMode;
 }
@@ -264,9 +271,9 @@ void QmitkTubeGraphView::OnSetRootToggled(bool enable)
     if(node.IsNotNull())
     {
       if (enable)
-        dynamic_cast<mitk::TubeGraphInteractor*>(node->GetInteractor())->SetActionMode(mitk::TubeGraphInteractor::RootMode);
+        dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer())->SetActionMode(mitk::TubeGraphDataInteractor::RootMode);
       else
-        dynamic_cast<mitk::TubeGraphInteractor*>(node->GetInteractor())->SetActionMode(mitk::TubeGraphInteractor::AttributationMode);
+        dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer())->SetActionMode(mitk::TubeGraphDataInteractor::AttributationMode);
     }
   }
 }
@@ -275,7 +282,7 @@ void QmitkTubeGraphView::OnDeselectAllTubes()
 {
   mitk::DataNode::Pointer node = m_Controls.activeGraphComboBox->GetSelectedNode();
   if(node.IsNotNull())
-    dynamic_cast<mitk::TubeGraphInteractor*>(node->GetInteractor())->ResetPickedTubes();
+    dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer())->ResetPickedTubes();
 
   if (m_ActiveProperty.IsNull())
   {
@@ -293,17 +300,17 @@ void QmitkTubeGraphView::OnTabSwitched(int tabIndex)
   mitk::DataNode::Pointer node = m_Controls.activeGraphComboBox->GetSelectedNode();
   if(node.IsNotNull())
   {
-    if (dynamic_cast<mitk::TubeGraphInteractor*>(node->GetInteractor()) == 0)
+    if (dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer()) == 0)
     {
-      /* this->UpdateActiveTubeGraphInInteractors();
-      if (dynamic_cast<mitk::TubeGraphInteractor::Pointer>(node->GetInteractor()).IsNull());*/
+      this->UpdateActiveTubeGraphInInteractors();
+      /* if (dynamic_cast<mitk::TubeGraphDataInteractor::Pointer>(node->GetDataInteractor().GetPointer()).IsNull());*/
       return;
     }
 
     switch(tabIndex)
     {
     case 0:
-      dynamic_cast<mitk::TubeGraphInteractor*>(node->GetInteractor())->SetActionMode(mitk::TubeGraphInteractor::AttributationMode);
+      dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer())->SetActionMode(mitk::TubeGraphDataInteractor::AttributationMode);
       m_Controls.noneModeRadioButton->setEnabled(true);
       m_Controls.singleModeRadioButton->setEnabled(true);
       m_Controls.multipleModeRadioButton->setEnabled(true);
@@ -312,7 +319,7 @@ void QmitkTubeGraphView::OnTabSwitched(int tabIndex)
       m_Controls.pointModeRadioButton->setEnabled(true);
       break;
     case 1:
-      dynamic_cast<mitk::TubeGraphInteractor*>(node->GetInteractor())->SetActionMode(mitk::TubeGraphInteractor::AnnotationMode);
+      dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer())->SetActionMode(mitk::TubeGraphDataInteractor::AnnotationMode);
       m_ActiveProperty->DeactivateAllTubes();
       m_Controls.noneModeRadioButton->setEnabled(true);
       m_Controls.singleModeRadioButton->setEnabled(true);
@@ -322,7 +329,7 @@ void QmitkTubeGraphView::OnTabSwitched(int tabIndex)
       m_Controls.pointModeRadioButton->setEnabled(false);
       break;
     case 2:
-      dynamic_cast<mitk::TubeGraphInteractor*>(node->GetInteractor())->SetActionMode(mitk::TubeGraphInteractor::EditMode);
+      dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer())->SetActionMode(mitk::TubeGraphDataInteractor::EditMode);
       m_Controls.noneModeRadioButton->setEnabled(true);
       m_Controls.singleModeRadioButton->setEnabled(true);
       m_Controls.multipleModeRadioButton->setEnabled(true);
@@ -331,7 +338,7 @@ void QmitkTubeGraphView::OnTabSwitched(int tabIndex)
       m_Controls.pointModeRadioButton->setEnabled(true);
       break;
     case 3:
-      dynamic_cast<mitk::TubeGraphInteractor*>(node->GetInteractor())->SetActionMode(mitk::TubeGraphInteractor::InformationMode);
+      dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer())->SetActionMode(mitk::TubeGraphDataInteractor::InformationMode);
       m_Controls.noneModeRadioButton->setEnabled(false);
       m_Controls.singleModeRadioButton->setEnabled(false);
       m_Controls.multipleModeRadioButton->setEnabled(false);
@@ -501,10 +508,15 @@ void QmitkTubeGraphView::OnSeperateSelection()
     newGraphNode->SetData(subGraph);
     newGraphNode->SetName(originGraphNode->GetName() + "-SubGraph");
 
-    mitk::TubeGraphInteractor::Pointer tubeGraphInteractor = mitk::TubeGraphInteractor::New( "TubeGraphInteraction", newGraphNode );
+    mitk::TubeGraphDataInteractor::Pointer tubeGraphInteractor = mitk::TubeGraphDataInteractor::New();
+    tubeGraphInteractor->LoadStateMachine("TubeGraphInteraction.xml", us::ModuleRegistry::GetModule("TubeGraph"));
+    tubeGraphInteractor->SetEventConfig("TubeGraphConfig.xml", us::ModuleRegistry::GetModule("TubeGraph"));
+    tubeGraphInteractor->SetDataNode(newGraphNode);
+
+    /* mitk::TubeGraphDataInteractor::Pointer tubeGraphInteractor = mitk::TubeGraphDataInteractor::New( "TubeGraphInteraction", newGraphNode );
     newGraphNode->SetInteractor( tubeGraphInteractor );
     tubeGraphInteractor->SetCurrentSelectedDataNode(m_Controls.activeGraphComboBox->GetSelectedNode());
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(tubeGraphInteractor);
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(tubeGraphInteractor);*/
 
 
     mitk::TubeGraphProperty::Pointer newProperty = mitk::TubeGraphProperty::New();

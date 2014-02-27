@@ -197,18 +197,22 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
       rightMostPoint = displayPoint;
   }
 
+  // If the planarfigure is closed, we add the first control point again.
+  // Thus we can always use 'GL_LINE_STRIP' and get rid of strange flickering
+  // effect when using the MESA OpenGL library.
+  if ( closed )
+  {
+    mitk::Point2D displayPoint;
+    this->TransformObjectToDisplay( vertices.begin()->Point, displayPoint,
+      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+
+    pointlist.push_back( displayPoint );
+  }
+
   // now paint all the points in one run
   std::vector<mitk::Point2D>::iterator pointIter;
 
-  if ( closed )
-  {
-    glBegin( GL_LINE_LOOP );
-  }
-  else
-  {
-    glBegin( GL_LINE_STRIP );
-  }
-
+  glBegin( GL_LINE_STRIP );
   for ( pointIter = pointlist.begin(); pointIter!=pointlist.end(); pointIter++ )
   {
     glVertex3f( (*pointIter)[0], (*pointIter)[1], PLANAR_OFFSET );

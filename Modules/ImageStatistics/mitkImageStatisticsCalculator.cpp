@@ -146,6 +146,49 @@ ImageStatisticsCalculator::Statistics::~Statistics()
   delete m_HotspotStatistics;
 }
 
+double ImageStatisticsCalculator::Statistics::GetVariance() const
+{
+  return this->Variance;
+}
+
+void ImageStatisticsCalculator::Statistics::SetVariance( const double value )
+{
+  if( this->Variance != value )
+  {
+    if( value < 0.0 )
+    {
+      this->Variance = 0.0; // if given value is negative set variance to 0.0
+    }
+    else
+    {
+      this->Variance = value;
+    }
+  }
+}
+
+double ImageStatisticsCalculator::Statistics::GetSigma() const
+{
+  return this->Sigma;
+}
+
+void ImageStatisticsCalculator::Statistics::SetSigma( const double value )
+{
+  if( this->Sigma != value )
+  {
+    // for some compiler the value != value works to check for NaN but not for all
+    // but we can always be sure that the standard deviation is a positive value
+    if( value != value || value < 0.0 )
+    {
+      // if standard deviation is NaN we just assume 0.0
+      this->Sigma = 0.0;
+    }
+    else
+    {
+      this->Sigma = value;
+    }
+  }
+}
+
 void ImageStatisticsCalculator::Statistics::Reset(unsigned int dimension)
 {
   SetLabel(0);
@@ -960,6 +1003,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   statistics.SetMax(statisticsFilter->GetMaximum());
   statistics.SetMean(statisticsFilter->GetMean());
   statistics.SetMedian(0.0);
+  statistics.SetVariance(statisticsFilter->GetVariance());
   statistics.SetSigma(statisticsFilter->GetSigma());
   statistics.SetRMS(sqrt( statistics.GetMean() * statistics.GetMean() + statistics.GetSigma() * statistics.GetSigma() ));
 
@@ -1240,6 +1284,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.SetMax(labelStatisticsFilter->GetMaximum( *it ));
       statistics.SetMean(labelStatisticsFilter->GetMean( *it ));
       statistics.SetMedian(labelStatisticsFilter->GetMedian( *it ));
+      statistics.SetVariance(labelStatisticsFilter->GetVariance( *it ));
       statistics.SetSigma(labelStatisticsFilter->GetSigma( *it ));
       statistics.SetRMS(sqrt( statistics.GetMean() * statistics.GetMean()
         + statistics.GetSigma() * statistics.GetSigma() ));
@@ -1715,6 +1760,7 @@ ImageStatisticsCalculator::CalculateHotspotStatistics(
       hotspotStatistics.SetMin(labelStatisticsFilter->GetMinimum(1));
       hotspotStatistics.SetMax(labelStatisticsFilter->GetMaximum(1));
       hotspotStatistics.SetMedian(labelStatisticsFilter->GetMedian(1));
+      hotspotStatistics.SetVariance(labelStatisticsFilter->GetVariance(1));
       hotspotStatistics.SetSigma(labelStatisticsFilter->GetSigma(1));
       hotspotStatistics.SetRMS(sqrt( hotspotStatistics.GetMean() * hotspotStatistics.GetMean()
             + hotspotStatistics.GetSigma() * hotspotStatistics.GetSigma() ));

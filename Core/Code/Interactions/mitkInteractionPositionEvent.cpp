@@ -18,26 +18,19 @@
 #include <string>
 
 mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* baseRenderer,
-    const mitk::Point2D& mousePosition)
+    const mitk::Point2D& mousePosition, const mitk::Point3D& worldPosition )
 : InteractionEvent(baseRenderer)
 , m_PointerPosition(mousePosition)
+, m_WorldPosition(worldPosition)
 {
-  if (GetSender() != NULL)
-  {
-    m_WorldPosition = GetSender()->Map2DRendererPositionTo3DWorldPosition(&m_PointerPosition);
-  }
-  else
-  {
-    m_WorldPosition.Fill(0);
-  }
 }
 
-const mitk::Point2D mitk::InteractionPositionEvent::GetPointerPositionOnScreen() const
+mitk::Point2D mitk::InteractionPositionEvent::GetPointerPositionOnScreen() const
 {
   return m_PointerPosition;
 }
 
-const mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld() const
+mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld() const
 {
   return m_WorldPosition;
 }

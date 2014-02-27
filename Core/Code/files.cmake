@@ -247,6 +247,7 @@ set(CPP_FILES
   Interactions/mitkEventFactory.cpp
   Interactions/mitkInteractionEventHandler.cpp
   Interactions/mitkEventMapper.cpp
+  Interactions/mitkEventRecorder.cpp
   Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp
   Interactions/mitkInteractor.cpp
@@ -283,6 +284,7 @@ set(CPP_FILES
   Interactions/mitkVtkEventAdapter.cpp
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkCrosshairPositionEvent.cpp
+  Interactions/mitkXML2EventParser.cpp
 
   Interfaces/mitkInteractionEventObserver.cpp
   Interfaces/mitkIShaderRepository.cpp

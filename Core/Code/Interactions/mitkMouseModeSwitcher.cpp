@@ -45,7 +45,6 @@ void mitk::MouseModeSwitcher::InitializeListeners()
     props["name"] = std::string("DisplayInteractor");
     m_ServiceRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>(
         m_CurrentObserver.GetPointer(),props);
-
   }
 }
 

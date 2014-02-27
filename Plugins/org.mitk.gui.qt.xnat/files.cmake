@@ -20,9 +20,7 @@ set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_xnatinterface_Activator.h
   src/internal/QmitkXnatEditor.h
   src/internal/QmitkXnatTreeBrowserView.h
-  src/internal/QmitkXnatObjectEditorInput.h
   src/internal/QmitkXnatConnectionPreferencePage.h
-  src/internal/QmitkXnatConnectionManager.h
 )
 
 # list of resource files which can be used by the plug-in

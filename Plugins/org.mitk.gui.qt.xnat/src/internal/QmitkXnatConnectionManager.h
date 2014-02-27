@@ -18,15 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKXNATCONNECTIONMANAGER_H_
 #define QMITKXNATCONNECTIONMANAGER_H_
 
-#include <QObject>
 #include <berryIPreferencesService.h>
 
 #include "ctkXnatSession.h"
 #include "ctkXnatLoginProfile.h"
 
-class QmitkXnatConnectionManager : public QObject
+class QmitkXnatConnectionManager
 {
-  Q_OBJECT
 
 public:
 

@@ -194,8 +194,32 @@ public:
     mitkSetGetConstMacro(Max, double)
     mitkSetGetConstMacro(Mean, double)
     mitkSetGetConstMacro(Median, double)
-    mitkSetGetConstMacro(Variance, double)
-    mitkSetGetConstMacro(Sigma, double)
+
+    double GetVariance() const;
+    /** \brief Set variance
+    *
+    * This method checks whether the variance is negative:
+    *   The reason that the variance may be negative is that the underlying itk::LabelStatisticsImageFilter uses a naïve algorithm
+    *   for calculating the variance ( http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance ) which can lead to negative values
+    *   due to rounding errors.
+    *
+    * If the variance is negative the value will be set to 0.0, else the given value will be set.
+    */
+    void SetVariance( const double );
+
+    double GetSigma() const;
+    /** \brief Set standard deviation (sigma)
+    *
+    * This method checks if the given standard deviation is a positive value. This is done because the underlying itk::LabelStatisticsImageFilter uses
+    * a naïve algorithm to calculate the variance. This may lead to a negative variance and because the square root of the variance is taken it also
+    * leads to NaN for sigma.
+    *
+    * If the given value is not reasonable the value will be set to 0.0, else the given value will be set.
+    *
+    * \see SetVariance()
+    */
+    void SetSigma( const double );
+
     mitkSetGetConstMacro(RMS, double)
     mitkSetGetConstMacro(MinIndex, vnl_vector<int>)
     mitkSetGetConstMacro(MaxIndex, vnl_vector<int>)

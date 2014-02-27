@@ -1,10 +1,4 @@
-if(APPLE)
-  # With XCode 4.3, the SDK location changed. Older CMake
-  # versions are not able to find it.
-  cmake_minimum_required(VERSION 2.8.8)
-else()
-  cmake_minimum_required(VERSION 2.8.5)
-endif()
+cmake_minimum_required(VERSION 2.8.8)
 
 #-----------------------------------------------------------------------------
 # Include ctest launchers for dashboard in case of makefile generator

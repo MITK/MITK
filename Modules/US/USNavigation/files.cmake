@@ -4,9 +4,6 @@ SET(CPP_FILES
   Filter/mitkNavigationDataPassThroughFilter.cpp
   Filter/mitkNeedleProjectionFilter.cpp
   Filter/mitkNodeDisplacementFilter.cpp
-
-  Interactors/mitkUSZonesInteractor.cpp
-  Interactors/mitkUSPointMarkInteractor.cpp
 )
 
 SET(RESOURCE_FILES

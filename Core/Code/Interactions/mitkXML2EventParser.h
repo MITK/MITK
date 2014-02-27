@@ -39,7 +39,7 @@ namespace mitk
    * @sa EventRecorder
    * @ingroup Interaction
    **/
-class XML2EventParser : public vtkXMLParser
+class MITK_CORE_EXPORT XML2EventParser : public vtkXMLParser
 {
 
 public:

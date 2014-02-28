@@ -64,7 +64,6 @@ public:
   bool IsDirty() const;
   bool IsSaveAsAllowed() const;
   void SetInput(berry::IEditorInput::Pointer input);
-  const char* GetClassNameA() const;
 
   /**
   \brief Here the root object will be set and the view reset. Additionally the breadcrumbs will set visible.

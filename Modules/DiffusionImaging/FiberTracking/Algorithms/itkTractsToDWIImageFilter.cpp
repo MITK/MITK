@@ -358,8 +358,16 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             resampler->SetSize(m_UpsampledImageRegion.GetSize());
             resampler->SetOutputSpacing(m_UpsampledSpacing);
             resampler->SetOutputOrigin(m_UpsampledOrigin);
+            itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType, double>::Pointer nn_interpolator
+                    = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType, double>::New();
+            resampler->SetInterpolator(nn_interpolator);
             resampler->Update();
             m_Parameters.m_MaskImage = resampler->GetOutput();
+
+            itk::ImageFileWriter<ItkUcharImgType>::Pointer w = itk::ImageFileWriter<ItkUcharImgType>::New();
+            w->SetFileName("/local/mask_ups.nrrd");
+            w->SetInput(m_Parameters.m_MaskImage);
+            w->Update();
         }
         // resample frequency map
         if (m_Parameters.m_FrequencyMap.IsNotNull())
@@ -370,6 +378,9 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             resampler->SetSize(m_UpsampledImageRegion.GetSize());
             resampler->SetOutputSpacing(m_UpsampledSpacing);
             resampler->SetOutputOrigin(m_UpsampledOrigin);
+            itk::NearestNeighborInterpolateImageFunction<ItkDoubleImgType, double>::Pointer nn_interpolator
+                    = itk::NearestNeighborInterpolateImageFunction<ItkDoubleImgType, double>::New();
+            resampler->SetInterpolator(nn_interpolator);
             resampler->Update();
             m_Parameters.m_FrequencyMap = resampler->GetOutput();
         }
@@ -498,8 +509,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     upsampler->SetSize(upsampledImageRegion.GetSize());
     upsampler->SetOutputSpacing(upsampledSpacing);
     upsampler->SetOutputOrigin(upsampledOrigin);
-    itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType>::Pointer nn_interpolator
-            = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType>::New();
+    itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType, double>::Pointer nn_interpolator
+            = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType, double>::New();
     upsampler->SetInterpolator(nn_interpolator);
     upsampler->Update();
     upsampledTissueMask = upsampler->GetOutput();

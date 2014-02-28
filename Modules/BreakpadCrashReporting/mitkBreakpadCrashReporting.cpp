@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLogMacros.h"
 
 
-#ifdef WIN32
+#ifdef Q_OS_WIN
 
 #include <windows.h>
 #include <tchar.h>
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "client/windows/handler/exception_handler.h"
 #include "client/windows/common/ipc_protocol.h"
 
-#elif __APPLE__
+#elif Q_OS_MAC
 
 #include <client/mac/handler/exception_handler.h>
 #include <sys/wait.h>
@@ -44,6 +44,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #endif
 
+#include <QApplication>
+#include <QDir>
+#include <QMessageBox>
+#include <QProcess>
+
 #include <itksys/SystemTools.hxx>
 
 static bool breakpadOnceConnected = false;            // indicates a server having had at least one client connection
@@ -53,34 +58,7 @@ static int  breakpadNumberOfConnections = 0;          // current number of conne
 static int  numberOfConnectionAttemptsPerformed = 1;  // number of performed re-connect attempts of a crash client
 #endif
 
-// Get application path: there is no cross-plattform standard c++ method which can get the executable path
-// (other toolkits offer it, e.g. Qt).
-// Currently only for Windows and Linux implemented:
-std::string mitk::BreakpadCrashReporting::GetModulePath() {
-#ifdef WIN32
-  TCHAR path[MAX_PATH];
-  if( GetModuleFileName( NULL, path, MAX_PATH ) )
-  {
-    std::string pathString = path;
-    pathString.erase( pathString.find_last_of("\\") );
-    return pathString;
-  }
-#elif __gnu_linux__
-  char buff[1024];
-  ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
-  if (len != -1) {
-    buff[len] = '\0';
-    std::string path = buff;
-    path.erase( path.find_last_of("/") );
-    return path;
-  } else {
-    /* handle error condition */
-  }
-#endif
-  return "";
-}
-
-mitk::BreakpadCrashReporting::BreakpadCrashReporting( const std::string& dumpPath )
+mitk::BreakpadCrashReporting::BreakpadCrashReporting( const QString& dumpPath )
 : m_CrashServer(NULL)
 , m_ExceptionHandler(NULL)
 , m_CrashDumpPath( dumpPath )
@@ -89,13 +67,13 @@ mitk::BreakpadCrashReporting::BreakpadCrashReporting( const std::string& dumpPat
 , client_fd(-1)
   // Windows connection parameters
 , m_NamedPipeString("\\\\.\\pipe\\MitkCrashServices\\MitkBasedApplication")
-, m_CrashReportingServerExecutable( GetModulePath() + "/CrashReportingServer.exe" )
+,  m_CrashReportingServerExecutable( QDir(QCoreApplication::instance()->applicationDirPath()).absolutePath().append("/CrashReportingServer.exe") )
 , m_NumberOfConnectionAttempts(3)
 , m_ReconnectDelay(300)
 {
-  if ( m_CrashDumpPath.empty() )
+  if ( m_CrashDumpPath.isEmpty() )
   {
-    m_CrashDumpPath = GetModulePath() + "/CrashDumps"; // ToDo: what happens if GetModulePath returns emtpy string
+    m_CrashDumpPath = QDir(QCoreApplication::instance()->applicationDirPath()).absolutePath() + "/CrashDumps";
   }
 }
 
@@ -124,6 +102,8 @@ bool BreakpadCrashReportingDumpCallbackWindows(const wchar_t* dump_path,
     NO STACK USE, NO HEAP USE IN THIS FUNCTION
     Creating QString's, using qDebug, etc. - everything is crash-unfriendly.
   */
+  //QMessageBox::information( NULL, "Application problem", "The application encountered an error. \n\n A detailed error report may have been written - contact support.", QMessageBox::Ok );
+
   return succeeded;
 }
 
@@ -145,9 +125,9 @@ bool mitk::BreakpadCrashReporting::DumpCallbackPlatformIndependent()
 void mitk::BreakpadCrashReporting::InitializeClientHandler(bool connectToCrashGenerationServer)
 {
 #ifdef WIN32  // http://stackoverflow.com/questions/5625884/conversion-of-stdwstring-to-qstring-throws-linker-error
-  std::wstring dump_path( m_CrashDumpPath.begin(), m_CrashDumpPath.end() );
+  std::wstring dump_path = std::wstring((const wchar_t *)m_CrashDumpPath.utf16());
 #else
-  std::string dump_path = m_CrashDumpPath;
+  std::string dump_path = m_CrashDumpPath.toStdString();
 #endif
 
 
@@ -160,8 +140,8 @@ void mitk::BreakpadCrashReporting::InitializeClientHandler(bool connectToCrashGe
   const wchar_t* pipe;
   if(connectToCrashGenerationServer)
   {
-     pipe = (const wchar_t*)m_NamedPipeString.c_str();
-     MITK_INFO << "Initializing Breakpad Crash Handler, connecting to named pipe: " << m_NamedPipeString.c_str() << "\n";
+     pipe = (const wchar_t*)m_NamedPipeString.utf16();
+     MITK_INFO << "Initializing Breakpad Crash Handler, connecting to named pipe: " << m_NamedPipeString.toStdString().c_str() << "\n";
   }
   else
   {
@@ -320,26 +300,29 @@ bool mitk::BreakpadCrashReporting::StartCrashServer(bool lauchOutOfProcessExecut
     return true; // assume we are fine since we got here..
   }
 
-#elif WIN32
+#endif
 
   if(lauchOutOfProcessExecutable)
   { // spawn process and launch CrashReportingServer executable
-    std::string commandline = m_CrashReportingServerExecutable + " \"" + m_NamedPipeString + "\" " + m_CrashDumpPath;
-    int success =  system( commandline.c_str() );
+    QString tmpPipeString           = m_NamedPipeString;
+    QString tmpCrashDumpPathString  = m_CrashDumpPath;
+    QStringList arguments;
+    arguments << tmpPipeString.prepend('"').append('"');
+    arguments << tmpCrashDumpPathString.prepend('"').append('"');
+    bool success =  QProcess::startDetached( m_CrashReportingServerExecutable, arguments);
 
-    return ( success != -1 );
+    return success;
   }
   else
   { // directly open up server instance in this thread
     return InitializeServer();
   }
-
-#endif
 }
 
 bool mitk::BreakpadCrashReporting::InitializeServer( int listen_fd )
 {
-  itksys::SystemTools::MakeDirectory(m_CrashDumpPath.c_str()); // Make sure directory is created.
+  QDir myDir;
+  myDir.mkpath(m_CrashDumpPath); // Assure directory is created.
 
   google_breakpad::CrashGenerationServer::OnClientDumpRequestCallback dump_callback = &ShowClientCrashed;
 #ifdef WIN32
@@ -352,8 +335,8 @@ bool mitk::BreakpadCrashReporting::InitializeServer( int listen_fd )
   void* exit_context = NULL;
 
 #ifdef WIN32  // http://stackoverflow.com/questions/5625884/conversion-of-stdwstring-to-qstring-throws-linker-error
-  std::wstring dump_path(m_CrashDumpPath.begin(), m_CrashDumpPath.end() );
-  std::wstring pipe_name( m_NamedPipeString.begin(), m_NamedPipeString.end() );
+  std::wstring dump_path = std::wstring((const wchar_t *)m_CrashDumpPath.utf16());
+  std::wstring pipe_name = std::wstring((const wchar_t *)m_NamedPipeString.utf16());
   m_CrashServer = new google_breakpad::CrashGenerationServer(pipe_name,
                                            NULL,
                                            ShowClientConnected, // connect callback
@@ -367,7 +350,7 @@ bool mitk::BreakpadCrashReporting::InitializeServer( int listen_fd )
                                            true,
                                            &dump_path);
 #elif __gnu_linux__
-  std::string dump_path = m_CrashDumpPath;
+  std::string dump_path = m_CrashDumpPath.toStdString();
 
   MITK_INFO << "Start Breakpad crash dump generation server with file descriptor " << listen_fd;
 
@@ -426,28 +409,28 @@ int mitk::BreakpadCrashReporting::GetNumberOfConnections() const
   return breakpadNumberOfConnections;
 }
 
-void mitk::BreakpadCrashReporting::SetNamedPipeName(const std::string& name)
+void mitk::BreakpadCrashReporting::SetNamedPipeName(const QString& name)
 {
   m_NamedPipeString = name;
 }
 
-std::string mitk::BreakpadCrashReporting::GetNamedPipeName() const
+QString mitk::BreakpadCrashReporting::GetNamedPipeName() const
 {
   return m_NamedPipeString;
 }
 
-void mitk::BreakpadCrashReporting::SetCrashDumpPath(const std::string& path)
+void mitk::BreakpadCrashReporting::SetCrashDumpPath(const QString& path)
 {
   m_CrashDumpPath = path;
 }
 
-std::string mitk::BreakpadCrashReporting::GetCrashDumpPath() const
+QString mitk::BreakpadCrashReporting::GetCrashDumpPath() const
 {
   return m_CrashDumpPath;
 }
 
 
-void mitk::BreakpadCrashReporting::SetCrashReportingServerExecutable(const std::string& exe)
+void mitk::BreakpadCrashReporting::SetCrashReportingServerExecutable(QString exe)
 {
   m_CrashReportingServerExecutable = exe;
 }

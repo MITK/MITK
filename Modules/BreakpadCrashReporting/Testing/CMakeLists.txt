@@ -6,8 +6,7 @@ if(BUILD_TESTING)
 if(CMAKE_SYSTEM MATCHES "Windows")
     MITK_CREATE_MODULE_TESTS()
 
-    add_executable(BreakpadCrashReportingDumpTestApplication mitkBreakpadCrashReportingDumpTestApplication.cpp)
-    target_link_libraries(BreakpadCrashReportingDumpTestApplication ${ALL_LIBRARIES} BreakpadCrashReporting)
-endif()
+  set_property(TEST mitkBreakpadCrashReportingDumpTest PROPERTY WILL_FAIL TRUE) # this one SHOULD crash
+  set_property(TEST mitkBreakpadCrashReportingDumpCheckTest PROPERTY DEPENDS mitkBreakpadCrashReportingDumpTest) # this one checks if a dump was created
 
 endif()

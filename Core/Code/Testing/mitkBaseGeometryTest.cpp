@@ -51,6 +51,7 @@ public:
 
   mitkClassMacro(DummyTestClass, mitk::BaseGeometry);
   itkNewMacro(Self);
+  mitkNewMacro1Param(Self,Self);
 
   itkGetConstMacro(IndexToWorldTransformLastModified, unsigned long);
   itkGetConstMacro(VtkMatrix, vtkMatrix4x4*);
@@ -270,7 +271,7 @@ public:
     dummy2->SetSpacing(anotherSpacing);
 
     DummyTestClass::Pointer dummy3;
-    dummy3 = new DummyTestClass(*dummy2);
+    dummy3 = DummyTestClass::New(*dummy2);
     CPPUNIT_ASSERT(mitk::Equal(dummy3,dummy2,mitk::eps,true));
   }
 };

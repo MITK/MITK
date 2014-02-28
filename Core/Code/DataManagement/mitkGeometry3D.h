@@ -95,22 +95,13 @@ namespace mitk {
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
+    mitkNewMacro1Param(Self,Self);
 
     void Initialize();
 
     //##Documentation
-    //## @brief Convenience method for setting the ITK transform
-    //## (m_IndexToWorldTransform) via an vtkMatrix4x4
-    //## \sa SetIndexToWorldTransform
-    virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
-
-    //##Documentation
     //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
     virtual void ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry );
-
-    //##Documentation
-    //## @brief Set the time bounds (in ms)
-    virtual void SetTimeBounds(const TimeBounds& timebounds);
 
     //##Documentation
     //## @brief Get the position of the corner number \a id (in world coordinates)
@@ -125,132 +116,6 @@ namespace mitk {
     Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const;
 
     virtual void InitializeGeometry(Self * newGeometry) const;
-
-    //##Documentation
-    //## @brief Get a VnlVector along bounding-box in the specified
-    //## @a direction, length is spacing
-    //##
-    //## \sa GetAxisVector
-    VnlVector GetMatrixColumn(unsigned int direction) const
-    {
-      return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction);
-    }
-
-    //##Documentation
-    //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates
-    //## \warning If you need (discrete) integer index coordinates (e.g., for iterating easily over an image),
-    //## use WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index).
-    //## For further information about coordinates types, please see the Geometry documentation
-    void WorldToIndex(const mitk::Point3D& pt_mm, mitk::Point3D& pt_units) const;
-
-    //##Documentation
-    //## @brief Convert (continuous or discrete) index coordinates of a \em point to world coordinates (in mm)
-    //## For further information about coordinates types, please see the Geometry documentation
-    void IndexToWorld(const mitk::Point3D& pt_units, mitk::Point3D& pt_mm) const;
-
-    //##Documentation
-    //## @brief Convert (discrete) index coordinates of a \em point to world coordinates (in mm)
-    //## For further information about coordinates types, please see the Geometry documentation
-    template <unsigned int VIndexDimension>
-    void IndexToWorld(const itk::Index<VIndexDimension> &index, mitk::Point3D& pt_mm ) const
-    {
-      mitk::Point3D pt_units;
-      pt_units.Fill(0);
-      int i, dim=index.GetIndexDimension();
-      if(dim>3)
-      {
-        dim=3;
-      }
-      for(i=0;i<dim;++i)
-      {
-        pt_units[i] = index[i];
-      }
-
-      IndexToWorld(pt_units,pt_mm);
-    }
-
-    //##Documentation
-    //## @brief Convert world coordinates (in mm) of a \em vector
-    //## \a vec_mm to (continuous!) index coordinates.
-    //## @deprecated First parameter (Point3D) is not used. If possible, please use void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const.
-    //## For further information about coordinates types, please see the Geometry documentation
-    void WorldToIndex(const mitk::Point3D& atPt3d_mm, const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
-
-    //##Documentation
-    //## @brief Convert world coordinates (in mm) of a \em vector
-    //## \a vec_mm to (continuous!) index coordinates.
-    //## For further information about coordinates types, please see the Geometry documentation
-    void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
-
-    //##Documentation
-    //## @brief Convert (continuous or discrete) index coordinates of a \em vector
-    //## \a vec_units to world coordinates (in mm)
-    //## @deprecated First parameter (Point3D) is not used. If possible, please use void IndexToWorld(const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const.
-    //## For further information about coordinates types, please see the Geometry documentation
-    void IndexToWorld(const mitk::Point3D& atPt3d_units, const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
-
-    //##Documentation
-    //## @brief Convert (continuous or discrete) index coordinates of a \em vector
-    //## \a vec_units to world coordinates (in mm)
-    //## For further information about coordinates types, please see the Geometry documentation
-    void IndexToWorld(const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
-
-    //##Documentation
-    //## @brief Convert world coordinates (in mm) of a \em point to (discrete!) index coordinates.
-    //## This method rounds to integer indices!
-    //## For further information about coordinates types, please see the Geometry documentation
-    template <unsigned int VIndexDimension>
-    void WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index) const
-    {
-      typedef itk::Index<VIndexDimension> IndexType;
-      mitk::Point3D pt_units;
-      this->WorldToIndex(pt_mm, pt_units);
-      int i, dim=index.GetIndexDimension();
-      if(dim>3)
-      {
-        index.Fill(0);
-        dim=3;
-      }
-      for(i=0;i<dim;++i){
-        index[i]=itk::Math::RoundHalfIntegerUp<typename IndexType::IndexValueType>( pt_units[i] );
-      }
-    }
-
-    //##Documentation
-    //## @brief Deprecated for use with ITK version 3.10 or newer.
-    //## Convert world coordinates (in mm) of a \em point to
-    //## ITK physical coordinates (in mm, but without a possible rotation)
-    //##
-    //## This method is useful if you have want to access an mitk::Image
-    //## via an itk::Image. ITK v3.8 and older did not support rotated (tilted)
-    //## images, i.e., ITK images are always parallel to the coordinate axes.
-    //## When accessing a (possibly rotated) mitk::Image via an itk::Image
-    //## the rotational part of the transformation in the Geometry3D is
-    //## simply discarded; in other word: only the origin and spacing is
-    //## used by ITK, not the complete matrix available in MITK.
-    //## With WorldToItkPhysicalPoint you can convert an MITK world
-    //## coordinate (including the rotation) into a coordinate that
-    //## can be used with the ITK image as a ITK physical coordinate
-    //## (excluding the rotation).
-    template<class TCoordRep>
-    void WorldToItkPhysicalPoint(const mitk::Point3D& pt_mm,
-      itk::Point<TCoordRep, 3>& itkPhysicalPoint) const
-    {
-      mitk::vtk2itk(pt_mm, itkPhysicalPoint);
-    }
-
-    //##Documentation
-    //## @brief Deprecated for use with ITK version 3.10 or newer.
-    //## Convert ITK physical coordinates of a \em point (in mm,
-    //## but without a rotation) into MITK world coordinates (in mm)
-    //##
-    //## For more information, see WorldToItkPhysicalPoint.
-    template<class TCoordRep>
-    void ItkPhysicalPointToWorld(const itk::Point<TCoordRep, 3>& itkPhysicalPoint,
-      mitk::Point3D& pt_mm) const
-    {
-      mitk::vtk2itk(itkPhysicalPoint, pt_mm);
-    }
 
     //##Documentation
     //## @brief Is this an ImageGeometry?
@@ -272,16 +137,6 @@ namespace mitk {
     //## that the Geometry3D is referring to an Image.
     itkSetMacro(ImageGeometry, bool);
     itkBooleanMacro(ImageGeometry);
-
-    //##Documentation
-    //## @brief Test whether the point \a p (world coordinates in mm) is
-    //## inside the bounding box
-    bool IsInside(const mitk::Point3D& p) const
-    {
-      mitk::Point3D index;
-      WorldToIndex(p, index);
-      return IsIndexInside(index);
-    }
 
     //##Documentation
     //## @brief Test whether the point \a p ((continous!)index coordinates in units) is
@@ -332,10 +187,25 @@ namespace mitk {
     }
 
     //##Documentation
+    //## @brief clones the geometry
+    //##
+    //## Overwrite in all sub-classes.
+    //## Normally looks like:
+    //## \code
+    //##  Self::Pointer newGeometry = new Self(*this);
+    //##  newGeometry->UnRegister();
+    //##  return newGeometry.GetPointer();
+    //## \endcode
+    virtual itk::LightObject::Pointer InternalClone() const;
+
+    //Umzug:
+
+    //##Documentation
     //## @brief Get the parametric bounding-box
     //##
     //## See AbstractTransformGeometry for an example usage of this.
     itkGetConstObjectMacro(ParametricBoundingBox, BoundingBox);
+
     //##Documentation
     //## @brief Get the parametric bounds
     //##
@@ -378,45 +248,13 @@ namespace mitk {
       return m_IndexToWorldTransform;
     }
 
-    //##Documentation
-    //## @brief Calculates a bounding-box around the geometry relative
-    //## to a coordinate system defined by a transform
-    //##
-    mitk::BoundingBox::Pointer CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform) const;
-
-    //##Documentation
-    //## @brief clones the geometry
-    //##
-    //## Overwrite in all sub-classes.
-    //## Normally looks like:
-    //## \code
-    //##  Self::Pointer newGeometry = new Self(*this);
-    //##  newGeometry->UnRegister();
-    //##  return newGeometry.GetPointer();
-    //## \endcode
-    virtual itk::LightObject::Pointer InternalClone() const;
-
-    //##Documentation
-    //##@brief executes affine operations (translate, rotate, scale)
-    virtual void ExecuteOperation(Operation* operation);
-
   protected:
     Geometry3D();
     Geometry3D(const Geometry3D& other);
 
-    static const std::string GetTransformAsString( TransformType* transformType );
-
     virtual ~Geometry3D();
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
-
-    virtual void BackTransform(const mitk::Point3D& in, mitk::Point3D& out) const;
-    //##Documentation
-    //## @brief Deprecated
-    virtual void BackTransform(const mitk::Point3D& at, const mitk::Vector3D& in, mitk::Vector3D& out) const;
-
-    //Without redundant parameter Point3D
-    virtual void BackTransform(const mitk::Vector3D& in, mitk::Vector3D& out) const;
 
     //##Documentation
     //## @brief Set the parametric bounds
@@ -425,10 +263,7 @@ namespace mitk {
     //## ExternAbstractTransformGeometry.
     virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
 
-    /** Resets sub-transforms that compose m_IndexToWorldTransform, by using
-    * the current value of m_IndexToWorldTransform and setting the rotation
-    * component to zero. */
-    virtual void ResetSubTransforms();
+    mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 
     bool m_ImageGeometry;
 

@@ -22,6 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMatrixConvert.h"
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>
+#include "mitkRotationOperation.h"
+#include "mitkRestorePlanePositionOperation.h"
+#include "mitkApplyTransformMatrixOperation.h"
+#include "mitkPointOperation.h"
+#include "mitkInteractionConst.h"
 
 mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
   m_Valid(true), m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0)
@@ -33,7 +38,7 @@ mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
   Initialize();
 }
 
-mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), m_ParametricBoundingBox(other.m_ParametricBoundingBox), m_TimeBounds(other.m_TimeBounds),
+mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), m_TimeBounds(other.m_TimeBounds),
   m_Valid(other.m_Valid), m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin)
 {
   //  DEPRECATED(m_RotationQuaternion = other.m_RotationQuaternion);
@@ -41,10 +46,7 @@ mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), m_Par
   SetBounds(other.GetBounds());
   m_VtkMatrix = vtkMatrix4x4::New();
   m_VtkMatrix->DeepCopy(other.m_VtkMatrix);
-  if (other.m_ParametricBoundingBox.IsNotNull())
-  {
-    m_ParametricBoundingBox = other.m_ParametricBoundingBox->DeepCopy();
-  }
+
   FillVector3D(m_FloatSpacing,other.m_FloatSpacing[0],other.m_FloatSpacing[1],other.m_FloatSpacing[2]);
   m_VtkIndexToWorldTransform = vtkMatrixToLinearTransform::New();
   m_VtkIndexToWorldTransform->DeepCopy(other.m_VtkIndexToWorldTransform);
@@ -138,6 +140,8 @@ void
 {
   newGeometry->SetBounds(m_BoundingBox->GetBounds());
   // we have to create a new transform!!
+  newGeometry->SetTimeBounds(m_TimeBounds);
+  newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
 
   if(m_IndexToWorldTransform)
   {
@@ -532,13 +536,6 @@ void mitk::BaseGeometry::WorldToIndex( const mitk::Vector3D &vec_mm, mitk::Vecto
   BackTransform( vec_mm, vec_units);
 }
 
-void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
-{
-  MITK_WARN<<"Warning! Call of the deprecated function Geometry3D::WorldToIndex(point, vec, vec). Use Geometry3D::WorldToIndex(vec, vec) instead!";
-  //BackTransform(atPt3d_mm, vec_mm, vec_units);
-  this->WorldToIndex(vec_mm, vec_units);
-}
-
 void mitk::BaseGeometry::BackTransform(const mitk::Vector3D& in, mitk::Vector3D& out) const
 {
   // Get WorldToIndex transform
@@ -615,41 +612,6 @@ void mitk::BaseGeometry::BackTransform(const mitk::Point3D &in, mitk::Point3D& o
   }
 }
 
-void mitk::BaseGeometry::BackTransform(const mitk::Point3D &/*at*/, const mitk::Vector3D &in, mitk::Vector3D& out) const
-{
-  MITK_INFO<<"Warning! Call of the deprecated function Geometry3D::BackTransform(point, vec, vec). Use Geometry3D::BackTransform(vec, vec) instead!";
-  //// Get WorldToIndex transform
-  //if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
-  //{
-  //  m_InvertedTransform = TransformType::New();
-  //  if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
-  //  {
-  //    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
-  //  }
-  //  m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
-  //}
-
-  //// Check for valid matrix inversion
-  //const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
-  //if(inverse.GetVnlMatrix().has_nans())
-  //{
-  //  itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
-  //    << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
-  //    << inverse );
-  //}
-
-  //// Transform vector
-  //for (unsigned int i = 0; i < 3; i++)
-  //{
-  //  out[i] = 0.0;
-  //  for (unsigned int j = 0; j < 3; j++)
-  //  {
-  //    out[i] += inverse[i][j]*in[j];
-  //  }
-  //}
-  this->BackTransform(in, out);
-}
-
 mitk::VnlVector mitk::BaseGeometry::GetOriginVnl() const
 {
   return const_cast<Self*>(this)->m_Origin.GetVnlVector();
@@ -704,14 +666,223 @@ void mitk::BaseGeometry::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point
   pt_mm = m_IndexToWorldTransform->TransformPoint(pt_units);
 }
 
+void mitk::BaseGeometry::IndexToWorld(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
+{
+  vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
+}
+
+#include <vtkTransform.h>
+void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
+{
+  vtkTransform *vtktransform = vtkTransform::New();
+  vtktransform->SetMatrix(m_VtkMatrix);
+  switch (operation->GetOperationType())
+  {
+  case OpNOTHING:
+    break;
+  case OpMOVE:
+    {
+      mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
+      if (pointOp == NULL)
+      {
+        //mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+        return;
+      }
+      mitk::Point3D newPos = pointOp->GetPoint();
+      ScalarType data[3];
+      vtktransform->GetPosition(data);
+      vtktransform->PostMultiply();
+      vtktransform->Translate(newPos[0], newPos[1], newPos[2]);
+      vtktransform->PreMultiply();
+      break;
+    }
+  case OpSCALE:
+    {
+      mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
+      if (pointOp == NULL)
+      {
+        //mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+        return;
+      }
+      mitk::Point3D newScale = pointOp->GetPoint();
+      ScalarType data[3];
+      /* calculate new scale: newscale = oldscale * (oldscale + scaletoadd)/oldscale */
+      data[0] = 1 + (newScale[0] / GetMatrixColumn(0).magnitude());
+      data[1] = 1 + (newScale[1] / GetMatrixColumn(1).magnitude());
+      data[2] = 1 + (newScale[2] / GetMatrixColumn(2).magnitude());
+
+      mitk::Point3D center = const_cast<mitk::BoundingBox*>(m_BoundingBox.GetPointer())->GetCenter();
+      ScalarType pos[3];
+      vtktransform->GetPosition(pos);
+      vtktransform->PostMultiply();
+      vtktransform->Translate(-pos[0], -pos[1], -pos[2]);
+      vtktransform->Translate(-center[0], -center[1], -center[2]);
+      vtktransform->PreMultiply();
+      vtktransform->Scale(data[0], data[1], data[2]);
+      vtktransform->PostMultiply();
+      vtktransform->Translate(+center[0], +center[1], +center[2]);
+      vtktransform->Translate(pos[0], pos[1], pos[2]);
+      vtktransform->PreMultiply();
+      break;
+    }
+  case OpROTATE:
+    {
+      mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
+      if (rotateOp == NULL)
+      {
+        //mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+        return;
+      }
+      Vector3D rotationVector = rotateOp->GetVectorOfRotation();
+      Point3D center = rotateOp->GetCenterOfRotation();
+      ScalarType angle = rotateOp->GetAngleOfRotation();
+      vtktransform->PostMultiply();
+      vtktransform->Translate(-center[0], -center[1], -center[2]);
+      vtktransform->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);
+      vtktransform->Translate(center[0], center[1], center[2]);
+      vtktransform->PreMultiply();
+      break;
+    }
+  case OpRESTOREPLANEPOSITION:
+    {
+      //Copy necessary to avoid vtk warning
+      vtkMatrix4x4* matrix = vtkMatrix4x4::New();
+      TransferItkTransformToVtkMatrix(dynamic_cast<mitk::RestorePlanePositionOperation*>(operation)->GetTransform().GetPointer(), matrix);
+      vtktransform->SetMatrix(matrix);
+      break;
+    }
+  case OpAPPLYTRANSFORMMATRIX:
+    {
+      ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast< ApplyTransformMatrixOperation* >( operation );
+      vtktransform->SetMatrix(applyMatrixOp->GetMatrix());
+      break;
+    }
+  default:
+    vtktransform->Delete();
+    return;
+  }
+  m_VtkMatrix->DeepCopy(vtktransform->GetMatrix());
+  TransferVtkToItkTransform();
+  Modified();
+  vtktransform->Delete();
+}
+
+mitk::VnlVector mitk::BaseGeometry::GetMatrixColumn(unsigned int direction) const
+{
+  return m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction);
+}
+
+mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform) const
+{
+  mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
+
+  mitk::BoundingBox::PointIdentifier pointid=0;
+
+  unsigned char i;
+  if(transform!=NULL)
+  {
+    mitk::AffineTransform3D::Pointer inverse = mitk::AffineTransform3D::New();
+    transform->GetInverse(inverse);
+    for(i=0; i<8; ++i)
+      pointscontainer->InsertElement( pointid++, inverse->TransformPoint( GetCornerPoint(i) ));
+  }
+  else
+  {
+    for(i=0; i<8; ++i)
+      pointscontainer->InsertElement( pointid++, GetCornerPoint(i) );
+  }
+
+  mitk::BoundingBox::Pointer result = mitk::BoundingBox::New();
+  result->SetPoints(pointscontainer);
+  result->ComputeBoundingBox();
+
+  return result;
+}
+
+void mitk::BaseGeometry::SetTimeBounds(const TimeBounds& timebounds)
+{
+  if(m_TimeBounds != timebounds)
+  {
+    m_TimeBounds = timebounds;
+    Modified();
+  }
+}
+
+const std::string mitk::BaseGeometry::GetTransformAsString( TransformType* transformType )
+{
+  std::ostringstream out;
+
+  out << '[';
+
+  for( int i=0; i<3; ++i )
+  {
+    out << '[';
+    for( int j=0; j<3; ++j )
+      out << transformType->GetMatrix().GetVnlMatrix().get(i, j) << ' ';
+    out << ']';
+  }
+
+  out << "][";
+
+  for( int i=0; i<3; ++i )
+    out << transformType->GetOffset()[i] << ' ';
+
+  out << "]\0";
+
+  return out.str();
+}
+
+void mitk::BaseGeometry::SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix)
+{
+  m_VtkMatrix->DeepCopy(vtkmatrix);
+  TransferVtkToItkTransform();
+}
+
+void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
+{
+  MITK_WARN<<"Warning! Call of the deprecated function BaseGeometry::WorldToIndex(point, vec, vec). Use BaseGeometry::WorldToIndex(vec, vec) instead!";
+  //BackTransform(atPt3d_mm, vec_mm, vec_units);
+  this->WorldToIndex(vec_mm, vec_units);
+}
+
 void mitk::BaseGeometry::IndexToWorld(const mitk::Point3D &/*atPt3d_units*/, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
 {
-  MITK_WARN<<"Warning! Call of the deprecated function Geometry3D::IndexToWorld(point, vec, vec). Use Geometry3D::IndexToWorld(vec, vec) instead!";
+  MITK_WARN<<"Warning! Call of the deprecated function BaseGeometry::IndexToWorld(point, vec, vec). Use BaseGeometry::IndexToWorld(vec, vec) instead!";
   //vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
   this->IndexToWorld(vec_units, vec_mm);
 }
 
-void mitk::BaseGeometry::IndexToWorld(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
+void mitk::BaseGeometry::BackTransform(const mitk::Point3D &/*at*/, const mitk::Vector3D &in, mitk::Vector3D& out) const
 {
-  vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
+  MITK_INFO<<"Warning! Call of the deprecated function BaseGeometry::BackTransform(point, vec, vec). Use BaseGeometry::BackTransform(vec, vec) instead!";
+  //// Get WorldToIndex transform
+  //if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
+  //{
+  //  m_InvertedTransform = TransformType::New();
+  //  if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
+  //  {
+  //    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
+  //  }
+  //  m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
+  //}
+
+  //// Check for valid matrix inversion
+  //const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
+  //if(inverse.GetVnlMatrix().has_nans())
+  //{
+  //  itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
+  //    << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
+  //    << inverse );
+  //}
+
+  //// Transform vector
+  //for (unsigned int i = 0; i < 3; i++)
+  //{
+  //  out[i] = 0.0;
+  //  for (unsigned int j = 0; j < 3; j++)
+  //  {
+  //    out[i] += inverse[i][j]*in[j];
+  //  }
+  //}
+  this->BackTransform(in, out);
 }

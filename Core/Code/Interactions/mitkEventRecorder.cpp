@@ -40,14 +40,12 @@ static void WriteEventXMLConfig(std::ofstream& stream)
 
   for(; rendererIterator != end; rendererIterator++)
   {
-    if((*rendererIterator).second->GetMapperID() == mitk::BaseRenderer::Standard2D)
-    {
-      std::string rendererName = (*rendererIterator).second->GetName();
-      mitk::SliceNavigationController::ViewDirection viewDirection = (*rendererIterator).second->GetSliceNavigationController()->GetDefaultViewDirection();
+    std::string rendererName = (*rendererIterator).second->GetName();
+    mitk::SliceNavigationController::ViewDirection viewDirection = (*rendererIterator).second->GetSliceNavigationController()->GetDefaultViewDirection();
+    mitk::BaseRenderer::MapperSlotId mapperID = (*rendererIterator).second->GetMapperID();
 
-      //  <renderer RendererName="stdmulti.widget2" ViewDirection="1"/>
-      stream << "  <" << mitk::InteractionEventConst::xmlTagRenderer() << " " << mitk::InteractionEventConst::xmlEventPropertyRendererName() << "=\"" <<  rendererName << "\" " << mitk::InteractionEventConst::xmlEventPropertyViewDirection() << "=\"" << viewDirection << "\"/>\n";
-    }
+    //  <renderer RendererName="stdmulti.widget2" ViewDirection="1" MapperID="1"/>
+    stream << "  <" << mitk::InteractionEventConst::xmlTagRenderer() << " " << mitk::InteractionEventConst::xmlEventPropertyRendererName() << "=\"" <<  rendererName << "\" " << mitk::InteractionEventConst::xmlEventPropertyViewDirection() << "=\"" << viewDirection << "\" " << mitk::InteractionEventConst::xmlEventPropertyMapperID() << "=\"" << mapperID << "\"/>\n";
   }
 
   // </config>

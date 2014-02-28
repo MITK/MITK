@@ -61,8 +61,20 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       const char* rendererName = element->Attribute(mitk::InteractionEventConst::xmlEventPropertyRendererName().c_str());
 
       //get view direction
-      int viewDirectionNum = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyViewDirection())->c_str());
-      mitk::SliceNavigationController::ViewDirection viewDirection = static_cast<mitk::SliceNavigationController::ViewDirection>(viewDirectionNum);
+      mitk::SliceNavigationController::ViewDirection viewDirection = mitk::SliceNavigationController::Axial;
+      if(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyViewDirection()) != NULL)
+      {
+        int viewDirectionNum = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyViewDirection())->c_str());
+        viewDirection = static_cast<mitk::SliceNavigationController::ViewDirection>(viewDirectionNum);
+      }
+
+      //get mapper slot id
+      mitk::BaseRenderer::MapperSlotId mapperID = mitk::BaseRenderer::Standard2D;
+      if(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID()) != NULL)
+      {
+        int mapperIDNum = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID())->c_str());
+        mapperID = static_cast<mitk::BaseRenderer::MapperSlotId>(mapperIDNum);
+      }
 
       //create renderWindow, renderer and dispatcher
       mitk::RenderWindow::Pointer rw = mitk::RenderWindow::New(NULL, rendererName, rm); //VtkRenderWindow is created within constructor if NULL
@@ -74,7 +86,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       rw->GetSliceNavigationController()->SetDefaultViewDirection( viewDirection );
 
       //set renderer to render 2D
-      rw->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
+      rw->GetRenderer()->SetMapperID(mapperID);
 
       //connect SliceNavigationControllers to timestep changed event of TimeNavigationController
       rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController(), false);

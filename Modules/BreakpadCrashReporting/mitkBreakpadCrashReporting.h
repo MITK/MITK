@@ -18,6 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_BREAKPAD_CRASH_REPORTING_H
 
 #include <string>
+#include "BreakpadCrashReportingExports.h"
+
+#include <QString>
+
 
 namespace google_breakpad {
 
@@ -59,7 +63,7 @@ namespace mitk {
   * Client and server output will indicate the operating mode.
   *
   * Note 3: The crash reporting server process will automatically shutdown, if there was a client connected and exits
-  * (either due to shutdown or due to crash). Also, the sample server will shutdown automatically, if there is already
+  * (either due to shutdown or due to crash). Also, the sample server will shutdown automatically, if  there isalready
   * one server instance running.
   *
   * Note 4: LINUX
@@ -78,11 +82,11 @@ namespace mitk {
   {
     public:
 
-      BreakpadCrashReporting( const std::string& dumpPath = "" );
+      BreakpadCrashReporting( const QString& dumpPath = QString::null );
       ~BreakpadCrashReporting();
 
       /** Initializes an event handler for 'unhandled exceptions' that will dump a so-called 'minidump' to a defined folder.
-      * For usage as "in-process" exception handler set connectToCrashGenerationServer = false.
+      * For usage as "in-process" exception handler set connectToCrashGenerationServer      = false.
       * For usage as "out-of-process" (OOP) exception handler, set connectToCrashGenerationServer = true.
       *
       * Related params:
@@ -94,10 +98,14 @@ namespace mitk {
       *
       * If the connection attempt to a server fails, reconnects attempt may be scheduled by SetNumberOfConnectionAttempts()
       * and SetReconnectDelayInMilliSeconds(). Note that during re-connect attempts, your application will be blocked.
+      *
+      *
+      *
       */
       void InitializeClientHandler(bool connectToCrashGenerationServer);
 
       /** Starts a crash generation server for "out-of-process" exception handling.
+      *
       * For usage outside of your main application (i.e. already in a separate process), set launchOutOfProcessExecutable = false.
       * For usage inside of your main application, set launchOutOfProcessExecutable = true.
       *
@@ -108,16 +116,17 @@ namespace mitk {
       * you may define a process to be started by SetCrashReportingServerExecutable().
       *
       * Related params are defined by means of SetNamedPipeName() and SetCrashDumpPath().
+      *
       */
       bool StartCrashServer(bool launchOutOfProcessExecutable);
 
       // Named pipe string to communicate with OutOfProcessCrashReporter.
-      void    SetNamedPipeName(const std::string& name);
-      std::string GetNamedPipeName() const;
+      void    SetNamedPipeName(const QString& name);
+      QString GetNamedPipeName() const;
 
       // Directory path to save crash dumps.
-      void    SetCrashDumpPath(const std::string& path);
-      std::string GetCrashDumpPath() const;
+      void    SetCrashDumpPath(const QString& path);
+      QString GetCrashDumpPath() const;
 
       // Re-connect handling in case a crash server cannot be reached.
       void    SetNumberOfConnectionAttempts(int no);
@@ -133,15 +142,13 @@ namespace mitk {
       // returns the number of currently connected clients
       int GetNumberOfConnections() const;
 
-      // Get the path of the breakpad module
-      static std::string GetModulePath();
 
   protected:
 
       bool InitializeServer(int listen_fd = -1);
 
       // External out-of-process (OOP) Crash Reporting Server file path - if OOP is used.
-      void SetCrashReportingServerExecutable(const std::string& exe);
+      void SetCrashReportingServerExecutable(QString exe);
 
 
       bool DumpCallbackPlatformIndependent();
@@ -149,15 +156,15 @@ namespace mitk {
       google_breakpad::CrashGenerationServer*  m_CrashServer;
       google_breakpad::ExceptionHandler*       m_ExceptionHandler;
 
-      std::string m_CrashDumpPath;
+      QString m_CrashDumpPath;
 
   // Linux connection parameters
       int server_fd;
       int client_fd;
 
   // Windows connection parameters
-      std::string m_NamedPipeString;
-      std::string m_CrashReportingServerExecutable;
+      QString m_NamedPipeString;
+      QString m_CrashReportingServerExecutable;
       int     m_NumberOfConnectionAttempts;
       int     m_ReconnectDelay;
 

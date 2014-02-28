@@ -18,19 +18,17 @@ if(MITK_USE_Breakpad) # from top-level CMakeLists.txt
   MITK_CREATE_MODULE(BreakpadCrashReporting
     INTERNAL_INCLUDE_DIRS ${Breakpad_INCLUDE_DIR}
     ADDITIONAL_LIBS ${Breakpad_LIBRARIES}
+    PACKAGE_DEPENDS QT
     FORCE_STATIC
     )
 
   if(CMAKE_SYSTEM MATCHES "Windows")
-    add_executable(CrashReportingServer mitkCrashReportingServer.cpp)
-    target_link_libraries(CrashReportingServer ${ALL_LIBRARIES} BreakpadCrashReporting)
-    MITK_INSTALL(TARGETS CrashReportingServer)
+    add_executable(CrashReportingServer WIN32 mitkCrashReportingServer.cpp)
+    # TODO MITK_INSTALL(CrashReportingServer ..)
+    target_link_libraries(CrashReportingServer ${ALL_LIBRARIES} ${QT_QTMAIN_LIBRARY} BreakpadCrashReporting)
   endif()
 
-  if(CMAKE_SYSTEM MATCHES "Linux")
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ProduceBreakpadSymbols.sh.in ${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ProduceBreakpadSymbols.sh)
-  endif()
 
-add_subdirectory(Testing)
+# add_subdirectory(Testing)
 
 endif(MITK_USE_Breakpad)

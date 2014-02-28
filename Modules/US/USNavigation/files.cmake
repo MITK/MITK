@@ -5,9 +5,3 @@ SET(CPP_FILES
   Filter/mitkNeedleProjectionFilter.cpp
   Filter/mitkNodeDisplacementFilter.cpp
 )
-
-SET(RESOURCE_FILES
-  Interactions/USZoneInteractions.xml
-  Interactions/USZoneInteractionsHold.xml
-  Interactions/USPointMarkInteractions.xml
-)

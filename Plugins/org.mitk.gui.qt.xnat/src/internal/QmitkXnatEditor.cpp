@@ -123,11 +123,6 @@ void QmitkXnatEditor::SetInput(berry::IEditorInput::Pointer input)
   }
 }
 
-//const char* QmitkXnatEditor::GetClassNameA() const
-//{
-//  return QtEditorPart::GetClassNameA();
-//}
-
 void QmitkXnatEditor::SetFocus()
 {
 }

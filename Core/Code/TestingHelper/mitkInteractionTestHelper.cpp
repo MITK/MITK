@@ -96,6 +96,10 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       m_RenderWindowList.push_back(rw);
     }
 
+    //TODO: check the following lines taken from QmitkStdMultiWidget and adapt them to be executed in our code here.
+//    mitkWidget1->GetSliceNavigationController()
+//      ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
+
     //########### register display interactor to handle scroll events ##################
     //use MouseModeSwitcher to ensure that the statemachine of DisplayInteractor is loaded correctly
     m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();

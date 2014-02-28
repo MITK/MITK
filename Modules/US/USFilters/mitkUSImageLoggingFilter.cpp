@@ -32,6 +32,7 @@ mitk::USImageLoggingFilter::~USImageLoggingFilter()
 void mitk::USImageLoggingFilter::GenerateData()
 {
   mitk::Image::ConstPointer inputImage = this->GetInput();
+  mitk::Image::Pointer outputImage = this->GetOutput();
 
   if(inputImage.IsNull() || inputImage->IsEmpty())
     {
@@ -39,17 +40,38 @@ void mitk::USImageLoggingFilter::GenerateData()
     return;
     }
 
+  //a clone is needed for a output and to store it.
+  mitk::Image::Pointer inputClone = inputImage->Clone();
+
+
   //simply redirecy the input to the output
-  /* not working at the moment: TODO fix it!
-  if (this->GetNumberOfOutputs() == 0)
+  //this->SetNumberOfRequiredOutputs(1);
+  //this->SetNthOutput(0, inputClone->Clone());
+  //outputImage->Graft(inputImage);
+  //this->SetOutput(this->GetInput());
+  /*if (!this->GetOutput()->IsInitialized())
+    {
+    this->SetNumberOfRequiredOutputs(1);
+    mitk::Image::Pointer newOutput = mitk::Image::New();
+    this->SetNthOutput(0, newOutput);
+    }
+  memcpy(this->GetOutput(),this->GetInput());*
+
+  //this->SetNthOutput(0,inputImage.);
+  //this->AllocateOutputs();
+  //this->GraftOutput(inputClone);
+
+  /*
+  if (!this->GetOutput()->IsInitialized())
     {
     mitk::Image::Pointer newOutput = mitk::Image::New();
     this->SetNthOutput(0, newOutput);
     }
-  this->GetOutput()->Graft(this->GetInput());
+  this->GetOutput()Graft(this->GetInput());
   */
 
-  m_LoggedImages.push_back(inputImage->Clone());
+
+  m_LoggedImages.push_back(inputClone);
   m_LoggedMITKSystemTimes.push_back(m_SystemTimeClock->GetCurrentStamp());
 
 }
@@ -58,6 +80,13 @@ void mitk::USImageLoggingFilter::AddMessageToCurrentImage(std::string message)
 {
   std::pair<int,std::string> newMessage(m_LoggedImages.size()-1,message);
   m_LoggedMessages.insert(newMessage);
+}
+
+void mitk::USImageLoggingFilter::SaveImages(std::string path)
+{
+std::vector<std::string> dummy1;
+std::string dummy2;
+this->SaveImages(path,dummy1,dummy2);
 }
 
 void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::string>& filenames, std::string& csvFileName)
@@ -93,6 +122,7 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
   std::filebuf fb;
   fb.open (csvFileName.c_str(),std::ios::out);
   std::ostream os(&fb);
+  os.precision(15); //set high precision to avoid loss of digits
 
   //write header
   os << "image filename; MITK system timestamp; message\n";

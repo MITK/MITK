@@ -59,7 +59,16 @@ namespace mitk {
      *  @throw         mitk::Exception Throws an exception if there is a problem during writing the images. E.g.,
      *                                 if the path is not valid / not writable.
      */
-    void SaveImages(std::string path, std::vector<std::string>& imageFilenames = std::vector<std::string>(), std::string& csvFileName = std::string());
+    void SaveImages(std::string path, std::vector<std::string>& imageFilenames, std::string& csvFileName);
+
+     /** Saves all logged data to the given path. Every image is written to a separate image file.
+     *  Additionaly a csv file containing a list of all images together with timestamps and messages is saved.
+     *  For one call of this method all files will start with a unique number to avoid overwrite of old files.
+     *  @param[in]     path            Should contain a valid path were all logging data will be stored.
+     *  @throw         mitk::Exception Throws an exception if there is a problem during writing the images. E.g.,
+     *                                 if the path is not valid / not writable.
+     */
+    void SaveImages(std::string path);
 
     /** Sets the extension of the output images which alse defines the file type. E.g., ".nrrd" or ".jpg".
      *  ".nrrd" is default.

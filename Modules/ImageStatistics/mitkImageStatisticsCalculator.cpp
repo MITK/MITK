@@ -1169,7 +1169,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     }
 
     double indexCoordDistance = maskOriginContinousIndex[i] - imageOriginContinousIndex[i];
-    offset[i] = (int) indexCoordDistance + image->GetBufferedRegion().GetIndex()[i];
+    offset[i] = int( indexCoordDistance + image->GetBufferedRegion().GetIndex()[i] + 0.5 );
   }
 
   // Adapt the origin and region (index/size) of the mask so that the origin of both are the same

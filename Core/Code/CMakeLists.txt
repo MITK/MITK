@@ -42,7 +42,7 @@ MITK_CREATE_MODULE(Core
 # this is needed for libraries which link to Mitk and need
 # symbols from explicitly instantiated templates
 if(MINGW)
-  get_target_property(_mitkCore_MINGW_linkflags Mitk LINK_FLAGS)
+  get_target_property(_mitkCore_MINGW_linkflags ${MODULE_TARGET} LINK_FLAGS)
   if(NOT _mitkCore_MINGW_linkflags)
     set(_mitkCore_MINGW_linkflags "")
   endif(NOT _mitkCore_MINGW_linkflags)
@@ -50,7 +50,7 @@ if(MINGW)
 endif(MINGW)
 
 if(MSVC_IDE OR MSVC_VERSION OR MINGW)
-  target_link_libraries(Mitk psapi.lib)
+  target_link_libraries(${MODULE_TARGET} psapi.lib)
 endif(MSVC_IDE OR MSVC_VERSION OR MINGW)
 
 # build tests?

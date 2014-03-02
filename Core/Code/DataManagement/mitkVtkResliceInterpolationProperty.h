@@ -41,7 +41,8 @@ public:
 
   mitkClassMacro( VtkResliceInterpolationProperty, EnumerationProperty );
 
-  itkNewMacro(VtkResliceInterpolationProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(VtkResliceInterpolationProperty, const IdType&);
 

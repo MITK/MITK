@@ -52,7 +52,8 @@ class MitkSegmentationUI_EXPORT QmitkAdaptiveRegionGrowingToolGUI : public Qmitk
 public:
   mitkClassMacro(QmitkAdaptiveRegionGrowingToolGUI, QmitkToolGUI);
 
-  itkNewMacro(QmitkAdaptiveRegionGrowingToolGUI);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   QmitkAdaptiveRegionGrowingToolGUI(QWidget* parent=0);
 

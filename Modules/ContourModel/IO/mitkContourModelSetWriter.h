@@ -42,7 +42,8 @@ namespace mitk
 
     mitkWriterMacro;
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::ContourModelSet InputType;
 

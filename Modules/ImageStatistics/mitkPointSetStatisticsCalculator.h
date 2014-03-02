@@ -33,7 +33,8 @@ class MitkImageStatistics_EXPORT PointSetStatisticsCalculator : public itk::Obje
 public:
 
   mitkClassMacro( PointSetStatisticsCalculator, itk::Object );
-  itkNewMacro( PointSetStatisticsCalculator );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(PointSetStatisticsCalculator,mitk::PointSet::Pointer);
 

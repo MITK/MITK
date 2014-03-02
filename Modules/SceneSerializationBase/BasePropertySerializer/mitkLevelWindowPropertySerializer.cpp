@@ -31,7 +31,8 @@ class MitkSceneSerializationBase_EXPORT LevelWindowPropertySerializer : public B
   public:
 
     mitkClassMacro( LevelWindowPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

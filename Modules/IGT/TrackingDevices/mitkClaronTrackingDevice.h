@@ -44,7 +44,8 @@ namespace mitk
   public:
 
     mitkClassMacro(ClaronTrackingDevice, TrackingDevice);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
     * \brief Starts the tracking.

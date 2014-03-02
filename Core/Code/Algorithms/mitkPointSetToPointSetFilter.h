@@ -33,7 +33,8 @@ namespace mitk
   public:
     mitkClassMacro( PointSetToPointSetFilter, PointSetSource );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::PointSet InputType;
 

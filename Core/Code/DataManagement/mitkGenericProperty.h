@@ -122,9 +122,10 @@ class MITK_EXPORT GenericProperty : public BaseProperty
 class Export PropertyName: public GenericProperty< Type >     \
 {                                                             \
 public:                                                       \
-  mitkClassMacro(PropertyName, GenericProperty< Type >);      \
-  itkNewMacro(PropertyName);                                  \
-  mitkNewMacro1Param(PropertyName, Type);                     \
+  mitkClassMacro(PropertyName, GenericProperty< Type >)       \
+  itkFactorylessNewMacro(Self)                                \
+  itkCloneMacro(Self)                                         \
+  mitkNewMacro1Param(PropertyName, Type)                      \
   using BaseProperty::operator=;                              \
 protected:                                                    \
   PropertyName();                                             \

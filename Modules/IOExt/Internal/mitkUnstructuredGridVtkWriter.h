@@ -52,7 +52,8 @@ public:
 
     mitkClassMacro( UnstructuredGridVtkWriter, mitk::FileWriterWithInformation );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     mitkWriterMacro;
 

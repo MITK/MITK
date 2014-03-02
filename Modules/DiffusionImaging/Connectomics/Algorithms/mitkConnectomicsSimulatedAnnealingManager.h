@@ -39,7 +39,8 @@ namespace mitk
     /** Method for creation through the object factory. */
 
     mitkClassMacro(ConnectomicsSimulatedAnnealingManager, itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     // Decide whether to accept the change or not
     bool AcceptChange( double costBefore, double costAfter, double temperature );

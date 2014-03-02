@@ -49,7 +49,8 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT UndistortCameraImage : public itk::Object
   public:
 
     mitkClassMacro(UndistortCameraImage,itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /// Initialization ///
     /*

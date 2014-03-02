@@ -38,7 +38,8 @@ public:
    */
   mitkClassMacro ( PointSetIndexToWorldTransformFilter, PointSetToPointSetFilter );
 
-  itkNewMacro ( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 protected:
 

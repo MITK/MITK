@@ -80,7 +80,8 @@ public:
 
   mitkClassMacro(DataNode, itk::DataObject);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitk::Mapper* GetMapper(MapperSlotId id) const;
   //##Documentation

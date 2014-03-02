@@ -69,7 +69,8 @@ class MITK_CORE_EXPORT Geometry2D : public mitk::Geometry3D
 {
 public:
   mitkClassMacro(Geometry2D, mitk::Geometry3D);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * \brief Project a 3D point given in mm (\a pt3d_mm) onto the 2D

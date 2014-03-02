@@ -46,7 +46,8 @@ public:
 
   typedef std::string ValueType;
 
-  itkNewMacro( ClippingProperty );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro2Param( ClippingProperty,
     const Point3D &, const Vector3D & );
 

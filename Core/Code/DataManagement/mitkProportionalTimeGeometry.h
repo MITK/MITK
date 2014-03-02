@@ -45,7 +45,8 @@ namespace mitk {
 
     ProportionalTimeGeometry();
     typedef ProportionalTimeGeometry self;
-    itkNewMacro(self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
     * \brief Returns the number of time steps.

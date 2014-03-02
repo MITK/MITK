@@ -36,7 +36,8 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT MovieGeneratorOpenCV : public MovieGenerato
 public:
 
   mitkClassMacro(MovieGeneratorOpenCV, MovieGenerator);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void SetFileName( const char *fileName );
 

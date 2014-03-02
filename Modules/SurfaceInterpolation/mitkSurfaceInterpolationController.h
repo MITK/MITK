@@ -56,7 +56,8 @@ namespace mitk
   public:
 
     mitkClassMacro(SurfaceInterpolationController, itk::Object)
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     static SurfaceInterpolationController* GetInstance();
 

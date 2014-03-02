@@ -46,7 +46,8 @@ class MitkSegmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
   typedef mitk::ITKImageImport<itkOutputImageType> ImageConverterType;
 
   mitkClassMacro(OtsuSegmentationFilter,ImageToImageFilter);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkGetMacro(NumberOfThresholds, unsigned int);
   void SetNumberOfThresholds(unsigned int number)

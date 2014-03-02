@@ -38,7 +38,8 @@ class MitkSegmentation_EXPORT CalculateVolumetryTool : public SegmentationsProce
   public:
 
     mitkClassMacro(CalculateVolumetryTool, SegmentationsProcessingTool);
-    itkNewMacro(CalculateVolumetryTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;

@@ -49,7 +49,8 @@ namespace mitk
     Message2<mitk::ScalarType, mitk::ScalarType>     ThresholdingValuesChanged;
 
     mitkClassMacro(BinaryThresholdULTool, AutoSegmentationTool);
-    itkNewMacro(BinaryThresholdULTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     us::ModuleResource GetIconResource() const;

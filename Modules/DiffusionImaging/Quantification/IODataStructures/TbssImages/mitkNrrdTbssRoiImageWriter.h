@@ -40,7 +40,8 @@ public:
 
     mitkWriterMacro
 
-    itkNewMacro( Self )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::TbssRoiImage InputType;
 

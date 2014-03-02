@@ -59,7 +59,8 @@ class MitkSegmentation_EXPORT OverwriteSliceImageFilter : public ImageToImageFil
   public:
 
     mitkClassMacro(OverwriteSliceImageFilter, ImageToImageFilter);
-    itkNewMacro(OverwriteSliceImageFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Which slice to overwrite (first one has index 0).

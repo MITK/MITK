@@ -35,7 +35,8 @@ public:
   typedef SmartPointer<const Self>                ConstPointer;
   typedef DWIVoxelFunctor                         Superclass;
   /** Method for creation through the object factory. */
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   /** Runtime information support. */
   itkTypeMacro(ADCAverageFunctor, DWIVoxelFunctor)
 

@@ -39,7 +39,8 @@ namespace mitk
   public:
     mitkClassMacro(VolumeCalculator,itk::Object);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     itkSetObjectMacro(Image,Image);
     /**
     * Sets threshold, all voxels that are equal or greater are accepted.

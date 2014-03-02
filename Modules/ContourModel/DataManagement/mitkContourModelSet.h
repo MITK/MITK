@@ -35,7 +35,8 @@ namespace mitk
 
     mitkClassMacro(ContourModelSet, mitk::BaseData);
 
-    itkNewMacro(ContourModelSet);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     mitkCloneMacro(ContourModelSet);
 

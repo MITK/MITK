@@ -97,7 +97,8 @@ public:
 
   mitkClassMacro( RenderingModeProperty, EnumerationProperty );
 
-  itkNewMacro(RenderingModeProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(RenderingModeProperty, const IdType&);
 

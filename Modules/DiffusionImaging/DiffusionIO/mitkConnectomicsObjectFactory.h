@@ -26,7 +26,8 @@ class ConnectomicsObjectFactory : public CoreObjectFactoryBase
 {
   public:
     mitkClassMacro(ConnectomicsObjectFactory,CoreObjectFactoryBase)
-    itkNewMacro(ConnectomicsObjectFactory)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     ~ConnectomicsObjectFactory();
 

@@ -39,7 +39,8 @@ public:
   /** Run-time type information (and related methods). */
   mitkClassMacro(SubImageSelector,ImageToImageFilter);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void SetPosNr(int p);
 

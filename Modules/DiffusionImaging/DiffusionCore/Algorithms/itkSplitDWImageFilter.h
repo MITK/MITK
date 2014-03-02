@@ -61,7 +61,8 @@ public:
   typedef std::map< unsigned int, IndexListType> BValueMapType;
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Runtime information support. */
   itkTypeMacro(SplitDWImageFilter, ImageToImageFilter);

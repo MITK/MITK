@@ -42,7 +42,8 @@ public:
 
   mitkClassMacro( VtkVolumeRenderingProperty, EnumerationProperty );
 
-  itkNewMacro(VtkVolumeRenderingProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(VtkVolumeRenderingProperty, const IdType&);
 

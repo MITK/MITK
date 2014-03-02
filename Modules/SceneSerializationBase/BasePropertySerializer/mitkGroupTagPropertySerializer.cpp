@@ -31,7 +31,8 @@ class MitkSceneSerializationBase_EXPORT GroupTagPropertySerializer : public Base
   public:
 
     mitkClassMacro( GroupTagPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

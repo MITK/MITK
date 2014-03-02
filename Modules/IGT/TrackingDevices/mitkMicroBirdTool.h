@@ -32,7 +32,8 @@ namespace mitk {
     {
     public:
       mitkClassMacro(MicroBirdTool, InternalTrackingTool);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
     protected:
       MicroBirdTool();
       virtual ~MicroBirdTool();

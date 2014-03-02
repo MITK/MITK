@@ -51,7 +51,8 @@ class MITK_CORE_EXPORT Geometry2DDataMapper2D : public GLMapper
 public:
   mitkClassMacro(Geometry2DDataMapper2D, GLMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
     * \brief Get the Geometry2DData to map

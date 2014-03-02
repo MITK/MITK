@@ -32,7 +32,8 @@ namespace mitk
   public:
 
     mitkClassMacro( ContourModelSetSource, BaseDataSource )
-    itkNewMacro( Self )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef ContourModelSet OutputType;
 

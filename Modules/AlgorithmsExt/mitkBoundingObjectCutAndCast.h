@@ -38,7 +38,8 @@ template <typename TPixel> class BoundingObjectCutAndCast : public BoundingObjec
 {
 public:
   mitkClassMacro(BoundingObjectCutAndCast, BoundingObjectCutter);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef TPixel PixelType;
 

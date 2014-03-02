@@ -47,7 +47,8 @@ class MitkSegmentation_EXPORT WatershedTool : public AutoSegmentationTool
   public:
 
     mitkClassMacro(WatershedTool, AutoSegmentationTool);
-    itkNewMacro(WatershedTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void SetThreshold(double t) {
       m_Threshold = t;

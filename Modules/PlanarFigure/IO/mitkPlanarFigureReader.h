@@ -42,7 +42,8 @@ public:
 
     mitkClassMacro( PlanarFigureReader, FileReader );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * @brief Sets the filename of the file to be read

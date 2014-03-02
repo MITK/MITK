@@ -36,7 +36,8 @@ namespace mitk {
     {
     public:
       mitkClassMacro(USProbe,itk::Object);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
       mitkNewMacro1Param(Self, std::string);
 
       /**

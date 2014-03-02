@@ -26,7 +26,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(ContourObjectFactory,CoreObjectFactoryBase);
-    itkNewMacro(ContourObjectFactory);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
     virtual void SetDefaultProperties(mitk::DataNode* node);
     virtual const char* GetFileExtensions();

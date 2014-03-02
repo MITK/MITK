@@ -34,7 +34,8 @@ class MITK_CORE_EXPORT ThinPlateSplineCurvedGeometry : public LandmarkProjectorB
 public:
   mitkClassMacro(ThinPlateSplineCurvedGeometry, LandmarkProjectorBasedCurvedGeometry);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void ComputeGeometry();
 

@@ -27,7 +27,8 @@ class MitkPlanarFigure_EXPORT PlanarFigureObjectFactory : public CoreObjectFacto
 public:
 
   mitkClassMacro(PlanarFigureObjectFactory,CoreObjectFactoryBase)
-  itkNewMacro(PlanarFigureObjectFactory)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   ~PlanarFigureObjectFactory();
 

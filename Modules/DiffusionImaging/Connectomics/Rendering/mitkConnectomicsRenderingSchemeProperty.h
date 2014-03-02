@@ -37,7 +37,8 @@ public:
 
   mitkClassMacro( ConnectomicsRenderingSchemeProperty, EnumerationProperty );
 
-  itkNewMacro(ConnectomicsRenderingSchemeProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(ConnectomicsRenderingSchemeProperty, const IdType&);
 

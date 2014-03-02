@@ -33,7 +33,8 @@ namespace mitk {
     {
     public:
       mitkClassMacro(USImageToUSImageFilter, mitk::ImageToImageFilter);
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
       // ---- OVERRIDDEN INHERITED METHODS ---- //
       virtual void SetInput (const mitk::USImage *image);

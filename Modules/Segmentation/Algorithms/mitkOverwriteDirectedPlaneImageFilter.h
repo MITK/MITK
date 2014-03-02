@@ -59,7 +59,8 @@ class MitkSegmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageTo
   public:
 
     mitkClassMacro(OverwriteDirectedPlaneImageFilter, ImageToImageFilter);
-    itkNewMacro(OverwriteDirectedPlaneImageFilter);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Which plane to overwrite

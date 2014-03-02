@@ -32,7 +32,8 @@ class MitkSceneSerialization_EXPORT PropertyListDeserializer : public itk::Objec
   public:
 
     mitkClassMacro( PropertyListDeserializer, itk::Object );
-    itkNewMacro(Self); // is this needed? should never be instantiated, only subclasses should
+    itkFactorylessNewMacro(Self) // is this needed? should never be instantiated, only subclasses should
+    itkCloneMacro(Self)
 
     itkSetStringMacro(Filename);
     itkGetStringMacro(Filename);

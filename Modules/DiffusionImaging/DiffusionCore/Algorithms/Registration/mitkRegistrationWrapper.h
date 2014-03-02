@@ -32,7 +32,8 @@ public:
   typedef double* RidgidTransformType;
 
   mitkClassMacro(RegistrationWrapper, itk::LightObject)
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
    * @brief ApplyTransformationToImage Applies transformation from GetTransformation to provided image.

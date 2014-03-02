@@ -40,7 +40,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(ContourModelToPointSetFilter, PointSetSource)
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef PointSet OutputType;
     typedef OutputType::Pointer OutputTypePointer;

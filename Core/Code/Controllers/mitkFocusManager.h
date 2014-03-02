@@ -40,7 +40,8 @@ namespace mitk {
 {
   public:
   mitkClassMacro(FocusManager, itk::Object);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   //##Documentation
   //##@brief Element, that can be focused and held here.

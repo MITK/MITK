@@ -44,7 +44,8 @@ namespace itk{
     typedef ImageToImageFilter< VectorImage< TPixelType, 3 >, VectorImage< TPixelType, 3 > > Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(AddArtifactsToDwiImageFilter, ImageToImageFilter)

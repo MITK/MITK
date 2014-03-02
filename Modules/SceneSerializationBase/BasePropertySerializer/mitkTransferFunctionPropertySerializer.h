@@ -26,7 +26,8 @@ namespace mitk
     public:
 
       mitkClassMacro( TransferFunctionPropertySerializer, BasePropertySerializer );
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
       virtual TiXmlElement* Serialize();
       virtual BaseProperty::Pointer Deserialize(TiXmlElement* element);

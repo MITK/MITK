@@ -36,7 +36,8 @@ class MitkSegmentationUI_EXPORT QmitkDrawPaintbrushToolGUI : public QmitkPaintbr
   public:
 
     mitkClassMacro(QmitkDrawPaintbrushToolGUI, QmitkPaintbrushToolGUI);
-    itkNewMacro(QmitkDrawPaintbrushToolGUI);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual ~QmitkDrawPaintbrushToolGUI();
 

@@ -31,7 +31,8 @@ class MitkSceneSerializationBase_EXPORT AnnotationPropertySerializer : public Ba
   public:
 
     mitkClassMacro( AnnotationPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

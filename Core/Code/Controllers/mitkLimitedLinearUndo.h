@@ -43,7 +43,8 @@ public:
   typedef std::vector<UndoStackItem*>::reverse_iterator UndoContainerRevIter;
 
   mitkClassMacro(LimitedLinearUndo, UndoModel);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual bool SetOperationEvent(UndoStackItem* stackItem);
 

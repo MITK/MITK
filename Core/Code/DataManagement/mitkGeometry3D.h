@@ -102,7 +102,8 @@ namespace mitk {
       typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;
 
       /** Method for creation through the object factory. */
-      itkNewMacro(Self);
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
       typedef itk::ScalableAffineTransform<ScalarType, 3>    TransformType;
       typedef itk::BoundingBox<unsigned long, 3, ScalarType> BoundingBoxType;

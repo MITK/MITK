@@ -35,7 +35,8 @@ namespace mitk
     typedef mitk::ConnectomicsNetwork OutputType;
 
     mitkClassMacro( ConnectomicsNetworkReader, BaseDataSource );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     const char* GetFileName() const;
     void SetFileName(const char* aFileName);

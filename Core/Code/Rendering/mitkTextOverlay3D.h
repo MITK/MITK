@@ -57,7 +57,8 @@ public:
   };
 
   mitkClassMacro(TextOverlay3D, mitk::VtkOverlay3D);
-  itkNewMacro(TextOverlay3D);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 protected:
 

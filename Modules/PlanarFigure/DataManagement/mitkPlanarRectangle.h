@@ -36,7 +36,8 @@ class MitkPlanarFigure_EXPORT PlanarRectangle : public PlanarFigure
 public:
   mitkClassMacro( PlanarRectangle, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   /** \brief Place figure in its minimal configuration (a point at least)

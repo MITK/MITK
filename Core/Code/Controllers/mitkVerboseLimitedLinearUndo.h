@@ -41,7 +41,8 @@ class MITK_CORE_EXPORT VerboseLimitedLinearUndo : public LimitedLinearUndo
 {
 public:
   mitkClassMacro(VerboseLimitedLinearUndo, LimitedLinearUndo);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef std::pair<int,std::string> StackDescriptionItem;
   typedef std::vector<StackDescriptionItem> StackDescription; /// a list of pairs (int,string), representing a stack with ObjectEventIDs and descriptions

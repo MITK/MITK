@@ -41,7 +41,8 @@ class MitkQuantification_EXPORT TbssImageSource : public ImageSource
 {
 public:
   mitkClassMacro(TbssImageSource, BaseDataSource)
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef TbssImage OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;

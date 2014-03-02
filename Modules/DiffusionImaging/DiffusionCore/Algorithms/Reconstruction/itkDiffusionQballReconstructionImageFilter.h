@@ -130,7 +130,8 @@ public:
                           Superclass;
 
    /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Runtime information support. */
   itkTypeMacro(DiffusionQballReconstructionImageFilter,

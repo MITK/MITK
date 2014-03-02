@@ -31,7 +31,8 @@ class MitkSceneSerializationBase_EXPORT Point3dPropertySerializer : public BaseP
   public:
 
     mitkClassMacro( Point3dPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

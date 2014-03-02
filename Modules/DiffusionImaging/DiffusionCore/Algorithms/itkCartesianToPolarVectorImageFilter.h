@@ -104,7 +104,8 @@ namespace itk
     itkTypeMacro( CartesianToPolarVectorImageFilter, UnaryFunctorImageFilter );
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Print internal ivars */
     void PrintSelf(std::ostream& os, Indent indent) const

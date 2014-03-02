@@ -48,7 +48,8 @@ namespace mitk {
 public:
   mitkClassMacro(TransferFunctionInitializer, itk::Object);
 
-  itkNewMacro( TransferFunctionInitializer );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro1Param(TransferFunctionInitializer, TransferFunction::Pointer);
 
   static void GetPresetNames(std::vector<std::string>& presetNames);

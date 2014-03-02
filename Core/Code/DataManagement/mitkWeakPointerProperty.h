@@ -38,7 +38,8 @@ namespace mitk {
   public:
     mitkClassMacro(WeakPointerProperty, BaseProperty);
 
-    itkNewMacro(WeakPointerProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(WeakPointerProperty, itk::Object*);
 
     virtual ~WeakPointerProperty();

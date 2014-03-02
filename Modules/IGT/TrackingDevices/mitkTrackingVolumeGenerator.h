@@ -49,7 +49,8 @@ class MitkIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
   public:
 
     mitkClassMacro(TrackingVolumeGenerator, mitk::SurfaceSource)
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
 
     /**

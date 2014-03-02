@@ -39,7 +39,8 @@ class DEPRECATED() MitkExt_EXPORT LineMapper2D : public PointSetGLMapper2D
 {
 public:
   mitkClassMacro(LineMapper2D, PointSetGLMapper2D);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   //##Documentation
   //## @brief Get the PointDataList to map

@@ -52,7 +52,8 @@ class MitkPlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : p
   public:
 
     mitkClassMacro(PlanarFigureSegmentationController, itk::Object);
-    itkNewMacro(PlanarFigureSegmentationController); /// specify the segmentation image that should be interpolated
+    itkFactorylessNewMacro(PlanarFigureSegmentationController) /// specify the segmentation image that should be interpolated
+    itkCloneMacro(Self)
 
     virtual ~PlanarFigureSegmentationController();
 

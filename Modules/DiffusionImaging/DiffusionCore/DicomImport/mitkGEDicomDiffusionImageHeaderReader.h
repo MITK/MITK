@@ -28,7 +28,8 @@ namespace mitk
   public:
 
     mitkClassMacro( GEDicomDiffusionImageHeaderReader, DicomDiffusionImageHeaderReader );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual void Update();
 

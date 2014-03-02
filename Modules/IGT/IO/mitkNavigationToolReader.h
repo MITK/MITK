@@ -40,7 +40,8 @@ namespace mitk {
   friend class mitk::NavigationToolStorageDeserializer;
   public:
     mitkClassMacro(NavigationToolReader,itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * @brief          This method reads a navigation tool from a file.

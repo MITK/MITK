@@ -43,7 +43,8 @@ class MITK_CORE_EXPORT BaseController : public StateMachine
 public:
   /** Standard class typedefs. */
   mitkClassMacro(BaseController, StateMachine);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Method for creation through ::New */
   mitkNewMacro1Param(Self, const char *);

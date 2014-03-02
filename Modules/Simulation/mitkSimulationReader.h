@@ -29,7 +29,8 @@ namespace mitk
     static bool CanReadFile(const std::string& filename, const std::string& filePrefix, const std::string& filePattern);
 
     mitkClassMacro(SimulationReader, BaseDataSource);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     const char* GetFileName() const;
     void SetFileName(const char* aFileName);

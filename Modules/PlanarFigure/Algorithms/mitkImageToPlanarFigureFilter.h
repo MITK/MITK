@@ -32,7 +32,8 @@ class MitkPlanarFigure_EXPORT ImageToPlanarFigureFilter : public PlanarFigureSou
 {
 public:
   mitkClassMacro(ImageToPlanarFigureFilter,PlanarFigureSource);
-  //itkNewMacro(Self);
+  //itkFactorylessNewMacro(Self)
+  //itkCloneMacro(Self)
 
   /** Some convenient typedefs. */
   typedef mitk::Image                    InputImageType;

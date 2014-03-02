@@ -35,7 +35,8 @@ class USTelemedImageSource : public USImageSource
 {
 public:
   mitkClassMacro(USTelemedImageSource, USImageSource);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /**
     * Implementation of the superclass method. Returns the pointer

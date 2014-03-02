@@ -69,7 +69,7 @@ namespace mitk
   To learn about the MITK implementation of state machines in general, have a look at \ref InteractionPage.
 
   To derive a non-abstract tool, you inherit from mitk::Tool (or some other base class further down the inheritance tree), and in your
-  own parameterless constructor (that is called from the itkNewMacro that you use) you pass a StateMachine pattern name to the superclass.
+  own parameterless constructor (that is called from the itkFactorylessNewMacro that you use) you pass a StateMachine pattern name to the superclass.
   Names for valid patterns can be found in StateMachine.xml (which might be enhanced by you).
 
   You have to implement at least GetXPM() and GetName() to provide some identification.

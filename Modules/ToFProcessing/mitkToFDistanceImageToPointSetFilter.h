@@ -49,7 +49,8 @@ namespace mitk
   public:
 
     mitkClassMacro( ToFDistanceImageToPointSetFilter , PointSetSource );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     itkSetMacro(CameraIntrinsics,mitk::CameraIntrinsics::Pointer);
 

@@ -39,7 +39,8 @@ class MitkSegmentation_EXPORT Contour : public BaseData
 public:
   mitkClassMacro(Contour, BaseData);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkCloneMacro(Contour);
 

@@ -71,7 +71,8 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
     /**
      * Method for creation through the object factory.
      */
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * Map structure to hold the properties: the map key is a string,

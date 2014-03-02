@@ -38,7 +38,8 @@ namespace mitk
   public:
 
     mitkClassMacro( DiffusionImageHeaderInformation, itk::Object );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef std::vector< std::string > FileNamesContainer;
 

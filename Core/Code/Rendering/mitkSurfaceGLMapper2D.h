@@ -80,7 +80,8 @@ class MITK_CORE_EXPORT SurfaceGLMapper2D : public GLMapper
 public:
   mitkClassMacro(SurfaceGLMapper2D, GLMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   const Surface* GetInput(void);
 

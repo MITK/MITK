@@ -103,7 +103,8 @@ namespace mitk
     typedef itk::Image< float, 2 > InternalImage2DType;
 
     mitkClassMacro( PartialVolumeAnalysisHistogramCalculator, itk::Object )
-    itkNewMacro( PartialVolumeAnalysisHistogramCalculator )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** \brief Set image from which to compute statistics. */
     void SetImage( const mitk::Image *image );

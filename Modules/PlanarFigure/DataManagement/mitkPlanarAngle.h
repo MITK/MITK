@@ -36,7 +36,8 @@ class MitkPlanarFigure_EXPORT PlanarAngle : public PlanarFigure
 public:
   mitkClassMacro( PlanarAngle, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 public:
   // Feature identifiers
   const unsigned int FEATURE_ID_ANGLE;

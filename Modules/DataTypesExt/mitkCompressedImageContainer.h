@@ -42,7 +42,8 @@ class MitkDataTypesExt_EXPORT CompressedImageContainer : public itk::Object
   public:
 
     mitkClassMacro(CompressedImageContainer, Object);
-    itkNewMacro(CompressedImageContainer);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * \brief Creates a compressed version of the image.

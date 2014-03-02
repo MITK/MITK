@@ -38,7 +38,8 @@ class MitkSegmentationUI_EXPORT QmitkFastMarchingTool3DGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkFastMarchingTool3DGUI, QmitkToolGUI);
-  itkNewMacro(QmitkFastMarchingTool3DGUI);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void OnThresholdChanged(int current);
 

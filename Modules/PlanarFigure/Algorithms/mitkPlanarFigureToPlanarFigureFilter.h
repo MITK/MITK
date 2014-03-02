@@ -37,7 +37,8 @@ class MitkPlanarFigure_EXPORT PlanarFigureToPlanarFigureFilter : public mitk::Pl
 {
 public:
     mitkClassMacro( PlanarFigureToPlanarFigureFilter, PlanarFigureSource );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef PlanarFigure InputType;
     typedef InputType::Pointer InputTypePointer;

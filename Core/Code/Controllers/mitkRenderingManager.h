@@ -410,7 +410,8 @@ class MITK_CORE_EXPORT TestingRenderingManager : public RenderingManager
 {
 public:
   mitkClassMacro(TestingRenderingManager,RenderingManager);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 protected:
   virtual void GenerateRenderingRequestEvent()

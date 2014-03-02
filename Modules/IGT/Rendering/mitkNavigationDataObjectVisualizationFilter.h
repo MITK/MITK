@@ -36,7 +36,8 @@ namespace mitk {
   public:
     mitkClassMacro(NavigationDataObjectVisualizationFilter, NavigationDataToNavigationDataFilter);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** Defines the rotation modes of this tracking device which results in different representations
      *  of quaternions.

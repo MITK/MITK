@@ -41,7 +41,8 @@ class MitkExt_EXPORT GeometryDataSource : public BaseDataSource
 public:
 
   mitkClassMacro(GeometryDataSource, BaseDataSource)
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef mitk::GeometryData OutputType;
 

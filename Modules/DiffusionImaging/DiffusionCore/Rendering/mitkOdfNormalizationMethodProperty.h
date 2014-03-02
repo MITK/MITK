@@ -44,7 +44,8 @@ class MitkDiffusionCore_EXPORT OdfNormalizationMethodProperty : public Enumerati
 public:
 
   mitkClassMacro( OdfNormalizationMethodProperty, EnumerationProperty );
-  itkNewMacro(OdfNormalizationMethodProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(OdfNormalizationMethodProperty, const IdType&);
 
@@ -109,7 +110,8 @@ class MitkDiffusionCore_EXPORT OdfNormalizationMethodPropertySerializer : public
   public:
 
     mitkClassMacro( OdfNormalizationMethodPropertySerializer, EnumerationPropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
     {

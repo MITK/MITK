@@ -39,7 +39,8 @@ namespace mitk
     typedef mitk::FiberBundleX OutputType;
 
     mitkClassMacro( FiberBundleXReader, BaseDataSource );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     const char* GetFileName() const;
     void SetFileName(const char* aFileName);

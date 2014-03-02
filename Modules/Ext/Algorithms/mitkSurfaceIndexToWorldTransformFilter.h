@@ -39,7 +39,8 @@ public:
   * Standard mitk class macro
   */
   mitkClassMacro(SurfaceIndexToWorldTransformFilter, SurfaceToSurfaceFilter);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 protected:
 

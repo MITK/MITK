@@ -34,7 +34,8 @@ class MITK_CORE_EXPORT ImageChannelSelector : public SubImageSelector
 public:
   mitkClassMacro(ImageChannelSelector,SubImageSelector);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkGetConstMacro(ChannelNr,int);
   itkSetMacro(ChannelNr,int);

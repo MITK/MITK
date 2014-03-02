@@ -25,7 +25,8 @@ class DiffusionCoreObjectFactory : public CoreObjectFactoryBase
 {
   public:
     mitkClassMacro(DiffusionCoreObjectFactory,CoreObjectFactoryBase)
-    itkNewMacro(DiffusionCoreObjectFactory)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     ~DiffusionCoreObjectFactory();
 

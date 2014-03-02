@@ -61,7 +61,8 @@ class MitkSegmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
   public:
 
     mitkClassMacro(RegionGrowingTool, FeedbackContourTool);
-    itkNewMacro(RegionGrowingTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual us::ModuleResource GetCursorIconResource() const;

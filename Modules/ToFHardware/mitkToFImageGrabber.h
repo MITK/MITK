@@ -41,7 +41,8 @@ namespace mitk
 
     mitkClassMacro( ToFImageGrabber , ImageSource );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void ShowDebugImage(float* distances);
     /*!

@@ -44,7 +44,8 @@ namespace mitk
   {
     public:
      mitkClassMacro( ImageBackground2D, itk::Object );
-     itkNewMacro( Self );
+     itkFactorylessNewMacro(Self)
+     itkCloneMacro(Self)
 
     ////##Documentation
     ////## @brief returns the mitkRenderWindow in which the video is displayed.

@@ -63,7 +63,8 @@ class MITK_CORE_EXPORT PointSetGLMapper2D : public GLMapper
 public:
   mitkClassMacro(PointSetGLMapper2D, GLMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** @brief Get the PointDataList to map */
   virtual const mitk::PointSet * GetInput(void);

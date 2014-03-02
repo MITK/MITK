@@ -73,7 +73,8 @@ namespace itk
     itkStaticConstMacro (ImageDimension, unsigned int,
       OutputImageType::ImageDimension);
 
-    itkNewMacro (Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef vnl_vector_fixed< double, 3 >               GradientType;
     typedef itk::VectorContainer< unsigned int, GradientType >    GradientListType;

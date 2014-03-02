@@ -39,7 +39,8 @@ namespace mitk {
     /*!
     * \brief Method for creation through the object factory.
     */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     * \brief Sets the reference image (fixed image) for the registration.

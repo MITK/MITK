@@ -57,7 +57,8 @@ class MitkSegmentation_EXPORT CorrectorTool2D : public FeedbackContourTool
   public:
 
     mitkClassMacro(CorrectorTool2D, FeedbackContourTool);
-    itkNewMacro(CorrectorTool2D);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual us::ModuleResource GetCursorIconResource() const;

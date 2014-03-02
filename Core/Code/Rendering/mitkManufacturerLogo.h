@@ -45,7 +45,8 @@ public:
 
   mitkClassMacro( ManufacturerLogo, BaseData );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   enum LogoPosition{ UpperLeft, UpperRight, LowerLeft, LowerRight, Middle };
 

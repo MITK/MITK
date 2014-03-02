@@ -39,7 +39,8 @@ public:
 
     mitkClassMacro(ContourSetMapper2D, GLMapper);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * reimplemented from Baseclass

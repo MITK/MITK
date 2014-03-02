@@ -54,7 +54,8 @@ namespace mitk {
 
 
   protected:
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     VirtualTrackingTool();
     virtual ~VirtualTrackingTool();
 

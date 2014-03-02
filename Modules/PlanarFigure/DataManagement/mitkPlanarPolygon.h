@@ -36,7 +36,8 @@ class MitkPlanarFigure_EXPORT PlanarPolygon : public PlanarFigure
 public:
   mitkClassMacro( PlanarPolygon, PlanarFigure );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   /** \brief Set whether the polygon should be closed between first and last control point or not. */

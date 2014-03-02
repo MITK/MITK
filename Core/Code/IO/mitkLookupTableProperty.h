@@ -57,7 +57,8 @@ class MITK_CORE_EXPORT LookupTableProperty : public BaseProperty
 
     mitkClassMacro(LookupTableProperty, BaseProperty);
 
-    itkNewMacro(LookupTableProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(LookupTableProperty, const mitk::LookupTable::Pointer);
 
     itkGetObjectMacro(LookupTable, LookupTable );

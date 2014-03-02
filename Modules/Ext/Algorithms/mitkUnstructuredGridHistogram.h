@@ -31,7 +31,8 @@ class MitkExt_EXPORT UnstructuredGridHistogram : public itk::Statistics::Histogr
 public:
   mitkClassMacro(UnstructuredGridHistogram,itk::Statistics::Histogram<double>)
 
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void Initialize(mitk::UnstructuredGrid*);
 

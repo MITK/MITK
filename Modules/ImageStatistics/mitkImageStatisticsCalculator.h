@@ -109,7 +109,8 @@ public:
 
 
   mitkClassMacro( ImageStatisticsCalculator, itk::Object );
-  itkNewMacro( ImageStatisticsCalculator );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** \brief Set image from which to compute statistics. */
   void SetImage( const mitk::Image *image );

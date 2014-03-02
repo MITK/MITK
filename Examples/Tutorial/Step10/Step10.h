@@ -29,7 +29,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ExampleInteractor, DataInteractor);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
   protected:
     ExampleInteractor();

@@ -68,7 +68,8 @@ class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::
   public:
 
     mitkClassMacro(SegmentationInterpolationController, itk::Object);
-    itkNewMacro(SegmentationInterpolationController); /// specify the segmentation image that should be interpolated
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
       \brief Find interpolator for a given image.

@@ -39,7 +39,8 @@ class MitkSegmentationUI_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
 
   public:
     mitkClassMacro(QmitkWatershedToolGUI, QmitkToolGUI);
-    itkNewMacro(QmitkWatershedToolGUI);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
   protected slots:
 

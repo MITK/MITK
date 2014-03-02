@@ -55,7 +55,8 @@ class MitkExt_EXPORT LineVtkMapper3D : public PointSetVtkMapper3D
 
     mitkClassMacro(LineVtkMapper3D, PointSetVtkMapper3D);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
 
   protected:

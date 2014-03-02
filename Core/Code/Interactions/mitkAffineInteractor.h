@@ -44,7 +44,8 @@ class MITK_CORE_EXPORT AffineInteractor : public Interactor
 {
 public:
   mitkClassMacro(AffineInteractor,Interactor);
-//  itkNewMacro(Self);
+//  itkFactorylessNewMacro(Self)
+//  itkCloneMacro(Self)
   mitkNewMacro2Param(Self, const char*, DataNode*);
 
 protected:

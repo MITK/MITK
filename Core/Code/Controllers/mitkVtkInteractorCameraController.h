@@ -33,7 +33,8 @@ class MITK_CORE_EXPORT VtkInteractorCameraController : public CameraController
 {
 public:
   mitkClassMacro(VtkInteractorCameraController, CameraController);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   //##Documentation
   //## @brief Returns the vtkRenderWindowInteractor used internally by this CameraController

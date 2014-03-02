@@ -31,7 +31,8 @@ class MitkSceneSerializationBase_EXPORT IntLookupTablePropertySerializer : publi
   public:
 
     mitkClassMacro( IntLookupTablePropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

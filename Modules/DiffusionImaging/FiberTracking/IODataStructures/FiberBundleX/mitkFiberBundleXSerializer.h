@@ -29,7 +29,8 @@ class MitkFiberTracking_EXPORT FiberBundleXSerializer : public BaseDataSerialize
 {
   public:
     mitkClassMacro( FiberBundleXSerializer, BaseDataSerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     virtual std::string Serialize();
   protected:
     FiberBundleXSerializer();

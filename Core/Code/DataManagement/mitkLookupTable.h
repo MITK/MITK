@@ -52,7 +52,8 @@ public:
 
     mitkClassMacro( LookupTable, itk::DataObject );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * @returns the associated vtkLookupTable

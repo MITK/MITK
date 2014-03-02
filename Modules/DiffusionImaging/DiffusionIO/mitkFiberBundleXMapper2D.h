@@ -46,7 +46,8 @@ namespace mitk {
 
   public:
     mitkClassMacro(FiberBundleXMapper2D, VtkMapper);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitk::FiberBundleX* GetInput();
 
 

@@ -28,7 +28,8 @@ class DiffusionImageSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( DiffusionImageSerializer, BaseDataSerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     virtual std::string Serialize();
   protected:
     DiffusionImageSerializer();

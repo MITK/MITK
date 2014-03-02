@@ -55,7 +55,8 @@ namespace mitk {
   public:
 
     mitkClassMacro(ImageLiveWireContourModelFilter, ContourModelSource);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef ContourModel OutputType;
     typedef OutputType::Pointer OutputTypePointer;

@@ -36,7 +36,8 @@ class MitkSegmentationUI_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintb
   public:
 
     mitkClassMacro(QmitkErasePaintbrushToolGUI, QmitkPaintbrushToolGUI);
-    itkNewMacro(QmitkErasePaintbrushToolGUI);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
   signals:
 

@@ -38,7 +38,8 @@ class MitkAlgorithmsExt_EXPORT MovieGeneratorWin32 : public MovieGenerator
 public:
 
   mitkClassMacro(MovieGeneratorWin32, MovieGenerator);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void SetFileName( const char *fileName );
 

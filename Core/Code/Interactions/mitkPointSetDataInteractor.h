@@ -47,7 +47,8 @@ namespace mitk
 
   public:
     mitkClassMacro(PointSetDataInteractor, DataInteractor)
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
   protected:
     PointSetDataInteractor();

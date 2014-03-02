@@ -42,7 +42,8 @@ namespace mitk
 
   public:
     mitkClassMacro(NavigationToolWriter,itk::Object);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * @brief           Writes a navigation tool to a file.

@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 /**Documentation
-* ClaronTool has a protected constructor and a protected itkNewMacro
+* ClaronTool has a protected constructor and a protected itkFactorylessNewMacro
 * so that only it's friend class ClaronTrackingDevice is able to instantiate
 * tool objects. Therefore, we derive from ClaronTool and add a
-* public itkNewMacro, so that we can instantiate and test the class
+* public itkFactorylessNewMacro, so that we can instantiate and test the class
 *
 */
 class ClaronToolTestClass : public mitk::ClaronTool
@@ -31,7 +31,8 @@ public:
   /** make a public constructor, so that the test is able
   *   to instantiate NDIPassiveTool
   */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 protected:
   ClaronToolTestClass() : mitk::ClaronTool()
   {

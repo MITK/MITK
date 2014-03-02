@@ -66,7 +66,8 @@ class MITK_CORE_EXPORT VolumeDataVtkMapper3D : public VtkMapper
 public:
   mitkClassMacro(VolumeDataVtkMapper3D, VtkMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual const mitk::Image* GetInput();
 

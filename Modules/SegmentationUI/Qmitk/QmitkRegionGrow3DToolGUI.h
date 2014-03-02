@@ -32,7 +32,8 @@ class QmitkRegionGrow3DToolGUI : public QmitkToolGUI
 public:
   mitkClassMacro(QmitkRegionGrow3DToolGUI, QmitkToolGUI);
 
-  itkNewMacro(QmitkRegionGrow3DToolGUI);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   protected slots:
     void OnNewToolAssociated(mitk::Tool*);
@@ -85,7 +86,8 @@ class QmitkRegionGrow3DToolGUI : public QmitkToolGUI
 public:
   mitkClassMacro(QmitkRegionGrow3DToolGUI, QmitkToolGUI);
 
-  itkNewMacro(QmitkRegionGrow3DToolGUI);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   protected slots:
     void OnNewToolAssociated(mitk::Tool*);

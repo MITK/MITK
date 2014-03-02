@@ -38,7 +38,8 @@ public:
 
   mitkClassMacro(UnstructuredGrid, BaseData);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkCloneMacro(UnstructuredGrid);
 

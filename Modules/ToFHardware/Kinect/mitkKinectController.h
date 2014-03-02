@@ -37,7 +37,8 @@ namespace mitk
 
     mitkClassMacro( KinectController , itk::Object );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     unsigned int GetCaptureWidth() const;
     unsigned int GetCaptureHeight() const;

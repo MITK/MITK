@@ -28,7 +28,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(Simulation, BaseData);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     void Animate();
     sofa::core::visual::DrawTool* GetDrawTool();

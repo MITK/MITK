@@ -67,7 +67,8 @@ public:
 
   mitkClassMacro(ColorProperty, BaseProperty)
 
-  itkNewMacro(ColorProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   mitkNewMacro1Param(ColorProperty, const float*);
   mitkNewMacro1Param(ColorProperty, const mitk::Color&);
   mitkNewMacro3Param(ColorProperty, const float, const float, const float);

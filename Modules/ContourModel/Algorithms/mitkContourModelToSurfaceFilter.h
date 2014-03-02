@@ -38,7 +38,8 @@ namespace mitk {
     mitkClassMacro( ContourModelToSurfaceFilter, SurfaceSource );
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::Surface OutputType;
 

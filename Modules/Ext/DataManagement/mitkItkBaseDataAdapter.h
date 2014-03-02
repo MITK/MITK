@@ -32,7 +32,8 @@ class MitkExt_EXPORT ItkBaseDataAdapter : public BaseData
 {
 public:
   mitkClassMacro(ItkBaseDataAdapter, BaseData);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Typedef for the data object */
   typedef itk::DataObject DataType;

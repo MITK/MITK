@@ -30,7 +30,8 @@ class MitkSceneSerializationBase_EXPORT ClippingPropertySerializer : public Base
 {
   public:
     mitkClassMacro( ClippingPropertySerializer, BasePropertySerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual TiXmlElement* Serialize()
     {

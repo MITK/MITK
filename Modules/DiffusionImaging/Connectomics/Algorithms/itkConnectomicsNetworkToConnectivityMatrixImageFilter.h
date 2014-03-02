@@ -41,7 +41,8 @@ namespace itk
 
     typedef mitk::ConnectomicsNetwork  InputType;
 
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     itkTypeMacro( ConnectomicsNetworkToConnectivityMatrixImageFilter, ImageSource )
 
     /** Get/Set m_BinaryConnectivity **/

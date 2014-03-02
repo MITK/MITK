@@ -37,7 +37,8 @@ namespace mitk
 
     mitkClassMacro( ToFDeviceFactoryManager, itk::Object );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     std::vector<std::string> GetRegisteredDeviceFactories();
 

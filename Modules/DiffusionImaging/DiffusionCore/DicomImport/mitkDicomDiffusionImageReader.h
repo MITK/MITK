@@ -39,7 +39,8 @@ public:
   typedef itk::ImageSource< OutputImageType > ImageSourceType;
 
   mitkClassMacro( DicomDiffusionImageReader, ImageSourceType );
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   /** The size of the output image. */

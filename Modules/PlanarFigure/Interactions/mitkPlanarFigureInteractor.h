@@ -65,7 +65,8 @@ class MitkPlanarFigure_EXPORT PlanarFigureInteractor : public DataInteractor
 {
 public:
   mitkClassMacro(PlanarFigureInteractor, DataInteractor);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** \brief Sets the amount of precision */
   void SetPrecision( ScalarType precision );

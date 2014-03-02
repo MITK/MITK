@@ -27,7 +27,8 @@ class TwoOutputsFilter : public mitk::SurfaceToImageFilter
 {
 public:
   mitkClassMacro(TwoOutputsFilter, SurfaceToImageFilter);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 protected:
   TwoOutputsFilter()
   {

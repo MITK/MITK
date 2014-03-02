@@ -41,7 +41,8 @@ class MitkExt_EXPORT SeedsImage : public Image
 public:
 
   mitkClassMacro(SeedsImage, Image);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkGetMacro(LastPoint, mitk::Point3D);
 

@@ -33,7 +33,8 @@ class MitkExt_EXPORT AngleCorrectByPointFilter : public ImageToImageFilter
 public:
   mitkClassMacro(AngleCorrectByPointFilter, ImageToImageFilter);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkSetMacro(Center, Point3D);
   itkGetConstReferenceMacro(Center, Point3D);

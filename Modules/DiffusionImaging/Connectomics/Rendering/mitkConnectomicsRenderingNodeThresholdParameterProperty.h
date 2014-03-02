@@ -37,7 +37,8 @@ public:
 
   mitkClassMacro( ConnectomicsRenderingNodeThresholdParameterProperty, EnumerationProperty );
 
-  itkNewMacro(ConnectomicsRenderingNodeThresholdParameterProperty);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkNewMacro1Param(ConnectomicsRenderingNodeThresholdParameterProperty, const IdType&);
 

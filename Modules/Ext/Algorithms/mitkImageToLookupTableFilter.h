@@ -34,7 +34,8 @@ public:
 
   mitkClassMacro( ImageToLookupTableFilter, LookupTableSource );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   // typedefs for setting an image as input
   typedef mitk::Image                    InputImageType;

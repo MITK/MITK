@@ -47,7 +47,8 @@ class MitkSegmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
  public:
 
    mitkClassMacro(ImageToContourFilter,ImageToSurfaceFilter);
-   itkNewMacro(Self);
+   itkFactorylessNewMacro(Self)
+   itkCloneMacro(Self)
 
     /**
       \brief Set macro for the geometry of the slice. If it is not set explicitly the geometry will be taken from the slice

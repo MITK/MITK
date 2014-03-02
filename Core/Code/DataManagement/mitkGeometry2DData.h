@@ -34,7 +34,8 @@ class MITK_CORE_EXPORT Geometry2DData : public GeometryData
 public:
   mitkClassMacro(Geometry2DData, GeometryData);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   //##Documentation
   //## @brief Set the reference to a Geometry2D that is stored

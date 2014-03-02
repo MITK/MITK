@@ -35,7 +35,8 @@ public:
     typedef enum {DSRDoppler, StrainRate, DefaultLUT} LookupTableMode;
 
     mitkClassMacro( USLookupTableSource, LookupTableSource );
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /** @brief Some convenient typedefs. */
     typedef mitk::LookupTable OutputType;

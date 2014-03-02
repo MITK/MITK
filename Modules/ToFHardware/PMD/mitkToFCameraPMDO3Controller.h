@@ -37,7 +37,8 @@ namespace mitk
 
     mitkClassMacro( ToFCameraPMDO3Controller , mitk::ToFCameraPMDController );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /*!
     \brief opens a connection to the PMD O3 ToF camera

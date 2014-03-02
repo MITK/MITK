@@ -37,7 +37,8 @@ class MitkDiffusionCore_EXPORT RegistrationObject : public BaseData
 public:
 
   mitkClassMacro( RegistrationObject, BaseData );
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   void SetReferenceGeometry( mitk::Geometry3D::Pointer );
 

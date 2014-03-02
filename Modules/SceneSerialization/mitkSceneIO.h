@@ -37,7 +37,8 @@ class MitkSceneSerialization_EXPORT SceneIO : public itk::Object
   public:
 
     mitkClassMacro( SceneIO, itk::Object );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef DataStorage::SetOfObjects                                FailedBaseDataListType;
 

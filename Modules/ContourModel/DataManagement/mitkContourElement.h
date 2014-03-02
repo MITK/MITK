@@ -44,7 +44,8 @@ namespace mitk
 
     mitkClassMacro(ContourElement, itk::LightObject);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     mitkCloneMacro(Self);
 

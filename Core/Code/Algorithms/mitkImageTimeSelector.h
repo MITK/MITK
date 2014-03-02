@@ -34,7 +34,8 @@ class MITK_CORE_EXPORT ImageTimeSelector : public SubImageSelector
 public:
   mitkClassMacro(ImageTimeSelector,SubImageSelector);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   itkGetConstMacro(TimeNr,int);
   itkSetMacro(TimeNr,int);

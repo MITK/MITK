@@ -49,7 +49,8 @@ class MITK_CORE_EXPORT RenderWindowBase
 public:
 
   //mitkClassMacro(RenderWindowBase,itk::Object);
-  //itkNewMacro(Self);
+  //itkFactorylessNewMacro(Self)
+  //itkCloneMacro(Self)
 
 
   virtual ~RenderWindowBase();

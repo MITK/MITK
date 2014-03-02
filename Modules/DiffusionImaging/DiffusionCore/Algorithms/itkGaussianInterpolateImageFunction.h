@@ -60,7 +60,8 @@ public:
   itkTypeMacro( GaussianInterpolateImageFunction, InterpolateImageFunction );
 
   /** Method for creation through the object factory. */
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** ImageDimension constant */
   itkStaticConstMacro( ImageDimension, unsigned int,

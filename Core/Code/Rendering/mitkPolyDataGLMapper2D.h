@@ -46,7 +46,8 @@ public:
 
     mitkClassMacro( PolyDataGLMapper2D, GLMapper );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
      * Sets if the cut lines are colored by mapping cell data

@@ -63,7 +63,8 @@ class MitkSegmentation_EXPORT FastMarchingTool : public FeedbackContourTool
   public:
 
     mitkClassMacro(FastMarchingTool, FeedbackContourTool);
-    itkNewMacro(FastMarchingTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /* typedefs for itk pipeline */
     typedef float                                     InternalPixelType;

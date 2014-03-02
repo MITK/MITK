@@ -44,7 +44,8 @@ class MitkDataTypesExt_EXPORT OrganTypeProperty : public EnumerationProperty
   public:
 
     mitkClassMacro(OrganTypeProperty, EnumerationProperty);
-    itkNewMacro(OrganTypeProperty);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(OrganTypeProperty, const IdType&);
     mitkNewMacro1Param(OrganTypeProperty, const std::string&);
 

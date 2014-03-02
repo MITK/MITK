@@ -19,7 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usPrototypeServiceFactory.h>
 #include <usModuleContext.h>
 
-const std::string QmitkUSAbstractCustomWidget::US_DEVICE_PROPKEY_CLASS = "ork.mitk.services.UltrasoundCustomWidget.deviceClass";
+std::string QmitkUSAbstractCustomWidget::US_DEVICE_PROPKEY_CLASS()
+{
+  static std::string s = "ork.mitk.services.UltrasoundCustomWidget.deviceClass";
+  return s;
+}
 
 QmitkUSAbstractCustomWidget::QmitkUSAbstractCustomWidget(QWidget* parent)
   : QWidget(parent), m_PrototypeServiceFactory(0), m_IsClonedForQt(false)
@@ -84,7 +88,7 @@ us::ServiceProperties QmitkUSAbstractCustomWidget::GetServiceProperties() const
 {
   us::ServiceProperties result;
 
-  result[QmitkUSAbstractCustomWidget::US_DEVICE_PROPKEY_CLASS] = this->GetDeviceClass();
+  result[QmitkUSAbstractCustomWidget::US_DEVICE_PROPKEY_CLASS()] = this->GetDeviceClass();
 
   return result;
 }

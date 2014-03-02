@@ -57,7 +57,8 @@ public:
 
     mitkClassMacro( SurfaceVtkWriter, mitk::FileWriter );
 
-    itkNewMacro( Self );
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     mitkWriterMacro;
 

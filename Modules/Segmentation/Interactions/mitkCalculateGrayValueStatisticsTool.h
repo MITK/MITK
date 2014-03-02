@@ -47,7 +47,8 @@ class MitkSegmentation_EXPORT CalculateGrayValueStatisticsTool : public Segmenta
   Message<> StatisticsCompleted;
 
     mitkClassMacro(CalculateGrayValueStatisticsTool, SegmentationsProcessingTool);
-    itkNewMacro(CalculateGrayValueStatisticsTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
   virtual const char** GetXPM() const;
   virtual const char* GetName() const;

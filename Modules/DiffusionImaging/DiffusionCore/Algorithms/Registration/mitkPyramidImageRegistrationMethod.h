@@ -63,7 +63,8 @@ public:
   mitkClassMacro(PyramidImageRegistrationMethod, itk::Object)
 
   /** Smart pointer support */
-  itkNewMacro(Self)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** Typedef for the transformation matrix, corresponds to the InternalMatrixType from ITK transforms */
   typedef vnl_matrix_fixed< double, 3, 3> TransformMatrixType;

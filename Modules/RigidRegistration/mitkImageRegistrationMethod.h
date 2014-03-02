@@ -48,7 +48,8 @@ namespace mitk
 
     mitkClassMacro(ImageRegistrationMethod, ImageToImageFilter);
 
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     static const int LINEARINTERPOLATOR = 0;
     static const int NEARESTNEIGHBORINTERPOLATOR = 1;

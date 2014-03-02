@@ -39,7 +39,8 @@ class MitkDataTypesExt_EXPORT MultiStepper : public Stepper
 {
 public:
   mitkClassMacro(MultiStepper, Stepper);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
   void AddStepper(Stepper::Pointer stepper,unsigned int repeat = 1);
   void RemoveStepper(Stepper::Pointer stepper,unsigned int repeat = 1);
   /*void Next();

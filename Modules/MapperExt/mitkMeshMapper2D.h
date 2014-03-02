@@ -38,7 +38,8 @@ class MitkMapperExt_EXPORT MeshMapper2D : public GLMapper
 public:
   mitkClassMacro(MeshMapper2D, GLMapper);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   /** @brief Get the Mesh to map */
   const mitk::Mesh *GetInput(void);

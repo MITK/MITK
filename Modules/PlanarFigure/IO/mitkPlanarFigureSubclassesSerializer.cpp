@@ -28,8 +28,9 @@ class MitkPlanarFigure_EXPORT classname ## Serializer : public PlanarFigureSeria
 { \
 public: \
   \
-  mitkClassMacro( classname ## Serializer, PlanarFigureSerializer ); \
-  itkNewMacro(Self); \
+  mitkClassMacro( classname ## Serializer, PlanarFigureSerializer ) \
+  itkFactorylessNewMacro(Self) \
+  itkCloneMacro(Self) \
   \
 protected: \
   \

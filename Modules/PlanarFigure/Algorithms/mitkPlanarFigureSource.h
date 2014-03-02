@@ -39,7 +39,8 @@ class MitkPlanarFigure_EXPORT PlanarFigureSource : public mitk::BaseDataSource
 {
 public:
     mitkClassMacro( PlanarFigureSource, BaseDataSource )
-    itkNewMacro( Self )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef mitk::PlanarFigure OutputType;
     typedef OutputType::Pointer OutputTypePointer;

@@ -36,7 +36,8 @@ namespace mitk
 
     //SmartPointer Macros
     mitkClassMacro(WiiMoteVtkCameraController, CameraController);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
   protected:
 

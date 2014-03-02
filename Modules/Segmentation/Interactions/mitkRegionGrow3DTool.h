@@ -32,7 +32,8 @@ namespace mitk{
   {
   public:
     mitkClassMacro(RegionGrow3DTool, Tool);
-    itkNewMacro(RegionGrow3DTool);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     mitk::Message1<int> UpperThresholdValueChanged;
     mitk::Message1<int> LowerThresholdValueChanged;

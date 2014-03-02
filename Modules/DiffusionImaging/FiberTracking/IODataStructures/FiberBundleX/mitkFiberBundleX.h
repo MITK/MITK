@@ -58,7 +58,8 @@ public:
     virtual void SetRequestedRegion(const itk::DataObject*);
 
     mitkClassMacro( FiberBundleX, BaseData )
-    itkNewMacro( Self )
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>) // custom constructor
 
     // colorcoding related methods

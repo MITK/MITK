@@ -164,7 +164,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
 {
   public:
     mitkClassMacro(SliceNavigationController,BaseController);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     mitkNewMacro1Param(Self, const char *);
 
     /**

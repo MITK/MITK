@@ -79,7 +79,8 @@ class MITK_CORE_EXPORT Image : public SlicedData
 public:
   mitkClassMacro(Image, SlicedData);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   mitkCloneMacro(Image);
 

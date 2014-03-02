@@ -55,7 +55,8 @@ public:
     typedef mitk::FiberBundleX::Pointer                         FiberType;
     typedef vector< mitk::FiberBundleX::Pointer >               FiberContainerType;
 
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
     itkTypeMacro( FibersFromPlanarFiguresFilter, ProcessObject )
 
     virtual void Update(){

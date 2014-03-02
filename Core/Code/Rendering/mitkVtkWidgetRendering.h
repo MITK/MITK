@@ -46,7 +46,8 @@ public:
 
   mitkClassMacro( VtkWidgetRendering, BaseData );
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
 

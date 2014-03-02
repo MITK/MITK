@@ -45,7 +45,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(NavigationDataPlayer, NavigationDataPlayerBase);
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
     * \brief sets the file name and path for the PlayerMode NormalFile and ZipFile

@@ -59,7 +59,8 @@ public:
 
   mitkClassMacro(VolumeVisualizationImagePreprocessor, itk::Object);
 
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
 
   mitk::Image::Pointer Process( mitk::Image::Pointer originalCT,

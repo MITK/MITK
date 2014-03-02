@@ -42,7 +42,8 @@ public:
   mitkClassMacro(PlaneCutFilter, ImageToImageFilter);
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   typedef enum {FILL, FILL_INVERSE} FillMode;
 

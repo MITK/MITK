@@ -30,7 +30,8 @@ class TrackingToolTestClass : public mitk::TrackingTool
 public:
 
   mitkClassMacro(TrackingToolTestClass, mitk::TrackingTool);
-  itkNewMacro(Self);
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
 
   virtual void GetPosition(mitk::Point3D & /*position*/) const {};
   virtual void GetOrientation(mitk::Quaternion&  /*orientation*/) const {};

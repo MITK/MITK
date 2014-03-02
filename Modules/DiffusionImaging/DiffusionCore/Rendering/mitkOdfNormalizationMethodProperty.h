@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkEnumerationProperty.h"
 #include "mitkEnumerationPropertySerializer.h"
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 #include "mitkSerializerMacros.h"
 
@@ -39,7 +39,7 @@ namespace mitk
  * ODFN_MINMAX, ODFN_MAX, ODFN_NONE ODFN_GLOBAL_MAX
  * Default is ODFN_MINMAX
  */
-class DiffusionCore_EXPORT OdfNormalizationMethodProperty : public EnumerationProperty
+class MitkDiffusionCore_EXPORT OdfNormalizationMethodProperty : public EnumerationProperty
 {
 public:
 
@@ -105,7 +105,7 @@ protected:
   virtual void AddInterpolationTypes();
 };
 
-class DiffusionCore_EXPORT OdfNormalizationMethodPropertySerializer : public EnumerationPropertySerializer
+class MitkDiffusionCore_EXPORT OdfNormalizationMethodPropertySerializer : public EnumerationPropertySerializer
 {
   public:
 

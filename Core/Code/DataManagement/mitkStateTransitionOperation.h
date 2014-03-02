@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef STATETRANSITIONOPERATION_H_HEADER_INCLUDED_C1695462
 #define STATETRANSITIONOPERATION_H_HEADER_INCLUDED_C1695462
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkOperation.h"
 #include "mitkState.h"
 

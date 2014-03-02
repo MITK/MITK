@@ -18,11 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPlanarDoubleEllipse_h
 
 #include <mitkPlanarFigure.h>
-#include <PlanarFigureExports.h>
+#include <MitkPlanarFigureExports.h>
 
 namespace mitk
 {
-  class PlanarFigure_EXPORT PlanarDoubleEllipse : public PlanarFigure
+  class MitkPlanarFigure_EXPORT PlanarDoubleEllipse : public PlanarFigure
   {
   public:
     mitkClassMacro(PlanarDoubleEllipse, PlanarFigure);

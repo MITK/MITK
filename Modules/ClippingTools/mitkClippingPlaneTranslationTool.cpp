@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  MITK_TOOL_MACRO(ClippingTools_EXPORT, ClippingPlaneTranslationTool, "Clipping Tool Translation");
+  MITK_TOOL_MACRO(MitkClippingTools_EXPORT, ClippingPlaneTranslationTool, "Clipping Tool Translation");
 }
 
 mitk::ClippingPlaneTranslationTool::ClippingPlaneTranslationTool()

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _SPHEREINTERPOLATOR
 #define _SPHEREINTERPOLATOR
 
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 
 #include <vnl/vnl_vector_fixed.h>
 
@@ -29,7 +29,7 @@ using namespace std;
 /**
  * \brief Lookuptable based trilinear interpolation of spherically arranged scalar values.
  */
-class FiberTracking_EXPORT SphereInterpolator
+class MitkFiberTracking_EXPORT SphereInterpolator
 {
 
 public:

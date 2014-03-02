@@ -19,7 +19,7 @@
 
 #include <mitkVtkOverlay3D.h>
 #include <mitkLocalStorageHandler.h>
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 
 class vtkFollower;
 class vtkVectorText;

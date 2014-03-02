@@ -2,8 +2,6 @@
 # Basic MITK CMake variables
 #-----------------------------------
 
-set(LIBPOSTFIX "")
-
 # MITK_VERSION
 set(MITK_VERSION_MAJOR "2013")
 set(MITK_VERSION_MINOR "12")
@@ -46,6 +44,11 @@ endif()
 set(MODULES_CONF_DIRNAME modulesConf)
 set(MODULES_CONF_DIRS ${MITK_BINARY_DIR}/${MODULES_CONF_DIRNAME})
 
+# Configure module naming conventions
+set(MITK_MODULE_NAME_REGEX_MATCH "^[A-Z].*$")
+set(MITK_MODULE_NAME_REGEX_NOT_MATCH "^[Mm][Ii][Tt][Kk].*$")
+set(MITK_MODULE_NAME_PREFIX "Mitk")
+set(MITK_MODULE_NAME_DEFAULTS_TO_DIRECTORY_NAME 1)
 
 #-----------------------------------
 # Configuration of the buid-in MITK pixel types

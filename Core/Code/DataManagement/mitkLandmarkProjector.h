@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKLANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
 #define MITKLANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "itkObject.h"
 
 #include "mitkPlaneGeometry.h"

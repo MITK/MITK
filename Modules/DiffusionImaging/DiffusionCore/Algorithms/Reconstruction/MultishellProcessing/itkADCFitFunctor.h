@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-class DiffusionCore_EXPORT ADCFitFunctor : public DWIVoxelFunctor
+class MitkDiffusionCore_EXPORT ADCFitFunctor : public DWIVoxelFunctor
 {
 public:
   ADCFitFunctor(){}

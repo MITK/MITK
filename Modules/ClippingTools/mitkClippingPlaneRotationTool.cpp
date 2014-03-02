@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  MITK_TOOL_MACRO(ClippingTools_EXPORT, ClippingPlaneRotationTool, "Clipping Tool Rotation");
+  MITK_TOOL_MACRO(MitkClippingTools_EXPORT, ClippingPlaneRotationTool, "Clipping Tool Rotation");
 }
 
 mitk::ClippingPlaneRotationTool::ClippingPlaneRotationTool()

@@ -4,7 +4,7 @@
 // ITK
 #include <itkLightObject.h>
 // MITK
-#include <DiffusionCoreExports.h>
+#include <MitkDiffusionCoreExports.h>
 #include "mitkCommon.h"
 #include "mitkImage.h"
 
@@ -23,7 +23,7 @@ namespace mitk
  *  For DWI images a registerable B0 Image will automatically be extracted.
  *
  */
-class DiffusionCore_EXPORT RegistrationWrapper : public itk::LightObject
+class MitkDiffusionCore_EXPORT RegistrationWrapper : public itk::LightObject
 {
 public:
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef VtkImageReader_H_HEADER_INCLUDED
 #define VtkImageReader_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 

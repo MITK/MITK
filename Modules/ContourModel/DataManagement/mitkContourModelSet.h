@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourModelSet_H_
 
 #include "mitkCommon.h"
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 
 #include "mitkContourModel.h"
 
@@ -28,7 +28,7 @@ namespace mitk
 
   /** \brief
   */
-  class ContourModel_EXPORT ContourModelSet : public mitk::BaseData
+  class MitkContourModel_EXPORT ContourModelSet : public mitk::BaseData
   {
 
   public:

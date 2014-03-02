@@ -26,14 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsNetwork.h"
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk
 {
 
     /**
   * \brief A class to generate synthetic networks */
-  class Connectomics_EXPORT ConnectomicsSyntheticNetworkGenerator : public itk::Object
+  class MitkConnectomics_EXPORT ConnectomicsSyntheticNetworkGenerator : public itk::Object
   {
   public:
 

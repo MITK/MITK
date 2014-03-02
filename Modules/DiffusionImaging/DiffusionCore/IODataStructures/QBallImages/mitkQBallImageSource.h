@@ -20,11 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageSource.h"
 #include "mitkQBallImage.h"
-#include <DiffusionCoreExports.h>
+#include <MitkDiffusionCoreExports.h>
 
 namespace mitk {
 
-class DiffusionCore_EXPORT QBallImageSource : public ImageSource
+class MitkDiffusionCore_EXPORT QBallImageSource : public ImageSource
 {
 public:
 

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define EVENTMAPPER_H_HEADER_INCLUDED
 
 #include <mitkEvent.h>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkEventDescription.h>
 #include <vtkXMLParser.h>
 

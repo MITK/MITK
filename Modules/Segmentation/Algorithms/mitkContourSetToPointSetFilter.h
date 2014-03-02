@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourSetToPointSetFilter_h__
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkPointSet.h"
 #include "mitkPointSetSource.h"
 #include "mitkContourSet.h"
@@ -34,7 +34,7 @@ namespace mitk {
  * @ingroup SurfaceFilters
  * @ingroup Process
  */
-class Segmentation_EXPORT ContourSetToPointSetFilter : public PointSetSource
+class MitkSegmentation_EXPORT ContourSetToPointSetFilter : public PointSetSource
 {
 public:
   mitkClassMacro(ContourSetToPointSetFilter, PointSetSource);

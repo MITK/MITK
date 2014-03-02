@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef DISPLAYPOSITIONEVENT_H_HEADER_INCLUDED_C184F366
 #define DISPLAYPOSITIONEVENT_H_HEADER_INCLUDED_C184F366
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkEvent.h"
 #include "mitkVector.h"
 #include "mitkDataNode.h"

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef RawImageFileReader_H_HEADER_INCLUDED
 #define RawImageFileReader_H_HEADER_INCLUDED
 #include "itkVector.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 

@@ -1,3 +1,2 @@
-mitk_create_executable(Step4
-  DEPENDS QmitkExt
-  )
+mitk_create_executable(DEPENDS MitkQtWidgetsExt)
+

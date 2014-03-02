@@ -14,7 +14,7 @@ set_source_files_properties( Controllers/mitkSliceNavigationController.cpp COMPI
 # Mitk Core library.
 set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 0)
 
-MITK_CREATE_MODULE( Mitk
+MITK_CREATE_MODULE(Core
   INCLUDE_DIRS
     Algorithms Common DataManagement Controllers
     Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
@@ -46,7 +46,7 @@ if(MINGW)
   if(NOT _mitkCore_MINGW_linkflags)
     set(_mitkCore_MINGW_linkflags "")
   endif(NOT _mitkCore_MINGW_linkflags)
-  set_target_properties(Mitk PROPERTIES LINK_FLAGS "${_mitkCore_MINGW_linkflags} -Wl,--export-all-symbols")
+  set_target_properties(${MODULE_TARGET} PROPERTIES LINK_FLAGS "${_mitkCore_MINGW_linkflags} -Wl,--export-all-symbols")
 endif(MINGW)
 
 if(MSVC_IDE OR MSVC_VERSION OR MINGW)

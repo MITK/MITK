@@ -22,7 +22,7 @@ This file is based heavily on a corresponding ITK filter.
 #ifndef __itkDftImageFilter_h_
 #define __itkDftImageFilter_h_
 
-#include "FiberTrackingExports.h"
+#include <MitkFiberTrackingExports.h>
 #include <itkImageToImageFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include <vcl_complex.h>

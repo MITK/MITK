@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSurfaceInterpolationController_h_Included
 
 #include "mitkCommon.h"
-#include "SurfaceInterpolationExports.h"
+#include <MitkSurfaceInterpolationExports.h>
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkSurface.h"
 #include "mitkInteractionConst.h"
@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
- class SurfaceInterpolation_EXPORT SurfaceInterpolationController : public itk::Object
+ class MitkSurfaceInterpolation_EXPORT SurfaceInterpolationController : public itk::Object
  {
 
   public:

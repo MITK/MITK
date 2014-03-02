@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_WIIMOTEADDON_H_
 
 // export macro
-#include <mitkWiiMoteExports.h>
+#include <MitkWiiMoteExports.h>
 
 // mitk
 #include "mitkVector.h" // used for Point2D

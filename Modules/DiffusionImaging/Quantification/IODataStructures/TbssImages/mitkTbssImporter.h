@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorImage.h"
 
 #include "mitkTbssImage.h"
-#include "QuantificationExports.h"
+#include "MitkQuantificationExports.h"
 
 
 namespace mitk
@@ -37,7 +37,7 @@ namespace mitk
   * This class converts the FSL Nifty image to NRRD and adds information about the type of measurement and the study groups.
   */
 
-  class Quantification_EXPORT TbssImporter : public itk::Object {
+  class MitkQuantification_EXPORT TbssImporter : public itk::Object {
 
   public:
 

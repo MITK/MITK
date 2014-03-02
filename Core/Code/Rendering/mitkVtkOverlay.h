@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef VTKOVERLAY_H
 #define VTKOVERLAY_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkOverlay.h"
 #include <vtkSmartPointer.h>
 

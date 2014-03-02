@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkEraseRegionTool_h_Included
 
 #include "mitkSetRegionTool.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 namespace us {
 class ModuleResource;
@@ -42,7 +42,7 @@ namespace mitk
 
   $Author$
 */
-class Segmentation_EXPORT EraseRegionTool : public SetRegionTool
+class MitkSegmentation_EXPORT EraseRegionTool : public SetRegionTool
 {
   public:
 

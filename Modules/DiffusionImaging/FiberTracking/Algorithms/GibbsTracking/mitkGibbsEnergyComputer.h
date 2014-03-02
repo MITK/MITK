@@ -1,7 +1,7 @@
 #ifndef GIBBSENERGYCOMPUTER_H
 #define GIBBSENERGYCOMPUTER_H
 
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 #include <itkOrientationDistributionFunction.h>
 #include <mitkParticleGrid.h>
 #include <mitkSphereInterpolator.h>
@@ -15,7 +15,7 @@ using namespace mitk;
 /**
 * \brief ODF lookuptable based energy computer.   */
 
-class FiberTracking_EXPORT GibbsEnergyComputer : public EnergyComputer
+class MitkFiberTracking_EXPORT GibbsEnergyComputer : public EnergyComputer
 {
   public:
 

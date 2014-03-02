@@ -55,7 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vector>
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk {
 
@@ -64,7 +64,7 @@ namespace mitk {
     * \ingroup Mapper
     */
 
-  class Connectomics_EXPORT ConnectomicsNetworkMapper3D : public VtkMapper
+  class MitkConnectomics_EXPORT ConnectomicsNetworkMapper3D : public VtkMapper
   {
   public:
 

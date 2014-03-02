@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCorrectorAlgorithmhIncluded
 
 #include "mitkImageToImageFilter.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkContourModel.h"
 #include "ipSegmentation.h"
 
@@ -46,7 +46,7 @@ namespace mitk
  *
  * \sa CorrectorTool2D
  */
-class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
+class MitkSegmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
 {
   public:
 

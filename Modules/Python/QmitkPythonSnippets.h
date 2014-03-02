@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWidget>
 #include <QMap>
-#include "mitkPythonExports.h"
+#include <MitkPythonExports.h>
 struct QmitkPythonSnippetsData;
 
 ///

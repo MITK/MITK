@@ -304,14 +304,12 @@ DEPRECATED( MITK_CORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, con
  */
 MITK_CORE_EXPORT bool Equal( const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose );
 
-#pragma GCC visibility push(default)
 itkEventMacro( PointSetEvent, itk::AnyEvent );
 itkEventMacro( PointSetMoveEvent, PointSetEvent );
 itkEventMacro( PointSetSizeChangeEvent, PointSetEvent );
 itkEventMacro( PointSetAddEvent, PointSetSizeChangeEvent );
 itkEventMacro( PointSetRemoveEvent, PointSetSizeChangeEvent );
 itkEventMacro( PointSetExtendTimeRangeEvent, PointSetEvent );
-#pragma GCC visibility pop
 
 } // namespace mitk
 

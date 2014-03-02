@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFImageWriter_h
 #define __mitkToFImageWriter_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkCommon.h"
 #include "mitkToFImageGrabber.h"
 

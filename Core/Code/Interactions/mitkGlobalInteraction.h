@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define GLOBALINTERACTION_H_HEADER_INCLUDED_C152938A
 
 #include "mitkFocusManager.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkStateMachineFactory.h"
 #include "mitkEventMapper.h"
 #include "mitkInteractor.h"

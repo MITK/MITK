@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK includes
 #include <mitkImage.h>
 #include "mitkImageToImageFilter.h"
-#include "mitkToFProcessingExports.h"
+#include <MitkToFProcessingExports.h>
 // ITK includes
 #include "itkImage.h"
 
@@ -34,7 +34,7 @@ namespace mitk
   * @ingroup ToFProcessing
   */
 
-  class mitkToFProcessing_EXPORT ToFImageDownsamplingFilter : public ImageToImageFilter
+  class MitkToFProcessing_EXPORT ToFImageDownsamplingFilter : public ImageToImageFilter
   {
   public:
     mitkClassMacro(ToFImageDownsamplingFilter, ImageToImageFilter);

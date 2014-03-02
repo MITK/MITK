@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _PARTICLEGRID
 
 // MITK
-#include "FiberTrackingExports.h"
+#include <MitkFiberTrackingExports.h>
 #include <mitkParticle.h>
 
 // ITK
@@ -30,7 +30,7 @@ namespace mitk
 /**
 * \brief Contains and manages particles.   */
 
-class FiberTracking_EXPORT ParticleGrid
+class MitkFiberTracking_EXPORT ParticleGrid
 {
 
 public:
@@ -86,7 +86,7 @@ protected:
 
 };
 
-class FiberTracking_EXPORT Track
+class MitkFiberTracking_EXPORT Track
 {
 public:
     std::vector< EndPoint > track;

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVector.h"
 #include "mitkInteractionConst.h"
 
-#include "mitkWiiMoteExports.h"
+#include <MitkWiiMoteExports.h>
 
 namespace mitk
 {

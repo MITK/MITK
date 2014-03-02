@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef OVERLAYMANAGER_H
 #define OVERLAYMANAGER_H
 
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include <itkLightObject.h>
 #include <vtkSmartPointer.h>
 #include "mitkOverlay.h"

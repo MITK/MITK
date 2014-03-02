@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFeedbackContourTool.h"
 #include "mitkLegacyAdaptors.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 struct mitkIpPicDescriptor;
 
@@ -56,7 +56,7 @@ namespace mitk
 
   $Author$
 */
-class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
+class MitkSegmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
 {
   public:
 

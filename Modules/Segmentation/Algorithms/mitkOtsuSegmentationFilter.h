@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkImage.h"
 
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk {
 
@@ -36,7 +36,7 @@ namespace mitk {
 
   $Author: somebody$
 */
-class Segmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
+class MitkSegmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
 {
 
  public:

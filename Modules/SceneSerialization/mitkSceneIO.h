@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSceneIO_h_included
 #define mitkSceneIO_h_included
 
-#include "SceneSerializationExports.h"
+#include <MitkSceneSerializationExports.h>
 
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateBase.h"
@@ -32,7 +32,7 @@ namespace mitk
 class BaseData;
 class PropertyList;
 
-class SceneSerialization_EXPORT SceneIO : public itk::Object
+class MitkSceneSerialization_EXPORT SceneIO : public itk::Object
 {
   public:
 

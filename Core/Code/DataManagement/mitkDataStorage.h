@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDATASTORAGE_H_HEADER_INCLUDED_
 
 #include "itkObject.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkMessage.h"
 #include "itkVectorContainer.h"
 #include "mitkDataNode.h"

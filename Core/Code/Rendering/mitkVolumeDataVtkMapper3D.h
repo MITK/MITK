@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKVOLUMEDATAVTKMAPPER3D_H_HEADER_INCLUDED
 #define MITKVOLUMEDATAVTKMAPPER3D_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkImage.h"

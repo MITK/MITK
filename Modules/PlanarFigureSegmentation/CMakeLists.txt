@@ -1,5 +1,5 @@
 
-MITK_CREATE_MODULE( PlanarFigureSegmentation
-  DEPENDS SurfaceInterpolation PlanarFigure
+MITK_CREATE_MODULE(
+  DEPENDS MitkSurfaceInterpolation MitkPlanarFigure
   WARNINGS_AS_ERRORS
 )

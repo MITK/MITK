@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_TESTMANAGER_H_INCLUDED
 #define MITK_TESTMANAGER_H_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk {
   class MITK_CORE_EXPORT TestManager {

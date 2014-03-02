@@ -29,14 +29,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingNodeThresholdParameterProperty.h"
 #include "mitkConnectomicsRenderingSchemeProperty.h"
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 #define MITK_REGISTER_ENUM_SUB_SERIALIZER(classname) \
  \
 namespace mitk \
 { \
  \
-class Connectomics_EXPORT classname ## Serializer : public EnumerationPropertySerializer \
+class MitkConnectomics_EXPORT classname ## Serializer : public EnumerationPropertySerializer \
 { \
   public: \
      \

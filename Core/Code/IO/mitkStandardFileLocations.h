@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

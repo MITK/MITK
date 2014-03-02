@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkWeakPointer.h>
 #include <itkOpenCVImageBridge.h>
-#include <mitkOpenCVVideoSupportExports.h>
+#include <MitkOpenCVVideoSupportExports.h>
 
 namespace mitk
 {

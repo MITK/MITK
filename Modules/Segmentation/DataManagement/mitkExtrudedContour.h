@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKEXTRUDEDCONTOUR_H_HEADER_INCLUDED
 
 #include "mitkBoundingObject.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include <mitkContour.h>
 #include <vtkConfigure.h>
 #include <mitkPlaneGeometry.h>
@@ -42,7 +42,7 @@ namespace mitk {
 //## The m_Contour is extruded in the direction m_Vector until
 //## reaching m_ClippingGeometry.
 //## @ingroup Data
-class Segmentation_EXPORT ExtrudedContour : public BoundingObject
+class MitkSegmentation_EXPORT ExtrudedContour : public BoundingObject
 {
 public:
   mitkClassMacro(ExtrudedContour, BoundingObject);

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_ConnectomicsNetwork_H
 #define _MITK_ConnectomicsNetwork_H
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 #include "mitkBaseData.h"
 
@@ -48,7 +48,7 @@ namespace mitk {
   *  <li> double edge_weight - Used for boost and algorithms, should be between 0 and 1
   * </ul>
   */
-  class Connectomics_EXPORT ConnectomicsNetwork : public BaseData
+  class MitkConnectomics_EXPORT ConnectomicsNetwork : public BaseData
   {
   public:
     /** Structs for the graph */
@@ -229,7 +229,7 @@ namespace mitk {
   * - Smallworldness
   */
 
-  Connectomics_EXPORT bool Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNetwork* rightHandSide, mitk::ScalarType eps, bool verbose);
+  MitkConnectomics_EXPORT bool Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNetwork* rightHandSide, mitk::ScalarType eps, bool verbose);
 
 } // namespace mitk
 

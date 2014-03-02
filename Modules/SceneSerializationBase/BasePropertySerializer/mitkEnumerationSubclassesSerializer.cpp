@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk \
 { \
  \
-class SceneSerializationBase_EXPORT classname ## Serializer : public EnumerationPropertySerializer \
+class MitkSceneSerializationBase_EXPORT classname ## Serializer : public EnumerationPropertySerializer \
 { \
   public: \
      \

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-class DiffusionCore_EXPORT ADCAverageFunctor : public DWIVoxelFunctor
+class MitkDiffusionCore_EXPORT ADCAverageFunctor : public DWIVoxelFunctor
 {
 public:
   ADCAverageFunctor(){}

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ABSTRACTOVERLAYLAYOUTER_H
 #define ABSTRACTOVERLAYLAYOUTER_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <itkObject.h>
 #include <mitkCommon.h>
 #include "mitkOverlay.h"

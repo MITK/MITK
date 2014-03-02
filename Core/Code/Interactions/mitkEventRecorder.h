@@ -17,7 +17,7 @@
 #ifndef mitkEventRecorder_h
 #define mitkEventRecorder_h
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkInteractionEventObserver.h"
 #include "iostream"
 

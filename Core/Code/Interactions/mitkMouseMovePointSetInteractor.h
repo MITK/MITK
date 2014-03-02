@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKMOUSEMOVEPOINTSETINTERACTOR_H_HEADER_INCLUDED_C11202FF
 #define MITKMOUSEMOVEPOINTSETINTERACTOR_H_HEADER_INCLUDED_C11202FF
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkVector.h"
 #include <mitkPointSetInteractor.h>
 

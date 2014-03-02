@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkDicomDiffusionImageHeaderReader_h__
 #define __mitkDicomDiffusionImageHeaderReader_h__
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 #include <mitkFileReader.h>
 #include "itkImageSeriesReader.h"
@@ -33,7 +33,7 @@ namespace mitk
     @brief Reads the header information from a DICOM series and stores it into an output object of type
     DiffusionImageHeaderInformation
     */
-  class DiffusionCore_EXPORT DicomDiffusionImageHeaderReader : public itk::Object
+  class MitkDiffusionCore_EXPORT DicomDiffusionImageHeaderReader : public itk::Object
   {
   public:
 

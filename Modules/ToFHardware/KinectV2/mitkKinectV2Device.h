@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkKinectV2Device_h
 
 #include <mitkCommon.h>
-#include "mitkKinectV2ModuleExports.h"
+#include <MitkKinectV2ModuleExports.h>
 #include "mitkToFCameraDevice.h"
 #include "mitkKinectV2Controller.h"
 

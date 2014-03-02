@@ -21,7 +21,7 @@
 #include <itkLightObject.h>
 #include <itkObjectFactory.h>
 #include <string>
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 
 namespace mitk
 {

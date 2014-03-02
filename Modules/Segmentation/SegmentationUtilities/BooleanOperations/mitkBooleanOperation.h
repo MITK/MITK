@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkBooleanOperation_h
 
 #include <mitkImage.h>
-#include <SegmentationExports.h>
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
@@ -27,7 +27,7 @@ namespace mitk
    * All parameters of the boolean operations must be specified during construction.
    * The actual operation is executed when calling GetResult().
    */
-  class Segmentation_EXPORT BooleanOperation
+  class MitkSegmentation_EXPORT BooleanOperation
   {
   public:
     enum Type

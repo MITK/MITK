@@ -25,7 +25,7 @@
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEvent.h"
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

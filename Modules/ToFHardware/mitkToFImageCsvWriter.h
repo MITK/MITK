@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkToFImageCsvWriter_h
 
 #include "mitkToFImageWriter.h"
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 
 namespace mitk
 {

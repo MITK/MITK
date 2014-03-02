@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_WIIMOTEMULTIIREVENT_H
 #define MITK_WIIMOTEMULITIREVENT_H
 
-#include "mitkInputDevicesExports.h"
+#include <MitkInputDevicesExports.h>
 
 #include "mitkEvent.h"
 #include "mitkVector.h"

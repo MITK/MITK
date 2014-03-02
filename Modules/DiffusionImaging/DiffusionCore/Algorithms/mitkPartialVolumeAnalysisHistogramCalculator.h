@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_PartialVolumeAnalysisHistogramCalculator_H
 #define _MITK_PartialVolumeAnalysisHistogramCalculator_H
 
-#include "DiffusionCoreExports.h"
+#include "MitkDiffusionCoreExports.h"
 
 #include <itkObject.h>
 #include <itkImage.h>
@@ -54,7 +54,7 @@ namespace mitk
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
-  class DiffusionCore_EXPORT PartialVolumeAnalysisHistogramCalculator : public itk::Object
+  class MitkDiffusionCore_EXPORT PartialVolumeAnalysisHistogramCalculator : public itk::Object
   {
   public:
 

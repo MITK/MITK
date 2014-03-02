@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QWidget>
 
-#include "OverlaysExports.h"
+#include <MitkOverlaysExports.h>
 
 
 /**
@@ -52,7 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
  \ingroup Qmitk
 */
-class Overlays_EXPORT QmitkOverlay : public QObject
+class MitkOverlays_EXPORT QmitkOverlay : public QObject
 {
   Q_OBJECT
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkAdaptiveRegionGrowingTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
 #include "mitkDataStorage.h"
 #include "mitkPointSetInteractor.h"
@@ -40,7 +40,7 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
 
   */
-  class Segmentation_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
+  class MitkSegmentation_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
   {
   public:
 

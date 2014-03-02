@@ -22,7 +22,7 @@ class vtkPiecewiseFunction;
 #include <vtkImageData.h>
 #include <vtkThreadedImageAlgorithm.h>
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 /** Documentation
 * \brief Applies the grayvalue or color/opacity level window to scalar or RGB(A) images.
 *

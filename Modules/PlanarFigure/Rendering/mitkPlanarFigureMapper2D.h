@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_PLANAR_FIGURE_MAPPER_2D_H_
 
 #include "mitkCommon.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include "mitkGLMapper.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureControlPointStyleProperty.h"
@@ -106,7 +106,7 @@ class Contour;
 * \ingroup Mapper
 */
 
-class PlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper
+class MitkPlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper
 {
 public:
 

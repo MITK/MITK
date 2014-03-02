@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSegmentationInterpolationController_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkImage.h"
 
 #include <itkImage.h>
@@ -63,7 +63,7 @@ class Image;
 
   $Author$
 */
-class Segmentation_EXPORT SegmentationInterpolationController : public itk::Object
+class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::Object
 {
   public:
 
@@ -148,7 +148,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     /**
       \brief Protected class of mitk::SegmentationInterpolationController. Don't use (you shouldn't be able to do so)!
     */
-    class Segmentation_EXPORT SetChangedSliceOptions
+    class MitkSegmentation_EXPORT SetChangedSliceOptions
     {
       public:
         SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels )

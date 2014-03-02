@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkPythonScriptEditorHighlighter_h
 
 #include <QSyntaxHighlighter>
-#include "mitkPythonExports.h"
+#include <MitkPythonExports.h>
 
 ///
 /// A script highlighter for Python Scripts

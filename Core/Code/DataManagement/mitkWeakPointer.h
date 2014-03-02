@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkWeakPointer_h
 #define __mitkWeakPointer_h
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkMessage.h"
 
 #include <itkCommand.h>

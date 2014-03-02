@@ -36,7 +36,7 @@ set(_example_dirs
   MbiLog
   QtFreeRender
   Tutorial
-#  Overlays# depends on QmitkExt..
+#  Overlays# depends on MitkQtWidgetsExt..
 )
 
 # some examples depend on Qt 5

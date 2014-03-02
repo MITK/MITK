@@ -204,10 +204,10 @@ void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
 
 }
 
-US_EXPORT_MODULE_ACTIVATOR(Mitk, MitkCoreActivator)
+US_EXPORT_MODULE_ACTIVATOR(MitkCore, MitkCoreActivator)
 
 // Call CppMicroservices initialization code at the end of the file.
 // This especially ensures that VTK object factories have already
 // been registered (VTK initialization code is injected by implicitly
 // include VTK header files at the top of this file).
-US_INITIALIZE_MODULE("Mitk", "Mitk")
+US_INITIALIZE_MODULE("MitkCore", "MitkCore")

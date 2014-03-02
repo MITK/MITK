@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "SceneSerializationExports.h"
+#include <MitkSceneSerializationExports.h>
 
 #include <tinyxml.h>
 
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class SceneSerialization_EXPORT SceneReader : public itk::Object
+class MitkSceneSerialization_EXPORT SceneReader : public itk::Object
 {
   public:
 

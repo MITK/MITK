@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFileReader.h>
 #include <mitkFiberBundleX.h>
 #include <vtkSmartPointer.h>
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 
 namespace mitk
 {
@@ -29,7 +29,7 @@ namespace mitk
   /** \brief
   */
 
-  class FiberTracking_EXPORT FiberBundleXReader : public FileReader, public BaseDataSource
+  class MitkFiberTracking_EXPORT FiberBundleXReader : public FileReader, public BaseDataSource
   {
   public:
 

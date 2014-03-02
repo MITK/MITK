@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFImageGrabber_h
 #define __mitkToFImageGrabber_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkCommon.h"
 #include "mitkImageSource.h"
 #include "mitkToFCameraDevice.h"

@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __vtkMitkThickSlicesFilter_h
 #define __vtkMitkThickSlicesFilter_h
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include "vtkThreadedImageAlgorithm.h"
 

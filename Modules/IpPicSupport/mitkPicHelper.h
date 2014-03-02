@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPICHELPER_H_HEADER_INCLUDED_C1F4DAB4
 #define MITKPICHELPER_H_HEADER_INCLUDED_C1F4DAB4
 
-#include <IpPicSupportExports.h>
+#include <MitkIpPicSupportExports.h>
 #include "mitkVector.h"
 #include <mitkIpPic.h>
 
@@ -29,7 +29,7 @@ class SlicedGeometry3D;
 //##Documentation
 //## @brief Internal class for managing references on sub-images
 //## @ingroup Data
-class IpPicSupport_EXPORT PicHelper
+class MitkIpPicSupport_EXPORT PicHelper
 {
 public:
   static const char *GetNameOfClass() { return "PicHelper"; }

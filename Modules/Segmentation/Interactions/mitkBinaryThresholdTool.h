@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkBinaryThresholdTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
 #include "mitkDataNode.h"
 
@@ -40,7 +40,7 @@ namespace mitk
 
   Last contributor: $Author$
   */
-  class Segmentation_EXPORT BinaryThresholdTool : public AutoSegmentationTool
+  class MitkSegmentation_EXPORT BinaryThresholdTool : public AutoSegmentationTool
   {
   public:
 

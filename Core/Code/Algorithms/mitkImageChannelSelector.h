@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef IMAGECHANNELSELECTOR_H_HEADER_INCLUDED_C1E4F4E7
 #define IMAGECHANNELSELECTOR_H_HEADER_INCLUDED_C1E4F4E7
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkSubImageSelector.h"
 
 namespace mitk {

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkOtsuTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 #include "mitkOtsuTool3D.h"
 #include <QListWidget>
 #include <QPushButton>
@@ -36,7 +36,7 @@ class QLabel;
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

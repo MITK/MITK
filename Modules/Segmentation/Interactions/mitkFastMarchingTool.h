@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFeedbackContourTool.h"
 #include "mitkLegacyAdaptors.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkDataNode.h"
 #include "mitkPointSet.h"
 #include "mitkToolCommand.h"
@@ -56,7 +56,7 @@ namespace mitk
 
   For detailed documentation see ITK Software Guide section 9.3.1 Fast Marching Segmentation.
 */
-class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
+class MitkSegmentation_EXPORT FastMarchingTool : public FeedbackContourTool
 {
     mitkNewMessageMacro(Ready);
 

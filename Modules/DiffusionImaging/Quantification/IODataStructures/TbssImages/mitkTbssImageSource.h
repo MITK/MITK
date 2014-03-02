@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Should be changed in a new type for TBSS
 #include "mitkImageSource.h"
-#include "QuantificationExports.h"
+#include "MitkQuantificationExports.h"
 
 
 namespace mitk {
@@ -37,7 +37,7 @@ namespace mitk {
 //##
 //## @ingroup Process
 
-class Quantification_EXPORT TbssImageSource : public ImageSource
+class MitkQuantification_EXPORT TbssImageSource : public ImageSource
 {
 public:
   mitkClassMacro(TbssImageSource, BaseDataSource)

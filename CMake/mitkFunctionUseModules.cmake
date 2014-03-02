@@ -131,7 +131,7 @@ function(mitk_use_modules)
       endif()
 
       list(APPEND ALL_INCLUDE_DIRECTORIES ${${dependency}_INCLUDE_DIRS})
-      list(APPEND ALL_LIBRARIES ${${dependency}_PROVIDES})
+      list(APPEND ALL_LIBRARIES ${${dependency}_TARGET})
       if(TARGET ${dependency}-autoload)
         list(APPEND ALL_META_DEPENDENCIES ${dependency}-autoload)
       endif()

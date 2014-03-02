@@ -1521,7 +1521,7 @@ void QmitkFiberfoxView::OnDrawROI()
     if(figureInteractor.IsNull())
     {
         figureInteractor = mitk::PlanarFigureInteractor::New();
-        us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+        us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
         figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
         figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
         figureInteractor->SetDataNode( node );
@@ -2156,7 +2156,7 @@ void QmitkFiberfoxView::NodeAdded( const mitk::DataNode* node )
         if(figureInteractor.IsNull())
         {
             figureInteractor = mitk::PlanarFigureInteractor::New();
-            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
             figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
             figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
             figureInteractor->SetDataNode( nonConstNode );

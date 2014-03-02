@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-class DiffusionCore_EXPORT KurtosisFitFunctor : public DWIVoxelFunctor
+class MitkDiffusionCore_EXPORT KurtosisFitFunctor : public DWIVoxelFunctor
 {
 public:
   KurtosisFitFunctor(){}

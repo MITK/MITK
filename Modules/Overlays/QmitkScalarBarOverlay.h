@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKSCALARBAROVERLAY_H_HEADER_INCLUDED_C10DC4EB
 #define MITKSCALARBAROVERLAY_H_HEADER_INCLUDED_C10DC4EB
 
-#include "OverlaysExports.h"
+#include <MitkOverlaysExports.h>
 
 // MITK-Stuff
 #include "mitkCommon.h"
@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 
 
-  class Overlays_EXPORT QmitkScalarBarOverlay : public QmitkOverlay
+  class MitkOverlays_EXPORT QmitkScalarBarOverlay : public QmitkOverlay
   {
     Q_OBJECT
 

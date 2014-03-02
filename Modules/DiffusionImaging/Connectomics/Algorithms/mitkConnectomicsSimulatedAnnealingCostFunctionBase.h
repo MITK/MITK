@@ -23,13 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk
 {
   /**
   * \brief A generic base class for cost functions for use in simulated annealing */
-  class Connectomics_EXPORT ConnectomicsSimulatedAnnealingCostFunctionBase : public itk::Object
+  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingCostFunctionBase : public itk::Object
   {
   public:
 

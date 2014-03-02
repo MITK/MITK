@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactory.h"
 #include "itkImage.h"
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
 

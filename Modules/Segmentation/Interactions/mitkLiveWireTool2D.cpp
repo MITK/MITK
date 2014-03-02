@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
 }
 
 

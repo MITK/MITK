@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourModelSubDivisionFilter_h__
 
 #include "mitkCommon.h"
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourModelSource.h"
 
@@ -38,7 +38,7 @@ namespace mitk {
   * \ingroup ContourModelFilters
   * \ingroup Process
   */
-  class ContourModel_EXPORT ContourModelSubDivisionFilter : public ContourModelSource
+  class MitkContourModel_EXPORT ContourModelSubDivisionFilter : public ContourModelSource
   {
 
   public:

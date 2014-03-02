@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MitkPolyDataGLMapper2D_H
 #define MitkPolyDataGLMapper2D_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkGLMapper.h"
 
 class vtkCutter;

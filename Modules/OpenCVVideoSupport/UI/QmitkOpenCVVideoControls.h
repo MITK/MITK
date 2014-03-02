@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <cv.h>
 #include <ui_QmitkOpenCVVideoControls.h>
-#include <mitkOpenCVVideoSupportUIExports.h>
+#include <MitkOpenCVVideoSupportUIExports.h>
 #include <mitkIPersistenceService.h>
 
 class QmitkRenderWindow;

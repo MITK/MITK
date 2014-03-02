@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _mitkGroupDiffusionHeadersFilter_h
 #define _mitkGroupDiffusionHeadersFilter_h
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 #include "mitkBaseProcess.h"
 #include "mitkDiffusionImageHeaderInformation.h"
@@ -29,7 +29,7 @@ namespace mitk
   * @brief Groups Headers containing Diffusion Information
   * @ingroup Process
   */
-  class DiffusionCore_EXPORT GroupDiffusionHeadersFilter : public BaseProcess
+  class MitkDiffusionCore_EXPORT GroupDiffusionHeadersFilter : public BaseProcess
   {
   public:
     mitkClassMacro( GroupDiffusionHeadersFilter, BaseProcess );

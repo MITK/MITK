@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_PartialVolumeAnalysisClusteringCalculator_H
 #define _MITK_PartialVolumeAnalysisClusteringCalculator_H
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 #include "mitkCommon.h"
 #include "mitkImage.h"
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  class DiffusionCore_EXPORT PartialVolumeAnalysisClusteringCalculator : public itk::Object
+  class MitkDiffusionCore_EXPORT PartialVolumeAnalysisClusteringCalculator : public itk::Object
   {
   public:
 

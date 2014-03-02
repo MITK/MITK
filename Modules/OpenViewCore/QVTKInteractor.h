@@ -52,7 +52,7 @@ class vtkTDxDevice;
 class vtkTDxUnixDevice;
 #endif
 
-#include "OpenViewCoreExports.h"
+#include <MitkOpenViewCoreExports.h>
 
 class QVTKInteractorInternal;
 
@@ -60,7 +60,7 @@ class QVTKInteractorInternal;
 // .SECTION Description
 // QVTKInteractor is an interactor for a QVTKWiget.
 
-class OVCORE_EXPORT QVTKInteractor : public vtkRenderWindowInteractor
+class MitkOVCORE_EXPORT QVTKInteractor : public vtkRenderWindowInteractor
 {
 public:
   static QVTKInteractor* New();

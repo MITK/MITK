@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // #include <QmitkFunctionality.h>
 #include "ui_QmitkDicomLocalStorageWidgetControls.h"
-#include "mitkDicomUIExports.h"
+#include <MitkDicomUIExports.h>
 
 // include ctk
 #include <ctkDICOMDatabase.h>

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLightObject.h>
 #include <ctkAbstractPythonManager.h>
 #include "mitkSurface.h"
-#include "mitkPythonExports.h"
+#include <MitkPythonExports.h>
 
 namespace mitk
 {

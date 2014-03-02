@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkTractAnalyzer_h_
 #define __mitkTractAnalyzer_h_
 
-#include "QuantificationExports.h"
+#include "MitkQuantificationExports.h"
 #include <itkImage.h>
 #include "mitkImage.h"
 #include "mitkImageCast.h"
@@ -39,7 +39,7 @@ namespace mitk{
   */
 
 
-class Quantification_EXPORT TractAnalyzer
+class MitkQuantification_EXPORT TractAnalyzer
 {
 
 public:

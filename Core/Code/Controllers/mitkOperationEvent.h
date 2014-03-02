@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef OPERATIONEVENT_H_HEADER_INCLUDED_C16E83FC
 #define OPERATIONEVENT_H_HEADER_INCLUDED_C16E83FC
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
 #include "mitkUndoModel.h"

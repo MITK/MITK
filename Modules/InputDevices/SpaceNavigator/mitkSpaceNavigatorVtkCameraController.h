@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_SPACENAVIGATORVTKCAMERACONTROLLER_H_
 
 #include <mitkCameraController.h>
-#include <mitkSpaceNavigatorExports.h>
+#include <MitkSpaceNavigatorExports.h>
 
 
 class vtkRenderWindow;

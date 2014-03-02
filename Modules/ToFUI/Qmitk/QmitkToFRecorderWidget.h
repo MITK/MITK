@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKTOFRECORDERWIDGET_H_INCLUDED
 #define _QMITKTOFRECORDERWIDGET_H_INCLUDED
 
-#include <mitkTOFUIExports.h>
+#include <MitkToFUIExports.h>
 #include <ui_QmitkToFRecorderWidgetControls.h>
 
 //QT headers
@@ -44,7 +44,7 @@ class QFileDialogPrivate;
 *
 * @ingroup ToFUI
 */
-class mitkTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
+class MitkToFUI_EXPORT QmitkToFRecorderWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

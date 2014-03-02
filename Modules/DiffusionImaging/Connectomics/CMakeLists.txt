@@ -13,10 +13,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
 endif()
 
-MITK_CREATE_MODULE( Connectomics
+MITK_CREATE_MODULE(
   SUBPROJECTS MITK-DTI
   INCLUDE_DIRS Algorithms IODataStructures Rendering ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS DiffusionCore FiberTracking
+  DEPENDS MitkDiffusionCore MitkFiberTracking
   PACKAGE_DEPENDS VTK|vtkInfovisLayout
   WARNINGS_AS_ERRORS
 )

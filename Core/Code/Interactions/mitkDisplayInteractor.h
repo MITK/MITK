@@ -17,7 +17,7 @@
 #ifndef mitkDisplayInteractor_h
 #define mitkDisplayInteractor_h
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkInteractionEventObserver.h"
 
 namespace mitk

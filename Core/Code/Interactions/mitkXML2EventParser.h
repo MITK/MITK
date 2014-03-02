@@ -17,7 +17,7 @@
 #ifndef mitkXML2EventParser_h
 #define mitkXML2EventParser_h
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include "mitkPropertyList.h"
 

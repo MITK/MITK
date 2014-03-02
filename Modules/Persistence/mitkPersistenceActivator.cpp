@@ -89,5 +89,5 @@ namespace mitk
     };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(Persistence, mitk::PersistenceActivator)
+US_EXPORT_MODULE_ACTIVATOR(MitkPersistence, mitk::PersistenceActivator)
 #endif

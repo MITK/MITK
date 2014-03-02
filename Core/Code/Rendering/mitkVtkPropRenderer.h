@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
 #define MITKVtkPropRenderer_H_HEADER_INCLUDED_C1C29F6D
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseRenderer.h"
 #include "mitkDataStorage.h"
 #include "mitkRenderingManager.h"

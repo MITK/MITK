@@ -22,7 +22,7 @@
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
 #include "mitkDataInteractor.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <list>
 #include "usServiceTracker.h"
 

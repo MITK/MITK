@@ -32,7 +32,7 @@ int mitkCopyToPythonAsItkImageTest(int /*argc*/, char* argv[])
   MITK_TEST_BEGIN("mitkCopyToPythonAsItkImageTest")
 
   //get the context of the python module
-  us::Module* module = us::ModuleRegistry::GetModule("mitkPython");
+  us::Module* module = us::ModuleRegistry::GetModule("MitkPython");
   us::ModuleContext* context = module->GetModuleContext();
   //get the service which is generated in the PythonModuleActivator
   us::ServiceReference<mitk::IPythonService> serviceRef = context->GetServiceReference<mitk::IPythonService>();

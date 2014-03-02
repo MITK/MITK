@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
-#include "FiberTrackingExports.h"
+#include <MitkFiberTrackingExports.h>
 #include "mitkPlanarFigure.h"
 #include "itkVectorContainer.h"
 #include "mitkDataNode.h"
@@ -44,7 +44,7 @@ namespace mitk {
 
 
 
-  class FiberTracking_EXPORT PlanarFigureComposite : public PlanarFigure
+  class MitkFiberTracking_EXPORT PlanarFigureComposite : public PlanarFigure
   {
 
     typedef itk::VectorContainer<unsigned int, PlanarFigure::Pointer> CompositionContainer;

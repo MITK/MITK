@@ -18,13 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkMorphologicalOperations_h
 
 #include <mitkImage.h>
-#include <SegmentationExports.h>
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
   /** \brief Encapsulates several morphological operations that can be performed on segmentations.
     */
-  class Segmentation_EXPORT MorphologicalOperations
+  class MitkSegmentation_EXPORT MorphologicalOperations
   {
   public:
     enum StructuralElementType

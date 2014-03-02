@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkCommand.h"
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk {
 
@@ -29,7 +29,7 @@ namespace mitk {
   * \sa ProgressBar
   *
   */
-  class Segmentation_EXPORT ToolCommand : public itk::Command
+  class MitkSegmentation_EXPORT ToolCommand : public itk::Command
   {
     public:
       typedef  ToolCommand   Self;

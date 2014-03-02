@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PointSetDifferenceStatisticsCalculator_H
 
 #include <itkObject.h>
-#include "ImageStatisticsExports.h"
+#include <MitkImageStatisticsExports.h>
 #include "mitkImageStatisticsCalculator.h"
 #include <mitkPointSet.h>
 
@@ -31,7 +31,7 @@ namespace mitk
  * The user can access the single distances between corresponding points as well as a complete statistic (mean, sd, rms, median, max, min)
  * The point sets must be of equal size!
  */
-class ImageStatistics_EXPORT PointSetDifferenceStatisticsCalculator : public itk::Object
+class MitkImageStatistics_EXPORT PointSetDifferenceStatisticsCalculator : public itk::Object
 {
 public:
 

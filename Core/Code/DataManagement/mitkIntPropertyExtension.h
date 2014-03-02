@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkIntPropertyExtension_h
 
 #include <mitkPropertyExtension.h>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

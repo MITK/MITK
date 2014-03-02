@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraMITKPlayerDevice_h
 #define __mitkToFCameraMITKPlayerDevice_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkCommon.h"
 #include "mitkToFCameraDevice.h"
 #include "mitkToFCameraMITKPlayerController.h"

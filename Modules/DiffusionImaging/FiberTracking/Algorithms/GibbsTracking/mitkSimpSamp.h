@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _SIMPSAMP
 #define _SIMPSAMP
 
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 #include <mitkParticle.h>
 #include <stdlib.h>
 
@@ -29,7 +29,7 @@ namespace mitk
 /**
 * \brief Samples new tract from surrounding fiber segments.   */
 
-class FiberTracking_EXPORT SimpSamp
+class MitkFiberTracking_EXPORT SimpSamp
 {
 
     float *P;

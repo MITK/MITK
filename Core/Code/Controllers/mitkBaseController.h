@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3
 #define BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkStepper.h"
 #include "mitkStateMachine.h"
 #include <itkObjectFactory.h>

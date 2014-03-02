@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPlaneOperation_H
 #define MITKPlaneOperation_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkPointOperation.h"
 #include "mitkVector.h"
 

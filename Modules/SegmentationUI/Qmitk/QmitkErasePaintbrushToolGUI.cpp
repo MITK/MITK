@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkErasePaintbrushToolGUI.h"
 
-MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkErasePaintbrushToolGUI, "")
+MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkErasePaintbrushToolGUI, "")
 
 QmitkErasePaintbrushToolGUI::QmitkErasePaintbrushToolGUI()
 {

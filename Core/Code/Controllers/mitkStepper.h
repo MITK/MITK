@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef STEPPER_H_HEADER_INCLUDED_C1E77191
 #define STEPPER_H_HEADER_INCLUDED_C1E77191
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include "mitkVector.h"
 

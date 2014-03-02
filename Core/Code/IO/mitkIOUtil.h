@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIOUTIL_H
 #define MITKIOUTIL_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkDataStorage.h>
 #include <mitkSurface.h>
 #include <mitkPointSet.h>

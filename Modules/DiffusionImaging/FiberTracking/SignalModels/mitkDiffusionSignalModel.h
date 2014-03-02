@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_DiffusionSignalModel_H
 #define _MITK_DiffusionSignalModel_H
 
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 #include <itkVariableLengthVector.h>
 #include <itkVector.h>
 #include <vnl/vnl_vector_fixed.h>

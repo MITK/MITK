@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MovieGeneratorOpenCV_H_HEADER_INCLUDED
 
 #include "mitkMovieGenerator.h"
-#include <mitkOpenCVVideoSupportExports.h>
+#include <MitkOpenCVVideoSupportExports.h>
 #include <memory.h>
 #include <string.h>
 

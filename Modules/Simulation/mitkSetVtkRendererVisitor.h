@@ -18,13 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSetVtkRendererVisitor_h
 
 #include <sofa/simulation/common/Visitor.h>
-#include <SimulationExports.h>
+#include <MitkSimulationExports.h>
 
 class vtkRenderer;
 
 namespace mitk
 {
-  class Simulation_EXPORT SetVtkRendererVisitor : public sofa::simulation::Visitor
+  class MitkSimulation_EXPORT SetVtkRendererVisitor : public sofa::simulation::Visitor
   {
   public:
     explicit SetVtkRendererVisitor(vtkRenderer* renderer, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());

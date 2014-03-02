@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkIPythonService_h
 
 // mitk
-#include "mitkPythonExports.h"
+#include <MitkPythonExports.h>
 #include "mitkImage.h"
 //for microservices
 #include <usServiceInterface.h>

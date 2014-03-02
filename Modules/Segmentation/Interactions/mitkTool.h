@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkStateMachine.h"
 #include "mitkToolEvents.h"
 #include "itkObjectFactoryBase.h"
@@ -80,7 +80,7 @@ namespace mitk
 
   $Author$
   */
-  class Segmentation_EXPORT Tool : public EventStateMachine
+  class MitkSegmentation_EXPORT Tool : public EventStateMachine
                                  , public InteractionEventObserver
   {
   public:

@@ -1,5 +1,5 @@
-MITK_CREATE_MODULE ( SegmentationUI
+MITK_CREATE_MODULE (
 INCLUDE_DIRS Qmitk
-DEPENDS Qmitk Segmentation QmitkExt
+DEPENDS MitkSegmentation MitkQtWidgetsExt
 PACKAGE_DEPENDS CTK|CTKWidgets
 )

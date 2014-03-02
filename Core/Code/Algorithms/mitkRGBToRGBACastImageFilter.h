@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKRGBTORGBACASTIMAGEFILTER_H_HEADER_INCLUDED
 #define MITKRGBTORGBACASTIMAGEFILTER_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkOpenCVToMitkImageFilter_h
 
 // mitk includes
-#include "mitkOpenCVVideoSupportExports.h"
+#include <MitkOpenCVVideoSupportExports.h>
 #include <mitkCommon.h>
 #include <mitkImageSource.h>
 

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDCamBoardController_h
 #define __mitkToFCameraPMDCamBoardController_h
 
-#include "mitkPMDModuleExports.h"
+#include "MitkPMDExports.h"
 #include "mitkCommon.h"
 #include "mitkToFCameraPMDController.h"
 
@@ -86,7 +86,7 @@ namespace mitk
     ~ToFCameraPMDCamBoardController();
 
     /*
-    \brief Transform the output of the camera, i.e. cut invalid pixels, and rotate 90°
+    \brief Transform the output of the camera, i.e. cut invalid pixels, and rotate 90 degrees
            counterclockwise
     \param input data array of original size (207x204)
     \param rotated output data array of reduced size (200x200)

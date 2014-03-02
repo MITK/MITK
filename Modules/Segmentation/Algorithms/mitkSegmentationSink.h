@@ -18,12 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_SEGMENTATION_SINK_H_INCLUDET_WAD
 
 #include "mitkNonBlockingAlgorithm.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
 
-class Segmentation_EXPORT SegmentationSink : public NonBlockingAlgorithm
+class MitkSegmentation_EXPORT SegmentationSink : public NonBlockingAlgorithm
 {
   public:
 

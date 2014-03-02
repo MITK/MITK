@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_CONNECTOMICS_RENDERING_NODE_THRESHOLD_PARAMETER_PROPERTY__H_
 
 #include "mitkEnumerationProperty.h"
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk
 {
@@ -31,7 +31,7 @@ namespace mitk
 /**
  * Encapsulates the enumeration of different rendering schemes for connectomics networks
  */
-class Connectomics_EXPORT ConnectomicsRenderingNodeThresholdParameterProperty : public EnumerationProperty
+class MitkConnectomics_EXPORT ConnectomicsRenderingNodeThresholdParameterProperty : public EnumerationProperty
 {
 public:
 

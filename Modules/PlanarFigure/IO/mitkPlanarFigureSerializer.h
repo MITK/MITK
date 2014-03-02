@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkPlanarFigureSerializer_h_included
 #define mitkPlanarFigureSerializer_h_included
 
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include "mitkBaseDataSerializer.h"
 
 namespace mitk
@@ -25,7 +25,7 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class PlanarFigure_EXPORT PlanarFigureSerializer : public BaseDataSerializer
+class MitkPlanarFigure_EXPORT PlanarFigureSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( PlanarFigureSerializer, BaseDataSerializer );

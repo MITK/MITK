@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkSurfaceToImageFilter_h__
 
 #include "mitkCommon.h"
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include "mitkImageSource.h"
 #include "mitkSurface.h"
 //#include "mitkImage.h"

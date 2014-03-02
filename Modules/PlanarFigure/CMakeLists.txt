@@ -1,6 +1,6 @@
-MITK_CREATE_MODULE( PlanarFigure
+MITK_CREATE_MODULE(
   INCLUDE_DIRS Algorithms DataManagement Interactions IO Rendering
-  DEPENDS Mitk SceneSerializationBase
+  DEPENDS MitkSceneSerializationBase
   WARNINGS_AS_ERRORS
 )
 

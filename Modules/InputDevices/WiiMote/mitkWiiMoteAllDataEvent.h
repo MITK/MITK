@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkEvent.h>
 
 // export macro
-#include <mitkWiiMoteExports.h>
+#include <MitkWiiMoteExports.h>
 
 namespace mitk
 {

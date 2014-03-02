@@ -22,7 +22,7 @@ This file is based heavily on a corresponding ITK filter.
 #ifndef __itkStreamlineTrackingFilter_h_
 #define __itkStreamlineTrackingFilter_h_
 
-#include "FiberTrackingExports.h"
+#include <MitkFiberTrackingExports.h>
 #include <itkImageToImageFilter.h>
 #include <itkVectorContainer.h>
 #include <itkVectorImage.h>

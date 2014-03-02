@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_IMAGESTATISTICSCALCULATOR_H
 
 #include <itkObject.h>
-#include "ImageStatisticsExports.h"
+#include "MitkImageStatisticsExports.h"
 #include <itkImage.h>
 #include <itkTimeStamp.h>
 
@@ -57,7 +57,7 @@ namespace mitk
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
-class ImageStatistics_EXPORT ImageStatisticsCalculator : public itk::Object
+class MitkImageStatistics_EXPORT ImageStatisticsCalculator : public itk::Object
 {
 public:
 

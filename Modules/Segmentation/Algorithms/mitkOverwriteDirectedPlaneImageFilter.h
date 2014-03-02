@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkOverwriteDirectedPlaneImageFilter_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkImageToImageFilter.h"
 
 #include <itkImage.h>
@@ -54,7 +54,7 @@ namespace mitk
 
   Last contributor: $Author: maleike $
 */
-class Segmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImageFilter
+class MitkSegmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImageFilter
 {
   public:
 

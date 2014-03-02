@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPaintbrushTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkFeedbackContourTool.h"
 #include "mitkPointSet.h"
 #include "mitkPointOperation.h"
@@ -47,7 +47,7 @@ namespace mitk
   \warning Only to be instantiated by mitk::ToolManager.
   $Author: maleike $
 */
-class Segmentation_EXPORT PaintbrushTool : public FeedbackContourTool
+class MitkSegmentation_EXPORT PaintbrushTool : public FeedbackContourTool
 {
   public:
 

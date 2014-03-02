@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_BASEPROPERTYOBSERVER_H_INCLUDED
 
 #include <itkEventObject.h>
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include "mitkCommon.h"
 
 namespace mitk {

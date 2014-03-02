@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1
 #define MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 #include <itkRGBPixel.h>
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef POSITIONEVENT_H_HEADER_INCLUDED_C184F366
 #define POSITIONEVENT_H_HEADER_INCLUDED_C184F366
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkDisplayPositionEvent.h"
 #include "mitkVector.h"
 

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QLabel>
 
-#include "OverlaysExports.h"
+#include <MitkOverlaysExports.h>
 
 
 /** \class  QmitkTextOverlay
@@ -59,7 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 
 
-  class Overlays_EXPORT QmitkTextOverlay : public QmitkOverlay
+  class MitkOverlays_EXPORT QmitkTextOverlay : public QmitkOverlay
   {
   public:
 

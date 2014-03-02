@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <GL/glew.h>
 
-#include <mitkGPGPUExports.h>
+#include <MitkGPGPUExports.h>
 
 #ifdef _WIN32
 #include <windows.h>

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkContourUtilshIncludett
 
 #include "mitkImage.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkContour.h"
 #include "mitkContourModel.h"
 
@@ -32,7 +32,7 @@ namespace mitk
  *  Legacy support for mitk::Contour
  *  TODO remove this class when mitk::Contour is removed
  */
-class Segmentation_EXPORT ContourUtils : public itk::Object
+class MitkSegmentation_EXPORT ContourUtils : public itk::Object
 {
   public:
 

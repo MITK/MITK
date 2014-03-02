@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define IMAGEDATAITEM_H
 
 #include "mitkCommon.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 //#include <mitkIpPic.h>
 //#include "mitkPixelType.h"
 #include "mitkImageDescriptor.h"

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef STATEMACHINE_H_HEADER_INCLUDED_C18896BD
 #define STATEMACHINE_H_HEADER_INCLUDED_C18896BD
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <itkObject.h>
 #include "mitkOperationActor.h"
 #include <string>

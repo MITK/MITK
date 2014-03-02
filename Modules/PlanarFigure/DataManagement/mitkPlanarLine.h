@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_LINE_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
@@ -31,7 +31,7 @@ class Geometry2D;
  * \brief Implementation of PlanarFigure representing a line
  * through two control points
  */
-class PlanarFigure_EXPORT PlanarLine : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarLine : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarLine, PlanarFigure );

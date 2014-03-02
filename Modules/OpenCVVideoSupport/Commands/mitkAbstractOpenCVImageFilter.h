@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkCropOpenCVImageFilter_h
 #define mitkCropOpenCVImageFilter_h
 
-#include "mitkOpenCVVideoSupportExports.h"
+#include <MitkOpenCVVideoSupportExports.h>
 
 #include <mitkCommon.h>
 

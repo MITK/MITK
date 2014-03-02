@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPropertyListReplacedObserver_h
 
 // mitk
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkPropertyList.h"
 #include <string>
 

@@ -18,14 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkDiffusionFunctionCollection_h_
 
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 #include "vnl/vnl_vector.h"
 #include "vnl/vnl_vector_fixed.h"
 #include "itkVectorContainer.h"
 
 namespace mitk{
 
-class DiffusionCore_EXPORT sh
+class MitkDiffusionCore_EXPORT sh
 {
 public:
   static double factorial(int number);
@@ -35,7 +35,7 @@ public:
   static double Yj(int m, int k, double theta, double phi);
 };
 
-class DiffusionCore_EXPORT gradients
+class MitkDiffusionCore_EXPORT gradients
 {
 private:
   typedef std::vector<unsigned int> IndiciesVector;

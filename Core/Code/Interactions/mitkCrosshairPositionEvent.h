@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkCrosshairPositionEvent_h
 #define mitkCrosshairPositionEvent_h
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkEvent.h"
 
 namespace mitk {

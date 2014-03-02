@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSegmentationInterpolationAlgorithm_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkImage.h"
 
 #include <itkObjectFactory.h>
@@ -48,7 +48,7 @@ namespace mitk
  *  Last contributor:
  *  $Author:$
  */
-class Segmentation_EXPORT SegmentationInterpolationAlgorithm : public itk::Object
+class MitkSegmentation_EXPORT SegmentationInterpolationAlgorithm : public itk::Object
 {
   public:
 

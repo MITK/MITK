@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkImageLiveWireContourModelFilter_h__
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourModelSource.h"
 
@@ -49,7 +49,7 @@ namespace mitk {
    \ingroup ContourModelFilters
    \ingroup Process
   */
-  class Segmentation_EXPORT ImageLiveWireContourModelFilter : public ContourModelSource
+  class MitkSegmentation_EXPORT ImageLiveWireContourModelFilter : public ContourModelSource
   {
 
   public:

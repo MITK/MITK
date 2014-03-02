@@ -1875,7 +1875,7 @@ void QmitkPartialVolumeAnalysisView::Activated()
           if(figureInteractor.IsNull())
           {
             figureInteractor = mitk::PlanarFigureInteractor::New();
-            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
             figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
             figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
             figureInteractor->SetDataNode( node );
@@ -2131,7 +2131,7 @@ void QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage(const mitk::DataNode
         if(figureInteractor.IsNull())
         {
           figureInteractor = mitk::PlanarFigureInteractor::New();
-          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
           figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
           figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
           figureInteractor->SetDataNode( nonConstNode );

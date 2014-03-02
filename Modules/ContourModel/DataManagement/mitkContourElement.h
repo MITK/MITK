@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourElement_H_
 
 #include "mitkCommon.h"
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include <mitkVector.h>
 
 //#include <ANN/ANN.h>
@@ -37,7 +37,7 @@ namespace mitk
   \Note It is highly not recommend to use this class directly as no secure mechanism is used here.
   Use mitk::ContourModel instead providing some additional features.
   */
-  class ContourModel_EXPORT ContourElement : public itk::LightObject
+  class MitkContourModel_EXPORT ContourElement : public itk::LightObject
   {
 
   public:

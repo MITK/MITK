@@ -3,7 +3,7 @@
 
 #include "mitkEndoDebug.h"
 #include "mitkAlgorithm.h"
-#include <mitkCameraCalibrationExports.h>
+#include <MitkCameraCalibrationExports.h>
 
 namespace mitk
 {
@@ -16,7 +16,7 @@ namespace mitk
   ///
   /// read EndoDebug params from xml file
   ///
-  class mitkCameraCalibration_EXPORT EndoDebugFromXmlFile:
+  class MitkCameraCalibration_EXPORT EndoDebugFromXmlFile:
     public Algorithm
   {
   public:

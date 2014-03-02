@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceInterface.h>
 #include <string>
 #include <vector>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

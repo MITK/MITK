@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 //MITK
 #include <mitkCommon.h>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkOperationActor.h"
 #include <mitkGeometry3D.h>
 

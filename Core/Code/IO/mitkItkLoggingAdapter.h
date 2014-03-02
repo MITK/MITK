@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ItkLoggingAdapter_H_HEADER_INCLUDED
 #define ItkLoggingAdapter_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <itkOutputWindow.h>
 #include <itkObjectFactory.h>
 

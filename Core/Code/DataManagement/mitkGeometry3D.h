@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 #define GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include "mitkVector.h"
 #include "mitkOperationActor.h"

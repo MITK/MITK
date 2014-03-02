@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _BUILDFIBRES
 
 // MITK
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 #include <mitkParticleGrid.h>
 
 // VTK
@@ -38,7 +38,7 @@ namespace mitk
 /**
 * \brief Gnerates actual fiber structure (vtkPolyData) from the particle grid content.   */
 
-class FiberTracking_EXPORT FiberBuilder
+class MitkFiberTracking_EXPORT FiberBuilder
 {
 public:
 

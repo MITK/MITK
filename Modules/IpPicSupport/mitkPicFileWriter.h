@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_PIC_FILE_WRITER__H_
 #define _MITK_PIC_FILE_WRITER__H_
 
-#include "IpPicSupportExports.h"
+#include <MitkIpPicSupportExports.h>
 #include <mitkFileWriter.h>
 #include <mitkIpPic.h>
 
@@ -32,7 +32,7 @@ class Image;
  * @brief Writer for mitk::Image
  * @ingroup IO
  */
-class IpPicSupport_EXPORT PicFileWriter : public mitk::FileWriter
+class MitkIpPicSupport_EXPORT PicFileWriter : public mitk::FileWriter
 {
 public:
 

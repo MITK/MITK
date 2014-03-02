@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConfig.h"
 #include "mitkCommon.h"
-#include <mitkOpenCVVideoSupportExports.h>
+#include <MitkOpenCVVideoSupportExports.h>
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 

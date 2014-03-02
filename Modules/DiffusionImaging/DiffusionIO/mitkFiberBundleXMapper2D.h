@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK Rendering
 #include <mitkCommon.h>
 #include <mitkBaseRenderer.h>
-//#include "FiberTrackingExports.h"
+//#include <MitkFiberTrackingExports.h>
 
 #include <mitkVtkMapper.h>
 #include <mitkFiberBundleX.h>

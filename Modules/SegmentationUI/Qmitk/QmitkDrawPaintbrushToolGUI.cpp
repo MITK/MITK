@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDrawPaintbrushToolGUI.h"
 
-MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkDrawPaintbrushToolGUI, "")
+MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkDrawPaintbrushToolGUI, "")
 
 QmitkDrawPaintbrushToolGUI::QmitkDrawPaintbrushToolGUI()
 {

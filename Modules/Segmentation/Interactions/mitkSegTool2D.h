@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSegTool2D_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkTool.h"
 #include "mitkImage.h"
 
@@ -58,7 +58,7 @@ class BaseRenderer;
 
   $Author$
 */
-class Segmentation_EXPORT SegTool2D : public Tool
+class MitkSegmentation_EXPORT SegTool2D : public Tool
 {
   public:
 

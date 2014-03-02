@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkBilateralFilter_h
 #define __mitkBilateralFilter_h
 
-#include "ImageDenoisingExports.h"
+#include "MitkImageDenoisingExports.h"
 
 //MITK
 #include <mitkImage.h>
@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  class ImageDenoising_EXPORT BilateralFilter : public ImageToImageFilter
+  class MitkImageDenoising_EXPORT BilateralFilter : public ImageToImageFilter
   {
   public:
 

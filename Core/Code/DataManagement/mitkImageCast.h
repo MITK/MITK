@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIMAGECAST_H_HEADER_INCLUDED
 #define MITKIMAGECAST_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkImage.h>
 
 #include <itkImage.h>

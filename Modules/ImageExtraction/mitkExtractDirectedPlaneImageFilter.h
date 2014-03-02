@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkExtractDirectedPlaneImageFilter_h_Included
 #define mitkExtractDirectedPlaneImageFilter_h_Included
 
-#include "ImageExtractionExports.h"
+#include <MitkImageExtractionExports.h>
 #include "mitkImageToImageFilter.h"
 
 #include "vtkImageReslice.h"
@@ -66,7 +66,7 @@ namespace mitk
   Last contributor: $Author: T. Schwarz$
 */
 
-  class ImageExtraction_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
+  class MitkImageExtraction_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
   {
   public:
 

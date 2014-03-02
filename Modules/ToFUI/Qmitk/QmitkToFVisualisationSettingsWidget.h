@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKTOFVISUALISATIONSETTINGSWIDGET_H_INCLUDED
 #define _QMITKTOFVISUALISATIONSETTINGSWIDGET_H_INCLUDED
 
-#include "mitkTOFUIExports.h"
+#include <MitkToFUIExports.h>
 #include "ui_QmitkToFVisualisationSettingsWidgetControls.h"
 
 #include "mitkDataNode.h"
@@ -35,7 +35,7 @@ class QmitkStdMultiWidget;
   *
   * \ingroup ToFUI
   */
-class mitkTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
+class MitkToFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

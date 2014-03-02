@@ -22,7 +22,7 @@ This file is based heavily on a corresponding ITK filter.
 #ifndef __itkDiffusionTensorPrincipalDirectionImageFilter_h_
 #define __itkDiffusionTensorPrincipalDirectionImageFilter_h_
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 #include <itkImageToImageFilter.h>
 #include <vnl/vnl_vector_fixed.h>
 #include <vnl/vnl_matrix.h>

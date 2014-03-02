@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkBinaryThresholdToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 #include "mitkBinaryThresholdTool.h"
 
 #include <QDoubleSpinBox>
@@ -37,7 +37,7 @@ class QSlider;
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

@@ -28,7 +28,7 @@ namespace mitk {
 //## @brief Superclass of all classes having one or more Images as input and
 //## generating PlanarFigures as output
 //## @ingroup PlanarFigure
-class PlanarFigure_EXPORT ImageToPlanarFigureFilter : public PlanarFigureSource
+class MitkPlanarFigure_EXPORT ImageToPlanarFigureFilter : public PlanarFigureSource
 {
 public:
   mitkClassMacro(ImageToPlanarFigureFilter,PlanarFigureSource);

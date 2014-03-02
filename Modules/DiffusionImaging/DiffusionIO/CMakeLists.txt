@@ -1,7 +1,7 @@
-MITK_CREATE_MODULE( DiffusionIO
+MITK_CREATE_MODULE(
   SUBPROJECTS MITK-DTI
-  DEPENDS Connectomics Quantification FiberTracking
-  AUTOLOAD_WITH Mitk
+  DEPENDS MitkConnectomics MitkQuantification MitkFiberTracking
+  AUTOLOAD_WITH MitkCore
   WARNINGS_AS_ERRORS
 )
 

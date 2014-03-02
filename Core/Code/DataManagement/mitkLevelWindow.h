@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C
 
 #include "mitkVector.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk {
 

@@ -34,10 +34,10 @@ if(NOT _missing_deps)
   endif()
 endif()
 
-MITK_CREATE_MODULE( FiberTracking
+MITK_CREATE_MODULE(
   SUBPROJECTS MITK-DTI
   INCLUDE_DIRS Algorithms Algorithms/GibbsTracking Algorithms/StochasticTracking IODataStructures IODataStructures/FiberBundleX IODataStructures/PlanarFigureComposite Interactions SignalModels Rendering ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS DiffusionCore MitkGraphAlgorithms
+  DEPENDS MitkDiffusionCore MitkGraphAlgorithms
   PACKAGE_DEPENDS ITK|ITKFFT
   #WARNINGS_AS_ERRORS
 )

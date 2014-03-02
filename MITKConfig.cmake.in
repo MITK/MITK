@@ -29,6 +29,9 @@ include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroCreateCTKPlugin)
 include(mitkMacroGetPMDPlatformString)
 
+# Standard CMake macros
+include(FeatureSummary)
+
 # The MITK version number
 set(MITK_VERSION_MAJOR "@MITK_VERSION_MAJOR@")
 set(MITK_VERSION_MINOR "@MITK_VERSION_MINOR@")
@@ -89,6 +92,7 @@ set(Poco_DIR "@Poco_DIR@")
 set(SOFA_DIR "@SOFA_DIR@")
 set(Qwt_DIR "@Qwt_DIR@")
 set(Qxt_DIR "@Qxt_DIR@")
+set(ACVD_DIR "@ACVD_DIR@")
 set(MITK_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
 set(MITK_DATA_DIR "@MITK_DATA_DIR@")
 
@@ -109,6 +113,7 @@ set(MITK_USE_DCMTK @MITK_USE_DCMTK@)
 set(MITK_USE_OpenCV @MITK_USE_OpenCV@)
 set(MITK_USE_SOFA @MITK_USE_SOFA@)
 set(MITK_USE_Python @MITK_USE_Python@)
+set(MITK_USE_ACVD @MITK_USE_ACVD@)
 
 if(MITK_USE_Qt4)
   set(MITK_QT4_MINIMUM_VERSION @MITK_QT4_MINIMUM_VERSION@)

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _SAMPLER
 
 // MITK
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 #include <mitkParticleGrid.h>
 #include <mitkEnergyComputer.h>
 #include <mitkSimpSamp.h>
@@ -37,7 +37,7 @@ namespace mitk
 /**
 * \brief Generates ne proposals of particle configurations.   */
 
-class FiberTracking_EXPORT MetropolisHastingsSampler
+class MitkFiberTracking_EXPORT MetropolisHastingsSampler
 {
 public:
 

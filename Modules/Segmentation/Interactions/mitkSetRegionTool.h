@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSetRegionTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkFeedbackContourTool.h"
 
 namespace mitk
@@ -44,7 +44,7 @@ class InteractionEvent;
 
   $Author$
 */
-class Segmentation_EXPORT SetRegionTool : public FeedbackContourTool
+class MitkSegmentation_EXPORT SetRegionTool : public FeedbackContourTool
 {
   public:
 

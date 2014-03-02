@@ -3,6 +3,6 @@ project(org_mitk_gui_qt_diffusionimaging)
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE DIFFUSIONIMAGING_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS QmitkExt Connectomics FiberTracking DiffusionCore Quantification
+  MODULE_DEPENDS MitkQtWidgetsExt MitkConnectomics MitkFiberTracking MitkDiffusionCore MitkQuantification
   PACKAGE_DEPENDS ITK|ITKDiffusionTensorImage
 )

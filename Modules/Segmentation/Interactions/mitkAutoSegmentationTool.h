@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkAutoSegmentationTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkTool.h"
 
 namespace mitk
@@ -29,7 +29,7 @@ namespace mitk
 
   This class is undocumented. Ask the creator ($Author$) to supply useful comments.
 */
-class Segmentation_EXPORT AutoSegmentationTool : public Tool
+class MitkSegmentation_EXPORT AutoSegmentationTool : public Tool
 {
   public:
 

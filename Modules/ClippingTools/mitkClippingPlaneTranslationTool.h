@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkClippingPlaneTranslationTool_h_Included
 #define mitkClippingPlaneTranslationTool_h_Included
 
-#include "ClippingToolsExports.h"
+#include <MitkClippingToolsExports.h>
 
 #include "mitkAffineDataInteractor3D.h"
 #include "mitkCommon.h"
@@ -36,7 +36,7 @@ namespace mitk
   /**
   \brief A tool which allows you to move planes.
   */
-  class ClippingTools_EXPORT ClippingPlaneTranslationTool : public Tool
+  class MitkClippingTools_EXPORT ClippingPlaneTranslationTool : public Tool
   {
   public:
 

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
 #define PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 #include "mitkGenericProperty.h"
 #include "mitkUIDGenerator.h"

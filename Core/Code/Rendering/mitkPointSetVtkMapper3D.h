@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPointSetVtkMAPPER3D_H_HEADER_INCLUDED_C1907273
 #define MITKPointSetVtkMAPPER3D_H_HEADER_INCLUDED_C1907273
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include <vtkSmartPointer.h>

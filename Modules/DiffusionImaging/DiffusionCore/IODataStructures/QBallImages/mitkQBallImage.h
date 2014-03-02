@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorImage.h"
 #include "mitkImageVtkAccessor.h"
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 // generate by n-fold subdivisions of an icosahedron
 // 1 - 12
@@ -43,7 +43,7 @@ namespace mitk
   /**
   * \brief this class encapsulates qball images
   */
-  class DiffusionCore_EXPORT QBallImage : public Image
+  class MitkDiffusionCore_EXPORT QBallImage : public Image
   {
 
   public:

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _PARTICLE
 #define _PARTICLE
 
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 #include <vnl/vnl_vector_fixed.h>
 
 
@@ -27,7 +27,7 @@ namespace mitk
 /**
 * \brief A particle is the basic element of the Gibbs fiber tractography method.   */
 
-class FiberTracking_EXPORT Particle
+class MitkFiberTracking_EXPORT Particle
 {
 public:
 
@@ -73,7 +73,7 @@ private:
 
 };
 
-class FiberTracking_EXPORT EndPoint
+class MitkFiberTracking_EXPORT EndPoint
 {
 public:
     EndPoint()

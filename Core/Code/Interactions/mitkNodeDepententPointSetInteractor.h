@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNodeDepententPointSetInteractor_H_HEADER_INCLUDED
 #define MITKNodeDepententPointSetInteractor_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkVector.h"
 #include <mitkInteractor.h>
 #include <mitkDataNode.h>

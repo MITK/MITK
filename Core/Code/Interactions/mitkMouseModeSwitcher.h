@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKMouseModeSwitcher_H_HEADER_INCLUDED_C10DC4EB
 #define MITKMouseModeSwitcher_H_HEADER_INCLUDED_C10DC4EB
 
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include <itkObject.h>
 #include "mitkDisplayInteractor.h"
 

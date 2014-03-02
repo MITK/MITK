@@ -21,9 +21,10 @@ mark_as_advanced(CppMicroServices_DIR)
 
 # create a custom module conf file for CppMicroServices
 function(_generate_cppmicroservices_conf)
+  set(MITK_MODULE_NAME_PREFIX "")
   set(MODULE_IS_ENABLED 1)
   set(MODULE_NAME CppMicroServices)
-  set(MODULE_PROVIDES ${MODULE_NAME})
+  set(MODULE_TARGET ${MODULE_NAME})
   set(MODULE_EXTRA_CMAKE_CODE "find_package(CppMicroServices NO_MODULE REQUIRED)")
   set(MODULE_INCLUDE_DIRS "\${CppMicroServices_INCLUDE_DIRS}")
 

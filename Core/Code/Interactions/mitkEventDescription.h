@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef EVENTDESCRIPTION_H_HEADER_INCLUDED_C188FC4D
 #define EVENTDESCRIPTION_H_HEADER_INCLUDED_C188FC4D
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkEvent.h"
 #include <string>
 

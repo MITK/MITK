@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <mitkVector.h>
 #include <itkProcessObject.h>
-#include <PlanarFigureExports.h>
+#include <MitkPlanarFigureExports.h>
 
 namespace mitk
 {
   class PlanarFigure;
   class Surface;
 
-  class PlanarFigure_EXPORT ExtrudePlanarFigureFilter : public itk::ProcessObject
+  class MitkPlanarFigure_EXPORT ExtrudePlanarFigureFilter : public itk::ProcessObject
   {
   public:
     mitkClassMacro(ExtrudePlanarFigureFilter, itk::ProcessObject);

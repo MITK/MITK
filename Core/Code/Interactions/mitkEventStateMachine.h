@@ -22,7 +22,7 @@
 #include "mitkMessage.h"
 #include "mitkInteractionEventHandler.h"
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <string>
 
 namespace us {

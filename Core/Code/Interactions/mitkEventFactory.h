@@ -20,7 +20,7 @@
 #include "mitkCommon.h"
 #include "mitkInteractionEvent.h"
 #include "mitkPropertyList.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 
 namespace mitk

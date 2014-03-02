@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkClippingPlaneDeformationTool_h_Included
 #define mitkClippingPlaneDeformationTool_h_Included
 
-#include "ClippingToolsExports.h"
+#include <MitkClippingToolsExports.h>
 
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
@@ -29,7 +29,7 @@ namespace mitk
   /**
   \brief A tool with whom you can deform planes.
   */
-  class ClippingTools_EXPORT ClippingPlaneDeformationTool : public Tool
+  class MitkClippingTools_EXPORT ClippingPlaneDeformationTool : public Tool
   {
   public:
 

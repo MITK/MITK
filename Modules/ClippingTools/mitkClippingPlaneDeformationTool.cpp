@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolManager.h"
 
 namespace mitk{
-  MITK_TOOL_MACRO(ClippingTools_EXPORT, ClippingPlaneDeformationTool, "Clipping Tool Deformation");
+  MITK_TOOL_MACRO(MitkClippingTools_EXPORT, ClippingPlaneDeformationTool, "Clipping Tool Deformation");
 }
 
 mitk::ClippingPlaneDeformationTool::ClippingPlaneDeformationTool()

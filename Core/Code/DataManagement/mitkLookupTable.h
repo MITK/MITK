@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKLookupTable_H_HEADER_INCLUDED_C1EBD53D
 #define MITKLookupTable_H_HEADER_INCLUDED_C1EBD53D
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include "vtkLookupTable.h"
 #include "vtkSmartPointer.h"

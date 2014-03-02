@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPythonConsole.h>
 #include <QString>
-#include "mitkPythonExports.h"
+#include <MitkPythonExports.h>
 
 ///
 /// forward declarations

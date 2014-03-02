@@ -25,7 +25,7 @@
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEvent.h"
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 /**
  * Note: A Click with the MiddleButton is to be handled with MousePressEvents

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_ARROW_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
@@ -31,7 +31,7 @@ class Geometry2D;
  * \brief Implementation of PlanarFigure representing an arrow
  * through two control points
  */
-class PlanarFigure_EXPORT PlanarArrow : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarArrow : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarArrow, PlanarFigure );

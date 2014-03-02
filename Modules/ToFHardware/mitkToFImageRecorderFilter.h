@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkToFImageRecorderFilter_h
 
 #include <mitkImageToImageFilter.h>
-#include <mitkToFHardwareExports.h>
+#include <MitkToFHardwareExports.h>
 
 #include <mitkToFImageWriter.h>
 

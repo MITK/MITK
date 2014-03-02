@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkExtExports.h"
 #include <mitkInteractor.h>
 #include <mitkVector.h>
-#include "FiberTrackingExports.h"
+#include <MitkFiberTrackingExports.h>
 
 #include <vtkType.h>
 
@@ -37,7 +37,7 @@ namespace mitk
   //## All Set-operations would be done through the method "ExecuteAction", if there would be anyone.
   //## the identificationnumber of this point is set by this points and evalued from an empty place in the DataStructure
   //## @ingroup Interaction
-  class FiberTracking_EXPORT FiberBundleInteractor : public Interactor
+  class MitkFiberTracking_EXPORT FiberBundleInteractor : public Interactor
   {
   public:
     mitkClassMacro(FiberBundleInteractor, Interactor);

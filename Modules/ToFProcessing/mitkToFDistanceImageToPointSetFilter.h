@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSetSource.h>
 #include "mitkImageSource.h"
 #include <mitkToFProcessingCommon.h>
-#include "mitkToFProcessingExports.h"
+#include <MitkToFProcessingExports.h>
 
 namespace mitk
 {
@@ -44,7 +44,7 @@ namespace mitk
   * @ingroup SurfaceFilters
   * @ingroup ToFProcessing
   */
-  class mitkToFProcessing_EXPORT ToFDistanceImageToPointSetFilter : public PointSetSource
+  class MitkToFProcessing_EXPORT ToFDistanceImageToPointSetFilter : public PointSetSource
   {
   public:
 

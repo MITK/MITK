@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdlib.h>
 
 #include "mitkVector.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 
 namespace mitk {

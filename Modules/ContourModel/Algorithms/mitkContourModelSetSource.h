@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_ContourModelSetSource_H
 #define _MITK_ContourModelSetSource_H
 
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include "mitkBaseDataSource.h"
 #include "mitkContourModelSet.h"
 
@@ -27,7 +27,7 @@ namespace mitk
   * @brief Superclass of all classes generating ContourModels.
   * @ingroup Process
   */
-  class ContourModel_EXPORT ContourModelSetSource : public BaseDataSource
+  class MitkContourModel_EXPORT ContourModelSetSource : public BaseDataSource
   {
   public:
 

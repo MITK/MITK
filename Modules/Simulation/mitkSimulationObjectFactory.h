@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class Simulation_EXPORT SimulationObjectFactory : public CoreObjectFactoryBase
+  class MitkSimulation_EXPORT SimulationObjectFactory : public CoreObjectFactoryBase
   {
   public:
     mitkClassMacro(SimulationObjectFactory, CoreObjectFactoryBase);
@@ -46,7 +46,7 @@ namespace mitk
     MultimapType m_SaveFileExtensionsMap;
   };
 
-  Simulation_EXPORT void RegisterSimulationObjectFactory();
+  MitkSimulation_EXPORT void RegisterSimulationObjectFactory();
 }
 
 #endif

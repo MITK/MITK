@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkAddContourTool_h_Included
 
 #include "mitkContourTool.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 namespace us {
 class ModuleResource;
@@ -46,7 +46,7 @@ namespace mitk
 
   $Author$
 */
-class Segmentation_EXPORT AddContourTool : public ContourTool
+class MitkSegmentation_EXPORT AddContourTool : public ContourTool
 {
   public:
 

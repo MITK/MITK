@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "itkVectorImage.h"
 #include "mitkImageCast.h"
-#include "QuantificationExports.h"
+#include "MitkQuantificationExports.h"
 
 namespace mitk
 {
@@ -31,7 +31,7 @@ namespace mitk
   * yet supported by mitkImage)
   */
 
-  class Quantification_EXPORT TbssImage : public Image
+  class MitkQuantification_EXPORT TbssImage : public Image
   {
 
   public:

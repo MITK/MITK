@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 #define MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include <vtkCallbackCommand.h>
 

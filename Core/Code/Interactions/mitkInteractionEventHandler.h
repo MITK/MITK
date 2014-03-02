@@ -21,7 +21,7 @@
 #include "itkObjectFactory.h"
 
 #include "mitkCommon.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkEventConfig.h"
 #include "mitkPropertyList.h"
 

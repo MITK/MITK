@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk includes
 #include "mitkImageSource.h"
-#include "mitkPMDModuleExports.h"
+#include <MitkPMDExports.h>
 
 // itk includes
 #include <itkBarrier.h>

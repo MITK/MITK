@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkComputeContourSetNormalsFilter_h_Included
 #define mitkComputeContourSetNormalsFilter_h_Included
 
-#include "SurfaceInterpolationExports.h"
+#include <MitkSurfaceInterpolationExports.h>
 #include "mitkSurfaceToSurfaceFilter.h"
 #include "mitkProgressBar.h"
 #include "mitkSurface.h"
@@ -51,7 +51,7 @@ namespace mitk {
 
    $Author: fetzer$
 */
-class SurfaceInterpolation_EXPORT ComputeContourSetNormalsFilter : public SurfaceToSurfaceFilter
+class MitkSurfaceInterpolation_EXPORT ComputeContourSetNormalsFilter : public SurfaceToSurfaceFilter
 {
 public:
 

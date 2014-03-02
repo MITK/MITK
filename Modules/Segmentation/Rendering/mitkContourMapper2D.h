@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_CONTOUR_MAPPER_2D_H_
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkGLMapper.h"
 
 
@@ -34,7 +34,7 @@ class Contour;
  *
  * @ingroup Mapper
  */
-class Segmentation_EXPORT ContourMapper2D : public GLMapper
+class MitkSegmentation_EXPORT ContourMapper2D : public GLMapper
 {
 public:
 

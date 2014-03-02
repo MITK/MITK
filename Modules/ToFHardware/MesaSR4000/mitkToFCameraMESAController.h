@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraMESAController_h
 #define __mitkToFCameraMESAController_h
 
-#include "mitkMESASR4000ModuleExports.h"
+#include <MitkMESASR4000ModuleExports.h>
 #include "mitkCommon.h"
 
 #include "itkObject.h"

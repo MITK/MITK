@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66ASDF
 #define MITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66ASDF
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include "mitkRenderWindowBase.h"
 

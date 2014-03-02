@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKEXCEPTION_H_INCLUDED
 #define MITKEXCEPTION_H_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <itkMacro.h>
 #include <vector>
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkSlicesInterpolator_h_Included
 
 #include "mitkSliceNavigationController.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 #include "mitkSegmentationInterpolationController.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
@@ -75,7 +75,7 @@ class QPushButton;
 
   Last contributor: $Author: maleike $
 */
-class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
+class MitkSegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
 {
   Q_OBJECT
 

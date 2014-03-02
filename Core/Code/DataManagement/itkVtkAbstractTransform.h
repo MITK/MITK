@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKVTKABSTRACTTRANSFORM_H_HEADER_INCLUDED_C1C68A2C
 #define MITKVTKABSTRACTTRANSFORM_H_HEADER_INCLUDED_C1C68A2C
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "itkTransform.h"
 
 class vtkAbstractTransform;

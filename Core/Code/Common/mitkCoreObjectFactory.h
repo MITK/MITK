@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <set>
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkCoreObjectFactoryBase.h"
 #include "mitkFileWriterWithInformation.h"
 namespace mitk {

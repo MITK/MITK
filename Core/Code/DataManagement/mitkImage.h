@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 #define MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkSlicedData.h"
 #include "mitkBaseData.h"
 #include "mitkLevelWindow.h"

@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     #define @MODULE_EXPORT_DEFINE@
     #define @MODULE_NAME@_LOCAL
   #else
-    #ifdef @MODULE_PROVIDES@_EXPORTS
+    #ifdef @MODULE_TARGET@_EXPORTS
       #define @MODULE_EXPORT_DEFINE@ MITK_EXPORT
     #else
       #define @MODULE_EXPORT_DEFINE@ MITK_IMPORT
@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   #endif
 
   #ifndef _CMAKE_MODULENAME
-    #ifdef @MODULE_PROVIDES@_EXPORTS
+    #ifdef @MODULE_TARGET@_EXPORTS
       #define _CMAKE_MODULENAME "@MODULE_NAME@"
     #endif
   #endif

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_BASE_DATA_SOURCE_H
 #define MITK_BASE_DATA_SOURCE_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include <itkProcessObject.h>
 

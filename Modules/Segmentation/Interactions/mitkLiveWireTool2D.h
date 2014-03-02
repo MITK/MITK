@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCorrectorTool2D_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkSegTool2D.h"
 #include <mitkContourModel.h>
 #include <mitkContourModelLiveWireInteractor.h>
@@ -47,7 +47,7 @@ namespace mitk
 
   \warning Only to be instantiated by mitk::ToolManager.
 */
-class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
+class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
 {
   public:
 

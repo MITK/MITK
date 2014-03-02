@@ -25,7 +25,7 @@ namespace mitk
 {
   /**
   * \brief A cost function using the modularity of the network */
-  class Connectomics_EXPORT ConnectomicsSimulatedAnnealingCostFunctionModularity : public mitk::ConnectomicsSimulatedAnnealingCostFunctionBase
+  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingCostFunctionModularity : public mitk::ConnectomicsSimulatedAnnealingCostFunctionBase
   {
   public:
 

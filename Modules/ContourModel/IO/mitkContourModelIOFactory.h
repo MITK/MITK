@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #pragma warning ( disable : 4786 )
 #endif
 
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
 
@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of ContourModelReader objects using an object factory.
 //##
 //## @ingroup IO
-class ContourModel_EXPORT ContourModelIOFactory : public itk::ObjectFactoryBase
+class MitkContourModel_EXPORT ContourModelIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */

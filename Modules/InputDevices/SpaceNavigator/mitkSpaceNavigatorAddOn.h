@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 
 #include <mitkEventMapperAddOn.h>
-#include <mitkSpaceNavigatorExports.h>
+#include <MitkSpaceNavigatorExports.h>
 
 namespace mitk {
 

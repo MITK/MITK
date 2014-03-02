@@ -1,11 +1,10 @@
-set(LIBPOSTFIX "Ext")
 
 # Modules must be listed according to their dependencies
 set(module_dirs
-    MitkDataTypesExt
-    MitkAlgorithmsExt
-    MitkMapperExt
-    MitkIOExt
+    DataTypesExt
+    AlgorithmsExt
+    MapperExt
+    IOExt
     Qt4Qt5TestModule
     SceneSerializationBase
     PlanarFigure
@@ -13,7 +12,7 @@ set(module_dirs
     ImageStatistics
     LegacyAdaptors
     IpPicSupport
-    MitkExt
+    Ext
     SceneSerialization
     GraphAlgorithms
     ContourModel
@@ -21,9 +20,9 @@ set(module_dirs
     Segmentation
     PlanarFigureSegmentation
     OpenViewCore
-    QmlMitk
-    Qmitk
-    QmitkExt
+    QmlItems
+    QtWidgets
+    QtWidgetsExt
     SegmentationUI
     DiffusionImaging
     GPGPU

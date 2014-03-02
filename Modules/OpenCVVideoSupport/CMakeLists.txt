@@ -5,7 +5,7 @@ if(MITK_USE_OpenCV)
     set(dependencies ${dependencies} videoInput)
   endif(MITK_USE_videoInput)
 
-  MITK_CREATE_MODULE(mitkOpenCVVideoSupport
+  MITK_CREATE_MODULE(
     INCLUDE_DIRS Commands
     DEPENDS MitkAlgorithmsExt
     PACKAGE_DEPENDS ${dependencies}

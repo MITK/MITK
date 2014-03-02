@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDRawDataCamCubeDeviceFactory_h
 #define __mitkToFCameraPMDRawDataCamCubeDeviceFactory_h
 
-#include "mitkPMDModuleExports.h"
+#include <MitkPMDExports.h>
 #include "mitkToFCameraPMDRawDataCamCubeDevice.h"
 #include "mitkAbstractToFDeviceFactory.h"
 #include <mitkCameraIntrinsics.h>

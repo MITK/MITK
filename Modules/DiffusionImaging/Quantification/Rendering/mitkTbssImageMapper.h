@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define TbssImageMapper_H_HEADER_INCLUDED
 
 #include "mitkImageVtkMapper2D.h"
-#include "QuantificationExports.h"
+#include "MitkQuantificationExports.h"
 
 namespace mitk {
 
@@ -27,7 +27,7 @@ namespace mitk {
   //## @brief Mapper for raw diffusion weighted images
   //## @ingroup Mapper
 
-  class Quantification_EXPORT TbssImageMapper : public ImageVtkMapper2D
+  class MitkQuantification_EXPORT TbssImageMapper : public ImageVtkMapper2D
   {
   public:
 

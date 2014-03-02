@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define CAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
 
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseController.h"
 #include "mitkDisplayPositionEvent.h"
 

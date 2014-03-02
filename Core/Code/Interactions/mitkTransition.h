@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef TRANSITION_H_HEADER_INCLUDED_C19AE06B
 #define TRANSITION_H_HEADER_INCLUDED_C19AE06B
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <string>
 #include <vector>
 #include <itkWeakPointer.h>

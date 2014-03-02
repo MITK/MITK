@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKTOFSURFACEGENERATIONWIDGET_H_INCLUDED
 #define _QMITKTOFSURFACEGENERATIONWIDGET_H_INCLUDED
 
-#include "mitkTOFUIExports.h"
+#include <MitkToFUIExports.h>
 #include "ui_QmitkToFSurfaceGenerationWidgetControls.h"
 
 // QT headers
@@ -43,7 +43,7 @@ class QmitkStdMultiWidget;
   * be reused in any other GUI.
   * \ingroup ToFUI
   */
-class mitkTOFUI_EXPORT QmitkToFSurfaceGenerationWidget :public QWidget
+class MitkToFUI_EXPORT QmitkToFSurfaceGenerationWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

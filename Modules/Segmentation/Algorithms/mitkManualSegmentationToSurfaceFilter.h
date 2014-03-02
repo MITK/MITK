@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITKMANUALSEGMENTATIONTISURFACEFILTER_h__
 
 #include <mitkImageToSurfaceFilter.h>
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 #include <vtkImageGaussianSmooth.h>
 #include <vtkImageMedian3D.h>
@@ -40,7 +40,7 @@ namespace mitk {
    * @ingroup Process
    */
 
-  class Segmentation_EXPORT ManualSegmentationToSurfaceFilter : public ImageToSurfaceFilter
+  class MitkSegmentation_EXPORT ManualSegmentationToSurfaceFilter : public ImageToSurfaceFilter
   {
     public:
       mitkClassMacro(ManualSegmentationToSurfaceFilter,ImageToSurfaceFilter);

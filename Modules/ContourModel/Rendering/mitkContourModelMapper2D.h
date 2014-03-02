@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkCommon.h"
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 
 #include "mitkBaseRenderer.h"
 #include "mitkVtkMapper.h"
@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class ContourModel_EXPORT ContourModelMapper2D : public VtkMapper
+  class MitkContourModel_EXPORT ContourModelMapper2D : public VtkMapper
   {
       public:
     /** Standard class typedefs. */
@@ -56,7 +56,7 @@ namespace mitk {
     /*+++ END methods of MITK-VTK rendering pipeline +++*/
 
 
-    class ContourModel_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+    class MitkContourModel_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
 

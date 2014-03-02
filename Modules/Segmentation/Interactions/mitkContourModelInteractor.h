@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkContourModelInteractor_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkInteractor.h"
 #include <mitkContourModel.h>
 #include <mitkDataNode.h>
@@ -37,7 +37,7 @@ namespace mitk
 
 
 */
-class Segmentation_EXPORT ContourModelInteractor : public Interactor
+class MitkSegmentation_EXPORT ContourModelInteractor : public Interactor
 {
   public:
 

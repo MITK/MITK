@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_CONTOURMODEL_WRITER__H_
 #define _MITK_CONTOURMODEL_WRITER__H_
 
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
 #include <mitkContourModel.h>
@@ -58,7 +58,7 @@ namespace mitk
  * @ingroup PSIO
  * @ingroup Process
  */
-class ContourModel_EXPORT ContourModelWriter : public mitk::FileWriterWithInformation
+class MitkContourModel_EXPORT ContourModelWriter : public mitk::FileWriterWithInformation
 {
 public:
 

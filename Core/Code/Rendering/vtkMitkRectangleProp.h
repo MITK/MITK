@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "vtkActor2D.h"
 #include "vtkRenderWindow.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 class MITK_CORE_EXPORT vtkMitkRectangleProp : public vtkProp
 {

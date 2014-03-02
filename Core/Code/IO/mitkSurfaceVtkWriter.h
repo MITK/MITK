@@ -192,7 +192,7 @@ protected:
     bool m_WriterWriteHasReturnValue;
 };
 
-#ifndef Mitk_EXPORTS
+#ifndef MitkCore_EXPORTS
 extern template class SurfaceVtkWriter<vtkSTLWriter>;
 extern template class SurfaceVtkWriter<vtkPolyDataWriter>;
 extern template class SurfaceVtkWriter<vtkXMLPolyDataWriter>;

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #pragma warning ( disable : 4786 )
 #endif
 
-#include "IpPicSupportExports.h"
+#include <MitkIpPicSupportExports.h>
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
 
@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of PicFileReader objects using an object factory.
 //##
 //## @ingroup IO
-class IpPicSupport_EXPORT PicFileIOFactory : public itk::ObjectFactoryBase
+class MitkIpPicSupport_EXPORT PicFileIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "itkVectorImage.h"
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 
 #define TENSOR_NUM_ELEMENTS 6
@@ -32,7 +32,7 @@ namespace mitk
   /**
   * \brief this class encapsulates tensor images
   */
-  class DiffusionCore_EXPORT TensorImage : public Image
+  class MitkDiffusionCore_EXPORT TensorImage : public Image
   {
 
   public:

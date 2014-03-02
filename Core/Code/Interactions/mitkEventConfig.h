@@ -17,7 +17,7 @@
 #ifndef mitkStateMachineConfig_h
 #define mitkStateMachineConfig_h
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include "usSharedData.h"
 #include "mitkPropertyList.h"

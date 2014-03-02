@@ -3,7 +3,7 @@
 #include <vnl/vnl_vector_fixed.h>
 #include <vnl/vnl_copy.h>
 #include <itkNumericTraits.h>
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 
 using namespace mitk;

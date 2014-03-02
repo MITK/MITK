@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkContourModelUtilshIncludett
 
 #include "mitkImage.h"
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include "mitkContourModel.h"
 
 #include <itkImage.h>
@@ -31,7 +31,7 @@ namespace mitk
  *
  *
  */
-class ContourModel_EXPORT ContourModelUtils : public itk::Object
+class MitkContourModel_EXPORT ContourModelUtils : public itk::Object
 {
   public:
 

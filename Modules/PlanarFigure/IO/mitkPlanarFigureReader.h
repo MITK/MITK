@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PlanarFigureReader__H_
 
 #include "mitkPlanarFigureSource.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include "mitkFileReader.h"
 
 #include <list>
@@ -36,7 +36,7 @@ namespace mitk
  * these are assigned to multiple outputs of the filter.
  * @ingroup IO
 */
-class PlanarFigure_EXPORT PlanarFigureReader: public PlanarFigureSource, public FileReader
+class MitkPlanarFigure_EXPORT PlanarFigureReader: public PlanarFigureSource, public FileReader
 {
 public:
 

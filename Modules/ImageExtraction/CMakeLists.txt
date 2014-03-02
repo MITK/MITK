@@ -1,4 +1,4 @@
-MITK_CREATE_MODULE( ImageExtraction
+MITK_CREATE_MODULE(
   DEPENDS MitkAlgorithmsExt
   WARNINGS_AS_ERRORS
 )

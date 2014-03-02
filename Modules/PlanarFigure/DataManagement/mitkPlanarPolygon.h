@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_POLYGON_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
@@ -31,7 +31,7 @@ class Geometry2D;
  * \brief Implementation of PlanarFigure representing a polygon
  * with two or more control points
  */
-class PlanarFigure_EXPORT PlanarPolygon : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarPolygon : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarPolygon, PlanarFigure );

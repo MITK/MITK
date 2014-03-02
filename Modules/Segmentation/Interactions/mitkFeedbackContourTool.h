@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkFeedbackContourTool_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkSegTool2D.h"
 #include "mitkContourModelUtils.h"
 #include "mitkContourUtils.h" //TODO remove legacy support
@@ -50,7 +50,7 @@ namespace mitk
 
   $Author: nolden $
 */
-class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
+class MitkSegmentation_EXPORT FeedbackContourTool : public SegTool2D
 {
   public:
 

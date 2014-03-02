@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define FiberBundleXThreadMonitorMapper3D_H_HEADER_INCLUDED
 
 //#include <mitkBaseData.h> //?? necessary
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 #include <mitkVtkMapper.h>
 #include <mitkFiberBundleXThreadMonitor.h>
 
@@ -40,7 +40,7 @@ namespace mitk {
   //## @brief Mapper for FiberBundleX
   //## @ingroup Mapper
 
-  class FiberTracking_EXPORT FiberBundleXThreadMonitorMapper3D : public VtkMapper
+  class MitkFiberTracking_EXPORT FiberBundleXThreadMonitorMapper3D : public VtkMapper
   {
   public:
 

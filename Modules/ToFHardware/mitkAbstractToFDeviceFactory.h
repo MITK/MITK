@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkAbstractToFDeviceFactory_h
 #define __mitkAbstractToFDeviceFactory_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkIToFDeviceFactory.h"
 
 // Microservices

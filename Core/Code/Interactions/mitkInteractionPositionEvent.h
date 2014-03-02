@@ -22,7 +22,7 @@
 #include "mitkCommon.h"
 #include "mitkInteractionEvent.h"
 #include "mitkInteractionEventConst.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <string>
 
 namespace mitk

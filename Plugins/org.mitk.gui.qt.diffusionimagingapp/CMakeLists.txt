@@ -5,7 +5,7 @@ project(org_mitk_gui_qt_diffusionimagingapp)
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE DIFFUSIONIMAGING_APP_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS Qmitk SceneSerialization
+  MODULE_DEPENDS MitkQtWidgets MitkSceneSerialization
   PACKAGE_DEPENDS Qt4|QtWebKit
 )
 

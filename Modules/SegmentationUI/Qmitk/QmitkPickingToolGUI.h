@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkPickingToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 #include "mitkPickingTool.h"
 #include "ui_QmitkPickingToolGUIControls.h"
 
@@ -38,7 +38,7 @@ class QmitkPickingToolGUIControls;
 \brief GUI for mitk::LiveWireTool.
 \sa mitk::PickingTool
 */
-class SegmentationUI_EXPORT QmitkPickingToolGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkPickingToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

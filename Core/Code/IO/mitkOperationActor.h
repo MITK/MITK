@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef OPERATIONACTOR_H_HEADER_INCLUDED_C16E28BD
 #define OPERATIONACTOR_H_HEADER_INCLUDED_C16E28BD
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

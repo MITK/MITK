@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __ContourInteractor_H
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include <mitkInteractor.h>
 #include <mitkVector.h>
 
@@ -27,7 +27,7 @@ namespace mitk {
   //##Documentation
   //## @brief Interactor for the creation of an mitk::Contour
   //## @ingroup Interaction
-  class Segmentation_EXPORT ContourInteractor : public mitk::Interactor
+  class MitkSegmentation_EXPORT ContourInteractor : public mitk::Interactor
   {
   public:
     mitkClassMacro(ContourInteractor, Interactor);

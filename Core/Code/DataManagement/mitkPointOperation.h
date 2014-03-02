@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPOINTOPERATION_H
 #define MITKPOINTOPERATION_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkOperation.h"
 #include "mitkVector.h"
 

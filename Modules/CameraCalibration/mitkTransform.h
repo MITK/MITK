@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 #include <vtkMatrix4x4.h>
 #include <mitkXMLSerializable.h>
-#include <mitkCameraCalibrationExports.h>
+#include <MitkCameraCalibrationExports.h>
 
 namespace mitk {
 
@@ -37,7 +37,7 @@ namespace mitk {
   /// between opencv/vnl/mitk/xml representations of transform
   /// data
   ///
-  class mitkCameraCalibration_EXPORT Transform: public itk::Object,
+  class MitkCameraCalibration_EXPORT Transform: public itk::Object,
     public XMLSerializable
   {
   public:
@@ -299,7 +299,7 @@ namespace mitk {
 
 } // namespace mitk
 
-mitkCameraCalibration_EXPORT std::ostream& operator<<
+MitkCameraCalibration_EXPORT std::ostream& operator<<
     (std::ostream& os, mitk::Transform::Pointer p);
 
 #endif // MITKTRANSFORM_H

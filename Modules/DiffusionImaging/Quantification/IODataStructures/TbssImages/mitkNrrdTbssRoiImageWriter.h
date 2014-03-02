@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
 #include <mitkTbssRoiImage.h>
-#include "QuantificationExports.h"
+#include "MitkQuantificationExports.h"
 
 namespace mitk
 {
@@ -30,7 +30,7 @@ namespace mitk
  * @ingroup Process
  */
 
-class Quantification_EXPORT NrrdTbssRoiImageWriter : public mitk::FileWriterWithInformation
+class MitkQuantification_EXPORT NrrdTbssRoiImageWriter : public mitk::FileWriterWithInformation
 {
 public:
 

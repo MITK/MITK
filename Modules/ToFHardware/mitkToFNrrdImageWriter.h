@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFNrrdImageWriter_h
 #define __mitkToFNrrdImageWriter_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkToFImageWriter.h"
 
 #include <fstream>

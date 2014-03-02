@@ -21,7 +21,7 @@
 #include "itkSmartPointer.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkDataInteractor.h"
 #include <mitkPointSet.h>
 

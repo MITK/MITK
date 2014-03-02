@@ -16,7 +16,6 @@ endif()
 
 # end fix
 
-MITK_CREATE_MODULE( Overlays
-                    DEPENDS Qmitk
-                    WARNINGS_AS_ERRORS
+MITK_CREATE_MODULE(DEPENDS MitkQtWidgets
+                   WARNINGS_AS_ERRORS
 )

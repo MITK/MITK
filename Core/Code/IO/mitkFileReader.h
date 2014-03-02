@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef FILEREADER_H_HEADER_INCLUDED_C1E7E521
 #define FILEREADER_H_HEADER_INCLUDED_C1E7E521
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk {
 

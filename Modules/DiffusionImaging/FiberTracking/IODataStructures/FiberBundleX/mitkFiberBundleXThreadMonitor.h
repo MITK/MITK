@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //includes for MITK datastructure
 #include "mitkBaseData.h"
-#include "FiberTrackingExports.h"
+#include <MitkFiberTrackingExports.h>
 #include <QString>
 
 #include <QMutex>
@@ -30,7 +30,7 @@ namespace mitk {
 
   /**
    * \brief Base Class for Fiber Bundles;   */
-  class  FiberTracking_EXPORT FiberBundleXThreadMonitor : public BaseData
+  class Mitk FiberTracking_EXPORT FiberBundleXThreadMonitor : public BaseData
   {
 
   public:

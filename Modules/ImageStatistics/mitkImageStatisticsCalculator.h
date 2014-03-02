@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_IMAGESTATISTICSCALCULATOR_H
 
 #include <itkObject.h>
-#include "ImageStatisticsExports.h"
+#include "MitkImageStatisticsExports.h"
 #include <itkImage.h>
 #include <itkTimeStamp.h>
 
@@ -57,7 +57,7 @@ namespace mitk
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
-class ImageStatistics_EXPORT ImageStatisticsCalculator : public itk::Object
+class MitkImageStatistics_EXPORT ImageStatisticsCalculator : public itk::Object
 {
 public:
 
@@ -204,7 +204,7 @@ protected:
 
 
   /** \brief If the passed vector matches any of the three principal axes
-   * of the passed geometry, the ínteger value corresponding to the axis
+   * of the passed geometry, the Ã­nteger value corresponding to the axis
    * is set and true is returned. */
   bool GetPrincipalAxis( const Geometry3D *geometry, Vector3D vector,
     unsigned int &axis );

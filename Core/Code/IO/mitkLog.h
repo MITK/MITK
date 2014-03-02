@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_LOG_H
 #define _MITK_LOG_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mbilog.h>
 
 namespace mitk

@@ -20,7 +20,7 @@
 #include <mitkVtkOverlay2D.h>
 #include <mitkLocalStorageHandler.h>
 #include <vtkSmartPointer.h>
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 
 class vtkTextActor;
 class vtkImageMapper;

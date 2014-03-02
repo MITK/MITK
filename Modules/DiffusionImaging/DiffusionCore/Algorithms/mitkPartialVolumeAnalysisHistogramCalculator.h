@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_PartialVolumeAnalysisHistogramCalculator_H
 #define _MITK_PartialVolumeAnalysisHistogramCalculator_H
 
-#include "DiffusionCoreExports.h"
+#include "MitkDiffusionCoreExports.h"
 
 #include <itkObject.h>
 #include <itkImage.h>
@@ -54,7 +54,7 @@ namespace mitk
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
-  class DiffusionCore_EXPORT PartialVolumeAnalysisHistogramCalculator : public itk::Object
+  class MitkDiffusionCore_EXPORT PartialVolumeAnalysisHistogramCalculator : public itk::Object
   {
   public:
 
@@ -246,7 +246,7 @@ namespace mitk
 
 
     /** \brief If the passed vector matches any of the three principal axes
-   * of the passed geometry, the ínteger value corresponding to the axis
+   * of the passed geometry, the Ã­nteger value corresponding to the axis
    * is set and true is returned. */
     bool GetPrincipalAxis( const Geometry3D *geometry, Vector3D vector,
                            unsigned int &axis );

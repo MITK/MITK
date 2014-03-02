@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkImageToContourFilter_h_Included
 
 //#include "MitkSBExports.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "itkImage.h"
 #include "mitkImage.h"
 #include "itkContourExtractor2DImageFilter.h"
@@ -42,7 +42,7 @@ namespace mitk {
 
   $Author: fetzer$
 */
-class Segmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
+class MitkSegmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
 {
  public:
 

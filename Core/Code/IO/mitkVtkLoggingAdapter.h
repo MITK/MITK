@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef VtkLoggingAdapter_H_HEADER_INCLUDED
 #define VtkLoggingAdapter_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <vtkOutputWindow.h>
 #include <vtkSmartPointer.h>
 

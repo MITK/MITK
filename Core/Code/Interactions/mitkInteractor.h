@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef INTERACTOR_H_HEADER_INCLUDED
 #define INTERACTOR_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkStateMachine.h"
 #include "mitkGeometry3D.h"
 

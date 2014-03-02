@@ -8,7 +8,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     ${CMAKE_CURRENT_BINARY_DIR}
     )
 
-  project( mitkDiffusionMiniApps )
+  project( MitkDiffusionMiniApps )
 
   # fill in the standalone executables here
   set(DIFFUSIONMINIAPPS
@@ -52,13 +52,13 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 #      ${ALL_LIBRARIES} )
 #  ENDFOREACH(tool)
 
-  mitk_create_executable(mitkDiffusionMiniApps
-    DEPENDS DiffusionCore FiberTracking Connectomics
+  mitk_create_executable(DiffusionMiniApps
+    DEPENDS MitkDiffusionCore MitkFiberTracking MitkConnectomics
     PACKAGE_DEPENDS ITK|ITKDiffusionTensorImage
   )
 
   if(EXECUTABLE_IS_ENABLED)
-    MITK_INSTALL_TARGETS(EXECUTABLES mitkDiffusionMiniApps )
+    MITK_INSTALL_TARGETS(EXECUTABLES ${EXECUTABLE_TARGET})
   endif()
 
 endif()

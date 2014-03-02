@@ -20,7 +20,7 @@
 #include <mitkVtkOverlay.h>
 #include <mitkLocalStorageHandler.h>
 #include <vtkSmartPointer.h>
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 
 class vtkLegendScaleActor;
 

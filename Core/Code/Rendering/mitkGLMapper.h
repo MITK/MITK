@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKGLMAPPER_H_HEADER_INCLUDED_C197C872
 #define MITKGLMAPPER_H_HEADER_INCLUDED_C197C872
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkVtkPropRenderer.h"

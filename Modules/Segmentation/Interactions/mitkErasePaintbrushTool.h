@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkErasePaintbrushTool_h_Included
 
 #include "mitkPaintbrushTool.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 namespace us {
 class ModuleResource;
@@ -44,7 +44,7 @@ namespace mitk
   \warning Only to be instantiated by mitk::ToolManager.
   $Author: maleike $
 */
-class Segmentation_EXPORT ErasePaintbrushTool : public PaintbrushTool
+class MitkSegmentation_EXPORT ErasePaintbrushTool : public PaintbrushTool
 {
   public:
 

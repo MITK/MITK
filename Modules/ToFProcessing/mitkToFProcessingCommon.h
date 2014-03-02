@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKTOFPROCESSINGCOMMON_H
 #define MITKTOFPROCESSINGCOMMON_H
 
-#include "mitkToFProcessingExports.h"
+#include <MitkToFProcessingExports.h>
 #include <mitkCameraIntrinsics.h>
 #include "mitkVector.h"
 #include <vnl/vnl_math.h>
@@ -39,7 +39,7 @@ namespace mitk
   * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png
   * @ingroup ToFProcessing
   */
-  class mitkToFProcessing_EXPORT ToFProcessingCommon
+  class MitkToFProcessing_EXPORT ToFProcessingCommon
   {
   public:
     typedef double ToFScalarType;

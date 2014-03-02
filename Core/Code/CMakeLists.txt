@@ -14,7 +14,7 @@ set_source_files_properties( Controllers/mitkSliceNavigationController.cpp COMPI
 # Mitk Core library.
 set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 0)
 
-MITK_CREATE_MODULE( Mitk
+MITK_CREATE_MODULE(Core
   INCLUDE_DIRS
     Algorithms Common DataManagement Controllers
     Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}

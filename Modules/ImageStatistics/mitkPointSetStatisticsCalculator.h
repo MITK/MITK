@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PointSetSTATISTICSCALCULATOR_H
 
 #include <itkObject.h>
-#include "ImageStatisticsExports.h"
+#include <MitkImageStatisticsExports.h>
 #include <mitkPointSet.h>
 
 namespace mitk
@@ -28,7 +28,7 @@ namespace mitk
 /**
  * \brief Class for calculating statistics (like standard derivation, RMS, mean, etc.) for a PointSet.
  */
-class ImageStatistics_EXPORT PointSetStatisticsCalculator : public itk::Object
+class MitkImageStatistics_EXPORT PointSetStatisticsCalculator : public itk::Object
 {
 public:
 

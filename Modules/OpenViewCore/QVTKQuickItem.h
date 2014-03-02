@@ -17,7 +17,7 @@
 
 #include <QMutex>
 
-#include "OpenViewCoreExports.h"
+#include <MitkOpenViewCoreExports.h>
 
 class QOpenGLContext;
 class QOpenGLFramebufferObject;
@@ -28,7 +28,7 @@ class vtkGenericOpenGLRenderWindow;
 class vtkObject;
 class vtkContextView;
 
-class OVCORE_EXPORT QVTKQuickItem : public QQuickItem
+class MitkOVCORE_EXPORT QVTKQuickItem : public QQuickItem
 {
   Q_OBJECT
 public:

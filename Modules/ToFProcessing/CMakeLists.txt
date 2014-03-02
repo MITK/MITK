@@ -1,6 +1,6 @@
-MITK_CREATE_MODULE(mitkToFProcessing
+MITK_CREATE_MODULE(
     SUBPROJECTS MITK-ToF
-    DEPENDS Mitk mitkCameraCalibration
+    DEPENDS MitkCameraCalibration
     PACKAGE_DEPENDS OpenCV
   )
   

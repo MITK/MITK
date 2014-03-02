@@ -3,5 +3,5 @@ project(org_mitk_gui_qt_igttracking)
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE IGTTRACKING_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS QmitkExt MitkMapperExt MitkIGT MitkIGTUI
+  MODULE_DEPENDS MitkQtWidgetsExt MitkMapperExt MitkIGT MitkIGTUI
 )

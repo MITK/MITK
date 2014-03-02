@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkToolReferenceDataSelectionBox_h_Included
 
 #include "mitkToolManager.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 #include "mitkDataStorage.h"
 
 #include <QWidget>
@@ -43,7 +43,7 @@ The reference image can be selected from a combobox, where all images of the sce
 
 $Author: maleike $
 */
-class SegmentationUI_EXPORT QmitkToolReferenceDataSelectionBox : public QWidget
+class MitkSegmentationUI_EXPORT QmitkToolReferenceDataSelectionBox : public QWidget
 {
   Q_OBJECT
 

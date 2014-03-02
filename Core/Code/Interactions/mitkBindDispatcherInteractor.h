@@ -18,7 +18,7 @@
 #define mitkBindDispatcherInteractor_h
 
 #include "mitkCommon.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include "mitkDataStorage.h"
 #include "mitkDataNode.h"

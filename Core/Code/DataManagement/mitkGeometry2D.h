@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef GEOMETRY2D_H_HEADER_INCLUDED_C1F4D8E0
 #define GEOMETRY2D_H_HEADER_INCLUDED_C1F4D8E0
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkGeometry3D.h"
 
 namespace mitk {

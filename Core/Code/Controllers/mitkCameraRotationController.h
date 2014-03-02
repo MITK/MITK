@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef CAMERAROTATIONCONTROLLER_H_HEADER_INCLUDED_NXYCBIU
 #define CAMERAROTATIONCONTROLLER_H_HEADER_INCLUDED_NXYCBIU
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseController.h"
 
 class vtkCamera;

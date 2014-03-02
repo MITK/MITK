@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFCameraPMDPlayerController_h
 #define __mitkToFCameraPMDPlayerController_h
 
-#include "mitkPMDModuleExports.h"
+#include <MitkPMDExports.h>
 #include "mitkToFCameraPMDController.h"
 
 #include "itkObject.h"

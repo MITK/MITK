@@ -4,7 +4,7 @@
 #include "mitkEndoDebug.h"
 #include "mitkAlgorithm.h"
 
-#include <mitkCameraCalibrationExports.h>
+#include <MitkCameraCalibrationExports.h>
 
 namespace mitk
 {
@@ -17,7 +17,7 @@ namespace mitk
   ///
   /// prints the EndoDebug to xml
   ///
-  class mitkCameraCalibration_EXPORT EndoDebugToXmlFile:
+  class MitkCameraCalibration_EXPORT EndoDebugToXmlFile:
     virtual public mitk::Algorithm
   {
   public:

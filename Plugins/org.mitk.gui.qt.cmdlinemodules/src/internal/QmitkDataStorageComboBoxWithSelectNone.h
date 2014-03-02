@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDataStorageComboBoxWithSelectNone_h
 #define QmitkDataStorageComboBoxWithSelectNone_h
 
-#include <QmitkExports.h>
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkCustomVariants.h"
 #include "mitkDataNode.h"

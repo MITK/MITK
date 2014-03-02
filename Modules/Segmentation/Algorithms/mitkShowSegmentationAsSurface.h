@@ -18,14 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_SHOW_SEGMENTATION_AS_SURFACE_H_INCLUDET_WAD
 
 #include "mitkSegmentationSink.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkUIDGenerator.h"
 #include "mitkSurface.h"
 
 namespace mitk
 {
 
-class Segmentation_EXPORT ShowSegmentationAsSurface : public SegmentationSink
+class MitkSegmentation_EXPORT ShowSegmentationAsSurface : public SegmentationSink
 {
   public:
 

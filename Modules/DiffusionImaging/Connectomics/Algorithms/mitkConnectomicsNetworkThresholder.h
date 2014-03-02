@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 #include <mitkConnectomicsNetwork.h>
 
@@ -31,7 +31,7 @@ namespace mitk
 {
   /**
   * \brief A class for thresholding connectomics networks */
-  class Connectomics_EXPORT ConnectomicsNetworkThresholder : public itk::Object
+  class MitkConnectomics_EXPORT ConnectomicsNetworkThresholder : public itk::Object
   {
   public:
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITKIMAGETOSURFACEFILTER_h__
 
 #include <vtkPolyData.h>
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include <mitkCommon.h>
 #include <mitkSurfaceSource.h>
 #include <mitkSurface.h>

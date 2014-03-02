@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef OVERLAY_H
 #define OVERLAY_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include <mitkBaseRenderer.h>
 

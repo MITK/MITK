@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __vtkMaskedProgrammableGlyphFilter_h
 #define __vtkMaskedProgrammableGlyphFilter_h
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 
 #include "vtkProgrammableGlyphFilter.h"
 #include "mitkGeometry3D.h"
@@ -31,7 +31,7 @@ class vtkMaskPoints;
  * InputVectors and InputNormals by their field name in the
  * input dataset.
  */
-class DiffusionCore_EXPORT vtkMaskedProgrammableGlyphFilter : public vtkProgrammableGlyphFilter
+class MitkDiffusionCore_EXPORT vtkMaskedProgrammableGlyphFilter : public vtkProgrammableGlyphFilter
 {
 public:
   vtkTypeMacro(vtkMaskedProgrammableGlyphFilter,vtkProgrammableGlyphFilter);

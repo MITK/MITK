@@ -57,7 +57,7 @@ macro(MITK_USE_MODULE)
     endif()
 
     list(APPEND ALL_INCLUDE_DIRECTORIES ${${dependency}_INCLUDE_DIRS})
-    list(APPEND ALL_LIBRARIES ${${dependency}_PROVIDES})
+    list(APPEND ALL_LIBRARIES ${${dependency}_TARGET})
     list(APPEND ALL_LIBRARY_DIRS ${${dependency}_LIBRARY_DIRS})
     if(TARGET ${dependency}-autoload)
       list(APPEND ALL_META_DEPENDENCIES ${dependency}-autoload)

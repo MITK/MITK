@@ -44,7 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkExceptionObject.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, WatershedTool, "Watershed tool");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, WatershedTool, "Watershed tool");
 }
 
 

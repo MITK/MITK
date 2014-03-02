@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkOverwriteSliceImageFilter_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkImageToImageFilter.h"
 
 #include <itkImage.h>
@@ -54,7 +54,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class Segmentation_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
+class MitkSegmentation_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
 {
   public:
 

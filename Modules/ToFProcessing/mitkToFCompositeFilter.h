@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImage.h>
 #include "mitkImageToImageFilter.h"
-#include <mitkToFProcessingExports.h>
+#include <MitkToFProcessingExports.h>
 #include <cv.h>
 #include <itkBilateralImageFilter.h>
 
@@ -41,7 +41,7 @@ namespace mitk
   *
   * @ingroup ToFProcessing
   */
-  class mitkToFProcessing_EXPORT ToFCompositeFilter : public ImageToImageFilter
+  class MitkToFProcessing_EXPORT ToFCompositeFilter : public ImageToImageFilter
   {
   public:
 

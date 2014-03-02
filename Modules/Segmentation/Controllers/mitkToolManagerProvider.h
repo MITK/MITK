@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_TOOLMANAGERPROVIDER_H
 #define MITK_TOOLMANAGERPROVIDER_H
 
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 
 #include <usModuleContext.h>
 #include <usServiceInterface.h>
@@ -44,7 +44,7 @@ namespace mitk
    \note Can only be instantiated by SegmentationModuleActivator. The common way to get the ToolManager is by
    <code> mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(); </code>
   */
-  class Segmentation_EXPORT ToolManagerProvider : public itk::LightObject
+  class MitkSegmentation_EXPORT ToolManagerProvider : public itk::LightObject
   {
   public:
     mitkClassMacro(ToolManagerProvider, itk::LightObject);

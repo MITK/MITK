@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 #include "mitkConnectomicsSimulatedAnnealingPermutationBase.h"
 
@@ -31,7 +31,7 @@ namespace mitk
 {
   /**
   * \brief A class allow generic simulated annealing by using classes derived from ConnectomicsSimulatedAnnealingPermutationBase */
-  class Connectomics_EXPORT ConnectomicsSimulatedAnnealingManager : public itk::Object
+  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingManager : public itk::Object
   {
   public:
 

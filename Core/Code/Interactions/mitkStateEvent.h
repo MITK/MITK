@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef STATEEVENT_H_HEADER_INCLUDED_C188E5BF
 #define STATEEVENT_H_HEADER_INCLUDED_C188E5BF
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk {
 

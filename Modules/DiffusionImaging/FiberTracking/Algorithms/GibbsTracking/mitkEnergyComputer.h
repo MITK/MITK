@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _ENCOMP
 #define _ENCOMP
 
-#include <FiberTrackingExports.h>
+#include <MitkFiberTrackingExports.h>
 #include <itkOrientationDistributionFunction.h>
 #include <mitkParticleGrid.h>
 #include <mitkSphereInterpolator.h>
@@ -28,7 +28,7 @@ using namespace mitk;
 /**
 * \brief Calculates internal and external energy of the new particle configuration proposal.   */
 
-class FiberTracking_EXPORT EnergyComputer
+class MitkFiberTracking_EXPORT EnergyComputer
 {
 
 public:

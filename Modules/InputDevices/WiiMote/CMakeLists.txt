@@ -12,9 +12,9 @@ if(MITK_USE_WIIMOTE)
 # #find_path(MITK_WII_WDK_LIB "Library Dir DDK or WDK (hid.lib)")
 # find_library(MITK_WII_WDK_LIB "hid.lib within DDK or WDK")
 
-MITK_CREATE_MODULE(mitkWiiMote
+MITK_CREATE_MODULE(
   INCLUDE_DIRS wiiyourself #${MITK_WII_WDK_INC} 
-  DEPENDS Mitk mitkOpenCVVideoSupport
+  DEPENDS MitkCore MitkOpenCVVideoSupport
   #ADDITIONAL_LIBS "${MITK_WII_WDK_LIB}"
 )
 endif(MITK_USE_WIIMOTE)

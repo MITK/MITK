@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDiffSliceOperation_h_Included
 #define mitkDiffSliceOperation_h_Included
 
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkCommon.h"
 #include <mitkOperation.h>
 //#include "mitkCompressedImageContainer.h"
@@ -44,7 +44,7 @@ namespace mitk
 
     This Operation can be used to realize undo-redo functionality for e.g. segmentation purposes.
   */
-  class Segmentation_EXPORT DiffSliceOperation : public Operation
+  class MitkSegmentation_EXPORT DiffSliceOperation : public Operation
   {
 
   public:

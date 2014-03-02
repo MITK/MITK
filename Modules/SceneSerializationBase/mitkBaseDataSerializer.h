@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSerializeBaseData_h_included
 #define mitkSerializeBaseData_h_included
 
-#include "SceneSerializationBaseExports.h"
+#include <MitkSceneSerializationBaseExports.h>
 #include "mitkSerializerMacros.h"
 
 #include <itkObjectFactoryBase.h>
@@ -37,7 +37,7 @@ namespace mitk
   Then the serializer for this class must be called GreenDataSerializer
   \endverbatim
 */
-class SceneSerializationBase_EXPORT BaseDataSerializer : public itk::Object
+class MitkSceneSerializationBase_EXPORT BaseDataSerializer : public itk::Object
 {
   public:
 

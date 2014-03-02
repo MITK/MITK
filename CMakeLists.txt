@@ -113,6 +113,7 @@ set(CMAKE_MODULE_PATH
 include(mitkMacroEmptyExternalProject)
 include(mitkFunctionGenerateProjectXml)
 include(mitkFunctionSuppressWarnings)
+include(FeatureSummary)
 
 SUPPRESS_VC_DEPRECATED_WARNINGS()
 
@@ -370,6 +371,12 @@ mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} MITK "${subproject_list}" ${MI
 
 if(MITK_USE_SUPERBUILD)
   include("${CMAKE_CURRENT_SOURCE_DIR}/SuperBuild.cmake")
+
+  # Print configuration summary
+  message("\n\n")
+  feature_summary(
+    DESCRIPTION "------- FEATURE SUMMARY FOR ${PROJECT_NAME} -------"
+    WHAT ALL)
   return()
 endif()
 
@@ -1011,3 +1018,13 @@ if(MITK_BUILD_EXAMPLES)
   # might do a find_package(MITK REQUIRED).
   add_subdirectory(Examples)
 endif()
+
+#-----------------------------------------------------------------------------
+# Print configuration summary
+#-----------------------------------------------------------------------------
+
+message("\n\n")
+feature_summary(
+  DESCRIPTION "------- FEATURE SUMMARY FOR ${PROJECT_NAME} -------"
+  WHAT ALL
+)

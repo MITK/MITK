@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkAddArtifactsToDwiImageFilter_h_
 #define __itkAddArtifactsToDwiImageFilter_h_
 
-#include "FiberTrackingExports.h"
+#include <MitkFiberTrackingExports.h>
 #include <itkImageToImageFilter.h>
 #include <itkVectorImage.h>
 #include <itkKspaceImageFilter.h>

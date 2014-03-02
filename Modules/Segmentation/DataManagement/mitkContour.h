@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_CONTOUR_H_
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkBaseData.h"
 #include <vtkRenderWindow.h>
 
@@ -34,7 +34,7 @@ namespace mitk
 
   \sa ContourModel
 */
-class Segmentation_EXPORT Contour : public BaseData
+class MitkSegmentation_EXPORT Contour : public BaseData
 {
 public:
   mitkClassMacro(Contour, BaseData);

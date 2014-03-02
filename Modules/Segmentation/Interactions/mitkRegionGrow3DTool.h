@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTool.h"
 #include "mitkPointSet.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkStateEvent.h"
 
 #include "itkImage.h"
@@ -28,7 +28,7 @@ namespace mitk{
   class StateMachineAction;
   class InteractionEvent;
 
-  class Segmentation_EXPORT RegionGrow3DTool : public Tool
+  class MitkSegmentation_EXPORT RegionGrow3DTool : public Tool
   {
   public:
     mitkClassMacro(RegionGrow3DTool, Tool);

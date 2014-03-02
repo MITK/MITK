@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // be available to all classes implementing this interface.
 #include "mitkLog.h"
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkMapper.h"
 #include <itkObjectFactoryBase.h>
 #include <itkVersion.h>

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <mitkCameraCalibrationExports.h>
+#include <MitkCameraCalibrationExports.h>
 
 namespace mitk
 {
@@ -33,7 +33,7 @@ namespace mitk
   /// class responsible for handling debug matters
   /// in endotracking
   ///
-  struct mitkCameraCalibration_EXPORT EndoDebug
+  struct MitkCameraCalibration_EXPORT EndoDebug
   {
     ///
     /// singleton class

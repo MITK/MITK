@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sofa/component/visualmodel/VisualModelImpl.h>
 #include <sofa/helper/system/gl.h>
 #include <vtkSmartPointer.h>
-#include <SimulationExports.h>
+#include <MitkSimulationExports.h>
 
 class vtkOpenGLTexture;
 class vtkRenderer;
 
 namespace mitk
 {
-  class Simulation_EXPORT VtkModel : public sofa::component::visualmodel::VisualModelImpl
+  class MitkSimulation_EXPORT VtkModel : public sofa::component::visualmodel::VisualModelImpl
   {
   public:
     SOFA_CLASS(VtkModel, sofa::component::visualmodel::VisualModelImpl);

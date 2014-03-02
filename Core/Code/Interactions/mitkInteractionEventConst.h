@@ -18,7 +18,7 @@
 #define MITKINTERACTEVENTCONST_H
 
 #include <string>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {

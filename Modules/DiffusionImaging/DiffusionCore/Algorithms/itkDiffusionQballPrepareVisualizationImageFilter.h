@@ -22,7 +22,7 @@ This file is based heavily on a corresponding ITK filter.
 #ifndef __itkDiffusionQballPrepareVisualizationImageFilter_h_
 #define __itkDiffusionQballPrepareVisualizationImageFilter_h_
 
-#include "DiffusionCoreExports.h"
+#include <MitkDiffusionCoreExports.h>
 #include "itkImageToImageFilter.h"
 //#include "vnl/vnl_matrix.h"
 #include "vnl/vnl_vector_fixed.h"
@@ -38,7 +38,7 @@ namespace itk{
 
 template< class TOdfPixelType,
           int NrOdfDirections>
-class DiffusionCore_EXPORT DiffusionQballPrepareVisualizationImageFilter :
+class MitkDiffusionCore_EXPORT DiffusionQballPrepareVisualizationImageFilter :
   public ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >,
                               Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
 {

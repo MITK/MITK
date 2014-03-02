@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFDeviceListener_h
 #define __mitkToFDeviceListener_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkToFCameraDevice.h"
 
 //Microservices

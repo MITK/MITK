@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include "QmitkPythonVariableStackTableModel.h"
 #include <mitkIPythonService.h>
-#include "mitkPythonExports.h"
+#include <MitkPythonExports.h>
 
 ///
 /// implements the table view for the variable stack

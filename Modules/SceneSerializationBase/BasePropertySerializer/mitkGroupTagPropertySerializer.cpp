@@ -21,12 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGroupTagProperty.h"
 
-#include "SceneSerializationBaseExports.h"
+#include <MitkSceneSerializationBaseExports.h>
 
 namespace mitk
 {
 
-class SceneSerializationBase_EXPORT GroupTagPropertySerializer : public BasePropertySerializer
+class MitkSceneSerializationBase_EXPORT GroupTagPropertySerializer : public BasePropertySerializer
 {
   public:
 

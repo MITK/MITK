@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <sofa/core/topology/BaseMeshTopology.h>
 #include <sofa/core/DataEngine.h>
-#include <SimulationExports.h>
+#include <MitkSimulationExports.h>
 
 namespace mitk
 {
-  class Simulation_EXPORT IndexROI : public sofa::core::DataEngine
+  class MitkSimulation_EXPORT IndexROI : public sofa::core::DataEngine
   {
   public:
     SOFA_CLASS(IndexROI, sofa::core::DataEngine);

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F
 #define SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseController.h"
 #include "mitkRenderingManager.h"
 #include "mitkTimeGeometry.h"

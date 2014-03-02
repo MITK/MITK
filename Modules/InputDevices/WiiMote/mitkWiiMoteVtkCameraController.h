@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_WIIMOTEVTKCAMERACONTROLLER_H
 
 // export
-#include "mitkWiiMoteExports.h"
+#include <MitkWiiMoteExports.h>
 
 // mitk
 #include "mitkCameraController.h"

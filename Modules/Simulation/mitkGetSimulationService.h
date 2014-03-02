@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkGetSimulationService_h
 
 #include <usGetModuleContext.h>
-#include <SimulationExports.h>
+#include <MitkSimulationExports.h>
 
 namespace us
 {
@@ -29,7 +29,7 @@ namespace mitk
 {
   class ISimulationService;
 
-  Simulation_EXPORT ISimulationService* GetSimulationService(us::ModuleContext* moduleContext = us::GetModuleContext());
+  MitkSimulation_EXPORT ISimulationService* GetSimulationService(us::ModuleContext* moduleContext = us::GetModuleContext());
 }
 
 #endif

@@ -13,8 +13,8 @@ set(H_FILES)
 set(CPP_FILES)
 
 # now create a new module only for testing purposes
-MITK_CREATE_MODULE( mitkDICOMTesting
-  DEPENDS Mitk # Mitk.so
+MITK_CREATE_MODULE(
+  DEPENDS MitkCore
 )
 
 if(MODULE_IS_ENABLED)
@@ -23,11 +23,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 # dumps out image information
 add_executable(DumpDICOMMitkImage DumpDICOMMitkImage.cpp)
-mitk_use_modules(TARGET DumpDICOMMitkImage MODULES mitkDICOMTesting)
+mitk_use_modules(TARGET DumpDICOMMitkImage MODULES MitkDICOMTesting)
 
 # compares dumped out image information against reference dump
 add_executable(VerifyDICOMMitkImageDump VerifyDICOMMitkImageDump.cpp)
-mitk_use_modules(TARGET VerifyDICOMMitkImageDump MODULES mitkDICOMTesting)
+mitk_use_modules(TARGET VerifyDICOMMitkImageDump MODULES MitkDICOMTesting)
 
 add_subdirectory(Testing)
 endif()

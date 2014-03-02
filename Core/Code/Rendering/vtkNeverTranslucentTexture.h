@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkNeverTranslucentTexture_h
 #define mitkNeverTranslucentTexture_h
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 #include <vtkOpenGLTexture.h>
 

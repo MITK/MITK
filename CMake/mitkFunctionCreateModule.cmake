@@ -26,7 +26,7 @@ endfunction()
 #! USAGE:
 #!
 #! \code
-#! MITK_CREATE_MODULE( <moduleName>
+#! MITK_CREATE_MODULE([<moduleName>]
 #!     [INCLUDE_DIRS <include directories>]
 #!     [INTERNAL_INCLUDE_DIRS <internally used include directories>]
 #!     [DEPENDS <modules we need>]
@@ -37,6 +37,20 @@ endfunction()
 #!     [HEADERS_ONLY]
 #!     [WARNINGS_AS_ERRORS]
 #! \endcode
+#!
+#! The <moduleName> parameter specifies the name of the module which is used
+#! create a logical target name. The parameter is options in case the
+#! MITK_MODULE_NAME_DEFAULTS_TO_DIRECTORY_NAME variable evaluates to TRUE. The
+#! module name will then be derived from the directory name in which this
+#! macro is called.
+#!
+#! If set, the following variables will be used to validate the module name:
+#!
+#!   MITK_MODULE_NAME_REGEX_MATCH The module name must match this regular expression.
+#!   MITK_MODULE_NAME_REGEX_NOT_MATCH The module name must not match this regular expression.
+#!
+#! If the MITK_MODULE_NAME_PREFIX variable is set, the module name will be prefixed
+#! with its contents.
 #!
 #! A modules source files are specified in a separate CMake file usually
 #! called files.cmake, located in the module root directory. The
@@ -54,14 +68,15 @@ endfunction()
 #!
 #! List of variables available after the function is called:
 #! - MODULE_NAME
+#! - MODULE_TARGET
 #! - MODULE_IS_ENABLED
 #! - MODULE_SUBPROJECTS
 #! - ALL_META_DEPENDENCIES
 #!
-#! \param MODULE_NAME_IN The name for the new module
+#! \param QT_MODULE deprecated. Just use Qt4 or Qt5 in the PACKAGE_DEPENDS argument.
 #! \param HEADERS_ONLY specify this if the modules just contains header files.
 ##################################################################
-function(mitk_create_module MODULE_NAME_IN)
+function(mitk_create_module)
 
   set(_macro_params
       SUBPROJECTS            # list of CDash labels
@@ -80,6 +95,7 @@ function(mitk_create_module MODULE_NAME_IN)
                              # (defaults to files.cmake)
       GENERATED_CPP          # not used (?)
       DEPRECATED_SINCE       # marks this modules as deprecated
+      DESCRIPTION            # a description for this module
      )
 
   set(_macro_options
@@ -88,13 +104,37 @@ function(mitk_create_module MODULE_NAME_IN)
       HEADERS_ONLY           # this module is a headers-only library
       GCC_DEFAULT_VISIBILITY # do not use gcc visibility flags - all symbols will be exported
       NO_INIT                # do not create CppMicroServices initialization code
+      NO_FEATURE_INFO        # do not create a feature info by calling add_feature_info()
       WARNINGS_AS_ERRORS     # treat all compiler warnings as errors
       EXECUTABLE             # create an executable; do not use directly, use mitk_create_executable() instead
      )
 
   MACRO_PARSE_ARGUMENTS(MODULE "${_macro_params}" "${_macro_options}" ${ARGN})
 
-  set(MODULE_NAME ${MODULE_NAME_IN})
+  set(MODULE_NAME ${MODULE_DEFAULT_ARGS})
+
+  if(NOT MODULE_NAME)
+    if(MITK_MODULE_NAME_DEFAULTS_TO_DIRECTORY_NAME)
+      get_filename_component(MODULE_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+    else()
+      message(SEND_ERROR "The module name must not be empty")
+    endif()
+  endif()
+
+  if(MITK_MODULE_NAME_REGEX_MATCH)
+    if(NOT ${MODULE_NAME} MATCHES ${MITK_MODULE_NAME_REGEX_MATCH})
+      message(SEND_ERROR "The module name \"${MODULE_NAME}\" does not match the regular expression \"${MITK_MODULE_NAME_REGEX_MATCH}\".")
+    endif()
+  endif()
+  if(MITK_MODULE_NAME_REGEX_NOT_MATCH)
+    if(${MODULE_NAME} MATCHES ${MITK_MODULE_NAME_REGEX_NOT_MATCH})
+      message(SEND_ERROR "The module name \"${MODULE_NAME}\" must not match the regular expression \"${MITK_MODULE_NAME_REGEX_NOT_MATCH}\".")
+    endif()
+  endif()
+
+  if(MITK_MODULE_NAME_PREFIX AND NOT MODULE_NAME MATCHES "^${MITK_MODULE_NAME_PREFIX}.*$")
+    set(MODULE_NAME "${MITK_MODULE_NAME_PREFIX}${MODULE_NAME}")
+  endif()
 
   if(NOT MODULE_FILES_CMAKE)
     set(MODULE_FILES_CMAKE files.cmake)
@@ -111,16 +151,12 @@ function(mitk_create_module MODULE_NAME_IN)
   endif()
 
   if(MODULE_HEADERS_ONLY)
-    set(MODULE_PROVIDES )
+    set(MODULE_TARGET )
     if(MODULE_AUTOLOAD_WITH)
       message(SEND_ERROR "A headers only module cannot be auto-loaded")
     endif()
   else()
-    set(MODULE_PROVIDES ${MODULE_NAME})
-    if(NOT MODULE_NO_INIT AND NOT MODULE_NAME STREQUAL "Mitk")
-      # Add a dependency to the "Mitk" module
-      #list(APPEND MODULE_DEPENDS Mitk)
-    endif()
+    set(MODULE_TARGET ${MODULE_NAME})
   endif()
 
   if(MODULE_DEPRECATED_SINCE)
@@ -175,7 +211,9 @@ function(mitk_create_module MODULE_NAME_IN)
                                    PACKAGE_DEPENDENCIES_VAR PACKAGE_NAMES)
 
     if(_MISSING_DEP)
-      message("Module ${MODULE_NAME} won't be built, missing dependency: ${_MISSING_DEP}")
+      if(MODULE_NO_FEATURE_INFO)
+        message("Module ${MODULE_NAME} won't be built, missing dependency: ${_MISSING_DEP}")
+      endif()
       set(MODULE_IS_ENABLED 0)
     else()
       set(MODULE_IS_ENABLED 1)
@@ -332,18 +370,16 @@ function(mitk_create_module MODULE_NAME_IN)
         endif(MODULE_FORCE_STATIC)
 
         if(NOT MODULE_HEADERS_ONLY)
-          set(MODULE_LIBNAME ${MODULE_PROVIDES})
-
           if(NOT MODULE_NO_INIT)
             find_package(CppMicroServices QUIET NO_MODULE REQUIRED)
             if(MODULE_EXECUTABLE)
               usFunctionGenerateExecutableInit(CPP_FILES
-                                               IDENTIFIER ${MODULE_NAME}
+                                               IDENTIFIER ${MODULE_TARGET}
                                               )
             else()
               usFunctionGenerateModuleInit(CPP_FILES
                                            NAME ${MODULE_NAME}
-                                           LIBRARY_NAME ${MODULE_LIBNAME}
+                                           LIBRARY_NAME ${MODULE_TARGET}
                                           )
             endif()
           endif()
@@ -371,7 +407,7 @@ function(mitk_create_module MODULE_NAME_IN)
             endif()
 
             usFunctionEmbedResources(CPP_FILES
-                                     LIBRARY_NAME ${MODULE_LIBNAME}
+                                     LIBRARY_NAME ${MODULE_TARGET}
                                      ${res_macro_args})
           endif()
 
@@ -437,7 +473,7 @@ function(mitk_create_module MODULE_NAME_IN)
           # We cannot use set_target_properties like below since there is no way to
           # differentiate C/C++ and Releas/Debug flags using target properties.
           # See http://www.cmake.org/Bug/view.php?id=6493
-          #set_target_properties(${MODULE_PROVIDES} PROPERTIES
+          #set_target_properties(${MODULE_TARGET} PROPERTIES
           #                      COMPILE_FLAGS "${module_compile_flags}")
           #
           # Strangely, we need to set the variables below in the parent scope
@@ -450,23 +486,23 @@ function(mitk_create_module MODULE_NAME_IN)
           set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${module_cxx_flags_release}" PARENT_SCOPE)
 
           if(MODULE_EXECUTABLE)
-            add_executable(${MODULE_PROVIDES}
+            add_executable(${MODULE_TARGET}
                            ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                            ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
           else()
-            add_library(${MODULE_PROVIDES} ${_STATIC}
+            add_library(${MODULE_TARGET} ${_STATIC}
                         ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
                         ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
           endif()
 
           if(MODULE_TARGET_DEPENDS)
-            add_dependencies(${MODULE_PROVIDES} ${MODULE_TARGET_DEPENDS})
+            add_dependencies(${MODULE_TARGET} ${MODULE_TARGET_DEPENDS})
           endif()
 
           if(MODULE_SUBPROJECTS)
-            set_property(TARGET ${MODULE_PROVIDES} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
+            set_property(TARGET ${MODULE_TARGET} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
             foreach(subproject ${MODULE_SUBPROJECTS})
-              add_dependencies(${subproject} ${MODULE_PROVIDES})
+              add_dependencies(${subproject} ${MODULE_TARGET})
             endforeach()
           endif()
 
@@ -477,20 +513,20 @@ function(mitk_create_module MODULE_NAME_IN)
             set(DEPENDS "CppMicroServices;${DEPENDS}")
           endif()
           if(DEPENDS OR MODULE_PACKAGE_DEPENDS)
-            mitk_use_modules(TARGET ${MODULE_PROVIDES}
+            mitk_use_modules(TARGET ${MODULE_TARGET}
                              MODULES ${DEPENDS}
                              PACKAGES ${MODULE_PACKAGE_DEPENDS}
                             )
           endif()
 
           if(MINGW)
-            target_link_libraries(${MODULE_PROVIDES} ssp) # add stack smash protection lib
+            target_link_libraries(${MODULE_TARGET} ssp) # add stack smash protection lib
           endif()
 
           # Add additional library search directories to a global property which
           # can be evaluated by other CMake macros, e.g. our install scripts.
           if(MODULE_ADDITIONAL_LIBS)
-            target_link_libraries(${MODULE_PROVIDES} ${MODULE_ADDITIONAL_LIBS})
+            target_link_libraries(${MODULE_TARGET} ${MODULE_ADDITIONAL_LIBS})
             get_property(_mitk_additional_library_search_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
             foreach(_lib_filepath ${MODULE_ADDITIONAL_LIBS})
               get_filename_component(_search_path "${_lib_filepath}" PATH)
@@ -506,10 +542,10 @@ function(mitk_create_module MODULE_NAME_IN)
 
           # add the target name to a global property which is used in the top-level
           # CMakeLists.txt file to export the target
-          set_property(GLOBAL APPEND PROPERTY MITK_MODULE_TARGETS ${MODULE_PROVIDES})
+          set_property(GLOBAL APPEND PROPERTY MITK_MODULE_TARGETS ${MODULE_TARGET})
           if(MODULE_AUTOLOAD_WITH)
             # for auto-loaded modules, adapt the output directory
-            add_dependencies(${_module_autoload_meta_target} ${MODULE_PROVIDES})
+            add_dependencies(${_module_autoload_meta_target} ${MODULE_TARGET})
             if(WIN32)
               set(_module_output_prop RUNTIME_OUTPUT_DIRECTORY)
             else()
@@ -521,17 +557,17 @@ function(mitk_create_module MODULE_NAME_IN)
               # if the auto-loading module is not imported, get its location
               # and put the auto-load module relative to it.
               get_target_property(_module_output_dir ${MODULE_AUTOLOAD_WITH} ${_module_output_prop})
-              set_target_properties(${MODULE_PROVIDES} PROPERTIES
+              set_target_properties(${MODULE_TARGET} PROPERTIES
                                     ${_module_output_prop} ${_module_output_dir}/${MODULE_AUTOLOAD_WITH})
             else()
-              set_target_properties(${MODULE_PROVIDES} PROPERTIES
+              set_target_properties(${MODULE_TARGET} PROPERTIES
                                     ${_module_output_prop} ${CMAKE_${_module_output_prop}}/${MODULE_AUTOLOAD_WITH})
             endif()
-            set_target_properties(${MODULE_PROVIDES} PROPERTIES
+            set_target_properties(${MODULE_TARGET} PROPERTIES
                                   MITK_AUTOLOAD_DIRECTORY ${MODULE_AUTOLOAD_WITH})
 
             # add the auto-load module name as a property
-            set_property(TARGET ${MODULE_AUTOLOAD_WITH} APPEND PROPERTY MITK_AUTOLOAD_TARGETS ${MODULE_PROVIDES})
+            set_property(TARGET ${MODULE_AUTOLOAD_WITH} APPEND PROPERTY MITK_AUTOLOAD_TARGETS ${MODULE_TARGET})
           endif()
         endif()
 
@@ -543,7 +579,19 @@ function(mitk_create_module MODULE_NAME_IN)
     _MITK_CREATE_MODULE_CONF()
   endif()
 
+  if(_MISSING_DEP)
+    if(MODULE_DESCRIPTION)
+      set(MODULE_DESCRIPTION "${MODULE_DESCRIPTION} (missing dependencies: ${_MISSING_DEP})")
+    else()
+      set(MODULE_DESCRIPTION "(missing dependencies: ${_MISSING_DEP})")
+    endif()
+  endif()
+  if(NOT MODULE_NO_FEATURE_INFO)
+    add_feature_info(${MODULE_NAME} MODULE_IS_ENABLED "${MODULE_DESCRIPTION}")
+  endif()
+
   set(MODULE_NAME ${MODULE_NAME} PARENT_SCOPE)
+  set(MODULE_TARGET ${MODULE_TARGET} PARENT_SCOPE)
   set(MODULE_IS_ENABLED ${MODULE_IS_ENABLED} PARENT_SCOPE)
   set(MODULE_SUBPROJECTS ${MODULE_SUBPROJECTS} PARENT_SCOPE)
   set(ALL_META_DEPENDENCIES ${ALL_META_DEPENDENCIES} PARENT_SCOPE)

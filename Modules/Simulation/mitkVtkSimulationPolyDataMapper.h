@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkSimulation.h>
 #include <vtkPolyDataMapper.h>
-#include <SimulationExports.h>
+#include <MitkSimulationExports.h>
 
 namespace mitk
 {
   class ISimulationService;
 
-  class Simulation_EXPORT vtkSimulationPolyDataMapper : public vtkPolyDataMapper
+  class MitkSimulation_EXPORT vtkSimulationPolyDataMapper : public vtkPolyDataMapper
   {
   public:
     static vtkSimulationPolyDataMapper* New();

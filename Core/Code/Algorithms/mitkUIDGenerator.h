@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_UID_GENERATOR_INDCLUDED_FASAWE
 
 #include<string>
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 
 #ifdef _MSC_VER

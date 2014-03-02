@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D
 #define MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkImageSource.h"
 #include "itkImageToImageFilterDetail.h"
 

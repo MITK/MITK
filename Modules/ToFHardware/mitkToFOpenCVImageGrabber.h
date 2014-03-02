@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkToFOpenCVImageGrabber_h
 #define __mitkToFOpenCVImageGrabber_h
 
-#include "mitkToFHardwareExports.h"
+#include <MitkToFHardwareExports.h>
 #include "mitkCommon.h"
 #include "mitkOpenCVImageSource.h"
 #include "mitkToFImageGrabber.h"

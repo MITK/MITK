@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKREGISTRATIONOBJECT_H
 #define MITKREGISTRATIONOBJECT_H
 
-#include <DiffusionCoreExports.h>
+#include <MitkDiffusionCoreExports.h>
 
 #include "mitkBaseData.h"
 #include "mitkGeometry3D.h"
@@ -32,7 +32,7 @@ namespace mitk
  *
  */
 
-class DiffusionCore_EXPORT RegistrationObject : public BaseData
+class MitkDiffusionCore_EXPORT RegistrationObject : public BaseData
 {
 public:
 

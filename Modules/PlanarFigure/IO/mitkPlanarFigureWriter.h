@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PlanarFigure_WRITER__H_
 
 #include <itkProcessObject.h>
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include <mitkFileWriterWithInformation.h>
 #include <mitkPlanarFigure.h>
 
@@ -33,7 +33,7 @@ namespace mitk
   * XML-based writer for mitk::PlanarFigures.
   * @ingroup Process
   */
-  class PlanarFigure_EXPORT PlanarFigureWriter : public mitk::FileWriterWithInformation
+  class MitkPlanarFigure_EXPORT PlanarFigureWriter : public mitk::FileWriterWithInformation
   {
   public:
 

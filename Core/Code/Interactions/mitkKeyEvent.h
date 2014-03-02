@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef KeyEvent_H_HEADER_INCLUDED_C184F366
 #define KeyEvent_H_HEADER_INCLUDED_C184F366
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkEvent.h"
 #include "mitkVector.h"
 

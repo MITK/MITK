@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SLICEDDATA_H_HEADER_INCLUDED
 #define SLICEDDATA_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseData.h"
 #include "mitkSlicedGeometry3D.h"
 #include "itkIndex.h"

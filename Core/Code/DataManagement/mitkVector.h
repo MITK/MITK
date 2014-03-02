@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkLogMacros.h>
 
 #include <itkPoint.h>

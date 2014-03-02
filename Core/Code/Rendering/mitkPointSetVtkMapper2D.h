@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPointSetVtkMAPPER2D_H_HEADER_INCLUDED_C1902626
 
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkLocalStorageHandler.h"

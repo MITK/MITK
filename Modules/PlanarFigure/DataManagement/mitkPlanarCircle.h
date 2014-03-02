@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_PLANAR_CIRCLE_H_
 
 #include "mitkPlanarFigure.h"
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 
 
 namespace mitk
@@ -31,7 +31,7 @@ class Geometry2D;
  * \brief Implementation of PlanarFigure representing a circle
  * through two control points
  */
-class PlanarFigure_EXPORT PlanarCircle : public PlanarFigure
+class MitkPlanarFigure_EXPORT PlanarCircle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarCircle, PlanarFigure );

@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkVtkInteractorStyle_h
 #define __mitkVtkInteractorStyle_h
 
-#include "MitkExports.h"
+#include "MitkCoreExports.h"
 #include <vtkInteractorStyleUser.h>
 
 class MITK_CORE_EXPORT mitkVtkInteractorStyle : public vtkInteractorStyleUser

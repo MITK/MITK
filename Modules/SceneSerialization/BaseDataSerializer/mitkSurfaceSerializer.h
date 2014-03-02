@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSurfaceSerializer_h_included
 #define mitkSurfaceSerializer_h_included
 
-#include "SceneSerializationExports.h"
+#include <MitkSceneSerializationExports.h>
 
 #include "mitkBaseDataSerializer.h"
 
@@ -27,7 +27,7 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class SceneSerialization_EXPORT SurfaceSerializer : public BaseDataSerializer
+class MitkSceneSerialization_EXPORT SurfaceSerializer : public BaseDataSerializer
 {
   public:
 

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_ConnectomicsConstantsManager_H
 #define _MITK_ConnectomicsConstantsManager_H
 
-#include "ConnectomicsExports.h"
+#include <MitkConnectomicsExports.h>
 
 namespace mitk
 {
@@ -26,7 +26,7 @@ namespace mitk
   /** \brief The XML consts for reading and writing
   */
 
-  class Connectomics_EXPORT ConnectomicsConstantsManager
+  class MitkConnectomics_EXPORT ConnectomicsConstantsManager
   {
   public:
 

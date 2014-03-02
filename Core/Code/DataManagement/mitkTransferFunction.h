@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
 
 #include "mitkHistogramGenerator.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkImage.h"
 
 #include <itkObject.h>

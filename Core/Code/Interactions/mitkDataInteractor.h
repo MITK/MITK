@@ -18,14 +18,10 @@
 #define MITKDATAINTERACTOR_H_
 
 #include "mitkCommon.h"
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkEventStateMachine.h"
 #include <string.h>
 
-
-#pragma GCC visibility push(default)
-#include <itkEventObject.h>
-#pragma GCC visibility pop
 
 namespace mitk
 {
@@ -39,14 +35,12 @@ namespace mitk
    * To implement a new interactor overwrite the ConnectActionsAndFunctions to connect the actions.
    */
 
-  #pragma GCC visibility push(default)
   // Define events for DataInteractors
   itkEventMacro( DataInteractorEvent, itk::AnyEvent )
   /** Event is thrown when interation is started */
   itkEventMacro( StartInteraction, DataInteractorEvent )
   /** Event is thrown when DataInteractor stores a finished result in the DataNode */
   itkEventMacro( ResultReady, DataInteractorEvent )
-  #pragma GCC visibility pop
 
   // Public 'cause it's also used by the mitk::Dispatcher
   enum ProcessEventMode

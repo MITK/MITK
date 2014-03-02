@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourModelToPointSetFilter_h__
 
 #include "mitkCommon.h"
-#include "ContourModelExports.h"
+#include <MitkContourModelExports.h>
 #include "mitkPointSet.h"
 #include "mitkPointSetSource.h"
 #include "mitkContourModel.h"
@@ -34,7 +34,7 @@ namespace mitk {
   * @ingroup SurfaceFilters
   * @ingroup Process
   */
-  class ContourModel_EXPORT ContourModelToPointSetFilter : public PointSetSource
+  class MitkContourModel_EXPORT ContourModelToPointSetFilter : public PointSetSource
   {
 
   public:

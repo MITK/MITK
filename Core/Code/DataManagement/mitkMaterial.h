@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_MATERIAL_H_
 #define _MITK_MATERIAL_H_
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include <itkRGBPixel.h>
 #include <itkObject.h>

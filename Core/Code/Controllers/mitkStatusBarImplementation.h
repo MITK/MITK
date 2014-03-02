@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifndef MITKSTATUSBARIMPLEMENTATION_H
 #define MITKSTATUSBARIMPLEMENTATION_H
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 
 namespace mitk {
 //##Documentation

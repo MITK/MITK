@@ -17,9 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _Qmitk_ToF_Image_Background_h_
 #define _Qmitk_ToF_Image_Background_h_
 
-#include "mitkTOFUIExports.h"
-
-#include "qobject.h"
+#include <QObject>
 
 #include <vector>
 

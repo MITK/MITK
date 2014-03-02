@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKFOCUSMANAGER_H_HEADER_INCLUDED_C135A197
 #define MITKFOCUSMANAGER_H_HEADER_INCLUDED_C135A197
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkBaseRenderer.h"
 #include <vector>
 #pragma GCC visibility push(default)

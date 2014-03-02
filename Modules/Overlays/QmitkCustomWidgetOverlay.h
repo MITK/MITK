@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include "QmitkOverlay.h"
 
-#include "OverlaysExports.h"
+#include <MitkOverlaysExports.h>
 
 
 /** \class  QmitkCustomWidgetOverlay
@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 
 
-  class Overlays_EXPORT QmitkCustomWidgetOverlay : public QmitkOverlay
+  class MitkOverlays_EXPORT QmitkCustomWidgetOverlay : public QmitkOverlay
   {
   public:
 

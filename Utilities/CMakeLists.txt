@@ -9,9 +9,9 @@ include(${ITK_USE_FILE})
 include_directories(.)
 
 subdirs(
-  ipPic
-  ipFunc
-  ipSegmentation
+  IpPic
+  IpFunc
+  IpSegmentation
   mbilog
   qtsingleapplication
   KWStyle

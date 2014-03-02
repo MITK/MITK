@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKOVERLAY2DLAYOUTER_H
 #define MITKOVERLAY2DLAYOUTER_H
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include <mitkAbstractOverlayLayouter.h>
 
 namespace mitk {

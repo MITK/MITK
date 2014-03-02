@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCorrectorTool2D_h_Included
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include <MitkSegmentationExports.h>
 #include "mitkFeedbackContourTool.h"
 
 namespace us {
@@ -52,7 +52,7 @@ class InteractionEvent;
 
   $Author$
 */
-class Segmentation_EXPORT CorrectorTool2D : public FeedbackContourTool
+class MitkSegmentation_EXPORT CorrectorTool2D : public FeedbackContourTool
 {
   public:
 

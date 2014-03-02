@@ -117,6 +117,10 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     list(APPEND _additional_target_libraries ${CppUnit_LIBRARIES})
   endif()
 
+  if(mbilog_FOUND)
+    include_directories(${mbilog_INCLUDE_DIRS})
+  endif()
+
   MACRO_ORGANIZE_SOURCES(
     SOURCE ${_PLUGIN_CPP_FILES}
     HEADER ${_PLUGIN_H_FILES}

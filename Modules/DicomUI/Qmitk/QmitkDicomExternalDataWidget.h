@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDicomExternalDataWidget_h
 #define QmitkDicomExternalDataWidget_h
 
-#include "mitkDicomUIExports.h"
+#include <MitkDicomUIExports.h>
 #include "ui_QmitkDicomExternalDataWidgetControls.h"
 
 // include ctk

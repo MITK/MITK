@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkToFTestingCOMMON_H
 #define mitkToFTestingCOMMON_H
 
-#include "mitkToFProcessingExports.h"
+#include <MitkToFProcessingExports.h>
 #include "mitkVector.h"
 #include <mitkToFProcessingCommon.h>
 #include <mitkSurface.h>
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class mitkToFProcessing_EXPORT ToFTestingCommon
+class MitkToFProcessing_EXPORT ToFTestingCommon
 {
 public:
 

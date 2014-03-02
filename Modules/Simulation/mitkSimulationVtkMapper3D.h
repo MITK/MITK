@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkVtkMapper.h>
 #include <vtkSmartPointer.h>
-#include <SimulationExports.h>
+#include <MitkSimulationExports.h>
 
 namespace mitk
 {
   class vtkSimulationPolyDataMapper;
 
-  class Simulation_EXPORT SimulationVtkMapper3D : public VtkMapper
+  class MitkSimulation_EXPORT SimulationVtkMapper3D : public VtkMapper
   {
     class LocalStorage
     {

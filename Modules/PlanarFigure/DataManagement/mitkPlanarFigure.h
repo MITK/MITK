@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_PLANAR_FIGURE_H_
 #define _MITK_PLANAR_FIGURE_H_
 
-#include "PlanarFigureExports.h"
+#include <MitkPlanarFigureExports.h>
 #include "mitkBaseData.h"
 #include "mitkCommon.h"
 
@@ -54,7 +54,7 @@ class Geometry2D;
  * TODO: Implement local 2D transform (including center of rotation...)
  *
  */
-class PlanarFigure_EXPORT PlanarFigure : public BaseData
+class MitkPlanarFigure_EXPORT PlanarFigure : public BaseData
 {
 public:
   mitkClassMacro( PlanarFigure, BaseData )

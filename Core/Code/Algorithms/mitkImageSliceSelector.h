@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef IMAGESLICESELECTOR_H_HEADER_INCLUDED_C1E4BE7B
 #define IMAGESLICESELECTOR_H_HEADER_INCLUDED_C1E4BE7B
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
 #include "mitkSubImageSelector.h"
 
 namespace mitk {

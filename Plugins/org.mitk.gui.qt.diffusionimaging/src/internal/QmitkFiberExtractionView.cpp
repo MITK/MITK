@@ -901,7 +901,7 @@ void QmitkFiberExtractionView::OnDrawPolygon()
             if(figureInteractor.IsNull())
             {
                 figureInteractor = mitk::PlanarFigureInteractor::New();
-                us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+                us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
                 figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
                 figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
                 figureInteractor->SetDataNode( node );
@@ -936,7 +936,7 @@ void QmitkFiberExtractionView::OnDrawCircle()
             if(figureInteractor.IsNull())
             {
                 figureInteractor = mitk::PlanarFigureInteractor::New();
-                us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+                us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
                 figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
                 figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
                 figureInteractor->SetDataNode( node );

@@ -1696,7 +1696,7 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
     if(figureInteractor.IsNull())
     {
       figureInteractor = mitk::PlanarFigureInteractor::New();
-      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
       figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
       figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
       figureInteractor->SetDataNode( m_SelectedNode );

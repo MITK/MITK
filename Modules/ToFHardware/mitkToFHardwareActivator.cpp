@@ -71,5 +71,5 @@ private:
 
 };
 }
-US_EXPORT_MODULE_ACTIVATOR(mitkToFHardware, mitk::ToFHardwareActivator)
+US_EXPORT_MODULE_ACTIVATOR(MitkToFHardware, mitk::ToFHardwareActivator)
 #endif

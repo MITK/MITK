@@ -158,5 +158,5 @@ private:
 
 };
 }
-US_EXPORT_MODULE_ACTIVATOR(mitkPMDModule, mitk::PMDModuleActivator)
+US_EXPORT_MODULE_ACTIVATOR(MitkPMD, mitk::PMDModuleActivator)
 #endif

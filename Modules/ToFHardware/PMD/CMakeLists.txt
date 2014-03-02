@@ -41,7 +41,7 @@ IF(MITK_USE_PMD)
     DEPENDS MitkToFHardware
     EXPORT_DEFINE MITK_PMDMODULE_EXPORT
     ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
-    AUTOLOAD_WITH mitkToFHardware
+    AUTOLOAD_WITH MitkToFHardware
   )
   Message("PMD Module generated")
   add_subdirectory(Testing)

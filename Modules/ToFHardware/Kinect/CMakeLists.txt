@@ -15,7 +15,7 @@ MITK_CREATE_MODULE(
   DEPENDS MitkToFHardware
   EXPORT_DEFINE MITK_KINECTMODULE_EXPORT
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
-  AUTOLOAD_WITH mitkToFHardware
+  AUTOLOAD_WITH MitkToFHardware
 )
 Message("Kinect Module generated")
 add_subdirectory(Testing)

@@ -75,10 +75,8 @@ itk::LightObject::Pointer mitk::Geometry3D::InternalClone() const
   return newGeometry.GetPointer();
 }
 
-void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
+void mitk::Geometry3D::InternPostInitializeGeometry(Geometry3D * newGeometry) const
 {
-  Superclass::InitializeGeometry(newGeometry);
-
   newGeometry->m_ImageGeometry = m_ImageGeometry;
 }
 
@@ -324,9 +322,7 @@ bool mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *r
   return result;
 }
 
-void mitk::Geometry3D::Initialize()
+void mitk::Geometry3D::InternPostInitialize()
 {
-  Superclass::Initialize();
-
   m_ImageGeometry = false;
 }

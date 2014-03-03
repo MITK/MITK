@@ -109,15 +109,15 @@ namespace mitk {
 
     //##Documentation
     //## @brief Is this Geometry3D in a state that is valid?
-    virtual bool IsValid() const;
+    bool IsValid() const;
 
     // ********************************** Initialize **********************************
 
     //##Documentation
     //## @brief Initialize the Geometry3D
-    virtual void Initialize();
+    void Initialize();
 
-    virtual void InitializeGeometry(Self * newGeometry) const;
+    void InitializeGeometry(Self * newGeometry) const;
 
     static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::Vector3D& spacing, float floatSpacing[3]);
 
@@ -463,6 +463,12 @@ namespace mitk {
     void BackTransform(const mitk::Point3D& at, const mitk::Vector3D& in, mitk::Vector3D& out) const;
 
     static const std::string GetTransformAsString( TransformType* transformType );
+
+    //Internal Functions
+    virtual bool InternPostIsValid() const;
+
+    virtual void InternPostInitialize() {};
+    virtual void InternPostInitializeGeometry(Self * newGeometry) const{};
 
     // ********************************** Variables **********************************
 

@@ -97,8 +97,6 @@ namespace mitk {
     itkNewMacro(Self);
     mitkNewMacro1Param(Self,Self);
 
-    void Initialize();
-
     //##Documentation
     //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
     virtual void ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry );
@@ -114,8 +112,6 @@ namespace mitk {
     //##
     //## See SetImageGeometry for how a corner is defined on images.
     Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const;
-
-    virtual void InitializeGeometry(Self * newGeometry) const;
 
     //##Documentation
     //## @brief Is this an ImageGeometry?
@@ -266,6 +262,9 @@ namespace mitk {
     mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 
     bool m_ImageGeometry;
+
+    virtual void InternPostInitialize();
+    virtual void InternPostInitializeGeometry(Geometry3D* newGeometry) const;
 
     static const std::string INDEX_TO_OBJECT_TRANSFORM;
     static const std::string OBJECT_TO_NODE_TRANSFORM;

@@ -114,6 +114,8 @@ void mitk::BaseGeometry::Initialize()
   m_TimeBounds[0]=ScalarTypeNumericTraits::NonpositiveMin(); m_TimeBounds[1]=ScalarTypeNumericTraits::max();
 
   m_FrameOfReferenceID = 0;
+
+  this->InternPostInitialize();
 }
 
 void mitk::BaseGeometry::SetFloatBounds(const float bounds[6])
@@ -151,6 +153,8 @@ void
     indexToWorldTransform->SetOffset( m_IndexToWorldTransform->GetOffset() );
     newGeometry->SetIndexToWorldTransform(indexToWorldTransform);
   }
+
+  this->InternPostInitializeGeometry(newGeometry);
 }
 
 /** Set the bounds */
@@ -198,7 +202,15 @@ const  mitk::BaseGeometry::BoundsArrayType  mitk::BaseGeometry::GetBounds() cons
 
 bool mitk::BaseGeometry::IsValid() const
 {
-  return m_Valid;
+  bool isValid = m_Valid;
+  isValid = isValid && this->InternPostIsValid();
+
+  return isValid;
+}
+
+bool mitk::BaseGeometry::InternPostIsValid() const
+{
+  return true;
 }
 
 const float* mitk::BaseGeometry::GetFloatSpacing() const

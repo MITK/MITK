@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkThinPlateSplineCurvedGeometry.h"
 #include <vtkThinPlateSplineTransform.h>
 #include <vtkPoints.h>
@@ -45,7 +44,7 @@ mitk::ThinPlateSplineCurvedGeometry::~ThinPlateSplineCurvedGeometry()
     m_VtkProjectedLandmarks->Delete();
 }
 
-bool mitk::ThinPlateSplineCurvedGeometry::IsValid() const
+bool mitk::ThinPlateSplineCurvedGeometry::InternPostIsValid() const
 {
   return m_TargetLandmarks.IsNotNull() && (m_TargetLandmarks->Size() >= 3) && m_LandmarkProjector.IsNotNull();
 }
@@ -58,7 +57,6 @@ void mitk::ThinPlateSplineCurvedGeometry::SetSigma(double sigma)
 double mitk::ThinPlateSplineCurvedGeometry::GetSigma() const
 {
   return m_ThinPlateSplineTransform->GetSigma();
-
 }
 
 void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()

@@ -123,6 +123,9 @@ public:
     // compare fiber bundles
     bool Equals(FiberBundleX* fib, double eps=0.0001);
 
+    itkSetMacro( ReferenceImage, mitk::Image::Pointer )
+    itkGetMacro( ReferenceImage, mitk::Image::Pointer )
+
 protected:
 
     FiberBundleX( vtkPolyData* fiberPolyData = NULL );
@@ -156,6 +159,8 @@ private:
     int     m_FiberSampling;
 
     std::vector<int> m_PointsRoi; // this global variable needs to be refactored
+
+    mitk::Image::Pointer m_ReferenceImage;
 
 };
 

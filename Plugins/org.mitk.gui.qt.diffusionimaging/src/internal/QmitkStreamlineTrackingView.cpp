@@ -262,6 +262,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     if ( fiberBundle->GetNumberOfLines()==0 )
         return;
     mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
+    fib->SetReferenceImage(dynamic_cast<mitk::Image*>(m_TensorImageNodes.at(0)->GetData()));
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData(fib);

@@ -64,5 +64,5 @@ void mitk::USControlInterfaceBMode::SetScanningRejection( double rejection )
 void mitk::USControlInterfaceBMode::SetScanningDynamicRange( double dynamicRange )
 {
   this->OnSetScanningDynamicRange(dynamicRange);
-  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_BMODE_FOCUS, dynamicRange);
+  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_BMODE_DYNAMIC_RANGE, dynamicRange);
 }

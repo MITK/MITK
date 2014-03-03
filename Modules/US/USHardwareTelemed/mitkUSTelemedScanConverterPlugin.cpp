@@ -72,9 +72,8 @@ STDMETHODIMP USTelemedScanConverterPlugin::InterimOutBufferCB (
     m_OutputImage->Initialize(mitk::MakeScalarPixelType<BYTE>(), 2, dim);
   }
 
-  // lock the image for writing an copy the given buffer
-  // into the image then
-  mitk::ImageWriteAccessor imageWriteAccessor(m_OutputImage);
+  // lock the image for writing an copy the given buffer into the image then
+  mitk::ImageWriteAccessor imageWriteAccessor(m_OutputImage, m_OutputImage->GetSliceData(0,0,0));
   m_OutputImage->SetSlice(pBufferOut);
 
   return S_OK;

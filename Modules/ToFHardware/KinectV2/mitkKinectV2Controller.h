@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkKinectV2Controller_h
 #define __mitkKinectV2Controller_h
 
-#include <MitkKinectV2ModuleExports.h>
+#include <MitkKinectV2Exports.h>
 #include <mitkCommon.h>
 #include "mitkToFConfig.h"
 

@@ -270,7 +270,7 @@ void UltrasoundSupport::CreateControlWidgets()
   }
 
   // select first enabled control widget
-  for ( unsigned int n = 0; n < m_Controls.m_ToolBoxControlWidgets->count(); ++n)
+  for ( int n = 0; n < m_Controls.m_ToolBoxControlWidgets->count(); ++n)
   {
     if ( m_Controls.m_ToolBoxControlWidgets->isItemEnabled(n) )
     {

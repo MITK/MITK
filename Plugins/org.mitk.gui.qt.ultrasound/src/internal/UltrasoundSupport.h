@@ -116,6 +116,7 @@ protected:
 
   QList<ctkServiceReference>    m_CustomWidgetServiceReference;
 
+  bool m_ImageAlreadySetToNode;
   unsigned int m_CurrentImageWidth;
   unsigned int m_CurrentImageHeight;
 };

@@ -92,7 +92,18 @@ void UltrasoundSupport::DisplayImage()
   m_Device->Update();
 
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
-  if (curOutput.IsNotNull() && curOutput->IsInitialized()) { m_Node->SetData(curOutput); }
+  if (! m_ImageAlreadySetToNode && curOutput.IsNotNull() && curOutput->IsInitialized())
+  {
+    m_Node->SetData(curOutput);
+    m_ImageAlreadySetToNode = true;
+  }
+
+  if ( curOutput.GetPointer() != m_Node->GetData() )
+  {
+    MITK_INFO << "Data Node of the ultrasound image stream was changed by another plugin. Stop viewing.";
+    this->StopViewing();
+    return;
+  }
 
   this->RequestRenderWindowUpdate();
 
@@ -166,6 +177,8 @@ void UltrasoundSupport::OnNewDeviceWidgetDone()
 
 void UltrasoundSupport::StartViewing()
 {
+  m_ImageAlreadySetToNode = false;
+
   m_Controls.tabWidget->setTabEnabled(1, true);
   m_Controls.tabWidget->setCurrentIndex(1);
 
@@ -319,8 +332,8 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 
 UltrasoundSupport::UltrasoundSupport()
 : m_ControlCustomWidget(0), m_ControlBModeWidget(0),
-  m_ControlProbesWidget(0), m_CurrentImageWidth(0),
-  m_CurrentImageHeight(0)
+  m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
+  m_CurrentImageWidth(0), m_CurrentImageHeight(0)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 

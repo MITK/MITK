@@ -75,6 +75,17 @@ mitk::USImageSource::Pointer mitk::USCombinedModality::GetUSImageSource()
   return m_UltrasoundDevice->GetUSImageSource();
 }
 
+mitk::USAbstractControlInterface::Pointer mitk::USCombinedModality::GetControlInterfaceCustom()
+{
+    if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
+
+  return m_UltrasoundDevice->GetControlInterfaceCustom();
+}
+
 mitk::USControlInterfaceBMode::Pointer mitk::USCombinedModality::GetControlInterfaceBMode()
 {
   if (m_UltrasoundDevice.IsNull())
@@ -191,7 +202,15 @@ bool mitk::USCombinedModality::OnConnection()
     mitkThrow() << "UltrasoundDevice must not be null.";
   }
 
-  return m_UltrasoundDevice->Connect();
+  // connect ultrasound device only if it is not already connected
+  if ( m_UltrasoundDevice->GetDeviceState() >= mitk::USDevice::State_Connected )
+  {
+    return true;
+  }
+  else
+  {
+    return m_UltrasoundDevice->Connect();
+  }
 }
 
 bool mitk::USCombinedModality::OnDisconnection()
@@ -220,7 +239,15 @@ bool mitk::USCombinedModality::OnActivation()
   }
   trackingDeviceSource->StartTracking();
 
-  return m_UltrasoundDevice->Activate();
+  // activate ultrasound device only if it is not already activated
+  if ( m_UltrasoundDevice->GetDeviceState() >= mitk::USDevice::State_Activated )
+  {
+    return true;
+  }
+  else
+  {
+    return m_UltrasoundDevice->Activate();
+  }
 }
 
 bool mitk::USCombinedModality::OnDeactivation()

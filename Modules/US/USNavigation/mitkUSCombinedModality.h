@@ -80,6 +80,11 @@ namespace mitk {
     virtual USImageSource::Pointer GetUSImageSource();
 
     /**
+    * \brief Wrapper for returning custom control interface of the UltrasoundDevice.
+    */
+    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom();
+
+    /**
     * \brief Wrapper for returning B mode control interface of the UltrasoundDevice.
     */
     virtual itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode();

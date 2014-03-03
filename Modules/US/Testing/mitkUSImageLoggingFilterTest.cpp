@@ -122,7 +122,7 @@ public:
   CPPUNIT_ASSERT_MESSAGE("Testing if csv file exists",Poco::File(csvFileName.c_str()).exists());
 
   //clean up
-  for(int i=0; i<filenames.size(); i++) std::remove(filenames.at(i).c_str());
+  for(size_t i=0; i<filenames.size(); i++) std::remove(filenames.at(i).c_str());
   std::remove(csvFileName.c_str());
   }
 

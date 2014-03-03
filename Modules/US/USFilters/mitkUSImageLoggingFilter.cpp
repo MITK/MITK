@@ -55,7 +55,7 @@ void mitk::USImageLoggingFilter::GenerateData()
     mitk::Image::Pointer newOutput = mitk::Image::New();
     this->SetNthOutput(0, newOutput);
     }
-  memcpy(this->GetOutput(),this->GetInput());*
+  memcpy(this->GetOutput(),this->GetInput());*/
 
   //this->SetNthOutput(0,inputImage.);
   //this->AllocateOutputs();
@@ -105,7 +105,7 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
   std::string uniqueID = myGen.GetUID();
 
   //first: write the images
-  for(int i=0; i<m_LoggedImages.size(); i++)
+  for(size_t i=0; i<m_LoggedImages.size(); i++)
     {
       std::stringstream name;
       name << path << uniqueID << "_Image_" << i << m_ImageExtension;
@@ -128,7 +128,7 @@ void mitk::USImageLoggingFilter::SaveImages(std::string path, std::vector<std::s
   os << "image filename; MITK system timestamp; message\n";
 
   //write data
-  for(int i=0; i<m_LoggedImages.size(); i++)
+  for(size_t i=0; i<m_LoggedImages.size(); i++)
     {
     std::map<int, std::string>::iterator it = m_LoggedMessages.find(i);
     if (m_LoggedMessages.empty() || (it == m_LoggedMessages.end())) os << filenames.at(i) << ";" << m_LoggedMITKSystemTimes.at(i) << ";" << "" << "\n";

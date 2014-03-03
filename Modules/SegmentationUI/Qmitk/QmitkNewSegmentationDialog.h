@@ -53,6 +53,8 @@ class SegmentationUI_EXPORT QmitkNewSegmentationDialog : public QDialog
 
     virtual ~QmitkNewSegmentationDialog();
 
+    void SetSegmentationName(const std::string& text);
+    void SetColor(const mitk::Color& color);
     const QString GetSegmentationName();
     const char* GetOrganType();
     mitk::Color GetColor();

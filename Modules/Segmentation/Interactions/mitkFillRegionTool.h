@@ -54,6 +54,15 @@ class Segmentation_EXPORT FillRegionTool : public SetRegionTool
     us::ModuleResource GetIconResource() const;
 
     virtual const char* GetName() const;
+    virtual void ConnectActionsAndFunctions();
+
+    virtual bool OnMousePressed(StateMachineAction*, InteractionEvent* interactionEvent);
+
+    /**
+      Called when the CTRL key is pressed. Will change the painting pixel value from 0 to the active label
+      and viceversa.
+    */
+    virtual bool OnInvertLogic(StateMachineAction*, InteractionEvent* interactionEvent);
 
   protected:
 

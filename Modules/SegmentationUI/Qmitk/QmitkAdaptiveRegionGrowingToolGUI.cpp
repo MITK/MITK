@@ -39,9 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "QmitkConfirmSegmentationDialog.h"
 
-#include "mitkPixelTypeMultiplex.h"
-#include "mitkImagePixelReadAccessor.h"
-
 
 MITK_TOOL_GUI_MACRO( , QmitkAdaptiveRegionGrowingToolGUI, "")
 
@@ -153,13 +150,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode* node)
   }
 }
 
-template <typename TPixel>
-static void AccessPixel(mitk::PixelType ptype, const mitk::Image::Pointer im, mitk::Point3D p, int & val)
-{
-  mitk::ImagePixelReadAccessor<TPixel,3> access(im);
-  val = access.GetPixelByWorldCoordinates(p);
-}
-
 void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 {
   if (m_RegionGrow3DTool.IsNull())
@@ -183,7 +173,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
       mitk::Point3D seedPoint = pointSet->GetPointSet(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep())->GetPoints()->ElementAt(0);
 
-      mitkPixelTypeMultiplex3(AccessPixel,image->GetChannelDescriptor().GetPixelType(),image,seedPoint,m_SeedpointValue);
+      m_SeedpointValue = image->GetPixelValueByWorldCoordinate(seedPoint);
 
       /* In this case the seedpoint is placed e.g. in the lung or bronchialtree
        * The lowerFactor sets the windowsize depending on the regiongrowing direction
@@ -282,6 +272,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
 void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
 {
+
   if (m_InputImageNode.IsNull())
   {
     QMessageBox::information( NULL, "Adaptive Region Growing functionality", "Please specify the image in Datamanager!");
@@ -314,7 +305,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
     return;
   }
 
-  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 
   mitk::PointSet::PointType seedPoint = seedPointSet->GetPointSet(timeStep)->GetPoints()->Begin().Value();
 
@@ -333,21 +323,18 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
       }
       else if (orgImage->GetDimension() == 3)
       {
-          //QApplication::setOverrideCursor(QCursor(Qt::WaitCursor)); //set the cursor to waiting
+          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor)); //set the cursor to waiting
           AccessByItk_2(orgImage, StartRegionGrowing, orgImage->GetGeometry(), seedPoint);
-          //QApplication::restoreOverrideCursor();//reset cursor
+          QApplication::restoreOverrideCursor();//reset cursor
       }
       else
       {
-          QApplication::restoreOverrideCursor();//reset cursor
           QMessageBox::information( NULL, "Adaptive Region Growing functionality", "Only images of dimension 3 or 4 can be processed!");
           return;
       }
   }
   EnableControls(true); // Segmentation ran successfully, so enable all controls.
   node->SetVisibility(true);
-  QApplication::restoreOverrideCursor();//reset cursor
-
 }
 
 template<typename TPixel, unsigned int VImageDimension>
@@ -518,6 +505,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
 
   if (m_UseVolumeRendering)
   this->UpdateVolumeRenderingThreshold((int) (*level + 0.5));//lower threshold for labeled image
+
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::ChangeLevelWindow(double newValue)
@@ -581,6 +569,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::IncreaseSlider()
 
 void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
 {
+  /*
   //get image node
   if(m_InputImageNode.IsNull())
   {
@@ -633,11 +622,13 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
   newNode->SetVisibility(false);
   m_Controls.m_cbVolumeRendering->setChecked(false);
   //TODO disable slider etc...
+*/
 }
 
 template<typename TPixel, unsigned int VImageDimension>
 void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImageDimension>* itkImage)
 {
+/*
   mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image*>(this->m_RegionGrow3DTool->
                                                                          GetTargetSegmentationNode()->GetData());
 
@@ -651,7 +642,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
     //select single 3D volume if we have more than one time step
     typename SegmentationType::Pointer originalSegmentationInITK = SegmentationType::New();
-    if(originalSegmentation->GetTimeGeometry()->CountTimeSteps() > 1)
+    if(originalSegmentation->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput( originalSegmentation );
@@ -702,6 +693,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
     originalSegmentation->Modified();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+*/
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::EnableControls(bool enable)
@@ -810,6 +802,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::UpdateVolumeRenderingThreshold(int thVal
   mitk::TransferFunctionProperty::Pointer tfp = mitk::TransferFunctionProperty::New();
   tfp->SetValue(tf);
   node->SetProperty("TransferFunction", tfp);
+
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::UseVolumeRendering(bool on)
@@ -845,4 +838,5 @@ void QmitkAdaptiveRegionGrowingToolGUI::Deactivated()
 
 void QmitkAdaptiveRegionGrowingToolGUI::Activated()
 {
+
 }

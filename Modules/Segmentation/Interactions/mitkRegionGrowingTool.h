@@ -77,15 +77,11 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
 
     void ConnectActionsAndFunctions();
 
-    virtual void Activated();
-    virtual void Deactivated();
-
     virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMousePressedInside ( StateMachineAction*, InteractionEvent* interactionEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset);
     virtual bool OnMousePressedOutside ( StateMachineAction*, InteractionEvent* interactionEvent );
-    virtual bool OnMouseMoved   ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual bool OnMouseMoved ( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
-
     mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour(int timestep=0);
 
     Image::Pointer m_ReferenceSlice;
@@ -101,7 +97,22 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
 
   private:
 
+    /**
+      Smoothes a binary ipPic image with a 5x5 mask. The image borders (some first and last rows) are treated differently.
+    */
     mitkIpPicDescriptor* SmoothIPPicBinaryImage( mitkIpPicDescriptor* image, int &contourOfs, mitkIpPicDescriptor* dest = NULL );
+
+    /**
+      Helper method for SmoothIPPicBinaryImage. Smoothes a given part of and image.
+
+      \param sourceImage The original binary image.
+      \param dest The smoothed image (will be written without bounds checking).
+      \param contourOfs One offset of the contour. Is updated if a pixel is changed (which might change the contour).
+      \param maskOffsets Memory offsets that describe the smoothing mask.
+      \param maskSize Entries of the mask.
+      \param startOffset First pixel that should be smoothed using this mask.
+      \param endOffset Last pixel that should be smoothed using this mask.
+    */
     void SmoothIPPicBinaryImageHelperForRows( mitkIpPicDescriptor* source, mitkIpPicDescriptor* dest, int &contourOfs, int* maskOffsets, int maskSize, int startOffset, int endOffset );
 
     mitkIpPicDescriptor* m_OriginalPicSlice;

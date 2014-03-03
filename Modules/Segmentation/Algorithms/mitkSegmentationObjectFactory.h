@@ -34,12 +34,20 @@ namespace mitk {
     virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap();
     virtual const char* GetSaveFileExtensions();
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
-    void RegisterIOFactories();
+
+    /** \deprecatedSince{2013_09} */
+    DEPRECATED(void RegisterIOFactories());
+
   protected:
     SegmentationObjectFactory();
+    ~SegmentationObjectFactory();
     void CreateFileExtensionsMap();
     MultimapType m_FileExtensionsMap;
     MultimapType m_SaveFileExtensionsMap;
+
+  private:
+    itk::ObjectFactoryBase::Pointer m_LabelSetImageIOFactory;
+    itk::ObjectFactoryBase::Pointer m_LabelSetImageWriterFactory;
   };
 
 }

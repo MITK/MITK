@@ -1,0 +1,12 @@
+<!--
+State machine pattern that adds label handling to the display interaction:
+-Change active label
+
+-->
+<statemachine>
+    <state name="start" startstate="true" >
+        <transition event_class="MousePressEvent" event_variant="SelectLabel" target="start">
+           <action name="change_active_label"/>
+        </transition>
+    </state>
+</statemachine>

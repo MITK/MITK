@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
 #include "mitkDataStorage.h"
 #include "mitkPointSetInteractor.h"
 #include "mitkPointSet.h"
@@ -42,18 +42,17 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
 
   */
-  class Segmentation_EXPORT PickingTool : public AutoSegmentationTool
+  class Segmentation_EXPORT PickingTool : public SegTool3D
   {
   public:
 
-    mitkClassMacro(PickingTool, AutoSegmentationTool);
+    mitkClassMacro(PickingTool, SegTool3D);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
     us::ModuleResource GetIconResource() const;
-
 
     virtual void Activated();
     virtual void Deactivated();

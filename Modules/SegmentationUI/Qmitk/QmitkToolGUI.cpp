@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkToolGUI.h"
-
+#include "mitkTool.h"
 #include <iostream>
 
 QmitkToolGUI::~QmitkToolGUI()
@@ -42,8 +42,6 @@ void QmitkToolGUI::SetReferenceCount(int)
 
 void QmitkToolGUI::SetTool( mitk::Tool* tool )
 {
-  m_Tool = tool;
-
   emit( NewToolAssociated(tool) );
 }
 

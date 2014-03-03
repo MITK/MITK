@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
+#include "mitkContourUtils.h"
 #include "ipSegmentation.h"
 
 #include "mitkLevelWindowProperty.h"
@@ -382,13 +383,14 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
     it++;
   }
 
-
+  /*
   if (leftMouseButtonPressed)
   {
-    FeedbackContourTool::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+    ContourUtils::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
     m_WorkingNode->SetData(m_WorkingSlice);
     m_WorkingNode->Modified();
   }
+  */
 
   // visualize contour
   ContourModel::Pointer displayContour = ContourModel::New();
@@ -405,8 +407,8 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   //  displayContour->AddVertex( point );
   //}
 
-  displayContour = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
-  SetFeedbackContour( *displayContour );
+  //displayContour = ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
+  //SetFeedbackContour( *displayContour );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
 
@@ -451,12 +453,8 @@ bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent*
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
     const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldGeometry2D() ) );
-    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
 
-    if (!workingNode)
-        return;
-
-    Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
+    Image::Pointer image = dynamic_cast<Image*>(m_WorkingNode->GetData());
 
     if ( !image || !planeGeometry )
         return;
@@ -465,7 +463,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
     {
         m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
         m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
-        m_WorkingNode->ReplaceProperty( "color", workingNode->GetProperty("color") );
+        m_WorkingNode->ReplaceProperty( "color", m_WorkingNode->GetProperty("color") );
         m_WorkingNode->SetData(m_WorkingSlice);
     }
     else
@@ -498,7 +496,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
     {
 
         m_WorkingNode->SetProperty( "outline binary", mitk::BoolProperty::New(true) );
-        m_WorkingNode->SetProperty( "color", workingNode->GetProperty("color") );
+        m_WorkingNode->SetProperty( "color", m_WorkingNode->GetProperty("color") );
         m_WorkingNode->SetProperty( "name", mitk::StringProperty::New("Paintbrush_Node") );
         m_WorkingNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
         m_WorkingNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );

@@ -61,6 +61,11 @@ class Segmentation_EXPORT SubtractContourTool : public ContourTool
 
     virtual const char* GetName() const;
 
+    virtual void ConnectActionsAndFunctions();
+
+    virtual bool OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual bool OnInvertLogic  (StateMachineAction*, InteractionEvent* interactionEvent);
+
   protected:
 
     SubtractContourTool(); // purposely hidden

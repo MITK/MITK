@@ -65,6 +65,9 @@ public:
    */
   itkGetMacro( OutsideValue, mitk::ScalarType );
 
+  itkSetMacro( InsideValue, mitk::ScalarType );
+  itkGetMacro( InsideValue, mitk::ScalarType );
+
   /**
    * If OverrideOutsideValue is set to false, this minimum
    * of the pixel type of the output image is taken as outside
@@ -81,6 +84,10 @@ public:
   itkGetMacro( OverrideOutsideValue, bool );
   itkBooleanMacro( OverrideOutsideValue );
 
+  itkSetMacro( OverrideInsideValue, bool );
+  itkGetMacro( OverrideInsideValue, bool );
+  itkBooleanMacro( OverrideInsideValue );
+
 protected:
   MaskImageFilter();
 
@@ -92,8 +99,8 @@ protected:
 
   virtual void GenerateData();
 
-  template < typename TPixel, unsigned int VImageDimension >
-  void InternalComputeMask(itk::Image<TPixel, VImageDimension>* itkImage);
+  template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
+  void InternalComputeMask( itk::Image<TPixel1, VDimension1>* referenceImage, const itk::Image<TPixel2, VDimension2>* maskImage );
 
   mitk::Image::Pointer m_Mask;
   mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
@@ -105,9 +112,11 @@ protected:
   itk::TimeStamp m_TimeOfHeaderInitialization;
 
   mitk::ScalarType m_OutsideValue;
+  mitk::ScalarType m_InsideValue;
   mitk::ScalarType m_MinValue;
   mitk::ScalarType m_MaxValue;
   bool m_OverrideOutsideValue;
+  bool m_OverrideInsideValue;
 };
 
 } // namespace mitk

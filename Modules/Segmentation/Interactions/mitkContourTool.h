@@ -57,7 +57,7 @@ class Segmentation_EXPORT ContourTool : public FeedbackContourTool
 
   protected:
 
-    ContourTool(int paintingPixelValue = 1); // purposely hidden
+    ContourTool(); // purposely hidden
     virtual ~ContourTool();
 
     virtual void Activated();
@@ -66,11 +66,12 @@ class Segmentation_EXPORT ContourTool : public FeedbackContourTool
     virtual bool OnMousePressed( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
-    virtual bool OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent );
 
-    void ConnectActionsAndFunctions();
+    virtual void ConnectActionsAndFunctions();
 
     int m_PaintingPixelValue;
+
+    bool m_LogicInverted;
 };
 
 } // namespace

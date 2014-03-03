@@ -1,7 +1,7 @@
 MITK_CREATE_MODULE(Segmentation
   INCLUDE_DIRS Algorithms Controllers DataManagement Interactions IO Rendering SegmentationUtilities/BooleanOperations SegmentationUtilities/MorphologicalOperations
   DEPENDS MitkAlgorithmsExt ipSegmentation mitkIpFunc LegacyAdaptors SurfaceInterpolation MitkGraphAlgorithms ContourModel
-  PACKAGE_DEPENDS ITK|ITKBinaryMathematicalMorphology+ITKLabelVoting+ITKRegionGrowing+ITKFastMarching+ITKAnisotropicSmoothing+ITKWatersheds
+  PACKAGE_DEPENDS ITK|ITKBinaryMathematicalMorphology+ITKLabelVoting+ITKRegionGrowing+ITKFastMarching+ITKAnisotropicSmoothing+ITKWatersheds+ITKAntiAlias
 )
 
 add_subdirectory(Testing)

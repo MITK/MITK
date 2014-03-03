@@ -5,7 +5,6 @@ set(CPP_FILES
   Algorithms/mitkGeometryDataSource.cpp
   Algorithms/mitkImageToLookupTableFilter.cpp
   Algorithms/mitkInterpolateLinesFilter.cpp
-  Algorithms/mitkMeshSource.cpp
   Algorithms/mitkPlaneCutFilter.cpp
   Algorithms/mitkPlaneFit.cpp
   Algorithms/mitkPlanesPerpendicularToLinesFilter.cpp

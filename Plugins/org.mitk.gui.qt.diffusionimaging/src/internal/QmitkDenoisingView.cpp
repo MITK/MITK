@@ -43,8 +43,17 @@ void QmitkDenoisingWorker::run()
       case 1:
       case 2:
       {
-        m_View->m_NonLocalMeansFilter->Update();
-        break;
+        try
+        {
+          m_View->m_NoExceptionThrown = true;
+          m_View->m_NonLocalMeansFilter->Update();
+        }
+        catch (itk::ExceptionObject& e)
+        {
+          m_View->m_NoExceptionThrown = false;
+          MITK_ERROR << e.what();
+        }
+          break;
       }
     }
     m_View->m_DenoisingThread.quit();
@@ -413,47 +422,50 @@ void QmitkDenoisingView::AfterThread()
   m_DenoisingTimer->stop();
   // make sure progressbar is finished
   mitk::ProgressBar::GetInstance()->Progress(m_MaxProgressCount);
-  switch (m_SelectedFilter)
+  if (m_NoExceptionThrown)
   {
-    case NOFILTERSELECTED:
-    case GAUSS:
+    switch (m_SelectedFilter)
     {
-      break;
-    }
+      case NOFILTERSELECTED:
+      case GAUSS:
+      {
+        break;
+      }
 
-    case NLMR:
-    {
-      DiffusionImageType::Pointer image = DiffusionImageType::New();
-      image->SetVectorImage(m_NonLocalMeansFilter->GetOutput());
-      image->SetReferenceBValue(m_InputImage->GetReferenceBValue());
-      image->SetDirections(m_InputImage->GetDirections());
-      image->InitializeFromVectorImage();
-      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-      imageNode->SetData( image );
-      QString name = m_ImageNode->GetName().c_str();
+      case NLMR:
+      {
+        DiffusionImageType::Pointer image = DiffusionImageType::New();
+        image->SetVectorImage(m_NonLocalMeansFilter->GetOutput());
+        image->SetReferenceBValue(m_InputImage->GetReferenceBValue());
+        image->SetDirections(m_InputImage->GetDirections());
+        image->InitializeFromVectorImage();
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_ImageNode->GetName().c_str();
 
-      imageNode->SetName((name+"_NLMr_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
-      GetDefaultDataStorage()->Add(imageNode);
-      break;
-    }
+        imageNode->SetName((name+"_NLMr_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode);
+        break;
+      }
 
-    case NLMV:
-    {
-      DiffusionImageType::Pointer image = DiffusionImageType::New();
-      image->SetVectorImage(m_NonLocalMeansFilter->GetOutput());
-      image->SetReferenceBValue(m_InputImage->GetReferenceBValue());
-      image->SetDirections(m_InputImage->GetDirections());
-      image->InitializeFromVectorImage();
-      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-      imageNode->SetData( image );
-      QString name = m_ImageNode->GetName().c_str();
+      case NLMV:
+      {
+        DiffusionImageType::Pointer image = DiffusionImageType::New();
+        image->SetVectorImage(m_NonLocalMeansFilter->GetOutput());
+        image->SetReferenceBValue(m_InputImage->GetReferenceBValue());
+        image->SetDirections(m_InputImage->GetDirections());
+        image->InitializeFromVectorImage();
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_ImageNode->GetName().c_str();
 
-      imageNode->SetName((name+"_NLMv_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter3->value())).toStdString().c_str());
-      GetDefaultDataStorage()->Add(imageNode);
+        imageNode->SetName((name+"_NLMv_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter3->value())).toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode);
 
-      m_Controls->m_LabelParameter_3->setEnabled(true);
-      m_Controls->m_SpinBoxParameter3->setEnabled(true);
-      break;
+        m_Controls->m_LabelParameter_3->setEnabled(true);
+        m_Controls->m_SpinBoxParameter3->setEnabled(true);
+        break;
+      }
     }
   }
 

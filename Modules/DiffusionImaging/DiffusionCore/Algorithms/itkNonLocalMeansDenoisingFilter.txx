@@ -58,18 +58,18 @@ NonLocalMeansDenoisingFilter< TPixelType >
   typename ImageExtractorType::Pointer extractor = ImageExtractorType::New();
   extractor->SetInput(inImage);
 
-  /// calculate max value of mask, for correct inversion
+  // calculate max value of mask, for correct inversion
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput(mask);
   statisticsFilter->Update();
 
-  /// invert mask, to mask the backround
+  // invert mask, to mask the backround
   typename InvertImageFilterType::Pointer inverter = InvertImageFilterType::New();
   inverter->SetInput(mask);
   inverter->SetMaximum(statisticsFilter->GetMaximum());
   inverter->Update();
 
-  /// make sure inverted mask has same origin is the brainmask
+  // make sure inverted mask has same origin is the brainmask
   typename ChangeInformationType::Pointer changeMaskFilter = ChangeInformationType::New();
   changeMaskFilter->ChangeOriginOn();
   changeMaskFilter->SetInput(inverter->GetOutput());

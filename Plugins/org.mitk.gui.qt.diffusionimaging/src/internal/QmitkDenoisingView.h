@@ -107,6 +107,7 @@ private:
   QmitkDenoisingWorker m_DenoisingWorker;
   QThread m_DenoisingThread;
   bool m_ThreadIsRunning;
+  bool m_NoExceptionThrown;
   NonLocalMeansDenoisingFilterType::Pointer m_NonLocalMeansFilter;
   GaussianFilterType::Pointer m_GaussianFilter;
   DiffusionImageType::Pointer m_InputImage;

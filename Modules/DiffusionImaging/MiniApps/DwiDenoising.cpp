@@ -46,7 +46,7 @@ mitk::BaseData::Pointer LoadFile(std::string filename)
 }
 
 /**
- * Calculate indices derived from Qball or tensor images
+ * Denoises DWI using the Nonlocal - Means algorithm
  */
 int DwiDenoising(int argc, char* argv[])
 {

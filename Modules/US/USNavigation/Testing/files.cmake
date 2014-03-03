@@ -1,5 +1,6 @@
 SET(MODULE_TESTS
    mitkCombinedModalityTest.cpp
+   mitkNodeDisplacementFilterTest.cpp
 
    # -----------------------------------------------------------------------
 

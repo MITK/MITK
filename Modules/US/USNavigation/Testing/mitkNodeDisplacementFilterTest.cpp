@@ -29,14 +29,12 @@ public:
 
   static void TestNodeDisplacement()
   {
-    /* create helper objects: navigation data with position as origin, zero quaternion, zero error and data valid */
+    /* create helper objects: navigation data with data valid */
     mitk::NavigationData::PositionType initialPos;
     mitk::FillVector3D(initialPos, 1.0, 2.0, 3.0);
-    mitk::NavigationData::OrientationType initialOri(0.1, 0.2, 0.3, 0.4);
     mitk::ScalarType initialError(22.22);
     mitk::NavigationData::Pointer nd0 = mitk::NavigationData::New();
     nd0->SetPosition(initialPos);
-    nd0->SetOrientation(initialOri);
     nd0->SetPositionAccuracy(initialError);
     nd0->SetDataValid(true);
     nd0->SetName("testName");
@@ -45,6 +43,8 @@ public:
     nodeDisplacementFilter->SetInput(nd0);
     nodeDisplacementFilter->SelectInput(0);
 
+
+    // test translation
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     mitk::Surface::Pointer surface = mitk::Surface::New();
     mitk::Point3D origin;
@@ -67,17 +67,28 @@ public:
 
     surface->GetGeometry()->SetOrigin(surface->GetGeometry()->GetOrigin()+(movedPos-initialPos));
     MITK_TEST_CONDITION(mitk::Equal(surface->GetGeometry(), node->GetData()->GetGeometry(), mitk::eps, true),
-                        "Node must be moved accordingly to the reference node.")
+                        "Node must have moved accordingly to the reference node.")
 
 
-    //vnl_vector_fixed<float, 3> rotateVect;
-    //rotateVect[0] = 0.4;
-    //rotateVect[1] = 0.2;
-    //rotateVect[2] = 1.5;
+    // test rotation
+    mitk::DataNode::Pointer node2 = mitk::DataNode::New();
+    mitk::Surface::Pointer surface2 = mitk::Surface::New();
+    mitk::FillVector3D(origin, 0, 0, 0);
+    surface->GetGeometry()->SetOrigin(origin);
+    node2->SetData(surface2->Clone());
+    MITK_TEST_CONDITION(nodeDisplacementFilter->AddNode(node2), "Adding second node to node displacement filter.");
 
-    //initialOri.rotate(rotateVect);
-    //initialOri.
-    //nd0->SetOrientation(initalOri);
+
+    mitk::NavigationData::OrientationType rotation(0.1, 0.2, 0.3, 0.4);
+    nd0->SetOrientation(rotation);
+
+    mitk::AffineTransform3D::Pointer navigationDataTransform = nd0->GetAffineTransform3D();
+
+    nodeDisplacementFilter->Modified();
+    nodeDisplacementFilter->Update();
+
+    MITK_TEST_CONDITION(mitk::Equal(navigationDataTransform, node2->GetData()->GetGeometry()->GetIndexToWorldTransform(), mitk::eps, true),
+                        "Rotation of the node must be the same as the rotation of the navigation data.")
   }
 };
 

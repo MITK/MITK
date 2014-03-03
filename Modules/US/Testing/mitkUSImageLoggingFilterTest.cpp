@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageGenerator.h"
 
+#include "itksys/SystemTools.hxx"
+
 #include "Poco/File.h"
 
 class mitkUSImageLoggingFilterTestSuite : public mitk::TestFixture
@@ -54,7 +56,7 @@ public:
     m_RandomRestImage1 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
     m_RandomRestImage2 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
     m_RandomSingleSliceImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 0.2, 0.3, 0.4);
-    m_RealTestImage = mitk::IOUtil::LoadImageA(GetTestDataFilePath("Pic3D.nrrd"));
+    m_RealTestImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
   }
 
   void tearDown()
@@ -103,7 +105,7 @@ public:
     std::stringstream testmessage;
     testmessage << "testmessage" << i;
     m_TestFilter->AddMessageToCurrentImage(testmessage.str());
-    Sleep(50);
+    itksys::SystemTools::Delay(50);
     }
   MITK_TEST_OUTPUT(<<"Call Update() 5 times.");
 
@@ -145,7 +147,7 @@ public:
   #ifdef WIN32
   std::string filename = "XV:/342INVALID<>"; //invalid filename for windows
   #else
-  std::string filename = "/dsfdsf:$�$342INVALID; //invalid filename for linux
+  std::string filename = "/dsfdsf:$�$342INVALID"; //invalid filename for linux
   #endif
 
   m_TestFilter->SetInput(m_RealTestImage);

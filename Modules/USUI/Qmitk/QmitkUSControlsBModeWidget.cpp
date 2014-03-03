@@ -70,14 +70,20 @@ QmitkUSControlsBModeWidget::QmitkUSControlsBModeWidget(mitk::USControlInterfaceB
 
   ui->scanningRejectionSlider->setMinimum(m_ControlInterface->GetScanningRejectionMin());
   ui->scanningRejectionSlider->setMaximum(m_ControlInterface->GetScanningRejectionMax());
-  ui->scanningRejectionSlider->setTickInterval(m_ControlInterface->GetScanningGainTick());
-  ui->scanningRejectionSlider->setValue(m_ControlInterface->GetScanningGain());
+  ui->scanningRejectionSlider->setTickInterval(m_ControlInterface->GetScanningRejectionTick());
+  ui->scanningRejectionSlider->setValue(m_ControlInterface->GetScanningRejection());
+
+  ui->scanningDynamicRangeSlider->setMinimum(m_ControlInterface->GetScanningDynamicRangeMin());
+  ui->scanningDynamicRangeSlider->setMaximum(m_ControlInterface->GetScanningDynamicRangeMax());
+  ui->scanningDynamicRangeSlider->setTickInterval(m_ControlInterface->GetScanningDynamicRangeTick());
+  ui->scanningDynamicRangeSlider->setValue(m_ControlInterface->GetScanningDynamicRange());
 
   connect( ui->scanningFrequencyComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnFrequencyControlIndexChanged(int)) );
   connect( ui->scanningDepthComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnDepthControlActivated(int)) );
   connect( ui->scanningPowerSlider, SIGNAL(valueChanged(int)), this, SLOT(OnPowerControlValueChanged(int)) );
   connect( ui->scanningGainSlider, SIGNAL(valueChanged(int)), this, SLOT(OnGainControlValueChanged(int)) );
   connect( ui->scanningRejectionSlider, SIGNAL(valueChanged(int)), this, SLOT(OnRejectionControlValueChanged(int)) );
+  connect( ui->scanningDynamicRangeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnDynamicRangeControlValueChanged(int)) );
 }
 
 QmitkUSControlsBModeWidget::~QmitkUSControlsBModeWidget()
@@ -110,4 +116,9 @@ void QmitkUSControlsBModeWidget::OnGainControlValueChanged(int value)
 void QmitkUSControlsBModeWidget::OnRejectionControlValueChanged(int value)
 {
   m_ControlInterface->SetScanningRejection(static_cast<double>(value));
+}
+
+void QmitkUSControlsBModeWidget::OnDynamicRangeControlValueChanged(int value)
+{
+  m_ControlInterface->SetScanningDynamicRange(static_cast<double>(value));
 }

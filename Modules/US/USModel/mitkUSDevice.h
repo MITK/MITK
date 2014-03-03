@@ -44,7 +44,6 @@ template<class T> class SmartPointer;
 }
 
 namespace mitk {
-
 class USAbstractControlInterface;
 class USControlInterfaceBMode;
 class USControlInterfaceProbes;
@@ -97,6 +96,7 @@ class USControlInterfaceDoppler;
     static const std::string US_PROPKEY_BMODE_DEPTH;
     static const std::string US_PROPKEY_BMODE_GAIN;
     static const std::string US_PROPKEY_BMODE_REJECTION;
+    static const std::string US_PROPKEY_BMODE_DYNAMIC_RANGE;
 
     /**
     * \brief Default getter for the custom control interface.

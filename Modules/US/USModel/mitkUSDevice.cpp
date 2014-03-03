@@ -44,6 +44,7 @@ const std::string mitk::USDevice::US_PROPKEY_BMODE_POWER = US_INTERFACE_NAME + "
 const std::string mitk::USDevice::US_PROPKEY_BMODE_DEPTH = US_INTERFACE_NAME + ".bmode.depth";
 const std::string mitk::USDevice::US_PROPKEY_BMODE_GAIN = US_INTERFACE_NAME + ".bmode.gain";
 const std::string mitk::USDevice::US_PROPKEY_BMODE_REJECTION = US_INTERFACE_NAME + ".bmode.rejection";
+const std::string mitk::USDevice::US_PROPKEY_BMODE_DYNAMIC_RANGE = US_INTERFACE_NAME + ".bmode.dynamicRange";
 
 mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 {

@@ -6,14 +6,56 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>216</width>
-    <height>261</height>
+    <width>262</width>
+    <height>342</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="scanningDepthLabel">
+     <property name="text">
+      <string>Depth Control</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="scanningDepthNext">
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/zoom-out.png</normaloff>:/USUI/zoom-out.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="scanningDepthPrev">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>+</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/zoom-in.png</normaloff>:/USUI/zoom-in.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QmitkComboBoxStepThrough" name="scanningDepthComboBox"/>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
@@ -74,46 +116,21 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="scanningDepthLabel">
+    <widget class="QLabel" name="scanningDynamicRangeLabel">
      <property name="text">
-      <string>Depth Control</string>
+      <string>Dynamic Range Control</string>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QToolButton" name="scanningDepthNext">
-       <property name="text">
-        <string>-</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/USUI.qrc">
-         <normaloff>:/USUI/zoom-out.png</normaloff>:/USUI/zoom-out.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="scanningDepthPrev">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>+</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/USUI.qrc">
-         <normaloff>:/USUI/zoom-in.png</normaloff>:/USUI/zoom-in.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QmitkComboBoxStepThrough" name="scanningDepthComboBox"/>
-     </item>
-    </layout>
+    <widget class="QSlider" name="scanningDynamicRangeSlider">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLabel" name="scanningGainLabel">

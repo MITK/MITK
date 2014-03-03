@@ -27,6 +27,7 @@ set(CPP_FILES
   mitkUnstructuredGrid.cpp
   mitkUnstructuredGridSource.cpp
   mitkVideoSource.cpp
+  mitkMeshSource.cpp
 
   Internal/mitkColorConversions.cpp
 )

@@ -56,7 +56,7 @@ void QmitkLiveWireTool2DGUI::OnConfirmSegmentation()
 {
   if (m_LiveWireTool.IsNotNull())
   {
-    m_LiveWireTool->ConfirmSegmentation();
+//    m_LiveWireTool->ConfirmSegmentation();
   }
 }
 

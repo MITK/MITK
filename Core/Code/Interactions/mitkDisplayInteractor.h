@@ -109,7 +109,7 @@ namespace mitk
      */
     virtual bool AdjustLevelWindow(StateMachineAction*, InteractionEvent*);
 
-  private:
+  protected:
     /**
      * \brief Coordinate of the pointer at begin of an interaction
      */

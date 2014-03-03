@@ -17,11 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkNeverTranslucentTexture_h
 #define mitkNeverTranslucentTexture_h
 
-#include <MitkCoreExports.h>
-
 #include <vtkOpenGLTexture.h>
 
-#include <vtkObjectFactory.h>
+#include <MitkExports.h>
 
 /**
   \brief VTK Fix to speed up our image rendering.
@@ -48,15 +46,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   \sa ImageVtkMapper2D
 */
-/* NOT exported, this is a 2D image mapper helper */
 
-class vtkNeverTranslucentTexture : public vtkOpenGLTexture
+class MITK_CORE_EXPORT vtkNeverTranslucentTexture : public vtkOpenGLTexture
 {
 public:
 
-  static vtkNeverTranslucentTexture* New();
-  vtkTypeMacro(vtkNeverTranslucentTexture, vtkTexture);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkNeverTranslucentTexture,vtkOpenGLTexture);
+
+  static vtkNeverTranslucentTexture *New();
 
   /**
     \brief The FIX (see class description).
@@ -71,37 +68,15 @@ public:
 
 protected:
 
+    /** Default constructor. */
   vtkNeverTranslucentTexture();
+  /** Default deconstructor. */
+  ~vtkNeverTranslucentTexture();
 
 private:
 
   vtkNeverTranslucentTexture(const vtkNeverTranslucentTexture&);  // Not implemented.
   void operator=(const vtkNeverTranslucentTexture&);  // Not implemented.
 };
-
-/**
-  \brief Factory for vtkNeverTranslucentTexture (see this class!).
-
-  Registered in CoreActivator to replace all instances of vtkTexture
-  with vtkNeverTranslucentTexture.
-
-  Required to make rendering of images during level/window operations
-  acceptably fast.
-*/
-class vtkNeverTranslucentTextureFactory : public vtkObjectFactory
-{
-  public:
-
-    vtkNeverTranslucentTextureFactory();
-
-    static vtkNeverTranslucentTextureFactory* New();
-    virtual const char* GetVTKSourceVersion();
-    const char* GetDescription();
-
-  protected:
-    vtkNeverTranslucentTextureFactory(const vtkNeverTranslucentTextureFactory&);
-    void operator=(const vtkNeverTranslucentTextureFactory&);
-};
-
 
 #endif

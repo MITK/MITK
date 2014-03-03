@@ -44,7 +44,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   mitk::OrganTypeProperty::Pointer organTypes = mitk::OrganTypeProperty::New();
 
   // to enter a name for the segmentation
-  lblPrompt = new QLabel( "Name and color of the segmentation", this );
+  lblPrompt = new QLabel( "Choose or set a name and a color:", this );
   verticalLayout->addWidget( lblPrompt );
 
   // to choose a color
@@ -68,8 +68,6 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   verticalLayout->addLayout(horizontalLayout2);
   horizontalLayout2->addWidget( btnColor );
   horizontalLayout2->addWidget( edtName );
-
-
 
   //buttons for closing the dialog
   btnOk = new QPushButton( tr("Ok"), this );
@@ -97,6 +95,19 @@ void QmitkNewSegmentationDialog::onAcceptClicked()
 {
   m_SegmentationName = edtName->text();
   this->accept();
+}
+
+void QmitkNewSegmentationDialog::SetSegmentationName(const std::string& text)
+{
+  this->edtName->setText(text.c_str());
+}
+
+void QmitkNewSegmentationDialog::SetColor(const mitk::Color& color)
+{
+  m_Color.setRed( color.GetRed() * 255 );
+  m_Color.setGreen( color.GetGreen() * 255 );
+  m_Color.setBlue( color.GetBlue() * 255 );
+  this->btnColor->setStyleSheet(QString("background-color:rgb(%1,%2, %3)").arg(m_Color.red()).arg(m_Color.green()).arg(m_Color.blue()));
 }
 
 const QString QmitkNewSegmentationDialog::GetSegmentationName()

@@ -21,34 +21,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSurfaceInterpolationExports.h>
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkSurface.h"
-#include "mitkInteractionConst.h"
-#include "mitkColorProperty.h"
-#include "mitkProperties.h"
+#include "mitkContourModel.h"
 
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 #include "mitkReduceContourSetFilter.h"
-#include "mitkComputeContourSetNormalsFilter.h"
-
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
-#include "mitkWeakPointer.h"
-
-#include "vtkPolygon.h"
-#include "vtkPoints.h"
-#include "vtkCellArray.h"
-#include "vtkPolyData.h"
-#include "vtkSmartPointer.h"
-#include "vtkAppendPolyData.h"
-
-#include "vtkMarchingCubes.h"
-#include "vtkImageData.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "vtkProperty.h"
 
 #include "mitkProgressBar.h"
 
 namespace mitk
 {
+
+ class RestorePlanePositionOperation;
 
  class MitkSurfaceInterpolation_EXPORT SurfaceInterpolationController : public itk::Object
  {
@@ -64,24 +47,27 @@ namespace mitk
     /**
      * Adds a new extracted contour to the list
      */
-    void AddNewContour(Surface::Pointer newContour, RestorePlanePositionOperation *op);
+    void AddNewContour(ContourModel::Pointer newContour, RestorePlanePositionOperation *op);
 
     /**
-     * Interpolates the 3D surface from the given extracted contours
+     * Launches the interpolation method. A surface mesh is generated out of the given extracted contours.
      */
-    void Interpolate ();
+    void Interpolate();
 
+    /**
+     * Retrieves a surface mesh resulting from the interpolation of the given extracted contours.
+     */
     mitk::Surface::Pointer GetInterpolationResult();
 
     /**
      * Sets the minimum spacing of the current selected segmentation
-     * This is needed since the contour points we reduced before they are used to interpolate the surface
+     * This is needed since the contour points we reduced before, are used to interpolate the surface
      */
     void SetMinSpacing(double minSpacing);
 
     /**
      * Sets the minimum spacing of the current selected segmentation
-     * This is needed since the contour points we reduced before they are used to interpolate the surface
+     * This is needed since the contour points we reduced before, are used to interpolate the surface
      */
     void SetMaxSpacing(double maxSpacing);
 
@@ -89,37 +75,32 @@ namespace mitk
      * Sets the volume i.e. the number of pixels that the distance image should have
      * By evaluation we found out that 50.000 pixel delivers a good result
      */
-    void SetDistanceImageVolume(unsigned int distImageVolume);
+    void SetDistanceImageVolume(unsigned int value);
 
     /**
-     * Sets the current segmentation which is used by the interpolation
-     * This is needed because the calculation of the normals needs to now wheather a normal points inside a segmentation or not
+     * Sets the working image used by the interpolation method.
+     * This is needed because the calculation of the normals needs to now wheather a normal points toward the inside of a segmentation or not
      */
-    void SetSegmentationImage(Image* workingImage);
+    void SetWorkingImage(Image* workingImage);
 
+    /**
+     * Retrieves the input contours as a mitk::Surface
+     */
     Surface* GetContoursAsSurface();
 
-    void SetDataStorage(DataStorage::Pointer ds);
+   /**
+    * Sets the current list of contour points which is used for the surface interpolation
+    * @param activeLabel The active label in the current working image
+    */
+   void SetActiveLabel(int activeLabel);
 
-    /**
-     * Sets the current list of contourpoints which is used for the surface interpolation
-     * @param segmentation The current selected segmentation
-     */
-    void SetCurrentSegmentationInterpolationList(mitk::Image* segmentation);
+   mitk::Image* GetImage();
 
-    /**
-     * Removes the segmentation and all its contours from the list
-     * @param segmentation The segmentation to be removed
-     */
-    void RemoveSegmentationFromContourList(mitk::Image* segmentation);
-
-    mitk::Image* GetImage();
-
-    /**
-     * Estimates the memory which is needed to build up the equationsystem for the interpolation.
-     * \returns The percentage of the real memory which will be used by the interpolation
-     */
-    double EstimatePortionOfNeededMemory();
+   /**
+    * Estimates the memory that is needed to build up the equation system for the interpolation.
+    * \returns The percentage of the real memory which will be used by the interpolation calculation
+    */
+   double EstimatePortionOfNeededMemory();
 
  protected:
 
@@ -127,41 +108,47 @@ namespace mitk
 
    ~SurfaceInterpolationController();
 
-   template<typename TPixel, unsigned int VImageDimension> void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result);
+   void Initialize();
 
  private:
 
-   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
-
+//   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
+   /*
    struct ContourPositionPair {
-     Surface::Pointer contour;
+     ContourModel::Pointer contour;
      RestorePlanePositionOperation* position;
-   };
+    };
+    */
+    typedef std::pair< ContourModel::Pointer, RestorePlanePositionOperation* > ContourPositionPair;
+    typedef std::vector< ContourPositionPair > ContourPositionPairList;
+    typedef std::map<unsigned int, ContourPositionPairList> ContourListMap;
 
-    typedef std::vector<ContourPositionPair> ContourPositionPairList;
-    typedef std::map<mitk::Image* , ContourPositionPairList> ContourListMap;
-
-    ContourPositionPairList::iterator m_Iterator;
-
-    ReduceContourSetFilter::Pointer m_ReduceFilter;
-    ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;
+    //ReduceContourSetFilter::Pointer m_ReduceFilter;
+    //ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;
     CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter;
+
+    double m_MinSpacing;
+    double m_MaxSpacing;
+
+    unsigned int m_DistanceImageVolume;
+
+    Image* m_WorkingImage;
 
     Surface::Pointer m_Contours;
 
-    vtkSmartPointer<vtkPolyData> m_PolyData;
+//    vtkSmartPointer<vtkPolyData> m_PolyData;
 
-    mitk::DataStorage::Pointer m_DataStorage;
+    unsigned int m_DistImageVolume;
 
     ContourListMap m_MapOfContourLists;
 
     mitk::Surface::Pointer m_InterpolationResult;
 
-    unsigned int m_CurrentNumberOfReducedContours;
+//    unsigned int m_CurrentNumberOfReducedContours;
 
-    mitk::Image* m_SelectedSegmentation;
+    int m_ActiveLabel;
 
-    std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
+//    std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
  };
 }
 #endif

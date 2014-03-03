@@ -15,8 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSubtractContourTool.h"
-
+#include "mitkToolManager.h"
+#include "mitkLabelSetImage.h"
+#include "mitkLookupTableProperty.h"
 #include "mitkSubtractContourTool.xpm"
+
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
 
 // us
 #include <usModule.h>
@@ -29,13 +34,26 @@ namespace mitk {
 }
 
 mitk::SubtractContourTool::SubtractContourTool()
-:ContourTool(0)
+:ContourTool()
 {
-  FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
 }
 
 mitk::SubtractContourTool::~SubtractContourTool()
 {
+}
+
+void mitk::SubtractContourTool::ConnectActionsAndFunctions()
+{
+  Superclass::ConnectActionsAndFunctions();
+  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic );
+}
+
+bool mitk::SubtractContourTool::OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  m_PaintingPixelValue = 0;
+  FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+
+  return Superclass::OnMousePressed(NULL, interactionEvent);
 }
 
 const char** mitk::SubtractContourTool::GetXPM() const
@@ -62,3 +80,31 @@ const char* mitk::SubtractContourTool::GetName() const
   return "Subtract";
 }
 
+/**
+  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to the active label
+  and viceversa.
+*/
+bool mitk::SubtractContourTool::OnInvertLogic(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
+
+  m_LogicInverted = !m_LogicInverted;
+
+  if (m_LogicInverted)
+  {
+    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+    assert(workingNode);
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+    assert(workingImage);
+    m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    const mitk::Color& color = workingImage->GetActiveLabelColor();
+    FeedbackContourTool::SetFeedbackContourColor(color.GetRed(), color.GetGreen(), color.GetBlue());
+  }
+  else
+  {
+    m_PaintingPixelValue = 0;
+    FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+  }
+
+return true;
+}

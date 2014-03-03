@@ -32,7 +32,7 @@ namespace mitk {
   MITK_TOOL_MACRO(MitkSegmentation_EXPORT, AdaptiveRegionGrowingTool, "AdaptiveRegionGrowingTool");
 }
 
-mitk::AdaptiveRegionGrowingTool::AdaptiveRegionGrowingTool()
+mitk::AdaptiveRegionGrowingTool::AdaptiveRegionGrowingTool() : SegTool3D("dummy")
 {
   m_PointSetNode = mitk::DataNode::New();
   m_PointSetNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New("3D_Regiongrowing_Seedpoint"));

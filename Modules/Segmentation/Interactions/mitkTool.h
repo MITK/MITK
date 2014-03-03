@@ -210,7 +210,10 @@ namespace mitk
     virtual ~Tool();
 
     virtual void Notify( InteractionEvent* interactionEvent,bool isHandled );
-
+    DataNode* m_ReferenceNode;
+    DataNode* m_WorkingNode;
+    int m_PaintingPixelValue;
+    int m_CurrentTimeStep;
     bool FilterEvents(InteractionEvent* , DataNode* );
 
     ToolManager* m_ToolManager;
@@ -227,20 +230,8 @@ namespace mitk
     NodePredicateProperty::Pointer m_PredicateBinary;
     NodePredicateNot::Pointer m_PredicateNotBinary;
 
-    NodePredicateProperty::Pointer m_PredicateSegmentation;
-    NodePredicateNot::Pointer m_PredicateNotSegmentation;
-
-    NodePredicateProperty::Pointer m_PredicateHelper;
-    NodePredicateNot::Pointer m_PredicateNotHelper;
-
-    NodePredicateAnd::Pointer m_PredicateImageColorful;
-
-    NodePredicateAnd::Pointer m_PredicateImageColorfulNotHelper;
-
-    NodePredicateAnd::Pointer m_PredicateReference;
-
-    // for working data
-    NodePredicateAnd::Pointer m_IsSegmentationPredicate;
+    mitk::NodePredicateAnd::Pointer m_PredicateReference;
+    mitk::NodePredicateAnd::Pointer m_PredicateWorking;
 
     std::string m_InteractorType;
 
@@ -249,4 +240,3 @@ namespace mitk
 } // namespace
 
 #endif
-

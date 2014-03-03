@@ -23,12 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include "mitkProgressBar.h"
 
-#include "vtkSmartPointer.h"
-#include "vtkDoubleArray.h"
-#include "vtkCellArray.h"
-#include "vtkCellData.h"
-#include "vtkPolyData.h"
-
 #include "vnl/vnl_matrix.h"
 #include "vnl/vnl_vector.h"
 #include "vnl/vnl_vector_fixed.h"
@@ -56,12 +50,12 @@ namespace mitk {
 
          Based on the contour edge points and their normal this filter calculates a distance function with the following
          properties:
-         - Putting a point into the distance function that lies inside the considered surface gives a negativ scalar value
+         - Putting a point into the distance function that lies inside the considered surface gives a negative scalar value
          - Putting a point into the distance function that lies outside the considered surface gives a positive scalar value
          - Putting a point into the distance function that lies exactly on the considered surface gives the value zero
 
-         With this interpolated distance function a distance image will be created. The desired surface can then be extract e.g.
-         with the marching cubes algorithm. (Within the  distance image the surface goes exactly where the pixelvalues are zero)
+         With this interpolated distance function a distance image will be created. The desired surface can then be extracted e.g.
+         with the marching cubes algorithm (the extracted surface corresponds to the zero iso-surface of the distance image).
 
          Note that the obtained distance image has always an isotropig spacing. The size (in this case volume) of the image can be
          adjusted by calling SetDistanceImageVolume(unsigned int volume) which specifies the number ob pixels enclosed by the image.
@@ -96,9 +90,6 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    using Superclass::SetInput;
-
-    //Methods copied from mitkSurfaceToSurfaceFilter
     virtual void SetInput( const mitk::Surface* surface );
 
     virtual void SetInput( unsigned int idx, const mitk::Surface* surface );
@@ -109,11 +100,10 @@ namespace mitk {
 
     virtual void RemoveInputs(mitk::Surface* input);
 
-
     /**
     \brief Set the size of the output distance image. The size is specified by the image's volume
-           (i.e. in this case how many pixels are enclosed by the image)
-           If non is set, the volume will be 500000 pixels.
+           (i.e. in this case, the number of voxels enclosed by the image)
+           Default value is 500000.
     */
     itkSetMacro(DistanceImageVolume, unsigned int);
 
@@ -136,7 +126,11 @@ namespace mitk {
     */
     void SetProgressStepSize(unsigned int stepSize);
 
-    void SetReferenceImage( itk::ImageBase<3>::Pointer referenceImage );
+    /**
+      \brief Sets a reference image for
+      \a Parameter The reference image
+    */
+    void SetReferenceImage(const mitk::Image* image); //itk::ImageBase<3>::Pointer referenceImage );
 
 
   protected:
@@ -160,10 +154,10 @@ namespace mitk {
     *
     * This method iterates over all input-points and transforms them from
     * world-coordinates to index-coordinates using the transform of the
-    * reference-Image.
+    * reference image.
     * Next, the minimal and maximal index-coordinates are determined that
-    * span an area that contains all given input-points.
-    * These index-coordinates are then transformed back to world-coordinates.
+    * span an area that contains all given input points.
+    * These index coordinates are then transformed back to world coordinates.
     *
     * These minimal and maximal points are then set to the given variables.
     */
@@ -175,7 +169,10 @@ namespace mitk {
 
     void FillImageRegion(DistanceImageType::RegionType reqRegion, DistanceImageType::PixelType pixelValue, DistanceImageType::Pointer image);
 
-    //Datastructures for the interpolation
+    template<typename TPixel, unsigned int VImageDimension>
+    void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& output);
+
+    //Data structures for the interpolation method
     CenterList m_Centers;
     NormalList m_Normals;
     FunctionValues m_FunctionValues;

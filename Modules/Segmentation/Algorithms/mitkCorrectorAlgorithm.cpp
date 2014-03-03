@@ -19,12 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageDataItem.h"
 #include "mitkContourUtils.h"
-#include "mitkLegacyAdaptors.h"
-
-#include <mitkContourModelUtils.h>
 
 mitk::CorrectorAlgorithm::CorrectorAlgorithm()
-:ImageToImageFilter()
+:ImageToImageFilter(), m_TimeStep(0)
 {
 }
 
@@ -47,10 +44,12 @@ void mitk::CorrectorAlgorithm::GenerateData()
     itkExceptionMacro("CorrectorAlgorithm needs a Contour object as input.");
   }
 
-  // copy the input (since m_WorkingImage will be changed later)
-  m_WorkingImage = inputImage;
+   // copy the input (since m_WorkingImage will be changed later)
+  m_WorkingImage = Image::New();
+  m_WorkingImage->Initialize( inputImage );
+  m_WorkingImage->SetVolume( inputImage.GetPointer()->GetData() );
 
-  TimeGeometry::Pointer originalGeometry = NULL;
+  TimeGeometry::Pointer originalGeometry;
 
   if (inputImage->GetTimeGeometry() )
   {
@@ -127,38 +126,38 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   std::vector<TSegData> segData;
   segData.reserve( 16 );
 
+  ContourModel* contour3D = const_cast<ContourModel*>(m_Contour.GetPointer());
+  ContourModel::Pointer projectedContour = ContourModel::New();
+  const mitk::Geometry3D* sliceGeometry = m_WorkingImage->GetGeometry();
+  mitk::ContourUtils::ProjectContourTo2DSlice( sliceGeometry, contour3D, projectedContour );
 
-  ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice( m_WorkingImage, m_Contour, true, false );
-
-  if (projectedContour.IsNull())
+  if (projectedContour->IsEmpty( m_TimeStep ))
   {
     delete[] _ofsArray;
     return;
   }
 
-  if (projectedContour->GetNumberOfVertices() < 2)
+  if (projectedContour->GetNumberOfVertices(m_TimeStep) < 2)
   {
     delete[] _ofsArray;
     return;
   }
 
   // convert the projected contour into a ipSegmentation format
-  mitkIpInt4_t* _points = new mitkIpInt4_t[2 * projectedContour->GetNumberOfVertices()];
-  ContourModel::VertexIterator iter = projectedContour->Begin();
-  ContourModel::VertexIterator end = projectedContour->End();
+  mitkIpInt4_t* _points = new mitkIpInt4_t[2 * projectedContour->GetNumberOfVertices(m_TimeStep)];
+ // const ContourModel::PathType::VertexListType* pointsIn2D = projectedContour->GetContourPath()->GetVertexList();
   unsigned int index(0);
-
-  while( iter != end)
+  for ( ContourModel::ConstVertexIterator iter = projectedContour->Begin();
+        iter != projectedContour->End();
+        ++iter, ++index )
   {
     _points[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)->Coordinates[0] + 0.5 );
     _points[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)->Coordinates[1] + 0.5 );
-    ++index;
-    iter++;
   }
 
   // store ofsets of the drawn line in array
   int _ofsNum = 0;
-  unsigned int num = projectedContour->GetNumberOfVertices();
+  unsigned int num = projectedContour->GetNumberOfVertices(m_TimeStep);
   int lastOfs = -1;
   for (unsigned int i=0; i<num-1; i++)
   {
@@ -285,8 +284,8 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   if (contourPoints)
   {
 
-    // copy point from float* to mitk::ContourModel
-    ContourModel::Pointer contourInImageIndexCoordinates = mitk::ContourModel::New();
+    // copy point from float* to mitk::Contour
+    ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
@@ -295,12 +294,12 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
       newPoint[1] = contourPoints[ 2 * index + 1];
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex( newPoint );
+      contourInImageIndexCoordinates->AddVertex( newPoint, m_TimeStep );
     }
 
     free(contourPoints);
 
-    mitk::ContourModelUtils::FillContourInSlice( contourInImageIndexCoordinates, m_WorkingImage );
+//    mitk::ContourUtils::FillContourInSlice( contourInImageIndexCoordinates, m_WorkingImage, 1, m_TimeStep );
   }
 
   delete[] _ofsArray;

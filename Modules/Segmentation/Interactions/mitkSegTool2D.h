@@ -21,14 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSegmentationExports.h>
 #include "mitkTool.h"
 #include "mitkImage.h"
-
 #include "mitkStateEvent.h"
 #include "mitkInteractionPositionEvent.h"
-
 #include "mitkPlanePositionManager.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkInteractionConst.h"
-
+#include "mitkToolCommand.h"
 #include <mitkDiffSliceOperation.h>
 
 
@@ -76,9 +74,14 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
     void SetShowMarkerNodes(bool);
 
     /**
-     * \brief Enables or disables the 3D interpolation after writing back the 2D segmentation result, and defaults to true.
+     * \brief Enables or disables the 3D interpolation after writing back the 2D segmentation result, and defaults to false.
      */
     void SetEnable3DInterpolation(bool);
+
+    /**
+     * \brief Enables or disables the 2D interpolation after writing back the 2D segmentation result, and defaults to false.
+     */
+    void SetEnable2DInterpolation(bool);
 
   protected:
 
@@ -118,6 +121,8 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
     */
     Image::Pointer GetAffectedReferenceSlice(const InteractionPositionEvent*);
 
+    void WritePreviewOnWorkingImage( Image* targetSlice, Image* sourceSlice, int paintingPixelValue, int timestep );
+
     void WriteBackSegmentationResult (const InteractionPositionEvent*, Image*);
 
     void WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image*, unsigned int timeStep);
@@ -129,20 +134,24 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
 
     unsigned int AddContourmarker ( const InteractionPositionEvent* );
 
-    void InteractiveSegmentationBugMessage( const std::string& message );
+    BaseRenderer*  m_LastEventSender;
+    int  m_LastEventSlice;
+    bool m_3DInterpolationEnabled;
+    bool m_2DInterpolationEnabled;
 
-    BaseRenderer*         m_LastEventSender;
-    unsigned int          m_LastEventSlice;
+    ToolCommand::Pointer m_ProgressCommand;
 
   private:
     //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;
 
     bool m_ShowMarkerNodes;
-    bool m_3DInterpolationEnabled;
 
     DiffSliceOperation* m_doOperation;
     DiffSliceOperation* m_undoOperation;
+
+    template<typename TPixel, unsigned int VImageDimension>
+    void InternalWritePreviewOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, int pixelvalue );
 };
 
 } // namespace

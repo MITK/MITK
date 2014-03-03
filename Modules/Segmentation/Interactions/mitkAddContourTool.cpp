@@ -15,8 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkAddContourTool.h"
-
+#include "mitkToolManager.h"
+#include "mitkLabelSetImage.h"
 #include "mitkAddContourTool.xpm"
+
+#include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
 
 // us
 #include <usModule.h>
@@ -29,12 +33,37 @@ namespace mitk {
 }
 
 mitk::AddContourTool::AddContourTool()
-:ContourTool(1)
+:ContourTool()
 {
+
 }
 
 mitk::AddContourTool::~AddContourTool()
 {
+}
+
+void mitk::AddContourTool::ConnectActionsAndFunctions()
+{
+  Superclass::ConnectActionsAndFunctions();
+  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic );
+}
+
+bool mitk::AddContourTool::OnMousePressed (StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  if (this->CanHandleEvent(interactionEvent) > 0.0)
+  {
+
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
+    assert (workingImage);
+
+    m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    const mitk::Color& color = workingImage->GetActiveLabelColor();
+    this->SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+
+    return Superclass::OnMousePressed(NULL, interactionEvent);
+  }
+  else
+    return false;
 }
 
 const char** mitk::AddContourTool::GetXPM() const
@@ -61,3 +90,22 @@ const char* mitk::AddContourTool::GetName() const
   return "Add";
 }
 
+bool mitk::AddContourTool::OnInvertLogic(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  if ( FeedbackContourTool::CanHandleEvent(interactionEvent) < 1.0 ) return false;
+  m_LogicInverted = !m_LogicInverted;
+  if (m_LogicInverted)
+  {
+    m_PaintingPixelValue = 0;
+    FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+  }
+  else
+  {
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
+    assert (workingImage);
+    m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    const mitk::Color& color = workingImage->GetActiveLabelColor();
+    FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+  }
+  return true;
+}

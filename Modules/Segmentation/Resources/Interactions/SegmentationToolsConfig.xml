@@ -10,7 +10,7 @@ Global variant    Event class   Button/Key      Modifiers
 <config>
   <!-- Undeclared tags are filled with standard values -->
   <!-- Mouse Events -->
-  
+
   <!-- MousePressEvents -->
   <event_variant class="MousePressEvent" name="PrimaryButtonPressed">
     <attribute name="EventButton" value="LeftMouseButton"/>
@@ -34,12 +34,12 @@ Global variant    Event class   Button/Key      Modifiers
     <attribute name="EventButton" value="RightMouseButton"/>
     <attribute name="Modifiers" value="shift"/>
   </event_variant>
-  
+
   <event_variant class="MouseDoubleClickEvent" name="PrimaryButtonDoubleClick">
     <attribute name="EventButton" value="LeftMouseButton" />
   </event_variant>
 
-  
+
   <!-- MouseMoveEvents -->
   <event_variant class="MouseMoveEvent" name="MouseMove"/>
   <event_variant class="MouseMoveEvent" name="PrimaryButtonMoved">
@@ -52,7 +52,7 @@ Global variant    Event class   Button/Key      Modifiers
     <attribute name="ButtonState" value="LeftMouseButton"/>
     <attribute name="Modifiers" value="ctrl"/>
   </event_variant>
-  
+
   <!-- MouseReleaseEvents -->
   <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
     <attribute name="EventButton" value="LeftMouseButton"/>
@@ -68,7 +68,7 @@ Global variant    Event class   Button/Key      Modifiers
     <attribute name="EventButton" value="RightMouseButton"/>
     <attribute name="Modifiers" value="ctrl"/>
   </event_variant>
-  
+
    <!-- MouseWheelEvents -->
   <event_variant class="MouseWheelEvent" name="StdMouseWheelUp">
     <attribute name="ScrollDirection" value="up"/>
@@ -76,7 +76,7 @@ Global variant    Event class   Button/Key      Modifiers
   <event_variant class="MouseWheelEvent" name="StdMouseWheelDown">
     <attribute name="ScrollDirection" value="down"/>
   </event_variant>
-  
+
   <!-- Key Events -->
   <!--<event_variant class="InteractionKeyEvent" name="KeyDelete">
     <attribute name="Key" value="DEL"/>

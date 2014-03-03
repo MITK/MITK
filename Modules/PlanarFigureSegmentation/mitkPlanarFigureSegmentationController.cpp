@@ -180,9 +180,10 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
     return m_SegmentationAsImage;
   }
 
-  itk::ImageBase<3>::Pointer itkImage;
-  AccessFixedDimensionByItk_1( m_ReferenceImage.GetPointer(), GetImageBase, 3, itkImage );
-  m_DistanceImageCreator->SetReferenceImage( itkImage.GetPointer() );
+  //itk::ImageBase<3>::Pointer itkImage;
+  //AccessFixedDimensionByItk_1( m_ReferenceImage.GetPointer(), GetImageBase, 3, itkImage );
+  //m_DistanceImageCreator->SetReferenceImage( itkImage.GetPointer() );
+  m_DistanceImageCreator->SetReferenceImage( m_ReferenceImage );
 
   m_ReduceFilter->Update();
   m_NormalsFilter->Update();
@@ -195,7 +196,7 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
   m_DistanceImageCreator = NULL;
   m_NormalsFilter = NULL;
   m_ReduceFilter = NULL;
-  itkImage = NULL;
+ // itkImage = NULL;
 
   // If this bool flag is true, the distanceImage will be written to the
   // filesystem as nrrd-image and as surface-representation.

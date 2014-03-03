@@ -19,14 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include <MitkSegmentationUIExports.h>
-#include "mitkFastMarchingTool.h"
 
-class ctkSliderWidget;
-class ctkRangeWidget;
-class QPushButton;
+namespace mitk {
+  class FastMarchingTool;
+}
 
-#include "QmitkStepperAdapter.h"
-
+#include "ui_QmitkFastMarchingToolGUIControls.h"
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
 \brief GUI for mitk::FastMarchingTool.
@@ -41,46 +39,38 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  void OnThresholdChanged(int current);
+  void OnSigmaValueSet(mitk::ScalarType value);
+  void OnAlphaValueSet(mitk::ScalarType value);
+  void OnBetaValueSet(mitk::ScalarType value);
+  void OnStopValueSet(mitk::ScalarType value);
 
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
 
-    void OnThresholdChanged(double, double);
     void OnAlphaChanged(double);
     void OnBetaChanged(double);
     void OnSigmaChanged(double);
-    void OnStoppingValueChanged(double);
-    void OnConfirmSegmentation();
-    void Refetch();
-    void SetStepper(mitk::Stepper *);
+    void OnStopValueChanged(double);
+    void OnAcceptPreview();
+    void OnCancel();
     void OnClearSeeds();
+    void OnNewLabel();
+    void OnShowInformation(bool);
+    void OnShowAdvancedControls(bool);
 
 protected:
 
   QmitkFastMarchingToolGUI();
   virtual ~QmitkFastMarchingToolGUI();
 
-  void Update();
-
   void BusyStateChanged(bool);
 
-  ctkRangeWidget*  m_slwThreshold;
-  ctkSliderWidget* m_slStoppingValue;
-  ctkSliderWidget* m_slSigma;
-  ctkSliderWidget* m_slAlpha;
-  ctkSliderWidget* m_slBeta;
+  Ui::QmitkFastMarchingToolGUIControls m_Controls;
 
-  QPushButton* m_btConfirm;
-  QPushButton* m_btClearSeeds;
+  mitk::FastMarchingTool* m_FastMarchingTool;
 
-  mitk::FastMarchingTool::Pointer m_FastMarchingTool;
-
-  bool m_TimeIsConnected;
-  mitk::Stepper::Pointer m_TimeStepper;
-
-  void OnFastMarchingToolReady();
+  bool m_SelfCall;
 };
 
 #endif

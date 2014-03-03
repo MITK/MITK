@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cv.h"
 
 namespace mitk {
-
 bool ConvertGrayscaleOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 {
   // there is nothing to do if the image is grayscale already
@@ -29,11 +28,9 @@ bool ConvertGrayscaleOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 
   cv::cvtColor(image, buffer, CV_RGB2GRAY, 1);
 
-  // content of buffer should now be the conten of image
-  image.release();
-  image = buffer;
+  // content of buffer should now be the content of image
+  buffer.copyTo(image);
 
   return true;
 }
-
 } // namespace mitk

@@ -19,11 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cv.h"
 
 namespace mitk {
-
 CropOpenCVImageFilter::CropOpenCVImageFilter( )
   : m_NewCropRegionSet(false)
 {
-
 }
 
 bool CropOpenCVImageFilter::OnFilterImage( cv::Mat& image )
@@ -55,9 +53,9 @@ bool CropOpenCVImageFilter::OnFilterImage( cv::Mat& image )
     }
   }
 
+  // crop image and copy cropped region into the input image
   cv::Mat buffer = image(m_CropRegion);
-  image.release();
-  image = buffer;
+  buffer.copyTo(image);
 
   return true;
 }
@@ -101,5 +99,4 @@ bool CropOpenCVImageFilter::GetIsCropRegionEmpty( )
 {
   return m_CropRegion.width == 0;
 }
-
 } // namespace mitk

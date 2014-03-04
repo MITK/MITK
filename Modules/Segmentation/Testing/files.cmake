@@ -1,4 +1,5 @@
 set(MODULE_TESTS
+  mitkComputeContourSetNormalsFilterTest.cpp
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
   mitkDataNodeSegmentationTest.cpp

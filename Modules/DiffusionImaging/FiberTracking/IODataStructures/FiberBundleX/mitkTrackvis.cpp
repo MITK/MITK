@@ -16,14 +16,15 @@ short TrackVis::create(string filename , mitk::FiberBundleX *fib)
         {
             hdr.dim[i]            = fib->GetReferenceImage()->GetDimension(i);
             hdr.voxel_size[i]     = fib->GetReferenceImage()->GetGeometry()->GetSpacing().GetElement(i);
-            hdr.origin[i]         = fib->GetReferenceImage()->GetGeometry()->GetOrigin().GetElement(i);
+            m_Origin[i]         = fib->GetReferenceImage()->GetGeometry()->GetOrigin().GetElement(i);
         }
         else
         {
             hdr.dim[i]            = 1;
             hdr.voxel_size[i]     = 1;
-            hdr.origin[i]         = 0;
+            m_Origin[i]         = 0;
         }
+        hdr.origin[i] = 0;
     }
     hdr.n_scalars = 0;
     hdr.n_properties = 0;
@@ -46,7 +47,6 @@ short TrackVis::create(string filename , mitk::FiberBundleX *fib)
     hdr.n_count = 0;
     hdr.version = 1;
     hdr.hdr_size = 1000;
-
 
     // write the header to the file
     fp = fopen(filename.c_str(),"w+b");
@@ -110,9 +110,9 @@ short TrackVis::append(mitk::FiberBundleX *fib)
         {
             double* p = points->GetPoint(i);
 
-            tmp[pos++] = p[0] - hdr.origin[0];
-            tmp[pos++] = p[1] - hdr.origin[1];
-            tmp[pos++] = p[2] - hdr.origin[2];
+            tmp[pos++] = p[0] - m_Origin[0];
+            tmp[pos++] = p[1] - m_Origin[1];
+            tmp[pos++] = p[2] - m_Origin[2];
         }
 
         // write the coordinates to the file
@@ -155,10 +155,6 @@ short TrackVis::read( mitk::FiberBundleX* fib )
         {
             if (fread((char*)tmp, 1, 12, fp) == 0)
                 MITK_ERROR << "TrackVis::read: Error during read.";
-
-            tmp[0] += hdr.origin[0];
-            tmp[1] += hdr.origin[1];
-            tmp[2] += hdr.origin[2];
 
             vtkIdType id = vtkNewPoints->InsertNextPoint(tmp);
             container->GetPointIds()->InsertNextId(id);

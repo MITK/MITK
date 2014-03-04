@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, ConnectedRegionSelectorTool3D, "ConnectedRegionSelectorTool3D");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, ConnectedRegionSelectorTool3D, "ConnectedRegionSelectorTool3D");
 }
 
 mitk::ConnectedRegionSelectorTool3D::ConnectedRegionSelectorTool3D() : SegTool3D("PressMoveReleaseAndPointSetting")

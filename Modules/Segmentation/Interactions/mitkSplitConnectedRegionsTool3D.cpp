@@ -43,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, SplitConnectedRegionsTool3D, "SplitConnectedRegionsTool3D");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, SplitConnectedRegionsTool3D, "SplitConnectedRegionsTool3D");
 }
 
 mitk::SplitConnectedRegionsTool3D::SplitConnectedRegionsTool3D() : SegTool3D("dummy"),

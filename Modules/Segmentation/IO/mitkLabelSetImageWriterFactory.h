@@ -16,14 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef LabelSetImageWriterFactory_H_HEADER_INCLUDED
 #define LabelSetImageWriterFactory_H_HEADER_INCLUDED
 
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
 
 namespace mitk
 {
 
-  class Segmentation_EXPORT LabelSetImageWriterFactory : public itk::ObjectFactoryBase
+  class MitkSegmentation_EXPORT LabelSetImageWriterFactory : public itk::ObjectFactoryBase
   {
   public:
 

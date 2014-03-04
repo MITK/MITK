@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkLabelSetImageReader_h
 #define __mitkLabelSetImageReader_h
 
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 #include "mitkFileReader.h"
 #include "mitkLabelSetImage.h"
 #include "mitkLabelSetImageSource.h"
@@ -31,7 +31,7 @@ namespace mitk
  * Reads a segmentation session from file
  * @ingroup Process
  */
-class Segmentation_EXPORT LabelSetImageReader : public LabelSetImageSource, public FileReader
+class MitkSegmentation_EXPORT LabelSetImageReader : public LabelSetImageSource, public FileReader
 {
   public:
     typedef LabelSetImage::PixelType            PixelType;

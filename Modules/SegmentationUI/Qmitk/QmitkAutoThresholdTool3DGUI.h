@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkAutoThresholdTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include "MitkSegmentationUIExports.h"
 #include "ui_QmitkAutoThresholdTool3DGUIControls.h"
 
 namespace mitk {
@@ -33,7 +33,7 @@ namespace mitk {
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkAutoThresholdTool3DGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkAutoThresholdTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

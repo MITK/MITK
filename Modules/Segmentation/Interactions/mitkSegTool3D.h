@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTool.h"
 
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 #include "mitkToolCommand.h"
 
 namespace mitk
@@ -29,7 +29,7 @@ namespace mitk
   \brief Superclass for tools that operate in 3D
 
 */
-class Segmentation_EXPORT SegTool3D : public Tool
+class MitkSegmentation_EXPORT SegTool3D : public Tool
 {
   public:
 

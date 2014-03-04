@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkConnectedRegionSelectorTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 
 namespace mitk {
   class ConnectedRegionSelectorTool3D;
@@ -34,14 +34,15 @@ namespace mitk {
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkConnectedRegionSelectorTool3DGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkConnectedRegionSelectorTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
 
     mitkClassMacro(QmitkConnectedRegionSelectorTool3DGUI, QmitkToolGUI);
-    itkNewMacro(QmitkConnectedRegionSelectorTool3DGUI);
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
   protected slots:
 

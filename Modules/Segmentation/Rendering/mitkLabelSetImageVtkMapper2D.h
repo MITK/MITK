@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //MITK
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 
 //MITK Rendering
 #include "mitkBaseRenderer.h"
@@ -60,7 +60,7 @@ namespace mitk {
 
  * \ingroup Mapper
  */
-class Segmentation_EXPORT LabelSetImageVtkMapper2D : public VtkMapper
+class MitkSegmentation_EXPORT LabelSetImageVtkMapper2D : public VtkMapper
 {
 
 public:

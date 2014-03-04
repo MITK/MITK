@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication.h>
 #include <QMessageBox>
 
-MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkOtsuMultipleThresholdTool3DGUI, "")
+MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkOtsuMultipleThresholdTool3DGUI, "")
 
 QmitkOtsuMultipleThresholdTool3DGUI::QmitkOtsuMultipleThresholdTool3DGUI() : QmitkToolGUI(), m_NumberOfRegions(0), m_OtsuMultipleThresholdTool3D(NULL)
 {

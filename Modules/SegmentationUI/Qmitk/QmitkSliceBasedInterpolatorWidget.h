@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSliceBasedInterpolatorWidget_h_Included
 #define QmitkSliceBasedInterpolatorWidget_h_Included
 
-#include "SegmentationUIExports.h"
+#include "MitkSegmentationUIExports.h"
 #include "mitkDataStorage.h"
 #include "mitkSegmentationInterpolationController.h"
 
@@ -58,7 +58,7 @@ namespace mitk
   Last contributor: $Author: maleike $
 */
 
-class SegmentationUI_EXPORT QmitkSliceBasedInterpolatorWidget : public QWidget
+class MitkSegmentationUI_EXPORT QmitkSliceBasedInterpolatorWidget : public QWidget
 {
   Q_OBJECT
 

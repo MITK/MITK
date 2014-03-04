@@ -44,7 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, AutoThresholdTool3D, "AutoThresholdTool3D tool");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, AutoThresholdTool3D, "AutoThresholdTool3D tool");
 }
 
 mitk::AutoThresholdTool3D::AutoThresholdTool3D() : SegTool3D("dummy")

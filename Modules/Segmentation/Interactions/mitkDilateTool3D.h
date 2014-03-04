@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkDilateTool3D_h_Included
 
 #include "mitkSegTool3D.h"
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 
 #include "itkImage.h"
 
@@ -34,7 +34,7 @@ namespace mitk
 
   This tool applies morphologic dilating on the active label.
 */
-class Segmentation_EXPORT DilateTool3D : public SegTool3D
+class MitkSegmentation_EXPORT DilateTool3D : public SegTool3D
 {
   public:
 

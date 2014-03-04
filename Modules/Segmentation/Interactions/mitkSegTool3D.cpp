@@ -39,7 +39,7 @@ const char* mitk::SegTool3D::GetGroup() const
 }
 
 //to be moved to mitkInteractionConst.h by StateMachineEditor
-const mitk::OperationType mitk::SegTool3D::OP_EXCHANGE = 717;
+//const mitk::OperationType mitk::SegTool3D::OP_EXCHANGE = 717;
 
 // constructors for operation classes
 mitk::SegTool3D::opExchangeNodes::opExchangeNodes(
@@ -51,7 +51,7 @@ mitk::SegTool3D::opExchangeNodes::opExchangeNodes(
 void mitk::SegTool3D::ExecuteOperation (mitk::Operation *operation)
 {
   if (!operation) return;
-
+  /*
   switch (operation->GetOperationType())
   {
     case OP_EXCHANGE:
@@ -63,6 +63,7 @@ void mitk::SegTool3D::ExecuteOperation (mitk::Operation *operation)
       }
     default:;
   }
+  */
 }
 
 void mitk::SegTool3D::AcceptPreview()

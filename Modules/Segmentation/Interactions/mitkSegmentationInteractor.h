@@ -17,7 +17,7 @@
 #ifndef mitkSegmentationInteractor_h
 #define mitkSegmentationInteractor_h
 
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 #include "mitkDisplayInteractor.h"
 
 namespace mitk
@@ -31,7 +31,7 @@ namespace mitk
    * @ingroup Interaction
    **/
 
-  class Segmentation_EXPORT SegmentationInteractor: public DisplayInteractor
+  class MitkSegmentation_EXPORT SegmentationInteractor: public DisplayInteractor
   {
   public:
     mitkClassMacro(SegmentationInteractor, DisplayInteractor)

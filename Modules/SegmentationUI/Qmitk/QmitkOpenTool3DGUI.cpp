@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkNewSegmentationDialog.h>
 #include <QApplication.h>
 
-MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkOpenTool3DGUI, "")
+MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkOpenTool3DGUI, "")
 
 QmitkOpenTool3DGUI::QmitkOpenTool3DGUI() : QmitkToolGUI(), m_OpenTool3D(NULL)
 {

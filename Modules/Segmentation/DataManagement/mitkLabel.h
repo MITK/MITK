@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkLabel_H_
 #define __mitkLabel_H_
 
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 #include <mitkColorProperty.h>
 #include <mitkVector.h>
 
@@ -33,7 +33,7 @@ namespace mitk
 //## @brief A data structure describing a label.
 //## @ingroup Data
 //##
-class Segmentation_EXPORT Label : public itk::Object
+class MitkSegmentation_EXPORT Label : public itk::Object
 {
 public:
 

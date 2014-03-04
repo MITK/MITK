@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, DilateTool3D, "DilateTool3D tool");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, DilateTool3D, "DilateTool3D tool");
 }
 
 

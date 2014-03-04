@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkKeepNConnectedRegionsTool3DGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkKeepNConnectedRegionsTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

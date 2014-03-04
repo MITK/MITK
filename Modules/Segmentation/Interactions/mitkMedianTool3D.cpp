@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, MedianTool3D, "MedianTool3D tool");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, MedianTool3D, "MedianTool3D tool");
 }
 
 mitk::MedianTool3D::MedianTool3D() : SegTool3D("dummy"), m_Radius(1)

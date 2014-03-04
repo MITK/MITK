@@ -17,14 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSearchLabelDialog_h_Included
 #define QmitkSearchLabelDialog_h_Included
 
-#include "SegmentationUIExports.h"
+#include "MitkSegmentationUIExports.h"
 
 #include <ui_QmitkSearchLabelDialogGUI.h>
 
 #include <QDialog>
 #include <QCompleter>
 
-class SegmentationUI_EXPORT QmitkSearchLabelDialog : public QDialog
+class MitkSegmentationUI_EXPORT QmitkSearchLabelDialog : public QDialog
 {
   Q_OBJECT
 

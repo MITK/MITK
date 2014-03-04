@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSurfaceStampWidget_h_Included
 #define QmitkSurfaceStampWidget_h_Included
 
-#include "SegmentationUIExports.h"
+#include "MitkSegmentationUIExports.h"
 
 #include <QWidget>
 
@@ -34,7 +34,7 @@ namespace mitk {
   \ingroup Widgets
 */
 
-class SegmentationUI_EXPORT QmitkSurfaceStampWidget : public QWidget
+class MitkSegmentationUI_EXPORT QmitkSurfaceStampWidget : public QWidget
 {
   Q_OBJECT
 

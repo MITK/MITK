@@ -25,7 +25,7 @@ namespace mitk
 /**
   \brief Serializes mitk::LabelSetImage for mitk::SceneIO
 */
-class Segmentation_EXPORT LabelSetImageSerializer : public BaseDataSerializer
+class MitkSegmentation_EXPORT LabelSetImageSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( LabelSetImageSerializer, BaseDataSerializer );

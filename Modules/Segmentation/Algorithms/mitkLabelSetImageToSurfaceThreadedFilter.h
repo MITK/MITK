@@ -17,13 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkLabelSetImageToSurfaceThreadedFilter_H_
 #define __mitkLabelSetImageToSurfaceThreadedFilter_H_
 
+#include <MitkSegmentationExports.h>
 #include "mitkSegmentationSink.h"
 #include "mitkSurface.h"
 
 namespace mitk
 {
 
-class Segmentation_EXPORT LabelSetImageToSurfaceThreadedFilter : public SegmentationSink
+class MitkSegmentation_EXPORT LabelSetImageToSurfaceThreadedFilter : public SegmentationSink
 {
   public:
 

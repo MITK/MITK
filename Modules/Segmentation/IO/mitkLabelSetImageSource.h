@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkLabelSetImageSource_H_
 
 #include "mitkImageSource.h"
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 
 namespace mitk {
 
@@ -30,7 +30,7 @@ class LabelSetImage;
 //## of class LabelSetImage) as output.
 //##
 //## @ingroup Process
-class Segmentation_EXPORT LabelSetImageSource : public ImageSource
+class MitkSegmentation_EXPORT LabelSetImageSource : public ImageSource
 {
 public:
   mitkClassMacro(LabelSetImageSource, ImageSource);

@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, OtsuMultipleThresholdTool3D, "Multiple Otsu Segmentation");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, OtsuMultipleThresholdTool3D, "Multiple Otsu Segmentation");
 }
 
 mitk::OtsuMultipleThresholdTool3D::OtsuMultipleThresholdTool3D() : SegTool3D("dummy"), m_NumberOfRegions(3)

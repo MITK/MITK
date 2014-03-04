@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkLabelSetImageToSurfaceFilter_H_
 
 #include <mitkSurfaceSource.h>
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 #include "mitkLabelSetImage.h"
 #include "mitkSurface.h"
 
@@ -36,7 +36,7 @@ namespace mitk
  * If you want to calculate a surface representation for all available labels,
  * you may call GenerateAllLabelsOn().
  */
-class Segmentation_EXPORT LabelSetImageToSurfaceFilter : public SurfaceSource
+class MitkSegmentation_EXPORT LabelSetImageToSurfaceFilter : public SurfaceSource
 {
 public:
 

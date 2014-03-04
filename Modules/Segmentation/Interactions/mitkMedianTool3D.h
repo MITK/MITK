@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkMedianTool3D_h_Included
 
 #include "mitkSegTool3D.h"
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 
 #include "itkImage.h"
 
@@ -36,7 +36,7 @@ namespace mitk
 
   This tool applies a median smoothing filter on the active label
 */
-class Segmentation_EXPORT MedianTool3D : public SegTool3D
+class MitkSegmentation_EXPORT MedianTool3D : public SegTool3D
 {
   public:
 

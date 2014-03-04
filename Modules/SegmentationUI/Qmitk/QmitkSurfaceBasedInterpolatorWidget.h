@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSurfaceBasedInterpolatorWidgetWidget_h_Included
 #define QmitkSurfaceBasedInterpolatorWidgetWidget_h_Included
 
-#include "SegmentationUIExports.h"
+#include "MitkSegmentationUIExports.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkSurfaceInterpolationController.h"
@@ -54,7 +54,7 @@ namespace mitk {
   visible. It triggers generation of interpolation suggestions and also triggers acception of suggestions.
 */
 
-class SegmentationUI_EXPORT QmitkSurfaceBasedInterpolatorWidget : public QWidget
+class MitkSegmentationUI_EXPORT QmitkSurfaceBasedInterpolatorWidget : public QWidget
 {
   Q_OBJECT
 

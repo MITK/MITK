@@ -34,7 +34,7 @@ namespace mitk {
 
   Last contributor: $Author$
 */
-class SegmentationUI_EXPORT QmitkOpenTool3DGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkOpenTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

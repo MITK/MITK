@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFillHolesTool3D.h>
 #include <QApplication.h>
 
-MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkFillHolesTool3DGUI, "")
+MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkFillHolesTool3DGUI, "")
 
 QmitkFillHolesTool3DGUI::QmitkFillHolesTool3DGUI() : QmitkToolGUI(), m_FillHolesTool3D(NULL)
 {

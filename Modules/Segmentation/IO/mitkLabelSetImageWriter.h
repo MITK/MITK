@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkLabelSetImageWriter_h
 #define __mitkLabelSetImageWriter_h
 
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 #include <mitkFileWriterWithInformation.h>
 #include <mitkLabelSetImage.h>
 
@@ -28,7 +28,7 @@ namespace mitk
  * Writes a segmentation session to a file
  * @ingroup Process
  */
-class Segmentation_EXPORT LabelSetImageWriter : public mitk::FileWriterWithInformation
+class MitkSegmentation_EXPORT LabelSetImageWriter : public mitk::FileWriterWithInformation
 {
 public:
 

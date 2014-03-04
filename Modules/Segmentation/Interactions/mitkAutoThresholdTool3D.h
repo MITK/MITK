@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkAutoThresholdTool3D_H
 
 #include "mitkSegTool3D.h"
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 
 #include "itkImage.h"
 
@@ -26,7 +26,7 @@ class ModuleResource;
 }
 
 namespace mitk{
-  class Segmentation_EXPORT AutoThresholdTool3D : public SegTool3D
+  class MitkSegmentation_EXPORT AutoThresholdTool3D : public SegTool3D
   {
     public:
 

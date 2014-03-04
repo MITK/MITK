@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkSurfaceStampImageFilter_h__
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkSurface.h"
 
@@ -49,7 +49,7 @@ namespace mitk {
  * @ingroup SurfaceFilters
  * @ingroup Process
  */
-class Segmentation_EXPORT SurfaceStampImageFilter : public ImageToImageFilter
+class MitkSegmentation_EXPORT SurfaceStampImageFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(SurfaceStampImageFilter, ImageToImageFilter);

@@ -17,13 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkConnectedRegionSelectorTool3D_h_Included
 #define mitkConnectedRegionSelectorTool3D_h_Included
 
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 #include <mitkSegTool3D.h>
 
 namespace mitk
 {
 
-class Segmentation_EXPORT ConnectedRegionSelectorTool3D : public SegTool3D
+class MitkSegmentation_EXPORT ConnectedRegionSelectorTool3D : public SegTool3D
 {
 
 public:

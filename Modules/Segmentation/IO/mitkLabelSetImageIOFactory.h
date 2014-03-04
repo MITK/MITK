@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #pragma warning ( disable : 4786 )
 #endif
 
-#include "SegmentationExports.h"
+#include "MitkSegmentationExports.h"
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
 
@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of LabelSetImageReader objects using an object factory.
 //##
 //## @ingroup IO
-class Segmentation_EXPORT LabelSetImageIOFactory : public itk::ObjectFactoryBase
+class MitkSegmentation_EXPORT LabelSetImageIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */

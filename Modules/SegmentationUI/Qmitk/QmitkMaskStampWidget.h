@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkMaskStampWidget_h_Included
 #define QmitkMaskStampWidget_h_Included
 
-#include "SegmentationUIExports.h"
+#include "MitkSegmentationUIExports.h"
 #include "mitkDataNode.h"
 
 #include <QWidget>
@@ -35,7 +35,7 @@ namespace mitk {
   \ingroup Widgets
 */
 
-class SegmentationUI_EXPORT QmitkMaskStampWidget : public QWidget
+class MitkSegmentationUI_EXPORT QmitkMaskStampWidget : public QWidget
 {
   Q_OBJECT
 

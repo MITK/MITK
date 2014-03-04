@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkLabelSetWidget_h
 #define QmitkLabelSetWidget_h
 
-#include "SegmentationUIExports.h"
+#include "MitkSegmentationUIExports.h"
 
 #include <ui_QmitkLabelSetWidgetControls.h>
 
@@ -30,7 +30,7 @@ namespace mitk {
   class ToolManager;
 }
 
-class SegmentationUI_EXPORT QmitkLabelSetWidget : public QWidget
+class MitkSegmentationUI_EXPORT QmitkLabelSetWidget : public QWidget
 {
   Q_OBJECT
 

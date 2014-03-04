@@ -282,7 +282,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     //set the interpolation modus according to the property
     localStorage->m_LayerTextureVector[lidx]->SetInterpolate(textureInterpolation);
 
-    localStorage->m_LayerTextureVector[lidx]->SetInputData(localStorage->m_LevelWindowFilterVector[lidx]->GetOutput());
+    localStorage->m_LayerTextureVector[lidx]->SetInputConnection(localStorage->m_LevelWindowFilterVector[lidx]->GetOutputPort());
 
     this->TransformActor( renderer );
 
@@ -653,8 +653,6 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   m_OutlineActor = vtkSmartPointer<vtkActor>::New();
   m_OutlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
-
-  m_ColorMap = -1;
 
   m_NumberOfLayers = 0;
 

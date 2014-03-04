@@ -121,9 +121,6 @@ public:
     /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
     mitk::ScalarType* m_mmPerPixel;
 
-    /** \brief Currently active color map. */
-    int m_ColorMap;
-
     int m_NumberOfLayers;
 
     /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */

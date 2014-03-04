@@ -43,14 +43,14 @@ public:
   // Reduce contours with nth point
   void TestReduceContourWithNthPoint()
   {
-    mitk::Surface::Pointer contour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/SingleContour_Reference.vtk"));
+    mitk::Surface::Pointer contour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/SingleContour.vtk"));
     m_ContourReducer->SetInput(contour);
     m_ContourReducer->SetReductionType(mitk::ReduceContourSetFilter::NTH_POINT);
     m_ContourReducer->SetStepSize(20);
     m_ContourReducer->Update();
     mitk::Surface::Pointer reducedContour = m_ContourReducer->GetOutput();
 
-    mitk::Surface::Pointer reference = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/ReducedContourNthPoint_20_Reference.vtk"));
+    mitk::Surface::Pointer reference = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/ReducedContourNthPoint_20.vtk"));
 
     CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(reducedContour->GetVtkPolyData(), reference->GetVtkPolyData(), 0.000001, true));
   }
@@ -58,13 +58,13 @@ public:
   // Reduce contours with Douglas Peucker
   void TestReduceContourWithDouglasPeuker()
   {
-    mitk::Surface::Pointer contour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/TwoContours_Reference.vtk"));
+    mitk::Surface::Pointer contour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/TwoContours.vtk"));
     m_ContourReducer->SetInput(contour);
     m_ContourReducer->SetReductionType(mitk::ReduceContourSetFilter::DOUGLAS_PEUCKER);
     m_ContourReducer->Update();
     mitk::Surface::Pointer reducedContour = m_ContourReducer->GetOutput();
 
-    mitk::Surface::Pointer reference = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/ReducedContourDouglasPeucker_Reference.vtk"));
+    mitk::Surface::Pointer reference = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/ReducedContourDouglasPeucker.vtk"));
 
     CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(reducedContour->GetVtkPolyData(), reference->GetVtkPolyData(), 0.000001, true));
   }

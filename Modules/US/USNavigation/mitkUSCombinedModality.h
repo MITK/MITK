@@ -130,6 +130,10 @@ namespace mitk {
     */
     void DeserializeCalibration(const std::string &xmlString, bool clearPreviousCalibrations = true);
 
+    void SetNumberOfSmoothingValues(unsigned int numberOfSmoothingValues);
+
+    void SetDelayCount(unsigned int delayCount);
+
   protected:
     USCombinedModality(USDevice::Pointer usDevice, itk::SmartPointer<NavigationDataSource> trackingDevice, std::string manufacturer = "", std::string model = "");
     virtual ~USCombinedModality();
@@ -172,12 +176,18 @@ namespace mitk {
 
     std::string GetIdentifierForCurrentCalibration();
 
+    void RebuildFilterPipeline();
+
     USDevice::Pointer                                      m_UltrasoundDevice;
     itk::SmartPointer<NavigationDataSource>                m_TrackingDevice;
     std::map<std::string, AffineTransform3D::Pointer>      m_Calibrations;
 
     itk::SmartPointer<mitk::NavigationDataSmoothingFilter> m_SmoothingFilter;
     itk::SmartPointer<mitk::NavigationDataDelayFilter>     m_DelayFilter;
+    itk::SmartPointer<mitk::NavigationDataSource>          m_LastFilter;
+
+    unsigned int m_NumberOfSmoothingValues;
+    unsigned int m_DelayCount;
 
   private:
     /**

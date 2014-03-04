@@ -34,17 +34,10 @@ const std::string mitk::USCombinedModality::DeviceClassIdentifier = "org.mitk.mo
 
 mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer, std::string model)
   : mitk::USDevice(manufacturer, model), m_UltrasoundDevice(usDevice), m_TrackingDevice(trackingDevice),
-  m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New()), m_DelayFilter(mitk::NavigationDataDelayFilter::New(0))
+  m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New()), m_DelayFilter(mitk::NavigationDataDelayFilter::New(0)),
+  m_NumberOfSmoothingValues(0), m_DelayCount(0)
 {
-  // build tracking filter pipeline
-  for (unsigned int i = 0; i < m_TrackingDevice->GetNumberOfOutputs(); i++)
-  {
-    m_SmoothingFilter->SetInput(i, m_TrackingDevice->GetOutput(i));
-    mitk::NavigationData::Pointer nd1 = m_TrackingDevice->GetOutput(i);
-    m_DelayFilter->SetInput(i, m_SmoothingFilter->GetOutput(i));
-    mitk::NavigationData::Pointer nd2 = m_SmoothingFilter->GetOutput(i);
-  }
-  m_SmoothingFilter->SetNumerOfValues(10);
+  this->RebuildFilterPipeline();
 
   //create a new output (for the image data)
   mitk::Image::Pointer newOutput = mitk::Image::New();
@@ -176,6 +169,34 @@ void mitk::USCombinedModality::SetCalibration (mitk::AffineTransform3D::Pointer 
   }
 }
 
+void mitk::USCombinedModality::SetNumberOfSmoothingValues(unsigned int numberOfSmoothingValues)
+{
+  unsigned int oldNumber = m_NumberOfSmoothingValues;
+  m_NumberOfSmoothingValues = numberOfSmoothingValues;
+
+  // if filter should be activated or deactivated
+  if ( ( oldNumber == 0 && numberOfSmoothingValues != 0 ) ||
+    ( oldNumber != 0 && numberOfSmoothingValues == 0 ) )
+  {
+    this->RebuildFilterPipeline();
+  }
+  m_SmoothingFilter->SetNumerOfValues(numberOfSmoothingValues);
+}
+
+void mitk::USCombinedModality::SetDelayCount(unsigned int delayCount)
+{
+  unsigned int oldCount = m_DelayCount;
+  m_DelayCount = delayCount;
+
+  // if filter should be activated or deactivated
+  if ( ( oldCount == 0 && delayCount != 0 ) ||
+    ( oldCount != 0 && delayCount == 0 ) )
+  {
+    this->RebuildFilterPipeline();
+  }
+  m_DelayFilter->SetDelay(delayCount);
+}
+
 bool mitk::USCombinedModality::OnInitialization()
 {
   if (m_UltrasoundDevice.IsNull())
@@ -293,8 +314,7 @@ void mitk::USCombinedModality::OnFreeze(bool freeze)
 
 mitk::NavigationDataSource::Pointer mitk::USCombinedModality::GetNavigationDataSource()
 {
-  //return m_DelayFilter.GetPointer();
-  return m_TrackingDevice.GetPointer();
+  return m_LastFilter.GetPointer();
 }
 
 bool mitk::USCombinedModality::GetIsCalibratedForCurrentStatus()
@@ -444,4 +464,27 @@ std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
   }
 
   return probeName + depth;
+}
+
+void mitk::USCombinedModality::RebuildFilterPipeline()
+{
+  m_LastFilter = m_TrackingDevice;
+
+  if ( m_NumberOfSmoothingValues > 0 )
+  {
+    for (unsigned int i = 0; i < m_TrackingDevice->GetNumberOfOutputs(); i++)
+    {
+      m_SmoothingFilter->SetInput(i, m_LastFilter->GetOutput(i));
+    }
+    m_LastFilter = m_SmoothingFilter;
+  }
+
+  if ( m_DelayCount > 0 )
+  {
+    for (unsigned int i = 0; i < m_TrackingDevice->GetNumberOfOutputs(); i++)
+    {
+      m_DelayFilter->SetInput(i, m_LastFilter->GetOutput(i));
+    }
+    m_LastFilter = m_DelayFilter;
+  }
 }

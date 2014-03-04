@@ -30,7 +30,7 @@ public:
 
   static std::string GetSerializedReference()
   {
-    return "<calibrations>\n<default0 M00=\"1.1234\" M01=\"1.2234\" M02=\"1.3234\" M10=\"1.4234\" M11=\"1.5234\" M12=\"1.6234\" M20=\"1.7234\" M21=\"1.8234\" M22=\"1.9234\" O0=\"2.1234\" O1=\"2.2234\" O2=\"2.3234\" />\n</calibrations>\n";
+    return "<calibrations>\n<default0 M00=\"1.1234\" M01=\"1.2234\" M02=\"1.3234\" M10=\"1.4234\" M11=\"1.5234\" M12=\"1.6234\" M20=\"1.7234\" M21=\"1.8234\" M22=\"1.9234\" T0=\"2.1234\" T1=\"2.2234\" T2=\"2.3234\" />\n</calibrations>\n";
   }
 
   static bool CompareDoubles (double A, double B)
@@ -87,6 +87,8 @@ public:
 
     modality->SetCalibration(transform);
 
+    //MITK_INFO << modality->SerializeCalibration();
+    //MITK_INFO << GetSerializedReference();
     MITK_TEST_CONDITION_REQUIRED(modality->SerializeCalibration() == GetSerializedReference(), "Testing correct Serialization...");
   }
 
@@ -117,6 +119,45 @@ public:
 
     MITK_TEST_CONDITION_REQUIRED(identical, "Testing if deserialized calibration is identical to serialized one...");
   }
+
+  static void TestFilterPipeline()
+  {
+    /*mitk::USCombinedModality::Pointer combinedModality = mitkCombinedModalityTestClass::CreateModality();
+    MITK_INFO << combinedModality->GetNavigationDataSource()->GetNameOfClass();
+    MITK_TEST_CONDITION(strcmp(combinedModality->GetNavigationDataSource()->GetNameOfClass(), "TrackingDeviceSource") == 0,
+                        "")*/
+
+    mitk::USVideoDevice::Pointer  usDevice =  mitk::USVideoDevice::New("IllegalPath", "Manufacturer", "Model");
+    mitk::VirtualTrackingDevice::Pointer tracker = mitk::VirtualTrackingDevice::New();
+    tracker->AddTool("tool1");
+    tracker->AddTool("tool2");
+    mitk::TrackingDeviceSource::Pointer source = mitk::TrackingDeviceSource::New();
+    source->SetTrackingDevice(tracker);
+    source->Connect();
+    source->StartTracking();
+    mitk::USCombinedModality::Pointer modality = mitk::USCombinedModality::New(usDevice.GetPointer(), source.GetPointer(), "MBI", "EchoTrack");
+
+    MITK_TEST_CONDITION(source->GetOutput(0) == modality->GetNavigationDataSource()->GetOutput(0),
+                        "Navigation data output of the Combined Modality should be the same as the source output as no filters are active.")
+
+    modality->SetNumberOfSmoothingValues(2);
+
+    mitk::NavigationDataSource::Pointer smoothingFilter = modality->GetNavigationDataSource();
+    MITK_TEST_CONDITION(source->GetOutput(0) != smoothingFilter->GetOutput(0),
+                        "Navigation data output of the Combined Modality should be different to the source output as smoothing filter is active.")
+
+    modality->SetNumberOfSmoothingValues(0);
+    MITK_TEST_CONDITION(source->GetOutput(0) == modality->GetNavigationDataSource()->GetOutput(0),
+                        "Navigation data output of the Combined Modality should be the same as the source output again.")
+
+    modality->SetDelayCount(5);
+    MITK_TEST_CONDITION(source->GetOutput(0) != smoothingFilter->GetOutput(0),
+                        "Navigation data output of the Combined Modality should be different to the source output as delay filter is active.")
+
+    modality->SetDelayCount(0);
+    MITK_TEST_CONDITION(source->GetOutput(0) == modality->GetNavigationDataSource()->GetOutput(0),
+                        "Navigation data output of the Combined Modality should be the same as the source output again.")
+  }
 };
 
 /**
@@ -129,6 +170,7 @@ int mitkCombinedModalityTest(int /* argc */, char* /*argv*/[])
   mitkCombinedModalityTestClass::TestInstantiation();
   mitkCombinedModalityTestClass::TestSerialization();
   mitkCombinedModalityTestClass::TestDeserialization();
+  mitkCombinedModalityTestClass::TestFilterPipeline();
 
   MITK_TEST_END();
 }

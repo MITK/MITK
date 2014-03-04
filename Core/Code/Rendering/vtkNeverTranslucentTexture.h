@@ -19,7 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkOpenGLTexture.h>
 
-#include <MitkExports.h>
+#include <MitkCoreExports.h>
+
+#include <vtkObjectFactory.h>
 
 /**
   \brief VTK Fix to speed up our image rendering.
@@ -78,5 +80,31 @@ private:
   vtkNeverTranslucentTexture(const vtkNeverTranslucentTexture&);  // Not implemented.
   void operator=(const vtkNeverTranslucentTexture&);  // Not implemented.
 };
+
+
+/**
+  \brief Factory for vtkNeverTranslucentTexture (see this class!).
+
+  Registered in CoreActivator to replace all instances of vtkTexture
+  with vtkNeverTranslucentTexture.
+
+  Required to make rendering of images during level/window operations
+  acceptably fast.
+*/
+class vtkNeverTranslucentTextureFactory : public vtkObjectFactory
+{
+  public:
+
+    vtkNeverTranslucentTextureFactory();
+
+    static vtkNeverTranslucentTextureFactory* New();
+    virtual const char* GetVTKSourceVersion();
+    const char* GetDescription();
+
+  protected:
+    vtkNeverTranslucentTextureFactory(const vtkNeverTranslucentTextureFactory&);
+    void operator=(const vtkNeverTranslucentTextureFactory&);
+};
+
 
 #endif

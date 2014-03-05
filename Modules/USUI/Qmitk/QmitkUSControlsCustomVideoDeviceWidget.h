@@ -18,8 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkUSControlsCustomVideoDeviceWidget_H
 
 #include "QmitkUSAbstractCustomWidget.h"
-
 #include "mitkUSVideoDeviceCustomControls.h"
+
+#include "mitkUSVideoDevice.h"
 
 namespace Ui {
 class QmitkUSControlsCustomVideoDeviceWidget;
@@ -69,6 +70,9 @@ public:
     * control interface is null, the control elements stay disabled.
     */
   virtual void OnDeviceSet();
+
+protected:
+  mitk::USImageVideoSource::USImageCropping m_Cropping;
 
 private:
   Ui::QmitkUSControlsCustomVideoDeviceWidget*         ui;

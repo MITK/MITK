@@ -526,7 +526,9 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
 
  // toolbar for showing file open, undo, redo and other main actions
  QToolBar* mainActionsToolBar = new QToolBar;
+ mainActionsToolBar->setObjectName("mainActionsToolBar");
  mainActionsToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+
 #ifdef __APPLE__
  mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextUnderIcon );
 #else
@@ -662,6 +664,7 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
 
   // ==== Perspective Toolbar ==================================
  QToolBar* qPerspectiveToolbar = new QToolBar;
+ qPerspectiveToolbar->setObjectName("perspectiveToolBar");
 
  if (showPerspectiveToolbar)
  {
@@ -673,6 +676,7 @@ if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()
 
  // ==== View Toolbar ==================================
  QToolBar* qToolbar = new QToolBar;
+ qToolbar->setObjectName("viewToolBar");
 
  std::map<std::string, berry::IViewDescriptor::Pointer>::const_iterator
   MapIter;

@@ -14,9 +14,9 @@ if(NOT DCMTK_FOUND)
   message(SEND_ERROR "DCMTK development files not found.\n Please check variables (e.g. DCMTK_DIR) for include directories and libraries.\nYou may set environment variable DCMTK_DIR before pressing 'configure'")
 endif(NOT DCMTK_FOUND)
 
-if( NOT WIN32 )
+if( NOT WIN32 AND NOT APPLE )
   set(MISSING_LIBS_REQUIRED_BY_DCMTK wrap tiff z)
-endif( NOT WIN32 )
+endif( NOT WIN32 AND NOT APPLE )
 
 set(QT_USE_QTSQL 1)
 

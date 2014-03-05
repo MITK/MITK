@@ -131,7 +131,8 @@ struct MITK_CORE_EXPORT IShaderRepository
   /** \brief Applies shader and shader specific variables of the specified DataNode
    * to the VTK object by updating the shader variables of its vtkProperty.
    */
-  virtual ShaderProgram::Pointer GetShaderProgramAndApplyProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, itk::TimeStamp& MTime) const = 0;
+  virtual ShaderProgram::Pointer UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer & shaderProgram, mitk::DataNode* node,
+                                                     mitk::BaseRenderer* renderer, const itk::TimeStamp& MTime) const = 0;
 
   /** \brief Loads a shader from a given file. Make sure that this stream is in the XML shader format.
    *

@@ -142,7 +142,7 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
 
       VtkMapperLocalStorage()
       {
-
+        m_ShaderProgram = mitk::IShaderRepository::ShaderProgram::New();
       }
 
       ~VtkMapperLocalStorage()

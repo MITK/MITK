@@ -466,7 +466,7 @@ mitk::IShaderRepository::Shader::Pointer mitk::VtkShaderRepository::GetShader(in
   return IShaderRepository::Shader::Pointer();
 }
 
-mitk::IShaderRepository::ShaderProgram::Pointer mitk::VtkShaderRepository::GetShaderProgramAndApplyProperties(DataNode* node, BaseRenderer* renderer, itk::TimeStamp& MTime) const
+mitk::IShaderRepository::ShaderProgram::Pointer mitk::VtkShaderRepository::UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer & shaderProgram, DataNode* node, BaseRenderer* renderer, itk::TimeStamp& MTime) const
 {
   vtkXMLMaterial* xmlMaterial = GetXMLMaterial(node,renderer,MTime);
   //SHADERTODO

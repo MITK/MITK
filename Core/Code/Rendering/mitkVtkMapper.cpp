@@ -86,12 +86,12 @@ void mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 
 void mitk::VtkMapper::ApplyShaderProperties(mitk::BaseRenderer* renderer)
 {
-  //VtkMapperLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  VtkMapperLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
   CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
-  shaderRepo->( )
+//  shaderRepo->( )
 
 
-  shaderRepo->UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer &,this->GetDataNode(),renderer, GetMTime()); //SHADERTODO
+  shaderRepo->UpdateShaderProgram(ls->m_ShaderProgram,this->GetDataNode(),renderer, GetTimeStamp()); //SHADERTODO
   //
 }
 

@@ -92,6 +92,7 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
   try
   {
     m_ControlInterface->SetCropArea(cropping);
+    m_Cropping = cropping;
   }
   catch (mitk::Exception e)
   {
@@ -103,15 +104,13 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
     BlockSignalAndSetValue(ui->crop_top, m_Cropping.top);
     BlockSignalAndSetValue(ui->crop_bot, m_Cropping.bottom);
 
-    QMessageBox msgBox; // inform user
+    // inform user
+    QMessageBox msgBox;
     msgBox.setInformativeText("The crop area you specified is invalid.\nPlease make sure that no more pixels are cropped than are available.");
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.exec();
     MITK_WARN << "User tried to crop beyond limits of the image";
-
-    return;
   }
-      m_Cropping = cropping;
 }
 
 void QmitkUSControlsCustomVideoDeviceWidget::BlockSignalAndSetValue(QSpinBox* target, int value)

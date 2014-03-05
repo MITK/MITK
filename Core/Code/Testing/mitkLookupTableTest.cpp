@@ -138,7 +138,7 @@ public:
     CPPUNIT_ASSERT(opacityTransferFunction != 0);
 
     int funcSize = opacityTransferFunction->GetSize();
-    double table[funcSize];
+    double *table = new double[funcSize];
     double rgba[4];
     opacityTransferFunction->GetTable(0, 1, funcSize, table);
     for (int i = 0; i < funcSize; ++i)
@@ -148,6 +148,7 @@ public:
                              mitk::Equal(table[i], rgba[3], 0.000001, true)
                              );
     }
+    delete [] table;
   }
 
   void TestCreateGradientTransferFunction ()
@@ -165,7 +166,7 @@ public:
     CPPUNIT_ASSERT(gradientTransferFunction != 0);
 
     int funcSize = gradientTransferFunction->GetSize();
-    double table[funcSize];
+    double *table = new double[funcSize];
     double rgba[4];
     gradientTransferFunction->GetTable(0, 1, funcSize, table);
     for (int i = 0; i < funcSize; ++i)
@@ -175,6 +176,7 @@ public:
                              mitk::Equal(table[i], rgba[3], 0.000001, true)
                              );
     }
+    delete [] table;
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkLookupTable)

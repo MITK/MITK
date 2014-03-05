@@ -16,8 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkUSControlsCustomVideoDeviceWidget.h"
 #include "ui_QmitkUSControlsCustomVideoDeviceWidget.h"
+#include <QMessageBox>
 
-#include "mitkUSVideoDevice.h"
+#include <mitkException.h>
 
 QmitkUSControlsCustomVideoDeviceWidget::QmitkUSControlsCustomVideoDeviceWidget(QWidget *parent)
   : QmitkUSAbstractCustomWidget(parent), ui(new Ui::QmitkUSControlsCustomVideoDeviceWidget)
@@ -28,6 +29,12 @@ QmitkUSControlsCustomVideoDeviceWidget::QmitkUSControlsCustomVideoDeviceWidget(Q
   connect( ui->crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
   connect( ui->crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
   connect( ui->crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
+
+  m_Cropping.left = 0;
+  m_Cropping.top = 0;
+  m_Cropping.right = 0;
+  m_Cropping.bottom = 0;
+
 }
 
 QmitkUSControlsCustomVideoDeviceWidget::~QmitkUSControlsCustomVideoDeviceWidget()
@@ -82,5 +89,33 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
   cropping.right = ui->crop_right->value();
   cropping.bottom = ui->crop_bot->value();
 
-  m_ControlInterface->SetCropArea(cropping);
+  try
+  {
+    m_ControlInterface->SetCropArea(cropping);
+    m_Cropping = cropping;
+  }
+  catch (mitk::Exception e)
+  {
+    m_ControlInterface->SetCropArea(m_Cropping); // reset to last valid crop
+
+    //reset values
+    BlockSignalAndSetValue(ui->crop_left, m_Cropping.left);
+    BlockSignalAndSetValue(ui->crop_right, m_Cropping.right);
+    BlockSignalAndSetValue(ui->crop_top, m_Cropping.top);
+    BlockSignalAndSetValue(ui->crop_bot, m_Cropping.bottom);
+
+    // inform user
+    QMessageBox msgBox;
+    msgBox.setInformativeText("The crop area you specified is invalid.\nPlease make sure that no more pixels are cropped than are available.");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
+    MITK_WARN << "User tried to crop beyond limits of the image";
+  }
+}
+
+void QmitkUSControlsCustomVideoDeviceWidget::BlockSignalAndSetValue(QSpinBox* target, int value)
+{
+  bool oldState = target->blockSignals(true);
+  target->setValue(value);
+  target->blockSignals(oldState);
 }

@@ -498,6 +498,11 @@ mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidget::ScanPort(QStrin
 void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
 {
 std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+if (!this->GetPeristenceService())
+  {
+  MITK_ERROR << "Persistence service not available, could not store UI settings!";
+  return;
+  }
 mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
 propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
 propList->Set("AuroraPortWin",m_Controls->m_portSpinBoxAurora->value());
@@ -508,6 +513,11 @@ propList->Set("SelectedDevice",m_Controls->m_trackingDeviceChooser->currentIndex
 void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
 {
 std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+if (!this->GetPeristenceService())
+  {
+  MITK_ERROR << "Persistence service not available, could not load UI settings!";
+  return;
+  }
 mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
 int portPolarisWin,portAuroraWin,SelectedDevice;
 propList->Get("PolarisPortWin",portPolarisWin);

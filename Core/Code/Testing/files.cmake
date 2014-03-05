@@ -104,7 +104,6 @@ set(MODULE_TESTS
 )
 endif()
 
-message (${MODULE_TESTS})
 
 # test with image filename as an extra command line parameter
 set(MODULE_IMAGE_TESTS

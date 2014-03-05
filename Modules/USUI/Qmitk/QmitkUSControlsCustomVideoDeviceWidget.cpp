@@ -97,18 +97,26 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
   {
     m_ControlInterface->SetCropArea(m_Cropping); // reset to last valid crop
 
+    //reset values
+    BlockSignalAndSetValue(ui->crop_left, m_Cropping.left);
+    BlockSignalAndSetValue(ui->crop_right, m_Cropping.right);
+    BlockSignalAndSetValue(ui->crop_top, m_Cropping.top);
+    BlockSignalAndSetValue(ui->crop_bot, m_Cropping.bottom);
+
     QMessageBox msgBox; // inform user
     msgBox.setInformativeText("The crop area you specified is invalid.\nPlease make sure that no more pixels are cropped than are available.");
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.exec();
     MITK_WARN << "User tried to crop beyond limits of the image";
 
-    ui->crop_left->setValue(cropping.left);
-    ui->crop_right->setValue(cropping.right);
-    ui->crop_top->setValue(cropping.top);
-    ui->crop_bot->setValue(cropping.bottom);
     return;
-    //reset values
   }
       m_Cropping = cropping;
+}
+
+void QmitkUSControlsCustomVideoDeviceWidget::BlockSignalAndSetValue(QSpinBox* target, int value)
+{
+  bool oldState = target->blockSignals(true);
+  target->setValue(value);
+  target->blockSignals(oldState);
 }

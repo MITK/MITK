@@ -43,7 +43,7 @@ void mitk::USVideoDeviceCustomControls::SetCropArea(mitk::USImageVideoSource::US
 
   if (m_ImageSource.IsNotNull())
   {
-    // removing of crop area is done when a complete empty crop are is given
+    // if area is empty, remove region
     if((newArea.bottom==0) && (newArea.top==0)&&
       (newArea.left==0) && (newArea.right==0))
     {

@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSVideoDevice.h"
 
+#include <QSpinBox>
+
 namespace Ui {
 class QmitkUSControlsCustomVideoDeviceWidget;
 }
@@ -72,6 +74,8 @@ public:
   virtual void OnDeviceSet();
 
 protected:
+  void BlockSignalAndSetValue(QSpinBox* target, int value);
+
   mitk::USImageVideoSource::USImageCropping m_Cropping;
 
 private:

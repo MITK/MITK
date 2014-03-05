@@ -16,12 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKLookupTable_H_HEADER_INCLUDED_C1EBD53D
 #define MITKLookupTable_H_HEADER_INCLUDED_C1EBD53D
 
-#include <MitkCoreExports.h>
 #include <mitkCommon.h>
-#include "vtkLookupTable.h"
-#include "vtkSmartPointer.h"
+#include <MitkCoreExports.h>
+
 #include <itkDataObject.h>
 #include <itkObjectFactory.h>
+
+#include <vtkLookupTable.h>
+#include <vtkSmartPointer.h>
 
 
 class vtkColorTransferFunction;
@@ -131,10 +133,22 @@ public:
 
     LookupTable();
     virtual ~LookupTable();
+    /**
+     * \deprecatedSince{2014_03} Please use CreateColorTransferFunction() instead
+     */
+   DEPRECATED(void CreateColorTransferFunction(vtkColorTransferFunction*& colorFunction));
+   /**
+    * \deprecatedSince{2014_03} Please use CreateOpacityTransferFunction() instead
+    */
+  DEPRECATED(void CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction));
+  /**
+   * \deprecatedSince{2014_03} Please use CreateGradientTransferFunction() instead
+   */
+ DEPRECATED(void CreateGradientTransferFunction(vtkPiecewiseFunction*& gradientFunction));
 
-    void CreateColorTransferFunction(vtkColorTransferFunction*& colorFunction);
-    void CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction);
-    void CreateGradientTransferFunction(vtkPiecewiseFunction*& gradientFunction);
+    vtkSmartPointer<vtkColorTransferFunction> CreateColorTransferFunction();
+    vtkSmartPointer<vtkPiecewiseFunction> CreateOpacityTransferFunction();
+    vtkSmartPointer<vtkPiecewiseFunction> CreateGradientTransferFunction();
 
     enum LookupTableType
     {

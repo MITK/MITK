@@ -625,11 +625,17 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     // create a empty diff image for the undo operation
     mitk::Image::Pointer diffImage = mitk::Image::New();
     diffImage->Initialize( image3D );
-    mitk::ImageWriteAccessor imAccess(diffImage);
 
-    // Set all pixels to zero
-    mitk::PixelType pixelType( mitk::MakeScalarPixelType<unsigned char>()  );
-    memset( imAccess.GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
+    // Create scope for ImageWriteAccessor so that the accessor is destroyed
+    // after the image is initialized. Otherwise later image access will lead to an error
+    {
+      mitk::ImageWriteAccessor imAccess(diffImage);
+
+      // Set all pixels to zero
+      mitk::PixelType pixelType( mitk::MakeScalarPixelType<unsigned char>()  );
+      memset( imAccess.GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
+    }
+
 
     // Since we need to shift the plane it must be clone so that the original plane isn't altered
     mitk::PlaneGeometry::Pointer reslicePlane = slicer->GetCurrentPlaneGeometry()->Clone();

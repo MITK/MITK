@@ -80,24 +80,8 @@ struct MITK_CORE_EXPORT IShaderRepository
 
   class MITK_CORE_EXPORT ShaderProgram : public itk::LightObject
   {
-
   public:
-
-    ~ShaderProgram();
-
-  protected:
-
-    ShaderProgram();
-
-    virtual void Activate() = 0; // TODOSHADER nur in shaderrepo
-
-    virtual void Deactivate() = 0;
-
-  private:
-
-    // not implemented
-    ShaderProgram(const ShaderProgram&);
-    ShaderProgram& operator=(const ShaderProgram&);
+    mitkClassMacro( ShaderProgram, itk::LightObject )
   };
 
 
@@ -115,6 +99,8 @@ struct MITK_CORE_EXPORT IShaderRepository
    */
   virtual Shader::Pointer GetShader(const std::string& name) const = 0;
 
+  virtual ShaderProgram::Pointer CreateShaderProgram() = 0;
+
   /**
    * \brief Return the shader identified by the given id.
    * @param id The shader id.
@@ -131,7 +117,7 @@ struct MITK_CORE_EXPORT IShaderRepository
   /** \brief Applies shader and shader specific variables of the specified DataNode
    * to the VTK object by updating the shader variables of its vtkProperty.
    */
-  virtual ShaderProgram::Pointer UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer & shaderProgram, mitk::DataNode* node,
+  virtual ShaderProgram::Pointer UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer shaderProgram, mitk::DataNode* node,
                                                      mitk::BaseRenderer* renderer, const itk::TimeStamp& MTime) const = 0;
 
   /** \brief Loads a shader from a given file. Make sure that this stream is in the XML shader format.

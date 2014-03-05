@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkPropRenderer.h"
 #include "mitkLocalStorageHandler.h"
 #include "mitkIShaderRepository.h"
+#include <mitkCoreServices.h>
 
 #include <vtkProp3D.h>
 #include <vtkActor.h>
@@ -142,7 +143,8 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
 
       VtkMapperLocalStorage()
       {
-        m_ShaderProgram = mitk::IShaderRepository::ShaderProgram::New();
+        CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+        m_ShaderProgram = shaderRepo->CreateShaderProgram();
       }
 
       ~VtkMapperLocalStorage()

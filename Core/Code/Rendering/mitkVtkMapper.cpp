@@ -16,9 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkMapper.h"
 
-#include <mitkIShaderRepository.h>
-#include <mitkCoreServices.h>
-
 mitk::VtkMapper::VtkMapper()
 {
 }

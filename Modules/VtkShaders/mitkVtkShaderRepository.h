@@ -138,6 +138,8 @@ private:
    */
   ~VtkShaderRepository();
 
+  ShaderProgram::Pointer CreateShaderProgram();
+
   std::list<IShaderRepository::Shader::Pointer> GetShaders() const;
 
   IShaderRepository::Shader::Pointer GetShader(const std::string& name) const;
@@ -160,7 +162,7 @@ private:
   vtkXMLMaterial* GetXMLMaterial(mitk::DataNode* node, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const;
 
   void ApplyShaderProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, vtkXMLMaterial* xmlMaterial, itk::TimeStamp& MTime);
-  mitk::IShaderRepository::ShaderProgram::Pointer UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer & shaderProgram, DataNode* node, BaseRenderer* renderer, itk::TimeStamp& MTime) const;
+  mitk::IShaderRepository::ShaderProgram::Pointer UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer shaderProgram, DataNode* node, BaseRenderer* renderer, const itk::TimeStamp& MTime) const;
 };
 
 } //end of namespace mitk

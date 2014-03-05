@@ -29,7 +29,7 @@ class VtkShaderProgram : public IShaderRepository::ShaderProgram
 {
 public:
 
-  mitkClassMacro( VtkShaderProgram, itk::Object )
+  mitkClassMacro( VtkShaderProgram, IShaderRepository::ShaderProgram )
   itkFactorylessNewMacro( Self )
 
   /**
@@ -40,12 +40,7 @@ public:
   /**
    * Destructor
    */
-  ~VtkShaderProgram();
-
-
-  virtual void Activate(){}; //SHADERTODO
-
-  virtual void Deactivate(){};
+  virtual ~VtkShaderProgram();
 
 private:
 

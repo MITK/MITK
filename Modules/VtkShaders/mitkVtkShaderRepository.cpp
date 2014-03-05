@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define SR_ERROR MITK_ERROR("shader.repository")
 
 #include "mitkVtkShaderRepository.h"
+#include "mitkVtkShaderProgram.h"
 #include "mitkShaderProperty.h"
 #include "mitkProperties.h"
 #include "mitkDataNode.h"
@@ -43,6 +44,12 @@ mitk::VtkShaderRepository::VtkShaderRepository()
 
 mitk::VtkShaderRepository::~VtkShaderRepository()
 {
+}
+
+mitk::IShaderRepository::ShaderProgram::Pointer mitk::VtkShaderRepository::CreateShaderProgram()
+{
+  mitk::IShaderRepository::ShaderProgram::Pointer shaderProg = (mitk::VtkShaderProgram::New()).GetPointer();
+  return shaderProg;
 }
 
 void mitk::VtkShaderRepository::LoadShaders()
@@ -466,8 +473,8 @@ mitk::IShaderRepository::Shader::Pointer mitk::VtkShaderRepository::GetShader(in
   return IShaderRepository::Shader::Pointer();
 }
 
-mitk::IShaderRepository::ShaderProgram::Pointer mitk::VtkShaderRepository::UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer & shaderProgram, DataNode* node, BaseRenderer* renderer, itk::TimeStamp& MTime) const
+mitk::IShaderRepository::ShaderProgram::Pointer mitk::VtkShaderRepository::UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer shaderProgram, DataNode* node, BaseRenderer* renderer, const itk::TimeStamp& MTime) const
 {
-  vtkXMLMaterial* xmlMaterial = GetXMLMaterial(node,renderer,MTime);
+//  vtkXMLMaterial* xmlMaterial = GetXMLMaterial(node,renderer,MTime);
   //SHADERTODO
 }

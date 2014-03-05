@@ -289,8 +289,7 @@ public:
     LAYOUT_2D_UP_AND_3D_DOWN};
 
   enum {
-    TRANSVERSAL,
-    AXIAL = TRANSVERSAL,
+    AXIAL,
     SAGITTAL,
     CORONAL,
     THREE_D

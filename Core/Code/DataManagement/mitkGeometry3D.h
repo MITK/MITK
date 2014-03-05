@@ -89,6 +89,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(Geometry3D, mitk::BaseGeometry);
+    //void testXYZ(){ int a=1; }; //xxxxxxxxxxxxxxxx
 
     typedef itk::QuaternionRigidTransform< ScalarType > QuaternionTransformType;
     typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;

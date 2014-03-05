@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 #define PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 
@@ -25,410 +24,371 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_cross.h>
 
 namespace mitk {
+  template < class TCoordRep, unsigned int NPointDimension > class Line;
+  typedef Line<ScalarType, 3> Line3D;
 
-template < class TCoordRep, unsigned int NPointDimension > class Line;
-typedef Line<ScalarType, 3> Line3D;
-
-
-
-/**
- * \brief Describes a two-dimensional, rectangular plane
- *
- * \ingroup Geometry
- */
-class MITK_CORE_EXPORT PlaneGeometry : public Geometry2D
-{
-public:
-  mitkClassMacro(PlaneGeometry,Geometry2D);
-
-  /** Method for creation through the object factory. */
-  itkNewMacro(Self);
-
-  enum PlaneOrientation
+  /**
+  * \brief Describes a two-dimensional, rectangular plane
+  *
+  * \ingroup Geometry
+  */
+  class MITK_CORE_EXPORT PlaneGeometry : public Geometry2D
   {
+  public:
+    mitkClassMacro(PlaneGeometry,Geometry2D);
+
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self);
+
+    enum PlaneOrientation
+    {
 #ifdef _MSC_VER
-    Transversal, // deprecated
+      Transversal, // deprecated
 #endif
-    Axial = 0,
-    Sagittal,
-    Frontal
-  };
+      Axial = 0,
+      Sagittal,
+      Frontal
+    };
 
 #ifdef __GNUC__
-  __attribute__ ((deprecated)) static const PlaneOrientation Transversal = PlaneOrientation(Axial);
+    __attribute__ ((deprecated)) static const PlaneOrientation Transversal = PlaneOrientation(Axial);
 #endif
 
-  virtual void IndexToWorld(const Point2D &pt_units, Point2D &pt_mm) const;
+    virtual void IndexToWorld(const Point2D &pt_units, Point2D &pt_mm) const;
 
-  virtual void WorldToIndex(const Point2D &pt_mm, Point2D &pt_units) const;
+    virtual void WorldToIndex(const Point2D &pt_mm, Point2D &pt_units) const;
 
+    //##Documentation
+    //## @brief Convert (continuous or discrete) index coordinates of a \em vector
+    //## \a vec_units to world coordinates (in mm)
+    //## @deprecated First parameter (Point2D) is not used. If possible, please use void IndexToWorld(const mitk::Vector2D& vec_units, mitk::Vector2D& vec_mm) const.
+    //## For further information about coordinates types, please see the Geometry documentation
+    virtual void IndexToWorld(const mitk::Point2D &atPt2d_untis, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
 
-  //##Documentation
-  //## @brief Convert (continuous or discrete) index coordinates of a \em vector
-  //## \a vec_units to world coordinates (in mm)
-  //## @deprecated First parameter (Point2D) is not used. If possible, please use void IndexToWorld(const mitk::Vector2D& vec_units, mitk::Vector2D& vec_mm) const.
-  //## For further information about coordinates types, please see the Geometry documentation
-  virtual void IndexToWorld(const mitk::Point2D &atPt2d_untis, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+    //##Documentation
+    //## @brief Convert (continuous or discrete) index coordinates of a \em vector
+    //## \a vec_units to world coordinates (in mm)
+    //## For further information about coordinates types, please see the Geometry documentation
+    virtual void IndexToWorld(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
 
-  //##Documentation
-  //## @brief Convert (continuous or discrete) index coordinates of a \em vector
-  //## \a vec_units to world coordinates (in mm)
-  //## For further information about coordinates types, please see the Geometry documentation
-  virtual void IndexToWorld(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+    //##Documentation
+    //## @brief Convert world coordinates (in mm) of a \em vector
+    //## \a vec_mm to (continuous!) index coordinates.
+    //## @deprecated First parameter (Point2D) is not used. If possible, please use void WorldToIndex(const mitk::Vector2D& vec_mm, mitk::Vector2D& vec_units) const.
+    //## For further information about coordinates types, please see the Geometry documentation
+    virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
-  //##Documentation
-  //## @brief Convert world coordinates (in mm) of a \em vector
-  //## \a vec_mm to (continuous!) index coordinates.
-  //## @deprecated First parameter (Point2D) is not used. If possible, please use void WorldToIndex(const mitk::Vector2D& vec_mm, mitk::Vector2D& vec_units) const.
-  //## For further information about coordinates types, please see the Geometry documentation
-  virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+    //##Documentation
+    //## @brief Convert world coordinates (in mm) of a \em vector
+    //## \a vec_mm to (continuous!) index coordinates.
+    //## For further information about coordinates types, please see the Geometry documentation
+    virtual void WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
-  //##Documentation
-  //## @brief Convert world coordinates (in mm) of a \em vector
-  //## \a vec_mm to (continuous!) index coordinates.
-  //## For further information about coordinates types, please see the Geometry documentation
-  virtual void WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+    virtual void Initialize();
 
+    /**
+    * \brief Initialize a plane with orientation \a planeorientation
+    * (default: axial) with respect to \a geometry3D (default: identity).
+    * Spacing also taken from \a geometry3D.
+    *
+    * \warning A former version of this method created a geometry with unit
+    * spacing. For unit spacing use
+    *
+    * \code
+    *   // for in-plane unit spacing:
+    *   thisgeometry->SetSizeInUnits(thisgeometry->GetExtentInMM(0),
+    *     thisgeometry->GetExtentInMM(1));
+    *   // additionally, for unit spacing in normal direction (former version
+    *   // did not do this):
+    *   thisgeometry->SetExtentInMM(2, 1.0);
+    * \endcode
+    */
+    virtual void InitializeStandardPlane( const Geometry3D* geometry3D,
+      PlaneOrientation planeorientation = Axial, ScalarType zPosition = 0,
+      bool frontside=true, bool rotated=false );
 
-  virtual void Initialize();
+    /**
+    * \brief Initialize a plane with orientation \a planeorientation
+    * (default: axial) with respect to \a geometry3D (default: identity).
+    * Spacing also taken from \a geometry3D.
+    *
+    * \param top if \a true, create plane at top, otherwise at bottom
+    * (for PlaneOrientation Axial, for other plane locations respectively)
+    */
+    virtual void InitializeStandardPlane( const Geometry3D* geometry3D, bool top,
+      PlaneOrientation planeorientation = Axial,
+      bool frontside=true, bool rotated=false );
 
-  /**
-   * \brief Initialize a plane with orientation \a planeorientation
-   * (default: axial) with respect to \a geometry3D (default: identity).
-   * Spacing also taken from \a geometry3D.
-   *
-   * \warning A former version of this method created a geometry with unit
-   * spacing. For unit spacing use
-   *
-   * \code
-   *   // for in-plane unit spacing:
-   *   thisgeometry->SetSizeInUnits(thisgeometry->GetExtentInMM(0),
-   *     thisgeometry->GetExtentInMM(1));
-   *   // additionally, for unit spacing in normal direction (former version
-   *   // did not do this):
-   *   thisgeometry->SetExtentInMM(2, 1.0);
-   * \endcode
-   */
-  virtual void InitializeStandardPlane( const Geometry3D* geometry3D,
-    PlaneOrientation planeorientation = Axial, ScalarType zPosition = 0,
-    bool frontside=true, bool rotated=false );
+    /**
+    * \brief Initialize a plane with orientation \a planeorientation
+    * (default: axial) with respect to \a transform (default: identity)
+    * given width and height in units.
+    *
+    */
+    virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
+      const AffineTransform3D* transform = NULL,
+      PlaneOrientation planeorientation = Axial,
+      ScalarType zPosition = 0, bool frontside=true, bool rotated=false );
 
+    /**
+    * \brief Initialize plane with orientation \a planeorientation
+    * (default: axial) given width, height and spacing.
+    *
+    */
+    virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
+      const Vector3D & spacing, PlaneOrientation planeorientation = Axial,
+      ScalarType zPosition = 0, bool frontside = true, bool rotated = false );
 
-  /**
-   * \brief Initialize a plane with orientation \a planeorientation
-   * (default: axial) with respect to \a geometry3D (default: identity).
-   * Spacing also taken from \a geometry3D.
-   *
-   * \param top if \a true, create plane at top, otherwise at bottom
-   * (for PlaneOrientation Axial, for other plane locations respectively)
-   */
-  virtual void InitializeStandardPlane( const Geometry3D* geometry3D, bool top,
-    PlaneOrientation planeorientation = Axial,
-    bool frontside=true, bool rotated=false );
+    /**
+    * \brief Initialize plane by width and height in pixels, right-/down-vector
+    * (itk) to describe orientation in world-space (vectors will be normalized)
+    * and spacing (default: 1.0 mm in all directions).
+    *
+    * The vectors are normalized and multiplied by the respective spacing before
+    * they are set in the matrix.
+    */
+    virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
+      const Vector3D& rightVector, const Vector3D& downVector,
+      const Vector3D *spacing = NULL );
 
+    /**
+    * \brief Initialize plane by width and height in pixels,
+    * right-/down-vector (vnl) to describe orientation in world-space (vectors
+    * will be normalized) and spacing (default: 1.0 mm in all directions).
+    *
+    * The vectors are normalized and multiplied by the respective spacing
+    * before they are set in the matrix.
+    */
+    virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
+      const VnlVector& rightVector, const VnlVector& downVector,
+      const Vector3D * spacing = NULL );
 
-  /**
-   * \brief Initialize a plane with orientation \a planeorientation
-   * (default: axial) with respect to \a transform (default: identity)
-   * given width and height in units.
-   *
-   */
-  virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
-    const AffineTransform3D* transform = NULL,
-    PlaneOrientation planeorientation = Axial,
-    ScalarType zPosition = 0, bool frontside=true, bool rotated=false );
+    /**
+    * \brief Initialize plane by right-/down-vector (itk) and spacing
+    * (default: 1.0 mm in all directions).
+    *
+    * The length of the right-/-down-vector is used as width/height in units,
+    * respectively. Then, the vectors are normalized and multiplied by the
+    * respective spacing before they are set in the matrix.
+    */
+    virtual void InitializeStandardPlane( const Vector3D& rightVector,
+      const Vector3D& downVector, const Vector3D * spacing = NULL );
 
+    /**
+    * \brief Initialize plane by right-/down-vector (vnl) and spacing
+    * (default: 1.0 mm in all directions).
+    *
+    * The length of the right-/-down-vector is used as width/height in units,
+    * respectively. Then, the vectors are normalized and multiplied by the
+    * respective spacing before they are set in the matrix.
+    */
+    virtual void InitializeStandardPlane( const VnlVector& rightVector,
+      const VnlVector& downVector, const Vector3D * spacing = NULL );
 
-  /**
-   * \brief Initialize plane with orientation \a planeorientation
-   * (default: axial) given width, height and spacing.
-   *
-   */
-  virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
-    const Vector3D & spacing, PlaneOrientation planeorientation = Axial,
-    ScalarType zPosition = 0, bool frontside = true, bool rotated = false );
+    /**
+    * \brief Initialize plane by origin and normal (size is 1.0 mm in
+    * all directions, direction of right-/down-vector valid but
+    * undefined).
+    *
+    */
+    virtual void InitializePlane( const Point3D& origin, const Vector3D& normal);
 
-  /**
-   * \brief Initialize plane by width and height in pixels, right-/down-vector
-   * (itk) to describe orientation in world-space (vectors will be normalized)
-   * and spacing (default: 1.0 mm in all directions).
-   *
-   * The vectors are normalized and multiplied by the respective spacing before
-   * they are set in the matrix.
-   */
-  virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
-    const Vector3D& rightVector, const Vector3D& downVector,
-    const Vector3D *spacing = NULL );
+    /**
+    * \brief Initialize plane by right-/down-vector.
+    *
+    * \warning The vectors are set into the matrix as they are,
+    * \em without normalization!
+    */
+    void SetMatrixByVectors( const VnlVector& rightVector,
+      const VnlVector& downVector, ScalarType thickness=1.0 );
 
+    /**
+    * \brief Change \a transform so that the third column of the
+    * transform-martix is perpendicular to the first two columns
+    *
+    */
+    static void EnsurePerpendicularNormal( AffineTransform3D* transform );
 
-  /**
-   * \brief Initialize plane by width and height in pixels,
-   * right-/down-vector (vnl) to describe orientation in world-space (vectors
-   * will be normalized) and spacing (default: 1.0 mm in all directions).
-   *
-   * The vectors are normalized and multiplied by the respective spacing
-   * before they are set in the matrix.
-   */
-  virtual void InitializeStandardPlane( ScalarType width, ScalarType height,
-    const VnlVector& rightVector, const VnlVector& downVector,
-    const Vector3D * spacing = NULL );
+    /**
+    * \brief Normal of the plane
+    *
+    */
+    Vector3D GetNormal() const;
 
+    /**
+    * \brief Normal of the plane as VnlVector
+    *
+    */
+    VnlVector GetNormalVnl() const;
 
-  /**
-   * \brief Initialize plane by right-/down-vector (itk) and spacing
-   * (default: 1.0 mm in all directions).
-   *
-   * The length of the right-/-down-vector is used as width/height in units,
-   * respectively. Then, the vectors are normalized and multiplied by the
-   * respective spacing before they are set in the matrix.
-   */
-  virtual void InitializeStandardPlane( const Vector3D& rightVector,
-    const Vector3D& downVector, const Vector3D * spacing = NULL );
+    virtual ScalarType SignedDistance( const Point3D& pt3d_mm ) const;
 
+    virtual bool IsAbove( const Point3D& pt3d_mm ) const;
 
-  /**
-   * \brief Initialize plane by right-/down-vector (vnl) and spacing
-   * (default: 1.0 mm in all directions).
-   *
-   * The length of the right-/-down-vector is used as width/height in units,
-   * respectively. Then, the vectors are normalized and multiplied by the
-   * respective spacing before they are set in the matrix.
-   */
-  virtual void InitializeStandardPlane( const VnlVector& rightVector,
-    const VnlVector& downVector, const Vector3D * spacing = NULL );
+    /**
+    * \brief Distance of the point from the plane
+    * (bounding-box \em not considered)
+    *
+    */
+    ScalarType DistanceFromPlane( const Point3D& pt3d_mm ) const ;
 
-  /**
-   * \brief Initialize plane by origin and normal (size is 1.0 mm in
-   * all directions, direction of right-/down-vector valid but
-   * undefined).
-   *
-   */
-  virtual void InitializePlane( const Point3D& origin, const Vector3D& normal);
-
-  /**
-   * \brief Initialize plane by right-/down-vector.
-   *
-   * \warning The vectors are set into the matrix as they are,
-   * \em without normalization!
-   */
-  void SetMatrixByVectors( const VnlVector& rightVector,
-    const VnlVector& downVector, ScalarType thickness=1.0 );
-
-
-  /**
-   * \brief Change \a transform so that the third column of the
-   * transform-martix is perpendicular to the first two columns
-   *
-   */
-  static void EnsurePerpendicularNormal( AffineTransform3D* transform );
-
-
-  /**
-   * \brief Normal of the plane
-   *
-   */
-  Vector3D GetNormal() const;
-
-
-  /**
-   * \brief Normal of the plane as VnlVector
-   *
-   */
-  VnlVector GetNormalVnl() const;
-
-
-  virtual ScalarType SignedDistance( const Point3D& pt3d_mm ) const;
-
-
-  virtual bool IsAbove( const Point3D& pt3d_mm ) const;
-
-
-  /**
-   * \brief Distance of the point from the plane
-   * (bounding-box \em not considered)
-   *
-   */
-  ScalarType DistanceFromPlane( const Point3D& pt3d_mm ) const ;
-
-
-  /**
-   * \brief Signed distance of the point from the plane
-   * (bounding-box \em not considered)
-   *
-   * > 0 : point is in the direction of the direction vector.
-   */
-  inline ScalarType SignedDistanceFromPlane( const Point3D& pt3d_mm ) const
-  {
-    ScalarType len = GetNormalVnl().two_norm();
-
-    if( len == 0 )
-      return 0;
-
-    return (pt3d_mm-GetOrigin())*GetNormal() / len;
-  }
-
-
-  /**
-   * \brief Distance of the plane from another plane
-   * (bounding-box \em not considered)
-   *
-   * Result is 0 if planes are not parallel.
-   */
-  ScalarType DistanceFromPlane(const PlaneGeometry* plane) const
-  {
-    return fabs(SignedDistanceFromPlane(plane));
-  }
-
-
-  /**
-   * \brief Signed distance of the plane from another plane
-   * (bounding-box \em not considered)
-   *
-   * Result is 0 if planes are not parallel.
-   */
-  inline ScalarType SignedDistanceFromPlane( const PlaneGeometry *plane ) const
-  {
-    if(IsParallel(plane))
+    /**
+    * \brief Signed distance of the point from the plane
+    * (bounding-box \em not considered)
+    *
+    * > 0 : point is in the direction of the direction vector.
+    */
+    inline ScalarType SignedDistanceFromPlane( const Point3D& pt3d_mm ) const
     {
-      return SignedDistance(plane->GetOrigin());
+      ScalarType len = GetNormalVnl().two_norm();
+
+      if( len == 0 )
+        return 0;
+
+      return (pt3d_mm-GetOrigin())*GetNormal() / len;
     }
-    return 0;
-  }
 
+    /**
+    * \brief Distance of the plane from another plane
+    * (bounding-box \em not considered)
+    *
+    * Result is 0 if planes are not parallel.
+    */
+    ScalarType DistanceFromPlane(const PlaneGeometry* plane) const
+    {
+      return fabs(SignedDistanceFromPlane(plane));
+    }
 
-  /**
-   * \brief Calculate the intersecting line of two planes
-   *
-   * \return \a true planes are intersecting
-   * \return \a false planes do not intersect
-   */
-  bool IntersectionLine( const PlaneGeometry *plane, Line3D &crossline ) const;
+    /**
+    * \brief Signed distance of the plane from another plane
+    * (bounding-box \em not considered)
+    *
+    * Result is 0 if planes are not parallel.
+    */
+    inline ScalarType SignedDistanceFromPlane( const PlaneGeometry *plane ) const
+    {
+      if(IsParallel(plane))
+      {
+        return SignedDistance(plane->GetOrigin());
+      }
+      return 0;
+    }
 
+    /**
+    * \brief Calculate the intersecting line of two planes
+    *
+    * \return \a true planes are intersecting
+    * \return \a false planes do not intersect
+    */
+    bool IntersectionLine( const PlaneGeometry *plane, Line3D &crossline ) const;
 
-  /**
-   * \brief Calculate two points where another plane intersects the border of this plane
-   *
-   * \return number of intersection points (0..2). First interection point (if existing)
-   * is returned in \a lineFrom, second in \a lineTo.
-   */
-  unsigned int IntersectWithPlane2D(const PlaneGeometry *plane,
-    Point2D &lineFrom, Point2D &lineTo ) const ;
+    /**
+    * \brief Calculate two points where another plane intersects the border of this plane
+    *
+    * \return number of intersection points (0..2). First interection point (if existing)
+    * is returned in \a lineFrom, second in \a lineTo.
+    */
+    unsigned int IntersectWithPlane2D(const PlaneGeometry *plane,
+      Point2D &lineFrom, Point2D &lineTo ) const ;
 
+    /**
+    * \brief Calculate the angle between two planes
+    *
+    * \return angle in radiants
+    */
+    double Angle( const PlaneGeometry *plane ) const;
 
-  /**
-   * \brief Calculate the angle between two planes
-   *
-   * \return angle in radiants
-   */
-  double Angle( const PlaneGeometry *plane ) const;
+    /**
+    * \brief Calculate the angle between the plane and a line
+    *
+    * \return angle in radiants
+    */
+    double Angle( const Line3D &line ) const;
 
+    /**
+    * \brief Calculate intersection point between the plane and a line
+    *
+    * \param intersectionPoint intersection point
+    * \return \a true if \em unique intersection exists, i.e., if line
+    * is \em not on or parallel to the plane
+    */
+    bool IntersectionPoint( const Line3D &line,
+      Point3D &intersectionPoint ) const;
 
-  /**
-   * \brief Calculate the angle between the plane and a line
-   *
-   * \return angle in radiants
-   */
-  double Angle( const Line3D &line ) const;
+    /**
+    * \brief Calculate line parameter of intersection point between the
+    * plane and a line
+    *
+    * \param t parameter of line: intersection point is
+    * line.GetPoint()+t*line.GetDirection()
+    * \return \a true if \em unique intersection exists, i.e., if line
+    * is \em not on or parallel to the plane
+    */
+    bool IntersectionPointParam( const Line3D &line, double &t ) const;
 
+    /**
+    * \brief Returns whether the plane is parallel to another plane
+    *
+    * @return true iff the normal vectors both point to the same or exactly oposit direction
+    */
+    bool IsParallel( const PlaneGeometry *plane ) const;
 
-  /**
-   * \brief Calculate intersection point between the plane and a line
-   *
-   * \param intersectionPoint intersection point
-   * \return \a true if \em unique intersection exists, i.e., if line
-   * is \em not on or parallel to the plane
-   */
-  bool IntersectionPoint( const Line3D &line,
-    Point3D &intersectionPoint ) const;
+    /**
+    * \brief Returns whether the point is on the plane
+    * (bounding-box \em not considered)
+    */
+    bool IsOnPlane( const Point3D &point ) const;
 
+    /**
+    * \brief Returns whether the line is on the plane
+    * (bounding-box \em not considered)
+    */
+    bool IsOnPlane( const Line3D &line ) const;
 
-  /**
-   * \brief Calculate line parameter of intersection point between the
-   * plane and a line
-   *
-   * \param t parameter of line: intersection point is
-   * line.GetPoint()+t*line.GetDirection()
-   * \return \a true if \em unique intersection exists, i.e., if line
-   * is \em not on or parallel to the plane
-   */
-  bool IntersectionPointParam( const Line3D &line, double &t ) const;
+    /**
+    * \brief Returns whether the plane is on the plane
+    * (bounding-box \em not considered)
+    *
+    * @return true iff the normal vector of the planes point to the same or the exactly oposit direction and
+    *  the distance of the planes is < eps
+    *
+    */
+    bool IsOnPlane( const PlaneGeometry *plane ) const;
 
+    /**
+    * \brief Returns the lot from the point to the plane
+    */
+    Point3D ProjectPointOntoPlane( const Point3D &pt ) const;
 
-  /**
-   * \brief Returns whether the plane is parallel to another plane
-   *
-   * @return true iff the normal vectors both point to the same or exactly oposit direction
-   */
-  bool IsParallel( const PlaneGeometry *plane ) const;
+    virtual void SetIndexToWorldTransform( AffineTransform3D *transform);
 
+    virtual itk::LightObject::Pointer InternalClone() const;
 
-  /**
-   * \brief Returns whether the point is on the plane
-   * (bounding-box \em not considered)
-   */
-  bool IsOnPlane( const Point3D &point ) const;
+    /** Implements operation to re-orient the plane */
+    virtual void ExecuteOperation( Operation *operation );
 
+  protected:
+    PlaneGeometry();
 
-  /**
-   * \brief Returns whether the line is on the plane
-   * (bounding-box \em not considered)
-   */
-  bool IsOnPlane( const Line3D &line ) const;
+    virtual ~PlaneGeometry();
 
+    virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
-  /**
-   * \brief Returns whether the plane is on the plane
-   * (bounding-box \em not considered)
-   *
-   * @return true iff the normal vector of the planes point to the same or the exactly oposit direction and
-   *  the distance of the planes is < eps
-   *
-   */
-  bool IsOnPlane( const PlaneGeometry *plane ) const;
+    virtual void InternPreSetBounds( const BoundingBox::BoundsArrayType &bounds );
 
+  private:
+    /**
+    * \brief Compares plane with another plane: \a true if IsOnPlane
+    * (bounding-box \em not considered)
+    */
+    virtual bool operator==( const PlaneGeometry * ) const { return false; };
 
-  /**
-   * \brief Returns the lot from the point to the plane
-   */
-  Point3D ProjectPointOntoPlane( const Point3D &pt ) const;
-
-
-  virtual void SetIndexToWorldTransform( AffineTransform3D *transform);
-
-
-  virtual void SetBounds( const BoundingBox::BoundsArrayType &bounds );
-
-
-  virtual itk::LightObject::Pointer InternalClone() const;
-
-
-  /** Implements operation to re-orient the plane */
-  virtual void ExecuteOperation( Operation *operation );
-
-
-protected:
-  PlaneGeometry();
-
-  virtual ~PlaneGeometry();
-
-  virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
-
-private:
-   /**
-   * \brief Compares plane with another plane: \a true if IsOnPlane
-   * (bounding-box \em not considered)
-   */
-  virtual bool operator==( const PlaneGeometry * ) const { return false; };
-
-  /**
-   * \brief Compares plane with another plane: \a false if IsOnPlane
-   * (bounding-box \em not considered)
-   */
-  virtual bool operator!=( const PlaneGeometry * ) const { return false; };
-
-};
-
+    /**
+    * \brief Compares plane with another plane: \a false if IsOnPlane
+    * (bounding-box \em not considered)
+    */
+    virtual bool operator!=( const PlaneGeometry * ) const { return false; };
+  };
 } // namespace mitk
-
 
 #endif /* PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */

@@ -160,6 +160,8 @@ void
 /** Set the bounds */
 void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
 {
+  InternPreSetBounds(bounds);
+
   m_BoundingBox = BoundingBoxType::New();
 
   BoundingBoxType::PointsContainer::Pointer pointscontainer =
@@ -181,6 +183,8 @@ void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
   m_BoundingBox->ComputeBoundingBox();
   this->Modified();
 }
+
+void mitk::BaseGeometry::InternPreSetBounds(const BoundsArrayType& bounds){};
 
 void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
 {

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef GEOMETRY2D_H_HEADER_INCLUDED_C1F4D8E0
 #define GEOMETRY2D_H_HEADER_INCLUDED_C1F4D8E0
 
@@ -22,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometry3D.h"
 
 namespace mitk {
-
 /**
  * \brief Describes the geometry of a two-dimensional object
  *
@@ -243,7 +241,6 @@ public:
   Geometry3D *GetReferenceGeometry() const;
   bool HasReferenceGeometry() const;
 
-
 protected:
   Geometry2D();
 
@@ -267,7 +264,6 @@ protected:
 
   mitk::Geometry3D *m_ReferenceGeometry;
 };
-
 } // namespace mitk
 
 #endif /* GEOMETRY2D_H_HEADER_INCLUDED_C1F4D8E0 */

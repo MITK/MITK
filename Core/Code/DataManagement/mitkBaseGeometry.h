@@ -56,6 +56,8 @@ namespace mitk {
   public:
     mitkClassMacro(BaseGeometry, itk::Object);
 
+    //void testXYZ(){}; //xxx
+
     // ********************************** TypeDef **********************************
 
     typedef itk::QuaternionRigidTransform< ScalarType > QuaternionTransformType;
@@ -336,7 +338,7 @@ namespace mitk {
     //##
     //## Only possible via the BoundsArray to make clear that a
     //## copy of the bounding-box is stored, not a reference to it.
-    virtual void SetBounds(const BoundsArrayType& bounds);
+    void SetBounds(const BoundsArrayType& bounds);
 
     //##Documentation
     //## @brief Set the bounding box (in index/unit coordinates) via a float array
@@ -469,6 +471,8 @@ namespace mitk {
 
     virtual void InternPostInitialize() {};
     virtual void InternPostInitializeGeometry(Self * newGeometry) const{};
+
+    virtual void InternPreSetBounds(const BoundsArrayType& bounds);
 
     // ********************************** Variables **********************************
 

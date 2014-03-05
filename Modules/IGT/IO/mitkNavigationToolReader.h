@@ -60,6 +60,8 @@ namespace mitk {
 
     std::string m_ErrorMessage;
 
+    std::string m_ToolfilePath; //This path is used to store the toolfiles. It must be available through the whole MITK run.
+
     mitk::NavigationTool::Pointer ConvertDataNodeToNavigationTool(mitk::DataNode::Pointer node, std::string toolPath);
 
     //################### protected help methods ########################

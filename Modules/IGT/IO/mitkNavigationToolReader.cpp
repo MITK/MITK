@@ -15,20 +15,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //Poco headers
-#include "Poco/Zip/Decompress.h"
-#include "Poco/Path.h"
+#include <Poco/Zip/Decompress.h>
+#include <Poco/Path.h>
 
 //mitk headers
 #include "mitkNavigationToolReader.h"
 #include "mitkTrackingTypes.h"
-#include <mitkStandardFileLocations.h>
+#include <mitkIOUtil.h>
 #include <mitkSceneIO.h>
-
-
 
 mitk::NavigationToolReader::NavigationToolReader()
   {
-
+    //TODO: maybe replace program path by a valid temp directory if there is one. See bug 17310 for the current problems.
+    m_ToolfilePath = mitk::IOUtil::GetProgramPath() + Poco::Path::separator() + "IGT_Toolfiles" + Poco::Path::separator();
   }
 
 mitk::NavigationToolReader::~NavigationToolReader()
@@ -46,7 +45,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
     return NULL;
     }
 
-  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "toolFilesByNavigationToolReader" + Poco::Path::separator() + GetFileWithoutPath(filename);
+  std::string tempDirectory = m_ToolfilePath + GetFileWithoutPath(filename);
   Poco::Zip::Decompress unzipper( file, Poco::Path( tempDirectory ) );
   unzipper.decompressAllFiles();
 
@@ -146,11 +145,8 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
 
 std::string mitk::NavigationToolReader::GetFileWithoutPath(std::string FileWithPath)
   {
-  std::string returnValue = "";
-  returnValue = FileWithPath.substr(FileWithPath.rfind("/")+1, FileWithPath.length());
-  //dirty hack: Windows path seperators
-  if (returnValue.size() == FileWithPath.size()) returnValue = FileWithPath.substr(FileWithPath.rfind("\\")+1, FileWithPath.length());
-  return returnValue;
+  Poco::Path myFile(FileWithPath.c_str());
+  return myFile.getFileName();
   }
 
 mitk::PointSet::Pointer mitk::NavigationToolReader::ConvertStringToPointSet(std::string string)

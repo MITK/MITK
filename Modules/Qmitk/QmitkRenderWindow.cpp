@@ -50,8 +50,12 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   {
     GetRenderWindow()->SetMultiSamples(8);
   }
+  else if(renderingMode == mitk::BaseRenderer::RenderingMode::Standard)
+  {
+    GetRenderWindow()->SetMultiSamples(0);
+  }
 
-  Initialize(renderingManager, name.toStdString().c_str()); // Initialize mitkRenderWindowBase
+  Initialize(renderingManager, name.toStdString().c_str(),renderingMode); // Initialize mitkRenderWindowBase
 
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);

@@ -63,6 +63,7 @@ private:
 public:
 
   mitkClassMacro(VtkPropRenderer,BaseRenderer);
+  mitkNewMacro3Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager* );
   mitkNewMacro4Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager*, mitk::BaseRenderer::RenderingMode::Type );
 
   typedef std::map<int,Mapper*> MappersMapType;

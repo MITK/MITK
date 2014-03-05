@@ -69,6 +69,20 @@ static void CropTestLoadedImage(std::string mitkImagePath, std::string mitkCropp
   // test with not correctable roi
   roiWrong = cv::Rect( 5,5,-1,-1 );
   MITK_TEST_FOR_EXCEPTION(mitk::Exception, cropFilter->SetCropRegion(roiWrong));
+
+  // test with rois where the top left corner is outside the image boundaries
+  roiWrong = cv::Rect( testImage.cols,0,1,1 );
+  cropFilter->SetCropRegion(roiWrong);
+  MITK_TEST_CONDITION(!cropFilter->FilterImage(testImage),
+                      "Filter function should return unsuccessfully if top left corner is outside image boundary (cols).");
+  roiWrong = cv::Rect( 0,testImage.rows,1,1 );
+  cropFilter->SetCropRegion(roiWrong);
+  MITK_TEST_CONDITION(!cropFilter->FilterImage(testImage),
+                       "Filter function should return unsuccessfully if top left corner is outside image boundary (rows).");
+  roiWrong = cv::Rect( testImage.cols,testImage.rows,1,1 );
+  cropFilter->SetCropRegion(roiWrong);
+  MITK_TEST_CONDITION(!cropFilter->FilterImage(testImage),
+                       "Filter function should return unsuccessfully if top left corner is outside image boundary (cols+rows).");
 }
 
 /**Documentation

@@ -24,5 +24,15 @@
     <file>Stop.png</file>
     <file>Help_48x48.png</file>
     <file>AdvancedTools.png</file>
+    <file>visible.png</file>
+    <file>invisible.png</file>
+    <file>lock.png</file>
+    <file>unlock.png</file>
+    <file>MergeLabels.png</file>
+    <file>RemoveLabel.png</file>
+    <file>EraseLabel.png</file>
+    <file>CreateSurface.png</file>
+    <file>RandomColor.png</file>
+    <file>RenameLabel.png</file>
   </qresource>
 </RCC>

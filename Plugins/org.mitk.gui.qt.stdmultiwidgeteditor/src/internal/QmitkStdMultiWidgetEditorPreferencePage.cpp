@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFormLayout>
 #include <QCheckBox>
 #include <QColorDialog>
+#include <QComboBox>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
@@ -29,12 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage()
 : m_MainControl(0)
 {
-
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::Init(berry::IWorkbench::Pointer )
 {
-
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
@@ -85,11 +84,35 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   QWidget* colorWidget = new QWidget;
   colorWidget->setLayout(colorWidgetLayout);
 
+  QLabel* renderLabel = new QLabel;
+  renderLabel->setText("Rendering Mode");
+
+  m_RenderingMode = new QComboBox;
+  m_RenderingMode->addItem("Standard Rendering");
+  m_RenderingMode->addItem("Enable Multisampling (Antialiasing)" );
+  m_RenderingMode->addItem("Enable Depth Peeling" );
+
+  QLabel* cBHint = new QLabel;
+  cBHint->setText("* Changes require restart of MITK");
+
+  QSpacerItem *spacer1 = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
+
+  QHBoxLayout* renderingWidgetLayout = new QHBoxLayout;
+  renderingWidgetLayout->setContentsMargins(4,4,4,4);
+  renderingWidgetLayout->addWidget(renderLabel);
+  renderingWidgetLayout->addWidget(m_RenderingMode);
+  renderingWidgetLayout->addWidget(cBHint);
+  renderingWidgetLayout->addSpacerItem(spacer1);
+
+  QWidget* renderingWidget = new QWidget;
+  renderingWidget->setLayout(renderingWidgetLayout);
+
   //spacer
   QSpacerItem *spacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
   QVBoxLayout* vBoxLayout = new QVBoxLayout;
   vBoxLayout->addLayout(formLayout);
   vBoxLayout->addWidget(colorWidget);
+  vBoxLayout->addWidget(renderingWidget);
   vBoxLayout->addSpacerItem(spacer);
 
   m_MainControl->setLayout(vBoxLayout);
@@ -102,6 +125,9 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 
   QObject::connect( resetButton, SIGNAL( clicked() )
     , this, SLOT( ResetColors() ) );
+
+  QObject::connect( m_RenderingMode, SIGNAL(activated(int) )
+    , this, SLOT( ChangeRenderingMode(int) ) );
 
   this->Update();
 }
@@ -121,13 +147,13 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
                                         , m_EnableFlexibleZooming->isChecked());
   m_StdMultiWidgetEditorPreferencesNode->PutBool("Show level/window widget", m_ShowLevelWindowWidget->isChecked());
   m_StdMultiWidgetEditorPreferencesNode->PutBool("PACS like mouse interaction", m_PACSLikeMouseMode->isChecked());
+  m_StdMultiWidgetEditorPreferencesNode->PutInt("Rendering Mode", m_RenderingMode->currentIndex());
 
   return true;
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::PerformCancel()
 {
-
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::Update()
@@ -139,6 +165,9 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   m_SecondColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("second background color style sheet", ""));
   m_FirstColor = m_StdMultiWidgetEditorPreferencesNode->GetByteArray("first background color", "");
   m_SecondColor = m_StdMultiWidgetEditorPreferencesNode->GetByteArray("second background color", "");
+  int index=m_StdMultiWidgetEditorPreferencesNode->GetInt("Rendering Mode",0);
+  m_RenderingMode->setCurrentIndex(index);
+
   if (m_FirstColorStyleSheet=="")
   {
     m_FirstColorStyleSheet = "background-color:rgb(25,25,25)";
@@ -209,13 +238,26 @@ void QmitkStdMultiWidgetEditorPreferencePage::ResetColors()
   m_ColorButton2->setStyleSheet(m_SecondColorStyleSheet);
 }
 
+void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
+{
+  if( i == 0 )
+  {
+    m_CurrentRenderingMode = "Standard";
+  }
+  else if( i == 1 )
+  {
+   m_CurrentRenderingMode = "Multisampling";
+  }
+  else if( i == 2 )
+  {
+    m_CurrentRenderingMode = "DepthPeeling";
+  }
+}
+
 void QmitkStdMultiWidgetEditorPreferencePage::UseGradientBackgroundSelected()
 {
-
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::ColorActionChanged()
 {
-
 }
-

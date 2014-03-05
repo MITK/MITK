@@ -32,7 +32,7 @@ QmitkSelectableGLWidget::QmitkSelectableGLWidget(QWidget* parent)
   rendererName += objectName();
 
   // create Renderer
-  m_Renderer= mitk::VtkPropRenderer::New( qPrintable(rendererName), NULL, mitk::RenderingManager::GetInstance() );
+  m_Renderer= mitk::VtkPropRenderer::New( qPrintable(rendererName), NULL, mitk::RenderingManager::GetInstance(),mitk::BaseRenderer::RenderingMode::Standard );
 
   // create widget
   QString composedName("QSGLWt::");
@@ -50,21 +50,17 @@ QmitkSelectableGLWidget::QmitkSelectableGLWidget(QWidget* parent)
   m_RenderWindow = new QmitkRenderWindow(this, composedName,m_Renderer);
 
   hlayout->addWidget(m_RenderWindow);
-
 }
-
 
 mitk::VtkPropRenderer* QmitkSelectableGLWidget::GetRenderer()
 {
   return m_Renderer.GetPointer();
 }
 
-
 QmitkRenderWindow* QmitkSelectableGLWidget::GetRenderWindow() const
 {
   return m_RenderWindow;
 }
-
 
 void QmitkSelectableGLWidget::wheelEvent( QWheelEvent * e )
 {
@@ -89,7 +85,6 @@ void QmitkSelectableGLWidget::wheelEvent( QWheelEvent * e )
   }
 }
 
-
 mitk::SliceNavigationController*
 QmitkSelectableGLWidget
 ::GetSliceNavigationController() const
@@ -97,14 +92,12 @@ QmitkSelectableGLWidget
   return m_RenderWindow->GetSliceNavigationController();
 }
 
-
 mitk::CameraRotationController*
 QmitkSelectableGLWidget
 ::GetCameraRotationController() const
 {
   return m_RenderWindow->GetCameraRotationController();
 }
-
 
 mitk::BaseController*
 QmitkSelectableGLWidget

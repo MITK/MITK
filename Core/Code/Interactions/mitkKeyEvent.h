@@ -56,7 +56,6 @@ class MITK_CORE_EXPORT KeyEvent : public Event
     void SetDisplayPosition(const Point2D& displPosition) {
       m_DisplayPosition = displPosition;
       m_WorldPositionIsSet = false;
-      m_PickedObjectIsSet = false;
     }
 
     const Point3D& GetWorldPosition() const;

@@ -194,17 +194,26 @@ void mitk::DataNode::SetRequestedRegion( const itk::DataObject * /*data*/)
 void mitk::DataNode::CopyInformation(const itk::DataObject * /*data*/)
 {
 }
+
 mitk::PropertyList* mitk::DataNode::GetPropertyList(const mitk::BaseRenderer* renderer) const
 {
   if(renderer==NULL)
     return m_PropertyList;
 
-  mitk::PropertyList::Pointer & propertyList = m_MapOfPropertyLists[renderer];
+  return this->GetPropertyList(renderer->GetName());
+}
+
+mitk::PropertyList* mitk::DataNode::GetPropertyList(const std::string& rendererName) const
+{
+  if (rendererName.empty())
+    return m_PropertyList;
+
+  mitk::PropertyList::Pointer & propertyList = m_MapOfPropertyLists[rendererName];
 
   if(propertyList.IsNull())
     propertyList = mitk::PropertyList::New();
 
-  assert(m_MapOfPropertyLists[renderer].IsNotNull());
+  assert(m_MapOfPropertyLists[rendererName].IsNotNull());
 
   return propertyList;
 }
@@ -222,9 +231,11 @@ mitk::BaseProperty* mitk::DataNode::GetProperty(const char *propertyKey, const m
   //renderer specified?
   if (renderer)
   {
-    std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer>::const_iterator it;
+    std::string rendererName = renderer->GetName();
+
+    MapOfPropertyLists::const_iterator it;
     //check for the renderer specific property
-    it=m_MapOfPropertyLists.find(renderer);
+    it=m_MapOfPropertyLists.find(rendererName);
     if(it!=m_MapOfPropertyLists.end()) //found
     {
       mitk::BaseProperty::Pointer property;

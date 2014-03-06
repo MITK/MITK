@@ -4,7 +4,7 @@ OPTION(MITK_USE_US_TELEMED_SDK "Enable support for Telemed api devices" OFF)
 
 IF(MITK_USE_US_TELEMED_SDK)
 
-SET(MITK_US_TELEMED_SDK_PATH "" CACHE FILEPATH "Path to Telemed SDK header files.")
+SET(MITK_US_TELEMED_SDK_PATH "" CACHE PATH "Path to Telemed SDK header files.")
 
 MITK_CREATE_MODULE(MitkUSHardwareTelemed
   SUBPROJECTS

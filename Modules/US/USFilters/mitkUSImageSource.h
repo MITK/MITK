@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKUSImageSource_H_HEADER_INCLUDED_
 #define MITKUSImageSource_H_HEADER_INCLUDED_
 
@@ -24,8 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
-#include "mitkUSImage.h"
-#include "mitkAbstractOpenCVImageFilter.h"
+#include "mitkBasicCombinationOpenCVImageFilter.h"
 #include "mitkOpenCVToMitkImageFilter.h"
 #include "mitkImageToOpenCVImageFilter.h"
 
@@ -33,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cv.h"
 
 namespace mitk {
-
   /**
   * \brief This is an abstract superclass for delivering USImages.
   * Each subclass must implement the method mitk::USImageSource::GetNextRawImage().
@@ -46,10 +43,15 @@ namespace mitk {
   class MitkUS_EXPORT USImageSource : public itk::Object
   {
   public:
+    static const char* IMAGE_PROPERTY_IDENTIFIER;
+
     mitkClassMacro(USImageSource, itk::Object);
 
-    itkGetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
-    itkSetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
+    itkGetMacro(ImageFilter, mitk::BasicCombinationOpenCVImageFilter::Pointer);
+
+    void PushFilter(AbstractOpenCVImageFilter::Pointer filter);
+    bool RemoveFilter(AbstractOpenCVImageFilter::Pointer filter);
+    bool GetIsFilterInThePipeline(AbstractOpenCVImageFilter::Pointer filter);
 
     /**
     * \brief Retrieves the next frame. This will typically be the next frame
@@ -58,31 +60,27 @@ namespace mitk {
     *
     * \return pointer to the next USImage (filtered if set)
     */
-    mitk::USImage::Pointer GetNextImage( );
+    mitk::Image::Pointer GetNextImage( );
 
   protected:
     USImageSource();
     virtual ~USImageSource();
     /**
-      * \brief Set the given OpenCV image matrix to the next image received
-      * from the device or file.
-      *
-      * The standard implementation calls the overloaded function with an
-      * mitk::Image and converts this image to OpenCV then. One should reimplement
-      * this method for a better performance if an image filter is set.
-      */
+    * \brief Set the given OpenCV image matrix to the next image received
+    * from the device or file.
+    *
+    * The standard implementation calls the overloaded function with an
+    * mitk::Image and converts this image to OpenCV then. One should reimplement
+    * this method for a better performance if an image filter is set.
+    */
     virtual void GetNextRawImage( cv::Mat& );
 
     /**
-      * \brief Set mitk::Image to the next image received from the device or file.
-      * This method must be implemented in every subclass.
-      */
+    * \brief Set mitk::Image to the next image received from the device or file.
+    * This method must be implemented in every subclass.
+    */
     virtual void GetNextRawImage( mitk::Image::Pointer& ) = 0;
 
-    /**
-      * \brief Filter is executed during mitk::USImageVideoSource::GetNextImage().
-      */
-    AbstractOpenCVImageFilter::Pointer m_ImageFilter;
     /**
     * \brief Used to convert from OpenCV Images to MITK Images.
     */
@@ -91,6 +89,14 @@ namespace mitk {
     * \brief Used to convert from MITK Images to OpenCV Images.
     */
     mitk::ImageToOpenCVImageFilter::Pointer m_MitkToOpenCVFilter;
+
+  private:
+        /**
+    * \brief Filter is executed during mitk::USImageVideoSource::GetNextImage().
+    */
+    BasicCombinationOpenCVImageFilter::Pointer m_ImageFilter;
+
+    int                                        m_CurrentImageId;
   };
 } // namespace mitk
 #endif /* MITKUSImageSource_H_HEADER_INCLUDED_ */

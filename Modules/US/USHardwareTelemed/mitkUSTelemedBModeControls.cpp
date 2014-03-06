@@ -24,8 +24,10 @@ mitk::USTelemedBModeControls::USTelemedBModeControls(itk::SmartPointer<USTelemed
 : mitk::USControlInterfaceBMode(device.GetPointer()),
   m_UsgDataView(0), m_PowerControl(0), m_FrequencyControl(0),
   m_DepthControl(0), m_GainControl(0), m_RejectionControl(0),
+  m_DynamicRangeControl(0),
   m_Active(false), m_PowerSteps(new double[3]),
-  m_GainSteps(new double[3]), m_RejectionSteps(new double[3])
+  m_GainSteps(new double[3]), m_RejectionSteps(new double[3]),
+  m_DynamicRangeSteps(new double[3])
 {
 }
 
@@ -36,6 +38,7 @@ mitk::USTelemedBModeControls::~USTelemedBModeControls()
   delete[] m_PowerSteps;
   delete[] m_GainSteps;
   delete[] m_RejectionSteps;
+  delete[] m_DynamicRangeSteps;
 }
 
 void mitk::USTelemedBModeControls::SetUsgDataView( Usgfw2Lib::IUsgDataView* usgDataView)
@@ -196,6 +199,31 @@ double mitk::USTelemedBModeControls::GetScanningRejectionTick( )
   return m_RejectionSteps[2];
 }
 
+double mitk::USTelemedBModeControls::GetScanningDynamicRange( )
+{
+  RETURN_TelemedValue(m_DynamicRangeControl);
+}
+
+void mitk::USTelemedBModeControls::OnSetScanningDynamicRange( double value )
+{
+  SET_TelemedValue(m_DynamicRangeControl, value);
+}
+
+double mitk::USTelemedBModeControls::GetScanningDynamicRangeMin( )
+{
+  return m_DynamicRangeSteps[0];
+}
+
+double mitk::USTelemedBModeControls::GetScanningDynamicRangeMax( )
+{
+  return m_DynamicRangeSteps[1];
+}
+
+double mitk::USTelemedBModeControls::GetScanningDynamicRangeTick( )
+{
+  return m_DynamicRangeSteps[2];
+}
+
 void mitk::USTelemedBModeControls::CreateControls()
 {
   // create frequency control
@@ -215,6 +243,10 @@ void mitk::USTelemedBModeControls::CreateControls()
   // create B mode rejection control
   CREATE_TelemedControl(m_RejectionControl, m_UsgDataView, Usgfw2Lib::IID_IUsgRejection2, Usgfw2Lib::IUsgRejection2, Usgfw2Lib::SCAN_MODE_B);
   GETINOUTPUT_TelemedAvailableValuesBounds(m_RejectionControl, m_RejectionSteps); // get min, max and tick for rejection
+
+  // create B mode dynamic range control
+  CREATE_TelemedControl(m_DynamicRangeControl, m_UsgDataView, Usgfw2Lib::IID_IUsgDynamicRange, Usgfw2Lib::IUsgDynamicRange, Usgfw2Lib::SCAN_MODE_B);
+  GETINOUTPUT_TelemedAvailableValuesBounds(m_DynamicRangeControl, m_DynamicRangeSteps); // get min, max and tick for dynamic range
 }
 
 void mitk::USTelemedBModeControls::ReleaseControls()
@@ -225,4 +257,5 @@ void mitk::USTelemedBModeControls::ReleaseControls()
   SAFE_RELEASE(m_DepthControl);
   SAFE_RELEASE(m_GainControl);
   SAFE_RELEASE(m_RejectionControl);
+  SAFE_RELEASE(m_DynamicRangeControl);
 }

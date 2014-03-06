@@ -1,0 +1,8 @@
+MITK_CREATE_MODULE(MitkUSNavigation
+  SUBPROJECTS
+  INCLUDE_DIRS Filter Interactors
+  DEPENDS MitkUS MitkIGT
+  INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
+)
+
+add_subdirectory(Testing)

@@ -60,3 +60,9 @@ void mitk::USControlInterfaceBMode::SetScanningRejection( double rejection )
   this->OnSetScanningRejection(rejection);
   m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_BMODE_REJECTION, rejection);
 }
+
+void mitk::USControlInterfaceBMode::SetScanningDynamicRange( double dynamicRange )
+{
+  this->OnSetScanningDynamicRange(dynamicRange);
+  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_BMODE_DYNAMIC_RANGE, dynamicRange);
+}

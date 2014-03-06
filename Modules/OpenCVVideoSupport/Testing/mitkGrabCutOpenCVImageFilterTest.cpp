@@ -175,10 +175,7 @@ int mitkGrabCutOpenCVImageFilterTest(int argc, char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED(argc == 4, "Test needs four command line parameters.")
 
-// test fails on windows, commented out till it can be fixed
-#ifndef WIN32
   GrabCutTestLoadedImage(argv[1], argv[2], argv[3]);
-#endif
 
   MITK_TEST_END() // always end with this!
 }

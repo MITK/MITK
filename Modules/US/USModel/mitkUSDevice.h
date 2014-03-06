@@ -23,13 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MitkUS
 #include "mitkUSProbe.h"
 #include "mitkUSImageMetadata.h"
-#include "mitkUSImage.h"
 #include <MitkUSExports.h>
 #include "mitkUSImageSource.h"
-
-#include "mitkUSControlInterfaceProbes.h"
-#include "mitkUSControlInterfaceBMode.h"
-#include "mitkUSControlInterfaceDoppler.h"
 
 // MITK
 #include <mitkCommon.h>
@@ -44,7 +39,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
 
+namespace itk {
+template<class T> class SmartPointer;
+}
+
 namespace mitk {
+class USAbstractControlInterface;
+class USControlInterfaceBMode;
+class USControlInterfaceProbes;
+class USControlInterfaceDoppler;
+
   /**
   * \brief A device holds information about it's model, make and the connected probes. It is the
   * common super class for all devices and acts as an image source for mitkUSImages. It is the base class
@@ -92,6 +96,7 @@ namespace mitk {
     static const std::string US_PROPKEY_BMODE_DEPTH;
     static const std::string US_PROPKEY_BMODE_GAIN;
     static const std::string US_PROPKEY_BMODE_REJECTION;
+    static const std::string US_PROPKEY_BMODE_DYNAMIC_RANGE;
 
     /**
     * \brief Default getter for the custom control interface.
@@ -100,7 +105,7 @@ namespace mitk {
     *
     * \return null pointer
     */
-    virtual USAbstractControlInterface::Pointer   GetControlInterfaceCustom();
+    virtual itk::SmartPointer<USAbstractControlInterface>   GetControlInterfaceCustom();
 
     /**
     * \brief Default getter for the b mode control interface.
@@ -109,7 +114,7 @@ namespace mitk {
     *
     * \return null pointer
     */
-    virtual USControlInterfaceBMode::Pointer      GetControlInterfaceBMode();
+    virtual itk::SmartPointer<USControlInterfaceBMode>      GetControlInterfaceBMode();
 
     /**
     * \brief Default getter for the probes control interface.
@@ -118,7 +123,7 @@ namespace mitk {
     *
     * \return null pointer
     */
-    virtual USControlInterfaceProbes::Pointer     GetControlInterfaceProbes();
+    virtual itk::SmartPointer<USControlInterfaceProbes>     GetControlInterfaceProbes();
 
     /**
     * \brief Default getter for the doppler control interface.
@@ -127,7 +132,7 @@ namespace mitk {
     *
     * \return null pointer
     */
-    virtual USControlInterfaceDoppler::Pointer    GetControlInterfaceDoppler();
+    virtual itk::SmartPointer<USControlInterfaceDoppler>    GetControlInterfaceDoppler();
 
     /**
     * \brief Changes device state to mitk::USDevice::State_Initialized.
@@ -150,6 +155,8 @@ namespace mitk {
     *
     */
     bool Connect();
+
+    void ConnectAsynchron();
 
     /**
     * \brief Works analogously to mitk::USDevice::Connect(). Don't override this Method, but onDisconnection instead.
@@ -182,33 +189,9 @@ namespace mitk {
     */
     virtual bool GetIsFreezed();
 
-    /**
-    * \brief Add a probe to the device without connecting to it.
-    *  This should usually be done before connecting to the probe.
-    */
-    virtual void AddProbe(mitk::USProbe::Pointer probe);
-
-    /**
-    * \brief Connect to a probe and activate it. The probe should be added first.
-    *  Usually, a VideoDevice will simply add a probe it wants to connect to,
-    *  but an SDK Device might require adding a probe first.
-    */
-    virtual void ActivateProbe(mitk::USProbe::Pointer probe);
-
-    /**
-    * \brief Deactivates the currently active probe.
-    */
-    virtual void DeactivateProbe();
-
-    /**
-    * \brief Removes a probe from the ist of currently added probes.
-    */
-    //virtual void removeProbe(mitk::USProbe::Pointer probe);
-
-    /**
-    *  \brief Returns a vector containing all connected probes.
-    */
-    std::vector<mitk::USProbe::Pointer> GetConnectedProbes();
+    void PushFilter(AbstractOpenCVImageFilter::Pointer filter);
+    void PushFilterIfNotPushedBefore(AbstractOpenCVImageFilter::Pointer filter);
+    bool RemoveFilter(AbstractOpenCVImageFilter::Pointer filter);
 
     /**
     * \brief Given property is updated in the device micro service.
@@ -219,44 +202,6 @@ namespace mitk {
     void UpdateServiceProperty(std::string key, std::string value);
     void UpdateServiceProperty(std::string key, double value);
     void UpdateServiceProperty(std::string key, bool value);
-
-    /**
-    *\brief return the output (output with id 0) of the filter
-    */
-    USImage* GetOutput(void);
-
-    /**
-    *\brief return the output with id idx of the filter
-    */
-    USImage* GetOutput(unsigned int idx);
-
-    /**
-    *\brief Graft the specified DataObject onto this ProcessObject's output.
-    *
-    * See itk::ImageSource::GraftNthOutput for details
-    */
-    virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
-
-    /**
-    * \brief Graft the specified DataObject onto this ProcessObject's output.
-    *
-    * See itk::ImageSource::Graft Output for details
-    */
-    virtual void GraftOutput(itk::DataObject *graft);
-
-    //      /**
-    //      * \brief Make a DataObject of the correct type to used as the specified output.
-    //      *
-    //      * This method is automatically called when DataObject::DisconnectPipeline()
-    //      * is called.  DataObject::DisconnectPipeline, disconnects a data object
-    //      * from being an output of its current source.  When the data object
-    //      * is disconnected, the ProcessObject needs to construct a replacement
-    //      * output data object so that the ProcessObject is in a valid state.
-    //      * Subclasses of USImageVideoSource that have outputs of different
-    //      * data types must overwrite this method so that proper output objects
-    //      * are created.
-    //      */
-    //      virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
     //########### GETTER & SETTER ##################//
 
@@ -281,22 +226,6 @@ namespace mitk {
     */
     bool GetIsConnected();
 
-    /**
-    * \brief Sets a transformation as Calibration data. It also marks the device as Calibrated. This data is not automatically applied to the image. Subclasses must call ApplyTransformation
-    * to achieve this.
-    */
-    void setCalibration (mitk::AffineTransform3D::Pointer calibration);
-
-    /**
-    * \brief Returns the current Calibration
-    */
-    itkGetMacro(Calibration, mitk::AffineTransform3D::Pointer);
-
-    /**
-    * \brief Returns the currently active probe or null, if none is active
-    */
-    itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);
-
     /* @return Returns the area that will be cropped from the US image. Is disabled / [0,0,0,0] by default. */
     mitk::USDevice::USImageCropArea GetCropArea();
 
@@ -304,16 +233,22 @@ namespace mitk {
     std::string GetDeviceModel();
     std::string GetDeviceComment();
 
+    itkGetMacro(DeviceState, DeviceStates);
+
     void GrabImage();
 
     virtual USImageSource::Pointer GetUSImageSource() = 0;
 
   protected:
-    static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
+    itkSetMacro(Image, mitk::Image::Pointer);
+    itkSetMacro(SpawnAcquireThread, bool);
+    itkGetMacro(SpawnAcquireThread, bool);
 
-    mitk::USProbe::Pointer m_ActiveProbe;
-    std::vector<mitk::USProbe::Pointer> m_ConnectedProbes;
-    mitk::USImage::Pointer m_Image;
+    static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
+    static ITK_THREAD_RETURN_TYPE ConnectThread(void* pInfoStruct);
+
+    mitk::Image::Pointer m_Image;
+    mitk::Image::Pointer m_OutputImage;
 
     bool m_IsFreezed;
 
@@ -389,7 +324,7 @@ namespace mitk {
     * Subclasses can overwrite this method to do additional actions. Default
     * implementation does noting.
     */
-    virtual void OnFreeze(bool) { };
+    virtual void OnFreeze(bool) { }
 
     /**
     * \brief This metadata set is privately used to imprint USImages with Metadata later.
@@ -416,26 +351,13 @@ namespace mitk {
     * \brief Grabs the next frame from the Video input.
     * This method is called internally, whenever Update() is invoked by an Output.
     */
-    void GenerateData() = 0;
-
-    /**
-    * \brief The Calibration Transformation of this US-Device.
-    * This will automatically be written into the image once
-    */
-    mitk::AffineTransform3D::Pointer m_Calibration;
-
-    /**
-    *  \brief Convenience method that can be used by subclasses to apply the Calibration Data to the image.
-    * A subclass has to call this method or set the transformation itself for
-    * the output to be calibrated!
-    *
-    * \return true if a Calibration was set and false otherwise (usually happens when no transformation was set yet)
-    */
-    bool ApplyCalibration(mitk::USImage::Pointer image);
+    virtual void GenerateData();
 
     std::string GetServicePropertyLabel();
 
   private:
+
+    bool m_SpawnAcquireThread;
 
     /**
     *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
@@ -443,7 +365,7 @@ namespace mitk {
     us::ServiceRegistration<Self> m_ServiceRegistration;
 
     /**
-    * \brief Properties of device microservice.
+    * \brief Properties of the device's Microservice.
     */
     us::ServiceProperties m_ServiceProperties;
 
@@ -451,8 +373,7 @@ namespace mitk {
     itk::ConditionVariable::Pointer m_FreezeBarrier;
     itk::SimpleMutexLock        m_FreezeMutex;
     itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
-    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the range camera
-    itk::FastMutexLock::Pointer m_CameraActiveMutex; ///< mutex for the cameraActive flag
+    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the image source
     int m_ThreadID; ///< ID of the started thread
 
     bool m_UnregisteringStarted;

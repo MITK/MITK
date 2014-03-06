@@ -72,6 +72,12 @@ namespace mitk {
     virtual double GetScanningRejectionMax( );
     virtual double GetScanningRejectionTick( );
 
+    virtual double GetScanningDynamicRange( );
+    virtual void OnSetScanningDynamicRange( double );
+    virtual double GetScanningDynamicRangeMin( );
+    virtual double GetScanningDynamicRangeMax( );
+    virtual double GetScanningDynamicRangeTick( );
+
     /**
       * \brief Setter for the IUsgDataView necesary for communicating with the Telemed API.
       * This method is just for internal use of the mitk::USTelemedDevice.
@@ -89,18 +95,20 @@ namespace mitk {
 
     double GetScanningFrequencyAPI( );
 
-    Usgfw2Lib::IUsgDataView*             m_UsgDataView;      // main SDK object for comminucating with the Telemed API
-    Usgfw2Lib::IUsgPower*                m_PowerControl;     // control for scanning power
-    Usgfw2Lib::IUsgProbeFrequency2*      m_FrequencyControl; // control for scanning frequency
-    Usgfw2Lib::IUsgDepth*                m_DepthControl;     // control for B mode scanning depth
-    Usgfw2Lib::IUsgGain*                 m_GainControl;      // control for B mode scanning gain
-    Usgfw2Lib::IUsgRejection2*           m_RejectionControl; // control for B mode scanning rejection
+    Usgfw2Lib::IUsgDataView*             m_UsgDataView;         // main SDK object for comminucating with the Telemed API
+    Usgfw2Lib::IUsgPower*                m_PowerControl;        // control for scanning power
+    Usgfw2Lib::IUsgProbeFrequency2*      m_FrequencyControl;    // control for scanning frequency
+    Usgfw2Lib::IUsgDepth*                m_DepthControl;        // control for B mode scanning depth
+    Usgfw2Lib::IUsgGain*                 m_GainControl;         // control for B mode scanning gain
+    Usgfw2Lib::IUsgRejection2*           m_RejectionControl;    // control for B mode scanning rejection
+    Usgfw2Lib::IUsgDynamicRange*         m_DynamicRangeControl; // control for B mode dynamic range
 
     bool                      m_Active;
 
-    double*                   m_PowerSteps;       // array holding possible power values: [min, max, tick]
-    double*                   m_GainSteps;        // array holding possible gains: [min, max, tick]
-    double*                   m_RejectionSteps;   // array holding possible rejections: [min, max, tick]
+    double*                   m_PowerSteps;        // array holding possible power values: [min, max, tick]
+    double*                   m_GainSteps;         // array holding possible gains: [min, max, tick]
+    double*                   m_RejectionSteps;    // array holding possible rejections: [min, max, tick]
+    double*                   m_DynamicRangeSteps; // array holding possible dynamic range values: [min, max, tick]
   };
 } // namespace mitk
 

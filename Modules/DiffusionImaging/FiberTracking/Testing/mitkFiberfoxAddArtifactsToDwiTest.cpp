@@ -112,17 +112,7 @@ public:
 
         if (refImage.IsNotNull())
         {
-            bool ok = CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage());
-            if (!ok)
-            {
-                mitk::IOUtil::SaveBaseData(testImage, "/tmp/test2.dwi");
-                mitk::IOUtil::SaveBaseData(refImage, "/tmp/ref2.dwi");
-            }
-            CPPUNIT_ASSERT_MESSAGE(testFileName, ok);
-        }
-        else
-        {
-            mitk::IOUtil::SaveBaseData(testImage, "/local/distortions2.dwi");
+            CPPUNIT_ASSERT_MESSAGE(testFileName, CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage()));
         }
     }
 

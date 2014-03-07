@@ -145,19 +145,6 @@ void mitk::USTelemedDevice::OnFreeze(bool freeze)
   }
 }
 
-void mitk::USTelemedDevice::GenerateData()
-{
-  mitk::USImage::Pointer result;
-  result = m_Image;
-
-  // set Metadata
-  result->SetMetadata(this->m_Metadata);
-  // apply Transformation
-  this->ApplyCalibration(result);
-  // set Output
-  this->SetNthOutput(0, result);
-}
-
 mitk::USImageSource::Pointer mitk::USTelemedDevice::GetUSImageSource()
 {
   return m_ImageSource.GetPointer();

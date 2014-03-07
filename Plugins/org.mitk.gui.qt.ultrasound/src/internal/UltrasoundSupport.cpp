@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkIRenderingManager.h>
 
 // Qmitk
 #include "UltrasoundSupport.h"
@@ -39,14 +40,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include "internal/org_mitk_gui_qt_ultrasound_Activator.h"
 
-#include <ctkFlowLayout.h>
-#include <ctkDoubleSlider.h>
-
 const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
 void UltrasoundSupport::SetFocus()
 {
-  //m_Controls.m_AddDevice->setFocus();
 }
 
 void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
@@ -66,18 +63,22 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 
   // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
-  std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(" + mitk::USDevice::US_PROPKEY_ISACTIVE + "=true))";
-  m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL ,filter);
+  std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "="
+      + "org.mitk.services.UltrasoundDevice)("
+      + mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE + "=true))";
+  m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(
+        mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL ,filter);
 
-  m_Node = mitk::DataNode::New();
-  m_Node->SetName("US Image Stream");
-  this->GetDataStorage()->Add(m_Node);
+  m_Node = this->GetDataStorage()->GetNamedNode("US Image Stream");
+  if (m_Node.IsNull())
+  {
+    // Create Node for US Stream
+    m_Node = mitk::DataNode::New();
+    m_Node->SetName("US Image Stream");
+    this->GetDataStorage()->Add(m_Node);
+  }
 
   m_Controls.tabWidget->setTabEnabled(1, false);
-
-  /*ctkFlowLayout* flowLayout = ctkFlowLayout::replaceLayout(m_Controls.m_WidgetDevices);
-  flowLayout->setAlignItems(true);
-  flowLayout->setOrientation(Qt::Vertical);*/
 }
 
 void UltrasoundSupport::OnClickedAddNewDevice()
@@ -90,17 +91,38 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 
 void UltrasoundSupport::DisplayImage()
 {
-  m_Device->UpdateOutputData(0);
+  m_Device->Modified();
+  m_Device->Update();
+
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
-  m_Node->SetData(curOutput->Clone());
-  //m_Node->SetData(curOutput);
+  if (! m_ImageAlreadySetToNode && curOutput.IsNotNull() && curOutput->IsInitialized())
+  {
+    m_Node->SetData(curOutput);
+    m_ImageAlreadySetToNode = true;
+  }
+
+  if ( curOutput.GetPointer() != m_Node->GetData() )
+  {
+    MITK_INFO << "Data Node of the ultrasound image stream was changed by another plugin. Stop viewing.";
+    this->StopViewing();
+    return;
+  }
+
   this->RequestRenderWindowUpdate();
 
   if ( curOutput->GetDimension() > 1
     && (curOutput->GetDimension(0) != m_CurrentImageWidth
     || curOutput->GetDimension(1) != m_CurrentImageHeight) )
   {
-    this->GlobalReinit();
+    // make a reinit on the ultrasound image
+    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+    if ( renderWindow != NULL && curOutput->GetTimeGeometry()->IsValid() )
+    {
+      renderWindow->GetRenderingManager()->InitializeViews(
+        curOutput->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+      renderWindow->GetRenderingManager()->RequestUpdateAll();
+    }
+
     m_CurrentImageWidth = curOutput->GetDimension(0);
     m_CurrentImageHeight = curOutput->GetDimension(1);
   }
@@ -156,21 +178,10 @@ void UltrasoundSupport::OnNewDeviceWidgetDone()
   m_Controls.m_WidgetActiveDevices->setVisible(true);
 }
 
-void UltrasoundSupport::GlobalReinit()
-{
-  // get all nodes that have not set "includeInBoundingBox" to false
-  mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
-
-  // calculate bounding geometry of these nodes
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
-
-  // initialize the views to the bounding geometry
-  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-}
-
 void UltrasoundSupport::StartViewing()
 {
+  m_ImageAlreadySetToNode = false;
+
   m_Controls.tabWidget->setTabEnabled(1, true);
   m_Controls.tabWidget->setCurrentIndex(1);
 
@@ -181,16 +192,11 @@ void UltrasoundSupport::StartViewing()
     m_Timer->stop();
     return;
   }
-  m_Device->Update();
-  m_Node->SetData(m_Device->GetOutput());
 
   //start timer
   int interval = (1000 / m_Controls.m_FrameRate->value());
   m_Timer->setInterval(interval);
   m_Timer->start();
-
-  //reinit view
-  //this->GlobalReinit();
 
   //change UI elements
   m_Controls.m_BtnView->setText("Stop Viewing");
@@ -218,18 +224,12 @@ void UltrasoundSupport::CreateControlWidgets()
   m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.m_ToolBoxControlWidgets);
   m_Controls.probesWidgetContainer->addWidget(m_ControlProbesWidget);
 
-  unsigned int firstEnabledControl = -1;
-
   // create b mode widget for current device
   m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.m_ToolBoxControlWidgets);
   m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
   if ( ! m_Device->GetControlInterfaceBMode() )
   {
     m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
-  }
-  else
-  {
-    if ( firstEnabledControl == -1 ) { firstEnabledControl = 0; }
   }
 
   // create doppler widget for current device
@@ -238,10 +238,6 @@ void UltrasoundSupport::CreateControlWidgets()
   if ( ! m_Device->GetControlInterfaceDoppler() )
   {
     m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
-  }
-  else
-  {
-    if ( firstEnabledControl == -1 ) { firstEnabledControl = 0; }
   }
 
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
@@ -267,7 +263,7 @@ void UltrasoundSupport::CreateControlWidgets()
   }
 
   // select first enabled control widget
-  for ( unsigned int n = 0; n < m_Controls.m_ToolBoxControlWidgets->count(); ++n)
+  for ( int n = 0; n < m_Controls.m_ToolBoxControlWidgets->count(); ++n)
   {
     if ( m_Controls.m_ToolBoxControlWidgets->isItemEnabled(n) )
     {
@@ -311,7 +307,7 @@ void UltrasoundSupport::RemoveControlWidgets()
 
 void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 {
-  if ( ! m_Device || event.getType() != us::ServiceEvent::MODIFIED ) { return; }
+  if ( m_Device.IsNull() || event.getType() != us::ServiceEvent::MODIFIED ) { return; }
 
   ctkServiceReference service = event.getServiceReference();
 
@@ -329,8 +325,8 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 
 UltrasoundSupport::UltrasoundSupport()
 : m_ControlCustomWidget(0), m_ControlBModeWidget(0),
-  m_ControlProbesWidget(0), m_CurrentImageWidth(0),
-  m_CurrentImageHeight(0)
+  m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
+  m_CurrentImageWidth(0), m_CurrentImageHeight(0)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 

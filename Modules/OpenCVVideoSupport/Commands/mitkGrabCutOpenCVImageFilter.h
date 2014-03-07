@@ -155,6 +155,11 @@ public:
    * The id will be increased for every segmentation that is produced by the worker thread.
    * It can be used to determine if a new segmentation was produced since the last time a
    * segmentation was got from this filter.
+   *
+   * int lastResultImageId = grabCutFilter->GetResultImageId();
+   * // do something
+   * if ( lastResultImageId != grabCutFilter->GetResultImageId() )
+   *   // get new segmentation
    */
   int GetResultImageId();
 
@@ -164,7 +169,6 @@ public:
    * mitk::GrabCutOpenCVImageFilter::GetResultContours() if they are called afterwards.
    * The segmentation may have changed in the meantime. One should decide if he needs
    * a mask or a contour or convert one into the other on his own.
-   *
    * \return image of the size of the input image where all pixels segmented as foreground are non-zero
    */
   cv::Mat GetResultMask();

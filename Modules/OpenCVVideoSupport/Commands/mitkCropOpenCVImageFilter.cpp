@@ -19,19 +19,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cv.h"
 
 namespace mitk {
-
 CropOpenCVImageFilter::CropOpenCVImageFilter( )
   : m_NewCropRegionSet(false)
 {
-
 }
 
 bool CropOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 {
   if (m_CropRegion.width == 0)
   {
-    MITK_ERROR("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
+    MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
         << "Cropping cannot be done without setting a non-empty crop region first.";
+    return false;
+  }
+
+  cv::Size imageSize = image.size();
+
+  if (m_CropRegion.x >= imageSize.width || m_CropRegion.y >= imageSize.height)
+  {
+    MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
+        << "Cannot crop if top left corner of the roi is outside the image boundaries.";
     return false;
   }
 
@@ -41,23 +48,23 @@ bool CropOpenCVImageFilter::OnFilterImage( cv::Mat& image )
   {
     m_NewCropRegionSet = false;
 
-    if ( m_CropRegion.x + m_CropRegion.width > image.size().width)
+    if ( m_CropRegion.x + m_CropRegion.width > imageSize.width)
     {
-      m_CropRegion.width = image.size().width - m_CropRegion.x;
+      m_CropRegion.width = imageSize.width - m_CropRegion.x;
       MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
           << "Changed too large roi in x direction to fit the image size.";
     }
-    if ( m_CropRegion.y + m_CropRegion.height > image.size().height)
+    if ( m_CropRegion.y + m_CropRegion.height > imageSize.height)
     {
-      m_CropRegion.height = image.size().height - m_CropRegion.y;
+      m_CropRegion.height = imageSize.height - m_CropRegion.y;
       MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
           << "Changed too large roi in y direction to fit the image size.";
     }
   }
 
+  // crop image and copy cropped region into the input image
   cv::Mat buffer = image(m_CropRegion);
-  image.release();
-  image = buffer;
+  buffer.copyTo(image);
 
   return true;
 }
@@ -101,5 +108,4 @@ bool CropOpenCVImageFilter::GetIsCropRegionEmpty( )
 {
   return m_CropRegion.width == 0;
 }
-
 } // namespace mitk

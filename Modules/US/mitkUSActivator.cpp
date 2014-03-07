@@ -70,15 +70,7 @@ void mitk::USActivator::OnServiceEvent(const us::ServiceEvent event)
     return;
   }
 
-  // just USVideoDevice objects need processing in this method
   us::ServiceReference<mitk::USDevice> service = event.GetServiceReference();
-  if ( service.GetProperty(mitk::USDevice::US_PROPKEY_CLASS).ToString() != "org.mitk.modules.us.USVideoDevice" )
-  {
-    MITK_INFO("us::ModuleActivator")("USActivator")
-        << "Device is no USVideoDevice.";
-    return;
-  }
-
   mitk::USDevice::Pointer device = m_Context->GetService(us::ServiceReference<mitk::USDevice>(service));
 
   switch (event.GetType())
@@ -88,13 +80,15 @@ void mitk::USActivator::OnServiceEvent(const us::ServiceEvent event)
       m_Devices.push_back(device.GetPointer());
       break;
     case us::ServiceEvent::UNREGISTERING:
+    {
       // unregistered device does not need to be hold any longer
       std::vector<mitk::USDevice::Pointer>::iterator it = find(m_Devices.begin(), m_Devices.end(), device.GetPointer());
       if (it != m_Devices.end()) { m_Devices.erase(it); }
       break;
-    /*default:
+    }
+    default:
       MITK_DEBUG("us::ModuleActivator")("USActivator")
           << "Received uninteresting service event: " << event.GetType();
-      break;*/
+      break;
   }
 }

@@ -92,6 +92,8 @@ namespace mitk {
       */
     void SetCameraInput(int deviceID);
 
+    void ReleaseInput();
+
     /**
       * \brief Sets the output image to rgb or grayscale.
       * Output is color by default
@@ -214,7 +216,6 @@ namespace mitk {
 
     ConvertGrayscaleOpenCVImageFilter::Pointer  m_GrayscaleFilter;
     CropOpenCVImageFilter::Pointer              m_CropFilter;
-    BasicCombinationOpenCVImageFilter::Pointer  m_CombinationFilter;
   };
 } // namespace mitk
 #endif /* MITKUSImageVideoSource_H_HEADER_INCLUDED_ */

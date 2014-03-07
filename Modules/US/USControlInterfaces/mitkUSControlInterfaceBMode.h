@@ -34,6 +34,10 @@ namespace mitk {
   * Scanning Rejection: Defines range of the received values from the ultrasound
   * signal.
   *
+  * Scanning Dynamic Range: Ability of displaying strong and weak signals at the same
+  * time. High dynamic range means that strong and weak signals can be distinguished.
+  * Lower dynamic range can lead to more contrast.
+  *
   * There is a getter and a setter defined for each kind of value. Additionaly
   * there are methods for getting the range of the possible values. For
   * uniformly distributed values there are three methods Get<VALUE>Min(),
@@ -198,9 +202,43 @@ public:
   virtual double GetScanningRejectionMax( ) = 0;
 
   /**
-    * \return interval between to rejection values for the ultrasound device
+    * \return interval between two rejection values for the ultrasound device
     */
   virtual double GetScanningRejectionTick( ) = 0;
+
+  /**
+    * \return current scanning dynamic range
+    */
+  virtual double GetScanningDynamicRange( ) = 0;
+
+  /**
+    * \param rejection new dynamic range value
+    * Do not override this method in a subclass. Implement
+    * mitk::USControlInterfaceBMode::OnSetScanningDynamicRange instead.
+    */
+  virtual void SetScanningDynamicRange( double dynamicRange );
+
+  /**
+    * \brief Virtual method which is called inside mitk::USControlInterfaceBMode::SetScanningDynamicRange.
+    * Implement this method to handle the actual setting of the
+    * value at the device api.
+    */
+  virtual void OnSetScanningDynamicRange( double dynamicRange ) = 0;
+
+  /**
+  * \return minimum dynamic range value for the ultrasound device
+  */
+  virtual double GetScanningDynamicRangeMin( ) = 0;
+
+  /**
+  * \return maximum dynamic range value for the ultrasound device
+  */
+  virtual double GetScanningDynamicRangeMax( ) = 0;
+
+  /**
+  * \return interval between two dynamic range values for the ultrasound device
+  */
+  virtual double GetScanningDynamicRangeTick( ) = 0;
 
 protected:
   USControlInterfaceBMode( itk::SmartPointer<USDevice> device );

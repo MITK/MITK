@@ -47,7 +47,8 @@ void QmitkUSDeviceManagerWidget::CreateQtPartControl(QWidget *parent)
 
   // Initializations
   std::string empty = "";
-  m_Controls->m_ConnectedDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL, empty);
+  m_Controls->m_ConnectedDevices->Initialize<mitk::USDevice>(
+        mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL, empty);
 }
 
 void QmitkUSDeviceManagerWidget::CreateConnections()
@@ -72,12 +73,13 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
   if (device->GetIsActive())
   {
     device->Deactivate();
+    device->Disconnect();
   }
   else
   {
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    if ( ! device->GetIsConnected() ) { device->Connect(); }
-    device->Activate();
+    if ( device->GetDeviceState() < mitk::USDevice::State_Connected ) { device->Connect(); }
+    if ( device->GetIsConnected()) { device->Activate(); }
     QApplication::restoreOverrideCursor();
 
     if ( ! device->GetIsActive() )
@@ -133,8 +135,8 @@ void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(us::ServiceReferenceU 
     m_Controls->m_BtnRemove->setEnabled(false);
     return;
   }
-  std::string isConnected = reference.GetProperty( mitk::USDevice::US_PROPKEY_ISCONNECTED ).ToString();
-  std::string isActive = reference.GetProperty( mitk::USDevice::US_PROPKEY_ISACTIVE ).ToString();
+  std::string isConnected = reference.GetProperty( mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISCONNECTED ).ToString();
+  std::string isActive = reference.GetProperty( mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE ).ToString();
 
   if ( isActive.compare("false") == 0 )
   {
@@ -147,7 +149,7 @@ void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(us::ServiceReferenceU 
     m_Controls->m_BtnActivate->setText("Deactivate");
   }
 
-  std::string deviceClass = reference.GetProperty( mitk::USDevice::US_PROPKEY_CLASS ).ToString();
+  std::string deviceClass = reference.GetProperty( mitk::USDevice::GetPropertyKeys().US_PROPKEY_CLASS ).ToString();
   m_Controls->m_BtnRemove->setEnabled(deviceClass == "org.mitk.modules.us.USVideoDevice");
 }
 

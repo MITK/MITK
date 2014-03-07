@@ -22,12 +22,14 @@ namespace mitk {
 
 bool BasicCombinationOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 {
+  int imageId = this->GetCurrentImageId();
+
   // go through the list of all filters
   for ( std::vector<AbstractOpenCVImageFilter::Pointer>::iterator it
-        = m_FilterList.begin(); it != m_FilterList.end(); it++ )
+        = m_FilterList.begin(); it != m_FilterList.end(); ++it )
   {
     // apply current filter and return false if the filter returned false
-    if (! (*it)->FilterImage(image) ) { return false; }
+    if (! (*it)->FilterImage(image, imageId) ) { return false; }
   }
 
   return true;
@@ -59,4 +61,13 @@ bool BasicCombinationOpenCVImageFilter::RemoveFilter( AbstractOpenCVImageFilter:
   return false;
 }
 
+bool BasicCombinationOpenCVImageFilter::GetIsFilterOnTheList( AbstractOpenCVImageFilter::Pointer filter )
+{
+  return std::find(m_FilterList.begin(), m_FilterList.end(), filter) != m_FilterList.end();
+}
+
+bool BasicCombinationOpenCVImageFilter::GetIsEmpty()
+{
+  return m_FilterList.empty();
+}
 } // namespace mitk

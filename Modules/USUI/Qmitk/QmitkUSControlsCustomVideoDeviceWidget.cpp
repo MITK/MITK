@@ -44,7 +44,7 @@ QmitkUSControlsCustomVideoDeviceWidget::~QmitkUSControlsCustomVideoDeviceWidget(
 
 std::string QmitkUSControlsCustomVideoDeviceWidget::GetDeviceClass() const
 {
-  return mitk::USVideoDevice::DeviceClassIdentifier;
+  return mitk::USVideoDevice::GetDeviceClassStatic();
 }
 
 QmitkUSAbstractCustomWidget* QmitkUSControlsCustomVideoDeviceWidget::Clone(QWidget* parent) const

@@ -61,6 +61,11 @@ private slots:
     */
   void OnRejectionControlValueChanged(int);
 
+  /**
+    * \brief Called when user changes dynamic range value.
+    */
+  void OnDynamicRangeControlValueChanged(int);
+
 public:
   /**
     * A pointer to a concrete mitk::USControlInterfaceBMode is needed to

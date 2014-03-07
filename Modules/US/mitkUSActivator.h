@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkUSTelemedActivator_h
-#define __mitkUSTelemedActivator_h
+#ifndef __mitkUSActivator_h
+#define __mitkUSActivator_h
 
 #include "mitkUSVideoDevice.h"
 
@@ -25,13 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 /**
   * \brief Module activator for the US module.
   * Loads mitk::USVideoDevice objects from hard disk on module load and write
   * them to hard disk on module unload.
   *
-  * Pointers to mitk::USVideoDevice objects are held to make sure that they
+  * Pointers to mitk::USDevice objects are held to make sure that they
   * will not be deleted while the module is loaded. A service event listener is
   * registered, so that pointers to devices which are registered into micro
   * service from a plugin for example can be held here, too.
@@ -54,16 +53,15 @@ public:
 
 protected:
   /**
-    *\brief Listens to ServiceRegistry changes and updates the list of mitk::USVideoDevice object accordingly.
+    *\brief Listens to ServiceRegistry changes and updates the list of mitk::USDevice object accordingly.
     */
   void OnServiceEvent(const us::ServiceEvent event);
 
   us::ModuleContext*                    m_Context;
   std::vector<USDevice::Pointer>        m_Devices;
 };
-
 } // namespace mitk
 
 US_EXPORT_MODULE_ACTIVATOR(MitkUS, mitk::USActivator)
 
-#endif // __mitkUSTelemedActivator_h
+#endif // __mitkUSActivator_h

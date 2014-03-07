@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSTelemedImageSource.h"
 #include "mitkUSTelemedSDKHeader.h"
 #include "MITKUSTelemedScanConverterPlugin.h"
+#include "mitkImageReadAccessor.h"
 
 mitk::USTelemedImageSource::USTelemedImageSource(  )
   : m_Image(mitk::Image::New()), m_Plugin(0), m_PluginCallback(0)
@@ -31,11 +32,13 @@ mitk::USTelemedImageSource::~USTelemedImageSource( )
 
 void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
+  if ( image.IsNull() ) { image = mitk::Image::New(); }
   if ( m_Image->IsInitialized() )
   {
-    // just set the image pointer to the image
-    // which content was filled by Telemed API
-    image = m_Image;
+    // copy contents of the given image into the member variable
+    image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
+    mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
+    image->SetSlice(inputReadAccessor.GetData());
   }
 }
 

@@ -29,7 +29,7 @@ mitk::USControlInterfaceProbes::~USControlInterfaceProbes()
 void mitk::USControlInterfaceProbes::SelectProbe( unsigned int index )
 {
   this->OnSelectProbe(index);
-  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_PROBES_SELECTED,
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED,
                                   this->GetSelectedProbe()->GetName());
 
 }
@@ -37,6 +37,6 @@ void mitk::USControlInterfaceProbes::SelectProbe( unsigned int index )
 void mitk::USControlInterfaceProbes::SelectProbe( USProbe::Pointer probe )
 {
   this->OnSelectProbe(probe);
-  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_PROBES_SELECTED,
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED,
                                   this->GetSelectedProbe()->GetName());
 }

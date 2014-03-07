@@ -54,9 +54,18 @@ namespace mitk {
     mitkNewMacro2Param(Self, std::string, mitk::USImageMetadata::Pointer);
 
     /**
-    * \return the qualified name of this class
+    * \return the qualified name of this class (as returned by GetDeviceClassStatic())
     */
     virtual std::string GetDeviceClass();
+
+    /**
+     * This methode is necessary instead of a static member attribute to avoid
+     * "static initialization order fiasco" when an instance of this class is
+     * used in a module activator.
+     *
+     * \return the qualified name of this class
+     */
+    static std::string GetDeviceClassStatic();
 
     /**
     * Getter for the custom control interface which was created during the
@@ -82,8 +91,6 @@ namespace mitk {
     itkGetMacro(Image, mitk::Image::Pointer);
     itkGetMacro(DeviceID,int);
     itkGetMacro(FilePath,std::string);
-
-    static const std::string DeviceClassIdentifier;
   protected:
 
     /**

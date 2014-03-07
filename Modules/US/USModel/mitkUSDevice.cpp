@@ -28,23 +28,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include <usModuleContext.h>
 
-const std::string yes = "true";
-const std::string no = "false";
-
-const std::string mitk::USDevice::US_INTERFACE_NAME = "org.mitk.services.UltrasoundDevice";
-const std::string mitk::USDevice::US_PROPKEY_LABEL = US_INTERFACE_NAME + ".label";
-const std::string mitk::USDevice::US_PROPKEY_ISCONNECTED = US_INTERFACE_NAME + ".isConnected";
-const std::string mitk::USDevice::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
-const std::string mitk::USDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";
-
-const std::string mitk::USDevice::US_PROPKEY_PROBES_SELECTED = US_INTERFACE_NAME + ".probes.selected";
-
-const std::string mitk::USDevice::US_PROPKEY_BMODE_FREQUENCY = US_INTERFACE_NAME + ".bmode.frequency";
-const std::string mitk::USDevice::US_PROPKEY_BMODE_POWER = US_INTERFACE_NAME + ".bmode.power";
-const std::string mitk::USDevice::US_PROPKEY_BMODE_DEPTH = US_INTERFACE_NAME + ".bmode.depth";
-const std::string mitk::USDevice::US_PROPKEY_BMODE_GAIN = US_INTERFACE_NAME + ".bmode.gain";
-const std::string mitk::USDevice::US_PROPKEY_BMODE_REJECTION = US_INTERFACE_NAME + ".bmode.rejection";
-const std::string mitk::USDevice::US_PROPKEY_BMODE_DYNAMIC_RANGE = US_INTERFACE_NAME + ".bmode.dynamicRange";
+mitk::USDevice::PropertyKeys mitk::USDevice::GetPropertyKeys()
+{
+  static mitk::USDevice::PropertyKeys propertyKeys;
+  return propertyKeys;
+}
 
 mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 {
@@ -149,12 +137,14 @@ mitk::USControlInterfaceDoppler::Pointer mitk::USDevice::GetControlInterfaceDopp
 
 us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 {
+  mitk::USDevice::PropertyKeys propertyKeys = mitk::USDevice::GetPropertyKeys();
+
   us::ServiceProperties props;
 
-  props[mitk::USDevice::US_PROPKEY_ISCONNECTED] = this->GetIsConnected() ? yes : no;
-  props[mitk::USDevice::US_PROPKEY_ISACTIVE] = this->GetIsActive() ? yes : no;
+  props[propertyKeys.US_PROPKEY_ISCONNECTED] = this->GetIsConnected() ? "true" : "false";
+  props[propertyKeys.US_PROPKEY_ISACTIVE] = this->GetIsActive() ? "true" : "false";
 
-  props[mitk::USDevice::US_PROPKEY_LABEL] = this->GetServicePropertyLabel();
+  props[propertyKeys.US_PROPKEY_LABEL] = this->GetServicePropertyLabel();
 
   // get identifier of selected probe if there is one selected
   mitk::USControlInterfaceProbes::Pointer probesControls = this->GetControlInterfaceProbes();
@@ -163,14 +153,11 @@ us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
     mitk::USProbe::Pointer probe = probesControls->GetSelectedProbe();
     if (probe.IsNotNull())
     {
-      props[mitk::USDevice::US_PROPKEY_PROBES_SELECTED] = probe->GetName();
+      props[propertyKeys.US_PROPKEY_PROBES_SELECTED] = probe->GetName();
     }
   }
 
-  //TODO Handle in subclasses?
-  //props[ mitk::USImageMetadata::PROP_DEV_ISCALIBRATED ] = m_Calibration.IsNotNull() ? yes : no;
-
-  props[ mitk::USDevice::US_PROPKEY_CLASS ] = GetDeviceClass();
+  props[ propertyKeys.US_PROPKEY_CLASS ] = GetDeviceClass();
   props[ mitk::USImageMetadata::PROP_DEV_MANUFACTURER ] = m_Metadata->GetDeviceManufacturer();
   props[ mitk::USImageMetadata::PROP_DEV_MODEL ] = m_Metadata->GetDeviceModel();
   props[ mitk::USImageMetadata::PROP_DEV_COMMENT ] = m_Metadata->GetDeviceComment();
@@ -231,7 +218,7 @@ bool mitk::USDevice::Connect()
   // Update state
   m_DeviceState = State_Connected;
 
-  this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISCONNECTED, true);
+  this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISCONNECTED, true);
   return true;
 }
 
@@ -253,7 +240,7 @@ bool mitk::USDevice::Disconnect()
   // Update state
   m_DeviceState = State_Initialized;
 
-  this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISCONNECTED, false);
+  this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISCONNECTED, false);
 
   return true;
 }
@@ -278,8 +265,8 @@ bool mitk::USDevice::Activate()
       this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
     }
 
-    this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISACTIVE, true);
-    this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_LABEL, this->GetServicePropertyLabel());
+    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE, true);
+    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL, this->GetServicePropertyLabel());
   }
 
   return m_DeviceState == State_Activated;
@@ -298,8 +285,8 @@ void mitk::USDevice::Deactivate()
 
   m_DeviceState = State_Connected;
 
-  this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_ISACTIVE, false);
-  this->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_LABEL, this->GetServicePropertyLabel());
+  this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE, false);
+  this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL, this->GetServicePropertyLabel());
 }
 
 void mitk::USDevice::SetIsFreezed(bool freeze)

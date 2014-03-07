@@ -81,22 +81,49 @@ class USControlInterfaceDoppler;
     };
 
     /**
-    *\brief These constants are used in conjunction with Microservices
-    */
-    static const std::string US_INTERFACE_NAME;       // Common Interface name of all US Devices. Used to refer to this device via Microservices
-    static const std::string US_PROPKEY_LABEL;        // Human readable text represntation of this device
-    static const std::string US_PROPKEY_ISCONNECTED;  // Whether this device is connected or not.
-    static const std::string US_PROPKEY_ISACTIVE;     // Whether this device is active or not.
-    static const std::string US_PROPKEY_CLASS;        // Class Name of this Object
+     * \brief These constants are used in conjunction with Microservices.
+     * The constants aren't defined as static member attributes to avoid the
+     * "static initialization order fiasco", which would occur when objects of
+     * this class are used in module activators (for restoring stored device,
+     * for example).
+     */
+    struct PropertyKeys
+    {
+      const std::string US_INTERFACE_NAME;       // Common Interface name of all US Devices. Used to refer to this device via Microservices
+      const std::string US_PROPKEY_LABEL;        // Human readable text represntation of this device
+      const std::string US_PROPKEY_ISCONNECTED;  // Whether this device is connected or not.
+      const std::string US_PROPKEY_ISACTIVE;     // Whether this device is active or not.
+      const std::string US_PROPKEY_CLASS;        // Class Name of this Object
 
-    static const std::string US_PROPKEY_PROBES_SELECTED;
+      const std::string US_PROPKEY_PROBES_SELECTED;
 
-    static const std::string US_PROPKEY_BMODE_FREQUENCY;
-    static const std::string US_PROPKEY_BMODE_POWER;
-    static const std::string US_PROPKEY_BMODE_DEPTH;
-    static const std::string US_PROPKEY_BMODE_GAIN;
-    static const std::string US_PROPKEY_BMODE_REJECTION;
-    static const std::string US_PROPKEY_BMODE_DYNAMIC_RANGE;
+      const std::string US_PROPKEY_BMODE_FREQUENCY;
+      const std::string US_PROPKEY_BMODE_POWER;
+      const std::string US_PROPKEY_BMODE_DEPTH;
+      const std::string US_PROPKEY_BMODE_GAIN;
+      const std::string US_PROPKEY_BMODE_REJECTION;
+      const std::string US_PROPKEY_BMODE_DYNAMIC_RANGE;
+
+      PropertyKeys()
+        : US_INTERFACE_NAME("org.mitk.services.UltrasoundDevice"),
+          US_PROPKEY_LABEL(US_INTERFACE_NAME + ".label"),
+          US_PROPKEY_ISCONNECTED(US_INTERFACE_NAME + ".isConnected"),
+          US_PROPKEY_ISACTIVE(US_INTERFACE_NAME + ".isActive"),
+          US_PROPKEY_CLASS(US_INTERFACE_NAME + ".class"),
+          US_PROPKEY_PROBES_SELECTED(US_INTERFACE_NAME + ".probes.selected"),
+          US_PROPKEY_BMODE_FREQUENCY(US_INTERFACE_NAME + ".bmode.frequency"),
+          US_PROPKEY_BMODE_POWER(US_INTERFACE_NAME + ".bmode.power"),
+          US_PROPKEY_BMODE_DEPTH(US_INTERFACE_NAME + ".bmode.depth"),
+          US_PROPKEY_BMODE_GAIN(US_INTERFACE_NAME + ".bmode.gain"),
+          US_PROPKEY_BMODE_REJECTION(US_INTERFACE_NAME + ".bmode.rejection"),
+          US_PROPKEY_BMODE_DYNAMIC_RANGE(US_INTERFACE_NAME + ".bmode.dynamicRange")
+      {}
+    };
+
+    /**
+     * \return keys for the microservice properties of ultrasound devices
+     */
+    static mitk::USDevice::PropertyKeys GetPropertyKeys();
 
     /**
     * \brief Default getter for the custom control interface.

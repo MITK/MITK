@@ -34,35 +34,35 @@ mitk::USControlInterfaceBMode::~USControlInterfaceBMode()
 void mitk::USControlInterfaceBMode::SetScanningFrequency( double frequency )
 {
   this->OnSetScanningFrequency(frequency);
-  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_BMODE_FREQUENCY, frequency);
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_FREQUENCY, frequency);
 }
 
 void mitk::USControlInterfaceBMode::SetScanningPower( double power )
 {
   this->OnSetScanningPower(power);
-  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_BMODE_POWER, power);
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_POWER, power);
 }
 
 void mitk::USControlInterfaceBMode::SetScanningDepth( double depth )
 {
   this->OnSetScanningDepth(depth);
-  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_BMODE_DEPTH, depth);
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH, depth);
 }
 
 void mitk::USControlInterfaceBMode::SetScanningGain( double gain )
 {
   this->OnSetScanningGain(gain);
-  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_BMODE_GAIN, gain);
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_GAIN, gain);
 }
 
 void mitk::USControlInterfaceBMode::SetScanningRejection( double rejection )
 {
   this->OnSetScanningRejection(rejection);
-  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_BMODE_REJECTION, rejection);
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_REJECTION, rejection);
 }
 
 void mitk::USControlInterfaceBMode::SetScanningDynamicRange( double dynamicRange )
 {
   this->OnSetScanningDynamicRange(dynamicRange);
-  m_Device->UpdateServiceProperty(mitk::USDevice::US_PROPKEY_BMODE_DYNAMIC_RANGE, dynamicRange);
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE, dynamicRange);
 }

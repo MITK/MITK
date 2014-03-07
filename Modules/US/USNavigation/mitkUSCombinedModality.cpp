@@ -442,7 +442,8 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
 
 std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
 {
-  us::ServiceProperties::const_iterator probeIt = m_ServiceProperties.find(US_PROPKEY_PROBES_SELECTED);
+  us::ServiceProperties::const_iterator probeIt = m_ServiceProperties.find(
+        mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED);
 
   // get probe identifier from control interface for probes
   std::string probeName = "default";
@@ -453,7 +454,8 @@ std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
 
   // get string for depth value from the micro service properties
   std::string depth;
-  us::ServiceProperties::iterator depthIterator = m_ServiceProperties.find(US_PROPKEY_BMODE_DEPTH);
+  us::ServiceProperties::iterator depthIterator = m_ServiceProperties.find(
+        mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH);
   if (depthIterator != m_ServiceProperties.end())
   {
     depth = depthIterator->second.ToString();

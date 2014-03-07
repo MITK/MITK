@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 #include <usModule.h>
 
-#include <MitkOclExports.h>
+#include <MitkOpenCLExports.h>
 
 namespace mitk
 {
@@ -34,7 +34,7 @@ namespace mitk
 
    This class takes care of loading and compiling the external GPU program code.
   */
-class MitkOcl_EXPORT OclFilter
+class MitkOpenCL_EXPORT OclFilter
 {
 public:
   /**

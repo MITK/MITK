@@ -27,7 +27,7 @@ class OclImageToImageFilter;
 /** @class OclImageToImageFilter
   * @brief The OclImageToImageFilter is the base class for all OpenCL image filter generating images.
   */
-class MitkOcl_EXPORT OclImageToImageFilter: public OclImageFilter
+class MitkOpenCL_EXPORT OclImageToImageFilter: public OclImageFilter
 {
 public:
   /*!

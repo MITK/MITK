@@ -31,7 +31,7 @@ class OclImageToImageFilter;
   *
   * The filter requires two threshold values ( the upper and the lower threshold ) and two image values ( inside and outside ). The resulting voxel of the segmentation image is assigned the inside value 1 if the image value is between the given thresholds and the outside value otherwise.
   */
-class MitkOcl_EXPORT OclBinaryThresholdImageFilter : public OclImageToImageFilter
+class MitkOpenCL_EXPORT OclBinaryThresholdImageFilter : public OclImageToImageFilter
 {
   typedef OclFilter Superclass;
 

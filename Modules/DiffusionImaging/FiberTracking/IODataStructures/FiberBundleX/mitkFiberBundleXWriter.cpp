@@ -88,11 +88,7 @@ void mitk::FiberBundleXWriter::GenerateData()
     {
         MITK_INFO << "Writing fiber bundle as TRK";
         TrackVis trk;
-        itk::Size<3> size;
-        size.SetElement(0,input->GetGeometry()->GetExtent(0));
-        size.SetElement(1,input->GetGeometry()->GetExtent(1));
-        size.SetElement(2,input->GetGeometry()->GetExtent(2));
-        trk.create(m_FileName,size);
+        trk.create(m_FileName, input);
         trk.writeHdr();
         trk.append(input);
     }

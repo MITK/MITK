@@ -547,6 +547,7 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
     if ( m_GlobalTracker->GetNumAcceptedFibers()==0 )
         return;
     m_FiberBundle = mitk::FiberBundleX::New(fiberBundle);
+    m_FiberBundle->SetReferenceImage(dynamic_cast<mitk::Image*>(m_ImageNode->GetData()));
 
     if (m_FiberBundleNode.IsNotNull()){
         GetDefaultDataStorage()->Remove(m_FiberBundleNode);
@@ -560,6 +561,7 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
     name += "_Gibbs";
     m_FiberBundleNode->SetName(name.toStdString());
     m_FiberBundleNode->SetVisibility(true);
+
 
     if (!m_OutputFileName.isEmpty())
     {

@@ -60,14 +60,15 @@ struct TrackVis_header
 class MitkFiberTracking_EXPORT TrackVis
 {
 private:
-    string                filename;
-    FILE*                 fp;
+    string              filename;
+    FILE*               fp;
     int                 maxSteps;  // [TODO] should be related to the variable defined for fiber-tracking
 
 public:
-    TrackVis_header        hdr;
+    TrackVis_header     hdr;
+    float               m_Origin[3];
 
-    short     create(string filename, itk::Size<3> size);
+    short     create(string filename, mitk::FiberBundleX* fib);
     short     open( string filename );
     short     read( mitk::FiberBundleX* fib );
     short    append( mitk::FiberBundleX* fib );

@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3D.h>
 #include "ctkCommandLineParser.h"
 #include <mitkCoreObjectFactory.h>
+#include <mitkFiberBundleXWriter.h>
 
 int StreamlineTracking(int argc, char* argv[])
 {
@@ -87,6 +88,8 @@ int StreamlineTracking(int argc, char* argv[])
         typedef itk::StreamlineTrackingFilter< float > FilterType;
         FilterType::Pointer filter = FilterType::New();
 
+        mitk::Image::Pointer mitkImage = NULL;
+
         MITK_INFO << "Loading tensor images ...";
         typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
         dtiFileName = inputImages.at(0);
@@ -94,6 +97,7 @@ int StreamlineTracking(int argc, char* argv[])
         {
             try
             {
+                mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(inputImages.at(i))->GetData());
                 mitk::TensorImage::Pointer img = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::LoadDataNode(inputImages.at(i))->GetData());
                 ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
                 mitk::CastToItkImage<ItkTensorImage>(img, itk_dti);
@@ -146,6 +150,7 @@ int StreamlineTracking(int argc, char* argv[])
             return EXIT_FAILURE;
         }
         mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
+        fib->SetReferenceImage(mitkImage);
 
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)

@@ -119,6 +119,8 @@ int GibbsTracking(int argc, char* argv[])
         const std::string s1="", s2="";
         std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
 
+        mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
+
         // try to cast to qball image
         if( boost::algorithm::ends_with(inFileName, ".qbi") )
         {
@@ -140,8 +142,6 @@ int GibbsTracking(int argc, char* argv[])
         else if ( boost::algorithm::ends_with(inFileName, ".nii") )
         {
             MITK_INFO << "Loading sh-coefficient image ...";
-            mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
-
             int nrCoeffs = mitkImage->GetLargestPossibleRegion().GetSize()[3];
             int c=3, d=2-2*nrCoeffs;
             double D = c*c-4*d;
@@ -214,6 +214,7 @@ int GibbsTracking(int argc, char* argv[])
         gibbsTracker->Update();
 
         mitk::FiberBundleX::Pointer mitkFiberBundle = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
+        mitkFiberBundle->SetReferenceImage(mitkImage);
 
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)

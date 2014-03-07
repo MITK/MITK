@@ -95,6 +95,7 @@ set(MODULE_TESTS
   mitkSTLFileReaderTest.cpp
   mitkSurfaceToImageFilterTest.cpp
   mitkImageToSurfaceFilterTest.cpp
+  mitkEqualTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow

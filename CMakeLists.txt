@@ -1,11 +1,7 @@
 if(MITK_USE_QT AND DESIRED_QT_VERSION MATCHES 5)
   cmake_minimum_required(VERSION 2.8.9)
-elseif(APPLE)
-  # With XCode 4.3, the SDK location changed. Older CMake
-  # versions are not able to find it.
-  cmake_minimum_required(VERSION 2.8.8)
 else()
-  cmake_minimum_required(VERSION 2.8.5)
+  cmake_minimum_required(VERSION 2.8.8)
 endif()
 
 #-----------------------------------------------------------------------------

@@ -66,20 +66,20 @@ public:
     mitk::USCombinedModality::Pointer modality = CreateModality();
 
     mitk::AffineTransform3D::MatrixType matrix;
-    matrix[0][0] = 1.1234f;
-    matrix[0][1] = 1.2234f;
-    matrix[0][2] = 1.3234f;
-    matrix[1][0] = 1.4234f;
-    matrix[1][1] = 1.5234f;
-    matrix[1][2] = 1.6234f;
-    matrix[2][0] = 1.7234f;
-    matrix[2][1] = 1.8234f;
-    matrix[2][2] = 1.9234f;
+    matrix[0][0] = 1.1234;
+    matrix[0][1] = 1.2234;
+    matrix[0][2] = 1.3234;
+    matrix[1][0] = 1.4234;
+    matrix[1][1] = 1.5234;
+    matrix[1][2] = 1.6234;
+    matrix[2][0] = 1.7234;
+    matrix[2][1] = 1.8234;
+    matrix[2][2] = 1.9234;
 
     mitk::AffineTransform3D::OffsetType offset;
-    offset[0] = 2.1234f;
-    offset[1] = 2.2234f;
-    offset[2] = 2.3234f;
+    offset[0] = 2.1234;
+    offset[1] = 2.2234;
+    offset[2] = 2.3234;
 
     mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
     transform->SetMatrix(matrix);
@@ -87,8 +87,6 @@ public:
 
     modality->SetCalibration(transform);
 
-    //MITK_INFO << modality->SerializeCalibration();
-    //MITK_INFO << GetSerializedReference();
     MITK_TEST_CONDITION_REQUIRED(modality->SerializeCalibration() == GetSerializedReference(), "Testing correct Serialization...");
   }
 
@@ -103,19 +101,19 @@ public:
 
     bool identical = true;
 
-    if (! CompareDoubles(matrix[0][0], 1.1234f)) identical = false;
-    if (! CompareDoubles(matrix[0][1], 1.2234f)) identical = false;
-    if (! CompareDoubles(matrix[0][2], 1.3234f)) identical = false;
-    if (! CompareDoubles(matrix[1][0], 1.4234f)) identical = false;
-    if (! CompareDoubles(matrix[1][1], 1.5234f)) identical = false;
-    if (! CompareDoubles(matrix[1][2], 1.6234f)) identical = false;
-    if (! CompareDoubles(matrix[2][0], 1.7234f)) identical = false;
-    if (! CompareDoubles(matrix[2][1], 1.8234f)) identical = false;
-    if (! CompareDoubles(matrix[2][2], 1.9234f)) identical = false;
+    if (! CompareDoubles(matrix[0][0], 1.1234)) identical = false;
+    if (! CompareDoubles(matrix[0][1], 1.2234)) identical = false;
+    if (! CompareDoubles(matrix[0][2], 1.3234)) identical = false;
+    if (! CompareDoubles(matrix[1][0], 1.4234)) identical = false;
+    if (! CompareDoubles(matrix[1][1], 1.5234)) identical = false;
+    if (! CompareDoubles(matrix[1][2], 1.6234)) identical = false;
+    if (! CompareDoubles(matrix[2][0], 1.7234)) identical = false;
+    if (! CompareDoubles(matrix[2][1], 1.8234)) identical = false;
+    if (! CompareDoubles(matrix[2][2], 1.9234)) identical = false;
 
-    if (! CompareDoubles(offset[0], 2.1234f)) identical = false;
-    if (! CompareDoubles(offset[1], 2.2234f)) identical = false;
-    if (! CompareDoubles(offset[2], 2.3234f)) identical = false;
+    if (! CompareDoubles(offset[0], 2.1234)) identical = false;
+    if (! CompareDoubles(offset[1], 2.2234)) identical = false;
+    if (! CompareDoubles(offset[2], 2.3234)) identical = false;
 
     MITK_TEST_CONDITION_REQUIRED(identical, "Testing if deserialized calibration is identical to serialized one...");
   }

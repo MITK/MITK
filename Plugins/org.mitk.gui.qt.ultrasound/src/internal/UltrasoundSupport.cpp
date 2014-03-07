@@ -224,18 +224,12 @@ void UltrasoundSupport::CreateControlWidgets()
   m_ControlProbesWidget = new QmitkUSControlsProbesWidget(m_Device->GetControlInterfaceProbes(), m_Controls.m_ToolBoxControlWidgets);
   m_Controls.probesWidgetContainer->addWidget(m_ControlProbesWidget);
 
-  unsigned int firstEnabledControl = -1;
-
   // create b mode widget for current device
   m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.m_ToolBoxControlWidgets);
   m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
   if ( ! m_Device->GetControlInterfaceBMode() )
   {
     m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
-  }
-  else
-  {
-    if ( firstEnabledControl == -1 ) { firstEnabledControl = 0; }
   }
 
   // create doppler widget for current device
@@ -244,10 +238,6 @@ void UltrasoundSupport::CreateControlWidgets()
   if ( ! m_Device->GetControlInterfaceDoppler() )
   {
     m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count()-1, false);
-  }
-  else
-  {
-    if ( firstEnabledControl == -1 ) { firstEnabledControl = 0; }
   }
 
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
@@ -317,7 +307,7 @@ void UltrasoundSupport::RemoveControlWidgets()
 
 void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 {
-  if ( ! m_Device || event.getType() != us::ServiceEvent::MODIFIED ) { return; }
+  if ( m_Device.IsNull() || event.getType() != us::ServiceEvent::MODIFIED ) { return; }
 
   ctkServiceReference service = event.getServiceReference();
 

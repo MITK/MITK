@@ -25,19 +25,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  mitk::PlaneGeometry::PlaneGeometry()
+  PlaneGeometry::PlaneGeometry()
   {
     Initialize();
   }
 
-  mitk::PlaneGeometry::~PlaneGeometry()
+  PlaneGeometry::~PlaneGeometry()
   {
-  }
-
-  void
-    PlaneGeometry::Initialize()
-  {
-    Superclass::Initialize();
   }
 
   void
@@ -60,11 +54,9 @@ namespace mitk
   }
 
   void
-    PlaneGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D *transform)
+    PlaneGeometry::InternPreSetIndexToWorldTransform(mitk::AffineTransform3D *transform)
   {
     EnsurePerpendicularNormal(transform);
-
-    Superclass::SetIndexToWorldTransform(transform);
   }
 
   void

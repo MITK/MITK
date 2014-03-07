@@ -84,8 +84,6 @@ namespace mitk {
     //## For further information about coordinates types, please see the Geometry documentation
     virtual void WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
-    virtual void Initialize();
-
     /**
     * \brief Initialize a plane with orientation \a planeorientation
     * (default: axial) with respect to \a geometry3D (default: identity).
@@ -360,8 +358,6 @@ namespace mitk {
     */
     Point3D ProjectPointOntoPlane( const Point3D &pt ) const;
 
-    virtual void SetIndexToWorldTransform( AffineTransform3D *transform);
-
     virtual itk::LightObject::Pointer InternalClone() const;
 
     /** Implements operation to re-orient the plane */
@@ -375,6 +371,8 @@ namespace mitk {
     virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
     virtual void InternPreSetBounds( const BoundingBox::BoundsArrayType &bounds );
+
+    virtual void InternPreSetIndexToWorldTransform( AffineTransform3D *transform);
 
   private:
     /**

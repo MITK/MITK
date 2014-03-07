@@ -90,7 +90,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Set the spacing (m_Spacing)
-    virtual void SetSpacing(const mitk::Vector3D& aSpacing);
+    void SetSpacing(const mitk::Vector3D& aSpacing);
 
     //##Documentation
     //## @brief Get the origin as VnlVector
@@ -134,7 +134,7 @@ namespace mitk {
 #endif
     //## @brief Set the transformation used to convert from index
     //## to world coordinates
-    virtual void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+    void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
     //##Documentation
     //## @brief Convenience method for setting the ITK transform
@@ -362,7 +362,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Set the time bounds (in ms)
-    virtual void SetTimeBounds(const TimeBounds& timebounds);
+    void SetTimeBounds(const TimeBounds& timebounds);
 
     // ********************************** Geometry **********************************
 
@@ -429,7 +429,7 @@ namespace mitk {
     //## @brief Set the extent of the bounding-box in the specified @a direction in mm
     //##
     //## @note This changes the matrix in the transform, @a not the bounds, which are given in units!
-    virtual void SetExtentInMM(int direction, ScalarType extentInMM);
+    void SetExtentInMM(int direction, ScalarType extentInMM);
 
     //##Documentation
     //## @brief Test whether the point \a p (world coordinates in mm) is
@@ -473,6 +473,16 @@ namespace mitk {
     virtual void InternPostInitializeGeometry(Self * newGeometry) const{};
 
     virtual void InternPreSetBounds(const BoundsArrayType& bounds);
+
+    virtual void InternPostSetExtentInMM(int direction, ScalarType extentInMM);
+
+    virtual void InternPostSetTimeBounds(const TimeBounds& timebounds);
+
+    virtual void InternPreSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+    virtual void InternPostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+
+    virtual void InternPreSetSpacing(const mitk::Vector3D& aSpacing);
+    void InternSetSpacing(const mitk::Vector3D& aSpacing);
 
     // ********************************** Variables **********************************
 

@@ -529,7 +529,7 @@ void
 }
 
 void
-  mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
+  mitk::SlicedGeometry3D::InternPreSetSpacing( const mitk::Vector3D &aSpacing )
 {
   bool hasEvenlySpacedPlaneGeometry = false;
   mitk::Point3D origin;
@@ -559,7 +559,7 @@ void
     }
   }
 
-  Superclass::SetSpacing(aSpacing);
+  InternSetSpacing(aSpacing);
 
   mitk::Geometry2D::Pointer firstGeometry;
 
@@ -637,10 +637,8 @@ void
 }
 
 void
-  mitk::SlicedGeometry3D::SetTimeBounds( const mitk::TimeBounds& timebounds )
+  mitk::SlicedGeometry3D::InternPostSetTimeBounds( const mitk::TimeBounds& timebounds )
 {
-  Superclass::SetTimeBounds( timebounds );
-
   unsigned int s;
   for ( s = 0; s < m_Slices; ++s )
   {

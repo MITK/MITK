@@ -36,11 +36,9 @@ mitk::Geometry2D::~Geometry2D()
 }
 
 void
-  mitk::Geometry2D::SetIndexToWorldTransform(
+  mitk::Geometry2D::InternPostSetIndexToWorldTransform(
   mitk::AffineTransform3D* transform)
 {
-  Superclass::SetIndexToWorldTransform(transform);
-
   m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
   m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
 
@@ -49,10 +47,8 @@ void
 }
 
 void
-  mitk::Geometry2D::SetExtentInMM(int direction, ScalarType extentInMM)
+  mitk::Geometry2D::InternPostSetExtentInMM(int direction, ScalarType extentInMM)
 {
-  Superclass::SetExtentInMM(direction, extentInMM);
-
   m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
   m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
 

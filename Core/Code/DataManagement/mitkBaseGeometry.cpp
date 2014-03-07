@@ -188,6 +188,7 @@ void mitk::BaseGeometry::InternPreSetBounds(const BoundsArrayType& bounds){};
 
 void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
 {
+  InternPreSetIndexToWorldTransform(transform);
   if(m_IndexToWorldTransform.GetPointer() != transform)
   {
     m_IndexToWorldTransform = transform;
@@ -196,7 +197,13 @@ void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* trans
     TransferItkToVtkTransform();
     Modified();
   }
+  InternPostSetIndexToWorldTransform(transform);
 }
+
+void mitk::BaseGeometry::InternPreSetIndexToWorldTransform(mitk::AffineTransform3D* transform)
+{}
+void mitk::BaseGeometry::InternPostSetIndexToWorldTransform(mitk::AffineTransform3D* transform)
+{}
 
 const  mitk::BaseGeometry::BoundsArrayType  mitk::BaseGeometry::GetBounds() const
 {
@@ -353,6 +360,13 @@ bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometr
 
 void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing)
 {
+  InternPreSetSpacing(aSpacing);
+  InternSetSpacing(aSpacing);
+}
+
+void mitk::BaseGeometry::InternPreSetSpacing(const mitk::Vector3D& aSpacing)
+{}
+void mitk::BaseGeometry::InternSetSpacing(const mitk::Vector3D& aSpacing){
   if(mitk::Equal(m_Spacing, aSpacing) == false)
   {
     assert(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0);
@@ -508,7 +522,10 @@ void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
     m_IndexToWorldTransform->SetMatrix(matrix);
     Modified();
   }
+  InternPostSetExtentInMM(direction,extentInMM);
 }
+
+void mitk::BaseGeometry::InternPostSetExtentInMM(int direction, ScalarType extentInMM){};
 
 bool mitk::BaseGeometry::IsInside(const mitk::Point3D& p) const
 {
@@ -642,6 +659,7 @@ void mitk::BaseGeometry::SetIdentity()
 {
   m_IndexToWorldTransform->SetIdentity();
   m_Origin.Fill(0);
+  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing, m_FloatSpacing); //NEW!!!
   Modified();
   TransferItkToVtkTransform();
 }
@@ -822,7 +840,11 @@ void mitk::BaseGeometry::SetTimeBounds(const TimeBounds& timebounds)
     m_TimeBounds = timebounds;
     Modified();
   }
+  InternPostSetTimeBounds(timebounds);
 }
+
+void mitk::BaseGeometry::InternPostSetTimeBounds(const TimeBounds& timebounds)
+{}
 
 const std::string mitk::BaseGeometry::GetTransformAsString( TransformType* transformType )
 {

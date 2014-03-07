@@ -196,6 +196,9 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                     resampler->SetOutputParametersFromImage(slice);
                     resampler->SetSize(upsampledSliceRegion.GetSize());
                     resampler->SetOutputSpacing(slice->GetSpacing()/2);
+                    itk::NearestNeighborInterpolateImageFunction<SliceType, double>::Pointer nn_interpolator
+                            = itk::NearestNeighborInterpolateImageFunction<SliceType, double>::New();
+                    resampler->SetInterpolator(nn_interpolator);
                     resampler->Update();
                     typename SliceType::Pointer upslice = resampler->GetOutput();
                     compartmentSlices.push_back(upslice);
@@ -207,6 +210,9 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                         resampler->SetOutputParametersFromImage(fMapSlice);
                         resampler->SetSize(upsampledSliceRegion.GetSize());
                         resampler->SetOutputSpacing(fMapSlice->GetSpacing()/2);
+                        itk::NearestNeighborInterpolateImageFunction<SliceType, double>::Pointer nn_interpolator
+                                = itk::NearestNeighborInterpolateImageFunction<SliceType, double>::New();
+                        resampler->SetInterpolator(nn_interpolator);
                         resampler->Update();
                         fMapSlice = resampler->GetOutput();
                     }

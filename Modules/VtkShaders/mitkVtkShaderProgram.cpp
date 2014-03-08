@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkVtkShaderProgram.h"
+#include "vtkShader2.h"
 
 mitk::VtkShaderProgram::VtkShaderProgram()
 {
@@ -23,3 +24,9 @@ mitk::VtkShaderProgram::VtkShaderProgram()
 mitk::VtkShaderProgram::~VtkShaderProgram()
 {
 }
+
+void mitk::VtkShaderProgram::SetVtkShaderProgram(vtkShaderProgram2* p) { m_VtkShaderProgram = p; }
+
+vtkShaderProgram2*mitk::VtkShaderProgram::GetVtkShaderProgram() const { return m_VtkShaderProgram; }
+
+itk::TimeStamp&mitk::VtkShaderProgram::GetShaderTimestampUpdate(){return m_ShaderTimestampUpdate;}

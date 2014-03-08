@@ -25,12 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <list>
 
 class vtkActor;
+class vtkShaderProgram2;
 
 namespace mitk {
 
 class DataNode;
 class BaseRenderer;
-class vtkShaderProgram2;
 
 /**
  * \brief Management class for vtkShader XML descriptions.
@@ -46,7 +46,7 @@ struct MITK_CORE_EXPORT IShaderRepository
 
   struct ShaderPrivate;
 
-  class MITK_CORE_EXPORT Shader : public itk::LightObject
+  class MITK_CORE_EXPORT Shader : public itk::Object
   {
 
   public:
@@ -81,6 +81,8 @@ struct MITK_CORE_EXPORT IShaderRepository
   class MITK_CORE_EXPORT ShaderProgram : public itk::LightObject
   {
   public:
+    virtual void Activate() = 0;
+    virtual void Deactivate() = 0;
     mitkClassMacro( ShaderProgram, itk::LightObject )
   };
 
@@ -117,8 +119,8 @@ struct MITK_CORE_EXPORT IShaderRepository
   /** \brief Applies shader and shader specific variables of the specified DataNode
    * to the VTK object by updating the shader variables of its vtkProperty.
    */
-  virtual ShaderProgram::Pointer UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer shaderProgram, mitk::DataNode* node,
-                                                     mitk::BaseRenderer* renderer, const itk::TimeStamp& MTime) const = 0;
+  virtual void UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram* shaderProgram, mitk::DataNode* node,
+                                                     mitk::BaseRenderer* renderer) const = 0;
 
   /** \brief Loads a shader from a given file. Make sure that this stream is in the XML shader format.
    *

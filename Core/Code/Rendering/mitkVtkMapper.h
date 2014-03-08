@@ -140,6 +140,7 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     public:
 
       mitk::IShaderRepository::ShaderProgram::Pointer m_ShaderProgram;
+      itk::TimeStamp m_ModifiedTimeStamp;
 
       VtkMapperLocalStorage()
       {
@@ -154,7 +155,7 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
 
     };
 
-    mitk::LocalStorageHandler<VtkMapperLocalStorage> m_LSH;
+    mitk::LocalStorageHandler<VtkMapperLocalStorage> m_VtkMapperLSH;
 
   protected:
 

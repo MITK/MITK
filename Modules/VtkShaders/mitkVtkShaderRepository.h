@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIShaderRepository.h"
 #include <vtkShaderProgram2.h>
+#include <vtkXMLShader.h>
 
 
 class vtkXMLDataElement;
@@ -47,6 +48,11 @@ protected:
 
     mitkClassMacro( Shader, itk::Object )
     itkFactorylessNewMacro( Self )
+
+    itkSetMacro(VertexShaderCode,std::string);
+    itkGetConstMacro(VertexShaderCode,std::string);
+    itkSetMacro(FragmentShaderCode,std::string);
+    itkGetConstMacro(FragmentShaderCode,std::string);
 
     class Uniform : public itk::Object
     {
@@ -110,8 +116,10 @@ protected:
 
     friend class VtkShaderRepository;
 
-//    void LoadProperties(vtkPropertyXMLParser* prop);
-    void LoadProperties(std::istream& stream);
+    std::string m_VertexShaderCode;
+    std::string m_FragmentShaderCode;
+
+    void LoadXmlShader(std::istream& stream);
 
   };
 
@@ -159,10 +167,8 @@ private:
 
   bool UnloadShader(int id);
 
-  vtkXMLMaterial* GetXMLMaterial(mitk::DataNode* node, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const;
-
-  void ApplyShaderProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, vtkXMLMaterial* xmlMaterial, itk::TimeStamp& MTime);
-  mitk::IShaderRepository::ShaderProgram::Pointer UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram::Pointer shaderProgram, DataNode* node, BaseRenderer* renderer, const itk::TimeStamp& MTime) const;
+  void UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram* shaderProgram,
+                           DataNode* node, BaseRenderer* renderer) const;
 };
 
 } //end of namespace mitk

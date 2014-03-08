@@ -25,14 +25,16 @@ mitk::VtkMapper::~VtkMapper()
 }
 
 void mitk::VtkMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type){
-
- switch(type)
-    {
-    case mitk::VtkPropRenderer::Opaque: this->MitkRenderOpaqueGeometry(renderer); break;
-    case mitk::VtkPropRenderer::Translucent: this->MitkRenderTranslucentGeometry(renderer); break;
-    case mitk::VtkPropRenderer::Overlay:       this->MitkRenderOverlay(renderer); break;
-    case mitk::VtkPropRenderer::Volumetric:    this->MitkRenderVolumetricGeometry(renderer); break;
-    }
+  VtkMapperLocalStorage* ls = m_VtkMapperLSH.GetLocalStorage(renderer);
+  ls->m_ShaderProgram->Activate();
+  switch(type)
+  {
+  case mitk::VtkPropRenderer::Opaque: this->MitkRenderOpaqueGeometry(renderer); break;
+  case mitk::VtkPropRenderer::Translucent: this->MitkRenderTranslucentGeometry(renderer); break;
+  case mitk::VtkPropRenderer::Overlay:       this->MitkRenderOverlay(renderer); break;
+  case mitk::VtkPropRenderer::Volumetric:    this->MitkRenderVolumetricGeometry(renderer); break;
+  }
+  ls->m_ShaderProgram->Deactivate();
 }
 
 bool mitk::VtkMapper::IsVtkBased() const
@@ -49,7 +51,6 @@ void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer* renderer)
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
-//    repository->act //SHADERTODO
     GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
   }
 }
@@ -63,9 +64,7 @@ void mitk::VtkMapper::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
-    //activate shader (set uniforms + call use) SHADERTODO
     GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-    //deactivate shader
   }
 }
 
@@ -83,13 +82,11 @@ void mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 
 void mitk::VtkMapper::ApplyShaderProperties(mitk::BaseRenderer* renderer)
 {
-  VtkMapperLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  VtkMapperLocalStorage *ls = m_VtkMapperLSH.GetLocalStorage(renderer);
   CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
-//  shaderRepo->( )
 
+  shaderRepo->UpdateShaderProgram(ls->m_ShaderProgram,this->GetDataNode(),renderer);
 
-  shaderRepo->UpdateShaderProgram(ls->m_ShaderProgram,this->GetDataNode(),renderer, GetTimeStamp()); //SHADERTODO
-  //
 }
 
 void mitk::VtkMapper::MitkRenderVolumetricGeometry(BaseRenderer* renderer)

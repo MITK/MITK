@@ -197,15 +197,13 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
         lastVtkBased = true;
       }
     }
-    else
-      if(lastVtkBased)
-      {
+    else if(lastVtkBased)
+    {
       Enable2DOpenGL();
       lastVtkBased = false;
     }
 
-  mapper->MitkRender(this, type);
-
+    mapper->MitkRender(this, type);
   }
 
   this->UpdateOverlays();

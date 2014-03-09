@@ -60,11 +60,11 @@ if(NOT DEFINED VTK_DIR)
      endif()
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtk-6.0.0.tar.gz)
-  set(VTK_URL_MD5 fa07fb55a905186f7d98807585efb20e)
+  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.1.0.tar.gz)
+  set(VTK_URL_MD5 25e4dfb3bad778722dcaec80cd5dab7d)
 
 
-    ExternalProject_Add(${proj}
+  ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
     BINARY_DIR ${proj}-build
     PREFIX ${proj}-cmake

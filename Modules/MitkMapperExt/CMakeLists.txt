@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(MitkMapperExt
-                   DEPENDS MitkDataTypesExt VtkShaders
+                   DEPENDS MitkDataTypesExt
                    PACKAGE_DEPENDS VTK|vtkRenderingVolumeOpenGL
                    WARNINGS_AS_ERRORS
                   )

@@ -27,7 +27,7 @@ namespace mitk {
 /**
  * \brief SHADERTODO
  */
-class VtkShaders_EXPORT VtkShaderProgram : public IShaderRepository::ShaderProgram
+class VtkShaderProgram : public IShaderRepository::ShaderProgram
 {
 public:
 

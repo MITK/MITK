@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkShader2.h"
 
 mitk::VtkShaderProgram::VtkShaderProgram()
+  : m_VtkShaderProgram(NULL)
 {
 }
 

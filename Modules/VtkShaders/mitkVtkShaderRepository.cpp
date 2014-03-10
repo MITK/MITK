@@ -276,8 +276,10 @@ void mitk::VtkShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *
 
   const char *sDefault=y->GetAttribute("value");
 
-  switch(type)
+  if(sDefault)
   {
+    switch(type)
+    {
     case glsl_float:
       sscanf(sDefault,"%f",&defaultFloat[0]);
       break;
@@ -312,6 +314,7 @@ void mitk::VtkShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *
 
     case glsl_none:
       break;
+    }
   }
 }
 

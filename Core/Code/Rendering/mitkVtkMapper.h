@@ -133,7 +133,7 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     */
     virtual void ReleaseGraphicsResources(mitk::BaseRenderer* /*renderer*/)
     {
-    };
+    }
 
     class VtkMapperLocalStorage : public mitk::Mapper::BaseLocalStorage
     {
@@ -144,8 +144,11 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
 
       VtkMapperLocalStorage()
       {
-        CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
-        m_ShaderProgram = shaderRepo->CreateShaderProgram();
+        IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+        if (shaderRepo)
+        {
+          m_ShaderProgram = shaderRepo->CreateShaderProgram();
+        }
       }
 
       ~VtkMapperLocalStorage()

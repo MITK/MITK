@@ -55,6 +55,7 @@ set(H_FILES
   DataManagement/mitkITKImageImport.h
   DataManagement/mitkITKImageImport.txx
   DataManagement/mitkImageToItk.h
+  DataManagement/mitkShaderProperty.h
   DataManagement/mitkImageToItk.txx
   DataManagement/mitkTimeSlicedGeometry.h # Deprecated, empty for compatibilty reasons.
   DataManagement/mitkPropertyListReplacedObserver.cpp
@@ -209,7 +210,6 @@ set(CPP_FILES
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
   DataManagement/mitkRenderingModeProperty.cpp
-  DataManagement/mitkShaderProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp
   DataManagement/mitkPointSetShapeProperty.cpp
@@ -221,6 +221,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyDescriptions.cpp
   DataManagement/mitkPropertyExtensions.cpp
   DataManagement/mitkPropertyFilters.cpp
+  DataManagement/mitkShaderProperty.cpp
 
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
@@ -361,7 +362,6 @@ set(CPP_FILES
   Rendering/mitkVtkEventProvider.cpp
   Rendering/mitkRenderWindow.cpp
   Rendering/mitkRenderWindowBase.cpp
-  Rendering/mitkShaderRepository.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkLevelWindowFilter.cpp
@@ -401,8 +401,6 @@ Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
 Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
-
-Shaders/mitkShaderLighting.xml
 
 mitkLevelWindowPresets.xml
 )

@@ -40,8 +40,8 @@ class IPropertyFilters;
  * @brief Access MITK core services.
  *
  * This class can be used to conveniently access common
- * MITK Core service objects. All getter methods are guaranteed
- * to return a non-NULL service object.
+ * MITK Core service objects. Some getter methods where implementations
+ * exist in the core library are guaranteed to return a non-NULL service object.
  *
  * To ensure that CoreServices::Unget() is called after the caller
  * has finished using a service object, you should use the CoreServicePointer
@@ -61,9 +61,9 @@ public:
   /**
    * @brief Get an IShaderRepository instance.
    * @param context The module context of the module getting the service.
-   * @return A non-NULL IShaderRepository instance.
+   * @return A IShaderRepository instance which can be NULL.
    */
-  static IShaderRepository* GetShaderRepository(us::ModuleContext* context = us::GetModuleContext());
+  static IShaderRepository* GetShaderRepository();
 
   /**
    * @brief Get an IPropertyAliases instance.

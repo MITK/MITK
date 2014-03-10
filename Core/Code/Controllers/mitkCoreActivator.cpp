@@ -18,13 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanePositionManager.h"
 #include <mitkCoreDataNodeReader.h>
 #include <mitkStandardFileLocations.h>
-#include <mitkShaderRepository.h>
+#include <mitkIShaderRepository.h>
 #include <mitkPropertyAliases.h>
 #include <mitkPropertyDescriptions.h>
 #include <mitkPropertyExtensions.h>
 #include <mitkPropertyFilters.h>
 #include <mitkIOUtil.h>
 
+#include <usGetModuleContext.h>
 #include <usModuleInitialization.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
@@ -33,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModule.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
+#include <usServiceTracker.h>
 
 void HandleMicroServicesMessages(us::MsgType type, const char* msg)
 {
@@ -81,6 +83,142 @@ void AddMitkAutoLoadPaths(const std::string& programPath)
 #endif
 }
 
+class ShaderRepositoryTracker : public us::ServiceTracker<mitk::IShaderRepository>
+{
+
+public:
+
+  ShaderRepositoryTracker()
+    : Superclass(us::GetModuleContext())
+  {
+  }
+
+  virtual void Close()
+  {
+    us::GetModuleContext()->RemoveModuleListener(this, &ShaderRepositoryTracker::HandleModuleEvent);
+    Superclass::Close();
+  }
+
+  virtual void Open()
+  {
+    us::GetModuleContext()->AddModuleListener(this, &ShaderRepositoryTracker::HandleModuleEvent);
+    Superclass::Open();
+  }
+
+private:
+
+  typedef us::ServiceTracker<mitk::IShaderRepository> Superclass;
+
+  TrackedType AddingService(const ServiceReferenceType &reference)
+  {
+    mitk::IShaderRepository* shaderRepo = Superclass::AddingService(reference);
+    if (shaderRepo)
+    {
+      // Add all existing shaders from modules to the new shader repository.
+      // If the shader repository is registered in a modules activator, the
+      // GetLoadedModules() function call below will also return the module
+      // which is currently registering the repository. The HandleModuleEvent
+      // method contains code to avoid double registrations due to a fired
+      // ModuleEvent::LOADED event after the activators Load() method finished.
+      std::vector<us::Module*> modules = us::ModuleRegistry::GetLoadedModules();
+      for (std::vector<us::Module*>::const_iterator iter = modules.begin(),
+           endIter = modules.end(); iter != endIter; ++iter)
+      {
+        this->AddModuleShaderToRepository(*iter, shaderRepo);
+      }
+
+      m_ShaderRepositories.push_back(shaderRepo);
+    }
+    return shaderRepo;
+  }
+
+  void RemovedService(const ServiceReferenceType& /*reference*/, TrackedType tracked)
+  {
+    m_ShaderRepositories.erase(std::remove(m_ShaderRepositories.begin(), m_ShaderRepositories.end(), tracked),
+                               m_ShaderRepositories.end());
+  }
+
+  void HandleModuleEvent(const us::ModuleEvent moduleEvent)
+  {
+    if (moduleEvent.GetType() == us::ModuleEvent::LOADED)
+    {
+      std::vector<mitk::IShaderRepository*> shaderRepos;
+      for (std::map<mitk::IShaderRepository*, std::map<long, std::vector<int> > >::const_iterator shaderMapIter = m_ModuleIdToShaderIds.begin(),
+           shaderMapEndIter = m_ModuleIdToShaderIds.end(); shaderMapIter != shaderMapEndIter; ++shaderMapIter)
+      {
+        if (shaderMapIter->second.find(moduleEvent.GetModule()->GetModuleId()) == shaderMapIter->second.end())
+        {
+          shaderRepos.push_back(shaderMapIter->first);
+        }
+      }
+      AddModuleShadersToRepositories(moduleEvent.GetModule(), shaderRepos);
+    }
+    else if (moduleEvent.GetType() == us::ModuleEvent::UNLOADED)
+    {
+      RemoveModuleShadersFromRepositories(moduleEvent.GetModule(), m_ShaderRepositories);
+    }
+  }
+
+  void AddModuleShadersToRepositories(us::Module* module, const std::vector<mitk::IShaderRepository*>& shaderRepos)
+  {
+    // search and load shader files
+    std::vector<us::ModuleResource> shaderResources = module->FindResources("Shaders", "*.xml", true);
+    for (std::vector<us::ModuleResource>::iterator i = shaderResources.begin();
+         i != shaderResources.end(); ++i)
+    {
+      if (*i)
+      {
+        us::ModuleResourceStream rs(*i);
+        for (std::vector<mitk::IShaderRepository*>::const_iterator shaderRepoIter = shaderRepos.begin(),
+             shaderRepoEndIter = shaderRepos.end(); shaderRepoIter != shaderRepoEndIter; ++shaderRepoIter)
+        {
+          int id = (*shaderRepoIter)->LoadShader(rs, i->GetBaseName());
+          if (id >= 0)
+          {
+            m_ModuleIdToShaderIds[*shaderRepoIter][module->GetModuleId()].push_back(id);
+          }
+        }
+        rs.seekg(0, std::ios_base::beg);
+      }
+    }
+  }
+
+  void AddModuleShaderToRepository(us::Module* module, mitk::IShaderRepository* shaderRepo)
+  {
+    std::vector<mitk::IShaderRepository*> shaderRepos;
+    shaderRepos.push_back(shaderRepo);
+    this->AddModuleShadersToRepositories(module, shaderRepos);
+  }
+
+  void RemoveModuleShadersFromRepositories(us::Module* module,
+                                           const std::vector<mitk::IShaderRepository*>& shaderRepos)
+  {
+    for (std::vector<mitk::IShaderRepository*>::const_iterator shaderRepoIter = shaderRepos.begin(),
+         shaderRepoEndIter = shaderRepos.end(); shaderRepoIter != shaderRepoEndIter; ++shaderRepoIter)
+    {
+      std::map<long, std::vector<int> >& moduleIdToShaderIds = m_ModuleIdToShaderIds[*shaderRepoIter];
+      std::map<long, std::vector<int> >::iterator shaderIdsIter =
+        moduleIdToShaderIds.find(module->GetModuleId());
+      if (shaderIdsIter != moduleIdToShaderIds.end())
+      {
+        for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin();
+             idIter != shaderIdsIter->second.end(); ++idIter)
+        {
+          (*shaderRepoIter)->UnloadShader(*idIter);
+        }
+        moduleIdToShaderIds.erase(shaderIdsIter);
+      }
+    }
+  }
+
+private:
+
+  // Maps to each shader repository a map containing module ids and related
+  // shader registration ids
+  std::map<mitk::IShaderRepository*, std::map<long, std::vector<int> > > m_ModuleIdToShaderIds;
+  std::vector<mitk::IShaderRepository*> m_ShaderRepositories;
+};
+
 /*
  * This is the module activator for the "Mitk" module. It registers core services
  * like ...
@@ -114,9 +252,6 @@ public:
     m_CoreDataNodeReader.reset(new mitk::CoreDataNodeReader);
     context->RegisterService<mitk::IDataNodeReader>(m_CoreDataNodeReader.get());
 
-    m_ShaderRepository.reset(new mitk::ShaderRepository);
-    context->RegisterService<mitk::IShaderRepository>(m_ShaderRepository.get());
-
     m_PropertyAliases.reset(new mitk::PropertyAliases);
     context->RegisterService<mitk::IPropertyAliases>(m_PropertyAliases.get());
 
@@ -129,7 +264,7 @@ public:
     m_PropertyFilters.reset(new mitk::PropertyFilters);
     context->RegisterService<mitk::IPropertyFilters>(m_PropertyFilters.get());
 
-    context->AddModuleListener(this, &MitkCoreActivator::HandleModuleEvent);
+    m_ShaderRepositoryTracker.Open();
 
     /*
     There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.
@@ -147,62 +282,22 @@ public:
     // will always be 0 for the Mitk library. It makes no sense
     // to use it at this stage anyway, since all libraries which
     // know about the module system have already been unloaded.
+
+    m_ShaderRepositoryTracker.Close();
   }
 
 private:
 
-  void HandleModuleEvent(const us::ModuleEvent moduleEvent);
-
-  std::map<long, std::vector<int> > moduleIdToShaderIds;
+  ShaderRepositoryTracker m_ShaderRepositoryTracker;
 
   //mitk::RenderingManager::Pointer m_RenderingManager;
   std::auto_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
   std::auto_ptr<mitk::CoreDataNodeReader> m_CoreDataNodeReader;
-  std::auto_ptr<mitk::ShaderRepository> m_ShaderRepository;
   std::auto_ptr<mitk::PropertyAliases> m_PropertyAliases;
   std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
   std::auto_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
   std::auto_ptr<mitk::PropertyFilters> m_PropertyFilters;
 };
-
-void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)
-{
-  if (moduleEvent.GetType() == us::ModuleEvent::LOADED)
-  {
-    // search and load shader files
-    std::vector<us::ModuleResource> shaderResoruces =
-        moduleEvent.GetModule()->FindResources("Shaders", "*.xml", true);
-    for (std::vector<us::ModuleResource>::iterator i = shaderResoruces.begin();
-         i != shaderResoruces.end(); ++i)
-    {
-      if (*i)
-      {
-        us::ModuleResourceStream rs(*i);
-        int id = m_ShaderRepository->LoadShader(rs, i->GetBaseName());
-        if (id >= 0)
-        {
-          moduleIdToShaderIds[moduleEvent.GetModule()->GetModuleId()].push_back(id);
-        }
-      }
-    }
-  }
-  else if (moduleEvent.GetType() == us::ModuleEvent::UNLOADED)
-  {
-    std::map<long, std::vector<int> >::iterator shaderIdsIter =
-        moduleIdToShaderIds.find(moduleEvent.GetModule()->GetModuleId());
-    if (shaderIdsIter != moduleIdToShaderIds.end())
-    {
-      for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin();
-           idIter != shaderIdsIter->second.end(); ++idIter)
-      {
-        m_ShaderRepository->UnloadShader(*idIter);
-      }
-      moduleIdToShaderIds.erase(shaderIdsIter);
-    }
-  }
-
-
-}
 
 US_EXPORT_MODULE_ACTIVATOR(MitkCore, MitkCoreActivator)
 

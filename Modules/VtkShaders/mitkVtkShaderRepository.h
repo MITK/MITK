@@ -106,12 +106,7 @@ protected:
     void SetFragmentShaderCode(const std::string& code);
     std::string GetFragmentShaderCode() const;
 
-    Uniform* GetUniform(char * /*id*/) { return 0; }
-
-    std::list<Uniform::Pointer> *GetUniforms()
-    {
-      return &uniforms;
-    }
+    std::list<Uniform::Pointer> GetUniforms() const;
 
   private:
 

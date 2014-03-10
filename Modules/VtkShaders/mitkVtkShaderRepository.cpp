@@ -159,6 +159,11 @@ std::string mitk::VtkShaderRepository::Shader::GetFragmentShaderCode() const
   return this->m_FragmentShaderCode;
 }
 
+std::list<mitk::VtkShaderRepository::Shader::Uniform::Pointer> mitk::VtkShaderRepository::Shader::GetUniforms() const
+{
+  return uniforms;
+}
+
 void mitk::VtkShaderRepository::Shader::LoadXmlShader(std::istream& stream)
 {
   std::string content;
@@ -299,13 +304,13 @@ void mitk::VtkShaderRepository::AddDefaultProperties(mitk::DataNode* node, mitk:
 
   while( i != shaders.end() )
   {
-    std::list<Shader::Uniform::Pointer> *l = (*i)->GetUniforms();
+    std::list<Shader::Uniform::Pointer> uniforms = (*i)->GetUniforms();
 
     std::string shaderName = (*i)->GetName();
 
-    std::list<Shader::Uniform::Pointer>::const_iterator j = l->begin();
+    std::list<Shader::Uniform::Pointer>::const_iterator j = uniforms.begin();
 
-    while( j != l->end() )
+    while( j != uniforms.end() )
     {
       std::string propertyName = "shader." + shaderName + "." + (*j)->name;
 

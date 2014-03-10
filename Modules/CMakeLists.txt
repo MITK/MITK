@@ -50,6 +50,7 @@ set(module_dirs
     Remeshing
     Python
     Persistence
+    SurfaceRegistration
 )
 
 if(MITK_ENABLE_PIC_READER)

@@ -84,9 +84,17 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
     // this method is implemented in mitkMapper
     this->CalculateTimeStep( renderer );
 
-    //check if updates occured in the node or on the display
-    FBXLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-    const DataNode *node = this->GetDataNode();
+ //check if updates occured in the node or on the display
+ FBXLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+
+ if ((localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) ) //was the display geometry modified? e.g. zooming, panning)
+ {
+
+   this->UpdateShaderParameter(renderer);
+
+ }
+
+ const DataNode *node = this->GetDataNode();
     if ( (localStorage->m_LastUpdateTime < node->GetMTime())
          || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
          || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
@@ -95,19 +103,11 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
         this->GenerateDataForRenderer( renderer );
     }
 
-    if ((localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) ) //was the display geometry modified? e.g. zooming, panning)
-    {
-
-        this->UpdateShaderParameter(renderer);
-
-    }
 
 }
 
 void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * renderer)
 {
-    FBXLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-
     //get information about current position of views
     mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
     mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
@@ -117,7 +117,6 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
 
 
     // since shader uses camera coordinates, transform origin and normal from worldcoordinates to cameracoordinates
-
 
     planeOrigin[0] = (float) planeGeo->GetOrigin()[0];
     planeOrigin[1] = (float) planeGeo->GetOrigin()[1];
@@ -149,19 +148,18 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
     if(!this->GetDataNode()->GetPropertyValue("Fiber2DfadeEFX",fiberfading))
         MITK_INFO << "FIBER2D SLICE FADE EFX PROPERTY ERROR";
 
-
-    int fiberfading_i = 1;
-    if (!fiberfading)
-        fiberfading_i = 0;
-
     // set Opacity
     float fiberOpacity;
     this->GetDataNode()->GetOpacity(fiberOpacity, NULL);
 
-    localStorage->m_PointActor->GetProperty()->AddShaderVariable("slicingPlane",4, plane1);
-    localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberThickness",1, &thickness);
-    localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberFadingON",1,  &fiberfading_i);
-    localStorage->m_PointActor->GetProperty()->AddShaderVariable("fiberOpacity", 1, &fiberOpacity);
+    DataNode::Pointer node = this->GetDataNode();
+    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.w",plane1[3],renderer);
+    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.x",plane1[0],renderer);
+    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.y",plane1[1],renderer);
+    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.z",plane1[2],renderer);
+    node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberThickness",thickness,renderer);
+    node->SetIntProperty("shader.mitkShaderFiberClipping.fiberFadingON",fiberfading,renderer);
+    node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberOpacity",fiberOpacity,renderer);
 
 
 }
@@ -208,9 +206,7 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     localStorage->m_PointActor->GetProperty()->SetLineWidth(lineWidth);
 
     // Applying shading properties
-    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
-    shaderRepo->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer, localStorage->m_LastUpdateTime);
-    this->UpdateShaderParameter(renderer);
+    this->ApplyShaderProperties(renderer);
 
     // We have been modified => save this for next Update()
     localStorage->m_LastUpdateTime.Modified();
@@ -229,8 +225,12 @@ void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
 {    //add shader to datano
     node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
 
-    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
-    shaderRepo->AddDefaultProperties(node,renderer,overwrite);
+    // Shaders
+    IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+    if (shaderRepo)
+    {
+        shaderRepo->AddDefaultProperties(node, renderer, overwrite);
+    }
 
     //add other parameters to propertylist
     node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(2.0f), renderer, overwrite );

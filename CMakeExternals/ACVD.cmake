@@ -24,8 +24,8 @@ if(MITK_USE_ACVD)
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      URL http://mitk.org/download/thirdparty/ACVD_VTK6.tar.gz
-      URL_MD5 e99d1cb7d264d421074d5346f1d3ce82
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_2d8f5ea5.tar.gz
+      URL_MD5 ecc97728a86798b35c20eef964b094c9
       PATCH_COMMAND ${ACVD_PATCH_COMMAND}
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

@@ -37,11 +37,24 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     list(APPEND _dir_candidates ${_additional_paths})
   endif()
 
+  if(VTK_DIR)
+    find_package(VTK QUIET)
+    if(VTK_RUNTIME_LIBRARY_DIRS)
+      list(APPEND _dir_candidates ${VTK_RUNTIME_LIBRARY_DIRS})
+    endif()
+  endif()
+
+
+  # The code below is sub-optimal. It makes assumptions about
+  # the structure of the build directories, pointed to by
+  # the *_DIR variables. Instead, we should rely on package
+  # specific "LIBRARY_DIRS" variables, if they exist.
+
   if(WIN32)
     if(DCMTK_DIR)
       list(APPEND _dir_candidates "${DCMTK_DIR}/bin")
     endif()
-   list(APPEND _dir_candidates "${ITK_DIR}/bin")
+    list(APPEND _dir_candidates "${ITK_DIR}/bin")
   else()
     if(DCMTK_DIR)
       list(APPEND _dir_candidates "${DCMTK_DIR}/lib")
@@ -49,10 +62,6 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     list(APPEND _dir_candidates "${ITK_DIR}/lib")
   endif()
 
-  # The code below is sub-optimal. It makes assumptions about
-  # the structure of the build directories, pointed to by
-  # the *_DIR variables. Instead, we should rely on package
-  # specific "LIBRARY_DIRS" variables, if they exist.
   if(MITK_USE_Python AND CTK_PYTHONQT_INSTALL_DIR)
     list(APPEND _dir_candidates "${CTK_PYTHONQT_INSTALL_DIR}/bin")
   endif()

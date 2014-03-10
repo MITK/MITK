@@ -12,7 +12,7 @@ set(proj_DEPENDENCIES)
 set(MITK-Data_DEPENDS ${proj})
 
 if(BUILD_TESTING)
-  set(revision_tag 5e202c70)
+  set(revision_tag af8a3ea5)
 #                 ^^^^^^^^  these are just to check correct length of hash part
 
   ExternalProject_Add(${proj}

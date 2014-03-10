@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestFixture.h"
 #include "itkNonLocalMeansDenoisingFilter.h"
 
-class itkNonLocalMeansDenoisingTestSuite : public mitk::TestFixture
+class mitkNonLocalMeansDenoisingTestSuite : public mitk::TestFixture
 {
 
-  CPPUNIT_TEST_SUITE(itkNonLocalMeansDenoisingTestSuite);
+  CPPUNIT_TEST_SUITE(mitkNonLocalMeansDenoisingTestSuite);
   MITK_TEST(Denoise_NLMr_1_1_shouldReturnTrue);
   MITK_TEST(Denoise_NLMv_1_1_1_shouldReturnTrue);
   CPPUNIT_TEST_SUITE_END();
@@ -121,4 +121,4 @@ public:
 
 };
 
-MITK_TEST_SUITE_REGISTRATION(itkNonLocalMeansDenoising)
+MITK_TEST_SUITE_REGISTRATION(mitkNonLocalMeansDenoising)

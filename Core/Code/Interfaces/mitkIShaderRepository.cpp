@@ -23,6 +23,7 @@ IShaderRepository::~IShaderRepository()
 {
 }
 
+
 struct IShaderRepository::ShaderPrivate
 {
   ShaderPrivate() : id(-1) {}

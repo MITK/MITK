@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usServiceReference.h>
+#include <usServiceTracker.h>
 
 #include <itkSimpleFastMutexLock.h>
 #include <itkMutexLockHolder.h>
@@ -51,9 +52,11 @@ static S* GetCoreService(us::ModuleContext* context)
   return coreService;
 }
 
-IShaderRepository* CoreServices::GetShaderRepository(us::ModuleContext* context)
+IShaderRepository* CoreServices::GetShaderRepository()
 {
-  return GetCoreService<IShaderRepository>(context);
+  static us::ServiceTracker<IShaderRepository> tracker(us::GetModuleContext());
+  tracker.Open();
+  return tracker.GetService();
 }
 
 IPropertyAliases* CoreServices::GetPropertyAliases(us::ModuleContext* context)

@@ -14,12 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITKSHADERREPOSITORY_H_
-#define _MITKSHADERREPOSITORY_H_
+#ifndef _MITKVTKSHADERREPOSITORY_H_
+#define _MITKVTKSHADERREPOSITORY_H_
 
 #include "mitkIShaderRepository.h"
+#include <vtkShaderProgram2.h>
+#include <vtkXMLShader.h>
+
 
 class vtkXMLDataElement;
+class vtkXMLMaterial;
 class vtkProperty;
 
 namespace mitk {
@@ -33,7 +37,7 @@ namespace mitk {
  * Additionally, it provides a utility function for applying properties for shaders
  * in mappers.
  */
-class ShaderRepository : public IShaderRepository
+class VtkShaderRepository : public IShaderRepository
 {
 
 protected:
@@ -96,7 +100,13 @@ protected:
      */
     ~Shader();
 
-    Uniform *GetUniform(char * /*id*/) { return 0; }
+    void SetVertexShaderCode(const std::string& code);
+    std::string GetVertexShaderCode() const;
+
+    void SetFragmentShaderCode(const std::string& code);
+    std::string GetFragmentShaderCode() const;
+
+    Uniform* GetUniform(char * /*id*/) { return 0; }
 
     std::list<Uniform::Pointer> *GetUniforms()
     {
@@ -105,10 +115,12 @@ protected:
 
   private:
 
-    friend class ShaderRepository;
+    friend class VtkShaderRepository;
 
-    void LoadProperties(vtkProperty* prop);
-    void LoadProperties(std::istream& stream);
+    std::string m_VertexShaderCode;
+    std::string m_FragmentShaderCode;
+
+    void LoadXmlShader(std::istream& stream);
 
   };
 
@@ -123,17 +135,19 @@ private:
   static int shaderId;
   static const bool debug;
 
-public:
+  public:
 
   /**
    * Constructor
    */
-  ShaderRepository();
+  VtkShaderRepository();
 
   /**
    * Destructor
    */
-  ~ShaderRepository();
+  ~VtkShaderRepository();
+
+  ShaderProgram::Pointer CreateShaderProgram();
 
   std::list<IShaderRepository::Shader::Pointer> GetShaders() const;
 
@@ -149,13 +163,13 @@ public:
   /** \brief Applies shader and shader specific variables of the specified DataNode
    * to the VTK object by updating the shader variables of its vtkProperty.
    */
-  void ApplyProperties(mitk::DataNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const;
 
   int LoadShader(std::istream& stream, const std::string& name);
 
   bool UnloadShader(int id);
 
-
+  void UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram* shaderProgram,
+                           DataNode* node, BaseRenderer* renderer) const;
 };
 
 } //end of namespace mitk

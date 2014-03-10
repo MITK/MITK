@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClippingProperty.h"
 #include "mitkSmartPointerProperty.h"
 
-#include "mitkShaderProperty.h"
+//#include "mitkShaderProperty.h"
 #include "mitkIShaderRepository.h"
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageSliceSelector.h>
@@ -82,7 +82,6 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
     ls->m_Actor->VisibilityOff();
     return;
   }
-
   if ( m_GenerateNormals )
   {
     ls->m_VtkPolyDataNormals->SetInputData( polydata );
@@ -251,11 +250,9 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
 
     // Applying shading properties
     Superclass::ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
+    this->ApplyShaderProperties(renderer);
     // VTK Properties
     ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
-    // Shaders
-    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
-    shaderRepo->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
 
     mitk::TransferFunctionProperty::Pointer transferFuncProp;
     this->GetDataNode()->GetProperty(transferFuncProp, "Surface.TransferFunction", renderer);
@@ -472,8 +469,11 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     }
 
     // Shaders
-    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
-    shaderRepo->AddDefaultProperties(node,renderer,overwrite);
+    IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+    if (shaderRepo)
+    {
+        shaderRepo->AddDefaultProperties(node, renderer, overwrite);
+    }
 }
 
 

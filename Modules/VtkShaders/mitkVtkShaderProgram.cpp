@@ -15,10 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkVtkShaderProgram.h"
+#include "mitkBaseRenderer.h"
+
 #include "vtkShader2.h"
 
 mitk::VtkShaderProgram::VtkShaderProgram()
-  : m_VtkShaderProgram(NULL)
+  : m_BaseRenderer(NULL)
+  , m_VtkShaderProgram(NULL)
 {
 }
 
@@ -26,8 +29,33 @@ mitk::VtkShaderProgram::~VtkShaderProgram()
 {
 }
 
-void mitk::VtkShaderProgram::SetVtkShaderProgram(vtkShaderProgram2* p) { m_VtkShaderProgram = p; }
+void mitk::VtkShaderProgram::Activate()
+{
+  if(m_VtkShaderProgram)
+  {
+    m_VtkShaderProgram->Use();
+  }
+}
 
-vtkShaderProgram2*mitk::VtkShaderProgram::GetVtkShaderProgram() const { return m_VtkShaderProgram; }
+void mitk::VtkShaderProgram::Deactivate()
+{
+  if(m_VtkShaderProgram)
+  {
+    m_VtkShaderProgram->Restore();
+  }
+}
 
-itk::TimeStamp&mitk::VtkShaderProgram::GetShaderTimestampUpdate(){return m_ShaderTimestampUpdate;}
+void mitk::VtkShaderProgram::SetVtkShaderProgram(vtkSmartPointer<vtkShaderProgram2> p)
+{
+  m_VtkShaderProgram = p;
+}
+
+vtkSmartPointer<vtkShaderProgram2> mitk::VtkShaderProgram::GetVtkShaderProgram() const
+{
+  return m_VtkShaderProgram;
+}
+
+itk::TimeStamp& mitk::VtkShaderProgram::GetShaderTimestampUpdate()
+{
+  return m_ShaderTimestampUpdate;
+}

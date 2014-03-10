@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITKVTKSHADERPROGRAM_H_
 
 #include <mitkIShaderRepository.h>
-#include <VtkShadersExports.h>
+
 #include <vtkShaderProgram2.h>
 #include <vtkSmartPointer.h>
 
@@ -44,29 +44,17 @@ public:
    */
   virtual ~VtkShaderProgram();
 
-  virtual void Activate()
-  {
-    if(m_VtkShaderProgram)
-    {
-      m_VtkShaderProgram->UseProgram();
+  virtual void Activate();
+  virtual void Deactivate();
 
-    }
-  }
-  virtual void Deactivate()
-  {
-    if(m_VtkShaderProgram)
-    {
-      m_VtkShaderProgram->UnuseProgram();
-    }
-  }
-
-  void SetVtkShaderProgram( vtkShaderProgram2 * p );
-  vtkShaderProgram2 * GetVtkShaderProgram() const;
+  void SetVtkShaderProgram(vtkSmartPointer<vtkShaderProgram2> p);
+  vtkSmartPointer<vtkShaderProgram2> GetVtkShaderProgram() const;
   itk::TimeStamp& GetShaderTimestampUpdate();
 
 private:
 
-  vtkShaderProgram2* m_VtkShaderProgram;
+  BaseRenderer* m_BaseRenderer;
+  vtkSmartPointer<vtkShaderProgram2> m_VtkShaderProgram;
   itk::TimeStamp m_ShaderTimestampUpdate;
 
 };

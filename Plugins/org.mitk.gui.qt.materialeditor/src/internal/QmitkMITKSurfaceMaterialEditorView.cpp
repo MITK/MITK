@@ -40,9 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCoordinate.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
-#include <vtkXMLMaterial.h>
-#include <vtkXMLShader.h>
-#include <vtkXMLDataElement.h>
 
 #include <mitkVtkPropRenderer.h>
 #include <mitkVtkLayerController.h>

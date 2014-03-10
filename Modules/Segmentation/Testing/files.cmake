@@ -6,6 +6,7 @@ set(MODULE_TESTS
   mitkOverwriteSliceFilterTest.cpp
   mitkOverwriteSliceFilterObliquePlaneTest.cpp
 #  mitkToolManagerTest.cpp
+  mitkToolInteractionTest.cpp
   mitkToolManagerProviderTest.cpp
 )
 

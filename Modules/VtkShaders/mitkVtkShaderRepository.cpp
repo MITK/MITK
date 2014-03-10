@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkShader2.h>
 #include <vtkShaderProgram2.h>
 #include <vtkShader2Collection.h>
+#include <vtkUniformVariables.h>
 
 #include <itkDirectory.h>
 #include <itksys/SystemTools.hxx>
@@ -191,7 +192,8 @@ void mitk::VtkShaderRepository::Shader::LoadXmlShader(std::istream& stream)
       for(int r=0;r<n;r++)
       {
         vtkXMLDataElement *y=x->GetNestedElement(r);
-        if(!strcmp(y->GetName(),"ApplicationUniform"))
+        if(strcmp(y->GetName(),"ApplicationUniform") == 0 ||
+           strcmp(y->GetName(), "Uniform") == 0)
         {
           Uniform::Pointer element=Uniform::New();
           element->LoadFromXML(y);
@@ -212,7 +214,8 @@ void mitk::VtkShaderRepository::Shader::LoadXmlShader(std::istream& stream)
       for(int r=0;r<n;r++)
       {
         vtkXMLDataElement *y=x->GetNestedElement(r);
-        if(!strcmp(y->GetName(),"ApplicationUniform"))
+        if(strcmp(y->GetName(),"ApplicationUniform") == 0 ||
+           strcmp(y->GetName(), "Uniform") == 0)
         {
           Uniform::Pointer element=Uniform::New();
           element->LoadFromXML(y);
@@ -266,7 +269,6 @@ void mitk::VtkShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *
 
   defaultFloat[0]=defaultFloat[1]=defaultFloat[2]=defaultFloat[3]=0;
 
-  /*
   const char *sDefault=y->GetAttribute("value");
 
   switch(type)
@@ -287,7 +289,6 @@ void mitk::VtkShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *
       sscanf(sDefault,"%f %f %f %f",&defaultFloat[0],&defaultFloat[1],&defaultFloat[2],&defaultFloat[3]);
       break;
   }
-  */
 }
 
 void mitk::VtkShaderRepository::AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite) const
@@ -460,20 +461,21 @@ mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram* shaderProgram,
       {
       case Shader::Uniform::glsl_float:
         node->GetFloatProperty( propertyName.c_str(), fval[0], renderer );
-        p->SetUniform1f( (*j)->name.c_str(), fval );
+        p->GetUniformVariables()->SetUniformf((*j)->name.c_str(), 1, fval);
         break;
 
       case Shader::Uniform::glsl_vec2:
         node->GetFloatProperty( (propertyName+".x").c_str(), fval[0], renderer );
         node->GetFloatProperty( (propertyName+".y").c_str(), fval[1], renderer );
-        p->SetUniform2f( (*j)->name.c_str(), fval );
+        p->GetUniformVariables()->SetUniformf((*j)->name.c_str(), 2, fval);
         break;
 
       case Shader::Uniform::glsl_vec3:
         node->GetFloatProperty( (propertyName+".x").c_str(), fval[0], renderer );
         node->GetFloatProperty( (propertyName+".y").c_str(), fval[1], renderer );
         node->GetFloatProperty( (propertyName+".z").c_str(), fval[2], renderer );
-        p->SetUniform3f( (*j)->name.c_str(), fval );
+        //p->SetUniform3f( (*j)->name.c_str(), fval );
+        p->GetUniformVariables()->SetUniformf((*j)->name.c_str(), 3, fval);
         break;
 
       case Shader::Uniform::glsl_vec4:
@@ -481,7 +483,7 @@ mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram* shaderProgram,
         node->GetFloatProperty( (propertyName+".y").c_str(), fval[1], renderer );
         node->GetFloatProperty( (propertyName+".z").c_str(), fval[2], renderer );
         node->GetFloatProperty( (propertyName+".w").c_str(), fval[3], renderer );
-        p->SetUniform4f( (*j)->name.c_str(), fval );
+        p->GetUniformVariables()->SetUniformf((*j)->name.c_str(), 4, fval);
         break;
 
       default:

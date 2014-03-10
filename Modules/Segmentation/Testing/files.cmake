@@ -6,9 +6,15 @@ set(MODULE_TESTS
   mitkOverwriteSliceFilterTest.cpp
   mitkOverwriteSliceFilterObliquePlaneTest.cpp
 #  mitkToolManagerTest.cpp
-  mitkToolInteractionTest.cpp
   mitkToolManagerProviderTest.cpp
 )
+
+if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
+set(MODULE_TESTS
+  ${MODULE_TESTS}
+  mitkToolInteractionTest.cpp
+)
+endif()
 
 set(MODULE_IMAGE_TESTS
   mitkManualSegmentationToSurfaceFilterTest.cpp #only runs on images

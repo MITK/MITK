@@ -30,8 +30,10 @@ class mitkToolInteractionTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkToolInteractionTestSuite);
+  /* ####### example ######
   MITK_TEST(AddToolInteractionTest);
   MITK_TEST(AddToolInteraction_4D_Test);
+  #########################*/
   CPPUNIT_TEST_SUITE_END();
 
 
@@ -138,15 +140,19 @@ public:
     m_ToolManager = NULL;
   }
 
+/*############ example ###################
   void AddToolInteractionTest()
   {
     RunTestWithParameters("Pic3D.nrrd", "Segmentation/ReferenceSegmentations/AddTool.nrrd", "AddContourTool", "Segmentation/InteractionPatterns/AddTool.xml");
   }
 
+
   void AddToolInteraction_4D_Test()
   {
+
     RunTestWithParameters("US4DCyl.nrrd", "Segmentation/ReferenceSegmentations/AddTool_4D.nrrd", "AddContourTool", "Segmentation/InteractionPatterns/AddTool_4D.xml", 1);
   }
+#########################################*/
 
 };
 

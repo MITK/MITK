@@ -7,5 +7,6 @@ set(MODULE_CUSTOM_TESTS
   mitkPyramidImageRegistrationMethodTest.cpp
   mitkDWHeadMotionCorrectionTest.cpp
   mitkImageReconstructionTest.cpp
+  itkNonLocalMeansDenoisingTest.cpp
 )
 

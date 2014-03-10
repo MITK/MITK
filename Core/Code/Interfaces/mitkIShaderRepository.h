@@ -46,12 +46,12 @@ struct MITK_CORE_EXPORT IShaderRepository
 
   struct ShaderPrivate;
 
-  class MITK_CORE_EXPORT Shader : public itk::Object
+  class MITK_CORE_EXPORT Shader : public itk::LightObject
   {
 
   public:
 
-    mitkClassMacro( Shader, itk::Object )
+    mitkClassMacro( Shader, itk::LightObject )
     itkFactorylessNewMacro( Self )
 
     ~Shader();

@@ -138,6 +138,26 @@ mitk::VtkShaderRepository::Shader::~Shader()
 {
 }
 
+void mitk::VtkShaderRepository::Shader::SetVertexShaderCode(const std::string& code)
+{
+  this->m_VertexShaderCode = code;
+}
+
+std::string mitk::VtkShaderRepository::Shader::GetVertexShaderCode() const
+{
+  return this->m_VertexShaderCode;
+}
+
+void mitk::VtkShaderRepository::Shader::SetFragmentShaderCode(const std::string& code)
+{
+  this->m_FragmentShaderCode = code;
+}
+
+std::string mitk::VtkShaderRepository::Shader::GetFragmentShaderCode() const
+{
+  return this->m_FragmentShaderCode;
+}
+
 void mitk::VtkShaderRepository::Shader::LoadXmlShader(std::istream& stream)
 {
   std::string content;

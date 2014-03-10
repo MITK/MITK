@@ -49,11 +49,6 @@ protected:
     mitkClassMacro( Shader, itk::Object )
     itkFactorylessNewMacro( Self )
 
-    itkSetMacro(VertexShaderCode,std::string);
-    itkGetConstMacro(VertexShaderCode,std::string);
-    itkSetMacro(FragmentShaderCode,std::string);
-    itkGetConstMacro(FragmentShaderCode,std::string);
-
     class Uniform : public itk::Object
     {
       public:
@@ -105,7 +100,13 @@ protected:
      */
     ~Shader();
 
-    Uniform *GetUniform(char * /*id*/) { return 0; }
+    void SetVertexShaderCode(const std::string& code);
+    std::string GetVertexShaderCode() const;
+
+    void SetFragmentShaderCode(const std::string& code);
+    std::string GetFragmentShaderCode() const;
+
+    Uniform* GetUniform(char * /*id*/) { return 0; }
 
     std::list<Uniform::Pointer> *GetUniforms()
     {

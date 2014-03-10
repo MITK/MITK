@@ -7,7 +7,7 @@ endif()
 
 # there are additional warnings in boost headers in Release mode with special gcc versions
 if(CMAKE_COMPILER_IS_GNUCXX)
-  if (CMAKE_BUILD_TYPE STREQUAL "Release" AND ${GCC_VERSION} VERSION_EQUAL "4.8")
+  if (CMAKE_BUILD_TYPE STREQUAL "Release" AND (${GCC_VERSION} VERSION_EQUAL "4.8" OR ${GCC_VERSION} VERSION_GREATER "4.8"))
     mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=maybe-uninitialized" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
     mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unused-parameter" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
   endif()

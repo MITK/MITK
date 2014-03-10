@@ -293,6 +293,25 @@ void mitk::VtkShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *
     case glsl_vec4:
       sscanf(sDefault,"%f %f %f %f",&defaultFloat[0],&defaultFloat[1],&defaultFloat[2],&defaultFloat[3]);
       break;
+
+    case glsl_int:
+      sscanf(sDefault,"%d",&defaultInt[0]);
+      break;
+
+    case glsl_ivec2:
+      sscanf(sDefault,"%d %d",&defaultInt[0],&defaultInt[1]);
+      break;
+
+    case glsl_ivec3:
+      sscanf(sDefault,"%d %d %d",&defaultInt[0],&defaultInt[1],&defaultInt[2]);
+      break;
+
+    case glsl_ivec4:
+      sscanf(sDefault,"%d %d %d %d",&defaultInt[0],&defaultInt[1],&defaultInt[2],&defaultInt[3]);
+      break;
+
+    case glsl_none:
+      break;
   }
 }
 
@@ -338,9 +357,30 @@ void mitk::VtkShaderRepository::AddDefaultProperties(mitk::DataNode* node, mitk:
           node->AddProperty( (propertyName+".w").c_str(), mitk::FloatProperty::New( (*j)->defaultFloat[3] ), renderer, overwrite );
           break;
 
-       default:
+       case Shader::Uniform::glsl_int:
+          node->AddProperty( propertyName.c_str(), mitk::IntProperty::New( (*j)->defaultInt[0] ), renderer, overwrite );
           break;
 
+       case Shader::Uniform::glsl_ivec2:
+          node->AddProperty( (propertyName+".x").c_str(), mitk::IntProperty::New( (*j)->defaultInt[0] ), renderer, overwrite );
+          node->AddProperty( (propertyName+".y").c_str(), mitk::IntProperty::New( (*j)->defaultInt[1] ), renderer, overwrite );
+          break;
+
+        case Shader::Uniform::glsl_ivec3:
+          node->AddProperty( (propertyName+".x").c_str(), mitk::IntProperty::New( (*j)->defaultInt[0] ), renderer, overwrite );
+          node->AddProperty( (propertyName+".y").c_str(), mitk::IntProperty::New( (*j)->defaultInt[1] ), renderer, overwrite );
+          node->AddProperty( (propertyName+".z").c_str(), mitk::IntProperty::New( (*j)->defaultInt[2] ), renderer, overwrite );
+          break;
+
+       case Shader::Uniform::glsl_ivec4:
+          node->AddProperty( (propertyName+".x").c_str(), mitk::IntProperty::New( (*j)->defaultInt[0] ), renderer, overwrite );
+          node->AddProperty( (propertyName+".y").c_str(), mitk::IntProperty::New( (*j)->defaultInt[1] ), renderer, overwrite );
+          node->AddProperty( (propertyName+".z").c_str(), mitk::IntProperty::New( (*j)->defaultInt[2] ), renderer, overwrite );
+          node->AddProperty( (propertyName+".w").c_str(), mitk::IntProperty::New( (*j)->defaultInt[3] ), renderer, overwrite );
+          break;
+
+       case Shader::Uniform::glsl_none:
+          break;
       }
 
       j++;
@@ -458,6 +498,7 @@ mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram* shaderProgram,
     //  if( p && p->GetMTime() > MTime.GetMTime() )
     {
       float fval[4];
+      int ival[4];
 
       // MITK_INFO << "copying property " << propertyName << " ->->- " << (*j)->name << " type=" << (*j)->type ;
 
@@ -491,7 +532,34 @@ mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram* shaderProgram,
         p->GetUniformVariables()->SetUniformf((*j)->name.c_str(), 4, fval);
         break;
 
-      default:
+      case Shader::Uniform::glsl_int:
+        node->GetIntProperty( propertyName.c_str(), ival[0], renderer );
+        p->GetUniformVariables()->SetUniformi((*j)->name.c_str(), 1, ival);
+        break;
+
+      case Shader::Uniform::glsl_ivec2:
+        node->GetIntProperty( (propertyName+".x").c_str(), ival[0], renderer );
+        node->GetIntProperty( (propertyName+".y").c_str(), ival[1], renderer );
+        p->GetUniformVariables()->SetUniformi((*j)->name.c_str(), 2, ival);
+        break;
+
+      case Shader::Uniform::glsl_ivec3:
+        node->GetIntProperty( (propertyName+".x").c_str(), ival[0], renderer );
+        node->GetIntProperty( (propertyName+".y").c_str(), ival[1], renderer );
+        node->GetIntProperty( (propertyName+".z").c_str(), ival[2], renderer );
+        //p->SetUniform3f( (*j)->name.c_str(), fval );
+        p->GetUniformVariables()->SetUniformi((*j)->name.c_str(), 3, ival);
+        break;
+
+      case Shader::Uniform::glsl_ivec4:
+        node->GetIntProperty( (propertyName+".x").c_str(), ival[0], renderer );
+        node->GetIntProperty( (propertyName+".y").c_str(), ival[1], renderer );
+        node->GetIntProperty( (propertyName+".z").c_str(), ival[2], renderer );
+        node->GetIntProperty( (propertyName+".w").c_str(), ival[3], renderer );
+        p->GetUniformVariables()->SetUniformi((*j)->name.c_str(), 4, ival);
+        break;
+
+      case Shader::Uniform::glsl_none:
         break;
 
       }

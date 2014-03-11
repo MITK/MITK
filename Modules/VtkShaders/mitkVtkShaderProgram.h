@@ -53,7 +53,6 @@ public:
 
 private:
 
-  BaseRenderer* m_BaseRenderer;
   vtkSmartPointer<vtkShaderProgram2> m_VtkShaderProgram;
   itk::TimeStamp m_ShaderTimestampUpdate;
 

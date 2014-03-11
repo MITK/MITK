@@ -15,10 +15,10 @@ Available sections:
 The IGT-TrackingLab is the last step of the IGT tutorial. It is a plugin which shows examples usage for many IGT classes and is also an example navigation implemented with IGT. In the following you can learn how to use the plugin by reading this manual together with the source code.
 
 \section QmitkIGTTrackingLabUsersManualPrel Preliminaries
-First connect your tracking device to your PC. Then start the MITK Workbench and configure your tracking device using the org_mitk_views_igttrackingtoolbox .
+First connect your tracking device to your PC. Then start the MITK Workbench and configure your tracking device using the \ref org_mitk_views_igttrackingtoolbox "Tracking Toolbox View".
 
 \section QmitkIGTTrackingLabUsersManualConf Configuration
-Select the desired <i>Navigation Data Source</i>. Now its time to define which tool shall be used as object marker and which tool shall be used as pointer. Next load the Book surface provided with the example data (TODO) in the Data Manager. Fixate the object marker on a real book of your choice. Now we need to tell MITK that the objectmarker has been fixated on a physical object. To do this, select the <i>Book</i> as surface in the <i>Object Selection</i> submenu.
+Select the desired <i>Navigation Data Source</i>. Now its time to define which tool shall be used as object marker and which tool shall be used as pointer. Next load the Book surface provided with the example data (e.g. book.stl from the MITK-Data repository which comes with every superbuild or may also be checked out seperately) into MITK. Fixate the object marker on a real book of your choice. Now we need to tell MITK that the objectmarker has been fixated on a physical object. To do this, select the <i>Book</i> as surface in the <i>Object Selection</i> submenu.
 
 \section QmitkIGTTrackingLabUsersManualIntialReg Initial Registration
 Now we need to register the objectmarker to the surface it's fixed upon, in our case the book. To do this, first press the initial registration button. For MITK to be able to do this registration, we need to 
@@ -50,7 +50,5 @@ You may need to adjust the Needle View Direction and the View Up Vector. This is
 \image html QmitkIGTExamples_Tool.png "The coordinate system of the NDI pointing tool"
 
 In the above case, the camera should look in inverse z-direction, and the view up vector should probably be set to positive x. Note this is just an example and may be different depending on your pointer.
-
-
 
 */

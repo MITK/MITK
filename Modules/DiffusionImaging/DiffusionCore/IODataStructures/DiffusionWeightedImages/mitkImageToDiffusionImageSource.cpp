@@ -135,6 +135,8 @@ void mitk::ImageToDiffusionImageSource<TPixelType>
   static_cast<OutputType*>(this->GetOutput())
       ->SetDirections(m_OutputCache->GetDirections());
   static_cast<OutputType*>(this->GetOutput())
+      ->UpdateBValueMap();
+  static_cast<OutputType*>(this->GetOutput())
       ->InitializeFromVectorImage();
 
 

@@ -28,8 +28,8 @@ mitk::PyramidImageRegistrationMethod::PyramidImageRegistrationMethod()
     m_UseNearestNeighborInterpolator(false),
     m_UseMask(false),
     m_EstimatedParameters(NULL),
-    m_Verbose(false),
-    m_InitializeByGeometry(false)
+    m_InitialParameters(NULL),
+    m_Verbose(false)
 {
 
 }
@@ -40,6 +40,7 @@ mitk::PyramidImageRegistrationMethod::~PyramidImageRegistrationMethod()
   {
     delete [] m_EstimatedParameters;
   }
+
 }
 
 void mitk::PyramidImageRegistrationMethod::SetFixedImage(mitk::Image::Pointer fixed)

@@ -103,6 +103,13 @@ public:
   void SetExtractAllAboveThreshold( double b_threshold, BValueMapType map);
 
   /**
+   * @brief SetExtractSingleShell
+   * @param b_value b-value of the shell to be extracted
+   * @param tol the tolerance of the shell choice, i.e. all shells within [ b_value - tol, b_value + tol ] will be extracted
+   */
+  void SetExtractSingleShell( double b_value, BValueMapType map, double tol );
+
+  /**
    * @brief Returns the index list used for extraction
    *
    * The list is necessary for further processing, especially when a b-value threshold is used ( like in \sa SetExtractAllAboveThreshold )

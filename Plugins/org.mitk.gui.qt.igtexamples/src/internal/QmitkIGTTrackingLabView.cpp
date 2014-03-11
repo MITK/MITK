@@ -70,62 +70,11 @@ QmitkIGTTrackingLabView::QmitkIGTTrackingLabView()
 {
 }
 
-QmitkIGTTrackingLabView::~QmitkIGTTrackingLabView()
-{
-  if (m_Timer->isActive()) m_Timer->stop();
-}
-
-void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
-{
-  // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi( parent );
-  this->CreateBundleWidgets( parent );
-  this->CreateConnections();
-}
-
-
-void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
-{
-  //initialize registration widget
-  m_Controls.m_RegistrationWidget->HideStaticRegistrationRadioButton(true);
-  m_Controls.m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
-  m_Controls.m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
-}
-
-
-void QmitkIGTTrackingLabView::CreateConnections()
-{
-  //initialize timer
-  m_Timer = new QTimer(this);
-
-  //create connections
-  connect(m_Timer, SIGNAL(timeout()), this, SLOT(UpdateTimer()));
-  connect( m_Controls.m_UsePermanentRegistrationToggle, SIGNAL(toggled(bool)), this, SLOT(OnPermanentRegistration(bool)) );
-  connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), this, SLOT(OnSetupNavigation()) );
-  connect( m_Controls.m_UseAsPointerButton, SIGNAL(clicked()), this, SLOT(OnInstrumentSelected()) );
-  connect( m_Controls.m_UseAsObjectmarkerButton, SIGNAL(clicked()), this, SLOT(OnObjectmarkerSelected()) );
-  connect( m_Controls.m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
-  connect( m_Controls.m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnInitialRegistration()) );
-  connect( m_Controls.m_PointSetRecordCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnPointSetRecording(bool)) );
-  connect( m_Controls.m_ActivateNeedleView, SIGNAL(toggled(bool)), this, SLOT(OnVirtualCamera(bool)) );
-
-  //start timer
-  m_Timer->start(30);
-
-  //initialize Combo Boxes
-  m_Controls.m_ObjectComboBox->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_ObjectComboBox->SetAutoSelectNewItems(false);
-  m_Controls.m_ObjectComboBox->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
-
-  m_Controls.m_ImageComboBox->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_ImageComboBox->SetAutoSelectNewItems(false);
-  m_Controls.m_ImageComboBox->SetPredicate(mitk::NodePredicateDataType::New("Image"));
-}
-
-void QmitkIGTTrackingLabView::SetFocus()
-{
-  m_Controls.m_UseAsPointerButton->setFocus();
-}
+//###############################################################################################
+//###############################################################################################
+//############################## Timer method for IGT pipeline updating #########################
+//###############################################################################################
+//###############################################################################################
 
 void QmitkIGTTrackingLabView::UpdateTimer()
 {
@@ -156,24 +105,43 @@ void QmitkIGTTrackingLabView::UpdateTimer()
     }
   }
 
+//###############################################################################################
+//###############################################################################################
+//############################## Slots of CONFIGURATION step ####################################
+//###############################################################################################
+//###############################################################################################
 
-void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
+void QmitkIGTTrackingLabView::OnSetupNavigation()
 {
-  mitk::NavigationData::Pointer nd = m_InstrumentNavigationData;
+  if(m_Source.IsNotNull())
+    if(m_Source->IsTracking())
+      return;
 
-  if( nd.IsNull() || !nd->IsDataValid())
+  mitk::DataStorage* ds = this->GetDataStorage();
+
+  if(ds == NULL)
   {
-    QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
+    MITK_WARN << "IGTSurfaceTracker: Error", "can not access DataStorage. Navigation not possible";
     return;
   }
 
-  if(m_TrackerFiducialsDataNode.IsNotNull() && m_TrackerFiducialsDataNode->GetData() != NULL)
+  //Building up the filter pipeline
+  try
   {
-    mitk::PointSet::Pointer ps = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
-    ps->InsertPoint(ps->GetSize(), nd->GetPosition());
+    this->InitializeRegistration();
   }
-  else
-    QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "Can not access Tracker Fiducials. Adding fiducial not possible!");
+  catch(mitk::IGTException& e)
+  {
+    MITK_WARN << "Error while building the IGT-Pipeline: " << e.GetDescription();
+    this->DestroyIGTPipeline(); // destroy the pipeline if building is incomplete
+    return;
+  }
+  catch(...)
+  {
+    MITK_WARN << "Unexpected error while building the IGT-Pipeline";
+    this->DestroyIGTPipeline();
+    return;
+  }
 }
 
 void QmitkIGTTrackingLabView::OnInstrumentSelected()
@@ -221,38 +189,11 @@ void QmitkIGTTrackingLabView::OnObjectmarkerSelected()
     }
 }
 
-void QmitkIGTTrackingLabView::OnSetupNavigation()
-{
-  if(m_Source.IsNotNull())
-    if(m_Source->IsTracking())
-      return;
-
-  mitk::DataStorage* ds = this->GetDataStorage();
-
-  if(ds == NULL)
-  {
-    MITK_WARN << "IGTSurfaceTracker: Error", "can not access DataStorage. Navigation not possible";
-    return;
-  }
-
-  //Building up the filter pipeline
-  try
-  {
-    this->InitializeRegistration();
-  }
-  catch(mitk::IGTException& e)
-  {
-    MITK_WARN << "Error while building the IGT-Pipeline: " << e.GetDescription();
-    this->DestroyIGTPipeline(); // destroy the pipeline if building is incomplete
-    return;
-  }
-  catch(...)
-  {
-    MITK_WARN << "Unexpected error while building the IGT-Pipeline";
-    this->DestroyIGTPipeline();
-    return;
-  }
-}
+//###############################################################################################
+//###############################################################################################
+//####################### Slots of INITIAL REGISTRATION step ####################################
+//###############################################################################################
+//###############################################################################################
 
 void QmitkIGTTrackingLabView::OnInitialRegistration()
 {
@@ -348,18 +289,26 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
 
 }
 
-void QmitkIGTTrackingLabView::DestroyIGTPipeline()
+
+void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
 {
-  if(m_Source.IsNotNull())
+  mitk::NavigationData::Pointer nd = m_InstrumentNavigationData;
+
+  if( nd.IsNull() || !nd->IsDataValid())
   {
-    m_Source->StopTracking();
-    m_Source->Disconnect();
-    m_Source = NULL;
+    QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
+    return;
   }
-  m_PermanentRegistrationFilter = NULL;
-  m_Visualizer = NULL;
-  m_VirtualView = NULL;
+
+  if(m_TrackerFiducialsDataNode.IsNotNull() && m_TrackerFiducialsDataNode->GetData() != NULL)
+  {
+    mitk::PointSet::Pointer ps = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
+    ps->InsertPoint(ps->GetSize(), nd->GetPosition());
+  }
+  else
+    QMessageBox::warning(NULL, "IGTSurfaceTracker: Error", "Can not access Tracker Fiducials. Adding fiducial not possible!");
 }
+
 
 void QmitkIGTTrackingLabView::InitializeRegistration()
 {
@@ -409,6 +358,103 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
   m_Controls.m_RegistrationWidget->SetTrackerFiducialsNode(m_TrackerFiducialsDataNode);
 }
 
+//###############################################################################################
+//###############################################################################################
+//####################### Slots of PERMANENT REGISTRATION step ##################################
+//###############################################################################################
+//###############################################################################################
+
+void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
+{
+  if(on)
+    {
+    //######################################################################
+    //######################## inititalization #############################
+    //######################################################################
+
+    //some initial checks
+    if(!CheckRegistrationInitialization())
+    {
+      m_Controls.m_UsePermanentRegistrationToggle->setChecked(false);
+      return;
+    }
+
+    //remember initial object transform to calculate the object to marker transform later on and convert it to navigation data
+    mitk::AffineTransform3D::Pointer transform = this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
+    mitk::NavigationData::Pointer T_Object = mitk::NavigationData::New(transform,false); //TODO: catch exception during conversion?
+
+    //then reset the transform because we will now start to calculate the permanent registration
+    this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIdentity();
+    if(m_Controls.m_ImageActive->isChecked()) {this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageGeo);}
+
+    //create the permanent registration filter
+    m_PermanentRegistrationFilter = mitk::NavigationDataObjectVisualizationFilter::New();
+
+    //######################################################################
+    //first: initialize permanent registration of surface (always activated)
+    //######################################################################
+
+    //connect filter to source
+    m_PermanentRegistrationFilter->SetInput(0,this->m_ObjectmarkerNavigationData);
+
+    //set representation object
+    m_PermanentRegistrationFilter->SetRepresentationObject(0,this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData());
+
+    //get the marker transform out of the navigation data
+    mitk::NavigationData::Pointer T_Marker = m_ObjectmarkerNavigationData;
+
+    //compute transform from object to marker (T_MarkerRel = T_Object * T_Marker^-1)
+    mitk::NavigationData::Pointer T_MarkerRel = mitk::NavigationData::New();
+    T_MarkerRel->Compose(T_Object);
+    T_MarkerRel->Compose(T_Marker->GetInverse());
+    m_T_MarkerRel = T_MarkerRel;
+    m_PermanentRegistrationFilter->SetOffset(0,m_T_MarkerRel->GetAffineTransform3D());
+
+    //######################################################################
+    //second: initialize permanent registration of image (if activated)
+    //######################################################################
+    if (m_Controls.m_ImageActive->isChecked() && (m_Controls.m_ImageComboBox->GetSelectedNode().IsNotNull()))
+      {
+      mitk::DataNode::Pointer imageNode = this->m_Controls.m_ImageComboBox->GetSelectedNode();
+      imageNode->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_LINEAR) );
+      m_PermanentRegistrationFilter->SetInput(1,this->m_ObjectmarkerNavigationData);
+      m_PermanentRegistrationFilter->SetRepresentationObject(1,imageNode->GetData());
+
+      //for the image we can't use NavigationData objects as transforms because an image needs additional geometry information, e.g., spacing
+      //thus we use mitk::AffineTransform3D objects
+
+      //computer transform from image to marker (T_ImageRel = T_ImageGeo * T_MarkerRel)
+      mitk::AffineTransform3D::Pointer T_ImageRel = mitk::AffineTransform3D::New();
+      T_ImageRel->SetIdentity();
+      T_ImageRel->Compose(m_T_ImageGeo);
+      T_ImageRel->Compose(m_T_MarkerRel->GetAffineTransform3D());
+      m_PermanentRegistrationFilter->SetOffset(1,T_ImageRel);
+      }
+
+    //some general stuff
+    m_PermanentRegistration = true;
+    m_ObjectmarkerNavigationDataLastUpdate = mitk::NavigationData::New();
+    }
+  else //if off = disable the permanent registration
+    {
+    //stop permanent registration
+    m_PermanentRegistration = false;
+
+    //restore old registration
+    if(m_T_ObjectReg.IsNotNull()) {this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ObjectReg->GetAffineTransform3D());}
+    if(m_T_ImageReg.IsNotNull()) {this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageReg);}
+
+    //delete filter
+    m_PermanentRegistrationFilter = NULL;
+    }
+}
+
+//###############################################################################################
+//###############################################################################################
+//####################### Slots of POINT SET RECORDING step #####################################
+//###############################################################################################
+//###############################################################################################
+
 void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
 {
   mitk::DataStorage* ds = this->GetDataStorage();
@@ -447,6 +493,12 @@ void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
     m_PointSetRecording = false;
   }
 }
+
+//###############################################################################################
+//###############################################################################################
+//####################### Slots of VIRTUAL CAMERA VIEW step #####################################
+//###############################################################################################
+//###############################################################################################
 
 void QmitkIGTTrackingLabView::OnVirtualCamera(bool on)
 {
@@ -498,6 +550,90 @@ else
   m_Controls.m_ViewUpBox->setEnabled(true);
   }
 
+}
+
+//###############################################################################################
+//###############################################################################################
+//############################## some general UI methods, always needed #########################
+//###############################################################################################
+//###############################################################################################
+
+QmitkIGTTrackingLabView::~QmitkIGTTrackingLabView()
+{
+  if (m_Timer->isActive()) m_Timer->stop();
+}
+
+void QmitkIGTTrackingLabView::CreateQtPartControl( QWidget *parent )
+{
+  // create GUI widgets from the Qt Designer's .ui file
+  m_Controls.setupUi( parent );
+  this->CreateBundleWidgets( parent );
+  this->CreateConnections();
+}
+
+
+void QmitkIGTTrackingLabView::CreateBundleWidgets( QWidget* parent )
+{
+  //initialize registration widget
+  m_Controls.m_RegistrationWidget->HideStaticRegistrationRadioButton(true);
+  m_Controls.m_RegistrationWidget->HideContinousRegistrationRadioButton(true);
+  m_Controls.m_RegistrationWidget->HideUseICPRegistrationCheckbox(true);
+}
+
+
+void QmitkIGTTrackingLabView::CreateConnections()
+{
+  //initialize timer
+  m_Timer = new QTimer(this);
+
+  //create connections
+  connect(m_Timer, SIGNAL(timeout()), this, SLOT(UpdateTimer()));
+  connect( m_Controls.m_UsePermanentRegistrationToggle, SIGNAL(toggled(bool)), this, SLOT(OnPermanentRegistration(bool)) );
+  connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), this, SLOT(OnSetupNavigation()) );
+  connect( m_Controls.m_UseAsPointerButton, SIGNAL(clicked()), this, SLOT(OnInstrumentSelected()) );
+  connect( m_Controls.m_UseAsObjectmarkerButton, SIGNAL(clicked()), this, SLOT(OnObjectmarkerSelected()) );
+  connect( m_Controls.m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
+  connect( m_Controls.m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnInitialRegistration()) );
+  connect( m_Controls.m_PointSetRecordCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnPointSetRecording(bool)) );
+  connect( m_Controls.m_ActivateNeedleView, SIGNAL(toggled(bool)), this, SLOT(OnVirtualCamera(bool)) );
+
+  //start timer
+  m_Timer->start(30);
+
+  //initialize Combo Boxes
+  m_Controls.m_ObjectComboBox->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_ObjectComboBox->SetAutoSelectNewItems(false);
+  m_Controls.m_ObjectComboBox->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
+
+  m_Controls.m_ImageComboBox->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_ImageComboBox->SetAutoSelectNewItems(false);
+  m_Controls.m_ImageComboBox->SetPredicate(mitk::NodePredicateDataType::New("Image"));
+}
+
+void QmitkIGTTrackingLabView::SetFocus()
+{
+  m_Controls.m_UseAsPointerButton->setFocus();
+}
+
+//###############################################################################################
+//###############################################################################################
+//####################### some additional slots and help methods ################################
+//####################### for cleaner code - not that important  ################################
+//####################### to understand the basic functions      ################################
+//###############################################################################################
+//###############################################################################################
+
+void QmitkIGTTrackingLabView::DestroyIGTPipeline()
+{
+  if(m_Source.IsNotNull())
+  {
+    m_Source->StopTracking();
+    m_Source->Disconnect();
+    m_Source = NULL;
+  }
+  m_PermanentRegistrationFilter = NULL;
+  m_Visualizer = NULL;
+  m_VirtualView = NULL;
 }
 
 bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
@@ -597,88 +733,6 @@ bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::NavigationData::Po
   if(returnValue*57.3 > angularDifferenceThreshold){return true;}
 
   return false;
-}
-
-
-void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
-{
-  if(on)
-    {
-
-    if(!CheckRegistrationInitialization())
-    {
-      m_Controls.m_UsePermanentRegistrationToggle->setChecked(false);
-      return;
-    }
-
-    //remember initial object transform to calculate the object to marker transform later on
-    mitk::AffineTransform3D::Pointer transform = this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
-
-    //TODO Exception abfangen?
-    mitk::NavigationData::Pointer T_Object = mitk::NavigationData::New(transform,false);
-
-
-    //then reset the transform because we will now start to calculate the permenent registration
-    this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIdentity();
-
-    if(m_Controls.m_ImageActive->isChecked())
-      this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageGeo);
-
-    //create the permanent registration filter
-    m_PermanentRegistrationFilter = mitk::NavigationDataObjectVisualizationFilter::New();
-    //set to rotation mode transposed because we are working with VNL style quaternions
-    //m_PermanentRegistrationFilter->SetRotationMode(mitk::NavigationDataObjectVisualizationFilter::RotationTransposed);
-
-    //first: surface (always activated)
-
-    //connect filter to source
-    m_PermanentRegistrationFilter->SetInput(0,this->m_ObjectmarkerNavigationData);
-
-    //set representation object
-    m_PermanentRegistrationFilter->SetRepresentationObject(0,this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData());
-
-    //get the marker transform out of the navigation data
-    mitk::NavigationData::Pointer T_Marker = m_ObjectmarkerNavigationData;
-
-    //compute transform from object to marker
-    mitk::NavigationData::Pointer T_MarkerRel = mitk::NavigationData::New();
-    T_MarkerRel->Compose(T_Object);
-    T_MarkerRel->Compose(T_Marker->GetInverse());
-    m_T_MarkerRel = T_MarkerRel;
-    m_PermanentRegistrationFilter->SetOffset(0,m_T_MarkerRel->GetAffineTransform3D());
-
-    //first: image (if activated)
-    //set interpolation mode
-    if (m_Controls.m_ImageActive->isChecked() && (m_Controls.m_ImageComboBox->GetSelectedNode().IsNotNull()))
-      {
-      mitk::DataNode::Pointer imageNode = this->m_Controls.m_ImageComboBox->GetSelectedNode();
-      imageNode->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_LINEAR) );
-      m_PermanentRegistrationFilter->SetInput(1,this->m_ObjectmarkerNavigationData);
-      m_PermanentRegistrationFilter->SetRepresentationObject(1,imageNode->GetData());
-
-      mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
-      newTransform->SetIdentity();
-      newTransform->Compose(m_T_ImageGeo);
-      newTransform->Compose(m_T_MarkerRel->GetAffineTransform3D());
-      m_PermanentRegistrationFilter->SetOffset(1,newTransform);
-      }
-
-    //some general stuff
-    m_PermanentRegistration = true;
-    m_ObjectmarkerNavigationDataLastUpdate = mitk::NavigationData::New();
-    }
-  else
-    {
-    //stop permanent registration
-    m_PermanentRegistration = false;
-
-    //restore old registration
-    if(m_T_ObjectReg.IsNotNull()) {this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ObjectReg->GetAffineTransform3D());}
-    if(m_T_ImageReg.IsNotNull()) {this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageReg);}
-
-    //delete filter
-    m_PermanentRegistrationFilter = NULL;
-    }
 }
 
 double QmitkIGTTrackingLabView::ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform)

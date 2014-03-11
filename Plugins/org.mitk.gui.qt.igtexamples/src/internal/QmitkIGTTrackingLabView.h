@@ -107,14 +107,14 @@ void OnObjectmarkerSelected();
 //############## Initial Registration Step ##############
 
 /**
+\brief This method calls the initial fiducial registration.
+*/
+void OnInitialRegistration();
+
+/**
 \brief This method adds a new fiducial to the tracker fiducials PointSet.
 */
 void OnAddRegistrationTrackingFiducial();
-
-/**
-\brief This method calls the fiducial registration.
-*/
-void OnInitialRegistration();
 
 /**
 \brief This method initializes the registration for the FiducialRegistrationWidget.
@@ -156,23 +156,10 @@ void CreateConnections();
 * Checks if everything is initialized for registration. Gives error messages and returns false if not.
 */
 bool CheckRegistrationInitialization();
-
-/**
-* Checks if the difference between two given transformations is high which means the method returns
-* true if the difference exeeds the given position and angular threshold.
-*/
-bool IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB, double euclideanDistanceThreshold = .8, double angularDifferenceThreshold = .8);
 /**
 \brief This method destroys the filter pipeline.
 */
 void DestroyIGTPipeline();
-
-/** @brief Computes the fiducial registration error out of two sets of fiducials.
- *  The two sets must have the same size and the points must correspond to each other.
- *  @param transform        This transform is applied to the image fiducials before the FRE calculation if it is given.
- *  @return                 Returns the FRE. Returns -1 if there was an error.
- */
-double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = NULL);
 
 //####################### Members for the IGT pipeline ######################################
 // The IGT pipeline is basically initialized in the method OnSetupNavigation(). Further initialization
@@ -188,31 +175,44 @@ mitk::TrackingDeviceSource::Pointer m_Source;                                   
 mitk::NavigationDataObjectVisualizationFilter::Pointer m_PermanentRegistrationFilter; ///< this filter transforms from tracking coordinates into mitk world coordinates if needed it is interconnected before the FiducialEegistrationFilter
 mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer;                  ///< visualization filter
 mitk::CameraVisualization::Pointer m_VirtualView;                                     ///< filter to update the vtk camera according to the reference navigation data
+//in addition to the pipeline objects, pointers to the navigation data objects are stored for fast access:
+mitk::NavigationData::Pointer m_InstrumentNavigationData;                             ///< navigation data of instrument
+mitk::NavigationData::Pointer m_ObjectmarkerNavigationData;                           ///< navigation data of object marker
 
+//####################### other members ######################################
+QTimer* m_Timer; ///< central timer which updates the IGT pipeline
 
-QTimer* m_Timer;
-
+//members for the point set recording
+mitk::NavigationData::Pointer m_PointSetRecordingNavigationData;
 mitk::PointSet::Pointer m_PSRecordingPointSet;
-
 bool m_PointSetRecording;
 bool m_PermanentRegistration;
 bool m_CameraView;
 
+//members for initial registration
 mitk::DataNode::Pointer m_ImageFiducialsDataNode;
 mitk::DataNode::Pointer m_TrackerFiducialsDataNode;
 
+//members for permanent registration
 mitk::PointSet::Pointer m_PermanentRegistrationSourcePoints;
-
-mitk::NavigationData::Pointer m_InstrumentNavigationData;
-mitk::NavigationData::Pointer m_ObjectmarkerNavigationData;
-mitk::NavigationData::Pointer m_PointSetRecordingNavigationData;
-
 mitk::NavigationData::Pointer m_T_MarkerRel;
 mitk::NavigationData::Pointer m_T_ObjectReg;
 mitk::AffineTransform3D::Pointer m_T_ImageReg;
 mitk::AffineTransform3D::Pointer m_T_ImageGeo;
-mitk::NavigationData::Pointer m_ObjectmarkerNavigationDataLastUpdate;
+mitk::NavigationData::Pointer m_ObjectmarkerNavigationDataLastUpdate; ///< this is the position of the object marker from the last call of update(); it is used to check the difference and decide if the visualization must be updated
 
+//######################## some internal help methods ############################
+/** @brief Computes the fiducial registration error out of two sets of fiducials.
+ *  The two sets must have the same size and the points must correspond to each other.
+ *  @param transform        This transform is applied to the image fiducials before the FRE calculation if it is given.
+ *  @return                 Returns the FRE. Returns -1 if there was an error.
+ */
+double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = NULL);
+/**
+* Checks if the difference between two given transformations is high which means the method returns
+* true if the difference exeeds the given position and angular threshold.
+*/
+bool IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::NavigationData::Pointer transformB, double euclideanDistanceThreshold = .8, double angularDifferenceThreshold = .8);
 
 
 

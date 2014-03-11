@@ -196,6 +196,7 @@ void RTDoseVisualizer::OnReferenceDoseChanged(double value)
       renderingMode->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
 
       m_selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
+      m_selectedNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
       mitk::TimeSlicedGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
       mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );
@@ -319,7 +320,6 @@ void RTDoseVisualizer::UpdateFreeIsoLine(mitk::IsoDoseLevel * level, mitk::DoseV
 {
   float pref;
   m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
-
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
   mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
 
@@ -431,6 +431,7 @@ void RTDoseVisualizer::OnConvertButtonClicked()
 
     selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
     selectedNode->SetProperty("Image Rendering.Mode", renderingMode);
+    m_selectedNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
     mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
     mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);
@@ -530,6 +531,7 @@ void RTDoseVisualizer::UpdateStdIsolines()
       color[0]=doseIT->GetColor()[0];color[1]=doseIT->GetColor()[1];color[2]=doseIT->GetColor()[2];
       isoNode->SetMapper(1,mapper);
       isoNode->SetColor(color);
+      isoNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
       isoNode->SetName("StdIsoline");
       isoNode->SetBoolProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),true);
       this->GetDataStorage()->Add(isoNode);

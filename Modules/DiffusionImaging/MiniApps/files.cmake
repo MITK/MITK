@@ -3,8 +3,10 @@ set(CPP_FILES
     MiniAppManager.cpp
     FileFormatConverter.cpp
     TensorReconstruction.cpp
+    TensorDerivedMapsExtraction.cpp
     QballReconstruction.cpp
     DiffusionIndices.cpp
+    ExtractImageStatistics.cpp
     CopyGeometry.cpp
     GibbsTracking.cpp
     StreamlineTracking.cpp

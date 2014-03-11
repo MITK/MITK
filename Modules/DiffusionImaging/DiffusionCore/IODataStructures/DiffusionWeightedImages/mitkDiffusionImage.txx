@@ -350,7 +350,7 @@ void mitk::DiffusionImage<TPixelType>::UpdateBValueMap()
 
   GradientDirectionContainerType::ConstIterator gdcit;
   for( gdcit = this->m_Directions->Begin(); gdcit != this->m_Directions->End(); ++gdcit)
-    m_B_ValueMap[GetB_Value(gdcit.Index())].push_back(gdcit.Index());
+    m_B_ValueMap[this->GetB_Value(gdcit.Index())].push_back(gdcit.Index());
 }
 
 template<typename TPixelType>

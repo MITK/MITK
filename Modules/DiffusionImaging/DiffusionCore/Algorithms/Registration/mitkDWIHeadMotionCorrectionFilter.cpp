@@ -154,7 +154,7 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   //
   typename SplitFilterType::Pointer split_filter = SplitFilterType::New();
   split_filter->SetInput (input->GetVectorImage() );
-  split_filter->SetExtractAllAboveThreshold(8, input->GetB_ValueMap() );
+  split_filter->SetExtractAllAboveThreshold(8, input->GetBValueMap() );
 
   try
   {
@@ -317,7 +317,6 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   this->GetOutput()->SetMeasurementFrame(output->GetMeasurementFrame());
   this->GetOutput()->SetDirections(output->GetDirections());
   this->GetOutput()->InitializeFromVectorImage();
-
   this->GetOutput()->Modified();
 }
 

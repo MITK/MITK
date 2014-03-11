@@ -62,8 +62,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-
-
 QmitkRegistrationWorker::QmitkRegistrationWorker(QmitkDiffusionRegistrationView* view)
   : m_View(view)
 {
@@ -92,7 +90,8 @@ void QmitkRegistrationWorker::run()
 
     m_View->m_GlobalRegisterer->SetInput(inImage);
 
-    try{
+    try
+    {
       m_View->m_GlobalRegisterer->Update();
     }
     catch( mitk::Exception e )
@@ -107,13 +106,12 @@ void QmitkRegistrationWorker::run()
       imageNode->SetData( image );
       QString name = node->GetName().c_str();
       imageNode->SetName((name+"_MC").toStdString().c_str());
-      m_View->GetDataStorage()->Add(imageNode);
+      mitk::DataStorage::Pointer ds = m_View->GetDataStorage();
+      if(ds.IsNotNull())
+        ds->Add(imageNode);
     }
 
-
   }
-
-
   m_View->m_RegistrationThread.quit();
 }
 

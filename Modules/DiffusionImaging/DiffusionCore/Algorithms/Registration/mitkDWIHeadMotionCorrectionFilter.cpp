@@ -206,9 +206,12 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   registeredWeighted->Initialize( splittedImage->GetPixelType(0), *tsg );
 
   // insert the first unweighted reference as the first volume
-  mitk::ImageWriteAccessor imac(b0referenceImage);
-  registeredWeighted->SetImportVolume( imac.GetData(),
-    0,0, mitk::Image::CopyMemory );
+  // in own scope to release the accessor asap after copy
+  {
+    mitk::ImageWriteAccessor imac(b0referenceImage);
+    registeredWeighted->SetImportVolume( imac.GetData(),
+      0,0, mitk::Image::CopyMemory );
+  }
 
 
   // mitk::Image::Pointer registeredWeighted = splittedImage->Clone();

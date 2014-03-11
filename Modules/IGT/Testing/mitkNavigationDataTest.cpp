@@ -48,6 +48,15 @@ static bool AreBasicNavigationMembersEqual(const NavigationData::Pointer nd1, co
       nd2->GetName());
 }
 
+/**
+ * Test if the NavigationData object nd has the correct settings for covariance matrix specific members.
+ *
+ * @param nd
+ * @param hasPosition the desired value for the hasPosition member
+ * @param hasOrientation  the desired value for the hasOrientation member
+ * @param covMatrix the covariance matrix nd should have
+ * @return
+ */
 static bool AreCovarianceNavigationMembersEqual(const NavigationData::Pointer nd, bool hasPosition,
     bool hasOrientation, NavigationData::CovarianceMatrixType covMatrix)
 {
@@ -59,7 +68,15 @@ static bool AreCovarianceNavigationMembersEqual(const NavigationData::Pointer nd
   return result;
 }
 
-
+/**
+ * Checks if the covariance related members of the two NavigationData objects are the same
+ *
+ * @see AreCovarianceNavigationMembersEqual
+ *
+ * @param nd1
+ * @param nd2
+ * @return
+ */
 static bool AreCovarianceNavigationMembersEqual(const NavigationData::Pointer nd1, const NavigationData::Pointer nd2)
 {
   return AreCovarianceNavigationMembersEqual(nd1,
@@ -67,6 +84,11 @@ static bool AreCovarianceNavigationMembersEqual(const NavigationData::Pointer nd
 }
 
 
+/**
+ * Creates a fully set NavigationData object for testing purposes.
+ *
+ * @return a smartpointer to the object
+ */
 static mitk::NavigationData::Pointer GetTestData()
 {
   mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
@@ -223,6 +245,9 @@ static mitk::Matrix3D   rotation2;
 
 static mitk::Point3D  point;
 
+/**
+ * Helper method setting up data required for tests (like points which shall be transformed by the NavigationData).
+ */
 static void SetupNaviDataTests()
 {
   // set rotation matrix to
@@ -281,6 +306,13 @@ static mitk::NavigationData::Pointer CreateNavidata(mitk::Quaternion quaternion,
   return navigationData;
 }
 
+/**
+ * Helper method which creates an affine transformation only composed by a rotation and a translation (no scalings and the likes).
+ *
+ * @param rotationMatrix
+ * @param offset
+ * @return
+ */
 static mitk::AffineTransform3D::Pointer CreateAffineTransform(mitk::Matrix3D rotationMatrix, mitk::Vector3D offset)
 {
   mitk::AffineTransform3D::Pointer affineTransform3D = mitk::AffineTransform3D::New();
@@ -290,6 +322,9 @@ static mitk::AffineTransform3D::Pointer CreateAffineTransform(mitk::Matrix3D rot
   return affineTransform3D;
 }
 
+/**
+ * Test if NavigationData::GetInverse returns the correct inverse
+ */
 static void TestInverse()
 {
   SetupNaviDataTests();
@@ -324,6 +359,9 @@ static void TestInverse()
   MITK_TEST_CONDITION(otherFlagsOk, "Testing GetInverse: other flags are same");
 }
 
+/**
+ * Test if the original orientation and position are retained after inverting two times.
+ */
 static void TestDoubleInverse()
 {
   SetupNaviDataTests();
@@ -335,6 +373,10 @@ static void TestDoubleInverse()
   MITK_TEST_CONDITION(mitk::Equal(nd->GetPosition(), ndDoubleInverse->GetPosition()), "Testing GetInverse double application: position preserved");
 }
 
+/**
+ * Tests if NavigationData::GetInverse throws an error if the NavigationData has no inverse
+ * (e.g. after it is initialized, no rotation is stored -> the transformation cannot be inverted).
+ */
 static void TestInverseError()
 {
   // initialize empty NavigationData (quaternion is zeroed)
@@ -346,6 +388,9 @@ static void TestInverseError()
   MITK_TEST_FOR_EXCEPTION(mitk::Exception&, nd->GetInverse());
 }
 
+/**
+ * Tests if NavigationData::TransformPoint works.
+ */
 static void TestTransform()
 {
   SetupNaviDataTests();
@@ -358,6 +403,10 @@ static void TestTransform()
   MITK_TEST_CONDITION(mitk::Equal(resultingPoint, point), "Testing point transformation");
 }
 
+/**
+ * Tests if the construction of a NavigationData object from an
+ * affine transformation which is only composed of a rotation and translation works.
+ */
 static void TestAffineConstructor()
 {
   SetupNaviDataTests();
@@ -378,7 +427,10 @@ static void TestAffineConstructor()
   MITK_TEST_CONDITION(mitk::Equal(navigationData->GetOrientation(), quaternion), "Testing affine constructor: quaternion");
 }
 
-
+/**
+ * Tests if the construction of a NavigationData object throws an error when constructing from an
+ * affine transformation which is orthogonal.
+ */
 static void TestAffineConstructorErrorTransposedNotInverse()
 {
   SetupNaviDataTests();
@@ -389,7 +441,10 @@ static void TestAffineConstructorErrorTransposedNotInverse()
   MITK_TEST_FOR_EXCEPTION(mitk::Exception&, mitk::NavigationData::New(affineTransform3D));
 }
 
-
+/**
+ * Tests if the construction of a NavigationData object throws an error when constructing from an
+ * affine transformation which is not normal.
+ */
 static void TestAffineConstructorErrorDeterminantNonEqualOne()
 {
   SetupNaviDataTests();
@@ -401,6 +456,10 @@ static void TestAffineConstructorErrorDeterminantNonEqualOne()
 }
 
 
+/**
+ * Tests if the error suppression mechanism works if a NavigationData object is created from a
+ * invalid affine transformation (one that is not only rotation and translation).
+ */
 static void TestAffineConstructorErrorCheckingFalse()
 {
   SetupNaviDataTests();
@@ -421,7 +480,9 @@ static void TestAffineConstructorErrorCheckingFalse()
   MITK_TEST_CONDITION(exceptionSuppressed, "Test affine constructor: exception can be suppressed.")
 }
 
-
+/**
+ * Test if NavigationData::GetAffineTransform3D() returns the correct affine transformation.
+ */
 static void TestAffineGetter()
 {
   SetupNaviDataTests();

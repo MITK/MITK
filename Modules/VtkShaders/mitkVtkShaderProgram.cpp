@@ -15,13 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkVtkShaderProgram.h"
-#include "mitkBaseRenderer.h"
 
 #include "vtkShader2.h"
 
 mitk::VtkShaderProgram::VtkShaderProgram()
-  : m_BaseRenderer(NULL)
-  , m_VtkShaderProgram(NULL)
+  : m_VtkShaderProgram(NULL)
 {
 }
 

@@ -180,7 +180,7 @@ mitk::NavigationData::NavigationData(
      if (!Equal(1.0, vnl_det(rotationMatrix), 0.1)
          || !((rotationMatrix*rotationMatrixTransposed).is_identity(0.1)))
      {
-       mitkThrow() << "tried to initialize NavigationData with non-rotation matrix :" << rotationMatrix;
+       mitkThrow() << "tried to initialize NavigationData with non-rotation matrix :" << rotationMatrix << " (Does your AffineTransform3D object include spacing? This is not supported by NavigationData objects!)";
      }
 
   }

@@ -214,6 +214,8 @@ namespace mitk {
 
       /**
        * Creates a NavigationData object from an affineTransform3D.
+       * Caution: NavigationData doesn't support spacing, only translation and rotation. If the affine
+       * transform includes spacing it cannot be converted to a NavigationData and an exception is thrown.
        * @param checkForRotationMatrix  if this is true, the rotation matrix coming from the affineTransform is checked
        *  for being a rotation matrix. If it isn't, an exception is thrown. Disable this check by
        *  setting checkForRotationMatrix to false.

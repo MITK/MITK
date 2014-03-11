@@ -71,8 +71,15 @@ void mitk::ToFDistanceImageToPointSetFilter::SetSubset(std::vector<mitk::Index3D
 {
   // check if points of PointSet are inside the input image
   mitk::Image::Pointer input = this->GetInput();
-  unsigned int xDim = input->GetDimension(0);
-  unsigned int yDim = input->GetDimension(1);
+
+  unsigned int xDim = UINT_MAX;
+  unsigned int yDim = UINT_MAX;
+  if(input.IsNotNull() && input->IsInitialized())
+  {
+    unsigned int xDim = input->GetDimension(0);
+    unsigned int yDim = input->GetDimension(1);
+  }
+
   bool pointSetValid = true;
   for (unsigned int i=0; i<subset.size(); i++)
   {

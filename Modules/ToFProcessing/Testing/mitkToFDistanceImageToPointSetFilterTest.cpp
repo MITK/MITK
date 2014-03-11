@@ -57,6 +57,29 @@ mitk::PointSet::Pointer CreateTestPointSet()
   return subSet;
 }
 
+std::vector<mitk::Index3D> CreateVectorPointSet()
+{
+  std::vector<mitk::Index3D> subSet = std::vector<mitk::Index3D>();
+  mitk::Index3D point;
+  point[0] = 10;
+  point[1] = 20;
+  point[2] = 0;
+  subSet.push_back(point);
+  point[0] = 100;
+  point[1] = 150;
+  point[2] = 0;
+  subSet.push_back(point);
+  point[0] = 110;
+  point[1] = 30;
+  point[2] = 0;
+  subSet.push_back(point);
+  point[0] = 40;
+  point[1] = 200;
+  point[2] = 0;
+  subSet.push_back(point);
+  return subSet;
+}
+
 // Create image with pixelValue in every pixel except for the pixels in subSet, which get successively the values of distances
 inline static mitk::Image::Pointer CreateTestImageWithPointSet(float pixelValue, unsigned int dimX, unsigned int dimY, mitk::PointSet::Pointer subSet)
 {
@@ -131,13 +154,17 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   mitk::ToFProcessingCommon::ToFPoint2D interPixelDistance;
   interPixelDistance[0] = 0.04564;
   interPixelDistance[1] = 0.0451564;
+
   mitk::ToFProcessingCommon::ToFScalarType focalLengthX = 295.78960;
   mitk::ToFProcessingCommon::ToFScalarType focalLengthY = 296.348535;
+
   mitk::ToFProcessingCommon::ToFScalarType focalLength = (focalLengthX*interPixelDistance[0]+focalLengthY*interPixelDistance[1])/2.0;
   mitk::ToFProcessingCommon::ToFScalarType k1=-0.36,k2=-0.14,p1=0.001,p2=-0.00;
+
   mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
   principalPoint[0] = 103.576546;
   principalPoint[1] = 100.1532;
+
   mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
   cameraIntrinsics->SetFocalLength(focalLengthX,focalLengthY);
   cameraIntrinsics->SetPrincipalPoint(principalPoint[0],principalPoint[1]);
@@ -303,7 +330,17 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED((expectedResult->GetSize()==result->GetSize()),"Test if point set size is equal");
   MITK_TEST_CONDITION_REQUIRED(mitk::ToFTestingCommon::PointSetsEqual(expectedResult,result),"Testing filter with subset");
 
+  // Test case to reproduce and check fix of bug 13933.
+  std::vector<mitk::Index3D> vecSubset = CreateVectorPointSet();
+  filter = mitk::ToFDistanceImageToPointSetFilter::New();
+  try
+  {
+    filter->SetSubset(vecSubset);
+  }
+  catch (...)
+  {
+    MITK_TEST_CONDITION_REQUIRED(false, "Caught an exception while setting point subset!");
+  }
+
   MITK_TEST_END();
-
 }
-

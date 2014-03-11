@@ -54,6 +54,11 @@ unsigned int mitk::NavigationDataPlayerBase::GetNumberOfSnapshots()
   return m_NavigationDataSet.IsNull() ? 0 : m_NavigationDataSet->Size();
 }
 
+unsigned int mitk::NavigationDataPlayerBase::GetCurrentSnapshotNumber()
+{
+  return m_NavigationDataSet.IsNull() ? 0 : m_NavigationDataSetIterator - m_NavigationDataSet->Begin();
+}
+
 void mitk::NavigationDataPlayerBase::InitPlayer()
 {
   if ( m_NavigationDataSet.IsNull() )

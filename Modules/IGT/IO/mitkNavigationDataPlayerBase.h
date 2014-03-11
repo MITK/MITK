@@ -59,6 +59,8 @@ namespace mitk{
      */
     unsigned int GetNumberOfSnapshots();
 
+    unsigned int GetCurrentSnapshotNumber();
+
     /**
      * \brief This method checks if player arrived at end of file.
      *

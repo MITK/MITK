@@ -141,19 +141,11 @@ namespace mitk
         // call modified to indicate that cameraDevice was modified
         toFCameraDevice->Modified();
 
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         TODO Buffer Handling currently only works for buffer size 1
-         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-        //toFCameraDevice->m_ImageSequence++;
         toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
         toFCameraDevice->m_ImageSequence++;
         if (toFCameraDevice->m_FreePos == toFCameraDevice->m_CurrentPos)
         {
-          // buffer overflow
-          //MITK_INFO << "Buffer overflow!! ";
-          //toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
-          //toFCameraDevice->m_ImageSequence++;
           overflow = true;
         }
         if (toFCameraDevice->m_ImageSequence % n == 0)
@@ -164,15 +156,9 @@ namespace mitk
         {
           overflow = false;
         }
-        /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         END TODO Buffer Handling currently only works for buffer size 1
-         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
-
-        // print current framerate
         if (printStatus)
         {
           t2 = realTimeClock->GetCurrentStamp() - t1;
-          //MITK_INFO << "t2: " << t2 <<" Time (s) for 1 image: " << (t2/1000) / n << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
           MITK_INFO << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
           t1 = realTimeClock->GetCurrentStamp();
           printStatus = false;
@@ -181,14 +167,6 @@ namespace mitk
     }
     return ITK_THREAD_RETURN_VALUE;
   }
-
-  //    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-  //  void ToFCameraPMDDevice::ResetBuffer(int bufferSize)
-  //  {
-  //    this->m_BufferSize = bufferSize;
-  //    this->m_CurrentPos = -1;
-  //    this->m_FreePos = 0;
-  //  }
 
   void ToFCameraPMDDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   {
@@ -291,13 +269,11 @@ namespace mitk
       {
         capturedImageSequence = this->m_ImageSequence;
         pos = this->m_CurrentPos;
-        //MITK_INFO << "Required image not found! Required: " << requiredImageSequence << " delivered/current: " << this->m_ImageSequence;
       }
       else if (requiredImageSequence <= this->m_ImageSequence - this->m_BufferSize)
       {
         capturedImageSequence = (this->m_ImageSequence - this->m_BufferSize) + 1;
         pos = (this->m_CurrentPos + 1) % this->m_BufferSize;
-        //MITK_INFO << "Out of buffer! Required: " << requiredImageSequence << " delivered: " << capturedImageSequence << " current: " << this->m_ImageSequence;
       }
       else // (requiredImageSequence > this->m_ImageSequence - this->m_BufferSize) && (requiredImageSequence <= this->m_ImageSequence)
 
@@ -316,20 +292,6 @@ namespace mitk
       memcpy(distanceArray, this->m_DistanceArray, this->m_CaptureWidth*this->m_CaptureHeight*sizeof(float));
       memcpy(intensityArray, this->m_IntensityArray, this->m_CaptureWidth*this->m_CaptureHeight*sizeof(float));
       memcpy(amplitudeArray, this->m_AmplitudeArray, this->m_CaptureWidth*this->m_CaptureHeight*sizeof(float));
-
-      //int u, v;
-      //for (int i=0; i<this->m_CaptureHeight; i++)
-      //{
-      //  for (int j=0; j<this->m_CaptureWidth; j++)
-      //  {
-      //    u = i*this->m_CaptureWidth+j;
-      //    v = (i+1)*this->m_CaptureWidth-1-j;
-      //    distanceArray[u] = 1000 * this->m_DistanceArray[v]; // unit in minimeter
-      //    //distanceArray[u] = this->m_DistanceArray[v]; // unit in meter
-      //    amplitudeArray[u] = this->m_AmplitudeArray[v];
-      //    intensityArray[u] = this->m_IntensityArray[v];
-      //  }
-      //}
     }
     else
     {

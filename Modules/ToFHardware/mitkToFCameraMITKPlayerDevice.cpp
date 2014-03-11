@@ -152,7 +152,6 @@ ITK_THREAD_RETURN_TYPE ToFCameraMITKPlayerDevice::Acquire(void* pInfoStruct)
       {
         overflow = false;
       }
-
       // print current framerate
       if (printStatus)
       {

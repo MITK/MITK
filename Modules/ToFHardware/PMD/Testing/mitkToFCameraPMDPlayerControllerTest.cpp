@@ -40,7 +40,7 @@ int mitkToFCameraPMDPlayerControllerTest(int /* argc */, char* /*argv*/[])
   //nice one!
   MITK_TEST_CONDITION_REQUIRED( !pmdPlayerController->OpenCameraConnection(),"Testing OpenConnection without valid data!");
 
-  // set some valid data and test connecting again! TODO: Set the data to generic dir!!
+  // set some valid data and test connecting again!
   std::string filePath = MITK_TOF_DATA_DIR;
   std::string fileName = "/TestSequence.pmd";
   filePath.append(fileName);

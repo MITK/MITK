@@ -241,7 +241,7 @@ void KinectDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
   m_ImageMutex->Lock();
   if (m_CameraActive)
   {
-    memcpy( amplitudeArray, this->m_AmplitudeDataBuffer[this->m_CurrentPos], m_PixelNumber);
+      // copy the image buffer
     imageSequence = this->m_ImageSequence;
   }
   else
@@ -260,7 +260,6 @@ void KinectDevice::GetDistances(float* distanceArray, int& imageSequence)
   m_ImageMutex->Lock();
   if (m_CameraActive)
   {
-    memcpy( distanceArray, this->m_DistanceDataBuffer[this->m_CurrentPos], m_PixelNumber);
     imageSequence = this->m_ImageSequence;
   }
   else

@@ -49,15 +49,14 @@ void mitk::NavigationDataPlayer::GenerateData()
   }
 
   // get elapsed time since start of playing
-  TimeStampType timeSinceStart =
-      mitk::IGTTimeStamp::GetInstance()->GetElapsed() - m_StartPlayingTimeStamp;
+  m_TimeStampSinceStart = mitk::IGTTimeStamp::GetInstance()->GetElapsed() - m_StartPlayingTimeStamp;
 
 
   // iterate through all NavigationData objects of the given tool index
   // till the timestamp of the NavigationData is greater then the given timestamp
   for (; m_NavigationDataSetIterator != m_NavigationDataSet->End(); ++m_NavigationDataSetIterator)
   {
-    if ( m_NavigationDataSetIterator->at(0)->GetIGTTimeStamp() > timeSinceStart)
+    if ( m_NavigationDataSetIterator->at(0)->GetIGTTimeStamp() > m_TimeStampSinceStart)
     {
       break;
     }
@@ -149,4 +148,14 @@ void mitk::NavigationDataPlayer::Resume()
   {
     MITK_ERROR << "Player is not paused!" << std::endl;
   }
+}
+
+mitk::NavigationDataPlayer::PlayerState mitk::NavigationDataPlayer::GetCurrentPlayerState()
+{
+  return m_CurPlayerState;
+}
+
+mitk::NavigationDataPlayer::TimeStampType mitk::NavigationDataPlayer::GetTimeStampSinceStart()
+{
+  return m_TimeStampSinceStart;
 }

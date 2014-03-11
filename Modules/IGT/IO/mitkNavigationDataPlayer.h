@@ -41,6 +41,9 @@ namespace mitk {
     mitkClassMacro(NavigationDataPlayer, NavigationDataPlayerBase);
     itkNewMacro(Self);
 
+    enum PlayerState { PlayerStopped, PlayerRunning, PlayerPaused };
+    typedef mitk::NavigationData::TimeStampType TimeStampType;
+
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update
     */
@@ -74,6 +77,10 @@ namespace mitk {
      */
     void Resume();
 
+    PlayerState GetCurrentPlayerState();
+
+    TimeStampType GetTimeStampSinceStart();
+
   protected:
     NavigationDataPlayer();
     virtual ~NavigationDataPlayer();
@@ -83,10 +90,7 @@ namespace mitk {
      */
     virtual void GenerateData();
 
-    enum PlayerState { PlayerStopped, PlayerRunning, PlayerPaused };
     PlayerState m_CurPlayerState;
-
-    typedef mitk::NavigationData::TimeStampType TimeStampType;
 
     /**
       * \brief The start time of the playing. Set in the method mitk::NavigationDataPlayer::StartPlaying().
@@ -97,6 +101,8 @@ namespace mitk {
       * \brief Stores the time when a pause began.
       */
     TimeStampType m_PauseTimeStamp;
+
+    TimeStampType m_TimeStampSinceStart;
   };
 } // namespace mitk
 

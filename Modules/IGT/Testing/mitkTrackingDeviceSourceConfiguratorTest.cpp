@@ -128,48 +128,6 @@ static void TestValidClaronTrackingDevice()
   MITK_TEST_CONDITION_REQUIRED(testSource->GetTrackingDevice()->GetToolCount()==2,"testing tracking device");
 }
 
-/*
-static void TestNDIAuroraTrackingDevice()
-{
-
-}
-*/
-
-/*
-static void TestNDIPolarisTrackingDevice()
-{
-  MITK_TEST_OUTPUT(<<"Testing simple NDI Polaris tracking device with 1 valid tool");
-
-  std::string toolFileName(MITK_IGT_DATA_DIR);
-  toolFileName.append("/SROMFile.rom");
-
-  mitk::TrackingDeviceSourceConfigurator::Pointer testInstance;
-
-  mitk::NavigationToolStorage::Pointer polarisStorage = mitk::NavigationToolStorage::New();
-
-  //create valid tool 1
-  mitk::NavigationTool::Pointer firstTool = mitk::NavigationTool::New();
-  firstTool->SetTrackingDeviceType(mitk::NDIPolaris);
-  mitk::DataNode::Pointer firstNode = mitk::DataNode::New();
-  firstNode->SetName("Tool1");
-  firstTool->SetDataNode(firstNode);
-  firstTool->SetCalibrationFile(toolFileName);
-  firstTool->SetIdentifier("Tool#1");
-  polarisStorage->AddTool(firstTool);
-
-  mitk::NDITrackingDevice::Pointer ndiDevice = mitk::NDITrackingDevice::New();
-  ndiDevice->SetType(mitk::NDIPolaris);
-  mitk::TrackingDevice::Pointer testDevice = dynamic_cast<mitk::TrackingDevice*>(ndiDevice.GetPointer());
-
-  testInstance = mitk::TrackingDeviceSourceConfigurator::New(polarisStorage,testDevice);
-
-  mitk::TrackingDeviceSource::Pointer testSource = testInstance->CreateTrackingDeviceSource();
-
-  MITK_TEST_CONDITION_REQUIRED(testSource->GetNumberOfOutputs()==1,"..testing number of outputs");
-  MITK_TEST_CONDITION_REQUIRED(testSource->GetTrackingDevice()->GetToolCount()==1,"..testing tracking device");
-}
-*/
-
 static void TestAdditionalMethods()
 {
   MITK_TEST_OUTPUT(<<"Testing additional methods of TrackingDeviceSourceCOnfigurator");

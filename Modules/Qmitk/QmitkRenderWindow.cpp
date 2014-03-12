@@ -33,6 +33,8 @@
 #include "mitkMouseWheelEvent.h"
 #include "mitkInternalEvent.h"
 
+#include "mitkBaseRenderer.h"
+
 #include "QmitkRenderWindowMenu.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
@@ -90,8 +92,10 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mousePressMitkEvent(&myevent);
+
+    if ( GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard3D )
+     QVTKWidget::mousePressEvent(me);
   }
-  QVTKWidget::mousePressEvent(me);
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -106,8 +110,10 @@ void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mousePressMitkEvent(&myevent);
+
+    if ( GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard3D )
+      QVTKWidget::mousePressEvent(me);
   }
-  QVTKWidget::mousePressEvent(me);
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -123,8 +129,10 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mouseReleaseMitkEvent(&myevent);
+
+    if ( GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard3D )
+      QVTKWidget::mouseReleaseEvent(me);
   }
-  QVTKWidget::mouseReleaseEvent(me);
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -141,8 +149,10 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mouseMoveMitkEvent(&myevent);
+
+    if ( GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard3D )
+      QVTKWidget::mouseMoveEvent(me);
   }
-  QVTKWidget::mouseMoveEvent(me);
 }
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
@@ -154,8 +164,10 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   { // TODO: INTERACTION_LEGACY
     mitk::WheelEvent myevent(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
     this->wheelMitkEvent(&myevent);
+
+    if ( GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard3D )
+      QVTKWidget::wheelEvent(we);
   }
-  QVTKWidget::wheelEvent(we);
 
   if (m_ResendQtEvents)
     we->ignore();
@@ -173,9 +185,11 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
     mitk::KeyEvent mke(QmitkEventAdapter::AdaptKeyEvent(m_Renderer, ke, cp));
     this->keyPressMitkEvent(&mke);
     ke->accept();
+
+    if ( GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard3D )
+      QVTKWidget::keyPressEvent(ke);
   }
 
-  QVTKWidget::keyPressEvent(ke);
 
   if (m_ResendQtEvents)
     ke->ignore();

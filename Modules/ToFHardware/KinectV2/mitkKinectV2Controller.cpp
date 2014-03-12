@@ -478,9 +478,10 @@ namespace mitk
           for(int i = 0; i < d->m_DepthCaptureWidth; ++i)
           {
             unsigned int pixelID = i+j*d->m_DepthCaptureWidth;
+            unsigned int inverseid = (d->m_DepthCaptureWidth - i - 1) + j*d->m_DepthCaptureWidth;
 
-            distances[pixelID] = static_cast<float>(*pDepthBuffer);
-            amplitudes[pixelID] = static_cast<float>(*pInfraRedBuffer);
+            distances[inverseid] = static_cast<float>(*pDepthBuffer);
+            amplitudes[inverseid] = static_cast<float>(*pInfraRedBuffer);
             ++pDepthBuffer;
             ++pInfraRedBuffer;
 

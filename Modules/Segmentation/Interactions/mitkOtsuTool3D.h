@@ -24,6 +24,9 @@ class ModuleResource;
 }
 
 namespace mitk{
+
+  class Image;
+
   class MitkSegmentation_EXPORT OtsuTool3D : public AutoSegmentationTool
   {
     public:
@@ -49,7 +52,7 @@ namespace mitk{
       OtsuTool3D();
       virtual ~OtsuTool3D();
 
-      mitk::Image::Pointer m_OriginalImage;
+      itk::SmartPointer<Image> m_OriginalImage;
       //holds the user selected binary segmentation
       mitk::DataNode::Pointer m_BinaryPreviewNode;
       //holds the multilabel result as a preview image

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAutoSegmentationTool.h"
 #include "mitkToolManager.h"
+#include "mitkImage.h"
 #include <mitkImageTimeSelector.h>
 
 mitk::AutoSegmentationTool::AutoSegmentationTool()

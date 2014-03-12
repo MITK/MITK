@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <limits>
 #include "mitkTestDICOMLoading.h"
-
+#include "mitkImage.h"
 #include <stack>
 
 mitk::TestDICOMLoading::TestDICOMLoading()
@@ -58,7 +58,7 @@ void mitk::TestDICOMLoading::ResetUserLocale()
 
 
 
-mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const StringContainer& files, Image::Pointer preLoadedVolume )
+mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const StringContainer& files, itk::SmartPointer<Image> preLoadedVolume )
 {
   for (StringContainer::const_iterator iter = files.begin();
        iter != files.end();

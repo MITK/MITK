@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSliceNavigationController.h"
 #include "mitkDataStorage.h"
 #include "mitkStandaloneDataStorage.h"
-
+#include "mitkSlicedGeometry3D.h"
 #include <QWidget>
 
 class MitkQtWidgetsExt_EXPORT QmitkSliceWidget : public QWidget, public Ui::QmitkSliceWidgetUi

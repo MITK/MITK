@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTimeGeometry.h>
 
 #include <berryConstants.h>
-
+#include <mitkPlaneGeometry.h>
 
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 

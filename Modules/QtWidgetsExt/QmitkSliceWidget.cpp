@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSliceWidget.h"
 #include "QmitkStepperAdapter.h"
 #include "mitkNodePredicateDataType.h"
-
+#include "mitkImage.h"
 #include <mitkProportionalTimeGeometry.h>
 
 

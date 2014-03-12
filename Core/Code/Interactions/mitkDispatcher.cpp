@@ -145,13 +145,14 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   // Standard behavior. Is executed in STANDARD mode  and PREFERINPUT mode, if preferred interactor rejects event.
   if (m_ProcessingMode == REGULAR || (m_ProcessingMode == PREFERINPUT && eventIsHandled == false))
   {
-    m_Interactors.sort(cmp()); // sorts interactors by layer (descending);
+    std::sort( m_Interactors.begin(), m_Interactors.end(), cmp() );
 
     // copy the list to prevent iterator invalidation as executing actions
     // in HandleEvent() can cause the m_Interactors list to be updated
-    std::list<DataInteractor::Pointer> tmpInteractorList( m_Interactors );
-    std::list<DataInteractor::Pointer>::iterator it;
-    for ( it=tmpInteractorList.begin(); it!=tmpInteractorList.end(); it++ )
+    std::vector<DataInteractor::Pointer> tmpInteractorList( m_Interactors );
+    std::vector<DataInteractor::Pointer>::iterator it, end;
+    end = tmpInteractorList.end();
+    for ( it=tmpInteractorList.begin(); it!=end; it++ )
     {
       DataInteractor::Pointer dataInteractor = *it;
       if ( (*it)->HandleEvent(event, dataInteractor->GetDataNode()) )
@@ -171,8 +172,10 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   /* Notify InteractionEventObserver  */
   std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver;
   m_EventObserverTracker->GetServiceReferences(listEventObserver);
-  for (std::vector<us::ServiceReference<InteractionEventObserver> >::iterator it = listEventObserver.begin();
-       it != listEventObserver.end(); ++it)
+
+  std::vector<us::ServiceReference<InteractionEventObserver> >::iterator it, end;
+  end = listEventObserver.end();
+  for ( it = listEventObserver.begin(); it != end; ++it)
   {
     InteractionEventObserver* interactionEventObserver = m_EventObserverTracker->GetService(*it);
     if (interactionEventObserver != NULL)
@@ -188,7 +191,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   if (!m_QueuedEvents.empty())
   {
     InteractionEvent::Pointer e = m_QueuedEvents.front();
-    m_QueuedEvents.pop_front();
+    m_QueuedEvents.erase( m_QueuedEvents.begin() );
     ProcessEvent(e);
   }
   return eventIsHandled;
@@ -244,7 +247,7 @@ bool mitk::Dispatcher::HandleInternalEvent(InternalEvent* internalEvent)
     internalEvent->GetTargetInteractor()->GetDataNode()->SetDataInteractor(NULL);
     internalEvent->GetTargetInteractor()->SetDataNode(NULL);
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    internalEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
     return true;
   }
   return false;

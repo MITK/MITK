@@ -51,8 +51,8 @@ namespace mitk
     mitkClassMacro(Dispatcher, itk::LightObject);
     mitkNewMacro1Param(Self, const std::string&);
 
-    typedef std::list<DataInteractor::Pointer> ListInteractorType;
-    typedef std::list<itk::SmartPointer<InteractionEvent> > ListEventsType;
+    typedef std::vector<DataInteractor::Pointer> ListInteractorType;
+    typedef std::vector<itk::SmartPointer<InteractionEvent> > ListEventsType;
 
     /**
      * To post new Events which are to be handled by the Dispatcher.
@@ -97,7 +97,7 @@ namespace mitk
         return (d1->GetLayer() > d2->GetLayer());
       }
     };
-    std::list<DataInteractor::Pointer> m_Interactors;
+    std::vector<DataInteractor::Pointer> m_Interactors;
     ListEventsType m_QueuedEvents;
 
     /**

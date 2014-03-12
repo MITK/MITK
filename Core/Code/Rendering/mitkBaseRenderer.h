@@ -78,12 +78,17 @@ namespace mitk
   {
   public:
 
+    /** \brief This rendering mode enumeration is specified at various constructors
+    *  of the Renderer and RenderWindow classes, which autoconfigures the
+    *  respective VTK objects. This has to be done at construction time because later
+    *  configuring turns out to be not working on most platforms.
+    */
     struct RenderingMode
     {
       enum Type {
-        Standard = 0,
-        MultiSampling,
-        DepthPeeling
+        Standard = 0,  // no multi-sampling, no depth-peeling
+        MultiSampling, // multi-sampling (antialiasing), no depth-peeling
+        DepthPeeling   // no multi-sampling, depth-peeling is on (order-independant transparency)
       };
     };
 

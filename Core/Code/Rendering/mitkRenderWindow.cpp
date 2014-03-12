@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkRenderWindowInteractor.h"
 #include "mitkVtkEventProvider.h"
 
-mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk::RenderingManager* rm )
+mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk::RenderingManager* rm, mitk::BaseRenderer::RenderingMode::Type rmtype )
 : m_vtkRenderWindow(renWin)
 , m_vtkRenderWindowInteractor(NULL)
 , m_vtkMitkEventProvider(NULL)
@@ -31,8 +31,20 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk
   if(m_vtkRenderWindow == NULL)
   {
     m_vtkRenderWindow = vtkRenderWindow::New();
-   //disable Antialiasing by default
-   m_vtkRenderWindow->SetMultiSamples(0);
+
+    if(rmtype == mitk::BaseRenderer::RenderingMode::DepthPeeling)
+    {
+      m_vtkRenderWindow->SetMultiSamples(0);
+      m_vtkRenderWindow->SetAlphaBitPlanes(1);
+    }
+    else if(rmtype == mitk::BaseRenderer::RenderingMode::MultiSampling)
+    {
+      m_vtkRenderWindow->SetMultiSamples(8);
+    }
+    else if(rmtype == mitk::BaseRenderer::RenderingMode::Standard)
+    {
+      m_vtkRenderWindow->SetMultiSamples(0);
+    }
   }
 
   if ( m_vtkRenderWindow->GetSize()[0] <= 10
@@ -46,7 +58,7 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk
   m_vtkRenderWindowInteractor->Initialize();
 
   // initialize from RenderWindowBase
-  Initialize(rm,name);
+  Initialize(rm,name,rmtype);
 
   m_vtkMitkEventProvider = vtkEventProvider::New();
   m_vtkMitkEventProvider->SetInteractor(this->GetVtkRenderWindowInteractor());

@@ -60,9 +60,6 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    mitkCloneMacro(Self);
-
-
     /*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
     typedef mitk::ContourElement::VertexType VertexType;
     typedef mitk::ContourElement::VertexListType VertexListType;
@@ -437,6 +434,7 @@ namespace mitk
     virtual void RedistributeControlVertices(int period, int timestep);
 
   protected:
+    mitkCloneMacro(Self);
 
     ContourModel();
     ContourModel(const mitk::ContourModel &other);

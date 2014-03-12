@@ -42,8 +42,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  mitkCloneMacro(Contour);
-
   typedef itk::PolyLineParametricPath<3>                        PathType;
   typedef PathType::Pointer                                     PathPointer;
   typedef PathType::ContinuousIndexType                         ContinuousIndexType;
@@ -142,6 +140,8 @@ public:
   virtual void SetRequestedRegion( const itk::DataObject *data);
 
 protected:
+  mitkCloneMacro(Self);
+
   Contour();
   Contour(const Contour & other);
   virtual ~Contour();

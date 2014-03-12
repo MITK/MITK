@@ -38,8 +38,6 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    mitkCloneMacro(ContourModelSet);
-
     typedef std::deque<mitk::ContourModel::Pointer> ContourModelListType;
     typedef ContourModelListType::iterator ContourModelSetIterator;
 
@@ -125,6 +123,7 @@ namespace mitk
 
 
   protected:
+    mitkCloneMacro(Self);
 
     ContourModelSet();
     ContourModelSet(const mitk::ContourModelSet &other);

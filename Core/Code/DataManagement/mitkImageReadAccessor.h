@@ -54,7 +54,10 @@ public:
       ) :
     ImageAccessorBase(iP,iDI,OptionFlags)
   {
-    OrganizeReadAccess();
+    if(!(OptionFlags & ImageAccessorBase::IgnoreLock))
+    {
+      OrganizeReadAccess();
+    }
   }
 
   /** \brief Gives const access to the data. */
@@ -66,26 +69,29 @@ public:
   /** Destructor informs Image to unlock memory. */
   virtual ~ImageReadAccessor()
   {
-    // Future work: In case of non-coherent memory, copied area needs to be deleted
-
-    m_Image->m_ReadWriteLock.Lock();
-
-    // delete self from list of ImageReadAccessors in Image
-    std::vector<ImageAccessorBase*>::iterator it = std::find(m_Image->m_Readers.begin(),m_Image->m_Readers.end(),this);
-    m_Image->m_Readers.erase(it);
-
-    // delete lock, if there are no waiting ImageAccessors
-    if(m_WaitLock->m_WaiterCount <= 0)
+    if(!(m_Options & ImageAccessorBase::IgnoreLock))
     {
-      m_WaitLock->m_Mutex.Unlock();
-      delete m_WaitLock;
-    }
-    else
-    {
-      m_WaitLock->m_Mutex.Unlock();
-    }
+      // Future work: In case of non-coherent memory, copied area needs to be deleted
 
-    m_Image->m_ReadWriteLock.Unlock();
+      m_Image->m_ReadWriteLock.Lock();
+
+      // delete self from list of ImageReadAccessors in Image
+      std::vector<ImageAccessorBase*>::iterator it = std::find(m_Image->m_Readers.begin(),m_Image->m_Readers.end(),this);
+      m_Image->m_Readers.erase(it);
+
+      // delete lock, if there are no waiting ImageAccessors
+      if(m_WaitLock->m_WaiterCount <= 0)
+      {
+        m_WaitLock->m_Mutex.Unlock();
+        delete m_WaitLock;
+      }
+      else
+      {
+        m_WaitLock->m_Mutex.Unlock();
+      }
+
+      m_Image->m_ReadWriteLock.Unlock();
+    }
   }
 
 protected:

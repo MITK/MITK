@@ -30,7 +30,7 @@ namespace mitk{
 }
 
 mitk::ClippingPlaneDeformationTool::ClippingPlaneDeformationTool()
-: Tool( "global" )
+: Tool( "" )
 {
   m_SurfaceInteractor = mitk::SurfaceDeformationDataInteractor3D::New();
 }

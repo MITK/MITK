@@ -55,6 +55,9 @@ mitk::Tool::~Tool()
 
 void mitk::Tool::InitializeStateMachine()
 {
+  if (m_InteractorType.empty())
+    return;
+
   m_InteractorType += ".xml";
 
   try

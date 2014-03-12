@@ -31,7 +31,7 @@ namespace mitk
 }
 
 mitk::ClippingPlaneRotationTool::ClippingPlaneRotationTool()
-: Tool( "global" )
+: Tool( "" )
 {
   m_AffineDataInteractor = mitk::AffineDataInteractor3D::New();
 }

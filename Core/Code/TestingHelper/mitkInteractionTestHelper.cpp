@@ -112,14 +112,19 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
 
 mitk::InteractionTestHelper::~InteractionTestHelper()
 {
-  //unregister renderers
-  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
-  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+    mitk::RenderingManager* rm = mitk::RenderingManager::GetInstance();
 
-  for(; it != end; it++)
-  {
-    mitk::BaseRenderer::RemoveInstance((*it)->GetVtkRenderWindow());
-  }
+    //unregister renderers
+    InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
+    InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+
+    for(; it != end; it++)
+    {
+        rm->GetTimeNavigationController()->Disconnect((*it)->GetSliceNavigationController());
+        (*it)->GetSliceNavigationController()->Disconnect(rm->GetTimeNavigationController());
+        mitk::BaseRenderer::RemoveInstance((*it)->GetVtkRenderWindow());
+    }
+    rm->RemoveAllObservers();
 }
 
 

@@ -130,13 +130,13 @@ int mitkEventConfigTest(int argc, char* argv[])
   configDescription.push_back(propertyList1);
 
   mitk::PropertyList::Pointer propertyList2 = mitk::PropertyList::New();
-  propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass().c_str(), "MOUSERELEASEEVENT");
+  propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass().c_str(), "MouseReleaseEvent");
   propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant().c_str(), "MouseReleaseEventVariant");
   propertyList2->SetStringProperty("Modifiers","SHIFT");
   configDescription.push_back(propertyList2);
 
   mitk::PropertyList::Pointer propertyList3 = mitk::PropertyList::New();
-  propertyList3->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass().c_str(), "MOUSERELEASEEVENT");
+  propertyList3->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass().c_str(), "MouseReleaseEvent");
   propertyList3->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant().c_str(), "MouseReleaseEventVariant");
   propertyList3->SetStringProperty("Modifiers","ALT");
   configDescription.push_back(propertyList3);

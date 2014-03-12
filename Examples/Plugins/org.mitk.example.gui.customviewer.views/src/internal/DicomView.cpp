@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIDataStorageService.h"
 #include "mitkDicomSeriesReader.h"
+#include "mitkImage.h"
 
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchWindow.h>

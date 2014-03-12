@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkDataStorageComboBox.h>
 #include <mitkNodePredicateDataType.h>
 #include <itkFieldmapGeneratorFilter.h>
+#include <mitkImage.h>
 
 const std::string QmitkFieldmapGeneratorView::VIEW_ID = "org.mitk.views.fieldmapgenerator";
 

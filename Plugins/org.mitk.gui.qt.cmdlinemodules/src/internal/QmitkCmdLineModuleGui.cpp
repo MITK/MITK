@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleDescription.h>
 #include <ctkCollapsibleGroupBox.h>
 #include "mitkDataStorage.h"
+#include <mitkImage.h>
 
 //-----------------------------------------------------------------------------
 struct QmitkCmdLineModuleGuiPrivate

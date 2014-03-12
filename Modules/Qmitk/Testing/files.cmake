@@ -1,4 +1,4 @@
   set(MODULE_TESTS
     QmitkThreadedLogTest.cpp
-    QmitkInteractionPerformanceTest.cpp
+    #QmitkInteractionPerformanceTest.cpp
   )

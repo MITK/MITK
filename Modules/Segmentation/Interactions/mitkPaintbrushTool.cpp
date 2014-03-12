@@ -291,7 +291,7 @@ bool mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEven
 
   m_MasterContour->SetClosed(true);
 
-  return this->OnMouseMoved( NULL, interactionEvent);
+  return this->MouseMoved(interactionEvent, true);
 }
 
 bool mitk::PaintbrushTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )

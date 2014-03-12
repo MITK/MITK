@@ -76,7 +76,8 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyModifier().c_str(), strModifiers))
   {
     std::vector<std::string> mods = split(strModifiers, ',');
-    for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
+    std::vector<std::string>::iterator end = mods.end();
+    for (std::vector<std::string>::iterator it = mods.begin(); it != end; ++it)
     {
       std::transform((*it).begin(), (*it).end(), (*it).begin(), ::toupper);
       if (*it == "CTRL")
@@ -101,16 +102,15 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
 // Set EventButton
   if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyEventButton().c_str(), strEventButton))
   {
-    std::transform(strEventButton.begin(), strEventButton.end(), strEventButton.begin(), ::toupper);
-    if (strEventButton == "MIDDLEMOUSEBUTTON")
+    if (strEventButton == "MiddleMouseButton")
     {
       eventButton = InteractionEvent::MiddleMouseButton;
     }
-    else if (strEventButton == "LEFTMOUSEBUTTON")
+    else if (strEventButton == "LeftMouseButton")
     {
       eventButton = InteractionEvent::LeftMouseButton;
     }
-    else if (strEventButton == "RIGHTMOUSEBUTTON")
+    else if (strEventButton == "RightMouseButton")
     {
       eventButton = InteractionEvent::RightMouseButton;
     }
@@ -124,18 +124,18 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyButtonState().c_str(), strButtonState))
   {
     std::vector<std::string> mods = split(strButtonState, ',');
-    for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
+    std::vector<std::string>::iterator end = mods.end();
+    for (std::vector<std::string>::iterator it = mods.begin(); it != end; ++it)
     {
-      std::transform((*it).begin(), (*it).end(), (*it).begin(), ::toupper);
-      if (*it == "MIDDLEMOUSEBUTTON")
+      if (*it == "MiddleMouseButton")
       {
         buttonState = buttonState | InteractionEvent::MiddleMouseButton;
       }
-      else if (*it == "LEFTMOUSEBUTTON")
+      else if (*it == "LeftMouseButton")
       {
         buttonState = buttonState | InteractionEvent::LeftMouseButton;
       }
-      else if (*it == "RIGHTMOUSEBUTTON")
+      else if (*it == "RightMouseButton")
       {
         buttonState = buttonState | InteractionEvent::RightMouseButton;
       }
@@ -178,46 +178,43 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   /*
    * Here the objects are created
    */
-
   mitk::InteractionEvent::Pointer event;
-  std::transform(eventClass.begin(), eventClass.end(), eventClass.begin(), ::toupper);
-
-  if (eventClass == "MOUSEPRESSEVENT")
+  if (eventClass == "MousePressEvent")
   {
     // buttonstates incorporate the event button (as in Qt)
     buttonState = buttonState | eventButton;
     event = MousePressEvent::New(NULL, pos, buttonState, modifiers, eventButton);
   }
-  else if (eventClass == "MOUSEDOUBLECLICKEVENT")
+  else if (eventClass == "MouseDoubleClickEvent")
   {
     buttonState = buttonState | eventButton;
     event = MouseDoubleClickEvent::New(NULL, pos, buttonState, modifiers, eventButton);
   }
-  else if (eventClass == "MOUSEMOVEEVENT")
+  else if (eventClass == "MouseMoveEvent")
   {
     event = MouseMoveEvent::New(NULL, pos, buttonState, modifiers);
   }
-  else if (eventClass == "MOUSERELEASEEVENT")
+  else if (eventClass == "MouseReleaseEvent")
   {
     event = MouseReleaseEvent::New(NULL, pos, buttonState, modifiers, eventButton);
   }
-  else if (eventClass == "INTERACTIONKEYEVENT")
+  else if (eventClass == "InteractionKeyEvent")
   {
     event = InteractionKeyEvent::New(NULL, key, modifiers);
   }
-  else if (eventClass == "MOUSEWHEELEVENT")
+  else if (eventClass == "MouseWheelEvent")
   {
     event = MouseWheelEvent::New(NULL, pos, buttonState, modifiers, wheelDelta);
   }
-  else if (eventClass == "INTERACTIONPOSITIONEVENT")
+  else if (eventClass == "InteractionPositionEvent")
   {
     event = InteractionPositionEvent::New(NULL, pos);
   }
-  else if (eventClass == "INTERNALEVENT")
+  else if (eventClass == "InternalEvent")
   {
     event = InternalEvent::New(NULL, NULL, strSignalName);
   }
-  else if (eventClass == "INTERACTIONEVENT")
+  else if (eventClass == "InteractionEvent")
   {
     event = InteractionEvent::New(NULL);
   }

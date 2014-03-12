@@ -32,7 +32,7 @@ namespace mitk
 }
 
 mitk::ClippingPlaneTranslationTool::ClippingPlaneTranslationTool()
-: Tool( "global" )
+: Tool( "" )
 {
   m_AffineDataInteractor = mitk::AffineDataInteractor3D::New();
 }

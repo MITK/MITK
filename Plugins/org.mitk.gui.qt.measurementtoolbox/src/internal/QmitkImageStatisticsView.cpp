@@ -221,6 +221,7 @@ void QmitkImageStatisticsView::OnClipboardHistogramButtonClicked()
 
 void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
 {
+  QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
   if ( this->m_CurrentStatisticsValid )
   {
     const mitk::ImageStatisticsCalculator::Statistics &statistics =
@@ -518,9 +519,9 @@ void QmitkImageStatisticsView::UpdateStatistics()
       }
 
       m_Controls->m_SelectedMaskLabel->setText(m_Controls->m_SelectedMaskLabel->text() +
-                                               QString(" (t=") +
-                                               QString::number(maskTimeStep) +
-                                               QString(")"));
+        QString(" (t=") +
+        QString::number(maskTimeStep) +
+        QString(")"));
     }
 
     //// initialize thread and trigger it

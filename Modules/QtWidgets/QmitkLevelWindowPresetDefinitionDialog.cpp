@@ -33,9 +33,6 @@ QmitkLevelWindowPresetDefinitionDialog::QmitkLevelWindowPresetDefinitionDialog(Q
 
   presetView->verticalHeader()->setVisible(false);
   presetView->horizontalHeader()->setResizeMode(QHeaderView::Fixed);
-  //presetView->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
-  //presetView->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
-  //presetView->horizontalHeader()->setResizeMode(2, QHeaderView::ResizeToContents);
 
   presetView->setModel(&m_SortModel);
 }
@@ -181,7 +178,8 @@ void QmitkLevelWindowPresetDefinitionDialog::ListViewSelectionChanged(const QIte
   }
   else
   {
-    PresetTableModel::Entry entry(m_TableModel->getPreset(indexes.first()));
+    //use the sorted index to get the entry
+    PresetTableModel::Entry entry( m_TableModel->getPreset((m_SortModel.mapToSource(indexes.first()))) );
     presetnameLineEdit->setText(QString(entry.name.c_str()));
     levelSpinBox->setValue((int)entry.level);
     windowSpinBox->setValue((int)entry.window);

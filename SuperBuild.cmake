@@ -403,6 +403,7 @@ ExternalProject_Add(${proj}
     ${mitk_superbuild_boolean_args}
     ${mitk_optional_cache_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF
+    -DMITK_BUILD_CONFIGURATION:STRING=${MITK_BUILD_CONFIGURATION}
     -DCTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
     # ----------------- Miscellaneous ---------------
     -DMITK_CTEST_SCRIPT_MODE:STRING=${MITK_CTEST_SCRIPT_MODE}

@@ -109,6 +109,7 @@ set(CMAKE_MODULE_PATH
 include(mitkMacroEmptyExternalProject)
 include(mitkFunctionGenerateProjectXml)
 include(mitkFunctionSuppressWarnings)
+include(mitkFunctionEnableBuildConfiguration)
 include(FeatureSummary)
 
 SUPPRESS_VC_DEPRECATED_WARNINGS()
@@ -177,12 +178,17 @@ env_option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
+set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
+set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS Custom Default All)
+
+mitkFunctionEnableBuildConfiguration()
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
                  MITK_USE_GLEW
                  MITK_USE_CTK
                  MITK_USE_DCMTK
                  MITK_ENABLE_PIC_READER
+                 MITK_BUILD_CONFIGURATION
                 )
 
 if(MITK_USE_Python)

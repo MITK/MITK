@@ -108,7 +108,8 @@ namespace mitk
 
   public:
     mitkClassMacro(EventStateMachine, InteractionEventHandler)
-    itkNewMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     typedef std::map<std::string, TActionFunctor*> DEPRECATED(ActionFunctionsMapType);
 

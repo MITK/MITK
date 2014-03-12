@@ -86,7 +86,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  mitkCloneMacro(PointSet);
   typedef mitk::ScalarType CoordinateType;
   typedef mitk::ScalarType InterpolationWeightType;
 
@@ -248,6 +247,9 @@ public:
   virtual void OnPointSetChange(){};
 
 protected:
+
+  mitkCloneMacro(Self);
+
   PointSet();
   PointSet(const PointSet &other);
   virtual ~PointSet();

@@ -47,9 +47,6 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    mitkCloneMacro(Self);
-
-
 // Data container representing vertices
 
     /** \brief Represents a single vertex of contour.
@@ -257,6 +254,7 @@ namespace mitk
     void RedistributeControlVertices(const VertexType* vertex, int period);
 
   protected:
+    mitkCloneMacro(Self);
 
     ContourElement();
     ContourElement(const mitk::ContourElement &other);

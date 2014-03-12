@@ -82,8 +82,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  mitkCloneMacro(Image);
-
   /** Smart Pointer type to a ImageDataItem. */
   typedef itk::SmartPointer<ImageDataItem> ImageDataItemPointer;
   typedef itk::Statistics::Histogram<double> HistogramType;
@@ -587,6 +585,8 @@ public:
   }
 
 protected:
+
+  mitkCloneMacro(Self);
 
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 

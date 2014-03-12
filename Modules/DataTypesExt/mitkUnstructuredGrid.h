@@ -41,8 +41,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  mitkCloneMacro(UnstructuredGrid);
-
   virtual void SetVtkUnstructuredGrid(vtkUnstructuredGrid* grid, unsigned int t = 0);
 
   virtual vtkUnstructuredGrid* GetVtkUnstructuredGrid(unsigned int t = 0);
@@ -86,6 +84,7 @@ public:
   void CalculateBoundingBox();
 
 protected:
+  mitkCloneMacro(Self);
 
   typedef std::vector< vtkUnstructuredGrid* > VTKUnstructuredGridSeries;
 

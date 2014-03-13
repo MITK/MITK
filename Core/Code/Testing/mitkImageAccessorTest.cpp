@@ -227,7 +227,7 @@ int mitkImageAccessorTest(int argc, char* argv[])
      mitk::ImageReadAccessor second(image, NULL, mitk::ImageAccessorBase::IgnoreLock);
      MITK_TEST_CONDITION_REQUIRED(true, "Testing the option flag \"IgnoreLock\" in ReadAccessor");
    }
-   catch(const mitk::Exception& e)
+   catch(const mitk::Exception& /*e*/)
    {
      MITK_TEST_CONDITION_REQUIRED(false, "Ignoring the lock mechanism leads to exception.");
    }

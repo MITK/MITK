@@ -1,12 +1,12 @@
 /**
-\page org_mitk_gui_gt_eventrecorder Eventrecorder
+\page org_mitk_gui_qt_eventrecorder Eventrecorder
 
 \image html icon.xpm "Icon of Eventrecorder"
 
 Available sections:
-  - \ref org_mitk_gui_gt_eventrecorderOverview
+  - \ref org_mitk_gui_qt_eventrecorderOverview
 
-\section org_mitk_gui_gt_eventrecorderOverview
+\section org_mitk_gui_qt_eventrecorderOverview
 Describe the features of your awesome plugin here
 <ul>
 <li>Increases productivity

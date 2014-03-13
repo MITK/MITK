@@ -59,6 +59,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPolyDataGLMapper2D.h"
 #include "mitkSurfaceVtkMapper3D.h"
 
+#include "mitkSliceNavigationController.h"
+
 const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualization";
 
 RTDoseVisualizer::RTDoseVisualizer()
@@ -72,6 +74,13 @@ RTDoseVisualizer::RTDoseVisualizer()
     m_selectedPresetName = "";
     m_internalUpdate = false;
     m_PrescribedDose_Data = 0.0;
+
+
+    itk::MemberCommand<RTDoseVisualizer>::Pointer sliceChangedCommand =
+        itk::MemberCommand<RTDoseVisualizer>::New();
+    sliceChangedCommand->SetCallbackFunction(this, &RTDoseVisualizer::OnSliceChanged);
+    mitk::SliceNavigationController::Pointer slicer = mitk::SliceNavigationController::New();
+    slicer->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand);
 
 //    mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
 //    std::string path = "/home/riecker/mitkShaderLighting.xml";
@@ -91,6 +100,11 @@ RTDoseVisualizer::~RTDoseVisualizer()
 
 void RTDoseVisualizer::SetFocus()
 {
+}
+
+void RTDoseVisualizer::OnSliceChanged(itk::Object *sender, const itk::EventObject &e)
+{
+  this->UpdateStdIsolines();
 }
 
 void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )

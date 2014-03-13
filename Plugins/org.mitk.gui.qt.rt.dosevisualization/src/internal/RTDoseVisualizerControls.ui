@@ -314,7 +314,7 @@
            <double>9999.000000000000000</double>
           </property>
           <property name="value">
-           <double>0.000000000000000</double>
+           <double>0.100000000000000</double>
           </property>
          </widget>
         </item>
@@ -343,6 +343,9 @@
       </item>
       <item>
        <widget class="QTableView" name="isoLevelSetView">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="alternatingRowColors">
          <bool>true</bool>
         </property>

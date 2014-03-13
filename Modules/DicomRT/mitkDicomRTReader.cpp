@@ -436,6 +436,7 @@ namespace mitk
     Uint16 &rows_ref = rows;
     Uint16 &columns_ref = columns;
     Float32 gridscale;
+//    const Uint16 *pixelData = NULL;
     const Uint16 *pixelData = NULL;
     unsigned long count = 0;
 
@@ -456,6 +457,7 @@ namespace mitk
     std::cout << std::setprecision(10) << "GRIDSCALE >> " << gridscale << endl;
     frames = atoi(nrframes.c_str());
 
+    //dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count);
     dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count);
 
     mitk::Image::Pointer image = mitk::Image::New();
@@ -475,6 +477,7 @@ namespace mitk
 
     for(int i=0; i<size; ++i, ++pixel)
     {
+//      MITK_INFO << "PixelData" << i << " : " << pixelData[i] << endl;
       *pixel=pixelData[i] * gridscale;
     }
 
@@ -523,6 +526,8 @@ namespace mitk
 
     frames = atoi(nrframes.c_str());
     gridscale = OFStandard::atof(gridScaling.c_str());
+    MITK_INFO << "Gridscale " << gridscale << endl;
+    MITK_INFO << "As String: " << gridScaling << endl;
     dataSet->findAndGetUint16Array(DCM_PixelData, pixelData, 0);
 
     int size = columns*rows*frames;

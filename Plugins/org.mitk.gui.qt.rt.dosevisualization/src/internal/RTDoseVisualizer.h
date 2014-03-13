@@ -67,6 +67,8 @@ public:
   virtual ~RTDoseVisualizer();
   static const std::string VIEW_ID;
 
+  void OnSliceChanged(itk::Object *sender, const itk::EventObject &e);
+
   protected slots:
 
     void OnConvertButtonClicked();

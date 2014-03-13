@@ -484,7 +484,12 @@ DataStorage::Pointer IOUtil::LoadFiles(const std::vector<std::string>& fileNames
     return ds.GetPointer();
 }
 
-DataNode::Pointer IOUtil::LoadDataNode(const std::string path)
+BaseData::Pointer IOUtil::LoadBaseData(const std::string& path)
+{
+  return LoadDataNode(path)->GetData();
+}
+
+DataNode::Pointer IOUtil::LoadDataNode(const std::string& path)
 {
     mitk::DataNodeFactory::Pointer reader = mitk::DataNodeFactory::New();
     try
@@ -515,7 +520,7 @@ DataNode::Pointer IOUtil::LoadDataNode(const std::string path)
     }
 }
 
-Image::Pointer IOUtil::LoadImage(const std::string path)
+Image::Pointer IOUtil::LoadImage(const std::string& path)
 {
     mitk::DataNode::Pointer node = LoadDataNode(path);
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
@@ -527,7 +532,7 @@ Image::Pointer IOUtil::LoadImage(const std::string path)
     return image;
 }
 
-Surface::Pointer IOUtil::LoadSurface(const std::string path)
+Surface::Pointer IOUtil::LoadSurface(const std::string& path)
 {
     mitk::DataNode::Pointer node = LoadDataNode(path);
     mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
@@ -539,7 +544,7 @@ Surface::Pointer IOUtil::LoadSurface(const std::string path)
     return surface;
 }
 
-PointSet::Pointer IOUtil::LoadPointSet(const std::string path)
+PointSet::Pointer IOUtil::LoadPointSet(const std::string& path)
 {
     mitk::DataNode::Pointer node = LoadDataNode(path);
     mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(node->GetData());
@@ -551,7 +556,7 @@ PointSet::Pointer IOUtil::LoadPointSet(const std::string path)
     return pointset;
 }
 
-bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string path)
+bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string& path)
 {
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
@@ -594,7 +599,7 @@ bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string path)
     return true;
 }
 
-bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
+bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string& path)
 {
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
@@ -664,7 +669,7 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
     return true;
 }
 
-bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
+bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string& path)
 {
     mitk::PointSetWriter::Pointer pointSetWriter = mitk::PointSetWriter::New();
 

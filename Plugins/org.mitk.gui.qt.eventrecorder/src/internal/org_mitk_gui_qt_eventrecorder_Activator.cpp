@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "org_mitk_gui_gt_eventrecorder_Activator.h"
+#include "org_mitk_gui_qt_eventrecorder_Activator.h"
 
 #include <QtPlugin>
 
@@ -23,16 +23,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-void org_mitk_gui_gt_eventrecorder_Activator::start(ctkPluginContext* context)
+void org_mitk_gui_qt_eventrecorder_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(InteractionEventRecorder, context)
 }
 
-void org_mitk_gui_gt_eventrecorder_Activator::stop(ctkPluginContext* context)
+void org_mitk_gui_qt_eventrecorder_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_gt_eventrecorder, mitk::org_mitk_gui_gt_eventrecorder_Activator)
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_eventrecorder, mitk::org_mitk_gui_qt_eventrecorder_Activator)

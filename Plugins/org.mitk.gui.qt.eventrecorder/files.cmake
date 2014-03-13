@@ -3,7 +3,7 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  org_mitk_gui_gt_eventrecorder_Activator.cpp
+  org_mitk_gui_qt_eventrecorder_Activator.cpp
   InteractionEventRecorder.cpp
 )
 
@@ -12,7 +12,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/org_mitk_gui_gt_eventrecorder_Activator.h
+  src/internal/org_mitk_gui_qt_eventrecorder_Activator.h
   src/internal/InteractionEventRecorder.h
 )
 

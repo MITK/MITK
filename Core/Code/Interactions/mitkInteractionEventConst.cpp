@@ -156,4 +156,10 @@ const std::string InteractionEventConst::xmlEventPropertyViewDirection()
   return xmlEventPropertyViewDirection;
 }
 
+const std::string InteractionEventConst::xmlEventPropertyMapperID()
+{
+  static const std::string xmlEventPropertyMapperID = "MapperID";
+  return xmlEventPropertyMapperID;
+}
+
 }

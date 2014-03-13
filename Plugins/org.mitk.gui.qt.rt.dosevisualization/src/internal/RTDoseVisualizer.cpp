@@ -76,11 +76,13 @@ RTDoseVisualizer::RTDoseVisualizer()
     m_PrescribedDose_Data = 0.0;
 
 
+    //hier crash ?!
+    QmitkRenderWindow* rw = this->GetRenderWindowPart()->GetQmitkRenderWindow("axial");
+
     itk::MemberCommand<RTDoseVisualizer>::Pointer sliceChangedCommand =
         itk::MemberCommand<RTDoseVisualizer>::New();
     sliceChangedCommand->SetCallbackFunction(this, &RTDoseVisualizer::OnSliceChanged);
-    mitk::SliceNavigationController::Pointer slicer = mitk::SliceNavigationController::New();
-    slicer->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand);
+    rw->GetSliceNavigationController()->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand);
 
 //    mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
 //    std::string path = "/home/riecker/mitkShaderLighting.xml";

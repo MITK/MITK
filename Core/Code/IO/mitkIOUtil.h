@@ -177,6 +177,14 @@ public:
   static DataStorage::Pointer LoadFiles(const std::vector<std::string>& fileNames);
 
   /**
+   * @brief Create a BaseData object from the given file.
+   * @param path The path to the file including file name and file extension.
+   * @throws mitk::Exception In case of an error when reading the file.
+   * @return Returns the created BaseData object.
+   */
+  static mitk::BaseData::Pointer LoadBaseData(const std::string& path);
+
+  /**
    * @brief LoadDataNode Method to load an arbitrary DataNode.
    * @param path The path to the file including file name and file extension.
    * @throws mitk::Exception This exception is thrown when the DataNodeFactory is not able to read/find the file

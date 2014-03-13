@@ -484,6 +484,11 @@ DataStorage::Pointer IOUtil::LoadFiles(const std::vector<std::string>& fileNames
     return ds.GetPointer();
 }
 
+BaseData::Pointer IOUtil::LoadBaseData(const std::string& path)
+{
+  return LoadDataNode(path)->GetData();
+}
+
 DataNode::Pointer IOUtil::LoadDataNode(const std::string& path)
 {
     mitk::DataNodeFactory::Pointer reader = mitk::DataNodeFactory::New();

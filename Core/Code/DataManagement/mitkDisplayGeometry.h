@@ -185,6 +185,8 @@ namespace mitk
     virtual bool Map(const Point3D & atPt3d_mm, const Vector3D &vec3d_mm, Vector2D &vec2d_mm) const;
     virtual void Map(const Point2D & atPt2d_mm, const Vector2D &vec2d_mm, Vector3D &vec3d_mm) const;
 
+    virtual bool IsValid() const;
+
   protected:
 
     DisplayGeometry();
@@ -219,8 +221,6 @@ namespace mitk
     bool m_ConstrainZoomingAndPanning;
     float m_MaxWorldViewPercentage;
     float m_MinWorldViewPercentage;
-
-    virtual bool InternPostIsValid() const;
   };
 } // namespace
 

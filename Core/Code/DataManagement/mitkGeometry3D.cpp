@@ -56,7 +56,7 @@ void mitk::Geometry3D::SetParametricBounds(const BoundingBox::BoundsArrayType& b
   for(pointid=0; pointid<2;++pointid)
   {
     unsigned int i;
-    for(i=0; i<NDimensions; ++i)
+    for(i=0; i<GetNDimensions(); ++i)
     {
       p[i] = bounds[2*i+pointid];
     }
@@ -83,7 +83,7 @@ void mitk::Geometry3D::InternPostInitializeGeometry(Geometry3D * newGeometry) co
 void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   os << indent << " IndexToWorldTransform: ";
-  if(m_IndexToWorldTransform.IsNull())
+  if(this->IsIndexToWorldTransformNull())
     os << "NULL" << std::endl;
   else
   {
@@ -96,14 +96,14 @@ void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
       os << indent.GetNextIndent();
       for (j = 0; j < 3; j++)
       {
-        os << m_IndexToWorldTransform->GetMatrix()[i][j] << " ";
+        os << this->GetIndexToWorldTransform()->GetMatrix()[i][j] << " ";
       }
       os << std::endl;
     }
 
-    os << indent << "Offset: " << m_IndexToWorldTransform->GetOffset() << std::endl;
-    os << indent << "Center: " << m_IndexToWorldTransform->GetCenter() << std::endl;
-    os << indent << "Translation: " << m_IndexToWorldTransform->GetTranslation() << std::endl;
+    os << indent << "Offset: " << this->GetIndexToWorldTransform()->GetOffset() << std::endl;
+    os << indent << "Center: " << this->GetIndexToWorldTransform()->GetCenter() << std::endl;
+    os << indent << "Translation: " << this->GetIndexToWorldTransform()->GetTranslation() << std::endl;
 
     os << indent << "Inverse: " << std::endl;
     for (i = 0; i < 3; i++)
@@ -111,7 +111,7 @@ void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
       os << indent.GetNextIndent();
       for (j = 0; j < 3; j++)
       {
-        os << m_IndexToWorldTransform->GetInverseMatrix()[i][j] << " ";
+        os << this->GetIndexToWorldTransform()->GetInverseMatrix()[i][j] << " ";
       }
       os << std::endl;
     }
@@ -120,36 +120,36 @@ void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
     os << indent << "Scale : ";
     for (i = 0; i < 3; i++)
     {
-      os << m_IndexToWorldTransform->GetScale()[i] << " ";
+      os << this->GetIndexToWorldTransform()->GetScale()[i] << " ";
     }
     os << std::endl;
   }
 
   os << indent << " BoundingBox: ";
-  if(m_BoundingBox.IsNull())
+  if(this->IsBoundingBoxNull())
     os << "NULL" << std::endl;
   else
   {
     os << indent << "( ";
     for (unsigned int i=0; i<3; i++)
     {
-      os << m_BoundingBox->GetBounds()[2*i] << "," << m_BoundingBox->GetBounds()[2*i+1] << " ";
+      os << this->GetBoundingBox()->GetBounds()[2*i] << "," << this->GetBoundingBox()->GetBounds()[2*i+1] << " ";
     }
     os << " )" << std::endl;
   }
 
-  os << indent << " Origin: " << m_Origin << std::endl;
+  os << indent << " Origin: " << this->GetOrigin() << std::endl;
   os << indent << " ImageGeometry: " << m_ImageGeometry << std::endl;
-  os << indent << " Spacing: " << m_Spacing << std::endl;
-  os << indent << " TimeBounds: " << m_TimeBounds << std::endl;
+  os << indent << " Spacing: " << this->GetSpacing() << std::endl;
+  os << indent << " TimeBounds: " << this->GetTimeBounds() << std::endl;
 }
 
 mitk::Point3D mitk::Geometry3D::GetCornerPoint(int id) const
 {
   assert(id >= 0);
-  assert(m_BoundingBox.IsNotNull());
+  assert(this->IsBoundingBoxNull()==false);
 
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  BoundingBox::BoundsArrayType bounds = this->GetBoundingBox()->GetBounds();
 
   Point3D cornerpoint;
   switch(id)
@@ -173,13 +173,13 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(int id) const
     // bounding box. The bounding box itself is no image, so it is corner-based
     FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
   }
-  return m_IndexToWorldTransform->TransformPoint(cornerpoint);
+  return this->GetIndexToWorldTransform()->TransformPoint(cornerpoint);
 }
 
 mitk::Point3D mitk::Geometry3D::GetCornerPoint(bool xFront, bool yFront, bool zFront) const
 {
-  assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  assert(this->IsBoundingBoxNull()==false);
+  BoundingBox::BoundsArrayType bounds = this->GetBoundingBox()->GetBounds();
 
   Point3D cornerpoint;
   cornerpoint[0] = (xFront ? bounds[0] : bounds[1]);
@@ -192,7 +192,7 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(bool xFront, bool yFront, bool zF
     FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
   }
 
-  return m_IndexToWorldTransform->TransformPoint(cornerpoint);
+  return this->GetIndexToWorldTransform()->TransformPoint(cornerpoint);
 }
 
 void

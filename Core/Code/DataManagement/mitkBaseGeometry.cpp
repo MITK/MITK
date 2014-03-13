@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 
 mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
-  m_Valid(true), m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0)
+  m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0)
 {
   FillVector3D(m_FloatSpacing, 1,1,1);
   m_VtkMatrix = vtkMatrix4x4::New();
@@ -39,7 +39,7 @@ mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
 }
 
 mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), m_TimeBounds(other.m_TimeBounds),
-  m_Valid(other.m_Valid), m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin)
+  m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin)
 {
   //  DEPRECATED(m_RotationQuaternion = other.m_RotationQuaternion);
   // AffineGeometryFrame
@@ -172,7 +172,7 @@ void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
   for(pointid=0; pointid<2;++pointid)
   {
     unsigned int i;
-    for(i=0; i<NDimensions; ++i)
+    for(i=0; i<m_NDimensions; ++i)
     {
       p[i] = bounds[2*i+pointid];
     }
@@ -212,14 +212,6 @@ const  mitk::BaseGeometry::BoundsArrayType  mitk::BaseGeometry::GetBounds() cons
 }
 
 bool mitk::BaseGeometry::IsValid() const
-{
-  bool isValid = m_Valid;
-  isValid = isValid && this->InternPostIsValid();
-
-  return isValid;
-}
-
-bool mitk::BaseGeometry::InternPostIsValid() const
 {
   return true;
 }
@@ -358,16 +350,16 @@ bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometr
   return result;
 }
 
-void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing)
+void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing )
 {
   InternPreSetSpacing(aSpacing);
-  InternSetSpacing(aSpacing);
+  InternSetSpacing(aSpacing, enforceSetSpacing);
 }
 
 void mitk::BaseGeometry::InternPreSetSpacing(const mitk::Vector3D& aSpacing)
 {}
-void mitk::BaseGeometry::InternSetSpacing(const mitk::Vector3D& aSpacing){
-  if(mitk::Equal(m_Spacing, aSpacing) == false)
+void mitk::BaseGeometry::InternSetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing){
+  if(mitk::Equal(m_Spacing, aSpacing) == false || enforceSetSpacing)
   {
     assert(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0);
 
@@ -406,7 +398,7 @@ mitk::Vector3D mitk::BaseGeometry::GetAxisVector(unsigned int direction) const
 mitk::ScalarType mitk::BaseGeometry::GetExtent(unsigned int direction) const
 {
   assert(m_BoundingBox.IsNotNull());
-  if (direction>=NDimensions)
+  if (direction>=m_NDimensions)
     mitkThrow() << "Direction is too big. This geometry is for 3D Data";
   BoundsArrayType bounds = m_BoundingBox->GetBounds();
   return bounds[direction*2+1]-bounds[direction*2];
@@ -923,4 +915,16 @@ void mitk::BaseGeometry::BackTransform(const mitk::Point3D &/*at*/, const mitk::
   //  }
   //}
   this->BackTransform(in, out);
+}
+
+vtkMatrix4x4* mitk::BaseGeometry::GetVtkMatrix(){
+  return m_VtkMatrix;
+}
+
+bool mitk::BaseGeometry::IsBoundingBoxNull() const{
+  return m_BoundingBox.IsNull();
+}
+
+bool mitk::BaseGeometry::IsIndexToWorldTransformNull() const{
+  return m_IndexToWorldTransform.IsNull();
 }

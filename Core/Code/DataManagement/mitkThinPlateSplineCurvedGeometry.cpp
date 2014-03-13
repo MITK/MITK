@@ -44,7 +44,7 @@ mitk::ThinPlateSplineCurvedGeometry::~ThinPlateSplineCurvedGeometry()
     m_VtkProjectedLandmarks->Delete();
 }
 
-bool mitk::ThinPlateSplineCurvedGeometry::InternPostIsValid() const
+bool mitk::ThinPlateSplineCurvedGeometry::IsValid() const
 {
   return m_TargetLandmarks.IsNotNull() && (m_TargetLandmarks->Size() >= 3) && m_LandmarkProjector.IsNotNull();
 }

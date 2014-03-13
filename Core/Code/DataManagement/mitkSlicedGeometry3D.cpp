@@ -107,7 +107,7 @@ mitk::Geometry2D *
         }
 
         Vector3D direction;
-        direction = m_DirectionVector * m_Spacing[2];
+        direction = m_DirectionVector * this->GetSpacing()[2];
 
         mitk::PlaneGeometry::Pointer requestedslice;
         requestedslice = static_cast< mitk::PlaneGeometry * >(
@@ -131,8 +131,8 @@ mitk::Geometry2D *
 const mitk::BoundingBox *
   mitk::SlicedGeometry3D::GetBoundingBox() const
 {
-  assert(m_BoundingBox.IsNotNull());
-  return m_BoundingBox.GetPointer();
+  assert(this->IsBoundingBoxNull()==false);
+  return Superclass::GetBoundingBox();
 }
 
 bool
@@ -212,20 +212,20 @@ void
     // transform->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
     // SetIndexToWorldTransform(transform);
 
-    m_IndexToWorldTransform = const_cast< AffineTransform3D * >(
-      geometry2D->GetIndexToWorldTransform() );
+    this->SetIndexToWorldTransform( const_cast< AffineTransform3D * >(
+      geometry2D->GetIndexToWorldTransform() ));
   }
   else
   {
     directionVector *= -1.0;
-    m_IndexToWorldTransform = AffineTransform3D::New();
-    m_IndexToWorldTransform->SetMatrix(
+    this->SetIndexToWorldTransform( AffineTransform3D::New());
+    this->GetIndexToWorldTransform()->SetMatrix(
       geometry2D->GetIndexToWorldTransform()->GetMatrix() );
 
     AffineTransform3D::OutputVectorType scaleVector;
     FillVector3D(scaleVector, 1.0, 1.0, -1.0);
-    m_IndexToWorldTransform->Scale(scaleVector, true);
-    m_IndexToWorldTransform->SetOffset(
+    this->GetIndexToWorldTransform()->Scale(scaleVector, true);
+    this->GetIndexToWorldTransform()->SetOffset(
       geometry2D->GetIndexToWorldTransform()->GetOffset() );
   }
 
@@ -235,18 +235,14 @@ void
     geometry2D->GetExtentInMM(1) / bounds[3],
     zSpacing );
 
-  // Ensure that spacing differs from m_Spacing to make SetSpacing change the
-  // matrix.
-  m_Spacing[2] = zSpacing - 1;
-
   this->SetDirectionVector( directionVector );
   this->SetBounds( bounds );
   this->SetGeometry2D( geometry2D, 0 );
-  this->SetSpacing( spacing );
+  this->SetSpacing( spacing ,true);
   this->SetEvenlySpaced();
   this->SetTimeBounds( geometry2D->GetTimeBounds() );
 
-  assert(m_IndexToWorldTransform.GetPointer()
+  assert(this->GetIndexToWorldTransform()
     != geometry2D->GetIndexToWorldTransform()); // (**) see above.
 
   this->SetFrameOfReferenceID( geometry2D->GetFrameOfReferenceID() );
@@ -576,8 +572,11 @@ void
     planeGeometry->SetImageGeometry( this->GetImageGeometry() );
 
     planeGeometry->SetReferenceGeometry( m_ReferenceGeometry );
+
+    //Store spacing, as Initialize... needs a pointer
+    mitk::Vector3D lokalSpacing = this->GetSpacing();
     planeGeometry->InitializeStandardPlane(
-      rightDV.GetVnlVector(), bottomDV.GetVnlVector(), &m_Spacing );
+      rightDV.GetVnlVector(), bottomDV.GetVnlVector(), &lokalSpacing );
     planeGeometry->SetOrigin(origin);
     planeGeometry->SetBounds(bounds);
 
@@ -647,7 +646,6 @@ void
       m_Geometry2Ds[s]->SetTimeBounds( timebounds );
     }
   }
-  m_TimeBounds = timebounds;
 }
 
 itk::LightObject::Pointer

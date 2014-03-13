@@ -414,7 +414,7 @@ namespace mitk
     matrix.GetVnlMatrix().set_column(1, downDV);
     matrix.GetVnlMatrix().set_column(2, normal);
     transform->SetMatrix(matrix);
-    transform->SetOffset(m_IndexToWorldTransform->GetOffset());
+    transform->SetOffset(this->GetIndexToWorldTransform()->GetOffset());
 
     ScalarType bounds[6] = { 0, width, 0, height, 0, 1 };
     this->SetBounds( bounds );
@@ -459,7 +459,7 @@ namespace mitk
     matrix.GetVnlMatrix().set_column(1, downVector);
     matrix.GetVnlMatrix().set_column(2, normal);
     transform->SetMatrix(matrix);
-    transform->SetOffset(m_IndexToWorldTransform->GetOffset());
+    transform->SetOffset(this->GetIndexToWorldTransform()->GetOffset());
     SetIndexToWorldTransform(transform);
   }
 
@@ -467,7 +467,7 @@ namespace mitk
     PlaneGeometry::GetNormal() const
   {
     Vector3D frontToBack;
-    frontToBack.SetVnlVector( m_IndexToWorldTransform
+    frontToBack.SetVnlVector( this->GetIndexToWorldTransform()
       ->GetMatrix().GetVnlMatrix().get_column(2) );
 
     return frontToBack;
@@ -476,7 +476,7 @@ namespace mitk
   VnlVector
     PlaneGeometry::GetNormalVnl() const
   {
-    return m_IndexToWorldTransform
+    return  this->GetIndexToWorldTransform()
       ->GetMatrix().GetVnlMatrix().get_column(2);
   }
 
@@ -651,7 +651,7 @@ namespace mitk
     PlaneGeometry::ExecuteOperation( Operation *operation )
   {
     vtkTransform *transform = vtkTransform::New();
-    transform->SetMatrix( m_VtkMatrix );
+    transform->SetMatrix( this->GetVtkMatrix());
 
     switch ( operation->GetOperationType() )
     {
@@ -713,7 +713,7 @@ namespace mitk
       return;
     }
 
-    m_VtkMatrix->DeepCopy(transform->GetMatrix());
+    this->GetVtkMatrix()->DeepCopy(transform->GetMatrix());
     this->TransferVtkToItkTransform();
     this->Modified();
     transform->Delete();

@@ -64,7 +64,7 @@ const mitk::Transform3D* mitk::AbstractTransformGeometry::GetParametricTransform
 
 bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
 {
-  assert(m_BoundingBox.IsNotNull());
+  assert(this->IsBoundingBoxNull()==false);
 
   mitk::Point2D pt2d_mm;
   bool isInside;
@@ -99,7 +99,7 @@ void mitk::AbstractTransformGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Po
 bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
 {
   itkExceptionMacro("not implemented yet - replace GetIndexToWorldTransform by m_ItkVtkAbstractTransform->GetInverseVtkAbstractTransform()");
-  assert(m_BoundingBox.IsNotNull());
+  assert(this->IsBoundingBoxNull()==false);
 
   Vector3D vec3d_units;
   vec3d_units = GetIndexToWorldTransform()->GetInverseMatrix() * vec3d_mm;
@@ -121,7 +121,7 @@ bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D & atPt3d_mm, c
       pt3d_units[i] += GetIndexToWorldTransform()->GetInverseMatrix()[i][j] * temp[j];
   }
 
-  return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
+  return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
 }
 
 bool mitk::AbstractTransformGeometry::Project(const mitk::Vector3D &/*vec3d_mm*/, mitk::Vector3D &/*projectedVec3d_mm*/) const

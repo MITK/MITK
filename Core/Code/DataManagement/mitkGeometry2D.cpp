@@ -60,14 +60,14 @@ bool
   mitk::Geometry2D::Map(
   const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
-  assert(m_BoundingBox.IsNotNull());
+  assert(this->IsBoundingBoxNull()==false);
 
   Point3D pt3d_units;
   BackTransform(pt3d_mm, pt3d_units);
   pt2d_mm[0]=pt3d_units[0]*m_ScaleFactorMMPerUnitX;
   pt2d_mm[1]=pt3d_units[1]*m_ScaleFactorMMPerUnitY;
   pt3d_units[2]=0;
-  return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
+  return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
 }
 
 void
@@ -146,19 +146,19 @@ bool
   mitk::Geometry2D::Project(
   const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
 {
-  assert(m_BoundingBox.IsNotNull());
+  assert(this->IsBoundingBoxNull()==false);
 
   Point3D pt3d_units;
   BackTransform(pt3d_mm, pt3d_units);
   pt3d_units[2] = 0;
   projectedPt3d_mm = GetParametricTransform()->TransformPoint(pt3d_units);
-  return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
+  return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
 }
 
 bool
   mitk::Geometry2D::Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
 {
-  assert(m_BoundingBox.IsNotNull());
+  assert(this->IsBoundingBoxNull()==false);
 
   Vector3D vec3d_units;
   BackTransform(vec3d_mm, vec3d_units);
@@ -172,7 +172,7 @@ bool
   const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
 {
   MITK_WARN << "Deprecated function! Call Project(vec3D,vec3D) instead.";
-  assert(m_BoundingBox.IsNotNull());
+  assert(this->IsBoundingBoxNull()==false);
 
   Vector3D vec3d_units;
   BackTransform(atPt3d_mm, vec3d_mm, vec3d_units);
@@ -181,7 +181,7 @@ bool
 
   Point3D pt3d_units;
   BackTransform(atPt3d_mm, pt3d_units);
-  return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
+  return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
 }
 
 bool
@@ -224,7 +224,7 @@ bool
 {
   Point3D pt3d_units;
   Geometry3D::WorldToIndex(pt3d_mm, pt3d_units);
-  return (pt3d_units[2] > m_BoundingBox->GetBounds()[4]);
+  return (pt3d_units[2] > this->GetBoundingBox()->GetBounds()[4]);
 }
 
 itk::LightObject::Pointer

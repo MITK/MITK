@@ -89,7 +89,6 @@ namespace mitk {
   {
   public:
     mitkClassMacro(Geometry3D, mitk::BaseGeometry);
-    //void testXYZ(){ int a=1; }; //xxxxxxxxxxxxxxxx
 
     typedef itk::QuaternionRigidTransform< ScalarType > QuaternionTransformType;
     typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;
@@ -150,12 +149,12 @@ namespace mitk {
         discretIndex[1]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[1] );
         discretIndex[2]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[2] );
 
-        inside = m_BoundingBox->IsInside(discretIndex);
+        inside = this->GetBoundingBox()->IsInside(discretIndex);
         //we have to check if the index is at the upper border of each dimension,
         // because the boundingbox is not centerbased
         if (inside)
         {
-          const BoundingBox::BoundsArrayType& bounds = m_BoundingBox->GetBounds();
+          const BoundingBox::BoundsArrayType& bounds = this->GetBoundingBox()->GetBounds();
           if((discretIndex[0] == bounds[1]) ||
             (discretIndex[1] == bounds[3]) ||
             (discretIndex[2] == bounds[5]))
@@ -163,7 +162,7 @@ namespace mitk {
         }
       }
       else
-        inside = m_BoundingBox->IsInside(index);
+        inside = this->GetBoundingBox()->IsInside(index);
 
       return inside;
     }
@@ -242,7 +241,7 @@ namespace mitk {
     //## See AbstractTransformGeometry for an example usage of this.
     virtual const Transform3D* GetParametricTransform() const
     {
-      return m_IndexToWorldTransform;
+      return this->GetIndexToWorldTransform();
     }
 
   protected:

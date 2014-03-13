@@ -23,7 +23,7 @@ itk::LightObject::Pointer mitk::DisplayGeometry::InternalClone() const
   return returnValue;
 }
 
-bool mitk::DisplayGeometry::InternPostIsValid() const
+bool mitk::DisplayGeometry::IsValid() const
 {
   return m_WorldGeometry.IsNotNull() && m_WorldGeometry->IsValid();
 }
@@ -41,7 +41,7 @@ const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
 {
   if(m_WorldGeometry.IsNull())
   {
-    return m_TimeBounds;
+    return this->GetTimeBounds();
   }
 
   return m_WorldGeometry->GetTimeBounds();

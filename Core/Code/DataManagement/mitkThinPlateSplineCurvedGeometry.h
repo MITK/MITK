@@ -23,42 +23,42 @@ class vtkPoints;
 class vtkThinPlateSplineTransform;
 
 namespace mitk {
-//##Documentation
-//## @brief Thin-plate-spline-based landmark-based curved geometry
-//##
-//## @ingroup Geometry
-class MITK_CORE_EXPORT ThinPlateSplineCurvedGeometry : public LandmarkProjectorBasedCurvedGeometry
-{
-public:
-  mitkClassMacro(ThinPlateSplineCurvedGeometry, LandmarkProjectorBasedCurvedGeometry);
-
-  itkNewMacro(Self);
-
-  virtual void ComputeGeometry();
-
-  virtual itk::LightObject::Pointer InternalClone() const;
-
-  vtkThinPlateSplineTransform* GetThinPlateSplineTransform() const
+  //##Documentation
+  //## @brief Thin-plate-spline-based landmark-based curved geometry
+  //##
+  //## @ingroup Geometry
+  class MITK_CORE_EXPORT ThinPlateSplineCurvedGeometry : public LandmarkProjectorBasedCurvedGeometry
   {
-    return m_ThinPlateSplineTransform;
-  }
+  public:
+    mitkClassMacro(ThinPlateSplineCurvedGeometry, LandmarkProjectorBasedCurvedGeometry);
 
-  virtual void SetSigma(double sigma);
-  virtual double GetSigma() const;
+    itkNewMacro(Self);
 
-protected:
-  ThinPlateSplineCurvedGeometry();
-  ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other );
+    virtual void ComputeGeometry();
 
-  virtual ~ThinPlateSplineCurvedGeometry();
+    virtual itk::LightObject::Pointer InternalClone() const;
 
-  vtkThinPlateSplineTransform* m_ThinPlateSplineTransform;
+    vtkThinPlateSplineTransform* GetThinPlateSplineTransform() const
+    {
+      return m_ThinPlateSplineTransform;
+    }
 
-  vtkPoints* m_VtkTargetLandmarks;
-  vtkPoints* m_VtkProjectedLandmarks;
+    virtual void SetSigma(double sigma);
+    virtual double GetSigma() const;
 
-    virtual bool InternPostIsValid() const;
-};
+    virtual bool IsValid() const;
+
+  protected:
+    ThinPlateSplineCurvedGeometry();
+    ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other );
+
+    virtual ~ThinPlateSplineCurvedGeometry();
+
+    vtkThinPlateSplineTransform* m_ThinPlateSplineTransform;
+
+    vtkPoints* m_VtkTargetLandmarks;
+    vtkPoints* m_VtkProjectedLandmarks;
+  };
 } // namespace mitk
 
 #endif /* MITKTHINPLATESPLINECURVEDGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */

@@ -56,8 +56,6 @@ namespace mitk {
   public:
     mitkClassMacro(BaseGeometry, itk::Object);
 
-    //void testXYZ(){}; //xxx
-
     // ********************************** TypeDef **********************************
 
     typedef itk::QuaternionRigidTransform< ScalarType > QuaternionTransformType;
@@ -90,7 +88,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Set the spacing (m_Spacing)
-    void SetSpacing(const mitk::Vector3D& aSpacing);
+    void SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
     //##Documentation
     //## @brief Get the origin as VnlVector
@@ -109,9 +107,11 @@ namespace mitk {
     //## used world coordinate system
     itkSetMacro(FrameOfReferenceID, unsigned int);
 
+    itkGetConstMacro(IndexToWorldTransformLastModified, unsigned long);
+
     //##Documentation
     //## @brief Is this Geometry3D in a state that is valid?
-    bool IsValid() const;
+    virtual bool IsValid() const;
 
     // ********************************** Initialize **********************************
 
@@ -145,6 +145,8 @@ namespace mitk {
     /** Set/Get the IndexToWorldTransform */
     itkGetConstObjectMacro(IndexToWorldTransform, AffineTransform3D);
     itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
+
+    vtkMatrix4x4* GetVtkMatrix();
 
     //##Documentation
     //## @brief Get the m_IndexToWorldTransform as a vtkLinearTransform
@@ -453,8 +455,6 @@ namespace mitk {
     BaseGeometry(const BaseGeometry& other);
     virtual ~BaseGeometry();
 
-    itkGetConstMacro(IndexToWorldTransformLastModified, unsigned long);
-
     void BackTransform(const mitk::Point3D& in, mitk::Point3D& out) const;
 
     //Without redundant parameter Point3D
@@ -465,9 +465,6 @@ namespace mitk {
     void BackTransform(const mitk::Point3D& at, const mitk::Vector3D& in, mitk::Vector3D& out) const;
 
     static const std::string GetTransformAsString( TransformType* transformType );
-
-    //Internal Functions
-    virtual bool InternPostIsValid() const;
 
     virtual void InternPostInitialize() {};
     virtual void InternPostInitializeGeometry(Self * newGeometry) const{};
@@ -482,43 +479,45 @@ namespace mitk {
     virtual void InternPostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
     virtual void InternPreSetSpacing(const mitk::Vector3D& aSpacing);
-    void InternSetSpacing(const mitk::Vector3D& aSpacing);
+    void InternSetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
+    itkGetConstMacro(NDimensions, unsigned int);
+
+    bool IsBoundingBoxNull() const;
+
+    bool IsIndexToWorldTransformNull() const;
+
+  private:
     // ********************************** Variables **********************************
 
+    mitk::Vector3D m_Spacing;
+
     AffineTransform3D::Pointer m_IndexToWorldTransform;
+
+    mutable BoundingBoxPointer m_BoundingBox;
 
     vtkMatrixToLinearTransform* m_VtkIndexToWorldTransform;
 
     vtkMatrix4x4* m_VtkMatrix;
 
-    bool m_Valid;
-
     unsigned int m_FrameOfReferenceID;
 
     mutable mitk::TimeBounds m_TimeBounds;
-
-    mutable BoundingBoxPointer m_BoundingBox;
 
     //##Documentation
     //## @brief Origin, i.e. upper-left corner of the plane
     //##
     Point3D m_Origin;
 
-    //##Documentation
-    //## @brief Spacing of the data. Only significant if the geometry describes
-    //## an Image (m_ImageGeometry==true).
-    mitk::Vector3D m_Spacing;
+    static const unsigned int m_NDimensions = 3;
 
-    static const unsigned int NDimensions = 3;
+    mutable TransformType::Pointer m_InvertedTransform;
 
-    mutable TransformType::Pointer m_InvertedTransform; //this was private
-
-    mutable unsigned long m_IndexToWorldTransformLastModified;  //this was private
+    mutable unsigned long m_IndexToWorldTransformLastModified;
 
     float m_FloatSpacing[3]; //this was private
 
-    //    DEPRECATED(VnlQuaternionType m_RotationQuaternion); //this was private
+    //    DEPRECATED(VnlQuaternionType m_RotationQuaternion);
   };
 
   // ********************************** Equal Functions **********************************

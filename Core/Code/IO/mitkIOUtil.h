@@ -183,7 +183,7 @@ public:
    * or the DataNode is NULL.
    * @return Returns the DataNode.
    */
-  static mitk::DataNode::Pointer LoadDataNode(const std::string path);
+  static mitk::DataNode::Pointer LoadDataNode(const std::string& path);
 
   /**
    * @brief LoadImage Convenience method to load an arbitrary mitkImage.
@@ -191,7 +191,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the Image is NULL.
    * @return Returns the mitkImage.
    */
-  static mitk::Image::Pointer LoadImage(const std::string path);
+  static mitk::Image::Pointer LoadImage(const std::string& path);
 
   /**
    * @brief LoadSurface Convenience method to load an arbitrary mitkSurface.
@@ -199,7 +199,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the Surface is NULL.
    * @return Returns the mitkSurface.
    */
-  static mitk::Surface::Pointer LoadSurface(const std::string path);
+  static mitk::Surface::Pointer LoadSurface(const std::string& path);
 
   /**
    * @brief LoadPointSet Convenience method to load an arbitrary mitkPointSet.
@@ -207,7 +207,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the PointSet is NULL.
    * @return Returns the mitkPointSet.
    */
-  static mitk::PointSet::Pointer LoadPointSet(const std::string path);
+  static mitk::PointSet::Pointer LoadPointSet(const std::string& path);
 
   /**
    * @brief SaveImage Convenience method to save an arbitrary mitkImage.
@@ -217,7 +217,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the image.
    * @return Returns true for success else false.
    */
-  static bool SaveImage(mitk::Image::Pointer image, const std::string path);
+  static bool SaveImage(mitk::Image::Pointer image, const std::string& path);
 
   /**
    * @brief SaveBaseData Convenience method to save arbitrary baseData.
@@ -237,7 +237,7 @@ public:
    * or if the fileextension is not suitable for writing.
    * @return Returns true for success else false.
    */
-  static bool SaveSurface(mitk::Surface::Pointer surface, const std::string path);
+  static bool SaveSurface(mitk::Surface::Pointer surface, const std::string& path);
 
   /**
    * @brief SavePointSet Convenience method to save an mitkPointSet.
@@ -246,7 +246,7 @@ public:
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the pointset.
    * @return Returns true for success else false.
    */
-  static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string path);
+  static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string& path);
 
   static const std::string DEFAULTIMAGEEXTENSION;
   static const std::string DEFAULTSURFACEEXTENSION;

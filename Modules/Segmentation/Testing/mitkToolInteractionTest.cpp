@@ -122,12 +122,12 @@ public:
 
     //load reference segmentation image
     mitk::Image::Pointer segmentationReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath(referenceSegmentationImage));
-    mitk::Image* currentSegmentationImage = dynamic_cast<mitk::Image*>(workingImageNode->GetData());
 
-    CPPUNIT_ASSERT(currentSegmentationImage != NULL);
+    mitk::Image::Pointer currentSegmentationImage = mitk::Image::New();
+    currentSegmentationImage = dynamic_cast<mitk::Image*>(workingImageNode->GetData());
 
     //compare reference with interaction result
-    MITK_ASSERT_EQUAL(segmentationReferenceImage.GetPointer(), currentSegmentationImage, "Reference equals interaction result." );
+    MITK_ASSERT_EQUAL(segmentationReferenceImage, currentSegmentationImage, "Reference equals interaction result." );
   }
 
   void setUp()

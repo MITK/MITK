@@ -84,7 +84,7 @@ function(mitkFunctionInstallAutoLoadModules)
         endforeach()
       endif()
     else()
-      message(WARNING "Ignoring unknown target \"${_install_target}\" for installation.")
+      message(WARNING "Ignoring unknown target \"${_install_plugin}\" for installation.")
     endif()
   endforeach()
 

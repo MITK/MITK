@@ -1091,6 +1091,13 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // a vtkImageStencil.
   const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
   const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
+
+  // If there is a second poly line in a closed planar figure, treat it as a hole.
+  PlanarFigure::PolyLineType planarFigureHolePolyline;
+
+  if (m_PlanarFigure->GetPolyLinesSize() == 2)
+    planarFigureHolePolyline = m_PlanarFigure->GetPolyLine(1);
+
   const mitk::Geometry3D *imageGeometry3D = m_Image->GetGeometry( 0 );
 
   // Determine x- and y-dimensions depending on principal axis
@@ -1142,6 +1149,23 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     points->InsertNextPoint( point3D[i0], point3D[i1], 0 );
   }
 
+  vtkSmartPointer<vtkPoints> holePoints = NULL;
+
+  if (!planarFigureHolePolyline.empty())
+  {
+    holePoints = vtkSmartPointer<vtkPoints>::New();
+
+    Point3D point3D;
+    PlanarFigure::PolyLineType::const_iterator end = planarFigureHolePolyline.end();
+
+    for (it = planarFigureHolePolyline.begin(); it != end; ++it)
+    {
+      planarFigureGeometry2D->Map(it->Point, point3D);
+      imageGeometry3D->WorldToIndex(point3D, point3D);
+      holePoints->InsertNextPoint(point3D[i0], point3D[i1], 0);
+    }
+  }
+
   // mark a malformed 2D planar figure ( i.e. area = 0 ) as out of bounds
   // this can happen when all control points of a rectangle lie on the same line = two of the three extents are zero
   double bounds[6] = {0, 0, 0, 0, 0, 0};
@@ -1167,6 +1191,15 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   lassoStencil->SetShapeToPolygon();
   lassoStencil->SetPoints( points );
 
+  vtkSmartPointer<vtkLassoStencilSource> holeLassoStencil = NULL;
+
+  if (holePoints.GetPointer() != NULL)
+  {
+    holeLassoStencil = vtkSmartPointer<vtkLassoStencilSource>::New();
+    holeLassoStencil->SetShapeToPolygon();
+    holeLassoStencil->SetPoints(holePoints);
+  }
+
   // Export from ITK to VTK (to use a VTK filter)
   typedef itk::VTKImageImport< MaskImage2DType > ImageImportType;
   typedef itk::VTKImageExport< MaskImage2DType > ImageExportType;
@@ -1185,9 +1218,23 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   imageStencilFilter->SetBackgroundValue( 0 );
   imageStencilFilter->Update();
 
+  vtkSmartPointer<vtkImageStencil> holeStencilFilter = NULL;
+
+  if (holeLassoStencil.GetPointer() != NULL)
+  {
+    holeStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
+    holeStencilFilter->SetInputConnection(imageStencilFilter->GetOutputPort());
+    holeStencilFilter->SetStencilConnection(holeLassoStencil->GetOutputPort());
+    holeStencilFilter->ReverseStencilOn();
+    holeStencilFilter->SetBackgroundValue(0);
+    holeStencilFilter->Update();
+  }
+
   // Export from VTK back to ITK
   vtkSmartPointer<vtkImageExport> vtkExporter = vtkSmartPointer<vtkImageExport>::New();
-  vtkExporter->SetInputConnection( imageStencilFilter->GetOutputPort() );
+  vtkExporter->SetInputConnection( holeStencilFilter.GetPointer() == NULL
+    ? imageStencilFilter->GetOutputPort()
+    : holeStencilFilter->GetOutputPort());
   vtkExporter->Update();
 
   typename ImageImportType::Pointer itkImporter = ImageImportType::New();

@@ -8,13 +8,11 @@ include(${ITK_USE_FILE})
 # like #include <ipPic/mitkIpPic.h>
 include_directories(.)
 
-subdirs(
-  IpPic
-  IpFunc
-  IpSegmentation
-  mbilog
-  KWStyle
-)
+add_subdirectory(IpPic)
+add_subdirectory(IpFunc)
+add_subdirectory(IpSegmentation)
+add_subdirectory(mbilog)
+add_subdirectory(KWStyle)
 
 # mbilog is independent of mitk, and cant use mitk macros
 # configuring happens through mbilog/mbilogConfig.cmake.in

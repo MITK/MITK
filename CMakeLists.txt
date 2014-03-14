@@ -152,7 +152,7 @@ option(BUILD_TESTING "Test the project" ON)
 
 macro(env_option name doc value)
   set(_value $ENV{${name}})
-  if(NOT _value)
+  if(_value STREQUAL "")
     set(_value ${value})
   endif()
   option(${name} "${doc}" ${_value})

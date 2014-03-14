@@ -122,6 +122,7 @@ namespace mitk {
 
     virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
 
+
     virtual const Transform3D* GetParametricTransform() const;
 
     //##Documentation
@@ -151,6 +152,26 @@ namespace mitk {
     virtual void SetFrameGeometry(const mitk::Geometry3D* frameGeometry);
 
     virtual itk::LightObject::Pointer InternalClone() const;
+
+
+    //##Documentation
+    //## @brief Get the parametric bounding-box
+    //##
+    //## See AbstractTransformGeometry for an example usage of this.
+    itkGetConstObjectMacro(ParametricBoundingBox, BoundingBox);
+
+    //##Documentation
+    //## @brief Get the parametric bounds
+    //##
+    //## See AbstractTransformGeometry for an example usage of this.
+    const BoundingBox::BoundsArrayType& GetParametricBounds() const;
+
+    //##Documentation
+    //## @brief Get the parametric extent
+    //##
+    //## See AbstractTransformGeometry for an example usage of this.
+    mitk::ScalarType GetParametricExtent(int direction) const;
+
   protected:
     AbstractTransformGeometry();
     AbstractTransformGeometry(const AbstractTransformGeometry& other);
@@ -184,6 +205,15 @@ namespace mitk {
     mitk::Geometry3D::Pointer m_FrameGeometry;
 
     virtual void InternPostInitialize();
+
+        //##Documentation
+    //## @brief Set the parametric bounds
+    //##
+    //## Protected in this class, made public in some sub-classes, e.g.,
+    //## ExternAbstractTransformGeometry.
+    virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
+
+    mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
   };
 } // namespace mitk
 #endif /* MITKVTKABSTRACTTRANSFORMPLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */

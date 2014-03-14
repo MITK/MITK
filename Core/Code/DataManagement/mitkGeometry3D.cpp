@@ -32,40 +32,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::Geometry3D::Geometry3D() :  m_ImageGeometry(false)
 {
 }
-mitk::Geometry3D::Geometry3D(const Geometry3D& other) : BaseGeometry(other), m_ImageGeometry(other.m_ImageGeometry), m_ParametricBoundingBox(other.m_ParametricBoundingBox)
+mitk::Geometry3D::Geometry3D(const Geometry3D& other) : BaseGeometry(other), m_ImageGeometry(other.m_ImageGeometry)
 {
-  if (other.m_ParametricBoundingBox.IsNotNull())
-  {
-    m_ParametricBoundingBox = other.m_ParametricBoundingBox->DeepCopy();
-  }
 }
 
 mitk::Geometry3D::~Geometry3D()
 {
-}
-
-void mitk::Geometry3D::SetParametricBounds(const BoundingBox::BoundsArrayType& bounds)
-{
-  m_ParametricBoundingBox = BoundingBoxType::New();
-
-  BoundingBoxType::PointsContainer::Pointer pointscontainer =
-    BoundingBoxType::PointsContainer::New();
-  BoundingBoxType::PointType p;
-  BoundingBoxType::PointIdentifier pointid;
-
-  for(pointid=0; pointid<2;++pointid)
-  {
-    unsigned int i;
-    for(i=0; i<GetNDimensions(); ++i)
-    {
-      p[i] = bounds[2*i+pointid];
-    }
-    pointscontainer->InsertElement(pointid, p);
-  }
-
-  m_ParametricBoundingBox->SetPoints(pointscontainer);
-  m_ParametricBoundingBox->ComputeBoundingBox();
-  this->Modified();
 }
 
 itk::LightObject::Pointer mitk::Geometry3D::InternalClone() const

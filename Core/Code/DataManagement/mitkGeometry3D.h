@@ -194,55 +194,11 @@ namespace mitk {
     //## \endcode
     virtual itk::LightObject::Pointer InternalClone() const;
 
-    //Umzug:
 
-    //##Documentation
-    //## @brief Get the parametric bounding-box
-    //##
-    //## See AbstractTransformGeometry for an example usage of this.
-    itkGetConstObjectMacro(ParametricBoundingBox, BoundingBox);
 
-    //##Documentation
-    //## @brief Get the parametric bounds
-    //##
-    //## See AbstractTransformGeometry for an example usage of this.
-    const BoundingBox::BoundsArrayType& GetParametricBounds() const
-    {
-      assert(m_ParametricBoundingBox.IsNotNull());
-      return m_ParametricBoundingBox->GetBounds();
-    }
 
-    //##Documentation
-    //## @brief Get the parametric extent
-    //##
-    //## See AbstractTransformGeometry for an example usage of this.
-    mitk::ScalarType GetParametricExtent(int direction) const
-    {
-      if (direction < 0 || direction>=3)
-        mitkThrow() << "Invalid direction. Must be between either 0, 1 or 2. ";
-      assert(m_ParametricBoundingBox.IsNotNull());
 
-      BoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
-      return bounds[direction*2+1]-bounds[direction*2];
-    }
 
-    //##Documentation
-    //## @brief Get the parametric extent in mm
-    //##
-    //## See AbstractTransformGeometry for an example usage of this.
-    virtual mitk::ScalarType GetParametricExtentInMM(int direction) const
-    {
-      return GetExtentInMM(direction);
-    }
-
-    //##Documentation
-    //## @brief Get the parametric transform
-    //##
-    //## See AbstractTransformGeometry for an example usage of this.
-    virtual const Transform3D* GetParametricTransform() const
-    {
-      return this->GetIndexToWorldTransform();
-    }
 
   protected:
     Geometry3D();
@@ -252,14 +208,7 @@ namespace mitk {
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
-    //##Documentation
-    //## @brief Set the parametric bounds
-    //##
-    //## Protected in this class, made public in some sub-classes, e.g.,
-    //## ExternAbstractTransformGeometry.
-    virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
 
-    mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 
     bool m_ImageGeometry;
 

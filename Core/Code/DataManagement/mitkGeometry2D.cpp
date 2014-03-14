@@ -77,7 +77,7 @@ void
   pt3d_units[0]=pt2d_mm[0]/m_ScaleFactorMMPerUnitX;
   pt3d_units[1]=pt2d_mm[1]/m_ScaleFactorMMPerUnitY;
   pt3d_units[2]=0;
-  pt3d_mm = GetParametricTransform()->TransformPoint(pt3d_units);
+  pt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);
 }
 
 void
@@ -151,7 +151,7 @@ bool
   Point3D pt3d_units;
   BackTransform(pt3d_mm, pt3d_units);
   pt3d_units[2] = 0;
-  projectedPt3d_mm = GetParametricTransform()->TransformPoint(pt3d_units);
+  projectedPt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);
   return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
 }
 
@@ -163,7 +163,7 @@ bool
   Vector3D vec3d_units;
   BackTransform(vec3d_mm, vec3d_units);
   vec3d_units[2] = 0;
-  projectedVec3d_mm = GetParametricTransform()->TransformVector(vec3d_units);
+  projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
   return true;
 }
 
@@ -177,7 +177,7 @@ bool
   Vector3D vec3d_units;
   BackTransform(atPt3d_mm, vec3d_mm, vec3d_units);
   vec3d_units[2] = 0;
-  projectedVec3d_mm = GetParametricTransform()->TransformVector(vec3d_units);
+  projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
 
   Point3D pt3d_units;
   BackTransform(atPt3d_mm, pt3d_units);

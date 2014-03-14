@@ -220,8 +220,8 @@ void mitk::DisplayGeometry::Fit()
   ScalarType w = width;
   ScalarType h = height;
 
-  const ScalarType& widthInMM = m_WorldGeometry->GetParametricExtentInMM(0);
-  const ScalarType& heightInMM = m_WorldGeometry->GetParametricExtentInMM(1);
+  const ScalarType& widthInMM = m_WorldGeometry->GetExtentInMM(0);
+  const ScalarType& heightInMM = m_WorldGeometry->GetExtentInMM(1);
   ScalarType aspRatio=((ScalarType)widthInMM)/heightInMM;
 
   ScalarType x = (ScalarType)w/widthInMM;
@@ -431,8 +431,8 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
   float displayWidthMM  = m_SizeInDisplayUnits[0] * m_ScaleFactorMMPerDisplayUnit;
   float displayHeightMM = m_SizeInDisplayUnits[1] * m_ScaleFactorMMPerDisplayUnit;
 
-  float worldWidthMM  = m_WorldGeometry->GetParametricExtentInMM(0);
-  float worldHeightMM = m_WorldGeometry->GetParametricExtentInMM(1);
+  float worldWidthMM  = m_WorldGeometry->GetExtentInMM(0);
+  float worldHeightMM = m_WorldGeometry->GetExtentInMM(1);
 
   // reserve variables for the correction logic to save a corrected origin and zoom factor
   Vector2D newOrigin = m_OriginInMM;

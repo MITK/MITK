@@ -22,10 +22,11 @@ mitk::AbstractTransformGeometry::AbstractTransformGeometry() : m_Plane(NULL), m_
   Initialize();
 }
 
-mitk::AbstractTransformGeometry::AbstractTransformGeometry(const AbstractTransformGeometry& other) : Superclass(other)
+mitk::AbstractTransformGeometry::AbstractTransformGeometry(const AbstractTransformGeometry& other) : Superclass(other), m_ParametricBoundingBox(other.m_ParametricBoundingBox)
 {
   if(other.m_ParametricBoundingBox.IsNotNull())
   {
+    m_ParametricBoundingBox = other.m_ParametricBoundingBox->DeepCopy();
     this->SetParametricBounds(m_ParametricBoundingBox->GetBounds());
   }
 
@@ -274,4 +275,44 @@ itk::LightObject::Pointer mitk::AbstractTransformGeometry::InternalClone() const
   Self::Pointer newGeometry = new AbstractTransformGeometry(*this);
   newGeometry->UnRegister();
   return newGeometry.GetPointer();
+}
+
+void mitk::AbstractTransformGeometry::SetParametricBounds(const BoundingBox::BoundsArrayType& bounds)
+{
+  m_ParametricBoundingBox = BoundingBoxType::New();
+
+  BoundingBoxType::PointsContainer::Pointer pointscontainer =
+    BoundingBoxType::PointsContainer::New();
+  BoundingBoxType::PointType p;
+  BoundingBoxType::PointIdentifier pointid;
+
+  for(pointid=0; pointid<2;++pointid)
+  {
+    unsigned int i;
+    for(i=0; i<GetNDimensions(); ++i)
+    {
+      p[i] = bounds[2*i+pointid];
+    }
+    pointscontainer->InsertElement(pointid, p);
+  }
+
+  m_ParametricBoundingBox->SetPoints(pointscontainer);
+  m_ParametricBoundingBox->ComputeBoundingBox();
+  this->Modified();
+}
+
+const mitk::BoundingBox::BoundsArrayType& mitk::AbstractTransformGeometry::GetParametricBounds() const
+{
+  assert(m_ParametricBoundingBox.IsNotNull());
+  return m_ParametricBoundingBox->GetBounds();
+}
+
+mitk::ScalarType mitk::AbstractTransformGeometry::GetParametricExtent(int direction) const
+{
+  if (direction < 0 || direction>=3)
+    mitkThrow() << "Invalid direction. Must be between either 0, 1 or 2. ";
+  assert(m_ParametricBoundingBox.IsNotNull());
+
+  BoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
+  return bounds[direction*2+1]-bounds[direction*2];
 }

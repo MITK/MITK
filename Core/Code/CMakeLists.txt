@@ -53,8 +53,9 @@ if(MSVC_IDE OR MSVC_VERSION OR MINGW)
   target_link_libraries(${MODULE_TARGET} psapi.lib)
 endif(MSVC_IDE OR MSVC_VERSION OR MINGW)
 
+add_subdirectory(TestingHelper)
+
 # build tests?
 if(BUILD_TESTING)
-  add_subdirectory(TestingHelper)
   add_subdirectory(Testing)
 ENDIF()

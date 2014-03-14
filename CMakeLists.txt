@@ -162,6 +162,11 @@ env_option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 set(MITK_BUILD_TUTORIAL OFF CACHE INTERNAL "Deprecated! Use MITK_BUILD_EXAMPLES instead!")
 env_option(MITK_BUILD_EXAMPLES "Build the MITK Examples" ${MITK_BUILD_TUTORIAL})
 env_option(MITK_USE_ACVD "Use Approximated Centroidal Voronoi Diagrams" OFF)
+env_option(MITK_USE_CppUnit "Use CppUnit for unit tests" ON)
+if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
+  message("> Forcing MITK_USE_CppUnit to ON because BUILD_TESTING=ON")
+  set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
+endif()
 env_option(MITK_USE_GLEW "Use the GLEW library" ON)
 env_option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
@@ -184,6 +189,7 @@ set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS Custom Default All)
 mitkFunctionEnableBuildConfiguration()
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
+                 MITK_USE_CppUnit
                  MITK_USE_GLEW
                  MITK_USE_CTK
                  MITK_USE_DCMTK

@@ -73,6 +73,7 @@ class mitkBaseGeometryTestSuite : public mitk::TestFixture
 
   //Constructor
   MITK_TEST(TestConstructors);
+  MITK_TEST(TestInitialize);
 
   //Set
   MITK_TEST(TestSetOrigin);
@@ -105,6 +106,10 @@ class mitkBaseGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestExtentInMM);
   MITK_TEST(TestGetAxisVector);
   MITK_TEST(TestGetCenter);
+  MITK_TEST(TestGetDiagonalLength);
+  MITK_TEST(TestGetExtent);
+  MITK_TEST(TestIsInside);
+  MITK_TEST(TestGetMatrixColumn);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -1018,7 +1023,7 @@ public:
     CPPUNIT_ASSERT(refCorner==corner);
 
     //Wrong Corner needs to fail
-    //    CPPUNIT_ASSERT_THROW(dummy->GetCornerPoint(-1),itk::ExceptionObject);
+    CPPUNIT_ASSERT_THROW(dummy->GetCornerPoint(-1),itk::ExceptionObject);
 
     //dummy geometry must not have changed!
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
@@ -1082,6 +1087,111 @@ public:
     dummy->IndexToWorld(refCenter,refCenter);
 
     CPPUNIT_ASSERT(dummy->GetCenter()==refCenter);
+  }
+
+  void TestGetDiagonalLength(){
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+    double bounds[6] = {1,3,5,8,7.5,11.5};
+    dummy->SetFloatBounds(bounds);
+    //3-1=2, 8-5=3, 11.5-7.5=4; 2^2+3^2+4^2 = 29
+    double expectedLength = sqrt(29.);
+
+    CPPUNIT_ASSERT(expectedLength==dummy->GetDiagonalLength());
+    CPPUNIT_ASSERT(29==dummy->GetDiagonalLength2());
+
+    //dummy must not have changed
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
+    newDummy->SetFloatBounds(bounds);
+    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+  }
+
+  void TestGetExtent(){
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+    double bounds[6] = {1,3,5,8,7.5,11.5};
+    dummy->SetFloatBounds(bounds);
+
+    CPPUNIT_ASSERT(2==dummy->GetExtent(0));
+    CPPUNIT_ASSERT(3==dummy->GetExtent(1));
+    CPPUNIT_ASSERT(4==dummy->GetExtent(2));
+
+    //dummy must not have changed
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
+    newDummy->SetFloatBounds(bounds);
+    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+  }
+
+  void TestIsInside(){
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+    double bounds[6] = {1,3,5,8,7.5,11.5};
+    dummy->SetFloatBounds(bounds);
+
+    mitk::Point3D insidePoint;
+    mitk::Point3D outsidePoint;
+
+    mitk::FillVector3D(insidePoint,2,6,7.6);
+    mitk::FillVector3D(outsidePoint,0,9,8.2);
+
+    CPPUNIT_ASSERT(dummy->IsIndexInside(insidePoint));
+    CPPUNIT_ASSERT(false==dummy->IsIndexInside(outsidePoint));
+
+    dummy->IndexToWorld(insidePoint,insidePoint);
+    dummy->IndexToWorld(outsidePoint,outsidePoint);
+
+    CPPUNIT_ASSERT(dummy->IsInside(insidePoint));
+    CPPUNIT_ASSERT(false==dummy->IsInside(outsidePoint));
+
+    //dummy must not have changed
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
+    newDummy->SetFloatBounds(bounds);
+    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+  }
+
+  void TestInitialize()
+  {
+    //test standard constructor
+    DummyTestClass::Pointer dummy1 = DummyTestClass::New();
+
+    DummyTestClass::Pointer dummy2 = DummyTestClass::New();
+    dummy2->SetOrigin(anotherPoint);
+    dummy2->SetBounds(anotherBoundingBox->GetBounds());
+    mitk::TimeBounds timeBounds;
+    timeBounds[0] = 1;
+    timeBounds[1] = 9;
+    dummy2->SetTimeBounds(timeBounds);
+    dummy2->SetIndexToWorldTransform(anotherTransform);
+    dummy2->SetSpacing(anotherSpacing);
+
+    dummy1->InitializeGeometry(dummy2);
+
+    CPPUNIT_ASSERT(mitk::Equal(dummy1,dummy2,mitk::eps,true));
+
+    dummy1->Initialize();
+
+    DummyTestClass::Pointer dummy3 = DummyTestClass::New();
+    CPPUNIT_ASSERT(mitk::Equal(dummy3,dummy1,mitk::eps,true));
+  }
+
+  void TestGetMatrixColumn(){
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+    dummy->SetIndexToWorldTransform(anotherTransform);
+    mitk::Vector3D testVector,refVector;
+
+    testVector.SetVnlVector(dummy->GetMatrixColumn(0));
+    mitk::FillVector3D(refVector,1,0,0);
+    CPPUNIT_ASSERT(testVector==refVector);
+
+    testVector.SetVnlVector(dummy->GetMatrixColumn(1));
+    mitk::FillVector3D(refVector,0,2,0);
+    CPPUNIT_ASSERT(testVector==refVector);
+
+    testVector.SetVnlVector(dummy->GetMatrixColumn(2));
+    mitk::FillVector3D(refVector,0,0,1);
+    CPPUNIT_ASSERT(testVector==refVector);
+
+    //dummy must not have changed
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
+    newDummy->SetIndexToWorldTransform(anotherTransform);
+    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
   }
 
   /*

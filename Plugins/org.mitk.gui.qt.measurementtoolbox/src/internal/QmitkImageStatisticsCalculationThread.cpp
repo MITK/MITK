@@ -48,7 +48,7 @@ void QmitkImageStatisticsCalculationThread::Initialize( mitk::Image::Pointer ima
   if(binaryImage.IsNotNull())
     this->m_BinaryMask = binaryImage->Clone();
   if(planarFig.IsNotNull())
-    this->m_PlanarFigureMask = dynamic_cast<mitk::PlanarFigure*>(planarFig.GetPointer()); // once clone methods for planar figures are implemented, copy the data here!
+    this->m_PlanarFigureMask = planarFig->Clone();
 }
 
 void QmitkImageStatisticsCalculationThread::SetTimeStep( int times )

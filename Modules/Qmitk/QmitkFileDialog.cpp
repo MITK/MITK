@@ -36,9 +36,9 @@ public:
   }
 
   DummyReader(const std::string& extension, int priority)
-    : mitk::AbstractFileReader("application/dummy", extension, "This is a dummy description")
+    : mitk::AbstractFileReader(extension, "This is a dummy description")
   {
-    this->SetPriority(priority);
+    this->SetRanking(priority);
     //std::vector<std::string> options;
     OptionList options;
     options.push_back(std::make_pair("isANiceGuy", true));

@@ -21,3 +21,10 @@ if (position EQUAL -1)
   set(CONTENTS ${contents})
   configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 endif()
+
+# bug with itk::ExtractImageFilter
+set(path "Modules/Core/Common/include/itkExtractImageFilter.hxx")
+file(STRINGS ${path} contents NEWLINE_CONSUME)
+string(REPLACE "inputDirection[nonZeroCount][dim]" "inputDirection[i][dim]" contents ${contents})
+set(CONTENTS ${contents})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)

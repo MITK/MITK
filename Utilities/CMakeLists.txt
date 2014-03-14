@@ -13,7 +13,6 @@ subdirs(
   IpFunc
   IpSegmentation
   mbilog
-  qtsingleapplication
   KWStyle
 )
 
@@ -24,3 +23,8 @@ set(mbilog_CONFIG_FILE "${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}/mbilogConf
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mbilog/mbilogConfig.cmake.in" "${mbilog_CONFIG_FILE}")
 
 set_property(GLOBAL APPEND PROPERTY MITK_MODULE_TARGETS mbilog)
+
+set(MITK_MODULE_NAME_REGEX_MATCH )
+set(MITK_MODULE_NAME_REGEX_NOT_MATCH )
+set(MITK_MODULE_NAME_PREFIX )
+add_subdirectory(qtsingleapplication)

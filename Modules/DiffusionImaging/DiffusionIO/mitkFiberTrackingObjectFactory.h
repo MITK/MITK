@@ -14,10 +14,6 @@
 //#include "mitkFiberBundleXThreadMonitorMapper3D.h"
 //#include "mitkFiberBundleXThreadMonitor.h"
 
-
-
-#include "mitkPlanarFigureMapper3D.h"
-
 namespace mitk {
 
 class FiberTrackingObjectFactory : public CoreObjectFactoryBase

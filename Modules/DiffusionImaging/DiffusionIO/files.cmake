@@ -35,7 +35,6 @@ set(CPP_FILES
 
   mitkFiberBundleXMapper2D.cpp
   mitkFiberBundleXMapper3D.cpp
-  mitkPlanarFigureMapper3D.cpp
   mitkCompositeMapper.cpp
 )
 

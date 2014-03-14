@@ -38,8 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 
-#include "mitkPlanarFigureMapper3D.h"
-
 
 typedef short DiffusionPixelType;
 
@@ -142,35 +140,6 @@ mitk::Mapper::Pointer mitk::DiffusionCoreObjectFactory::CreateMapper(mitk::DataN
       newMapper = mitk::GPUVolumeMapper3D::New();
       newMapper->SetDataNode(node);
     }
-
-    classname =  "PlanarRectangle";
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    {
-      newMapper = mitk::PlanarFigureMapper3D::New();
-      newMapper->SetDataNode(node);
-    }
-
-    classname =  "PlanarCircle";
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    {
-      newMapper = mitk::PlanarFigureMapper3D::New();
-      newMapper->SetDataNode(node);
-    }
-
-    classname =  "PlanarEllipse";
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    {
-      newMapper = mitk::PlanarFigureMapper3D::New();
-      newMapper->SetDataNode(node);
-    }
-
-    classname = "PlanarPolygon";
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    {
-      newMapper = mitk::PlanarFigureMapper3D::New();
-      newMapper->SetDataNode(node);
-    }
-
   }
 
   return newMapper;
@@ -198,32 +167,6 @@ void mitk::DiffusionCoreObjectFactory::SetDefaultProperties(mitk::DataNode* node
     mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
-
-
-  classname = "PlanarRectangle";
-  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-  {
-    mitk::PlanarFigureMapper3D::SetDefaultProperties(node);
-  }
-
-  classname = "PlanarEllipse";
-  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-  {
-    mitk::PlanarFigureMapper3D::SetDefaultProperties(node);
-  }
-
-  classname = "PlanarCircle";
-  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-  {
-    mitk::PlanarFigureMapper3D::SetDefaultProperties(node);
-  }
-
-  classname = "PlanarPolygon";
-  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-  {
-    mitk::PlanarFigureMapper3D::SetDefaultProperties(node);
-  }
-
 }
 
 const char* mitk::DiffusionCoreObjectFactory::GetFileExtensions()

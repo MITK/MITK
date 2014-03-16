@@ -61,7 +61,7 @@ public:
       contourList.push_back(contour);
     }
 
-    mitk::Image::Pointer segmentationImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/InterpolateLiver/LiverSegmentation.nrrd"));
+    mitk::Image::Pointer segmentationImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverSegmentation.nrrd"));
 
     mitk::ComputeContourSetNormalsFilter::Pointer m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
     mitk::CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter = mitk::CreateDistanceImageFromSurfaceFilter::New();
@@ -103,7 +103,7 @@ public:
       contourList.push_back(contour);
     }
 
-    mitk::Image::Pointer segmentationImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/InterpolateWithHoles/SegmentationWithHoles.nrrd"));
+    mitk::Image::Pointer segmentationImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/SegmentationWithHoles.nrrd"));
 
     mitk::ComputeContourSetNormalsFilter::Pointer m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
     mitk::CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter = mitk::CreateDistanceImageFromSurfaceFilter::New();

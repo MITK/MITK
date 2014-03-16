@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkExtractSliceFilter.h>
 #include <mitkPlaneGeometry.h>
-#include <mitkImageToContourFilter.h>
 
 class mitkComputeContourSetNormalsFilterTestSuite : public mitk::TestFixture
 {
@@ -67,7 +66,7 @@ public:
   // Reduce contours with Douglas Peucker
   void TestComputeNormalsWithHole()
   {
-    mitk::Image::Pointer segmentationImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/LiverSegmentation.nrrd"));
+    mitk::Image::Pointer segmentationImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverSegmentation.nrrd"));
 
     mitk::Surface::Pointer contour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/ComputeNormals/ContourWithHoles.vtk"));
     m_ContourNormalsFilter->SetInput(contour);

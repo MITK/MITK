@@ -2,6 +2,7 @@ set(MODULE_TESTS
   mitkComputeContourSetNormalsFilterTest.cpp
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
+  mitkCreateDistanceImageFromSurfaceFilterTest.cpp
   mitkDataNodeSegmentationTest.cpp
   mitkImageToContourFilterTest.cpp
 #  mitkSegmentationInterpolationTest.cpp

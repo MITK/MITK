@@ -321,8 +321,8 @@ protected:
    * @note Currently the access is currently reduced only for short and float ( the only types occuring with mitk::DiffusionImage ) and
    *       hence the method is accessed by means of the \sa AccessTwoImagesFixedDimensionTypeSubsetByItk macro.
    */
-  template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
-  void RegisterTwoImages(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image<TPixel2, VImageDimension2>* itkImage2);
+template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
+  void RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image<TPixel2, VImageDimension2>* itkImage2);
 
   /**
    * @brief ResampleMitkImage applies the functionality of an the itk::ResampleImageFilter to the given

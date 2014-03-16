@@ -87,11 +87,21 @@ public:
   {
     RegistrationType* registration = dynamic_cast< RegistrationType* >( caller );
 
-    MITK_DEBUG << "\t - Pyramid level " << registration->GetCurrentLevel();
-    if( registration->GetCurrentLevel() == 0 )
+    if( registration == NULL)
       return;
 
+    MITK_DEBUG << "\t - Pyramid level " << registration->GetCurrentLevel();
+    if( registration->GetCurrentLevel() == 0 )
+    { MITK_WARN("OptCommand") << "Cast to registration failed";
+          return;
+    }
+
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >(registration->GetOptimizer());
+
+    if( optimizer == NULL)
+    { MITK_WARN("OptCommand") << "Cast to optimizer failed";
+          return;
+    }
 
     MITK_INFO /*<< optimizer->GetStopConditionDescription()  << "\n"*/
                << optimizer->GetValue() << " : " << optimizer->GetCurrentPosition();
@@ -99,6 +109,48 @@ public:
     optimizer->SetMaximumStepLength( optimizer->GetMaximumStepLength() * 0.25f );
     optimizer->SetMinimumStepLength( optimizer->GetMinimumStepLength() * 0.1f );
    // optimizer->SetNumberOfIterations( optimizer->GetNumberOfIterations() * 1.5f );
+  }
+
+  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/){}
+};
+
+#include <itkGradientDescentLineSearchOptimizerv4.h>
+
+template <typename RegistrationType >
+class PyramidOptControlCommandv4 : public itk::Command
+{
+public:
+
+  typedef itk::GradientDescentLineSearchOptimizerv4 OptimizerType;
+
+  mitkClassMacro(PyramidOptControlCommandv4<RegistrationType>, itk::Command)
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
+
+  void Execute(itk::Object *caller, const itk::EventObject & /*event*/)
+  {
+    RegistrationType* registration = dynamic_cast< RegistrationType* >( caller );
+
+    if( registration == NULL)
+      return;
+
+    MITK_DEBUG << "\t - Pyramid level " << registration->GetCurrentLevel();
+    if( registration->GetCurrentLevel() == 0 )
+      return;
+
+    OptimizerType* optimizer = dynamic_cast< OptimizerType* >( registration->GetOptimizer() );
+
+    if( optimizer == NULL)
+    { MITK_WARN("OptCommand4") << "Cast to optimizer failed";
+          return;
+    }
+
+    optimizer->SetNumberOfIterations( optimizer->GetNumberOfIterations() * 2.5 );
+    optimizer->SetMaximumStepSizeInPhysicalUnits( optimizer->GetMaximumStepSizeInPhysicalUnits() * 0.4);
+
+    MITK_INFO("Pyramid.Command.Iter") << optimizer->GetNumberOfIterations();
+    MITK_INFO("Pyramid.Command.MaxStep") << optimizer->GetMaximumStepSizeInPhysicalUnits();
+
   }
 
   void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/){}

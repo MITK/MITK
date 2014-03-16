@@ -191,6 +191,7 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   weightedRegistrationMethod->SetFixedImage( b0referenceImage );
   // use the advanced (windowed sinc) interpolation
   weightedRegistrationMethod->SetUseAdvancedInterpolation(true);
+  weightedRegistrationMethod->SetVerboseOn();
 
   //
   //   - (3.2) Register all timesteps in the splitted image onto the first reference

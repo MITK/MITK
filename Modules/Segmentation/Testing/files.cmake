@@ -1,5 +1,4 @@
 set(MODULE_TESTS
-  mitkContourExtractionTest.cpp
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
   mitkDataNodeSegmentationTest.cpp

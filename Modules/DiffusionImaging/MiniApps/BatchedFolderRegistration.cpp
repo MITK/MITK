@@ -90,7 +90,7 @@ static std::string GetSavePath(std::string outputFolder, std::string fileName)
 static FileListType CreateDerivedFileList(std::string baseFN, std::string baseSuffix, std::vector<std::string> derivedPatterns)
 {
   FileListType files;
-  for (int i=0; i < derivedPatterns.size(); i++)
+  for (unsigned int i=0; i < derivedPatterns.size(); i++)
   {
     std::string derResourceSuffix =  derivedPatterns.at(i);
     std::string derivedResourceFilename = baseFN.substr(0,baseFN.length() -baseSuffix.length()) + derResourceSuffix;
@@ -263,7 +263,7 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   //    resampleImage = mitk::IOUtil::LoadImage(resampleReference.toStdString());
   //  }
 
-  for (int i =0; i < movingImagesList.size(); i++){
+  for (unsigned int i =0; i < movingImagesList.size(); i++){
 
     std::string fileMorphName = movingImagesList.at(i);
     if (fileMorphName == referenceFileName)

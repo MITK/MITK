@@ -8,7 +8,7 @@ or used from an existing MITK build.
 The Plugin Generator takes the following command line arguments:
 
 \verbatim
-./MITKPluginGenerator -h
+./MitkPluginGenerator -h
 A CTK plugin generator for MITK (version 1.2.0)
 
   -h, --help                      Show this help text
@@ -45,7 +45,7 @@ Here is an example call to the Plugin Generator, creating one plugin with the sy
 <tt>com.mycompany.myplugin</tt> and a View named <tt>My View</tt>:
 
 \verbatim
-./MITKPluginGenerator --plugin-symbolic-name org.mycompany.myplugin --view-name "My View"
+./MitkPluginGenerator --plugin-symbolic-name org.mycompany.myplugin --view-name "My View"
 \endverbatim
 
 If you did not already specify the final location of the plugin via the <tt>--out-dir</tt> argument, move the
@@ -62,7 +62,7 @@ MITK-based projects created with the Plugin Generator need the same prerequisite
 Here is an example call to the Plugin Generator, creating the same plugin as above but integrated in a new project:
 
 \verbatim
-./MITKPluginGenerator --plugin-symbolic-name org.mycompany.myplugin --view-name "My View" --project-name "MyProject" --project-app-name "MyApp"
+./MitkPluginGenerator --plugin-symbolic-name org.mycompany.myplugin --view-name "My View" --project-name "MyProject" --project-app-name "MyApp"
 \endverbatim
 
 The generated project is completely self-contained and can be configured via CMake immediately. When building the

@@ -224,7 +224,7 @@ bool generateFiles(const QHash<QString, QString>& parameters,
 
 int main(int argc, char** argv)
 {
-  QString appName("MITKPluginGenerator");
+  QString appName("MitkPluginGenerator");
 
   QCoreApplication app(argc, argv);
   app.setApplicationName(appName);

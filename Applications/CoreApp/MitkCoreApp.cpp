@@ -66,7 +66,7 @@ public:
 int main(int argc, char** argv)
 {
   QSafeApplication safeApp(argc, argv);
-  safeApp.setApplicationName("CoreApp");
+  safeApp.setApplicationName("MitkCoreApp");
   safeApp.setOrganizationName("DKFZ");
 
   // These paths replace the .ini file and are tailored for installation
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   basePath.setFileName("");
 
   Poco::Path provFile(basePath);
-  provFile.setFileName("CoreApp.provisioning");
+  provFile.setFileName("MitkCoreApp.provisioning");
 
   Poco::Util::MapConfiguration* coreConfig(new Poco::Util::MapConfiguration());
   coreConfig->setString(berry::Platform::ARG_PROVISIONING, provFile.toString());

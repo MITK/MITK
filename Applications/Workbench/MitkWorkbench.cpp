@@ -135,7 +135,7 @@ int main(int argc, char** argv)
   basePath.setFileName("");
 
   Poco::Path provFile(basePath);
-  provFile.setFileName("mitkWorkbench.provisioning");
+  provFile.setFileName("MitkWorkbench.provisioning");
 
   Poco::Path extPath(basePath);
   extPath.pushDirectory("ExtBundles");

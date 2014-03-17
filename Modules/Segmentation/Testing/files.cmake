@@ -1,5 +1,5 @@
 set(MODULE_TESTS
-  mitkComputeContourSetNormalsFilterTest.cpp
+  mitkContourExtractionTest.cpp
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
   mitkDataNodeSegmentationTest.cpp
@@ -8,7 +8,6 @@ set(MODULE_TESTS
   mitkOverwriteSliceFilterTest.cpp
   mitkOverwriteSliceFilterObliquePlaneTest.cpp
 #  mitkToolManagerTest.cpp
-  mitkReduceContourSetFilterTest.cpp
   mitkToolManagerProviderTest.cpp
 )
 

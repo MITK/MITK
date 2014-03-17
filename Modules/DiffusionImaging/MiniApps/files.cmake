@@ -1,6 +1,8 @@
 set(CPP_FILES
     mitkDiffusionMiniApps.cpp
     MiniAppManager.cpp
+
+    BatchedFolderRegistration.cpp
     FileFormatConverter.cpp
     TensorReconstruction.cpp
     TensorDerivedMapsExtraction.cpp

@@ -57,8 +57,8 @@ public:
     mitk::Surface::Pointer referenceContour = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/ContourWithNormals.vtk"));
     mitk::Surface::Pointer referenceNormals = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/ContourNormals.vtk"));
 
-    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(contourWithNormals->GetVtkPolyData(), referenceContour->GetVtkPolyData(), 0.000001, true));
-    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(normals->GetVtkPolyData(), referenceNormals->GetVtkPolyData(), 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(*(contourWithNormals->GetVtkPolyData()), *(referenceContour->GetVtkPolyData()), 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(*(normals->GetVtkPolyData()), *(referenceNormals->GetVtkPolyData()), 0.000001, true));
   }
 
 
@@ -78,7 +78,7 @@ public:
     mitk::Surface::Pointer contourReference = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/ContourWithHolesWithNormals.vtk"));
     mitk::Surface::Pointer normalsReference = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/NormalsWithHoles.vtk"));
 
-    CPPUNIT_ASSERT_MESSAGE("Error computing normals", mitk::Equal(normals->GetVtkPolyData(), normalsReference->GetVtkPolyData(), 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("Error computing normals", mitk::Equal(*(normals->GetVtkPolyData()), *(normalsReference->GetVtkPolyData()), 0.000001, true));
     CPPUNIT_ASSERT_MESSAGE("Error computing normals",
                            contourWithNormals->GetVtkPolyData()->GetCellData()->GetNormals()->GetNumberOfTuples() == contourReference->GetVtkPolyData()->GetNumberOfPoints());
   }

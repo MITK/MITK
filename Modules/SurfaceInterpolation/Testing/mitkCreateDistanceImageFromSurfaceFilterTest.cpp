@@ -83,7 +83,7 @@ public:
     CPPUNIT_ASSERT(liverDistanceImage.IsNotNull());
     mitk::Image::Pointer liverDistanceImageReference = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/LiverDistanceImage.nrrd"));
 
-    MITK_ASSERT_EQUAL(liverDistanceImageReference, liverDistanceImage, "LiverDistanceImages are not equal!");
+    CPPUNIT_ASSERT_MESSAGE("LiverDistanceImages are not equal!", mitk::Equal(*(liverDistanceImageReference), *(liverDistanceImage), 0.0001, true));
   }
 
 
@@ -126,7 +126,7 @@ public:
     CPPUNIT_ASSERT(holeDistanceImage.IsNotNull());
     mitk::Image::Pointer holesDistanceImageReference = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/Reference/HolesDistanceImage.nrrd"));
 
-    MITK_ASSERT_EQUAL(holesDistanceImageReference, holeDistanceImage, "HolesDistanceImages are not equal!");
+    CPPUNIT_ASSERT_MESSAGE("HolesDistanceImages are not equal!", mitk::Equal(*(holesDistanceImageReference), *(holeDistanceImage), 0.0001, true));
   }
 
 };

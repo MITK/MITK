@@ -52,7 +52,7 @@ public:
 
     mitk::Surface::Pointer reference = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/ReducedContourNthPoint_20.vtk"));
 
-    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(reducedContour->GetVtkPolyData(), reference->GetVtkPolyData(), 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(*(reducedContour->GetVtkPolyData()), *(reference->GetVtkPolyData()), 0.000001, true));
   }
 
   // Reduce contours with Douglas Peucker
@@ -66,7 +66,7 @@ public:
 
     mitk::Surface::Pointer reference = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/ReducedContourDouglasPeucker.vtk"));
 
-    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(reducedContour->GetVtkPolyData(), reference->GetVtkPolyData(), 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(*(reducedContour->GetVtkPolyData()), *(reference->GetVtkPolyData()), 0.000001, true));
   }
 
 };

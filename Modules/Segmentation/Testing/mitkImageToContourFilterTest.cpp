@@ -80,7 +80,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Extracted contour has wrong number of points!", contour->GetVtkPolyData()->GetNumberOfPoints() ==
                            referenceContour->GetVtkPolyData()->GetNumberOfPoints());
 
-    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(contour->GetVtkPolyData(), referenceContour->GetVtkPolyData(), 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(*(contour->GetVtkPolyData()), *(referenceContour->GetVtkPolyData()), 0.000001, true));
   }
 
   // Extract multiple contours from a single slice
@@ -101,7 +101,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Extracted contour1 has wrong number of points!", contour->GetVtkPolyData()->GetNumberOfPolys() ==
                            referenceContour->GetVtkPolyData()->GetNumberOfPolys());
 
-     CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(contour->GetVtkPolyData(), referenceContour->GetVtkPolyData(), 0.000001, true));
+     CPPUNIT_ASSERT_MESSAGE("Unequal contours", mitk::Equal(*(contour->GetVtkPolyData()), *(referenceContour->GetVtkPolyData()), 0.000001, true));
 
   }
 };

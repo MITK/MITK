@@ -962,53 +962,7 @@ void QmitkFiberExtractionView::AddFigureToDataStorage(mitk::PlanarFigure* figure
     newNode->SetName(name.toStdString());
     newNode->SetData(figure);
 
-    newNode->AddProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(1.0,0.0,0.0));
-    newNode->AddProperty( "planarfigure.line.width", mitk::FloatProperty::New(2.0));
-    newNode->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true));
-
-    newNode->AddProperty( "selected", mitk::BoolProperty::New(true) );
-    newNode->AddProperty( "planarfigure.ishovering", mitk::BoolProperty::New(true) );
-    newNode->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(true) );
-    newNode->AddProperty( "planarfigure.drawquantities", mitk::BoolProperty::New(false) );
-    newNode->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true) );
-
-    newNode->AddProperty( "planarfigure.line.width", mitk::FloatProperty::New(3.0) );
-    newNode->AddProperty( "planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.outline.width", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.helperline.width", mitk::FloatProperty::New(2.0) );
-
-    newNode->AddProperty( "planarfigure.default.line.color", mitk::ColorProperty::New(1.0,1.0,1.0) );
-    newNode->AddProperty( "planarfigure.default.line.opacity", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.default.outline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.default.outline.opacity", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.default.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.default.helperline.opacity", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.default.markerline.color", mitk::ColorProperty::New(0.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.default.markerline.opacity", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.default.marker.color", mitk::ColorProperty::New(1.0,1.0,1.0)  );
-    newNode->AddProperty( "planarfigure.default.marker.opacity",mitk::FloatProperty::New(2.0) );
-
-    newNode->AddProperty( "planarfigure.hover.line.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.hover.line.opacity", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.hover.outline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.hover.outline.opacity", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.hover.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.hover.helperline.opacity", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.hover.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.hover.markerline.opacity", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.hover.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.hover.marker.opacity", mitk::FloatProperty::New(2.0) );
-
-    newNode->AddProperty( "planarfigure.selected.line.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.selected.line.opacity",mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.selected.outline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.selected.outline.opacity", mitk::FloatProperty::New(2.0));
-    newNode->AddProperty( "planarfigure.selected.helperline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.selected.helperline.opacity",mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.selected.markerline.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.selected.markerline.opacity", mitk::FloatProperty::New(2.0) );
-    newNode->AddProperty( "planarfigure.selected.marker.color", mitk::ColorProperty::New(1.0,0.0,0.0)  );
-    newNode->AddProperty( "planarfigure.selected.marker.opacity",mitk::FloatProperty::New(2.0));
+    newNode->SetBoolProperty("planarfigure.3drendering", true);
 
     // figure drawn on the topmost layer / image
     newNode->SetColor(1.0,1.0,1.0);

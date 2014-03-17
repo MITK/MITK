@@ -36,7 +36,7 @@ endif()
 # include required mfc libraries
 include(InstallRequiredSystemLibraries)
 
-set(CPACK_PACKAGE_NAME "MITKPluginGenerator")
+set(CPACK_PACKAGE_NAME "MitkPluginGenerator")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MITK PluginGenerator bootstraps MITK-based projects")
 set(CPACK_PACKAGE_VENDOR "German Cancer Research Center (DKFZ)")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")

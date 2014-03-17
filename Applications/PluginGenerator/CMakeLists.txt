@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.5)
 
-project(MITKPluginGenerator)
+project(MitkPluginGenerator)
 
 set(VERSION_MAJOR 1)
 set(VERSION_MINOR 4)

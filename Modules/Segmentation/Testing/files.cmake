@@ -7,6 +7,7 @@ set(MODULE_TESTS
   mitkOverwriteSliceFilterTest.cpp
   mitkOverwriteSliceFilterObliquePlaneTest.cpp
 #  mitkToolManagerTest.cpp
+  mitkReduceContourSetFilterTest.cpp
   mitkToolManagerProviderTest.cpp
 )
 

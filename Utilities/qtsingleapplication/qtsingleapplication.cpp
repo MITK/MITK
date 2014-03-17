@@ -1,12 +1,11 @@
 /****************************************************************************
 **
-** Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
-** All rights reserved.
+** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
+** Contact: http://www.qt-project.org/legal
 **
-** Contact: Nokia Corporation (qt-info@nokia.com)
+** This file is part of the Qt Solutions component.
 **
-** This file is part of a Qt Solutions component.
-**
+** $QT_BEGIN_LICENSE:BSD$
 ** You may use this file under the terms of the BSD license as follows:
 **
 ** "Redistribution and use in source and binary forms, with or without
@@ -18,10 +17,10 @@
 **     notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the
 **     distribution.
-**   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor
-**     the names of its contributors may be used to endorse or promote
-**     products derived from this software without specific prior written
-**     permission.
+**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
+**     of its contributors may be used to endorse or promote products derived
+**     from this software without specific prior written permission.
+**
 **
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 ** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -35,12 +34,14 @@
 ** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 **
+** $QT_END_LICENSE$
+**
 ****************************************************************************/
 
 
 #include "qtsingleapplication.h"
 #include "qtlocalpeer.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 
 
 /*!
@@ -136,7 +137,7 @@ void QtSingleApplication::sysInit(const QString &appId)
 {
     actWin = 0;
     peer = new QtLocalPeer(this, appId);
-    connect(peer, SIGNAL(messageReceived(const QByteArray&)), SIGNAL(messageReceived(const QByteArray&)));
+    connect(peer, SIGNAL(messageReceived(const QString&)), SIGNAL(messageReceived(const QString&)));
 }
 
 
@@ -169,6 +170,7 @@ QtSingleApplication::QtSingleApplication(const QString &appId, int &argc, char *
     sysInit(appId);
 }
 
+#if QT_VERSION < 0x050000
 
 /*!
     Creates a QtSingleApplication object. The application identifier
@@ -182,7 +184,7 @@ QtSingleApplication::QtSingleApplication(int &argc, char **argv, Type type)
 }
 
 
-#if defined(Q_WS_X11)
+#  if defined(Q_WS_X11)
 /*!
   Special constructor for X11, ref. the documentation of
   QApplication's corresponding constructor. The application identifier
@@ -220,7 +222,8 @@ QtSingleApplication::QtSingleApplication(Display* dpy, const QString &appId, int
 {
     sysInit(appId);
 }
-#endif
+#  endif // Q_WS_X11
+#endif // QT_VERSION < 0x050000
 
 
 /*!
@@ -253,7 +256,7 @@ bool QtSingleApplication::isRunning()
 
     \sa isRunning(), messageReceived()
 */
-bool QtSingleApplication::sendMessage(const QByteArray &message, int timeout)
+bool QtSingleApplication::sendMessage(const QString &message, int timeout)
 {
     return peer->sendMessage(message, timeout);
 }
@@ -285,9 +288,9 @@ void QtSingleApplication::setActivationWindow(QWidget* aw, bool activateOnMessag
 {
     actWin = aw;
     if (activateOnMessage)
-        connect(peer, SIGNAL(messageReceived(const QByteArray&)), this, SLOT(activateWindow()));
+        connect(peer, SIGNAL(messageReceived(const QString&)), this, SLOT(activateWindow()));
     else
-        disconnect(peer, SIGNAL(messageReceived(const QByteArray&)), this, SLOT(activateWindow()));
+        disconnect(peer, SIGNAL(messageReceived(const QString&)), this, SLOT(activateWindow()));
 }
 
 

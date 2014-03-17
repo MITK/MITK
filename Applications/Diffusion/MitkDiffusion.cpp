@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 {
   // Create a QApplication instance first
   QtSafeApplication qSafeApp(argc, argv);
-  qSafeApp.setApplicationName("mitkDiffusion");
+  qSafeApp.setApplicationName("MitkDiffusion");
   qSafeApp.setOrganizationName("DKFZ");
 
   bool showSplashScreen(true);
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
   basePath.setFileName("");
 
   Poco::Path provFile(basePath);
-  provFile.setFileName("mitkDiffusion.provisioning");
+  provFile.setFileName("MitkDiffusion.provisioning");
 
   Poco::Util::MapConfiguration* diffConfig(new Poco::Util::MapConfiguration());
   if (!storageDir.isEmpty())

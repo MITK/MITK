@@ -5,6 +5,7 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
   mitk_check_module_dependencies(MODULES MitkCore ${_PLUGIN_MODULE_DEPENDENCIES} ${_PLUGIN_MODULE_DEPENDS}
                                  PACKAGES ${_PLUGIN_PACKAGE_DEPENDS}
                                  MISSING_DEPENDENCIES_VAR _missing_deps
+                                 MODULE_DEPENDENCIES_VAR _module_deps
                                  PACKAGE_DEPENDENCIES_VAR _package_deps)
 
   if(_PLUGIN_MODULE_DEPENDENCIES)
@@ -59,7 +60,7 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
     if(NOT _PLUGIN_NO_INSTALL)
 
       set(_autoload_targets )
-      foreach(_dependency ${ALL_DEPENDENCIES})
+      foreach(_dependency ${_module_deps})
         get_target_property(_dep_autoloads ${_dependency} MITK_AUTOLOAD_TARGETS)
         if (_dep_autoloads)
           list(APPEND _autoload_targets ${_dep_autoloads})

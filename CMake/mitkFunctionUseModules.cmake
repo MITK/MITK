@@ -24,13 +24,18 @@ function(_mitk_parse_package_args)
       set(${_package_name}_REQUIRED_COMPONENTS )
       # Special filter for exclusive OR Qt4 / Qt5 dependency
       if(_package_name STREQUAL "Qt4")
-        if(MITK_USE_Qt4)
+        if(MITK_USE_Qt4 OR NOT MITK_USE_Qt5)
+          # MITK_USE_Qt4 is ON or both MITK_USE_Qt4 and MITK_USE_Qt5
+          # are OFF. So list Qt4 as a dependency.
           list(APPEND package_names_normalized ${_package_name})
         elseif(MITK_USE_Qt5 AND _has_qt5_dep EQUAL -1)
-          list(APPEND package_names_normalized ${_package_name})
+            # List Qt4 as a dependency only if there is no Qt5 dependency
+            # so the module will not be build because of the missing
+            # MITK_USE_Qt4
+            list(APPEND package_names_normalized ${_package_name})
         endif()
       elseif(_package_name STREQUAL "Qt5")
-        if(MITK_USE_Qt5)
+        if(MITK_USE_Qt5 OR NOT MITK_USE_Qt4)
           list(APPEND package_names_normalized ${_package_name})
         elseif(MITK_USE_Qt4 AND _has_qt4_dep EQUAL -1)
           list(APPEND package_names_normalized ${_package_name})

@@ -65,7 +65,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
              slIter != listOfDataNodeAddressPointers.end();
              slIter++)
         {
-          long val = (*slIter).toLong();
+          unsigned long long val = (*slIter).toULongLong();
           mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
           MITK_DEBUG("QmitkPythonVariableStackTableModel") << "mitkImage is not null " << (mitkImage != 0? "true": "false");

@@ -174,7 +174,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
       double Z = 0;
       double sumj = 0;
       double w = 0;
-      double deviation = m_Deviations.GetElement(i);
+      double variance = m_Deviations.GetElement(i) * m_Deviations.GetElement(i);
       std::vector<double> wj;
       std::vector<double> p;
 
@@ -207,40 +207,6 @@ NonLocalMeansDenoisingFilter< TPixelType >
                     indexJ.SetElement(0, xj);
                     indexJ.SetElement(1, yj);
                     indexJ.SetElement(2, zj);
-                    // Count amount of used neighbors
-                    if (inputImagePointer->GetLargestPossibleRegion().IsInside(indexI) && inputImagePointer->GetLargestPossibleRegion().IsInside(indexJ))
-                    {
-                      if (m_UseJointInformation)
-                      {
-                        for (int d = i - m_ChannelRadius; d <= i + m_ChannelRadius; ++d)
-                        {
-                          if (d >= 0 && d < (int)inputImagePointer->GetVectorLength())
-                          {
-                            size++;
-                          }
-                        }
-                      }
-                      else
-                      {
-                        size++;
-                      }
-                    }
-                  }
-                }
-              }
-              for (int xi = git.GetIndex().GetElement(0) - m_ComparisonRadius, xj = hit.GetIndex().GetElement(0) - m_ComparisonRadius; xi <= git.GetIndex().GetElement(0) + m_ComparisonRadius; ++xi, ++xj)
-              {
-                for (int yi = git.GetIndex().GetElement(1) - m_ComparisonRadius, yj = hit.GetIndex().GetElement(1) - m_ComparisonRadius; yi <= git.GetIndex().GetElement(1) + m_ComparisonRadius; ++yi, ++yj)
-                {
-                  for (int zi = git.GetIndex().GetElement(2) - m_ComparisonRadius, zj = hit.GetIndex().GetElement(2) - m_ComparisonRadius; zi <= git.GetIndex().GetElement(2) + m_ComparisonRadius; ++zi, ++zj)
-                  {
-                    typename InputIteratorType::IndexType indexI, indexJ;
-                    indexI.SetElement(0, xi);
-                    indexI.SetElement(1, yi);
-                    indexI.SetElement(2, zi);
-                    indexJ.SetElement(0, xj);
-                    indexJ.SetElement(1, yj);
-                    indexJ.SetElement(2, zj);
                     // Compare neighborhoods ni & nj
                     if (inputImagePointer->GetLargestPossibleRegion().IsInside(indexI) && inputImagePointer->GetLargestPossibleRegion().IsInside(indexJ))
                     {
@@ -255,6 +221,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
                           {
                             int diff = niit.Get()[d] - njit.Get()[d];
                             sumk += (double)(diff*diff);
+                            ++size;
                           }
                         }
                       }
@@ -262,13 +229,14 @@ NonLocalMeansDenoisingFilter< TPixelType >
                       {
                         int diff = niit.Get()[i] - njit.Get()[i];
                         sumk += (double)(diff*diff);
+                        ++size;
                       }
                     }
                   }
                 }
               }
               // weight all neighborhoods
-              w = std::exp( - (std::sqrt((sumk / size)) / (deviation * deviation)));
+              w = std::exp( - (sumk / size) / variance);
               wj.push_back(w);
               p.push_back((double)(pixelJ*pixelJ));
               Z += w;
@@ -280,7 +248,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
       {
         sumj += (wj[n]/Z) * p[n];
       }
-      double df = sumj - (2 * deviation * deviation);
+      double df = sumj - (2 * variance);
       if (df < 0)
       {
         df = 0;

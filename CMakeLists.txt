@@ -1,8 +1,4 @@
-if(MITK_USE_QT AND DESIRED_QT_VERSION MATCHES 5)
-  cmake_minimum_required(VERSION 2.8.9)
-else()
-  cmake_minimum_required(VERSION 2.8.8)
-endif()
+cmake_minimum_required(VERSION 2.8.9)
 
 #-----------------------------------------------------------------------------
 # Include ctest launchers for dashboard in case of makefile generator

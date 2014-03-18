@@ -99,6 +99,8 @@ public:
 
 protected:
 
+  void InitScrolling();
+
   virtual void CreateQtPartControl(QWidget *parent);
 
   virtual void SetFocus();
@@ -141,6 +143,7 @@ protected:
   mitk::DataNode::Pointer m_selectedNode;
   mitk::IsoDoseLevelVector::Pointer m_freeIsoValues;
   std::vector<mitk::DataNode::Pointer> m_FreeIsoLines;
+  std::vector<mitk::DataNode::Pointer> m_StdIsoLines;
   /** Iso level set of the current node. Should normaly be a clone of the
   * current iso preset. It held as own member because visibility
   * settings may differ.*/

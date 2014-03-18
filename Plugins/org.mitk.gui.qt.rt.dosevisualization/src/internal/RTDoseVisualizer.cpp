@@ -75,14 +75,13 @@ RTDoseVisualizer::RTDoseVisualizer()
     m_internalUpdate = false;
     m_PrescribedDose_Data = 0.0;
 
-
     //hier crash ?!
-    QmitkRenderWindow* rw = this->GetRenderWindowPart()->GetQmitkRenderWindow("axial");
+//    QmitkRenderWindow* rw = this->GetRenderWindowPart()->GetQmitkRenderWindow(name);
 
-    itk::MemberCommand<RTDoseVisualizer>::Pointer sliceChangedCommand =
-        itk::MemberCommand<RTDoseVisualizer>::New();
-    sliceChangedCommand->SetCallbackFunction(this, &RTDoseVisualizer::OnSliceChanged);
-    rw->GetSliceNavigationController()->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand);
+//    itk::MemberCommand<RTDoseVisualizer>::Pointer sliceChangedCommand =
+//        itk::MemberCommand<RTDoseVisualizer>::New();
+//    sliceChangedCommand->SetCallbackFunction(this, &RTDoseVisualizer::OnSliceChanged);
+//    rw->GetSliceNavigationController()->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand);
 
 //    mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
 //    std::string path = "/home/riecker/mitkShaderLighting.xml";
@@ -100,12 +99,26 @@ RTDoseVisualizer::~RTDoseVisualizer()
   delete m_DoseVisualDelegate;
 }
 
+void RTDoseVisualizer::InitScrolling(){
+  QmitkRenderWindow* rw = this->GetRenderWindowPart()->GetQmitkRenderWindow("axial");
+
+      itk::MemberCommand<RTDoseVisualizer>::Pointer sliceChangedCommand =
+          itk::MemberCommand<RTDoseVisualizer>::New();
+      sliceChangedCommand->SetCallbackFunction(this, &RTDoseVisualizer::OnSliceChanged);
+      rw->GetSliceNavigationController()->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand);
+}
+
 void RTDoseVisualizer::SetFocus()
 {
 }
 
 void RTDoseVisualizer::OnSliceChanged(itk::Object *sender, const itk::EventObject &e)
 {
+  for(int i=0; i<m_StdIsoLines.size();++i)
+  {
+    GetDataStorage()->Remove(m_StdIsoLines.at(i));
+  }
+  m_StdIsoLines.clear();
   this->UpdateStdIsolines();
 }
 
@@ -383,6 +396,8 @@ void RTDoseVisualizer::OnGlobalVisIsoLineToggled(bool showIsoLines)
 
 void RTDoseVisualizer::OnConvertButtonClicked()
 {
+  this->InitScrolling();
+
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
 
   mitk::DataNode* selectedNode = NULL;
@@ -550,6 +565,7 @@ void RTDoseVisualizer::UpdateStdIsolines()
       isoNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
       isoNode->SetName("StdIsoline");
       isoNode->SetBoolProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),true);
+      m_StdIsoLines.push_back(isoNode);
       this->GetDataStorage()->Add(isoNode);
     }
   }

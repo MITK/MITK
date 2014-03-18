@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarDoubleEllipse.h"
 #include <mitkProperties.h>
 
+#include <algorithm>
+
 mitk::PlanarDoubleEllipse::PlanarDoubleEllipse()
   : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
     FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),

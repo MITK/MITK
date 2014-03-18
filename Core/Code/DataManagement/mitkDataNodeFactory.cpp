@@ -144,7 +144,7 @@ void mitk::DataNodeFactory::GenerateData()
         std::string message("File does not exist, or cannot be read. Filename = ");
         message += m_FileName;
         MITK_ERROR << message;
-        itkExceptionMacro( << message );
+        itkExceptionMacro( << message.str() );
       }
     }
   }

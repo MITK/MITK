@@ -23,7 +23,7 @@ find_package(mbilog REQUIRED)
 include_directories(${mbilog_INCLUDE_DIRS})
 
 
-find_package(Qt4 4.6.2 REQUIRED)
+find_package(Qt4 4.7 REQUIRED)
 
 if(QT_QMAKE_CHANGED)
   set(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)

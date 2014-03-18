@@ -168,7 +168,7 @@ set(MITK_DESIRED_QT_VERSION ${DESIRED_QT_VERSION})
 if(MITK_USE_QT)
   # find the package at the very beginning, so that QT4_FOUND is available
   if(DESIRED_QT_VERSION MATCHES 4)
-    set(MITK_QT4_MINIMUM_VERSION 4.6.2)
+    set(MITK_QT4_MINIMUM_VERSION 4.7)
     find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
     set(MITK_USE_Qt4 TRUE)
     set(MITK_USE_Qt5 FALSE)

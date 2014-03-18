@@ -36,6 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkShaderProgram2.h>
 #include <vtkShader2Collection.h>
 #include <vtkUniformVariables.h>
+#include <vtkOpenGLRenderWindow.h>
+#include <vtkVersionMacros.h>
+
 
 #include <itkDirectory.h>
 #include <itksys/SystemTools.hxx>
@@ -453,13 +456,20 @@ mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram* shaderProgram,
     }
 
     vtkSmartPointer<vtkShaderProgram2> program = vtkSmartPointer<vtkShaderProgram2>::New();
+#if ((VTK_MAJOR_VERSION < 6 ) || ((VTK_MAJOR_VERSION == 6) && (VTK_MINOR_VERSION == 0) ))
+    program->SetContext(dynamic_cast<vtkOpenGLRenderWindow*>(renderer->GetRenderWindow()));
+#else
     program->SetContext(renderer->GetRenderWindow());
-
+#endif
     // The vertext shader
     vtkShader2 *shader = vtkShader2::New();
     shader->SetType(VTK_SHADER_TYPE_VERTEX);
     shader->SetSourceCode(s->GetVertexShaderCode().c_str());
+#if ((VTK_MAJOR_VERSION < 6 ) || ((VTK_MAJOR_VERSION == 6) && (VTK_MINOR_VERSION == 0) ))
+    shader->SetContext(dynamic_cast<vtkOpenGLRenderWindow*>(renderer->GetRenderWindow()));
+#else
     shader->SetContext(renderer->GetRenderWindow());
+#endif
     program->GetShaders()->AddItem(shader);
     shader->Delete();
 
@@ -467,7 +477,11 @@ mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram* shaderProgram,
     shader = vtkShader2::New();
     shader->SetType(VTK_SHADER_TYPE_FRAGMENT);
     shader->SetSourceCode(s->GetFragmentShaderCode().c_str());
+#if ((VTK_MAJOR_VERSION < 6 ) || ((VTK_MAJOR_VERSION == 6) && (VTK_MINOR_VERSION == 0) ))
+    shader->SetContext(dynamic_cast<vtkOpenGLRenderWindow*>(renderer->GetRenderWindow()));
+#else
     shader->SetContext(renderer->GetRenderWindow());
+#endif
     program->GetShaders()->AddItem(shader);
     shader->Delete();
 

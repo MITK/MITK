@@ -72,6 +72,10 @@ class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     int m_NumberOfRegions;
 
+    bool m_UseValleyEmphasis;
+
+    int m_NumberOfBins;
+
     QListWidgetItem* m_SelectedItem;
 };
 

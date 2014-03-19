@@ -101,7 +101,7 @@ us::ModuleResource mitk::OtsuTool3D::GetIconResource() const
   return resource;
 }
 
-void mitk::OtsuTool3D::RunSegmentation(int regions)
+void mitk::OtsuTool3D::RunSegmentation(int regions, bool useValley, int numberOfBins)
 {
   //this->m_OtsuSegmentationDialog->setCursor(Qt::WaitCursor);
 
@@ -113,6 +113,8 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
 
   mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
   otsuFilter->SetNumberOfThresholds( numberOfThresholds );
+  otsuFilter->SetValleyEmphasis( useValley );
+  otsuFilter->SetNumberOfBins( numberOfBins );
   otsuFilter->SetInput( image3D );
 
   try

@@ -39,7 +39,7 @@ namespace mitk{
       virtual void Activated();
       virtual void Deactivated();
 
-      void RunSegmentation( int regions);
+      void RunSegmentation( int regions, bool useValley, int numberOfBins);
       void ConfirmSegmentation();
       void UpdateBinaryPreview(int regionID);
       void UpdateVolumePreview(bool volumeRendering);

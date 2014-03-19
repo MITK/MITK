@@ -100,7 +100,7 @@ public:
     std::string referenceImagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi_NLMv_1-1-1.dwi");
     m_ReferenceImage = static_cast<mitk::DiffusionImage<short>*>( mitk::IOUtil::LoadImage(referenceImagePath).GetPointer());
 
-    m_DenoisingFilter->SetChannelRadius(1);
+//    m_DenoisingFilter->SetChannelRadius(1);
     m_DenoisingFilter->SetUseJointInformation(true);
     try
     {

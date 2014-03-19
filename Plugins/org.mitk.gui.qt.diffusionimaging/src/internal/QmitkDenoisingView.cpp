@@ -222,13 +222,13 @@ void QmitkDenoisingView::StartDenoising()
         mitk::CastToItkImage(m_ImageMask, itkMask);
 
         m_NonLocalMeansFilter = NonLocalMeansDenoisingFilterType::New();
-        m_NonLocalMeansFilter->SetNumberOfThreads(12);
+        m_NonLocalMeansFilter->SetNumberOfThreads(1);
         m_NonLocalMeansFilter->SetInputImage(m_InputImage->GetVectorImage());
         m_NonLocalMeansFilter->SetInputMask(itkMask);
         m_NonLocalMeansFilter->SetUseJointInformation(true);
         m_NonLocalMeansFilter->SetSearchRadius(m_Controls->m_SpinBoxParameter1->value());
         m_NonLocalMeansFilter->SetComparisonRadius(m_Controls->m_SpinBoxParameter2->value());
-        m_NonLocalMeansFilter->SetChannelRadius(m_Controls->m_SpinBoxParameter3->value());
+//        m_NonLocalMeansFilter->SetChannelRadius(m_Controls->m_SpinBoxParameter3->value());
 
         // initialize the progressbar
         m_MaxProgressCount = m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2);

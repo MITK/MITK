@@ -74,10 +74,12 @@ namespace itk{
 
     /** Set/Get Macros */
     itkSetMacro(UseJointInformation, bool)
-    itkSetMacro(ChannelRadius, int)
     itkSetMacro(SearchRadius, int)
     itkSetMacro(ComparisonRadius, int)
+    itkSetMacro(Variance, double)
+    itkSetMacro(UseRicianAdaption, bool)
     itkGetMacro(CurrentVoxelCount, unsigned int)
+
 
     void SetInputImage(const InputImageType* image);
     void SetInputMask(const MaskImageType* mask);
@@ -96,10 +98,12 @@ namespace itk{
 
     int m_SearchRadius;
     int m_ComparisonRadius;
-    int m_ChannelRadius;
-    VariableLengthVector< double > m_Deviations;
+//    int m_ChannelRadius;
+//    VariableLengthVector< double > m_Deviations;
     bool m_UseJointInformation;
+    bool m_UseRicianAdaption;
     unsigned int m_CurrentVoxelCount;
+    double m_Variance;
   };
 }
 

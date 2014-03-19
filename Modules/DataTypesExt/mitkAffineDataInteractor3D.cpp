@@ -317,7 +317,7 @@ bool mitk::AffineDataInteractor3D::ColorizeSurface(BaseRenderer::Pointer rendere
     return false;
   }
 
-  for (unsigned int i = 0; i < pointData->GetNumberOfTuples(); ++i)
+  for (vtkIdType i = 0; i < pointData->GetNumberOfTuples(); ++i)
   {
     scalars->SetComponent(i, 0, scalar);
   }

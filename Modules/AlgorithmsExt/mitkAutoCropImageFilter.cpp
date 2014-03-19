@@ -239,7 +239,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       m_RegionIndex[i] = m_CroppingRegion.GetIndex()[i];
       m_RegionSize[i] = m_CroppingRegion.GetSize()[i];
 
-      if (m_RegionIndex[i] >= inputMitk->GetDimension(i))
+      if (m_RegionIndex[i] >= static_cast<RegionType::IndexValueType>(inputMitk->GetDimension(i)))
       {
         itkExceptionMacro("Cropping index is not inside the image. "
                        << std::endl << "Index:"

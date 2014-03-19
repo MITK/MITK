@@ -181,7 +181,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::DeformObject (StateMachineAction*
 
   double denom = m_GaussSigma * m_GaussSigma * 2;
   double point[3];
-  for (unsigned int i = 0; i < deformedPoints->GetNumberOfPoints(); ++i)
+  for (vtkIdType i = 0; i < deformedPoints->GetNumberOfPoints(); ++i)
   {
     // Get original point
     double* originalPoint = originalPoints->GetPoint( i );
@@ -271,7 +271,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::ColorizeSurface(vtkPolyData* poly
     }
 
     double denom = m_GaussSigma * m_GaussSigma * 2;
-    for (unsigned int i = 0; i < points->GetNumberOfPoints(); ++i)
+    for (vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
     {
       // Get original point
       double* point = points->GetPoint(i);
@@ -289,7 +289,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::ColorizeSurface(vtkPolyData* poly
   }
   else if (mode == COLORIZATION_CONSTANT)
   {
-    for (unsigned int i = 0; i < pointData->GetNumberOfTuples(); ++i)
+    for (vtkIdType i = 0; i < pointData->GetNumberOfTuples(); ++i)
     {
       scalars->SetComponent(i, 0, scalar);
     }

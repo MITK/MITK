@@ -87,7 +87,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
       v1[1] = p2[1]-p1[1];
       v1[2] = p2[2]-p1[2];
 
-      for (unsigned int k = 2; k < cellSize; k++)
+      for (vtkIdType k = 2; k < cellSize; k++)
       {
         index = cellSize*0.25;
         existingPoints->GetPoint(cell[index], p1);
@@ -121,7 +121,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
       double vertexNormal[3];
 
-      for (unsigned j = 0; j < cellSize-2; j++)
+      for (vtkIdType j = 0; j < cellSize-2; j++)
       {
         existingPoints->GetPoint(cell[j+1], p1);
         existingPoints->GetPoint(cell[j+2], p2);
@@ -249,7 +249,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
 
     for( existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
     {
-      for ( unsigned int j = 0; j < cellSize; j++ )
+      for ( vtkIdType j = 0; j < cellSize; j++ )
       {
         double currentNormal[3];
         currentCellNormals->GetTuple(cell[j], currentNormal);

@@ -18,16 +18,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkLineEdit_h
 
 #include <MitkQtWidgetsExtExports.h>
+#include <mitkCommon.h>
 #include <QLineEdit>
 
+/**
+ * \deprecatedSince{2014_03} Use QLineEdit instead
+ */
 class MitkQtWidgetsExt_EXPORT QmitkLineEdit : public QLineEdit
 {
   Q_OBJECT
   Q_PROPERTY(QString DefaultText READ GetDefaultText WRITE SetDefaultText FINAL)
 
 public:
-  explicit QmitkLineEdit(QWidget* parent = NULL);
-  explicit QmitkLineEdit(const QString& defaultText, QWidget* parent = NULL);
+
+  /**
+   * \deprecatedSince{2014_03} Use QLineEdit instead
+   */
+  DEPRECATED(explicit QmitkLineEdit(QWidget* parent = NULL));
+  /**
+   * \deprecatedSince{2014_03} Use QLineEdit instead
+   */
+  DEPRECATED(explicit QmitkLineEdit(const QString& defaultText, QWidget* parent = NULL));
   ~QmitkLineEdit();
 
   QString GetDefaultText() const;

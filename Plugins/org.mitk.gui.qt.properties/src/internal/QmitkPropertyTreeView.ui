@@ -65,7 +65,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QmitkLineEdit" name="filterLineEdit" />
+    <widget class="QLineEdit" name="filterLineEdit"/>
    </item>
    <item>
     <widget class="QTreeView" name="treeView">
@@ -123,13 +123,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QmitkLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>QmitkLineEdit.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../../resources/Properties.qrc"/>
  </resources>

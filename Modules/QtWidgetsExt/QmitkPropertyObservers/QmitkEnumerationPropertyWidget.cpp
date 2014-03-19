@@ -119,4 +119,3 @@ void QmitkEnumerationPropertyWidget::SetProperty(mitk::EnumerationProperty* prop
    }
  }
 
-

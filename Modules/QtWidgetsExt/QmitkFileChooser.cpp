@@ -93,9 +93,8 @@ std::string QmitkFileChooser::GetFile() const
   return m_File->text().toStdString();
 }
 
-void QmitkFileChooser::OnSelectFileClicked( bool /*checked*/ )
+void QmitkFileChooser::OnSelectFileClicked(bool)
 {
-
   QString filename;
   if( m_SelectDir )
     filename = QFileDialog::getExistingDirectory( QApplication::activeWindow()
@@ -120,3 +119,4 @@ void QmitkFileChooser::OnFileEditingFinished()
 {
   emit NewFileSelected( m_File->text().toStdString() );
 }
+

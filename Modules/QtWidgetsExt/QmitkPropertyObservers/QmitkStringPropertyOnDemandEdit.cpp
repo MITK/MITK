@@ -83,16 +83,3 @@ void QmitkStringPropertyOnDemandEdit::onToolButtonClicked()
   }
 }
 
-//void QmitkStringPropertyOnDemandEdit::setPalette( const QPalette& p )
-//{
-//  m_label->setPalette(p);
-//  m_toolbutton->setPalette(p);
-//  QFrame::setPalette(p);
-//}
-
-//void QmitkStringPropertyOnDemandEdit::setBackgroundMode (BackgroundMode m)
-//{
-//  m_label->setBackgroundMode(m);
-//  m_toolbutton->setBackgroundMode(m);
-//  QFrame::setBackgroundMode(m);
-//}

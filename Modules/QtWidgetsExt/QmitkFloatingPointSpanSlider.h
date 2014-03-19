@@ -83,4 +83,5 @@ private:
   bool m_IntMode;
 };
 
-#endif // QMITKFLOATINGPOINTSPANSLIDER_H
+#endif
+

@@ -32,7 +32,7 @@ public:
   QmitkPointListModel( mitk::DataNode* = NULL, int t = 0, QObject* parent = 0 );
   ~QmitkPointListModel();
 
-  Qt::ItemFlags flags(const QModelIndex& /*index*/) const;
+  Qt::ItemFlags flags(const QModelIndex&) const;
 
   /// interface of QAbstractListModel
   int rowCount( const QModelIndex& parent = QModelIndex() ) const;
@@ -128,4 +128,6 @@ protected:
   unsigned int    m_PointSetDeletedObserverTag;
   int             m_TimeStep;
 };
+
 #endif
+

@@ -35,7 +35,7 @@
        </property>
        <property name="icon">
         <iconset resource="resources/QmitkResources.qrc">
-         <normaloff>:/qmitk/play.xpm</normaloff>:/qmitk/play.xpm</iconset>
+         <normaloff>:/QtWidgetsExt/play.xpm</normaloff>:/QtWidgetsExt/play.xpm</iconset>
        </property>
       </widget>
      </item>
@@ -52,7 +52,7 @@
        </property>
        <property name="icon">
         <iconset resource="resources/QmitkResources.qrc">
-         <normaloff>:/qmitk/stop.xpm</normaloff>:/qmitk/stop.xpm</iconset>
+         <normaloff>:/QtWidgetsExt/stop.xpm</normaloff>:/QtWidgetsExt/stop.xpm</iconset>
        </property>
       </widget>
      </item>

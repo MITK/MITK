@@ -274,4 +274,5 @@ signals:
   void SignalGraphChanged();
 };
 
-#endif // QMITKHISTOGRAMJSWIDGET_H
+#endif
+

@@ -170,4 +170,6 @@ protected:
   void RemoveObservers();
   void AddObservers();
 };
+
 #endif
+

@@ -50,7 +50,6 @@ void QmitkTransferFunctionCanvas::paintEvent(QPaintEvent* ev)
 std::pair<int,int> QmitkTransferFunctionCanvas::FunctionToCanvas(
     std::pair<double,double> functionPoint)
 {
-  //std::cout<<"F2C.first: "<<(int)((functionPoint.first - m_Lower) /  (m_Upper - m_Lower) * width())<<" F2C.second: "<<(int)(height() * (1 - functionPoint.second))<<std::endl;
   return std::make_pair((int) ((functionPoint.first - m_Lower) / (m_Upper
       - m_Lower) * contentsRect().width()) + contentsRect().x(), (int) (contentsRect().height() * (1 - functionPoint.second)) + contentsRect().y());
 }
@@ -58,7 +57,6 @@ std::pair<int,int> QmitkTransferFunctionCanvas::FunctionToCanvas(
 std::pair<double,double> QmitkTransferFunctionCanvas::CanvasToFunction(
     std::pair<int,int> canvasPoint)
 {
-  //std::cout<<"C2F.first: "<<(canvasPoint.first * (m_Upper - m_Lower) / width() + m_Lower)<<" C2F.second: "<<(1.0 - (double)canvasPoint.second / height())<<std::endl;
   return std::make_pair((canvasPoint.first - contentsRect().x()) * (m_Upper - m_Lower) / contentsRect().width()
       + m_Lower, 1.0 - (double) (canvasPoint.second - contentsRect().y()) / contentsRect().height());
 }
@@ -74,8 +72,7 @@ void QmitkTransferFunctionCanvas::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 
 /** returns index of a near handle or -1 if none is near
  */
-int QmitkTransferFunctionCanvas::GetNearHandle(int /*x*/, int /*y*/,
-    unsigned int /*maxSquaredDistance*/)
+int QmitkTransferFunctionCanvas::GetNearHandle(int, int, unsigned int)
 {
   return -1;
 }
@@ -110,8 +107,6 @@ void QmitkTransferFunctionCanvas::mousePressEvent(QMouseEvent* mouseEvent)
      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   update();
-
-  // m_TransferFunction->UpdateVtkFunctions();
 }
 
 void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent* mouseEvent)
@@ -148,31 +143,14 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent* mouseEvent)
     // Move selected point
     this->MoveFunctionPoint(m_GrabbedHandle, newPos);
 
-    /*
-    // Search again selected point ??????? should not be required, seems like a legacy workaround/bugfix
-    // and no longer required
-    m_GrabbedHandle = -1;
-    for (int i = 0; i < this->GetFunctionSize(); i++)
-    {
-      if (this->GetFunctionX(i) == newPos.first)
-      {
-        m_GrabbedHandle = i;
-        break;
-      }
-    }
-    */
-
     update();
 
-    //if (m_ImmediateUpdate)
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
 void QmitkTransferFunctionCanvas::mouseReleaseEvent(QMouseEvent*)
 {
-  // m_GrabbedHandle = -1;
   update();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -256,3 +234,4 @@ void QmitkTransferFunctionCanvas::SetImmediateUpdate(bool state)
 {
   m_ImmediateUpdate = state;
 }
+

@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNewSegmentationDialog.h"
 #include <QBoxLayout>
 
-#include "btnSetSeedPoint.xpm"
-
 MITK_TOOL_GUI_MACRO( , QmitkRegionGrow3DToolGUI, "")
 
 QmitkRegionGrow3DToolGUI::QmitkRegionGrow3DToolGUI():QmitkToolGUI()
@@ -41,7 +39,7 @@ QmitkRegionGrow3DToolGUI::QmitkRegionGrow3DToolGUI():QmitkToolGUI()
   m_SetSeedButton = new QPushButton(this);
   m_SetSeedButton->setCheckable(true);
   m_SetSeedButton->setFixedSize(32,32);
-  const QIcon iconAdd(btnSetSeedPoint_xpm);
+  const QIcon iconAdd(":/QtWidgetsExt/btnSetSeedPoint.xpm");
   m_SetSeedButton->setIcon(iconAdd);
   connect (m_SetSeedButton, SIGNAL(toggled(bool)), this, SLOT(OnSeedButtonToggled(bool)) );
 

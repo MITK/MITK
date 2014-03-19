@@ -32,7 +32,6 @@ class MitkQtWidgetsExt_EXPORT QmitkNumberPropertySlider : public QSlider, public
 
   public:
 
-    //QmitkNumberPropertySlider( mitk::GenericProperty<short>*, QWidget* parent, const char* name = 0 );
     QmitkNumberPropertySlider( mitk::IntProperty*, QWidget* parent, const char* name = 0 );
     QmitkNumberPropertySlider( mitk::FloatProperty*, QWidget* parent, const char* name = 0 );
     QmitkNumberPropertySlider( mitk::DoubleProperty*, QWidget* parent, const char* name = 0 );
@@ -62,7 +61,6 @@ class MitkQtWidgetsExt_EXPORT QmitkNumberPropertySlider : public QSlider, public
     void DisplayNumber();
 
     union {
-      //mitk::GenericProperty<short>*   m_ShortProperty;
       mitk::GenericProperty<int>*     m_IntProperty;
       mitk::GenericProperty<float>*   m_FloatProperty;
       mitk::GenericProperty<double>*  m_DoubleProperty;

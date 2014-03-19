@@ -73,4 +73,5 @@ protected:
 
 };
 
-#endif // QMITKUGCOMBINEDREPRESENTATIONPROPERTYWIDGET_H
+#endif
+

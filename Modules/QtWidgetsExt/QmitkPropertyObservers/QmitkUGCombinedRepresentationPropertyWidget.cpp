@@ -286,3 +286,4 @@ void QmitkUGCombinedRepresentationPropertyWidget::IsVolumeChanged(bool volume)
     this->SetGridRepresentationId(m_GridRepIndex);
   }
 }
+

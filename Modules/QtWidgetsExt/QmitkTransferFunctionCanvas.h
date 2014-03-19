@@ -87,8 +87,6 @@ public:
     this->m_Upper = upper;
   }
 
-  // itkGetConstObjectMacro(Histogram,mitk::HistogramGenerator::HistogramType);
-  // itkSetObjectMacro(Histogram,mitk::HistogramGenerator::HistogramType);
   void mousePressEvent( QMouseEvent* mouseEvent );
   virtual void paintEvent( QPaintEvent* e );
   virtual void DoubleClickOnHandle(int handle) = 0;
@@ -163,5 +161,6 @@ protected:
   QLineEdit* m_XEdit;
   QLineEdit* m_YEdit;
 };
+
 #endif
 

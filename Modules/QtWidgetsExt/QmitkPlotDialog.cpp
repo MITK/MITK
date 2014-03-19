@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPlotDialog.h"
 
-QmitkPlotDialog::QmitkPlotDialog(const char* title, QWidget* parent, const char*  /*name*/): QDialog(parent)
+QmitkPlotDialog::QmitkPlotDialog(const char* title, QWidget* parent, const char*): QDialog(parent)
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   m_Plot = new QmitkPlotWidget( this, title ) ;
@@ -43,3 +43,4 @@ QwtPlot* QmitkPlotDialog::GetQwtPlot()
 {
   return m_Plot->GetPlot();
 }
+

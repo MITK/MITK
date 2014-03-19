@@ -103,3 +103,4 @@ void QmitkLineEdit::ShowDefaultText(bool show)
 
   this->blockSignals(false);
 }
+

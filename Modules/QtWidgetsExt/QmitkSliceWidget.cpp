@@ -19,16 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateDataType.h"
 
 #include <mitkProportionalTimeGeometry.h>
-
-
-//#include "QmitkRenderWindow.h"
-//
-//#include "mitkSliceNavigationController.h"
-//#include "QmitkLevelWindowWidget.h"
-//
-//#include <vtkRenderer.h>
-//#include "mitkRenderingManager.h"
-
 #include <QMenu>
 #include <QMouseEvent>
 
@@ -122,18 +112,6 @@ void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node)
   SetData(node, m_View);
 }
 
-//void QmitkSliceWidget::AddData( mitk::DataNode::Pointer node)
-//{
-//  if ( m_DataTree.IsNull() )
-//  {
-//    m_DataTree = mitk::DataTree::New();
-//  }
-//  mitk::DataTreePreOrderIterator it(m_DataTree);
-//  it.Add( node );
-//  SetData(&it, m_View);
-//}
-
-
 void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node,
     mitk::SliceNavigationController::ViewDirection view)
 {
@@ -187,7 +165,6 @@ void QmitkSliceWidget::InitWidget(
   const mitk::BoundingBox::BoundsArrayType imageBounds =
       m_SlicedGeometry->GetBoundingBox()->GetBounds();
 
-  //  mitk::SlicedGeometry3D::Pointer correctGeometry = m_SlicedGeometry.GetPointer();
   mitk::Geometry3D::Pointer
       geometry =
           static_cast<mitk::Geometry3D*> (m_SlicedGeometry->Clone().GetPointer());
@@ -196,11 +173,6 @@ void QmitkSliceWidget::InitWidget(
       m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
   if (boundingbox->GetPoints()->Size() > 0)
   {
-    ////geometry = mitk::Geometry3D::New();
-    ////geometry->Initialize();
-    //geometry->SetBounds(boundingbox->GetBounds());
-    //geometry->SetSpacing(correctGeometry->GetSpacing());
-
     //let's see if we have data with a limited live-span ...
     mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(
         GetRenderer(), NULL);
@@ -227,11 +199,6 @@ void QmitkSliceWidget::InitWidget(
   GetRenderer()->GetDisplayGeometry()->Fit();
   mitk::RenderingManager::GetInstance()->RequestUpdate(
       GetRenderer()->GetRenderWindow());
-  //int w=vtkObject::GetGlobalWarningDisplay();
-  //vtkObject::GlobalWarningDisplayOff();
-  //vtkRenderer * vtkrenderer = ((mitk::OpenGLRenderer*)(GetRenderer()))->GetVtkRenderer();
-  //if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
-  //vtkObject::SetGlobalWarningDisplay(w);
 }
 
 void QmitkSliceWidget::UpdateGL()
@@ -332,3 +299,4 @@ QmitkSliceWidget::GetController() const
 {
   return m_RenderWindow->GetController();
 }
+

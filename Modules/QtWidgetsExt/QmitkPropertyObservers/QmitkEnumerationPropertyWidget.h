@@ -52,5 +52,5 @@ class MitkQtWidgetsExt_EXPORT QmitkEnumerationPropertyWidget : public QComboBox
 
 };
 
-#endif // QMITK_ENUMERATIONPROPERTYWIDGET_H_INCLUDED
+#endif
 

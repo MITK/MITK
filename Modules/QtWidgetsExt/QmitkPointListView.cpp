@@ -40,28 +40,21 @@ QmitkPointListView::QmitkPointListView( QWidget* parent )
 {
   QListView::setAlternatingRowColors( true );
 
-  // logic
-
   QListView::setSelectionBehavior( QAbstractItemView::SelectRows );
   QListView::setSelectionMode( QAbstractItemView::SingleSelection );
   QListView::setModel( m_PointListModel );
   QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse wheel to change the timestep.\n\nTimeStep:\t%1").arg(0);
   QListView::setToolTip(tooltip);
-  //m_FadeTimer = new QTimer();
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
   m_TimeStepFaderLabel = new QLabel(this);
   QFont font("Arial", 17);
   m_TimeStepFaderLabel->setFont(font);
 
-  //Define Size
   this->setMinimumHeight(40);
 
-  //horizontal, vertical
   this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-
-  //connect
   connect( m_PointListModel, SIGNAL(SignalUpdateSelection()), this, SLOT(OnPointSetSelectionChanged()) );
 
   connect( this, SIGNAL(doubleClicked ( const QModelIndex & )),
@@ -71,7 +64,6 @@ QmitkPointListView::QmitkPointListView( QWidget* parent )
            this, SLOT(OnListViewSelectionChanged(const QItemSelection& , const QItemSelection&)) );
 
   connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ctxMenu(const QPoint &)));
-
 }
 
 QmitkPointListView::~QmitkPointListView()
@@ -243,7 +235,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
 {
 
 
-  if (!m_PointListModel || !m_PointListModel->GetPointSet() || (int)(m_PointListModel->GetPointSet()->GetTimeSteps()) == 1 /*|| !m_4DPointSet*/)
+  if (!m_PointListModel || !m_PointListModel->GetPointSet() || (int)(m_PointListModel->GetPointSet()->GetTimeSteps()) == 1)
     return;
 
 
@@ -290,9 +282,6 @@ void QmitkPointListView::fadeTimeStepIn()
   m_TimeStepFader->setLayout(layout);
   m_TimeStepFader->setAttribute(Qt::WA_DeleteOnClose);
 
-  //setup Label
-  //    QLabel *label = new QLabel(QString("%1").arg(this->m_PointListModel->GetTimeStep()));
-
   layout->addWidget(m_TimeStepFaderLabel);
   m_TimeStepFaderLabel->setAlignment(Qt::AlignCenter);
   m_TimeStepFaderLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
@@ -329,9 +318,6 @@ void QmitkPointListView::fadeTimeStepOut()
 void QmitkPointListView::ctxMenu(const QPoint &pos)
 {
   QMenu *menu = new QMenu;
-  //    menu->setStyle();
-  //    menu->addAction(tr("Test Item"), this, SLOT(test_slot()));
-
 
   //add Fading check
   QAction *showFading = new QAction(this);
@@ -352,15 +338,6 @@ void QmitkPointListView::ctxMenu(const QPoint &pos)
   clearTS->setText("Clear current time step");
   connect(clearTS, SIGNAL(triggered()), this, SLOT(ClearPointListTS()));
   menu->addAction(clearTS);
-
-  //    //add "show time step in list" option
-  //    QAction *viewTS = new QAction(this);
-  //    viewTS->setText("Show time step in list");
-  //    viewTS->setCheckable(true);
-  //    viewTS->setChecked(false);
-  //    connect(viewTS, SIGNAL(triggered(bool)), this, SLOT(ClearPointList(bool)));
-  //    menu->addAction(viewTS);
-
 
   menu->exec(this->mapToGlobal(pos));
 
@@ -386,15 +363,6 @@ void QmitkPointListView::ClearPointList()
   {
   case QMessageBox::Yes:
     {
-      //        m_PointListModel->ClearList();
-      //      /*
-      //        if (curPS)
-      //        {
-      //            curPS->Clear();
-      //        }
-      //        */
-      //        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      //        break;
       mitk::PointSet::PointsIterator it;
       mitk::PointSet::PointsContainer *curPsPoints;
       while( !curPS->IsEmptyTimeStep(0))
@@ -411,35 +379,10 @@ void QmitkPointListView::ClearPointList()
   default:
     break;
   }
-  // emit PointListChanged();
 }
 
 void QmitkPointListView::ClearPointListTS()
 {
-  //    mitk::PointSet* /*::Pointer*/  curPS = m_PointListModel->GetPointSet();
-  //    if ( curPS->GetSize() == 0)
-  //        return;
-
-  //     int ts = this->m_PointListModel->GetTimeStep();
-  //    switch( QMessageBox::question( this, tr("Clear Points in Timestep"),
-  //                                   tr("Remove all points from the list with the timestep %1?").arg(ts),
-  //                                   QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
-  //    {
-  //    case QMessageBox::Yes:
-  //        if (curPS)
-  //        {
-  //            mitk::PointSet::DataType::Pointer curPSwithTS = curPS->GetPointSet(ts);
-  //            //curPSwithTS->Clear();
-
-  //        }
-  //        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  //        break;
-
-  //    case QMessageBox::No:
-  //        default:
-  //        break;
-  //     }
-  //   // emit PointListChanged();
 }
 
 void QmitkPointListView::SetSnc1(mitk::SliceNavigationController* snc)
@@ -468,3 +411,4 @@ void QmitkPointListView::RemoveSliceNavigationController(mitk::SliceNavigationCo
   if (snc == NULL) return;
   m_Sncs.erase(snc);
 }
+

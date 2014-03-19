@@ -53,8 +53,6 @@ class MitkQtWidgetsExt_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, p
     QmitkStringPropertyOnDemandEdit( mitk::StringProperty*, QWidget* parent );
     virtual ~QmitkStringPropertyOnDemandEdit();
 
-    //virtual void setPalette ( const QPalette & );
-    //virtual void setBackgroundMode ( BackgroundMode );
   protected:
 
     virtual void PropertyChanged();
@@ -69,9 +67,6 @@ class MitkQtWidgetsExt_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, p
   protected slots:
 
     void onToolButtonClicked();
-
-  private:
-
 };
 
 #endif

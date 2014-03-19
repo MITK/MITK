@@ -125,7 +125,7 @@ void QmitkCorrespondingPointSetsModel::AddObservers()
   }
 }
 
-void QmitkCorrespondingPointSetsModel::OnPointSetChanged( const itk::EventObject &  /*e*/ )
+void QmitkCorrespondingPointSetsModel::OnPointSetChanged(const itk::EventObject&)
 {
   QAbstractTableModel::reset();
 }
@@ -168,7 +168,7 @@ int QmitkCorrespondingPointSetsModel::GetTimeStep() const
   return m_TimeStepper->GetPos();
 }
 
-int QmitkCorrespondingPointSetsModel::rowCount( const QModelIndex&  /*parent*/ ) const
+int QmitkCorrespondingPointSetsModel::rowCount(const QModelIndex&) const
 {
   if (!m_TimeStepper)
     return 0;
@@ -190,7 +190,7 @@ int QmitkCorrespondingPointSetsModel::rowCount( const QModelIndex&  /*parent*/ )
   return sizeRPS;
 }
 
-int QmitkCorrespondingPointSetsModel::columnCount( const QModelIndex&  /*parent*/ ) const
+int QmitkCorrespondingPointSetsModel::columnCount(const QModelIndex&) const
 {
   return 2;
 }
@@ -440,7 +440,6 @@ void QmitkCorrespondingPointSetsModel::MoveSelectedPointUp()
 
 void QmitkCorrespondingPointSetsModel::MoveSelectedPointDown()
 {
-  //QModelIndex;
   if (!m_TimeStepper)
     return;
 
@@ -627,7 +626,6 @@ void QmitkCorrespondingPointSetsModel::ClearSelectedPointSet()
 
   mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(dataNode->GetData());
 
-  //pointSet->Clear();
   mitk::PointSet::PointsContainer::Iterator it;
   if (this->m_TimeStepper->GetRangeMax()==-1)
   {
@@ -738,3 +736,4 @@ void QmitkCorrespondingPointSetsModel::SetMultiWidget( QmitkStdMultiWidget* mult
   this->m_MultiWidget = multiWidget;
   this->m_TimeStepper = m_MultiWidget->GetTimeNavigationController()->GetTime();
 }
+

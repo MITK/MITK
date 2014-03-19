@@ -45,3 +45,4 @@ class QmitkSelectableGLWidget : public QWidget, public Ui::QmitkSelectableGLWidg
 };
 
 #endif
+

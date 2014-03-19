@@ -54,5 +54,6 @@ protected:
   int lastX,lastY;
 
 };
+
 #endif
 

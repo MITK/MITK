@@ -83,5 +83,5 @@ protected:
   QmitkHistogram* m_Histogram;
 };
 
-#endif /* QMITKHistogramWidget_H_ */
+#endif
 

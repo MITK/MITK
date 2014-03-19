@@ -273,7 +273,6 @@ void QmitkVideoBackground::SetVideoSource( mitk::VideoSource* videoSource )
 void QmitkVideoBackground::SetTimerDelay( int ms )
 {
   m_QTimer->setInterval( ms );
-  //ResetVideoBackground();
 }
 
 mitk::VideoSource* QmitkVideoBackground::GetVideoSource()
@@ -296,8 +295,9 @@ void QmitkVideoBackground::OnVideoSourceDelete( const itk::Object* caller,
 void QmitkVideoBackground::OnRenderWindowDelete( vtkObject * object,
                                                  unsigned long eid,
                                                  void* clientdata,
-                                                 void * /*calldata*/ )
+                                                 void*)
 {
   QmitkVideoBackground* instance = static_cast<QmitkVideoBackground*>( clientdata );
   instance->RemoveRenderWindow( static_cast<vtkRenderWindow*>(object), false );
 }
+

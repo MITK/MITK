@@ -34,7 +34,7 @@ QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   setPage(m_Page);
   // set html from source
   connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(AddJSObject()));
-  QUrl myUrl = QUrl("qrc:/qmitk/Histogram.html");
+  QUrl myUrl = QUrl("qrc:///QtWidgetsExt/Histogram.html");
   setUrl(myUrl);
 
   // set Scrollbars to be always disabled
@@ -236,3 +236,4 @@ bool QmitkHistogramJSWidget::GetIntensityProfile()
 {
   return m_IntensityProfile;
 }
+

@@ -58,11 +58,11 @@ public:
       {
 
       };
-      virtual void   Execute (itk::Object * /* caller */, const itk::EventObject & /* event */)
+      virtual void   Execute (itk::Object*, const itk::EventObject&)
       {
         emit m_Receiver->Refetch();
       };
-      virtual void   Execute (const itk::Object * /* caller */, const itk::EventObject & /* event */)
+      virtual void   Execute (const itk::Object*, const itk::EventObject&)
       {
         emit m_Receiver->Refetch();
       };
@@ -83,4 +83,5 @@ protected:
   ItkEventListener::Pointer m_ItkEventListener;
 };
 
-#endif /* QMITKSTEPPERADAPTER_H_HEADER_INCLUDED_C1E77191 */
+#endif
+

@@ -65,9 +65,11 @@ int mitk::DataInteractor::GetLayer() const
 
 mitk::DataInteractor::~DataInteractor()
 {
-  if (m_DataNode.IsNotNull())
+  if (m_DataNode.IsNotNull() )
   {
-    m_DataNode->SetDataInteractor(NULL);
+    // only reset if this interactor is still the current one
+    if (m_DataNode->GetDataInteractor() == this)
+      m_DataNode->SetDataInteractor(NULL);
   }
 }
 

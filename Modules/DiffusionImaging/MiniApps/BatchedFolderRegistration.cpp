@@ -160,12 +160,14 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   parser.addArgument("fixed", "f", ctkCommandLineParser::String, "Suffix for fixed image",us::Any(),false);
   parser.addArgument("moving", "m", ctkCommandLineParser::String, "Suffix for moving images",us::Any(),false);
   parser.addArgument("derived", "d", ctkCommandLineParser::String, "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
+  parser.addArgument("silent", "s", ctkCommandLineParser::Bool, "No xml progress output.");
   // Feature currently disabled
   //parser.addArgument("resample", "r", QVariant::String, "Reference Image for resampling (optional), is not applied to tensor data");
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   // Handle special arguments
+  bool silent = false;
   {
     if (parsedArgs.size() == 0)
     {
@@ -178,6 +180,10 @@ int BatchedFolderRegistration( int argc, char* argv[] )
       MITK_ERROR << "This is to be handled by shell script";
       return EXIT_SUCCESS;
     }
+
+    if (parsedArgs.count("silent"))
+      silent = true;
+
     // Show a help message
     if ( parsedArgs.count("help") || parsedArgs.count("h"))
     {
@@ -202,7 +208,7 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   }
 
   MITK_INFO << "Input Folder : " << inputPath;
-  MITK_INFO << "Looking for reference image";
+  MITK_INFO << "Looking for reference image ...";
   FileListType referenceFileList = CreateFileList(inputPath,refPattern);
 
   if (referenceFileList.size() != 1)
@@ -215,15 +221,12 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   std::string referenceFileName = referenceFileList.at(0);
 
   MITK_INFO << "Loading Reference (fixed) image: " << referenceFileName;
-  mitk::Image::Pointer refImage;
-  mitk::DataNode::Pointer dnFileRead = mitk::IOUtil::LoadDataNode(referenceFileName);
-
-
-  refImage = dynamic_cast<mitk::Image*> (dnFileRead->GetData());
+  mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(referenceFileName);
 
   if (refImage.IsNull())
     MITK_ERROR << "Loaded fixed image is NULL";
 
+  // Copy reference image to destination
   std::string savePathAndFileName = GetSavePath(outputPath, referenceFileName);
   mitk::IOUtil::SaveImage(refImage, savePathAndFileName);
 
@@ -232,13 +235,9 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   CopyResources(referenceFileList, outputPath);
 
   std::string derivedResourceFilename;
-  mitk::Image::Pointer movingImage;
-  mitk::Image::Pointer derivedMovingResource;
-
   mitk::Image::Pointer referenceMask = NULL; // union of all segmentations
 
-  mitk::RegistrationWrapper::Pointer imgReg = mitk::RegistrationWrapper::New();
-
+  if (!silent)
   {
     // XML Output to report progress
     std::cout << "<filter-start>";
@@ -262,12 +261,12 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   //  {
   //    resampleImage = mitk::IOUtil::LoadImage(resampleReference.toStdString());
   //  }
-
-  for (unsigned int i =0; i < movingImagesList.size(); i++){
-
+  for (unsigned int i =0; i < movingImagesList.size(); i++)
+  {
     std::string fileMorphName = movingImagesList.at(i);
     if (fileMorphName == referenceFileName)
     {
+
       // do not process reference image again
       continue;
     }
@@ -280,27 +279,33 @@ int BatchedFolderRegistration( int argc, char* argv[] )
       MITK_WARN << "File does not exit. Skipping entry.";
       continue;
     }
-
-    movingImage = mitk::IOUtil::LoadImage(fileMorphName);
-    if (movingImage.IsNull())
-      MITK_ERROR << "Loaded moving image is NULL";
-
-    // Store transformation,  apply it to morph file
-    MITK_INFO << "----------Registering moving image to reference----------";
-
-
     // Origin of images is cancelled
     // TODO make this optional!!
     double transf[6];
     double offset[3];
-    FileListType fList = CreateDerivedFileList(fileMorphName, movingImgPattern,derPatterns);
-    imgReg->GetTransformation(refImage, movingImage, transf, offset, referenceMask);
-    imgReg->ApplyTransformationToImage(movingImage, transf,offset, NULL); // , resampleImage
+    {
+      mitk::Image::Pointer movingImage = mitk::IOUtil::LoadImage(fileMorphName);
 
-    std::string savePathAndFileName = GetSavePath(outputPath, fileMorphName);
-    std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
-    SaveImage(savePathAndFileName,movingImage,fileType );
+      MITK_ERROR << "REF COUNT MOVING 0 " << movingImage->GetReferenceCount();
+      if (movingImage.IsNull())
+        MITK_ERROR << "Loaded moving image is NULL";
 
+      // Store transformation,  apply it to morph file
+      MITK_INFO << "----------Registering moving image to reference----------";
+
+
+      MITK_ERROR << "REF COUNT MOVING 1 " << movingImage->GetReferenceCount();
+      //mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, referenceMask);
+      MITK_ERROR << "REF COUNT MOVING 2 " << movingImage->GetReferenceCount();
+
+      mitk::Image::Pointer regImage = mitk::RegistrationWrapper::ApplyTransformationToImage(movingImage, transf,offset, NULL); // , resampleImage
+      MITK_ERROR << "REF COUNT MOVING 3 " << movingImage->GetReferenceCount();
+      savePathAndFileName = GetSavePath(outputPath, fileMorphName);
+      std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
+      SaveImage(savePathAndFileName,regImage,fileType );
+    }
+
+    if (!silent)
     {
       std::cout << "<filter-progress-text progress=\"" <<
                    (float)i / (float)movingImagesList.size()
@@ -310,23 +315,26 @@ int BatchedFolderRegistration( int argc, char* argv[] )
     // Now parse all derived resource and apply the above calculated transformation to them
     // ------------------------------------------------------------------------------------
 
-    MITK_INFO << "----------DERIVED RESOURCES ---------";
+    FileListType fList = CreateDerivedFileList(fileMorphName, movingImgPattern,derPatterns);
+    if (fList.size() > 0)
+      MITK_INFO << "----------DERIVED RESOURCES ---------";
     for (unsigned int j=0; j < fList.size(); j++)
     {
       derivedResourceFilename = fList.at(j);
       MITK_INFO << "----Processing derived resource " << derivedResourceFilename << " ...";
-      dnFileRead = mitk::IOUtil::LoadDataNode(derivedResourceFilename);
-      derivedMovingResource = dynamic_cast<mitk::Image*> (dnFileRead->GetData());
-      // apply transformation to derived resource
-      imgReg->ApplyTransformationToImage(derivedMovingResource, transf,offset, NULL, true);
+      mitk::Image::Pointer derivedMovingResource = mitk::IOUtil::LoadImage(derivedResourceFilename);
+      // Apply transformation to derived resource, treat derived resource as binary
+      mitk::Image::Pointer regDerImage = mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource->Clone(), transf,offset, NULL, true);
 
       savePathAndFileName = GetSavePath(outputPath, derivedResourceFilename);
       std::string fileType = itksys::SystemTools::GetFilenameExtension(derivedResourceFilename);
 
-      SaveImage(savePathAndFileName,derivedMovingResource,fileType );
+      SaveImage(savePathAndFileName,regDerImage,fileType );
     }
   }
-  std::cout << "<filter-end/>";
+
+  if (!silent)
+    std::cout << "<filter-end/>";
   return EXIT_SUCCESS;
 }
 

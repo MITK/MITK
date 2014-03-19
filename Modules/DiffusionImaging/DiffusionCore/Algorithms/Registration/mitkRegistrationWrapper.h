@@ -1,8 +1,6 @@
 #ifndef MITKBATCHEDREGISTRATION_H
 #define MITKBATCHEDREGISTRATION_H
 
-// ITK
-#include <itkLightObject.h>
 // MITK
 #include <MitkDiffusionCoreExports.h>
 #include "mitkCommon.h"
@@ -23,17 +21,14 @@ namespace mitk
  *  For DWI images a registerable B0 Image will automatically be extracted.
  *
  */
-class MitkDiffusionCore_EXPORT RegistrationWrapper : public itk::LightObject
+class MitkDiffusionCore_EXPORT RegistrationWrapper
 {
 public:
 
-  typedef itk::Image<ScalarType,3> ItkImageType;
+  typedef itk::Image<float,3> ItkImageType;
   typedef itk::Image<unsigned char,3> ItkBinaryImageType;
   typedef double* RidgidTransformType;
 
-  mitkClassMacro(RegistrationWrapper, itk::LightObject)
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
 
   /**
    * @brief ApplyTransformationToImage Applies transformation from GetTransformation to provided image.
@@ -48,7 +43,7 @@ public:
    * @param resampleReference - image to which is to be resampled
    * @param binary
    */
-  void ApplyTransformationToImage(mitk::Image::Pointer& img, const RidgidTransformType& transformation, double *offset, mitk::Image::Pointer resampleReference = NULL , bool binary = false) const;
+  static Image::Pointer ApplyTransformationToImage(mitk::Image* img, const RidgidTransformType& transformation, double *offset, mitk::Image* resampleReference = NULL , bool binary = false);
 
   /**
    * @brief GetTransformation Registeres the moving to the fixed image and returns the according transformation
@@ -67,16 +62,7 @@ public:
    * @param offset - stores offset that has been applied to match origin of both images
    * @param mask - optional, provide a mask that is excluded from registration metric
    */
-  void GetTransformation(mitk::Image::Pointer fixedImage , mitk::Image::Pointer movingImage, RidgidTransformType transformation, double* offset, mitk::Image::Pointer mask = NULL);
-
-
-protected:
-  RegistrationWrapper();
-  ~RegistrationWrapper(){};
-
-private:
-  RegistrationWrapper(const Self &); //purposely not implemented
-  void operator=(const Self &);  //purposely not implemented
+  static void GetTransformation(mitk::Image* fixedImage , mitk::Image* movingImage, RidgidTransformType transformation, double* offset, mitk::Image* mask = NULL);
 };
 
 }

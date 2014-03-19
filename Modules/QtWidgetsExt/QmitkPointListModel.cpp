@@ -266,7 +266,6 @@ void QmitkPointListModel::MoveSelectedPointUp()
 
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
-  mitk::PointSet::PointType point = pointSet->GetPoint(selectedID, m_TimeStep);
   mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP,tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   pointSet->ExecuteOperation(doOp);

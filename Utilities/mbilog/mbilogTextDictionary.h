@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mbilog {
   /** \brief This is a dictionary to replace long names of classes,
     *        modules, etc. to shorter versions in the console output. */
-  static char *replace[] =
+  static const char *replace[] =
       {
         ".cpp",                "",
         ".cxx",                "",

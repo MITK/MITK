@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkBoundingObjectWidget::QmitkBoundingObjectWidget (QWidget* parent, Qt::WindowFlags f ):QWidget( parent, f ),
 m_DataStorage(NULL),
 m_lastSelectedItem(NULL),
-m_lastAffineObserver(NULL),
+m_lastAffineObserver(0),
 m_ItemNodeMap(),
 m_BoundingObjectCounter(1)
 {
@@ -444,7 +444,7 @@ mitk::DataNode::Pointer QmitkBoundingObjectWidget::GetSelectedBoundingObjectNode
   return node;
 }
 
-void QmitkBoundingObjectWidget::OnBoundingObjectModified(const itk::EventObject& e)
+void QmitkBoundingObjectWidget::OnBoundingObjectModified(const itk::EventObject&)
 {
   emit BoundingObjectsChanged();
 }

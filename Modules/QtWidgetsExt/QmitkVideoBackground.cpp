@@ -49,7 +49,7 @@ QmitkVideoBackground::QmitkVideoBackground( QObject *parent )
   this->ResetVideoBackground();
 }
 
-QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v, int TimerDelay)
+QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v, int)
 : QObject(0)
 , m_QTimer(new QTimer(this))
 , m_VideoSource(0)
@@ -285,15 +285,15 @@ int QmitkVideoBackground::GetTimerDelay()
   return m_QTimer->interval();
 }
 
-void QmitkVideoBackground::OnVideoSourceDelete( const itk::Object* caller,
-                                               const itk::EventObject &event )
+void QmitkVideoBackground::OnVideoSourceDelete(const itk::Object*,
+                                               const itk::EventObject&)
 {
   this->Disable(); // will only disable if enabled
   m_VideoSource = 0;
 }
 
 void QmitkVideoBackground::OnRenderWindowDelete( vtkObject * object,
-                                                 unsigned long eid,
+                                                 unsigned long,
                                                  void* clientdata,
                                                  void*)
 {

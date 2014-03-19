@@ -49,7 +49,7 @@ public:
   * @param fileName The file name where to save the data (including path and extension).
   * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the screen.
   */
-  static void SaveBaseDataWithDialog(BaseData *data, std::string fileName, QWidget* parent = NULL);
+  static void SaveBaseDataWithDialog(mitk::BaseData *data, std::string fileName, QWidget* parent = NULL);
 
   /**
    * @brief SaveSurfaceWithDialog Convenience method to save a surface with a Qt dialog.

@@ -157,7 +157,7 @@ void QmitkHistogramJSWidget::SetPlanarFigure(const mitk::PlanarFigure* planarFig
 }
 
 template <class PixelType>
-void ReadPixel(mitk::PixelType ptype, mitk::Image::Pointer image, mitk::Index3D indexPoint, double& value)
+void ReadPixel(mitk::PixelType, mitk::Image::Pointer image, mitk::Index3D indexPoint, double& value)
 {
   if (image->GetDimension() == 2)
   {

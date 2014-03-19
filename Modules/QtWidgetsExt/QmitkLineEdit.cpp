@@ -75,7 +75,7 @@ void QmitkLineEdit::OnFocusChanged(bool hasFocus)
   }
 }
 
-void QmitkLineEdit::OnTextChanged(const QString& text)
+void QmitkLineEdit::OnTextChanged(const QString&)
 {
   if (this->palette() == m_DefaultPalette)
     this->setPalette(QPalette());

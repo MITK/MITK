@@ -161,16 +161,12 @@ void QmitkSliceWidget::InitWidget(
     return;
   }
 
-  // compute bounding box with respect to first images geometry
-  const mitk::BoundingBox::BoundsArrayType imageBounds =
-      m_SlicedGeometry->GetBoundingBox()->GetBounds();
-
-  mitk::Geometry3D::Pointer
-      geometry =
-          static_cast<mitk::Geometry3D*> (m_SlicedGeometry->Clone().GetPointer());
+  mitk::Geometry3D::Pointer geometry =
+    static_cast<mitk::Geometry3D*> (m_SlicedGeometry->Clone().GetPointer());
 
   const mitk::BoundingBox::Pointer boundingbox =
-      m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
+    m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
+
   if (boundingbox->GetPoints()->Size() > 0)
   {
     //let's see if we have data with a limited live-span ...
@@ -179,8 +175,6 @@ void QmitkSliceWidget::InitWidget(
 
     if (timebounds[1] < mitk::ScalarTypeNumericTraits::max())
     {
-      mitk::ScalarType duration = timebounds[1] - timebounds[0];
-
       timebounds[1] = timebounds[0] + 1.0f;
       geometry->SetTimeBounds(timebounds);
     }

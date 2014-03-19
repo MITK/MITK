@@ -45,7 +45,6 @@ void QmitkCorrespondingPointSetsWidget::SetupUi()
   // add status bar buttons
   if (QTPropShowButtonBar)
   {
-    bool isPointSelected = this->m_CorrespondingPointSetsView->IsPointSelected();
     QBoxLayout* lay2 = new QHBoxLayout();
     lay1->addLayout(lay2);
     lay2->stretch(true);

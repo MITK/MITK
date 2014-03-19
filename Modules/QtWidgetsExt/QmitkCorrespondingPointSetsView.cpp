@@ -264,7 +264,7 @@ void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
   int numNodes = this->GetPointSetNodes().size();
 
   //add delete point action
-  mitk::PointSet::PointsContainer::ElementIdentifier id;
+  int id;
   mitk::PointSet::PointType p;
   bool pointSelected = m_CorrespondingPointSetsModel->GetPointForModelIndex(row, col, p, id);
 
@@ -297,14 +297,14 @@ void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
   QAction *clearTS = new QAction(this);
   clearTS->setText("Clear time step");
   connect(clearTS, SIGNAL(triggered()), this, SLOT(ClearCurrentTimeStep()));
-  if(numNodes==0 || col!=0 && col!=1)
+  if(numNodes==0 || (col!=0 && col!=1))
     clearTS->setEnabled(false);
   menu->addAction(clearTS);
 
   QAction *clearList = new QAction(this);
   clearList->setText("Clear point set");
   connect(clearList, SIGNAL(triggered()), this, SLOT(ClearSelectedPointSet()));
-  if(numNodes==0 || col!=0 && col!=1)
+  if(numNodes==0 || (col!=0 && col!=1))
     clearList->setEnabled(false);
   menu->addAction(clearList);
 

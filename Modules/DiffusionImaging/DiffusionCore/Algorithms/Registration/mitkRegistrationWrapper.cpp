@@ -10,19 +10,22 @@
 
 #include <vnl/vnl_inverse.h>
 
-
-mitk::RegistrationWrapper::RegistrationWrapper()
-{
-}
-
-void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer &img, const mitk::RegistrationWrapper::RidgidTransformType &transformation,double* offset, mitk::Image::Pointer resampleReference,  bool binary) const
+void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer img, const mitk::RegistrationWrapper::RidgidTransformType &transformation,double* offset, mitk::Image* resampleReference,  bool binary)
 {
   typedef mitk::DiffusionImage<short> DiffusionImageType;
 
   if (dynamic_cast<DiffusionImageType*> (img.GetPointer()) == NULL)
   {
+
     ItkImageType::Pointer itkImage = ItkImageType::New();
+
+
+    MITK_ERROR << "imgCopy  0 " <<  "/" << img->GetReferenceCount();
+    MITK_ERROR << "pixel type  " << img->GetPixelType().GetComponentTypeAsString();
+
     CastToItkImage(img, itkImage);
+
+
 
     typedef itk::Euler3DTransform< double > RigidTransformType;
     RigidTransformType::Pointer rtransform = RigidTransformType::New();
@@ -48,7 +51,7 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
     itkImage->SetDirection(newDirection);
 
     // Perform Resampling if reference image is provided
-    if (resampleReference.IsNotNull())
+    if (resampleReference != NULL)
     {
       typedef itk::ResampleImageFilter<ItkImageType, ItkImageType>  ResampleFilterType;
 
@@ -76,8 +79,15 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
       GrabItkImageMemory(resampler->GetOutput(), img);
     }
     else
-     GrabItkImageMemory(itkImage, img);
-
+    {
+      // !! CastToItk behaves very differently depending on the original data type
+      // if the target type is the same as the original, only a pointer to the data is set
+      // and an additional GrabItkImageMemory will cause a segfault when the image is destroyed
+      // GrabItkImageMemory - is not necessary in this case since we worked on the original data
+      // See Bug 17538.
+      if (img->GetPixelType().GetComponentTypeAsString() != "double")
+        img = GrabItkImageMemory(itkImage);
+    }
   }
   else
   {
@@ -118,11 +128,11 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
   }
 }
 
-void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, RidgidTransformType transformation,double* offset, mitk::Image::Pointer mask)
+void mitk::RegistrationWrapper::GetTransformation(mitk::Image* fixedImage, mitk::Image* movingImage, RidgidTransformType transformation,double* offset, mitk::Image* mask)
 {
   // Handle the case that fixed/moving image is a DWI image
-  mitk::DiffusionImage<short>* fixedDwi = dynamic_cast<mitk::DiffusionImage<short>*> (fixedImage.GetPointer());
-  mitk::DiffusionImage<short>* movingDwi = dynamic_cast<mitk::DiffusionImage<short>*> (movingImage.GetPointer());
+  mitk::DiffusionImage<short>* fixedDwi = dynamic_cast<mitk::DiffusionImage<short>*> (fixedImage);
+  mitk::DiffusionImage<short>* movingDwi = dynamic_cast<mitk::DiffusionImage<short>*> (movingImage);
   itk::B0ImageExtractionImageFilter<short,short >::Pointer b0Extraction = itk::B0ImageExtractionImageFilter<short,short>::New();
   offset[0]=offset[1]=offset[2]=0;
   if (fixedDwi != NULL)
@@ -160,7 +170,7 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
   registrationMethod->SetFixedImage( fixedImage );
 
-  if (mask.IsNotNull())
+  if (mask != NULL)
   {
     registrationMethod->SetFixedImageMask(mask);
     registrationMethod->SetUseFixedImageMask(true);

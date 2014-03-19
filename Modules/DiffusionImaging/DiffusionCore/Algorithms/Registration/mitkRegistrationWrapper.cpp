@@ -10,26 +10,22 @@
 
 #include <vnl/vnl_inverse.h>
 
-mitk::Image::Pointer mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image* img, const mitk::RegistrationWrapper::RidgidTransformType &transformation,double* offset, mitk::Image* resampleReference,  bool binary)
+void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer img, const mitk::RegistrationWrapper::RidgidTransformType &transformation,double* offset, mitk::Image* resampleReference,  bool binary)
 {
   typedef mitk::DiffusionImage<short> DiffusionImageType;
 
-  Image::Pointer registeredImage = Image::New();
-
-  if (dynamic_cast<DiffusionImageType*> (img) == NULL)
+  if (dynamic_cast<DiffusionImageType*> (img.GetPointer()) == NULL)
   {
 
     ItkImageType::Pointer itkImage = ItkImageType::New();
 
 
-    Image::Pointer imgCopy = img->Clone();
+    MITK_ERROR << "imgCopy  0 " <<  "/" << img->GetReferenceCount();
+    MITK_ERROR << "pixel type  " << img->GetPixelType().GetComponentTypeAsString();
 
-    MITK_ERROR << "imgCopy  0 " <<  "/" << imgCopy->GetReferenceCount();
-    MITK_ERROR << "pixel type  " << imgCopy->GetPixelType().GetComponentTypeAsString();
+    CastToItkImage(img, itkImage);
 
-    CastToItkImage(imgCopy, itkImage);
 
-    MITK_ERROR << "imgCopy  1 " <<  "/" << imgCopy->GetReferenceCount();
 
     typedef itk::Euler3DTransform< double > RigidTransformType;
     RigidTransformType::Pointer rtransform = RigidTransformType::New();
@@ -80,20 +76,22 @@ mitk::Image::Pointer mitk::RegistrationWrapper::ApplyTransformationToImage(mitk:
 
       resampler->Update();
 
-      GrabItkImageMemory(resampler->GetOutput(), registeredImage);
+      GrabItkImageMemory(resampler->GetOutput(), img);
     }
     else
     {
-     ItkImageType::Pointer itkImageCopy = ItkImageType::New();
-     itkImageCopy->Graft(itkImage);
-     registeredImage = GrabItkImageMemory(itkImageCopy);
-
+      // !! CastToItk behaves very differently depending on the original data type
+      // if the target type is the same as the original, only a pointer to the data is set
+      // and an additional GrabItkImageMemory will cause a segfault when the image is destroyed
+      // GrabItkImageMemory - is not necessary in this case since we worked on the original data
+      // See Bug 17538.
+      if (img->GetPixelType().GetComponentTypeAsString() != "double")
+        img = GrabItkImageMemory(itkImage);
     }
-
   }
   else
   {
-    DiffusionImageType::Pointer diffImages = dynamic_cast<DiffusionImageType*>(img);
+    DiffusionImageType::Pointer diffImages = dynamic_cast<DiffusionImageType*>(img.GetPointer());
 
     typedef itk::Euler3DTransform< double > RigidTransformType;
     RigidTransformType::Pointer rtransform = RigidTransformType::New();
@@ -126,9 +124,8 @@ mitk::Image::Pointer mitk::RegistrationWrapper::ApplyTransformationToImage(mitk:
     // For Diff. Images: Need to rotate the gradients (works in-place)
     correctionFilter->SetImage(diffImages);
     correctionFilter->CorrectDirections(transM.GetVnlMatrix());
-    registeredImage = diffImages;
+    img = diffImages;
   }
-  return registeredImage;
 }
 
 void mitk::RegistrationWrapper::GetTransformation(mitk::Image* fixedImage, mitk::Image* movingImage, RidgidTransformType transformation,double* offset, mitk::Image* mask)

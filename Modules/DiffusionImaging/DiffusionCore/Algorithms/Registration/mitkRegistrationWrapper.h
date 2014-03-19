@@ -25,7 +25,7 @@ class MitkDiffusionCore_EXPORT RegistrationWrapper
 {
 public:
 
-  typedef itk::Image<float,3> ItkImageType;
+  typedef itk::Image<double,3> ItkImageType;
   typedef itk::Image<unsigned char,3> ItkBinaryImageType;
   typedef double* RidgidTransformType;
 
@@ -43,7 +43,7 @@ public:
    * @param resampleReference - image to which is to be resampled
    * @param binary
    */
-  static Image::Pointer ApplyTransformationToImage(mitk::Image* img, const RidgidTransformType& transformation, double *offset, mitk::Image* resampleReference = NULL , bool binary = false);
+  static void ApplyTransformationToImage(mitk::Image::Pointer img, const RidgidTransformType& transformation, double *offset, mitk::Image* resampleReference = NULL , bool binary = false);
 
   /**
    * @brief GetTransformation Registeres the moving to the fixed image and returns the according transformation

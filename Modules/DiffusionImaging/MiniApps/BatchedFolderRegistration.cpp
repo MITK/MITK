@@ -298,11 +298,11 @@ int BatchedFolderRegistration( int argc, char* argv[] )
       //mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, referenceMask);
       MITK_ERROR << "REF COUNT MOVING 2 " << movingImage->GetReferenceCount();
 
-      mitk::Image::Pointer regImage = mitk::RegistrationWrapper::ApplyTransformationToImage(movingImage, transf,offset, NULL); // , resampleImage
+      mitk::RegistrationWrapper::ApplyTransformationToImage(movingImage, transf,offset, NULL); // , resampleImage
       MITK_ERROR << "REF COUNT MOVING 3 " << movingImage->GetReferenceCount();
       savePathAndFileName = GetSavePath(outputPath, fileMorphName);
       std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
-      SaveImage(savePathAndFileName,regImage,fileType );
+      SaveImage(savePathAndFileName,movingImage,fileType );
     }
 
     if (!silent)
@@ -324,12 +324,12 @@ int BatchedFolderRegistration( int argc, char* argv[] )
       MITK_INFO << "----Processing derived resource " << derivedResourceFilename << " ...";
       mitk::Image::Pointer derivedMovingResource = mitk::IOUtil::LoadImage(derivedResourceFilename);
       // Apply transformation to derived resource, treat derived resource as binary
-      mitk::Image::Pointer regDerImage = mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource->Clone(), transf,offset, NULL, true);
+      mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, NULL, true);
 
       savePathAndFileName = GetSavePath(outputPath, derivedResourceFilename);
       std::string fileType = itksys::SystemTools::GetFilenameExtension(derivedResourceFilename);
 
-      SaveImage(savePathAndFileName,regDerImage,fileType );
+      SaveImage(savePathAndFileName,derivedMovingResource,fileType );
     }
   }
 

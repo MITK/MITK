@@ -14,8 +14,8 @@ configure_file(${TEMPLATE_FILE} Source/MediaStorageAndFileFormat/gdcmSorter.cxx 
 
 # fix issues with whitespace in source directories
 file(STRINGS CMake/ExportConfiguration/GDCMConfig.cmake.in sourceCode NEWLINE_CONSUME)
-string(REPLACE "SET( GDCM_INCLUDE_DIRS @GDCM_INCLUDE_PATH@)" "SET( GDCM_INCLUDE_DIRS \"@GDCM_INCLUDE_PATH@\")" sourceCode ${sourceCode})
-string(REPLACE "SET(GDCM_LIBRARY_DIRS @GDCM_LIBRARY_DIR@)" "SET(GDCM_LIBRARY_DIRS \"@GDCM_LIBRARY_DIR@\")" sourceCode ${sourceCode})
+string(REPLACE "set( GDCM_INCLUDE_DIRS @GDCM_INCLUDE_PATH@)" "set( GDCM_INCLUDE_DIRS \"@GDCM_INCLUDE_PATH@\")" sourceCode ${sourceCode})
+string(REPLACE "set(GDCM_LIBRARY_DIRS @GDCM_LIBRARY_DIR@)" "set(GDCM_LIBRARY_DIRS \"@GDCM_LIBRARY_DIR@\")" sourceCode ${sourceCode})
 SET(GDCM_LIBRARY_DIRS @GDCM_LIBRARY_DIR@)
 # set variable CONTENTS, which is substituted in TEMPLATE_FILE
 set(CONTENTS ${sourceCode})

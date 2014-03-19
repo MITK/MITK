@@ -104,7 +104,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
 
     for( existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
     {
-      for ( unsigned int j = 0; j < cellSize; j++ )
+      for ( vtkIdType j = 0; j < cellSize; j++ )
       {
         existingPoints->GetPoint(cell[j], p);
 
@@ -354,7 +354,9 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
   double prevPixelVal = 1;
 
-  unsigned int _size[3] = { (unsigned int)(sizeOfRegion[0] - 1), (unsigned int)(sizeOfRegion[1] - 1), (unsigned int)(sizeOfRegion[2] - 1) };
+  DistanceImageType::IndexType _size;
+  _size.Fill(-1);
+  _size += sizeOfRegion;
   double center [3] = {_size[0]/2.0, _size[1]/2.0, _size[2]/2.0};
   MITK_INFO<<"Size: ["<<_size[0]<<","<<_size[1]<<","<<_size[2]<<"] Center: ["<<center[0]<<","<<center[1]<<","<<center[2]<<"]";
 

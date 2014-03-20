@@ -196,7 +196,7 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
               glEnd();
               glLineWidth(1);
               //the actual point in the specified color to see the usual color of the point
-              glColor3f(color[0],color[1],color[2]);
+              glColor3f(colorprop->GetColor().GetRed(),colorprop->GetColor().GetGreen(),colorprop->GetColor().GetBlue());
               glPointSize(1);
               glBegin (GL_POINTS);
               tmp=pt2d;             glVertex2dv(&tmp[0]);
@@ -226,7 +226,7 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
           glEnd();
           glLineWidth(1);
           //the actual point in the specified color to see the usual color of the point
-          glColor3f(color[0],color[1],color[2]);
+          glColor3f(colorprop->GetColor().GetRed(),colorprop->GetColor().GetGreen(),colorprop->GetColor().GetBlue());
           glPointSize(1);
           glBegin (GL_POINTS);
           tmp=pt2d;             glVertex2dv(&tmp[0]);

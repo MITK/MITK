@@ -29,18 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkPropAssembly.h>
 
-#include <vtkMarchingSquares.h>
-#include <vtkContourFilter.h>
-#include <vtkMarchingCubes.h>
-#include <mitkSurface.h>
-#include <mitkIOUtil.h>
-
-#include <mitkStandardFileLocations.h>
-#include <mitkCoreServices.h>
-#include <mitkShaderProperty.h>
-
-#include <fstream>
-
 class vtkActor;
 class vtkPolyDataMapper;
 class vtkPlaneSource;
@@ -297,9 +285,6 @@ protected:
 
   /** \brief Set the color of the image/polydata */
   void ApplyColor( mitk::BaseRenderer* renderer );
-
-  /** \brief Set the shader of the image/polydata */
-  void ApplyShader( mitk::BaseRenderer* renderer );
 
   /** \brief Set the opacity of the actor. */
   void ApplyOpacity( mitk::BaseRenderer* renderer );

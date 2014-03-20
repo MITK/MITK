@@ -227,7 +227,7 @@ void RTDoseVisualizer::OnReferenceDoseChanged(double value)
       m_selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
       m_selectedNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
-      mitk::TimeSlicedGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+      mitk::TimeGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
       mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );
     }
   }
@@ -352,7 +352,7 @@ void RTDoseVisualizer::UpdateFreeIsoLine(mitk::IsoDoseLevel * level, mitk::DoseV
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
   mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
 
-  m_Filters.at(0)->SetInput(slicedImage->GetVtkImageData());
+  m_Filters.at(0)->SetInputData(slicedImage->GetVtkImageData());
   m_Filters.at(0)->GenerateValues(1,level->GetDoseValue()*pref,level->GetDoseValue()*pref);
   m_Filters.at(0)->Update();
 
@@ -504,7 +504,7 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
 
   vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
   m_Filters.push_back(contourFilter);
-  contourFilter->SetInput(reslicedImage->GetVtkImageData());
+  contourFilter->SetInputData(reslicedImage->GetVtkImageData());
   contourFilter->GenerateValues(num,min,max);
   contourFilter->Update();
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
@@ -542,7 +542,7 @@ void RTDoseVisualizer::UpdateStdIsolines()
   {
     if(doseIT->GetVisibleIsoLine()){
       vtkSmartPointer<vtkContourFilter> isolineFilter = vtkSmartPointer<vtkContourFilter>::New();
-      isolineFilter->SetInput(reslicedImage->GetVtkImageData());
+      isolineFilter->SetInputData(reslicedImage->GetVtkImageData());
       isolineFilter->GenerateValues(1,doseIT->GetDoseValue()*pref,doseIT->GetDoseValue()*pref);
       isolineFilter->Update();
 

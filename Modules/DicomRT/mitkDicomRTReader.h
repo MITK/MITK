@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
-#include <mitkDicomRTExports.h>
+#include <MitkDicomRTExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourElement.h"
 #include <mitkContourModelSet.h>
@@ -72,7 +72,7 @@ class DRTStructureSetIOD;
 namespace mitk
 {
 
-  class mitkDicomRT_EXPORT DicomRTReader: public itk::Object
+  class MitkDicomRT_EXPORT DicomRTReader: public itk::Object
   {
 
     typedef std::deque<mitk::ContourModelSet::Pointer> ContourModelSetVector;

@@ -1,5 +1,4 @@
 SET(CPP_FILES
-  mitkDicomRTWriter.cpp
   mitkDicomRTReader.cpp
   DataStructures/mitkRTConstants.cpp
   DataStructures/mitkIsoDoseLevel.cpp
@@ -9,7 +8,6 @@ SET(CPP_FILES
 )
 
 set(H_FILES
-  mitkDicomRTWriter.h
   mitkDicomRTReader.h
   DataStructures/mitkIsoDoseLevel.h
   DataStructures/mitkIsoDoseLevelCollections.h

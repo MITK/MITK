@@ -20,13 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <mitkDoseValueType.h>
 
-#include "RTUIExports.h"
+#include "MitkRTUIExports.h"
 
 namespace mitk
 {
   namespace rt
   {
-    struct RTUI_EXPORT UIConstants
+    struct MitkRTUI_EXPORT UIConstants
     {
       /** ID/Path of main preference node for RT UI.  */
       static const std::string ROOT_PREFERENCE_NODE_ID;
@@ -71,7 +71,7 @@ namespace mitk
       static const DoseValueAbs DEFAULT_REFERENCE_DOSE_VALUE;
     };
 
-    struct RTUI_EXPORT CTKEventConstants
+    struct MitkRTUI_EXPORT CTKEventConstants
     {
       /** ID/Path of main preference node for RT UI.  */
       static const std::string TOPIC_REFERENCE_DOSE;

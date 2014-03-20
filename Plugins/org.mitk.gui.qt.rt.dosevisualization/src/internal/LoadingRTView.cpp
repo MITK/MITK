@@ -86,7 +86,7 @@ void LoadingRTView::LoadRTStructureSet()
     x->SetVisibility(true);
     GetDataStorage()->Add(x);
   }
-  mitk::TimeSlicedGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+  mitk::TimeGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews( geo );
 }
 
@@ -126,6 +126,6 @@ void LoadingRTView::LoadRTDoseFile()
 
   GetDataStorage()->Add(mitkImage);
 
-  mitk::TimeSlicedGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+  mitk::TimeGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );
 }

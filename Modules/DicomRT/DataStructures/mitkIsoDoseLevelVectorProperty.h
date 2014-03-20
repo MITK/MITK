@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseProperty.h"
 #include "mitkIsoDoseLevelCollections.h"
-#include "mitkDicomRTExports.h"
+#include "MitkDicomRTExports.h"
 
 namespace mitk {
 
@@ -28,7 +28,7 @@ namespace mitk {
 /**
 \brief Property class for dose iso level vector.
 */
-class mitkDicomRT_EXPORT IsoDoseLevelVectorProperty : public BaseProperty
+class MitkDicomRT_EXPORT IsoDoseLevelVectorProperty : public BaseProperty
 {
 
 protected:

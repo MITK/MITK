@@ -366,9 +366,6 @@ set(CPP_FILES
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkLevelWindowFilter.cpp
   Rendering/vtkNeverTranslucentTexture.cpp
-
-  Rendering/vtkMitkShaderTexture.cpp
-
   Rendering/mitkOverlay.cpp
   Rendering/mitkVtkOverlay.cpp
   Rendering/mitkVtkOverlay2D.cpp

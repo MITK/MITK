@@ -1,6 +1,6 @@
-MITK_CREATE_MODULE(RTUI
+MITK_CREATE_MODULE(
   INCLUDE_DIRS Qmitk Helper
-  DEPENDS mitkDicomRT Qmitk QmitkExt
+  DEPENDS MitkDicomRT MitkQtWidgets MitkQtWidgetsExt
   PACKAGE_DEPENDS CTK
   QT_MODULE
 )

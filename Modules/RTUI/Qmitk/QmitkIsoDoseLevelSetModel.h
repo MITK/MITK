@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIsoDoseLevelCollections.h"
 
-#include "RTUIExports.h"
+#include "MitkRTUIExports.h"
 
 
 /*!
@@ -31,7 +31,7 @@ Please see special delegates (QmitkDoseColorDelegate, QmitkDoseValueDelegate, Qm
 handle visualization and editing in views that work on this model.
 \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 */
-class RTUI_EXPORT QmitkIsoDoseLevelSetModel : public QAbstractTableModel
+class MitkRTUI_EXPORT QmitkIsoDoseLevelSetModel : public QAbstractTableModel
 {
   Q_OBJECT
 

@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QStyledItemDelegate>
 
-#include "RTUIExports.h"
+#include "MitkRTUIExports.h"
 
 /** \class QmitkDoseValueDelegate
 \brief An item delegate for rendering and editing dose values.
 The delegate assumes that the model uses the role Qt::UserRole+1
 to indicate if the returned dose value is an absolute (data(Qt::UserRole+1) == true)
 or an relative dose (data(Qt::UserRole+1) == false).*/
-class RTUI_EXPORT QmitkDoseValueDelegate : public QStyledItemDelegate
+class MitkRTUI_EXPORT QmitkDoseValueDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 

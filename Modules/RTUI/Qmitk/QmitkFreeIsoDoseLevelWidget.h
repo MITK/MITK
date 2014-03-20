@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_FREE_ISO_DOSE_LEVEL_WIDGET_H
 #define QMITK_FREE_ISO_DOSE_LEVEL_WIDGET_H
 
-#include "RTUIExports.h"
+#include "MitkRTUIExports.h"
 
 #include "ui_QmitkFreeIsoDoseLevelWidget.h"
 #include <QWidget>
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * \class QmitkFreeIsoDoseLevelWidget
 * \brief Widget that allows to show and edit the content of an mitk::IsoDoseLevel instance.
 */
-class RTUI_EXPORT QmitkFreeIsoDoseLevelWidget : public QWidget, private Ui::QmitkFreeIsoDoseLevelWidget
+class MitkRTUI_EXPORT QmitkFreeIsoDoseLevelWidget : public QWidget, private Ui::QmitkFreeIsoDoseLevelWidget
 {
   Q_OBJECT
 

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "mitkDoseValueType.h"
-#include "mitkDicomRTExports.h"
+#include "MitkDicomRTExports.h"
 
 namespace mitk
 {
@@ -37,7 +37,7 @@ namespace mitk
   * by the next IsoDoseLevel greater (higher dose value) than the current iso level.
   * Color and the visibility options are used to indicate the visualization style.
   */
-  class mitkDicomRT_EXPORT IsoDoseLevel: public itk::Object
+  class MitkDicomRT_EXPORT IsoDoseLevel: public itk::Object
   {
   public:
     typedef ::itk::RGBPixel<float> ColorType;

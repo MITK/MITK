@@ -20,11 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QStyledItemDelegate>
 
-#include "RTUIExports.h"
+#include "MitkRTUIExports.h"
 
 /** \class QmitkDoseColorDelegate
 \brief An item delegate for rendering and editing dose color in a QTableView.*/
-class RTUI_EXPORT QmitkDoseColorDelegate : public QStyledItemDelegate
+class MitkRTUI_EXPORT QmitkDoseColorDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 

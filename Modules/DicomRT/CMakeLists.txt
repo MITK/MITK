@@ -1,8 +1,8 @@
 # CREATE MODULE HERE
 IF (NOT DEFINED DCMTK_dcmrt_LIBRARY OR DCMTK_dcmrt_LIBRARY)
-MITK_CREATE_MODULE(mitkDicomRT
+MITK_CREATE_MODULE(
   INCLUDE_DIRS DataStructures
-  DEPENDS Mitk Segmentation SceneSerializationBase
+  DEPENDS MitkSegmentation MitkSceneSerializationBase
   PACKAGE_DEPENDS DCMTK
   QT_MODULE
 )

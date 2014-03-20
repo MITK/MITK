@@ -21,14 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// Toolkit includes.
 #include <QStyledItemDelegate>
 
-#include "RTUIExports.h"
+#include "MitkRTUIExports.h"
 
 
 /** \class QmitkDoseVisualStyleDelegate
 \brief An item delegate for rendering and editing dose visualization options.
 The delegate is used to handle aspects of a isodose level like visualization
 of the isodose lines or colorwash display.*/
-class RTUI_EXPORT QmitkDoseVisualStyleDelegate : public QStyledItemDelegate
+class MitkRTUI_EXPORT QmitkDoseVisualStyleDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 

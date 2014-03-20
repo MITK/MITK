@@ -65,7 +65,11 @@
     </layout>
    </item>
    <item>
-    <widget class="QLineEdit" name="filterLineEdit"/>
+    <widget class="QLineEdit" name="filterLineEdit">
+     <property name="placeholderText">
+      <string>Filter</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QTreeView" name="treeView">

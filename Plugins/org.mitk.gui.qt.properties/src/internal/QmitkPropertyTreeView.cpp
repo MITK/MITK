@@ -69,8 +69,6 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.newButton->setEnabled(false);
 
-  m_Controls.filterLineEdit->setPlaceholderText("Filter");
-
   m_Controls.description->hide();
   m_Controls.propertyListLabel->hide();
   m_Controls.propertyListComboBox->hide();

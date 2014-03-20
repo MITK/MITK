@@ -43,7 +43,6 @@ set(module_dirs
     ToFProcessing
     ToFUI
     US
-    ClippingTools
     USUI
     DicomUI
     Simulation

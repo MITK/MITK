@@ -1,4 +1,0 @@
-MITK_CREATE_MODULE(
-  DEPENDS MitkSegmentation
-  WARNINGS_AS_ERRORS
-)

@@ -56,7 +56,9 @@ find_program(QT_XMLPATTERNS_EXECUTABLE
   NO_DEFAULT_PATH
 )
 
-option(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
+find_package(Doxygen)
+
+option(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ${DOXYGEN_FOUND})
 
 mark_as_advanced(BLUEBERRY_USE_QT_HELP
                  QT_HELPGENERATOR_EXECUTABLE
@@ -65,8 +67,11 @@ mark_as_advanced(BLUEBERRY_USE_QT_HELP
                  QT_XMLPATTERNS_EXECUTABLE)
 
 if(BLUEBERRY_USE_QT_HELP)
-  find_package(Doxygen)
   set(_force_blueberry_use_qt_help_to_off 0)
+  if(NOT DOXYGEN_FOUND)
+    message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because Doxygen was not found.")
+    set(_force_blueberry_use_qt_help_to_off 1)
+  endif()
   if(DOXYGEN_FOUND AND NOT DOXYGEN_VERSION VERSION_EQUAL 1.8.0)
     message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because Doxygen version 1.8.0 not found.")
     set(_force_blueberry_use_qt_help_to_off 1)

@@ -106,8 +106,16 @@ void RTDoseVisualizer::OnSliceChanged(itk::Object *sender, const itk::EventObjec
 
   if(m_FreeIsoAdded)
   {
-    GetDataStorage()->Remove(m_FreeIsoline);
-    this->UpdatePolyData(1,m_Controls.spinReferenceDose->value()*0.5,m_Controls.spinReferenceDose->value()*0.5);
+//    float pref;
+//    m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+//    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+//    mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
+
+//    m_Filters.at(0)->SetInput(slicedImage->GetVtkImageData());
+//    m_Filters.at(0)->GenerateValues(1,pref,level->GetDoseValue()*pref);
+//    m_Filters.at(0)->Update();
+
+//    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -348,6 +356,8 @@ void RTDoseVisualizer::UpdateFreeIsoValues()
 
 void RTDoseVisualizer::UpdateFreeIsoLineColor(mitk::IsoDoseLevel *level)
 {
+  //push it in and get the key!
+//  m_freeIsoValues
   ::itk::RGBPixel<float> color = level->GetColor();
   mitk::Color mColor;
   mColor[0]=color.GetRed();

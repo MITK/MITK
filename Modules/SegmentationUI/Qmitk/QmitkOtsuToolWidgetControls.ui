@@ -136,7 +136,7 @@
       <number>0</number>
      </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
+      <enum>QAbstractItemView::MultiSelection</enum>
      </property>
      <property name="resizeMode">
       <enum>QListView::Adjust</enum>

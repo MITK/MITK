@@ -57,7 +57,7 @@ class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     void OnSegmentationRegionAccept();
 
-    void OnItemSelectionChanged(QListWidgetItem *item);
+    void OnItemSelectionChanged();
 
     void OnVolumePreviewChecked(int);
 
@@ -76,7 +76,7 @@ class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     int m_NumberOfBins;
 
-    QListWidgetItem* m_SelectedItem;
+    QList<QListWidgetItem *> m_SelectedItems;
 };
 
 #endif

@@ -38,10 +38,10 @@ NonLocalMeansDenoisingFilter< TPixelType >
   : m_SearchRadius(5),
     m_ComparisonRadius(1),
     m_UseJointInformation(false),
-    m_UseRicianAdaption(false),
-    m_Variance(0)
+    m_UseRicianAdaption(true),
+    m_Variance(343.6)
 {
-  this->SetNumberOfRequiredInputs( 2 );
+  this->SetNumberOfRequiredInputs( 1 );
 }
 
 template< class TPixelType >
@@ -49,97 +49,11 @@ void
 NonLocalMeansDenoisingFilter< TPixelType >
 ::BeforeThreadedGenerateData()
 {
-//  typename OutputImageType::Pointer outputImage =
-//          static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
-//  typename OutputImageType::PixelType px;
-//  px.SetSize(1);
-//  px.SetElement(0,0);
-//  outputImage->FillBuffer(px);
-
-//  typename InputImageType::Pointer inImage = static_cast< InputImageType* >(this->ProcessObject::GetInput(0));
-//  typename MaskImageType::Pointer mask = static_cast< MaskImageType* >(this->ProcessObject::GetInput(1));
-//  int size = inImage->GetVectorLength();
-//  m_Deviations.SetSize(size);
-//  typename ImageExtractorType::Pointer extractor = ImageExtractorType::New();
-//  extractor->SetInput(inImage);
-
-//  // calculate max value of mask, for correct inversion
-//  typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
-//  statisticsFilter->SetInput(mask);
-//  statisticsFilter->Update();
-
-//  // invert mask, to mask the backround
-//  typename InvertImageFilterType::Pointer inverter = InvertImageFilterType::New();
-//  inverter->SetInput(mask);
-//  inverter->SetMaximum(statisticsFilter->GetMaximum());
-//  inverter->Update();
-
-//  // make sure inverted mask has same origin is the brainmask
-//  typename ChangeInformationType::Pointer changeMaskFilter = ChangeInformationType::New();
-//  changeMaskFilter->ChangeOriginOn();
-//  changeMaskFilter->SetInput(inverter->GetOutput());
-//  changeMaskFilter->SetOutputOrigin(mask->GetOrigin());
-//  changeMaskFilter->Update();
-//  typename MaskImageType::Pointer invertedMask = changeMaskFilter->GetOutput();
-//  typename MaskImageType::PointType imageOrigin = inImage->GetOrigin();
-//  typename MaskImageType::PointType maskOrigin = invertedMask->GetOrigin();
-//  long offset[3];
-
-//  typedef itk::ContinuousIndex<double, 3> ContinousIndexType;
-//  ContinousIndexType maskOriginContinousIndex, imageOriginContinousIndex;
-
-//  inImage->TransformPhysicalPointToContinuousIndex(maskOrigin, maskOriginContinousIndex);
-//  inImage->TransformPhysicalPointToContinuousIndex(imageOrigin, imageOriginContinousIndex);
-
-//  // make sure there is no misalignment between mask and image
-//  for ( unsigned int i = 0; i < 3; ++i )
-//  {
-//    double misalignment = maskOriginContinousIndex[i] - floor( maskOriginContinousIndex[i] + 0.5 );
-//    if ( fabs( misalignment ) > mitk::eps )
-//    {
-//        itkExceptionMacro( << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << misalignment << ")" );
-//    }
-
-//    double indexCoordDistance = maskOriginContinousIndex[i] - imageOriginContinousIndex[i];
-//    offset[i] = (int) indexCoordDistance + inImage->GetBufferedRegion().GetIndex()[i];
-//  }
-
-//  // calculate for each channel the stddev
-//  for ( int i = 0; i < size; ++i)
-//  {
-//    /// extract channel i of the input
-//    extractor->SetIndex(i);
-//    extractor->Update();
-
-//    // adapt mask to the image
-//    typename ChangeInformationType::Pointer adaptMaskFilter;
-//    adaptMaskFilter = ChangeInformationType::New();
-//    adaptMaskFilter->ChangeOriginOn();
-//    adaptMaskFilter->ChangeRegionOn();
-//    adaptMaskFilter->SetInput( invertedMask );
-//    adaptMaskFilter->SetOutputOrigin( extractor->GetOutput()->GetOrigin() /*image->GetOrigin()*/ );
-//    adaptMaskFilter->SetOutputOffset( offset );
-//    adaptMaskFilter->Update();
-
-//    // extract backround as the ROI
-//    typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput();
-//    typename ExtractImageFilterType::Pointer extractImageFilter = ExtractImageFilterType::New();
-//    extractImageFilter->SetInput( extractor->GetOutput() );
-//    extractImageFilter->SetExtractionRegion( adaptedMaskImage->GetBufferedRegion() );
-//    extractImageFilter->Update();
-
-//    // calculate statistics of ROI
-//    typename MaskImageType::Pointer adaptedImage = extractImageFilter->GetOutput();
-//    typename LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
-//    labelStatisticsFilter->SetInput(adaptedImage);
-//    labelStatisticsFilter->SetLabelInput(adaptedMaskImage);
-//    labelStatisticsFilter->UseHistogramsOff();
-//    labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
-//    labelStatisticsFilter->Update();
-
-//    // save the stddev of each channel
-//    m_Deviations.SetElement(i, labelStatisticsFilter->GetSigma(1));
-//  }
+  MITK_INFO << "Variance: " << m_Variance;
+  MITK_INFO << "SearchRadius: " << m_SearchRadius;
+  MITK_INFO << "ComparisonRadius: " << m_ComparisonRadius;
+  MITK_INFO << "Use Joint Information: " << std::boolalpha << m_UseJointInformation;
+  MITK_INFO << "Use Rician Adaption: " << std::boolalpha << m_UseRicianAdaption;
 
   m_CurrentVoxelCount = 0;
 }
@@ -149,6 +63,8 @@ void
 NonLocalMeansDenoisingFilter< TPixelType >
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
+
+
   // initialize iterators
   typename OutputImageType::Pointer outputImage =
           static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
@@ -257,7 +173,15 @@ NonLocalMeansDenoisingFilter< TPixelType >
           df = 0;
         }
 
-        TPixelType outval = std::floor(std::sqrt(df) + 0.5);
+        TPixelType outval;
+        if (m_UseRicianAdaption)
+        {
+          outval = std::floor(std::sqrt(df) + 0.5);
+        }
+        else
+        {
+          outval = std::floor(df + 0.5);
+        }
         outpix.SetElement(i, outval);
       }
     }
@@ -355,7 +279,15 @@ NonLocalMeansDenoisingFilter< TPixelType >
         {
           a = 0;
         }
-        TPixelType outval = std::floor(std::sqrt(a) + 0.5);
+        TPixelType outval;
+        if (m_UseRicianAdaption)
+        {
+          outval = std::floor(std::sqrt(a) + 0.5);
+        }
+        else
+        {
+          outval = std::floor(a + 0.5);
+        }
         outpix.SetElement(i, outval);
       }
     }

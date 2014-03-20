@@ -390,6 +390,9 @@
         </item>
         <item>
          <widget class="QCheckBox" name="checkGlobalVisIsoLine">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Isolines</string>
           </property>
@@ -408,6 +411,9 @@
         </item>
         <item>
          <widget class="QCheckBox" name="checkGlobalVisColorWash">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Colorwash</string>
           </property>

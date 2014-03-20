@@ -64,19 +64,17 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer( mitk::BaseRenderer 
     mitk::ContourModel* inputContour  = it->GetPointer();
     vtkSmartPointer<vtkPolyData> polyData = this->CreateVtkPolyDataFromContour(inputContour, renderer);
 
-    vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
+    vtkSmartPointer<vtkRibbonFilter> tubeFilter = vtkSmartPointer<vtkRibbonFilter>::New();
     tubeFilter->SetInput(polyData);
 
     float lineWidth(1.0);
     if (this->GetDataNode()->GetFloatProperty( "contour.3D.width", lineWidth, renderer ))
     {
-      tubeFilter->SetRadius(lineWidth);
+      tubeFilter->SetWidth(lineWidth);
     }else
     {
-      tubeFilter->SetRadius(0.5);
+      tubeFilter->SetWidth(0.5);
     }
-    tubeFilter->CappingOn();
-    tubeFilter->SetNumberOfSides(10);
     tubeFilter->Update();
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();

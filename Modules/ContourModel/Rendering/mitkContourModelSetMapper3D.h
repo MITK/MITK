@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkAssembly.h>
 #include <vtkProp.h>
 #include <vtkPolyData.h>
-#include <vtkTubeFilter.h>
+#include <vtkRibbonFilter.h>
 
 
 namespace mitk {

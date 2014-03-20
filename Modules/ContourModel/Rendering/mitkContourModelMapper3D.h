@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkActor.h>
 #include <vtkProp.h>
 #include <vtkPolyData.h>
-#include <vtkTubeFilter.h>
+#include <vtkRibbonFilter.h>
 
 
 namespace mitk {
@@ -68,7 +68,7 @@ namespace mitk {
       /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
 
-      vtkSmartPointer<vtkTubeFilter> m_TubeFilter;
+      vtkSmartPointer<vtkRibbonFilter> m_TubeFilter;
 
       //mitk::ContourModelToVtkPolyDataFilter::Pointer m_contourToPolyData;
 

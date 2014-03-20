@@ -89,6 +89,10 @@ protected slots:
     void BeforeThread();                      ///< start timer etc.
     void TimerUpdate();
 
+    void AddInputFolderName();
+    void AddOutputFolderName();
+    void StartBatch();
+
     void AdvancedSettings();
 
 
@@ -108,12 +112,19 @@ private:
   void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
 
   /** flags etc. */
+  bool            m_IsBatch, m_IsAborted;
+  QStringList     m_BatchList;
   bool            m_ThreadIsRunning;
   QTimer*         m_RegistrationTimer;
   QTime           m_RegistrationTime;
   unsigned long   m_ElapsedTime;
   unsigned long   m_Steps;
   int             m_LastStep;
+  unsigned int    m_CurrentFile;
+  unsigned int    m_TotalFiles;
+
+  // the Qt parent of our GUI (NOT of this object)
+  QWidget* m_Parent;
 
   /** global Registerer and friends */
   itk::SmartPointer<DWIHeadMotionCorrectionFilterType> m_GlobalRegisterer;

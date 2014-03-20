@@ -85,8 +85,14 @@
       <string>Monitor</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_26">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="toolTip">
          <string/>
         </property>
@@ -97,11 +103,11 @@
          <string/>
         </property>
         <property name="text">
-         <string>Process Time:</string>
+         <string>Process Time: </string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QLabel" name="label_23">
         <property name="toolTip">
          <string/>
@@ -117,7 +123,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="1" column="1">
        <widget class="QLabel" name="m_CurrentStepLabel">
         <property name="toolTip">
          <string/>
@@ -133,7 +139,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QLabel" name="m_RegistrationTimeLabel">
         <property name="toolTip">
          <string/>
@@ -148,6 +154,20 @@
          <string>-</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+           <string>File:</string>
+         </property>
+        </widget>
+      </item>
+      <item row="0" column="1">
+        <widget class="QLabel" name="m_CurrentFileLabel">
+          <property name="text">
+           <string>-</string>
+          </property>
+         </widget>
       </item>
      </layout>
     </widget>
@@ -170,6 +190,13 @@
       <iconset resource="../../../../Modules/QmitkExt/resources/QmitkResources.qrc">
        <normaloff>:/qmitk/stop.xpm</normaloff>:/qmitk/stop.xpm</iconset>
      </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QCheckBox" name="m_AdvancedSettingsCheckbox">
+      <property name="text">
+       <string>Advanced</string>
+      </property>
     </widget>
    </item>
    <item row="5" column="0">
@@ -200,20 +227,65 @@
        <number>4</number>
       </property>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Advanced settings</string>
+        <string>Batch mode</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>This will process all the .dwi files inside the input folder</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLineEdit" name="m_OutputFolderTextbox"/>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QLineEdit" name="m_InputFolderTextbox"/>
+      </item>
+      <item row="7" column="0">
+       <widget class="QPushButton" name="m_StartBatchButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>START BATCH PROCESSING</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QPushButton" name="m_SelectInputButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Select input folder</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QPushButton" name="m_SelectOutputButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Select output folder</string>
         </property>
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QCheckBox" name="m_AdvancedSettingsCheckbox">
-     <property name="text">
-      <string>Advanced Settings</string>
-     </property>
     </widget>
    </item>
   </layout>

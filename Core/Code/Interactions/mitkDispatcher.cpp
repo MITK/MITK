@@ -120,7 +120,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
       m_SelectedInteractor = NULL;
     }
     // give event to selected interactor
-    if (eventIsHandled == false)
+    if (eventIsHandled == false && m_SelectedInteractor.IsNotNull())
     {
       eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
     }

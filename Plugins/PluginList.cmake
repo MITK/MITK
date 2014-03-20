@@ -10,6 +10,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.core.jobs:OFF
   org.mitk.diffusionimaging:OFF
   org.mitk.simulation:OFF
+  org.mitk.gui.qt.rt.dosevisualization:ON
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.coreapplication:OFF
   org.mitk.gui.qt.ext:OFF

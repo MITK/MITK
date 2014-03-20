@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
 #include <vtkProperty.h>
-#include "mitkSurface.h"
+#include <mitkCoreServices.h>
+#include <mitkPropertyAliases.h>
+#include <mitkSurface.h>
 
 mitk::ContourModelSetMapper3D::ContourModelSetMapper3D()
 {
@@ -90,7 +92,7 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer( mitk::BaseRenderer 
   }
 
 
-  this->ApplyContourProperties(renderer);
+  this->ApplyColorAndOpacityProperties(renderer);
 
 }
 
@@ -156,28 +158,21 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelSetMapper3D::CreateVtkPolyDataFro
 
 
 
-void mitk::ContourModelSetMapper3D::ApplyContourProperties(mitk::BaseRenderer* renderer)
+void mitk::ContourModelSetMapper3D::ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor*)
 {
+  MITK_INFO << "ApplyColorAndOpacityProperties()";
+
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
+  float color[3];
+  this->GetDataNode()->GetColor(color, renderer);
 
-  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-        ("contour.color", renderer));
-  if(colorprop)
+  vtkSmartPointer<vtkPropCollection> collection = vtkSmartPointer<vtkPropCollection>::New();
+  localStorage->m_Assembly->GetActors(collection);
+  collection->InitTraversal();
+  for(vtkIdType i = 0; i < collection->GetNumberOfItems(); i++)
   {
-    //set the color of the contour
-    double red = colorprop->GetColor().GetRed();
-    double green = colorprop->GetColor().GetGreen();
-    double blue = colorprop->GetColor().GetBlue();
-
-
-    vtkSmartPointer<vtkPropCollection> collection = vtkSmartPointer<vtkPropCollection>::New();
-    localStorage->m_Assembly->GetActors(collection);
-    collection->InitTraversal();
-    for(vtkIdType i = 0; i < collection->GetNumberOfItems(); i++)
-    {
-      vtkActor::SafeDownCast(collection->GetNextProp())->GetProperty()->SetColor(red, green, blue);
-    }
+    vtkActor::SafeDownCast(collection->GetNextProp())->GetProperty()->SetColor(color[0], color[1], color[2]);
   }
 }
 
@@ -199,8 +194,15 @@ mitk::ContourModelSetMapper3D::LocalStorage::LocalStorage()
 
 void mitk::ContourModelSetMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
+  node->AddProperty( "color", ColorProperty::New(1.0,1.0,0.0), renderer, overwrite );
   node->AddProperty( "contour.3D.width", mitk::FloatProperty::New( 0.5 ), renderer, overwrite );
+
+  IPropertyAliases* aliases = CoreServices::GetPropertyAliases();
+
+  if (aliases != NULL)
+  {
+    aliases->AddAlias("color", "contour.color", "ContourModelSet");
+  }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

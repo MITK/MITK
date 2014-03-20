@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/RTUI">
+    <file>powerGreen.png</file>
+    <file>eye_close.png</file>
+    <file>eye_open.png</file>
+    <file>powerRed.png</file>
+  </qresource>
+</RCC>

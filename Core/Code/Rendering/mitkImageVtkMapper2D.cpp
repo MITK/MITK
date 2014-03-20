@@ -36,6 +36,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkMitkThickSlicesFilter.h"
 #include "vtkMitkLevelWindowFilter.h"
 #include "vtkNeverTranslucentTexture.h"
+#include "vtkMitkShaderTexture.h"
+#include "vtkImageToImageFilter.h"
+
+#include <mitkIShaderRepository.h>
 
 //VTK
 #include <vtkProperty.h>
@@ -395,8 +399,18 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   //set the interpolation modus according to the property
   localStorage->m_Texture->SetInterpolate(textureInterpolation);
 
+//  bool doseProperty;
+//  if(datanode->GetBoolProperty("dose",doseProperty) && doseProperty)
+//  {
+//    // if the input is a dose file dont use the levelwindow filter because we need a float texture
+//    // and the levelwindow filter is casting to unsigned char
+//    localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
+//  }
+//  else
+//  {
   // connect the texture with the output of the levelwindow filter
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
+//  }
 
   this->TransformActor( renderer );
 
@@ -515,6 +529,17 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
   }
 }
 
+void mitk::ImageVtkMapper2D::ApplyShader( mitk::BaseRenderer* renderer)
+{
+  LocalStorage *localStorage = this->GetLocalStorage( renderer );
+
+  localStorage->m_Texture = vtkSmartPointer<vtkMitkShaderTexture>::New().GetPointer();
+
+  CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+  itk::TimeStamp timestamp;
+  shaderRepo->ApplyProperties(this->GetDataNode(),localStorage->m_Actor,renderer,timestamp);
+}
+
 void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
@@ -574,6 +599,12 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
     case mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR:
       MITK_DEBUG << "'Image Rendering.Mode' = ColorTransferFunction_Color";
       this->ApplyColorTransferFunction( renderer );
+      break;
+    case mitk::RenderingModeProperty::ISODOSESHADER_COLOR:
+      MITK_DEBUG << "'Image Rendering.Mode' = IsoDoseShader_Color";
+      localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_DefaultLookupTable);
+      this->ApplyLevelWindow( renderer );
+//      this->ApplyShader( renderer );
       break;
     default:
       MITK_ERROR << "No valid 'Image Rendering.Mode' set";
@@ -685,6 +716,9 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
+
+  CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+  shaderRepo->AddDefaultProperties(node,renderer,overwrite);
 
   mitk::RenderingModeProperty::Pointer renderingModeProperty = mitk::RenderingModeProperty::New();
   node->AddProperty( "Image Rendering.Mode", renderingModeProperty);
@@ -840,6 +874,36 @@ mitk::ImageVtkMapper2D::LocalStorage* mitk::ImageVtkMapper2D::GetLocalStorage(mi
 }
 
 vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer* renderer ){
+//  LocalStorage* localStorage = this->GetLocalStorage(renderer);
+
+//  vtkMarchingSquares* squares = vtkMarchingSquares::New();
+//  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
+//  float depth = CalculateLayerDepth(renderer);
+
+//  squares->SetInput(localStorage->m_ReslicedImage);
+//  squares->SetNumberOfContours(1);
+//  squares->SetValue(0,1);
+//  squares->Update();
+
+//  polyData = squares->GetOutput();
+
+//  vtkIdType numberOfPoints = polyData->GetNumberOfPoints();
+//  fstream f;
+//  f.open("mapper_neu.txt", ios::out);
+
+//  for(int i=0;i<numberOfPoints;i++)
+//  {
+//    double* x = polyData->GetPoint(i);
+//    x[2] = depth;
+//    f << "Point" << i << ": " << x[0] << ", " << x[1] << ", " << x[2] << endl;
+//  }
+
+//  polyData->BuildCells();
+//  polyData->BuildLinks();
+
+//  f.close();
+
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
   //get the min and max index values of each direction
@@ -979,6 +1043,18 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   polyData->SetPoints(points);
   // Add the lines to the dataset
   polyData->SetLines(lines);
+
+  fstream f;
+  f.open("mapper_alt.txt", ios::out);
+
+  for(int i=0;i<polyData->GetNumberOfPoints();i++)
+  {
+    double x[3];
+    polyData->GetPoint(i,x);
+    f << "Point" << i << ": " << x[0] << ", " << x[1] << ", " << x[2] << endl;
+  }
+
+  f.close();
   return polyData;
 }
 

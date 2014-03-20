@@ -147,6 +147,7 @@ protected:
 
   Ui::RTDoseVisualizerControls m_Controls;
   mitk::DataNode::Pointer m_selectedNode;
+  mitk::IsoDoseLevel::Pointer m_FreeIsoValue;
   mitk::IsoDoseLevelVector::Pointer m_freeIsoValues;
   std::vector<mitk::DataNode::Pointer> m_FreeIsoLines;
   std::vector<mitk::DataNode::Pointer> m_StdIsoLines;

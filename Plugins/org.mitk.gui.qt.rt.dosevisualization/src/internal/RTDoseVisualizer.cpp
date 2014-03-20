@@ -106,16 +106,16 @@ void RTDoseVisualizer::OnSliceChanged(itk::Object *sender, const itk::EventObjec
 
   if(m_FreeIsoAdded)
   {
-//    float pref;
-//    m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
-//    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-//    mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
+    float pref;
+    m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+    mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
 
-//    m_Filters.at(0)->SetInput(slicedImage->GetVtkImageData());
-//    m_Filters.at(0)->GenerateValues(1,pref,level->GetDoseValue()*pref);
-//    m_Filters.at(0)->Update();
+    m_Filters.at(0)->SetInputData(slicedImage->GetVtkImageData());
+    m_Filters.at(0)->GenerateValues(1,m_FreeIsoValue->GetDoseValue()*pref,m_FreeIsoValue->GetDoseValue()*pref);
+    m_Filters.at(0)->Update();
 
-//    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -372,6 +372,9 @@ void RTDoseVisualizer::UpdateFreeIsoLine(mitk::IsoDoseLevel * level, mitk::DoseV
   m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
   mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
+
+  m_FreeIsoValue = level;
+//  m_freeIsoValues->at(0) = level;
 
   m_Filters.at(0)->SetInputData(slicedImage->GetVtkImageData());
   m_Filters.at(0)->GenerateValues(1,level->GetDoseValue()*pref,level->GetDoseValue()*pref);

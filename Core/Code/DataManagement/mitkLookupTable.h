@@ -157,6 +157,7 @@ public:
        HOT_IRON,
        JET,
        LEGACY_BINARY,
+       LEGACY_RAINBOW_COLOR,
        MULTILABEL,
        PET_COLOR,
        PET_20
@@ -196,6 +197,9 @@ protected:
     virtual void BuildPETColorLookupTable();
     virtual void BuildPET20LookupTable();
     virtual void BuildMultiLabelLookupTable();
+
+    virtual void BuildLegacyRainbowColorLookupTable();
+
 
     vtkSmartPointer<vtkLookupTable> m_LookupTable;
 

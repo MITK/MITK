@@ -34,6 +34,7 @@ const char* const mitk::LookupTable::typenameList[] =
   "Hot Iron",
   "Jet",
   "Legacy Binary",
+  "Legacy Rainbow Color",
   "Multilabel",
   "PET Color",
   "PET 20",
@@ -102,6 +103,9 @@ void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
       break;
     case (mitk::LookupTable::PET_20):
       this->BuildPET20LookupTable();
+      break;
+    case (mitk::LookupTable::LEGACY_RAINBOW_COLOR):
+      this->BuildLegacyRainbowColorLookupTable();
       break;
     default:
       MITK_ERROR << "non-existing colormap";
@@ -555,6 +559,18 @@ void mitk::LookupTable::BuildMultiLabelLookupTable()
     else if (i%12 == 11)
       lut->SetTableValue (i, 1.0, 0.5, 1.0, 0.4);
   }
+
+  m_LookupTable = lut;
+  this->Modified();
+}
+
+void mitk::LookupTable::BuildLegacyRainbowColorLookupTable()
+{
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+  lut->SetRampToLinear();
+  lut->SetHueRange(0.6667, 0.0);
+  lut->SetTableRange(0.0, 20.0);
+  lut->Build();
 
   m_LookupTable = lut;
   this->Modified();

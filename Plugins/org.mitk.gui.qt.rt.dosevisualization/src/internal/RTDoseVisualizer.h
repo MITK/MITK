@@ -134,9 +134,13 @@ protected:
   void ActualizeDisplayStyleForAllDoseDataNodes();
 
   mitk::DataNode::Pointer UpdatePolyData(int num, double min, double max);
+
   void UpdateStdIsolines();
+
   void HideIsoline();
+
   mitk::Image::Pointer GetExtractedSlice(mitk::Image::Pointer image);
+
   const mitk::Geometry2D* GetGeometry2D(char* dim);
 
   Ui::RTDoseVisualizerControls m_Controls;

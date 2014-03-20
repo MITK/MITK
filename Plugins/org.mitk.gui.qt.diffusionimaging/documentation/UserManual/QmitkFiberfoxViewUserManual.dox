@@ -26,7 +26,7 @@ Fiber strands are defined simply by placing markers in a 3D image volume. The fi
 <b>Fiber Options:</b>
 \li <b>Real Time Fibers</b>: If checked, each parameter adjustment (fiducial position, number of fibers, ...) will be directly applied to the selected fiber bundle. If unchecked, the fibers will only be generated if the corresponding button "Generate Fibers" is clicked.
 \li <b>Advanced Options</b>: Show/hide advanced options
-\li <b>#Fibers</b>: Specifies the number of fibers that will be generated for the selected bundle.
+\li <b>\# Fibers</b>: Specifies the number of fibers that will be generated for the selected bundle.
 \li <b>Fiber Sampling</b>: Adjusts the distenace of the fiber sampling points (in mm). A higher sampling rate is needed if high curvatures are modeled.
 \li <b>Tension, Continuity, Bias</b>: Parameters controlling the shape of the splines interpolation the fiducials. See <a href="http://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline">Wikipedia</a> for details.
 

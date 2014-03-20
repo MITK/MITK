@@ -19,6 +19,14 @@ The preprocessing view gives an overview over the important features of a diffus
 
 The DWI registration view allows head-motion and eddy-current correction. First the b=0 images (if more than 1) are registered and averaged. The averaged image then serves as fixed image for the alignment of the remaining (weighted, b>0) images.
 
+\image html registration_basic.png Basic DWI Registration Interface
+
+In the basic settings, a selected DW image in the Data Manager is marked as Input Data and the <i> Start Head Motion Correction </i> button is enabled. If more than one DW images are selected, they will be processed in a consecutive manner. For larger sets of dw images to be processed, the <i> Advanced </i> settings can be used.
+
+\image html registration_batch.png Batch Processing DWI Registration Interface
+
+Here all valid .dwi data located in the given input folder will be processed through the head motion correction and the output will be stored in the current working directory or in a custom folder if specified in the user interface. The output image will have the _MC postfix attached to the input's name.
+
 \section QmitkDiffusionImagingUserManualTensorReconstruction Tensor Reconstruction
 
 The tensor reconstruction view allows ITK based tensor reconstruction [3]. The advanced settings for ITK reconstruction let you configure a manual threshold on the non-diffusion weighted image. All voxels below this threshold will not be reconstructed and left blank. It is also possible to check for negative eigenvalues. The according voxels are also left blank.

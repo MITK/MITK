@@ -16,12 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkSurface.h>
-#include <vtkTimerLog.h>
 #include <mitkIOUtil.h>
 #include <vtkCleanPolyData.h>
 
 #include "mitkAnisotropicIterativeClosestPointRegistration.h"
 #include "mitkCovarianceMatrixCalculator.h"
+#include "mitkAnisotropicRegistrationCommon.h"
 
 /**
  * Test to verify the results of the AICP registration achieved for publications.
@@ -84,17 +84,7 @@ int mitkAnisotropicIterativeClosestPointRegistrationTest( int argc, char* args[]
   aICP->SetCovarianceMatricesMovingSurface(covarianceMatricesMoving);
   aICP->SetCovarianceMatricesFixedSurface(covarianceMatricesFixed);
   aICP->SetFRENormalizationFactor(FRENormalizationFactor);
-
-  //  aICP->SetMovingPointSet(movingPointSet);
-  //  aICP->SetFixedPointSet(fixedPointSet);
-  //  aICP->SetCovarianceMatrices(covarianceMatricesMoving,covarianceMatricesFixed);
-  //  aICP->SetMovingSurface(movingSurface);
-  //  aICP->SetFixedSurface(fixedSurface);
-  //  aICP->SetFRENormalizationFactor(FRENormalizationFactor);
-  //  aICP->SetLimitIterationsAnisotropicPointRegister(200.0);
-  //  aICP->SetMaxNumberOfIterations(200);
   aICP->SetThreshold(0.0000000010);
-  //  aICP->SetCandiateRadius(30.0);
 
   if(trimmedPart != 0.0)
   {
@@ -111,10 +101,15 @@ int mitkAnisotropicIterativeClosestPointRegistrationTest( int argc, char* args[]
   MITK_TEST_CONDITION( mitk::Equal(aICP->GetFRE(), freLiterature,0.001), "Testing if FRE equals results from literature.");
 
   double tre = -1;
+  tre = mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError( movingTargets.GetPointer(),
+                                                                             fixedTargets.GetPointer(),
+                                                                             aICP->GetRotation(),
+                                                                             aICP->GetTranslation()
+                                                                            );
  // tre = mitk::AnisotropicRegistrationTestUtil::ComputeTRE( movingTargets, fixedTargets, aICP->GetRotation(), aICP->GetTranslation());
- // MITK_INFO << "tre: " << tre << ", ref :" << treLiterature;
+ MITK_INFO << "tre: " << tre << ", ref :" << treLiterature;
  // //  //value 0.0784612 obtained from: \e130-projekte\NeedleNavigation\AnisotropicICP\EvaluationTPAMI\Experimente_Maerz2011/Ergebnisse.xlsx
- // MITK_TEST_CONDITION( mitk::Equal(tre, treLiterature,0.001), "Testing if TRE equals the results from literature.");
+ MITK_TEST_CONDITION( mitk::Equal(tre, treLiterature), "Testing if TRE equals the results from literature.");
 
   MITK_TEST_END();
 }

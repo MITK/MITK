@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAnisotropicRegistrationCommon.h>
 #include <vtkPoints.h>
+#include <mitkPointSet.h>
 
 mitk::AnisotropicRegistrationCommon::WeightMatrix
 mitk::AnisotropicRegistrationCommon::CalculateWeightMatrix( const WeightMatrix &sigma_X,
@@ -77,7 +78,32 @@ void mitk::AnisotropicRegistrationCommon::PropagateMatrices( const MatrixList &s
   for ( size_t i = 0; i < src.size(); ++i )
   {
     dst[i] = rotation * src[i] * rotationT;
+    }
+}
+
+double mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(const mitk::PointSet *movingTargets,
+                                                                           const mitk::PointSet *fixedTargets,
+                                                                           const mitk::AnisotropicRegistrationCommon::Rotation &rotation,
+                                                                           const mitk::AnisotropicRegistrationCommon::Translation &translation)
+{
+  double tre = 0.0;
+
+  for ( int i = 0; i < movingTargets->GetSize(); ++i )
+  {
+    mitk::Point3D pm = movingTargets->GetPoint(i);
+    mitk::Point3D ps = fixedTargets->GetPoint(i);
+
+    // transform point
+    pm = rotation * pm + translation;
+
+    const double dist = (ps[0] - pm[0]) * (ps[0] - pm[0]) +
+                        (ps[1] - pm[1]) * (ps[1] - pm[1]) +
+                        (ps[2] - pm[2]) * (ps[2] - pm[2]);
+
+    tre += sqrt(dist);
   }
+
+  return (tre / movingTargets->GetSize());
 }
 
 vtkSmartPointer<vtkPoints> mitk::AnisotropicRegistrationCommon::GetVTKPoints(mitk::PointSet *p)
@@ -93,7 +119,7 @@ vtkSmartPointer<vtkPoints> mitk::AnisotropicRegistrationCommon::GetVTKPoints(mit
   return out;
 }
 
-mitk::PointSet::Pointer mitk::AnisotropicRegistrationCommon::GetMITKPoints(vtkPoints *p)
+itk::SmartPointer<mitk::PointSet> mitk::AnisotropicRegistrationCommon::GetMITKPoints(vtkPoints *p)
 {
   mitk::PointSet::Pointer out = mitk::PointSet::New();
 

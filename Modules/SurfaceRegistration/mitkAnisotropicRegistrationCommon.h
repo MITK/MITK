@@ -21,16 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMatrix.h>
 #include <mitkVector.h>
 
-#include <mitkPointSet.h>
 
 #include <vtkPoints.h>
 #include <vtkSmartPointer.h>
-
+#include <MitkSurfaceRegistrationExports.h>
 //class vtkPoints;
 
-namespace mitk {
+namespace mitk
+{
 
-class AnisotropicRegistrationCommon
+class PointSet;
+
+class MitkSurfaceRegistration_EXPORT  AnisotropicRegistrationCommon
 {
 
 typedef itk::Matrix <double, 3, 3> WeightMatrix;
@@ -51,9 +53,16 @@ static void TransformPoints(vtkPoints* src, vtkPoints* dst,
 
 static void PropagateMatrices(const MatrixList &src, MatrixList& dst, const Rotation &rotation);
 
+static double ComputeTargetRegistrationError( const mitk::PointSet* movingTargets,
+                                              const mitk::PointSet* fixedTargets,
+                                              const Rotation& rotation,
+                                              const Translation& translation
+                                            );
+
+// TODO: Methods used for porting
 static vtkSmartPointer<vtkPoints> GetVTKPoints( mitk::PointSet* p );
 
-static mitk::PointSet::Pointer GetMITKPoints( vtkPoints* p );
+static itk::SmartPointer<mitk::PointSet> GetMITKPoints( vtkPoints* p );
 
 };
 

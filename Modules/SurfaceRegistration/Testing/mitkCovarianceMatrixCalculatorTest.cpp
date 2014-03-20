@@ -14,17 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkToFTestingCommon.h>
 #include <mitkTestingMacros.h>
 #include <mitkSurface.h>
-#include <mitkAICPRegistration.h>
-#include <mitkCovarianceMatricesCalculator.h>
-#include <mitkSurfaceToPointSetFilter.h>
-#include <mitkRegistrationEvaluation.h>
 #include <mitkPointSetReader.h>
 #include <vtkTimerLog.h>
 #include <mitkIOUtil.h>
-#include <mitkAnisotropicRegistrationTestUtil.h>
 #include <vtkCleanPolyData.h>
 #include <mitkVector.h>
 

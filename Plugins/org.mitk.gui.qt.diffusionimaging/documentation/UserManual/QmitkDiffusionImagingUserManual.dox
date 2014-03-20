@@ -15,6 +15,10 @@ The preprocessing view gives an overview over the important features of a diffus
 
 \image html prepro1.png Preprocessing
 
+\section QmitkDiffusionImagingUserManualDWIRegistration DWI Registration
+
+The DWI registration view allows head-motion and eddy-current correction. First the b=0 images (if more than 1) are registered and averaged. The averaged image then serves as fixed image for the alignment of the remaining (weighted, b>0) images.
+
 \section QmitkDiffusionImagingUserManualTensorReconstruction Tensor Reconstruction
 
 The tensor reconstruction view allows ITK based tensor reconstruction [3]. The advanced settings for ITK reconstruction let you configure a manual threshold on the non-diffusion weighted image. All voxels below this threshold will not be reconstructed and left blank. It is also possible to check for negative eigenvalues. The according voxels are also left blank.

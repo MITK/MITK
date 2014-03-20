@@ -69,6 +69,7 @@ RTDoseVisualizer::RTDoseVisualizer()
 
     m_freeIsoFilter = vtkSmartPointer<vtkContourFilter>::New();
 
+    m_FreeIsoAdded = false;
     m_selectedNode = NULL;
     m_selectedPresetName = "";
     m_internalUpdate = false;
@@ -102,6 +103,20 @@ void RTDoseVisualizer::OnSliceChanged(itk::Object *sender, const itk::EventObjec
   }
   m_StdIsoLines.clear();
   this->UpdateStdIsolines();
+
+  if(m_FreeIsoAdded)
+  {
+//    float pref;
+//    m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+//    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+//    mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
+
+//    m_Filters.at(0)->SetInput(slicedImage->GetVtkImageData());
+//    m_Filters.at(0)->GenerateValues(1,pref,level->GetDoseValue()*pref);
+//    m_Filters.at(0)->Update();
+
+//    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
@@ -221,8 +236,13 @@ void RTDoseVisualizer::OnAddFreeValueClicked()
   //Use HSV schema of QColor to calculate a different color depending on the
   //number of already existing free iso lines.
   newColor.setHsv((m_freeIsoValues->Size()*85)%360,255,255);
+  mitk::Color mColor;
+  mColor[0]=newColor.redF();
+  mColor[1]=newColor.greenF();
+  mColor[2]=newColor.blueF();
 
   mitk::DataNode::Pointer isoNode = this->UpdatePolyData(1,m_Controls.spinReferenceDose->value()*0.5,m_Controls.spinReferenceDose->value()*0.5);
+  isoNode->SetColor(mColor);
   m_FreeIsoLines.push_back(isoNode);
 
   mitk::IsoDoseLevel::ColorType color;
@@ -232,8 +252,11 @@ void RTDoseVisualizer::OnAddFreeValueClicked()
   m_freeIsoValues->push_back(mitk::IsoDoseLevel::New(0.5,color,true,false));
   UpdateFreeIsoValues();
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-  if(m_FreeIsoLines.size()>=3)
+  if(m_FreeIsoLines.size()>=1)
+  {
     this->m_Controls.btnAddFreeValue->setDisabled(true);
+    m_FreeIsoAdded = true;
+  }
   this->m_Controls.btnRemoveFreeValue->setEnabled(true);
 }
 
@@ -245,8 +268,11 @@ void RTDoseVisualizer::OnRemoveFreeValueClicked()
   m_Filters.pop_back();
   if(m_FreeIsoLines.empty())
     this->m_Controls.btnRemoveFreeValue->setDisabled(true);
-  if(m_FreeIsoLines.size()<3)
+  if(m_FreeIsoLines.size()<1)
+  {
+    m_FreeIsoAdded = false;
     this->m_Controls.btnAddFreeValue->setEnabled(true);
+  }
   this->GetDataStorage()->Remove(isoNode);
   UpdateFreeIsoValues();
 }
@@ -320,11 +346,24 @@ void RTDoseVisualizer::UpdateFreeIsoValues()
     widget->setIsoDoseLevel(pos->Value().GetPointer());
     widget->setReferenceDose(pref);
     connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), widget, SLOT(setReferenceDose(double)));
+    connect(widget,SIGNAL(ColorChanged(mitk::IsoDoseLevel*)), this, SLOT(UpdateFreeIsoLineColor(mitk::IsoDoseLevel*)));
     connect(widget,SIGNAL(ValueChanged(mitk::IsoDoseLevel*,mitk::DoseValueRel)), this, SLOT(UpdateFreeIsoLine(mitk::IsoDoseLevel*,mitk::DoseValueRel)));
 
     this->m_Controls.listFreeValues->addItem(item);
     this->m_Controls.listFreeValues->setItemWidget(item,widget);
   }
+}
+
+void RTDoseVisualizer::UpdateFreeIsoLineColor(mitk::IsoDoseLevel *level)
+{
+  //push it in and get the key!
+//  m_freeIsoValues
+  ::itk::RGBPixel<float> color = level->GetColor();
+  mitk::Color mColor;
+  mColor[0]=color.GetRed();
+  mColor[1]=color.GetGreen();
+  mColor[2]=color.GetBlue();
+  m_FreeIsoline->SetColor(mColor);
 }
 
 void RTDoseVisualizer::UpdateFreeIsoLine(mitk::IsoDoseLevel * level, mitk::DoseValueRel old)
@@ -496,7 +535,9 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
   mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
   isolineNode->SetMapper(1, mapper);
   isolineNode->SetName("Isoline1");
+  isolineNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
   isolineNode->SetBoolProperty(mitk::rt::Constants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(),true);
+  m_FreeIsoline = isolineNode;
   this->GetDataStorage()->Add(isolineNode);
   return isolineNode;
 }

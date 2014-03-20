@@ -156,6 +156,7 @@ protected:
   std::string m_selectedPresetName;
 
   mitk::DataNode::Pointer m_FreeIsoline;
+  bool m_FreeIsoAdded;
 
   /** Prescribed Dose of the selected data.*/
   mitk::DoseValueAbs m_PrescribedDose_Data;

@@ -116,6 +116,8 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
     {
       m_ProcessingMode = REGULAR;
       eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
+      // delete reference to interactor as soon as connected action is finished
+      m_SelectedInteractor = NULL;
     }
     // give event to selected interactor
     if (eventIsHandled == false)

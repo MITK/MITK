@@ -97,6 +97,8 @@ public:
 
     void UpdateFreeIsoLine(mitk::IsoDoseLevel*level, mitk::DoseValueRel old);
 
+    void UpdateFreeIsoLineColor(mitk::IsoDoseLevel* level);
+
 protected:
 
   void InitScrolling();

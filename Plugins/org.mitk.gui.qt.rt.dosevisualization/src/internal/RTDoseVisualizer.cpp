@@ -338,11 +338,22 @@ void RTDoseVisualizer::UpdateFreeIsoValues()
     widget->setIsoDoseLevel(pos->Value().GetPointer());
     widget->setReferenceDose(pref);
     connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), widget, SLOT(setReferenceDose(double)));
+    connect(widget,SIGNAL(ColorChanged(mitk::IsoDoseLevel*)), this, SLOT(UpdateFreeIsoLineColor(mitk::IsoDoseLevel*)));
     connect(widget,SIGNAL(ValueChanged(mitk::IsoDoseLevel*,mitk::DoseValueRel)), this, SLOT(UpdateFreeIsoLine(mitk::IsoDoseLevel*,mitk::DoseValueRel)));
 
     this->m_Controls.listFreeValues->addItem(item);
     this->m_Controls.listFreeValues->setItemWidget(item,widget);
   }
+}
+
+void RTDoseVisualizer::UpdateFreeIsoLineColor(mitk::IsoDoseLevel *level)
+{
+  ::itk::RGBPixel<float> color = level->GetColor();
+  mitk::Color mColor;
+  mColor[0]=color.GetRed();
+  mColor[1]=color.GetGreen();
+  mColor[2]=color.GetBlue();
+  m_FreeIsoline->SetColor(mColor);
 }
 
 void RTDoseVisualizer::UpdateFreeIsoLine(mitk::IsoDoseLevel * level, mitk::DoseValueRel old)

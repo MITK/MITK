@@ -344,7 +344,7 @@
       <item>
        <widget class="QTableView" name="isoLevelSetView">
         <property name="enabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="alternatingRowColors">
          <bool>true</bool>

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Qt
 #include <QMessageBox>
 #include <QMenu>
@@ -74,21 +73,6 @@ RTDoseVisualizer::RTDoseVisualizer()
     m_selectedPresetName = "";
     m_internalUpdate = false;
     m_PrescribedDose_Data = 0.0;
-
-    //hier crash ?!
-//    QmitkRenderWindow* rw = this->GetRenderWindowPart()->GetQmitkRenderWindow(name);
-
-//    itk::MemberCommand<RTDoseVisualizer>::Pointer sliceChangedCommand =
-//        itk::MemberCommand<RTDoseVisualizer>::New();
-//    sliceChangedCommand->SetCallbackFunction(this, &RTDoseVisualizer::OnSliceChanged);
-//    rw->GetSliceNavigationController()->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand);
-
-//    mitk::CoreServicePointer<mitk::IShaderRepository> shadoRepo(mitk::CoreServices::GetShaderRepository());
-//    std::string path = "/home/riecker/mitkShaderLighting.xml";
-//    std::string isoShaderName = "mitkIsoLineShader";
-//    MITK_INFO << "shader found under: " << path;
-//    std::ifstream str(path.c_str());
-//    shadoRepo->LoadShader(str,isoShaderName);
 }
 
 RTDoseVisualizer::~RTDoseVisualizer()
@@ -102,15 +86,13 @@ RTDoseVisualizer::~RTDoseVisualizer()
 void RTDoseVisualizer::InitScrolling(){
   QmitkRenderWindow* rw = this->GetRenderWindowPart()->GetQmitkRenderWindow("axial");
 
-      itk::MemberCommand<RTDoseVisualizer>::Pointer sliceChangedCommand =
-          itk::MemberCommand<RTDoseVisualizer>::New();
-      sliceChangedCommand->SetCallbackFunction(this, &RTDoseVisualizer::OnSliceChanged);
-      rw->GetSliceNavigationController()->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand);
+  itk::MemberCommand<RTDoseVisualizer>::Pointer sliceChangedCommand =
+      itk::MemberCommand<RTDoseVisualizer>::New();
+  sliceChangedCommand->SetCallbackFunction(this, &RTDoseVisualizer::OnSliceChanged);
+  rw->GetSliceNavigationController()->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL,0), sliceChangedCommand);
 }
 
-void RTDoseVisualizer::SetFocus()
-{
-}
+void RTDoseVisualizer::SetFocus(){}
 
 void RTDoseVisualizer::OnSliceChanged(itk::Object *sender, const itk::EventObject &e)
 {
@@ -414,8 +396,6 @@ void RTDoseVisualizer::OnConvertButtonClicked()
     selectedNode->SetBoolProperty(mitk::rt::Constants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), true);
     selectedNode->SetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), m_Controls.spinReferenceDose->value());
 
-    //selectedNode->GetData()->SetProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(), mitk::DoubleProperty::New(1.0));
-
     mitk::IsoDoseLevelSet::Pointer clonedPreset = this->m_Presets[this->m_selectedPresetName]->Clone();
     mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(clonedPreset);
     selectedNode->SetProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),levelSetProp);
@@ -470,15 +450,10 @@ void RTDoseVisualizer::OnConvertButtonClicked()
 
     UpdateBySelectedNode();
 
-//    mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-//    renderingMode->SetValue(mitk::RenderingModeProperty::ISODOSESHADER_COLOR);
-//    selectedNode->SetProperty("shader.mitkIsoLineShader.Gridscale", mitk::FloatProperty::New(10.0));
-//    selectedNode->SetProperty("Image Rendering.Mode", renderingMode);
-
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
 }
-//######################################################################################################
+
 const mitk::Geometry2D* RTDoseVisualizer::GetGeometry2D(char* dim)
 {
   QmitkRenderWindow* rw = this->GetRenderWindowPart()->GetQmitkRenderWindow(dim);
@@ -509,7 +484,6 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
   contourFilter->Update();
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData =contourFilter->GetOutput();
-//  polyData->Print(std::cout);
 
   mitk::Surface::Pointer isoline = mitk::Surface::New();
   isoline->SetVtkPolyData(polyData);
@@ -519,8 +493,6 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
 
   mitk::DataNode::Pointer isolineNode = mitk::DataNode::New();
   isolineNode->SetData(isoline);
-//  mitk::PolyDataGLMapper2D::Pointer mapper = mitk::PolyDataGLMapper2D::New();
-//  mitk::SurfaceGLMapper2D::Pointer mapper = mitk::SurfaceGLMapper2D::New();
   mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
   isolineNode->SetMapper(1, mapper);
   isolineNode->SetName("Isoline1");
@@ -545,7 +517,6 @@ void RTDoseVisualizer::UpdateStdIsolines()
       isolineFilter->SetInputData(reslicedImage->GetVtkImageData());
       isolineFilter->GenerateValues(1,doseIT->GetDoseValue()*pref,doseIT->GetDoseValue()*pref);
       isolineFilter->Update();
-
       vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
       polyData=isolineFilter->GetOutput();
 
@@ -581,7 +552,6 @@ void RTDoseVisualizer::HideIsoline()
   }
 }
 
-//######################################################################################################
 void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
   const QList<mitk::DataNode::Pointer>& nodes )
 {
@@ -622,7 +592,6 @@ void RTDoseVisualizer::UpdateBySelectedNode()
   }
   else
   {
-    ///////////////////////////////////////////
     //dose specific information
     int fracCount = 1;
     m_selectedNode->GetIntProperty(mitk::rt::Constants::DOSE_FRACTION_COUNT_PROPERTY_NAME.c_str(),fracCount);
@@ -633,16 +602,9 @@ void RTDoseVisualizer::UpdateBySelectedNode()
     float tmp;
     m_selectedNode->GetFloatProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),tmp);
     m_PrescribedDose_Data = (double)tmp;
-//    dynamic cast von float zu doubleproperty funktioniert nicht & getProperty von node->getData() funktioniert das ?
-//    mitk::DoubleProperty* propDouble = dynamic_cast<mitk::DoubleProperty*>(m_selectedNode->GetData()->GetProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str()).GetPointer());
-//    if (propDouble)
-//    {
-//      m_PrescribedDose_Data = propDouble->GetValue();
-//    }
 
     m_Controls.prescribedDoseSpecific->setText(QString::number(m_PrescribedDose_Data));
 
-    ///////////////////////////////////////////
     //free iso lines
     mitk::IsoDoseLevelVectorProperty::Pointer propIsoVector;
     m_selectedNode->GetProperty<mitk::IsoDoseLevelVectorProperty>(propIsoVector, mitk::rt::Constants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str());
@@ -660,7 +622,6 @@ void RTDoseVisualizer::UpdateBySelectedNode()
 
     UpdateFreeIsoValues();
 
-    ///////////////////////////////////////////
     //global dose issues
     bool showIsoLine = false;
     m_selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(),showIsoLine);

@@ -219,12 +219,11 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
   m_Rotation.SetIdentity();
   m_Translation.Fill(0.0);
 
-
   // compute number of correspondences based
   // on the trimmfactor
   if ( m_TrimmFactor > 0.0)
   {
-    numberOfTrimmedPoints *= m_TrimmFactor;
+    numberOfTrimmedPoints = X->GetNumberOfPoints() * m_TrimmFactor;
   }
 
   // initialize the sizes of the sorted datasets

@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAnisotropicRegistrationCommon.h"
 #include <itkLandmarkBasedTransformInitializer.h>
 #include <itkImage.h>
+#include <vtkLandmarkTransform.h>
+#include <vtkPoints.h>
+#include <vtkMatrix4x4.h>
 
 mitk::WeightedPointTransform::WeightedPointTransform()
 {
@@ -30,10 +33,14 @@ mitk::WeightedPointTransform::WeightedPointTransform()
 }
 
 void mitk::WeightedPointTransform::SetThreshold(double threshold)
-{m_Threshold = threshold;}
+{
+  m_Threshold = threshold;
+}
 
 void mitk::WeightedPointTransform::SetMaxIterations(double value)
-{m_MaxIterations = value;}
+{
+  m_MaxIterations = value;
+}
 
 void mitk::WeightedPointTransform::SetCovarianceMatrices(std::vector< itk::Matrix<double,3,3> > CovarianceMatricesM,std::vector< itk::Matrix<double,3,3> > CovarianceMatricesS)
 {
@@ -152,12 +159,12 @@ double ComputeWeightedFRE (  mitk::PointSet::Pointer MovingPointSet,
   }
 
   FRE /= WeightMatrices.size();
-  FRE = FRENormalizationFactor*sqrt(FRE);
+  FRE = FRENormalizationFactor * sqrt(FRE);
 
   return FRE;
 }
 
-static void IsotropicRegistration( mitk::PointSet* X, mitk::PointSet* Y, Matrix3x3& rotation, itk::Vector<double,3>& translation)
+static void IsotropicRegistrationItk( mitk::PointSet* X, mitk::PointSet* Y, Matrix3x3& rotation, itk::Vector<double,3>& translation)
 {
   //ITK registration
   typedef itk::Image<short,3> ImageType ;
@@ -205,6 +212,25 @@ static void IsotropicRegistration( mitk::PointSet* X, mitk::PointSet* Y, Matrix3
   //return ComputeFRE(X,Y,rotation,translation);
 }
 
+static void IsotropicRegistration( vtkPoints* X, vtkPoints* Y, Matrix3x3& rotation, itk::Vector<double,3>& translation)
+{
+  vtkSmartPointer<vtkLandmarkTransform> landmarkTransform = vtkSmartPointer<vtkLandmarkTransform>::New();
+  landmarkTransform->SetSourceLandmarks(X);
+  landmarkTransform->SetTargetLandmarks(Y);
+  landmarkTransform->SetModeToRigidBody();
+  landmarkTransform->Modified();
+  landmarkTransform->Update();
+
+  vtkMatrix4x4* m = landmarkTransform->GetMatrix();
+
+  for ( int i = 0; i < 3; ++i )
+    for ( int j = 0; j < 3;++j )
+      rotation[i][j] = m->GetElement(i,j);
+
+  translation[0] = m->GetElement(3,0);
+  translation[1] = m->GetElement(3,1);
+  translation[2] = m->GetElement(3,2);
+}
 
 bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
     mitk::PointSet::Pointer MovingPointSet,
@@ -237,7 +263,19 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
   itk::Matrix<double,3,3> initial_TransformationR;
   itk::Vector<double,3> initial_TransformationT;
 
-  IsotropicRegistration(MovingPointSet,FixedPointSet,initial_TransformationR,initial_TransformationT);
+  IsotropicRegistrationItk(MovingPointSet,FixedPointSet,initial_TransformationR,initial_TransformationT);
+
+  MITK_INFO << "===========================================";
+  MITK_INFO << initial_TransformationR;
+  MITK_INFO << initial_TransformationT;
+
+  m_vtkFixedPointSet  = mitk::AnisotropicRegistrationCommon::GetVTKPoints(FixedPointSet);
+  m_vtkMovingPointSet = mitk::AnisotropicRegistrationCommon::GetVTKPoints(MovingPointSet);
+
+  IsotropicRegistration(m_vtkMovingPointSet, m_vtkMovingPointSet,initial_TransformationR, initial_TransformationT);
+
+  MITK_INFO << initial_TransformationR;
+  MITK_INFO << initial_TransformationT;
 
   //result of unweighted registration algorithm
   TransformationR = initial_TransformationR;
@@ -516,6 +554,16 @@ vnl_vector< double > mitk::WeightedPointTransform::e_marker(mitk::PointSet::Poin
     }
 
   return returnValue;
+}
+
+void mitk::WeightedPointTransform::SetVtkMovingPointSet(vtkSmartPointer<vtkPoints> p)
+{
+  m_vtkMovingPointSet = p;
+}
+
+void mitk::WeightedPointTransform::SetVtkFixedPointSet(vtkSmartPointer<vtkPoints> p)
+{
+  m_vtkFixedPointSet = p;
 }
 
 double mitk::WeightedPointTransform::CalculateConfigChange(mitk::PointSet::Pointer MovingSetOld,mitk::PointSet::Pointer MovingSetNew)

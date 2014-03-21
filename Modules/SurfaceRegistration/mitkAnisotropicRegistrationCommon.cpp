@@ -100,10 +100,12 @@ double mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(const
                         (ps[1] - pm[1]) * (ps[1] - pm[1]) +
                         (ps[2] - pm[2]) * (ps[2] - pm[2]);
 
-    tre += sqrt(dist);
+    tre += dist;
   }
 
-  return (tre / movingTargets->GetSize());
+  tre /= movingTargets->GetSize();
+
+  return sqrt(tre);
 }
 
 vtkSmartPointer<vtkPoints> mitk::AnisotropicRegistrationCommon::GetVTKPoints(mitk::PointSet *p)

@@ -115,6 +115,8 @@ void RTDoseVisualizer::OnSliceChanged(itk::Object *sender, const itk::EventObjec
     m_Filters.at(0)->GenerateValues(1,m_FreeIsoValue->GetDoseValue()*pref,m_FreeIsoValue->GetDoseValue()*pref);
     m_Filters.at(0)->Update();
 
+    m_FreeIsoline->GetData()->GetGeometry()->SetOrigin(slicedImage->GetGeometry()->GetOrigin());
+
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

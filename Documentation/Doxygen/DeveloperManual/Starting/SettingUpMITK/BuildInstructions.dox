@@ -18,7 +18,7 @@ For more advanced users, the last sections explain how to inject custom build li
 You need:
   -# Git from http://git-scm.com (there are also numerous third-party graphical clients available). We recomment using
      Git, but see below for a way how to get the current source code without using it.
-  -# <a href="http://www.cmake.org">CMake</a> (version 2.8.4 or higher)
+  -# <a href="http://www.cmake.org">CMake</a> (version \minimumCMakeVersion or higher)
   -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based applications
   (version 4.6 or above is recommended, we cannot guarantee compatibility with lower versions)
   -# If you are using <b>Mac OS X</b> you need an Xcode installation as this provides the neccessary compilers and SDKs

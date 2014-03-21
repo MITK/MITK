@@ -20,7 +20,7 @@ You need:
      Git, but see below for a way how to get the current source code without using it.
   -# <a href="http://www.cmake.org">CMake</a> (version \minimumCMakeVersion or higher)
   -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based applications
-  (version 4.6 or above is recommended, we cannot guarantee compatibility with lower versions)
+  (version \minimumQt4Version or above is required, Qt 5.x is only supported experimentally for a very limited number of modules)
   -# If you are using <b>Mac OS X</b> you need an Xcode installation as this provides the neccessary compilers and SDKs
 
 \attention For Mac OS X it is strongly recommended to use CMake version 2.8.8 or higher

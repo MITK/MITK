@@ -49,13 +49,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunctionProperty.h>
 #include <vtkMath.h>
 
-#include <vtkMarchingSquares.h>
 #include <mitkSurface.h>
 #include "QmitkRenderWindow.h"
 #include <mitkExtractSliceFilter.h>
 
-#include "mitkSurfaceGLMapper2D.h"
-#include "mitkPolyDataGLMapper2D.h"
 #include "mitkSurfaceVtkMapper3D.h"
 
 #include "mitkSliceNavigationController.h"

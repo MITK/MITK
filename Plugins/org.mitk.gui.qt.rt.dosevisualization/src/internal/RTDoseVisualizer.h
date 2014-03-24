@@ -38,6 +38,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIShaderRepository.h>
 #include <mitkShaderProperty.h>
 
+#include <vtkSmartPointer.h>
+#include <mitkRenderingModeProperty.h>
+
 #include <vtkContourFilter.h>
 
 /*forward declarations*/
@@ -135,14 +138,37 @@ protected:
   @TODO: should be moved outside the class, to be available for other classes at well.*/
   void ActualizeDisplayStyleForAllDoseDataNodes();
 
+  /**
+   * @brief UpdatePolyData
+   * @param num
+   * @param min
+   * @param max
+   * @return
+   */
   mitk::DataNode::Pointer UpdatePolyData(int num, double min, double max);
 
+  /**
+   * @brief UpdateStdIsolines
+   */
   void UpdateStdIsolines();
 
+  /**
+   * @brief HideIsoline
+   */
   void HideIsoline();
 
+  /**
+   * @brief GetExtractedSlice
+   * @param image
+   * @return
+   */
   mitk::Image::Pointer GetExtractedSlice(mitk::Image::Pointer image);
 
+  /**
+   * @brief GetGeometry2D
+   * @param dim
+   * @return
+   */
   const mitk::Geometry2D* GetGeometry2D(char* dim);
 
   Ui::RTDoseVisualizerControls m_Controls;
@@ -171,7 +197,6 @@ protected:
 
   vtkSmartPointer<vtkContourFilter> m_freeIsoFilter;
   std::vector< vtkSmartPointer<vtkContourFilter> > m_Filters;
-
 
   bool m_internalUpdate;
 };

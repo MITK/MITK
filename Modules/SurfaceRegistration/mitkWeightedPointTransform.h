@@ -61,9 +61,6 @@ public:
     /** @return Returns the number of iterations of the last run of the registration algorithm. Returns -1 if there was no run of the registration yet. */
     itkGetMacro(Iterations,int);
 
-    /** @return Returns if the registration algorithm converged. Returns false if there was no run of the registration yet. */
-    itkGetMacro(IsConverged,bool);
-
     /** @return Returns the FRE of the last run of the registration algorithm. Returns -1 if there was no run of the registration yet. */
     itkGetMacro(FRE,double);
 
@@ -133,8 +130,6 @@ protected:
 
   int m_Iterations;
 
-  bool m_IsConverged;
-
   double m_FRE;
 
   double m_FRENormalizationFactor;
@@ -154,16 +149,6 @@ protected:
   vtkSmartPointer<vtkPoints> m_vtkFixedPointSet;
 
   vtkSmartPointer<vtkPoints> m_vtkMovingPointSet;
-
-  //double CalculateConfigChange(mitk::PointSet::Pointer MovingSetOld, mitk::PointSet::Pointer MovingSetNew);
-
-  /** @brief Computes the mean of two point sets. The point sets must have the same size.
-    * @return Returns the mean of both point sets. Returns an empty point set if the point sets do not have the same size.
-    */
-  mitk::PointSet::Pointer ComputeMean(mitk::PointSet::Pointer ptSet1, mitk::PointSet::Pointer ptSet2);
-
-  /** Computes the mean of x- ,y- and z-component of the complete pointset */
-  itk::Vector<double,3> ComputeMean(mitk::PointSet::Pointer pSet);
 
   /**
    * @brief               This method performs a variant of the weighted point register alogorithm presented by
@@ -193,8 +178,7 @@ protected:
                                                   itk::Matrix<double,3,3>& TransformationR,
                                                   itk::Vector<double,3>& TransformationT,
                                                   double& FRE,
-                                                  int& n,
-                                                  bool& isConverged);
+                                                  int& n);
 
 private:
   WeightedPointTransformData* d;

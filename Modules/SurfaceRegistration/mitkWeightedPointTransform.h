@@ -33,6 +33,9 @@ class vtkPoints;
 
 namespace mitk
 {
+
+class WeightedPointTransformData;
+
     /** @brief TODO */
 class MitkSurfaceRegistration_EXPORT WeightedPointTransform : public itk::Object
 {
@@ -192,6 +195,9 @@ protected:
                                                   double& FRE,
                                                   int& n,
                                                   bool& isConverged);
+
+private:
+  WeightedPointTransformData* d;
 };
 
 }

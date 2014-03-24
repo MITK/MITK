@@ -57,6 +57,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkIOUtil.h>
 #include <QScrollBar>
+#include <itkInvertIntensityImageFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -116,6 +117,8 @@ void QmitkFiberfoxView::KillThread()
         m_ArtifactsToDwiFilter->SetAbortGenerateData(true);
         break;
     }
+    m_Controls->m_AbortSimulationButton->setEnabled(false);
+    m_Controls->m_AbortSimulationButton->setText("Aborting simulation ...");
 }
 
 void QmitkFiberfoxView::BeforeThread()
@@ -133,16 +136,19 @@ void QmitkFiberfoxView::AfterThread()
     UpdateSimulationStatus();
     m_SimulationTimer->stop();
     m_Controls->m_AbortSimulationButton->setVisible(false);
+    m_Controls->m_AbortSimulationButton->setEnabled(true);
+    m_Controls->m_AbortSimulationButton->setText("Abort simulation");
     m_Controls->m_GenerateImageButton->setVisible(true);
-    //m_Controls->m_SimulationStatusText->setVisible(false);
     m_ThreadIsRunning = false;
 
+    QString statusText;
     FiberfoxParameters<double> parameters;
     mitk::DiffusionImage<short>::Pointer mitkImage = mitk::DiffusionImage<short>::New();
     switch (m_Worker.m_FilterType)
     {
     case 0:
     {
+        statusText = QString(m_TractsToDwiFilter->GetStatusText().c_str());
         if (m_TractsToDwiFilter->GetAbortGenerateData())
         {
             MITK_INFO << "Simulation aborted.";
@@ -158,10 +164,10 @@ void QmitkFiberfoxView::AfterThread()
         parameters.m_ResultNode->SetData( mitkImage );
 
         parameters.m_ResultNode->SetName(parameters.m_ParentNode->GetName()
-                                                       +"_D"+QString::number(parameters.m_ImageRegion.GetSize(0)).toStdString()
-                                                       +"-"+QString::number(parameters.m_ImageRegion.GetSize(1)).toStdString()
-                                                       +"-"+QString::number(parameters.m_ImageRegion.GetSize(2)).toStdString()
-                                                       +"_S"+QString::number(parameters.m_ImageSpacing[0]).toStdString()
+                                         +"_D"+QString::number(parameters.m_ImageRegion.GetSize(0)).toStdString()
+                                         +"-"+QString::number(parameters.m_ImageRegion.GetSize(1)).toStdString()
+                                         +"-"+QString::number(parameters.m_ImageRegion.GetSize(2)).toStdString()
+                                         +"_S"+QString::number(parameters.m_ImageSpacing[0]).toStdString()
                 +"-"+QString::number(parameters.m_ImageSpacing[1]).toStdString()
                 +"-"+QString::number(parameters.m_ImageSpacing[2]).toStdString()
                 +"_b"+QString::number(parameters.m_Bvalue).toStdString()
@@ -192,6 +198,7 @@ void QmitkFiberfoxView::AfterThread()
     }
     case 1:
     {
+        statusText = QString(m_ArtifactsToDwiFilter->GetStatusText().c_str());
         if (m_ArtifactsToDwiFilter->GetAbortGenerateData())
         {
             MITK_INFO << "Simulation aborted.";
@@ -329,6 +336,8 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
         mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
         m_Controls->m_FrequencyMapBox->SetPredicate(finalPredicate);
+        m_Controls->m_Comp4VolumeFraction->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_Comp4VolumeFraction->SetPredicate(finalPredicate);
 
         connect( m_SimulationTimer, SIGNAL(timeout()), this, SLOT(UpdateSimulationStatus()) );
         connect((QObject*) m_Controls->m_AbortSimulationButton, SIGNAL(clicked()), (QObject*) this, SLOT(KillThread()));
@@ -573,15 +582,6 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     // signal models
-    double m_Comp3Weight = 1;
-    double m_Comp4Weight = 0;
-    if (m_Controls->m_Compartment4Box->currentIndex()>0)
-    {
-        m_Comp4Weight = m_Controls->m_Comp4FractionBox->value();
-        m_Comp3Weight -= m_Comp4Weight;
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment3.weight", DoubleProperty::New(m_Comp3Weight));
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.weight", DoubleProperty::New(m_Comp4Weight));
-    }
 
     // compartment 1
     switch (m_Controls->m_Compartment1Box->currentIndex())
@@ -689,7 +689,6 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         m_BallModel1.SetBvalue(parameters.m_Bvalue);
         m_BallModel1.SetDiffusivity(m_Controls->m_BallWidget1->GetD());
         m_BallModel1.SetT2(m_Controls->m_BallWidget1->GetT2());
-        m_BallModel1.SetWeight(m_Comp3Weight);
         parameters.m_NonFiberModelList.push_back(&m_BallModel1);
         parameters.m_SignalModelString += "Ball";
         parameters.m_ResultNode->AddProperty("Fiberfox.Compartment3.Description", StringProperty::New("Extra-axonal compartment 1") );
@@ -703,7 +702,6 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         m_AstrosticksModel1.SetDiffusivity(m_Controls->m_AstrosticksWidget1->GetD());
         m_AstrosticksModel1.SetT2(m_Controls->m_AstrosticksWidget1->GetT2());
         m_AstrosticksModel1.SetRandomizeSticks(m_Controls->m_AstrosticksWidget1->GetRandomizeSticks());
-        m_AstrosticksModel1.SetWeight(m_Comp3Weight);
         parameters.m_NonFiberModelList.push_back(&m_AstrosticksModel1);
         parameters.m_SignalModelString += "Astrosticks";
         parameters.m_ResultNode->AddProperty("Fiberfox.Compartment3.Description", StringProperty::New("Extra-axonal compartment 1") );
@@ -715,7 +713,6 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     case 2:
         m_DotModel1.SetGradientList(parameters.GetGradientDirections());
         m_DotModel1.SetT2(m_Controls->m_DotWidget1->GetT2());
-        m_DotModel1.SetWeight(m_Comp3Weight);
         parameters.m_NonFiberModelList.push_back(&m_DotModel1);
         parameters.m_SignalModelString += "Dot";
         parameters.m_ResultNode->AddProperty("Fiberfox.Compartment3.Description", StringProperty::New("Extra-axonal compartment 1") );
@@ -730,43 +727,107 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     case 0:
         break;
     case 1:
+    {
         m_BallModel2.SetGradientList(parameters.GetGradientDirections());
         m_BallModel2.SetBvalue(parameters.m_Bvalue);
         m_BallModel2.SetDiffusivity(m_Controls->m_BallWidget2->GetD());
         m_BallModel2.SetT2(m_Controls->m_BallWidget2->GetT2());
-        m_BallModel2.SetWeight(m_Comp4Weight);
-        parameters.m_NonFiberModelList.push_back(&m_BallModel2);
-        parameters.m_SignalModelString += "Ball";
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Ball") );
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_BallWidget2->GetD()) );
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_BallModel2.GetT2()) );
+
+        mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp4VolumeFraction->GetSelectedNode();
+        mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
+        ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
+        CastToItkImage< ItkDoubleImgType >(img, itkImg);
+        if (parameters.m_ImageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
+                parameters.m_ImageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
+                parameters.m_ImageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
+        {
+            m_BallModel2.SetVolumeFractionImage(itkImg);
+            parameters.m_NonFiberModelList.push_back(&m_BallModel2);
+            parameters.m_SignalModelString += "Ball";
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Ball") );
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_BallWidget2->GetD()) );
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_BallModel2.GetT2()) );
+
+            itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+            double max = img->GetScalarValueMax();
+            if (max<1)
+                max = 1;
+            inverter->SetMaximum( max );
+            inverter->SetInput(itkImg);
+            inverter->Update();
+            parameters.m_NonFiberModelList.at(parameters.m_NonFiberModelList.size()-2)->SetVolumeFractionImage(inverter->GetOutput());
+        }
+
         break;
+    }
     case 2:
+    {
         m_AstrosticksModel2.SetGradientList(parameters.GetGradientDirections());
         m_AstrosticksModel2.SetBvalue(parameters.m_Bvalue);
         m_AstrosticksModel2.SetDiffusivity(m_Controls->m_AstrosticksWidget2->GetD());
         m_AstrosticksModel2.SetT2(m_Controls->m_AstrosticksWidget2->GetT2());
         m_AstrosticksModel2.SetRandomizeSticks(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks());
-        m_AstrosticksModel2.SetWeight(m_Comp4Weight);
-        parameters.m_NonFiberModelList.push_back(&m_AstrosticksModel2);
-        parameters.m_SignalModelString += "Astrosticks";
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Astrosticks") );
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_AstrosticksWidget2->GetD()) );
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_AstrosticksModel2.GetT2()) );
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.RandomSticks", BoolProperty::New(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks()) );
+
+        mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp4VolumeFraction->GetSelectedNode();
+        mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
+        ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
+        CastToItkImage< ItkDoubleImgType >(img, itkImg);
+        if (parameters.m_ImageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
+                parameters.m_ImageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
+                parameters.m_ImageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
+        {
+            m_AstrosticksModel2.SetVolumeFractionImage(itkImg);
+            parameters.m_NonFiberModelList.push_back(&m_AstrosticksModel2);
+            parameters.m_SignalModelString += "Astrosticks";
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Astrosticks") );
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_AstrosticksWidget2->GetD()) );
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_AstrosticksModel2.GetT2()) );
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.RandomSticks", BoolProperty::New(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks()) );
+
+            itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+            double max = img->GetScalarValueMax();
+            if (max<1)
+                max = 1;
+            inverter->SetMaximum( max );
+            inverter->SetInput(itkImg);
+            inverter->Update();
+            parameters.m_NonFiberModelList.at(parameters.m_NonFiberModelList.size()-2)->SetVolumeFractionImage(inverter->GetOutput());
+        }
         break;
+    }
     case 3:
+    {
         m_DotModel2.SetGradientList(parameters.GetGradientDirections());
         m_DotModel2.SetT2(m_Controls->m_DotWidget2->GetT2());
-        m_DotModel2.SetWeight(m_Comp4Weight);
-        parameters.m_NonFiberModelList.push_back(&m_DotModel2);
-        parameters.m_SignalModelString += "Dot";
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Dot") );
-        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_DotModel2.GetT2()) );
+
+        mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp4VolumeFraction->GetSelectedNode();
+        mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
+        ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
+        CastToItkImage< ItkDoubleImgType >(img, itkImg);
+        if (parameters.m_ImageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
+                parameters.m_ImageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
+                parameters.m_ImageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
+        {
+            m_DotModel2.SetVolumeFractionImage(itkImg);
+            parameters.m_NonFiberModelList.push_back(&m_DotModel2);
+            parameters.m_SignalModelString += "Dot";
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Dot") );
+            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_DotModel2.GetT2()) );
+
+            itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+            double max = img->GetScalarValueMax();
+            if (max<1)
+                max = 1;
+            inverter->SetMaximum( max );
+            inverter->SetInput(itkImg);
+            inverter->Update();
+            parameters.m_NonFiberModelList.at(parameters.m_NonFiberModelList.size()-2)->SetVolumeFractionImage(inverter->GetOutput());
+        }
         break;
+    }
     }
 
     parameters.m_ResultNode->AddProperty("Fiberfox.SignalScale", IntProperty::New(parameters.m_SignalScale));
@@ -907,8 +968,6 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.compartment4.astrosticks.randomize", m_Controls->m_AstrosticksWidget2->GetRandomizeSticks());
     parameters.put("fiberfox.image.compartment4.dot.t2", m_Controls->m_DotWidget2->GetT2());
 
-    parameters.put("fiberfox.image.compartment4.weight", m_Controls->m_Comp4FractionBox->value());
-
     boost::property_tree::xml_parser::write_xml(filename.toStdString(), parameters);
 }
 
@@ -1046,8 +1105,6 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_AstrosticksWidget2->SetT2(v1.second.get<double>("compartment4.astrosticks.t2"));
             m_Controls->m_AstrosticksWidget2->SetRandomizeSticks(v1.second.get<bool>("compartment4.astrosticks.randomize"));
             m_Controls->m_DotWidget2->SetT2(v1.second.get<double>("compartment4.dot.t2"));
-
-            m_Controls->m_Comp4FractionBox->setValue(v1.second.get<double>("compartment4.weight"));
         }
     }
 }

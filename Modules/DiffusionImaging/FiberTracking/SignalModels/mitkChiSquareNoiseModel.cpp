@@ -44,5 +44,5 @@ template< class ScalarType >
 void ChiSquareNoiseModel< ScalarType >::AddNoise(PixelType& pixel)
 {
     for( unsigned int i=0; i<pixel.Size(); i++)
-        pixel[i] += (ScalarType)(m_Distribution(m_RandGen)-m_Distribution.n());
+        pixel[i] += (ScalarType)(m_Distribution(m_RandGen));//-m_Distribution.n());
 }

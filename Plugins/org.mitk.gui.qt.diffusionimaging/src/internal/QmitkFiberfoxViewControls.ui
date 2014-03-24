@@ -2794,26 +2794,17 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="m_Comp4FractionBox">
-               <property name="toolTip">
-                <string>Weighting factor between the two extra-axonal compartments.</string>
-               </property>
-               <property name="maximum">
-                <double>1.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.300000000000000</double>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="0">
               <widget class="QLabel" name="m_NoiseLabel_3">
                <property name="text">
-                <string>Compartment Fraction:</string>
+                <string>Volume Fraction:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QmitkDataStorageComboBox" name="m_Comp4VolumeFraction">
+               <property name="toolTip">
+                <string/>
                </property>
               </widget>
              </item>
@@ -3007,7 +2998,6 @@
   <tabstop>m_Compartment2Box</tabstop>
   <tabstop>m_Compartment3Box</tabstop>
   <tabstop>m_Compartment4Box</tabstop>
-  <tabstop>m_Comp4FractionBox</tabstop>
   <tabstop>m_AddNoise</tabstop>
   <tabstop>m_NoiseLevel</tabstop>
   <tabstop>m_AddSpikes</tabstop>

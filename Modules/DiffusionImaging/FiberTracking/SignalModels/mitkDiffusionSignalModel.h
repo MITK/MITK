@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkFiberTrackingExports.h>
 #include <itkVariableLengthVector.h>
 #include <itkVector.h>
+#include <itkImage.h>
 #include <vnl/vnl_vector_fixed.h>
 
 namespace mitk {
@@ -36,10 +37,10 @@ public:
 
     DiffusionSignalModel()
         : m_T2(100)
-        , m_Weight(1)
     {}
     ~DiffusionSignalModel(){}
 
+    typedef itk::Image<double, 3>                   ItkDoubleImgType;
     typedef itk::VariableLengthVector< ScalarType > PixelType;
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;
@@ -48,21 +49,21 @@ public:
     virtual PixelType SimulateMeasurement() = 0;
     virtual ScalarType SimulateMeasurement(unsigned int dir) = 0;
 
-    GradientType GetGradientDirection(int i) { return m_GradientList.at(i); }
     void SetFiberDirection(GradientType fiberDirection){ m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { m_GradientList = gradientList; }
     void SetT2(double T2) { m_T2 = T2; }
-    void SetWeight(double Weight) { m_Weight = Weight; }
+    void SetVolumeFractionImage(ItkDoubleImgType::Pointer img){ m_VolumeFractionImage = img; }
 
-    double GetWeight() { return m_Weight; }
+    ItkDoubleImgType::Pointer GetVolumeFractionImage(){ return m_VolumeFractionImage; }
+    GradientType GetGradientDirection(int i) { return m_GradientList.at(i); }
     double GetT2() { return m_T2; }
 
 protected:
 
-    GradientType        m_FiberDirection;   ///< Needed to generate anisotropc signal to determin direction of anisotropy
-    GradientListType    m_GradientList;     ///< Diffusion gradient direction container
-    double              m_T2;               ///< Tissue specific relaxation time
-    double              m_Weight;
+    GradientType                m_FiberDirection;       ///< Needed to generate anisotropc signal to determin direction of anisotropy
+    GradientListType            m_GradientList;         ///< Diffusion gradient direction container
+    double                      m_T2;                   ///< Tissue specific relaxation time
+    ItkDoubleImgType::Pointer   m_VolumeFractionImage;  ///< Tissue specific volume fraction for each voxel (only relevant for non fiber compartments)
 };
 
 }

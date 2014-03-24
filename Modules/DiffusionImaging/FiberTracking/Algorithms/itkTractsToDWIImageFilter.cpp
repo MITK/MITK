@@ -323,7 +323,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         compartments.push_back(doubleDwi);
     }
 
-    // initialize volume fraction images
+    // initialize output volume fraction images
     m_VolumeFractions.clear();
     for (unsigned int i=0; i<m_Parameters.m_FiberModelList.size()+m_Parameters.m_NonFiberModelList.size(); i++)
     {
@@ -337,6 +337,83 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         doubleImg->Allocate();
         doubleImg->FillBuffer(0);
         m_VolumeFractions.push_back(doubleImg);
+    }
+
+    // get volume fraction images
+    ItkDoubleImgType::Pointer sumImage = ItkDoubleImgType::New();
+    sumImage->SetSpacing( m_UpsampledSpacing );
+    sumImage->SetOrigin( m_UpsampledOrigin );
+    sumImage->SetDirection( m_Parameters.m_ImageDirection );
+    sumImage->SetLargestPossibleRegion( m_UpsampledImageRegion );
+    sumImage->SetBufferedRegion( m_UpsampledImageRegion );
+    sumImage->SetRequestedRegion( m_UpsampledImageRegion );
+    sumImage->Allocate();
+    sumImage->FillBuffer(0);
+    for (unsigned int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
+    {
+        if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNull())
+        {
+            ItkDoubleImgType::Pointer doubleImg = ItkDoubleImgType::New();
+            doubleImg->SetSpacing( m_UpsampledSpacing );
+            doubleImg->SetOrigin( m_UpsampledOrigin );
+            doubleImg->SetDirection( m_Parameters.m_ImageDirection );
+            doubleImg->SetLargestPossibleRegion( m_UpsampledImageRegion );
+            doubleImg->SetBufferedRegion( m_UpsampledImageRegion );
+            doubleImg->SetRequestedRegion( m_UpsampledImageRegion );
+            doubleImg->Allocate();
+            doubleImg->FillBuffer(1.0/m_Parameters.m_NonFiberModelList.size());
+            m_Parameters.m_NonFiberModelList[i]->SetVolumeFractionImage(doubleImg);
+        }
+        else
+        {
+            if (pad[0]>0 || pad[1]>0)
+            {
+                itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
+                zeroPadder->SetInput(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+                zeroPadder->SetConstant(0);
+                zeroPadder->SetPadUpperBound(pad);
+                zeroPadder->Update();
+                m_Parameters.m_NonFiberModelList[i]->SetVolumeFractionImage(zeroPadder->GetOutput());
+            }
+            if (m_Parameters.m_DoAddGibbsRinging)
+            {
+                itk::ResampleImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer resampler = itk::ResampleImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
+                resampler->SetInput(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+                resampler->SetOutputParametersFromImage(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+                resampler->SetSize(m_UpsampledImageRegion.GetSize());
+                resampler->SetOutputSpacing(m_UpsampledSpacing);
+                resampler->SetOutputOrigin(m_UpsampledOrigin);
+                itk::NearestNeighborInterpolateImageFunction<ItkDoubleImgType, double>::Pointer nn_interpolator
+                        = itk::NearestNeighborInterpolateImageFunction<ItkDoubleImgType, double>::New();
+                resampler->SetInterpolator(nn_interpolator);
+                resampler->Update();
+                m_Parameters.m_NonFiberModelList[i]->SetVolumeFractionImage(resampler->GetOutput());
+            }
+
+            itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::New();
+            rescaler->SetInput(0, m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+            rescaler->SetOutputMaximum(1);
+            rescaler->SetOutputMinimum(0);
+            rescaler->Update();
+            m_Parameters.m_NonFiberModelList[i]->SetVolumeFractionImage(rescaler->GetOutput());
+        }
+
+        ImageRegionIterator<ItkDoubleImgType> it(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage(), m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion());
+        while(!it.IsAtEnd())
+        {
+            sumImage->SetPixel(it.GetIndex(), sumImage->GetPixel(it.GetIndex())+it.Get());
+            ++it;
+        }
+    }
+    for (unsigned int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
+    {
+        ImageRegionIterator<ItkDoubleImgType> it(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage(), m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion());
+        while(!it.IsAtEnd())
+        {
+            if (sumImage->GetPixel(it.GetIndex())>0)
+                it.Set(it.Get()/sumImage->GetPixel(it.GetIndex()));
+            ++it;
+        }
     }
 
     // resample mask image and frequency map to fit upsampled geometry
@@ -471,7 +548,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
     maxVolume = 0;
 
-    m_StatusText += "\n"+this->GetTime()+" > Generating signal of " + boost::lexical_cast<std::string>(m_Parameters.m_FiberModelList.size()) + " fiber compartments\n";
+    m_StatusText += "\n"+this->GetTime()+" > Generating " + boost::lexical_cast<std::string>(m_Parameters.m_FiberModelList.size()+m_Parameters.m_NonFiberModelList.size()) + "-compartment diffusion-weighted signal.\n";
     MITK_INFO << "Generating signal of " << m_Parameters.m_FiberModelList.size() << " fiber compartments";
     int numFibers = m_FiberBundle->GetNumFibers();
     boost::progress_display disp(numFibers*m_Parameters.GetNumVolumes());
@@ -654,11 +731,31 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                     }
                     for (unsigned int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
                     {
+                        DoubleDwiType::IndexType newIndex = index;
+                        if (m_Parameters.m_DoAddMotion)
+                        {
+                            itk::Point<double, 3> point;
+                            tempTissueMask->TransformIndexToPhysicalPoint(index, point);
+                            if (m_Parameters.m_DoRandomizeMotion && g>0)
+                                point = fiberBundle->TransformPoint(point.GetVnlVector(), -rotation[0],-rotation[1],-rotation[2],-translation[0],-translation[1],-translation[2]);
+                            else
+                                point = fiberBundle->TransformPoint(point.GetVnlVector(), -rotation[0]*g,-rotation[1]*g,-rotation[2]*g,-translation[0]*g,-translation[1]*g,-translation[2]*g);
+
+                            DoubleDwiType::IndexType tempIndex;
+                            tempTissueMask->TransformPhysicalPointToIndex(point, tempIndex);
+                            if (tempTissueMask->GetLargestPossibleRegion().IsInside(tempIndex))
+                                newIndex = tempIndex;
+                            else
+                                continue;
+                        }
+
                         DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_Parameters.m_FiberModelList.size());
                         DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
-                        pix[g] += m_Parameters.m_NonFiberModelList[i]->SimulateMeasurement(g)*other*m_Parameters.m_NonFiberModelList[i]->GetWeight();
+                        double weight = m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetPixel(newIndex);
+
+                        pix[g] += m_Parameters.m_NonFiberModelList[i]->SimulateMeasurement(g)*other*weight;
                         doubleDwi->SetPixel(index, pix);
-                        m_VolumeFractions.at(i+m_Parameters.m_FiberModelList.size())->SetPixel(index, other/voxelVolume*m_Parameters.m_NonFiberModelList[i]->GetWeight());
+                        m_VolumeFractions.at(i+m_Parameters.m_FiberModelList.size())->SetPixel(index, other/voxelVolume*weight);
                     }
                 }
             }

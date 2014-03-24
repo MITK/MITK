@@ -302,6 +302,12 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
   vnl_vector< double > oldq;
   std::vector< itk::Matrix<double,3,3> > W;
 
+  itk::VariableSizeMatrix< double > iA;
+  iA.SetSize(3u * m_vtkMovingPointSet->GetNumberOfPoints(), 6u);
+
+  vnl_vector< double > iB;
+  iB.set_size(3u * m_vtkMovingPointSet->GetNumberOfPoints());
+
   while (config_change>Threshold)
     {
       //check wether maximum iterations is reached
@@ -355,8 +361,8 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
       //                          (and we will have those matrices in most cases)
 
       //convert to needed data types
-      itk::VariableSizeMatrix< double > iA = C_marker(MovingSetTrans,W);
-      vnl_vector< double > iB = e_marker(MovingSetTrans,FixedPointSet,W);
+      C_marker(MovingSetTrans,W,iA);
+      e_marker(MovingSetTrans,FixedPointSet,W,iB);
 
       vnl_matrix_inverse<double> myInverse(iA.GetVnlMatrix());
       vnl_vector< double > q = myInverse.pinverse(iB.size()) * iB;
@@ -438,14 +444,12 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
   return true;
 }
 
-itk::VariableSizeMatrix< double > mitk::WeightedPointTransform::C_marker(mitk::PointSet::Pointer X, const std::vector< itk::Matrix<double,3,3> > &W)
+void mitk::WeightedPointTransform::C_marker(mitk::PointSet::Pointer X, const std::vector< itk::Matrix<double,3,3> > &W, itk::VariableSizeMatrix< double >& returnValue)
 {
   unsigned int size = X->GetSize();
-  itk::VariableSizeMatrix< double > returnValue;
 
   if (size == W.size())
     {
-      returnValue.SetSize(3u * size, 6u);
 
       for(unsigned int i=0; i<size; i++)
         {
@@ -477,19 +481,18 @@ itk::VariableSizeMatrix< double > mitk::WeightedPointTransform::C_marker(mitk::P
           returnValue[index][5] = W.at(i)[2][2];
         }
     }
-
-  return returnValue;
 }
 
-vnl_vector< double > mitk::WeightedPointTransform::e_marker(mitk::PointSet::Pointer X, mitk::PointSet::Pointer Y, const std::vector< itk::Matrix<double,3,3> > &W)
+void mitk::WeightedPointTransform::e_marker( mitk::PointSet::Pointer X,
+                                                             mitk::PointSet::Pointer Y,
+                                                             const std::vector< itk::Matrix<double,3,3> > &W,
+                                                             vnl_vector< double >& returnValue
+                                                            )
 {
   unsigned int size = X->GetSize();
-  vnl_vector< double > returnValue;
 
   if ((size == Y->GetSize())&&(size == W.size()))
     {
-      returnValue.set_size(3u * size);
-
       std::vector< itk::Matrix<double,3,3> > D;
 
       D.reserve(size);
@@ -518,8 +521,6 @@ vnl_vector< double > mitk::WeightedPointTransform::e_marker(mitk::PointSet::Poin
           returnValue[index] = W.at(i)[2][0] * D.at(i)[2][0] + W.at(i)[2][1] * D.at(i)[2][1] + W.at(i)[2][2] * D.at(i)[2][2];
         }
     }
-
-  return returnValue;
 }
 
 void mitk::WeightedPointTransform::SetVtkMovingPointSet(vtkSmartPointer<vtkPoints> p)

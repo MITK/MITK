@@ -63,7 +63,10 @@ public:
 
     // delete self from list of ImageReadAccessors in Image
     std::vector<ImageAccessorBase*>::iterator it = std::find(m_Image->m_Writers.begin(),m_Image->m_Writers.end(),this);
-    m_Image->m_Writers.erase(it);
+    if(it != m_Image->m_Writers.end())
+    {
+      m_Image->m_Writers.erase(it);
+    }
 
     // delete lock, if there are no waiting ImageAccessors
     if(m_WaitLock->m_WaiterCount <= 0)
@@ -179,6 +182,8 @@ private:
     m_Image->m_ReadWriteLock.Unlock();
 
   }
+
+  void operator=(const ImageWriteAccessor&);  // Not implemented on purpose.
 
 };
 

@@ -101,8 +101,9 @@ public:
      *
      *  converted to C++ by Alfred Franz in March/April 2010
      */
-    void C_marker(mitk::PointSet::Pointer X, const std::vector< itk::Matrix<double,3,3> > &W, itk::VariableSizeMatrix<double> &returnValue);
-
+     void C_marker(vtkPoints* X,
+                  const std::vector< itk::Matrix<double,3,3> > &W,
+                  itk::VariableSizeMatrix< double >& returnValue);
     /**
      *  original matlab-function:
      *
@@ -117,8 +118,11 @@ public:
      *
      *  converted to C++ by Alfred Franz in March/April 2010
      */
-    void e_marker(mitk::PointSet::Pointer X, mitk::PointSet::Pointer Y, const std::vector< itk::Matrix<double,3,3> > &W, vnl_vector<double> &returnValue);
-
+    void E_marker( vtkPoints* X,
+                   vtkPoints* Y,
+                   const std::vector< itk::Matrix<double,3,3> > &W,
+                   vnl_vector< double >& returnValue
+                 );
 
     void SetVtkMovingPointSet(vtkSmartPointer<vtkPoints> p);
 

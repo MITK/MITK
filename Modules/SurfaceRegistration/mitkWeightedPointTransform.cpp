@@ -23,15 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkMatrix4x4.h>
 
-//namespace mitk {
-//
-//class WeightedPointTransformData
-//{
-//
-//};
-//
-//}
-
 mitk::WeightedPointTransform::WeightedPointTransform()
 {
   m_Threshold = 1.0e-4;
@@ -216,6 +207,87 @@ static void IsotropicRegistration( vtkPoints* X, vtkPoints* Y, Matrix3x3& rotati
   translation[2] = m->GetElement(2,3);
 }
 
+void mitk::WeightedPointTransform::C_marker(vtkPoints* X,
+              const std::vector< itk::Matrix<double,3,3> > &W,
+              itk::VariableSizeMatrix< double >& returnValue)
+{
+  for(vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i )
+  {
+    unsigned int index = 3u * i;
+    double point[3];
+    X->GetPoint(i,point);
+
+    returnValue[index][0] = -W.at(i)[0][1] * point[2] + W.at(i)[0][2] * point[1];
+    returnValue[index][1] = W.at(i)[0][0] * point[2] - W.at(i)[0][2] * point[0];
+    returnValue[index][2] = - W.at(i)[0][0] * point[1] + W.at(i)[0][1] * point[0];
+    returnValue[index][3] = W.at(i)[0][0];
+    returnValue[index][4] = W.at(i)[0][1];
+    returnValue[index][5] = W.at(i)[0][2];
+
+    ++index;
+
+    returnValue[index][0] = -W.at(i)[1][1] * point[2] + W.at(i)[1][2] * point[1];
+    returnValue[index][1] = W.at(i)[1][0] * point[2] - W.at(i)[1][2] * point[0];
+    returnValue[index][2] = - W.at(i)[1][0] * point[1] + W.at(i)[1][1] * point[0];
+    returnValue[index][3] = W.at(i)[1][0];
+    returnValue[index][4] = W.at(i)[1][1];
+    returnValue[index][5] = W.at(i)[1][2];
+
+    ++index;
+
+    returnValue[index][0] = -W.at(i)[2][1] *  point[2] + W.at(i)[2][2] * point[1];
+    returnValue[index][1] = W.at(i)[2][0] *   point[2] - W.at(i)[2][2] * point[0];
+    returnValue[index][2] = - W.at(i)[2][0] * point[1] + W.at(i)[2][1] * point[0];
+    returnValue[index][3] = W.at(i)[2][0];
+    returnValue[index][4] = W.at(i)[2][1];
+    returnValue[index][5] = W.at(i)[2][2];
+  }
+}
+
+void mitk::WeightedPointTransform::E_marker(
+               vtkPoints* X,
+               vtkPoints* Y,
+               const std::vector< itk::Matrix<double,3,3> > &W,
+               vnl_vector< double >& returnValue
+             )
+{
+  unsigned int size = X->GetNumberOfPoints();
+
+  std::vector< itk::Matrix<double,3,3> > D;
+
+  D.reserve(size);
+  // TODO: do this on the fly inplace
+  for(int i = 0; i < size; ++i)
+  {
+    itk::Matrix<double,3,3> newMatrix;
+    double pX[3];
+    double pY[3];
+
+    X->GetPoint(i,pX);
+    Y->GetPoint(i,pY);
+
+    newMatrix[0][0] = pY[0] - pX[0];
+    newMatrix[0][1] = pY[1] - pX[1];
+    newMatrix[0][2] = pY[2] - pX[2];
+    newMatrix[1][0] = newMatrix[0][0];
+    newMatrix[1][1] = newMatrix[0][1];
+    newMatrix[1][2] = newMatrix[0][2];
+    newMatrix[2][0] = newMatrix[0][0];
+    newMatrix[2][1] = newMatrix[0][1];
+    newMatrix[2][2] = newMatrix[0][2];
+    D.push_back(newMatrix);
+  }
+
+  for(int i = 0; i < size; ++i)
+  {
+    unsigned int index = 3u * i;
+
+    returnValue[index++] = W.at(i)[0][0] * D.at(i)[0][0] + W.at(i)[0][1] * D.at(i)[0][1] + W.at(i)[0][2] * D.at(i)[0][2];
+    returnValue[index++] = W.at(i)[1][0] * D.at(i)[1][0] + W.at(i)[1][1] * D.at(i)[1][1] + W.at(i)[1][2] * D.at(i)[1][2];
+    returnValue[index] = W.at(i)[2][0] * D.at(i)[2][0] + W.at(i)[2][1] * D.at(i)[2][1] + W.at(i)[2][2] * D.at(i)[2][2];
+  }
+}
+
 bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
     mitk::PointSet::Pointer MovingPointSet,
     mitk::PointSet::Pointer FixedPointSet,
@@ -255,16 +327,12 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
   double FRE_identity = 0.0;
   itk::Matrix<double,3,3> identityR; identityR.SetIdentity();
   itk::Vector<double,3> identityT; identityT.Fill(0);
-  FRE_identity = ComputeWeightedFREItk(MovingPointSet,FixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed,m_FRENormalizationFactor,identityR,identityT);
-  std::cout <<"\nFRE for identity transform: "<<FRE_identity<<std::endl; //TODO TEST
   FRE_identity = ComputeWeightedFRE(m_vtkMovingPointSet,m_vtkFixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed,m_FRENormalizationFactor,identityR,identityT);
   std::cout <<"\nFRE for identity transform: "<<FRE_identity<<std::endl; //TODO TEST
 
   //TODO TEST
   //calculate FRE with current transform
   double FRE_isotropic_weighted = 0;
-  FRE_isotropic_weighted = ComputeWeightedFREItk(MovingPointSet,FixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed,m_FRENormalizationFactor,TransformationR,TransformationT);
-  std::cout <<"FRE for transform obtained with unweighted registration: "<<FRE_isotropic_weighted<<std::endl;
   FRE_isotropic_weighted = ComputeWeightedFRE(m_vtkMovingPointSet,m_vtkFixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed,m_FRENormalizationFactor,TransformationR,TransformationT);
   std::cout <<"FRE for transform obtained with unweighted registration: "<<FRE_isotropic_weighted<<std::endl;
 
@@ -283,6 +351,10 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
       initial_TransformationR = identityR;
       initial_TransformationT = identityT;
   }
+
+
+  vtkSmartPointer<vtkPoints> vtkMovingSetTrans;
+  vtkSmartPointer<vtkPoints> vtkMovingSetTransNew;
 
   //apply transform to moving set:
   MovingSetTrans = mitk::PointSet::New();
@@ -304,47 +376,46 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
 
   itk::VariableSizeMatrix< double > iA;
   iA.SetSize(3u * m_vtkMovingPointSet->GetNumberOfPoints(), 6u);
-
   vnl_vector< double > iB;
   iB.set_size(3u * m_vtkMovingPointSet->GetNumberOfPoints());
 
   while (config_change>Threshold)
-    {
+  {
       //check wether maximum iterations is reached
-      if (n > MaxIterations)
-        {
-          isConverged = false;
-
-          double currentFRE;
-          currentFRE = ComputeWeightedFREItk(MovingPointSet,FixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed, this->m_FRENormalizationFactor,TransformationR,TransformationT);
-
-
-          if (currentFRE > initialFRE)
-            {
-              std::cout <<"Current FRE ("<<currentFRE<<") is larger than initial FRE ("<<initialFRE<<std::endl;
-
-              //in this case use the initial transform
-              TransformationR = initial_TransformationR;
-              TransformationT = initial_TransformationT;
-              //transform moving points with initial transform
-              mitk::PointSet::Pointer MovingSetTransNew = mitk::PointSet::New();
-              for (int i=0; i<MovingSetTrans->GetSize(); i++)
-                {
-                  itk::Point<double,3> newPointItk = TransformationR * MovingPointSet->GetPoint(i) + TransformationT;
-                  mitk::Point3D newPoint;
-                  newPoint[0] = newPointItk[0];
-                  newPoint[1] = newPointItk[1];
-                  newPoint[2] = newPointItk[2];
-                  MovingSetTransNew->InsertPoint(i,newPoint);
-                }
-              MovingSetTrans = MovingSetTransNew;
-              FRE = initialFRE;
-            }
-          else //Algorithm improved FRE -> use current transform
-            FRE = currentFRE;
-
-          break;
-        }
+//      if (n > MaxIterations)
+//        {
+//          isConverged = false;
+//
+//          double currentFRE;
+//          currentFRE = ComputeWeightedFREItk(MovingPointSet,FixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed, this->m_FRENormalizationFactor,TransformationR,TransformationT);
+//
+//
+//          if (currentFRE > initialFRE)
+//            {
+//              std::cout <<"Current FRE ("<<currentFRE<<") is larger than initial FRE ("<<initialFRE<<std::endl;
+//
+//              //in this case use the initial transform
+//              TransformationR = initial_TransformationR;
+//              TransformationT = initial_TransformationT;
+//              //transform moving points with initial transform
+//              mitk::PointSet::Pointer MovingSetTransNew = mitk::PointSet::New();
+//              for (int i=0; i<MovingSetTrans->GetSize(); i++)
+//                {
+//                  itk::Point<double,3> newPointItk = TransformationR * MovingPointSet->GetPoint(i) + TransformationT;
+//                  mitk::Point3D newPoint;
+//                  newPoint[0] = newPointItk[0];
+//                  newPoint[1] = newPointItk[1];
+//                  newPoint[2] = newPointItk[2];
+//                  MovingSetTransNew->InsertPoint(i,newPoint);
+//                }
+//              MovingSetTrans = MovingSetTransNew;
+//              FRE = initialFRE;
+//            }
+//          else //Algorithm improved FRE -> use current transform
+//            FRE = currentFRE;
+//
+//          break;
+//        }
 
       n++;
 
@@ -360,9 +431,11 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
       //          current method: treat the problem as a minimization problem, because this is what the "backslash"-operator also does with "high" matrices.
       //                          (and we will have those matrices in most cases)
 
+      vtkMovingSetTrans = mitk::AnisotropicRegistrationCommon::GetVTKPoints(MovingSetTrans);
+      C_marker(vtkMovingSetTrans.GetPointer(),W,iA);
+      E_marker(vtkMovingSetTrans.GetPointer(),m_vtkFixedPointSet.GetPointer(),W,iB);
       //convert to needed data types
-      C_marker(MovingSetTrans,W,iA);
-      e_marker(MovingSetTrans,FixedPointSet,W,iB);
+      //C_marker(MovingSetTrans,W,iA);
 
       vnl_matrix_inverse<double> myInverse(iA.GetVnlMatrix());
       vnl_vector< double > q = myInverse.pinverse(iB.size()) * iB;
@@ -421,8 +494,7 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
 
       //the old set for the next iteration is the new set of the last
       MovingSetTrans = MovingSetTransNew;
-
-    }
+  }
 
   //calculate FRE with current transform
   FRE = ComputeWeightedFREItk(MovingPointSet,FixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed,m_FRENormalizationFactor,TransformationR,TransformationT);
@@ -442,85 +514,6 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
 
   std::cout.precision(2);
   return true;
-}
-
-void mitk::WeightedPointTransform::C_marker(mitk::PointSet::Pointer X, const std::vector< itk::Matrix<double,3,3> > &W, itk::VariableSizeMatrix< double >& returnValue)
-{
-  unsigned int size = X->GetSize();
-
-  if (size == W.size())
-    {
-
-      for(unsigned int i=0; i<size; i++)
-        {
-          unsigned int index = 3u * i;
-
-          returnValue[index][0] = -W.at(i)[0][1] * X->GetPoint(i)[2] + W.at(i)[0][2] * X->GetPoint(i)[1];
-          returnValue[index][1] = W.at(i)[0][0] * X->GetPoint(i)[2] - W.at(i)[0][2] * X->GetPoint(i)[0];
-          returnValue[index][2] = - W.at(i)[0][0] * X->GetPoint(i)[1] + W.at(i)[0][1] * X->GetPoint(i)[0];
-          returnValue[index][3] = W.at(i)[0][0];
-          returnValue[index][4] = W.at(i)[0][1];
-          returnValue[index][5] = W.at(i)[0][2];
-
-          ++index;
-
-          returnValue[index][0] = -W.at(i)[1][1] * X->GetPoint(i)[2] + W.at(i)[1][2] * X->GetPoint(i)[1];
-          returnValue[index][1] = W.at(i)[1][0] * X->GetPoint(i)[2] - W.at(i)[1][2] * X->GetPoint(i)[0];
-          returnValue[index][2] = - W.at(i)[1][0] * X->GetPoint(i)[1] + W.at(i)[1][1] * X->GetPoint(i)[0];
-          returnValue[index][3] = W.at(i)[1][0];
-          returnValue[index][4] = W.at(i)[1][1];
-          returnValue[index][5] = W.at(i)[1][2];
-
-          ++index;
-
-          returnValue[index][0] = -W.at(i)[2][1] * X->GetPoint(i)[2] + W.at(i)[2][2] * X->GetPoint(i)[1];
-          returnValue[index][1] = W.at(i)[2][0] * X->GetPoint(i)[2] - W.at(i)[2][2] * X->GetPoint(i)[0];
-          returnValue[index][2] = - W.at(i)[2][0] * X->GetPoint(i)[1] + W.at(i)[2][1] * X->GetPoint(i)[0];
-          returnValue[index][3] = W.at(i)[2][0];
-          returnValue[index][4] = W.at(i)[2][1];
-          returnValue[index][5] = W.at(i)[2][2];
-        }
-    }
-}
-
-void mitk::WeightedPointTransform::e_marker( mitk::PointSet::Pointer X,
-                                                             mitk::PointSet::Pointer Y,
-                                                             const std::vector< itk::Matrix<double,3,3> > &W,
-                                                             vnl_vector< double >& returnValue
-                                                            )
-{
-  unsigned int size = X->GetSize();
-
-  if ((size == Y->GetSize())&&(size == W.size()))
-    {
-      std::vector< itk::Matrix<double,3,3> > D;
-
-      D.reserve(size);
-
-      for(int i=0; i<size; i++)
-        {
-          itk::Matrix<double,3,3> newMatrix;
-          newMatrix[0][0] = Y->GetPoint(i)[0] - X->GetPoint(i)[0];
-          newMatrix[0][1] = Y->GetPoint(i)[1] - X->GetPoint(i)[1];
-          newMatrix[0][2] = Y->GetPoint(i)[2] - X->GetPoint(i)[2];
-          newMatrix[1][0] = newMatrix[0][0];
-          newMatrix[1][1] = newMatrix[0][1];
-          newMatrix[1][2] = newMatrix[0][2];
-          newMatrix[2][0] = newMatrix[0][0];
-          newMatrix[2][1] = newMatrix[0][1];
-          newMatrix[2][2] = newMatrix[0][2];
-          D.push_back(newMatrix);
-        }
-
-      for(int i=0; i<size; i++)
-        {
-          unsigned int index = 3u * i;
-
-          returnValue[index++] = W.at(i)[0][0] * D.at(i)[0][0] + W.at(i)[0][1] * D.at(i)[0][1] + W.at(i)[0][2] * D.at(i)[0][2];
-          returnValue[index++] = W.at(i)[1][0] * D.at(i)[1][0] + W.at(i)[1][1] * D.at(i)[1][1] + W.at(i)[1][2] * D.at(i)[1][2];
-          returnValue[index] = W.at(i)[2][0] * D.at(i)[2][0] + W.at(i)[2][1] * D.at(i)[2][1] + W.at(i)[2][2] * D.at(i)[2][2];
-        }
-    }
 }
 
 void mitk::WeightedPointTransform::SetVtkMovingPointSet(vtkSmartPointer<vtkPoints> p)

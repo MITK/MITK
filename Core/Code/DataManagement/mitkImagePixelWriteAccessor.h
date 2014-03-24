@@ -162,6 +162,8 @@ private:
 
   ImageWriteAccessor m_WriteAccessor;
 
+  void operator=(const ImagePixelWriteAccessor&);  // Not implemented on purpose.
+
 };
 
 }

@@ -71,79 +71,6 @@ static Matrix3x3List calculateWeightMatrices(const Matrix3x3List& X, const Matri
   return result;
 }
 
-mitk::PointSet::Pointer DeepCopyPoints(mitk::PointSet::Pointer original)
-{
-  mitk::PointSet::Pointer returnValue = mitk::PointSet::New();
-  for (int i=0; i<original->GetSize(); i++)
-      {
-      mitk::Point3D newPoint;
-      newPoint[0] = original->GetPoint(i)[0];
-      newPoint[1] = original->GetPoint(i)[1];
-      newPoint[2] = original->GetPoint(i)[2];
-      returnValue->InsertPoint(i,newPoint);
-      }
-  return returnValue;
-}
-
-Matrix3x3List DeepCopyMatrices(const Matrix3x3List& original)
-{
-  Matrix3x3List returnValue;
-  for (unsigned int i=0; i<original.size(); i++)
-    {
-    itk::Matrix<double,3,3> copy;
-    copy[0][0] = original.at(i)[0][0];
-    copy[0][1] = original.at(i)[0][1];
-    copy[0][2] = original.at(i)[0][2];
-    copy[1][0] = original.at(i)[1][0];
-    copy[1][1] = original.at(i)[1][1];
-    copy[1][2] = original.at(i)[1][2];
-    copy[2][0] = original.at(i)[2][0];
-    copy[2][1] = original.at(i)[2][1];
-    copy[2][2] = original.at(i)[2][2];
-    returnValue.push_back(copy);
-    }
-  return returnValue;
-}
-
-double ComputeWeightedFREItk (  mitk::PointSet::Pointer MovingPointSet,
-                                mitk::PointSet::Pointer FixedPointSet,
-                                const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesMoving,
-                                const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesFixed,
-                                double FRENormalizationFactor,
-                                const Matrix3x3& rotation,
-                                const itk::Vector<double,3>& translation
-                             )
-{
-  //compute weighting matrices
-  Matrix3x3List WeightMatrices = calculateWeightMatrices(CovarianceMatricesMoving,CovarianceMatricesFixed,rotation);
-
-  double FRE = 0;
-#pragma omp parallel for reduction(+:FRE)
-  for (unsigned int ii = 0; ii < WeightMatrices.size(); ii++)
-  {
-    //convert to itk data types (nessecary since itk 4 migration)
-    itk::Vector<double,3> converted_MovingPoint;
-    converted_MovingPoint[0] = MovingPointSet->GetPoint(ii)[0];
-    converted_MovingPoint[1] = MovingPointSet->GetPoint(ii)[1];
-    converted_MovingPoint[2] = MovingPointSet->GetPoint(ii)[2];
-
-    const itk::Vector<double,3> p = rotation * converted_MovingPoint + translation;
-
-    itk::Vector<double,3> converted_FixedPoint;
-    converted_FixedPoint[0] = FixedPointSet->GetPoint(ii)[0];
-    converted_FixedPoint[1] = FixedPointSet->GetPoint(ii)[1];
-    converted_FixedPoint[2] = FixedPointSet->GetPoint(ii)[2];
-    //do calculation
-    itk::Vector<double,3> D = WeightMatrices.at(ii) * (p - converted_FixedPoint);
-    FRE += D[0] * D[0] + D[1] * D[1] + D[2] * D[2];
-  }
-
-  FRE /= WeightMatrices.size();
-  FRE = FRENormalizationFactor * sqrt(FRE);
-
-  return FRE;
-}
-
 double ComputeWeightedFRE (  vtkPoints* X,
                              vtkPoints* Y,
                              const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesMoving,
@@ -207,9 +134,9 @@ static void IsotropicRegistration( vtkPoints* X, vtkPoints* Y, Matrix3x3& rotati
   translation[2] = m->GetElement(2,3);
 }
 
-void mitk::WeightedPointTransform::C_marker(vtkPoints* X,
-              const std::vector< itk::Matrix<double,3,3> > &W,
-              itk::VariableSizeMatrix< double >& returnValue)
+void mitk::WeightedPointTransform::C_marker( vtkPoints* X,
+                                            const std::vector< itk::Matrix<double,3,3> > &W,
+                                            itk::VariableSizeMatrix< double >& returnValue)
 {
   for(vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i )
   {
@@ -244,20 +171,19 @@ void mitk::WeightedPointTransform::C_marker(vtkPoints* X,
   }
 }
 
-void mitk::WeightedPointTransform::E_marker(
-               vtkPoints* X,
-               vtkPoints* Y,
-               const std::vector< itk::Matrix<double,3,3> > &W,
-               vnl_vector< double >& returnValue
-             )
+void mitk::WeightedPointTransform::E_marker( vtkPoints* X,
+                                             vtkPoints* Y,
+                                             const std::vector< itk::Matrix<double,3,3> > &W,
+                                             vnl_vector< double >& returnValue
+                                            )
 {
   unsigned int size = X->GetNumberOfPoints();
 
   std::vector< itk::Matrix<double,3,3> > D;
 
   D.reserve(size);
-  // TODO: do this on the fly inplace
-  for(int i = 0; i < size; ++i)
+
+  for(unsigned int i = 0; i < size; ++i)
   {
     itk::Matrix<double,3,3> newMatrix;
     double pX[3];
@@ -265,7 +191,6 @@ void mitk::WeightedPointTransform::E_marker(
 
     X->GetPoint(i,pX);
     Y->GetPoint(i,pY);
-
     newMatrix[0][0] = pY[0] - pX[0];
     newMatrix[0][1] = pY[1] - pX[1];
     newMatrix[0][2] = pY[2] - pX[2];
@@ -278,14 +203,14 @@ void mitk::WeightedPointTransform::E_marker(
     D.push_back(newMatrix);
   }
 
-  for(int i = 0; i < size; ++i)
-  {
-    unsigned int index = 3u * i;
+  for(int i=0; i<size; ++i)
+    {
+      unsigned int index = 3u * i;
 
-    returnValue[index++] = W.at(i)[0][0] * D.at(i)[0][0] + W.at(i)[0][1] * D.at(i)[0][1] + W.at(i)[0][2] * D.at(i)[0][2];
-    returnValue[index++] = W.at(i)[1][0] * D.at(i)[1][0] + W.at(i)[1][1] * D.at(i)[1][1] + W.at(i)[1][2] * D.at(i)[1][2];
-    returnValue[index] = W.at(i)[2][0] * D.at(i)[2][0] + W.at(i)[2][1] * D.at(i)[2][1] + W.at(i)[2][2] * D.at(i)[2][2];
-  }
+      returnValue[index++] = W.at(i)[0][0] * D.at(i)[0][0] + W.at(i)[0][1] * D.at(i)[0][1] + W.at(i)[0][2] * D.at(i)[0][2];
+      returnValue[index++] = W.at(i)[1][0] * D.at(i)[1][0] + W.at(i)[1][1] * D.at(i)[1][1] + W.at(i)[1][2] * D.at(i)[1][2];
+      returnValue[index] = W.at(i)[2][0] * D.at(i)[2][0] + W.at(i)[2][1] * D.at(i)[2][1] + W.at(i)[2][2] * D.at(i)[2][2];
+    }
 }
 
 bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
@@ -353,16 +278,21 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
   }
 
 
-  vtkSmartPointer<vtkPoints> vtkMovingSetTrans;
-  vtkSmartPointer<vtkPoints> vtkMovingSetTransNew;
+  vtkPoints* vtkMovingSetTrans = vtkPoints::New();
+  vtkMovingSetTrans->SetNumberOfPoints(m_vtkMovingPointSet->GetNumberOfPoints());
+  vtkPoints* vtkMovingSetTransNew = vtkPoints::New();
+  vtkMovingSetTransNew->SetNumberOfPoints(m_vtkMovingPointSet->GetNumberOfPoints());
 
   //apply transform to moving set:
   MovingSetTrans = mitk::PointSet::New();
-  for (int i=0; i<MovingPointSet->GetSize(); i++)
-  {
-    mitk::Point3D transformedPoint = (TransformationR * MovingPointSet->GetPoint(i)) + TransformationT;
-    MovingSetTrans->InsertPoint(i,transformedPoint);
-  }
+ // for (int i=0; i<MovingPointSet->GetSize(); i++)
+ // {
+ //   mitk::Point3D transformedPoint = (TransformationR * MovingPointSet->GetPoint(i)) + TransformationT;
+ //   MovingSetTrans->InsertPoint(i,transformedPoint);
+ // }
+
+  mitk::AnisotropicRegistrationCommon::TransformPoints( m_vtkMovingPointSet, vtkMovingSetTrans,
+                                                        TransformationR, TransformationT);
 
   //set config_change to infinite (max double) at start
   double config_change = std::numeric_limits<double>::max();
@@ -431,11 +361,8 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
       //          current method: treat the problem as a minimization problem, because this is what the "backslash"-operator also does with "high" matrices.
       //                          (and we will have those matrices in most cases)
 
-      vtkMovingSetTrans = mitk::AnisotropicRegistrationCommon::GetVTKPoints(MovingSetTrans);
-      C_marker(vtkMovingSetTrans.GetPointer(),W,iA);
-      E_marker(vtkMovingSetTrans.GetPointer(),m_vtkFixedPointSet.GetPointer(),W,iB);
-      //convert to needed data types
-      //C_marker(MovingSetTrans,W,iA);
+      C_marker(vtkMovingSetTrans,W,iA);
+      E_marker(vtkMovingSetTrans,m_vtkFixedPointSet,W,iB);
 
       vnl_matrix_inverse<double> myInverse(iA.GetVnlMatrix());
       vnl_vector< double > q = myInverse.pinverse(iB.size()) * iB;
@@ -465,9 +392,14 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
 
       //convert vnl matrices to itk matrices...
       itk::Matrix<double,3,3> U;
-      for (int i=0; i<3; i++) for (int j=0; j<3; j++) U[i][j] = svd_delta_theta.U()[i][j];
       itk::Matrix<double,3,3> V;
-      for (int i=0; i<3; i++) for (int j=0; j<3; j++) V[i][j] = svd_delta_theta.V()[i][j];
+
+      for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+          U[i][j] = svd_delta_theta.U()[i][j];
+          V[i][j] = svd_delta_theta.V()[i][j];
+        }
+      }
 
       itk::Matrix<double,3,3> delta_R = U * V.GetTranspose();
 
@@ -478,26 +410,27 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
       TransformationT = delta_R * TransformationT + delta_t;
 
       //update moving points
-      mitk::PointSet::Pointer MovingSetTransNew = mitk::PointSet::New();
-      for (int i=0; i<MovingSetTrans->GetSize(); i++)
-        {
-          itk::Point<double,3> newPointItk = TransformationR * MovingPointSet->GetPoint(i) + TransformationT;
-          mitk::Point3D newPoint;
-          newPoint[0] = newPointItk[0];
-          newPoint[1] = newPointItk[1];
-          newPoint[2] = newPointItk[2];
-          MovingSetTransNew->InsertPoint(i,newPoint);
-        }
-
+      mitk::AnisotropicRegistrationCommon::TransformPoints( m_vtkMovingPointSet,
+                                                            vtkMovingSetTransNew,
+                                                            TransformationR,
+                                                            TransformationT );
       //calculate config change
-      config_change = CalculateConfigChange(MovingSetTrans,MovingSetTransNew);
+      config_change = CalculateConfigChange(vtkMovingSetTrans,vtkMovingSetTransNew);
 
       //the old set for the next iteration is the new set of the last
-      MovingSetTrans = MovingSetTransNew;
+      vtkPoints* tmp = vtkMovingSetTrans;
+      vtkMovingSetTrans = vtkMovingSetTransNew;
+      vtkMovingSetTransNew = tmp;
+
+      if ( n > MaxIterations )
+      {
+          MITK_ERROR << "max iteration reached";
+          break;
+      }
   }
 
   //calculate FRE with current transform
-  FRE = ComputeWeightedFREItk(MovingPointSet,FixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed,m_FRENormalizationFactor,TransformationR,TransformationT);
+  FRE = ComputeWeightedFRE(m_vtkMovingPointSet,m_vtkFixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed,m_FRENormalizationFactor,TransformationR,TransformationT);
 
   std::cout <<"FRE after algorithm (prior to check with initial): "<<FRE<<std::endl;
 
@@ -513,6 +446,9 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
   std::cout <<"FRE final: "<<FRE<<std::endl;
 
   std::cout.precision(2);
+
+  vtkMovingSetTrans->Delete();
+  vtkMovingSetTransNew->Delete();
   return true;
 }
 
@@ -526,64 +462,49 @@ void mitk::WeightedPointTransform::SetVtkFixedPointSet(vtkSmartPointer<vtkPoints
   m_vtkFixedPointSet = p;
 }
 
-double mitk::WeightedPointTransform::CalculateConfigChange(mitk::PointSet::Pointer MovingSetOld,mitk::PointSet::Pointer MovingSetNew)
+double mitk::WeightedPointTransform::CalculateConfigChange(vtkPoints* X, vtkPoints* X_new)
 {
-  itk::Vector<double,3> mean = ComputeMean(MovingSetOld);
-  //std::cout <<"MEan old"<<mean<<std::endl;
-  itk::Vector<double,3> sqrSum = itk::Vector<double,3>(); sqrSum.Fill(0);
-  for(int i=0; i<MovingSetOld->GetSize(); i++)
-    {
-      sqrSum[0] += (pow((MovingSetNew->GetPoint(i)[0] - MovingSetOld->GetPoint(i)[0]),2));
-      sqrSum[1] += (pow((MovingSetNew->GetPoint(i)[1] - MovingSetOld->GetPoint(i)[1]),2));
-      sqrSum[2] += (pow((MovingSetNew->GetPoint(i)[2] - MovingSetOld->GetPoint(i)[2]),2));
-    }
-  double zaehler = sqrSum[0]+sqrSum[1]+sqrSum[2];
+  double sum[3] = { 0.0,0.0,0.0 };
+  double mean[3] = { 0.0,0.0,0.0 };
+  double pX[3] = { 0.0,0.0,0.0 };
+  double pX_new[3] = { 0.0,0.0,0.0 };
 
-  itk::Vector<double,3> sqrSum2 = itk::Vector<double,3>(); sqrSum2.Fill(0);
-  for(int i=0; i<MovingSetOld->GetSize(); i++)
-    {
-      sqrSum2[0] += (pow((MovingSetOld->GetPoint(i)[0] - mean[0]),2));
-      sqrSum2[1] += (pow((MovingSetOld->GetPoint(i)[1] - mean[1]),2));
-      sqrSum2[2] += (pow((MovingSetOld->GetPoint(i)[2] - mean[2]),2));
-    }
-  double nenner = sqrSum2[0]+sqrSum2[1]+sqrSum2[2];
-  double config_change = sqrt(zaehler / nenner);
+  // compute mean of the old point set and the first sum
+  for ( vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i )
+  {
+    X->GetPoint(i,pX);
+    X_new->GetPoint(i,pX_new);
 
-  return config_change;
-}
+    // first sum
+    sum[0] += ( pX_new[0] - pX[0] ) * ( pX_new[0] - pX[0] );
+    sum[1] += ( pX_new[1] - pX[1] ) * ( pX_new[1] - pX[1] );
+    sum[2] += ( pX_new[2] - pX[2] ) * ( pX_new[2] - pX[2] );
 
-itk::Vector<double,3> mitk::WeightedPointTransform::ComputeMean(mitk::PointSet::Pointer pSet)
-{
-  itk::Vector<double,3> returnValue = itk::Vector<double,3>();  returnValue.Fill(0);
-  for (int i=0; i<pSet->GetSize(); i++)
-    {
-      returnValue[0] = returnValue[0] + pSet->GetPoint(i)[0];
-      returnValue[1] = returnValue[1] + pSet->GetPoint(i)[1];
-      returnValue[2] = returnValue[2] + pSet->GetPoint(i)[2];
-    }
-  returnValue = returnValue / pSet->GetSize();
+    // mean
+    mean[0] += pX[0];
+    mean[1] += pX[1];
+    mean[2] += pX[2];
+  }
 
-  return returnValue;
-}
+  mean[0] /= X->GetNumberOfPoints();
+  mean[1] /= X->GetNumberOfPoints();
+  mean[2] /= X->GetNumberOfPoints();
 
-mitk::PointSet::Pointer mitk::WeightedPointTransform::ComputeMean(mitk::PointSet::Pointer ptSet1, mitk::PointSet::Pointer ptSet2)
-{
-  mitk::PointSet::Pointer returnValue = mitk::PointSet::New();
-  if (ptSet1->GetSize() == ptSet2->GetSize())
-    {
-      for (int i=0; i<ptSet1->GetSize(); i++)
-        {
-          //compute mean of current points
-          mitk::Point3D point1 = ptSet1->GetPoint(i);
-          mitk::Point3D point2 = ptSet2->GetPoint(i);
-          mitk::Point3D mean;
-          mean[0] = (point1[0] + point2[0])/2;
-          mean[1] = (point1[1] + point2[1])/2;
-          mean[2] = (point1[2] + point2[2])/2;
+  const double us = sum[0] + sum[1] + sum[2];
 
-          //add the mean to the returnvalue
-          returnValue->InsertPoint(i,mean);
-        }
-    }
-  return returnValue;
+  // reset sum
+  sum[0] = sum[1] = sum[2] = 0.0;
+
+  for ( vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i )
+  {
+    X->GetPoint(i,pX);
+
+    sum[0] += (pX[0] - mean[0]) * (pX[0] - mean[0]);
+    sum[1] += (pX[1] - mean[1]) * (pX[1] - mean[1]);
+    sum[2] += (pX[2] - mean[2]) * (pX[2] - mean[2]);
+  }
+
+  const double ls = sum[0] + sum[1] + sum[2];
+
+  return sqrt(us/ls);
 }

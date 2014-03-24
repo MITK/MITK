@@ -44,7 +44,6 @@ public:
     mitkClassMacro(WeightedPointTransform, itk::Object);
     itkNewMacro(Self);
 
-
     /** @brief Method which registers both point sets. */
     virtual bool Update();
 
@@ -101,9 +100,8 @@ public:
      *
      *  converted to C++ by Alfred Franz in March/April 2010
      */
-     void C_marker(vtkPoints* X,
-                  const std::vector< itk::Matrix<double,3,3> > &W,
-                  itk::VariableSizeMatrix< double >& returnValue);
+    void C_marker( vtkPoints* X, const std::vector< itk::Matrix<double,3,3> > &W, itk::VariableSizeMatrix< double >& returnValue);
+
     /**
      *  original matlab-function:
      *
@@ -118,11 +116,9 @@ public:
      *
      *  converted to C++ by Alfred Franz in March/April 2010
      */
-    void E_marker( vtkPoints* X,
-                   vtkPoints* Y,
-                   const std::vector< itk::Matrix<double,3,3> > &W,
-                   vnl_vector< double >& returnValue
-                 );
+    void E_marker( vtkPoints* X, vtkPoints* Y, const std::vector< itk::Matrix<double,3,3> > &W, vnl_vector< double >& returnValue);
+
+    double CalculateConfigChange(vtkPoints* X, vtkPoints* X_new);
 
     void SetVtkMovingPointSet(vtkSmartPointer<vtkPoints> p);
 
@@ -159,7 +155,7 @@ protected:
 
   vtkSmartPointer<vtkPoints> m_vtkMovingPointSet;
 
-  double CalculateConfigChange(mitk::PointSet::Pointer MovingSetOld, mitk::PointSet::Pointer MovingSetNew);
+  //double CalculateConfigChange(mitk::PointSet::Pointer MovingSetOld, mitk::PointSet::Pointer MovingSetNew);
 
   /** @brief Computes the mean of two point sets. The point sets must have the same size.
     * @return Returns the mean of both point sets. Returns an empty point set if the point sets do not have the same size.

@@ -51,7 +51,8 @@ namespace mitk
     SetPolyData(src.ContourModelSet);
   }
 
-  DicomRTReader::RoiEntry& DicomRTReader::RoiEntry::operator=(const RoiEntry &src)
+  DicomRTReader::RoiEntry& DicomRTReader::RoiEntry::
+        operator=(const RoiEntry &src)
   {
     Number=src.Number;
     Name=src.Name;
@@ -63,14 +64,16 @@ namespace mitk
     return (*this);
   }
 
-  void DicomRTReader::RoiEntry::SetPolyData(mitk::ContourModelSet::Pointer roiPolyData)
+  void DicomRTReader::RoiEntry::
+        SetPolyData(mitk::ContourModelSet::Pointer roiPolyData)
   {
     if (roiPolyData == this->ContourModelSet)
       return;
     this->ContourModelSet = roiPolyData;
   }
 
-  std::deque<mitk::ContourModelSet::Pointer> DicomRTReader::ReadDicomFile(char* filename)
+  std::deque<mitk::ContourModelSet::Pointer> DicomRTReader::
+        ReadDicomFile(char* filename)
   {
     DcmFileFormat file;
     OFCondition outp;
@@ -79,7 +82,8 @@ namespace mitk
     {
       DcmDataset *dataset = file.getDataset();
       OFString sopClass;
-      if(dataset->findAndGetOFString(DCM_SOPClassUID, sopClass).good() && !sopClass.empty())
+      if(dataset->findAndGetOFString
+              (DCM_SOPClassUID, sopClass).good() && !sopClass.empty())
       {
         if(sopClass == UID_RTDoseStorage)
         {
@@ -90,19 +94,14 @@ namespace mitk
         }
         else if(sopClass == UID_RTStructureSetStorage)
         {
-          ContourModelSetVector x = this->DicomRTReader::ReadStructureSet(dataset);
+          ContourModelSetVector x =
+                  this->DicomRTReader::ReadStructureSet(dataset);
           return x;
-        }
-        else if(sopClass == UID_RTPlanStorage)
-        {
-//          Function isnt implemented yet
-//          int x = this->DicomRTReader::LoadRTPlan(dataset);
-          ContourModelSetVector y;
-          return y;
         }
         else
         {
-          MITK_ERROR << "Error matching the SOP Class, maybe an unsupported type" << endl;
+          MITK_ERROR << "Error matching SOP Class, maybe an unsupported type"
+                     << endl;
           ContourModelSetVector y;
           return y;
         }
@@ -127,23 +126,24 @@ namespace mitk
     return this->RoiSequenceVector.size();
   }
 
-  DicomRTReader::RoiEntry* DicomRTReader::FindRoiByNumber(unsigned int roiNumber)
+  DicomRTReader::RoiEntry* DicomRTReader::FindRoiByNumber(unsigned int roiNum)
   {
     for(unsigned int i=0; i<this->RoiSequenceVector.size(); ++i)
     {
-      if(this->RoiSequenceVector[i].Number == roiNumber)
+      if(this->RoiSequenceVector[i].Number == roiNum)
         return &this->RoiSequenceVector[i];
     }
     return NULL;
   }
 
-  std::deque<mitk::ContourModelSet::Pointer> DicomRTReader::ReadStructureSet(DcmDataset* dataset)
+  std::deque<mitk::ContourModelSet::Pointer> DicomRTReader::
+        ReadStructureSet(DcmDataset* dataset)
   {
     /**
      * @brief For storing contourmodelsets that belongs to the same object
      *
-     * e.g. An eye consists of several contourmodels (contourmodel consists of several 3D-Points)
-     * and together they are a contourmodelset
+     * e.g. An eye consists of several contourmodels (contourmodel consists
+     * of several 3D-Points) and together they are a contourmodelset
      */
     ContourModelSetVector contourModelSetVector;
 
@@ -155,7 +155,8 @@ namespace mitk
       std::deque<mitk::ContourModelSet::Pointer> x;
       return x;
     }
-    DRTStructureSetROISequence &roiSequence = structureSetObject.getStructureSetROISequence();
+    DRTStructureSetROISequence &roiSequence =
+            structureSetObject.getStructureSetROISequence();
     if(!roiSequence.gotoFirstItem().good())
     {
       MITK_ERROR << "Error reading the structure sequence" << endl;
@@ -163,7 +164,8 @@ namespace mitk
       return x;
     }
     do{
-      DRTStructureSetROISequence::Item &currentSequence = roiSequence.getCurrentItem();
+      DRTStructureSetROISequence::Item &currentSequence =
+              roiSequence.getCurrentItem();
       if(!currentSequence.isValid())
       {
         continue;
@@ -185,12 +187,9 @@ namespace mitk
     }
     while(roiSequence.gotoNextItem().good());
 
-//    Dont know anymore >.<
-//    OFString refSOPInstUID = GetReferencedFrameOfReferenceSOPInstanceUID(structureSetObject);
-//    double sliceThickness = 2.0;
-
     Sint32 refRoiNumber;
-    DRTROIContourSequence &roiContourSeqObject = structureSetObject.getROIContourSequence();
+    DRTROIContourSequence &roiContourSeqObject =
+            structureSetObject.getROIContourSequence();
     if(!roiContourSeqObject.gotoFirstItem().good())
     {
       MITK_ERROR << "Error reading the contour sequence" << endl;
@@ -200,19 +199,22 @@ namespace mitk
     do
     {
       mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
-      DRTROIContourSequence::Item &currentRoiObject = roiContourSeqObject.getCurrentItem();
+      DRTROIContourSequence::Item &currentRoiObject =
+              roiContourSeqObject.getCurrentItem();
       if(!currentRoiObject.isValid())
       {
         continue;
       }
       currentRoiObject.getReferencedROINumber(refRoiNumber);
-      DRTContourSequence &contourSeqObject = currentRoiObject.getContourSequence();
+      DRTContourSequence &contourSeqObject =
+              currentRoiObject.getContourSequence();
 
       if(contourSeqObject.gotoFirstItem().good())
       {
         do
         {
-          DRTContourSequence::Item &contourItem = contourSeqObject.getCurrentItem();
+          DRTContourSequence::Item &contourItem =
+                  contourSeqObject.getCurrentItem();
           if(!contourItem.isValid())
           {
             continue;
@@ -221,7 +223,8 @@ namespace mitk
           OFString contourNumber;
           OFString numberOfPoints;
           OFVector<Float64> contourData_LPS;
-          mitk::ContourModel::Pointer contourSequence = mitk::ContourModel::New();
+          mitk::ContourModel::Pointer contourSequence =
+                  mitk::ContourModel::New();
 
           contourItem.getContourNumber(contourNumber);
           contourItem.getNumberOfContourPoints(numberOfPoints);
@@ -260,8 +263,6 @@ namespace mitk
         currentRoiObject.getROIDisplayColor(roiColor, j);
         refROI->DisplayColor[j] = roiColor/255.0;
       }
-      //TODO check for ordering maybe outsource contourmodelsetvector to
-      //Roientry and maybe it can replace the ContoruModelSet
       refROI->ContourModelSet = contourSet;
       contourSet->SetProperty("name", mitk::StringProperty::New(refROI->Name));
       contourModelSetVector.push_back(contourSet);
@@ -269,36 +270,43 @@ namespace mitk
     }
     while(roiContourSeqObject.gotoNextItem().good());
 
-    MITK_INFO << "Number of ROIs found: " << contourModelSetVector.size() << endl;
-
     return contourModelSetVector;
   }
 
-  OFString DicomRTReader::GetReferencedFrameOfReferenceSOPInstanceUID(DRTStructureSetIOD &structSetObject)
+  OFString DicomRTReader::
+        GetRefFrameOfRefSOPInstanceUID(DRTStructureSetIOD &structSetObject)
   {
     OFString invalid;
-    DRTReferencedFrameOfReferenceSequence &refFrameOfRefSeqObject = structSetObject.getReferencedFrameOfReferenceSequence();
+    DRTReferencedFrameOfReferenceSequence &refFrameOfRefSeqObject =
+            structSetObject.getReferencedFrameOfReferenceSequence();
     if(!refFrameOfRefSeqObject.gotoFirstItem().good())
       return invalid;
-    DRTReferencedFrameOfReferenceSequence::Item &currentRefFrameOfRefSeqItem = refFrameOfRefSeqObject.getCurrentItem();
+    DRTReferencedFrameOfReferenceSequence::Item &currentRefFrameOfRefSeqItem =
+            refFrameOfRefSeqObject.getCurrentItem();
     if(!currentRefFrameOfRefSeqItem.isValid())
       return invalid;
-    DRTRTReferencedStudySequence &refStudySeqObject = currentRefFrameOfRefSeqItem.getRTReferencedStudySequence();
+    DRTRTReferencedStudySequence &refStudySeqObject =
+            currentRefFrameOfRefSeqItem.getRTReferencedStudySequence();
     if(!refStudySeqObject.gotoFirstItem().good())
       return invalid;
-    DRTRTReferencedStudySequence::Item &refStudySeqItem = refStudySeqObject.getCurrentItem();
+    DRTRTReferencedStudySequence::Item &refStudySeqItem =
+            refStudySeqObject.getCurrentItem();
     if(!refStudySeqItem.isValid())
       return invalid;
-    DRTRTReferencedSeriesSequence &refSeriesSeqObject = refStudySeqItem.getRTReferencedSeriesSequence();
+    DRTRTReferencedSeriesSequence &refSeriesSeqObject =
+            refStudySeqItem.getRTReferencedSeriesSequence();
     if(!refSeriesSeqObject.gotoFirstItem().good())
       return invalid;
-    DRTRTReferencedSeriesSequence::Item &refSeriesSeqItem = refSeriesSeqObject.getCurrentItem();
+    DRTRTReferencedSeriesSequence::Item &refSeriesSeqItem =
+            refSeriesSeqObject.getCurrentItem();
     if(!refSeriesSeqItem.isValid())
       return invalid;
-    DRTContourImageSequence &contourImageSeqObject = refSeriesSeqItem.getContourImageSequence();
+    DRTContourImageSequence &contourImageSeqObject =
+            refSeriesSeqItem.getContourImageSequence();
     if(!contourImageSeqObject.gotoFirstItem().good())
       return invalid;
-    DRTContourImageSequence::Item &contourImageSeqItem = contourImageSeqObject.getCurrentItem();
+    DRTContourImageSequence::Item &contourImageSeqItem =
+            contourImageSeqObject.getCurrentItem();
     if(!contourImageSeqItem.isValid())
       return invalid;
 
@@ -308,108 +316,8 @@ namespace mitk
     return resultUid;
   }
 
-  int DicomRTReader::LoadRTPlan(DcmDataset *dataset)
-  {
-    DRTPlanIOD planObject;
-    OFCondition result = planObject.read(*dataset);
-    if(result.good())
-    {
-      OFString tmpString, dummyString;
-      DRTBeamSequence &planeBeamSeqObject = planObject.getBeamSequence();
-      if(planeBeamSeqObject.gotoFirstItem().good())
-      {
-        do
-        {
-          DRTBeamSequence::Item &currentBeamSeqItem = planeBeamSeqObject.getCurrentItem();
-          if(!currentBeamSeqItem.isValid())
-         {
-            std::cout << "Invalid Beam Sequence \n\n";
-            continue;
-          }
-          BeamEntry beamEntry;
-          OFString beamName, beamDescription, beamType;
-          Sint32 beamNumber;
-          Float64 srcAxisDistance;
-
-          currentBeamSeqItem.getBeamName(beamName);
-          currentBeamSeqItem.getBeamDescription(beamDescription);
-          currentBeamSeqItem.getBeamType(beamType);
-          currentBeamSeqItem.getBeamNumber(beamNumber);
-          currentBeamSeqItem.getSourceAxisDistance(srcAxisDistance);
-
-          beamEntry.Name = beamName.c_str();
-          beamEntry.Description = beamDescription.c_str();
-          beamEntry.Type = beamType.c_str();
-          beamEntry.Number = beamNumber;
-          beamEntry.SrcAxisDistance = srcAxisDistance;
-
-          DRTControlPointSequence &controlPointSeqObject = currentBeamSeqItem.getControlPointSequence();
-          if(controlPointSeqObject.gotoFirstItem().good())
-          {
-            DRTControlPointSequence::Item &controlPointItem = controlPointSeqObject.getCurrentItem();
-            if(controlPointItem.isValid())
-            {
-              OFVector<Float64> isocenterPosData_LPS;
-              Float64 gantryAngle, patientSupportAngle, beamLimitingDeviceAngle;
-              unsigned int numOfCollimatorPosItems = 0;
-
-              controlPointItem.getIsocenterPosition(isocenterPosData_LPS);
-              controlPointItem.getGantryAngle(gantryAngle);
-              controlPointItem.getPatientSupportAngle(patientSupportAngle);
-              controlPointItem.getBeamLimitingDeviceAngle(beamLimitingDeviceAngle);
-
-              beamEntry.GantryAngle = gantryAngle;
-              beamEntry.PatientSupportAngle = patientSupportAngle;
-              beamEntry.BeamLimitingDeviceAngle = beamLimitingDeviceAngle;
-
-              DRTBeamLimitingDevicePositionSequence &currentCollimatorPosSeqObject = controlPointItem.getBeamLimitingDevicePositionSequence();
-              if(currentCollimatorPosSeqObject.gotoFirstItem().good())
-              {
-                do
-                {
-                  if(++numOfCollimatorPosItems > 2)
-                  {
-                    std::cout << "Number of collimator position items is higher than 2 but should be exactly 2 ...";
-                    return 0;
-                  }
-                  DRTBeamLimitingDevicePositionSequence::Item &collimatorPositionItem = currentCollimatorPosSeqObject.getCurrentItem();
-                  if(collimatorPositionItem.isValid())
-                  {
-                    OFString beamLimitingDeviceType;
-                    OFVector<Float64> leafJawPositions;
-
-                    collimatorPositionItem.getRTBeamLimitingDeviceType(beamLimitingDeviceType);
-                    collimatorPositionItem.getLeafJawPositions(leafJawPositions);
-
-                    if(!beamLimitingDeviceType.compare("ASYMX") || !beamLimitingDeviceType.compare("X"))
-                    {
-                      beamEntry.LeafJawPositions[0][0] = leafJawPositions[0];
-                      beamEntry.LeafJawPositions[0][1] = leafJawPositions[1];
-                    }
-                    else if(!beamLimitingDeviceType.compare("ASYMY") || !beamLimitingDeviceType.compare("Y"))
-                    {
-                      beamEntry.LeafJawPositions[1][0] = leafJawPositions[0];
-                      beamEntry.LeafJawPositions[1][1] = leafJawPositions[0];
-                    }
-                    else
-                    {
-                      std::cout << "Unknown collimator type: " << beamLimitingDeviceType << "\n\n";
-                    }
-                  }
-                }
-                while(currentCollimatorPosSeqObject.gotoNextItem().good());
-              }
-            }//endif controlPointItem.isValid()
-          }
-          this->BeamSequenceVector.push_back(beamEntry);
-        }
-        while(planeBeamSeqObject.gotoNextItem().good());
-      }
-    }
-    return 1;
-  }
-
-  mitk::DataNode::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset, char* filename)
+  mitk::DataNode::Pointer DicomRTReader::
+        LoadRTDose(DcmDataset* dataset, char* filename)
   {
     std::string name = filename;
     itk::FilenamesContainer file;
@@ -418,7 +326,8 @@ namespace mitk
     mitk::DicomSeriesReader* reader = new mitk::DicomSeriesReader;
 
     mitk::DataNode::Pointer originalNode = reader->LoadDicomSeries(file,false);
-    mitk::Image::Pointer originalImage = dynamic_cast<mitk::Image*>(originalNode->GetData());
+    mitk::Image::Pointer originalImage =
+            dynamic_cast<mitk::Image*>(originalNode->GetData());
 
     mitk::Geometry3D::Pointer geo = originalImage->GetGeometry()->Clone();
 
@@ -427,16 +336,16 @@ namespace mitk
     OFCondition result = doseObject.read(*dataset);
     if(result.bad())
     {
-      std::cout << "Error reading the RT Dose dataset\n\n";
+      MITK_ERROR << "Error reading the Dataset" << endl;
       return 0;
     }
 
     Uint16 rows, columns, frames, planarConfig, samplesPP;
-    OFString nrframes, doseUnits, doseType, summationType, gridScaling, photoInterpret, lutShape;
+    OFString nrframes, doseUnits, doseType, summationType,
+            gridScaling, photoInterpret, lutShape;
     Uint16 &rows_ref = rows;
     Uint16 &columns_ref = columns;
     Float32 gridscale;
-//    const Uint16 *pixelData = NULL;
     const Uint16 *pixelData = NULL;
     unsigned long count = 0;
 
@@ -452,12 +361,9 @@ namespace mitk
     doseObject.getSamplesPerPixel(samplesPP);
     doseObject.getPresentationLUTShape(lutShape);
 
-    //standard testing picture: 0.001
-    gridscale = OFStandard::atof(gridScaling.c_str());
-    std::cout << std::setprecision(10) << "GRIDSCALE >> " << gridscale << endl;
-    frames = atoi(nrframes.c_str());
+    gridscale = static_cast<Float32>(*gridScaling.c_str());
+    frames = static_cast<Uint16>(*nrframes.c_str());
 
-    //dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count);
     dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count);
 
     mitk::Image::Pointer image = mitk::Image::New();
@@ -472,12 +378,12 @@ namespace mitk
     m_origin[2] = 0.0;
     image->SetOrigin(m_origin);
 
+    //HELP CAST UND DEPRECATED
     float* pixel = (float*)image->GetData();
     int size = dim[0]*dim[1]*dim[2];
 
     for(int i=0; i<size; ++i, ++pixel)
     {
-//      MITK_INFO << "PixelData" << i << " : " << pixelData[i] << endl;
       *pixel=pixelData[i] * gridscale;
     }
 
@@ -487,16 +393,12 @@ namespace mitk
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetName("DicomRT Dosis");
-//    node->SetProperty("shader.mitkIsoLineShader.Gridscale", mitk::FloatProperty::New(10.0));
-    node->SetFloatProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
+    node->SetFloatProperty(mitk::rt::Constants::
+                           PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
+    node->SetFloatProperty(mitk::rt::Constants::
+                           REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
     node->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),true);
-    node->SetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
-//    node->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
-//    node->SetProperty("Image Rendering.Mode", renderingMode);
-//    node->SetProperty("opacity", mitk::FloatProperty::New(0.3));
     node->SetData(image);
-
-    MITK_INFO << "PRESCRIPEDOSE >> " << prescripeDose << endl;
 
     return node;
   }

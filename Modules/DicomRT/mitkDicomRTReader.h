@@ -23,45 +23,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <MitkDicomRTExports.h>
 #include "mitkContourModel.h"
-#include "mitkContourElement.h"
 #include <mitkContourModelSet.h>
 
-#include "dcmtk/config/osconfig.h"
-#include "dcmtk/ofstd/ofconapp.h"
-
-#include "dcmtk/ofstd/ofcond.h"
-
+#include "dcmtk/dcmrt/drtstrct.h"
 #include "dcmtk/dcmrt/drtdose.h"
 #include "dcmtk/dcmrt/drtimage.h"
-#include "dcmtk/dcmrt/drtplan.h"
-#include "dcmtk/dcmrt/drttreat.h"
-#include "dcmtk/dcmrt/drtionpl.h"
-#include "dcmtk/dcmrt/drtiontr.h"
 
-#include <fstream>
-#include <mitkImage.h>
-#include <mitkPixelType.h>
-#include <mitkDataNode.h>
 #include <mitkProperties.h>
-#include <mitkRenderingModeProperty.h>
-#include <mitkDataNodeFactory.h>
 #include <itkGDCMSeriesFileNames.h>
 #include <mitkDicomSeriesReader.h>
 #include <DataStructures/mitkRTConstants.h>
-
-#include <mitkCoreServices.h>
-#include <mitkIShaderRepository.h>
-
-#include "dcmtk/dcmrt/drtstrct.h"
-
-#include <vtkObjectFactory.h>
-#include <vtkPolyData.h>
-#include <vtkPoints.h>
-#include <vtkCellArray.h>
-#include <vtkRibbonFilter.h>
-#include <vtkPolyDataNormals.h>
-#include <vtkSmartPointer.h>
-#include <vtkCleanPolyData.h>
 
 class vtkPolyData;
 class DcmDataset;
@@ -153,30 +124,22 @@ namespace mitk
      * @param dataset DcmDataset-object from DCMTK
      * @return Returns a Deque with mitk::ContourModelSet
      *
-     * The returned mitk::ContourModelSet represent exactly one Roi/Structureset.
+     * The returned mitk::ContourModelSet represent exactly one
+     * Roi/Structureset.
      * So the size of the returned deque is the number of Rois. The names of the
      * rois is stored in their mitk::Property.
      */
     ContourModelSetVector ReadStructureSet(DcmDataset* dataset);
 
     /**
-     * @brief Reads a DcmDataset from a DicomRT plan file
-     * @param dataset DcmDataset-object from DCMTK
-     * @return The return doesnt make senese at the moment
-     *
-     * This method isnt ready for use at the moment. Dont use it!
-     */
-    int LoadRTPlan(DcmDataset* dataset);
-
-    /**
      * @brief Reads a DcmDataset from a DicomRT dose file
      * @param dataset  DcmDataset-object from DCMTK
      * @param filename The path with the dose file used for getting the geometry
-     * @return Returns a mitk::DataNode::Pointer in which a mitk::Image is stored
+     * @return Returns a mitkDataNode::Pointer in which a mitk::Image is stored
      *
-     * The method reads the PixelData from the DicomRT dose file and scales them
-     * with a factor for getting Gray-values instead of pixel-values.
-     * The Gray-values are stored in a mitk::Image with an vtkColorTransferFunction.
+     * The method reads the PixelData from the DicomRT dose file and scales
+     * them with a factor for getting Gray-values instead of pixel-values.
+     * The Gray-values are stored in a mitkImage with a vtkColorTransferFunc.
      * Relative values are used for coloring the image. The relative values are
      * relative to a PrescriptionDose definied in the RT-Plan. If there is no
      * RT-Plan file PrescriptionDose is set to 80% of the maximum dose.
@@ -194,14 +157,15 @@ namespace mitk
      * @param roiNumber The number of the searched roi
      * @return Returns a mitk::DicomRTReader::RoiEntry object
      */
-    RoiEntry* FindRoiByNumber(unsigned int roiNumber);
+    RoiEntry* FindRoiByNumber(unsigned int roiNum);
 
     /**
      * @brief GetReferencedFrameOfReferenceSOPInstanceUID
      * @param structSetObject
      * @return
      */
-    OFString GetReferencedFrameOfReferenceSOPInstanceUID(DRTStructureSetIOD &structSetObject);
+    OFString GetRefFrameOfRefSOPInstanceUID
+                            (DRTStructureSetIOD &structSetObject);
 
     /**
     * Virtual destructor.

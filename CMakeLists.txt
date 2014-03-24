@@ -550,8 +550,10 @@ if(NOT MSVC_VERSION)
   endforeach()
 endif()
 
-mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
-mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
+if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
+  mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
+  mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 

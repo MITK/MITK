@@ -550,7 +550,7 @@ if(NOT MSVC_VERSION)
   endforeach()
 endif()
 
-if(NOT CMAKE_GENERATOR MATCHES Xcode)
+if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
   mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
 endif()

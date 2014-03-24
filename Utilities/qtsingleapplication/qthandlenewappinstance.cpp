@@ -19,7 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "qtsingleapplication.h"
 #include <QDir>
 #include <stdlib.h> // mkdtemp
+#ifdef Q_OS_UNIX
 #include <unistd.h>
+#endif
 #ifdef Q_OS_WIN
 #include <windows.h>
 //#include <private/qfsfileengine_p.h>

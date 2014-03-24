@@ -14,9 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef ANISOTROPICPOINTREGISTRATIONINTERFACE_H_
-#define ANISOTROPICPOINTREGISTRATIONINTERFACE_H_
-
+#ifndef __WEIGHTEDPOINTTRANSFORM_H__
+#define __WEIGHTEDPOINTTRANSFORM_H__
 
 //EXPORTS
 #include "MitkSurfaceRegistrationExports.h"
@@ -30,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 
 class vtkPoints;
+class vtkLandmarkTransform;
 
 namespace mitk
 {
@@ -83,7 +83,6 @@ public:
 
   const Rotation& GetTransformR() const { return m_Rotation; }
 
-
 protected:
   WeightedPointTransform();
   ~WeightedPointTransform();
@@ -97,6 +96,8 @@ protected:
   double m_FRE;
 
   double m_FRENormalizationFactor;
+
+  vtkSmartPointer<vtkLandmarkTransform> m_LandmarkTransform;
 
   vtkSmartPointer<vtkPoints> m_FixedPointSet;
 
@@ -125,7 +126,7 @@ protected:
    *
    *  converted to C++ by Alfred Franz in March/April 2010
    */
-  void C_marker( vtkPoints* X, const WeightMatrixList &W, itk::VariableSizeMatrix< double >& returnValue);
+  void C_maker( vtkPoints* X, const WeightMatrixList &W, itk::VariableSizeMatrix< double >& returnValue);
 
   /**
    *  original matlab-function:
@@ -141,7 +142,7 @@ protected:
    *
    *  converted to C++ by Alfred Franz in March/April 2010
    */
-  void E_marker( vtkPoints* X, vtkPoints* Y, const WeightMatrixList &W, vnl_vector< double >& returnValue);
+  void E_maker( vtkPoints* X, vtkPoints* Y, const WeightMatrixList &W, vnl_vector< double >& returnValue);
 
   double CalculateConfigChange(vtkPoints* X, vtkPoints* X_new);
 
@@ -164,16 +165,16 @@ protected:
    *
    * @return  Returns true if the alorithm was computed without unexpected errors, false if not.
    */
-  bool WeightedPointRegisterInvNewVariant(  vtkPoints* X,
-                                            vtkPoints* Y,
-                                            const CovarianceMatrixList &Sigma_X,
-                                            const CovarianceMatrixList &Sigma_Y,
-                                            double Threshold,
-                                            int MaxIterations,
-                                            Rotation& TransformationR,
-                                            Translation& TransformationT,
-                                            double& FRE,
-                                            int& n);
+  bool WeightedPointRegister( vtkPoints* X,
+                              vtkPoints* Y,
+                              const CovarianceMatrixList &Sigma_X,
+                              const CovarianceMatrixList &Sigma_Y,
+                              double Threshold,
+                              int MaxIterations,
+                              Rotation& TransformationR,
+                              Translation& TransformationT,
+                              double& FRE,
+                              int& n );
 
 };
 

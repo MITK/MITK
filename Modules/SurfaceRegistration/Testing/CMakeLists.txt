@@ -1,7 +1,7 @@
 MITK_CREATE_MODULE_TESTS()
 if(BUILD_TESTING AND MODULE_IS_ENABLED)
 
-set(MITK_MBI_DATA_DIR "/media/Data/mbidata/MITK-MBI-Data")
+set(MITK_MBI_DATA_DIR "/home/heime/MITK-MBI-Data")
 
 mitkAddCustomModuleTest(mitkAnisotropicIterativeClosestPointRegistrationTest_bunnyICP mitkAnisotropicIterativeClosestPointRegistrationTest
                         ${MITK_MBI_DATA_DIR}/AICPTestData/bunny_scaled_3000_reoriented_ICP.stl #fixed surface

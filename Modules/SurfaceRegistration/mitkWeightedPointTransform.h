@@ -34,95 +34,59 @@ class vtkPoints;
 namespace mitk
 {
 
-class WeightedPointTransformData;
-
     /** @brief TODO */
 class MitkSurfaceRegistration_EXPORT WeightedPointTransform : public itk::Object
 {
+
+  typedef itk::Matrix<double,3,3> Matrix3x3;
+  typedef Matrix3x3 WeightMatrix;
+  typedef Matrix3x3 Rotation;
+  typedef itk::Vector<double,3> Translation;
+  typedef std::vector<WeightMatrix> WeightMatrixList;
+  typedef std::vector<Matrix3x3> CovarianceMatrixList;
+
 public:
 
-    mitkClassMacro(WeightedPointTransform, itk::Object);
-    itkNewMacro(Self);
+  mitkClassMacro(WeightedPointTransform, itk::Object);
+  itkNewMacro(Self);
 
-    /** @brief Method which registers both point sets. */
-    virtual bool Update();
+  /** @brief Method which registers both point sets. */
+  void ComputeTransformation();
 
-    /** @brief Covariance Matrices of both point sets. This matrices must be set before registration is started.
-     *         The vectors must have the same size like the point sets!
-     */
-    void SetCovarianceMatrices(std::vector< itk::Matrix<double,3,3> > CovarianceMatricesM,std::vector< itk::Matrix<double,3,3> > CovarianceMatricesS);
+  /** @brief Sets the threshold of the registration. Default value is 0.0001.*/
+  itkSetMacro(Threshold,double)
 
-    /** @brief Sets the threshold of the registration. Default value is 0.0001.*/
-    void SetThreshold(double threshold);
+  /** @brief Sets the maximum number of iterations of the registration. Default value is 1000.*/
+  itkSetMacro(MaxIterations,double)
 
-    /** @brief Sets the maximum number of iterations of the registration. Default value is 1000.*/
-    void SetMaxIterations(double value);
+  /** @return Returns the number of iterations of the last run of the registration algorithm. Returns -1 if there was no run of the registration yet. */
+  itkGetMacro(Iterations,int);
 
-    /** @return Returns the number of iterations of the last run of the registration algorithm. Returns -1 if there was no run of the registration yet. */
-    itkGetMacro(Iterations,int);
+  /** @return Returns the FRE of the last run of the registration algorithm. Returns -1 if there was no run of the registration yet. */
+  itkGetMacro(FRE,double);
 
-    /** @return Returns the FRE of the last run of the registration algorithm. Returns -1 if there was no run of the registration yet. */
-    itkGetMacro(FRE,double);
+  /** @brief Sets the FRE normalization factor. Default value is 1.0. */
+  itkSetMacro(FRENormalizationFactor,double);
 
-    /** @brief Sets the FRE normalization factor. Default value is 1.0. */
-    itkSetMacro(FRENormalizationFactor,double);
+  /** @return Returns the current FRE normalization factor.*/
+  itkGetMacro(FRENormalizationFactor,double);
 
-    /** @return Returns the current FRE normalization factor.*/
-    itkGetMacro(FRENormalizationFactor,double);
+  void SetMovingPointSet(vtkSmartPointer<vtkPoints> p);
 
-    itkSetMacro( FixedPointSet, mitk::PointSet::Pointer )
+  void SetCovarianceMatricesMoving( const CovarianceMatrixList& matrices);
 
-    itkSetMacro( MovingPointSet, mitk::PointSet::Pointer )
+  void SetFixedPointSet(vtkSmartPointer<vtkPoints> p);
 
-    const mitk::Vector3D& GetTransformT() const { return m_TransformT; }
+  void SetCovarianceMatricesFixed( const CovarianceMatrixList& matrices);
 
-    const itk::Matrix<double,3,3>& GetTransformR() const { return m_TransformR; }
+  const Translation& GetTransformT() const { return m_Translation; }
 
-    //################## private methods for WeightedPointRegisterInv ####################
-    //moved to public for testing purposes. Move back to private later.
-    //Possible solution to make unit tests of private methods anyway:
-    //define child-class in test class and make methods public only in child-class.
+  const Rotation& GetTransformR() const { return m_Rotation; }
 
-    /**
-     *  original matlab-function:
-     *
-     *  Constructs the C matrix of the linear version of the registration
-     *  problem, Cq = e, where q = [delta_angle(1:3),delta_translation(1:3)] and
-     *  e is produced by e_maker(X,Y,W)
-     *
-     *  Authors: JM Fitzpatrick and R Balachandran
-     *  Creation: February 2009
-     *
-     *  --------------------------------------------
-     *
-     *  converted to C++ by Alfred Franz in March/April 2010
-     */
-    void C_marker( vtkPoints* X, const std::vector< itk::Matrix<double,3,3> > &W, itk::VariableSizeMatrix< double >& returnValue);
-
-    /**
-     *  original matlab-function:
-     *
-     *  Constructs the e vector of the linear version of the registration
-     *  problem, Cq = e, where q = [delta_angle(1:3),delta_translation(1:3)] and
-     *  C is produced by C_maker(X,W)
-     *
-     *  Authors: JM Fitzpatrick and R Balachandran
-     *  Creation: February 2009
-     *
-     *  --------------------------------------------
-     *
-     *  converted to C++ by Alfred Franz in March/April 2010
-     */
-    void E_marker( vtkPoints* X, vtkPoints* Y, const std::vector< itk::Matrix<double,3,3> > &W, vnl_vector< double >& returnValue);
-
-    double CalculateConfigChange(vtkPoints* X, vtkPoints* X_new);
-
-    void SetVtkMovingPointSet(vtkSmartPointer<vtkPoints> p);
-
-    void SetVtkFixedPointSet(vtkSmartPointer<vtkPoints> p);
 
 protected:
   WeightedPointTransform();
+  ~WeightedPointTransform();
 
   double m_Threshold;
 
@@ -134,21 +98,52 @@ protected:
 
   double m_FRENormalizationFactor;
 
-  std::vector< itk::Matrix<double,3,3> > m_CovarianceMatricesM;
+  vtkSmartPointer<vtkPoints> m_FixedPointSet;
 
-  std::vector< itk::Matrix<double,3,3> > m_CovarianceMatricesS;
+  vtkSmartPointer<vtkPoints> m_MovingPointSet;
 
-  mitk::PointSet::Pointer m_MovingPointSet;
+  CovarianceMatrixList m_CovarianceMatricesMoving;
 
-  mitk::PointSet::Pointer m_FixedPointSet;
+  CovarianceMatrixList m_CovarianceMatricesFixed;
 
-  mitk::Vector3D m_TransformT;
+  Translation m_Translation;
 
-  itk::Matrix < double,3,3 > m_TransformR;
+  Rotation m_Rotation;
 
-  vtkSmartPointer<vtkPoints> m_vtkFixedPointSet;
 
-  vtkSmartPointer<vtkPoints> m_vtkMovingPointSet;
+  /**
+   *  original matlab-function:
+   *
+   *  Constructs the C matrix of the linear version of the registration
+   *  problem, Cq = e, where q = [delta_angle(1:3),delta_translation(1:3)] and
+   *  e is produced by e_maker(X,Y,W)
+   *
+   *  Authors: JM Fitzpatrick and R Balachandran
+   *  Creation: February 2009
+   *
+   *  --------------------------------------------
+   *
+   *  converted to C++ by Alfred Franz in March/April 2010
+   */
+  void C_marker( vtkPoints* X, const WeightMatrixList &W, itk::VariableSizeMatrix< double >& returnValue);
+
+  /**
+   *  original matlab-function:
+   *
+   *  Constructs the e vector of the linear version of the registration
+   *  problem, Cq = e, where q = [delta_angle(1:3),delta_translation(1:3)] and
+   *  C is produced by C_maker(X,W)
+   *
+   *  Authors: JM Fitzpatrick and R Balachandran
+   *  Creation: February 2009
+   *
+   *  --------------------------------------------
+   *
+   *  converted to C++ by Alfred Franz in March/April 2010
+   */
+  void E_marker( vtkPoints* X, vtkPoints* Y, const WeightMatrixList &W, vnl_vector< double >& returnValue);
+
+  double CalculateConfigChange(vtkPoints* X, vtkPoints* X_new);
 
   /**
    * @brief               This method performs a variant of the weighted point register alogorithm presented by
@@ -169,19 +164,17 @@ protected:
    *
    * @return  Returns true if the alorithm was computed without unexpected errors, false if not.
    */
-  bool WeightedPointRegisterInvNewVariant(mitk::PointSet::Pointer MovingPointSet,
-                                                  mitk::PointSet::Pointer FixedPointSet,
-                                                  const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesMoving,
-                                                  const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesFixed,
-                                                  double Threshold,
-                                                  int MaxIterations,
-                                                  itk::Matrix<double,3,3>& TransformationR,
-                                                  itk::Vector<double,3>& TransformationT,
-                                                  double& FRE,
-                                                  int& n);
+  bool WeightedPointRegisterInvNewVariant(  vtkPoints* X,
+                                            vtkPoints* Y,
+                                            const CovarianceMatrixList &Sigma_X,
+                                            const CovarianceMatrixList &Sigma_Y,
+                                            double Threshold,
+                                            int MaxIterations,
+                                            Rotation& TransformationR,
+                                            Translation& TransformationT,
+                                            double& FRE,
+                                            int& n);
 
-private:
-  WeightedPointTransformData* d;
 };
 
 }

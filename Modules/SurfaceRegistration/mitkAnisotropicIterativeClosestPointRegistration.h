@@ -30,8 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK
 #include <itkMatrix.h>
 
-//#include <mitkSurface.h>
-
 namespace mitk
 {
 

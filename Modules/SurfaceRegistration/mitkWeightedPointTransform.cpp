@@ -28,44 +28,44 @@ typedef itk::Matrix < double,3,3 > Matrix3x3;
 typedef std::vector < Matrix3x3 > Matrix3x3List;
 static double ComputeWeightedFRE (  vtkPoints* X,
                                     vtkPoints* Y,
-                                    const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesMoving,
-                                    const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesFixed,
+                                    const Matrix3x3List &CovarianceMatricesMoving,
+                                    const Matrix3x3List &CovarianceMatricesFixed,
                                     double FRENormalizationFactor,
                                     Matrix3x3List& WeightMatrices,
                                     const Matrix3x3& rotation,
                                     const itk::Vector<double,3>& translation
                                  );
 
-void calculateWeightMatrices(const Matrix3x3List& X, const Matrix3x3List& Y,
-                             Matrix3x3List& result, const Matrix3x3& rotation);
+void calculateWeightMatrices( const Matrix3x3List& X, const Matrix3x3List& Y,
+                              Matrix3x3List& result, const Matrix3x3& rotation );
 
 mitk::WeightedPointTransform::WeightedPointTransform()
+  : m_Threshold(1.0e-4),
+    m_MaxIterations(1000),
+    m_Iterations(-1),
+    m_FRE(-1.0),
+    m_FRENormalizationFactor(1.0)
 {
-  m_Threshold = 1.0e-4;
-  m_Iterations = -1;
-  m_FRE = -1;
-  m_FRENormalizationFactor = 1.0;
 }
 
-void mitk::WeightedPointTransform::SetThreshold(double threshold)
+mitk::WeightedPointTransform::~WeightedPointTransform()
 {
-  m_Threshold = threshold;
+  m_FixedPointSet = NULL;
+  m_MovingPointSet = NULL;
 }
 
-void mitk::WeightedPointTransform::SetMaxIterations(double value)
+void mitk::WeightedPointTransform::ComputeTransformation()
 {
-  m_MaxIterations = value;
-}
-
-void mitk::WeightedPointTransform::SetCovarianceMatrices(std::vector< itk::Matrix<double,3,3> > CovarianceMatricesM,std::vector< itk::Matrix<double,3,3> > CovarianceMatricesS)
-{
-  m_CovarianceMatricesM = CovarianceMatricesM;
-  m_CovarianceMatricesS = CovarianceMatricesS;
-}
-
-bool mitk::WeightedPointTransform::Update()
-{
-   return WeightedPointRegisterInvNewVariant(m_MovingPointSet,m_FixedPointSet,m_CovarianceMatricesM,m_CovarianceMatricesS,m_Threshold,m_MaxIterations,m_TransformR,m_TransformT,m_FRE,m_Iterations);
+   WeightedPointRegisterInvNewVariant( m_MovingPointSet,
+                                       m_FixedPointSet,
+                                       m_CovarianceMatricesMoving,
+                                       m_CovarianceMatricesFixed,
+                                       m_Threshold,
+                                       m_MaxIterations,
+                                       m_Rotation,
+                                       m_Translation,
+                                       m_FRE,
+                                       m_Iterations );
 }
 
 void calculateWeightMatrices( const Matrix3x3List& X, const Matrix3x3List& Y,
@@ -83,8 +83,8 @@ void calculateWeightMatrices( const Matrix3x3List& X, const Matrix3x3List& Y,
 
 double ComputeWeightedFRE (  vtkPoints* X,
                              vtkPoints* Y,
-                             const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesMoving,
-                             const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesFixed,
+                             const Matrix3x3List &CovarianceMatricesMoving,
+                             const Matrix3x3List &CovarianceMatricesFixed,
                              double FRENormalizationFactor,
                              Matrix3x3List& WeightMatrices,
                              const Matrix3x3& rotation,
@@ -147,8 +147,8 @@ static void IsotropicRegistration( vtkPoints* X, vtkPoints* Y, Matrix3x3& rotati
 }
 
 void mitk::WeightedPointTransform::C_marker( vtkPoints* X,
-                                            const std::vector< itk::Matrix<double,3,3> > &W,
-                                            itk::VariableSizeMatrix< double >& returnValue)
+                                             const WeightMatrixList &W,
+                                             itk::VariableSizeMatrix< double >& returnValue)
 {
   for(vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i )
   {
@@ -185,7 +185,7 @@ void mitk::WeightedPointTransform::C_marker( vtkPoints* X,
 
 void mitk::WeightedPointTransform::E_marker( vtkPoints* X,
                                              vtkPoints* Y,
-                                             const std::vector< itk::Matrix<double,3,3> > &W,
+                                             const WeightMatrixList &W,
                                              vnl_vector< double >& returnValue
                                             )
 {
@@ -226,23 +226,21 @@ void mitk::WeightedPointTransform::E_marker( vtkPoints* X,
 }
 
 bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
-    mitk::PointSet::Pointer MovingPointSet,
-    mitk::PointSet::Pointer FixedPointSet,
-    const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesMoving,
-    const std::vector< itk::Matrix<double,3,3> > &CovarianceMatricesFixed,
+    vtkPoints *X,
+    vtkPoints *Y,
+    const CovarianceMatrixList &Sigma_X,
+    const CovarianceMatrixList &Sigma_Y,
     double Threshold,
     int MaxIterations,
-    itk::Matrix<double,3,3>& TransformationR,
-    itk::Vector<double,3>& TransformationT,
+    Rotation &TransformationR,
+    Translation &TransformationT,
     double& FRE,
     int& n
     )
 {
-  //test fitzpatricks new variant (2011 03 08)
-  //calculate unweighted registration as initial estimate:
   double FRE_identity = 0.0;
   double FRE_isotropic_weighted = 0.0;
-  double initialFRE = 0.0; //FRE of initial transform
+  double initialFRE = 0.0;
   //set config_change to infinite (max double) at start
   double config_change = std::numeric_limits<double>::max();
   itk::Matrix<double,3,3> initial_TransformationR;
@@ -251,36 +249,36 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
   itk::Vector<double,3> identityT; identityT.Fill(0);
   // Weightmatrices
   Matrix3x3List W;
-  W.resize(m_vtkMovingPointSet->GetNumberOfPoints());
   vtkPoints* vtkMovingSetTrans = vtkPoints::New();
-  vtkMovingSetTrans->SetNumberOfPoints(m_vtkMovingPointSet->GetNumberOfPoints());
   vtkPoints* vtkMovingSetTransNew = vtkPoints::New();
-  vtkMovingSetTransNew->SetNumberOfPoints(m_vtkMovingPointSet->GetNumberOfPoints());
   vnl_vector< double > oldq;
   itk::VariableSizeMatrix< double > iA;
-  iA.SetSize(3u * m_vtkMovingPointSet->GetNumberOfPoints(), 6u);
   vnl_vector< double > iB;
-  iB.set_size(3u * m_vtkMovingPointSet->GetNumberOfPoints());
 
-  // compute isotropic transformation
-  IsotropicRegistration(m_vtkMovingPointSet, m_vtkFixedPointSet,initial_TransformationR, initial_TransformationT);
+  // initialize memory
+  W.resize(X->GetNumberOfPoints());
+  vtkMovingSetTrans->SetNumberOfPoints(X->GetNumberOfPoints());
+  vtkMovingSetTransNew->SetNumberOfPoints(X->GetNumberOfPoints());
+  iA.SetSize(3u * X->GetNumberOfPoints(), 6u);
+  iB.set_size(3u * X->GetNumberOfPoints());
+
+  // compute isotropic transformation as initial estimate
+  IsotropicRegistration(X,Y,initial_TransformationR, initial_TransformationT);
 
   //result of unweighted registration algorithm
   TransformationR = initial_TransformationR;
   TransformationT = initial_TransformationT;
 
-  //###################### compare with identity ############################
   //calculate FRE_0 with identity transform
-  FRE_identity = ComputeWeightedFRE(m_vtkMovingPointSet,m_vtkFixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed,m_FRENormalizationFactor,W,identityR,identityT);
+  FRE_identity = ComputeWeightedFRE(X,Y,Sigma_X,Sigma_Y,m_FRENormalizationFactor,W,identityR,identityT);
   MITK_INFO << "FRE for identity transform: "<<FRE_identity;
 
-  //TODO TEST
   //calculate FRE with current transform
-  FRE_isotropic_weighted = ComputeWeightedFRE(m_vtkMovingPointSet,m_vtkFixedPointSet,CovarianceMatricesMoving,CovarianceMatricesFixed,m_FRENormalizationFactor,W,TransformationR,TransformationT);
+  FRE_isotropic_weighted = ComputeWeightedFRE(X,Y,Sigma_X,Sigma_Y,m_FRENormalizationFactor,W,TransformationR,TransformationT);
   MITK_INFO << "FRE for transform obtained with unweighted registration: "<<FRE_isotropic_weighted;
-  //TODO END TEST
 
-  if (FRE_isotropic_weighted < FRE_identity)  //if R,t is worse than the identity, use the identity as initial transform
+  //if R,t is worse than the identity, use the identity as initial transform
+  if (FRE_isotropic_weighted < FRE_identity)
   {
     initialFRE = FRE_isotropic_weighted;
   }
@@ -294,7 +292,7 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
   }
 
   //apply transform to moving set:
-  mitk::AnisotropicRegistrationCommon::TransformPoints( m_vtkMovingPointSet, vtkMovingSetTrans,
+  mitk::AnisotropicRegistrationCommon::TransformPoints( X, vtkMovingSetTrans,
                                                         TransformationR, TransformationT);
 
   //start with iteration 0
@@ -302,92 +300,84 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
 
   do {
 
-      n++;
+    n++;
 
-      //TODO RUN-TIME: is calculated twice in first iteration
-      calculateWeightMatrices(CovarianceMatricesMoving,CovarianceMatricesFixed,W,TransformationR);
+    //TODO RUN-TIME: is calculated twice in first iteration
+    calculateWeightMatrices(Sigma_X,Sigma_Y,W,TransformationR);
 
-      //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-      //PROBLEM:  no square matrix but the backslash operator in matlab does solve the system anyway. How to convert this to C++?
-      //          good descriptons to the "backslash"-operator (in german): http://www.tm-mathe.de/Themen/html/matlab__zauberstab__backslash-.html
-      //                                                                    http://www.tm-mathe.de/Themen/html/matlab__matrix-division__vorsi.html#HoheMatrixA
-      //
-      //          current method: treat the problem as a minimization problem, because this is what the "backslash"-operator also does with "high" matrices.
-      //                          (and we will have those matrices in most cases)
+    //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    //PROBLEM:  no square matrix but the backslash operator in matlab does solve the system anyway. How to convert this to C++?
+    //          good descriptons to the "backslash"-operator (in german): http://www.tm-mathe.de/Themen/html/matlab__zauberstab__backslash-.html
+    //                                                                    http://www.tm-mathe.de/Themen/html/matlab__matrix-division__vorsi.html#HoheMatrixA
+    //
+    //          current method: treat the problem as a minimization problem, because this is what the "backslash"-operator also does with "high" matrices.
+    //                          (and we will have those matrices in most cases)
 
-      C_marker(vtkMovingSetTrans,W,iA);
-      E_marker(vtkMovingSetTrans,m_vtkFixedPointSet,W,iB);
+    C_marker(vtkMovingSetTrans,W,iA);
+    E_marker(vtkMovingSetTrans,Y,W,iB);
 
-      vnl_matrix_inverse<double> myInverse(iA.GetVnlMatrix());
-      vnl_vector< double > q = myInverse.pinverse(iB.size()) * iB;
-      //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    vnl_matrix_inverse<double> myInverse(iA.GetVnlMatrix());
+    vnl_vector< double > q = myInverse.pinverse(iB.size()) * iB;
+    //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-      if (n>1)
-        q = (q+oldq)/2;
-      oldq = q;
+    if (n>1)
+      q = (q+oldq)/2;
+    oldq = q;
 
-      itk::Vector<double,3> delta_t;
-      delta_t[0] = q[3];
-      delta_t[1] = q[4];
-      delta_t[2] = q[5];
+    itk::Vector<double,3> delta_t;
+    delta_t[0] = q[3];
+    delta_t[1] = q[4];
+    delta_t[2] = q[5];
 
-      itk::Matrix<double,3,3> delta_theta;
-      delta_theta[0][0] = 1;
-      delta_theta[0][1] = -q[2];
-      delta_theta[0][2] = q[1];
-      delta_theta[1][0] = q[2];
-      delta_theta[1][1] = 1;
-      delta_theta[1][2] = -q[0];
-      delta_theta[2][0] = -q[1];
-      delta_theta[2][1] = q[0];
-      delta_theta[2][2] = 1;
+    itk::Matrix<double,3,3> delta_theta;
+    delta_theta[0][0] = 1;
+    delta_theta[0][1] = -q[2];
+    delta_theta[0][2] = q[1];
+    delta_theta[1][0] = q[2];
+    delta_theta[1][1] = 1;
+    delta_theta[1][2] = -q[0];
+    delta_theta[2][0] = -q[1];
+    delta_theta[2][1] = q[0];
+    delta_theta[2][2] = 1;
 
-      vnl_svd<double> svd_delta_theta(delta_theta.GetVnlMatrix());
+    vnl_svd<double> svd_delta_theta(delta_theta.GetVnlMatrix());
 
-      //convert vnl matrices to itk matrices...
-      itk::Matrix<double,3,3> U;
-      itk::Matrix<double,3,3> V;
+    //convert vnl matrices to itk matrices...
+    itk::Matrix<double,3,3> U;
+    itk::Matrix<double,3,3> V;
 
-      for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < 3; ++j) {
-          U[i][j] = svd_delta_theta.U()[i][j];
-          V[i][j] = svd_delta_theta.V()[i][j];
-        }
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+        U[i][j] = svd_delta_theta.U()[i][j];
+        V[i][j] = svd_delta_theta.V()[i][j];
       }
+    }
 
-      itk::Matrix<double,3,3> delta_R = U * V.GetTranspose();
+    itk::Matrix<double,3,3> delta_R = U * V.GetTranspose();
 
-      //update rotation
-      TransformationR = delta_R * TransformationR;
+    //update rotation
+    TransformationR = delta_R * TransformationR;
 
-      //update translation
-      TransformationT = delta_R * TransformationT + delta_t;
+    //update translation
+    TransformationT = delta_R * TransformationT + delta_t;
 
-      //update moving points
-      mitk::AnisotropicRegistrationCommon::TransformPoints( m_vtkMovingPointSet,
-                                                            vtkMovingSetTransNew,
-                                                            TransformationR,
-                                                            TransformationT );
-      //calculate config change
-      config_change = CalculateConfigChange(vtkMovingSetTrans,vtkMovingSetTransNew);
+    //update moving points
+    mitk::AnisotropicRegistrationCommon::TransformPoints( X, vtkMovingSetTransNew,
+                                                          TransformationR,
+                                                          TransformationT );
+    //calculate config change
+    config_change = CalculateConfigChange(vtkMovingSetTrans,vtkMovingSetTransNew);
 
-      //the old set for the next iteration is the new set of the last
-      vtkPoints* tmp = vtkMovingSetTrans;
-      vtkMovingSetTrans = vtkMovingSetTransNew;
-      vtkMovingSetTransNew = tmp;
+    //the old set for the next iteration is the new set of the last
+    vtkPoints* tmp = vtkMovingSetTrans;
+    vtkMovingSetTrans = vtkMovingSetTransNew;
+    vtkMovingSetTransNew = tmp;
 
-      if ( n > MaxIterations )
-      {
-          MITK_ERROR << "max iteration reached";
-          break;
-      }
-
-  } while ( config_change > Threshold && n < m_MaxIterations );
+  } while ( config_change > Threshold && n < MaxIterations );
 
   //calculate FRE with current transform
-  FRE = ComputeWeightedFRE( m_vtkMovingPointSet,m_vtkFixedPointSet,
-                            CovarianceMatricesMoving,CovarianceMatricesFixed,
-                            m_FRENormalizationFactor,W,TransformationR,TransformationT );
+  FRE = ComputeWeightedFRE( X,Y,Sigma_X,Sigma_Y,m_FRENormalizationFactor,
+                            W,TransformationR,TransformationT );
 
   MITK_INFO <<"FRE after algorithm (prior to check with initial): "<<FRE;
 
@@ -407,14 +397,24 @@ bool mitk::WeightedPointTransform::WeightedPointRegisterInvNewVariant(
   return true;
 }
 
-void mitk::WeightedPointTransform::SetVtkMovingPointSet(vtkSmartPointer<vtkPoints> p)
+void mitk::WeightedPointTransform::SetMovingPointSet(vtkSmartPointer<vtkPoints> p)
 {
-  m_vtkMovingPointSet = p;
+  m_MovingPointSet = p;
 }
 
-void mitk::WeightedPointTransform::SetVtkFixedPointSet(vtkSmartPointer<vtkPoints> p)
+void mitk::WeightedPointTransform::SetCovarianceMatricesMoving(const mitk::WeightedPointTransform::CovarianceMatrixList &matrices)
 {
-  m_vtkFixedPointSet = p;
+  m_CovarianceMatricesMoving = matrices;
+}
+
+void mitk::WeightedPointTransform::SetFixedPointSet(vtkSmartPointer<vtkPoints> p)
+{
+  m_FixedPointSet = p;
+}
+
+void mitk::WeightedPointTransform::SetCovarianceMatricesFixed(const mitk::WeightedPointTransform::CovarianceMatrixList &matrices)
+{
+  m_CovarianceMatricesFixed = matrices;
 }
 
 double mitk::WeightedPointTransform::CalculateConfigChange(vtkPoints* X, vtkPoints* X_new)

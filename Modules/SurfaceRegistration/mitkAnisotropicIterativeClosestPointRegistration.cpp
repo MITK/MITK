@@ -277,16 +277,14 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
       }
 
       // compute weighted transformation
-      m_WeightedPointTransform->SetVtkMovingPointSet(X_k);
-      m_WeightedPointTransform->SetVtkFixedPointSet(Z_k);
-      m_WeightedPointTransform->SetCovarianceMatrices(*Sigma_X_k, *Sigma_Z_k);
+      m_WeightedPointTransform->SetMovingPointSet(X_k);
+      m_WeightedPointTransform->SetFixedPointSet(Z_k);
+      m_WeightedPointTransform->SetCovarianceMatricesMoving(*Sigma_X_k);
+      m_WeightedPointTransform->SetCovarianceMatricesFixed(*Sigma_Z_k);
       m_WeightedPointTransform->SetMaxIterations(m_MaxIterationsInWeightedPointTransform);
       m_WeightedPointTransform->SetFRENormalizationFactor(m_FRENormalizationFactor);
 
-      if ( ! m_WeightedPointTransform->Update() )
-      {
-        MITK_INFO << "Error in weighted point transform";
-      }
+      m_WeightedPointTransform->ComputeTransformation();
 
       RotationNew =    m_WeightedPointTransform->GetTransformR();
       TranslationNew = m_WeightedPointTransform->GetTransformT();

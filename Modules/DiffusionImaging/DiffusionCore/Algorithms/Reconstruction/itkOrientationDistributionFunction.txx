@@ -568,7 +568,7 @@ namespace itk
 
       polydata->SetPolys(vtknewpolys);
 
-      for (vtkIdType p = 0; p < NOdfDirections; p++)
+      for (unsigned int p = 0; p < NOdfDirections; p++)
       {
         points->SetPoint(p,m_Directions->get_column(p).data_block());
       }

@@ -223,8 +223,7 @@ void RTDoseVisualizer::OnReferenceDoseChanged(double value)
       m_selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
       m_selectedNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
-      mitk::TimeGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
-      mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -249,6 +248,7 @@ void RTDoseVisualizer::OnAddFreeValueClicked()
   color[1] = newColor.greenF();
   color[2] = newColor.blueF();
   m_freeIsoValues->push_back(mitk::IsoDoseLevel::New(0.5,color,true,false));
+  m_FreeIsoValue = mitk::IsoDoseLevel::New(0.5,color,true,false);
   UpdateFreeIsoValues();
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   if(m_FreeIsoLines.size()>=1)
@@ -279,7 +279,7 @@ void RTDoseVisualizer::OnRemoveFreeValueClicked()
 void RTDoseVisualizer::OnUsePrescribedDoseClicked()
 {
   m_Controls.spinReferenceDose->setValue(this->m_PrescribedDose_Data);
-};
+}
 
 
 void RTDoseVisualizer::OnShowContextMenuIsoSet(const QPoint& pos)

@@ -361,8 +361,8 @@ namespace mitk
     doseObject.getSamplesPerPixel(samplesPP);
     doseObject.getPresentationLUTShape(lutShape);
 
-    gridscale = static_cast<Float32>(*gridScaling.c_str());
-    frames = static_cast<Uint16>(*nrframes.c_str());
+    gridscale = OFStandard::atof(gridScaling.c_str());
+    frames = atoi(nrframes.c_str());
 
     dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count);
 
@@ -379,7 +379,8 @@ namespace mitk
     image->SetOrigin(m_origin);
 
     //HELP CAST UND DEPRECATED
-    float* pixel = (float*)image->GetData();
+    float* pixel = reinterpret_cast<float*>(image->GetData());
+//    float* pixel = (float*)image->GetData();
     int size = dim[0]*dim[1]*dim[2];
 
     for(int i=0; i<size; ++i, ++pixel)

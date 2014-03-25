@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkErodeTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include "MitkSegmentationUIExports.h"
 #include "ui_QmitkErodeTool3DGUIControls.h"
 
 namespace mitk {

@@ -18,9 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkDilateTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include "MitkSegmentationUIExports.h"
 #include "ui_QmitkDilateTool3DGUIControls.h"
-
 
 namespace mitk {
   class DilateTool3D;

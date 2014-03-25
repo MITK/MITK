@@ -18,8 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkKeepNConnectedRegionsTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
-#include "mitkKeepNConnectedRegionsTool3D.h"
+#include "MitkSegmentationUIExports.h"
+
+namespace mitk {
+  class KeepNConnectedRegionsTool3D;
+}
 
 #include "ui_QmitkKeepNConnectedRegionsTool3DGUIControls.h"
 
@@ -61,7 +64,7 @@ class MitkSegmentationUI_EXPORT QmitkKeepNConnectedRegionsTool3DGUI : public Qmi
 
     Ui::QmitkKeepNConnectedRegionsTool3DGUIControls m_Controls;
 
-    mitk::KeepNConnectedRegionsTool3D::Pointer m_KeepNConnectedRegionsTool3D;
+    mitk::KeepNConnectedRegionsTool3D* m_KeepNConnectedRegionsTool3D;
 };
 
 #endif

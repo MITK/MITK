@@ -16,12 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkKeepNConnectedRegionsTool3DGUI.h"
 
+#include "mitkKeepNConnectedRegionsTool3D.h"
+
 #include <QmitkNewSegmentationDialog.h>
 #include <QApplication.h>
 
 MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkKeepNConnectedRegionsTool3DGUI, "")
 
-QmitkKeepNConnectedRegionsTool3DGUI::QmitkKeepNConnectedRegionsTool3DGUI() : QmitkToolGUI()
+QmitkKeepNConnectedRegionsTool3DGUI::QmitkKeepNConnectedRegionsTool3DGUI() : QmitkToolGUI(), m_KeepNConnectedRegionsTool3D(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -40,7 +42,7 @@ QmitkKeepNConnectedRegionsTool3DGUI::QmitkKeepNConnectedRegionsTool3DGUI() : Qmi
 
 QmitkKeepNConnectedRegionsTool3DGUI::~QmitkKeepNConnectedRegionsTool3DGUI()
 {
-  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  if (m_KeepNConnectedRegionsTool3D)
   {
     m_KeepNConnectedRegionsTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkKeepNConnectedRegionsTool3DGUI, bool>( this, &QmitkKeepNConnectedRegionsTool3DGUI::BusyStateChanged );
   }
@@ -48,14 +50,14 @@ QmitkKeepNConnectedRegionsTool3DGUI::~QmitkKeepNConnectedRegionsTool3DGUI()
 
 void QmitkKeepNConnectedRegionsTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
-  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  if (m_KeepNConnectedRegionsTool3D)
   {
     m_KeepNConnectedRegionsTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkKeepNConnectedRegionsTool3DGUI, bool>( this, &QmitkKeepNConnectedRegionsTool3DGUI::BusyStateChanged );
   }
 
   m_KeepNConnectedRegionsTool3D = dynamic_cast<mitk::KeepNConnectedRegionsTool3D*>( tool );
 
-  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  if (m_KeepNConnectedRegionsTool3D)
   {
     m_KeepNConnectedRegionsTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkKeepNConnectedRegionsTool3DGUI, bool>( this, &QmitkKeepNConnectedRegionsTool3DGUI::BusyStateChanged );
   }
@@ -63,7 +65,7 @@ void QmitkKeepNConnectedRegionsTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkKeepNConnectedRegionsTool3DGUI::OnRun()
 {
-  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  if (m_KeepNConnectedRegionsTool3D)
   {
     m_KeepNConnectedRegionsTool3D->SetNumberOfConnectedRegionsToKeep(m_Controls.m_sbConnectedRegionsToKeep->value());
     m_KeepNConnectedRegionsTool3D->Run();
@@ -72,7 +74,7 @@ void QmitkKeepNConnectedRegionsTool3DGUI::OnRun()
 
 void QmitkKeepNConnectedRegionsTool3DGUI::OnCancel()
 {
-  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  if (m_KeepNConnectedRegionsTool3D)
   {
     m_KeepNConnectedRegionsTool3D->Cancel();
   }
@@ -80,7 +82,7 @@ void QmitkKeepNConnectedRegionsTool3DGUI::OnCancel()
 
 void QmitkKeepNConnectedRegionsTool3DGUI::OnNumberOfConnectedRegionsToKeepChanged(int value)
 {
-  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  if (m_KeepNConnectedRegionsTool3D)
   {
     m_KeepNConnectedRegionsTool3D->SetNumberOfConnectedRegionsToKeep(value);
   }
@@ -88,7 +90,7 @@ void QmitkKeepNConnectedRegionsTool3DGUI::OnNumberOfConnectedRegionsToKeepChange
 
 void QmitkKeepNConnectedRegionsTool3DGUI::OnAcceptPreview()
 {
-  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  if (m_KeepNConnectedRegionsTool3D)
   {
     m_KeepNConnectedRegionsTool3D->AcceptPreview();
   }
@@ -96,7 +98,7 @@ void QmitkKeepNConnectedRegionsTool3DGUI::OnAcceptPreview()
 
 void QmitkKeepNConnectedRegionsTool3DGUI::OnInvertPreview()
 {
-  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  if (m_KeepNConnectedRegionsTool3D)
   {
     m_KeepNConnectedRegionsTool3D->InvertPreview();
   }
@@ -104,7 +106,7 @@ void QmitkKeepNConnectedRegionsTool3DGUI::OnInvertPreview()
 
 void QmitkKeepNConnectedRegionsTool3DGUI::OnCalculateUnion()
 {
-  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  if (m_KeepNConnectedRegionsTool3D)
   {
     m_KeepNConnectedRegionsTool3D->AddPreview();
   }
@@ -136,7 +138,7 @@ void QmitkKeepNConnectedRegionsTool3DGUI::OnShowAdvancedControls( bool on )
 
 void QmitkKeepNConnectedRegionsTool3DGUI::OnNewLabel()
 {
-  if (m_KeepNConnectedRegionsTool3D.IsNotNull())
+  if (m_KeepNConnectedRegionsTool3D)
   {
     QmitkNewSegmentationDialog dialog(this);
 //    dialog->SetSuggestionList( m_OrganColors );

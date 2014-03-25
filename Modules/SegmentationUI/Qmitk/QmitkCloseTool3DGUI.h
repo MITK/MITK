@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkCloseTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "SegmentationUIExports.h"
+#include "MitkSegmentationUIExports.h"
 
 namespace mitk {
   class CloseTool3D;

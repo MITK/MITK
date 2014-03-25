@@ -84,6 +84,13 @@ set(MODULE_TESTS
   mitkTypeOperationTest.cpp
 )
 
+IF(MITK_USE_OpenCV)
+  set(MODULE_TESTS ${MODULE_TESTS}
+    mitkTypeConversionOpenCVTest.cpp
+  )
+endif(MITK_USE_OpenCV)
+
+
 # test with image filename as an extra command line parameter
 set(MODULE_IMAGE_TESTS
   mitkImageTimeSelectorTest.cpp #only runs on images

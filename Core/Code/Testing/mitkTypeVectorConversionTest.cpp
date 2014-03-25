@@ -27,9 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVector.h"
 #include "mitkTypes.h" // for Equals
 
-// TODO SW: here we will need a guard in case opencv is not activated in a build.
-#include <cv.h>
-
 using namespace mitk;
 
 /**
@@ -176,27 +173,6 @@ static void Test_vnl2mitk_WrongVnlVectorSize()
 }
 
 
-static void Test_mitk2opencv()
-{
-  cv::Vec3d opencvVector(originalValues[0], originalValues[1], originalValues[2]);
-  mitk::Vector3D vector3D = valuesToCopy;
-
-  opencvVector = vector3D.ToArray<cv::Vec3d>();
-
-  TestForEquality(opencvVector, vector3D, "cv::Vec3d", "mitk::Vector3D");
-}
-
-
-static void Test_opencv2mitk()
-{
-  mitk::Vector3D vector3D = originalValues;
-  cv::Vec3d opencvVector(valuesToCopy[0], valuesToCopy[1], valuesToCopy[2]);
-
-  vector3D.FromArray(opencvVector);
-
-  TestForEquality(vector3D, opencvVector, "mitk::Vector3D", "cv::Vec3d");
-}
-
 
 static void Test_ToArray_DifferentType(void)
 {
@@ -254,9 +230,6 @@ int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
   Test_vnl2mitk();
   Test_mitk2vnl();
   Test_vnl2mitk_WrongVnlVectorSize();
-
-  Test_mitk2opencv();
-  Test_opencv2mitk();
 
   /**
    * The ToArray and FromArray can assign non equal types by implicit primitive type conversion.

@@ -341,63 +341,50 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     // get volume fraction images
     ItkDoubleImgType::Pointer sumImage = ItkDoubleImgType::New();
-    sumImage->SetSpacing( m_UpsampledSpacing );
-    sumImage->SetOrigin( m_UpsampledOrigin );
-    sumImage->SetDirection( m_Parameters.m_ImageDirection );
-    sumImage->SetLargestPossibleRegion( m_UpsampledImageRegion );
-    sumImage->SetBufferedRegion( m_UpsampledImageRegion );
-    sumImage->SetRequestedRegion( m_UpsampledImageRegion );
-    sumImage->Allocate();
-    sumImage->FillBuffer(0);
+    bool foundVolumeFractionImage = false;
+
+    for (unsigned int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)  // look if a volume fraction image is set
+    {
+        if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNotNull())
+        {
+            foundVolumeFractionImage = true;
+            sumImage->SetSpacing( m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetSpacing() );
+            sumImage->SetOrigin( m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetOrigin() );
+            sumImage->SetDirection( m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetDirection() );
+            sumImage->SetLargestPossibleRegion( m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion() );
+            sumImage->SetBufferedRegion( m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion() );
+            sumImage->SetRequestedRegion( m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion() );
+            sumImage->Allocate();
+            sumImage->FillBuffer(0);
+            break;
+        }
+    }
+    if (!foundVolumeFractionImage)
+    {
+        sumImage->SetSpacing( m_UpsampledSpacing );
+        sumImage->SetOrigin( m_UpsampledOrigin );
+        sumImage->SetDirection( m_Parameters.m_ImageDirection );
+        sumImage->SetLargestPossibleRegion( m_UpsampledImageRegion );
+        sumImage->SetBufferedRegion( m_UpsampledImageRegion );
+        sumImage->SetRequestedRegion( m_UpsampledImageRegion );
+        sumImage->Allocate();
+        sumImage->FillBuffer(0.0);
+    }
     for (unsigned int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
     {
         if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNull())
         {
             ItkDoubleImgType::Pointer doubleImg = ItkDoubleImgType::New();
-            doubleImg->SetSpacing( m_UpsampledSpacing );
-            doubleImg->SetOrigin( m_UpsampledOrigin );
-            doubleImg->SetDirection( m_Parameters.m_ImageDirection );
-            doubleImg->SetLargestPossibleRegion( m_UpsampledImageRegion );
-            doubleImg->SetBufferedRegion( m_UpsampledImageRegion );
-            doubleImg->SetRequestedRegion( m_UpsampledImageRegion );
+            doubleImg->SetSpacing( sumImage->GetSpacing() );
+            doubleImg->SetOrigin( sumImage->GetOrigin() );
+            doubleImg->SetDirection( sumImage->GetDirection() );
+            doubleImg->SetLargestPossibleRegion( sumImage->GetLargestPossibleRegion() );
+            doubleImg->SetBufferedRegion( sumImage->GetLargestPossibleRegion() );
+            doubleImg->SetRequestedRegion( sumImage->GetLargestPossibleRegion() );
             doubleImg->Allocate();
             doubleImg->FillBuffer(1.0/m_Parameters.m_NonFiberModelList.size());
             m_Parameters.m_NonFiberModelList[i]->SetVolumeFractionImage(doubleImg);
         }
-        else
-        {
-            if (pad[0]>0 || pad[1]>0)
-            {
-                itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
-                zeroPadder->SetInput(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
-                zeroPadder->SetConstant(0);
-                zeroPadder->SetPadUpperBound(pad);
-                zeroPadder->Update();
-                m_Parameters.m_NonFiberModelList[i]->SetVolumeFractionImage(zeroPadder->GetOutput());
-            }
-            if (m_Parameters.m_DoAddGibbsRinging)
-            {
-                itk::ResampleImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer resampler = itk::ResampleImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
-                resampler->SetInput(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
-                resampler->SetOutputParametersFromImage(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
-                resampler->SetSize(m_UpsampledImageRegion.GetSize());
-                resampler->SetOutputSpacing(m_UpsampledSpacing);
-                resampler->SetOutputOrigin(m_UpsampledOrigin);
-                itk::NearestNeighborInterpolateImageFunction<ItkDoubleImgType, double>::Pointer nn_interpolator
-                        = itk::NearestNeighborInterpolateImageFunction<ItkDoubleImgType, double>::New();
-                resampler->SetInterpolator(nn_interpolator);
-                resampler->Update();
-                m_Parameters.m_NonFiberModelList[i]->SetVolumeFractionImage(resampler->GetOutput());
-            }
-
-            itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::New();
-            rescaler->SetInput(0, m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
-            rescaler->SetOutputMaximum(1);
-            rescaler->SetOutputMinimum(0);
-            rescaler->Update();
-            m_Parameters.m_NonFiberModelList[i]->SetVolumeFractionImage(rescaler->GetOutput());
-        }
-
         ImageRegionIterator<ItkDoubleImgType> it(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage(), m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion());
         while(!it.IsAtEnd())
         {
@@ -731,22 +718,23 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                     }
                     for (unsigned int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
                     {
-                        DoubleDwiType::IndexType newIndex = index;
+                        itk::Point<double, 3> point;
+                        tempTissueMask->TransformIndexToPhysicalPoint(index, point);
+
                         if (m_Parameters.m_DoAddMotion)
                         {
-                            itk::Point<double, 3> point;
-                            tempTissueMask->TransformIndexToPhysicalPoint(index, point);
                             if (m_Parameters.m_DoRandomizeMotion && g>0)
                                 point = fiberBundle->TransformPoint(point.GetVnlVector(), -rotation[0],-rotation[1],-rotation[2],-translation[0],-translation[1],-translation[2]);
                             else
                                 point = fiberBundle->TransformPoint(point.GetVnlVector(), -rotation[0]*g,-rotation[1]*g,-rotation[2]*g,-translation[0]*g,-translation[1]*g,-translation[2]*g);
+                        }
 
-                            DoubleDwiType::IndexType tempIndex;
-                            tempTissueMask->TransformPhysicalPointToIndex(point, tempIndex);
-                            if (tempTissueMask->GetLargestPossibleRegion().IsInside(tempIndex))
-                                newIndex = tempIndex;
-                            else
-                                continue;
+                        DoubleDwiType::IndexType newIndex;
+                        m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->TransformPhysicalPointToIndex(point, newIndex);
+                        if (!m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion().IsInside(newIndex))
+                        {
+                            MITK_WARN << "Volume fraction image is too small for the chosen motion artifacts! Due to motion a volume fraction outside of the specified image volume is requested.";
+                            continue;
                         }
 
                         DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_Parameters.m_FiberModelList.size());

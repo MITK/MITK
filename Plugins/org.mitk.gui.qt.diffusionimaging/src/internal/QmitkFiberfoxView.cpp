@@ -737,27 +737,33 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
         ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
         CastToItkImage< ItkDoubleImgType >(img, itkImg);
-        if (parameters.m_ImageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
-                parameters.m_ImageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
-                parameters.m_ImageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
-        {
-            m_BallModel2.SetVolumeFractionImage(itkImg);
-            parameters.m_NonFiberModelList.push_back(&m_BallModel2);
-            parameters.m_SignalModelString += "Ball";
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Ball") );
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_BallWidget2->GetD()) );
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_BallModel2.GetT2()) );
 
-            itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
-            double max = img->GetScalarValueMax();
-            if (max<1)
-                max = 1;
-            inverter->SetMaximum( max );
-            inverter->SetInput(itkImg);
-            inverter->Update();
-            parameters.m_NonFiberModelList.at(parameters.m_NonFiberModelList.size()-2)->SetVolumeFractionImage(inverter->GetOutput());
+        double max = img->GetScalarValueMax();
+        double min = img->GetScalarValueMin();
+
+        if (max>1 || min<0) // are volume fractions between 0 and 1?
+        {
+            itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::New();
+            rescaler->SetInput(0, itkImg);
+            rescaler->SetOutputMaximum(1);
+            rescaler->SetOutputMinimum(0);
+            rescaler->Update();
+            itkImg = rescaler->GetOutput();
         }
+
+        m_BallModel2.SetVolumeFractionImage(itkImg);
+        parameters.m_NonFiberModelList.push_back(&m_BallModel2);
+        parameters.m_SignalModelString += "Ball";
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Ball") );
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_BallWidget2->GetD()) );
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_BallModel2.GetT2()) );
+
+        itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+        inverter->SetMaximum(1.0);
+        inverter->SetInput(itkImg);
+        inverter->Update();
+        parameters.m_NonFiberModelList.at(parameters.m_NonFiberModelList.size()-2)->SetVolumeFractionImage(inverter->GetOutput());
 
         break;
     }
@@ -773,28 +779,35 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
         ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
         CastToItkImage< ItkDoubleImgType >(img, itkImg);
-        if (parameters.m_ImageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
-                parameters.m_ImageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
-                parameters.m_ImageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
-        {
-            m_AstrosticksModel2.SetVolumeFractionImage(itkImg);
-            parameters.m_NonFiberModelList.push_back(&m_AstrosticksModel2);
-            parameters.m_SignalModelString += "Astrosticks";
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Astrosticks") );
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_AstrosticksWidget2->GetD()) );
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_AstrosticksModel2.GetT2()) );
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.RandomSticks", BoolProperty::New(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks()) );
 
-            itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
-            double max = img->GetScalarValueMax();
-            if (max<1)
-                max = 1;
-            inverter->SetMaximum( max );
-            inverter->SetInput(itkImg);
-            inverter->Update();
-            parameters.m_NonFiberModelList.at(parameters.m_NonFiberModelList.size()-2)->SetVolumeFractionImage(inverter->GetOutput());
+        double max = img->GetScalarValueMax();
+        double min = img->GetScalarValueMin();
+
+        if (max>1 || min<0) // are volume fractions between 0 and 1?
+        {
+            itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::New();
+            rescaler->SetInput(0, itkImg);
+            rescaler->SetOutputMaximum(1);
+            rescaler->SetOutputMinimum(0);
+            rescaler->Update();
+            itkImg = rescaler->GetOutput();
         }
+
+        m_AstrosticksModel2.SetVolumeFractionImage(itkImg);
+        parameters.m_NonFiberModelList.push_back(&m_AstrosticksModel2);
+        parameters.m_SignalModelString += "Astrosticks";
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Astrosticks") );
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_AstrosticksWidget2->GetD()) );
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_AstrosticksModel2.GetT2()) );
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.RandomSticks", BoolProperty::New(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks()) );
+
+        itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+        inverter->SetMaximum( 1.0 );
+        inverter->SetInput(itkImg);
+        inverter->Update();
+        parameters.m_NonFiberModelList.at(parameters.m_NonFiberModelList.size()-2)->SetVolumeFractionImage(inverter->GetOutput());
+
         break;
     }
     case 3:
@@ -806,26 +819,33 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
         ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
         CastToItkImage< ItkDoubleImgType >(img, itkImg);
-        if (parameters.m_ImageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
-                parameters.m_ImageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
-                parameters.m_ImageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
-        {
-            m_DotModel2.SetVolumeFractionImage(itkImg);
-            parameters.m_NonFiberModelList.push_back(&m_DotModel2);
-            parameters.m_SignalModelString += "Dot";
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Dot") );
-            parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_DotModel2.GetT2()) );
 
-            itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
-            double max = img->GetScalarValueMax();
-            if (max<1)
-                max = 1;
-            inverter->SetMaximum( max );
-            inverter->SetInput(itkImg);
-            inverter->Update();
-            parameters.m_NonFiberModelList.at(parameters.m_NonFiberModelList.size()-2)->SetVolumeFractionImage(inverter->GetOutput());
+        double max = img->GetScalarValueMax();
+        double min = img->GetScalarValueMin();
+
+        if (max>1 || min<0) // are volume fractions between 0 and 1?
+        {
+            itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::New();
+            rescaler->SetInput(0, itkImg);
+            rescaler->SetOutputMaximum(1);
+            rescaler->SetOutputMinimum(0);
+            rescaler->Update();
+            itkImg = rescaler->GetOutput();
         }
+
+        m_DotModel2.SetVolumeFractionImage(itkImg);
+        parameters.m_NonFiberModelList.push_back(&m_DotModel2);
+        parameters.m_SignalModelString += "Dot";
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Dot") );
+        parameters.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(m_DotModel2.GetT2()) );
+
+        itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+        inverter->SetMaximum( 1.0 );
+        inverter->SetInput(itkImg);
+        inverter->Update();
+        parameters.m_NonFiberModelList.at(parameters.m_NonFiberModelList.size()-2)->SetVolumeFractionImage(inverter->GetOutput());
+
         break;
     }
     }

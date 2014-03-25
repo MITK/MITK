@@ -585,16 +585,6 @@ void RTDoseVisualizer::UpdateStdIsolines()
   }
 }
 
-void RTDoseVisualizer::HideIsoline()
-{
-  mitk::NodePredicateProperty::Pointer isoProp = mitk::NodePredicateProperty::
-      New(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(true));
-  mitk::DataStorage::SetOfObjects::ConstPointer isoSet =  this->GetDataStorage()->GetSubset(isoProp);
-  for(mitk::DataStorage::SetOfObjects::ConstIterator iso = isoSet->Begin(); iso!=isoSet->End(); ++iso)
-  {
-  }
-}
-
 void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
   const QList<mitk::DataNode::Pointer>& nodes )
 {

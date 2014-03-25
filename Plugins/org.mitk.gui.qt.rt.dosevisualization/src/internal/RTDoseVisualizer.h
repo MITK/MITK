@@ -148,26 +148,24 @@ protected:
   mitk::DataNode::Pointer UpdatePolyData(int num, double min, double max);
 
   /**
-   * @brief UpdateStdIsolines
+   * @brief Calculates the isolines for the dose image
+   * Number, value and color depends on the selected preset
    */
   void UpdateStdIsolines();
 
   /**
-   * @brief HideIsoline
-   */
-  void HideIsoline();
-
-  /**
-   * @brief GetExtractedSlice
-   * @param image
-   * @return
+   * @brief Get the active axial slice as 2D image
+   * Uses a mitkExtractSliceFilter for getting the 2D slice of the
+   * axial view
+   * @param image the mitkImage which is shown in the axial window
+   * @return the 2D mitkImage slice
    */
   mitk::Image::Pointer GetExtractedSlice(mitk::Image::Pointer image);
 
   /**
-   * @brief GetGeometry2D
-   * @param dim
-   * @return
+   * @brief Get the mitkGeometry2D of a specific render window
+   * @param dim the name of the render window
+   * @return the mitkGeometry2D of the render window
    */
   const mitk::Geometry2D* GetGeometry2D(char* dim);
 

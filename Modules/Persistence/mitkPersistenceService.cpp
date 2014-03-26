@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#define MBILOG_ENABLE_DEBUG
+
 #include "mitkPersistenceService.h"
 #include "mitkStandaloneDataStorage.h"
 #include "mitkUIDGenerator.h"
@@ -51,6 +53,8 @@ std::string mitk::PersistenceService::GetDefaultPersistenceFile()
   std::string file = "PersistentData.mitk";
   us::ModuleContext* context = us::GetModuleContext();
   std::string contextDataFile = context->GetDataFile("PersistentData.mitk");
+  itksys::SystemTools::MakeDirectory(context->GetDataFile("").c_str());
+
   if( !contextDataFile.empty() )
   {
       file = contextDataFile;

@@ -35,12 +35,13 @@ class PointSet;
 class MitkSurfaceRegistration_EXPORT  AnisotropicRegistrationCommon
 {
 
-typedef itk::Matrix <double, 3, 3> WeightMatrix;
-typedef WeightMatrix Rotation;
-typedef mitk::Vector3D Translation;
-typedef std::vector< WeightMatrix > MatrixList;
-
 protected:
+
+  typedef itk::Matrix <double, 3, 3> WeightMatrix;
+  typedef WeightMatrix Rotation;
+  typedef mitk::Vector3D Translation;
+  typedef std::vector< WeightMatrix > MatrixList;
+
   AnisotropicRegistrationCommon(){}
   ~AnisotropicRegistrationCommon(){}
 
@@ -58,11 +59,6 @@ static double ComputeTargetRegistrationError( const mitk::PointSet* movingTarget
                                               const Rotation& rotation,
                                               const Translation& translation
                                             );
-
-// TODO: Methods used for porting
-static vtkSmartPointer<vtkPoints> GetVTKPoints( mitk::PointSet* p );
-
-static itk::SmartPointer<mitk::PointSet> GetMITKPoints( vtkPoints* p );
 
 };
 

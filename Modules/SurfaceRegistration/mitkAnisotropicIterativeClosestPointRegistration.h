@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK
 #include <itkMatrix.h>
 
+class vtkPoints;
+class vtkKdTreePointLocator;
+
 namespace mitk
 {
 
@@ -45,6 +48,8 @@ protected:
   typedef std::vector< CovarianceMatrix > CovarianceMatrixList;
   typedef mitk::Vector3D Translation;
   typedef CovarianceMatrix Rotation;
+  typedef std::pair < unsigned int, double > Correspondence;
+  typedef std::vector < Correspondence > CorrespondenceList;
 
   AnisotropicIterativeClosestPointRegistration();
   ~AnisotropicIterativeClosestPointRegistration();
@@ -75,6 +80,17 @@ protected:
 
   Translation m_Translation;
   Rotation    m_Rotation;
+
+  void ComputeCorrespondences ( vtkPoints* X,
+                                vtkPoints* Z,
+                                vtkKdTreePointLocator *Y,
+                                const CovarianceMatrixList& sigma_X,
+                                const CovarianceMatrixList& sigma_Y,
+                                CovarianceMatrixList& sigma_Z,
+                                CorrespondenceList &correspondences,
+                                const double radius
+                               );
+
 
 public:
 
@@ -115,7 +131,6 @@ public:
   mitkClassMacro(AnisotropicIterativeClosestPointRegistration, itk::Object)
   itkNewMacro(Self)
 
-  /** @brief Method which registers both point sets. */
   void Update();
 };
 

@@ -14,43 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
+// MITK
 #include "mitkAnisotropicIterativeClosestPointRegistration.h"
 #include "mitkWeightedPointTransform.h"
 #include "mitkAnisotropicRegistrationCommon.h"
-
 #include <mitkSurface.h>
+// VTK
 #include <vtkKdTree.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkIdList.h>
 #include <vtkKdTreePointLocator.h>
+// STL pair
 #include <utility>
-
-typedef std::vector < itk::Matrix < double, 3, 3 > > CovarianceMatrixList;
-typedef std::pair < unsigned int, double > Correspondence;
-typedef std::vector < Correspondence > CorrespondenceList;
 
 struct myComperator
 {
+  typedef std::pair < unsigned int, double > Correspondence;
+
   bool operator() (const Correspondence& a, const Correspondence& b)
   {
     return (a.second < b.second);
   }
 } myComp;
-
-static void ComputeCorrespondences ( vtkPoints* X,
-                                     vtkPoints* Z,
-                                     vtkKdTreePointLocator *Y,
-                                     const CovarianceMatrixList& sigma_X,
-                                     const CovarianceMatrixList& sigma_Y,
-                                     CovarianceMatrixList& sigma_Z,
-                                     CorrespondenceList &correspondences,
-                                     const double radius
-                                   );
-
-static mitk::PointSet::Pointer getPointSet(vtkPoints* p);
-
 
 mitk::AnisotropicIterativeClosestPointRegistration::AnisotropicIterativeClosestPointRegistration()
   : m_MaxIterations(1000),
@@ -71,15 +57,15 @@ mitk::AnisotropicIterativeClosestPointRegistration::~AnisotropicIterativeClosest
 {
 }
 
-void ComputeCorrespondences ( vtkPoints* X,
-                              vtkPoints* Z,
-                              vtkKdTreePointLocator* Y,
-                              const CovarianceMatrixList& sigma_X,
-                              const CovarianceMatrixList& sigma_Y,
-                              CovarianceMatrixList& sigma_Z,
-                              CorrespondenceList& correspondences,
-                              const double radius
-                            )
+void mitk::AnisotropicIterativeClosestPointRegistration::ComputeCorrespondences ( vtkPoints* X,
+                                                                                  vtkPoints* Z,
+                                                                                  vtkKdTreePointLocator* Y,
+                                                                                  const CovarianceMatrixList& sigma_X,
+                                                                                  const CovarianceMatrixList& sigma_Y,
+                                                                                  CovarianceMatrixList& sigma_Z,
+                                                                                  CorrespondenceList& correspondences,
+                                                                                  const double radius
+                                                                                )
 {
   typedef itk::Matrix < double, 3, 3 > WeightMatrix;
 
@@ -148,27 +134,6 @@ void ComputeCorrespondences ( vtkPoints* X,
 
     ids->Delete();
   }
-}
-
-
-inline mitk::PointSet::Pointer getPointSet(vtkPoints* p)
-{
-  mitk::PointSet::Pointer retVal = mitk::PointSet::New();
-  double point[3];
-
-  for ( vtkIdType i = 0; i < p->GetNumberOfPoints(); ++i )
-  {
-    p->GetPoint(i,point);
-
-    mitk::Point3D mitkPoint;
-    mitkPoint[0] = point[0];
-    mitkPoint[1] = point[1];
-    mitkPoint[2] = point[2];
-
-    retVal->InsertPoint(i,mitkPoint);
-    //retVal->SetPoint(i,mitkPoint);
-  }
-  return retVal;
 }
 
 void mitk::AnisotropicIterativeClosestPointRegistration::Update()

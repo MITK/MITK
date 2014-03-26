@@ -107,35 +107,3 @@ double mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(const
 
   return sqrt(tre);
 }
-
-vtkSmartPointer<vtkPoints> mitk::AnisotropicRegistrationCommon::GetVTKPoints(mitk::PointSet *p)
-{
-  vtkSmartPointer<vtkPoints> out = vtkSmartPointer<vtkPoints>::New();
-  out->SetNumberOfPoints(p->GetSize());
-
-  for ( vtkIdType i = 0; i < p->GetSize(); ++i )
-  {
-    out->SetPoint(i,p->GetPoint(i)[0],p->GetPoint(i)[1],p->GetPoint(i)[2]);
-  }
-
-  return out;
-}
-
-itk::SmartPointer<mitk::PointSet> mitk::AnisotropicRegistrationCommon::GetMITKPoints(vtkPoints *p)
-{
-  mitk::PointSet::Pointer out = mitk::PointSet::New();
-
-  for ( int i = 0; i < p->GetNumberOfPoints(); ++i )
-  {
-    mitk::Point3D point;
-    double vtkPoint[3];
-    p->GetPoint(i,vtkPoint);
-
-    point[0] = vtkPoint[0];
-    point[1] = vtkPoint[1];
-    point[2] = vtkPoint[2];
-
-    out->InsertPoint(i,point);
-  }
-  return out;
-}

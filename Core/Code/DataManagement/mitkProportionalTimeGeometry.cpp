@@ -71,10 +71,10 @@ bool mitk::ProportionalTimeGeometry::IsValidTimeStep (TimeStepType timeStep) con
 
 mitk::TimePointType mitk::ProportionalTimeGeometry::TimeStepToTimePoint( TimeStepType timeStep) const
 {
-  if (m_FirstTimePoint <= std::numeric_limits<TimePointType>::min() ||
-      m_FirstTimePoint >= std::numeric_limits<TimePointType>::max() ||
-      m_StepDuration <= std::numeric_limits<TimePointType>::min() ||
-      m_StepDuration >= std::numeric_limits<TimePointType>::max())
+  if (m_FirstTimePoint <= itk::NumericTraits<TimePointType>::NonpositiveMin() ||
+      m_FirstTimePoint >= itk::NumericTraits<TimePointType>::max() ||
+      m_StepDuration <= itk::NumericTraits<TimePointType>::min() ||
+      m_StepDuration >= itk::NumericTraits<TimePointType>::max())
   {
     return static_cast<TimePointType>(timeStep);
   }

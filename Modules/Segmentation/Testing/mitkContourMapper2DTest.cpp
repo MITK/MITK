@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkContour.h"
 #include "mitkDataNode.h"
 #include "mitkContourMapper2D.h"
@@ -68,7 +67,7 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
 
   vtkRenderWindow* renWin = vtkRenderWindow::New();
 
-  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New( "ContourRenderer",renWin, mitk::RenderingManager::GetInstance() );
+  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New( "ContourRenderer",renWin, mitk::RenderingManager::GetInstance(),mitk::BaseRenderer::RenderingMode::Standard );
 
   std::cout<<"Testing mitk::BaseRenderer::SetData()"<<std::endl;
 

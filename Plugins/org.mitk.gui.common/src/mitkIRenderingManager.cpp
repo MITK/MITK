@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIRenderingManager.h"
 
 namespace mitk {
-
 struct RenderingManagerInterface : public IRenderingManager
 {
   RenderingManagerInterface(RenderingManager::Pointer manager)
@@ -126,16 +125,6 @@ struct RenderingManagerInterface : public IRenderingManager
     return m_RM->GetLODAbortMechanismEnabled();
   }
 
-  void SetDepthPeelingEnabled(bool enabled)
-  {
-    m_RM->SetDepthPeelingEnabled(enabled);
-  }
-
-  void SetMaxNumberOfPeels(int maxNumber)
-  {
-    m_RM->SetMaxNumberOfPeels(maxNumber);
-  }
-
   int GetNextLOD( BaseRenderer* renderer ) const
   {
     return m_RM->GetNextLOD(renderer);
@@ -185,12 +174,10 @@ struct RenderingManagerInterface : public IRenderingManager
   }
 
   const RenderingManager::Pointer m_RM;
-
 };
 
 IRenderingManager* MakeRenderingManagerInterface(RenderingManager::Pointer manager)
 {
   return new RenderingManagerInterface(manager);
 }
-
 }

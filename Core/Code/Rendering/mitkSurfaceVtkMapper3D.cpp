@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkSurfaceVtkMapper3D.h"
 #include "mitkDataNode.h"
 #include "mitkProperties.h"
@@ -32,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageSliceSelector.h>
 #include <mitkCoreServices.h>
 #include <mitkTransferFunctionProperty.h>
+#include <mitkIPropertyDescriptions.h>
+#include <mitkIPropertyAliases.h>
 
 //VTK
 #include <vtkActor.h>
@@ -89,7 +90,22 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
   }
   else
   {
-    ls->m_VtkPolyDataMapper->SetInputData( polydata );
+    ls->m_DepthSort->SetInputData( polydata );
+    ls->m_DepthSort->SetCamera( renderer->GetVtkRenderer()->GetActiveCamera() );
+    ls->m_DepthSort->SetDirectionToBackToFront();
+    ls->m_DepthSort->Update();
+
+    bool depthsorting = false;
+    GetDataNode()->GetBoolProperty("Depth Sorting", depthsorting);
+
+    if (depthsorting)
+    {
+      ls->m_VtkPolyDataMapper->SetInputConnection(ls->m_DepthSort->GetOutputPort());
+    }
+    else
+    {
+      ls->m_VtkPolyDataMapper->SetInputData( polydata );
+    }
   }
 
   //
@@ -100,7 +116,6 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
   if(visible)
     ls->m_Actor->VisibilityOn();
 }
-
 
 void mitk::SurfaceVtkMapper3D::ResetMapper( BaseRenderer* renderer )
 {
@@ -241,8 +256,6 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
         }
     }
 }
-
-
 
 void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer, vtkActor* /*actor*/)
 {
@@ -386,7 +399,6 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
         //m_Actor->GetProperty()->SetInterpolationToPhong();
     }
 
-
     // Check whether one or more ClippingProperty objects have been defined for
     // this node. Check both renderer specific and global property lists, since
     // properties in both should be considered.
@@ -415,8 +427,6 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
     {
         ls->m_VtkPolyDataMapper->RemoveAllClippingPlanes();
     }
-
-
 }
 
 vtkProp *mitk::SurfaceVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
@@ -448,7 +458,6 @@ void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseRenderer* ren
     }
 }
 
-
 void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
     // Shading
@@ -476,7 +485,6 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     }
 }
 
-
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
     node->AddProperty( "color", mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
@@ -500,5 +508,7 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::
     // Backface culling
     node->AddProperty( "Backface Culling", mitk::BoolProperty::New(false), renderer, overwrite );
 
+    node->AddProperty( "Depth Sorting", mitk::BoolProperty::New(false), renderer, overwrite );
+    mitk::CoreServices::GetPropertyDescriptions()->AddDescription( "Depth Sorting", "Enables correct rendering for transparent objects by ordering polygons according to the distance to the camera. It is not recommended to enable this property for large surfaces (rendering might be slow).");
     Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

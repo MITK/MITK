@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPNGWriter.h>
 #include <vtkRenderLargeImage.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkCamera.h>
 
 //MITK
 #include <mitkRenderingTestHelper.h>
@@ -33,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkOpenGL.h>
 #include <vtkOpenGLExtensionManager.h>
 
-
 #if defined _MSC_VER
 #if _MSC_VER >= 1700
 #define RESIZE_WORKAROUND
@@ -47,25 +47,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 //VTK Testing to compare the rendered image pixel-wise against a reference screen shot
 #include "vtkTesting.h"
 
-mitk::RenderingTestHelper::RenderingTestHelper(int width, int height)
+mitk::RenderingTestHelper::RenderingTestHelper(int width, int height, mitk::BaseRenderer::RenderingMode::Type renderingMode)
   : m_AutomaticallyCloseRenderWindow(true)
 {
-  this->Initialize(width, height);
+  this->Initialize(width, height, renderingMode );
 }
 
-mitk::RenderingTestHelper::RenderingTestHelper(int width, int height, int argc, char* argv[])
+mitk::RenderingTestHelper::RenderingTestHelper(int width, int height, int argc, char* argv[], mitk::BaseRenderer::RenderingMode::Type renderingMode)
   : m_AutomaticallyCloseRenderWindow(true)
 {
-  this->Initialize(width, height);
+  this->Initialize(width, height, renderingMode);
   this->SetInputFileNames(argc, argv);
 }
 
-void mitk::RenderingTestHelper::Initialize(int width, int height)
+void mitk::RenderingTestHelper::Initialize(int width, int height, mitk::BaseRenderer::RenderingMode::Type renderingMode)
 {
   // Global interaction must(!) be initialized
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
-  m_RenderWindow = mitk::RenderWindow::New();
+  m_RenderWindow = mitk::RenderWindow::New(NULL ,"unnamed renderer" , NULL, renderingMode);
+
   m_DataStorage = mitk::StandaloneDataStorage::New();
 
   m_RenderWindow->GetRenderer()->SetDataStorage(m_DataStorage);
@@ -151,6 +152,7 @@ void mitk::RenderingTestHelper::SetMapperID( mitk::BaseRenderer::StandardMapperS
 void mitk::RenderingTestHelper::SetMapperIDToRender3D()
 {
   this->SetMapperID(mitk::BaseRenderer::Standard3D);
+   mitk::RenderingManager::GetInstance()->InitializeViews( this->GetDataStorage()->ComputeBoundingGeometry3D( this->GetDataStorage()->GetAll() ) );
 }
 
 void mitk::RenderingTestHelper::SetMapperIDToRender2D()

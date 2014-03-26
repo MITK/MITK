@@ -24,7 +24,7 @@
 #include "QmitkRenderWindowMenu.h"
 
 #include "mitkInteractionEventConst.h"
-
+#include "mitkBaseRenderer.h"
 
 class QmitkStdMultiWidget;
 class QDragEnterEvent;
@@ -42,7 +42,7 @@ Q_OBJECT
 public:
 
   QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL,
-      mitk::RenderingManager* renderingManager = NULL);
+    mitk::RenderingManager* renderingManager = NULL,mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
   virtual ~QmitkRenderWindow();
 
   /**
@@ -174,7 +174,6 @@ private:
   bool m_MenuWidgetActivated;
 
   unsigned int m_LayoutIndex;
-
 };
 
 #endif

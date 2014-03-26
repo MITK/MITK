@@ -158,7 +158,7 @@ int main(int argc, char** argv)
 #endif
 
 
-  QString applicationPath = "liborg_mitk_gui_qt_ext,";
+  QString libraryPath = "liborg_mitk_gui_qt_ext,";
 
   // Fix for bug 17557:
   // Setting absolute path to liborg_mitk_gui_qt_ext. Otherwise MITK fails to preload
@@ -166,24 +166,24 @@ int main(int argc, char** argv)
 #ifdef Q_OS_MAC
 
   // In case the application is started from an install directory
-  QString tempApplicationPath = QCoreApplication::applicationDirPath().append("/plugins/liborg_mitk_gui_qt_ext.dylib");
+  QString tempLibraryPath = QCoreApplication::applicationDirPath().append("/plugins/liborg_mitk_gui_qt_ext.dylib");
 
-  QFile preloadLibrary (tempApplicationPath);
+  QFile preloadLibrary (tempLibraryPath);
   if (preloadLibrary.exists())
   {
-    tempApplicationPath.append(",");
-    applicationPath = tempApplicationPath;
+    tempLibraryPath.append(",");
+    libraryPath = tempLibraryPath;
   }
   else
   {
     // In case the application is started from a build tree
-    tempApplicationPath = QCoreApplication::applicationDirPath().append("/../../../plugins/liborg_mitk_gui_qt_ext.dylib");
+    tempLibraryPath = QCoreApplication::applicationDirPath().append("/../../../plugins/liborg_mitk_gui_qt_ext.dylib");
 
-    preloadLibrary.setFileName(tempApplicationPath);
+    preloadLibrary.setFileName(tempLibraryPath);
     if (preloadLibrary.exists())
     {
-      tempApplicationPath.append(",");
-      applicationPath = tempApplicationPath;
+      tempLibraryPath.append(",");
+      libraryPath = tempLibraryPath;
     }
   }
 #endif
@@ -193,7 +193,7 @@ int main(int argc, char** argv)
   // which have difficulties with multiple dynamic opening and closing of shared libraries with
   // many global static initializers. It also helps if dependent libraries have weird static
   // initialization methods and/or missing de-initialization code.
-  extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, applicationPath.toStdString()+CTK_LIB_PREFIX "CTKDICOMCore:0.1");
+  extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, libraryPath.toStdString()+CTK_LIB_PREFIX "CTKDICOMCore:0.1");
 
   // Seed the random number generator, once at startup.
   QTime time = QTime::currentTime();

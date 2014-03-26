@@ -9,6 +9,7 @@ set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkNodeTableViewKeyFilter.cpp
   QmitkInfoDialog.cpp
+  QmitkDataManagerItemDelegate.cpp
 )
 
 set(MOC_H_FILES
@@ -17,6 +18,7 @@ set(MOC_H_FILES
   src/QmitkDataManagerHotkeysPrefPage.h
   src/internal/QmitkNodeTableViewKeyFilter.h
   src/internal/QmitkInfoDialog.h
+  src/internal/QmitkDataManagerItemDelegate.h
   src/internal/mitkPluginActivator.h
 )
 

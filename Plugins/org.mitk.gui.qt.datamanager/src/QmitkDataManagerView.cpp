@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkCustomVariants.h>
 #include "src/internal/QmitkNodeTableViewKeyFilter.h"
 #include "src/internal/QmitkInfoDialog.h"
+#include "src/internal/QmitkDataManagerItemDelegate.h"
 //## Berry
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
@@ -90,7 +91,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
 QmitkDataManagerView::QmitkDataManagerView()
-    : m_GlobalReinitOnNodeDelete(true)
+    : m_GlobalReinitOnNodeDelete(true),
+      m_ItemDelegate(NULL)
 {
 }
 
@@ -145,6 +147,10 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeView->setModel(m_NodeTreeModel);
   m_NodeTreeView->setTextElideMode(Qt::ElideMiddle);
   m_NodeTreeView->installEventFilter(new QmitkNodeTableViewKeyFilter(this));
+
+  m_ItemDelegate = new QmitkDataManagerItemDelegate(m_NodeTreeView);
+  m_NodeTreeView->setItemDelegate(m_ItemDelegate);
+
   QObject::connect( m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&))
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
   QObject::connect( m_NodeTreeModel, SIGNAL(rowsInserted (const QModelIndex&, int, int))

@@ -221,6 +221,7 @@ void QmitkImageStatisticsView::OnClipboardHistogramButtonClicked()
 
 void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
 {
+  QLocale tempLocal;
   QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
   if ( this->m_CurrentStatisticsValid )
   {
@@ -246,6 +247,7 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
   {
     QApplication::clipboard()->clear();
   }
+  QLocale::setDefault(tempLocal);
 }
 
 void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*part*/,

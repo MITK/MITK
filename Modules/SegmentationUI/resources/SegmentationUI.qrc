@@ -32,6 +32,7 @@
     <file>RemoveLabel.png</file>
     <file>EraseLabel.png</file>
     <file>CreateSurface.png</file>
+    <file>CreateMask.png</file>
     <file>RandomColor.png</file>
     <file>RenameLabel.png</file>
   </qresource>

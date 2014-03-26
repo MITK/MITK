@@ -149,6 +149,7 @@ protected:
   /**
    * @brief               This method performs a variant of the weighted point register alogorithm presented by
    *                      A. Danilchenko, R. Balachandran and J. M. Fitzpatrick in January 2010. (Modified in January 2011)
+   *                      converted to C++ by Alfred Franz in March/April 2010
    *
    * @param MovingPointSet               (input) the moving point set
    * @param FixedPointSet               (input) the fixed (static) point set

@@ -49,7 +49,6 @@ struct CovarianceMatrixCalculatorData
   double m_VoronoiScalingFactor;
   bool m_EnableNormalization;
   double m_MeanVariance;
-  CovarianceMatrixCalculator::CalculationMethod m_CalculationMethod;
 
   CovarianceMatrixCalculatorData()
     : m_PolyDataNormals(vtkPolyDataNormals::New()),
@@ -57,8 +56,7 @@ struct CovarianceMatrixCalculatorData
       m_Input(NULL),
       m_VoronoiScalingFactor(1.0),
       m_EnableNormalization(false),
-      m_MeanVariance(0.0),
-      m_CalculationMethod(CovarianceMatrixCalculator::CM_PCA)
+      m_MeanVariance(0.0)
   {
     m_PolyDataNormals->SplittingOff();
   }
@@ -90,11 +88,6 @@ void mitk::CovarianceMatrixCalculator::SetVoronoiScalingFator(const double facto
 void mitk::CovarianceMatrixCalculator::EnableNormalization(bool state)
 {
   d->m_EnableNormalization = state;
-}
-
-void mitk::CovarianceMatrixCalculator::SetCalculationMethod(mitk::CovarianceMatrixCalculator::CalculationMethod method)
-{
-  d->m_CalculationMethod = method;
 }
 
 double mitk::CovarianceMatrixCalculator::GetMeanVariance() const
@@ -147,29 +140,14 @@ void mitk::CovarianceMatrixCalculator::ComputeCovarianceMatrices()
     normals->GetTuple(i,normal);
     d->m_PolyData->GetPoint(i, currentVertex);
 
-    switch ( d->m_CalculationMethod )
-    {
-      case CM_PCA:
-        ComputeOrthonormalCoordinateSystem(i,normal,mat,variances, currentVertex);
+    ComputeOrthonormalCoordinateSystem(i,normal,mat,variances, currentVertex);
 
-        //use prefactor for sigma along surface
-        variances[0] = (d->m_VoronoiScalingFactor * variances[0]);
-        variances[1] = (d->m_VoronoiScalingFactor * variances[1]);
-        variances[2] = (d->m_VoronoiScalingFactor * variances[2]);
+    //use prefactor for sigma along surface
+    variances[0] = (d->m_VoronoiScalingFactor * variances[0]);
+    variances[1] = (d->m_VoronoiScalingFactor * variances[1]);
+    variances[2] = (d->m_VoronoiScalingFactor * variances[2]);
 
-        d->m_MeanVariance += ( variances[0] + variances[1] + variances[2] );
-        break;
-      case CM_TOF:
-        MITK_WARN << "CM_TOF not implemented yet";
-        break;
-      case CM_VORONOI:
-        MITK_WARN << "CM_VORONOI not implemented yet";
-        break;
-
-      default:
-        MITK_ERROR << "CovarianceMatrixCalculator. Computation method not specified.";
-    }
-
+    d->m_MeanVariance += ( variances[0] + variances[1] + variances[2] );
     // compute the covariance matrix and save it
     CovarianceMatrix covarianceMatrix = ComputeCovarianceMatrix(mat, variances, normalizationValue);
     m_CovarianceMatrixList.push_back(covarianceMatrix);

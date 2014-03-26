@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 #include "mitkWeightedPointTransform.h"
 #include "mitkAnisotropicRegistrationCommon.h"
-#include <itkLandmarkBasedTransformInitializer.h>
 #include <vtkLandmarkTransform.h>
 #include <vtkPoints.h>
 #include <vtkMatrix4x4.h>

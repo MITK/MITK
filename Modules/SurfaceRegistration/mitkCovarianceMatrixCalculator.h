@@ -48,14 +48,6 @@ struct CovarianceMatrixCalculatorData;
 class MitkSurfaceRegistration_EXPORT CovarianceMatrixCalculator : public itk::Object
 {
 
-public:
-  enum CalculationMethod
-  {
-    CM_PCA = 1,
-    CM_VORONOI = 2,
-    CM_TOF = 3
-  };
-
 protected:
 
   // local typedefs
@@ -89,12 +81,6 @@ public:
     * @param state Enables the covariance matrix normalization.
     */
   void EnableNormalization( bool state );
-
-  /** Sets the covariance matrix calculation method.
-    * Available methods are <code>CM_PCA</code>, <code>CM_VORONOI</code>, <code>CM_TOF</code>.
-    * @param method The computation method.
-    */
-  void SetCalculationMethod ( CalculationMethod method );
 
   /** Returns the mean of variance of all computed covariance matrices.
     * @return The mean variance.

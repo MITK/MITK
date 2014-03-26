@@ -21,11 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMatrix.h>
 #include <mitkVector.h>
 
-
-#include <vtkPoints.h>
-#include <vtkSmartPointer.h>
 #include <MitkSurfaceRegistrationExports.h>
-//class vtkPoints;
+
+class vtkPoints;
 
 namespace mitk
 {
@@ -39,6 +37,7 @@ protected:
 
   typedef itk::Matrix <double, 3, 3> WeightMatrix;
   typedef WeightMatrix Rotation;
+  typedef WeightMatrix CovarianceMatrix;
   typedef mitk::Vector3D Translation;
   typedef std::vector< WeightMatrix > MatrixList;
 

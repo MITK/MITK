@@ -83,8 +83,8 @@ void mitk::AnisotropicRegistrationCommon::PropagateMatrices( const MatrixList &s
 
 double mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(const mitk::PointSet *movingTargets,
                                                                            const mitk::PointSet *fixedTargets,
-                                                                           const mitk::AnisotropicRegistrationCommon::Rotation &rotation,
-                                                                           const mitk::AnisotropicRegistrationCommon::Translation &translation)
+                                                                           const Rotation &rotation,
+                                                                           const Translation &translation)
 {
   double tre = 0.0;
 

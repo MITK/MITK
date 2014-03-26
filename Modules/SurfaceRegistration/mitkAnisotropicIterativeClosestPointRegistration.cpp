@@ -192,6 +192,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
   }
 
   // initialize the sizes of the sorted datasets
+  // used in the trimmed version of the algorithm
   Sigma_Z_sorted.resize(numberOfTrimmedPoints);
   Sigma_X_sorted.resize(numberOfTrimmedPoints);
   X_sorted->SetNumberOfPoints(numberOfTrimmedPoints);

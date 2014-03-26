@@ -65,7 +65,7 @@ void QmitkStoreSCPLauncher::FindPathToStoreSCP()
         fileName = "/storescp";
 #endif
 
-        m_PathToStoreSCP = fileName;
+        m_PathToStoreSCP = appPath + fileName;
 
         //In developement the storescp isn't copied into bin directory
         if(!QFile::exists(m_PathToStoreSCP))

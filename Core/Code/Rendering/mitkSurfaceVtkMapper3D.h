@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273
 #define MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273
 
@@ -30,17 +29,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPlaneCollection.h>
-
+#include <vtkDepthSortPolyData.h>
+#include <vtkSmartPointer.h>
 
 namespace mitk {
-
-
 //##Documentation
 //## @brief Vtk-based mapper for Surface
 //##
 //## @ingroup Mapper
-
-
 
   /**
   * @brief Vtk-based mapper for Surface
@@ -125,7 +121,7 @@ public:
       vtkPolyDataMapper *m_VtkPolyDataMapper;
       vtkPolyDataNormals *m_VtkPolyDataNormals;
       vtkPlaneCollection *m_ClippingPlaneCollection;
-
+      vtkSmartPointer<vtkDepthSortPolyData> m_DepthSort;
       itk::TimeStamp m_ShaderTimestampUpdate;
 
       LocalStorage()
@@ -136,6 +132,8 @@ public:
         m_ClippingPlaneCollection = vtkPlaneCollection::New();
 
         m_Actor->SetMapper(m_VtkPolyDataMapper);
+
+        m_DepthSort = vtkSmartPointer<vtkDepthSortPolyData>::New();
       }
 
       ~LocalStorage()
@@ -152,7 +150,6 @@ public:
   static void ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer);
   static void SetDefaultPropertiesForVtkProperty(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite);
 };
-
 } // namespace mitk
 
 #endif /* MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273 */

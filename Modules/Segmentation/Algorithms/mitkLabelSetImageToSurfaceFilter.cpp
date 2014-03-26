@@ -183,7 +183,7 @@ void mitk::LabelSetImageToSurfaceFilter::InternalProcessing( itk::Image<TPixel, 
   marching->ComputeScalarsOff();
   marching->ComputeNormalsOn();
   marching->ComputeGradientsOn();
-  marching->SetInputData(indexCoordinatesImageFilter->GetOutput());
+  marching->SetInputConnection(indexCoordinatesImageFilter->GetOutputPort());
   marching->SetValue(0, 0.0);
 
   marching->Update();

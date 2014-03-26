@@ -85,7 +85,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   colorWidget->setLayout(colorWidgetLayout);
 
   QLabel* renderLabel = new QLabel;
-  renderLabel->setText("Rendering Mode");
+  renderLabel->setText("Rendering Mode* ");
 
   m_RenderingMode = new QComboBox;
   m_RenderingMode->addItem("Standard Rendering");
@@ -93,7 +93,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   m_RenderingMode->addItem("Enable Depth Peeling" );
 
   QLabel* cBHint = new QLabel;
-  cBHint->setText("* Changes require restart of MITK");
+  cBHint->setText("* Changes require restart of MITK. \n Depth Peeling is only supported by Windows. \n For other OS, use Standard Rendering and enable \n the property 'Depth Sorting' in the property list of the surface data node.");
 
   QSpacerItem *spacer1 = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
 

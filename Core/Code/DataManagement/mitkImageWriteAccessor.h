@@ -180,6 +180,9 @@ private:
 
   }
 
+  ImageWriteAccessor& operator=(const ImageWriteAccessor&);  // Not implemented on purpose.
+  ImageWriteAccessor(const ImageWriteAccessor&);
+
 };
 
 }

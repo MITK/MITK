@@ -155,6 +155,9 @@ private:
     m_Image->m_ReadWriteLock.Unlock();
   }
 
+  ImageReadAccessor& operator=(const ImageReadAccessor&);  // Not implemented on purpose.
+  ImageReadAccessor(const ImageReadAccessor&);
+
 };
 
 }

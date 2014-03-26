@@ -113,6 +113,8 @@ namespace mitk {
     //## @brief Is this Geometry3D in a state that is valid?
     virtual bool IsValid() const;
 
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const = 0;
+
     // ********************************** Initialize **********************************
 
     //##Documentation
@@ -419,13 +421,13 @@ namespace mitk {
     //## @brief Get the position of the corner number \a id (in world coordinates)
     //##
     //## See SetImageGeometry for how a corner is defined on images.
-    virtual Point3D GetCornerPoint(int id) const;
+    Point3D GetCornerPoint(int id) const;
 
     //##Documentation
     //## @brief Get the position of a corner (in world coordinates)
     //##
     //## See SetImageGeometry for how a corner is defined on images.
-    virtual Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const;
+    Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const;
 
     //##Documentation
     //## @brief Set the extent of the bounding-box in the specified @a direction in mm
@@ -436,17 +438,54 @@ namespace mitk {
     //##Documentation
     //## @brief Test whether the point \a p (world coordinates in mm) is
     //## inside the bounding box
-    virtual bool IsInside(const mitk::Point3D& p) const;
+    bool IsInside(const mitk::Point3D& p) const;
 
     //##Documentation
     //## @brief Test whether the point \a p ((continous!)index coordinates in units) is
     //## inside the bounding box
-    virtual bool IsIndexInside(const mitk::Point3D& index) const;
+    bool IsIndexInside(const mitk::Point3D& index) const;
 
     //##Documentation
     //## @brief Convenience method for working with ITK indices
     template <unsigned int VIndexDimension>
-    bool IsIndexInside(const itk::Index<VIndexDimension> &index) const;
+    bool IsIndexInside(const itk::Index<VIndexDimension> &index) const
+    {
+      int i, dim=index.GetIndexDimension();
+      Point3D pt_index;
+      pt_index.Fill(0);
+      for ( i = 0; i < dim; ++i )
+      {
+        pt_index[i] = index[i];
+      }
+      return IsIndexInside(pt_index);
+    }
+
+
+    // ********************************* Image Geometry ********************************
+    //##Documentation
+    //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
+    virtual void ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry );
+
+    //##Documentation
+    //## @brief Is this an ImageGeometry?
+    //##
+    //## For more information, see SetImageGeometry
+    itkGetConstMacro(ImageGeometry, bool);
+    //##Documentation
+    //## @brief Define that this Geometry3D is refering to an Image
+    //##
+    //## A geometry referring to an Image needs a slightly different
+    //## definition of the position of the corners (see GetCornerPoint).
+    //## The position of a voxel is defined by the position of its center.
+    //## If we would use the origin (position of the (center of) the first
+    //## voxel) as a corner and display this point, it would seem to be
+    //## \em not at the corner but a bit within the image. Even worse for
+    //## the opposite corner of the image: here the corner would appear
+    //## outside the image (by half of the voxel diameter). Thus, we have
+    //## to correct for this and to be able to do that, we need to know
+    //## that the Geometry3D is referring to an Image.
+    itkSetMacro(ImageGeometry, bool);
+    itkBooleanMacro(ImageGeometry);
 
   protected:
 
@@ -466,8 +505,8 @@ namespace mitk {
 
     static const std::string GetTransformAsString( TransformType* transformType );
 
-    virtual void InternPostInitialize() {};
-    virtual void InternPostInitializeGeometry(Self * newGeometry) const{};
+    virtual void InternPostInitialize();
+    virtual void InternPostInitializeGeometry(Self * newGeometry) const;
 
     virtual void InternPreSetBounds(const BoundsArrayType& bounds);
 
@@ -516,6 +555,8 @@ namespace mitk {
     mutable unsigned long m_IndexToWorldTransformLastModified;
 
     float m_FloatSpacing[3]; //this was private
+
+    bool m_ImageGeometry;
 
     //    DEPRECATED(VnlQuaternionType m_RotationQuaternion);
   };

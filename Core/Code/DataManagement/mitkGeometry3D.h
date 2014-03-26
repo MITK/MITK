@@ -98,91 +98,6 @@ namespace mitk {
     mitkNewMacro1Param(Self,Self);
 
     //##Documentation
-    //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
-    virtual void ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry );
-
-    //##Documentation
-    //## @brief Get the position of the corner number \a id (in world coordinates)
-    //##
-    //## See SetImageGeometry for how a corner is defined on images.
-    Point3D GetCornerPoint(int id) const;
-
-    //##Documentation
-    //## @brief Get the position of a corner (in world coordinates)
-    //##
-    //## See SetImageGeometry for how a corner is defined on images.
-    Point3D GetCornerPoint(bool xFront=true, bool yFront=true, bool zFront=true) const;
-
-    //##Documentation
-    //## @brief Is this an ImageGeometry?
-    //##
-    //## For more information, see SetImageGeometry
-    itkGetConstMacro(ImageGeometry, bool);
-    //##Documentation
-    //## @brief Define that this Geometry3D is refering to an Image
-    //##
-    //## A geometry referring to an Image needs a slightly different
-    //## definition of the position of the corners (see GetCornerPoint).
-    //## The position of a voxel is defined by the position of its center.
-    //## If we would use the origin (position of the (center of) the first
-    //## voxel) as a corner and display this point, it would seem to be
-    //## \em not at the corner but a bit within the image. Even worse for
-    //## the opposite corner of the image: here the corner would appear
-    //## outside the image (by half of the voxel diameter). Thus, we have
-    //## to correct for this and to be able to do that, we need to know
-    //## that the Geometry3D is referring to an Image.
-    itkSetMacro(ImageGeometry, bool);
-    itkBooleanMacro(ImageGeometry);
-
-    //##Documentation
-    //## @brief Test whether the point \a p ((continous!)index coordinates in units) is
-    //## inside the bounding box
-    bool IsIndexInside(const mitk::Point3D& index) const
-    {
-      bool inside = false;
-      //if it is an image geometry, we need to convert the index to discrete values
-      //this is done by applying the rounding function also used in WorldToIndex (see line 323)
-      if (m_ImageGeometry)
-      {
-        mitk::Point3D discretIndex;
-        discretIndex[0]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[0] );
-        discretIndex[1]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[1] );
-        discretIndex[2]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[2] );
-
-        inside = this->GetBoundingBox()->IsInside(discretIndex);
-        //we have to check if the index is at the upper border of each dimension,
-        // because the boundingbox is not centerbased
-        if (inside)
-        {
-          const BoundingBox::BoundsArrayType& bounds = this->GetBoundingBox()->GetBounds();
-          if((discretIndex[0] == bounds[1]) ||
-            (discretIndex[1] == bounds[3]) ||
-            (discretIndex[2] == bounds[5]))
-            inside = false;
-        }
-      }
-      else
-        inside = this->GetBoundingBox()->IsInside(index);
-
-      return inside;
-    }
-
-    //##Documentation
-    //## @brief Convenience method for working with ITK indices
-    template <unsigned int VIndexDimension>
-    bool IsIndexInside(const itk::Index<VIndexDimension> &index) const
-    {
-      int i, dim=index.GetIndexDimension();
-      Point3D pt_index;
-      pt_index.Fill(0);
-      for ( i = 0; i < dim; ++i )
-      {
-        pt_index[i] = index[i];
-      }
-      return IsIndexInside(pt_index);
-    }
-
-    //##Documentation
     //## @brief clones the geometry
     //##
     //## Overwrite in all sub-classes.
@@ -194,12 +109,6 @@ namespace mitk {
     //## \endcode
     virtual itk::LightObject::Pointer InternalClone() const;
 
-
-
-
-
-
-
   protected:
     Geometry3D();
     Geometry3D(const Geometry3D& other);
@@ -208,40 +117,11 @@ namespace mitk {
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
-
-
-    bool m_ImageGeometry;
-
-    virtual void InternPostInitialize();
-    virtual void InternPostInitializeGeometry(Geometry3D* newGeometry) const;
-
     static const std::string INDEX_TO_OBJECT_TRANSFORM;
     static const std::string OBJECT_TO_NODE_TRANSFORM;
     static const std::string INDEX_TO_NODE_TRANSFORM;
     static const std::string INDEX_TO_WORLD_TRANSFORM;
   };
-
-  //
-  // Static compare functions mainly for testing
-  //
-  /**
-  * @brief Equal A function comparing two geometries for beeing identical.
-  *
-  * @ingroup MITKTestingAPI
-  *
-  * The function compares the spacing, origin, axisvectors, extents, the matrix of the
-  * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
-  *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
-  * If you want to use different tolarance values for different parts of the geometry, feel free to use
-  * the other comparison methods and write your own implementation of Equal.
-  * @param rightHandSide Compare this against leftHandSide.
-  * @param leftHandSide Compare this against rightHandSide.
-  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
-  * @param verbose Flag indicating if the user wants detailed console output or not.
-  * @return True, if all comparison are true. False in any other case.
-  */
-  MITK_CORE_EXPORT bool Equal(const mitk::Geometry3D* leftHandSide, const mitk::Geometry3D* rightHandSide, ScalarType eps, bool verbose);
 } // namespace mitk
 
 #endif /* GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD */

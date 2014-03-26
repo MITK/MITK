@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 
 mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
-  m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0)
+  m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0), m_ImageGeometry(false)
 {
   FillVector3D(m_FloatSpacing, 1,1,1);
   m_VtkMatrix = vtkMatrix4x4::New();
@@ -39,7 +39,8 @@ mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
 }
 
 mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), m_TimeBounds(other.m_TimeBounds),
-  m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin)
+  m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin),
+  m_ImageGeometry(other.m_ImageGeometry)
 {
   //  DEPRECATED(m_RotationQuaternion = other.m_RotationQuaternion);
   // AffineGeometryFrame
@@ -118,6 +119,11 @@ void mitk::BaseGeometry::Initialize()
   this->InternPostInitialize();
 }
 
+void mitk::BaseGeometry::InternPostInitializeGeometry(BaseGeometry * newGeometry) const
+{
+  newGeometry->m_ImageGeometry = m_ImageGeometry;
+}
+
 void mitk::BaseGeometry::SetFloatBounds(const float bounds[6])
 {
   mitk::BoundingBox::BoundsArrayType b;
@@ -155,6 +161,10 @@ void
   }
 
   this->InternPostInitializeGeometry(newGeometry);
+}
+void mitk::BaseGeometry::InternPostInitialize()
+{
+  m_ImageGeometry = false;
 }
 
 /** Set the bounds */
@@ -279,13 +289,13 @@ bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometr
   if( rightHandSide == NULL )
   {
     if(verbose)
-      MITK_INFO << "[( BaseGeometry )] rightHandSide NULL.";
+      MITK_INFO << "[( Geometry3D )] rightHandSide NULL.";
     return false;
   }
   if( leftHandSide == NULL)
   {
     if(verbose)
-      MITK_INFO << "[( BaseGeometry )] leftHandSide NULL.";
+      MITK_INFO << "[( Geometry3D )] leftHandSide NULL.";
     return false;
   }
 
@@ -294,7 +304,7 @@ bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometr
   {
     if(verbose)
     {
-      MITK_INFO << "[( BaseGeometry )] Spacing differs.";
+      MITK_INFO << "[( Geometry3D )] Spacing differs.";
       MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetSpacing() << " : leftHandSide is " << leftHandSide->GetSpacing() << " and tolerance is " << eps;
     }
     result = false;
@@ -305,21 +315,20 @@ bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometr
   {
     if(verbose)
     {
-      MITK_INFO << "[( BaseGeometry )] Origin differs.";
+      MITK_INFO << "[( Geometry3D )] Origin differs.";
       MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetOrigin() << " : leftHandSide is " << leftHandSide->GetOrigin() << " and tolerance is " << eps;
     }
     result = false;
   }
 
   //Compare Axis and Extents
-
   for( unsigned int i=0; i<3; ++i)
   {
     if( !mitk::Equal( leftHandSide->GetAxisVector(i), rightHandSide->GetAxisVector(i), eps))
     {
       if(verbose)
       {
-        MITK_INFO << "[( BaseGeometry )] AxisVector #" << i << " differ";
+        MITK_INFO << "[( Geometry3D )] AxisVector #" << i << " differ";
         MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetAxisVector(i) << " : leftHandSide is " << leftHandSide->GetAxisVector(i) << " and tolerance is " << eps;
       }
       result =  false;
@@ -329,11 +338,22 @@ bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometr
     {
       if(verbose)
       {
-        MITK_INFO << "[( BaseGeometry )] Extent #" << i << " differ";
+        MITK_INFO << "[( Geometry3D )] Extent #" << i << " differ";
         MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide->GetExtent(i) << " : leftHandSide is " << leftHandSide->GetExtent(i) << " and tolerance is " << eps;
       }
       result = false;
     }
+  }
+
+  //Compare ImageGeometry Flag
+  if( rightHandSide->GetImageGeometry() != leftHandSide->GetImageGeometry() )
+  {
+    if(verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] GetImageGeometry is different.";
+      MITK_INFO << "rightHandSide is " << rightHandSide->GetImageGeometry() << " : leftHandSide is " << leftHandSide->GetImageGeometry();
+    }
+    result = false;
   }
 
   //Compare BoundingBoxes
@@ -457,9 +477,9 @@ double mitk::BaseGeometry::GetDiagonalLength() const
 mitk::Point3D mitk::BaseGeometry::GetCornerPoint(int id) const
 {
   assert(id >= 0);
-  assert(m_BoundingBox.IsNotNull());
+  assert(this->IsBoundingBoxNull()==false);
 
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  BoundingBox::BoundsArrayType bounds = this->GetBoundingBox()->GetBounds();
 
   Point3D cornerpoint;
   switch(id)
@@ -477,20 +497,32 @@ mitk::Point3D mitk::BaseGeometry::GetCornerPoint(int id) const
       itkExceptionMacro(<<"A cube only has 8 corners. These are labeled 0-7.");
     }
   }
-  return m_IndexToWorldTransform->TransformPoint(cornerpoint);
+  if(m_ImageGeometry)
+  {
+    // Here i have to adjust the 0.5 offset manually, because the cornerpoint is the corner of the
+    // bounding box. The bounding box itself is no image, so it is corner-based
+    FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
+  }
+  return this->GetIndexToWorldTransform()->TransformPoint(cornerpoint);
 }
 
 mitk::Point3D mitk::BaseGeometry::GetCornerPoint(bool xFront, bool yFront, bool zFront) const
 {
-  assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  assert(this->IsBoundingBoxNull()==false);
+  BoundingBox::BoundsArrayType bounds = this->GetBoundingBox()->GetBounds();
 
   Point3D cornerpoint;
   cornerpoint[0] = (xFront ? bounds[0] : bounds[1]);
   cornerpoint[1] = (yFront ? bounds[2] : bounds[3]);
   cornerpoint[2] = (zFront ? bounds[4] : bounds[5]);
+  if(m_ImageGeometry)
+  {
+    // Here i have to adjust the 0.5 offset manually, because the cornerpoint is the corner of the
+    // bounding box. The bounding box itself is no image, so it is corner-based
+    FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
+  }
 
-  return m_IndexToWorldTransform->TransformPoint(cornerpoint);
+  return this->GetIndexToWorldTransform()->TransformPoint(cornerpoint);
 }
 
 mitk::ScalarType mitk::BaseGeometry::GetExtentInMM(int direction) const
@@ -531,25 +563,32 @@ bool mitk::BaseGeometry::IsIndexInside(const mitk::Point3D& index) const
   bool inside = false;
   //if it is an image geometry, we need to convert the index to discrete values
   //this is done by applying the rounding function also used in WorldToIndex (see line 323)
-  inside = m_BoundingBox->IsInside(index);
+  if (m_ImageGeometry)
+  {
+    mitk::Point3D discretIndex;
+    discretIndex[0]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[0] );
+    discretIndex[1]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[1] );
+    discretIndex[2]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[2] );
+
+    inside = this->GetBoundingBox()->IsInside(discretIndex);
+    //we have to check if the index is at the upper border of each dimension,
+    // because the boundingbox is not centerbased
+    if (inside)
+    {
+      const BoundingBox::BoundsArrayType& bounds = this->GetBoundingBox()->GetBounds();
+      if((discretIndex[0] == bounds[1]) ||
+        (discretIndex[1] == bounds[3]) ||
+        (discretIndex[2] == bounds[5]))
+        inside = false;
+    }
+  }
+  else
+    inside = this->GetBoundingBox()->IsInside(index);
 
   return inside;
 }
 
-//##Documentation
-//## @brief Convenience method for working with ITK indices
-template <unsigned int VIndexDimension>
-bool mitk::BaseGeometry::IsIndexInside(const itk::Index<VIndexDimension> &index) const
-{
-  int i, dim=index.GetIndexDimension();
-  Point3D pt_index;
-  pt_index.Fill(0);
-  for ( i = 0; i < dim; ++i )
-  {
-    pt_index[i] = index[i];
-  }
-  return IsIndexInside(pt_index);
-}
+
 
 void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
 {
@@ -927,4 +966,43 @@ bool mitk::BaseGeometry::IsBoundingBoxNull() const{
 
 bool mitk::BaseGeometry::IsIndexToWorldTransformNull() const{
   return m_IndexToWorldTransform.IsNull();
+}
+
+void
+  mitk::BaseGeometry::ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry )
+{
+  // If Geometry is switched to ImageGeometry, you have to put an offset to the origin, because
+  // imageGeometries origins are pixel-center-based
+  // ... and remove the offset, if you switch an imageGeometry back to a normal geometry
+  // For more information please see the Geometry documentation page
+
+  if(m_ImageGeometry == isAnImageGeometry)
+    return;
+
+  const BoundingBox::BoundsArrayType& boundsarray =
+    this->GetBoundingBox()->GetBounds();
+
+  Point3D  originIndex;
+  FillVector3D(originIndex,  boundsarray[0], boundsarray[2], boundsarray[4]);
+
+  if(isAnImageGeometry == true)
+    FillVector3D( originIndex,
+    originIndex[0] + 0.5,
+    originIndex[1] + 0.5,
+    originIndex[2] + 0.5 );
+  else
+    FillVector3D( originIndex,
+    originIndex[0] - 0.5,
+    originIndex[1] - 0.5,
+    originIndex[2] - 0.5 );
+
+  Point3D originWorld;
+
+  originWorld = GetIndexToWorldTransform()
+    ->TransformPoint( originIndex );
+  // instead could as well call  IndexToWorld(originIndex,originWorld);
+
+  SetOrigin(originWorld);
+
+  this->SetImageGeometry(isAnImageGeometry);
 }

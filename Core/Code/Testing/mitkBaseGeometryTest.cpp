@@ -64,6 +64,9 @@ public:
     newGeometry->UnRegister();
     return newGeometry.GetPointer();
   }
+
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const{};
+
 };
 
 class mitkBaseGeometryTestSuite : public mitk::TestFixture
@@ -86,6 +89,7 @@ class mitkBaseGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestTransferItkToVtkTransform);
   MITK_TEST(TestSetIndexToWorldTransformByVtkMatrix);
   MITK_TEST(TestSetIdentity);
+  MITK_TEST(TestSetImageGeometry);
   //Equal
   MITK_TEST(Equal_CloneAndOriginal_ReturnsTrue);
   MITK_TEST(Equal_DifferentOrigin_ReturnsFalse);
@@ -226,6 +230,19 @@ public:
 
     //undo changes, new and changed object need to be the same!
     dummy->SetOrigin(aPoint);
+    DummyTestClass::Pointer newDummy = DummyTestClass::New();
+    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+  }
+
+  void TestSetImageGeometry()
+  {
+    DummyTestClass::Pointer dummy = DummyTestClass::New();
+    dummy->SetImageGeometry(true);
+    CPPUNIT_ASSERT(dummy->GetImageGeometry());
+
+    //undo changes, new and changed object need to be the same!
+    dummy->SetImageGeometry(false);
+    CPPUNIT_ASSERT(dummy->GetImageGeometry()==false);
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
   }
@@ -386,6 +403,8 @@ public:
 
     CPPUNIT_ASSERT(dummy1->GetSpacing() == aSpacing);
     CPPUNIT_ASSERT(dummy1->GetOrigin()==aPoint);
+
+    CPPUNIT_ASSERT(dummy1->GetImageGeometry()==false);
 
     CPPUNIT_ASSERT(mitk::Equal( dummy1->GetIndexToWorldTransform(), aTransform, mitk::eps, true));
 

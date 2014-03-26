@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkVtkPropRenderer.h"
 
 // MAPPERS
@@ -59,9 +58,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 
-
-mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm )
-  : BaseRenderer(name,renWin, rm),
+mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, mitk::BaseRenderer::RenderingMode::Type renderingMode )
+  : BaseRenderer(name,renWin, rm, renderingMode ),
   m_VtkMapperPresent(false),
   m_CameraInitializedForMapperID(0)
 {
@@ -124,7 +122,6 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     m_TextRenderer->Delete();
 }
 
-
 void mitk::VtkPropRenderer::SetDataStorage(  mitk::DataStorage* storage  )
 {
   if ( storage == NULL )
@@ -137,7 +134,6 @@ void mitk::VtkPropRenderer::SetDataStorage(  mitk::DataStorage* storage  )
   // Compute the geometry from the current data tree bounds and set it as world geometry
   this->SetWorldGeometryToDataStorageBounds();
 }
-
 
 bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
 {
@@ -158,7 +154,6 @@ bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
   return true;
 }
 
-
 /*!
 \brief
 
@@ -166,7 +161,6 @@ Called by the vtkMitkRenderProp in order to start MITK rendering process.
 */
 int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 {
-
   // Do we have objects to render?
   if ( this->GetEmptyWorldGeometry())
     return 0;
@@ -377,7 +371,6 @@ void mitk::VtkPropRenderer::Disable2DOpenGL()
   glPopMatrix();
 }
 
-
 void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
 {
   if(datatreenode!=NULL)
@@ -409,7 +402,6 @@ void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
   }
 }
 
-
 void mitk::VtkPropRenderer::Update()
 {
   if( m_DataStorage.IsNull() )
@@ -423,7 +415,6 @@ void mitk::VtkPropRenderer::Update()
   Modified();
   m_LastUpdateTime = GetMTime();
 }
-
 
 /*!
 \brief
@@ -445,9 +436,7 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
   m_ResizeNeeded = true;
 
   m_LastUpdateTime = 0;
-
 }
-
 
 /*!
 \brief Resize the OpenGL Window
@@ -457,7 +446,6 @@ void mitk::VtkPropRenderer::Resize(int w, int h)
   BaseRenderer::Resize(w, h);
   m_RenderingManager->RequestUpdate(this->GetRenderWindow());
 }
-
 
 void mitk::VtkPropRenderer::InitSize(int w, int h)
 {
@@ -474,7 +462,6 @@ void mitk::VtkPropRenderer::InitSize(int w, int h)
   }
 }
 
-
 void mitk::VtkPropRenderer::SetMapperID(const MapperSlotId mapperId)
 {
   if(m_MapperID != mapperId)
@@ -484,7 +471,6 @@ void mitk::VtkPropRenderer::SetMapperID(const MapperSlotId mapperId)
   checkState();
 }
 
-
 /*!
 \brief Activates the current renderwindow.
 */
@@ -493,7 +479,6 @@ void mitk::VtkPropRenderer::MakeCurrent()
   if(m_RenderWindow!=NULL)
     m_RenderWindow->MakeCurrent();
 }
-
 
 void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk::Point3D& worldPoint) const
 {
@@ -596,7 +581,6 @@ mitk::DataNode *
       m_CellPicker->AddPickList( prop );
     }
 
-
     // Do the picking and retrieve the picked vtkProp (if any)
     m_CellPicker->PickFromListOn();
     m_CellPicker->Pick( displayPosition[0], displayPosition[1], 0.0, m_VtkRenderer );
@@ -643,8 +627,6 @@ mitk::DataNode *
   }
 };
 
-
-
 /*!
 \brief Writes some 2D text as overlay. Function returns an unique int Text_ID for each call, which can be used via the GetTextLabelProperty(int text_id) function
 in order to get a vtkTextProperty. This property enables the setup of font, font size, etc.
@@ -675,7 +657,6 @@ int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double
   }
 }
 
-
 /*!
 \brief Can be used in order to get a vtkTextProperty for a specific text_id. This property enables the setup of font, font size, etc.
 */
@@ -683,7 +664,6 @@ vtkTextProperty* mitk::VtkPropRenderer::GetTextLabelProperty(int text_id)
 {
   return this->m_TextCollection[text_id]->GetTextProperty();
 }
-
 
 void mitk::VtkPropRenderer::InitPathTraversal()
 {
@@ -693,7 +673,6 @@ void mitk::VtkPropRenderer::InitPathTraversal()
     m_PickingObjectsIterator = m_PickingObjects->begin();
   }
 }
-
 
 vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 {
@@ -750,7 +729,6 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
   }
 }
 
-
 void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow* /*renWin*/)
 {
   if( m_DataStorage.IsNull() )
@@ -775,30 +753,25 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow* /*renWin*/)
    }
 }
 
-
 const vtkWorldPointPicker *mitk::VtkPropRenderer::GetWorldPointPicker() const
 {
   return m_WorldPointPicker;
 }
-
 
 const vtkPointPicker *mitk::VtkPropRenderer::GetPointPicker() const
 {
   return m_PointPicker;
 }
 
-
 const vtkCellPicker *mitk::VtkPropRenderer::GetCellPicker() const
 {
   return m_CellPicker;
 }
 
-
 mitk::VtkPropRenderer::MappersMapType mitk::VtkPropRenderer::GetMappersMap() const
 {
   return m_MappersMap;
 }
-
 
 // Workaround for GL Displaylist bug
 
@@ -824,7 +797,6 @@ void mitk::VtkPropRenderer::checkState()
         //          vtkMapper::GlobalImmediateModeRenderingOn();
       }
       //MITK_INFO << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
-
     }
   }
   else

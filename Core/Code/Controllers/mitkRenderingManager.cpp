@@ -33,10 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 RenderingManager::Pointer RenderingManager::s_Instance = 0;
 RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
-
 
 RenderingManager
 ::RenderingManager()
@@ -56,7 +54,6 @@ RenderingManager
 
   InitializePropertyList();
 }
-
 
 RenderingManager
 ::~RenderingManager()
@@ -79,7 +76,6 @@ RenderingManager
   }
 }
 
-
 void
 RenderingManager
 ::SetFactory( RenderingManagerFactory *factory )
@@ -87,14 +83,12 @@ RenderingManager
   s_RenderingManagerFactory = factory;
 }
 
-
 const RenderingManagerFactory *
 RenderingManager
 ::GetFactory()
 {
   return s_RenderingManagerFactory;
 }
-
 
 bool
 RenderingManager
@@ -109,7 +103,6 @@ RenderingManager
     return false;
   }
 }
-
 
 RenderingManager::Pointer
 RenderingManager
@@ -136,7 +129,6 @@ RenderingManager
   return s_Instance;
 }
 
-
 bool
 RenderingManager
 ::IsInstantiated()
@@ -146,7 +138,6 @@ RenderingManager
   else
     return false;
 }
-
 
 void
 RenderingManager
@@ -160,7 +151,6 @@ RenderingManager
 
     if ( m_DataStorage.IsNotNull() )
       mitk::BaseRenderer::GetInstance( renderWindow )->SetDataStorage( m_DataStorage.GetPointer() );
-
 
     // Register vtkRenderWindow instance
     renderWindow->Register( NULL );
@@ -193,10 +183,8 @@ RenderingManager
     startCallbackCommand->Delete();
     progressCallbackCommand->Delete();
     endCallbackCommand->Delete();
-
   }
 }
-
 
 void
 RenderingManager
@@ -224,7 +212,6 @@ RenderingManager
   }
 }
 
-
 const RenderingManager::RenderWindowVector&
 RenderingManager
 ::GetAllRegisteredRenderWindows()
@@ -232,12 +219,10 @@ RenderingManager
   return m_AllRenderWindows;
 }
 
-
 void
 RenderingManager
 ::RequestUpdate( vtkRenderWindow *renderWindow )
 {
-
   // If the renderWindow is not valid, we do not want to inadvertantly create
   // an entry in the m_RenderWindowList map. It is possible if the user is
   // regularly calling AddRenderer and RemoveRenderer for a rendering update
@@ -258,7 +243,6 @@ RenderingManager
     this->GenerateRenderingRequestEvent();
   }
 }
-
 
 void
 RenderingManager
@@ -298,7 +282,6 @@ RenderingManager
   }
 }
 
-
 void
 RenderingManager
 ::RequestUpdateAll( RequestType type )
@@ -315,7 +298,6 @@ RenderingManager
     }
   }
 }
-
 
 void
 RenderingManager
@@ -334,7 +316,6 @@ RenderingManager
       this->ForceImmediateUpdate(it->first);
     }
   }
-
 }
 
 void RenderingManager::InitializeViewsByBoundingObjects( const DataStorage *ds)
@@ -366,7 +347,6 @@ RenderingManager
   return InitializeViews(propTimeGeometry,type, preserveRoughOrientationInWorldSpace);
 }
 
-
 bool
 RenderingManager
 ::InitializeViews( const TimeGeometry * dataGeometry, RequestType type, bool /*preserveRoughOrientationInWorldSpace*/ )
@@ -381,7 +361,6 @@ RenderingManager
   {
     modifiedGeometry = dataGeometry->Clone();
   }
-
 
   // //TODO_GOETZ previously this code section has been disabled by
   // a later asignment to geometry (e.g. timeGeometry)
@@ -412,7 +391,6 @@ RenderingManager
     // get rid of rotation other than pi/2 degree
     for ( unsigned int i = 0; i < 3; ++i )
     {
-
       // i-th column of the direction matrix
       Vector3D currentVector;
       currentVector[0] = oldMatrix(0,i);
@@ -452,7 +430,6 @@ RenderingManager
         offset += modifiedGeometry->GetAxisVector(i);
       }
 
-
       // matchingRow is now used as column index to place currentVector
       // correctly in the new matrix
       vnl_vector<ScalarType> newMatrixColumn(3);
@@ -476,7 +453,6 @@ RenderingManager
     transform->SetOffset( offset );
     modifiedGeometry->SetIndexToWorldTransform( transform );
     geometry = modifiedGeometry;
-
   }*/
 
   int warningLevel = vtkObject::GetGlobalWarningDisplay();
@@ -541,10 +517,8 @@ RenderingManager
   // Inform listeners that views have been initialized
   this->InvokeEvent( mitk::RenderingManagerViewsInitializedEvent() );
 
-
   return boundingBoxInitialized;
 }
-
 
 bool
 RenderingManager
@@ -560,7 +534,6 @@ RenderingManager
       || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
       || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
-
       mitk::SliceNavigationController *nc =
 
       baseRenderer->GetSliceNavigationController();
@@ -619,7 +592,6 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Tim
   return boundingBoxInitialized;
 }
 
-
 bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow )
 {
   mitk::BaseRenderer *baseRenderer =
@@ -669,18 +641,15 @@ void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRender
   }
 }
 
-
 const SliceNavigationController* RenderingManager::GetTimeNavigationController() const
 {
   return m_TimeNavigationController.GetPointer();
 }
 
-
 SliceNavigationController* RenderingManager::GetTimeNavigationController()
 {
   return m_TimeNavigationController.GetPointer();
 }
-
 
 void RenderingManager::ExecutePendingRequests()
 {
@@ -698,7 +667,6 @@ void RenderingManager::ExecutePendingRequests()
   }
 }
 
-
 void RenderingManager::RenderingStartCallback( vtkObject *caller, unsigned long , void *, void * )
 {
   vtkRenderWindow *renderWindow  = dynamic_cast< vtkRenderWindow * >( caller );
@@ -712,7 +680,6 @@ void RenderingManager::RenderingStartCallback( vtkObject *caller, unsigned long 
 
   renman->m_UpdatePending = false;
 }
-
 
 void
 RenderingManager
@@ -766,7 +733,6 @@ RenderingManager
   }
 }
 
-
 bool
 RenderingManager
 ::IsRendering() const
@@ -781,7 +747,6 @@ RenderingManager
   }
   return false;
 }
-
 
 void
 RenderingManager
@@ -798,7 +763,6 @@ RenderingManager
   }
 }
 
-
 int
 RenderingManager
 ::GetNextLOD( BaseRenderer *renderer )
@@ -812,7 +776,6 @@ RenderingManager
     return 0;
   }
 }
-
 
 void
 RenderingManager
@@ -841,7 +804,6 @@ RenderingManager
   m_MaxLOD = max;
 }
 
-
 //enable/disable shading
 void
 RenderingManager
@@ -853,7 +815,6 @@ RenderingManager
     return;
   }
   m_ShadingEnabled[lod] = state;
-
 }
 
 bool
@@ -868,7 +829,6 @@ RenderingManager
   return m_ShadingEnabled[lod];
 }
 
-
 //enable/disable the clipping plane
 void
 RenderingManager
@@ -877,14 +837,12 @@ RenderingManager
   m_ClippingPlaneEnabled = status;
 }
 
-
 bool
 RenderingManager
 ::GetClippingPlaneStatus()
 {
   return m_ClippingPlaneEnabled;
 }
-
 
 void
 RenderingManager
@@ -896,32 +854,11 @@ RenderingManager
   m_ShadingValues[3] = specpower;
 }
 
-
 RenderingManager::FloatVector &
 RenderingManager
 ::GetShadingValues()
 {
   return m_ShadingValues;
-}
-
-void RenderingManager::SetDepthPeelingEnabled( bool enabled )
-{
-  RenderWindowList::iterator it;
-  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
-  {
-    mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance( it->first );
-    baseRenderer->SetDepthPeelingEnabled(enabled);
-  }
-}
-
-void RenderingManager::SetMaxNumberOfPeels( int maxNumber )
-{
-  RenderWindowList::iterator it;
-  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
-  {
-    mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance( it->first );
-    baseRenderer->SetMaxNumberOfPeels(maxNumber);
-  }
 }
 
 void RenderingManager::InitializePropertyList()
@@ -951,7 +888,6 @@ void RenderingManager::SetProperty(const char *propertyKey, BaseProperty* proper
   m_PropertyList->SetProperty(propertyKey, propertyValue);
 }
 
-
 void RenderingManager::SetDataStorage( DataStorage* storage )
 {
   if ( storage != NULL )
@@ -971,7 +907,6 @@ mitk::DataStorage* RenderingManager::GetDataStorage()
   return m_DataStorage;
 }
 
-
 void RenderingManager::SetGlobalInteraction( mitk::GlobalInteraction* globalInteraction )
 {
   if ( globalInteraction != NULL )
@@ -987,6 +922,4 @@ mitk::GlobalInteraction* RenderingManager::GetGlobalInteraction()
 
 // Create and register generic RenderingManagerFactory.
 TestingRenderingManagerFactory renderingManagerFactory;
-
-
 } // namespace

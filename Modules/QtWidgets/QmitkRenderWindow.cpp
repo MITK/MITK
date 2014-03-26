@@ -38,20 +38,32 @@
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
     QString name,
     mitk::VtkPropRenderer* /*renderer*/,
-    mitk::RenderingManager* renderingManager) :
+    mitk::RenderingManager* renderingManager,mitk::BaseRenderer::RenderingMode::Type renderingMode) :
     QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0)
 {
-  Initialize(renderingManager, name.toStdString().c_str()); // Initialize mitkRenderWindowBase
+  if(renderingMode == mitk::BaseRenderer::RenderingMode::DepthPeeling)
+  {
+    GetRenderWindow()->SetMultiSamples(0);
+    GetRenderWindow()->SetAlphaBitPlanes(1);
+  }
+  else if(renderingMode == mitk::BaseRenderer::RenderingMode::MultiSampling)
+  {
+    GetRenderWindow()->SetMultiSamples(8);
+  }
+  else if(renderingMode == mitk::BaseRenderer::RenderingMode::Standard)
+  {
+    GetRenderWindow()->SetMultiSamples(0);
+  }
+
+  Initialize(renderingManager, name.toStdString().c_str(),renderingMode); // Initialize mitkRenderWindowBase
 
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
-
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
 {
   Destroy(); // Destroy mitkRenderWindowBase
-
 }
 
 void QmitkRenderWindow::SetResendQtEvents(bool resend)
@@ -119,12 +131,10 @@ void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
 
   if (m_ResendQtEvents)
     me->ignore();
-
 }
 
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 {
-
   mitk::Point2D displayPos = GetMousePosition(me);
   mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
 

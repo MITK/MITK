@@ -21,6 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 
+#include <mitkIOUtil.h>
+#include <mitkDataNodeFactory.h>
+#include <mitkImagePixelWriteAccessor.h>
+#include <mitkImageAccessByItk.h>
+#include <itkImageIterator.h>
+
 namespace mitk
 {
 
@@ -378,30 +384,64 @@ namespace mitk
     m_origin[2] = 0.0;
     image->SetOrigin(m_origin);
 
+//    mitk::IOUtil* io = new mitk::IOUtil();
+    mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
+    nodeReader->SetFileName(name);
+    nodeReader->Update();
+    mitk::DataNode::Pointer superNode = nodeReader->GetOutput();
+    mitk::Image::Pointer superImage = dynamic_cast<mitk::Image*>(superNode->GetData());
+
+    MITK_INFO << "SuperImagePixelType: " << superImage->GetPixelType().GetTypeAsString() << endl;
+
+    mitk::ImagePixelWriteAccessor<unsigned int,3> accessor(superImage);
+    unsigned int* pixelAccessData = accessor.GetData();
+
+    AccessByItk_1(superImage, MultiplayGridScaling, gridscale);
+
+    int pixelNumber = 300;
+
+    for(int i=0;i<pixelNumber;++i)
+    {
+      *pixelAccessData *= gridscale;
+      pixelAccessData++;
+    }
+
     //HELP CAST UND DEPRECATED
     float* pixel = reinterpret_cast<float*>(image->GetData());
 //    float* pixel = (float*)image->GetData();
     int size = dim[0]*dim[1]*dim[2];
 
-    for(int i=0; i<size; ++i, ++pixel)
-    {
-      *pixel=pixelData[i] * gridscale;
-    }
+//    for(int i=0; i<size; ++i, ++pixel)
+//    {
+//      imageData->GetScalar
+//      *pixel=pixelData[i] * gridscale;
+//    }
 
     image->SetGeometry(geo);
 
     double prescripeDose = this->GetMaxDoseValue(dataset);
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetName("DicomRT Dosis");
-    node->SetFloatProperty(mitk::rt::Constants::
+    superNode->SetName("DicomRT Dosis");
+    superNode->SetFloatProperty(mitk::rt::Constants::
                            PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
-    node->SetFloatProperty(mitk::rt::Constants::
+    superNode->SetFloatProperty(mitk::rt::Constants::
                            REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
-    node->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),true);
+    superNode->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),true);
     node->SetData(image);
 
-    return node;
+    return superNode;
+  }
+
+  template<typename TPixel, unsigned int VImageDimension>
+  void DicomRTReader::MultiplayGridScaling(itk::Image<TPixel,VImageDimension>* image , Float32 gridscale)
+  {
+    typedef itk::Image<TPixel, VImageDimension> InputImageType;
+    itk::ImageIterator<InputImageType> it( image, image->GetRequestedRegion() );
+    for(it=it.Begin(); !it.IsAtEnd(); ++it)
+    {
+      it.Set(it.Get()*gridscale);
+    }
   }
 
   double DicomRTReader::GetMaxDoseValue(DcmDataset* dataSet)

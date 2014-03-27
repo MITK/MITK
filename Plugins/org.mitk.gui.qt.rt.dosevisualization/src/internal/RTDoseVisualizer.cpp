@@ -528,7 +528,7 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
 
   mitk::Surface::Pointer isoline = mitk::Surface::New();
   isoline->SetVtkPolyData(polyData);
-  isoline->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial"))->Clone());
+  isoline->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial")->Clone().GetPointer()));
   isoline->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing());
   isoline->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
 

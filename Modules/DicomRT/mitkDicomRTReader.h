@@ -102,6 +102,9 @@ namespace mitk
     mitkClassMacro( DicomRTReader, itk::Object );
     itkNewMacro( Self );
 
+    template<typename TPixel, unsigned int VImageDimension>
+    void MultiplayGridScaling( itk::Image< TPixel, VImageDimension>* image, Float32 gridscale);
+
     /**
      * @brief Get the maximum dose value from the dose file
      * @param dataSet The DcmDataset of the DicomRTDose file

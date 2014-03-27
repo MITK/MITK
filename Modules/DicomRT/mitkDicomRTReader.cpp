@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImagePixelWriteAccessor.h>
 #include <mitkImageAccessByItk.h>
 #include <itkImageIterator.h>
+#include <itkImageRegionIterator.h>
 
 namespace mitk
 {
@@ -437,7 +438,7 @@ namespace mitk
   void DicomRTReader::MultiplayGridScaling(itk::Image<TPixel,VImageDimension>* image , Float32 gridscale)
   {
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
-    itk::ImageIterator<InputImageType> it( image, image->GetRequestedRegion() );
+    itk::ImageRegionIterator<InputImageType> it( image, image->GetRequestedRegion() );
     for(it=it.Begin(); !it.IsAtEnd(); ++it)
     {
       it.Set(it.Get()*gridscale);

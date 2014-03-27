@@ -130,6 +130,14 @@ mitk::RenderingTestHelper::~RenderingTestHelper()
 {
 }
 
+bool  mitk::RenderingTestHelper::IsAdvancedOpenGL()
+{
+  const GLubyte *version = glGetString(GL_VERSION);
+  if(!version)
+    return false;
+  return *version >= '2';
+}
+
 void mitk::RenderingTestHelper::PrintGLInfo()
 {
   GLint maxTextureSize;

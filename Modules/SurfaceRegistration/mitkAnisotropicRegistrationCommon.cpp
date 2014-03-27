@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 
 mitk::AnisotropicRegistrationCommon::WeightMatrix
-mitk::AnisotropicRegistrationCommon::CalculateWeightMatrix( const WeightMatrix &sigma_X,
-                                                            const WeightMatrix &sigma_Y )
+mitk::AnisotropicRegistrationCommon::CalculateWeightMatrix(const CovarianceMatrix &sigma_X,
+                                                            const CovarianceMatrix &sigma_Y )
 {
   WeightMatrix returnValue;
 

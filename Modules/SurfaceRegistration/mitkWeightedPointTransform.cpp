@@ -23,14 +23,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef itk::Matrix < double,3,3 > Matrix3x3;
 typedef std::vector < Matrix3x3 > Matrix3x3List;
-static double ComputeWeightedFRE (  vtkPoints* X,
-                                    vtkPoints* Y,
-                                    const Matrix3x3List &CovarianceMatricesMoving,
-                                    const Matrix3x3List &CovarianceMatricesFixed,
-                                    double FRENormalizationFactor,
-                                    Matrix3x3List& WeightMatrices,
-                                    const Matrix3x3& rotation,
-                                    const itk::Vector<double,3>& translation
+
+// forward declarations of private functions
+static double ComputeWeightedFRE ( vtkPoints* X,
+                                   vtkPoints* Y,
+                                   const Matrix3x3List &CovarianceMatricesMoving,
+                                   const Matrix3x3List &CovarianceMatricesFixed,
+                                   double FRENormalizationFactor,
+                                   Matrix3x3List& WeightMatrices,
+                                   const Matrix3x3& rotation,
+                                   const itk::Vector<double,3>& translation
                                  );
 
 static void calculateWeightMatrices( const Matrix3x3List& X,
@@ -77,6 +79,8 @@ void mitk::WeightedPointTransform::ComputeTransformation()
                          m_Iterations );
 }
 
+// computes the weightmatrix with 2 covariance matrices
+// and a given transformation
 void calculateWeightMatrices( const Matrix3x3List& X,
                               const Matrix3x3List& Y,
                               Matrix3x3List& result,
@@ -92,6 +96,7 @@ void calculateWeightMatrices( const Matrix3x3List& X,
   }
 }
 
+// computes the weighted fiducial registration error
 double ComputeWeightedFRE (  vtkPoints* X,
                              vtkPoints* Y,
                              const Matrix3x3List &CovarianceMatricesMoving,
@@ -104,7 +109,10 @@ double ComputeWeightedFRE (  vtkPoints* X,
 {
   double FRE = 0;
   //compute weighting matrices
-  calculateWeightMatrices(CovarianceMatricesMoving,CovarianceMatricesFixed,WeightMatrices,rotation);
+  calculateWeightMatrices( CovarianceMatricesMoving,
+                           CovarianceMatricesFixed,
+                           WeightMatrices,
+                           rotation );
 
 #pragma omp parallel for reduction(+:FRE)
   for (unsigned int i = 0; i < WeightMatrices.size(); ++i)
@@ -136,6 +144,7 @@ double ComputeWeightedFRE (  vtkPoints* X,
   return FRE;
 }
 
+// registers two pointsets with an isotropic landmark transform
 void IsotropicRegistration( vtkPoints* X,
                             vtkPoints* Y,
                             vtkLandmarkTransform* landmarkTransform,
@@ -210,9 +219,13 @@ void mitk::WeightedPointTransform::E_maker( vtkPoints* X,
     M[2][1] = M[0][1];
     M[2][2] = M[0][2];
 
-    returnValue[index++] = W.at(i)[0][0] * M[0][0] + W.at(i)[0][1] * M[0][1] + W.at(i)[0][2] * M[0][2];
-    returnValue[index++] = W.at(i)[1][0] * M[1][0] + W.at(i)[1][1] * M[1][1] + W.at(i)[1][2] * M[1][2];
-    returnValue[index]   = W.at(i)[2][0] * M[2][0] + W.at(i)[2][1] * M[2][1] + W.at(i)[2][2] * M[2][2];
+
+    for ( unsigned int j = 0; j < 3; ++j )
+    {
+      returnValue[index + j] = W.at(i)[j][0] * M[j][0] +
+                               W.at(i)[j][1] * M[j][1] +
+                               W.at(i)[j][2] * M[j][2];
+    }
   }
 }
 
@@ -252,19 +265,26 @@ bool mitk::WeightedPointTransform::WeightedPointRegister (
   iB.set_size(3u * X->GetNumberOfPoints());
 
   //calculate FRE_0 with identity transform
-  FRE_identity = ComputeWeightedFRE(X,Y,Sigma_X,Sigma_Y,m_FRENormalizationFactor,W,initial_TransformationR,initial_TransformationT);
+  FRE_identity = ComputeWeightedFRE(X,Y,Sigma_X,Sigma_Y,m_FRENormalizationFactor,
+                                    W,initial_TransformationR,
+                                    initial_TransformationT);
+
   MITK_INFO << "FRE for identity transform: "<<FRE_identity;
 
   // compute isotropic transformation as initial estimate
-  IsotropicRegistration(X,Y,m_LandmarkTransform,initial_TransformationR,initial_TransformationT);
+  IsotropicRegistration( X,Y,m_LandmarkTransform,initial_TransformationR,
+                         initial_TransformationT );
 
   //result of unweighted registration algorithm
   TransformationR = initial_TransformationR;
   TransformationT = initial_TransformationT;
 
-  //calculate FRE with current transform
-  FRE_isotropic_weighted = ComputeWeightedFRE(X,Y,Sigma_X,Sigma_Y,m_FRENormalizationFactor,W,TransformationR,TransformationT);
-  MITK_INFO << "FRE for transform obtained with unweighted registration: "<<FRE_isotropic_weighted;
+  //calculate FRE_0 with isotropic transform
+  FRE_isotropic_weighted = ComputeWeightedFRE(X,Y,Sigma_X,Sigma_Y,
+                                              m_FRENormalizationFactor,
+                                              W,TransformationR,TransformationT);
+  MITK_INFO << "FRE for transform obtained with unweighted registration: "
+            <<FRE_isotropic_weighted;
 
   //if R,t is worse than the identity, use the identity as initial transform
   if (FRE_isotropic_weighted < FRE_identity)
@@ -356,7 +376,8 @@ bool mitk::WeightedPointTransform::WeightedPointRegister (
     //calculate config change
     config_change = CalculateConfigChange(X_transformed,X_transformedNew);
 
-    //the old set for the next iteration is the new set of the last
+    // swap the pointers the old set for the next iteration is
+    // the new set of the last iteration
     vtkPoints* tmp = X_transformed;
     X_transformed = X_transformedNew;
     X_transformedNew = tmp;
@@ -372,7 +393,7 @@ bool mitk::WeightedPointTransform::WeightedPointRegister (
   //compare with FRE_initial
   if (initialFRE < FRE)
   {
-    std::cout<<"WARNING: FRE did not improve in anisotropic point registration function\n";
+    MITK_WARN <<"FRE did not improve in anisotropic point registration function";
     TransformationR = initial_TransformationR;
     TransformationT = initial_TransformationT;
     FRE = initialFRE;

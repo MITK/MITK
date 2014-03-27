@@ -95,7 +95,8 @@ double mitk::CovarianceMatrixCalculator::GetMeanVariance() const
   return d->m_MeanVariance;
 }
 
-const mitk::CovarianceMatrixCalculator::CovarianceMatrixList &mitk::CovarianceMatrixCalculator::GetCovarianceMatrices() const
+const mitk::CovarianceMatrixCalculator::CovarianceMatrixList&
+mitk::CovarianceMatrixCalculator::GetCovarianceMatrices() const
 {
   return m_CovarianceMatrixList;
 }

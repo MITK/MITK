@@ -35,15 +35,15 @@ struct CovarianceMatrixCalculatorData;
 /**
  * \ingroup AnisotropicRegistration
  *
- * Computes covariance matrices for every vertex in a given {@link Surface} based on it's
- * direct neighbours. Three different computation are available:
- * <ul>
- * <li> <code>CM_PCA</code> computes a covariance matrix based a principal component analysis
- * of the adjacent vertices.
- * <li> <code>CM_VORONOI</code> gets a covariance matrix based on voronoi regions.
- * <li> <code>CM_TOF</code> a covariance matrix that represents the error in the viewing
- * of a time of flight camera.
- * </ul>
+ * @brief Class that computes the covariance matrices for every point in a
+ * {@link Surface} used in the A-ICP algorithm.
+ *
+ * Computes a covariance matrix for every vertex in a given {@link Surface}
+ * based on it's direct neighbours.
+ * The Class implements the CM_PCA method presented and developped by
+ * L. Maier-Hein et al. in "Convergent Iterative Closest-Point Algorithm
+ * to Accomodate Anisotropic and Inhomogenous Localization Error.",
+ * IEEE T Pattern Anal 34 (8), 1520-1532, 2012.
  */
 class MitkSurfaceRegistration_EXPORT CovarianceMatrixCalculator : public itk::Object
 {
@@ -51,7 +51,10 @@ class MitkSurfaceRegistration_EXPORT CovarianceMatrixCalculator : public itk::Ob
 protected:
 
   // local typedefs
+
+  /** Definition of the covariance matrix.*/
   typedef itk::Matrix<double,3,3> CovarianceMatrix;
+  /** Definition of a list of covariance matrices */
   typedef std::vector<CovarianceMatrix> CovarianceMatrixList;
   typedef double Vertex[3];
 
@@ -88,7 +91,7 @@ public:
   double GetMeanVariance() const;
 
   /** Returns a reference to the CovarianceMatrixList with the computed covariance matrices.
-    * @return A <code>CovarianceMatrixList></code>.
+    * @return A CovarianceMatrixList.
     */
   const CovarianceMatrixList& GetCovarianceMatrices() const;
 

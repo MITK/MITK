@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_NAMED_POINT_H
 #define MITK_NAMED_POINT_H
 
-#include <mitkVector.h>
+#include <mitkTypes.h>
 #include <string>
 
 namespace mitk {

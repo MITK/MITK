@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTestingMacros.h>
-#include <mitkVector.h>
+#include <mitkTypes.h>
 
 #include <vnl/vnl_vector_fixed.txx>
 

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 #include <fstream>
-#include <mitkVector.h>
+#include <mitkTypes.h>
 
 bool testGetAxisVectorVariants(mitk::Geometry3D* geometry)
 {

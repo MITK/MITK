@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
-#include "mitkVector.h"
+#include "mitkTypes.h"
 #include "mitkOperationActor.h"
 
 #include <itkIndex.h>

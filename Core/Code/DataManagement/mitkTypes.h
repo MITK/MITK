@@ -87,6 +87,38 @@ template <class T, unsigned int NVectorDimension>
   return vector;
 }
 
+/**
+ * Helper method to check if the difference is bigger than a given epsilon
+ *
+ * @param diff the difference to be checked against the epsilon
+ * @param the epsilon. The absolute difference needs to be smaller than this.
+ * @return true if abs(diff) > eps
+ */
+template <typename DifferenceType>
+static inline bool DifferenceBiggerEps(DifferenceType diff, mitk::ScalarType epsilon = mitk::eps)
+{
+  return fabs(diff) > epsilon;
+}
+
+/**
+ * outputs elem1, elem2 and eps in case verbose and !isEqual.
+ * Elem can e.g. be a mitk::Vector or an mitk::Point.
+ *
+ * @param elem1 first element to be output
+ * @param elem2 second
+ * @param eps the epsilon which their difference was bigger than
+ * @param verbose tells the function if something shall be output
+ * @param isEqual function will only output something if the two elements are not equal
+ */
+template <typename ElementToOutput1, typename ElementToOutput2>
+static inline void ConditionalOutputOfDifference(ElementToOutput1 elem1, ElementToOutput2 elem2, mitk::ScalarType eps, bool verbose, bool isEqual)
+{
+  if(verbose && !isEqual)
+  {
+    MITK_INFO << typeid(ElementToOutput1).name() << " and " << typeid(ElementToOutput2).name() << " not equal. Lefthandside " << std::setprecision(12) << elem1 << " - Righthandside " << elem2 << " - epsilon " << eps;
+  }
+}
+
 /*!
 \brief Check for matrix equality with a user defined accuracy. As an equality metric the root mean squared error (RMS) of all elements is calculated.
 \param matrix1 first vnl matrix
@@ -141,8 +173,8 @@ inline bool MatrixEqualElementWise(const vnl_matrix_fixed<TCoordRep,NRows,NCols>
     {
       for( unsigned int c=0; c<NCols; c++ )
       {
-        TCoordRep difference =  fabs(matrix1(r,c)-matrix2(r,c));
-        if (difference>epsilon)
+        TCoordRep difference =  matrix1(r,c)-matrix2(r,c);
+        if (DifferenceBiggerEps(difference, epsilon))
         {
           return false;
         }
@@ -184,17 +216,15 @@ inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const 
   typename itk::Vector<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
   for (unsigned int i=0; i<NPointDimension; i++)
   {
-    if (diff[i]>eps || diff[i]<-eps)
+    if (DifferenceBiggerEps(diff[i], eps))
     {
       isEqual = false;
       break;
     }
   }
 
-  if(verbose && !isEqual)
-  {
-    MITK_INFO << "Vectors not equal. Lefthandside " << std::setprecision(12) << vector1 << " - Righthandside " << vector2 << " - epsilon " << eps;
-  }
+  ConditionalOutputOfDifference(vector1, vector2, eps, verbose, isEqual);
+
   return isEqual;
 }
 
@@ -214,17 +244,15 @@ template <typename TCoordRep, unsigned int NPointDimension>
   typename itk::Point<TCoordRep, NPointDimension>::VectorType diff = point1-point2;
   for (unsigned int i=0; i<NPointDimension; i++)
   {
-    if (diff[i]>eps || diff[i]<-eps)
+    if (DifferenceBiggerEps(diff[i], eps))
     {
       isEqual = false;
       break;
     }
   }
 
-  if(verbose && !isEqual)
-  {
-    MITK_INFO << "Points not equal. Lefthandside " << std::setprecision(12) << point1 << " - Righthandside " << point2 << " - epsilon " << eps;
-  }
+  ConditionalOutputOfDifference(point1, point2, eps, verbose, isEqual);
+
   return isEqual;
 }
 
@@ -243,17 +271,15 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
   mitk::VnlVector diff = vector1-vector2;
   for (unsigned int i=0; i<diff.size(); i++)
   {
-    if (diff[i]>eps || diff[i]<-eps)
+    if (DifferenceBiggerEps(diff[i], eps))
     {
       isEqual = false;
       break;
     }
   }
 
-  if(verbose && !isEqual)
-  {
-    MITK_INFO << "Vectors not equal. Lefthandside " << std::setprecision(12) << vector1 << " - Righthandside " << vector2 << " - epsilon " << eps;
-  }
+  ConditionalOutputOfDifference(vector1, vector2, eps, verbose, isEqual);
+
   return isEqual;
 }
 
@@ -268,11 +294,10 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
  */
 inline bool Equal(ScalarType scalar1, ScalarType scalar2, ScalarType eps=mitk::eps, bool verbose=false)
 {
-  bool isEqual( fabs(scalar1-scalar2) < eps );
-  if(verbose && !isEqual)
-  {
-    MITK_INFO << "Scalars not equal. Lefthandside " << std::setprecision(12) << scalar1 << " - Righthandside " << scalar2 << " - epsilon " << eps;
-  }
+  bool isEqual( !DifferenceBiggerEps(scalar1-scalar2, eps));
+
+  ConditionalOutputOfDifference(scalar1, scalar2, eps, verbose, isEqual);
+
   return isEqual;
 }
 
@@ -292,17 +317,15 @@ template <typename TCoordRep, unsigned int NPointDimension>
   bool isEqual = true;
   for( unsigned int i=0; i<diff.size(); i++)
   {
-    if(diff[i]>eps || diff[i]<-eps)
+    if (DifferenceBiggerEps(diff[i], eps))
     {
       isEqual = false;
       break;
     }
   }
 
-  if(verbose && !isEqual)
-  {
-    MITK_INFO << "Vectors not equal. Lefthandside " << std::setprecision(12) << vector1 << " - Righthandside " << vector2 << " - epsilon " << eps;
-  }
+  ConditionalOutputOfDifference(vector1, vector2, eps, verbose, isEqual);
+
   return isEqual;
 }
 
@@ -320,10 +343,7 @@ template <typename TArrayType1, typename TArrayType2>
     isEqual = isEqual && Equal(arrayType1[var], arrayType2[var], eps);
   }
 
-  if(verbose && !isEqual)
-  {
-    MITK_INFO << "Array not equal. Lefthandside " << std::setprecision(12) << arrayType1 << " - Righthandside " << arrayType2 << " - epsilon " << eps;
-  }
+  ConditionalOutputOfDifference(arrayType1, arrayType2, eps, verbose, isEqual);
 
   return isEqual;
 }

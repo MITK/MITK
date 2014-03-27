@@ -35,7 +35,6 @@ int mitkSurfaceDepthPeelingTest(int argc, char* argv[])
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv , mitk::BaseRenderer::RenderingMode::DepthPeeling);
 
   renderingHelper.SetMapperIDToRender3D();
-  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
   mitk::DataNode* dataNode = renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Surface"));
 

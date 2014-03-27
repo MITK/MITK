@@ -34,18 +34,21 @@ int mitkSurfaceDepthPeelingTest(int argc, char* argv[])
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv , mitk::BaseRenderer::RenderingMode::DepthPeeling);
 
-  renderingHelper.SetMapperIDToRender3D();
-
-  mitk::DataNode* dataNode = renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Surface"));
-
-  if(dataNode)
+  if( renderingHelper.IsAdvancedOpenGL() )
   {
-    dataNode->SetOpacity(0.8);
-    dataNode->Update();
-  }
+    renderingHelper.SetMapperIDToRender3D();
 
-  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+    mitk::DataNode* dataNode = renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Surface"));
+
+    if(dataNode)
+    {
+      dataNode->SetOpacity(0.8);
+      dataNode->Update();
+    }
+
+    //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+    MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+  }
 
   MITK_TEST_END();
 }

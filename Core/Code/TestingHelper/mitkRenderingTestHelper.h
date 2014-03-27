@@ -136,6 +136,9 @@ public:
    */
   bool CompareRenderWindowAgainstReference(int argc, char *argv[], double threshold = 10.0);
 
+  /** @brief Returns true if the opengl context is compatible for advanced vtk effects **/
+  bool IsAdvancedOpenGL();
+
 protected:
   /**
      * @brief Initialize Internal method to initialize the renderwindow and set the datastorage.

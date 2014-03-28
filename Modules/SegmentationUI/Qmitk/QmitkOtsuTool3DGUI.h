@@ -61,6 +61,10 @@ class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     void OnVolumePreviewChecked(int);
 
+  private slots:
+
+    void OnAdvancedSettingsButtonToggled(bool toggled);
+
   protected:
 
     QmitkOtsuTool3DGUI();

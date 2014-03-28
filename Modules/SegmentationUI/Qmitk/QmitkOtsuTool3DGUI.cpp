@@ -37,6 +37,9 @@ m_NumberOfRegions(0)
           this, SLOT(OnItemSelectionChanged()));
   connect( m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+  connect(m_Controls.advancedSettingsButton, SIGNAL(toggled(bool)), this, SLOT(OnAdvancedSettingsButtonToggled(bool)));
+
+  this->OnAdvancedSettingsButtonToggled(false);
 }
 
 QmitkOtsuTool3DGUI::~QmitkOtsuTool3DGUI()
@@ -63,7 +66,15 @@ void QmitkOtsuTool3DGUI::OnItemSelectionChanged()
     for (it = m_SelectedItems.begin(); it != m_SelectedItems.end(); ++it)
       regionIDs.push_back((*it)->text().toInt());
     m_OtsuTool3DTool->UpdateBinaryPreview(regionIDs);
+    m_Controls.m_ConfSegButton->setEnabled( true );
   }
+}
+
+void QmitkOtsuTool3DGUI::OnAdvancedSettingsButtonToggled(bool toggled)
+{
+  m_Controls.m_ValleyCheckbox->setVisible(toggled);
+  m_Controls.binLabel->setVisible(toggled);
+  m_Controls.m_BinsSpinBox->setVisible(toggled);
 }
 
 void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)

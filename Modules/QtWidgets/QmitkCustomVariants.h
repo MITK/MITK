@@ -20,7 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDataNode.h>
 
-Q_DECLARE_METATYPE(mitk::DataNode::Pointer)
+typedef mitk::DataNode::Pointer mitkDataNodePtr;
+
+Q_DECLARE_METATYPE(mitkDataNodePtr)
 Q_DECLARE_METATYPE(mitk::DataNode*)
 
 #endif /* QMITKCUSTOMVARIANTS_H_ */

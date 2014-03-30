@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkCustomVariants.h"
 #include "mitkDataNode.h"
 
+
 /**
  * \class QmitkDataStorageComboBoxWithSelectNone
  * \brief Displays all or a subset (defined by a predicate) of nodes of the Data Storage,
@@ -32,10 +33,9 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
 {
-  typedef mitk::DataNode::Pointer DataNodePtr;
 
   Q_OBJECT
-  Q_PROPERTY(DataNodePtr SelectedNode READ GetSelectedNode WRITE SetSelectedNode)
+  Q_PROPERTY(mitkDataNodePtr SelectedNode READ GetSelectedNode WRITE SetSelectedNode)
   Q_PROPERTY(QString currentValue READ currentValue WRITE setCurrentValue)
 
   public:

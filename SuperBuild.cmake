@@ -106,8 +106,8 @@ set(MITK_USE_VTK 1)
 # Semi-hard dependencies, enabled by user-controlled variables
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 if(MITK_USE_QT)
-  set(MITK_USE_Qwt 1)
   if(MITK_USE_Qt4)
+    set(MITK_USE_Qwt 1)
     set(MITK_USE_Qxt 1) #TODO: Check how Qxt builds with Qt 5
   endif()
 endif()

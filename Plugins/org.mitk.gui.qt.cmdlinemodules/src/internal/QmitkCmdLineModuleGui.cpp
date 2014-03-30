@@ -49,6 +49,7 @@ QmitkCmdLineModuleGui::QmitkCmdLineModuleGui(const mitk::DataStorage* dataStorag
 , d(new QmitkCmdLineModuleGuiPrivate(dataStorage))
 {
   qRegisterMetaType<mitk::DataNode::Pointer>();
+  qRegisterMetaType<mitkDataNodePtr>();
 }
 
 

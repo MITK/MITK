@@ -2583,7 +2583,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>b-Value:</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;b-Value&lt;span style=&quot; font-style:italic;&quot;&gt; [s/mm&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:super;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;]&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -2593,7 +2593,7 @@
              <item row="1" column="1">
               <widget class="QSpinBox" name="m_BvalueBox">
                <property name="toolTip">
-                <string>b-value in mm/s²</string>
+                <string>b-value in s/mm²</string>
                </property>
                <property name="minimum">
                 <number>0</number>

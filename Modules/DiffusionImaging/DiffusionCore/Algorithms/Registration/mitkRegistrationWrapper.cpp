@@ -19,13 +19,7 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
 
     ItkImageType::Pointer itkImage = ItkImageType::New();
 
-
-    MITK_ERROR << "imgCopy  0 " <<  "/" << img->GetReferenceCount();
-    MITK_ERROR << "pixel type  " << img->GetPixelType().GetComponentTypeAsString();
-
     CastToItkImage(img, itkImage);
-
-
 
     typedef itk::Euler3DTransform< double > RigidTransformType;
     RigidTransformType::Pointer rtransform = RigidTransformType::New();

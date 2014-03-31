@@ -73,6 +73,12 @@ public:
   /brief Get status of zero value voxel ignoring. */
   bool GetIgnoreZeroValueVoxel();
   /*!
+  /brief Set bin size for histogram resolution.*/
+  void SetHistogramBinSize( unsigned int size);
+  /*!
+  /brief Get bin size for histogram resolution.*/
+  unsigned int GetHistogramBinSize();
+  /*!
   /brief Returns the histogram of the currently selected time step. */
   HistogramType::Pointer GetTimeStepHistogram();
   /*!
@@ -96,6 +102,7 @@ private:
   mitk::ImageStatisticsCalculator::Statistics m_StatisticsStruct; ///< member variable holds the result struct.
   int m_TimeStep;                                                 ///< member variable holds the time step for statistics calculation
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
+  unsigned int m_HistogramBinSize;                                ///< member variable holds the bin size for histogram resolution.
   bool m_StatisticChanged;                                        ///< flag set if statistics have changed
   bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful
   HistogramType::Pointer m_TimeStepHistogram;                     ///< member holds the histogram of the current time step.

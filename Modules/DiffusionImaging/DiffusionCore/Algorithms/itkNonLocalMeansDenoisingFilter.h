@@ -82,7 +82,7 @@ namespace itk{
 
 
     void SetInputImage(const InputImageType* image);
-    void SetInputMask(const MaskImageType* mask);
+    void SetInputMask(MaskImageType* mask);
 
   protected:
     NonLocalMeansDenoisingFilter();
@@ -98,12 +98,11 @@ namespace itk{
 
     int m_SearchRadius;
     int m_ComparisonRadius;
-//    int m_ChannelRadius;
-//    VariableLengthVector< double > m_Deviations;
     bool m_UseJointInformation;
     bool m_UseRicianAdaption;
     unsigned int m_CurrentVoxelCount;
     double m_Variance;
+    typename MaskImageType::Pointer m_Mask;
   };
 }
 

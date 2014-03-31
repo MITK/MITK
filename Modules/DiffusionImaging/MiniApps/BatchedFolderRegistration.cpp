@@ -110,6 +110,7 @@ static FileListType CreateDerivedFileList(std::string baseFN, std::string baseSu
 static void SaveImage(std::string fileName, mitk::Image* image, std::string fileType )
 {
   MITK_INFO << "----Save to " << fileName;
+
   if (fileType == "dwi") // IOUtil does not handle dwi files properly Bug 15772
   {
     mitk::NrrdDiffusionImageWriter< short >::Pointer dwiwriter = mitk::NrrdDiffusionImageWriter< short >::New();
@@ -296,6 +297,8 @@ int BatchedFolderRegistration( int argc, char* argv[] )
 
       savePathAndFileName = GetSavePath(outputPath, fileMorphName);
       std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
+      if (fileType == ".dwi")
+        fileType = "dwi";
       SaveImage(savePathAndFileName,movingImage,fileType );
     }
 

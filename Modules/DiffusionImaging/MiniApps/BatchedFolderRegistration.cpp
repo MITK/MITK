@@ -286,20 +286,14 @@ int BatchedFolderRegistration( int argc, char* argv[] )
     {
       mitk::Image::Pointer movingImage = mitk::IOUtil::LoadImage(fileMorphName);
 
-      MITK_ERROR << "REF COUNT MOVING 0 " << movingImage->GetReferenceCount();
       if (movingImage.IsNull())
         MITK_ERROR << "Loaded moving image is NULL";
 
       // Store transformation,  apply it to morph file
       MITK_INFO << "----------Registering moving image to reference----------";
-
-
-      MITK_ERROR << "REF COUNT MOVING 1 " << movingImage->GetReferenceCount();
-      //mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, referenceMask);
-      MITK_ERROR << "REF COUNT MOVING 2 " << movingImage->GetReferenceCount();
-
+      mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, referenceMask);
       mitk::RegistrationWrapper::ApplyTransformationToImage(movingImage, transf,offset, NULL); // , resampleImage
-      MITK_ERROR << "REF COUNT MOVING 3 " << movingImage->GetReferenceCount();
+
       savePathAndFileName = GetSavePath(outputPath, fileMorphName);
       std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
       SaveImage(savePathAndFileName,movingImage,fileType );

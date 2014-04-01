@@ -88,16 +88,16 @@ template <class T, unsigned int NVectorDimension>
 }
 
 /**
- * Helper method to check if the difference is bigger than a given epsilon
+ * Helper method to check if the difference is bigger or eqaual to a given epsilon
  *
  * @param diff the difference to be checked against the epsilon
  * @param the epsilon. The absolute difference needs to be smaller than this.
- * @return true if abs(diff) > eps
+ * @return true if abs(diff) >= eps
  */
 template <typename DifferenceType>
-static inline bool DifferenceBiggerEps(DifferenceType diff, mitk::ScalarType epsilon = mitk::eps)
+static inline bool DifferenceBiggerOrEqualEps(DifferenceType diff, mitk::ScalarType epsilon = mitk::eps)
 {
-  return fabs(diff) > epsilon;
+  return fabs(diff) >= epsilon;
 }
 
 /**
@@ -174,7 +174,7 @@ inline bool MatrixEqualElementWise(const vnl_matrix_fixed<TCoordRep,NRows,NCols>
       for( unsigned int c=0; c<NCols; c++ )
       {
         TCoordRep difference =  matrix1(r,c)-matrix2(r,c);
-        if (DifferenceBiggerEps(difference, epsilon))
+        if (DifferenceBiggerOrEqualEps(difference, epsilon))
         {
           return false;
         }
@@ -216,7 +216,7 @@ inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const 
   typename itk::Vector<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
   for (unsigned int i=0; i<NPointDimension; i++)
   {
-    if (DifferenceBiggerEps(diff[i], eps))
+    if (DifferenceBiggerOrEqualEps(diff[i], eps))
     {
       isEqual = false;
       break;
@@ -244,7 +244,7 @@ template <typename TCoordRep, unsigned int NPointDimension>
   typename itk::Point<TCoordRep, NPointDimension>::VectorType diff = point1-point2;
   for (unsigned int i=0; i<NPointDimension; i++)
   {
-    if (DifferenceBiggerEps(diff[i], eps))
+    if (DifferenceBiggerOrEqualEps(diff[i], eps))
     {
       isEqual = false;
       break;
@@ -271,7 +271,7 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
   mitk::VnlVector diff = vector1-vector2;
   for (unsigned int i=0; i<diff.size(); i++)
   {
-    if (DifferenceBiggerEps(diff[i], eps))
+    if (DifferenceBiggerOrEqualEps(diff[i], eps))
     {
       isEqual = false;
       break;
@@ -294,7 +294,7 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
  */
 inline bool Equal(ScalarType scalar1, ScalarType scalar2, ScalarType eps=mitk::eps, bool verbose=false)
 {
-  bool isEqual( !DifferenceBiggerEps(scalar1-scalar2, eps));
+  bool isEqual( !DifferenceBiggerOrEqualEps(scalar1-scalar2, eps));
 
   ConditionalOutputOfDifference(scalar1, scalar2, eps, verbose, isEqual);
 
@@ -317,7 +317,7 @@ template <typename TCoordRep, unsigned int NPointDimension>
   bool isEqual = true;
   for( unsigned int i=0; i<diff.size(); i++)
   {
-    if (DifferenceBiggerEps(diff[i], eps))
+    if (DifferenceBiggerOrEqualEps(diff[i], eps))
     {
       isEqual = false;
       break;

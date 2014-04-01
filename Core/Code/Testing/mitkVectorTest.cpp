@@ -131,7 +131,7 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
   vnlMatrix3x3_2(2,2) = 1.0000009;
 
   mitk::ScalarType epsilon = 0.000001;
-  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_1,0.0),"Test for matrix equality with given epsilon=0.0 and exactly the same matrix elements");
+  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_1,mitk::eps),"Test for matrix equality with given epsilon=mitk::eps and exactly the same matrix elements");
   MITK_TEST_CONDITION(!mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_2,0.0),"Test for matrix equality with given epsilon=0.0 and slightly different matrix elements");
   MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_2,epsilon),"Test for matrix equality with given epsilon and slightly different matrix elements");
   MITK_TEST_CONDITION(!mitk::MatrixEqualRMS(vnlMatrix3x3_1,vnlMatrix3x3_2,0.0),"Test for matrix equality with given epsilon=0.0 and slightly different matrix elements");

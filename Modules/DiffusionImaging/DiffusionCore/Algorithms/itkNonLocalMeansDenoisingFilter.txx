@@ -133,15 +133,8 @@ NonLocalMeansDenoisingFilter< TPixelType >
   // iterate over complete image region
   while( !git.IsAtEnd() )
   {
-
-
     typename OutputImageType::PixelType outpix;
     outpix.SetSize (inputImagePointer->GetVectorLength());
-
-    typename InputIteratorType::IndexType idx;
-    idx.SetElement(0, 53);
-    idx.SetElement(1, 30);
-    idx.SetElement(2, 27);
 
     if (mit.Get() != 0)
     {
@@ -348,8 +341,6 @@ NonLocalMeansDenoisingFilter< TPixelType >
     {
       outpix.Fill(0);
     }
-
-
 
     oit.Set(outpix);
     ++oit;

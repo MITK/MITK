@@ -62,7 +62,7 @@ public:
    * @param offset - stores offset that has been applied to match origin of both images
    * @param mask - optional, provide a mask that is excluded from registration metric
    */
-  static void GetTransformation(mitk::Image* fixedImage , mitk::Image* movingImage, RidgidTransformType transformation, double* offset, mitk::Image* mask = NULL);
+  static void GetTransformation(Image::Pointer fixedImage , Image::Pointer movingImage, RidgidTransformType transformation, double* offset, mitk::Image* mask = NULL);
 };
 
 }

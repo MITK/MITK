@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL pair
 #include <utility>
 
+// comperator to sort correspondences
 struct myComperator
 {
   typedef std::pair < unsigned int, double > Correspondence;
@@ -101,7 +102,9 @@ void mitk::AnisotropicIterativeClosestPointRegistration::ComputeCorrespondences 
       const vtkIdType id = ids->GetId(j);
       // compute weightmatrix
       WeightMatrix m =
-          mitk::AnisotropicRegistrationCommon::CalculateWeightMatrix(sigma_X[i],sigma_Y[id]);
+          mitk::AnisotropicRegistrationCommon::CalculateWeightMatrix( sigma_X[i],
+                                                                      sigma_Y[id]
+                                                                    );
       // point of the Y dataset
 
       Y->GetDataSet()->GetPoint(id,p);

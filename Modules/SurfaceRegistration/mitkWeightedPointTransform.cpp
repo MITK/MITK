@@ -229,7 +229,7 @@ void mitk::WeightedPointTransform::E_maker( vtkPoints* X,
   }
 }
 
-bool mitk::WeightedPointTransform::WeightedPointRegister (
+void mitk::WeightedPointTransform::WeightedPointRegister(
     vtkPoints *X,
     vtkPoints *Y,
     const CovarianceMatrixList &Sigma_X,
@@ -403,7 +403,6 @@ bool mitk::WeightedPointTransform::WeightedPointRegister (
 
   X_transformed->Delete();
   X_transformedNew->Delete();
-  return true;
 }
 
 void mitk::WeightedPointTransform::SetMovingPointSet(vtkSmartPointer<vtkPoints> p)
@@ -411,7 +410,7 @@ void mitk::WeightedPointTransform::SetMovingPointSet(vtkSmartPointer<vtkPoints> 
   m_MovingPointSet = p;
 }
 
-void mitk::WeightedPointTransform::SetCovarianceMatricesMoving(const mitk::WeightedPointTransform::CovarianceMatrixList &matrices)
+void mitk::WeightedPointTransform::SetCovarianceMatricesMoving(const CovarianceMatrixList &matrices)
 {
   m_CovarianceMatricesMoving = matrices;
 }
@@ -421,12 +420,14 @@ void mitk::WeightedPointTransform::SetFixedPointSet(vtkSmartPointer<vtkPoints> p
   m_FixedPointSet = p;
 }
 
-void mitk::WeightedPointTransform::SetCovarianceMatricesFixed(const mitk::WeightedPointTransform::CovarianceMatrixList &matrices)
+void mitk::WeightedPointTransform::SetCovarianceMatricesFixed(const CovarianceMatrixList &matrices)
 {
   m_CovarianceMatricesFixed = matrices;
 }
 
-double mitk::WeightedPointTransform::CalculateConfigChange(vtkPoints* X, vtkPoints* X_new)
+double mitk::WeightedPointTransform::CalculateConfigChange( vtkPoints* X,
+                                                            vtkPoints* X_new
+                                                          )
 {
   double sum[3] = { 0.0,0.0,0.0 };
   double mean[3] = { 0.0,0.0,0.0 };

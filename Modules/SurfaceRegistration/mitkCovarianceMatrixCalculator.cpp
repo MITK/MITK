@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPlane.h>
 #include <mitkExceptionMacro.h>
 
+// forward declarations of private functions
 static vtkIdList* GetNeighboursOfPoint( unsigned int index, vtkPolyData* polydata);
 
 static vtkIdList* CalculatePCAonPointNeighboursForNormalVector ( int index,
@@ -164,6 +165,8 @@ void mitk::CovarianceMatrixCalculator::ComputeCovarianceMatrices()
   d->m_Input = NULL;
 }
 
+// Get a list with the id's of all surrounding conected vertices
+// to the current vertex at the given index in the polydata
 vtkIdList* GetNeighboursOfPoint( unsigned int index, vtkPolyData* polydata)
 {
   vtkIdList* cellIds = vtkIdList::New();
@@ -186,6 +189,8 @@ vtkIdList* GetNeighboursOfPoint( unsigned int index, vtkPolyData* polydata)
   return result;
 }
 
+// Computes a primary component analysis of the surounding vertices
+// of the verex at the current index.
 vtkIdList* CalculatePCAonPointNeighboursForNormalVector( int index,
                                                          double normal[3],
                                                          itk::Matrix<double,3,3> & mat,
@@ -268,6 +273,7 @@ vtkIdList* CalculatePCAonPointNeighboursForNormalVector( int index,
   return neighbourPoints;
 }
 
+// Computes an orthonormal system for a vertex with it's surrounding neighbours.
 void mitk::CovarianceMatrixCalculator::ComputeOrthonormalCoordinateSystem( const int index,
                                                                            Vertex normal,
                                                                            CovarianceMatrix& axes,
@@ -337,6 +343,8 @@ void mitk::CovarianceMatrixCalculator::ComputeOrthonormalCoordinateSystem( const
   neighbourPoints->Delete();
 }
 
+// Sorts the axes of the computed orthonormal system based on
+// the eigenvalues in a descending order
 itk::Matrix<double,3,3> ComputeCovarianceMatrix( itk::Matrix < double,3,3 > & axes,
                                                  double sigma[3],
                                                  double normalizationValue
@@ -385,7 +393,6 @@ itk::Matrix<double,3,3> ComputeCovarianceMatrix( itk::Matrix < double,3,3 > & ax
       idxMin = 0;
     }
   }
-
 
   V[0][0] = axes[idxMax][0];     V[1][0] = axes[idxMax][1];     V[2][0] = axes[idxMax][2];
   V[0][1] = axes[idxBetween][0]; V[1][1] = axes[idxBetween][1]; V[2][1] = axes[idxBetween][2];

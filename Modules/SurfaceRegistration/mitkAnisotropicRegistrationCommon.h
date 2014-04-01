@@ -121,6 +121,13 @@ static void PropagateMatrices( const MatrixList &src,
  * Method that is used for testing and evaluation. It computes the target
  * registration error (TRE) between two point sets with a rotation matrix and
  * a translation vector.
+ *
+ * @param movingTargets The target points of the moving point set.
+ * @param fixedTargets The target points of the fixed point set.
+ * @param rotation A 3x3 rotation matrix.
+ * @param translation A 3x1 translation vector.
+ *
+ * @return The Target Registration Error (TRE).
  */
 static double ComputeTargetRegistrationError( const mitk::PointSet* movingTargets,
                                               const mitk::PointSet* fixedTargets,

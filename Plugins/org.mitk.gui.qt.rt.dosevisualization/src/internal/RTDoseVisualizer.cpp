@@ -565,7 +565,7 @@ void RTDoseVisualizer::UpdateStdIsolines()
 
       mitk::Surface::Pointer surface = mitk::Surface::New();
       surface->SetVtkPolyData(polyData);
-      surface->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial"))->Clone());
+//      surface->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial"))->Clone());
       surface->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing());
       surface->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
 

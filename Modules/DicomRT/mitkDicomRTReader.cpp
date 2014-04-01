@@ -394,23 +394,23 @@ namespace mitk
 
     MITK_INFO << "SuperImagePixelType: " << superImage->GetPixelType().GetTypeAsString() << endl;
 
-    mitk::ImagePixelWriteAccessor<unsigned int,3> accessor(superImage);
-    unsigned int* pixelAccessData = accessor.GetData();
+//    mitk::ImagePixelWriteAccessor<unsigned int,3> accessor(superImage);
+//    unsigned int* pixelAccessData = accessor.GetData();
 
     AccessByItk_1(superImage, MultiplayGridScaling, gridscale);
 
-    int pixelNumber = 300;
+//    int pixelNumber = 300;
 
-    for(int i=0;i<pixelNumber;++i)
-    {
-      *pixelAccessData *= gridscale;
-      pixelAccessData++;
-    }
+//    for(int i=0;i<pixelNumber;++i)
+//    {
+//      *pixelAccessData *= gridscale;
+//      pixelAccessData++;
+//    }
 
     //HELP CAST UND DEPRECATED
-    float* pixel = reinterpret_cast<float*>(image->GetData());
+//    float* pixel = reinterpret_cast<float*>(image->GetData());
 //    float* pixel = (float*)image->GetData();
-    int size = dim[0]*dim[1]*dim[2];
+//    int size = dim[0]*dim[1]*dim[2];
 
 //    for(int i=0; i<size; ++i, ++pixel)
 //    {
@@ -429,7 +429,7 @@ namespace mitk
     superNode->SetFloatProperty(mitk::rt::Constants::
                            REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
     superNode->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),true);
-    node->SetData(image);
+    node->SetData(superImage);
 
     return superNode;
   }
@@ -442,6 +442,7 @@ namespace mitk
     for(it=it.Begin(); !it.IsAtEnd(); ++it)
     {
       it.Set(it.Get()*gridscale);
+//      it.Set(50.0);
     }
   }
 

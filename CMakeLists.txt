@@ -476,7 +476,7 @@ if(MITK_USE_BLUEBERRY AND APPLE)
     list(GET target_info_list 0 app_name)
     # check if the application is enabled
     if(${option_name} OR MITK_BUILD_ALL_APPS)
-      set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ${app_name})
+      set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} Mitk${app_name})
     endif()
   endforeach()
 

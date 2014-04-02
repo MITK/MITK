@@ -571,7 +571,9 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
       this->ApplyColorTransferFunction( renderer );
       break;
     default:
-      MITK_ERROR << "No valid 'Image Rendering.Mode' set";
+      MITK_ERROR << "No valid 'Image Rendering.Mode' set. Using LOOKUPTABLE_LEVELWINDOW_COLOR instead.";
+      this->ApplyLookuptable( renderer );
+      this->ApplyLevelWindow( renderer );
       break;
     }
   }

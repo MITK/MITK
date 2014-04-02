@@ -430,7 +430,6 @@ void QmitkToFUtilView::OnChangeCoronalWindowOutput(int index)
 
 mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName, mitk::BaseData* data )
 {
-
   mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode(nodeName);
   if (node.IsNull())
   {

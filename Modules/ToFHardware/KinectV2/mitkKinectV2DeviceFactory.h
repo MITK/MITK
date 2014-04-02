@@ -84,6 +84,9 @@ namespace mitk
       device->SetBoolProperty("RGBImageHasDifferentResolution", true);
       device->SetBoolProperty("HasSurface", true);
       device->SetBoolProperty("HasTextureCoordinates", true);
+      device->SetBoolProperty("GenerateTriangularMesh", false);
+
+      device->SetFloatProperty("TriangulationThreshold", 0.0);
 
       return device.GetPointer();
     }

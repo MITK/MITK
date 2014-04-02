@@ -88,6 +88,7 @@ void QmitkToFSurfaceGenerationWidget::Initialize(mitk::ToFDistanceImageToSurface
                                                  mitk::CameraIntrinsics::Pointer intrinsics,
                                                  mitk::DataNode::Pointer surface,
                                                  vtkSmartPointer<vtkCamera> camera,
+                                                 bool generateSurface,
                                                  bool showAdvancedOptions)
 {
   m_ToFDistanceImageToSurfaceFilter = filter;
@@ -113,6 +114,7 @@ void QmitkToFSurfaceGenerationWidget::Initialize(mitk::ToFDistanceImageToSurface
   this->FindReconstructionModeProperty();
   m_Controls->m_ShowAdvancedOptionsCheckbox->setChecked(showAdvancedOptions);
   this->OnShowAdvancedOptionsCheckboxChecked(showAdvancedOptions);
+  m_Controls->m_Compute3DDataCheckbox->setChecked(generateSurface);
 }
 
 bool QmitkToFSurfaceGenerationWidget::IsActive()

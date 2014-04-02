@@ -74,9 +74,6 @@ class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
     virtual void Activated();
     virtual void Deactivated();
 
-    /// \brief Memory release from all used contours
-    virtual void ClearContours();
-
     /// \brief Initialize tool
     virtual bool OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent );
 
@@ -144,6 +141,11 @@ class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
 
     template<typename TPixel, unsigned int VImageDimension>
     void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex);
+
+  private:
+    void RemoveHelperObjects();
+    void ReleaseHelperObjects();
+    void ReleaseInteractors();
 };
 
 } // namespace

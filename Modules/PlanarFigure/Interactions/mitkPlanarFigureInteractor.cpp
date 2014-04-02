@@ -413,7 +413,7 @@ bool mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*,
 
   planarFigure->DeselectControlPoint();
 
-  mitk::Point2D pointProjectedOntoLine;
+  mitk::Point2D pointProjectedOntoLine = positionEvent->GetPointerPositionOnScreen();
 
   bool selected(false);
   bool isExtendable(false);

@@ -36,18 +36,24 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
   {
     case QmitkDataSelectionWidget::ImagePredicate:
       return mitk::NodePredicateAnd::New(
-        mitk::NodePredicateAnd::New(mitk::TNodePredicateDataType<mitk::Image>::New(),
-                               mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)))),
+        mitk::TNodePredicateDataType<mitk::Image>::New(),
+        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true))),
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
     case QmitkDataSelectionWidget::SegmentationPredicate:
       return mitk::NodePredicateAnd::New(
+        mitk::TNodePredicateDataType<mitk::Image>::New(),
         mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)),
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
     case QmitkDataSelectionWidget::SurfacePredicate:
       return mitk::NodePredicateAnd::New(
         mitk::TNodePredicateDataType<mitk::Surface>::New(),
+        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+
+    case QmitkDataSelectionWidget::ImageAndSegmentationPredicate:
+      return mitk::NodePredicateAnd::New(
+        mitk::TNodePredicateDataType<mitk::Image>::New(),
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
     default:

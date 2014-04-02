@@ -149,11 +149,10 @@ public:
   {
     bool ok = false;
 
-    ok = ( mitk::RenderingModeProperty::LEVELWINDOW_COLOR == 0 ) &&
-    (mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR == 1 ) &&
-    (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR == 2 ) &&
-    (mitk::RenderingModeProperty::LOOKUPTABLE_COLOR == 3 ) &&
-    (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR == 4 );
+    ok = ( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR == 0 ) &&
+    (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR == 1 ) &&
+    (mitk::RenderingModeProperty::LOOKUPTABLE_COLOR == 2 ) &&
+    (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR == 3 );
 
     return ok;
   }

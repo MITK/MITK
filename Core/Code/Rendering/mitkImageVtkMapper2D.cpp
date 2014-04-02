@@ -544,7 +544,7 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
   else
   {
     //all other image types can make use of the rendering mode
-    int renderingMode = mitk::RenderingModeProperty::LEVELWINDOW_COLOR;
+    int renderingMode = mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR;
     mitk::RenderingModeProperty::Pointer mode = dynamic_cast<mitk::RenderingModeProperty*>(this->GetDataNode()->GetProperty( "Image Rendering.Mode", renderer ));
     if(mode.IsNotNull())
     {
@@ -552,11 +552,6 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
     }
     switch(renderingMode)
     {
-    case mitk::RenderingModeProperty::LEVELWINDOW_COLOR:
-      MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_Color";
-      localStorage->m_LevelWindowFilter->SetLookupTable( localStorage->m_DefaultLookupTable );
-      this->ApplyLevelWindow( renderer );
-      break;
     case mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR:
       MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_LookupTable_Color";
       this->ApplyLookuptable( renderer );
@@ -691,7 +686,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
 
   // Set default grayscale look-up table
   mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-  mitkLut->SetType(mitk::LookupTable::LEGACY_RAINBOW_COLOR);
+  mitkLut->SetType(mitk::LookupTable::GRAYSCALE);
   mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
   mitkLutProp->SetLookupTable(mitkLut);
   node->SetProperty("LookupTable", mitkLutProp);

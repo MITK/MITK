@@ -44,6 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkCustomVariants.h>
 #include "QmitkCmdLineModuleGui.h"
 
+
 //-----------------------------------------------------------------------------
 QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *parent)
   : QWidget(parent)
@@ -63,7 +64,6 @@ QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *pare
   m_Layout->setSpacing(0);
   m_UI->m_ParametersGroupBox->setLayout(m_Layout);
 
-  qRegisterMetaType<mitk::DataNode::Pointer>();
   qRegisterMetaType<ctkCmdLineModuleReference>();
 
   connect(m_UI->m_RemoveButton, SIGNAL(clicked()), this, SLOT(OnRemoveButtonClicked()));
@@ -533,7 +533,7 @@ void QmitkCmdLineModuleProgressWidget::Run()
     parameterName = parameter.name();
 
     QVariant tmp = m_ModuleFrontEnd->value(parameterName, ctkCmdLineModuleFrontend::UserRole);
-    mitk::DataNode::Pointer node = tmp.value<mitk::DataNode::Pointer>();
+    mitk::DataNode::Pointer node = tmp.value<mitkDataNodePtr>();
 
     if (node.IsNotNull())
     {

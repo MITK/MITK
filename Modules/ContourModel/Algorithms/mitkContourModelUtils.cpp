@@ -148,6 +148,7 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
 
       // fill the image with foreground voxels:
       unsigned char inval = 255;
+      unsigned char outval = 0;
       vtkIdType count = whiteImage->GetNumberOfPoints();
       for (vtkIdType i = 0; i < count; ++i)
       {
@@ -157,7 +158,7 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       // polygonal data --> image stencil:
       vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
         vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-      //pol2stenc->SetTolerance(0); // important if extruder->SetVector(0, 0, 1) !!!
+      pol2stenc->SetTolerance(0);
       pol2stenc->SetInputData(surface2D);
       pol2stenc->Update();
 
@@ -166,9 +167,9 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
         vtkSmartPointer<vtkImageStencil>::New();
 
       imgstenc->SetInputData(whiteImage);
-      imgstenc->ReverseStencilOff();
       imgstenc->SetStencilConnection(pol2stenc->GetOutputPort());
-      imgstenc->SetBackgroundValue(0);
+      imgstenc->ReverseStencilOff();
+      imgstenc->SetBackgroundValue(outval);
       imgstenc->Update();
 
 

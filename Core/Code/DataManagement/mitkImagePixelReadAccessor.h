@@ -158,6 +158,9 @@ private:
 
   ImageReadAccessor m_ReadAccessor;
 
+  ImagePixelReadAccessor& operator=(const ImagePixelReadAccessor&);  // Not implemented on purpose.
+  ImagePixelReadAccessor(const ImagePixelReadAccessor&);
+
 };
 
 }

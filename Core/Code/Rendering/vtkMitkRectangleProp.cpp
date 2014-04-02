@@ -43,6 +43,7 @@ int vtkMitkRectangleProp::RenderOverlay(vtkViewport* /*viewport*/)
   //make it nicer
   glEnable(GL_LINE_SMOOTH);
   glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+  glDisable(GL_LINE_STIPPLE);
 
   //size and position
   int * i = m_RenderWindow->GetSize();

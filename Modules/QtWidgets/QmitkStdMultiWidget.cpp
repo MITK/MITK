@@ -51,7 +51,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iomanip>
 
-QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager)
+QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode)
 : QWidget(parent, f),
 mitkWidget1(NULL),
 mitkWidget2(NULL),
@@ -144,7 +144,6 @@ m_CrosshairNavigationEnabled(false)
   mitkWidget3Container->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
   mitkWidget4Container->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-
   //insert Widget Container into the splitters
   m_SubSplit1->addWidget( mitkWidget1Container );
   m_SubSplit1->addWidget( mitkWidget2Container );
@@ -155,26 +154,26 @@ m_CrosshairNavigationEnabled(false)
   //  m_RenderingManager->SetGlobalInteraction( mitk::GlobalInteraction::GetInstance() );
 
   //Create RenderWindows 1
-  mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, "stdmulti.widget1", NULL, m_RenderingManager);
+  mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, "stdmulti.widget1", NULL, m_RenderingManager,renderingMode);
   mitkWidget1->setMaximumSize(2000,2000);
   mitkWidget1->SetLayoutIndex( AXIAL );
   mitkWidgetLayout1->addWidget(mitkWidget1);
 
   //Create RenderWindows 2
-  mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, "stdmulti.widget2", NULL, m_RenderingManager);
+  mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, "stdmulti.widget2", NULL, m_RenderingManager,renderingMode);
   mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( TRUE );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
   mitkWidgetLayout2->addWidget(mitkWidget2);
 
   //Create RenderWindows 3
-  mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, "stdmulti.widget3", NULL, m_RenderingManager);
+  mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, "stdmulti.widget3", NULL, m_RenderingManager,renderingMode);
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget3->SetLayoutIndex( CORONAL );
   mitkWidgetLayout3->addWidget(mitkWidget3);
 
   //Create RenderWindows 4
-  mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, "stdmulti.widget4", NULL, m_RenderingManager);
+  mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, "stdmulti.widget4", NULL, m_RenderingManager,renderingMode);
   mitkWidget4->setMaximumSize(2000,2000);
   mitkWidget4->SetLayoutIndex( THREE_D );
   mitkWidgetLayout4->addWidget(mitkWidget4);
@@ -334,7 +333,6 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[2].ren,true);
 
   /*************************************************/
-
 
   // create a slice rotator
   // m_SlicesRotator = mitk::SlicesRotator::New();
@@ -1003,7 +1001,6 @@ void QmitkStdMultiWidget::changeLayoutToRowWidgetSmall3andBig4()
   m_Layout = LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4;
 }
 
-
 void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
 {
   SMW_INFO << "changing layout to Widget3 and 4 in a Row..." << std::endl;
@@ -1068,7 +1065,6 @@ void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
   this->UpdateAllWidgets();
 }
 
-
 void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
 {
   SMW_INFO << "changing layout to 2 x 2D and 3D Widget" << std::endl;
@@ -1129,7 +1125,6 @@ void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
   this->UpdateAllWidgets();
 }
 
-
 void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
 {
   SMW_INFO << "changing layout to 2D and 3D left, 2D right Widget" << std::endl;
@@ -1156,7 +1151,6 @@ void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
   //create m_SubSplit1 and m_SubSplit2
   m_SubSplit1 = new QSplitter( Qt::Vertical, m_LayoutSplit );
   m_SubSplit2 = new QSplitter( m_LayoutSplit );
-
 
   //add Widgets to splitter
   m_SubSplit1->addWidget( mitkWidget1Container );
@@ -1261,8 +1255,6 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
   this->UpdateAllWidgets();
 }
 
-
-
 void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* ds )
 {
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetDataStorage(ds);
@@ -1271,7 +1263,6 @@ void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* ds )
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetDataStorage(ds);
   m_DataStorage = ds;
 }
-
 
 void QmitkStdMultiWidget::Fit()
 {
@@ -1303,7 +1294,6 @@ void QmitkStdMultiWidget::Fit()
   vtkObject::SetGlobalWarningDisplay(w);
 }
 
-
 void QmitkStdMultiWidget::InitPositionTracking()
 {
   //PoinSetNode for MouseOrientation
@@ -1317,7 +1307,6 @@ void QmitkStdMultiWidget::InitPositionTracking()
   m_PositionTrackerNode->SetProperty("BaseRendererMapperID", mitk::IntProperty::New(0) );//point position 2D mouse
   m_PositionTrackerNode->SetProperty("baserenderer", mitk::StringProperty::New("N/A"));
 }
-
 
 void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
 {
@@ -1362,12 +1351,10 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   m_Node->SetProperty("helper object", mitk::BoolProperty::New(true));
 }
 
-
 mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()
 {
   return m_TimeNavigationController;
 }
-
 
 void QmitkStdMultiWidget::EnableStandardLevelWindow()
 {
@@ -1376,13 +1363,11 @@ void QmitkStdMultiWidget::EnableStandardLevelWindow()
   levelWindowWidget->show();
 }
 
-
 void QmitkStdMultiWidget::DisableStandardLevelWindow()
 {
   levelWindowWidget->disconnect(this);
   levelWindowWidget->hide();
 }
-
 
 // CAUTION: Legacy code for enabling Qt-signal-controlled view initialization.
 // Use RenderingManager::InitializeViews() instead.
@@ -1390,7 +1375,6 @@ bool QmitkStdMultiWidget::InitializeStandardViews( const mitk::Geometry3D * geom
 {
   return m_RenderingManager->InitializeViews( geometry );
 }
-
 
 void QmitkStdMultiWidget::RequestUpdate()
 {
@@ -1400,7 +1384,6 @@ void QmitkStdMultiWidget::RequestUpdate()
   m_RenderingManager->RequestUpdate(mitkWidget4->GetRenderWindow());
 }
 
-
 void QmitkStdMultiWidget::ForceImmediateUpdate()
 {
   m_RenderingManager->ForceImmediateUpdate(mitkWidget1->GetRenderWindow());
@@ -1408,7 +1391,6 @@ void QmitkStdMultiWidget::ForceImmediateUpdate()
   m_RenderingManager->ForceImmediateUpdate(mitkWidget3->GetRenderWindow());
   m_RenderingManager->ForceImmediateUpdate(mitkWidget4->GetRenderWindow());
 }
-
 
 void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
 {
@@ -1443,30 +1425,25 @@ QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow1() const
   return mitkWidget1;
 }
 
-
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow2() const
 {
   return mitkWidget2;
 }
-
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow3() const
 {
   return mitkWidget3;
 }
 
-
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow4() const
 {
   return mitkWidget4;
 }
 
-
 const mitk::Point3D& QmitkStdMultiWidget::GetLastLeftClickPosition() const
 {
   return m_LastLeftClickPositionSupplier->GetCurrentPoint();
 }
-
 
 const mitk::Point3D QmitkStdMultiWidget::GetCrossPosition() const
 {
@@ -1491,7 +1468,6 @@ const mitk::Point3D QmitkStdMultiWidget::GetCrossPosition() const
   return m_LastLeftClickPositionSupplier->GetCurrentPoint();
 }
 
-
 void QmitkStdMultiWidget::EnablePositionTracking()
 {
   if (!m_PositionTracker)
@@ -1507,7 +1483,6 @@ void QmitkStdMultiWidget::EnablePositionTracking()
   }
 }
 
-
 void QmitkStdMultiWidget::DisablePositionTracking()
 {
   mitk::GlobalInteraction* globalInteraction =
@@ -1520,7 +1495,6 @@ void QmitkStdMultiWidget::DisablePositionTracking()
     globalInteraction->RemoveListener(m_PositionTracker);
   }
 }
-
 
 void QmitkStdMultiWidget::EnsureDisplayContainsPoint(
   mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p)
@@ -1547,7 +1521,6 @@ void QmitkStdMultiWidget::EnsureDisplayContainsPoint(
     displayGeometry->MoveBy( offset );
   }
 }
-
 
 void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
 {
@@ -1779,7 +1752,6 @@ void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
   m_CrosshairNavigationEnabled = false;
 }
 
-
 int QmitkStdMultiWidget::GetLayout() const
 {
   return m_Layout;
@@ -1801,7 +1773,6 @@ void QmitkStdMultiWidget::EnableGradientBackground()
   m_GradientBackgroundFlag = true;
 }
 
-
 void QmitkStdMultiWidget::DisableGradientBackground()
 {
   //m_GradientBackground1->Disable();
@@ -1811,12 +1782,10 @@ void QmitkStdMultiWidget::DisableGradientBackground()
   m_GradientBackgroundFlag = false;
 }
 
-
 void QmitkStdMultiWidget::EnableDepartmentLogo()
 {
   m_LogoRendering4->Enable();
 }
-
 
 void QmitkStdMultiWidget::DisableDepartmentLogo()
 {
@@ -1833,18 +1802,15 @@ bool QmitkStdMultiWidget::IsCrosshairNavigationEnabled() const
   return m_CrosshairNavigationEnabled;
 }
 
-
 mitk::SlicesRotator * QmitkStdMultiWidget::GetSlicesRotator() const
 {
   return m_SlicesRotator;
 }
 
-
 mitk::SlicesSwiveller * QmitkStdMultiWidget::GetSlicesSwiveller() const
 {
   return m_SlicesSwiveller;
 }
-
 
 void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool visible, mitk::BaseRenderer *renderer)
 {
@@ -1856,7 +1822,6 @@ void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool 
   }
 }
 
-
 void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible, mitk::BaseRenderer *renderer)
 {
   SetWidgetPlaneVisibility("widget1Plane", visible, renderer);
@@ -1864,7 +1829,6 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible, mitk::BaseRend
   SetWidgetPlaneVisibility("widget3Plane", visible, renderer);
   m_RenderingManager->RequestUpdateAll();
 }
-
 
 void QmitkStdMultiWidget::SetWidgetPlanesLocked(bool locked)
 {
@@ -1874,7 +1838,6 @@ void QmitkStdMultiWidget::SetWidgetPlanesLocked(bool locked)
   GetRenderWindow3()->GetSliceNavigationController()->SetSliceLocked(locked);
 }
 
-
 void QmitkStdMultiWidget::SetWidgetPlanesRotationLocked(bool locked)
 {
   //do your job and lock or unlock slices.
@@ -1883,14 +1846,12 @@ void QmitkStdMultiWidget::SetWidgetPlanesRotationLocked(bool locked)
   GetRenderWindow3()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
 }
 
-
 void QmitkStdMultiWidget::SetWidgetPlanesRotationLinked( bool link )
 {
   m_SlicesRotator->SetLinkPlanes( link );
   m_SlicesSwiveller->SetLinkPlanes( link );
   emit WidgetPlanesRotationLinked( link );
 }
-
 
 void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
 {
@@ -2011,7 +1972,6 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
   emit WidgetPlaneModeChange(m_PlaneMode);
 }
 
-
 void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper, const mitk::Color & lower )
 {
   m_GradientBackground1->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
@@ -2021,7 +1981,6 @@ void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper
   m_GradientBackgroundFlag = true;
 }
 
-
 void QmitkStdMultiWidget::SetDepartmentLogoPath( const char * path )
 {
   m_LogoRendering1->SetLogoSource(path);
@@ -2029,7 +1988,6 @@ void QmitkStdMultiWidget::SetDepartmentLogoPath( const char * path )
   m_LogoRendering3->SetLogoSource(path);
   m_LogoRendering4->SetLogoSource(path);
 }
-
 
 void QmitkStdMultiWidget::SetWidgetPlaneModeToSlicing( bool activate )
 {
@@ -2039,7 +1997,6 @@ void QmitkStdMultiWidget::SetWidgetPlaneModeToSlicing( bool activate )
   }
 }
 
-
 void QmitkStdMultiWidget::SetWidgetPlaneModeToRotation( bool activate )
 {
   if ( activate )
@@ -2047,7 +2004,6 @@ void QmitkStdMultiWidget::SetWidgetPlaneModeToRotation( bool activate )
     this->SetWidgetPlaneMode( PLANE_MODE_ROTATION );
   }
 }
-
 
 void QmitkStdMultiWidget::SetWidgetPlaneModeToSwivel( bool activate )
 {
@@ -2126,10 +2082,7 @@ void QmitkStdMultiWidget::OnLayoutDesignChanged( int layoutDesignIndex )
       this->changeLayoutToLeft2Dand3DRight2D();
       break;
     }
-
   };
-
-
 }
 
 void QmitkStdMultiWidget::UpdateAllWidgets()
@@ -2145,9 +2098,7 @@ void QmitkStdMultiWidget::UpdateAllWidgets()
 
   mitkWidget4->resize( mitkWidget4Container->frameSize().width()-1, mitkWidget4Container->frameSize().height() );
   mitkWidget4->resize( mitkWidget4Container->frameSize().width(), mitkWidget4Container->frameSize().height() );
-
 }
-
 
 void QmitkStdMultiWidget::HideAllWidgetToolbars()
 {
@@ -2247,4 +2198,3 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane(int id)
     default: return NULL;
   }
 }
-

@@ -1,5 +1,9 @@
-# Boost throws a lot of unused variable warnings on linux
+# With apple clang 5.0 the following waring leads to an build error if boost is enabled
+if(APPLE)
+  mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=tautological-constant-out-of-range-compare" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+endif()
 
+# Boost throws a lot of unused variable warnings on linux
 if(UNIX)
   mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unused-variable" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
   mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unneeded-internal-declaration" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)

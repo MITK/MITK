@@ -106,8 +106,8 @@ set(MITK_USE_VTK 1)
 # Semi-hard dependencies, enabled by user-controlled variables
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 if(MITK_USE_QT)
-  set(MITK_USE_Qwt 1)
   if(MITK_USE_Qt4)
+    set(MITK_USE_Qwt 1)
     set(MITK_USE_Qxt 1) #TODO: Check how Qxt builds with Qt 5
   endif()
 endif()
@@ -186,18 +186,6 @@ set(sep "^^")
 if(MSVC_VERSION)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj /MP")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
-endif()
-
-# With the current toolkits like VTK and ITK Mac OSX 10.9
-# does not compile with if stdlib=libc++is used
-# For more information see bug 16803 and 16776
-# This could probably be remove if ITK 4.5.1 and VTK 6.1 is integrated
-if (APPLE)
-  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE osx_version)
-  if (osx_version VERSION_EQUAL "10.9" OR osx_version VERSION_GREATER "10.9")
-    message("Detected OS X version is ${osx_version}...setting C++ library to libstdc++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
-  endif()
 endif()
 
 set(ep_common_args

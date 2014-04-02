@@ -13,26 +13,21 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef MITKPLUGINACTIVATOR_H
-#define MITKPLUGINACTIVATOR_H
 
-#include <ctkPluginActivator.h>
+#ifndef QmitkDataManagerItemDelegate_h
+#define QmitkDataManagerItemDelegate_h
 
-namespace mitk {
+#include <QStyledItemDelegate>
 
-class PluginActivator :
-  public QObject, public ctkPluginActivator
+class QmitkDataManagerItemDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
 
 public:
+  explicit QmitkDataManagerItemDelegate(QObject* parent = NULL);
+  ~QmitkDataManagerItemDelegate();
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void setEditorData(QWidget* editor, const QModelIndex& index) const;
+};
 
-}; // PluginActivator
-
-}
-
-#endif // MITKPLUGINACTIVATOR_H
+#endif

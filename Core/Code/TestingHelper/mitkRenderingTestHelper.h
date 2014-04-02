@@ -29,21 +29,20 @@ class vtkRenderer;
 
 namespace mitk
 {
-
 class MITK_TESTINGHELPER_EXPORT RenderingTestHelper
 {
-
 public:
   /** @brief Generate a rendering test helper object including a render window of the size width * height (in pixel).
       @param argc Number of parameters. (here: Images) "Usage: [filename1 filenam2 -V referenceScreenshot
         (optional -T /directory/to/save/differenceImage)]
       @param argv Given parameters. If no data is inserted via commandline, you can add data
       later via AddNodeToDataStorage().
+      @param renderingMode Enable Standard, Multisample or DepthPeeling
     **/
-  RenderingTestHelper(int width, int height, int argc, char *argv[]);
+  RenderingTestHelper(int width, int height, int argc, char *argv[], mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
 
   /** @brief Generate a rendering test helper object including a render window of the size width * height (in pixel).*/
-  RenderingTestHelper(int width, int height);
+  RenderingTestHelper(int width, int height, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
 
   /** Default destructor */
   ~RenderingTestHelper();
@@ -137,13 +136,17 @@ public:
    */
   bool CompareRenderWindowAgainstReference(int argc, char *argv[], double threshold = 10.0);
 
+  /** @brief Returns true if the opengl context is compatible for advanced vtk effects **/
+  bool IsAdvancedOpenGL();
+
 protected:
   /**
      * @brief Initialize Internal method to initialize the renderwindow and set the datastorage.
      * @param width Height of renderwindow.
      * @param height Width of renderwindow.
+     * @param renderingMode Enable Standard, Multisampling or Depthpeeling
      */
-  void Initialize(int width, int height);
+  void Initialize(int width, int height, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
 
   /** @brief Prints the opengl information, e.g. version, vendor and extensions,
      *         This function can only be called after an opengl context is active.
@@ -165,7 +168,6 @@ protected:
   mitk::RenderWindow::Pointer m_RenderWindow; //<< Contains the mitkRenderWindow into which the test renders the data
   mitk::DataStorage::Pointer m_DataStorage; //<< Contains the mitkDataStorage which contains the data to be rendered
   bool m_AutomaticallyCloseRenderWindow; //<< Flag indicating whether the renderwindow should automatically close (true, default) or stay open (false). Usefull for debugging.
-
 };
 }//namespace mitk
 #endif

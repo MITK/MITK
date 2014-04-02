@@ -476,7 +476,7 @@ if(MITK_USE_BLUEBERRY AND APPLE)
     list(GET target_info_list 0 app_name)
     # check if the application is enabled
     if(${option_name} OR MITK_BUILD_ALL_APPS)
-      set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ${app_name})
+      set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} Mitk${app_name})
     endif()
   endforeach()
 
@@ -520,6 +520,8 @@ set(MITK_SHARED_LINKER_FLAGS )
 if(WIN32)
   set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
   set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} /wd4231") # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
+  # the following line should be removed after fixing bug 17637
+  mitkFunctionCheckCompilerFlags("/wd4316" MITK_CXX_FLAGS) # warning C4316: object alignment on heap
 endif()
 
 if(NOT MSVC_VERSION)
@@ -550,8 +552,10 @@ if(NOT MSVC_VERSION)
   endforeach()
 endif()
 
-mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
-mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
+if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
+  mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
+  mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 

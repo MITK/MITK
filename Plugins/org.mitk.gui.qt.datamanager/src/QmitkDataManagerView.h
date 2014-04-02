@@ -44,6 +44,7 @@ class QSignalMapper;
 
 class QmitkDnDFrameWidget;
 class QmitkDataStorageTreeModel;
+class QmitkDataManagerItemDelegate;
 
 ///
 /// \ingroup org_mitk_gui_qt_datamanager_internal
@@ -247,6 +248,8 @@ protected:
 
   /// if true, GlobalReinit() is called if a node is deleted
   bool  m_GlobalReinitOnNodeDelete;
+
+  QmitkDataManagerItemDelegate* m_ItemDelegate;
 
 private:
 

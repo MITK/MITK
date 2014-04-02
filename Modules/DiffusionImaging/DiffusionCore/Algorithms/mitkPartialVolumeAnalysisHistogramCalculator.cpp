@@ -1083,9 +1083,9 @@ namespace mitk
       throw std::runtime_error( "Figure at least partially outside of image bounds!" );
     }
 
-    unsigned int numberOfPoints = planarFigurePolyline.size();
+    std::size_t numberOfPoints = planarFigurePolyline.size();
     vtkIdType *ptIds = new vtkIdType[numberOfPoints];
-    for ( vtkIdType i = 0; i < numberOfPoints; ++i )
+    for ( std::size_t i = 0; i < numberOfPoints; ++i )
     {
       ptIds[i] = i;
     }
@@ -1161,8 +1161,10 @@ namespace mitk
         itimage(image, image->GetLargestPossibleRegion());
     itimage.GoToBegin();
 
-    typename ImageType::SizeType lowersize = {{9999999999,9999999999,9999999999}};
-    typename ImageType::SizeType uppersize = {{0,0,0}};
+    typename ImageType::SizeType lowersize;
+    lowersize.Fill(std::numeric_limits<typename ImageType::SizeValueType>::max());
+    typename ImageType::SizeType uppersize;
+    uppersize.Fill(std::numeric_limits<typename ImageType::SizeValueType>::min());
     while( !itmask.IsAtEnd() )
     {
       if(itmask.Get() == 0)

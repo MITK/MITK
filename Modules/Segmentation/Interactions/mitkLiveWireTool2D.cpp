@@ -281,6 +281,16 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
   //set current slice as input for ImageToLiveWireContourFilter
   m_WorkingSlice = this->GetAffectedReferenceSlice(positionEvent);
 
+  //Transfer LiveWire's center based contour output to corner based via the adaption of the input
+  //slice image. Just in case someone stumbles across the 0.5 here I know what I'm doing ;-).
+  m_WorkingSlice->GetSlicedGeometry()->ChangeImageGeometryConsideringOriginOffset(false);
+  mitk::Point3D newOrigin = m_WorkingSlice->GetSlicedGeometry()->GetOrigin();
+  m_WorkingSlice->GetSlicedGeometry()->WorldToIndex(newOrigin, newOrigin);
+  newOrigin[2] += 0.5;
+  m_WorkingSlice->GetSlicedGeometry()->IndexToWorld(newOrigin, newOrigin);
+  m_WorkingSlice->GetSlicedGeometry()->SetOrigin(newOrigin);
+
+
   m_LiveWireFilter = mitk::ImageLiveWireContourModelFilter::New();
   m_LiveWireFilter->SetInput(m_WorkingSlice);
 

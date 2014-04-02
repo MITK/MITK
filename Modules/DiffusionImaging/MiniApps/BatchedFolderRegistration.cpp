@@ -110,6 +110,7 @@ static FileListType CreateDerivedFileList(std::string baseFN, std::string baseSu
 static void SaveImage(std::string fileName, mitk::Image* image, std::string fileType )
 {
   MITK_INFO << "----Save to " << fileName;
+
   if (fileType == "dwi") // IOUtil does not handle dwi files properly Bug 15772
   {
     mitk::NrrdDiffusionImageWriter< short >::Pointer dwiwriter = mitk::NrrdDiffusionImageWriter< short >::New();
@@ -286,22 +287,18 @@ int BatchedFolderRegistration( int argc, char* argv[] )
     {
       mitk::Image::Pointer movingImage = mitk::IOUtil::LoadImage(fileMorphName);
 
-      MITK_ERROR << "REF COUNT MOVING 0 " << movingImage->GetReferenceCount();
       if (movingImage.IsNull())
         MITK_ERROR << "Loaded moving image is NULL";
 
       // Store transformation,  apply it to morph file
       MITK_INFO << "----------Registering moving image to reference----------";
-
-
-      MITK_ERROR << "REF COUNT MOVING 1 " << movingImage->GetReferenceCount();
-      //mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, referenceMask);
-      MITK_ERROR << "REF COUNT MOVING 2 " << movingImage->GetReferenceCount();
-
+      mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, referenceMask);
       mitk::RegistrationWrapper::ApplyTransformationToImage(movingImage, transf,offset, NULL); // , resampleImage
-      MITK_ERROR << "REF COUNT MOVING 3 " << movingImage->GetReferenceCount();
+
       savePathAndFileName = GetSavePath(outputPath, fileMorphName);
       std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
+      if (fileType == ".dwi")
+        fileType = "dwi";
       SaveImage(savePathAndFileName,movingImage,fileType );
     }
 

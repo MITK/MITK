@@ -19,13 +19,7 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
 
     ItkImageType::Pointer itkImage = ItkImageType::New();
 
-
-    MITK_ERROR << "imgCopy  0 " <<  "/" << img->GetReferenceCount();
-    MITK_ERROR << "pixel type  " << img->GetPixelType().GetComponentTypeAsString();
-
     CastToItkImage(img, itkImage);
-
-
 
     typedef itk::Euler3DTransform< double > RigidTransformType;
     RigidTransformType::Pointer rtransform = RigidTransformType::New();
@@ -128,11 +122,11 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
   }
 }
 
-void mitk::RegistrationWrapper::GetTransformation(mitk::Image* fixedImage, mitk::Image* movingImage, RidgidTransformType transformation,double* offset, mitk::Image* mask)
+void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, RidgidTransformType transformation,double* offset, mitk::Image* mask)
 {
   // Handle the case that fixed/moving image is a DWI image
-  mitk::DiffusionImage<short>* fixedDwi = dynamic_cast<mitk::DiffusionImage<short>*> (fixedImage);
-  mitk::DiffusionImage<short>* movingDwi = dynamic_cast<mitk::DiffusionImage<short>*> (movingImage);
+  mitk::DiffusionImage<short>* fixedDwi = dynamic_cast<mitk::DiffusionImage<short>*> (fixedImage.GetPointer());
+  mitk::DiffusionImage<short>* movingDwi = dynamic_cast<mitk::DiffusionImage<short>*> (movingImage.GetPointer());
   itk::B0ImageExtractionImageFilter<short,short >::Pointer b0Extraction = itk::B0ImageExtractionImageFilter<short,short>::New();
   offset[0]=offset[1]=offset[2]=0;
   if (fixedDwi != NULL)

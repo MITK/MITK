@@ -49,7 +49,7 @@ namespace mitk
  * IEEE T Pattern Anal 34 (8), 1520-1532, 2012. The extension computes, in order
  * to ensure the convergence of the algorithm, an isotropic estimation
  * by an unweighted point based registration algorithm as an initial estimate.
- * The implemantion was orinally ported to C/C++ by A. Franz.
+ * The implemantion was originally ported to C/C++ by A. Franz.
  *
  */
 class MitkSurfaceRegistration_EXPORT WeightedPointTransform : public itk::Object

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkClippedSurfaceBoundsCalculator.h"
 #include "mitkGeometry3D.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkVector.h"
 
 static void CheckPlanesInsideBoundingBoxOnlyOnOneSlice(mitk::BaseGeometry::Pointer geometry3D)
@@ -442,7 +442,7 @@ int mitkClippedSurfaceBoundsCalculatorTest(int, char* [])
 
   //Initialize SlicedGeometry3D:
   mitk::SlicedGeometry3D::Pointer slicedGeometry3D = mitk::SlicedGeometry3D::New();
-  slicedGeometry3D->InitializeEvenlySpaced(dynamic_cast<mitk::Geometry2D*>(planeGeometry.GetPointer()), 20);
+  slicedGeometry3D->InitializeEvenlySpaced(dynamic_cast<mitk::PlaneGeometry*>(planeGeometry.GetPointer()), 20);
   mitk::BaseGeometry::Pointer geometry3D = dynamic_cast< mitk::BaseGeometry* > ( slicedGeometry3D.GetPointer() );
   geometry3D->SetImageGeometry(true);
 
@@ -462,7 +462,7 @@ int mitkClippedSurfaceBoundsCalculatorTest(int, char* [])
 
   //Initialize SlicedGeometry3D:
   mitk::SlicedGeometry3D::Pointer secondSlicedGeometry3D = mitk::SlicedGeometry3D::New();
-  secondSlicedGeometry3D->InitializeEvenlySpaced(dynamic_cast<mitk::Geometry2D*>(planeGeometry2.GetPointer()), 20);
+  secondSlicedGeometry3D->InitializeEvenlySpaced(dynamic_cast<mitk::PlaneGeometry*>(planeGeometry2.GetPointer()), 20);
   mitk::BaseGeometry::Pointer secondGeometry3D = dynamic_cast< mitk::BaseGeometry* > ( secondSlicedGeometry3D.GetPointer() );
   secondGeometry3D->SetImageGeometry(true);
 

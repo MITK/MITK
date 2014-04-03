@@ -142,7 +142,6 @@ set(CPP_FILES
 # DataManagement/mitkDataTreeStorage.cpp
   DataManagement/mitkDisplayGeometry.cpp
   DataManagement/mitkEnumerationProperty.cpp
-  DataManagement/mitkGeometry2D.cpp
   DataManagement/mitkGeometry2DData.cpp
   DataManagement/mitkGeometry3D.cpp
   DataManagement/mitkGeometryData.cpp

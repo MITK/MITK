@@ -68,7 +68,7 @@ namespace mitk
     mitkNewMacro1Param(Self, vtkImageReslice*);
 
     /** \brief Set the axis where to reslice at.*/
-    void SetWorldGeometry(const Geometry2D* geometry ){
+    void SetWorldGeometry(const PlaneGeometry* geometry ){
        this->m_WorldGeometry = geometry;
        this->Modified(); }
 
@@ -146,7 +146,7 @@ namespace mitk
     virtual void GenerateOutputInformation();
     virtual void GenerateInputRequestedRegion();
 
-    const Geometry2D* m_WorldGeometry;
+    const PlaneGeometry* m_WorldGeometry;
     vtkSmartPointer<vtkImageReslice> m_Reslicer;
 
     unsigned int m_TimeStep;

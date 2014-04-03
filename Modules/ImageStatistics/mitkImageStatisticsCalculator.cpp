@@ -608,7 +608,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
         throw std::runtime_error( "Image geometry invalid!" );
       }
 
-      const Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+      const PlaneGeometry *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
       if ( planarFigureGeometry2D == NULL )
       {
         throw std::runtime_error( "Planar-Figure not yet initialized!" );
@@ -1088,7 +1088,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
   // These points are used by the vtkLassoStencilSource to create
   // a vtkImageStencil.
-  const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+  const mitk::PlaneGeometry *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
   const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
   const mitk::BaseGeometry *imageGeometry3D = m_Image->GetGeometry( 0 );
 

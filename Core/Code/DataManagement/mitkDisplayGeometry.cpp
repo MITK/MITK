@@ -30,11 +30,11 @@ bool mitk::DisplayGeometry::IsValid() const
 
 unsigned long mitk::DisplayGeometry::GetMTime() const
 {
-  if((m_WorldGeometry.IsNotNull()) && (Geometry2D::GetMTime() < m_WorldGeometry->GetMTime()))
+  if((m_WorldGeometry.IsNotNull()) && (PlaneGeometry::GetMTime() < m_WorldGeometry->GetMTime()))
   {
     Modified();
   }
-  return Geometry2D::GetMTime();
+  return PlaneGeometry::GetMTime();
 }
 
 const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
@@ -49,7 +49,7 @@ const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
 
 // size definition methods
 
-void mitk::DisplayGeometry::SetWorldGeometry(const Geometry2D* aWorldGeometry)
+void mitk::DisplayGeometry::SetWorldGeometry(const PlaneGeometry* aWorldGeometry)
 {
   m_WorldGeometry = aWorldGeometry;
 

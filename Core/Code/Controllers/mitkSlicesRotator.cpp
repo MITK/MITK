@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkLine.h>
 #include <mitkGeometry3D.h>
-#include <mitkGeometry2D.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkDisplayGeometry.h>
 #include <mitkSlicedGeometry3D.h>

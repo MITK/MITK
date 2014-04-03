@@ -48,8 +48,8 @@ mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D& other)
 
   if ( m_EvenlySpaced )
   {
-    Geometry2D::Pointer geometry = other.m_Geometry2Ds[0]->Clone();
-    Geometry2D* geometry2D = dynamic_cast<Geometry2D*>(geometry.GetPointer());
+    PlaneGeometry::Pointer geometry = other.m_Geometry2Ds[0]->Clone();
+    PlaneGeometry* geometry2D = dynamic_cast<PlaneGeometry*>(geometry.GetPointer());
     assert(geometry2D!=NULL);
     SetGeometry2D(geometry2D, 0);
   }
@@ -65,7 +65,7 @@ mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D& other)
       }
       else
       {
-        Geometry2D* geometry2D = other.m_Geometry2Ds[s]->Clone();
+        PlaneGeometry* geometry2D = other.m_Geometry2Ds[s]->Clone();
         assert(geometry2D!=NULL);
         SetGeometry2D(geometry2D, s);
       }
@@ -77,16 +77,16 @@ mitk::SlicedGeometry3D::~SlicedGeometry3D()
 {
 }
 
-mitk::Geometry2D *
+mitk::PlaneGeometry *
   mitk::SlicedGeometry3D::GetGeometry2D( int s ) const
 {
-  mitk::Geometry2D::Pointer geometry2D = NULL;
+  mitk::PlaneGeometry::Pointer geometry2D = NULL;
 
   if ( this->IsValidSlice(s) )
   {
     geometry2D = m_Geometry2Ds[s];
 
-    // If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored
+    // If (a) m_EvenlySpaced==true, (b) we don't have a PlaneGeometry stored
     // for the requested slice, and (c) the first slice (s=0)
     // is a PlaneGeometry instance, then we calculate the geometry of the
     // requested as the plane of the first slice shifted by m_Spacing[2]*s
@@ -136,7 +136,7 @@ const mitk::BoundingBox *
 }
 
 bool
-  mitk::SlicedGeometry3D::SetGeometry2D( mitk::Geometry2D *geometry2D, int s )
+  mitk::SlicedGeometry3D::SetGeometry2D( mitk::PlaneGeometry *geometry2D, int s )
 {
   if ( this->IsValidSlice(s) )
   {
@@ -153,7 +153,7 @@ void
   Superclass::Initialize();
   m_Slices = slices;
 
-  Geometry2D::Pointer gnull = NULL;
+  PlaneGeometry::Pointer gnull = NULL;
   m_Geometry2Ds.assign( m_Slices, gnull );
 
   Vector3D spacing;
@@ -165,7 +165,7 @@ void
 
 void
   mitk::SlicedGeometry3D::InitializeEvenlySpaced(
-  mitk::Geometry2D* geometry2D, unsigned int slices, bool flipped )
+  mitk::PlaneGeometry* geometry2D, unsigned int slices, bool flipped )
 {
   assert( geometry2D != NULL );
   this->InitializeEvenlySpaced(
@@ -175,7 +175,7 @@ void
 
 void
   mitk::SlicedGeometry3D::InitializeEvenlySpaced(
-  mitk::Geometry2D* geometry2D, mitk::ScalarType zSpacing,
+  mitk::PlaneGeometry* geometry2D, mitk::ScalarType zSpacing,
   unsigned int slices, bool flipped )
 {
   assert( geometry2D != NULL );
@@ -192,7 +192,7 @@ void
   bounds[5] = slices;
 
   // clear and reserve
-  Geometry2D::Pointer gnull = NULL;
+  PlaneGeometry::Pointer gnull = NULL;
   m_Geometry2Ds.assign( m_Slices, gnull );
 
   Vector3D directionVector = geometry2D->GetAxisVector(2);
@@ -413,7 +413,7 @@ void
 
   // Finally, we can clear the previous geometry stack and initialize it with
   // our re-initialized "first plane".
-  m_Geometry2Ds.assign( m_Slices, Geometry2D::Pointer( NULL ) );
+  m_Geometry2Ds.assign( m_Slices, PlaneGeometry::Pointer( NULL ) );
 
   if ( m_Slices > 0 )
   {
@@ -516,7 +516,7 @@ void
 {
   m_ReferenceGeometry = referenceGeometry;
 
-  std::vector<Geometry2D::Pointer>::iterator it;
+  std::vector<PlaneGeometry::Pointer>::iterator it;
 
   for ( it = m_Geometry2Ds.begin(); it != m_Geometry2Ds.end(); ++it )
   {
@@ -534,11 +534,11 @@ void
 
   assert(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0);
 
-  // In case of evenly-spaced data: re-initialize instances of Geometry2D,
+  // In case of evenly-spaced data: re-initialize instances of PlaneGeometry,
   // since the spacing influences them
   if ((m_EvenlySpaced) && (m_Geometry2Ds.size() > 0))
   {
-    mitk::Geometry2D::ConstPointer firstGeometry =
+    mitk::PlaneGeometry::ConstPointer firstGeometry =
       m_Geometry2Ds[0].GetPointer();
 
     const PlaneGeometry *planeGeometry =
@@ -557,9 +557,9 @@ void
 
   InternSetSpacing(aSpacing);
 
-  mitk::Geometry2D::Pointer firstGeometry;
+  mitk::PlaneGeometry::Pointer firstGeometry;
 
-  // In case of evenly-spaced data: re-initialize instances of Geometry2D,
+  // In case of evenly-spaced data: re-initialize instances of PlaneGeometry,
   // since the spacing influences them
   if ( hasEvenlySpacedPlaneGeometry )
   {
@@ -588,7 +588,7 @@ void
   }
 
   //clear and reserve
-  Geometry2D::Pointer gnull=NULL;
+  PlaneGeometry::Pointer gnull=NULL;
   m_Geometry2Ds.assign(m_Slices, gnull);
 
   if ( m_Slices > 0 )
@@ -697,7 +697,7 @@ void
         // The other slices will be re-generated on demand
 
         // Save first slice
-        Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
+        PlaneGeometry::Pointer geometry2D = m_Geometry2Ds[0];
 
         RotationOperation *rotOp = dynamic_cast< RotationOperation * >( operation );
 
@@ -739,7 +739,7 @@ void
         if ( m_Geometry2Ds.size() > 0 )
         {
           // Reach through to all slices in my container
-          for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
+          for (std::vector<PlaneGeometry::Pointer>::iterator iter = m_Geometry2Ds.begin();
             iter != m_Geometry2Ds.end();
             ++iter)
           {
@@ -759,7 +759,7 @@ void
     else
     {
       // Reach through to all slices
-      for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
+      for (std::vector<PlaneGeometry::Pointer>::iterator iter = m_Geometry2Ds.begin();
         iter != m_Geometry2Ds.end();
         ++iter)
       {
@@ -775,7 +775,7 @@ void
       PlaneOperation *planeOp = dynamic_cast< PlaneOperation * >( operation );
 
       // Get first slice
-      Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
+      PlaneGeometry::Pointer geometry2D = m_Geometry2Ds[0];
       PlaneGeometry *planeGeometry = dynamic_cast< PlaneGeometry * >(
         geometry2D.GetPointer() );
 
@@ -900,7 +900,7 @@ void
     else
     {
       // Reach through to all slices
-      for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
+      for (std::vector<PlaneGeometry::Pointer>::iterator iter = m_Geometry2Ds.begin();
         iter != m_Geometry2Ds.end();
         ++iter)
       {
@@ -913,7 +913,7 @@ void
     if ( m_EvenlySpaced )
     {
       // Save first slice
-      Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
+      PlaneGeometry::Pointer geometry2D = m_Geometry2Ds[0];
 
       PlaneGeometry* planeGeometry = dynamic_cast< PlaneGeometry * >(
         geometry2D.GetPointer() );
@@ -967,7 +967,7 @@ void
           m_Slices = 1;
         }
 
-        m_Geometry2Ds.assign( m_Slices, Geometry2D::Pointer( NULL ) );
+        m_Geometry2Ds.assign( m_Slices, PlaneGeometry::Pointer( NULL ) );
 
         if ( m_Slices > 0 )
         {
@@ -991,7 +991,7 @@ void
     else
     {
       // Reach through to all slices
-      for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
+      for (std::vector<PlaneGeometry::Pointer>::iterator iter = m_Geometry2Ds.begin();
         iter != m_Geometry2Ds.end();
         ++iter)
       {
@@ -1006,7 +1006,7 @@ void
     // The other slices will be re-generated on demand
 
     // Save first slice
-    Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
+    PlaneGeometry::Pointer geometry2D = m_Geometry2Ds[0];
 
     ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast< ApplyTransformMatrixOperation* >( operation );
 

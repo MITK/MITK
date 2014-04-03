@@ -236,7 +236,7 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
   }
 }
 
-//const mitk::Geometry2D* mitk::SlicedData::GetGeometry2D(int s, int t) const
+//const mitk::PlaneGeometry* mitk::SlicedData::GetGeometry2D(int s, int t) const
 //{
 //  const_cast<SlicedData*>(this)->SetRequestedRegionToLargestPossibleRegion();
 //
@@ -269,7 +269,7 @@ void mitk::SlicedData::SetGeometry(BaseGeometry* aGeometry3D)
     SlicedGeometry3D::Pointer slicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
     if(slicedGeometry.IsNull())
     {
-      Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(aGeometry3D);
+      PlaneGeometry* geometry2d = dynamic_cast<PlaneGeometry*>(aGeometry3D);
       if(geometry2d!=NULL)
       {
         if((GetSlicedGeometry()->GetGeometry2D(0)==geometry2d) && (GetSlicedGeometry()->GetSlices()==1))
@@ -321,7 +321,7 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
       slicedGeometry->SetOrigin(origin);
       if(slicedGeometry->GetEvenlySpaced())
       {
-        mitk::Geometry2D* geometry2D = slicedGeometry->GetGeometry2D(0);
+        mitk::PlaneGeometry* geometry2D = slicedGeometry->GetGeometry2D(0);
         geometry2D->SetOrigin(origin);
         slicedGeometry->InitializeEvenlySpaced(geometry2D, slicedGeometry->GetSlices());
       }

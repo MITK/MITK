@@ -26,11 +26,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   PlaneGeometry::PlaneGeometry()
+    : m_ScaleFactorMMPerUnitX( 1.0 ),
+    m_ScaleFactorMMPerUnitY( 1.0 ),
+    m_ReferenceGeometry( NULL )
   {
     Initialize();
   }
 
   PlaneGeometry::~PlaneGeometry()
+  {
+  }
+
+  PlaneGeometry::PlaneGeometry(const PlaneGeometry& other)
+    : Superclass(other), m_ScaleFactorMMPerUnitX( other.m_ScaleFactorMMPerUnitX),
+    m_ScaleFactorMMPerUnitY( other.m_ScaleFactorMMPerUnitY),
+    m_ReferenceGeometry( other.m_ReferenceGeometry )
   {
   }
 
@@ -492,10 +502,32 @@ namespace mitk
     return SignedDistanceFromPlane(pt3d_mm);
   }
 
+  //Function from Geometry2D
+  //  mitk::ScalarType
+  //  PlaneGeometry::SignedDistance(const mitk::Point3D& pt3d_mm) const
+  //{
+  //  Point3D projectedPoint;
+  //  Project(pt3d_mm, projectedPoint);
+  //  Vector3D direction = pt3d_mm-projectedPoint;
+  //  ScalarType distance = direction.GetNorm();
+
+  //  if(IsAbove(pt3d_mm) == false)
+  //    distance*=-1.0;
+
+  //  return distance;
+  //}
+
   bool
-    PlaneGeometry::IsAbove( const Point3D &pt3d_mm ) const
+    PlaneGeometry::IsAbove( const Point3D &pt3d_mm , bool considerBoundingBox) const
   {
-    return SignedDistanceFromPlane(pt3d_mm) > 0;
+    if(considerBoundingBox)
+    {
+      Point3D pt3d_units;
+      BaseGeometry::WorldToIndex(pt3d_mm, pt3d_units);
+      return (pt3d_units[2] > this->GetBoundingBox()->GetBounds()[4]);
+    }
+    else
+      return SignedDistanceFromPlane(pt3d_mm) > 0;
   }
 
   bool
@@ -722,6 +754,163 @@ namespace mitk
   void PlaneGeometry::PrintSelf( std::ostream& os, itk::Indent indent ) const
   {
     Superclass::PrintSelf(os,indent);
+    os << indent << " ScaleFactorMMPerUnitX: "
+      << m_ScaleFactorMMPerUnitX << std::endl;
+    os << indent << " ScaleFactorMMPerUnitY: "
+      << m_ScaleFactorMMPerUnitY << std::endl;
     os << indent << " Normal: " << GetNormal() << std::endl;
+  }
+
+  void  PlaneGeometry::InternPostSetIndexToWorldTransform(
+    mitk::AffineTransform3D* transform)
+  {
+    m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
+    m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
+
+    assert(m_ScaleFactorMMPerUnitX<ScalarTypeNumericTraits::infinity());
+    assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
+  }
+
+  void
+    PlaneGeometry::InternPostSetExtentInMM(int direction, ScalarType extentInMM)
+  {
+    m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
+    m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
+
+    assert(m_ScaleFactorMMPerUnitX<ScalarTypeNumericTraits::infinity());
+    assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
+  }
+
+  bool
+    PlaneGeometry::Map(
+    const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
+  {
+    assert(this->IsBoundingBoxNull()==false);
+
+    Point3D pt3d_units;
+    BackTransform(pt3d_mm, pt3d_units);
+    pt2d_mm[0]=pt3d_units[0]*m_ScaleFactorMMPerUnitX;
+    pt2d_mm[1]=pt3d_units[1]*m_ScaleFactorMMPerUnitY;
+    pt3d_units[2]=0;
+    return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
+  }
+
+  void
+    PlaneGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
+  {
+    Point3D pt3d_units;
+    pt3d_units[0]=pt2d_mm[0]/m_ScaleFactorMMPerUnitX;
+    pt3d_units[1]=pt2d_mm[1]/m_ScaleFactorMMPerUnitY;
+    pt3d_units[2]=0;
+    pt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);
+  }
+
+  void
+    PlaneGeometry::SetSizeInUnits(mitk::ScalarType width, mitk::ScalarType height)
+  {
+    ScalarType bounds[6]={0, width, 0, height, 0, 1};
+    ScalarType extent, newextentInMM;
+    if(GetExtent(0)>0)
+    {
+      extent = GetExtent(0);
+      if(width>extent)
+        newextentInMM = GetExtentInMM(0)/width*extent;
+      else
+        newextentInMM = GetExtentInMM(0)*extent/width;
+      SetExtentInMM(0, newextentInMM);
+    }
+    if(GetExtent(1)>0)
+    {
+      extent = GetExtent(1);
+      if(width>extent)
+        newextentInMM = GetExtentInMM(1)/height*extent;
+      else
+        newextentInMM = GetExtentInMM(1)*extent/height;
+      SetExtentInMM(1, newextentInMM);
+    }
+    SetBounds(bounds);
+  }
+
+  bool
+    PlaneGeometry::Project(
+    const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const
+  {
+    assert(this->IsBoundingBoxNull()==false);
+
+    Point3D pt3d_units;
+    BackTransform(pt3d_mm, pt3d_units);
+    pt3d_units[2] = 0;
+    projectedPt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);
+    return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
+  }
+
+  bool
+    PlaneGeometry::Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
+  {
+    assert(this->IsBoundingBoxNull()==false);
+
+    Vector3D vec3d_units;
+    BackTransform(vec3d_mm, vec3d_units);
+    vec3d_units[2] = 0;
+    projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
+    return true;
+  }
+
+  bool
+    PlaneGeometry::Project(const mitk::Point3D & atPt3d_mm,
+    const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
+  {
+    MITK_WARN << "Deprecated function! Call Project(vec3D,vec3D) instead.";
+    assert(this->IsBoundingBoxNull()==false);
+
+    Vector3D vec3d_units;
+    BackTransform(atPt3d_mm, vec3d_mm, vec3d_units);
+    vec3d_units[2] = 0;
+    projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
+
+    Point3D pt3d_units;
+    BackTransform(atPt3d_mm, pt3d_units);
+    return const_cast<BoundingBox*>(this->GetBoundingBox())->IsInside(pt3d_units);
+  }
+
+  bool
+    PlaneGeometry::Map(const mitk::Point3D & atPt3d_mm,
+    const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const
+  {
+    Point2D pt2d_mm_start, pt2d_mm_end;
+    Point3D pt3d_mm_end;
+    bool inside=Map(atPt3d_mm, pt2d_mm_start);
+    pt3d_mm_end = atPt3d_mm+vec3d_mm;
+    inside&=Map(pt3d_mm_end, pt2d_mm_end);
+    vec2d_mm=pt2d_mm_end-pt2d_mm_start;
+    return inside;
+  }
+
+  void
+    PlaneGeometry::Map(const mitk::Point2D &/*atPt2d_mm*/,
+    const mitk::Vector2D &/*vec2d_mm*/, mitk::Vector3D &/*vec3d_mm*/) const
+  {
+    //@todo implement parallel to the other Map method!
+    assert(false);
+  }
+
+
+
+  void
+    PlaneGeometry::SetReferenceGeometry( mitk::BaseGeometry *geometry )
+  {
+    m_ReferenceGeometry = geometry;
+  }
+
+  mitk::BaseGeometry *
+    PlaneGeometry::GetReferenceGeometry() const
+  {
+    return m_ReferenceGeometry;
+  }
+
+  bool
+    PlaneGeometry::HasReferenceGeometry() const
+  {
+    return ( m_ReferenceGeometry != NULL );
   }
 } // namespace

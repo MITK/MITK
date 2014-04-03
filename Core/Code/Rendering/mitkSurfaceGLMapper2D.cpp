@@ -167,7 +167,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   //
   // get the world time
   //
-  Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
   assert( worldGeometry.IsNotNull() );
 
   ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
@@ -301,7 +301,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 }
 
 void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData* contour,
-                                       const Geometry2D* worldGeometry,
+                                       const PlaneGeometry* worldGeometry,
                                        const DisplayGeometry* displayGeometry,
                                        vtkLinearTransform * vtktransform,
                                        vtkLookupTable *lut,

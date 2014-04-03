@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKVTKABSTRACTTRANSFORMPLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 
 #include <MitkExports.h>
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkPlaneGeometry.h"
 #include "itkVtkAbstractTransform.h"
 
@@ -31,7 +31,7 @@ namespace mitk {
   //## vtkAbstractTransform is the most general transform in vtk (superclass for
   //## all vtk geometric transformations). It defines an arbitrary 3D transformation,
   //## i.e., a transformation of 3D space into 3D space. In contrast,
-  //## AbstractTransformGeometry (since it is a subclass of Geometry2D) describes a
+  //## AbstractTransformGeometry (since it is a subclass of PlaneGeometry) describes a
   //## 2D manifold in 3D space. The 2D manifold is defined as the manifold that results
   //## from transforming a rectangle (given in m_Plane as a PlaneGeometry) by the
   //## vtkAbstractTransform (given in m_VtkAbstractTransform).
@@ -44,10 +44,10 @@ namespace mitk {
   //## @note The bounds of the PlaneGeometry are used as the parametric bounds.
   //## @sa ExternAbstractTransformGeometry
   //## @ingroup Geometry
-  class MITK_CORE_EXPORT AbstractTransformGeometry : public Geometry2D
+  class MITK_CORE_EXPORT AbstractTransformGeometry : public PlaneGeometry
   {
   public:
-    mitkClassMacro(AbstractTransformGeometry, Geometry2D);
+    mitkClassMacro(AbstractTransformGeometry, PlaneGeometry);
 
     itkNewMacro(Self);
 

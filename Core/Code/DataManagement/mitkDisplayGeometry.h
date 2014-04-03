@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDisplayGeometry_h
 #define mitkDisplayGeometry_h
 
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 namespace mitk
 {
@@ -27,7 +27,7 @@ namespace mitk
   The main purpose of this class is to convert between display coordinates
   (in display-units) and world coordinates (in mm).
   DisplayGeometry depends on the size of the display area (widget width and
-  height, m_SizeInDisplayUnits) and on a Geometry2D (m_WoldGeometry). It
+  height, m_SizeInDisplayUnits) and on a PlaneGeometry (m_WoldGeometry). It
   represents a recangular view on this world-geometry. E.g., you can tell
   the DisplayGeometry to fit the world-geometry in the display area by
   calling Fit(). Provides methods for zooming and panning.
@@ -61,11 +61,11 @@ namespace mitk
 
   \ingroup Geometry
   */
-  class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
+  class MITK_CORE_EXPORT DisplayGeometry : public PlaneGeometry
   {
   public:
 
-    mitkClassMacro(DisplayGeometry,Geometry2D);
+    mitkClassMacro(DisplayGeometry,PlaneGeometry);
 
     /// Method for creation through the object factory.
     itkNewMacro(Self);
@@ -80,8 +80,8 @@ namespace mitk
 
     // size definition methods
 
-    virtual void SetWorldGeometry(const Geometry2D* aWorldGeometry);
-    itkGetConstObjectMacro(WorldGeometry, Geometry2D);
+    virtual void SetWorldGeometry(const PlaneGeometry* aWorldGeometry);
+    itkGetConstObjectMacro(WorldGeometry, PlaneGeometry);
 
     /// \return if new origin was within accepted limits
     virtual bool SetOriginInMM(const Vector2D& origin_mm);
@@ -187,6 +187,8 @@ namespace mitk
 
     virtual bool IsValid() const;
 
+    virtual bool IsAbove( const Point3D &pt3d_mm , bool considerBoundingBox=false) const { return Superclass::IsAbove(pt3d_mm, true);};
+
   protected:
 
     DisplayGeometry();
@@ -216,7 +218,7 @@ namespace mitk
     ScalarType m_ScaleFactorMMPerDisplayUnit;
     Vector2D m_SizeInMM;
     Vector2D m_SizeInDisplayUnits;
-    Geometry2D::ConstPointer m_WorldGeometry;
+    PlaneGeometry::ConstPointer m_WorldGeometry;
 
     bool m_ConstrainZoomingAndPanning;
     float m_MaxWorldViewPercentage;

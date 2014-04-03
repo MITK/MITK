@@ -85,7 +85,7 @@ int testSurfaceBoundingBoxConsistency(mitk::Surface* surface, bool expectIdentit
   int i;
   if(expectIdentityTransform == false)
   {
-    mitk::Geometry2D::Pointer geometry = mitk::Geometry2D::New();
+    mitk::PlaneGeometry::Pointer geometry = mitk::PlaneGeometry::New();
     geometry->SetFloatBounds(bounds);
     geometry->SetIndexToWorldTransform(surface->GetGeometry()->GetIndexToWorldTransform());
     mitk::BoundingBox::BoundsArrayType bb = const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetBounds();

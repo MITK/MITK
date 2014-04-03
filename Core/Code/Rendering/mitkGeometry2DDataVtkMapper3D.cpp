@@ -269,7 +269,7 @@ namespace mitk
 
       double tubeRadius = 1.0; // Radius of tubular edge surrounding plane
 
-      // Clip the Geometry2D with the reference geometry bounds (if available)
+      // Clip the PlaneGeometry with the reference geometry bounds (if available)
       if ( input->GetGeometry2D()->HasReferenceGeometry() )
       {
         BaseGeometry *referenceGeometry =
@@ -306,7 +306,7 @@ namespace mitk
         tubeRadius = sqrt( m_SurfaceCreator->GetBoundingBox()->GetDiagonalLength2() ) / 450.0;
       }
 
-      // Calculate the surface of the Geometry2D
+      // Calculate the surface of the PlaneGeometry
       m_SurfaceCreator->Update();
       Surface *surface = m_SurfaceCreator->GetOutput();
 

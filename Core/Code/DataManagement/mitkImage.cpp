@@ -851,10 +851,10 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeomet
   }*/
 }
 
-void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped, unsigned int channels, int tDim )
+void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry2d, bool flipped, unsigned int channels, int tDim )
 {
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-  slicedGeometry->InitializeEvenlySpaced(static_cast<Geometry2D*>(geometry2d.Clone().GetPointer()), sDim, flipped);
+  slicedGeometry->InitializeEvenlySpaced(static_cast<PlaneGeometry*>(geometry2d.Clone().GetPointer()), sDim, flipped);
   Initialize(type, *slicedGeometry, channels, tDim);
 }
 

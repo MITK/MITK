@@ -69,7 +69,7 @@ public:
 private:
 
   mitk::Image::Pointer m_Image;
-  mitk::Geometry2D::Pointer m_Geometry;
+  mitk::PlaneGeometry::Pointer m_Geometry;
 
   // calculate statistics for the given image and planarpolygon
   const mitk::ImageStatisticsCalculator::Statistics ComputeStatistics( mitk::Image::Pointer image,

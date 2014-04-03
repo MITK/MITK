@@ -140,10 +140,10 @@ float AffineInteractor3D
 
   //if ( curveModel != NULL )
   //{
-  //  // Get the Geometry2D of the window the user interacts with (for 2D point
+  //  // Get the PlaneGeometry of the window the user interacts with (for 2D point
   //  // projection)
   //  BaseRenderer *renderer = stateEvent->GetEvent()->GetSender();
-  //  const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
+  //  const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldGeometry2D();
 
   //  // For reading on the points, Ids etc
   //  //CurveModel::PointSetType *pointSet = curveModel->GetPointSet( timeStep );

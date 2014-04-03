@@ -83,7 +83,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     return ;
 
 
-  mitk::PlaneGeometry::Pointer worldPlaneGeometry2D = dynamic_cast< mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>( renderer->GetCurrentWorldGeometry2D() ) );
+  mitk::PlaneGeometry::Pointer worldPlaneGeometry2D = dynamic_cast< mitk::PlaneGeometry*>( const_cast<mitk::PlaneGeometry*>( renderer->GetCurrentWorldGeometry2D() ) );
   assert( worldPlaneGeometry2D.IsNotNull() );
 
   vtkImageData* vtkImage = input->GetVtkImageData( this->GetCurrentTimeStep( input, renderer ) );
@@ -94,7 +94,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
   //
   Point3D point;
   Vector3D normal;
-  Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
   PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
 
   if ( worldPlaneGeometry.IsNotNull() )
@@ -385,7 +385,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
 
 
 
-void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, mitk::BaseRenderer*  /*renderer*/, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing )
+void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const PlaneGeometry* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, mitk::BaseRenderer*  /*renderer*/, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing )
 {
 
   vtkPoints * points = glyphs->GetPoints();
@@ -519,7 +519,7 @@ int mitk::VectorImageMapper2D::GetCurrentTimeStep( mitk::BaseData* data, mitk::B
   //
   // get the world time
   //
-  Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
   assert( worldGeometry.IsNotNull() );
   ScalarType time = worldGeometry->GetTimeBounds() [ 0 ];
 

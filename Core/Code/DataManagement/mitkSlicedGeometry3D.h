@@ -26,7 +26,7 @@ namespace mitk {
 
   /** \brief Describes the geometry of a data object consisting of slices.
   *
-  * A Geometry2D can be requested for each slice. In the case of
+  * A PlaneGeometry can be requested for each slice. In the case of
   * \em evenly-spaced, \em plane geometries (m_EvenlySpaced==true),
   * only the 2D-geometry of the first slice has to be set (to an instance of
   * PlaneGeometry). The 2D geometries of the other slices are calculated
@@ -71,9 +71,9 @@ namespace mitk {
     itkNewMacro(Self);
 
     /**
-    * \brief Returns the Geometry2D of the slice (\a s).
+    * \brief Returns the PlaneGeometry of the slice (\a s).
     *
-    * If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored
+    * If (a) m_EvenlySpaced==true, (b) we don't have a PlaneGeometry stored
     * for the requested slice, and (c) the first slice (s=0)
     * is a PlaneGeometry instance, then we calculate the geometry of the
     * requested as the plane of the first slice shifted by m_Spacing[3]*s
@@ -91,12 +91,12 @@ namespace mitk {
     * \sa itk::DataObject::CopyInformation() and
     * \sa itk::DataObject::UpdateOutputInformation().
     */
-    virtual mitk::Geometry2D* GetGeometry2D( int s ) const;
+    virtual mitk::PlaneGeometry* GetGeometry2D( int s ) const;
 
     /**
-    * \brief Set Geometry2D of slice \a s.
+    * \brief Set PlaneGeometry of slice \a s.
     */
-    virtual bool SetGeometry2D( mitk::Geometry2D *geometry2D, int s );
+    virtual bool SetGeometry2D( mitk::PlaneGeometry *geometry2D, int s );
 
     //##Documentation
     //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
@@ -131,7 +131,7 @@ namespace mitk {
     * \brief Set/Get whether the SlicedGeometry3D is evenly-spaced
     * (m_EvenlySpaced)
     *
-    * If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored for
+    * If (a) m_EvenlySpaced==true, (b) we don't have a PlaneGeometry stored for
     * the requested slice, and (c) the first slice (s=0) is a PlaneGeometry
     * instance, then we calculate the geometry of the requested as the plane
     * of the first slice shifted by m_Spacing.z * s in the direction of
@@ -174,25 +174,25 @@ namespace mitk {
 
     /**
     * \brief Completely initialize this instance as evenly-spaced with slices
-    * parallel to the provided Geometry2D that is used as the first slice and
+    * parallel to the provided PlaneGeometry that is used as the first slice and
     * for spacing calculation.
     *
     * Initializes the bounding box according to the width/height of the
-    * Geometry2D and \a slices. The spacing is calculated from the Geometry2D.
+    * PlaneGeometry and \a slices. The spacing is calculated from the PlaneGeometry.
     */
-    virtual void InitializeEvenlySpaced( mitk::Geometry2D *geometry2D,
+    virtual void InitializeEvenlySpaced( mitk::PlaneGeometry *geometry2D,
       unsigned int slices, bool flipped=false );
 
     /**
     * \brief Completely initialize this instance as evenly-spaced with slices
-    * parallel to the provided Geometry2D that is used as the first slice and
+    * parallel to the provided PlaneGeometry that is used as the first slice and
     * for spacing calculation (except z-spacing).
     *
     * Initializes the bounding box according to the width/height of the
-    * Geometry2D and \a slices. The x-/y-spacing is calculated from the
-    * Geometry2D.
+    * PlaneGeometry and \a slices. The x-/y-spacing is calculated from the
+    * PlaneGeometry.
     */
-    virtual void InitializeEvenlySpaced( mitk::Geometry2D *geometry2D,
+    virtual void InitializeEvenlySpaced( mitk::PlaneGeometry *geometry2D,
       mitk::ScalarType zSpacing, unsigned int slices, bool flipped=false );
 
     /**
@@ -274,10 +274,10 @@ namespace mitk {
     /**
     * Container for the 2D-geometries contained within this SliceGeometry3D.
     */
-    mutable std::vector<Geometry2D::Pointer> m_Geometry2Ds;
+    mutable std::vector<PlaneGeometry::Pointer> m_Geometry2Ds;
 
     /**
-    * If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored
+    * If (a) m_EvenlySpaced==true, (b) we don't have a PlaneGeometry stored
     * for the requested slice, and (c) the first slice (s=0)
     * is a PlaneGeometry instance, then we calculate the geometry of the
     * requested as the plane of the first slice shifted by m_Spacing.z*s

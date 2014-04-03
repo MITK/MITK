@@ -255,7 +255,7 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
   vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
 
-  const mitk::Geometry2D* figureGeometry = figure->GetGeometry2D();
+  const mitk::PlaneGeometry* figureGeometry = figure->GetGeometry2D();
 
   // Get the polyline
   mitk::PlanarFigure::PolyLineType planarPolyLine = figure->GetPolyLine(0);

@@ -197,7 +197,7 @@ void QmitkHistogramJSWidget::ComputeIntensityProfile(unsigned int timeStep)
   }
 
   // Get 2D geometry frame of PlanarFigure
-  mitk::Geometry2D* planarFigureGeometry2D = dynamic_cast<mitk::Geometry2D*>(m_PlanarFigure->GetGeometry(0));
+  mitk::PlaneGeometry* planarFigureGeometry2D = dynamic_cast<mitk::PlaneGeometry*>(m_PlanarFigure->GetGeometry(0));
   if (planarFigureGeometry2D == NULL)
   {
     mitkThrow() << "PlanarFigure has no valid geometry!";

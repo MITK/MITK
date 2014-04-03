@@ -32,7 +32,7 @@ namespace mitk
 {
 
 class DataNode;
-class Geometry2D;
+class PlaneGeometry;
 class DisplayGeometry;
 class PlanarFigure;
 class PositionEvent;
@@ -142,13 +142,13 @@ protected:
   bool IsMousePositionAcceptableAsNewControlPoint( const mitk::InteractionPositionEvent* positionEvent, const PlanarFigure* );
 
   bool TransformPositionEventToPoint2D( const InteractionPositionEvent* positionEvent,
-                                        const Geometry2D *planarFigureGeometry,
+                                        const PlaneGeometry *planarFigureGeometry,
                                         Point2D &point2D );
 
   bool TransformObjectToDisplay( const mitk::Point2D &point2D,
     mitk::Point2D &displayPoint,
-    const mitk::Geometry2D *objectGeometry,
-    const mitk::Geometry2D *rendererGeometry,
+    const mitk::PlaneGeometry *objectGeometry,
+    const mitk::PlaneGeometry *rendererGeometry,
     const mitk::DisplayGeometry *displayGeometry ) const;
 
   /** \brief Returns true if the first specified point is in proximity of the line defined
@@ -164,8 +164,8 @@ protected:
   int IsPositionOverFigure(
     const InteractionPositionEvent* positionEvent,
     PlanarFigure *planarFigure,
-    const Geometry2D *planarFigureGeometry,
-    const Geometry2D *rendererGeometry,
+    const PlaneGeometry *planarFigureGeometry,
+    const PlaneGeometry *rendererGeometry,
     const DisplayGeometry *displayGeometry,
     Point2D& pointProjectedOntoLine) const;
 
@@ -175,8 +175,8 @@ protected:
   int IsPositionInsideMarker(
     const InteractionPositionEvent* positionEvent,
     const PlanarFigure *planarFigure,
-    const Geometry2D *planarFigureGeometry,
-    const Geometry2D *rendererGeometry,
+    const PlaneGeometry *planarFigureGeometry,
+    const PlaneGeometry *rendererGeometry,
     const DisplayGeometry *displayGeometry ) const;
 
   void LogPrintPlanarFigureQuantities( const PlanarFigure *planarFigure );

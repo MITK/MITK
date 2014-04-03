@@ -67,7 +67,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
     {
       vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
 
-      Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
+      PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
       PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
 
       if ( vtkpolydata != NULL )

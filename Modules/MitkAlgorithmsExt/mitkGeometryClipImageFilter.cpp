@@ -122,7 +122,7 @@ void mitk::GeometryClipImageFilter::GenerateOutputInformation()
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inputItkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::Geometry2D* clippingGeometry2D)
+void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inputItkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::PlaneGeometry* clippingGeometry2D)
 {
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
   typedef itk::Image<TPixel, VImageDimension> ItkOutputImageType;
@@ -210,15 +210,15 @@ void mitk::GeometryClipImageFilter::GenerateData()
   if((output->IsInitialized()==false) || (m_ClippingGeometry.IsNull()))
     return;
 
-  const Geometry2D * clippingGeometryOfCurrentTimeStep = NULL;
+  const PlaneGeometry * clippingGeometryOfCurrentTimeStep = NULL;
 
   if(m_TimeClippingGeometry.IsNull())
   {
-    clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_ClippingGeometry.GetPointer());
+    clippingGeometryOfCurrentTimeStep = dynamic_cast<const PlaneGeometry*>(m_ClippingGeometry.GetPointer());
   }
   else
   {
-    clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeClippingGeometry->GetGeometryForTimeStep(0).GetPointer());
+    clippingGeometryOfCurrentTimeStep = dynamic_cast<const PlaneGeometry*>(m_TimeClippingGeometry->GetGeometryForTimeStep(0).GetPointer());
   }
 
   if(clippingGeometryOfCurrentTimeStep == NULL)
@@ -253,7 +253,7 @@ void mitk::GeometryClipImageFilter::GenerateData()
       if(m_TimeClippingGeometry->IsValidTimeStep(timestep) == false)
         continue;
 
-      clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeClippingGeometry->GetGeometryForTimeStep(timestep).GetPointer());
+      clippingGeometryOfCurrentTimeStep = dynamic_cast<const PlaneGeometry*>(m_TimeClippingGeometry->GetGeometryForTimeStep(timestep).GetPointer());
     }
 
     AccessByItk_2(m_InputTimeSelector->GetOutput(),_InternalComputeClippedImage,this,clippingGeometryOfCurrentTimeStep);

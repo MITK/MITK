@@ -313,7 +313,7 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
 
 unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 {
-  const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
+  const mitk::PlaneGeometry* plane = dynamic_cast<const PlaneGeometry*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
     positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
 
   us::ServiceReference<PlanePositionManagerService> serviceRef =
@@ -330,7 +330,7 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
   p2[1] -= plane->GetSpacing()[1];
   contourMarker->PlaceFigure( p1 );
   contourMarker->SetCurrentControlPoint( p1 );
-  contourMarker->SetGeometry2D( const_cast<Geometry2D*>(plane));
+  contourMarker->SetGeometry2D( const_cast<PlaneGeometry*>(plane));
 
   std::stringstream markerStream;
   mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkPlaneFit.h>
 #include <mitkPointSet.h>
-#include <mitkGeometry2D.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkVector.h>
 #include <mitkGeometryData.h>
 #include <fstream>
@@ -80,8 +80,8 @@ int mitkPlaneFitTest(int, char*[] )
 
   //Test PlaneGeometry
   std::cout << "  Test PlaneGeometry: ";
-  mitk::Geometry2D* Geometry2D = dynamic_cast<mitk::Geometry2D*>( PlaneFit->GetOutput()->GetGeometry());
-  if( Geometry2D )
+  mitk::PlaneGeometry* PlaneGeometry = dynamic_cast<mitk::PlaneGeometry*>( PlaneFit->GetOutput()->GetGeometry());
+  if( PlaneGeometry )
   {
     std::cout<<"[PASSED]"<<std::endl;
   }

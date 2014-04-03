@@ -73,7 +73,7 @@ namespace mitk
     mitkClassMacro(ExtractDirectedPlaneImageFilter, ImageToImageFilter);
     itkNewMacro(ExtractDirectedPlaneImageFilter);
 
-    itkSetMacro( WorldGeometry, Geometry2D* );
+    itkSetMacro( WorldGeometry, PlaneGeometry* );
 
     // The Reslicer is accessible to configure the desired interpolation;
     // (See vtk::ImageReslice class for documentation).
@@ -107,7 +107,7 @@ namespace mitk
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,
       double *bounds );
 
-    const Geometry2D*  m_WorldGeometry;
+    const PlaneGeometry*  m_WorldGeometry;
     vtkImageReslice *  m_Reslicer;
 
     unsigned int    m_TargetTimestep;

@@ -21,12 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include "mitkBaseData.h"
 #include "mitkGeometryData.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 namespace mitk {
 
 //##Documentation
-//## @brief Data class containing Geometry2D objects
+//## @brief Data class containing PlaneGeometry objects
 //## @ingroup Geometry
 //##
 class MITK_CORE_EXPORT Geometry2DData : public GeometryData
@@ -37,22 +37,22 @@ public:
   itkNewMacro(Self);
 
   //##Documentation
-  //## @brief Set the reference to a Geometry2D that is stored
+  //## @brief Set the reference to a PlaneGeometry that is stored
   //## by the object
   //##
-  //## @warning Accepts only instances of Geometry2D or sub-classes.
+  //## @warning Accepts only instances of PlaneGeometry or sub-classes.
   virtual void SetGeometry(mitk::BaseGeometry *geometry);
 
   //##Documentation
-  //## @brief Set the reference to the Geometry2D that is stored
+  //## @brief Set the reference to the PlaneGeometry that is stored
   //## by the object
-  virtual void SetGeometry2D(mitk::Geometry2D* geometry2d);
+  virtual void SetGeometry2D(mitk::PlaneGeometry* geometry2d);
   //##Documentation
-  //## @brief Get the reference to the Geometry2D that is stored
+  //## @brief Get the reference to the PlaneGeometry that is stored
   //## by the object
-  virtual mitk::Geometry2D * GetGeometry2D() const
+  virtual mitk::PlaneGeometry * GetGeometry2D() const
   {
-    return static_cast<mitk::Geometry2D *>(GetGeometry());
+    return static_cast<mitk::PlaneGeometry *>(GetGeometry());
   };
 
   virtual void UpdateOutputInformation();

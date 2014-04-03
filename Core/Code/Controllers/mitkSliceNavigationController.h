@@ -86,7 +86,7 @@ class BaseRenderer;
  *
  * The SliceNavigationController holds has Steppers (one for the slice, a
  * second for the time step), which control the selection of a single
- * Geometry2D from the TimeGeometry. SliceNavigationController generates
+ * PlaneGeometry from the TimeGeometry. SliceNavigationController generates
  * ITK events to tell observers, like a BaseRenderer,  when the selected slice
  * or timestep changes.
  *
@@ -169,7 +169,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
 
     /**
      * \brief Possible view directions, \a Original will uses
-     * the Geometry2D instances in a SlicedGeometry3D provided
+     * the PlaneGeometry instances in a SlicedGeometry3D provided
      * as input world geometry (by SetInputWorldGeometry).
      */
     enum ViewDirection

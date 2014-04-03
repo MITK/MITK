@@ -33,14 +33,14 @@ void mitk::Geometry2DData::SetGeometry(mitk::BaseGeometry *geometry)
     SetGeometry2D(NULL);
   else
   {
-    Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(geometry);
+    PlaneGeometry* geometry2d = dynamic_cast<PlaneGeometry*>(geometry);
     if(geometry2d==NULL)
-      itkExceptionMacro(<<"Trying to set a geometry which is not a Geometry2D into Geometry2DData.");
+      itkExceptionMacro(<<"Trying to set a geometry which is not a PlaneGeometry into Geometry2DData.");
     SetGeometry2D(geometry2d);
   }
 }
 
-void mitk::Geometry2DData::SetGeometry2D(mitk::Geometry2D *geometry2d)
+void mitk::Geometry2DData::SetGeometry2D(mitk::PlaneGeometry *geometry2d)
 {
   if(geometry2d != NULL)
   {

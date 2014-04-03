@@ -52,7 +52,7 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
     mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslice);
     extractor->SetInput( imageOperation->GetImage() );
     extractor->SetTimeStep( imageOperation->GetTimeStep() );
-    extractor->SetWorldGeometry( dynamic_cast<Geometry2D*>(imageOperation->GetWorldGeometry()) );
+    extractor->SetWorldGeometry( dynamic_cast<PlaneGeometry*>(imageOperation->GetWorldGeometry()) );
     extractor->SetVtkOutputRequest(true);
     extractor->SetResliceTransformByGeometry( imageOperation->GetImage()->GetGeometry( imageOperation->GetTimeStep() ) );
 

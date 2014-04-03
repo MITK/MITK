@@ -403,7 +403,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
     surfaceCreator->SetInput( input );
 
-    // Clip the Geometry2D with the reference geometry bounds (if available)
+    // Clip the PlaneGeometry with the reference geometry bounds (if available)
     if ( input->GetGeometry2D()->HasReferenceGeometry() )
     {
       surfaceCreator->SetBoundingBox(
@@ -425,7 +425,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
     }
     surfaceCreator->SetUseGeometryParametricBounds(usegeometryparametricbounds);
 
-    // Calculate the surface of the Geometry2D
+    // Calculate the surface of the PlaneGeometry
     surfaceCreator->Update();
 
     if (m_SurfaceMapper.IsNull())

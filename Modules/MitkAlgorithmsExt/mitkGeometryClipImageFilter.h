@@ -31,11 +31,11 @@ template <class TPixel, unsigned int VImageDimension> class ITK_EXPORT Image;
 namespace mitk {
 
 //##Documentation
-//## @brief Filter for clipping an image with a Geometry2D
+//## @brief Filter for clipping an image with a PlaneGeometry
 //##
-//## The given geometry for clipping can be either a Geometry2D
+//## The given geometry for clipping can be either a PlaneGeometry
 //## or a TimeGeometry containing multiple instances
-//## of Geometry2D
+//## of PlaneGeometry
 //##
 //## \todo add AutoOrientLabels, which makes the "left" side (minimum X value) side of the image get one defined label.
 //##       left-most because vtkPolyDataNormals uses the same definition and this filter is used for visualization of
@@ -52,7 +52,7 @@ public:
   /**
   * Set the geometry to be used for clipping
   *
-  * The given geometry for clipping must be a Geometry2D.
+  * The given geometry for clipping must be a PlaneGeometry.
   */
   void SetClippingGeometry(const mitk::BaseGeometry* aClippingGeometry);
 
@@ -61,7 +61,7 @@ public:
   *
   * The given geometry for clipping must a
   * TimeGeometry containing multiple instances
-  * of Geometry2D
+  * of PlaneGeometry
   */
   void SetClippingGeometry(const mitk::TimeGeometry* aClippingGeometry);
 
@@ -127,7 +127,7 @@ public:
   virtual void GenerateData();
 
   template < typename TPixel, unsigned int VImageDimension >
-    friend void _InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* itkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::Geometry2D* clippingGeometry2D);
+    friend void _InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* itkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::PlaneGeometry* clippingGeometry2D);
 
   mitk::BaseGeometry::ConstPointer m_ClippingGeometry;
   mitk::GeometryData::Pointer m_ClippingGeometryData;

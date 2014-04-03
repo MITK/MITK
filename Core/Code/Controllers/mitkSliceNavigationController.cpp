@@ -472,7 +472,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
     slices = slicedWorldGeometry->GetSlices();
     if ( slicedWorldGeometry->GetEvenlySpaced() )
     {
-      mitk::Geometry2D *plane = slicedWorldGeometry->GetGeometry2D( 0 );
+      mitk::PlaneGeometry *plane = slicedWorldGeometry->GetGeometry2D( 0 );
 
       const Vector3D &direction = slicedWorldGeometry->GetDirectionVector();
 

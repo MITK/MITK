@@ -55,7 +55,7 @@ namespace mitk
       \return returns the ID i.e. the position in the positionlist. If the PlaneGeometry which is to be added already exists the existing
               ID will be returned.
     */
-    unsigned int AddNewPlanePosition(const mitk::Geometry2D* plane, unsigned int sliceIndex = 0);
+    unsigned int AddNewPlanePosition(const mitk::PlaneGeometry* plane, unsigned int sliceIndex = 0);
 
     /**
       \brief Removes the plane at the position \a ID from the list.

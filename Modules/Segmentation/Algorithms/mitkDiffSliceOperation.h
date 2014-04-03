@@ -53,7 +53,7 @@ namespace mitk
 
     //itkNewMacro(DiffSliceOperation);
 
-    //mitkNewMacro4Param(DiffSliceOperation,mitk::Image,mitk::Image,unsigned int, mitk::Geometry2D);
+    //mitkNewMacro4Param(DiffSliceOperation,mitk::Image,mitk::Image,unsigned int, mitk::PlaneGeometry);
 
     /** \brief Creates an empty instance.
       Note that it is not valid yet. The properties of the object have to be set.

@@ -50,7 +50,7 @@ void mitkSlicedGeometry3D_ChangeImageGeometryConsideringOriginOffset_Test()
   // create subslices as well
   for (int i=0; i < num_slices; i++)
   {
-    mitk::Geometry2D::Pointer geo2d = mitk::Geometry2D::New();
+    mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
     geo2d->Initialize();
     slicedGeo3D->SetGeometry2D(geo2d,i);
   }

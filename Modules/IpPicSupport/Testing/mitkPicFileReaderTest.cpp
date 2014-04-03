@@ -114,7 +114,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       std::cout<<"[PASSED]"<<std::endl;
 
       std::cout << "Testing availability of first geometry contained in the SlicedGeometry3D: ";
-      mitk::Geometry2D* geometry2d = slicedgeometry->GetGeometry2D(0);
+      mitk::PlaneGeometry* geometry2d = slicedgeometry->GetGeometry2D(0);
       if(geometry2d==NULL)
       {
         std::cout<<"[FAILED]"<<std::endl;

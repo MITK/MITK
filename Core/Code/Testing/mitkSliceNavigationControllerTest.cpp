@@ -452,8 +452,8 @@ int testRestorePlanePostionOperation ()
    service->AddNewPlanePosition(slicedgeometry2->GetGeometry2D(0), 178);
    sliceCtrl1->ExecuteOperation(service->GetPlanePosition(0));
    sliceCtrl1->Update();
-   mitk::Geometry2D* planeRotated = slicedgeometry2->GetGeometry2D(178);
-   mitk::Geometry2D* planeRestored = dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetGeometry2D(178);
+   mitk::PlaneGeometry* planeRotated = slicedgeometry2->GetGeometry2D(178);
+   mitk::PlaneGeometry* planeRestored = dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetGeometry2D(178);
 
    try{
       MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(planeRotated->GetIndexToWorldTransform()->GetMatrix(), planeRestored->GetIndexToWorldTransform()->GetMatrix()),"Testing for IndexToWorld");

@@ -28,7 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL pair
 #include <utility>
 
-/** Comperator implementation used to sort the CorrespondenceList.
+/** \brief Comperator implementation used to sort the CorrespondenceList in the
+  *        trimmed version of the AnisotropicIterativeClosestPointRegistration.
   */
 struct AICPComperator
 {

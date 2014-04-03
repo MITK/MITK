@@ -121,7 +121,7 @@ int DwiDenoising(int argc, char* argv[])
         filter->SetUseJointInformation(true);
         filter->SetSearchRadius(search);
         filter->SetComparisonRadius(compare);
-        filter->SetChannelRadius(channels);
+//        filter->SetChannelRadius(channels);
         filter->Update();
 
         DiffusionImageType::Pointer output = DiffusionImageType::New();

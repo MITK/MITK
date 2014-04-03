@@ -118,8 +118,7 @@ private:
 
   enum FilterType {
     NOFILTERSELECTED,
-    NLMR,
-    NLMV,
+    NLM,
     GAUSS
   }m_SelectedFilter;
 

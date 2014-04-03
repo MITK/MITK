@@ -35,7 +35,7 @@ namespace itk {
 template< class TPixelType >
 NonLocalMeansDenoisingFilter< TPixelType >
 ::NonLocalMeansDenoisingFilter()
-  : m_SearchRadius(5),
+  : m_SearchRadius(4),
     m_ComparisonRadius(1),
     m_UseJointInformation(false),
     m_UseRicianAdaption(false),

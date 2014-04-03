@@ -58,7 +58,7 @@ int mitkAnisotropicIterativeClosestPointRegistrationTest( int argc, char* args[]
   mitk::Surface::Pointer fixedSurface = mitk::IOUtil::LoadSurface(fixedSurfaceFile);
   mitk::Surface::Pointer movingSurface = mitk::IOUtil::LoadSurface(movingSurfaceFile);
 
-  // compute cov matrices for the moving (.e.g. ToF Surface)
+  // compute cov matrices
   mitk::CovarianceMatrixCalculator::Pointer matrixCalculator =
                                         mitk::CovarianceMatrixCalculator::New();
 

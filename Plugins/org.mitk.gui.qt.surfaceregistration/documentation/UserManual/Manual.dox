@@ -1,0 +1,18 @@
+/**
+\page org_mitk_gui_qt_surfaceregistration Surfaceregistration
+
+\image html icon.xpm "Icon of Surfaceregistration"
+
+Available sections:
+  - \ref org_mitk_gui_qt_surfaceregistrationOverview
+
+\section org_mitk_gui_qt_surfaceregistrationOverview
+Describe the features of your awesome plugin here
+<ul>
+<li>Increases productivity
+<li>Creates beautiful images
+<li>Generates PhD thesis
+<li>Brings world peace
+</ul>
+
+*/

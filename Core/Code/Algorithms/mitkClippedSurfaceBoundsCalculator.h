@@ -50,7 +50,7 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
 
     ClippedSurfaceBoundsCalculator(const mitk::PlaneGeometry* geometry = NULL,
                                    mitk::Image::Pointer image = NULL);
-    ClippedSurfaceBoundsCalculator(const mitk::Geometry3D* geometry,
+    ClippedSurfaceBoundsCalculator(const mitk::BaseGeometry* geometry,
                                    mitk::Image::Pointer image);
     ClippedSurfaceBoundsCalculator(const PointListType pointlist,
                                    mitk::Image::Pointer image);
@@ -61,7 +61,7 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
 
 
     void SetInput(const mitk::PlaneGeometry* geometry, mitk::Image* image);
-    void SetInput(const mitk::Geometry3D *geometry, mitk::Image *image);
+    void SetInput(const mitk::BaseGeometry *geometry, mitk::Image *image);
     void SetInput(const PointListType pointlist, mitk::Image *image);
 
     /**
@@ -109,7 +109,7 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
 
 
     mitk::PlaneGeometry::ConstPointer m_PlaneGeometry;
-    mitk::Geometry3D::ConstPointer m_Geometry3D;
+    mitk::BaseGeometry::ConstPointer m_Geometry3D;
     mitk::Image::Pointer m_Image;
     std::vector<mitk::Point3D> m_ObjectPointsInWorldCoordinates;
     std::vector< OutputType > m_MinMaxOutput;

@@ -72,7 +72,7 @@ void mitk::ProbeFilter::GenerateOutputInformation()
 
   if( (input->GetTimeGeometry()->CountTimeSteps()==1) && (source->GetTimeGeometry()->CountTimeSteps()>1) )
   {
-    Geometry3D::Pointer geometry3D = Geometry3D::New();
+    BaseGeometry::Pointer geometry3D = BaseGeometry::New();
     geometry3D->Initialize();
     geometry3D->SetBounds(source->GetTimeGeometry()->GetBoundsInWorld());
     geometry3D->SetTimeBounds(source->GetTimeGeometry()->GetGeometryForTimeStep(0)->GetTimeBounds());
@@ -84,7 +84,7 @@ void mitk::ProbeFilter::GenerateOutputInformation()
     output->SetTimeGeometry( outputTimeGeometry );
   }
   else
-    output->SetGeometry( static_cast<Geometry3D*>(input->GetGeometry()->Clone().GetPointer()) );
+    output->SetGeometry( static_cast<BaseGeometry*>(input->GetGeometry()->Clone().GetPointer()) );
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 }

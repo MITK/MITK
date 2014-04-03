@@ -199,11 +199,11 @@ void mitk::PlanesPerpendicularToLinesFilter::SetInput(const mitk::Mesh *input)
     const_cast< mitk::Mesh * >( input ) );
 }
 
-void mitk::PlanesPerpendicularToLinesFilter::SetFrameGeometry(const mitk::Geometry3D* frameGeometry)
+void mitk::PlanesPerpendicularToLinesFilter::SetFrameGeometry(const mitk::BaseGeometry* frameGeometry)
 {
   if((frameGeometry != NULL) && (frameGeometry->IsValid()))
   {
-    m_FrameGeometry = static_cast<mitk::Geometry3D*>(frameGeometry->Clone().GetPointer());
+    m_FrameGeometry = static_cast<mitk::BaseGeometry*>(frameGeometry->Clone().GetPointer());
   }
   else
   {

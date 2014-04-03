@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 
-#include "mitkGeometry3D.h"
+#include "mitkBaseGeometry.h"
 #include "mitkPlaneGeometry.h"
 
 namespace mitk {
@@ -62,10 +62,10 @@ namespace mitk {
   *
   * \ingroup Geometry
   */
-  class MITK_CORE_EXPORT SlicedGeometry3D : public mitk::Geometry3D
+  class MITK_CORE_EXPORT SlicedGeometry3D : public mitk::BaseGeometry
   {
   public:
-    mitkClassMacro(SlicedGeometry3D, Geometry3D);
+    mitkClassMacro(SlicedGeometry3D, BaseGeometry);
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);

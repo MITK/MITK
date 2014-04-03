@@ -28,8 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL pair
 #include <utility>
 
-// comperator to sort correspondences
-struct myComperator
+/** Comperator implementation used to sort the CorrespondenceList.
+  */
+struct AICPComperator
 {
   typedef std::pair < unsigned int, double > Correspondence;
 
@@ -37,7 +38,7 @@ struct myComperator
   {
     return (a.second < b.second);
   }
-} myComp;
+} AICPComp;
 
 mitk::AnisotropicIterativeClosestPointRegistration::AnisotropicIterativeClosestPointRegistration()
   : m_MaxIterations(1000),
@@ -227,7 +228,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
       // distance, if trimming is enabled
       if ( m_TrimmFactor > 0.0 )
       {
-        std::sort ( distanceList.begin(), distanceList.end(), myComp );
+        std::sort ( distanceList.begin(), distanceList.end(), AICPComp );
         // map correspondences to the data arrays
         for ( unsigned int i = 0; i < numberOfTrimmedPoints; ++i )
         {

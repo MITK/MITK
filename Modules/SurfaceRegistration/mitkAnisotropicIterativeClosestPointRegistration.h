@@ -57,43 +57,52 @@ class WeightedPointTransform;
   * for each surface can be defined by the user, or calculated
   * by the CovarianceMatrixCalculator. In addition a trimmed algorithm version
   * is provided to compute the registration of partial overlapping surfaces.
-  * Example:
+  * The algorithm needs a clean surface non manifold edges and without duplicated
+  * vertices. In addition vtkCleanPolyData can be used to ensure a correct
+  * Surface representation.
+  *
+  * \b Example:
   *
   *
-  * \code{.cpp}
+  * \code
   * typedef itk::Matrix < double, 3, 3 > Matrix3x3;
   * typedef itk::Vector < double, 3 > Vector3;
   * typedef std::vector < Matrix3x3 > CovarianceMatrixList;
   *
+  * // compute the covariance matrices
   * mitk::CovarianceMatrixCalculator::Pointer matrixCalculator =
   *                                    mitk::CovarianceMatrixCalculator::New();
   *
+  * // compute the covariance matrices for the moving surface (X)
   * matrixCalculator->SetInputSurface(movingSurface);
   * matrixCalculator->ComputeCovarianceMatrices();
   * CovarianceMatrixList sigmas_X = matrixCalculator->GetCovarianceMatrices();
   * double meanVarX = matrixCalculator->GetMeanVariance();
   *
-  * // compute the cov matrices for the fixed surface ( ct surface)
+  * // compute the covariance matrices for the fixed surface (Y)
   * matrixCalculator->SetInputSurface(fixedSurface);
   * matrixCalculator->ComputeCovarianceMatrices();
   * CovarianceMatrixList sigmas_Y = matrixCalculator->GetCovarianceMatrices();
   * double meanVarY = matrixCalculator->GetMeanVariance();
   *
+  * // the FRE normalization factor
   * double normalizationFactor = sqrt( meanVarX + meanVarY);
   *
   * // A-ICP algorithm
   * mitk::AnisotropicIterativeClosestPointRegistration::Pointer aICP =
   *    mitk::AnisotropicIterativeClosestPointRegistration::New();
   *
-  *  // set up parameters
+  * // set up parameters
   * aICP->SetMovingSurface(movingSurface);
   * aICP->SetFixedSurface(fixedSurface);
-  * aICP->SetCovarianceMatricesMovingSurface(covarianceMatricesMoving);
-  * aICP->SetCovarianceMatricesFixedSurface(covarianceMatricesFixed);
+  * aICP->SetCovarianceMatricesMovingSurface(sigmas_X);
+  * aICP->SetCovarianceMatricesFixedSurface(sigmas_Y);
   * aICP->SetFRENormalizationFactor(normalizationFactor);
   *
-  * // enable trimming. 40 percent of the moving point set
-  * // will be used for registration
+  * // Trimming is enabled if a fator > 0.0 is set.
+  * // 40 percent of the moving point set
+  * // will be used for registration in this example.
+  * // To disable trimming set the trim factor back to 0.0
   * aICP->SetTrimmFactor(0.4);
   *
   * // run the algorithm

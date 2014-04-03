@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
+// forward declarations
 class Surface;
 struct CovarianceMatrixCalculatorData;
 
@@ -43,7 +43,9 @@ struct CovarianceMatrixCalculatorData;
  * The Class implements the CM_PCA method presented by
  * L. Maier-Hein et al. in "Convergent Iterative Closest-Point Algorithm
  * to Accomodate Anisotropic and Inhomogenous Localization Error.",
- * IEEE T Pattern Anal 34 (8), 1520-1532, 2012.
+ * IEEE T Pattern Anal 34 (8), 1520-1532, 2012. The algorithm needs
+ * a clean Surface with non manifold edges and no duplicated vertices. To
+ * ensure a clean Surface representation use vtkCleanPolyData.
  */
 class MitkSurfaceRegistration_EXPORT CovarianceMatrixCalculator : public itk::Object
 {
@@ -58,6 +60,7 @@ protected:
   typedef std::vector<CovarianceMatrix> CovarianceMatrixList;
   typedef double Vertex[3];
 
+  /** Pimpl to hold private data.*/
   CovarianceMatrixCalculatorData* d;
 
   /** List that stores the computed covariance matrices. */

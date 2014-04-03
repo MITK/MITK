@@ -81,7 +81,7 @@ namespace mitk
 
     //itk regrowing
     template < typename TPixel, unsigned int VImageDimension >
-    void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint );
+    void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint );
 
     //seed point
     PointSet::Pointer m_PointSet;

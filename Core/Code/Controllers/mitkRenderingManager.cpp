@@ -359,10 +359,10 @@ void RenderingManager::InitializeViewsByBoundingObjects( const DataStorage *ds)
 // Remove old function, so only this one is working.
 bool
 RenderingManager
-::InitializeViews( const Geometry3D * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
+::InitializeViews( const BaseGeometry * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
 {
   ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
-  propTimeGeometry->Initialize(dynamic_cast<Geometry3D *>(dataGeometry->Clone().GetPointer()), 1);
+  propTimeGeometry->Initialize(dynamic_cast<BaseGeometry *>(dataGeometry->Clone().GetPointer()), 1);
   return InitializeViews(propTimeGeometry,type, preserveRoughOrientationInWorldSpace);
 }
 
@@ -495,7 +495,7 @@ RenderingManager
     assert(modifiedGeometry.IsNotNull());
     for (TimeStepType step = 0; step < modifiedGeometry->CountTimeSteps(); ++step)
     {
-      Geometry3D::BoundsArrayType newBounds = modifiedGeometry->GetGeometryForTimeStep(step)->GetBounds();
+      BaseGeometry::BoundsArrayType newBounds = modifiedGeometry->GetGeometryForTimeStep(step)->GetBounds();
       for( unsigned int dimension = 0; ( 2 * dimension ) < newBounds.Size() ; dimension++ )
       {
         //check for equality but for an epsilon
@@ -578,10 +578,10 @@ RenderingManager
   return true;
 }
 
-bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Geometry3D * geometry, bool initializeGlobalTimeSNC )
+bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const BaseGeometry * geometry, bool initializeGlobalTimeSNC )
 {
   ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
-  propTimeGeometry->Initialize(dynamic_cast<Geometry3D *>(geometry->Clone().GetPointer()), 1);
+  propTimeGeometry->Initialize(dynamic_cast<BaseGeometry *>(geometry->Clone().GetPointer()), 1);
   return InitializeView(renderWindow, propTimeGeometry, initializeGlobalTimeSNC );
 }
 

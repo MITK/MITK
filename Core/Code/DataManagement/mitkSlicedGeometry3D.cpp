@@ -253,11 +253,11 @@ void
 
 void
   mitk::SlicedGeometry3D::InitializePlanes(
-  const mitk::Geometry3D *geometry3D,
+  const mitk::BaseGeometry *geometry3D,
   mitk::PlaneGeometry::PlaneOrientation planeorientation,
   bool top, bool frontside, bool rotated )
 {
-  m_ReferenceGeometry = const_cast< Geometry3D * >( geometry3D );
+  m_ReferenceGeometry = const_cast< BaseGeometry * >( geometry3D );
 
   PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
   planeGeometry->InitializeStandardPlane(
@@ -474,7 +474,7 @@ void
 {
   Superclass::SetImageGeometry( isAnImageGeometry );
 
-  mitk::Geometry3D* geometry;
+  mitk::BaseGeometry* geometry;
 
   unsigned int s;
   for ( s = 0; s < m_Slices; ++s )
@@ -490,7 +490,7 @@ void
 void
   mitk::SlicedGeometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry )
 {
-  mitk::Geometry3D* geometry;
+  mitk::BaseGeometry* geometry;
 
   unsigned int s;
   for ( s = 0; s < m_Slices; ++s )
@@ -512,7 +512,7 @@ bool
 }
 
 void
-  mitk::SlicedGeometry3D::SetReferenceGeometry( Geometry3D *referenceGeometry )
+  mitk::SlicedGeometry3D::SetReferenceGeometry( BaseGeometry *referenceGeometry )
 {
   m_ReferenceGeometry = referenceGeometry;
 
@@ -731,7 +731,7 @@ void
           m_SliceNavigationController->AdjustSliceStepperRange();
         }
 
-        Geometry3D::ExecuteOperation( &centeredRotation );
+        BaseGeometry::ExecuteOperation( &centeredRotation );
       }
       else
       {
@@ -752,7 +752,7 @@ void
 
           // rotate overall geometry
           RotationOperation *rotOp = dynamic_cast< RotationOperation * >( operation );
-          Geometry3D::ExecuteOperation( rotOp);
+          BaseGeometry::ExecuteOperation( rotOp);
         }
       }
     }
@@ -852,7 +852,7 @@ void
       }
 
       // Also apply rotation on the slicedGeometry - Geometry3D (Bounding geometry)
-      Geometry3D::ExecuteOperation( &centeredRotation );
+      BaseGeometry::ExecuteOperation( &centeredRotation );
 
       //
       // 2nd step. If axis vectors were defined, rotate the plane around its normal to fit these
@@ -894,7 +894,7 @@ void
         }
 
         // Also apply rotation on the slicedGeometry - Geometry3D (Bounding geometry)
-        Geometry3D::ExecuteOperation( &op );
+        BaseGeometry::ExecuteOperation( &op );
       }
     }
     else
@@ -985,7 +985,7 @@ void
           m_SliceNavigationController->GetSlice()->SetPos( restorePlaneOp->GetPos() );
           m_SliceNavigationController->AdjustSliceStepperRange();
         }
-        Geometry3D::ExecuteOperation(restorePlaneOp);
+        BaseGeometry::ExecuteOperation(restorePlaneOp);
       }
     }
     else
@@ -1023,7 +1023,7 @@ void
     // ReinitializePlanes)
     this->ReinitializePlanes( center, applyMatrixOp->GetReferencePoint() );
 
-    Geometry3D::ExecuteOperation( applyMatrixOp );
+    BaseGeometry::ExecuteOperation( applyMatrixOp );
     break;
   }
 

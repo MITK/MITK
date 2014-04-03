@@ -833,7 +833,7 @@ void TestDataStorage( mitk::DataStorage* ds, std::string filename )
   MITK_TEST_CONDITION((timebounds[0]==0)&&(timebounds[1]==4),"Test for timebounds with ComputeBoundingGeometry()");
   for (unsigned int i=0; i<geometry->CountTimeSteps(); i++)
   {
-    mitk::Geometry3D::Pointer subGeometry = geometry->GetGeometryForTimeStep(i);
+    mitk::BaseGeometry::Pointer subGeometry = geometry->GetGeometryForTimeStep(i);
     mitk::TimeBounds bounds = subGeometry->GetTimeBounds();
     MITK_TEST_CONDITION((bounds[0]==i)&&(bounds[1]==i+1),"Test for timebounds of geometry at different time steps with ComputeBoundingGeometry()");
   }
@@ -843,7 +843,7 @@ void TestDataStorage( mitk::DataStorage* ds, std::string filename )
   MITK_TEST_CONDITION((timebounds[0]==0)&&(timebounds[1]==4),"Test for timebounds with ComputeBoundingGeometry(allNodes)");
   for (unsigned int i=0; i<geometry->CountTimeSteps(); i++)
   {
-    mitk::Geometry3D::Pointer subGeometry = geometry->GetGeometryForTimeStep(i);
+    mitk::BaseGeometry::Pointer subGeometry = geometry->GetGeometryForTimeStep(i);
     mitk::TimeBounds bounds = subGeometry->GetTimeBounds();
     MITK_TEST_CONDITION((bounds[0]==i)&&(bounds[1]==i+1),"Test for timebounds of geometry at different time steps with ComputeBoundingGeometry()");
   }

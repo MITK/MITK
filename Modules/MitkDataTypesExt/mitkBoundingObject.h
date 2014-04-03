@@ -47,7 +47,7 @@ public:
   //##
   //## The fit is done once, so if the given geometry changes it will
   //## \em not effect the bounding object.
-  virtual void FitGeometry(Geometry3D* aGeometry3D);
+  virtual void FitGeometry(BaseGeometry* aGeometry3D);
 protected:
   BoundingObject();
   virtual ~BoundingObject();

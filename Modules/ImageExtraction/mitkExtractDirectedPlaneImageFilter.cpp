@@ -133,7 +133,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   assert( input->GetTimeGeometry() == inputTimeGeometry );
 
   // take transform of input image into account
-  Geometry3D* inputGeometry = inputTimeGeometry->GetGeometryForTimeStep( timestep );
+  BaseGeometry* inputGeometry = inputTimeGeometry->GetGeometryForTimeStep( timestep );
   if ( inputGeometry == NULL )
   {
     itkWarningMacro(<<"There is no Geometry3D at given timestep "<<timestep);
@@ -373,7 +373,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateOutputInformation()
 
 
 bool mitk::ExtractDirectedPlaneImageFilter
-::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
+::CalculateClippedPlaneBounds( const BaseGeometry *boundingGeometry,
                 const PlaneGeometry *planeGeometry, double *bounds )
 {
   // Clip the plane with the bounding geometry. To do so, the corner points

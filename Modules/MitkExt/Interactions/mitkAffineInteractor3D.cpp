@@ -52,7 +52,7 @@ AffineInteractor3D
   m_Precision( 6.5 ),
   m_InteractionMode( INTERACTION_MODE_TRANSLATION )
 {
-  m_OriginalGeometry = Geometry3D::New();
+  m_OriginalGeometry = BaseGeometry::New();
 
   // Initialize vector arithmetic
   m_ObjectNormal[0] = 0.0;
@@ -355,7 +355,7 @@ bool AffineInteractor3D
 
       // Make deep copy of current Geometry3D of the plane
       data->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
-      m_OriginalGeometry = static_cast< Geometry3D * >(
+      m_OriginalGeometry = static_cast< BaseGeometry * >(
         data->GetGeometry( timeStep )->Clone().GetPointer() );
 
       ok = true;
@@ -431,7 +431,7 @@ bool AffineInteractor3D
           // Reset current Geometry3D to original state (pre-interaction) and
           // apply rotation
           RotationOperation op( OpROTATE, rotationCenter, rotationAxis, rotationAngle );
-          Geometry3D::Pointer newGeometry = static_cast< Geometry3D * >(
+          BaseGeometry::Pointer newGeometry = static_cast< BaseGeometry * >(
             m_OriginalGeometry->Clone().GetPointer() );
           newGeometry->ExecuteOperation( &op );
           data->SetClonedGeometry(newGeometry, timeStep);

@@ -154,7 +154,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
 
   // geometry data
   result << "Geometry: \n";
-  Geometry3D* geometry = image->GetGeometry();
+  BaseGeometry* geometry = image->GetGeometry();
   if (geometry)
   {
     AffineTransform3D* transform = geometry->GetIndexToWorldTransform();

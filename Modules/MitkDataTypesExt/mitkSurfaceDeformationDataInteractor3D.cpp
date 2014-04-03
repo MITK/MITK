@@ -145,7 +145,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::DeformObject (StateMachineAction*
 
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData* polyData = m_Surface->GetVtkPolyData(timeStep);
-  Geometry3D::Pointer geometry = this->GetDataNode()->GetData()->GetGeometry(timeStep);
+  BaseGeometry::Pointer geometry = this->GetDataNode()->GetData()->GetGeometry(timeStep);
 
   Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
 
@@ -257,7 +257,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::ColorizeSurface(vtkPolyData* poly
   {
     // Get picked point and transform into local coordinates
     Point3D localPickedPoint;
-    Geometry3D::Pointer geometry = this->GetDataNode()->GetData()->GetGeometry(timeStep);
+    BaseGeometry::Pointer geometry = this->GetDataNode()->GetData()->GetGeometry(timeStep);
     geometry->WorldToIndex( pickedPoint, localPickedPoint );
 
     Vector3D v1 = localPickedPoint.GetVectorFromOrigin();

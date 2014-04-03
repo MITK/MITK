@@ -60,8 +60,8 @@ void mitkSlicedGeometry3D_ChangeImageGeometryConsideringOriginOffset_Test()
   MITK_TEST_OUTPUT( << "Testing whether slicedGeo3D->GetImageGeometry() is false by default");
   MITK_TEST_CONDITION_REQUIRED( slicedGeo3D->GetImageGeometry()==false, "");
   MITK_TEST_OUTPUT( << "Testing whether first and last geometry in the SlicedGeometry3D have GetImageGeometry()==false by default");
-  mitk::Geometry3D* subSliceGeo2D_first = slicedGeo3D->GetGeometry2D(0);
-  mitk::Geometry3D* subSliceGeo2D_last = slicedGeo3D->GetGeometry2D(num_slices-1);
+  mitk::BaseGeometry* subSliceGeo2D_first = slicedGeo3D->GetGeometry2D(0);
+  mitk::BaseGeometry* subSliceGeo2D_last = slicedGeo3D->GetGeometry2D(num_slices-1);
   MITK_TEST_CONDITION_REQUIRED( subSliceGeo2D_first->GetImageGeometry()==false, "");
   MITK_TEST_CONDITION_REQUIRED( subSliceGeo2D_last->GetImageGeometry()==false, "");
 

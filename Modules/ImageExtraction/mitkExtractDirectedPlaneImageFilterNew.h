@@ -65,9 +65,9 @@ public:
       \a Parameter The current wordgeometry that describes the position (rotation, translation)
          of the plane (and therefore the slice to be extracted) in our 3D(+t) image
     */
-    itkSetMacro(CurrentWorldGeometry2D, Geometry3D* );
+    itkSetMacro(CurrentWorldGeometry2D, BaseGeometry* );
 
-    itkSetMacro(ImageGeometry, Geometry3D* );
+    itkSetMacro(ImageGeometry, BaseGeometry* );
 
     /**
       \brief Set macro for the current timestep
@@ -83,8 +83,8 @@ protected:
     virtual void GenerateOutputInformation();
 
 private:
-    const Geometry3D* m_CurrentWorldGeometry2D;
-    const Geometry3D* m_ImageGeometry;
+    const BaseGeometry* m_CurrentWorldGeometry2D;
+    const BaseGeometry* m_ImageGeometry;
     int m_ActualInputTimestep;
 
     template<typename TPixel, unsigned int VImageDimension>

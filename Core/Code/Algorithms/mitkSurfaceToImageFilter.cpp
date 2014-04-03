@@ -119,12 +119,12 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   move->ReleaseDataFlagOn();
 
   vtkSmartPointer<vtkTransform> transform=vtkTransform::New();
-  Geometry3D* geometry = surfaceTimeGeometry->GetGeometryForTimeStep( surfaceTimeStep );
+  BaseGeometry* geometry = surfaceTimeGeometry->GetGeometryForTimeStep( surfaceTimeStep );
   geometry->TransferItkToVtkTransform();
   transform->PostMultiply();
   transform->Concatenate(geometry->GetVtkTransform()->GetMatrix());
   // take image geometry into account. vtk-Image information will be changed to unit spacing and zero origin below.
-  Geometry3D* imageGeometry = imageTimeGeometry->GetGeometryForTimeStep(time);
+  BaseGeometry* imageGeometry = imageTimeGeometry->GetGeometryForTimeStep(time);
   imageGeometry->TransferItkToVtkTransform();
   transform->Concatenate(imageGeometry->GetVtkTransform()->GetLinearInverse());
   move->SetTransform(transform);

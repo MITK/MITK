@@ -115,7 +115,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
     DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
     assert( displayGeometry );
 
-    const Geometry3D *referenceGeometry =
+    const BaseGeometry *referenceGeometry =
       inputPlaneGeometry->GetReferenceGeometry();
 
     // calculate intersection of the plane data with the border of the

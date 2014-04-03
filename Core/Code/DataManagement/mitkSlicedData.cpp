@@ -261,7 +261,7 @@ const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry(unsigne
   return GetSlicedGeometry(t);
 }
 
-void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
+void mitk::SlicedData::SetGeometry(BaseGeometry* aGeometry3D)
 {
   if(aGeometry3D!=NULL)
   {

@@ -54,7 +54,7 @@ public:
   *
   * The given geometry for clipping must be a Geometry2D.
   */
-  void SetClippingGeometry(const mitk::Geometry3D* aClippingGeometry);
+  void SetClippingGeometry(const mitk::BaseGeometry* aClippingGeometry);
 
   /**
   * Set the geometry to be used for clipping
@@ -65,7 +65,7 @@ public:
   */
   void SetClippingGeometry(const mitk::TimeGeometry* aClippingGeometry);
 
-  const mitk::Geometry3D* GetClippingGeometry() const;
+  const mitk::BaseGeometry* GetClippingGeometry() const;
   const mitk::TimeGeometry* GetClippingTimeGeometry() const;
 
   //##Description
@@ -129,7 +129,7 @@ public:
   template < typename TPixel, unsigned int VImageDimension >
     friend void _InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* itkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::Geometry2D* clippingGeometry2D);
 
-  mitk::Geometry3D::ConstPointer m_ClippingGeometry;
+  mitk::BaseGeometry::ConstPointer m_ClippingGeometry;
   mitk::GeometryData::Pointer m_ClippingGeometryData;
   mitk::TimeGeometry::ConstPointer m_TimeClippingGeometry;
   mitk::ImageTimeSelector::Pointer m_InputTimeSelector;

@@ -349,7 +349,7 @@ void mitk::ExtrudedContour::BuildGeometry()
 
   itk2vtk(origin, m_Origin);
 
-  mitk::Geometry3D::Pointer g3d = GetGeometry( 0 );
+  mitk::BaseGeometry::Pointer g3d = GetGeometry( 0 );
   assert( g3d.IsNotNull() );
   g3d->SetBounds(bounds);
   g3d->SetIndexToWorldTransform(m_ProjectionPlane->GetIndexToWorldTransform());

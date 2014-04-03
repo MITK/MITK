@@ -101,7 +101,7 @@ namespace mitk {
     *   thisgeometry->SetExtentInMM(2, 1.0);
     * \endcode
     */
-    virtual void InitializeStandardPlane( const Geometry3D* geometry3D,
+    virtual void InitializeStandardPlane( const BaseGeometry* geometry3D,
       PlaneOrientation planeorientation = Axial, ScalarType zPosition = 0,
       bool frontside=true, bool rotated=false );
 
@@ -113,7 +113,7 @@ namespace mitk {
     * \param top if \a true, create plane at top, otherwise at bottom
     * (for PlaneOrientation Axial, for other plane locations respectively)
     */
-    virtual void InitializeStandardPlane( const Geometry3D* geometry3D, bool top,
+    virtual void InitializeStandardPlane( const BaseGeometry* geometry3D, bool top,
       PlaneOrientation planeorientation = Axial,
       bool frontside=true, bool rotated=false );
 

@@ -72,7 +72,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   if ( workingSlice.IsNull() ) return false; // can't do anything without the segmentation
 
   // if click was outside the image, don't continue
-  const Geometry3D* sliceGeometry = workingSlice->GetGeometry();
+  const BaseGeometry* sliceGeometry = workingSlice->GetGeometry();
   itk::Index<2> projectedPointIn2D;
   sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), projectedPointIn2D );
   if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) )

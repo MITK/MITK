@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define GEOMETRY2D_H_HEADER_INCLUDED_C1F4D8E0
 
 #include <MitkExports.h>
-#include "mitkGeometry3D.h"
+#include "mitkBaseGeometry.h"
 
 namespace mitk {
   /**
@@ -63,10 +63,10 @@ namespace mitk {
   * stated otherwise.
   * \ingroup Geometry
   */
-  class MITK_CORE_EXPORT Geometry2D : public mitk::Geometry3D
+  class MITK_CORE_EXPORT Geometry2D : public mitk::BaseGeometry
   {
   public:
-    mitkClassMacro(Geometry2D, mitk::Geometry3D);
+    mitkClassMacro(Geometry2D, mitk::BaseGeometry);
     itkNewMacro(Self);
 
     /**
@@ -229,12 +229,12 @@ namespace mitk {
     * This would usually be the Geometry3D of the underlying dataset, but
     * setting it is optional.
     */
-    void SetReferenceGeometry( mitk::Geometry3D *geometry );
+    void SetReferenceGeometry( mitk::BaseGeometry *geometry );
 
     /**
     * \brief Get the geometrical frame of reference for this Geometry2D.
     */
-    Geometry3D *GetReferenceGeometry() const;
+    BaseGeometry *GetReferenceGeometry() const;
     bool HasReferenceGeometry() const;
 
   protected:
@@ -262,7 +262,7 @@ namespace mitk {
     */
     mutable mitk::ScalarType m_ScaleFactorMMPerUnitY;
 
-    mitk::Geometry3D *m_ReferenceGeometry;
+    mitk::BaseGeometry *m_ReferenceGeometry;
   };
 } // namespace mitk
 

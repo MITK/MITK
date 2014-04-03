@@ -602,7 +602,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
         throw std::runtime_error( "Masking not possible for non-closed figures" );
       }
 
-      const Geometry3D *imageGeometry = timeSliceImage->GetGeometry();
+      const BaseGeometry *imageGeometry = timeSliceImage->GetGeometry();
       if ( imageGeometry == NULL )
       {
         throw std::runtime_error( "Image geometry invalid!" );
@@ -687,7 +687,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
 
 bool ImageStatisticsCalculator::GetPrincipalAxis(
-  const Geometry3D *geometry, Vector3D vector,
+  const BaseGeometry *geometry, Vector3D vector,
   unsigned int &axis )
 {
   vector.Normalize();
@@ -1090,7 +1090,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // a vtkImageStencil.
   const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
   const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
-  const mitk::Geometry3D *imageGeometry3D = m_Image->GetGeometry( 0 );
+  const mitk::BaseGeometry *imageGeometry3D = m_Image->GetGeometry( 0 );
 
   // Determine x- and y-dimensions depending on principal axis
   int i0, i1;

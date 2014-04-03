@@ -66,7 +66,7 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
   VTKWRITER* unstructuredGridWriter = VTKWRITER::New();
   vtkTransformFilter* transformPointSet = vtkTransformFilter::New();
   vtkUnstructuredGrid * unstructuredGrid;
-  Geometry3D* geometry;
+  BaseGeometry* geometry;
 
   if(input->GetTimeGeometry()->CountTimeSteps()>1)
   {

@@ -115,8 +115,6 @@ namespace mitk {
 
     virtual ~Geometry3D();
 
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
-
     static const std::string INDEX_TO_OBJECT_TRANSFORM;
     static const std::string OBJECT_TO_NODE_TRANSFORM;
     static const std::string INDEX_TO_NODE_TRANSFORM;

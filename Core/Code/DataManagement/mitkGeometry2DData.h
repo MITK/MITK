@@ -41,7 +41,7 @@ public:
   //## by the object
   //##
   //## @warning Accepts only instances of Geometry2D or sub-classes.
-  virtual void SetGeometry(mitk::Geometry3D *geometry);
+  virtual void SetGeometry(mitk::BaseGeometry *geometry);
 
   //##Documentation
   //## @brief Set the reference to the Geometry2D that is stored

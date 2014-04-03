@@ -46,7 +46,7 @@ mitk::BaseData::~BaseData()
 
 void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
 {
-  mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
+  mitk::BaseGeometry::Pointer g3d = mitk::BaseGeometry::New();
   g3d->Initialize();
 
  if ( timeSteps > 1 )
@@ -108,7 +108,7 @@ void mitk::BaseData::Expand( unsigned int timeSteps )
   }
 }
 
-const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry(int t)
+const mitk::BaseGeometry* mitk::BaseData::GetUpdatedGeometry(int t)
 {
   SetRequestedRegionToLargestPossibleRegion();
 
@@ -117,7 +117,7 @@ const mitk::Geometry3D* mitk::BaseData::GetUpdatedGeometry(int t)
   return GetGeometry(t);
 }
 
-void mitk::BaseData::SetGeometry(Geometry3D* geometry)
+void mitk::BaseData::SetGeometry(BaseGeometry* geometry)
 {
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   if(geometry!=NULL)
@@ -134,9 +134,9 @@ void mitk::BaseData::SetTimeGeometry(TimeGeometry* geometry)
   this->Modified();
 }
 
-void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
+void mitk::BaseData::SetClonedGeometry(const BaseGeometry* aGeometry3D)
 {
-  SetGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()));
+  SetGeometry(static_cast<mitk::BaseGeometry*>(aGeometry3D->Clone().GetPointer()));
 }
 
 void mitk::BaseData::SetClonedTimeGeometry(const TimeGeometry* geometry)
@@ -146,11 +146,11 @@ void mitk::BaseData::SetClonedTimeGeometry(const TimeGeometry* geometry)
 }
 
 
-void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D, unsigned int time)
+void mitk::BaseData::SetClonedGeometry(const BaseGeometry* aGeometry3D, unsigned int time)
 {
   if (m_TimeGeometry)
   {
-    m_TimeGeometry->SetTimeStepGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()),time);
+    m_TimeGeometry->SetTimeStepGeometry(static_cast<mitk::BaseGeometry*>(aGeometry3D->Clone().GetPointer()),time);
   }
 }
 
@@ -207,7 +207,7 @@ void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
   TimeGeometry* timeGeom = GetTimeGeometry();
 
   assert (timeGeom != NULL);
-  Geometry3D* geometry;
+  BaseGeometry* geometry;
 
   TimeStepType steps = timeGeom->CountTimeSteps();
   for (TimeStepType timestep = 0; timestep < steps; ++timestep)

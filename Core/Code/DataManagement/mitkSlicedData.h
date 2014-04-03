@@ -189,7 +189,7 @@ public:
   //##
   //## @warning This method will normally be called internally by the sub-class of SlicedData
   //## during initialization.
-  virtual void SetGeometry(Geometry3D* aGeometry3D);
+  virtual void SetGeometry(BaseGeometry* aGeometry3D);
 
   //##Documentation
   //## @brief Convenience method for setting the origin of

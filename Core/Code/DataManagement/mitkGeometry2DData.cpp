@@ -27,7 +27,7 @@ mitk::Geometry2DData::~Geometry2DData()
 {
 }
 
-void mitk::Geometry2DData::SetGeometry(mitk::Geometry3D *geometry)
+void mitk::Geometry2DData::SetGeometry(mitk::BaseGeometry *geometry)
 {
   if(geometry==NULL)
     SetGeometry2D(NULL);

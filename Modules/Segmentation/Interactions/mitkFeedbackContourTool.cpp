@@ -105,7 +105,7 @@ mitk::ContourModel::Pointer mitk::FeedbackContourTool::ProjectContourTo2DSlice(I
   return m_ContourUtils->ProjectContourTo2DSlice(slice, contourIn3D, correctionForIpSegmentation, constrainToInside);
 }
 
-mitk::ContourModel::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation)
+mitk::ContourModel::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation)
 {
   return m_ContourUtils->BackProjectContourFrom2DSlice(sliceGeometry, contourIn2D, correctionForIpSegmentation);
 }

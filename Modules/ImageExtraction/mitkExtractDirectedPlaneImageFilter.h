@@ -102,7 +102,7 @@ namespace mitk
     virtual void GenerateData();
     virtual void GenerateOutputInformation();
 
-    bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
+    bool CalculateClippedPlaneBounds( const BaseGeometry *boundingGeometry,
       const PlaneGeometry *planeGeometry, double *bounds );
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,
       double *bounds );

@@ -58,14 +58,14 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
 
             \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);
+    ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);
 
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
 
       \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation = false);
+    ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation = false);
 
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.

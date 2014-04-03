@@ -477,7 +477,7 @@ bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(double bounds[6]){
 }
 
 
-bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const Geometry3D *boundingGeometry,
+bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const BaseGeometry *boundingGeometry,
                                                      const PlaneGeometry *planeGeometry, double *bounds )
 {
   bool b =  mitk::PlaneClipping::CalculateClippedPlaneBounds(boundingGeometry, planeGeometry, bounds);

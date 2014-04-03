@@ -79,7 +79,7 @@ namespace mitk
     /** \brief Set a transform for the reslice axes.
     * This transform is needed if the image volume itself is transformed. (Effects the reslice axis)
     */
-    void SetResliceTransformByGeometry(const Geometry3D* transform){ this->m_ResliceTransform = transform; }
+    void SetResliceTransformByGeometry(const BaseGeometry* transform){ this->m_ResliceTransform = transform; }
 
     /** \brief Resampling grid corresponds to: false->image    true->worldgeometry*/
     void SetInPlaneResampleExtentByGeometry(bool inPlaneResampleExtentByGeometry){ this->m_InPlaneResampleExtentByGeometry = inPlaneResampleExtentByGeometry; }
@@ -106,7 +106,7 @@ namespace mitk
     bool GetClippedPlaneBounds(double bounds[6]);
 
     /** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]*/
-    bool GetClippedPlaneBounds( const Geometry3D *boundingGeometry,
+    bool GetClippedPlaneBounds( const BaseGeometry *boundingGeometry,
       const PlaneGeometry *planeGeometry, double *bounds );
 
     /** \brief Get the spacing of the slice. returns mitk::ScalarType[2] */
@@ -161,7 +161,7 @@ namespace mitk
 
     ResliceInterpolation m_InterpolationMode;
 
-    Geometry3D::ConstPointer m_ResliceTransform;
+    BaseGeometry::ConstPointer m_ResliceTransform;
 
     bool m_InPlaneResampleExtentByGeometry;//Resampling grid corresponds to:  false->image    true->worldgeometry
 

@@ -66,7 +66,7 @@ protected:
   virtual void GenerateData();
 
   template <typename TPixel, unsigned int VImageDimension>
-  void _computeIntersection(itk::Image<TPixel, VImageDimension> *itkImage, const PlaneGeometry *plane, const Geometry3D *geometry);
+  void _computeIntersection(itk::Image<TPixel, VImageDimension> *itkImage, const PlaneGeometry *plane, const BaseGeometry *geometry);
 };
 
 } // namespace mitk

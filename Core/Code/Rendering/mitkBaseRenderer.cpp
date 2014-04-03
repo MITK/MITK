@@ -468,13 +468,13 @@ void mitk::BaseRenderer::SetWorldTimeGeometry(mitk::TimeGeometry* geometry)
     if (m_TimeStep >= m_WorldTimeGeometry->CountTimeSteps())
         m_TimeStep = m_WorldTimeGeometry->CountTimeSteps() - 1;
 
-    Geometry3D* geometry3d;
+    BaseGeometry* geometry3d;
     geometry3d = m_WorldTimeGeometry->GetGeometryForTimeStep(m_TimeStep);
     SetWorldGeometry3D(geometry3d);
   }
 }
 
-void mitk::BaseRenderer::SetWorldGeometry3D(mitk::Geometry3D* geometry)
+void mitk::BaseRenderer::SetWorldGeometry3D(mitk::BaseGeometry* geometry)
 {
   itkDebugMacro("setting WorldGeometry3D to " << geometry);
 
@@ -548,7 +548,7 @@ void mitk::BaseRenderer::SendUpdateSlice()
   m_CurrentWorldGeometry2DUpdateTime.Modified();
 }
 
-void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::Geometry3D* geometry)
+void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::BaseGeometry* geometry)
 {
   m_CurrentWorldGeometry = geometry;
   if (geometry == NULL)

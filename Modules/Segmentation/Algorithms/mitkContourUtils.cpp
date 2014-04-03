@@ -58,7 +58,7 @@ mitk::ContourModel::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* s
   ContourModel::Pointer projectedContour = ContourModel::New();
   projectedContour->Initialize(*contourIn3D);
 
-  const Geometry3D* sliceGeometry = slice->GetGeometry();
+  const BaseGeometry* sliceGeometry = slice->GetGeometry();
 
   int numberOfTimesteps = contourIn3D->GetTimeGeometry()->CountTimeSteps();
 
@@ -90,7 +90,7 @@ mitk::ContourModel::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* s
 }
 
 
-mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
+mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, Contour* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
 {
   mitk::Contour::PointsContainerIterator it = contourIn2D->GetPoints()->Begin();
   mitk::Contour::PointsContainerIterator end = contourIn2D->GetPoints()->End();
@@ -105,7 +105,7 @@ mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(co
   return this->BackProjectContourFrom2DSlice(sliceGeometry, contour, false/*not used*/);
 }
 
-mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
+mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, ContourModel* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
 {
   if ( !sliceGeometry || !contourIn2D ) return NULL;
 

@@ -99,7 +99,7 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateData()
   if ( m_XYPlane.IsNull()  ||  m_XZPlane.IsNull() || m_YZPlane.IsNull() )
   {
     m_ImageToBeMapped->UpdateOutputInformation();
-    const mitk::Geometry3D* imageGeometry = m_ImageToBeMapped->GetUpdatedGeometry();
+    const mitk::BaseGeometry* imageGeometry = m_ImageToBeMapped->GetUpdatedGeometry();
     imageGeometry = m_ImageToBeMapped->GetUpdatedGeometry();
     m_XYPlane = mitk::PlaneGeometry::New();
     m_XZPlane = mitk::PlaneGeometry::New();

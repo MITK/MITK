@@ -239,7 +239,7 @@ public:
   //## initialize new (or re-initialize) image information by a Geometry3D
   //##
   //## @param tDim defines the number of time steps for which the Image should be initialized
-  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=1);
+  virtual void Initialize(const mitk::PixelType& type, const mitk::BaseGeometry& geometry, unsigned int channels = 1, int tDim=1);
 
   /**
   * initialize new (or re-initialize) image information by a Geometry3D
@@ -473,7 +473,7 @@ public:
 
   /** \brief Sets a geometry to an image.
     */
-  virtual void SetGeometry(Geometry3D* aGeometry3D);
+  virtual void SetGeometry(BaseGeometry* aGeometry3D);
 
   /**
   * @warning for internal use only

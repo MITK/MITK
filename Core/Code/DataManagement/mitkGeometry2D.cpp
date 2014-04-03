@@ -25,7 +25,7 @@ mitk::Geometry2D::Geometry2D()
 }
 
 mitk::Geometry2D::Geometry2D(const Geometry2D& other)
-  : Geometry3D(other), m_ScaleFactorMMPerUnitX( other.m_ScaleFactorMMPerUnitX),
+  : BaseGeometry(other), m_ScaleFactorMMPerUnitX( other.m_ScaleFactorMMPerUnitX),
   m_ScaleFactorMMPerUnitY( other.m_ScaleFactorMMPerUnitY),
   m_ReferenceGeometry( other.m_ReferenceGeometry )
 {
@@ -223,7 +223,7 @@ bool
   mitk::Geometry2D::IsAbove(const mitk::Point3D& pt3d_mm) const
 {
   Point3D pt3d_units;
-  Geometry3D::WorldToIndex(pt3d_mm, pt3d_units);
+  BaseGeometry::WorldToIndex(pt3d_mm, pt3d_units);
   return (pt3d_units[2] > this->GetBoundingBox()->GetBounds()[4]);
 }
 
@@ -246,12 +246,12 @@ void
 }
 
 void
-  mitk::Geometry2D::SetReferenceGeometry( mitk::Geometry3D *geometry )
+  mitk::Geometry2D::SetReferenceGeometry( mitk::BaseGeometry *geometry )
 {
   m_ReferenceGeometry = geometry;
 }
 
-mitk::Geometry3D *
+mitk::BaseGeometry *
   mitk::Geometry2D::GetReferenceGeometry() const
 {
   return m_ReferenceGeometry;

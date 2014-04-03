@@ -180,7 +180,7 @@ namespace mitk
     //## \sa m_WorldGeometry
     //## \sa m_WorldTimeGeometry
     //## \sa m_CurrentWorldGeometry2D
-    virtual void SetWorldGeometry3D(Geometry3D* geometry);
+    virtual void SetWorldGeometry3D(BaseGeometry* geometry);
     virtual void SetWorldTimeGeometry(mitk::TimeGeometry* geometry);
 
 
@@ -190,14 +190,14 @@ namespace mitk
     DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry* geometry));
 
 
-    itkGetConstObjectMacro(WorldGeometry, Geometry3D)
-    itkGetObjectMacro(WorldGeometry, Geometry3D)
+    itkGetConstObjectMacro(WorldGeometry, BaseGeometry)
+    itkGetObjectMacro(WorldGeometry, BaseGeometry)
     itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
     itkGetObjectMacro(WorldTimeGeometry, TimeGeometry)
 
     //##Documentation
     //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
-    itkGetConstObjectMacro(CurrentWorldGeometry, Geometry3D)
+    itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry)
 
     //##Documentation
     //## @brief Get the current 2D-worldgeometry (m_CurrentWorldGeometry2D) used for 2D-rendering
@@ -502,7 +502,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Sets m_CurrentWorldGeometry
-    virtual void SetCurrentWorldGeometry(Geometry3D* geometry);
+    virtual void SetCurrentWorldGeometry(BaseGeometry* geometry);
 
     //##Documentation
     //## @brief This method is called during the rendering process to update or render the Overlays
@@ -518,7 +518,7 @@ namespace mitk
     //## directly from the geometry of an image-slice and thus it would be
     //## very strange when suddenly the image-slice changes its geometry).
     //## \sa SetWorldGeometry
-    Geometry3D::Pointer m_WorldGeometry;
+    BaseGeometry::Pointer m_WorldGeometry;
 
     itk::SmartPointer<OverlayManager> m_OverlayManager;
 
@@ -533,7 +533,7 @@ namespace mitk
 
     //##Documentation
     //## Pointer to the current 3D-worldgeometry.
-    Geometry3D::Pointer m_CurrentWorldGeometry;
+    BaseGeometry::Pointer m_CurrentWorldGeometry;
 
     //##Documentation
     //## Pointer to the current 2D-worldgeometry. The 2D-worldgeometry

@@ -36,7 +36,7 @@ public:
   void SetLandmarkProjector(mitk::LandmarkProjector* aLandmarkProjector);
   itkGetConstObjectMacro(LandmarkProjector, mitk::LandmarkProjector);
 
-  virtual void SetFrameGeometry(const mitk::Geometry3D* frameGeometry);
+  virtual void SetFrameGeometry(const mitk::BaseGeometry* frameGeometry);
 
   virtual void ComputeGeometry();
 

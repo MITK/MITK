@@ -121,7 +121,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
         planeGeometry->GetIndexToWorldTransform();
 
       TimeGeometry *timeGeometry = output->GetTimeGeometry();
-      Geometry3D *geometrie3d = timeGeometry->GetGeometryForTimeStep( 0 );
+      BaseGeometry *geometrie3d = timeGeometry->GetGeometryForTimeStep( 0 );
       geometrie3d->SetIndexToWorldTransform( affineTransform );
     }
 
@@ -190,7 +190,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
         planeGeometry->GetVtkTransform()->GetLinearInverse()
       );
 
-      Geometry3D *referenceGeometry = planeGeometry->GetReferenceGeometry();
+      BaseGeometry *referenceGeometry = planeGeometry->GetReferenceGeometry();
       if ( referenceGeometry )
       {
         m_Transform->Concatenate(
@@ -307,7 +307,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
         abstractGeometry->GetIndexToWorldTransform();
 
       TimeGeometry *timeGeometry = output->GetTimeGeometry();
-      Geometry3D *g3d = timeGeometry->GetGeometryForTimeStep( 0 );
+      BaseGeometry *g3d = timeGeometry->GetGeometryForTimeStep( 0 );
       g3d->SetIndexToWorldTransform( affineTransform );
 
       vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();

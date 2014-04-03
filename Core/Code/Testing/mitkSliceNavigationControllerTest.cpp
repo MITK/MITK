@@ -68,7 +68,7 @@ int compareGeometry(const mitk::TimeGeometry & timeGeometry,
 {
    //Probleme durch umstellung von Time-SlicedGeometry auf  TimeGeometry?
    //Eventuell gibt es keine Entsprechung mehr.
-   const mitk::Geometry3D::Pointer geometry= timeGeometry.GetGeometryForTimeStep(0);
+   const mitk::BaseGeometry::Pointer geometry= timeGeometry.GetGeometryForTimeStep(0);
    std::cout << "Testing width, height and thickness (in units): ";
    if((mitk::Equal(geometry->GetExtent(0),width)==false) ||
       (mitk::Equal(geometry->GetExtent(1),height)==false) ||

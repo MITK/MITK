@@ -56,12 +56,12 @@ public:
   //## @brief Set frame geometry within which the interpolation shall occur.
   //##
   //## Used as a hint, may be ignored depending on the concrete sub-classes.
-  itkSetConstObjectMacro(FrameGeometry, mitk::Geometry3D);
+  itkSetConstObjectMacro(FrameGeometry, mitk::BaseGeometry);
   //##Documentation
   //## @brief Get frame geometry within which the interpolation shall occur.
   //##
   //## Used as a hint, may be ignored depending on the concrete sub-classes.
-  itkGetConstObjectMacro(FrameGeometry, mitk::Geometry3D);
+  itkGetConstObjectMacro(FrameGeometry, mitk::BaseGeometry);
 
   //##Documentation
   //## @brief Get the parameter plane for use in AbstractTransformGeometry::SetPlane.
@@ -105,7 +105,7 @@ protected:
 
   vtkAbstractTransform* m_InterpolatingAbstractTransform;
   vtkAbstractTransform* m_CompleteAbstractTransform;
-  mitk::Geometry3D::ConstPointer m_FrameGeometry;
+  mitk::BaseGeometry::ConstPointer m_FrameGeometry;
   mutable mitk::PlaneGeometry::ConstPointer m_ParameterPlane;
   mitk::PointSet::DataType::PointsContainer::Pointer m_WritableFinalTargetLandmarks;
   mitk::PointSet::DataType::PointsContainer::ConstPointer m_FinalTargetLandmarks;

@@ -63,7 +63,7 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION(baseDataImpl->GetTimeSteps() == 5, "Expand the geometry to further time slices!");
 
   //test method GetUpdatedGeometry(int timeStep);
-  mitk::Geometry3D::Pointer geo3 = mitk::Geometry3D::New();
+  mitk::BaseGeometry::Pointer geo3 = mitk::BaseGeometry::New();
   mitk::ProportionalTimeGeometry::Pointer timeGeometry = dynamic_cast<mitk::ProportionalTimeGeometry *>(baseDataImpl->GetTimeGeometry());
   if (timeGeometry.IsNotNull() )
   {

@@ -279,11 +279,11 @@ namespace mitk
   }
 
   void
-    PlaneGeometry::InitializeStandardPlane( const Geometry3D *geometry3D,
+    PlaneGeometry::InitializeStandardPlane( const BaseGeometry *geometry3D,
     PlaneOrientation planeorientation, ScalarType zPosition,
     bool frontside, bool rotated )
   {
-    this->SetReferenceGeometry( const_cast< Geometry3D * >( geometry3D ) );
+    this->SetReferenceGeometry( const_cast< BaseGeometry * >( geometry3D ) );
 
     ScalarType width, height;
 
@@ -334,7 +334,7 @@ namespace mitk
   }
 
   void
-    PlaneGeometry::InitializeStandardPlane( const Geometry3D *geometry3D,
+    PlaneGeometry::InitializeStandardPlane( const BaseGeometry *geometry3D,
     bool top, PlaneOrientation planeorientation, bool frontside, bool rotated )
   {
     ScalarType zPosition;

@@ -197,7 +197,7 @@ bool mitk::AbstractTransformGeometry::IsAbove(const mitk::Point3D& pt3d_mm) cons
   pt3d_ParametricWorld = m_ItkVtkAbstractTransform->BackTransform(pt3d_mm);
 
   Point3D pt3d_ParametricUnits;
-  ((Geometry3D*)m_Plane)->WorldToIndex(pt3d_ParametricWorld, pt3d_ParametricUnits);
+  ((BaseGeometry*)m_Plane)->WorldToIndex(pt3d_ParametricWorld, pt3d_ParametricUnits);
 
   return (pt3d_ParametricUnits[2] > m_ParametricBoundingBox->GetBounds()[4]);
 }
@@ -236,11 +236,11 @@ void mitk::AbstractTransformGeometry::CalculateFrameGeometry()
   SetBounds(m_Plane->GetBoundingBox()->GetBounds());
 }
 
-void mitk::AbstractTransformGeometry::SetFrameGeometry(const mitk::Geometry3D* frameGeometry)
+void mitk::AbstractTransformGeometry::SetFrameGeometry(const mitk::BaseGeometry* frameGeometry)
 {
   if((frameGeometry != NULL) && (frameGeometry->IsValid()))
   {
-    m_FrameGeometry = static_cast<mitk::Geometry3D*>(frameGeometry->Clone().GetPointer());
+    m_FrameGeometry = static_cast<mitk::BaseGeometry*>(frameGeometry->Clone().GetPointer());
     SetIndexToWorldTransform(m_FrameGeometry->GetIndexToWorldTransform());
     SetBounds(m_FrameGeometry->GetBounds());
   }

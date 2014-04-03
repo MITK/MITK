@@ -64,8 +64,8 @@ class Segmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImag
     /**
       \brief Which plane to overwrite
     */
-    const Geometry3D* GetPlaneGeometry3D() const { return m_PlaneGeometry; }
-    void SetPlaneGeometry3D( const Geometry3D *geometry ) { m_PlaneGeometry = geometry; }
+    const BaseGeometry* GetPlaneGeometry3D() const { return m_PlaneGeometry; }
+    void SetPlaneGeometry3D( const BaseGeometry *geometry ) { m_PlaneGeometry = geometry; }
 
     /**
       \brief Time step of the slice to overwrite
@@ -105,8 +105,8 @@ class Segmentation_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImag
     Image::ConstPointer m_SliceImage;
     Image::Pointer m_SliceDifferenceImage;
 
-    const Geometry3D  *m_PlaneGeometry;
-    const Geometry3D *m_ImageGeometry3D;
+    const BaseGeometry  *m_PlaneGeometry;
+    const BaseGeometry *m_ImageGeometry3D;
     unsigned int m_TimeStep;
     unsigned int m_Dimension0;
     unsigned int m_Dimension1;

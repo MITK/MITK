@@ -80,7 +80,7 @@ void mitk::Contour::UpdateOutputInformation()
     mitkBounds[4] = tmp[4];
     mitkBounds[5] = tmp[5];
   }
-  Geometry3D* geometry3d = GetGeometry(0);
+  BaseGeometry* geometry3d = GetGeometry(0);
   geometry3d->SetBounds(mitkBounds);
   GetTimeGeometry()->Update();
 }

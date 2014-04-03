@@ -204,7 +204,7 @@ void QmitkHistogramJSWidget::ComputeIntensityProfile(unsigned int timeStep)
   }
 
   // Get 3D geometry from Image (needed for conversion of point to index)
-  mitk::Geometry3D* imageGeometry = m_Image->GetGeometry(0);
+  mitk::BaseGeometry* imageGeometry = m_Image->GetGeometry(0);
   if (imageGeometry == NULL)
   {
     mitkThrow() << "Image has no valid geometry!";

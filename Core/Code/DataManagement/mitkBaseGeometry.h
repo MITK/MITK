@@ -55,6 +55,20 @@ namespace mitk {
   {
   public:
     mitkClassMacro(BaseGeometry, itk::Object);
+        /** Method for creation through the object factory. */
+    itkNewMacro(Self);
+    mitkNewMacro1Param(Self,Self);
+        //##Documentation
+    //## @brief clones the geometry
+    //##
+    //## Overwrite in all sub-classes.
+    //## Normally looks like:
+    //## \code
+    //##  Self::Pointer newGeometry = new Self(*this);
+    //##  newGeometry->UnRegister();
+    //##  return newGeometry.GetPointer();
+    //## \endcode
+    virtual itk::LightObject::Pointer InternalClone() const;
 
     // ********************************** TypeDef **********************************
 
@@ -113,8 +127,6 @@ namespace mitk {
     //## @brief Is this Geometry3D in a state that is valid?
     virtual bool IsValid() const;
 
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const = 0;
-
     // ********************************** Initialize **********************************
 
     //##Documentation
@@ -122,8 +134,6 @@ namespace mitk {
     void Initialize();
 
     void InitializeGeometry(Self * newGeometry) const;
-
-    static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::Vector3D& spacing, float floatSpacing[3]);
 
     // ********************************** Transformations Set/Get **********************************
 
@@ -493,6 +503,8 @@ namespace mitk {
     BaseGeometry();
     BaseGeometry(const BaseGeometry& other);
     virtual ~BaseGeometry();
+
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
     void BackTransform(const mitk::Point3D& in, mitk::Point3D& out) const;
 

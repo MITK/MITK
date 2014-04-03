@@ -27,7 +27,7 @@ int mitkPlaneFitTest(int, char*[] )
 
   mitk::PlaneFit::Pointer PlaneFit = mitk::PlaneFit::New();
   mitk::PointSet::Pointer PointSet = mitk::PointSet::New();
-  mitk::Geometry3D::Pointer Geometry3D = mitk::Geometry3D::New();
+  mitk::BaseGeometry::Pointer BaseGeometry = mitk::BaseGeometry::New();
 
   mitk::Point3D Point;
 

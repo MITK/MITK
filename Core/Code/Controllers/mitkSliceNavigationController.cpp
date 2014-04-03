@@ -97,7 +97,7 @@ SliceNavigationController::~SliceNavigationController()
 
 
 void
-SliceNavigationController::SetInputWorldGeometry3D( const Geometry3D *geometry )
+SliceNavigationController::SetInputWorldGeometry3D( const BaseGeometry *geometry )
 {
   if ( geometry != NULL )
   {
@@ -241,7 +241,7 @@ SliceNavigationController::Update(
 
     // initialize the viewplane
     SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
-    Geometry3D::ConstPointer currentGeometry = NULL;
+    BaseGeometry::ConstPointer currentGeometry = NULL;
     if (m_InputWorldTimeGeometry.IsNotNull())
       if (m_InputWorldTimeGeometry->IsValidTimeStep(GetTime()->GetPos()))
         currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(GetTime()->GetPos());
@@ -545,7 +545,7 @@ SliceNavigationController::GetCreatedWorldGeometry()
   return m_CreatedWorldGeometry;
 }
 
-const mitk::Geometry3D *
+const mitk::BaseGeometry *
 SliceNavigationController::GetCurrentGeometry3D()
 {
   if ( m_CreatedWorldGeometry.IsNotNull() )

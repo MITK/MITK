@@ -54,7 +54,7 @@ class Segmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
 
       \a Parameter The slice`s geometry
     */
-   itkSetMacro(SliceGeometry, Geometry3D*);
+   itkSetMacro(SliceGeometry, BaseGeometry*);
 
    //typedef unsigned int VDimension;
    typedef itk::PolyLineParametricPath<2> PolyLineParametricPath2D;
@@ -81,7 +81,7 @@ class Segmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
    virtual void GenerateOutputInformation();
 
  private:
-   const Geometry3D* m_SliceGeometry;
+   const BaseGeometry* m_SliceGeometry;
    bool m_UseProgressBar;
    unsigned int m_ProgressStepSize;
 

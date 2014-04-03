@@ -84,7 +84,7 @@ void CutImageWithOutputTypeSelect
   cutter->m_OutsidePixelCount = 0;
   cutter->m_InsidePixelCount = 0;
   mitk::Point3D p;
-  mitk::Geometry3D* inputGeometry = cutter->GetInput()->GetGeometry();
+  mitk::BaseGeometry* inputGeometry = cutter->GetInput()->GetGeometry();
 
   TOutputPixel outsideValue;
   if(cutter->m_AutoOutsideValue)

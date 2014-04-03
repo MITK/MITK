@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <MitkExports.h>
 #include "mitkOperationActor.h"
-#include <mitkGeometry3D.h>
+#include <mitkBaseGeometry.h>
 
 
 namespace mitk {
@@ -149,7 +149,7 @@ namespace mitk {
     * time point or all time points depending on the used implementation
     * of TimeGeometry.
     */
-    virtual Geometry3D::Pointer GetGeometryForTimePoint ( TimePointType timePoint) const = 0;
+    virtual BaseGeometry::Pointer GetGeometryForTimePoint ( TimePointType timePoint) const = 0;
     /**
     * \brief Returns the geometry which corresponds to the given time step
     *
@@ -162,7 +162,7 @@ namespace mitk {
     * time step or all time steps depending on the used implementation
     * of TimeGeometry.
     */
-    virtual Geometry3D::Pointer GetGeometryForTimeStep ( TimeStepType timeStep) const = 0;
+    virtual BaseGeometry::Pointer GetGeometryForTimeStep ( TimeStepType timeStep) const = 0;
 
     /**
     * \brief Returns a clone of the geometry of a specific time point
@@ -170,14 +170,14 @@ namespace mitk {
     * If an invalid time step is given (e.g. no geometry is defined for this time step)
     * a null-pointer will be returned.
     */
-    virtual Geometry3D::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const = 0;
+    virtual BaseGeometry::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const = 0;
     /**
     * \brief Sets the geometry for a given time step
     *
     * Sets the geometry for the given time steps. This may also afflects other
     * time steps, depending on the implementation of TimeGeometry.
     */
-    virtual void SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep) = 0;
+    virtual void SetTimeStepGeometry(BaseGeometry* geometry, TimeStepType timeStep) = 0;
 
     /**
     * \brief Expands to the given number of time steps

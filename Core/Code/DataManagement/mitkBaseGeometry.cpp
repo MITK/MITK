@@ -85,7 +85,7 @@ void mitk::BaseGeometry::TransferItkToVtkTransform()
   m_VtkIndexToWorldTransform->Modified();
 }
 
-void mitk::BaseGeometry::CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::Vector3D& spacing, float floatSpacing[3])
+static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::Vector3D& spacing, float floatSpacing[3])
 {
   mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
   vnlmatrix = transform->GetMatrix().GetVnlMatrix();
@@ -1005,4 +1005,74 @@ void
   SetOrigin(originWorld);
 
   this->SetImageGeometry(isAnImageGeometry);
+}
+itk::LightObject::Pointer mitk::BaseGeometry::InternalClone() const
+{
+  Self::Pointer newGeometry = new Self(*this);
+  newGeometry->UnRegister();
+  return newGeometry.GetPointer();
+}
+
+void mitk::BaseGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  os << indent << " IndexToWorldTransform: ";
+  if(this->IsIndexToWorldTransformNull())
+    os << "NULL" << std::endl;
+  else
+  {
+    // from itk::MatrixOffsetTransformBase
+    unsigned int i, j;
+    os << std::endl;
+    os << indent << "Matrix: " << std::endl;
+    for (i = 0; i < 3; i++)
+    {
+      os << indent.GetNextIndent();
+      for (j = 0; j < 3; j++)
+      {
+        os << this->GetIndexToWorldTransform()->GetMatrix()[i][j] << " ";
+      }
+      os << std::endl;
+    }
+
+    os << indent << "Offset: " << this->GetIndexToWorldTransform()->GetOffset() << std::endl;
+    os << indent << "Center: " << this->GetIndexToWorldTransform()->GetCenter() << std::endl;
+    os << indent << "Translation: " << this->GetIndexToWorldTransform()->GetTranslation() << std::endl;
+
+    os << indent << "Inverse: " << std::endl;
+    for (i = 0; i < 3; i++)
+    {
+      os << indent.GetNextIndent();
+      for (j = 0; j < 3; j++)
+      {
+        os << this->GetIndexToWorldTransform()->GetInverseMatrix()[i][j] << " ";
+      }
+      os << std::endl;
+    }
+
+    // from itk::ScalableAffineTransform
+    os << indent << "Scale : ";
+    for (i = 0; i < 3; i++)
+    {
+      os << this->GetIndexToWorldTransform()->GetScale()[i] << " ";
+    }
+    os << std::endl;
+  }
+
+  os << indent << " BoundingBox: ";
+  if(this->IsBoundingBoxNull())
+    os << "NULL" << std::endl;
+  else
+  {
+    os << indent << "( ";
+    for (unsigned int i=0; i<3; i++)
+    {
+      os << this->GetBoundingBox()->GetBounds()[2*i] << "," << this->GetBoundingBox()->GetBounds()[2*i+1] << " ";
+    }
+    os << " )" << std::endl;
+  }
+
+  os << indent << " Origin: " << this->GetOrigin() << std::endl;
+  os << indent << " ImageGeometry: " << this->GetImageGeometry() << std::endl;
+  os << indent << " Spacing: " << this->GetSpacing() << std::endl;
+  os << indent << " TimeBounds: " << this->GetTimeBounds() << std::endl;
 }

@@ -114,7 +114,7 @@ namespace mitk {
     */
     virtual bool IsValidSlice( int s = 0 ) const;
 
-    virtual void SetReferenceGeometry( Geometry3D *referenceGeometry );
+    virtual void SetReferenceGeometry( BaseGeometry *referenceGeometry );
 
     /**
     * \brief Set the SliceNavigationController corresponding to this sliced
@@ -213,7 +213,7 @@ namespace mitk {
     * \param rotate rotates the plane by 180 degree around its normal (the
     * definition of rotated vs not rotated is somewhat arbitrary)
     */
-    virtual void InitializePlanes( const mitk::Geometry3D *geometry3D,
+    virtual void InitializePlanes( const mitk::BaseGeometry *geometry3D,
       mitk::PlaneGeometry::PlaneOrientation planeorientation, bool top=true,
       bool frontside=true, bool rotated=false );
 
@@ -255,7 +255,7 @@ namespace mitk {
     virtual void ReinitializePlanes( const Point3D &center,
       const Point3D &referencePoint );
 
-    ScalarType GetLargestExtent( const Geometry3D *geometry );
+    ScalarType GetLargestExtent( const BaseGeometry *geometry );
 
     void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
@@ -299,7 +299,7 @@ namespace mitk {
     unsigned int m_Slices;
 
     /** Underlying Geometry3D for this SlicedGeometry */
-    mitk::Geometry3D *m_ReferenceGeometry;
+    mitk::BaseGeometry *m_ReferenceGeometry;
 
     /** SNC correcsponding to this geometry; used to reflect changes in the
     * number of slices due to rotation. */

@@ -149,7 +149,7 @@ namespace mitk {
     //## Maybe used as a hint within which the interpolation shall occur
     //## by concrete sub-classes.
     //## \sa CalculateFrameGeometry
-    virtual void SetFrameGeometry(const mitk::Geometry3D* frameGeometry);
+    virtual void SetFrameGeometry(const mitk::BaseGeometry* frameGeometry);
 
     virtual itk::LightObject::Pointer InternalClone() const;
 
@@ -202,7 +202,7 @@ namespace mitk {
 
     itk::VtkAbstractTransform<ScalarType>::Pointer m_ItkVtkAbstractTransform;
 
-    mitk::Geometry3D::Pointer m_FrameGeometry;
+    mitk::BaseGeometry::Pointer m_FrameGeometry;
 
     virtual void InternPostInitialize();
 

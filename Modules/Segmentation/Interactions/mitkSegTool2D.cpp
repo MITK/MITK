@@ -128,7 +128,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   }
 
   // determine slice number in image
-  Geometry3D* imageGeometry = image->GetGeometry(0);
+  BaseGeometry* imageGeometry = image->GetGeometry(0);
   Point3D testPoint = imageGeometry->GetCenter();
   Point3D projectedPoint;
   plane->Project( testPoint, projectedPoint );

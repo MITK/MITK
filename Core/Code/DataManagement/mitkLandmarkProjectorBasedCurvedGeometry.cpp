@@ -58,7 +58,7 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::SetLandmarkProjector(mitk::Land
   }
 }
 
-void mitk::LandmarkProjectorBasedCurvedGeometry::SetFrameGeometry(const mitk::Geometry3D* frameGeometry)
+void mitk::LandmarkProjectorBasedCurvedGeometry::SetFrameGeometry(const mitk::BaseGeometry* frameGeometry)
 {
   Superclass::SetFrameGeometry(frameGeometry);
   if(m_LandmarkProjector.IsNotNull())
@@ -76,7 +76,7 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::ComputeGeometry()
 }
 itk::LightObject::Pointer mitk::LandmarkProjectorBasedCurvedGeometry::InternalClone() const
 {
-  mitk::Geometry3D::Pointer newGeometry = new LandmarkProjectorBasedCurvedGeometry(*this);
+  mitk::BaseGeometry::Pointer newGeometry = new LandmarkProjectorBasedCurvedGeometry(*this);
   newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }

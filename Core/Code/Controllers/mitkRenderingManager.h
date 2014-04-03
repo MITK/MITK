@@ -38,7 +38,7 @@ namespace mitk
 
 class RenderingManager;
 class RenderingManagerFactory;
-class Geometry3D;
+class BaseGeometry;
 class SliceNavigationController;
 class BaseRenderer;
 class DataStorage;
@@ -154,7 +154,7 @@ public:
 
   /** Initializes the windows specified by requestType to the given
    * geometry. PLATFORM SPECIFIC. TODO: HOW IS THIS PLATFORM SPECIFIC? */
-  virtual bool InitializeViews( const Geometry3D *geometry,
+  virtual bool InitializeViews( const BaseGeometry *geometry,
     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
   virtual bool InitializeViews( const TimeGeometry *geometry,
     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
@@ -173,7 +173,7 @@ public:
   /** Initializes the specified window to the given geometry. Set
    * "initializeGlobalTimeSNC" to true in order to use this geometry as
    * global TimeGeometry. PLATFORM SPECIFIC. */
-  virtual bool InitializeView( vtkRenderWindow *renderWindow, const Geometry3D *geometry, bool initializeGlobalTimeSNC = false);
+  virtual bool InitializeView( vtkRenderWindow *renderWindow, const BaseGeometry *geometry, bool initializeGlobalTimeSNC = false);
   virtual bool InitializeView( vtkRenderWindow *renderWindow, const TimeGeometry *geometry, bool initializeGlobalTimeSNC = false);
 
   /** Initializes the specified window to the default viewing direction

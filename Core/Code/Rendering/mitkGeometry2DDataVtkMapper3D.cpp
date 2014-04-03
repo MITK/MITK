@@ -272,7 +272,7 @@ namespace mitk
       // Clip the Geometry2D with the reference geometry bounds (if available)
       if ( input->GetGeometry2D()->HasReferenceGeometry() )
       {
-        Geometry3D *referenceGeometry =
+        BaseGeometry *referenceGeometry =
             input->GetGeometry2D()->GetReferenceGeometry();
 
         BoundingBox::PointType boundingBoxMin, boundingBoxMax;

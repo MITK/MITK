@@ -153,7 +153,7 @@ public:
 
     image->SetClonedGeometry(planegeometry);
 
-    mitk::Geometry3D::Pointer imageGeometry = image->GetGeometry();
+    mitk::BaseGeometry::Pointer imageGeometry = image->GetGeometry();
     itk::ScalableAffineTransform<mitk::ScalarType,3>* frameNew = imageGeometry->GetIndexToWorldTransform();
     itk::ScalableAffineTransform<mitk::ScalarType,3>* frameOld = planegeometry->GetIndexToWorldTransform();
     bool matrixEqual = true;
@@ -301,7 +301,7 @@ int mitkImageTest(int argc, char* argv[])
 
   // Testing Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int slices) with PlaneGeometry and GetData(): ";
   imgMem->Initialize( mitk::MakePixelType<int, int, 1>(), *planegeometry);
-  MITK_TEST_CONDITION_REQUIRED( imgMem->GetGeometry()->GetOrigin() == static_cast<mitk::Geometry3D*>(planegeometry)->GetOrigin(), "Testing correct setting of geometry via initialize!");
+  MITK_TEST_CONDITION_REQUIRED( imgMem->GetGeometry()->GetOrigin() == static_cast<mitk::BaseGeometry*>(planegeometry)->GetOrigin(), "Testing correct setting of geometry via initialize!");
 
   try
   {

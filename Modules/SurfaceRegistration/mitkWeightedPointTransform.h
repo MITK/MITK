@@ -188,7 +188,8 @@ protected:
    *
    *  converted to C++ by Alfred Franz in March/April 2010
    */
-  void C_maker( vtkPoints* X, const WeightMatrixList &W, itk::VariableSizeMatrix< double >& returnValue);
+  void C_maker( vtkPoints* X, const WeightMatrixList &W,
+                itk::VariableSizeMatrix< double >& returnValue );
 
   /**
    *  original matlab-function:
@@ -204,7 +205,9 @@ protected:
    *
    *  converted to C++ by Alfred Franz in March/April 2010
    */
-  void E_maker( vtkPoints* X, vtkPoints* Y, const WeightMatrixList &W, vnl_vector< double >& returnValue);
+  void E_maker( vtkPoints* X, vtkPoints* Y,
+                const WeightMatrixList &W,
+                vnl_vector< double >& returnValue );
 
   /**
     * This method computes the change in a root mean squared
@@ -217,24 +220,24 @@ protected:
     *
     * @return The computed change between the two point sets.
     */
-  double CalculateConfigChange(vtkPoints* X, vtkPoints* X_new);
+  double CalculateConfigChange( vtkPoints* X, vtkPoints* X_new );
 
   /**
    * @brief This method performs a variant of the weighted point register alogorithm presented by
    *        A. Danilchenko, R. Balachandran and J. M. Fitzpatrick in January 2010. (Modified in January 2011)
    *        converted to C++ by Alfred Franz in March/April 2010
    *
-   * @param X                       (input) the moving point set
-   * @param Y                       (input) the fixed (static) point set
-   * @param Sigma_X                 (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair of points in X (inverted and squared TODO: describe better)
-   * @param Sigma_Y                 (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair of points in Y (inverted and squared TODO: describe better)
-   * @param Threshold               (input) the relative size of the change to the moving set above which the iteration continues
-   * @param MaxIterations           (input) the maximum number of iterations allowed
-   * @param Threshold               (input) the threshold used to terminate the algorithm
-   * @param TransformationR         (output) this variable will hold the computed rotation matrix
-   * @param TransformationT         (output) this variable will hold the computed translation vector
-   * @param FRE                     (output) this variable will hold the computed rotation FRE of the transformation
-   * @param n                       (output) this variable will hold the number of iterations used by the algorithm
+   * @param X                (input) the moving point set
+   * @param Y                (input) the fixed (static) point set
+   * @param Sigma_X          (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair of points in X (inverted and squared TODO: describe better)
+   * @param Sigma_Y          (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair of points in Y (inverted and squared TODO: describe better)
+   * @param Threshold        (input) the relative size of the change to the moving set above which the iteration continues
+   * @param MaxIterations    (input) the maximum number of iterations allowed
+   * @param Threshold        (input) the threshold used to terminate the algorithm
+   * @param TransformationR  (output) this variable will hold the computed rotation matrix
+   * @param TransformationT  (output) this variable will hold the computed translation vector
+   * @param FRE              (output) this variable will hold the computed rotation FRE of the transformation
+   * @param n                (output) this variable will hold the number of iterations used by the algorithm
    */
   void WeightedPointRegister( vtkPoints* X,
                               vtkPoints* Y,

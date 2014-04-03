@@ -105,8 +105,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::ComputeCorrespondences 
           mitk::AnisotropicRegistrationCommon::CalculateWeightMatrix( sigma_X[i],
                                                                       sigma_Y[id]
                                                                     );
-      // point of the Y dataset
-
+      // point of the fixed data set
       Y->GetDataSet()->GetPoint(id,p);
 
       // fill mitk vector
@@ -127,7 +126,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::ComputeCorrespondences 
       }
     }
 
-    // save correspondences of the fixed set
+    // save correspondences of the fixed point set
     Y->GetDataSet()->GetPoint(bestIdx,p);
     Z->SetPoint(i,p);
     sigma_Z[i] = sigma_Y[bestIdx];
@@ -218,7 +217,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
                               distanceList,
                               currSearchRadius );
 
-
+      // tmp pointers
       vtkPoints* X_k = X;
       vtkPoints* Z_k = Z;
       CovarianceMatrixList* Sigma_Z_k = &Sigma_Z;
@@ -238,7 +237,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
           Z_sorted->SetPoint(i,Z->GetPoint(idx));
           X_sorted->SetPoint(i,X->GetPoint(idx));
         }
-
+        // assign pointers
         X_k = X_sorted;
         Z_k = Z_sorted;
         Sigma_X_k = &Sigma_X_sorted;
@@ -246,6 +245,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
       }
 
       // compute weighted transformation
+      // set parameters
       m_WeightedPointTransform->SetMovingPointSet(X_k);
       m_WeightedPointTransform->SetFixedPointSet(Z_k);
       m_WeightedPointTransform->SetCovarianceMatricesMoving(*Sigma_X_k);
@@ -253,8 +253,9 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
       m_WeightedPointTransform->SetMaxIterations(m_MaxIterationsInWeightedPointTransform);
       m_WeightedPointTransform->SetFRENormalizationFactor(m_FRENormalizationFactor);
 
+      // run computation
       m_WeightedPointTransform->ComputeTransformation();
-
+      // retrieve result
       RotationNew =    m_WeightedPointTransform->GetTransformR();
       TranslationNew = m_WeightedPointTransform->GetTransformT();
       FRE_new =        m_WeightedPointTransform->GetFRE();

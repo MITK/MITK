@@ -24,7 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::Matrix < double,3,3 > Matrix3x3;
 typedef std::vector < Matrix3x3 > Matrix3x3List;
 
+///////////////////////////////////////////////
 // forward declarations of private functions
+///////////////////////////////////////////////
+
 static double ComputeWeightedFRE ( vtkPoints* X,
                                    vtkPoints* Y,
                                    const Matrix3x3List &CovarianceMatricesMoving,

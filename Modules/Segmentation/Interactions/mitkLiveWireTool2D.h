@@ -64,6 +64,9 @@ class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
     /// \brief Convert all current contour objects to binary segmentation image.
     void ConfirmSegmentation();
 
+    /// \brief Delete all current contour objects.
+    void ClearSegmentation();
+
   protected:
 
     LiveWireTool2D();

@@ -42,7 +42,7 @@ static itk::Matrix<double,3,3> ComputeCovarianceMatrix( itk::Matrix < double,3,3
 namespace mitk
 {
 
-/** \brief Pimpl to hold the prifate data in the CovarianceMatrixCalculator.*/
+/** \brief Pimpl to hold the private data in the CovarianceMatrixCalculator.*/
 struct CovarianceMatrixCalculatorData
 {
   vtkPolyDataNormals* m_PolyDataNormals;

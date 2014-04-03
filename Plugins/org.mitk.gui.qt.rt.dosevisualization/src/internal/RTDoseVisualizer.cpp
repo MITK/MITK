@@ -94,27 +94,31 @@ void RTDoseVisualizer::SetFocus(){}
 
 void RTDoseVisualizer::OnSliceChanged(itk::Object *sender, const itk::EventObject &e)
 {
-  for(int i=0; i<m_StdIsoLines.size();++i)
+  bool isDoseNode = false;
+  if(m_selectedNode && m_selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),isDoseNode) && isDoseNode)
   {
-    GetDataStorage()->Remove(m_StdIsoLines.at(i));
-  }
-  m_StdIsoLines.clear();
-  this->UpdateStdIsolines();
+    for(int i=0; i<m_StdIsoLines.size();++i)
+    {
+      GetDataStorage()->Remove(m_StdIsoLines.at(i));
+    }
+    m_StdIsoLines.clear();
+    this->UpdateStdIsolines();
 
-  if(m_FreeIsoAdded)
-  {
-    float pref;
-    m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
+    if(m_FreeIsoAdded)
+    {
+      float pref;
+      m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+      mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
 
-    m_Filters.at(0)->SetInputData(slicedImage->GetVtkImageData());
-    m_Filters.at(0)->GenerateValues(1,m_FreeIsoValue->GetDoseValue()*pref,m_FreeIsoValue->GetDoseValue()*pref);
-    m_Filters.at(0)->Update();
+      m_Filters.at(0)->SetInputData(slicedImage->GetVtkImageData());
+      m_Filters.at(0)->GenerateValues(1,m_FreeIsoValue->GetDoseValue()*pref,m_FreeIsoValue->GetDoseValue()*pref);
+      m_Filters.at(0)->Update();
 
-    m_FreeIsoline->GetData()->GetGeometry()->SetOrigin(slicedImage->GetGeometry()->GetOrigin());
+      m_FreeIsoline->GetData()->GetGeometry()->SetOrigin(slicedImage->GetGeometry()->GetOrigin());
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
   }
 }
 
@@ -546,41 +550,45 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
 
 void RTDoseVisualizer::UpdateStdIsolines()
 {
+  bool isDoseNode = false;
   mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = this->m_Presets[this->m_selectedPresetName];
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-  mitk::Image::Pointer reslicedImage = this->GetExtractedSlice(image);
-
-  float pref;
-  m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
-
-  for(mitk::IsoDoseLevelSet::ConstIterator doseIT = isoDoseLevelSet->Begin(); doseIT!=isoDoseLevelSet->End();++doseIT)
+  if(m_selectedNode && m_selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),isDoseNode) && isDoseNode)
   {
-    if(doseIT->GetVisibleIsoLine()){
-      vtkSmartPointer<vtkContourFilter> isolineFilter = vtkSmartPointer<vtkContourFilter>::New();
-      isolineFilter->SetInputData(reslicedImage->GetVtkImageData());
-      isolineFilter->GenerateValues(1,doseIT->GetDoseValue()*pref,doseIT->GetDoseValue()*pref);
-      isolineFilter->Update();
-      vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-      polyData=isolineFilter->GetOutput();
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+    mitk::Image::Pointer reslicedImage = this->GetExtractedSlice(image);
 
-      mitk::Surface::Pointer surface = mitk::Surface::New();
-      surface->SetVtkPolyData(polyData);
-//      surface->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial"))->Clone());
-      surface->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing());
-      surface->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
+    float pref;
+    m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
 
-      mitk::DataNode::Pointer isoNode = mitk::DataNode::New();
-      isoNode->SetData(surface);
-      mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
-      mitk::Color color;
-      color[0]=doseIT->GetColor()[0];color[1]=doseIT->GetColor()[1];color[2]=doseIT->GetColor()[2];
-      isoNode->SetMapper(1,mapper);
-      isoNode->SetColor(color);
-      isoNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
-      isoNode->SetName("StdIsoline");
-      isoNode->SetBoolProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),true);
-      m_StdIsoLines.push_back(isoNode);
-      this->GetDataStorage()->Add(isoNode);
+    for(mitk::IsoDoseLevelSet::ConstIterator doseIT = isoDoseLevelSet->Begin(); doseIT!=isoDoseLevelSet->End();++doseIT)
+    {
+      if(doseIT->GetVisibleIsoLine()){
+        vtkSmartPointer<vtkContourFilter> isolineFilter = vtkSmartPointer<vtkContourFilter>::New();
+        isolineFilter->SetInputData(reslicedImage->GetVtkImageData());
+        isolineFilter->GenerateValues(1,doseIT->GetDoseValue()*pref,doseIT->GetDoseValue()*pref);
+        isolineFilter->Update();
+        vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+        polyData=isolineFilter->GetOutput();
+
+        mitk::Surface::Pointer surface = mitk::Surface::New();
+        surface->SetVtkPolyData(polyData);
+        surface->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial"))->Clone());
+        surface->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing());
+        surface->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
+
+        mitk::DataNode::Pointer isoNode = mitk::DataNode::New();
+        isoNode->SetData(surface);
+        mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
+        mitk::Color color;
+        color[0]=doseIT->GetColor()[0];color[1]=doseIT->GetColor()[1];color[2]=doseIT->GetColor()[2];
+        isoNode->SetMapper(1,mapper);
+        isoNode->SetColor(color);
+        isoNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
+        isoNode->SetName("StdIsoline");
+        isoNode->SetBoolProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),true);
+        m_StdIsoLines.push_back(isoNode);
+        this->GetDataStorage()->Add(isoNode);
+      }
     }
   }
 }

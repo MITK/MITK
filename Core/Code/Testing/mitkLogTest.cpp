@@ -153,7 +153,7 @@ static void TestObjectInfoLogging()
       MITK_INFO << f;
       MITK_INFO << d;
       MITK_INFO << testString;
-      MITK_INFO << testStringStream;
+      MITK_INFO << testStringStream.str();
       MITK_INFO << testMitkPoint;
       }
     catch(mitk::Exception e)

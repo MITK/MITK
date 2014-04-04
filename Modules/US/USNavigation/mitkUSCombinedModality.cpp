@@ -390,7 +390,8 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
   // Sanitize Input
   if (xmlString == "")
   {
-    MITK_WARN << "Empty string passed to Deserialize() method of CombinedModality. Aborting...";
+    MITK_ERROR << "Empty string passed to Deserialize() method of CombinedModality. Aborting...";
+    mitkThrow() << "Empty string passed to Deserialize() method of CombinedModality. Aborting...";
     return;
   }
   // Clear previous calibrations if necessary
@@ -400,13 +401,15 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
   TiXmlDocument doc;
   if(!doc.Parse(xmlString.c_str()))
   {
-    MITK_WARN << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
+    MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
+    mitkThrow() << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
     return;
   }
   TiXmlElement* root = doc.FirstChildElement();
   if(root == NULL)
   {
-    MITK_WARN << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
+    MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
+    mitkThrow() << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
     return;
   }
   // Read Calibrations

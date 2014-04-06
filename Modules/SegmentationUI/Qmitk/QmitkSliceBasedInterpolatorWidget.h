@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkSegmentationUIExports.h"
 #include "mitkDataStorage.h"
-#include "mitkSegmentationInterpolationController.h"
+#include "mitkSliceBasedInterpolationController.h"
 
 #include <map>
 
@@ -164,7 +164,7 @@ class MitkSegmentationUI_EXPORT QmitkSliceBasedInterpolatorWidget : public QWidg
 
 private:
 
-    mitk::SegmentationInterpolationController::Pointer m_SliceInterpolatorController;
+    mitk::SliceBasedInterpolationController::Pointer m_SliceInterpolatorController;
 
     mitk::ToolManager* m_ToolManager;
 

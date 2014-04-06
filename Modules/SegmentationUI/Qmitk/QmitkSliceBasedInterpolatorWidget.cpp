@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 
 QmitkSliceBasedInterpolatorWidget::QmitkSliceBasedInterpolatorWidget(QWidget* parent, const char*  /*name*/) : QWidget(parent),
-m_SliceInterpolatorController( mitk::SegmentationInterpolationController::New() ),
+m_SliceInterpolatorController( mitk::SliceBasedInterpolationController::New() ),
 m_ToolManager(NULL),
 m_DataStorage(NULL),
 m_Activated(false),

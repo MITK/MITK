@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkLabelSetImage.h"
 #include "mitkContourUtils.h"
-#include "mitkSurfaceInterpolationController.h"
+//#include "mitkSurfaceInterpolationController.h"
 #include "mitkStateMachineAction.h"
 #include "mitkInteractionEvent.h"
 #include "mitkPositionEvent.h"

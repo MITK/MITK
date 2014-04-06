@@ -60,7 +60,7 @@ class MitkSegmentationUI_EXPORT QmitkToolSelectionBox : public QWidget
 
   public:
 
-    enum EnabledMode { EnabledWithReferenceAndWorkingData, EnabledWithReferenceData, EnabledWithWorkingData, AlwaysEnabled };
+    enum EnabledMode { EnabledWithReferenceAndWorkingDataVisible, EnabledWithReferenceDataVisible, EnabledWithWorkingDataVisible, AlwaysEnabled };
 
     QmitkToolSelectionBox(QWidget* parent = 0, mitk::DataStorage* storage = 0);
     virtual ~QmitkToolSelectionBox();

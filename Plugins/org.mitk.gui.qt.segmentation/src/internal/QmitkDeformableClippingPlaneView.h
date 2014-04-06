@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkImage.h"
-#include "mitkToolManager.h"
 
 typedef itk::RGBPixel< float > Color;
 
@@ -71,6 +70,10 @@ protected slots:
     void OnCreateNewClippingPlane();
     void OnCalculateClippingVolume();
 
+    void OnTranslationMode(bool check);
+    void OnRotationMode(bool check);
+    void OnDeformationMode(bool check);
+
 protected:
 
   /*!
@@ -85,11 +88,13 @@ protected:
 
   QmitkStdMultiWidget* m_MultiWidget;
   Ui::QmitkDeformableClippingPlaneViewControls m_Controls;
-  mitk::ToolManager::Pointer m_ToolManager;
 
 private:
   mitk::DataStorage::SetOfObjects::ConstPointer GetAllClippingPlanes();
   mitk::Color GetLabelColor(int label);
+
+  mitk::DataNode::Pointer m_ReferenceNode;
+  mitk::DataNode::Pointer m_WorkingNode;
 };
 
 #endif // _QMITKDEFORMABLECLIPPINGPLANEVIEW_H_INCLUDED

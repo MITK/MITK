@@ -2,9 +2,6 @@
   <qresource prefix="/multilabelsegmentation" >
     <file>multilabelsegmentation.png</file>
     <file>NewLabel_48x48.png</file>
-    <file>DeleteSegmentationSession_48x48.png</file>
-    <file>LoadSegmentationSession_48x48.png</file>
-    <file>SaveSegmentationSession_48x48.png</file>
     <file>NewSegmentationSession_48x48.png</file>
   </qresource>
 </RCC>

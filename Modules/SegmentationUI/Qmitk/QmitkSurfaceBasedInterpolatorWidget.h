@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkSegmentationUIExports.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
-#include "mitkSurfaceInterpolationController.h"
+#include "mitkSurfaceBasedInterpolationController.h"
 #include "mitkLabelSetImage.h"
 
 #include <map>
@@ -46,14 +46,13 @@ namespace mitk {
   \ingroup Widgets
 
   \sa QmitkInteractiveSegmentation
-  \sa mitk::SurfaceInterpolationController
+  \sa mitk::SurfaceBasedInterpolationController
 
   There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
 
   QmitkSurfaceBasedInterpolatorWidgetController is responsible to watch the GUI, to notice, which slice is currently
   visible. It triggers generation of interpolation suggestions and also triggers acception of suggestions.
 */
-
 class MitkSegmentationUI_EXPORT QmitkSurfaceBasedInterpolatorWidget : public QWidget
 {
   Q_OBJECT
@@ -104,7 +103,7 @@ class MitkSegmentationUI_EXPORT QmitkSurfaceBasedInterpolatorWidget : public QWi
 
 private:
 
-    mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
+    mitk::SurfaceBasedInterpolationController::Pointer m_SurfaceBasedInterpolatorController;
 
     mitk::ToolManager* m_ToolManager;
 

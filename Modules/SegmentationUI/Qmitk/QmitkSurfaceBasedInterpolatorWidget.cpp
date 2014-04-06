@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 QmitkSurfaceBasedInterpolatorWidget::QmitkSurfaceBasedInterpolatorWidget(QWidget* parent, const char*  /*name*/) : QWidget(parent),
-m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()),
+m_SurfaceBasedInterpolatorController(mitk::SurfaceBasedInterpolationController::GetInstance()),
 m_ToolManager(NULL),
 m_DataStorage(NULL),
 m_Activated(false)
@@ -56,7 +56,7 @@ m_Activated(false)
 
   itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolatorWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkSurfaceBasedInterpolatorWidget>::New();
   command->SetCallbackFunction( this, &QmitkSurfaceBasedInterpolatorWidget::OnSurfaceInterpolationInfoChanged );
-  m_SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver( itk::ModifiedEvent(), command );
+  m_SurfaceInterpolationInfoChangedObserverTag = m_SurfaceBasedInterpolatorController->AddObserver( itk::ModifiedEvent(), command );
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
   m_InterpolatedSurfaceNode->SetName( "Surface Interpolation feedback" );
@@ -107,7 +107,7 @@ QmitkSurfaceBasedInterpolatorWidget::~QmitkSurfaceBasedInterpolatorWidget()
     m_DataStorage->Remove(m_InterpolatedSurfaceNode);
 
   // remove observer
-  m_SurfaceInterpolator->RemoveObserver( m_SurfaceInterpolationInfoChangedObserverTag );
+  m_SurfaceBasedInterpolatorController->RemoveObserver( m_SurfaceInterpolationInfoChangedObserverTag );
 
   delete m_Timer;
 }
@@ -125,12 +125,12 @@ void QmitkSurfaceBasedInterpolatorWidget::ShowInterpolationResult(bool status)
 
  void QmitkSurfaceBasedInterpolatorWidget::OnSurfaceInterpolationFinished()
  {
-   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
+   mitk::Surface::Pointer interpolatedSurface = m_SurfaceBasedInterpolatorController->GetInterpolationResult();
 
    if ( interpolatedSurface.IsNotNull() )
    {
      m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
-     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
+     m_3DContourNode->SetData(m_SurfaceBasedInterpolatorController->GetContoursAsSurface());
      this->ShowInterpolationResult(true);
    }
    else
@@ -222,7 +222,7 @@ void QmitkSurfaceBasedInterpolatorWidget::OnToolManagerWorkingDataModified()
 
 void QmitkSurfaceBasedInterpolatorWidget::OnRunInterpolation()
 {
-  m_SurfaceInterpolator->Interpolate();
+  m_SurfaceBasedInterpolatorController->Interpolate();
 }
 
 void QmitkSurfaceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
@@ -273,15 +273,15 @@ void QmitkSurfaceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
       }
     }
 
-    m_SurfaceInterpolator->SetWorkingImage(m_WorkingImage);
-    m_SurfaceInterpolator->SetActiveLabel(m_WorkingImage->GetActiveLabelIndex());
-    m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
-    m_SurfaceInterpolator->SetMinSpacing(minSpacing);
-    m_SurfaceInterpolator->SetDistanceImageVolume(50000);
+    m_SurfaceBasedInterpolatorController->SetWorkingImage(m_WorkingImage);
+    m_SurfaceBasedInterpolatorController->SetActiveLabel(m_WorkingImage->GetActiveLabelIndex());
+    m_SurfaceBasedInterpolatorController->SetMaxSpacing(maxSpacing);
+    m_SurfaceBasedInterpolatorController->SetMinSpacing(minSpacing);
+    m_SurfaceBasedInterpolatorController->SetDistanceImageVolume(50000);
 
     int ret = QMessageBox::Yes;
 
-    if (m_SurfaceInterpolator->EstimatePortionOfNeededMemory() > 0.5)
+    if (m_SurfaceBasedInterpolatorController->EstimatePortionOfNeededMemory() > 0.5)
     {
       QMessageBox msgBox;
       msgBox.setText("Due to short handed system memory the 3D interpolation may be very slow!");

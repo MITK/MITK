@@ -26,8 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkAutoCropImageFilter.h>
-#include <mitkSurfaceInterpolationController.h>
-#include <mitkSegmentationInterpolationController.h>
+#include <mitkSurfaceBasedInterpolationController.h>
+#include <mitkSliceBasedInterpolationController.h>
 
 // Qmitk
 #include <QmitkDataStorageComboBox.h>
@@ -432,7 +432,7 @@ void QmitkLabelSetWidget::UpdateControls()
 
 void QmitkLabelSetWidget::OnActiveLabelChanged(int activeLabel)
 {
-  mitk::SurfaceInterpolationController* interpolator = mitk::SurfaceInterpolationController::GetInstance();
+  mitk::SurfaceBasedInterpolationController* interpolator = mitk::SurfaceBasedInterpolationController::GetInstance();
   if (interpolator)
   {
     interpolator->SetActiveLabel(activeLabel);

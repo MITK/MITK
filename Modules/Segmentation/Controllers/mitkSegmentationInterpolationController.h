@@ -17,8 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSegmentationInterpolationController_h_Included
 #define mitkSegmentationInterpolationController_h_Included
 
+//#include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
-#include "mitkLabelSetImage.h"
+#include "mitkImage.h"
 
 #include <itkImage.h>
 #include <itkObjectFactory.h>
@@ -62,6 +63,7 @@ class Image;
 
   $Author$
 */
+
 class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::Object
 {
   public:
@@ -80,6 +82,16 @@ class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::
     static SegmentationInterpolationController* InterpolatorForImage(const Image*);
 
     /**
+      \brief Block reaction to an images Modified() events.
+
+      Blocking the scan of the whole image is especially useful when you are about to change a single slice
+      of the image. Then you would send a difference image of this single slice to SegmentationInterpolationController
+      but call image->Modified() anyway. Before calling image->Modified() you should block
+      SegmentationInterpolationController's reactions to this modified by using this method.
+    */
+    void BlockModified(bool);
+
+    /**
       \brief Initialize with a whole volume.
 
       Will scan the volume for segmentation pixels (values other than 0) and fill some internal data structures.
@@ -88,21 +100,21 @@ class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::
 
       When you change a single slice, call SetChangedSlice() instead.
     */
-    void SetWorkingImage( LabelSetImage* image );
+    void SetSegmentationVolume( const Image* segmentation );
 
     /**
       \brief Set a reference image (original patient image) - optional.
 
-      If this image is set (must exactly match the dimensions of the segmentation),
+      If this volume is set (must exactly match the dimensions of the segmentation),
       the interpolation algorithm may consider image content to improve the interpolated
       (estimated) segmentation.
      */
-    void SetReferenceImage( Image* image );
+    void SetReferenceVolume( const Image* segmentation );
 
     /**
-      \brief Update after changing a single slice in the working image.
+      \brief Update after changing a single slice.
 
-      \param image is a 2D image with the difference image of the slice determined by sliceDimension and sliceIndex.
+      \param sliceDiff is a 2D image with the difference image of the slice determined by sliceDimension and sliceIndex.
              The difference is (pixel value in the new slice minus pixel value in the old slice).
 
       \param sliceDimension Number of the dimension which is constant for all pixels of the meant slice.
@@ -111,17 +123,8 @@ class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::
 
       \param timeStep Which time step is changed
     */
-    void SetChangedSlice( const Image* image, unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
-
-    /**
-      \brief Update after changing the whole working image.
-
-      \param image is a 3D image with the difference image of the slice determined by sliceDimension and sliceIndex.
-             The difference is (pixel value in the new slice minus pixel value in the old slice).
-
-      \param timeStep Which time step is changed
-    */
-//    void SetChangedImage( const Image* image, unsigned int timeStep );
+    void SetChangedSlice( const Image* sliceDiff, unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
+    void SetChangedVolume( const Image* sliceDiff, unsigned int timeStep );
 
     /**
       \brief Generates an interpolated image for the given slice.
@@ -134,10 +137,12 @@ class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::
     */
     Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep );
 
+    void OnImageModified(const itk::EventObject&);
+
     /**
-      \brief Initializes the internal container with the number of voxels per label.
+     * Activate/Deactivate the 2D interpolation.
     */
-    void ResetLabelCount();
+    void Activate2DInterpolation(bool);
 
   protected:
 
@@ -147,8 +152,8 @@ class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::
     class MitkSegmentation_EXPORT SetChangedSliceOptions
     {
       public:
-        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t)
-          : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), timeStep(t)
+        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels )
+          : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), timeStep(t), pixelData(pixels)
         {
         }
 
@@ -157,37 +162,45 @@ class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::
         unsigned int dim0;
         unsigned int dim1;
         unsigned int timeStep;
-//        void* pixelData;
+        void* pixelData;
     };
 
-    typedef std::vector<unsigned int> LabelCounterVectorType;
-    typedef std::vector< LabelCounterVectorType > LabelCounterSliceVectorType;
-    typedef std::vector< std::vector< LabelCounterSliceVectorType > > LabelCounterSliceTimeVectorType;
+    typedef std::vector<unsigned int> DirtyVectorType;
+    //typedef std::vector< DirtyVectorType[3] > TimeResolvedDirtyVectorType; // cannot work with C++, so next line is used for implementation
+    typedef std::vector< std::vector<DirtyVectorType> > TimeResolvedDirtyVectorType;
     typedef std::map< const Image*, SegmentationInterpolationController* > InterpolatorMapType;
 
     SegmentationInterpolationController();// purposely hidden
     virtual ~SegmentationInterpolationController();
 
     /// internal scan of a single slice
-    template < typename PixelType >
-    void ScanSliceITKProcessing( itk::Image<PixelType, 2>*, const SetChangedSliceOptions& options );
+    template < typename DATATYPE >
+    void ScanChangedSlice( itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options );
 
-    /// internal scan of the whole image
     template < typename TPixel, unsigned int VImageDimension >
-    void ScanImageITKProcessing( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
+    void ScanChangedVolume( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
+
+    template < typename DATATYPE >
+    void ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep );
+
+    void PrintStatus();
 
     /**
-      An array that of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
+      An array of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
       has at least one pixel that is not 0 (which would mean that it has to be considered by the interpolation algorithm).
+
       E.g. flags for axial slices are stored in m_SegmentationCountInSlice[0][index].
+
       Enhanced with time steps it is now m_SegmentationCountInSlice[timeStep][0][index]
     */
-    LabelCounterSliceTimeVectorType m_LabelCountInSlice;
+    TimeResolvedDirtyVectorType m_SegmentationCountInSlice;
 
     static InterpolatorMapType s_InterpolatorForImage;
 
-    LabelSetImage::Pointer m_WorkingImage;
-    Image::Pointer m_ReferenceImage;
+    Image::ConstPointer m_Segmentation;
+    Image::ConstPointer m_ReferenceImage;
+    bool m_BlockModified;
+    bool m_2DInterpolationActivated;
 };
 
 } // namespace

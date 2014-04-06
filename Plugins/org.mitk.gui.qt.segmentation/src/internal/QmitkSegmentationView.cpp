@@ -144,11 +144,9 @@ void QmitkSegmentationView::Deactivated()
 {
    if( m_Controls )
    {
-      m_Controls->m_ManualToolSelectionBox2D->setEnabled( false );
-      m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
+      this->SetToolSelectionBoxesEnabled( false );
       //deactivate all tools
       mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
-      m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
 
       //Removing all observers
       for ( NodeTagMapType::iterator dataIter = m_WorkingDataObserverTags.begin(); dataIter != m_WorkingDataObserverTags.end(); ++dataIter )
@@ -496,6 +494,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
       //as we don't know which node was actually removed e.g. our reference node, disable 'New Segmentation' button.
       //consider the case that there is no more image in the datastorage
       this->SetToolManagerSelection(NULL, NULL);
+      this->SetToolSelectionBoxesEnabled( false );
    }
 }
 
@@ -598,6 +597,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
          if ( !isSourceNode && (!this->CheckForSameGeometry(segNode, node) || possibleParents->Size() > 0 ))
          {
             this->SetToolManagerSelection(node, NULL);
+            this->SetToolSelectionBoxesEnabled( false );
             this->UpdateWarningLabel("The selected patient image does not match with the selected segmentation!");
          }
          else if ((!isSourceNode && this->CheckForSameGeometry(segNode, node)) || isSourceNode )
@@ -616,12 +616,14 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
       else
       {
          this->SetToolManagerSelection(node, NULL);
+         this->SetToolSelectionBoxesEnabled( false );
          this->UpdateWarningLabel("Select or create a segmentation");
       }
    }
    else
    {
       this->UpdateWarningLabel("Please load an image!");
+      this->SetToolSelectionBoxesEnabled( false );
    }
 }
 
@@ -630,6 +632,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
    if (node == NULL)
    {
       this->UpdateWarningLabel("Select or create a segmentation");
+      this->SetToolSelectionBoxesEnabled( false );
       return;
    }
 
@@ -654,6 +657,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
          if (parentNode != refNode)
          {
             this->UpdateWarningLabel("The selected segmentation does not match with the selected patient image!");
+            this->SetToolSelectionBoxesEnabled( false );
             this->SetToolManagerSelection(NULL, node);
          }
          else
@@ -673,7 +677,10 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
       }
    }
    if (!node->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))))
-      this->UpdateWarningLabel("The selected segmentation is currently not visible!");
+   {
+     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
+     this->SetToolSelectionBoxesEnabled( false );
+   }
 }
 
 void QmitkSegmentationView::OnShowMarkerNodes (bool state)
@@ -825,6 +832,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
                   if (!selectedNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))))
                      selectedNode->SetVisibility(true);
                   this->UpdateWarningLabel("The selected patient image does not\nmatchwith the selected segmentation!");
+                  this->SetToolSelectionBoxesEnabled( false );
                }
             }
          }

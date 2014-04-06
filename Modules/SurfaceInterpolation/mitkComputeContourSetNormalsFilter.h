@@ -59,7 +59,7 @@ public:
   /**
     \brief Sets the working image and the current active label.
   */
-  void SetWorkingImage(Image* image, int activeLabel);
+  void SetSegmentationBinaryImage(Image* image, int activeLabel=1);
 
   /**
     \brief Returns the computed normals as a surface.

@@ -224,7 +224,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
     mitk::ProgressBar::GetInstance()->Progress(this->m_ProgressStepSize);
 }
 
-void mitk::ComputeContourSetNormalsFilter::SetWorkingImage(Image* image, int activeLabel)
+void mitk::ComputeContourSetNormalsFilter::SetSegmentationBinaryImage(Image* image, int activeLabel)
 {
   m_WorkingImage = image;
   m_ActiveLabel = activeLabel;

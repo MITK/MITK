@@ -40,6 +40,7 @@ Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkLabelSetTableWidget.cpp
 Qmitk/QmitkLabelSetWidget.cpp
 Qmitk/QmitkSearchLabelDialog.cpp
+Qmitk/QmitkSlicesInterpolator.cpp
 )
 
 set(MOC_H_FILES
@@ -84,6 +85,7 @@ Qmitk/QmitkMaskStampWidget.h
 Qmitk/QmitkLabelSetTableWidget.h
 Qmitk/QmitkLabelSetWidget.h
 Qmitk/QmitkSearchLabelDialog.h
+Qmitk/QmitkSlicesInterpolator.h
 )
 
 set(UI_FILES

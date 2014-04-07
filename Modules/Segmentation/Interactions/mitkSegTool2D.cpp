@@ -26,8 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkLabelSetImage.h"
 #include "mitkImageToContourFilter.h"
-#include "mitkSurfaceInterpolationController.h"
-#include "mitkSegmentationInterpolationController.h"
+#include "mitkSurfaceBasedInterpolationController.h"
+#include "mitkSliceBasedInterpolationController.h"
 #include "mitkImageToContourModelSetFilter.h"
 
 #include "usGetModuleContext.h"
@@ -232,7 +232,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEven
     int clickedSliceDimension(-1);
     int clickedSliceIndex(-1);
     mitk::SegTool2D::DetermineAffectedImageSlice( workingImage, planeGeometry, clickedSliceDimension, clickedSliceIndex );
-    mitk::SegmentationInterpolationController* interpolator = mitk::SegmentationInterpolationController::InterpolatorForImage(workingImage);
+    mitk::SliceBasedInterpolationController* interpolator = mitk::SliceBasedInterpolationController::InterpolatorForImage(workingImage);
     if(interpolator)
     {
       try
@@ -252,7 +252,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEven
     unsigned int pos = this->AddContourmarker(positionEvent);
     us::ServiceReference<PlanePositionManagerService> serviceRef = us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
     PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
-    mitk::SurfaceInterpolationController* interpolator = mitk::SurfaceInterpolationController::GetInstance();
+    mitk::SurfaceBasedInterpolationController* interpolator = mitk::SurfaceBasedInterpolationController::GetInstance();
     assert(interpolator);
     mitk::ImageToContourModelSetFilter::Pointer converter = mitk::ImageToContourModelSetFilter::New();
     converter->SetInput(slice);

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkRenderingManager.h"
-#include "mitkSegmentationInterpolationController.h"
+#include "mitkSliceBasedInterpolationController.h"
 #include "mitkImageTimeSelector.h"
 
 #include <itkImageSliceIteratorWithIndex.h>
@@ -99,8 +99,8 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
           AccessFixedDimensionByItk( m_SliceDifferenceImage, ItkInvertPixelValues, 2 );
         }
 
-        // just send the diff to SegmentationInterpolationController
-        mitk::SegmentationInterpolationController* interpolator = mitk::SegmentationInterpolationController::InterpolatorForImage(m_Image);
+        // just send the diff to SliceBasedInterpolationController
+        mitk::SliceBasedInterpolationController* interpolator = mitk::SliceBasedInterpolationController::InterpolatorForImage(m_Image);
         if (interpolator)
         {
           interpolator->SetChangedSlice( m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex, m_TimeStep );
@@ -153,8 +153,8 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
           AccessFixedDimensionByItk( m_SliceDifferenceImage, ItkInvertPixelValues, 3 );
         }
 /*
-        // just send the diff to SegmentationInterpolationController
-        SegmentationInterpolationController* interpolator = SegmentationInterpolationController::InterpolatorForImage(m_Image);
+        // just send the diff to SliceBasedInterpolationController
+        SliceBasedInterpolationController* interpolator = SliceBasedInterpolationController::InterpolatorForImage(m_Image);
         if (interpolator)
         {
           interpolator->SetChangedImage( m_SliceDifferenceImage, m_TimeStep );

@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarCross.h>
 #include <mitkPlanarFourPointAngle.h>
 #include <mitkPlanarDoubleEllipse.h>
+#include <mitkPlanarBezierCurve.h>
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkGlobalInteraction.h>
@@ -74,8 +75,9 @@ struct QmitkMeasurementViewData
 {
   QmitkMeasurementViewData()
     : m_LineCounter(0), m_PathCounter(0), m_AngleCounter(0),
-    m_FourPointAngleCounter(0), m_EllipseCounter(0), m_DoubleEllipseCounter(0),
-      m_RectangleCounter(0), m_PolygonCounter(0), m_UnintializedPlanarFigure(false)
+      m_FourPointAngleCounter(0), m_EllipseCounter(0), m_DoubleEllipseCounter(0),
+      m_RectangleCounter(0), m_PolygonCounter(0), m_BezierCurveCounter(0),
+      m_UnintializedPlanarFigure(false)
   {
   }
 
@@ -88,6 +90,7 @@ struct QmitkMeasurementViewData
   unsigned int m_DoubleEllipseCounter;
   unsigned int m_RectangleCounter;
   unsigned int m_PolygonCounter;
+  unsigned int m_BezierCurveCounter;
   QList<mitk::DataNode::Pointer> m_CurrentSelection;
   std::map<mitk::DataNode*, QmitkPlanarFigureData> m_DataNodeToPlanarFigureData;
   mitk::WeakPointer<mitk::DataNode> m_SelectedImageNode;
@@ -100,10 +103,11 @@ struct QmitkMeasurementViewData
   QAction* m_DrawPath;
   QAction* m_DrawAngle;
   QAction* m_DrawFourPointAngle;
-  QAction* m_DrawEllipse;
   QAction* m_DrawDoubleEllipse;
   QAction* m_DrawRectangle;
   QAction* m_DrawPolygon;
+  QAction* m_DrawEllipse;
+  QAction* m_DrawBezierCurve;
   QToolBar* m_DrawActionsToolBar;
   QActionGroup* m_DrawActionsGroup;
   QTextBrowser* m_SelectedPlanarFiguresText;
@@ -171,13 +175,6 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
-  MEASUREMENT_DEBUG << "Draw Double Ellipse";
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/doubleellipse.png"), "Draw Double Ellipse");
-  currentAction->setCheckable(true);
-  d->m_DrawDoubleEllipse = currentAction;
-  d->m_DrawActionsToolBar->addAction(currentAction);
-  d->m_DrawActionsGroup->addAction(currentAction);
-
   MEASUREMENT_DEBUG << "Draw Rectangle";
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/rectangle.png"), "Draw Rectangle");
   currentAction->setCheckable(true);
@@ -189,6 +186,20 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/polygon.png"), "Draw Polygon");
   currentAction->setCheckable(true);
   d->m_DrawPolygon = currentAction;
+  d->m_DrawActionsToolBar->addAction(currentAction);
+  d->m_DrawActionsGroup->addAction(currentAction);
+
+  MEASUREMENT_DEBUG << "Draw Double Ellipse";
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/doubleellipse.png"), "Draw Double Ellipse");
+  currentAction->setCheckable(true);
+  d->m_DrawDoubleEllipse = currentAction;
+  d->m_DrawActionsToolBar->addAction(currentAction);
+  d->m_DrawActionsGroup->addAction(currentAction);
+
+  MEASUREMENT_DEBUG << "Draw Bezier Curve";
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/beziercurve.png"), "Draw Bezier Curve");
+  currentAction->setCheckable(true);
+  d->m_DrawBezierCurve = currentAction;
   d->m_DrawActionsToolBar->addAction(currentAction);
   d->m_DrawActionsGroup->addAction(currentAction);
 
@@ -223,6 +234,7 @@ void QmitkMeasurementView::CreateConnections()
   QObject::connect( d->m_DrawDoubleEllipse, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawDoubleEllipseTriggered(bool) ) );
   QObject::connect( d->m_DrawRectangle, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawRectangleTriggered(bool) ) );
   QObject::connect( d->m_DrawPolygon, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawPolygonTriggered(bool) ) );
+  QObject::connect( d->m_DrawBezierCurve, SIGNAL( triggered(bool) ), this, SLOT( ActionDrawBezierCurveTriggered(bool) ) );
   QObject::connect( d->m_CopyToClipboard, SIGNAL( clicked(bool) ), this, SLOT( CopyToClipboard(bool) ) );
 }
 
@@ -435,9 +447,10 @@ void QmitkMeasurementView::PlanarFigureInitialized()
   d->m_DrawAngle->setChecked(false);
   d->m_DrawFourPointAngle->setChecked(false);
   d->m_DrawEllipse->setChecked(false);
-  d->m_DrawDoubleEllipse->setChecked(false);
   d->m_DrawRectangle->setChecked(false);
   d->m_DrawPolygon->setChecked(false);
+  d->m_DrawDoubleEllipse->setChecked(false);
+  d->m_DrawBezierCurve->setChecked(false);
 }
 
 void QmitkMeasurementView::SetFocus()
@@ -651,6 +664,17 @@ void QmitkMeasurementView::ActionDrawDoubleEllipseTriggered(bool checked)
   this->AddFigureToDataStorage(figure, qString);
 
   MEASUREMENT_DEBUG << "PlanarDoubleEllipse initialized...";
+}
+
+void QmitkMeasurementView::ActionDrawBezierCurveTriggered(bool checked)
+{
+  Q_UNUSED(checked)
+
+  mitk::PlanarBezierCurve::Pointer figure = mitk::PlanarBezierCurve::New();
+  QString qString = QString("BezierCurve%1").arg(++d->m_BezierCurveCounter);
+  this->AddFigureToDataStorage(figure, qString);
+
+  MEASUREMENT_DEBUG << "PlanarBezierCurve initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawRectangleTriggered(bool checked)

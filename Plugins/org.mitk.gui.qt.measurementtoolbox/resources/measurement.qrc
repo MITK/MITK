@@ -11,6 +11,7 @@
 	 <file>rectangle.png</file>
 	 <file>text.png</file>
    <file>doubleellipse.png</file>
+   <file>beziercurve.png</file>
  </qresource>
  </RCC>
 

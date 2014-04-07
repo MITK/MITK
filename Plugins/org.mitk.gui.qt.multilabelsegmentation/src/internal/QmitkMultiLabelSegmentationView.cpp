@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStatusBar.h"
 #include "mitkApplicationCursor.h"
 #include "mitkToolManagerProvider.h"
-#include "mitkSegmentationObjectFactory.h"
+//#include "mitkSegmentationObjectFactory.h"
 #include "mitkSegTool2D.h"
 #include "mitkPlanePositionManager.h"
 #include "mitkPluginActivator.h"
@@ -189,13 +189,6 @@ void QmitkMultiLabelSegmentationView::InitializeListeners()
 {
   if (m_Interactor.IsNull())
   {
-    /*
-    us::ModuleContext* moduleContext = us::GetModuleContext();
-    m_Interactor = mitk::SegmentationInteractor::New();
-    m_Interactor->LoadStateMachine( "SegmentationInteraction.xml", moduleContext->GetModule());
-    m_Interactor->SetEventConfig ( "ConfigSegmentation.xml", moduleContext->GetModule());
-    us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>( m_Interactor.GetPointer(), us::ServiceProperties() );
-    */
     us::Module* module = us::GetModuleContext()->GetModule();
     std::vector<us::ModuleResource> resources = module->FindResources("/", "*", true);
     for (std::vector<us::ModuleResource>::iterator iter = resources.begin(); iter != resources.end(); ++iter)
@@ -217,8 +210,7 @@ void QmitkMultiLabelSegmentationView::InitializeListeners()
     // Register as listener via micro services
     us::ServiceProperties props;
     props["name"] = std::string("SegmentationInteraction");
-    m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(
-        m_Interactor.GetPointer(),props);
+    m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(m_Interactor.GetPointer(), props);
   }
 }
 
@@ -305,6 +297,7 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
     m_Controls.m_pbNewSegmentationSession->setEnabled(false);
     m_Controls.m_LabelSetWidget->setEnabled(false);
     m_Controls.m_pbNewLabel->setEnabled(false);
+    m_Controls.m_gbInterpolation->setEnabled(false);
     m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(false);
     m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(false);
     return;
@@ -317,6 +310,7 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   {
     m_Controls.m_LabelSetWidget->setEnabled(false);
     m_Controls.m_pbNewLabel->setEnabled(false);
+    m_Controls.m_gbInterpolation->setEnabled(false);
     m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(false);
     m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(false);
     return;
@@ -324,6 +318,7 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
 
   m_Controls.m_LabelSetWidget->setEnabled(true);
   m_Controls.m_pbNewLabel->setEnabled(true);
+  m_Controls.m_gbInterpolation->setEnabled(true);
   m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(true);
   m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(true);
 

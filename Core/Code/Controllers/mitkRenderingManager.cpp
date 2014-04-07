@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderWindow.h>
 
 #include <itkCommand.h>
-#include "mitkVector.h"
+#include "mitkTypes.h"
 #include <itkAffineGeometryFrame.h>
 #include <itkScalableAffineTransform.h>
 #include <mitkVtkPropRenderer.h>

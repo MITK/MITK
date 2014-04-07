@@ -93,6 +93,10 @@ set(MODULE_TESTS
   mitkInteractionEventTest.cpp
   mitkLookupTableTest.cpp
   mitkSTLFileReaderTest.cpp
+  mitkTypePointConversionTest.cpp
+  mitkTypeVectorConversionTest.cpp
+  mitkTypeMatrixConversionTest.cpp
+  mitkTypeOperationTest.cpp
   mitkSurfaceToImageFilterTest.cpp
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
@@ -104,6 +108,13 @@ set(MODULE_TESTS
   mitkPointSetDataInteractorTest.cpp
 )
 endif()
+
+
+IF(MITK_USE_OpenCV)
+  set(MODULE_TESTS ${MODULE_TESTS}
+    mitkTypeConversionOpenCVTest.cpp
+  )
+endif(MITK_USE_OpenCV)
 
 
 # test with image filename as an extra command line parameter

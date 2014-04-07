@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 #include "mitkInteractor.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 
 namespace mitk {
 class DisplayPositionEvent;

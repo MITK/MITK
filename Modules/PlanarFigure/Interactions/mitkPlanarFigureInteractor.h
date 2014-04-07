@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkPlanarFigureExports.h>
 
 #include "mitkCommon.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 #include "mitkDataInteractor.h"
 
 #pragma GCC visibility push(default)

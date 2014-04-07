@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPointOperation.h"
 #include "MitkExtExports.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 
 namespace mitk {
 

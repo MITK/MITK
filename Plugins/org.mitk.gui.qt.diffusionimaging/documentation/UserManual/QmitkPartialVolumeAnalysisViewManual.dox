@@ -1,13 +1,15 @@
 /**
 \page org_mitk_views_partialvolumeanalysisview Partial Volume Analysis
 
-The "Partial Volume Analysis" view can be found in the "Quantification" perspective. It allows for robust quantification of diffusion or other scalar measures in the presents of two classes (e.g. fiber vs. non-fiber) and partial volume between them. The algorithm estimates a probabilistic segmentation of the three classes and returns a weighted average of the measure of interest within the each class. 
+The "Partial Volume Analysis" view can be found in the "Quantification" perspective. It allows for robust quantification of diffusion or other scalar measures in the presents of two classes (e.g. fiber vs. non-fiber) and partial volume between them. The algorithm estimates a probabilistic segmentation of the three classes and returns a weighted average of the measure of interest within the each class.
 
 \image html pvanalysisview.png The Partial Volume Analysis View
 
 \section QmitkPVAAnalysisUserManualExport  Export
 
-All measures are automatically written to the clipboard once the estimation is updated. The histogram export is provided by the button underneath the histogram. The values can be pasted to excel or any text editor. 
+All measures are automatically written to the clipboard once the estimation is updated. For scalar images, the mean and the variance of the gaussian selected in the radio-box above is copied out. If 'All' is selected, then all means and variances are carried out as a tab-separated list. For tensor images, the values for all scalar measures (FA, MD, RD and AD) are carried out to the clipboard.
+
+The histogram export is provided by the button underneath the histogram. The values can be pasted to excel or any text editor.
 
 \section QmitkPVAAnalysisUserManualAdvancedSettings  Advanced Settings
 

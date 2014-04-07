@@ -9,6 +9,9 @@
           class="QmitkAppInstancesPreferencePage" category="org.mitk.GeneralPreferencePage">
       <keywordreference id="org.mitk.AppInstancesPreferencePageKeywords"/>
     </page>
+    <page id="org.mitk.ExternalProgramsPreferencePage" name="External Programs"
+          class="QmitkExternalProgramsPreferencePage" >
+    </page>
   </extension>
 
   <extension point="org.blueberry.ui.keywords">

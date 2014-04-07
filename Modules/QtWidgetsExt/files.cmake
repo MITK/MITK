@@ -62,6 +62,7 @@ set(CPP_FILES
  QmitkWebPage.cpp
 
  QmitkLineEdit.cpp
+ QmitkGnuplotWidget.cpp
 )
 
 set(MOC_H_FILES
@@ -113,6 +114,7 @@ set(MOC_H_FILES
  QmitkWebPage.h
 
  QmitkLineEdit.h
+ QmitkGnuplotWidget.h
 )
 
 set(UI_FILES
@@ -123,6 +125,7 @@ set(UI_FILES
   QmitkSelectableGLWidget.ui
   QmitkPrimitiveMovieNavigatorWidget.ui
   QmitkAboutDialog/QmitkAboutDialogGUI.ui
+  QmitkGnuplotWidget.ui
 )
 
 set(QRC_FILES

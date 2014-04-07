@@ -58,6 +58,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <QScrollBar>
 #include <itkInvertIntensityImageFilter.h>
+#include <QDialogButtonBox>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -734,6 +735,11 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         m_BallModel2.SetT2(m_Controls->m_BallWidget2->GetT2());
 
         mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp4VolumeFraction->GetSelectedNode();
+        if (volumeNode.IsNull())
+        {
+            MITK_WARN << "No volume fraction image selected! Second extra-axonal compartment has been disabled.";
+            break;
+        }
         mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
         ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
         CastToItkImage< ItkDoubleImgType >(img, itkImg);
@@ -776,6 +782,11 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         m_AstrosticksModel2.SetRandomizeSticks(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks());
 
         mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp4VolumeFraction->GetSelectedNode();
+        if (volumeNode.IsNull())
+        {
+            MITK_WARN << "No volume fraction image selected! Second extra-axonal compartment has been disabled.";
+            break;
+        }
         mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
         ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
         CastToItkImage< ItkDoubleImgType >(img, itkImg);
@@ -816,6 +827,11 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         m_DotModel2.SetT2(m_Controls->m_DotWidget2->GetT2());
 
         mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp4VolumeFraction->GetSelectedNode();
+        if (volumeNode.IsNull())
+        {
+            MITK_WARN << "No volume fraction image selected! Second extra-axonal compartment has been disabled.";
+            break;
+        }
         mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
         ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
         CastToItkImage< ItkDoubleImgType >(img, itkImg);

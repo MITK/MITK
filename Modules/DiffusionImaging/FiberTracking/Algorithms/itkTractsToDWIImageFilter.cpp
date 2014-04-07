@@ -504,8 +504,12 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     if (m_Parameters.m_DoAddMotion)
     {
         std::string fileName = "fiberfox_motion_0.log";
+        std::string filePath = mitk::IOUtil::GetTempPath();
+        if (m_Parameters.m_OutputPath.size()>0)
+            filePath = m_Parameters.m_OutputPath;
+
         int c = 1;
-        while (itksys::SystemTools::FileExists(mitk::IOUtil::GetTempPath().append(fileName).c_str()))
+        while (itksys::SystemTools::FileExists(filePath.append(fileName).c_str()))
         {
             fileName = "fiberfox_motion_";
             fileName += boost::lexical_cast<std::string>(c);
@@ -513,7 +517,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             c++;
         }
 
-        logFile.open(mitk::IOUtil::GetTempPath().append(fileName).c_str());
+        logFile.open(filePath.append(fileName).c_str());
         logFile << "0 rotation: 0,0,0; translation: 0,0,0\n";
 
         if (m_Parameters.m_DoRandomizeMotion)
@@ -528,7 +532,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             m_StatusText += "Maximum rotation: " + boost::lexical_cast<std::string>(m_Parameters.m_Rotation) + "°\n";
             m_StatusText += "Maximum translation: " + boost::lexical_cast<std::string>(m_Parameters.m_Translation) + "mm\n";
         }
-        m_StatusText += "Motion logfile: " + mitk::IOUtil::GetTempPath().append(fileName) + "\n";
+        m_StatusText += "Motion logfile: " + filePath.append(fileName) + "\n";
         MITK_INFO << "Adding motion artifacts";
         MITK_INFO << "Maximum rotation: " << m_Parameters.m_Rotation;
         MITK_INFO << "Maxmimum translation: " << m_Parameters.m_Translation;

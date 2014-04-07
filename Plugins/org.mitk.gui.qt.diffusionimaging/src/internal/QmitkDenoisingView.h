@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <mitkDiffusionImage.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
+#include <itkMaskImageFilter.h>
 #include <itkDiscreteGaussianImageFilter.h>
 #include <itkVectorImageToImageFilter.h>
 #include <itkComposeImageFilter.h>
@@ -72,13 +73,13 @@ public:
   virtual ~QmitkDenoisingView();
 
   /** Typedefs */
-  typedef short DiffusionPixelType;
-  typedef mitk::DiffusionImage< DiffusionPixelType > DiffusionImageType;
-  typedef mitk::Image MaskImageType;
-  typedef itk::NonLocalMeansDenoisingFilter< DiffusionPixelType > NonLocalMeansDenoisingFilterType;
-  typedef itk::DiscreteGaussianImageFilter < itk::Image< DiffusionPixelType, 3>, itk::Image< DiffusionPixelType, 3> > GaussianFilterType;
-  typedef itk::VectorImageToImageFilter < DiffusionPixelType > ExtractFilterType;
-  typedef itk::ComposeImageFilter < itk::Image<DiffusionPixelType, 3> > ComposeFilterType;
+  typedef short                                                                                                         DiffusionPixelType;
+  typedef mitk::DiffusionImage< DiffusionPixelType >                                                                    DiffusionImageType;
+  typedef mitk::Image                                                                                                   MaskImageType;
+  typedef itk::NonLocalMeansDenoisingFilter< DiffusionPixelType >                                                       NonLocalMeansDenoisingFilterType;
+  typedef itk::DiscreteGaussianImageFilter < itk::Image< DiffusionPixelType, 3>, itk::Image< DiffusionPixelType, 3> >   GaussianFilterType;
+  typedef itk::VectorImageToImageFilter < DiffusionPixelType >                                                          ExtractFilterType;
+  typedef itk::ComposeImageFilter < itk::Image<DiffusionPixelType, 3> >                                                 ComposeFilterType;
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -87,7 +88,7 @@ public:
   /// \brief Creation of the connections of the FilterComboBox
   virtual void Activated();
 
-protected slots:
+private slots:
 
   void StartDenoising();                  ///< prepares filter condition and starts thread for denoising
   void SelectFilter(int filter);          ///< updates which filter is selected
@@ -107,7 +108,7 @@ private:
   QmitkDenoisingWorker m_DenoisingWorker;
   QThread m_DenoisingThread;
   bool m_ThreadIsRunning;
-  bool m_NoExceptionThrown;
+  bool m_CompletedCalculation;
   NonLocalMeansDenoisingFilterType::Pointer m_NonLocalMeansFilter;
   GaussianFilterType::Pointer m_GaussianFilter;
   DiffusionImageType::Pointer m_InputImage;

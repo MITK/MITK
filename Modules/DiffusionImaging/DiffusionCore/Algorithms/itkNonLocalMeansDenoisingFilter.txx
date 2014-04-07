@@ -50,11 +50,13 @@ void
 NonLocalMeansDenoisingFilter< TPixelType >
 ::BeforeThreadedGenerateData()
 {
-  MITK_INFO << "Variance: " << m_Variance;
+
   MITK_INFO << "SearchRadius: " << m_SearchRadius;
   MITK_INFO << "ComparisonRadius: " << m_ComparisonRadius;
-  MITK_INFO << "Use Joint Information: " << std::boolalpha << m_UseJointInformation;
+  MITK_INFO << "Noisevariance: " << m_Variance;
   MITK_INFO << "Use Rician Adaption: " << std::boolalpha << m_UseRicianAdaption;
+  MITK_INFO << "Use Joint Information: " << std::boolalpha << m_UseJointInformation;
+
 
   typename InputImageType::Pointer inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
   if (m_Mask.IsNull())
@@ -136,7 +138,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
     typename OutputImageType::PixelType outpix;
     outpix.SetSize (inputImagePointer->GetVectorLength());
 
-    if (mit.Get() != 0)
+    if (mit.Get() != 0 && !this->GetAbortGenerateData())
     {
       if(!m_UseJointInformation)
       {

@@ -25,12 +25,6 @@ This file is based heavily on a corresponding ITK filter.
 #include "itkImageToImageFilter.h"
 #include "itkVectorImage.h"
 #include <mitkDiffusionImage.h>
-#include <itkNeighborhoodIterator.h>
-#include <itkVectorImageToImageFilter.h>
-#include <itkChangeInformationImageFilter.h>
-#include <itkExtractImageFilter.h>
-#include <itkLabelStatisticsImageFilter.h>
-#include <itkInvertIntensityImageFilter.h>
 
 #include <itkStatisticsImageFilter.h>
 
@@ -50,20 +44,14 @@ namespace itk{
   public:
 
     /** Typedefs */
-    typedef NonLocalMeansDenoisingFilter Self;
-    typedef SmartPointer<Self>                      Pointer;
-    typedef SmartPointer<const Self>                ConstPointer;
-    typedef ImageToImageFilter< VectorImage < TPixelType, 3 >, VectorImage < TPixelType, 3 > >  Superclass;
-    typedef typename Superclass::InputImageType InputImageType;
-    typedef typename Superclass::OutputImageType OutputImageType;
-    typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
-    typedef Image <TPixelType, 3> MaskImageType;
-    typedef VectorImageToImageFilter < TPixelType > ImageExtractorType;
-    typedef ChangeInformationImageFilter < MaskImageType > ChangeInformationType;
-    typedef ExtractImageFilter < MaskImageType, MaskImageType > ExtractImageFilterType;
-    typedef LabelStatisticsImageFilter < MaskImageType, MaskImageType > LabelStatisticsFilterType;
-    typedef InvertIntensityImageFilter < MaskImageType, MaskImageType > InvertImageFilterType;
-    typedef StatisticsImageFilter < MaskImageType > StatisticsFilterType;
+    typedef NonLocalMeansDenoisingFilter                                                          Self;
+    typedef SmartPointer<Self>                                                                    Pointer;
+    typedef SmartPointer<const Self>                                                              ConstPointer;
+    typedef ImageToImageFilter< VectorImage < TPixelType, 3 >, VectorImage < TPixelType, 3 > >    Superclass;
+    typedef typename Superclass::InputImageType                                                   InputImageType;
+    typedef typename Superclass::OutputImageType                                                  OutputImageType;
+    typedef typename Superclass::OutputImageRegionType                                            OutputImageRegionType;
+    typedef Image <TPixelType, 3>                                                                 MaskImageType;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)

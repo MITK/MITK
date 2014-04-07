@@ -77,6 +77,9 @@ namespace mitk
 
     vtkSmartPointer<vtkPolyData> GetVtkPolyData();
 
+    void SetGenerateTriangularMesh(bool flag);
+    void SetTriangulationThreshold(double triangulationThreshold);
+
     /*!
     \brief acquire new rgb data from the Kinect camera
     \param rgb pointer to memory location where rgb information should be stored

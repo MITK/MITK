@@ -80,9 +80,11 @@ class MitkToFUI_EXPORT QmitkToFSurfaceGenerationWidget :public QWidget
      * @param grabber ToFImageGrabber to get/set device properties.
      * @param intrinsics Intrincs of the device.
      * @param surface Generated Surface.
+     * @param generateSurface Check the generate surface combo box.
      * @param showAdvancedOptions Show/Hide advanced options.
      */
-    void Initialize(mitk::ToFDistanceImageToSurfaceFilter::Pointer filter, mitk::ToFImageGrabber::Pointer grabber, mitk::CameraIntrinsics::Pointer intrinsics, mitk::DataNode::Pointer surface, vtkSmartPointer<vtkCamera> camera, bool showAdvancedOptions = true);
+    void Initialize(mitk::ToFDistanceImageToSurfaceFilter::Pointer filter, mitk::ToFImageGrabber::Pointer grabber, mitk::CameraIntrinsics::Pointer intrinsics,
+      mitk::DataNode::Pointer surface, vtkSmartPointer<vtkCamera> camera, bool generateSurface = false, bool showAdvancedOptions = true);
 
     /**
      * @brief UpdateSurface Generate new surface data according to the device properties

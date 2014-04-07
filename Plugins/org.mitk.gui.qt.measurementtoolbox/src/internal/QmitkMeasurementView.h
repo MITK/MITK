@@ -66,6 +66,7 @@ class QmitkMeasurementView : public QmitkAbstractView
     void ActionDrawDoubleEllipseTriggered( bool checked = false );
     void ActionDrawRectangleTriggered( bool checked = false );
     void ActionDrawPolygonTriggered( bool checked = false );
+    void ActionDrawBezierCurveTriggered( bool checked = false );
     void CopyToClipboard( bool checked = false );
 
   private:

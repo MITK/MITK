@@ -61,6 +61,10 @@ mitk::PlanarFigureActivator::start(ctkPluginContext* /*context*/)
   // Adding "PlanarDoubleEllipse"
   mitk::NodePredicateDataType::Pointer isPlanarDoubleEllipse = mitk::NodePredicateDataType::New("PlanarDoubleEllipse");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor("PlanarDoubleEllipse", ":/QmitkExt/PlanarDoubleEllipse_48.png", isPlanarDoubleEllipse, descriptorManager));
+
+  // Adding "PlanarBezierCurve"
+  mitk::NodePredicateDataType::Pointer isPlanarBezierCurve = mitk::NodePredicateDataType::New("PlanarBezierCurve");
+  descriptorManager->AddDescriptor(new QmitkNodeDescriptor("PlanarBezierCurve", ":/QmitkExt/PlanarBezierCurve_48.png", isPlanarBezierCurve, descriptorManager));
 }
 
 void

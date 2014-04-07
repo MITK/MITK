@@ -382,7 +382,8 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   m_DrawShadow = false;
   m_DrawControlPoints = false;
   m_DrawName = true;
-  m_DrawDashed = true;
+  m_DrawDashed = false;
+  m_DrawHelperDashed = false;
 
   m_ShadowWidthFactor = 1.2;
   m_LineWidth = 1.0;
@@ -464,6 +465,7 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetBoolProperty( "planarfigure.drawname", m_DrawName );
 
   node->GetBoolProperty( "planarfigure.drawdashed", m_DrawDashed );
+  node->GetBoolProperty( "planarfigure.helperline.drawdashed", m_DrawHelperDashed );
 
   node->GetFloatProperty( "planarfigure.line.width", m_LineWidth );
   node->GetFloatProperty( "planarfigure.shadow.widthmodifier", m_ShadowWidthFactor );
@@ -556,12 +558,12 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
   node->AddProperty( "planarfigure.drawcontrolpoints", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawname", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawdashed", mitk::BoolProperty::New(false) );
-
+  node->AddProperty( "planarfigure.helperline.drawdashed", mitk::BoolProperty::New(false) );
 
   node->AddProperty("planarfigure.line.width", mitk::FloatProperty::New(2.0) );
   node->AddProperty("planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );
   node->AddProperty("planarfigure.outline.width", mitk::FloatProperty::New(2.0) );
-  node->AddProperty("planarfigure.helperline.width", mitk::FloatProperty::New(2.0) );
+  node->AddProperty("planarfigure.helperline.width", mitk::FloatProperty::New(1.0) );
 
   node->AddProperty( "planarfigure.default.line.opacity", mitk::FloatProperty::New(1.0) );
   node->AddProperty( "planarfigure.default.outline.opacity", mitk::FloatProperty::New(1.0) );
@@ -761,11 +763,7 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
                                               const mitk::Geometry2D * rendererGeometry2D,
                                               mitk::DisplayGeometry * displayGeometry )
 {
-  if ( m_DrawDashed )
-  {
-    glLineStipple(1, 0x00FF);
-    glEnable(GL_LINE_STIPPLE);
-  }
+  glLineStipple(1, 0x00FF);
 
   // If we want to draw an outline, we do it here
   if ( m_DrawOutline )
@@ -784,6 +782,10 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
     glColor4fv( colorVector );
     glLineWidth(m_OutlineWidth);
 
+    if (m_DrawDashed)
+      glEnable(GL_LINE_STIPPLE);
+    else
+      glDisable(GL_LINE_STIPPLE);
 
     // Draw the outline for all polylines if requested
     this->DrawMainLines( planarFigure,
@@ -791,6 +793,13 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
                          planarFigureGeometry2D,
                          rendererGeometry2D,
                          displayGeometry );
+
+    glLineWidth( m_HelperlineWidth );
+
+    if (m_DrawHelperDashed)
+      glEnable(GL_LINE_STIPPLE);
+    else
+      glDisable(GL_LINE_STIPPLE);
 
     // Draw the outline for all helper objects if requested
     this->DrawHelperLines( planarFigure,
@@ -823,6 +832,10 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
     glColor4fv( shadow );
     glLineWidth( m_OutlineWidth * m_ShadowWidthFactor );
 
+    if (m_DrawDashed)
+      glEnable(GL_LINE_STIPPLE);
+    else
+      glDisable(GL_LINE_STIPPLE);
 
     // Draw the outline for all polylines if requested
     this->DrawMainLines( planarFigure,
@@ -830,6 +843,13 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
                          planarFigureGeometry2D,
                          rendererGeometry2D,
                          displayGeometry );
+
+    glLineWidth( m_HelperlineWidth );
+
+    if (m_DrawHelperDashed)
+      glEnable(GL_LINE_STIPPLE);
+    else
+      glDisable(GL_LINE_STIPPLE);
 
     // Draw the outline for all helper objects if requested
     this->DrawHelperLines( planarFigure,
@@ -858,6 +878,11 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
     glColor4fv( colorVector );
     glLineWidth( m_LineWidth );
 
+    if (m_DrawDashed)
+      glEnable(GL_LINE_STIPPLE);
+    else
+      glDisable(GL_LINE_STIPPLE);
+
     // Draw the main line for all polylines
     this->DrawMainLines( planarFigure,
       anchorPoint,
@@ -878,6 +903,13 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
     // we only set the color for the helperlines as the linewidth is unchanged
     glColor4fv( helperColorVector );
 
+    glLineWidth( m_HelperlineWidth );
+
+    if (m_DrawHelperDashed)
+      glEnable(GL_LINE_STIPPLE);
+    else
+      glDisable(GL_LINE_STIPPLE);
+
     // Draw helper objects
     this->DrawHelperLines( planarFigure,
       anchorPoint,
@@ -890,8 +922,6 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
     delete[] helperColorVector;
   }
 
-  if ( m_DrawDashed )
-  {
+  if ( m_DrawDashed || m_DrawHelperDashed )
     glDisable(GL_LINE_STIPPLE);
-  }
 }

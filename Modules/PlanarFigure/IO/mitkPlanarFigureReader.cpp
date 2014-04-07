@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometry.h"
 #include "mitkPlanarEllipse.h"
 #include "mitkPlanarDoubleEllipse.h"
+#include "mitkPlanarBezierCurve.h"
 
 #include "mitkBasePropertySerializer.h"
 
@@ -179,6 +180,10 @@ void mitk::PlanarFigureReader::GenerateData()
     else if (type == "PlanarDoubleEllipse")
     {
       planarFigure = mitk::PlanarDoubleEllipse::New();
+    }
+    else if (type == "PlanarBezierCurve")
+    {
+      planarFigure = mitk::PlanarBezierCurve::New();
     }
     else
     {

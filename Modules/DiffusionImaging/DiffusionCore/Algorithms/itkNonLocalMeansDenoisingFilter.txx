@@ -355,12 +355,6 @@ NonLocalMeansDenoisingFilter< TPixelType >
 }
 
 template< class TPixelType >
-void NonLocalMeansDenoisingFilter< TPixelType >::PrintSelf(std::ostream& os, Indent indent) const
-{
-  Superclass::PrintSelf(os,indent);
-}
-
-template< class TPixelType >
 void NonLocalMeansDenoisingFilter< TPixelType >::SetInputImage(const InputImageType* image)
 {
   this->SetNthInput(0, const_cast< InputImageType* >(image));
@@ -369,7 +363,6 @@ void NonLocalMeansDenoisingFilter< TPixelType >::SetInputImage(const InputImageT
 template< class TPixelType >
 void NonLocalMeansDenoisingFilter< TPixelType >::SetInputMask(MaskImageType* mask)
 {
-  //this->SetNthInput(1, const_cast< MaskImageType* >(mask));
   m_Mask = mask;
 }
 }

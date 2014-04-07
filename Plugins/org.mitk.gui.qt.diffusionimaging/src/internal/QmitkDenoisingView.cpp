@@ -203,6 +203,7 @@ void QmitkDenoisingView::StartDenoising()
           m_NonLocalMeansFilter->SetUseJointInformation(m_Controls->m_JointInformationCheckbox->isChecked());
           m_NonLocalMeansFilter->SetSearchRadius(m_Controls->m_SpinBoxParameter1->value());
           m_NonLocalMeansFilter->SetComparisonRadius(m_Controls->m_SpinBoxParameter2->value());
+          m_NonLocalMeansFilter->SetVariance(m_Controls->m_DoubleSpinBoxParameter3->value());
 
 
 
@@ -430,7 +431,22 @@ void QmitkDenoisingView::AfterThread()
         QString name = m_ImageNode->GetName().c_str();
 
         //TODO: Rician adaption & joint information in name
-        imageNode->SetName((name+"_NLM_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
+        if (m_Controls->m_RicianCheckbox->isChecked() && !m_Controls->m_JointInformationCheckbox->isChecked())
+        {
+          imageNode->SetName((name+"_NLMr_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
+        }
+        else if(!m_Controls->m_RicianCheckbox->isChecked() && m_Controls->m_JointInformationCheckbox->isChecked())
+        {
+          imageNode->SetName((name+"_NLMv_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
+        }
+        else if(m_Controls->m_RicianCheckbox->isChecked() && m_Controls->m_JointInformationCheckbox->isChecked())
+        {
+          imageNode->SetName((name+"_NLMvr_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
+        }
+        else
+        {
+          imageNode->SetName((name+"_NLM_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
+        }
         GetDefaultDataStorage()->Add(imageNode);
         break;
       }

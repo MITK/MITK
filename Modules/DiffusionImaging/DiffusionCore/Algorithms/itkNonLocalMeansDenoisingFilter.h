@@ -14,11 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-/*===================================================================
-
-This file is based heavily on a corresponding ITK filter.
-
-===================================================================*/
 #ifndef __itkNonLocalMeansDenoisingFilter_h_
 #define __itkNonLocalMeansDenoisingFilter_h_
 
@@ -26,15 +21,15 @@ This file is based heavily on a corresponding ITK filter.
 #include "itkVectorImage.h"
 #include <mitkDiffusionImage.h>
 
-#include <itkStatisticsImageFilter.h>
+//#include <itkStatisticsImageFilter.h>
 
 
 namespace itk{
   /** \class NonLocalMeansDenoisingFilter
    * \brief This class denoises a vectorimage according to the non local means procedure.
    *
-   * This Filter needs as an input the diffusion weigthed image and a related brainmask.
-   * Search- and comparisonradius need to be set!
+   * This Filter needs as an input a diffusion weigthed image.
+   * An input mask is optional to denoise only inside the mask range. All other voxels will be set to 0.
   */
 
   template< class TPixelType >
@@ -60,22 +55,59 @@ namespace itk{
     /** Runtime information support. */
     itkTypeMacro(NonLocalMeansDenoisingFilter, ImageToImageFilter)
 
-    /** Set/Get Macros */
+    /**
+     * \brief Set flag to use joint information
+     */
     itkSetMacro(UseJointInformation, bool)
+    /**
+     * \brief Set the searchradius
+     *
+     * The searchradius generates a neighborhood of size (2 * searchradius + 1)³.
+     * Default is 4.
+     */
     itkSetMacro(SearchRadius, int)
+    /**
+     * \brief Set the comparisonradius
+     *
+     * The comparisonradius generates neighborhoods of size (2 * comparisonradius +1)³.
+     * Default is 1.
+     */
     itkSetMacro(ComparisonRadius, int)
+    /**
+     * \brief Set the variance of the noise
+     *
+     * The variance of the noise needs to be estimated tu use this filter properly.
+     * Default is 1.
+     */
     itkSetMacro(Variance, double)
+    /**
+     * \brief Set flag to use a rician adaption
+     *
+     * If this flag is true the filter uses a method which is optimized for Rician distributed noise.
+     */
     itkSetMacro(UseRicianAdaption, bool)
+    /**
+     * \brief Get the amount of calculated Voxels
+     *
+     * Returns the number of calculated Voxels until yet, useful for the use of a progressbars.
+     */
     itkGetMacro(CurrentVoxelCount, unsigned int)
 
 
+    /** \brief Set the input image. **/
     void SetInputImage(const InputImageType* image);
+    /**
+     * \brief Set a denoising mask
+     *
+     * optional
+     *
+     * Set a mask to denoise only the masked area, all voxel outside this area will be set to 0.
+     */
     void SetInputMask(MaskImageType* mask);
 
   protected:
     NonLocalMeansDenoisingFilter();
     ~NonLocalMeansDenoisingFilter() {}
-    void PrintSelf(std::ostream& os, Indent indent) const;
 
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);

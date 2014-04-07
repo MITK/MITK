@@ -34,6 +34,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QThread>
 #include <QTimer>
 
+/**
+ * \class QmitkDenoisingView
+ * \brief View displaying details to denoise diffusionweighted images.
+ *
+ * \sa QmitkFunctionality
+ * \ingroup Functionalities
+ */
 class QmitkDenoisingView;
 
 class QmitkDenoisingWorker : public QObject
@@ -53,12 +60,7 @@ private:
   QmitkDenoisingView* m_View;
 };
 
-/*!
-  \brief View displaying details to denoise diffusionweighted images.
 
-  \sa QmitkFunctionality
-  \ingroup Functionalities
-*/
 class QmitkDenoisingView : public QmitkFunctionality
 {
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -90,11 +92,11 @@ public:
 
 private slots:
 
-  void StartDenoising();                  ///< prepares filter condition and starts thread for denoising
-  void SelectFilter(int filter);          ///< updates which filter is selected
-  void BeforeThread();                    ///< starts timer & disables all buttons while denoising
-  void AfterThread();                     ///< stops timer & creates a new datanode of the denoised image
-  void UpdateProgress();                  ///< updates the progressbar each timestep
+  void StartDenoising();                  //< prepares filter condition and starts thread for denoising
+  void SelectFilter(int filter);          //< updates which filter is selected
+  void BeforeThread();                    //< starts timer & disables all buttons while denoising
+  void AfterThread();                     //< stops timer & creates a new datanode of the denoised image
+  void UpdateProgress();                  //< updates the progressbar each timestep
 
 private:
 

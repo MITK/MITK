@@ -101,7 +101,7 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
 
   // connect signals and slots
   connect ( m_Controls.m_EnableTreCalculation,SIGNAL(clicked()),this, SLOT(OnEnableTreCalculation()) );
-  connect ( m_Controls.m_RegisterSurfaceButton, SIGNAL(clicked()), this, SLOT(OnRunRegistration()) );
+  connect ( m_Controls.m_RegisterSurfaceButton, SIGNAL(clicked()), this, SLOT(OnStartRegistration()) );
   connect ( m_Controls.m_EnableTrimming, SIGNAL(clicked()), this, SLOT(OnEnableTrimming()) );
   connect ( d->m_Worker, SIGNAL( RegistrationFinished()), this, SLOT( OnRegistrationFinished()) );
   connect(d->m_RegistrationThread,SIGNAL(started()), d->m_Worker,SLOT(RegistrationThreadFunc()) );
@@ -130,7 +130,7 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
   m_Controls.m_TrimmFactorSpinbox->setEnabled(false);
 }
 
-void QmitkSurfaceRegistrationView::OnRunRegistration()
+void QmitkSurfaceRegistrationView::OnStartRegistration()
 {
   d->m_Threshold = m_Controls.m_ThresholdSpinbox->value();
   d->m_MaxIterations = m_Controls.m_MaxIterationsSpinbox->value();
@@ -218,12 +218,12 @@ void QmitkSurfaceRegistrationView::OnRegistrationFinished()
     // sanity check
     if ( movingTargets.IsNotNull() && fixedTargets.IsNotNull() )
     {
-      tre = mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError (
-                                                                       movingTargets,
-                                                                       fixedTargets,
-                                                                       rotation,
-                                                                       translation
-                                                                     );
+      tre = mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(
+                                                                  movingTargets,
+                                                                  fixedTargets,
+                                                                  rotation,
+                                                                  translation
+                                                                );
       MITK_INFO << "TRE: " << tre;
     }
   }

@@ -59,7 +59,7 @@ namespace mitk {
     Point<TCoordRep, NPointDimension>(const mitk::Point<TCoordRep, NPointDimension>& r) : itk::Point<TCoordRep, NPointDimension>(r) {}
     Point<TCoordRep, NPointDimension>(const TCoordRep r[NPointDimension]):itk::Point<TCoordRep, NPointDimension>(r) {}
     Point<TCoordRep, NPointDimension>(const TCoordRep & v):itk::Point<TCoordRep, NPointDimension>(v) {}
-    Point<TCoordRep, NPointDimension>(const itk::Point<TCoordRep, NPointDimension> r) : itk::Point<TCoordRep, NPointDimension>(r) {}
+    Point<TCoordRep, NPointDimension>(const itk::Point<TCoordRep, NPointDimension> & p) : itk::Point<TCoordRep, NPointDimension>(p) {}
 
     /** Pass-through assignment operator for the Array base class. */
     /**

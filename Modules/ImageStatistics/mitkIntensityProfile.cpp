@@ -162,10 +162,10 @@ static IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, i
   return intensityProfile;
 }
 
-class AddPointToPath
+class AddPolyLineElementToPath
 {
 public:
-  AddPointToPath(const Geometry2D* planarFigureGeometry, const Geometry3D* imageGeometry, itk::PolyLineParametricPath<3>::Pointer path)
+  AddPolyLineElementToPath(const Geometry2D* planarFigureGeometry, const Geometry3D* imageGeometry, itk::PolyLineParametricPath<3>::Pointer path)
     : m_PlanarFigureGeometry(planarFigureGeometry),
       m_ImageGeometry(imageGeometry),
       m_Path(path)
@@ -196,7 +196,28 @@ static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPlanarFigure(Geomet
   const PlanarFigure::PolyLineType polyLine = planarFigure->GetPolyLine(0);
 
   std::for_each(polyLine.begin(), polyLine.end(),
-    AddPointToPath(planarFigure->GetGeometry2D(), imageGeometry, path));
+    AddPolyLineElementToPath(planarFigure->GetGeometry2D(), imageGeometry, path));
+
+  return path;
+}
+
+static void AddPointToPath(const Geometry3D* imageGeometry, const Point3D& point, itk::PolyLineParametricPath<3>::Pointer path)
+{
+  Point3D continuousIndexPoint;
+  imageGeometry->WorldToIndex(point, continuousIndexPoint);
+
+  itk::PolyLineParametricPath<3>::ContinuousIndexType vertex;
+  vertex.CastFrom(continuousIndexPoint);
+
+  path->AddVertex(vertex);
+}
+
+static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPoints(Geometry3D* imageGeometry, const Point3D& startPoint, const Point3D& endPoint)
+{
+  itk::PolyLineParametricPath<3>::Pointer path = itk::PolyLineParametricPath<3>::New();
+
+  AddPointToPath(imageGeometry, startPoint, path);
+  AddPointToPath(imageGeometry, endPoint, path);
 
   return path;
 }
@@ -209,6 +230,11 @@ IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, Pl
 IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, PlanarLine::Pointer planarLine, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)
 {
   return ::ComputeIntensityProfile(image, CreatePathFromPlanarFigure(image->GetGeometry(), planarLine.GetPointer()), numSamples, interpolator);
+}
+
+IntensityProfile::Pointer mitk::ComputeIntensityProfile(Image::Pointer image, const Point3D& startPoint, const Point3D& endPoint, unsigned int numSamples, InterpolateImageFunction::Enum interpolator)
+{
+  return ::ComputeIntensityProfile(image, CreatePathFromPoints(image->GetGeometry(), startPoint, endPoint), numSamples, interpolator);
 }
 
 IntensityProfile::InstanceIdentifier mitk::ComputeGlobalMaximum(IntensityProfile::Pointer intensityProfile)

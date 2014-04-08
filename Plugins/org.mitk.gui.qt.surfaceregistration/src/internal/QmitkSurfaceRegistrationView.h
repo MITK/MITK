@@ -48,6 +48,8 @@ class QmitkSurfaceRegistrationView : public QmitkAbstractView
 
     void OnEnableTreCalculation();
 
+    void OnEnableTrimming();
+
   protected:
 
     virtual void CreateQtPartControl(QWidget *parent);

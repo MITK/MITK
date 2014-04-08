@@ -47,6 +47,7 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
 
   connect ( m_Controls.m_EnableTreCalculation,SIGNAL(clicked()),this, SLOT(OnEnableTreCalculation()) );
   connect ( m_Controls.m_RegisterSurfaceButton, SIGNAL(clicked()), this, SLOT(OnRunRegistration()) );
+  connect ( m_Controls.m_EnableTrimming, SIGNAL(clicked()), this, SLOT(OnEnableTrimming()) );
 
   // init combo boxes
   m_Controls.m_FixedSurfaceComboBox->SetDataStorage(this->GetDataStorage());
@@ -176,7 +177,7 @@ void QmitkSurfaceRegistrationView::OnRunRegistration()
   MITK_INFO << "Rotation: \n" << rotation << "Translation: " << translation;
   MITK_INFO << "FRE: " << aICP->GetFRE();
 
-  // display result in textbox
+  // display result in textbox ( the inverse transform )
   QString text("");
   std::ostringstream oss;
 
@@ -210,6 +211,9 @@ void QmitkSurfaceRegistrationView::OnRunRegistration()
 
   //update view
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  // reanable registration button
+  m_Controls.m_RegisterSurfaceButton->setEnabled(true);
 }
 
 void QmitkSurfaceRegistrationView::OnEnableTreCalculation()
@@ -218,4 +222,19 @@ void QmitkSurfaceRegistrationView::OnEnableTreCalculation()
     m_Controls.m_TargetSelectFrame->setEnabled(true);
   else
     m_Controls.m_TargetSelectFrame->setEnabled(false);
+}
+
+void QmitkSurfaceRegistrationView::OnEnableTrimming()
+{
+  MITK_INFO << "enable trimming";
+  if ( m_Controls.m_EnableTrimming->isChecked() )
+  {
+    // disable trimming options
+    m_Controls.m_TrimmFactorLabel->setEnabled(true);
+    m_Controls.m_TrimmFactorSpinbox->setEnabled(true);
+  } else {
+    // disable trimming options
+    m_Controls.m_TrimmFactorLabel->setEnabled(false);
+    m_Controls.m_TrimmFactorSpinbox->setEnabled(false);
+  }
 }

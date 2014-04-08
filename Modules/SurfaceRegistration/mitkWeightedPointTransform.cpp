@@ -272,7 +272,7 @@ void mitk::WeightedPointTransform::WeightedPointRegister(
                                     W,initial_TransformationR,
                                     initial_TransformationT);
 
-  MITK_INFO << "FRE for identity transform: "<<FRE_identity;
+  MITK_DEBUG << "FRE for identity transform: "<<FRE_identity;
 
   // compute isotropic transformation as initial estimate
   IsotropicRegistration( X,Y,m_LandmarkTransform,initial_TransformationR,
@@ -286,8 +286,8 @@ void mitk::WeightedPointTransform::WeightedPointRegister(
   FRE_isotropic_weighted = ComputeWeightedFRE(X,Y,Sigma_X,Sigma_Y,
                                               m_FRENormalizationFactor,
                                               W,TransformationR,TransformationT);
-  MITK_INFO << "FRE for transform obtained with unweighted registration: "
-            <<FRE_isotropic_weighted;
+  MITK_DEBUG << "FRE for transform obtained with unweighted registration: "
+             << FRE_isotropic_weighted;
 
   //if R,t is worse than the identity, use the identity as initial transform
   if (FRE_isotropic_weighted < FRE_identity)
@@ -391,7 +391,7 @@ void mitk::WeightedPointTransform::WeightedPointRegister(
   FRE = ComputeWeightedFRE( X,Y,Sigma_X,Sigma_Y,m_FRENormalizationFactor,
                             W,TransformationR,TransformationT );
 
-  MITK_INFO <<"FRE after algorithm (prior to check with initial): "<<FRE;
+  MITK_DEBUG <<"FRE after algorithm (prior to check with initial): "<<FRE;
 
   //compare with FRE_initial
   if (initialFRE < FRE)
@@ -402,7 +402,7 @@ void mitk::WeightedPointTransform::WeightedPointRegister(
     FRE = initialFRE;
   }
 
-  MITK_INFO <<"FRE final: "<<FRE;
+  MITK_DEBUG <<"FRE final: "<<FRE;
 
   X_transformed->Delete();
   X_transformedNew->Delete();

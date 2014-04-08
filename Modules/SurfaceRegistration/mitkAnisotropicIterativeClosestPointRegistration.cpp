@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkWeightedPointTransform.h"
 #include "mitkAnisotropicRegistrationCommon.h"
 #include <mitkSurface.h>
+#include <mitkProgressBar.h>
 // VTK
 #include <vtkKdTree.h>
 #include <vtkPoints.h>
@@ -202,6 +203,11 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
   X_sorted->SetNumberOfPoints(numberOfTrimmedPoints);
   Z_sorted->SetNumberOfPoints(numberOfTrimmedPoints);
 
+  // initialize the progress bar
+  unsigned int steps = m_MaxIterations;
+  unsigned int stepSize = m_MaxIterations / 10;
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
+
   do {
 
     // reset innerloop
@@ -277,7 +283,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
 
     } while ( diff < -1.0e-3 ); // increase radius as long as the FRE grows
 
-    MITK_INFO << "FRE:" << m_FRE << ", FRE_new: "<< FRE_new;
+    MITK_DEBUG << "FRE:" << m_FRE << ", FRE_new: "<< FRE_new;
     // transform points and propagate matrices
     mitk::AnisotropicRegistrationCommon::TransformPoints(X,X,RotationNew,TranslationNew);
     mitk::AnisotropicRegistrationCommon::PropagateMatrices(Sigma_X,Sigma_X,RotationNew);
@@ -286,13 +292,25 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
     m_Rotation = RotationNew * m_Rotation;
     m_Translation = RotationNew * m_Translation + TranslationNew;
 
-    MITK_INFO << "diff:" << diff;
+    MITK_DEBUG << "diff:" << diff;
     // update FRE
     m_FRE = FRE_new;
+
+    // update the progressbar. Just use the half every 2nd iteration
+    // to use a simulated endless progress bar since we don't have
+    // a fixed amount of iterations
+    stepSize = (k % 2 == 0) ? stepSize / 2 : stepSize;
+    stepSize = ( stepSize == 0 ) ? 1 : stepSize;
+    mitk::ProgressBar::GetInstance()->Progress(stepSize);
 
   } while ( diff >= m_Threshold && k < m_MaxIterations );
 
   m_NumberOfIterations = k;
+
+  // finish the progress bar if there are more steps
+  // left than iterations used
+  if ( k < steps )
+    mitk::ProgressBar::GetInstance()->Progress(steps);
 
   // free memory
   Y->Delete();

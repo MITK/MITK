@@ -38,8 +38,10 @@ const std::string QmitkSurfaceRegistrationView::VIEW_ID = "org.mitk.views.a-icpr
 
 class SurfaceRegistrationViewData
 {
+
 public:
   QThread* m_RegistrationThread;
+  UIWorker* m_Worker;
   double m_Threshold;
   double m_MaxIterations;
   double m_TrimmFactor;
@@ -55,7 +57,8 @@ public:
   mitk::Surface::Pointer m_FixedSurface;
 
   SurfaceRegistrationViewData()
-   : m_RegistrationThread(new QThread),
+   : m_RegistrationThread(new QThread()),
+     m_Worker(new UIWorker()),
      m_Threshold(0.00001),
      m_MaxIterations(1000),
      m_TrimmFactor(0.0),
@@ -70,6 +73,8 @@ public:
   {
     if ( m_RegistrationThread )
       delete m_RegistrationThread;
+    if ( m_Worker )
+      delete m_Worker;
 
     m_AICP = NULL;
     m_MatrixCalculator = NULL;
@@ -87,18 +92,22 @@ QmitkSurfaceRegistrationView::~QmitkSurfaceRegistrationView()
     delete d;
 }
 
-void QmitkSurfaceRegistrationView::SetFocus()
-{
-}
+void QmitkSurfaceRegistrationView::SetFocus(){}
 
 void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
 
+  // connect signals and slots
   connect ( m_Controls.m_EnableTreCalculation,SIGNAL(clicked()),this, SLOT(OnEnableTreCalculation()) );
   connect ( m_Controls.m_RegisterSurfaceButton, SIGNAL(clicked()), this, SLOT(OnRunRegistration()) );
   connect ( m_Controls.m_EnableTrimming, SIGNAL(clicked()), this, SLOT(OnEnableTrimming()) );
+  connect ( d->m_Worker, SIGNAL( RegistrationFinished()), this, SLOT( OnRegistrationFinished()) );
+  connect(d->m_RegistrationThread,SIGNAL(started()), d->m_Worker,SLOT(RegistrationThreadFunc()) );
+
+  // move the u worker to the thread
+  d->m_Worker->moveToThread(d->m_RegistrationThread);
 
   // init combo boxes
   m_Controls.m_FixedSurfaceComboBox->SetDataStorage(this->GetDataStorage());
@@ -123,10 +132,6 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
 
 void QmitkSurfaceRegistrationView::OnRunRegistration()
 {
-  typedef itk::Matrix<double,3,3> Matrix3x3;
-  typedef itk::Vector<double,3> TranslationVector;
-  typedef std::vector<Matrix3x3> CovarianceMatrixList;
-
   d->m_Threshold = m_Controls.m_ThresholdSpinbox->value();
   d->m_MaxIterations = m_Controls.m_MaxIterationsSpinbox->value();
   d->m_TrimmFactor = 0.0;
@@ -135,8 +140,6 @@ void QmitkSurfaceRegistrationView::OnRunRegistration()
   {
     d->m_TrimmFactor = m_Controls.m_TrimmFactorSpinbox->value();
   }
-
-
 
   d->m_MovingSurface = dynamic_cast<mitk::Surface*>(
             m_Controls.m_MovingSurfaceComboBox->GetSelectedNode()->GetData() );
@@ -157,36 +160,50 @@ void QmitkSurfaceRegistrationView::OnRunRegistration()
     d->m_TrimmFactor = m_Controls.m_TrimmFactorSpinbox->value();
   }
 
-  // compute the covariance matrices for the moving surface (X)
-  d->m_MatrixCalculator->SetInputSurface(d->m_MovingSurface);
-  d->m_MatrixCalculator->ComputeCovarianceMatrices();
-  CovarianceMatrixList sigmas_X = d->m_MatrixCalculator->GetCovarianceMatrices();
-  double meanVarX = d->m_MatrixCalculator->GetMeanVariance();
+  // set data into the UI thread
+  d->m_Worker->SetRegistrationData(d);
 
-  // compute the covariance matrices for the fixed surface (Y)
-  d->m_MatrixCalculator->SetInputSurface(d->m_FixedSurface);
-  d->m_MatrixCalculator->ComputeCovarianceMatrices();
-  CovarianceMatrixList sigmas_Y = d->m_MatrixCalculator->GetCovarianceMatrices();
-  double meanVarY = d->m_MatrixCalculator->GetMeanVariance();
+  // start thread
+  d->m_RegistrationThread->start();
 
-  // the FRE normalization factor
-  double normalizationFactor = sqrt( meanVarX + meanVarY);
+  // disable registration button
+  m_Controls.m_RegisterSurfaceButton->setEnabled(false);
 
-  // set up parameters
-  d->m_AICP->SetMovingSurface(d->m_MovingSurface);
-  d->m_AICP->SetFixedSurface(d->m_FixedSurface);
-  d->m_AICP->SetCovarianceMatricesMovingSurface(sigmas_X);
-  d->m_AICP->SetCovarianceMatricesFixedSurface(sigmas_Y);
-  d->m_AICP->SetFRENormalizationFactor(normalizationFactor);
-  d->m_AICP->SetMaxIterations(d->m_MaxIterations);
-  d->m_AICP->SetThreshold(d->m_Threshold);
-  d->m_AICP->SetTrimmFactor(d->m_TrimmFactor);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
 
-  // run the algorithm
-  d->m_AICP->Update();
+void QmitkSurfaceRegistrationView::OnEnableTreCalculation()
+{
+  if ( m_Controls.m_EnableTreCalculation->isChecked() )
+    m_Controls.m_TargetSelectFrame->setEnabled(true);
+  else
+    m_Controls.m_TargetSelectFrame->setEnabled(false);
+}
+
+void QmitkSurfaceRegistrationView::OnEnableTrimming()
+{
+  MITK_INFO << "enable trimming";
+  if ( m_Controls.m_EnableTrimming->isChecked() )
+  {
+    // disable trimming options
+    m_Controls.m_TrimmFactorLabel->setEnabled(true);
+    m_Controls.m_TrimmFactorSpinbox->setEnabled(true);
+  } else {
+    // disable trimming options
+    m_Controls.m_TrimmFactorLabel->setEnabled(false);
+    m_Controls.m_TrimmFactorSpinbox->setEnabled(false);
+    }
+}
+
+void QmitkSurfaceRegistrationView::OnRegistrationFinished()
+{
+  typedef itk::Matrix<double,3,3> Matrix3x3;
+  typedef itk::Vector<double,3> TranslationVector;
 
   Matrix3x3 rotation = d->m_AICP->GetRotation();
   TranslationVector translation = d->m_AICP->GetTranslation();
+
+  d->m_RegistrationThread->quit();
 
   double tre = -1.0;
   // compute TRE
@@ -226,8 +243,14 @@ void QmitkSurfaceRegistrationView::OnRunRegistration()
 
   oss << "<b>Iterations:</b> "<< d->m_AICP->GetNumberOfIterations()
       << "<br><b>FRE:</b> " << d->m_AICP->GetFRE()
-      << "<br><b>TRE:</b> " << tre
-      << "<br><br><b>Rotation:</b><br>";
+      << "<br><b>TRE:</b> ";
+
+   if ( tre != -1.0)
+    oss << tre;
+   else
+    oss << "N/A";
+
+  oss << "<br><br><b>Rotation:</b><br>";
 
   for ( int i = 0; i < 3; ++i ) {
     for ( int j = 0; j < 3; ++j )
@@ -246,38 +269,58 @@ void QmitkSurfaceRegistrationView::OnRunRegistration()
   mitk::AnisotropicRegistrationCommon::TransformPoints (
           d->m_FixedSurface->GetVtkPolyData()->GetPoints(),
           d->m_FixedSurface->GetVtkPolyData()->GetPoints(),
-          rotation, translation
+          rotation,
+          translation
         );
 
   // set modified flag to update rendering
   d->m_FixedSurface->GetVtkPolyData()->Modified();
 
-  //update view
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
   // reanable registration button
   m_Controls.m_RegisterSurfaceButton->setEnabled(true);
+
+  //update view
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSurfaceRegistrationView::OnEnableTreCalculation()
+void UIWorker::SetRegistrationData(SurfaceRegistrationViewData *data)
 {
-  if ( m_Controls.m_EnableTreCalculation->isChecked() )
-    m_Controls.m_TargetSelectFrame->setEnabled(true);
-  else
-    m_Controls.m_TargetSelectFrame->setEnabled(false);
+  this->d = data;
 }
 
-void QmitkSurfaceRegistrationView::OnEnableTrimming()
+void UIWorker::RegistrationThreadFunc()
 {
-  MITK_INFO << "enable trimming";
-  if ( m_Controls.m_EnableTrimming->isChecked() )
-  {
-    // disable trimming options
-    m_Controls.m_TrimmFactorLabel->setEnabled(true);
-    m_Controls.m_TrimmFactorSpinbox->setEnabled(true);
-  } else {
-    // disable trimming options
-    m_Controls.m_TrimmFactorLabel->setEnabled(false);
-    m_Controls.m_TrimmFactorSpinbox->setEnabled(false);
-  }
+  typedef itk::Matrix<double,3,3> Matrix3x3;
+  typedef itk::Vector<double,3> TranslationVector;
+  typedef std::vector<Matrix3x3> CovarianceMatrixList;
+
+  // compute the covariance matrices for the moving surface (X)
+  d->m_MatrixCalculator->SetInputSurface(d->m_MovingSurface);
+  d->m_MatrixCalculator->ComputeCovarianceMatrices();
+  CovarianceMatrixList sigmas_X = d->m_MatrixCalculator->GetCovarianceMatrices();
+  double meanVarX = d->m_MatrixCalculator->GetMeanVariance();
+
+  // compute the covariance matrices for the fixed surface (Y)
+  d->m_MatrixCalculator->SetInputSurface(d->m_FixedSurface);
+  d->m_MatrixCalculator->ComputeCovarianceMatrices();
+  CovarianceMatrixList sigmas_Y = d->m_MatrixCalculator->GetCovarianceMatrices();
+  double meanVarY = d->m_MatrixCalculator->GetMeanVariance();
+
+  // the FRE normalization factor
+  double normalizationFactor = sqrt( meanVarX + meanVarY);
+
+  // set up parameters
+  d->m_AICP->SetMovingSurface(d->m_MovingSurface);
+  d->m_AICP->SetFixedSurface(d->m_FixedSurface);
+  d->m_AICP->SetCovarianceMatricesMovingSurface(sigmas_X);
+  d->m_AICP->SetCovarianceMatricesFixedSurface(sigmas_Y);
+  d->m_AICP->SetFRENormalizationFactor(normalizationFactor);
+  d->m_AICP->SetMaxIterations(d->m_MaxIterations);
+  d->m_AICP->SetThreshold(d->m_Threshold);
+  d->m_AICP->SetTrimmFactor(d->m_TrimmFactor);
+
+  // run the algorithm
+  d->m_AICP->Update();
+
+  emit RegistrationFinished();
 }

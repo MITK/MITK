@@ -21,11 +21,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
-
+#include <QWidget>
 #include "ui_QmitkSurfaceRegistrationViewControls.h"
 
 // forwarddeclaration
 class SurfaceRegistrationViewData;
+
+class UIWorker : public QObject
+{
+  Q_OBJECT
+
+  private:
+    SurfaceRegistrationViewData* d;
+
+  public slots:
+
+    void RegistrationThreadFunc();
+
+  signals:
+
+    void RegistrationFinished();
+
+  public:
+    void SetRegistrationData(SurfaceRegistrationViewData* data);
+};
 
 /**
   \brief QmitkSurfaceRegistrationView
@@ -49,7 +68,6 @@ class QmitkSurfaceRegistrationView : public QmitkAbstractView
 
     ~QmitkSurfaceRegistrationView();
 
-
   protected slots:
 
     void OnRunRegistration();
@@ -57,6 +75,10 @@ class QmitkSurfaceRegistrationView : public QmitkAbstractView
     void OnEnableTreCalculation();
 
     void OnEnableTrimming();
+
+  public slots:
+
+    void OnRegistrationFinished();
 
   protected:
 

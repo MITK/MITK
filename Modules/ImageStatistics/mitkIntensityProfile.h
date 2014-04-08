@@ -70,6 +70,18 @@ namespace mitk
     */
   MitkImageStatistics_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, PlanarLine::Pointer planarLine, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
 
+  /** \brief Compute intensity profile of an image for each sample between two points.
+    *
+    * \param[in] image A three-dimensional image which consists of single component pixels.
+    * \param[in] startPoint A point at which the first sample is to be read.
+    * \param[in] endPoint A point at which the last sample is to be read.
+    * \param[in] numSamples Number of samples between startPoint and endPoint (must be at least 2).
+    * \param[in] interpolator Image interpolation function which is used to read each sample.
+    *
+    * \return The computed intensity profile.
+    */
+  MitkImageStatistics_EXPORT IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, const Point3D& startPoint, const Point3D& endPoint, unsigned int numSamples, InterpolateImageFunction::Enum interpolator = InterpolateImageFunction::NearestNeighbor);
+
   /** \brief Compute global maximum of an intensity profile.
     *
     * \param[in] intensityProfile An intensity profile.

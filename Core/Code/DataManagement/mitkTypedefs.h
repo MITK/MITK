@@ -34,8 +34,6 @@ namespace mitk {
 
 typedef vnl_matrix_fixed<ScalarType, 3, 3> VnlMatrix3D;
 
-typedef itk::Transform<ScalarType, 3, 3> Transform3D;
-
 typedef vnl_vector<ScalarType> VnlVector;
 typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 

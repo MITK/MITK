@@ -593,7 +593,7 @@ namespace mitk {
       //## @brief Get the parametric transform
       //##
       //## See AbstractTransformGeometry for an example usage of this.
-      virtual const Transform3D* GetParametricTransform() const
+      virtual const itk::Transform<ScalarType, 3, 3>* GetParametricTransform() const
       {
          return m_IndexToWorldTransform;
       }

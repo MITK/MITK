@@ -57,8 +57,8 @@ int DwiDenoising(int argc, char* argv[])
   parser.addArgument("mask", "m", ctkCommandLineParser::String, "brainmask for input image", us::Any(), true);
   parser.addArgument("search", "s", ctkCommandLineParser::Int, "search radius", us::Any(), true);
   parser.addArgument("compare", "c", ctkCommandLineParser::Int, "compare radius", us::Any(), true);
-  parser.addArgument("joint", "j", ctkCommandLineParser::Bool, "use joint information"/*, us::Any(), true*/);
-  parser.addArgument("rician", "r", ctkCommandLineParser::Bool, "use rician adaption"/*, us::Any(), true*/);
+  parser.addArgument("joint", "j", ctkCommandLineParser::Bool, "use joint information");
+  parser.addArgument("rician", "r", ctkCommandLineParser::Bool, "use rician adaption");
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

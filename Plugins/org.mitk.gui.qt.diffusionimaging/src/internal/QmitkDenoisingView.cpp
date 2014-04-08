@@ -194,7 +194,45 @@ void QmitkDenoisingView::StartDenoising()
             itk::Image<DiffusionPixelType, 3>::Pointer itkMask = itk::Image<DiffusionPixelType, 3>::New();
             mitk::CastToItkImage(m_ImageMask, itkMask);
             m_NonLocalMeansFilter->SetInputMask(itkMask);
+
+            itk::ImageRegionIterator< itk::Image<DiffusionPixelType, 3> > mit(itkMask, itkMask->GetLargestPossibleRegion());
+            mit.GoToBegin();
+            itk::Image<DiffusionPixelType, 3>::IndexType minIndex;
+            itk::Image<DiffusionPixelType, 3>::IndexType maxIndex;
+            minIndex.Fill(10000);
+            maxIndex.Fill(0);
+            while (!mit.IsAtEnd())
+            {
+
+              if (mit.Get())
+              {
+                // calculation of the start & end index of the smallest masked region
+                minIndex[0] = minIndex[0] < mit.GetIndex()[0] ? minIndex[0] : mit.GetIndex()[0];
+                minIndex[1] = minIndex[1] < mit.GetIndex()[1] ? minIndex[1] : mit.GetIndex()[1];
+                minIndex[2] = minIndex[2] < mit.GetIndex()[2] ? minIndex[2] : mit.GetIndex()[2];
+
+                maxIndex[0] = maxIndex[0] > mit.GetIndex()[0] ? maxIndex[0] : mit.GetIndex()[0];
+                maxIndex[1] = maxIndex[1] > mit.GetIndex()[1] ? maxIndex[1] : mit.GetIndex()[1];
+                maxIndex[2] = maxIndex[2] > mit.GetIndex()[2] ? maxIndex[2] : mit.GetIndex()[2];
+              }
+              ++mit;
+            }
+            typename itk::Image<DiffusionPixelType, 3>::SizeType size;
+            size[0] = maxIndex[0] - minIndex[0];
+            size[1] = maxIndex[1] - minIndex[1];
+            size[2] = maxIndex[2] - minIndex[2];
+
+            m_MaxProgressCount = size[0] * size[1] * size[2];
           }
+          else
+          {
+            // initialize the progressbar
+            m_MaxProgressCount = m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2);
+
+          }
+
+
+          mitk::ProgressBar::GetInstance()->AddStepsToDo(m_MaxProgressCount);
 
 
           m_NonLocalMeansFilter->SetNumberOfThreads(12);
@@ -207,9 +245,7 @@ void QmitkDenoisingView::StartDenoising()
 
 
 
-          // initialize the progressbar
-          m_MaxProgressCount = m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2);
-          mitk::ProgressBar::GetInstance()->AddStepsToDo(m_MaxProgressCount);
+
 
           // start denoising in detached thread
           m_DenoisingThread.start(QThread::HighestPriority);

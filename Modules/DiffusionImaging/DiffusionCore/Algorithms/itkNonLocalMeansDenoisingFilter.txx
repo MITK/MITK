@@ -61,6 +61,8 @@ NonLocalMeansDenoisingFilter< TPixelType >
   typename InputImageType::Pointer inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
   if (m_Mask.IsNull())
   {
+    // If no mask is used generate a mask of the complete image
+
     m_Mask = MaskImageType::New();
     m_Mask->SetRegions(inputImagePointer->GetLargestPossibleRegion());
     m_Mask->Allocate();
@@ -68,6 +70,8 @@ NonLocalMeansDenoisingFilter< TPixelType >
   }
   else
   {
+    // Calculation of the smallest masked region
+
     ImageRegionIterator< MaskImageType > mit(m_Mask, m_Mask->GetLargestPossibleRegion());
     mit.GoToBegin();
     typename MaskImageType::IndexType minIndex;
@@ -79,6 +83,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
 
       if (mit.Get())
       {
+        // calculation of the start & end index of the smallest masked region
         minIndex[0] = minIndex[0] < mit.GetIndex()[0] ? minIndex[0] : mit.GetIndex()[0];
         minIndex[1] = minIndex[1] < mit.GetIndex()[1] ? minIndex[1] : mit.GetIndex()[1];
         minIndex[2] = minIndex[2] < mit.GetIndex()[2] ? minIndex[2] : mit.GetIndex()[2];
@@ -89,6 +94,8 @@ NonLocalMeansDenoisingFilter< TPixelType >
       }
       ++mit;
     }
+
+    // calculation of the masked region
     typename OutputImageType::SizeType size;
     size[0] = maxIndex[0] - minIndex[0];
     size[1] = maxIndex[1] - minIndex[1];
@@ -116,9 +123,6 @@ NonLocalMeansDenoisingFilter< TPixelType >
 
   ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
   oit.GoToBegin();
-
-//  typename MaskImageType::Pointer maskImage =
-//          static_cast< MaskImageType* >( this->ProcessObject::GetInput(1) );
 
   ImageRegionIterator< MaskImageType > mit(m_Mask, outputRegionForThread);
   mit.GoToBegin();
@@ -237,6 +241,8 @@ NonLocalMeansDenoisingFilter< TPixelType >
 
       else
       {
+        // same procedure for vektoranalysis
+
         double Z = 0;
         itk::VariableLengthVector<double> sumj;
         sumj.SetSize(inputImagePointer->GetVectorLength());

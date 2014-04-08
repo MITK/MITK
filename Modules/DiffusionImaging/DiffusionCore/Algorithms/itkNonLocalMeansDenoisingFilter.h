@@ -21,14 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorImage.h"
 #include <mitkDiffusionImage.h>
 
-//#include <itkStatisticsImageFilter.h>
 
 
 namespace itk{
-  /** \class NonLocalMeansDenoisingFilter
-   * \brief This class denoises a vectorimage according to the non local means procedure.
+  /** @class NonLocalMeansDenoisingFilter
+   * @brief This class denoises a vectorimage according to the non-local means procedure.
    *
-   * This Filter needs as an input a diffusion weigthed image.
+   * This Filter needs as an input a diffusion weigthed image, which will be denoised unsing the non-local means principle.
    * An input mask is optional to denoise only inside the mask range. All other voxels will be set to 0.
   */
 
@@ -56,48 +55,48 @@ namespace itk{
     itkTypeMacro(NonLocalMeansDenoisingFilter, ImageToImageFilter)
 
     /**
-     * \brief Set flag to use joint information
+     * @brief Set flag to use joint information
      */
     itkSetMacro(UseJointInformation, bool)
     /**
-     * \brief Set the searchradius
+     * @brief Set the searchradius
      *
      * The searchradius generates a neighborhood of size (2 * searchradius + 1)³.
      * Default is 4.
      */
     itkSetMacro(SearchRadius, int)
     /**
-     * \brief Set the comparisonradius
+     * @brief Set the comparisonradius
      *
      * The comparisonradius generates neighborhoods of size (2 * comparisonradius +1)³.
      * Default is 1.
      */
     itkSetMacro(ComparisonRadius, int)
     /**
-     * \brief Set the variance of the noise
+     * @brief Set the variance of the noise
      *
-     * The variance of the noise needs to be estimated tu use this filter properly.
+     * The variance of the noise needs to be estimated to use this filter properly.
      * Default is 1.
      */
     itkSetMacro(Variance, double)
     /**
-     * \brief Set flag to use a rician adaption
+     * @brief Set flag to use a rician adaption
      *
      * If this flag is true the filter uses a method which is optimized for Rician distributed noise.
      */
     itkSetMacro(UseRicianAdaption, bool)
     /**
-     * \brief Get the amount of calculated Voxels
+     * @brief Get the amount of calculated Voxels
      *
-     * Returns the number of calculated Voxels until yet, useful for the use of a progressbars.
+     * @return the number of calculated Voxels until yet, useful for the use of a progressbars.
      */
     itkGetMacro(CurrentVoxelCount, unsigned int)
 
 
-    /** \brief Set the input image. **/
+    /** @brief Set the input image. **/
     void SetInputImage(const InputImageType* image);
     /**
-     * \brief Set a denoising mask
+     * @brief Set a denoising mask
      *
      * optional
      *
@@ -109,20 +108,35 @@ namespace itk{
     NonLocalMeansDenoisingFilter();
     ~NonLocalMeansDenoisingFilter() {}
 
+    /**
+     * @brief Calculations which need to be done before the denoising starts
+     *
+     * This method is called before the denoising starts. It calculates the ROI if a mask is used
+     * and sets the number of processed voxels to zero.
+     */
     void BeforeThreadedGenerateData();
+
+    /**
+     * @brief Denoising procedure
+     *
+     * This method calculates the denoised voxelvalue for each voxel in the image in multiple threads.
+     * If a mask is used, voxels outside the masked area will be set to 0.
+     *
+     * @param outputRegionForThread Region to denoise for each thread.
+     */
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
 
 
 
   private:
 
-    int m_SearchRadius;
-    int m_ComparisonRadius;
-    bool m_UseJointInformation;
-    bool m_UseRicianAdaption;
-    unsigned int m_CurrentVoxelCount;
-    double m_Variance;
-    typename MaskImageType::Pointer m_Mask;
+    int m_SearchRadius;                               ///< Radius of the searchblock.
+    int m_ComparisonRadius;                           ///< Radius of the comparisonblock.
+    bool m_UseJointInformation;                       ///< Flag to use joint information.
+    bool m_UseRicianAdaption;                         ///< Flag to use rician adaption.
+    unsigned int m_CurrentVoxelCount;                 ///< Amount of processed voxels.
+    double m_Variance;                                ///< Estimated noise variance.
+    typename MaskImageType::Pointer m_Mask;           ///< Pointer to the mask image.
   };
 }
 

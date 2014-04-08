@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkSurfaceRegistrationViewControls.h"
 
+// forwarddeclaration
+class SurfaceRegistrationViewData;
+
 /**
   \brief QmitkSurfaceRegistrationView
 
@@ -42,6 +45,11 @@ class QmitkSurfaceRegistrationView : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
+    QmitkSurfaceRegistrationView();
+
+    ~QmitkSurfaceRegistrationView();
+
+
   protected slots:
 
     void OnRunRegistration();
@@ -57,6 +65,10 @@ class QmitkSurfaceRegistrationView : public QmitkAbstractView
     virtual void SetFocus();
 
     Ui::QmitkSurfaceRegistrationViewControls m_Controls;
+
+  private:
+
+    SurfaceRegistrationViewData* d;
 };
 
 #endif // QmitkSurfaceRegistrationView_h

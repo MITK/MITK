@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
+#include <QThread>
 
 #include <mitkSurface.h>
 #include <mitkPointSet.h>
@@ -35,9 +36,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkSurfaceRegistrationView::VIEW_ID = "org.mitk.views.a-icpregistration";
 
+class SurfaceRegistrationViewData
+{
+public:
+  QThread* m_RegistrationThread;
+  double m_Threshold;
+  double m_MaxIterations;
+  double m_TrimmFactor;
+
+  // anisotropic registration
+  mitk::AnisotropicIterativeClosestPointRegistration::Pointer m_AICP;
+
+  // covariance matrix calculator
+  mitk::CovarianceMatrixCalculator::Pointer m_MatrixCalculator;
+
+  mitk::Surface::Pointer m_MovingSurface;
+
+  mitk::Surface::Pointer m_FixedSurface;
+
+  SurfaceRegistrationViewData()
+   : m_RegistrationThread(new QThread),
+     m_Threshold(0.00001),
+     m_MaxIterations(1000),
+     m_TrimmFactor(0.0),
+     m_AICP(mitk::AnisotropicIterativeClosestPointRegistration::New()),
+     m_MatrixCalculator(mitk::CovarianceMatrixCalculator::New()),
+     m_MovingSurface(NULL),
+     m_FixedSurface(NULL)
+  {
+  }
+
+  ~SurfaceRegistrationViewData()
+  {
+    if ( m_RegistrationThread )
+      delete m_RegistrationThread;
+
+    m_AICP = NULL;
+    m_MatrixCalculator = NULL;
+  }
+};
+
+QmitkSurfaceRegistrationView::QmitkSurfaceRegistrationView()
+{
+  d = new SurfaceRegistrationViewData();
+}
+
+QmitkSurfaceRegistrationView::~QmitkSurfaceRegistrationView()
+{
+  if ( d )
+    delete d;
+}
+
 void QmitkSurfaceRegistrationView::SetFocus()
 {
-  // m_Controls.buttonPerformImageProcessing->setFocus();
 }
 
 void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
@@ -70,39 +121,31 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
   m_Controls.m_TrimmFactorSpinbox->setEnabled(false);
 }
 
-
 void QmitkSurfaceRegistrationView::OnRunRegistration()
 {
   typedef itk::Matrix<double,3,3> Matrix3x3;
   typedef itk::Vector<double,3> TranslationVector;
   typedef std::vector<Matrix3x3> CovarianceMatrixList;
 
-  double threshold = m_Controls.m_ThresholdSpinbox->value();
-  double maxIterations = m_Controls.m_MaxIterationsSpinbox->value();
-  double trimmFactor = 0.0;
+  d->m_Threshold = m_Controls.m_ThresholdSpinbox->value();
+  d->m_MaxIterations = m_Controls.m_MaxIterationsSpinbox->value();
+  d->m_TrimmFactor = 0.0;
 
   if ( m_Controls.m_EnableTrimming->isChecked() )
   {
-    trimmFactor = m_Controls.m_TrimmFactorSpinbox->value();
+    d->m_TrimmFactor = m_Controls.m_TrimmFactorSpinbox->value();
   }
 
-  // anisotropic registration
-  mitk::AnisotropicIterativeClosestPointRegistration::Pointer aICP =
-      mitk::AnisotropicIterativeClosestPointRegistration::New();
-
-  // covariance matrix calculator
-  mitk::CovarianceMatrixCalculator::Pointer matrixCalculator =
-                                        mitk::CovarianceMatrixCalculator::New();
 
 
-  mitk::Surface::Pointer movingSurface = dynamic_cast<mitk::Surface*>(
+  d->m_MovingSurface = dynamic_cast<mitk::Surface*>(
             m_Controls.m_MovingSurfaceComboBox->GetSelectedNode()->GetData() );
 
-  mitk::Surface::Pointer fixedSurface = dynamic_cast<mitk::Surface*>(
+  d->m_FixedSurface = dynamic_cast<mitk::Surface*>(
             m_Controls.m_FixedSurfaceComboBox->GetSelectedNode()->GetData() );
 
   // sanity check
-  if ( fixedSurface.IsNull() || movingSurface.IsNull() )
+  if ( d->m_FixedSurface.IsNull() || d->m_MovingSurface.IsNull() )
   {
     MITK_ERROR << "Input surface not set";
     return;
@@ -111,39 +154,39 @@ void QmitkSurfaceRegistrationView::OnRunRegistration()
   // enable trimming
   if ( m_Controls.m_EnableTrimming->isChecked() )
   {
-    trimmFactor = m_Controls.m_TrimmFactorSpinbox->value();
+    d->m_TrimmFactor = m_Controls.m_TrimmFactorSpinbox->value();
   }
 
   // compute the covariance matrices for the moving surface (X)
-  matrixCalculator->SetInputSurface(movingSurface);
-  matrixCalculator->ComputeCovarianceMatrices();
-  CovarianceMatrixList sigmas_X = matrixCalculator->GetCovarianceMatrices();
-  double meanVarX = matrixCalculator->GetMeanVariance();
+  d->m_MatrixCalculator->SetInputSurface(d->m_MovingSurface);
+  d->m_MatrixCalculator->ComputeCovarianceMatrices();
+  CovarianceMatrixList sigmas_X = d->m_MatrixCalculator->GetCovarianceMatrices();
+  double meanVarX = d->m_MatrixCalculator->GetMeanVariance();
 
   // compute the covariance matrices for the fixed surface (Y)
-  matrixCalculator->SetInputSurface(fixedSurface);
-  matrixCalculator->ComputeCovarianceMatrices();
-  CovarianceMatrixList sigmas_Y = matrixCalculator->GetCovarianceMatrices();
-  double meanVarY = matrixCalculator->GetMeanVariance();
+  d->m_MatrixCalculator->SetInputSurface(d->m_FixedSurface);
+  d->m_MatrixCalculator->ComputeCovarianceMatrices();
+  CovarianceMatrixList sigmas_Y = d->m_MatrixCalculator->GetCovarianceMatrices();
+  double meanVarY = d->m_MatrixCalculator->GetMeanVariance();
 
   // the FRE normalization factor
   double normalizationFactor = sqrt( meanVarX + meanVarY);
 
   // set up parameters
-  aICP->SetMovingSurface(movingSurface);
-  aICP->SetFixedSurface(fixedSurface);
-  aICP->SetCovarianceMatricesMovingSurface(sigmas_X);
-  aICP->SetCovarianceMatricesFixedSurface(sigmas_Y);
-  aICP->SetFRENormalizationFactor(normalizationFactor);
-  aICP->SetMaxIterations(maxIterations);
-  aICP->SetThreshold(threshold);
-  aICP->SetTrimmFactor(trimmFactor);
+  d->m_AICP->SetMovingSurface(d->m_MovingSurface);
+  d->m_AICP->SetFixedSurface(d->m_FixedSurface);
+  d->m_AICP->SetCovarianceMatricesMovingSurface(sigmas_X);
+  d->m_AICP->SetCovarianceMatricesFixedSurface(sigmas_Y);
+  d->m_AICP->SetFRENormalizationFactor(normalizationFactor);
+  d->m_AICP->SetMaxIterations(d->m_MaxIterations);
+  d->m_AICP->SetThreshold(d->m_Threshold);
+  d->m_AICP->SetTrimmFactor(d->m_TrimmFactor);
 
   // run the algorithm
-  aICP->Update();
+  d->m_AICP->Update();
 
-  Matrix3x3 rotation = aICP->GetRotation();
-  TranslationVector translation = aICP->GetTranslation();
+  Matrix3x3 rotation = d->m_AICP->GetRotation();
+  TranslationVector translation = d->m_AICP->GetTranslation();
 
   double tre = -1.0;
   // compute TRE
@@ -175,14 +218,14 @@ void QmitkSurfaceRegistrationView::OnRunRegistration()
   translation = (rotation * translation) * -1.0;
 
   MITK_INFO << "Rotation: \n" << rotation << "Translation: " << translation;
-  MITK_INFO << "FRE: " << aICP->GetFRE();
+  MITK_INFO << "FRE: " << d->m_AICP->GetFRE();
 
   // display result in textbox ( the inverse transform )
   QString text("");
   std::ostringstream oss;
 
-  oss << "<b>Iterations:</b> "<< aICP->GetNumberOfIterations()
-      << "<br><b>FRE:</b> " << aICP->GetFRE()
+  oss << "<b>Iterations:</b> "<< d->m_AICP->GetNumberOfIterations()
+      << "<br><b>FRE:</b> " << d->m_AICP->GetFRE()
       << "<br><b>TRE:</b> " << tre
       << "<br><br><b>Rotation:</b><br>";
 
@@ -201,13 +244,13 @@ void QmitkSurfaceRegistrationView::OnRunRegistration()
   m_Controls.m_TextEdit->append(text);
 
   mitk::AnisotropicRegistrationCommon::TransformPoints (
-          fixedSurface->GetVtkPolyData()->GetPoints(),
-          fixedSurface->GetVtkPolyData()->GetPoints(),
+          d->m_FixedSurface->GetVtkPolyData()->GetPoints(),
+          d->m_FixedSurface->GetVtkPolyData()->GetPoints(),
           rotation, translation
         );
 
   // set modified flag to update rendering
-  fixedSurface->GetVtkPolyData()->Modified();
+  d->m_FixedSurface->GetVtkPolyData()->Modified();
 
   //update view
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

@@ -50,6 +50,10 @@ struct CovarianceMatrixCalculatorData;
 class MitkSurfaceRegistration_EXPORT CovarianceMatrixCalculator : public itk::Object
 {
 
+private:
+  /** Pimpl to hold private data.*/
+  CovarianceMatrixCalculatorData* d;
+
 protected:
 
   // local typedefs
@@ -59,9 +63,6 @@ protected:
   /** Definition of a list of covariance matrices */
   typedef std::vector<CovarianceMatrix> CovarianceMatrixList;
   typedef double Vertex[3];
-
-  /** Pimpl to hold private data.*/
-  CovarianceMatrixCalculatorData* d;
 
   /** List that stores the computed covariance matrices. */
   CovarianceMatrixList m_CovarianceMatrixList;
@@ -73,7 +74,6 @@ protected:
                                            Vertex curVertex);
   CovarianceMatrixCalculator();
   ~CovarianceMatrixCalculator();
-
 
 public:
   mitkClassMacro(CovarianceMatrixCalculator, itk::Object)

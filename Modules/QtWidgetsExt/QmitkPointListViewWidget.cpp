@@ -153,7 +153,7 @@ void QmitkPointListViewWidget::keyPressEvent( QKeyEvent * e )
 
 void QmitkPointListViewWidget::MoveSelectedPointUp()
 {
-  if (m_PointSet == NULL)
+  if (m_PointSet.IsNull())
     return;
 
   mitk::PointSet::PointIdentifier selectedID;
@@ -166,7 +166,7 @@ void QmitkPointListViewWidget::MoveSelectedPointUp()
 
 void QmitkPointListViewWidget::MoveSelectedPointDown()
 {
-  if (m_PointSet == NULL)
+  if (m_PointSet.IsNull())
     return;
 
   mitk::PointSet::PointIdentifier selectedID;
@@ -179,7 +179,7 @@ void QmitkPointListViewWidget::MoveSelectedPointDown()
 
 void QmitkPointListViewWidget::RemoveSelectedPoint()
 {
-  if (m_PointSet == NULL)
+  if (m_PointSet.IsNull())
     return;
 
   mitk::PointSet::PointIdentifier selectedID;

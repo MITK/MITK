@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkTransferFunctionGeneratorWidget.h"
 
+#include <mitkImageStatisticsHolder.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkTransferFunctionInitializer.h>
@@ -383,8 +384,9 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode* node)
 
     if( mitk::Image* image = dynamic_cast<mitk::Image*>( node->GetData() ) )
     {
-      histoMinimum= image->GetScalarValueMin();
-      histoMaximum= image->GetScalarValueMax();
+      mitk::ImageStatisticsHolder* statistics = image->GetStatistics();
+      histoMinimum= statistics->GetScalarValueMin();
+      histoMaximum= statistics->GetScalarValueMax();
     }
     else if (mitk::UnstructuredGrid* grid = dynamic_cast<mitk::UnstructuredGrid*>( node->GetData() ) )
     {

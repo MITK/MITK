@@ -134,10 +134,11 @@ void mitk::LiveWireTool2D::ConnectActionsAndFunctions()
 
   CONNECT_FUNCTION("InitObject", OnInitLiveWire);
   CONNECT_FUNCTION("AddPoint", OnAddPoint);
+  CONNECT_FUNCTION("CtrlAddPoint", OnAddPoint);
   CONNECT_FUNCTION("MovePoint", OnMouseMoveNoDynamicCosts);
   CONNECT_FUNCTION("FinishContour", OnFinish);
   CONNECT_FUNCTION("DeletePoint", OnLastSegmentDelete);
-  CONNECT_FUNCTION("MovePoint", OnMouseMoved);
+  CONNECT_FUNCTION("CtrlMovePoint", OnMouseMoved);
 }
 
 const char** mitk::LiveWireTool2D::GetXPM() const

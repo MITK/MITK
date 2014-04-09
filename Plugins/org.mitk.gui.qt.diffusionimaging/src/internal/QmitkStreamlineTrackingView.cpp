@@ -260,7 +260,15 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
     vtkSmartPointer<vtkPolyData> fiberBundle = filter->GetFiberPolyData();
     if ( fiberBundle->GetNumberOfLines()==0 )
+    {
+        QMessageBox warnBox;
+        warnBox.setWindowTitle("Warning");
+        warnBox.setText("No fiberbundle was generated!");
+        warnBox.setDetailedText("No fibers were generated using the parameters: \n\n" + m_Controls->m_FaThresholdLabel->text() + "\n" + m_Controls->m_AngularThresholdLabel->text() + "\n" + m_Controls->m_fLabel->text() + "\n" + m_Controls->m_gLabel->text() + "\n" + m_Controls->m_StepsizeLabel->text() + "\n" + m_Controls->m_MinTractLengthLabel->text() + "\n" + m_Controls->m_SeedsPerVoxelLabel->text() + "\n\nPlease check your parametersettings.");
+        warnBox.setIcon(QMessageBox::Warning);
+        warnBox.exec();
         return;
+    }
     mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
     fib->SetReferenceImage(dynamic_cast<mitk::Image*>(m_TensorImageNodes.at(0)->GetData()));
 

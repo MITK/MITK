@@ -8,7 +8,7 @@ This view provides the user interface for Fiberfox [1,2,3], an interactive simul
   - \ref QmitkFiberfoxViewUserManualSignalGeneration
   - \ref QmitkFiberfoxViewUserManualKnownIssues
   - \ref QmitkFiberfoxViewUserManualReferences
-\image html Fiberfox.png Fig. 1: Screenshot of the Fiberfox framework. The four render windows display an axial (top left), sagittal (top right) and coronal (bottom left) 2D cut as well as a 3D view of a synthetic fiber helix and the fiducials used to define its shape. In the 2D views the helix is superimposing the baseline volume of the corresponding diffusion weighted image. The sagittal render window shows a close-up view on one of the circular fiducials.
+\image html Fiberfox.png "Fig. 1: Screenshot of the Fiberfox framework. The four render windows display an axial (top left), sagittal (top right) and coronal (bottom left) 2D cut as well as a 3D view of a synthetic fiber helix and the fiducials used to define its shape. In the 2D views the helix is superimposing the baseline volume of the corresponding diffusion weighted image. The sagittal render window shows a close-up view on one of the circular fiducials."
 
 \section QmitkFiberfoxViewUserManualFiberDefinition Fiber Definition
 

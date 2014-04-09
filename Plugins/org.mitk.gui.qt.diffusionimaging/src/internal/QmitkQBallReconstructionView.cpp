@@ -930,8 +930,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
 
   mitk::DiffusionImage<short>::BValueMap currSelectionMap = m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap();
 
-  currSelectionMap.erase(0);
-  if(currSelectionMap.size() != 3)
+  if(currSelectionMap.size() != 4 && currSelectionMap.find(0) != currSelectionMap.end())
   {
     QMessageBox::information(0, "Reconstruction not possible:" ,QString("Only three shells in a equidistant configuration is supported. (ImageName: " + QString(nodename.c_str()) + ")"));
     return;

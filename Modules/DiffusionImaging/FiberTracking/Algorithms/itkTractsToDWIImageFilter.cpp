@@ -230,10 +230,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     if (m_FiberBundle.IsNull())
         itkExceptionMacro("Input fiber bundle is NULL!");
 
-    if (m_Parameters.m_DoDisablePartialVolume)
-        while (m_Parameters.m_FiberModelList.size()>1)
-            m_Parameters.m_FiberModelList.pop_back();
-
     if (m_Parameters.m_NonFiberModelList.empty())
         itkExceptionMacro("No diffusion model for non-fiber compartments defined!");
 
@@ -348,6 +344,14 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNotNull())
         {
             foundVolumeFractionImage = true;
+
+            itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
+            zeroPadder->SetInput(m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
+            zeroPadder->SetConstant(0);
+            zeroPadder->SetPadUpperBound(pad);
+            zeroPadder->Update();
+            m_Parameters.m_NonFiberModelList[i]->SetVolumeFractionImage(zeroPadder->GetOutput());
+
             sumImage->SetSpacing( m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetSpacing() );
             sumImage->SetOrigin( m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetOrigin() );
             sumImage->SetDirection( m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetDirection() );
@@ -541,7 +545,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     maxVolume = 0;
 
     m_StatusText += "\n"+this->GetTime()+" > Generating " + boost::lexical_cast<std::string>(m_Parameters.m_FiberModelList.size()+m_Parameters.m_NonFiberModelList.size()) + "-compartment diffusion-weighted signal.\n";
-    MITK_INFO << "Generating signal of " << m_Parameters.m_FiberModelList.size() << " fiber compartments";
     int numFibers = m_FiberBundle->GetNumFibers();
     boost::progress_display disp(numFibers*m_Parameters.GetNumVolumes());
 
@@ -738,6 +741,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                         m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->TransformPhysicalPointToIndex(point, newIndex);
                         if (!m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion().IsInside(newIndex))
                         {
+                            MITK_INFO << index;
+                            MITK_INFO << point;
+                            MITK_INFO << newIndex;
+
                             MITK_WARN << "Volume fraction image is too small for the chosen motion artifacts! Due to motion a volume fraction outside of the specified image volume is requested.";
                             continue;
                         }

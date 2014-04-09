@@ -30,10 +30,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QmitkRenderWindow;
 
-class MitkQtWidgetsExt_EXPORT QmitkSelectableGLWidget : public QWidget, public Ui::QmitkSelectableGLWidget
+class MitkQtWidgetsExt_EXPORT QmitkSelectableGLWidget : public QWidget
 {
+  Q_OBJECT
+
   public:
   QmitkSelectableGLWidget(QWidget* parent=0);
+  ~QmitkSelectableGLWidget();
   mitk::VtkPropRenderer* GetRenderer();
   QmitkRenderWindow* GetRenderWindow() const;
   mitk::SliceNavigationController*  GetSliceNavigationController() const;
@@ -43,6 +46,8 @@ class MitkQtWidgetsExt_EXPORT QmitkSelectableGLWidget : public QWidget, public U
   void wheelEvent( QWheelEvent * e );
     QmitkRenderWindow *m_RenderWindow;
     mitk::VtkPropRenderer::Pointer m_Renderer;
+  private:
+  Ui::QmitkSelectableGLWidget* m_Ui;
 };
 
 #endif

@@ -98,6 +98,8 @@ void mitk::LiveWireTool2D::RemoveHelperObjects()
 
   if (m_ContourModelNode.IsNotNull())
     dataStorage->Remove(m_ContourModelNode);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::LiveWireTool2D::ReleaseHelperObjects()

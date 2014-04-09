@@ -30,7 +30,6 @@ set(CPP_FILES
   QmitkHistogramJSWidget.cpp
   QmitkHistogramWidget.cpp
   QmitkHotkeyLineEdit.cpp
-  QmitkLineEdit.cpp
   QmitkModulesDialog.cpp
   QmitkModuleTableModel.cpp
   QmitkPiecewiseFunctionCanvas.cpp
@@ -83,7 +82,6 @@ set(MOC_H_FILES
   QmitkHistogramJSWidget.h
   QmitkHistogramWidget.h
   QmitkHotkeyLineEdit.h
-  QmitkLineEdit.h
   QmitkPiecewiseFunctionCanvas.h
   QmitkPlotWidget.h
   QmitkPointListModel.h

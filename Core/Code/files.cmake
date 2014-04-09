@@ -351,7 +351,6 @@ set(CPP_FILES
   Rendering/mitkPointSetGLMapper2D.cpp
   Rendering/mitkPointSetVtkMapper2D.cpp
   Rendering/mitkPointSetVtkMapper3D.cpp
-  Rendering/mitkPolyDataGLMapper2D.cpp
   Rendering/mitkSurfaceGLMapper2D.cpp
   Rendering/mitkSurfaceVtkMapper3D.cpp
   Rendering/mitkVolumeDataVtkMapper3D.cpp

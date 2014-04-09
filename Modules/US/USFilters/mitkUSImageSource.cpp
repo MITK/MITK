@@ -25,7 +25,6 @@ mitk::USImageSource::USImageSource()
   m_ImageFilter(mitk::BasicCombinationOpenCVImageFilter::New()),
   m_CurrentImageId(0)
 {
-  m_OpenCVToMitkFilter->SetCopyBuffer(false);
 }
 
 mitk::USImageSource::~USImageSource()

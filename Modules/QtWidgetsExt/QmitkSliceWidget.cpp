@@ -150,12 +150,6 @@ void QmitkSliceWidget::InitWidget(
     controller->SetViewDirection(mitk::SliceNavigationController::Sagittal);
   }
 
-  int currentPos = 0;
-  if (m_RenderWindow->GetSliceNavigationController())
-  {
-    currentPos = controller->GetSlice()->GetPos();
-  }
-
   if (m_SlicedGeometry.IsNull())
   {
     return;

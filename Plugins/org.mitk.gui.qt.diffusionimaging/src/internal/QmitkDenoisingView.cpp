@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkDenoisingWorker::QmitkDenoisingWorker(QmitkDenoisingView *view)
   : m_View(view)
 {
-
 }
 
 void QmitkDenoisingWorker::run()
@@ -157,7 +156,6 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
     {
         m_Controls->m_InputBrainMaskLabel->setText(node->GetName().c_str());
         m_BrainMaskNode = node;
-
     }
   }
 
@@ -203,7 +201,6 @@ void QmitkDenoisingView::StartDenoising()
             maxIndex.Fill(0);
             while (!mit.IsAtEnd())
             {
-
               if (mit.Get())
               {
                 // calculation of the start & end index of the smallest masked region
@@ -217,7 +214,7 @@ void QmitkDenoisingView::StartDenoising()
               }
               ++mit;
             }
-            typename itk::Image<DiffusionPixelType, 3>::SizeType size;
+            itk::Image<DiffusionPixelType, 3>::SizeType size;
             size[0] = maxIndex[0] - minIndex[0];
             size[1] = maxIndex[1] - minIndex[1];
             size[2] = maxIndex[2] - minIndex[2];
@@ -228,7 +225,6 @@ void QmitkDenoisingView::StartDenoising()
           {
             // initialize the progressbar
             m_MaxProgressCount = m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2);
-
           }
 
 
@@ -510,6 +506,4 @@ void QmitkDenoisingView::UpdateProgress()
       break;
     }
   }
-
-
 }

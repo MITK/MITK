@@ -37,10 +37,6 @@ class MitkQtWidgetsExt_EXPORT QmitkStringPropertyView : public QLabel, public mi
     virtual void PropertyRemoved();
 
     const mitk::StringProperty* m_StringProperty;
-
-  private:
-
-
 };
 
 #endif

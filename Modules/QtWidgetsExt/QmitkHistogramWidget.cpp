@@ -163,13 +163,11 @@ void QmitkHistogramWidget::InitializeZoomer()
   m_Zoomer = new QwtPlotZoomer(m_Plot->xBottom, m_Plot->yLeft, m_Plot->canvas());
   m_Zoomer->setRubberBandPen(QPen(Qt::red, 2, Qt::DotLine));
   m_Zoomer->setTrackerPen(QPen(Qt::red));
-  //m_Zoomer->setSelectionFlags(QwtPlotZoomer::RectSelection);
 }
 
 void QmitkHistogramWidget::OnSelect( const QPointF& pos )
 {
   m_Marker->setXValue( this->Round(pos.x()) );
-  //unsigned int count = (unsigned int)(m_Histogram->data().value(pos.x()));
   QString str = QString( "%1" )
     .arg( (int)(this->Round(pos.x())), 0, 10 );
   QwtText text(str);
@@ -192,3 +190,4 @@ double QmitkHistogramWidget::Round(double val)
   else
     return ival;
 }
+

@@ -64,7 +64,6 @@ QmitkCorrespondingPointSetsView::QmitkCorrespondingPointSetsView( QWidget* paren
   QFont font("Arial", 17);
   m_TimeStepFaderLabel->setFont(font);
 
-  //connect
   connect( QTableView::selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
            this, SLOT(OnPointSelectionChanged(const QItemSelection& , const QItemSelection&)) );
 
@@ -77,6 +76,7 @@ QmitkCorrespondingPointSetsView::~QmitkCorrespondingPointSetsView()
 {
   delete m_CorrespondingPointSetsModel;
 }
+
 void QmitkCorrespondingPointSetsView::SetPointSetNodes( std::vector<mitk::DataNode*> nodes )
 {
   if ( !this->m_swapPointSets || nodes.size()<2 )
@@ -89,20 +89,23 @@ void QmitkCorrespondingPointSetsView::SetPointSetNodes( std::vector<mitk::DataNo
     m_CorrespondingPointSetsModel->SetPointSetNodes( reverseNodes );
   }
 }
+
 void QmitkCorrespondingPointSetsView::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
 {
   this->m_CorrespondingPointSetsModel->SetMultiWidget(multiWidget);
 }
+
 QmitkStdMultiWidget* QmitkCorrespondingPointSetsView::GetMultiWidget() const
 {
   return this->m_CorrespondingPointSetsModel->GetMultiWidget();
 }
+
 void QmitkCorrespondingPointSetsView::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
 {
   m_DataStorage = dataStorage;
 }
 
-void QmitkCorrespondingPointSetsView::OnPointSelectionChanged(const QItemSelection& selected, const QItemSelection&  /*deselected*/)
+void QmitkCorrespondingPointSetsView::OnPointSelectionChanged(const QItemSelection& selected, const QItemSelection&)
 {
   if(m_SelfCall)
     return;
@@ -243,10 +246,12 @@ void QmitkCorrespondingPointSetsView::fadeTimeStepIn()
   m_TimeStepFaderLabel->setVisible(true);
   QTimer::singleShot(2000, this, SLOT(fadeTimeStepOut()));
 }
+
 void QmitkCorrespondingPointSetsView::fadeTimeStepOut()
 {
   m_TimeStepFaderLabel->hide();
 }
+
 void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
 {
   QMenu *menu = new QMenu;
@@ -259,7 +264,7 @@ void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
   int numNodes = this->GetPointSetNodes().size();
 
   //add delete point action
-  mitk::PointSet::PointsContainer::ElementIdentifier id;
+  int id;
   mitk::PointSet::PointType p;
   bool pointSelected = m_CorrespondingPointSetsModel->GetPointForModelIndex(row, col, p, id);
 
@@ -292,14 +297,14 @@ void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
   QAction *clearTS = new QAction(this);
   clearTS->setText("Clear time step");
   connect(clearTS, SIGNAL(triggered()), this, SLOT(ClearCurrentTimeStep()));
-  if(numNodes==0 || col!=0 && col!=1)
+  if(numNodes==0 || (col!=0 && col!=1))
     clearTS->setEnabled(false);
   menu->addAction(clearTS);
 
   QAction *clearList = new QAction(this);
   clearList->setText("Clear point set");
   connect(clearList, SIGNAL(triggered()), this, SLOT(ClearSelectedPointSet()));
-  if(numNodes==0 || col!=0 && col!=1)
+  if(numNodes==0 || (col!=0 && col!=1))
     clearList->setEnabled(false);
   menu->addAction(clearList);
 
@@ -333,10 +338,13 @@ void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
   menu->exec(this->mapToGlobal(pos));
 }
 
-std::vector<mitk::DataNode*> QmitkCorrespondingPointSetsView::GetPointSetNodes(){
+std::vector<mitk::DataNode*> QmitkCorrespondingPointSetsView::GetPointSetNodes()
+{
   return this->m_CorrespondingPointSetsModel->GetPointSetNodes();
 }
-std::vector<mitk::PointSet*> QmitkCorrespondingPointSetsView::GetPointSets(){
+
+std::vector<mitk::PointSet*> QmitkCorrespondingPointSetsView::GetPointSets()
+{
   std::vector<mitk::DataNode*> pointSetNodes = GetPointSetNodes();
   std::vector<mitk::PointSet*> pointSets;
 
@@ -351,19 +359,23 @@ std::vector<mitk::PointSet*> QmitkCorrespondingPointSetsView::GetPointSets(){
 
   return pointSets;
 }
+
 void QmitkCorrespondingPointSetsView::RemoveSelectedPoint()
 {
   this->m_CorrespondingPointSetsModel->RemoveSelectedPoint();
   emit(SignalPointSelectionChanged());
 }
+
 void QmitkCorrespondingPointSetsView::MoveSelectedPointDown()
 {
   this->m_CorrespondingPointSetsModel->MoveSelectedPointDown();
 }
+
 void QmitkCorrespondingPointSetsView::MoveSelectedPointUp()
 {
   this->m_CorrespondingPointSetsModel->MoveSelectedPointUp();
 }
+
 void QmitkCorrespondingPointSetsView::ClearSelectedPointSet()
 {
   switch( QMessageBox::question( this, tr("Clear point set"),
@@ -382,6 +394,7 @@ void QmitkCorrespondingPointSetsView::ClearSelectedPointSet()
   }
   emit(SignalPointSelectionChanged());
 }
+
 void QmitkCorrespondingPointSetsView::ClearCurrentTimeStep()
 {
   switch( QMessageBox::question( this, tr("Clear time step"),
@@ -419,6 +432,7 @@ void QmitkCorrespondingPointSetsView::SwapPointSets(bool checked)
   m_CorrespondingPointSetsModel->SetSelectedPointSetIndex((m_CorrespondingPointSetsModel->GetSelectedPointSetIndex()+1)%2);
   this->UpdateSelectionHighlighting();
 }
+
 void QmitkCorrespondingPointSetsView::AddPointsMode(bool checked)
 {
   m_addPointsMode = checked;
@@ -446,10 +460,12 @@ void QmitkCorrespondingPointSetsView::AddPointsMode(bool checked)
   m_addPointsMode = selected;
   emit SignalAddPointsModeChanged(selected);
 }
+
 void QmitkCorrespondingPointSetsView::UpdateSelection(mitk::DataNode* selectedNode)
 {
   this->m_CorrespondingPointSetsModel->UpdateSelection(selectedNode);
 }
+
 void QmitkCorrespondingPointSetsView::AddPointSet()
 {
   //Ask for the name of the point set
@@ -491,6 +507,7 @@ QmitkCorrespondingPointSetsModel* QmitkCorrespondingPointSetsView::GetModel()
 {
   return this->m_CorrespondingPointSetsModel;
 }
+
 void QmitkCorrespondingPointSetsView::UpdateSelectionHighlighting()
 {
   this->m_SelfCall = true;
@@ -504,3 +521,4 @@ void QmitkCorrespondingPointSetsView::UpdateSelectionHighlighting()
   this->setFocus();
   this->m_SelfCall = false;
 }
+

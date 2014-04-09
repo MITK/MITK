@@ -39,3 +39,4 @@ protected slots:
 private:
   Ui::QmitkAboutDialog m_GUI;
 };
+

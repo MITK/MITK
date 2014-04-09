@@ -95,4 +95,6 @@ class MitkQtWidgetsExt_EXPORT QmitkPointListViewWidget : public QListWidget
     /// used to position the planes on a selected point
     QmitkStdMultiWidget* m_MultiWidget;
 };
-#endif // QmitkPointListViewWidget_h
+
+#endif
+

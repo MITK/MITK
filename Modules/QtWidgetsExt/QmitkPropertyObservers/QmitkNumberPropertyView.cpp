@@ -20,16 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define DT_INT     2
 #define DT_FLOAT   3
 #define DT_DOUBLE  4
-/*
-QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::GenericProperty<short>* property, QWidget* parent, const char* name )
-: QLabel( parent, name ),
-  PropertyView( property ),
-  m_ShortProperty(property),
-  m_DataType(DT_SHORT)
-{
-  initialize();
-}
-*/
+
 QmitkNumberPropertyView::QmitkNumberPropertyView( const mitk::IntProperty* property, QWidget* parent )
 : QLabel( parent ),
   PropertyView( property ),
@@ -65,7 +56,6 @@ void QmitkNumberPropertyView::initialize()
 { // only to be called from constructors
   m_Suffix = "";
   m_DisplayFactor = 1.0;
-  //setDecimalPlaces(-1); // unlimited
   setDecimalPlaces(2);
 }
 
@@ -77,17 +67,6 @@ short QmitkNumberPropertyView::decimalPlaces() const
 void QmitkNumberPropertyView::setDecimalPlaces(short places)
 {
   m_DecimalPlaces = places;
-
-//  if (m_DecimalPlaces >= 0)
-//  {
-//    m_FormatString = "%%.%if";
-//    m_FormatString.sprintf(QString(m_FormatString), m_DecimalPlaces); // do copy before sprintf
-//  }
-//  else
-//  {
-//    m_FormatString = "%g";
-//  }
-
   DisplayNumber();
 }
 
@@ -123,8 +102,6 @@ void QmitkNumberPropertyView::setShowPercent(bool show)
     m_DisplayFactor = 1.0;
     setSuffix("");
   }
-
-  //DisplayNumber(); // gets called in setSuffix
 }
 
 void QmitkNumberPropertyView::PropertyChanged()
@@ -148,14 +125,6 @@ void QmitkNumberPropertyView::DisplayNumber()
 
   switch (m_DataType)
   {
-  /*
-    case DT_SHORT:
-      {
-        short s = m_ShortProperty->GetValue();
-        displayedText.sprintf(m_FormatString, s * m_DisplayFactor);
-        break;
-      }
-    */
     case DT_INT:
       {
         int i = m_IntProperty->GetValue();

@@ -1,134 +1,119 @@
 set(CPP_FILES
-
- QmitkApplicationBase/QmitkIOUtil.cpp
-
- QmitkAboutDialog/QmitkAboutDialog.cpp
-
- QmitkPropertyObservers/QmitkBasePropertyView.cpp
- QmitkPropertyObservers/QmitkBoolPropertyWidget.cpp
- QmitkPropertyObservers/QmitkColorPropertyEditor.cpp
- QmitkPropertyObservers/QmitkColorPropertyView.cpp
- QmitkPropertyObservers/QmitkEnumerationPropertyWidget.cpp
- QmitkPropertyObservers/QmitkNumberPropertyEditor.cpp
- QmitkPropertyObservers/QmitkNumberPropertyView.cpp
- QmitkPropertyObservers/QmitkPropertyViewFactory.cpp
- QmitkPropertyObservers/QmitkStringPropertyEditor.cpp
- QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.cpp
- QmitkPropertyObservers/QmitkStringPropertyView.cpp
- QmitkPropertyObservers/QmitkNumberPropertySlider.cpp
- QmitkPropertyObservers/QmitkUGCombinedRepresentationPropertyWidget.cpp
-
- qclickablelabel.cpp
-
- QmitkCallbackFromGUIThread.cpp
- QmitkEditPointDialog.cpp
- QmitkExtRegisterClasses.cpp
- QmitkFileChooser.cpp
-
- QmitkFloatingPointSpanSlider.cpp
- QmitkColorTransferFunctionCanvas.cpp
- QmitkStandardViews.cpp
- QmitkStepperAdapter.cpp
- QmitkPiecewiseFunctionCanvas.cpp
- QmitkSliderNavigatorWidget.cpp
- QmitkTransferFunctionCanvas.cpp
- QmitkCrossWidget.cpp
- QmitkSliceWidget.cpp
- QmitkTransferFunctionWidget.cpp
- QmitkTransferFunctionGeneratorWidget.cpp
- QmitkSelectableGLWidget.cpp
- QmitkPrimitiveMovieNavigatorWidget.cpp
-
- QmitkHistogram.cpp
- QmitkHistogramWidget.cpp
-
- QmitkPlotWidget.cpp
- QmitkPlotDialog.cpp
- QmitkPointListModel.cpp
- QmitkPointListView.cpp
- QmitkPointListWidget.cpp
- QmitkPointListViewWidget.cpp
- QmitkCorrespondingPointSetsView.cpp
- QmitkCorrespondingPointSetsModel.cpp
- QmitkCorrespondingPointSetsWidget.cpp
- QmitkVideoBackground.cpp
- QmitkHotkeyLineEdit.cpp
- QmitkBoundingObjectWidget.cpp
-
- QmitkModuleTableModel.cpp
- QmitkModulesDialog.cpp
-
- QmitkHistogramJSWidget.cpp
- QmitkWebPage.cpp
-
- QmitkLineEdit.cpp
- QmitkGnuplotWidget.cpp
+  QmitkAboutDialog/QmitkAboutDialog.cpp
+  QmitkApplicationBase/QmitkIOUtil.cpp
+  QmitkPropertyObservers/QmitkBasePropertyView.cpp
+  QmitkPropertyObservers/QmitkBoolPropertyWidget.cpp
+  QmitkPropertyObservers/QmitkColorPropertyEditor.cpp
+  QmitkPropertyObservers/QmitkColorPropertyView.cpp
+  QmitkPropertyObservers/QmitkEnumerationPropertyWidget.cpp
+  QmitkPropertyObservers/QmitkNumberPropertyEditor.cpp
+  QmitkPropertyObservers/QmitkNumberPropertySlider.cpp
+  QmitkPropertyObservers/QmitkNumberPropertyView.cpp
+  QmitkPropertyObservers/QmitkPropertyViewFactory.cpp
+  QmitkPropertyObservers/QmitkStringPropertyEditor.cpp
+  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.cpp
+  QmitkPropertyObservers/QmitkStringPropertyView.cpp
+  QmitkPropertyObservers/QmitkUGCombinedRepresentationPropertyWidget.cpp
+  qclickablelabel.cpp
+  QmitkBoundingObjectWidget.cpp
+  QmitkCallbackFromGUIThread.cpp
+  QmitkColorTransferFunctionCanvas.cpp
+  QmitkCorrespondingPointSetsModel.cpp
+  QmitkCorrespondingPointSetsView.cpp
+  QmitkCorrespondingPointSetsWidget.cpp
+  QmitkCrossWidget.cpp
+  QmitkEditPointDialog.cpp
+  QmitkFileChooser.cpp
+  QmitkFloatingPointSpanSlider.cpp
+  QmitkGnuplotWidget.cpp
+  QmitkHistogram.cpp
+  QmitkHistogramJSWidget.cpp
+  QmitkHistogramWidget.cpp
+  QmitkHotkeyLineEdit.cpp
+  QmitkLineEdit.cpp
+  QmitkModulesDialog.cpp
+  QmitkModuleTableModel.cpp
+  QmitkPiecewiseFunctionCanvas.cpp
+  QmitkPlotWidget.cpp
+  QmitkPlotDialog.cpp
+  QmitkPointListModel.cpp
+  QmitkPointListView.cpp
+  QmitkPointListViewWidget.cpp
+  QmitkPointListWidget.cpp
+  QmitkPrimitiveMovieNavigatorWidget.cpp
+  QmitkSelectableGLWidget.cpp
+  QmitkSliceWidget.cpp
+  QmitkSliderNavigatorWidget.cpp
+  QmitkStandardViews.cpp
+  QmitkStepperAdapter.cpp
+  QmitkTransferFunctionCanvas.cpp
+  QmitkTransferFunctionGeneratorWidget.cpp
+  QmitkTransferFunctionWidget.cpp
+  QmitkVideoBackground.cpp
+  QmitkWebPage.cpp
+  QtWidgetsExtRegisterClasses.cpp
 )
 
 set(MOC_H_FILES
- QmitkPropertyObservers/QmitkBasePropertyView.h
- QmitkPropertyObservers/QmitkBoolPropertyWidget.h
- QmitkPropertyObservers/QmitkColorPropertyEditor.h
- QmitkPropertyObservers/QmitkColorPropertyView.h
- QmitkPropertyObservers/QmitkEnumerationPropertyWidget.h
- QmitkPropertyObservers/QmitkNumberPropertyEditor.h
- QmitkPropertyObservers/QmitkNumberPropertyView.h
- QmitkPropertyObservers/QmitkStringPropertyEditor.h
- QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.h
- QmitkPropertyObservers/QmitkStringPropertyView.h
- QmitkPropertyObservers/QmitkNumberPropertySlider.h
- QmitkPropertyObservers/QmitkUGCombinedRepresentationPropertyWidget.h
-
- qclickablelabel.h
- QmitkCallbackFromGUIThread.h
- QmitkEditPointDialog.h
- QmitkStandardViews.h
- QmitkStepperAdapter.h
- QmitkSliderNavigatorWidget.h
- QmitkSliceWidget.h
- QmitkColorTransferFunctionCanvas.h
- QmitkPiecewiseFunctionCanvas.h
- QmitkTransferFunctionCanvas.h
- QmitkFloatingPointSpanSlider.h
- QmitkCrossWidget.h
- QmitkTransferFunctionWidget.h
- QmitkTransferFunctionGeneratorWidget.h
- QmitkPrimitiveMovieNavigatorWidget.h
- QmitkPlotWidget.h
- QmitkPointListModel.h
- QmitkPointListView.h
- QmitkPointListWidget.h
- QmitkPointListViewWidget.h
- QmitkCorrespondingPointSetsView.h
- QmitkCorrespondingPointSetsModel.h
- QmitkCorrespondingPointSetsWidget.h
- QmitkHistogramWidget.h
- QmitkVideoBackground.h
- QmitkFileChooser.h
- QmitkHotkeyLineEdit.h
- QmitkAboutDialog/QmitkAboutDialog.h
- QmitkBoundingObjectWidget.h
- QmitkPlotWidget.h
-
- QmitkHistogramJSWidget.h
- QmitkWebPage.h
-
- QmitkLineEdit.h
- QmitkGnuplotWidget.h
+  QmitkAboutDialog/QmitkAboutDialog.h
+  QmitkPropertyObservers/QmitkBasePropertyView.h
+  QmitkPropertyObservers/QmitkBoolPropertyWidget.h
+  QmitkPropertyObservers/QmitkColorPropertyEditor.h
+  QmitkPropertyObservers/QmitkColorPropertyView.h
+  QmitkPropertyObservers/QmitkEnumerationPropertyWidget.h
+  QmitkPropertyObservers/QmitkNumberPropertyEditor.h
+  QmitkPropertyObservers/QmitkNumberPropertySlider.h
+  QmitkPropertyObservers/QmitkNumberPropertyView.h
+  QmitkPropertyObservers/QmitkStringPropertyEditor.h
+  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.h
+  QmitkPropertyObservers/QmitkStringPropertyView.h
+  QmitkPropertyObservers/QmitkUGCombinedRepresentationPropertyWidget.h
+  qclickablelabel.h
+  QmitkBoundingObjectWidget.h
+  QmitkCallbackFromGUIThread.h
+  QmitkColorTransferFunctionCanvas.h
+  QmitkCorrespondingPointSetsModel.h
+  QmitkCorrespondingPointSetsView.h
+  QmitkCorrespondingPointSetsWidget.h
+  QmitkCrossWidget.h
+  QmitkEditPointDialog.h
+  QmitkFileChooser.h
+  QmitkFloatingPointSpanSlider.h
+  QmitkGnuplotWidget.h
+  QmitkHistogramJSWidget.h
+  QmitkHistogramWidget.h
+  QmitkHotkeyLineEdit.h
+  QmitkLineEdit.h
+  QmitkPiecewiseFunctionCanvas.h
+  QmitkPlotWidget.h
+  QmitkPointListModel.h
+  QmitkPointListView.h
+  QmitkPointListViewWidget.h
+  QmitkPointListWidget.h
+  QmitkPrimitiveMovieNavigatorWidget.h
+  QmitkSelectableGLWidget.h
+  QmitkSliceWidget.h
+  QmitkSliderNavigatorWidget.h
+  QmitkStandardViews.h
+  QmitkStepperAdapter.h
+  QmitkTransferFunctionCanvas.h
+  QmitkTransferFunctionGeneratorWidget.h
+  QmitkTransferFunctionWidget.h
+  QmitkVideoBackground.h
+  QmitkWebPage.h
 )
 
 set(UI_FILES
-  QmitkSliderNavigator.ui
-  QmitkSliceWidget.ui
-  QmitkTransferFunctionWidget.ui
-  QmitkTransferFunctionGeneratorWidget.ui
-  QmitkSelectableGLWidget.ui
-  QmitkPrimitiveMovieNavigatorWidget.ui
   QmitkAboutDialog/QmitkAboutDialogGUI.ui
   QmitkGnuplotWidget.ui
+  QmitkPrimitiveMovieNavigatorWidget.ui
+  QmitkSelectableGLWidget.ui
+  QmitkSliceWidget.ui
+  QmitkSliderNavigator.ui
+  QmitkTransferFunctionGeneratorWidget.ui
+  QmitkTransferFunctionWidget.ui
 )
 
 set(QRC_FILES
-  QmitkExt.qrc
-  resources/QmitkResources.qrc
+  resources/QtWidgetsExt.qrc
 )

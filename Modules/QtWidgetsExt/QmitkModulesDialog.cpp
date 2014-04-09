@@ -63,3 +63,4 @@ QmitkModulesDialog::QmitkModulesDialog(QWidget *parent, Qt::WindowFlags f) :
 
   connect(btnBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
+

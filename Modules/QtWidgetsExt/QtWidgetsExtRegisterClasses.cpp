@@ -14,13 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkExtRegisterClassesHIncluded
-#define QmitkExtRegisterClassesHIncluded
+#include "QtWidgetsExtRegisterClasses.h"
+#include "QmitkCallbackFromGUIThread.h"
 
-#include "mitkCommon.h"
-#include "MitkQtWidgetsExtExports.h"
+void QtWidgetsExtRegisterClasses()
+{
+  static bool alreadyDone = false;
+  if (!alreadyDone)
+  {
+    MITK_DEBUG << "QmitkExtRegisterClasses()";
 
-MitkQtWidgetsExt_EXPORT void QmitkExtRegisterClasses();
+    static QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;
 
-#endif
+
+    alreadyDone = true;
+  }
+}
 

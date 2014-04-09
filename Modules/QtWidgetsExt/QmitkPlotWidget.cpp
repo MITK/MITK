@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPlotWidget.h"
 
-QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*  /*name*/, Qt::WindowFlags f)
+QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
@@ -104,7 +104,7 @@ void QmitkPlotWidget::SetCurveBrush( unsigned int curveId, const QBrush& brush )
 }
 
 
-void QmitkPlotWidget::SetCurveTitle( unsigned int  /*curveId*/, const char* title )
+void QmitkPlotWidget::SetCurveTitle( unsigned int, const char* title )
 {
   m_Plot->setTitle( title );
 }
@@ -162,3 +162,4 @@ double* QmitkPlotWidget::ConvertToRawArray( const QmitkPlotWidget::XYDataVector&
   }
   return raw;
 }
+

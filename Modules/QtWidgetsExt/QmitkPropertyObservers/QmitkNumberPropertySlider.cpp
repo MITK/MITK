@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define ROUND(x)       (((x) > 0) ?   int((x) + 0.5) :   int((x) - 0.5))
 #define ROUND_SHORT(x) (((x) > 0) ? short((x) + 0.5) : short((x) - 0.5))
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::IntProperty* property, QWidget* parent, const char* /*name*/ )
+QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::IntProperty* property, QWidget* parent, const char*)
 : QSlider( parent ),
   PropertyEditor( property ),
   m_IntProperty(property),
@@ -33,7 +33,7 @@ QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::IntProperty* propert
   initialize();
 }
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::FloatProperty* property, QWidget* parent, const char* /*name*/ )
+QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::FloatProperty* property, QWidget* parent, const char*)
 : QSlider( parent ),
   PropertyEditor( property ),
   m_FloatProperty(property),
@@ -42,7 +42,7 @@ QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::FloatProperty* prope
   initialize();
 }
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::DoubleProperty* property, QWidget* parent, const char* /*name*/ )
+QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::DoubleProperty* property, QWidget* parent, const char* )
 : QSlider( parent ),
   PropertyEditor( property ),
   m_DoubleProperty(property),
@@ -59,8 +59,6 @@ void QmitkNumberPropertySlider::initialize()
 { // only to be called from constructors
 
   // spinbox settings
-  //setValidator(0);
-  //setSuffix("");
   setOrientation( Qt::Horizontal );
 
   // protected
@@ -89,19 +87,8 @@ void QmitkNumberPropertySlider::adjustFactors(short newDecimalPlaces, bool newSh
   m_FactorPropertyToSlider = pow(10.0,m_DecimalPlaces);
   m_FactorSliderToDisplay = 1.0 / m_FactorPropertyToSlider;
 
-  // commented line would set the default increase/decrease to 1.0, no matter how many decimal places are available
-  //setLineStep( ROUND(m_FactorPropertyToSlider) );
-
   if ( m_ShowPercents )
-  {
     m_FactorPropertyToSlider *= 100.0;
-    //setLineStep( ROUND(0.01 *m_FactorPropertyToSlider) );
-    //setSuffix("%");
-  }
-  else
-  {
-    //setSuffix("");
-  }
 
   setMinimum(oldMin);
   setMaximum(oldMax);
@@ -182,7 +169,6 @@ double QmitkNumberPropertySlider::doubleValue() const
 void QmitkNumberPropertySlider::setDoubleValue(double value)
 {
   QSlider::setValue( ROUND( value * m_FactorPropertyToSlider ) );
-  //QSlider::updateDisplay();
 }
 
 void QmitkNumberPropertySlider::onValueChanged(int value)
@@ -203,13 +189,6 @@ void QmitkNumberPropertySlider::onValueChanged(int value)
 
   switch (m_DataType)
   {
-  /*
-    case DT_SHORT:
-      {
-        m_ShortProperty->SetValue(ROUND_SHORT(newValue));
-        break;
-      }
-    */
     case DT_INT:
       {
         m_IntProperty->SetValue(ROUND(newValue));
@@ -249,14 +228,6 @@ void QmitkNumberPropertySlider::DisplayNumber()
   m_SelfChangeLock = true;
   switch (m_DataType)
   {
-  /*
-    case DT_SHORT:
-      {
-        short s = m_ShortProperty->GetValue();
-        QSlider::setValue( s );
-        break;
-      }
-  */
     case DT_INT:
       {
         int i = m_IntProperty->GetValue();

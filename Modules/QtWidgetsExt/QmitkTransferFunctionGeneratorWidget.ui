@@ -260,7 +260,7 @@ Move the mouse to the right and the function moves to the right. </string>
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="resources/QmitkResources.qrc">:/qmitk/cross.png</pixmap>
+          <pixmap resource="resources/QmitkResources.qrc">:/QtWidgetsExt/cross.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -353,7 +353,7 @@ Move the mouse to the  right and the center of the bell moves to the right.</str
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="resources/QmitkResources.qrc">:/qmitk/cross.png</pixmap>
+          <pixmap resource="resources/QmitkResources.qrc">:/QtWidgetsExt/cross.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>

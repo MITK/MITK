@@ -108,15 +108,14 @@ void QmitkPointListModel::ObserveNewPointSet( mitk::DataNode* pointSetNode )
   }
 }
 
-void QmitkPointListModel::OnPointSetChanged( const itk::EventObject &  /*e*/ )
+void QmitkPointListModel::OnPointSetChanged(const itk::EventObject&)
 {
   QAbstractListModel::reset();
   emit SignalUpdateSelection();
 }
 
-void QmitkPointListModel::OnPointSetDeleted( const itk::EventObject &  /*e*/ )
+void QmitkPointListModel::OnPointSetDeleted(const itk::EventObject&)
 {
-//  m_PointSetNode = NULL;
   mitk::PointSet::Pointer ps = CheckForPointSetInNode(m_PointSetNode);
   if (ps)
   {
@@ -129,7 +128,7 @@ void QmitkPointListModel::OnPointSetDeleted( const itk::EventObject &  /*e*/ )
   QAbstractListModel::reset();
 }
 
-int QmitkPointListModel::rowCount( const QModelIndex&  /*parent*/ ) const
+int QmitkPointListModel::rowCount(const QModelIndex&) const
 {
   mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
   if ( pointSet.IsNotNull() )
@@ -267,7 +266,6 @@ void QmitkPointListModel::MoveSelectedPointUp()
 
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
-  mitk::PointSet::PointType point = pointSet->GetPoint(selectedID, m_TimeStep);
   mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP,tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   pointSet->ExecuteOperation(doOp);

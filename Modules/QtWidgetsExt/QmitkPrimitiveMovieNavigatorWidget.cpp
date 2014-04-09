@@ -27,7 +27,6 @@ QmitkPrimitiveMovieNavigatorWidget::QmitkPrimitiveMovieNavigatorWidget( QWidget*
   connect( m_Controls.m_GoButton, SIGNAL( clicked() ), this, SLOT( goButton_clicked() ) );
   connect( m_Controls.m_TimerInterval, SIGNAL( valueChanged(int) ), this, SLOT( setTimerInterval(int) ) );
 
-  //this->setupUi(parent);
   m_InRefetch = true; // this avoids trying to use m_Stepper until it is set to something != NULL (additionally to the avoiding recursions during refetching)
   m_Timer = new QTimer(this);
   m_TimerIntervalInMS = 120;
@@ -116,3 +115,4 @@ void QmitkPrimitiveMovieNavigatorWidget::setTimerInterval( int timerIntervalInMS
     }
   }
 }
+

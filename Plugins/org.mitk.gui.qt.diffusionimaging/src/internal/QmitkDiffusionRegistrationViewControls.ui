@@ -167,8 +167,8 @@
       <string>Stop</string>
      </property>
      <property name="icon">
-      <iconset resource="../../../../Modules/QmitkExt/resources/QmitkResources.qrc">
-       <normaloff>:/qmitk/stop.xpm</normaloff>:/qmitk/stop.xpm</iconset>
+      <iconset resource="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc">
+       <normaloff>:/QtWidgetsExt/stop.xpm</normaloff>:/QtWidgetsExt/stop.xpm</iconset>
      </property>
     </widget>
    </item>
@@ -220,7 +220,7 @@
  </widget>
  <resources>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>
-  <include location="../../../../Modules/QmitkExt/resources/QmitkResources.qrc"/>
+  <include location="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc"/>
  </resources>
  <connections/>
 </ui>

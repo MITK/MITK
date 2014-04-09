@@ -26,7 +26,6 @@ QmitkSelectableGLWidget::QmitkSelectableGLWidget(QWidget* parent)
   QLayout *hlayout;
   hlayout=layout();
   hlayout->setMargin(3);
-  //hlayout->setAutoAdd(true);
 
   QString rendererName("Renderer::");
   rendererName += objectName();

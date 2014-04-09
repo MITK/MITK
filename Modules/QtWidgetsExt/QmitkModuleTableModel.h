@@ -56,4 +56,5 @@ private:
   QmitkModuleTableModelPrivate* const d;
 };
 
-#endif // QMITKMODULETABLEMODEL_H
+#endif
+

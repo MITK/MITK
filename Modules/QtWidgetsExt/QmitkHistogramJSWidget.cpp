@@ -34,7 +34,7 @@ QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   setPage(m_Page);
   // set html from source
   connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(AddJSObject()));
-  QUrl myUrl = QUrl("qrc:/qmitk/Histogram.html");
+  QUrl myUrl = QUrl("qrc:///QtWidgetsExt/Histogram.html");
   setUrl(myUrl);
 
   // set Scrollbars to be always disabled
@@ -157,7 +157,7 @@ void QmitkHistogramJSWidget::SetPlanarFigure(const mitk::PlanarFigure* planarFig
 }
 
 template <class PixelType>
-void ReadPixel(mitk::PixelType ptype, mitk::Image::Pointer image, mitk::Index3D indexPoint, double& value)
+void ReadPixel(mitk::PixelType, mitk::Image::Pointer image, mitk::Index3D indexPoint, double& value)
 {
   if (image->GetDimension() == 2)
   {
@@ -236,3 +236,4 @@ bool QmitkHistogramJSWidget::GetIntensityProfile()
 {
   return m_IntensityProfile;
 }
+

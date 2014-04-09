@@ -31,4 +31,5 @@ public:
 
 };
 
-#endif // QMITKMODULESDIALOG_H
+#endif
+

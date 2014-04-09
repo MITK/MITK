@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 
 struct QmitkEditPointDialogData;
+
 /*!
  * \brief A dialog for editing points directly (coordinates) via TextEdits
  *
@@ -36,10 +37,13 @@ class MitkQtWidgetsExt_EXPORT QmitkEditPointDialog : public QDialog
     virtual ~QmitkEditPointDialog();
 
     void SetPoint( mitk::PointSet* _PointSet, mitk::PointSet::PointIdentifier _PointId, int timestep=0 );
+
   protected slots:
-    void OnOkButtonClicked( bool /*triggered = false*/ );
+    void OnOkButtonClicked(bool);
+
   protected:
     QmitkEditPointDialogData* d;
 };
 
-#endif // QmitkEditPointDialog_h
+#endif
+

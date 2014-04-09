@@ -110,20 +110,13 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
       painter.drawRoundRect(point.first - handleWidth / 2,
           y - handleHeight / 2, handleWidth, handleHeight, 50, 50);
 
-      if (i == m_GrabbedHandle)
-      {
-        if (m_LineEditAvailable)
-        {
-          m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle)));
-          //m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle)));
-        }
-      }
-
+      if (i == m_GrabbedHandle && m_LineEditAvailable)
+        m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle)));
     }
   }
 }
 
-int QmitkColorTransferFunctionCanvas::GetNearHandle(int x, int /*y*/,
+int QmitkColorTransferFunctionCanvas::GetNearHandle(int x, int,
     unsigned int maxSquaredDistance)
 {
   for (int i = 0; i < this->GetFunctionSize(); i++)
@@ -169,3 +162,4 @@ void QmitkColorTransferFunctionCanvas::AddRGB(double x, double r, double g,
 {
   m_ColorTransferFunction->AddRGBPoint(x, r, g, b);
 }
+

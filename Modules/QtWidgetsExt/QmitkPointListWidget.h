@@ -129,7 +129,7 @@ protected slots:
     void MoveSelectedPointUp();
     void OnBtnAddPoint(bool checked);
     void OnBtnAddPointManually();
-    //void OnBtnSetPointsMode(bool checked);
+
     /*!
     \brief pass through signal from PointListView that point selection has changed
     */
@@ -169,3 +169,4 @@ protected:
 };
 
 #endif
+

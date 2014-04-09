@@ -14,18 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QmitkWebPage.h>
+#ifndef QtWidgetsExtRegisterClasses_h
+#define QtWidgetsExtRegisterClasses_h
 
-QmitkJSWebPage::QmitkJSWebPage(QObject *parent) : QWebPage(parent)
-{
-}
+#include "mitkCommon.h"
+#include "MitkQtWidgetsExtExports.h"
 
-QmitkJSWebPage::~QmitkJSWebPage()
-{
-}
+MitkQtWidgetsExt_EXPORT void QtWidgetsExtRegisterClasses();
 
-bool QmitkJSWebPage::shouldInterruptJavaScript()
-{
-  return false;
-}
+#endif
 

@@ -71,8 +71,6 @@ public slots:
 
  void SetData( mitk::DataNode::Pointer node  );
 
- // void AddData( mitk::DataNode::Pointer node);
-
   void SetData( mitk::DataNode::Pointer node, mitk::SliceNavigationController::ViewDirection view );
 
   void InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection );
@@ -88,7 +86,6 @@ protected:
 
   QmitkRenderWindow* m_RenderWindow;
   mitk::SliceNavigationController::ViewDirection m_View;
-  //int newVariable;
 
 private:
 
@@ -101,4 +98,5 @@ private:
 
 };
 
-#endif /*QMITKSLICEWIDGET_H_*/
+#endif
+

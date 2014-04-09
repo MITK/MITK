@@ -928,6 +928,37 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
   std::string nodename;
   dataNodePointer->GetStringProperty("name",nodename);
 
+  mitk::DiffusionImage<short>::BValueMap currSelectionMap = m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap();
+
+  currSelectionMap.erase(0);
+  if(currSelectionMap.size() != 3)
+  {
+    QMessageBox::information(0, "Reconstruction not possible:" ,QString("Only three shells in a equidistant configuration is supported. (ImageName: " + QString(nodename.c_str()) + ")"));
+    return;
+  }
+
+  mitk::DiffusionImage<short>::BValueMap::reverse_iterator it1 = currSelectionMap.rbegin();
+  mitk::DiffusionImage<short>::BValueMap::reverse_iterator it2 = currSelectionMap.rbegin();
+  ++it2;
+
+  // Get average distance
+  int avdistance = 0;
+  for(; it2 != currSelectionMap.rend(); ++it1,++it2)
+    avdistance += (int)it1->first - (int)it2->first;
+  avdistance /= currSelectionMap.size()-1;
+
+  // Check if all shells are using the same averae distance
+  it1 = currSelectionMap.rbegin();
+  it2 = currSelectionMap.rbegin();
+  ++it2;
+  for(; it2 != currSelectionMap.rend(); ++it1,++it2)
+    if(avdistance != (int)it1->first - (int)it2->first)
+    {
+      QMessageBox::information(0, "Reconstruction not possible:" ,QString("Selected Shells are not in a equidistant configuration. (ImageName: " + QString(nodename.c_str()) + ")"));
+      return;
+    }
+
+
   filter->SetBValueMap(m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap());
   filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage(), vols->GetReferenceBValue() );
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );

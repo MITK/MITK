@@ -79,6 +79,29 @@ void itk::SplitDWImageFilter< TInputImagePixelType, TOutputImagePixelType >
 
 template< class TInputImagePixelType,
           class TOutputImagePixelType>
+void itk::SplitDWImageFilter< TInputImagePixelType, TOutputImagePixelType >
+::SetExtractSingleShell(double b_value, BValueMapType map, double tol)
+{
+  m_ExtractAllImages = false;
+  m_IndexList.clear();
+
+  // create index list
+  BValueMapType::const_iterator bvalueIt = map.begin();
+  while( bvalueIt != map.end() )
+  {
+    IndexListType::const_iterator listIt = bvalueIt->second.begin();
+    if( std::fabs( bvalueIt->first - b_value) < tol)
+    {
+      m_IndexList.insert( m_IndexList.begin(), bvalueIt->second.begin(), bvalueIt->second.end() );
+      ++listIt;
+    }
+
+    ++bvalueIt;
+  }
+}
+
+template< class TInputImagePixelType,
+          class TOutputImagePixelType>
 void itk::SplitDWImageFilter<
 TInputImagePixelType, TOutputImagePixelType >::GenerateData()
 {

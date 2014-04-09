@@ -32,7 +32,8 @@ set(H_FILES
   Algorithms/itkTractDensityImageFilter.h
   Algorithms/itkTractsToFiberEndingsImageFilter.h
   Algorithms/itkTractsToRgbaImageFilter.h
-  Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
+  # moved to DiffusionCore
+  #Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
   Algorithms/itkFibersFromPlanarFiguresFilter.h
   Algorithms/itkTractsToDWIImageFilter.h
   Algorithms/itkTractsToVectorImageFilter.h

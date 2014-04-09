@@ -66,8 +66,8 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
     void SetOpenCVMat(const cv::Mat& image);
     itkGetMacro(OpenCVMat, cv::Mat);
 
-    DEPRECATED( void SetCopyBuffer( bool ); );
-    DEPRECATED( bool GetCopyBuffer(); );
+    DEPRECATED( void SetCopyBuffer( bool ) );
+    DEPRECATED( bool GetCopyBuffer() );
 
     OutputImageType* GetOutput(void);
 

@@ -17,7 +17,7 @@ Optional Input:
 
 \section QmitkGibbsTrackingUserManualParameters Q-Ball Reconstruction
 
-\li Number of iterations: More iterations causes the algorithm to be more stable but also to take longer to finish the tracking. Rcommended: 10⁷-10⁹ iterations.
+\li Number of iterations: More iterations causes the algorithm to be more stable but also to take longer to finish the tracking. Recommended: 10^7  to 10^8 iterations.
 \li Particle length/width/weight controlling the contribution of each particle to the model M
 \li Start and end temperature controlling how fast the process reaches a stable state. (usually no change needed)
 \li Weighting between the internal (affinity of the model to long and straigt fibers) and external energy (affinity of the model towards the data). (usually no change needed).

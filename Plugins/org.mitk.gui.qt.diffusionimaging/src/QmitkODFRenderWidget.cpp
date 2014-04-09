@@ -20,6 +20,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkGeometry2D.h>
+#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkObjectFactory.h>
+
+class MouseInteractorOnlyRotateStyle : public vtkInteractorStyleTrackballCamera
+{
+  public:
+    static MouseInteractorOnlyRotateStyle* New();
+    vtkTypeMacro(MouseInteractorOnlyRotateStyle, vtkInteractorStyleTrackballCamera);
+
+
+    virtual void OnMiddleButtonDown(){}
+    virtual void OnMiddleButtonUp(){}
+    virtual void OnRightButtonDown(){}
+    virtual void OnRightButtonUp(){}
+    virtual void OnMouseWheelForward(){}
+    virtual void OnMouseWheelBackward(){}
+
+};
+
+vtkStandardNewMacro(MouseInteractorOnlyRotateStyle);
 
 QmitkODFRenderWidget::QmitkODFRenderWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
 {
@@ -114,6 +134,8 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
   cam->SetViewUp(camUp);
   cam->SetParallelProjection(1);
   m_RenderWindow->GetRenderer()->GetVtkRenderer()->SetActiveCamera(cam);
+  vtkSmartPointer<MouseInteractorOnlyRotateStyle> style = vtkSmartPointer<MouseInteractorOnlyRotateStyle>::New();
+  m_RenderWindow->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
   m_RenderWindow->update();
   }
   catch (...)

@@ -150,6 +150,23 @@ public:
   vtkSmartPointer<vtkPiecewiseFunction> CreateOpacityTransferFunction();
   vtkSmartPointer<vtkPiecewiseFunction> CreateGradientTransferFunction();
 
+  /**
+   * @brief The LookupTableType enum for different predefined lookup tables.
+   *
+   * \li GRAYSCALE Our default level-window (sometimes referred to as window-level by other sources) setup for a test image looks like this:
+   * \image html ExampleLevelWindowColor.png
+   * \li INVERSE_GRAYSCALE Inverse LookupTable of GRAYSCALE.
+   * \li HOT_IRON A LookupTable for red colors.
+   * \li JET A LookupTable for JET color rendering.
+   * \li LEGACY_BINARY A LookupTable for binary images.
+   * \li LEGACY_RAINBOW_COLOR A rainbow-like LookupTable.
+   * \li MULTILABEL A LookupTable for multilabel images.
+   * \li PET_COLOR A LookupTable for PET color rendering.
+   * \li PET_20 A LookupTable for PET_20 color rendering.
+   *
+   * The different LookupTableTypes can be applied in the MitkWorkbench via right-clicking
+   * on an image and choosing a color map.
+   */
   enum LookupTableType
   {
     GRAYSCALE,

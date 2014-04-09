@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#define MBILOG_ENABLE_DEBUG
 
 #include <mitkDicomSeriesReader.h>
-
+#include <mitkImage.h>
 #include <itkGDCMSeriesFileNames.h>
 
 #include <gdcmSorter.h>
@@ -155,14 +155,13 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, 
 }
 
 bool
-DicomSeriesReader::LoadDicomSeries(
-    const StringContainer &filenames,
+DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames,
     DataNode &node,
     bool sort,
     bool check_4d,
     bool correctTilt,
     UpdateCallBackMethod callback,
-    Image::Pointer preLoadedImageBlock)
+    itk::SmartPointer<Image> preLoadedImageBlock)
 {
   if( filenames.empty() )
   {
@@ -242,7 +241,7 @@ DicomSeriesReader::IsPhilips3DDicom(const std::string &filename)
 }
 
 bool
-DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::Pointer output_image)
+DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, itk::SmartPointer<Image> output_image)
 {
   // Now get PhilipsSpecific Tags
 

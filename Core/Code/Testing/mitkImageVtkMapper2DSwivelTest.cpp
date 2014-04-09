@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkRenderingTestHelper.h"
 #include <mitkNodePredicateDataType.h>
+#include "mitkImage.h"
 
 //VTK
 #include <vtkRegressionTestImage.h>

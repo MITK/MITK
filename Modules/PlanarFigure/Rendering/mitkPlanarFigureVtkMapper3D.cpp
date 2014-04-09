@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPlanarFigureVtkMapper3D.h"
+#include "mitkImage.h"
+#include "mitkPlaneGeometry.h"
 #include <mitkPlanarFigure.h>
 #include <vtkCellArray.h>
 #include <vtkIdList.h>

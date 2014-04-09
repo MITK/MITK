@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
 #include <QHBoxLayout>
+#include <mitkImage.h>
 
 //##Documentation
 //## @brief Use several views to explore data

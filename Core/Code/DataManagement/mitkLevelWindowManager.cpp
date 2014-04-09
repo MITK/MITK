@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkMessage.h"
 #include "mitkRenderingModeProperty.h"
-
+#include "mitkImage.h"
 
 mitk::LevelWindowManager::LevelWindowManager()
 : m_DataStorage(NULL)

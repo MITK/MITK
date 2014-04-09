@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLevelWindowProperty.h"
 #include "mitkPlanarFigure.h"
 #include "mitkSurface.h"
+#include "mitkImage.h"
 
 // ITK
 #include <itkVectorContainer.h>

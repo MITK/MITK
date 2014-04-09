@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGlobalInteraction.h"
 #include "mitkEventMapper.h"
 #include "mitkGenericProperty.h"
-
+#include "mitkImageSource.h"
 #include "mitkCoreObjectFactory.h"
 
 

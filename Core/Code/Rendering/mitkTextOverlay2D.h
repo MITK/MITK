@@ -24,6 +24,7 @@
 
 class vtkTextActor;
 class vtkImageMapper;
+class vtkImageData;
 
 namespace mitk {
 

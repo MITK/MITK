@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 
+#include "mitkPlaneGeometry.h"
+#include "mitkGeometry2D.h"
+
 
 //how precise must the user pick the point
 //default value

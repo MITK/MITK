@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  class Image;
+
   class MitkSegmentation_EXPORT PixelManipulationTool : public Tool
   {
   public:
@@ -50,7 +52,7 @@ namespace mitk
     virtual ~PixelManipulationTool();
 
     virtual void OnRoiDataChanged();
-    void AddImageToDataStorage(mitk::Image::Pointer image);
+    void AddImageToDataStorage(itk::SmartPointer<mitk::Image> image);
 
     template <typename TPixel, unsigned int VImageDimension>
     void ITKPixelManipulation( itk::Image<TPixel, VImageDimension>* originalImage, Image* maskImage, Image* newImage, int newValue);

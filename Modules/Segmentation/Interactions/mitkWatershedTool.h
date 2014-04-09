@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
+#include <itkImage.h>
 
 namespace us {
 class ModuleResource;
@@ -69,7 +70,7 @@ class MitkSegmentation_EXPORT WatershedTool : public AutoSegmentationTool
       * \param segmentation A pointer to the output image, which will point to the pipeline output after execution.
       */
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& segmentation );
+    void ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, itk::SmartPointer<mitk::Image>& segmentation );
 
     const char** GetXPM() const;
     const char* GetName() const;

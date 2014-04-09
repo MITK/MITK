@@ -20,7 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../QmitkSegmentationUtilityWidget.h"
 #include <ui_QmitkSurfaceToImageWidgetControls.h>
 
-#include <mitkSurface.h>
+namespace mitk {
+  class Surface;
+  class Image;
+}
 
 /*!
   \brief QmitkSurfaceToImageWidget
@@ -56,7 +59,7 @@ private:
   void EnableButtons(bool enable = true);
 
   /** @brief Convert a surface into an binary image. */
-  mitk::Image::Pointer ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface );
+  itk::SmartPointer<mitk::Image> ConvertSurfaceToImage( itk::SmartPointer<mitk::Image> image, itk::SmartPointer<mitk::Surface> surface );
 
   Ui::QmitkSurfaceToImageWidgetControls m_Controls;
 };

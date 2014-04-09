@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
 #include "mitkOtsuSegmentationFilter.h"
+#include "mitkImage.h"
 
 // ITK
 #include <itkOtsuMultipleThresholdsImageFilter.h>

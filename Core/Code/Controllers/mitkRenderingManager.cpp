@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGlobalInteraction.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
+#include "mitkProportionalTimeGeometry.h"
 
 #include <vtkRenderWindow.h>
 

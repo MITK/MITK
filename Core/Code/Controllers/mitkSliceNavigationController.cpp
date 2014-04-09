@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOperationEvent.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkStatusBar.h"
+#include "mitkImage.h"
 
 #include "mitkApplyTransformMatrixOperation.h"
 

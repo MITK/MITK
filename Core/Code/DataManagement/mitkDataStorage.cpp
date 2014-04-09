@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkGroupTagProperty.h"
+#include "mitkImage.h"
 #include "itkMutexLockHolder.h"
-
 #include "itkCommand.h"
 
 mitk::DataStorage::DataStorage() : itk::Object()

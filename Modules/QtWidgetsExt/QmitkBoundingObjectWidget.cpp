@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGlobalInteraction.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkLine.h>
+#include <mitkPlaneGeometry.h>
 
 #include <QPushButton>
 #include <QCheckBox>

@@ -51,6 +51,7 @@ set(CPP_FILES
   QmitkTransferFunctionWidget.cpp
   QmitkVideoBackground.cpp
   QmitkWebPage.cpp
+  QtWidgetsExtRegisterClasses.cpp
 )
 
 set(MOC_H_FILES

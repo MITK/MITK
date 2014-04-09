@@ -83,10 +83,12 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
   m_Node->SetData(m_Surface);
 
   mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-  vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
-  vtkLut->SetTableRange(0, 1);
 
-  vtkLut->Build();
+  // assign an empty vtk lookup table to the odf renderer, it is the same
+  // the ODF 2D Mapper has
+  vtkLookupTable *lut = vtkLookupTable::New();
+  mitkLut->SetVtkLookupTable( lut );
+
   mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
   mitkLutProp->SetLookupTable(mitkLut);
   m_Node->SetProperty( "LookupTable", mitkLutProp );

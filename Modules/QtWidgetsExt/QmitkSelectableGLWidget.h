@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkSliceNavigationController.h"
 #include "mitkVtkPropRenderer.h"
+#include <MitkQtWidgetsExtExports.h>
 
 #include <mitkCommon.h>
 
@@ -29,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QmitkRenderWindow;
 
-class QmitkSelectableGLWidget : public QWidget, public Ui::QmitkSelectableGLWidget
+class MitkQtWidgetsExt_EXPORT QmitkSelectableGLWidget : public QWidget, public Ui::QmitkSelectableGLWidget
 {
   public:
   QmitkSelectableGLWidget(QWidget* parent=0);

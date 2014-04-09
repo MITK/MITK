@@ -1910,6 +1910,8 @@ void QmitkFiberfoxView::ApplyTransform()
                         mitk::Vector3D newWc = rot*trans;
                         newWc = newWc-trans;
                         geom->Translate(newWc);
+
+                        pe->Modified();
                     }
                 }
             }
@@ -1957,6 +1959,7 @@ void QmitkFiberfoxView::ApplyTransform()
 
             // rotate fiducial
             geom->GetIndexToWorldTransform()->SetMatrix(rot*geom->GetIndexToWorldTransform()->GetMatrix());
+            pe->Modified();
         }
         if (m_Controls->m_RealTimeFibers->isChecked())
             GenerateFibers();
@@ -2015,7 +2018,9 @@ void QmitkFiberfoxView::CopyBundles()
                     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
                     newNode->SetData(pe);
                     newNode->SetName(fiducialNode->GetName());
+                    newNode->SetBoolProperty("planarfigure.3drendering", true);
                     GetDataStorage()->Add(newNode, fbNode);
+
                 }
             }
         }

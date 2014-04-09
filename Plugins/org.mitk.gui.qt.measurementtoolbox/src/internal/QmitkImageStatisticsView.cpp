@@ -94,37 +94,10 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*) (this->m_Controls->m_lineRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnLineRadioButtonSelected()));
   }
 
-  mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
-
-  if (renderWindow)
-  {
-    itk::ReceptorMemberCommand<QmitkImageStatisticsView>::Pointer cmdTimeEvent =
-      itk::ReceptorMemberCommand<QmitkImageStatisticsView>::New();
-    cmdTimeEvent->SetCallbackFunction(this, &QmitkImageStatisticsView::OnTimeChanged);
-
-    // It is sufficient to add the observer to the axial render window since the GeometryTimeEvent
-    // is always triggered by all views.
-    m_TimeObserverTag = renderWindow->GetQmitkRenderWindow("axial")->
-      GetSliceNavigationController()->
-      AddObserver(mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), cmdTimeEvent);
-  }
 }
 
 void QmitkImageStatisticsView::PartClosed( berry::IWorkbenchPartReference::Pointer )
 {
-  // The slice navigation controller observer is removed here instead of in the destructor.
-  // If it was called in the destructor, the application would freeze because the view's
-  // destructor gets called after the render windows have been destructed.
-  if ( m_TimeObserverTag != NULL )
-  {
-    mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
-
-    if (renderWindow)
-    {
-      renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->
-        RemoveObserver( m_TimeObserverTag );
-    }
-  }
 }
 
 void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject&)
@@ -791,6 +764,24 @@ void QmitkImageStatisticsView::Deactivated()
 void QmitkImageStatisticsView::Visible()
 {
   m_Visible = true;
+
+  mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
+
+  if (renderWindow)
+  {
+    itk::ReceptorMemberCommand<QmitkImageStatisticsView>::Pointer cmdTimeEvent =
+      itk::ReceptorMemberCommand<QmitkImageStatisticsView>::New();
+    cmdTimeEvent->SetCallbackFunction(this, &QmitkImageStatisticsView::OnTimeChanged);
+
+    // It is sufficient to add the observer to the axial render window since the GeometryTimeEvent
+    // is always triggered by all views.
+    m_TimeObserverTag = renderWindow->GetQmitkRenderWindow("axial")->
+      GetSliceNavigationController()->
+      AddObserver(mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), cmdTimeEvent);
+  }
+
+
+
   if (m_DataNodeSelectionChanged)
   {
     if (this->IsCurrentSelectionValid())
@@ -808,6 +799,22 @@ void QmitkImageStatisticsView::Visible()
 void QmitkImageStatisticsView::Hidden()
 {
   m_Visible = false;
+
+  // The slice navigation controller observer is removed here instead of in the destructor.
+  // If it was called in the destructor, the application would freeze because the view's
+  // destructor gets called after the render windows have been destructed.
+  if ( m_TimeObserverTag != NULL )
+  {
+    mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
+
+    if (renderWindow)
+    {
+      renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->
+        RemoveObserver( m_TimeObserverTag );
+    }
+    m_TimeObserverTag = NULL;
+  }
+
 }
 
 void QmitkImageStatisticsView::SetFocus()

@@ -189,7 +189,7 @@ void QmitkDenoisingView::StartDenoising()
           {
             // use brainmask if set
             m_ImageMask = dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData());
-            itk::Image<DiffusionPixelType, 3>::Pointer itkMask = itk::Image<DiffusionPixelType, 3>::New();
+            itk::Image<DiffusionPixelType, 3>::Pointer itkMask;
             mitk::CastToItkImage(m_ImageMask, itkMask);
             m_NonLocalMeansFilter->SetInputMask(itkMask);
 
@@ -215,9 +215,9 @@ void QmitkDenoisingView::StartDenoising()
               ++mit;
             }
             itk::Image<DiffusionPixelType, 3>::SizeType size;
-            size[0] = maxIndex[0] - minIndex[0];
-            size[1] = maxIndex[1] - minIndex[1];
-            size[2] = maxIndex[2] - minIndex[2];
+            size[0] = maxIndex[0] - minIndex[0] + 1;
+            size[1] = maxIndex[1] - minIndex[1] + 1;
+            size[2] = maxIndex[2] - minIndex[2] + 1;
 
             m_MaxProgressCount = size[0] * size[1] * size[2];
           }
@@ -231,7 +231,6 @@ void QmitkDenoisingView::StartDenoising()
           mitk::ProgressBar::GetInstance()->AddStepsToDo(m_MaxProgressCount);
 
 
-          m_NonLocalMeansFilter->SetNumberOfThreads(12);
           m_NonLocalMeansFilter->SetInputImage(m_InputImage->GetVectorImage());
           m_NonLocalMeansFilter->SetUseRicianAdaption(m_Controls->m_RicianCheckbox->isChecked());
           m_NonLocalMeansFilter->SetUseJointInformation(m_Controls->m_JointInformationCheckbox->isChecked());

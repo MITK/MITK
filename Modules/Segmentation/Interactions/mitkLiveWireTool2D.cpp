@@ -134,10 +134,11 @@ void mitk::LiveWireTool2D::ConnectActionsAndFunctions()
 
   CONNECT_FUNCTION("InitObject", OnInitLiveWire);
   CONNECT_FUNCTION("AddPoint", OnAddPoint);
+  CONNECT_FUNCTION("CtrlAddPoint", OnAddPoint);
   CONNECT_FUNCTION("MovePoint", OnMouseMoveNoDynamicCosts);
   CONNECT_FUNCTION("FinishContour", OnFinish);
   CONNECT_FUNCTION("DeletePoint", OnLastSegmentDelete);
-  CONNECT_FUNCTION("MovePoint", OnMouseMoved);
+  CONNECT_FUNCTION("CtrlMovePoint", OnMouseMoved);
 }
 
 const char** mitk::LiveWireTool2D::GetXPM() const
@@ -183,10 +184,14 @@ void mitk::LiveWireTool2D::EnableContourLiveWireInteraction(bool on)
 void mitk::LiveWireTool2D::ConfirmSegmentation()
 {
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  assert ( workingNode );
+
+  if (!workingNode)
+    return;
 
   Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
-  assert ( workingImage );
+
+  if (!workingImage)
+    return;
 
   // for all contours in list (currently created by tool)
   std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itWorkingContours = this->m_WorkingContours.begin();
@@ -247,6 +252,8 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
   m_ContourModelNode = mitk::DataNode::New();
   m_ContourModelNode->SetData( m_Contour );
   m_ContourModelNode->SetName("working contour node");
+  m_ContourModelNode->SetProperty( "layer", IntProperty::New(100));
+  m_ContourModelNode->AddProperty( "fixedLayer", BoolProperty::New(true));
   m_ContourModelNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_ContourModelNode->AddProperty( "contour.color", ColorProperty::New(1, 1, 0), NULL, true );
   m_ContourModelNode->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.1), NULL, true );
@@ -257,7 +264,8 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
   m_LiveWireContourNode = mitk::DataNode::New();
   m_LiveWireContourNode->SetData( m_LiveWireContour );
   m_LiveWireContourNode->SetName("active livewire node");
-  m_LiveWireContourNode->SetProperty( "layer", IntProperty::New(100));
+  m_LiveWireContourNode->SetProperty( "layer", IntProperty::New(101));
+  m_LiveWireContourNode->AddProperty( "fixedLayer", BoolProperty::New(true));
   m_LiveWireContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_LiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LiveWireContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
@@ -267,7 +275,8 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
   m_EditingContourNode = mitk::DataNode::New();
   m_EditingContourNode->SetData( m_EditingContour );
   m_EditingContourNode->SetName("editing node");
-  m_EditingContourNode->SetProperty( "layer", IntProperty::New(100));
+  m_EditingContourNode->SetProperty( "layer", IntProperty::New(102));
+  m_EditingContourNode->AddProperty( "fixedLayer", BoolProperty::New(true));
   m_EditingContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_EditingContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_EditingContourNode->AddProperty( "contour.points.color", ColorProperty::New(0.0, 0.0, 1.0), NULL, true );

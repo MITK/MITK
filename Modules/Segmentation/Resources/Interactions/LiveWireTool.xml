@@ -24,11 +24,11 @@
       <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Active" >
         <condition name="CheckContourClosed" inverted="true"/>
       </transition>
-      <transition event_class="MouseMoveEvent" event_variant="CtrlPrimaryButtonMoved" target="Active" >
-        <action name="AddLine" ID="12"/>
+      <transition event_class="MouseMoveEvent" event_variant="CtrlMouseMove" target="Active" >
+        <action name="CtrlMovePoint" ID="12"/>
       </transition>
       <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" target="Active" >
-        <action name="AddPoint" ID="10" />
+        <action name="CtrlAddPoint" ID="10" />
       </transition>
     </state>
   </statemachine>

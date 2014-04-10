@@ -51,7 +51,7 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
 
   // GetShellSelection from GUI
   BValueMap shellSelectionMap;
-  BValueMap originalShellMap = dwimage->GetB_ValueMap();
+  BValueMap originalShellMap = dwimage->GetBValueMap();
   std::vector<unsigned int> newNumGradientDirections;
 
   shellSelectionMap[extract_value] = originalShellMap[extract_value];
@@ -76,7 +76,7 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
 
   DiffusionImageType::Pointer image = DiffusionImageType::New();
   image->SetVectorImage( filter->GetOutput() );
-  image->SetB_Value(dwimage->GetB_Value());
+  image->SetReferenceBValue(dwimage->GetReferenceBValue());
   image->SetDirections(filter->GetGradientDirections());
   image->SetMeasurementFrame(dwimage->GetMeasurementFrame());
   image->InitializeFromVectorImage();

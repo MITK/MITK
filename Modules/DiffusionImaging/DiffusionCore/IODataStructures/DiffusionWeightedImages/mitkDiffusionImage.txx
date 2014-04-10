@@ -318,6 +318,7 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
     ++oldIt;
   }
   ApplyMeasurementFrame();
+  UpdateBValueMap();
   std::cout << std::endl;
 }
 

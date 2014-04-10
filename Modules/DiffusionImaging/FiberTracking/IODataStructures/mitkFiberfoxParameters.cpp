@@ -378,7 +378,6 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 ballModel->SetBvalue(m_Bvalue);
                 ballModel->SetDiffusivity(v1.second.get<double>("compartment3.ball.d"));
                 ballModel->SetT2(v1.second.get<double>("compartment3.ball.t2"));
-                ballModel->SetWeight(v1.second.get<double>("compartment3.weight"));
                 m_NonFiberModelList.push_back(ballModel);
                 break;
             }
@@ -390,7 +389,6 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 astrosticksModel->SetDiffusivity(v1.second.get<double>("compartment3.astrosticks.d"));
                 astrosticksModel->SetT2(v1.second.get<double>("compartment3.astrosticks.t2"));
                 astrosticksModel->SetRandomizeSticks(v1.second.get<bool>("compartment3.astrosticks.randomize"));
-                astrosticksModel->SetWeight(v1.second.get<double>("compartment3.weight"));
                 m_NonFiberModelList.push_back(astrosticksModel);
                 break;
             }
@@ -399,7 +397,6 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 mitk::DotModel<double>* dotModel = new mitk::DotModel<double>();
                 dotModel->SetGradientList(m_GradientDirections);
                 dotModel->SetT2(v1.second.get<double>("compartment3.dot.t2"));
-                dotModel->SetWeight(v1.second.get<double>("compartment3.weight"));
                 m_NonFiberModelList.push_back(dotModel);
                 break;
             }
@@ -415,7 +412,6 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 ballModel->SetBvalue(m_Bvalue);
                 ballModel->SetDiffusivity(v1.second.get<double>("compartment4.ball.d"));
                 ballModel->SetT2(v1.second.get<double>("compartment4.ball.t2"));
-                ballModel->SetWeight(v1.second.get<double>("compartment4.weight"));
                 m_NonFiberModelList.push_back(ballModel);
                 break;
             }
@@ -427,7 +423,6 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 astrosticksModel->SetDiffusivity(v1.second.get<double>("compartment4.astrosticks.d"));
                 astrosticksModel->SetT2(v1.second.get<double>("compartment4.astrosticks.t2"));
                 astrosticksModel->SetRandomizeSticks(v1.second.get<bool>("compartment4.astrosticks.randomize"));
-                astrosticksModel->SetWeight(v1.second.get<double>("compartment4.weight"));
                 m_NonFiberModelList.push_back(astrosticksModel);
                 break;
             }
@@ -436,7 +431,6 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 mitk::DotModel<double>* dotModel = new mitk::DotModel<double>();
                 dotModel->SetGradientList(m_GradientDirections);
                 dotModel->SetT2(v1.second.get<double>("compartment4.dot.t2"));
-                dotModel->SetWeight(v1.second.get<double>("compartment4.weight"));
                 m_NonFiberModelList.push_back(dotModel);
                 break;
             }

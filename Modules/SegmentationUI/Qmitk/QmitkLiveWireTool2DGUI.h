@@ -53,6 +53,8 @@ public:
 
     void OnConfirmSegmentation();
 
+    void OnClearSegmentation();
+
     void OnShowInformation( bool on );
 
 protected:

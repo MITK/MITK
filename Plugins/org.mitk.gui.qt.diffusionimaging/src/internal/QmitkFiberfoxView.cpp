@@ -385,12 +385,15 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_OutputPath += "/";
     }
 
-    mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
-    mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, parameters.m_MaskImage);
-    itk::ImageDuplicator<ItkUcharImgType>::Pointer duplicator = itk::ImageDuplicator<ItkUcharImgType>::New();
-    duplicator->SetInputImage(parameters.m_MaskImage);
-    duplicator->Update();
-    parameters.m_MaskImage = duplicator->GetOutput();
+    if (m_MaskImageNode.IsNotNull())
+    {
+        mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+        mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, parameters.m_MaskImage);
+        itk::ImageDuplicator<ItkUcharImgType>::Pointer duplicator = itk::ImageDuplicator<ItkUcharImgType>::New();
+        duplicator->SetInputImage(parameters.m_MaskImage);
+        duplicator->Update();
+        parameters.m_MaskImage = duplicator->GetOutput();
+    }
 
     if (m_SelectedDWI.IsNotNull())  // use parameters of selected DWI
     {

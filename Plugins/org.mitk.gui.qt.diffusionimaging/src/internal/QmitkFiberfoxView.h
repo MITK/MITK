@@ -188,7 +188,7 @@ protected:
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles2;
     vector< mitk::DataNode::Pointer >                   m_SelectedFiducials;
     vector< mitk::DataNode::Pointer >                   m_SelectedImages;
-    ItkUcharImgType::Pointer                            m_ItkMaskImage;
+    mitk::DataNode::Pointer                             m_MaskImageNode;
 
     /** intra and inter axonal compartments */
     mitk::StickModel<double> m_StickModel1;

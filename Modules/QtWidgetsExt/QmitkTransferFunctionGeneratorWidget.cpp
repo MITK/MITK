@@ -375,10 +375,7 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode* node)
     tfpToChange = dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction"));
 
     if(!tfpToChange)
-    {
       node->SetProperty("TransferFunction", tfpToChange = mitk::TransferFunctionProperty::New() );
-      dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction"));
-    }
 
     mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
 

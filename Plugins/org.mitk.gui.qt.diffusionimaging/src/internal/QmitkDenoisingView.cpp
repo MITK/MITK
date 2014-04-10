@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkDenoisingWorker::QmitkDenoisingWorker(QmitkDenoisingView *view)
   : m_View(view)
 {
-
 }
 
 void QmitkDenoisingWorker::run()
@@ -157,7 +156,6 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
     {
         m_Controls->m_InputBrainMaskLabel->setText(node->GetName().c_str());
         m_BrainMaskNode = node;
-
     }
   }
 
@@ -191,7 +189,7 @@ void QmitkDenoisingView::StartDenoising()
           {
             // use brainmask if set
             m_ImageMask = dynamic_cast<mitk::Image*>(m_BrainMaskNode->GetData());
-            itk::Image<DiffusionPixelType, 3>::Pointer itkMask = itk::Image<DiffusionPixelType, 3>::New();
+            itk::Image<DiffusionPixelType, 3>::Pointer itkMask;
             mitk::CastToItkImage(m_ImageMask, itkMask);
             m_NonLocalMeansFilter->SetInputMask(itkMask);
 
@@ -203,7 +201,6 @@ void QmitkDenoisingView::StartDenoising()
             maxIndex.Fill(0);
             while (!mit.IsAtEnd())
             {
-
               if (mit.Get())
               {
                 // calculation of the start & end index of the smallest masked region
@@ -217,10 +214,10 @@ void QmitkDenoisingView::StartDenoising()
               }
               ++mit;
             }
-            typename itk::Image<DiffusionPixelType, 3>::SizeType size;
-            size[0] = maxIndex[0] - minIndex[0];
-            size[1] = maxIndex[1] - minIndex[1];
-            size[2] = maxIndex[2] - minIndex[2];
+            itk::Image<DiffusionPixelType, 3>::SizeType size;
+            size[0] = maxIndex[0] - minIndex[0] + 1;
+            size[1] = maxIndex[1] - minIndex[1] + 1;
+            size[2] = maxIndex[2] - minIndex[2] + 1;
 
             m_MaxProgressCount = size[0] * size[1] * size[2];
           }
@@ -228,14 +225,12 @@ void QmitkDenoisingView::StartDenoising()
           {
             // initialize the progressbar
             m_MaxProgressCount = m_InputImage->GetDimension(0) * m_InputImage->GetDimension(1) * m_InputImage->GetDimension(2);
-
           }
 
 
           mitk::ProgressBar::GetInstance()->AddStepsToDo(m_MaxProgressCount);
 
 
-          m_NonLocalMeansFilter->SetNumberOfThreads(12);
           m_NonLocalMeansFilter->SetInputImage(m_InputImage->GetVectorImage());
           m_NonLocalMeansFilter->SetUseRicianAdaption(m_Controls->m_RicianCheckbox->isChecked());
           m_NonLocalMeansFilter->SetUseJointInformation(m_Controls->m_JointInformationCheckbox->isChecked());
@@ -510,6 +505,4 @@ void QmitkDenoisingView::UpdateProgress()
       break;
     }
   }
-
-
 }

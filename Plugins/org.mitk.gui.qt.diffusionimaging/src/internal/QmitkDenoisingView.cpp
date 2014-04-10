@@ -217,7 +217,7 @@ void QmitkDenoisingView::StartDenoising()
               }
               ++mit;
             }
-            typename itk::Image<DiffusionPixelType, 3>::SizeType size;
+            itk::Image<DiffusionPixelType, 3>::SizeType size;
             size[0] = maxIndex[0] - minIndex[0];
             size[1] = maxIndex[1] - minIndex[1];
             size[2] = maxIndex[2] - minIndex[2];

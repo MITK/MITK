@@ -767,7 +767,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         }
 
         // move fibers
-        if (m_Parameters.m_DoAddMotion)
+        if (m_Parameters.m_DoAddMotion && g<m_Parameters.GetNumVolumes()-1)
         {
             if (m_Parameters.m_DoRandomizeMotion)
             {

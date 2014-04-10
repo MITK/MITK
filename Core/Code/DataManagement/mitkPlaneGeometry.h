@@ -534,14 +534,14 @@ namespace mitk {
 
     virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
-    virtual void InternPreSetBounds( const BoundingBox::BoundsArrayType &bounds );
+    virtual void PreSetBounds( const BoundingBox::BoundsArrayType &bounds );
 
-    virtual void InternPreSetIndexToWorldTransform( AffineTransform3D *transform);
+    virtual void PreSetIndexToWorldTransform( AffineTransform3D *transform);
 
     //******************** from Geometry2D *********************
-    virtual void InternPostSetExtentInMM(int direction, ScalarType extentInMM);
+    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
 
-    virtual void InternPostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
     /**
     * \brief factor to convert x-coordinates from mm to units and vice versa

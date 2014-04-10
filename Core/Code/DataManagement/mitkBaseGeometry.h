@@ -97,10 +97,6 @@ namespace mitk {
     itkGetConstReferenceMacro(Spacing, mitk::Vector3D);
 
     //##Documentation
-    //## @brief Get the spacing as a float[3] array.
-    const float* GetFloatSpacing() const;
-
-    //##Documentation
     //## @brief Set the spacing (m_Spacing)
     void SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
@@ -170,18 +166,6 @@ namespace mitk {
     virtual void SetIdentity();
 
     // ********************************** Transformations **********************************
-
-    //##Documentation
-    //## @brief Copy the ITK transform
-    //## (m_IndexToWorldTransform) to the VTK transform
-    //## \sa SetIndexToWorldTransform
-    void TransferItkToVtkTransform();
-
-    //##Documentation
-    //## @brief Copy the VTK transform
-    //## to the ITK transform (m_IndexToWorldTransform)
-    //## \sa SetIndexToWorldTransform
-    void TransferVtkToItkTransform();
 
     //##Documentation
     //## @brief Compose new IndexToWorldTransform with a given transform.
@@ -515,22 +499,34 @@ namespace mitk {
     //## @brief Deprecated
     void BackTransform(const mitk::Point3D& at, const mitk::Vector3D& in, mitk::Vector3D& out) const;
 
+    //##Documentation
+    //## @brief Copy the ITK transform
+    //## (m_IndexToWorldTransform) to the VTK transform
+    //## \sa SetIndexToWorldTransform
+    void TransferItkToVtkTransform();
+
+    //##Documentation
+    //## @brief Copy the VTK transform
+    //## to the ITK transform (m_IndexToWorldTransform)
+    //## \sa SetIndexToWorldTransform
+    void TransferVtkToItkTransform();
+
     static const std::string GetTransformAsString( TransformType* transformType );
 
-    virtual void InternPostInitialize();
-    virtual void InternPostInitializeGeometry(Self * newGeometry) const;
+    virtual void PostInitialize();
+    virtual void PostInitializeGeometry(Self * newGeometry) const;
 
-    virtual void InternPreSetBounds(const BoundsArrayType& bounds);
+    virtual void PreSetBounds(const BoundsArrayType& bounds);
 
-    virtual void InternPostSetExtentInMM(int direction, ScalarType extentInMM);
+    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
 
-    virtual void InternPostSetTimeBounds(const TimeBounds& timebounds);
+    virtual void PostSetTimeBounds(const TimeBounds& timebounds);
 
-    virtual void InternPreSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
-    virtual void InternPostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
-    virtual void InternPreSetSpacing(const mitk::Vector3D& aSpacing);
-    void InternSetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing);
+    void _SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
     itkGetConstMacro(NDimensions, unsigned int);
 
@@ -545,7 +541,7 @@ namespace mitk {
 
     AffineTransform3D::Pointer m_IndexToWorldTransform;
 
-    mutable BoundingBoxPointer m_BoundingBox;
+    BoundingBoxPointer m_BoundingBox;
 
     vtkMatrixToLinearTransform* m_VtkIndexToWorldTransform;
 
@@ -553,7 +549,7 @@ namespace mitk {
 
     unsigned int m_FrameOfReferenceID;
 
-    mutable mitk::TimeBounds m_TimeBounds;
+    mitk::TimeBounds m_TimeBounds;
 
     //##Documentation
     //## @brief Origin, i.e. upper-left corner of the plane
@@ -565,8 +561,6 @@ namespace mitk {
     mutable TransformType::Pointer m_InvertedTransform;
 
     mutable unsigned long m_IndexToWorldTransformLastModified;
-
-    float m_FloatSpacing[3]; //this was private
 
     bool m_ImageGeometry;
 

@@ -124,7 +124,7 @@ static bool CalculateClippedPlaneBounds( const BaseGeometry *boundingGeometry, c
   {
     // The resulting bounds must be adjusted by the plane spacing, since we
     // we have so far dealt with index coordinates
-    const float *planeSpacing = planeGeometry->GetFloatSpacing();
+    const mitk::Vector3D planeSpacing = planeGeometry->GetSpacing();
     bounds[0] *= planeSpacing[0];
     bounds[1] *= planeSpacing[0];
     bounds[2] *= planeSpacing[1];

@@ -353,7 +353,6 @@ void mitk::ExtrudedContour::BuildGeometry()
   assert( g3d.IsNotNull() );
   g3d->SetBounds(bounds);
   g3d->SetIndexToWorldTransform(m_ProjectionPlane->GetIndexToWorldTransform());
-  g3d->TransferItkToVtkTransform();
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(g3d,1);

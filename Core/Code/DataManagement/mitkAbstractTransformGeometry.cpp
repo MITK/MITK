@@ -39,7 +39,7 @@ mitk::AbstractTransformGeometry::~AbstractTransformGeometry()
 {
 }
 
-void mitk::AbstractTransformGeometry::InternPostInitialize()
+void mitk::AbstractTransformGeometry::PostInitialize()
 {
   m_ItkVtkAbstractTransform = itk::VtkAbstractTransform<ScalarType>::New();
 }

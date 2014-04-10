@@ -204,7 +204,7 @@ namespace mitk {
 
     mitk::BaseGeometry::Pointer m_FrameGeometry;
 
-    virtual void InternPostInitialize();
+    virtual void PostInitialize();
 
         //##Documentation
     //## @brief Set the parametric bounds

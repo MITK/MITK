@@ -230,14 +230,16 @@ namespace mitk {
 
     virtual ~SlicedGeometry3D();
 
-    virtual void InternPostSetTimeBounds( const mitk::TimeBounds& timebounds );
+    virtual void PreSetBounds(const BoundsArrayType& bounds){};
+
+    virtual void PostSetTimeBounds( const mitk::TimeBounds& timebounds );
 
     /**
     * \brief Set the spacing (m_Spacing), in direction of the plane normal.
     *
     * INTERNAL METHOD.
     */
-    virtual void InternPreSetSpacing( const mitk::Vector3D &aSpacing );
+    virtual void PreSetSpacing( const mitk::Vector3D &aSpacing );
 
     /**
     * Reinitialize plane stack after rotation. More precisely, the first plane

@@ -64,13 +64,13 @@ namespace mitk
   }
 
   void
-    PlaneGeometry::InternPreSetIndexToWorldTransform(mitk::AffineTransform3D *transform)
+    PlaneGeometry::PreSetIndexToWorldTransform(mitk::AffineTransform3D *transform)
   {
     EnsurePerpendicularNormal(transform);
   }
 
   void
-    PlaneGeometry::InternPreSetBounds(const BoundingBox::BoundsArrayType &bounds)
+    PlaneGeometry::PreSetBounds(const BoundingBox::BoundsArrayType &bounds)
   {
     //currently the unit rectangle must be starting at the origin [0,0]
     assert(bounds[0]==0);
@@ -761,7 +761,7 @@ namespace mitk
     os << indent << " Normal: " << GetNormal() << std::endl;
   }
 
-  void  PlaneGeometry::InternPostSetIndexToWorldTransform(
+  void  PlaneGeometry::PostSetIndexToWorldTransform(
     mitk::AffineTransform3D* transform)
   {
     m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
@@ -772,7 +772,7 @@ namespace mitk
   }
 
   void
-    PlaneGeometry::InternPostSetExtentInMM(int direction, ScalarType extentInMM)
+    PlaneGeometry::PostSetExtentInMM(int direction, ScalarType extentInMM)
   {
     m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
     m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);

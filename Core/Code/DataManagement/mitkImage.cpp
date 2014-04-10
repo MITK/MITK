@@ -217,8 +217,8 @@ mitk::ImageVtkAccessor* mitk::Image::GetVtkImageData(int t, int n)
     return NULL;
 
   SlicedGeometry3D* geom3d = GetSlicedGeometry(t);
-  float *fspacing = const_cast<float *>(geom3d->GetFloatSpacing());
-  double dspacing[3] = {fspacing[0],fspacing[1],fspacing[2]};
+  const mitk::Vector3D vspacing = (geom3d->GetSpacing());
+  double dspacing[3] = {vspacing[0],vspacing[1],vspacing[2]};
   volume->GetVtkImageData(this)->SetSpacing( dspacing );
 
   return volume->GetVtkImageData(this);

@@ -396,11 +396,6 @@ public:
     CPPUNIT_ASSERT(dummy1->GetFrameOfReferenceID() == 0);
     CPPUNIT_ASSERT(dummy1->GetIndexToWorldTransformLastModified() == 0);
 
-    const float *dummy1FloatSpacing = dummy1->GetFloatSpacing();
-    CPPUNIT_ASSERT(dummy1FloatSpacing[0]==aFloatSpacing[0]);
-    CPPUNIT_ASSERT(dummy1FloatSpacing[1]==aFloatSpacing[1]);
-    CPPUNIT_ASSERT(dummy1FloatSpacing[2]==aFloatSpacing[2]);
-
     CPPUNIT_ASSERT(dummy1->GetSpacing() == aSpacing);
     CPPUNIT_ASSERT(dummy1->GetOrigin()==aPoint);
 

@@ -72,12 +72,19 @@ NonLocalMeansDenoisingFilter< TPixelType >
   {
     // Calculation of the smallest masked region
 
+    typename OutputImageType::Pointer outputImage =
+            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+    ImageRegionIterator< OutputImageType > oit(outputImage, inputImagePointer->GetLargestPossibleRegion());
+    oit.GoToBegin();
     ImageRegionIterator< MaskImageType > mit(m_Mask, m_Mask->GetLargestPossibleRegion());
     mit.GoToBegin();
     typename MaskImageType::IndexType minIndex;
     typename MaskImageType::IndexType maxIndex;
     minIndex.Fill(10000);
     maxIndex.Fill(0);
+    typename OutputImageType::PixelType outpix;
+    outpix.SetSize(inputImagePointer->GetVectorLength());
+    outpix.Fill(0);
     while (!mit.IsAtEnd())
     {
 
@@ -92,18 +99,23 @@ NonLocalMeansDenoisingFilter< TPixelType >
         maxIndex[1] = maxIndex[1] > mit.GetIndex()[1] ? maxIndex[1] : mit.GetIndex()[1];
         maxIndex[2] = maxIndex[2] > mit.GetIndex()[2] ? maxIndex[2] : mit.GetIndex()[2];
       }
+      else
+      {
+        oit.Set(outpix);
+      }
       ++mit;
+      ++oit;
     }
+
 
     // calculation of the masked region
     typename OutputImageType::SizeType size;
-    size[0] = maxIndex[0] - minIndex[0];
-    size[1] = maxIndex[1] - minIndex[1];
-    size[2] = maxIndex[2] - minIndex[2];
+    size[0] = maxIndex[0] - minIndex[0] + 1;
+    size[1] = maxIndex[1] - minIndex[1] + 1;
+    size[2] = maxIndex[2] - minIndex[2] + 1;
 
     typename OutputImageType::RegionType region (minIndex, size);
-    typename OutputImageType::Pointer outputImage =
-            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+
     outputImage->SetRequestedRegion(region);
   }
 

@@ -395,7 +395,15 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_OutputPath += "/";
     }
 
-    parameters.m_MaskImage = m_ItkMaskImage;
+    if (m_MaskImageNode.IsNotNull())
+    {
+        mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+        mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, parameters.m_MaskImage);
+        itk::ImageDuplicator<ItkUcharImgType>::Pointer duplicator = itk::ImageDuplicator<ItkUcharImgType>::New();
+        duplicator->SetInputImage(parameters.m_MaskImage);
+        duplicator->Update();
+        parameters.m_MaskImage = duplicator->GetOutput();
+    }
 
     if (m_SelectedDWI.IsNotNull())  // use parameters of selected DWI
     {
@@ -568,7 +576,10 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
                 parameters.m_ImageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
                 parameters.m_ImageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
         {
-            parameters.m_FrequencyMap = itkImg;
+            itk::ImageDuplicator<ItkDoubleImgType>::Pointer duplicator = itk::ImageDuplicator<ItkDoubleImgType>::New();
+            duplicator->SetInputImage(itkImg);
+            duplicator->Update();
+            parameters.m_FrequencyMap = duplicator->GetOutput();
             parameters.m_ArtifactModelString += "_DISTORTED";
             parameters.m_ResultNode->AddProperty("Fiberfox.Distortions", BoolProperty::New(true));
         }
@@ -2088,7 +2099,7 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_AlignOnGrid->setEnabled(true);
     }
 
-    if (m_ItkMaskImage.IsNotNull() || m_SelectedImage.IsNotNull())
+    if (m_MaskImageNode.IsNotNull() || m_SelectedImage.IsNotNull())
     {
         m_Controls->m_GeometryMessage->setVisible(true);
         m_Controls->m_GeometryFrame->setEnabled(false);
@@ -2123,7 +2134,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedBundles.clear();
     m_SelectedImage = NULL;
     m_SelectedDWI = NULL;
-    m_ItkMaskImage = NULL;
+    m_MaskImageNode = NULL;
     m_Controls->m_TissueMaskLabel->setText("<font color='grey'>optional</font>");
 
     // iterate all selected objects, adjust warning visibility
@@ -2141,13 +2152,12 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         {
             m_SelectedImages.push_back(node);
             m_SelectedImage = node;
-            mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
             bool isbinary = false;
             node->GetPropertyValue<bool>("binary", isbinary);
             if (isbinary)
             {
-                mitk::CastToItkImage<ItkUcharImgType>(image, m_ItkMaskImage);
-                m_Controls->m_TissueMaskLabel->setText(node->GetName().c_str());
+                m_MaskImageNode = node;
+                m_Controls->m_TissueMaskLabel->setText(m_MaskImageNode->GetName().c_str());
             }
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )

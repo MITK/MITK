@@ -824,7 +824,9 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
 
     GetDefaultDataStorage()->Add(node);
 
-    // Need review!
+    /*A reinitialization is needed to access the time channels via the ImageNavigationController
+    The Global-Geometry can not recognize the time channel without a re-init.
+    (for a new selection in datamanger a automatically updated of the Global-Geometry should be done - if it contains the time channel)*/
     mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeGeometry(),mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 
     ++itemiter;

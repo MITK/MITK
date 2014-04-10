@@ -129,4 +129,5 @@ The MITK Diffusion tools consist of further components, which have their own doc
   \li \subpage org_mitk_views_streamlinetracking
   \li \subpage org_mitk_views_fiberfoxview
   \li \subpage org_mitk_views_fieldmapgenerator
+  \li \subpage org_mitk_views_denoisingview
 */

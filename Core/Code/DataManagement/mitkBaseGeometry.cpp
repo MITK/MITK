@@ -111,6 +111,8 @@ void mitk::BaseGeometry::Initialize()
 
   m_FrameOfReferenceID = 0;
 
+  m_ImageGeometry = false;
+
   this->PostInitialize();
 }
 
@@ -159,7 +161,6 @@ void
 }
 void mitk::BaseGeometry::PostInitialize()
 {
-  m_ImageGeometry = false;
 }
 
 /** Set the bounds */
@@ -995,12 +996,12 @@ void
 
   this->SetImageGeometry(isAnImageGeometry);
 }
-itk::LightObject::Pointer mitk::BaseGeometry::InternalClone() const
-{
-  Self::Pointer newGeometry = new Self(*this);
-  newGeometry->UnRegister();
-  return newGeometry.GetPointer();
-}
+//itk::LightObject::Pointer mitk::BaseGeometry::InternalClone() const
+//{
+//  Self::Pointer newGeometry = new Self(*this);
+//  newGeometry->UnRegister();
+//  return newGeometry.GetPointer();
+//}
 
 void mitk::BaseGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
 {

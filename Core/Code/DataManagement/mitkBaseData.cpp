@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProportionalTimeGeometry.h>
 #include <itkObjectFactoryBase.h>
 #include <mitkException.h>
+#include <mitkGeometry3D.h>
 
 
 mitk::BaseData::BaseData() :
@@ -46,13 +47,14 @@ mitk::BaseData::~BaseData()
 
 void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
 {
-  mitk::BaseGeometry::Pointer g3d = mitk::BaseGeometry::New();
-  g3d->Initialize();
+  mitk::Geometry3D::Pointer geo3D = mitk::Geometry3D::New();
+  mitk::BaseGeometry::Pointer baseGeo = dynamic_cast<BaseGeometry*>(geo3D.GetPointer());
+  baseGeo->Initialize();
 
  if ( timeSteps > 1 )
  {
     mitk::ScalarType timeBounds[] = {0.0, 1.0};
-    g3d->SetTimeBounds( timeBounds );
+    baseGeo->SetTimeBounds( timeBounds );
  }
 
   // The geometry is propagated automatically to the other items,
@@ -64,7 +66,7 @@ void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
   timeGeometry->Expand(timeSteps);
   for (TimeStepType step = 0; step < timeSteps; ++step)
   {
-    timeGeometry->SetTimeStepGeometry(g3d.GetPointer(),step);
+    timeGeometry->SetTimeStepGeometry(baseGeo.GetPointer(),step);
   }
 }
 

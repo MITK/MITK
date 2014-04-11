@@ -27,7 +27,8 @@ int mitkPlaneFitTest(int, char*[] )
 
   mitk::PlaneFit::Pointer PlaneFit = mitk::PlaneFit::New();
   mitk::PointSet::Pointer PointSet = mitk::PointSet::New();
-  mitk::BaseGeometry::Pointer BaseGeometry = mitk::BaseGeometry::New();
+  mitk::PlaneGeometry::Pointer planeGeo= mitk::PlaneGeometry::New();
+  mitk::BaseGeometry::Pointer BaseGeometry = dynamic_cast<mitk::PlaneGeometry*>(planeGeo.GetPointer());
 
   mitk::Point3D Point;
 

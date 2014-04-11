@@ -120,7 +120,8 @@ mitk::BaseGeometry::Pointer mitk::ProportionalTimeGeometry::GetGeometryCloneForT
 {
   if (timeStep > m_GeometryVector.size())
     return 0;
-  return m_GeometryVector[timeStep]->Clone();
+  itk::LightObject::Pointer lopointer = m_GeometryVector[timeStep]->Clone();
+  return dynamic_cast<BaseGeometry*>(lopointer.GetPointer());
 }
 
 bool mitk::ProportionalTimeGeometry::IsValid() const
@@ -146,7 +147,8 @@ void mitk::ProportionalTimeGeometry::Expand(mitk::TimeStepType size)
   m_GeometryVector.reserve(size);
   while  (m_GeometryVector.size() < size)
   {
-    m_GeometryVector.push_back(BaseGeometry::New());
+    Geometry3D::Pointer geo3D = Geometry3D::New();
+    m_GeometryVector.push_back(dynamic_cast<BaseGeometry*>(geo3D.GetPointer()));
   }
 }
 
@@ -171,7 +173,8 @@ itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
   newTimeGeometry->Expand(this->CountTimeSteps());
   for (TimeStepType i =0; i < CountTimeSteps(); ++i)
   {
-    BaseGeometry::Pointer tempGeometry = GetGeometryForTimeStep(i)->Clone();
+    itk::LightObject::Pointer lopointer=GetGeometryForTimeStep(i)->Clone();
+    BaseGeometry::Pointer tempGeometry = dynamic_cast<BaseGeometry*>(lopointer.GetPointer());
     newTimeGeometry->SetTimeStepGeometry(tempGeometry.GetPointer(),i);
   }
   return parent;
@@ -196,8 +199,8 @@ void mitk::ProportionalTimeGeometry::Initialize (BaseGeometry* geometry, TimeSte
     {
       timeBounds = geometry->GetTimeBounds();
     }
-
-    BaseGeometry::Pointer clonedGeometry = geometry->Clone();
+    itk::LightObject::Pointer lopointer=geometry->Clone();
+    BaseGeometry::Pointer clonedGeometry = dynamic_cast<BaseGeometry*>(lopointer.GetPointer());
     this->SetTimeStepGeometry(clonedGeometry.GetPointer(), currentStep);
     GetGeometryForTimeStep(currentStep)->SetTimeBounds(timeBounds);
   }
@@ -211,7 +214,8 @@ void mitk::ProportionalTimeGeometry::Initialize (BaseGeometry* geometry, TimeSte
 
 void mitk::ProportionalTimeGeometry::Initialize (TimeStepType timeSteps)
 {
-  mitk::BaseGeometry::Pointer geometry = mitk::BaseGeometry::New();
+  mitk::Geometry3D::Pointer geo3D = Geometry3D::New();
+  mitk::BaseGeometry::Pointer geometry = dynamic_cast<BaseGeometry*>(geo3D.GetPointer());
   geometry->Initialize();
 
   if ( timeSteps > 1 )

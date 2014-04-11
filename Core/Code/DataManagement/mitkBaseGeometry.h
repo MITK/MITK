@@ -55,10 +55,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(BaseGeometry, itk::Object);
-        /** Method for creation through the object factory. */
-    itkNewMacro(Self);
-    mitkNewMacro1Param(Self,Self);
-        //##Documentation
+
+    //##Documentation
     //## @brief clones the geometry
     //##
     //## Overwrite in all sub-classes.
@@ -68,7 +66,7 @@ namespace mitk {
     //##  newGeometry->UnRegister();
     //##  return newGeometry.GetPointer();
     //## \endcode
-    virtual itk::LightObject::Pointer InternalClone() const;
+    virtual itk::LightObject::Pointer InternalClone() const =0;
 
     // ********************************** TypeDef **********************************
 
@@ -513,10 +511,11 @@ namespace mitk {
 
     static const std::string GetTransformAsString( TransformType* transformType );
 
+    virtual void PreSetBounds(const BoundsArrayType& bounds);
+
     virtual void PostInitialize();
     virtual void PostInitializeGeometry(Self * newGeometry) const;
 
-    virtual void PreSetBounds(const BoundsArrayType& bounds);
 
     virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
 

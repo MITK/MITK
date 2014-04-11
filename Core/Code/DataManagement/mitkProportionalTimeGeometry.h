@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //MITK
 #include <mitkTimeGeometry.h>
+#include <mitkGeometry3D.h>
 #include <mitkCommon.h>
 #include <MitkExports.h>
 

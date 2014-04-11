@@ -802,8 +802,8 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::BaseGeometry& geometry, unsigned int channels, int tDim )
 {
   mitk::ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  BaseGeometry::Pointer geometry3D = geometry.Clone();
-  timeGeometry->Initialize(geometry3D.GetPointer(), tDim);
+  itk::LightObject::Pointer lopointer = geometry.Clone();
+  timeGeometry->Initialize(dynamic_cast<BaseGeometry*>(lopointer.GetPointer()), tDim);
   this->Initialize(type, *timeGeometry, channels, tDim);
 }
 

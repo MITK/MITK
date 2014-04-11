@@ -61,7 +61,7 @@ namespace mitk
     DiffSliceOperation();
 
     /** \brief */
-    DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, BaseGeometry* sliceGeometry, unsigned int timestep, BaseGeometry* currentWorldGeometry);
+    DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, SlicedGeometry3D* sliceGeometry, unsigned int timestep, BaseGeometry* currentWorldGeometry);
 
     /** \brief
     *
@@ -88,9 +88,9 @@ namespace mitk
     unsigned int GetTimeStep(){return this->m_TimeStep;}
 
     /** \brief Set the axis where the slice has to be applied in the volume.*/
-    void SetSliceGeometry(BaseGeometry* sliceGeometry){this->m_SliceGeometry = sliceGeometry;}
+    void SetSliceGeometry(SlicedGeometry3D* sliceGeometry){this->m_SliceGeometry = sliceGeometry;}
     /** \brief Get the axis where the slice has to be applied in the volume.*/
-    BaseGeometry* GetSliceGeometry(){return this->m_SliceGeometry;}
+    SlicedGeometry3D* GetSliceGeometry(){return this->m_SliceGeometry;}
 
 
     /** \brief Set the axis where the slice has to be applied in the volume.
@@ -122,7 +122,7 @@ namespace mitk
 
     vtkSmartPointer<vtkImageData> m_Slice;
 
-    BaseGeometry::Pointer m_SliceGeometry;
+    SlicedGeometry3D::Pointer m_SliceGeometry;
 
     unsigned int m_TimeStep;
 

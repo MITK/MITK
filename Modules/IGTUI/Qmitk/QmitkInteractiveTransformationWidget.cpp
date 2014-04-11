@@ -77,7 +77,8 @@ void QmitkInteractiveTransformationWidget::CreateConnections()
 void QmitkInteractiveTransformationWidget::SetGeometry( mitk::BaseGeometry::Pointer geometry, mitk::BaseGeometry::Pointer defaultValues )
 {
   m_Geometry = geometry;
-  m_ResetGeometry = geometry->Clone();
+  itk::LightObject::Pointer lopointer = geometry->Clone();
+  m_ResetGeometry = dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer());
 
   //set default values
   if (defaultValues.IsNotNull())

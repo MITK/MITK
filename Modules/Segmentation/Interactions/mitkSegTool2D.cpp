@@ -185,7 +185,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
 
   /*============= BEGIN undo feature block ========================*/
   //specify the undo operation with the non edited slice
-  m_undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), extractor->GetVtkOutput(), slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+  m_undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), extractor->GetVtkOutput(), dynamic_cast<SlicedGeometry3D*>(slice->GetGeometry()), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
   /*============= END undo feature block ========================*/
 
   return slice;
@@ -283,7 +283,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
 
   /*============= BEGIN undo feature block ========================*/
   //specify the undo operation with the edited slice
-  m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
+  m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),dynamic_cast<SlicedGeometry3D*>(slice->GetGeometry()), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
 
   //create an operation event for the undo stack
   OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );

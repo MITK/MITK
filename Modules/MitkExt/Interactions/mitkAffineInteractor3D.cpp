@@ -52,7 +52,8 @@ AffineInteractor3D
   m_Precision( 6.5 ),
   m_InteractionMode( INTERACTION_MODE_TRANSLATION )
 {
-  m_OriginalGeometry = BaseGeometry::New();
+  Geometry3D::Pointer geo3D = Geometry3D::New();
+  m_OriginalGeometry = dynamic_cast<BaseGeometry*>(geo3D.GetPointer());
 
   // Initialize vector arithmetic
   m_ObjectNormal[0] = 0.0;

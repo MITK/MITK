@@ -31,8 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_quaternion.h>
 #include <iomanip>
 
-#include "mitkTypeBasics.h"
-#include "mitkTypedefs.h"
+#include "mitkConstants.h"
+#include "mitkQuaternion.h"
 #include "mitkPoint.h" // TODO SW: should not be included here, maybe generate one "general datatype include" like mitkPrimitives.h
 #include "mitkVector.h"
 #include "mitkMatrix.h"
@@ -45,50 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 
-template <class T, unsigned int NVectorDimension>
-  itk::Vector<T, NVectorDimension> operator+(const itk::Vector<T, NVectorDimension> &vector, const itk::Point<T, NVectorDimension> &point)
-{
-  itk::Vector<T, NVectorDimension> sub;
-  for( unsigned int i=0; i<NVectorDimension; i++)
-  {
-    sub[i] = vector[i]+point[i];
-  }
-  return sub;
-}
-
-template <class T, unsigned int NVectorDimension>
-  inline itk::Vector<T, NVectorDimension>& operator+=(itk::Vector<T, NVectorDimension> &vector, const itk::Point<T, NVectorDimension> &point)
-{
-  for( unsigned int i=0; i<NVectorDimension; i++)
-  {
-    vector[i] += point[i];
-  }
-  return vector;
-}
-
-template <class T, unsigned int NVectorDimension>
-  itk::Vector<T, NVectorDimension> operator-(const itk::Vector<T, NVectorDimension> &vector, const itk::Point<T, NVectorDimension> &point)
-{
-  itk::Vector<T, NVectorDimension> sub;
-  for( unsigned int i=0; i<NVectorDimension; i++)
-  {
-    sub[i] = vector[i]-point[i];
-  }
-  return sub;
-}
-
-template <class T, unsigned int NVectorDimension>
-  inline itk::Vector<T, NVectorDimension>& operator-=(itk::Vector<T, NVectorDimension> &vector, const itk::Point<T, NVectorDimension> &point)
-{
-  for( unsigned int i=0; i<NVectorDimension; i++)
-  {
-    vector[i] -= point[i];
-  }
-  return vector;
-}
-
 /**
- * Helper method to check if the difference is bigger or eqaual to a given epsilon
+ * Helper method to check if the difference is bigger or equal to a given epsilon
  *
  * @param diff the difference to be checked against the epsilon
  * @param the epsilon. The absolute difference needs to be smaller than this.

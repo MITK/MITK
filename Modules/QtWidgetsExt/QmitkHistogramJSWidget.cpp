@@ -156,7 +156,7 @@ void QmitkHistogramJSWidget::SetPlanarFigure(const mitk::PlanarFigure* planarFig
 }
 
 template <class PixelType>
-void ReadPixel(mitk::PixelType ptype, mitk::Image::Pointer image, mitk::Index3D indexPoint, double& value)
+void ReadPixel(mitk::PixelType ptype, mitk::Image::Pointer image, itk::Index<3> indexPoint, double& value)
 {
   if (image->GetDimension() == 2)
   {
@@ -261,7 +261,7 @@ void QmitkHistogramJSWidget::ComputeIntensityProfile(unsigned int timeStep)
 
 
     distance += currentWorldPoint.EuclideanDistanceTo(worldPoint);
-    mitk::Index3D indexPoint;
+    itk::Index<3> indexPoint;
     imageGeometry->WorldToIndex(worldPoint, indexPoint);
     const mitk::PixelType ptype = m_Image->GetPixelType();
     double intensity = 0.0;

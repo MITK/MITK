@@ -125,7 +125,7 @@ public:
 
   virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
 
-  virtual const itk::Transform<ScalarType, 3, 3>* GetParametricTransform() const;
+  virtual const itk::Transform<mitk::ScalarType, 3, 3>* GetParametricTransform() const;
 
   //##Documentation
   //## @brief Change the parametric bounds to @a oversampling times

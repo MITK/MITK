@@ -69,7 +69,7 @@ namespace mitk {
    //## and world-coordinates (called world or mm coordinates),
    //## e.g. WorldToIndex.
    //## In case you need integer index coordinates, provide an
-   //## mitk::Index3D (or itk::Index) as target variable to
+   //## itk::Index<3> (or itk::Index) as target variable to
    //## WorldToIndex, otherwise you will get a continuous index
    //## (floating point values).
    //##
@@ -593,7 +593,7 @@ namespace mitk {
       //## @brief Get the parametric transform
       //##
       //## See AbstractTransformGeometry for an example usage of this.
-      virtual const itk::Transform<ScalarType, 3, 3>* GetParametricTransform() const
+      virtual const itk::Transform<mitk::ScalarType, 3, 3>* GetParametricTransform() const
       {
          return m_IndexToWorldTransform;
       }

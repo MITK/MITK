@@ -37,13 +37,9 @@ typedef vnl_matrix_fixed<ScalarType, 3, 3> VnlMatrix3D;
 typedef vnl_vector<ScalarType> VnlVector;
 typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
-typedef itk::Index<3> Index3D;
-typedef itk::ContinuousIndex<ScalarType, 3> ContinuousIndex3D;
 typedef vnl_quaternion<ScalarType> Quaternion;
 
 typedef itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
-
-typedef std::pair<std::string, bool> FileServiceOption;
 
 }
 

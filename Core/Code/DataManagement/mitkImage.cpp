@@ -148,7 +148,7 @@ void AccessPixel( const mitk::PixelType ptype, void* data, const unsigned int of
 
 }
 
-double mitk::Image::GetPixelValueByIndex(const mitk::Index3D &position, unsigned int timestep)
+double mitk::Image::GetPixelValueByIndex(const itk::Index<3> &position, unsigned int timestep)
 {
   double value = 0;
   if (this->GetTimeSteps() < timestep)
@@ -195,7 +195,7 @@ double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position
     timestep = this->GetTimeSteps();
   }
 
-  Index3D itkIndex;
+  itk::Index<3> itkIndex;
   this->GetGeometry()->WorldToIndex(position, itkIndex);
 
   value = this->GetPixelValueByIndex( itkIndex, timestep);

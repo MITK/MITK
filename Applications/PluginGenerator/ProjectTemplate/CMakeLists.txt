@@ -13,7 +13,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 
   # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY 
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
                STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
@@ -91,7 +91,7 @@ option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
 
 option(${MY_PROJECT_NAME}_BUILD_ALL_PLUGINS "Build all ${MY_PROJECT_NAME} plugins" OFF)
-  
+
 mark_as_advanced(${MY_PROJECT_NAME}_INSTALL_RPATH_RELATIVE
                  ${MY_PROJECT_NAME}_BUILD_ALL_PLUGINS
                  )
@@ -122,7 +122,7 @@ endif()
 # Prerequesites
 #-----------------------------------------------------------------------------
 
-find_package(MITK REQUIRED)
+find_package(MITK 2014.03.99 REQUIRED)
 
 if(COMMAND mitkFunctionCheckMitkCompatibility)
   mitkFunctionCheckMitkCompatibility(VERSIONS MITK_VERSION_PLUGIN_SYSTEM 1 REQUIRED)
@@ -140,7 +140,7 @@ set(CMAKE_MODULE_PATH
   ${MITK_SOURCE_DIR}/CMake
   ${CMAKE_MODULE_PATH}
   )
-  
+
 include(mitkFunctionCheckCompilerFlags)
 include(mitkFunctionGetGccVersion)
 include(mitkFunctionGetVersion)
@@ -378,7 +378,7 @@ include(mitkInstallRules)
 # set up the environment for the application and for Visual Studio
 if(WIN32)
   include(mitkFunctionCreateWindowsBatchScript)
-  
+
   set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
   foreach(VS_BUILD_TYPE debug release)
     mitkFunctionCreateWindowsBatchScript("${PROJECT_SOURCE_DIR}/CMake/StartVS.bat.in"

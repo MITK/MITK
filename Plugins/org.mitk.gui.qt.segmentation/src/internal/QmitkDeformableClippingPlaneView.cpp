@@ -96,10 +96,18 @@ void QmitkDeformableClippingPlaneView::CreateConnections()
 void QmitkDeformableClippingPlaneView::Activated()
 {
   QmitkFunctionality::Activated();
+  //If a tube graph already exist in the data storage, set the working node correctly
+  m_WorkingNode = m_Controls.clippingPlaneSelector->GetSelectedNode();
+  this->UpdateView();
 }
 
 void QmitkDeformableClippingPlaneView::Deactivated()
 {
+  if(m_WorkingNode.IsNotNull())
+  {
+    if(m_WorkingNode->GetDataInteractor().IsNotNull())
+      m_WorkingNode->SetDataInteractor(NULL);
+  }
   QmitkFunctionality::Deactivated();
 }
 

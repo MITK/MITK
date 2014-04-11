@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <itkPoint.h>
-#include "mitkTypeBasics.h"
+#include "mitkConstants.h"
 
 
 namespace mitk {

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKMATRIX_H_
 #define MITKMATRIX_H_
 
-#include "mitkTypeBasics.h"
+#include "mitkConstants.h"
 #include <itkMatrix.h>
 
 namespace mitk
@@ -75,6 +75,10 @@ namespace mitk
   typedef Matrix<ScalarType,2,2> Matrix2D;
   typedef Matrix<ScalarType,3,3> Matrix3D;
   typedef Matrix<ScalarType,4,4> Matrix4D;
+
+  // other matrix types used in mitk code
+  typedef vnl_matrix_fixed<ScalarType, 3, 3> VnlMatrix3D;
+
 
 }
 

@@ -402,7 +402,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
           // compute desired display position of text
           Vector2D vec2d = pt2d-lastPt2d;
           makePerpendicularVector2D(vec2d, vec2d); // text is rendered within text2dDistance perpendicular to current line
-          Vector2D pos2d = (lastPt2d.GetVectorFromOrigin() + pt2d ) * 0.5 + vec2d * text2dDistance;
+          Vector2D pos2d = (lastPt2d.GetVectorFromOrigin() + pt2d.GetVectorFromOrigin() ) * 0.5 + vec2d * text2dDistance;
 
           ls->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
 

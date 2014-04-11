@@ -9,8 +9,8 @@
 #define MITKTYPECONVERSIONS_H_
 
 
-#include "mitkTypeBasics.h"
-#include "mitkTypedefs.h"
+#include "mitkConstants.h"
+
 
 namespace mitk {
 

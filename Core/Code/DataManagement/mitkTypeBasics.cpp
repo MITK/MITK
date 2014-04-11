@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTypeBasics.h"
+#include "mitkConstants.h"
 #include "vnl/vnl_math.h"
 #include <limits>
 

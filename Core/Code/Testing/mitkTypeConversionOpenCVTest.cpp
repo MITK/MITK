@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_math.h"
 
 #include "mitkTestingMacros.h"
-#include "mitkTypeBasics.h"
+#include "mitkConstants.h"
 #include "mitkVector.h"
 #include "mitkTypes.h" // for Equals
 

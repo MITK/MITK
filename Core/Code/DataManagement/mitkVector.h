@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_vector_fixed.h>
 #include <vnl/vnl_vector.h>
 
-#include "mitkTypeBasics.h"
+#include "mitkConstants.h"
 #include "mitkTypeConversions.h"
 #include "mitkExceptionMacro.h"
 
@@ -152,7 +152,9 @@ namespace mitk
   typedef Vector<ScalarType,3> Vector3D;
   typedef Vector<ScalarType,4> Vector4D;
 
-
+  // other vector types used in MITK
+  typedef vnl_vector<ScalarType> VnlVector;
+  typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
 } // end namespace mitk
 

@@ -20,8 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vnl/vnl_quaternion.h>
 
-#include "mitkTypeBasics.h"
-#include "mitkTypedefs.h"
+#include "mitkConstants.h"
 #include "mitkVector.h"
 
 

@@ -61,7 +61,7 @@ set(H_FILES
   DataManagement/mitkPropertyListReplacedObserver.cpp
   DataManagement/mitkOldTypeConversions.h
   DataManagement/mitkTypeConversions.h
-  DataManagement/mitkTypedefs.h
+  DataManagement/mitkQuaternion.h
   DataManagement/mitkTypes.h
   DataManagement/mitkVector.h
   DataManagement/mitkPoint.h

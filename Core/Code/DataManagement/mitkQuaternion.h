@@ -26,16 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_quaternion.h>
 #include <utility>
 
-#include "mitkTypeBasics.h"
-
-//template<class TCoordRep, unsigned int NPointDimension>  class Vector;
+#include "mitkConstants.h"
 
 namespace mitk {
-
-typedef vnl_matrix_fixed<ScalarType, 3, 3> VnlMatrix3D;
-
-typedef vnl_vector<ScalarType> VnlVector;
-typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
 typedef vnl_quaternion<ScalarType> Quaternion;
 

@@ -41,7 +41,8 @@ namespace mitk{
 
       void RunSegmentation( int regions, bool useValley, int numberOfBins);
       void ConfirmSegmentation();
-      void UpdateBinaryPreview(int regionID);
+      //void UpdateBinaryPreview(int regionID);
+      void UpdateBinaryPreview(std::vector<int> regionIDs);
       void UpdateVolumePreview(bool volumeRendering);
       void ShowMultiLabelResultNode(bool);
 

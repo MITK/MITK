@@ -33,10 +33,13 @@ m_NumberOfRegions(0)
   m_Controls.setupUi(this);
 
   connect( m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSpinboxValueAccept()));
-  connect(m_Controls.m_selectionListWidget, SIGNAL(itemClicked(QListWidgetItem*)),
-          this, SLOT(OnItemSelectionChanged(QListWidgetItem*)));
+  connect(m_Controls.m_selectionListWidget, SIGNAL(itemSelectionChanged()),
+          this, SLOT(OnItemSelectionChanged()));
   connect( m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+  connect(m_Controls.advancedSettingsButton, SIGNAL(toggled(bool)), this, SLOT(OnAdvancedSettingsButtonToggled(bool)));
+
+  this->OnAdvancedSettingsButtonToggled(false);
 }
 
 QmitkOtsuTool3DGUI::~QmitkOtsuTool3DGUI()
@@ -44,32 +47,34 @@ QmitkOtsuTool3DGUI::~QmitkOtsuTool3DGUI()
 
 }
 
-void QmitkOtsuTool3DGUI::OnItemSelectionChanged(QListWidgetItem* item)
+void QmitkOtsuTool3DGUI::OnItemSelectionChanged()
 {
-  if (m_SelectedItem == item)
+  m_SelectedItems = m_Controls.m_selectionListWidget->selectedItems();
+
+  if (m_SelectedItems.size() == 0)
   {
-    m_SelectedItem = 0;
-    m_Controls.m_selectionListWidget->clearSelection();
     m_Controls.m_ConfSegButton->setEnabled( false );
     m_OtsuTool3DTool->ShowMultiLabelResultNode(true);
     return;
   }
 
-  m_SelectedItem = item;
-
   if (m_OtsuTool3DTool.IsNotNull())
   {
-    // TODO update preview of region
-    m_OtsuTool3DTool->UpdateBinaryPreview(m_SelectedItem->text().toInt());
-    if ( !m_Controls.m_selectionListWidget->selectedItems().empty() )
-    {
-      m_Controls.m_ConfSegButton->setEnabled( true );
-    }
-    else
-    {
-      m_Controls.m_ConfSegButton->setEnabled( false );
-    }
+    // update preview of region
+    QList<QListWidgetItem *>::Iterator it;
+    std::vector<int> regionIDs;
+    for (it = m_SelectedItems.begin(); it != m_SelectedItems.end(); ++it)
+      regionIDs.push_back((*it)->text().toInt());
+    m_OtsuTool3DTool->UpdateBinaryPreview(regionIDs);
+    m_Controls.m_ConfSegButton->setEnabled( true );
   }
+}
+
+void QmitkOtsuTool3DGUI::OnAdvancedSettingsButtonToggled(bool toggled)
+{
+  m_Controls.m_ValleyCheckbox->setVisible(toggled);
+  m_Controls.binLabel->setVisible(toggled);
+  m_Controls.m_BinsSpinBox->setVisible(toggled);
 }
 
 void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)

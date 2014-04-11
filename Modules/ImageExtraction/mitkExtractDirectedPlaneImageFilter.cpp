@@ -84,7 +84,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   if ( ! m_TargetTimestep )
   {
     ScalarType time = m_WorldGeometry->GetTimeBounds()[0];
-    if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
+    if ( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
     {
       timestep = inputTimeGeometry->TimePointToTimeStep( time );
     }

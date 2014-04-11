@@ -173,7 +173,7 @@ bool mitk::DisplayGeometry::SetScaleFactor(ScalarType mmPerDisplayUnit)
   }
 
   m_ScaleFactorMMPerDisplayUnit = mmPerDisplayUnit;
-  assert(m_ScaleFactorMMPerDisplayUnit < ScalarTypeNumericTraits::infinity());
+  assert(m_ScaleFactorMMPerDisplayUnit < itk::NumericTraits<mitk::ScalarType>::infinity());
 
   DisplayToWorld(m_SizeInDisplayUnits, m_SizeInMM);
 

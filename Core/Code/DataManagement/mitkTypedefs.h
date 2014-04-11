@@ -39,8 +39,6 @@ typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
 typedef vnl_quaternion<ScalarType> Quaternion;
 
-typedef itk::NumericTraits<mitk::ScalarType> ScalarTypeNumericTraits;
-
 }
 
 #endif /* MITKTYPEDEFS_H_ */

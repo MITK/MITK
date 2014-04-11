@@ -49,8 +49,8 @@ mitk::Geometry2D::SetIndexToWorldTransform(
   m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
   m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
 
-  assert(m_ScaleFactorMMPerUnitX<ScalarTypeNumericTraits::infinity());
-  assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
+  assert(m_ScaleFactorMMPerUnitX<itk::NumericTraits<mitk::ScalarType>::infinity());
+  assert(m_ScaleFactorMMPerUnitY<itk::NumericTraits<mitk::ScalarType>::infinity());
 }
 
 
@@ -62,8 +62,8 @@ mitk::Geometry2D::SetExtentInMM(int direction, ScalarType extentInMM)
   m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
   m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
 
-  assert(m_ScaleFactorMMPerUnitX<ScalarTypeNumericTraits::infinity());
-  assert(m_ScaleFactorMMPerUnitY<ScalarTypeNumericTraits::infinity());
+  assert(m_ScaleFactorMMPerUnitX<itk::NumericTraits<mitk::ScalarType>::infinity());
+  assert(m_ScaleFactorMMPerUnitY<itk::NumericTraits<mitk::ScalarType>::infinity());
 }
 
 

@@ -205,7 +205,7 @@ void QmitkSliceWidget::InitWidget(
     mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(
         GetRenderer(), NULL);
 
-    if (timebounds[1] < mitk::ScalarTypeNumericTraits::max())
+    if (timebounds[1] <  itk::NumericTraits<mitk::ScalarType>::max())
     {
       mitk::ScalarType duration = timebounds[1] - timebounds[0];
 

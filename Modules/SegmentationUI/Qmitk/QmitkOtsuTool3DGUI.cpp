@@ -105,7 +105,9 @@ void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
 
 void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
 {
-  if( m_NumberOfRegions == m_Controls.m_Spinbox->value() )
+  if( m_NumberOfRegions == m_Controls.m_Spinbox->value() &&
+    m_UseValleyEmphasis == m_Controls.m_ValleyCheckbox->isChecked() &&
+    m_NumberOfBins == m_Controls.m_BinsSpinBox->value() )
     return;
 
   if (m_OtsuTool3DTool.IsNotNull())
@@ -113,6 +115,8 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
     try
     {
       m_NumberOfRegions = m_Controls.m_Spinbox->value();
+      m_UseValleyEmphasis = m_Controls.m_ValleyCheckbox->isChecked();
+      m_NumberOfBins = m_Controls.m_BinsSpinBox->value();
       int proceed;
 
       QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::Ok | QMessageBox::Cancel);
@@ -122,7 +126,7 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
         if (proceed != QMessageBox::Ok) return;
       }
       this->setCursor(Qt::WaitCursor);
-      m_OtsuTool3DTool->RunSegmentation( m_NumberOfRegions );
+      m_OtsuTool3DTool->RunSegmentation( m_NumberOfRegions, m_UseValleyEmphasis, m_NumberOfBins );
       this->setCursor(Qt::ArrowCursor);
     }
     catch( ... )

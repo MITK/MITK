@@ -37,13 +37,13 @@ QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
   if (!QString(MITK_REVISION_DESC).isEmpty())
     revisionText += QString("\nDescription: %1").arg(MITK_REVISION_DESC);
 
-  m_GUI.m_RevisionLabel->setText(revisionText);
+  QString mitkDiffusionVersion("MITK Diffusion 2014.03\n based on MITK 2014.03.00");
+  QString mitkDiffusionCaption("MITK Diffusion");
+
+  m_GUI.m_CaptionLabel->setText(mitkDiffusionCaption);
+  m_GUI.m_RevisionLabel->setText(mitkDiffusionVersion);
   m_GUI.m_ToolkitVersionsLabel->setText(QString("ITK %1, VTK %2, Qt %3").arg(itkVersion, vtkVersion, QT_VERSION_STR));
 
-  QPushButton* btnModules = new QPushButton(QIcon(":/qmitk/ModuleView.png"), "Modules");
-  m_GUI.m_ButtonBox->addButton(btnModules, QDialogButtonBox::ActionRole);
-
-  connect(btnModules, SIGNAL(clicked()), this, SLOT(ShowModules()));
   connect(m_GUI.m_ButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 

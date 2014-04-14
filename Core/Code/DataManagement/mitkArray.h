@@ -1,22 +1,24 @@
 /*
- * mitkTypeConversions.h
+ * mitkArray.h
  *
  *  Created on: Nov 11, 2013
  *      Author: wirkert
  */
 
-#ifndef MITKTYPECONVERSIONS_H_
-#define MITKTYPECONVERSIONS_H_
+#ifndef MITKARRAY_H_
+#define MITKARRAY_H_
 
+#include <itkFixedArray.h>
 
 #include "mitkConstants.h"
+#include "mitkEqual.h"
 
 
 namespace mitk {
 
 
   /**
-   *  Now methods to copy from and into ArrayTypes.
+   *  Methods to copy from itk::FixedArray s (like mitk::Vector and mitk::Point) into ArrayTypes and vice versa.
    *  ArrayTypes here are all types who implement operator[].
    *  The two templated methods were made free floating so you may specialize them
    *  for your concrete type.
@@ -92,7 +94,48 @@ namespace mitk {
     return result;
   }
 
+
+  // The FillVector3D and FillVector4D methods are implemented for all common array types here
+
+  template <class Tout>
+  inline void FillVector3D(Tout& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
+  {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+  }
+
+  template <class Tout>
+  inline void FillVector4D(Tout& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
+  {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    out[3] = t;
+  }
+
+
+
+  /**
+   * Compares two ArrayTypes of size size.
+   * ArrayTypes are all Objects/Types who have a [] operator. Pay attention not to set size higher
+   * than the actual size of the ArrayType. For POD arrays like float array[4] this will lead to unexpected results.
+   */
+  template <typename TArrayType1, typename TArrayType2>
+    inline bool EqualArray(TArrayType1& arrayType1, TArrayType2& arrayType2, int size, ScalarType eps = mitk::eps, bool verbose = false)
+  {
+    bool isEqual = true;
+    for (int var = 0; var < size; ++var)
+    {
+      isEqual = isEqual && Equal(arrayType1[var], arrayType2[var], eps);
+    }
+
+    ConditionalOutputOfDifference(arrayType1, arrayType2, eps, verbose, isEqual);
+
+    return isEqual;
+  }
+
 }
 
 
-#endif /* MITKTYPECONVERSIONS_H_ */
+#endif /* MITKARRAY_H_ */

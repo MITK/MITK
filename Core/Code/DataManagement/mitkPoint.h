@@ -20,8 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <itkPoint.h>
-#include "mitkConstants.h"
 
+#include "mitkConstants.h"
+#include "mitkArray.h"
+#include "mitkEqual.h"
 
 namespace mitk {
 
@@ -102,22 +104,35 @@ namespace mitk {
   typedef Point<int,2> Point2I;
   typedef Point<int,3> Point3I;
   typedef Point<int,4> Point4I;
-/**
-  inline void FillVector3D(Point<mitk::ScalarType, 3>& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
-  {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
-  }
 
-  inline void FillVector4D(Point<mitk::ScalarType, 4>& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
+
+  /**
+   * @ingroup MITKTestingAPI
+   *
+   * @param point1 Point to compare.
+   * @param point2 Point to compare.
+   * @param eps Tolerance for floating point comparison.
+   * @param verbose Flag indicating detailed console output.
+   * @return True if points are equal.
+   */
+  template <typename TCoordRep, unsigned int NPointDimension>
+    inline bool Equal(const itk::Point<TCoordRep, NPointDimension>& point1, const itk::Point<TCoordRep, NPointDimension>& point2, TCoordRep eps=mitk::eps, bool verbose=false)
   {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
-    out[4] = t;
+    bool isEqual = true;
+    typename itk::Point<TCoordRep, NPointDimension>::VectorType diff = point1-point2;
+    for (unsigned int i=0; i<NPointDimension; i++)
+    {
+      if (DifferenceBiggerOrEqualEps(diff[i], eps))
+      {
+        isEqual = false;
+        break;
+      }
+    }
+
+    ConditionalOutputOfDifference(point1, point2, eps, verbose, isEqual);
+
+    return isEqual;
   }
-  */
 
 
 

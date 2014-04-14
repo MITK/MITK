@@ -8,6 +8,7 @@
 #ifndef MITKEQUAL_H_
 #define MITKEQUAL_H_
 
+#include <iomanip>
 
 #include "mitkConstants.h"
 #include "mitkLogMacros.h"

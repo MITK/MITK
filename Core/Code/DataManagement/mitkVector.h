@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_vector.h>
 
 #include "mitkConstants.h"
-#include "mitkTypeConversions.h"
+#include "mitkArray.h"
+#include "mitkEqual.h"
 #include "mitkExceptionMacro.h"
 
 namespace mitk
@@ -157,70 +158,91 @@ namespace mitk
   typedef vnl_vector<ScalarType> VnlVector;
   typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
-  // The FillVector3D and FillVector4D methods are implemented for all common vector types here
-  // (mitk::Vector, vnl_vector and vnl_vector_ref)
+  // The equal methods to compare vectors for equality are below:
 
-  template <class Tout>
-  inline void FillVector3D(Tout& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
+  /**
+   * @ingroup MITKTestingAPI
+   *
+   * @param vector1 Vector to compare.
+   * @param vector2 Vector to compare.
+   * @param eps Tolerance for floating point comparison.
+   * @param verbose Flag indicating detailed console output.
+   * @return True if vectors are equal.
+   */
+  template <typename TCoordRep, unsigned int NPointDimension>
+  inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps, bool verbose=false)
   {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
+    bool isEqual = true;
+    typename itk::Vector<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
+    for (unsigned int i=0; i<NPointDimension; i++)
+    {
+      if (DifferenceBiggerOrEqualEps(diff[i], eps))
+      {
+        isEqual = false;
+        break;
+      }
+    }
+
+    ConditionalOutputOfDifference(vector1, vector2, eps, verbose, isEqual);
+
+    return isEqual;
   }
 
-  template <class Tout>
-  inline void FillVector4D(Tout& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
+  /**
+   * @ingroup MITKTestingAPI
+   *
+   * @param vector1 Vector to compare.
+   * @param vector2 Vector to compare.
+   * @param eps Tolerance for floating point comparison.
+   * @param verbose Flag indicating detailed console output.
+   * @return True if vectors are equal.
+   */
+  inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2, ScalarType eps=mitk::eps, bool verbose=false)
   {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
-    out[3] = t;
+    bool isEqual = true;
+    mitk::VnlVector diff = vector1-vector2;
+    for (unsigned int i=0; i<diff.size(); i++)
+    {
+      if (DifferenceBiggerOrEqualEps(diff[i], eps))
+      {
+        isEqual = false;
+        break;
+      }
+    }
+
+    ConditionalOutputOfDifference(vector1, vector2, eps, verbose, isEqual);
+
+    return isEqual;
   }
 
-/*
-  inline void FillVector3D(Vector<mitk::ScalarType, 3>& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
+
+  /**
+   * @ingroup MITKTestingAPI
+   *
+   * @param vector1 Vector to compare.
+   * @param vector2 Vector to compare.
+   * @param eps Tolerance for floating point comparison.
+   * @param verbose Flag indicating detailed console output.
+   * @return True if vectors are equal.
+   */
+  template <typename TCoordRep, unsigned int NPointDimension>
+    inline bool Equal(const vnl_vector_fixed<TCoordRep, NPointDimension> & vector1, const vnl_vector_fixed<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps, bool verbose=false)
   {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
+    vnl_vector_fixed<TCoordRep, NPointDimension> diff = vector1-vector2;
+    bool isEqual = true;
+    for( unsigned int i=0; i<diff.size(); i++)
+    {
+      if (DifferenceBiggerOrEqualEps(diff[i], eps))
+      {
+        isEqual = false;
+        break;
+      }
+    }
+
+    ConditionalOutputOfDifference(vector1, vector2, eps, verbose, isEqual);
+
+    return isEqual;
   }
-
-  inline void FillVector4D(Vector<mitk::ScalarType, 4>& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
-  {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
-    out[4] = t;
-  }
-
-  inline void FillVector3D(VnlVector& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
-  {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
-  }
-
-  inline void FillVector4D(VnlVector& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
-  {
-    FillVector3D(out, x, y, z);
-    out[4] = t;
-  }
-
-  inline void FillVector3D(VnlVectorRef& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
-  {
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
-  }
-
-  inline void FillVector4D(VnlVectorRef& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
-  {
-    FillVector3D(out, x, y, z);
-    out[4] = t;
-  }
-  */
-
-
 
 
 } // end namespace mitk

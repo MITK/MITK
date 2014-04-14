@@ -19,26 +19,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKVECTOR_H_HEADER_INCLUDED_C1EBD0AD
 
 
-#include <mitkLogMacros.h>
-
-#include <itkPoint.h>
-#include <float.h>
-#include <itkIndex.h>
-#include <itkContinuousIndex.h>
-#include <itkVector.h>
-#include <itkMatrix.h>
-#include <itkTransform.h>
-#include <vnl/vnl_quaternion.h>
-
-
 #include "mitkConstants.h"
 #include "mitkQuaternion.h"
-#include "mitkPoint.h" // TODO SW: should not be included here, maybe generate one "general datatype include" like mitkPrimitives.h
+#include "mitkPoint.h"
 #include "mitkVector.h"
 #include "mitkMatrix.h"
 #include "mitkEqual.h"
 
-#include "mitkOldTypeConversions.h"
+
+// this include hold the old deprecated ways to convert from itk 2 vtk and the likes.
+#include "mitkVectorDeprecated.h"
 
 
 /*

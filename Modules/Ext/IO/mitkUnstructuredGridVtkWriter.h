@@ -145,7 +145,7 @@ protected:
     bool m_Success;
 };
 
-#ifndef MitkExt_EXPORTS
+#if defined(BUILD_SHARED_LIBS) && !defined(MitkExt_EXPORTS)
 extern template class UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
 extern template class UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
 extern template class UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>;

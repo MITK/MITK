@@ -193,7 +193,7 @@ protected:
     bool m_WriterWriteHasReturnValue;
 };
 
-#ifndef MitkCore_EXPORTS
+#if defined(BUILD_SHARED_LIBS) && !defined(MitkCore_EXPORTS)
 extern template class SurfaceVtkWriter<vtkSTLWriter>;
 extern template class SurfaceVtkWriter<vtkPolyDataWriter>;
 extern template class SurfaceVtkWriter<vtkXMLPolyDataWriter>;

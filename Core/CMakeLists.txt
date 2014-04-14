@@ -4,6 +4,7 @@
 
 set(US_ENABLE_AUTOLOADING_SUPPORT ON)
 set(US_ENABLE_THREADING_SUPPORT ON)
+set(US_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS} CACHE BOOL "Toggle microservices build shared libraries flag." FORCE)
 
 # Don't create a "doc" target and don't install the documentation files
 set(US_NO_DOCUMENTATION ON)

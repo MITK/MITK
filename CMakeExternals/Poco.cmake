@@ -13,6 +13,11 @@ if(MITK_USE_Poco)
   set(proj_DEPENDENCIES )
   set(${proj}_DEPENDS ${proj})
 
+  set(POCO_STATIC 1)
+  if(${BUILD_SHARED_LIBS})
+    set(POCO_STATIC 0)
+  endif()
+
   if(NOT DEFINED ${proj}_DIR)
 
     set(patch_cmd ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/PatchPoco-1.5.2-rc3.cmake)
@@ -28,6 +33,7 @@ if(MITK_USE_Poco)
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
+        -DPOCO_STATIC:BOOL=${POCO_STATIC}
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DCMAKE_INSTALL_NAME_DIR:STRING=<INSTALL_DIR>/lib
         -DCMAKE_INSTALL_RPATH:STRING=<INSTALL_DIR>/lib

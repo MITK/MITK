@@ -110,6 +110,9 @@ if(MITK_USE_QT)
     set(MITK_USE_Qwt 1)
     set(MITK_USE_Qxt 1) #TODO: Check how Qxt builds with Qt 5
   endif()
+else()
+  set(MITK_USE_Qwt 0)
+  set(MITK_USE_Qxt 0)
 endif()
 
 if(MITK_USE_SOFA)
@@ -191,7 +194,7 @@ endif()
 set(ep_common_args
   -DBUILD_TESTING:BOOL=${ep_build_testing}
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
-  -DBUILD_SHARED_LIBS:BOOL=ON
+  -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
   -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
@@ -223,6 +226,45 @@ if(APPLE)
         ${MAC_OSX_ARCHITECTURE_ARGS}
         ${ep_common_args}
   )
+endif()
+
+#------------------------------------------------------------------------------------------------------------
+# If MITK is not built with shared libraries switch off external projects that cannot be built staticaly
+#------------------------------------------------------------------------------------------------------------
+
+if(NOT ${BUILD_SHARED_LIBS})
+  if(${BUILD_TESTING})
+    set(BUILD_TESTING 0 CACHE BOOL "Test the project" FORCE)
+    message("Test drivers cannot be built statically. Forcing BUILD_TESTING to OFF.")
+  endif()
+  if(${MITK_USE_QT})
+    message("Qt cannot be built statically. Forcing MITK_USE_QT to OFF.")
+    set(MITK_USE_QT 0 CACHE BOOL "Use Nokia's Qt library" FORCE)
+  endif()
+  if(${MITK_USE_Qwt})
+    message("Qwt cannot be built statically. Forcing MITK_USE_Qwt to OFF.")
+    set(MITK_USE_Qwt 0)
+  endif()
+  if(${MITK_USE_Qxt})
+    message("Qxt cannot be built statically. Forcing MITK_USE_Qxt to OFF.")
+    set(MITK_USE_Qxt 0)
+  endif()
+  if(${MITK_USE_BLUEBERRY})
+    message("BlueBerry cannot be built statically. Forcing MITK_USE_BLUEBERRY to OFF.")
+    set(MITK_USE_BLUEBERRY 0 CACHE BOOL "Build the BlueBerry platform" FORCE)
+  endif()
+  if(${MITK_USE_CTK})
+    message("CTK cannot be built statically. Forcing MITK_USE_CTK to OFF.")
+    set(MITK_USE_CTK 0 CACHE BOOL "Use CTK in MITK" FORCE)
+  endif()
+  if(${MITK_USE_Python})
+    message("Python cannot be built statically. Forcing MITK_USE_Python to OFF.")
+    set(MITK_USE_Python 0 CACHE BOOL "Use Python wrapping in MITK" FORCE)
+  endif()
+  if(${MITK_USE_SOFA})
+    message("SOFA cannot be built statically. Forcing MITK_USE_SOFA to OFF.")
+    set(MITK_USE_SOFA 0 CACHE BOOL "Use Simulation Open Framework Architecture" FORCE)
+  endif()
 endif()
 
 # Include external projects
@@ -257,6 +299,8 @@ set(mitk_cmake_boolean_args
   MITK_USE_SOFA
   MITK_USE_Python
   MITK_USE_OpenCL
+  MITK_USE_Qwt
+  MITK_USE_Qxt
 
   MITK_ENABLE_PIC_READER
   )

@@ -45,9 +45,52 @@ namespace mitk {
   typedef itk::FixedArray<ScalarType, 3> FixedArrayType;
 
   //##Documentation
-  //## @brief BaseGeometry xxxxxxxxxxxxxx
+  //## @brief BaseGeometry Describes the geometry of a data object
   //##
-  //## xxxxxxxxxxx
+  //## The class holds
+  //## \li a bounding box which is axes-parallel in intrinsic coordinates
+  //## (often integer indices of pixels), to be accessed by
+  //## GetBoundingBox()
+  //## \li a transform to convert intrinsic coordinates into a
+  //## world-coordinate system with coordinates in millimeters
+  //## and milliseconds (all are floating point values), to
+  //## be accessed by GetIndexToWorldTransform()
+  //## \li a life span, i.e. a bounding box in time in ms (with
+  //## start and end time), to be accessed by GetTimeBounds().
+  //## The default is minus infinity to plus infinity.
+  //## \li an origin and spacing to define the geometry
+  //##
+  //## BaseGeometry and its sub-classes allow converting between
+  //## intrinsic coordinates (called index or unit coordinates)
+  //## and world-coordinates (called world or mm coordinates),
+  //## e.g. WorldToIndex.
+  //## In case you need integer index coordinates, provide an
+  //## mitk::Index3D (or itk::Index) as target variable to
+  //## WorldToIndex, otherwise you will get a continuous index
+  //## (floating point values).
+  //##
+  //## An important sub-class is SlicedGeometry3D, which descibes
+  //## data objects consisting of slices, e.g., objects of type Image.
+  //## Conversions between world coordinates (in mm) and unit coordinates
+  //## (e.g., pixels in the case of an Image) can be performed.
+  //##
+  //## For more information on related classes, see \ref Geometry.
+  //##
+  //## BaseGeometry instances referring to an Image need a slightly
+  //## different definition of corners, see SetImageGeometry. This
+  //## is usualy automatically called by Image.
+  //##
+  //## BaseGeometry have to be initialized in the method GenerateOutputInformation()
+  //## of BaseProcess (or CopyInformation/ UpdateOutputInformation of BaseData,
+  //## if possible, e.g., by analyzing pic tags in Image) subclasses. See also
+  //## itk::ProcessObject::GenerateOutputInformation(),
+  //## itk::DataObject::CopyInformation() and
+  //## itk::DataObject::UpdateOutputInformation().
+  //##
+  //## At least, it can return the bounding box of the data object.
+  //##
+  //## The BaseGeometry class is an abstract class. The most simple implementation
+  //## is the sublass Geometry3D.
   //##
   //## Rule: everything is in mm (ms) if not stated otherwise.
   //## @ingroup Geometry
@@ -69,9 +112,6 @@ namespace mitk {
     virtual itk::LightObject::Pointer InternalClone() const =0;
 
     // ********************************** TypeDef **********************************
-
-    typedef itk::QuaternionRigidTransform< ScalarType > QuaternionTransformType;
-    typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;
 
     typedef itk::ScalableAffineTransform<ScalarType, 3>    TransformType;
     typedef itk::BoundingBox<unsigned long, 3, ScalarType> BoundingBoxType;
@@ -95,7 +135,9 @@ namespace mitk {
     itkGetConstReferenceMacro(Spacing, mitk::Vector3D);
 
     //##Documentation
-    //## @brief Set the spacing (m_Spacing)
+    //## @brief Set the spacing (m_Spacing).
+    //##
+    //##The spacing is also changed in the IndexToWorldTransform.
     void SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
     //##Documentation
@@ -118,13 +160,15 @@ namespace mitk {
     itkGetConstMacro(IndexToWorldTransformLastModified, unsigned long);
 
     //##Documentation
-    //## @brief Is this Geometry3D in a state that is valid?
+    //## @brief Is this BaseGeometry in a state that is valid?
+    //##
+    //## This function returns always true in the BaseGeometry class. Other implementations are possible in subclasses.
     virtual bool IsValid() const;
 
     // ********************************** Initialize **********************************
 
     //##Documentation
-    //## @brief Initialize the Geometry3D
+    //## @brief Initialize the BaseGeometry
     void Initialize();
 
     void InitializeGeometry(Self * newGeometry) const;
@@ -139,19 +183,22 @@ namespace mitk {
     itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
 #endif
     //## @brief Set the transformation used to convert from index
-    //## to world coordinates
+    //## to world coordinates. The spacing of the new transform is
+    //## copied to m_spacing.
     void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
     //##Documentation
     //## @brief Convenience method for setting the ITK transform
-    //## (m_IndexToWorldTransform) via an vtkMatrix4x4
+    //## (m_IndexToWorldTransform) via an vtkMatrix4x4.The spacing of
+    //## the new transform is copied to m_spacing.
     //## \sa SetIndexToWorldTransform
     virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
 
-    /** Set/Get the IndexToWorldTransform */
+    //## Get the IndexToWorldTransform
     itkGetConstObjectMacro(IndexToWorldTransform, AffineTransform3D);
     itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
 
+    //## Get the Vtk Matrix which describes the transform.
     vtkMatrix4x4* GetVtkMatrix();
 
     //##Documentation
@@ -159,7 +206,7 @@ namespace mitk {
     vtkLinearTransform* GetVtkTransform() const;
 
     //##Documentation
-    //## @brief Set the transform to identity and origin to 0
+    //## @brief Set the transform to identity, the spacing to 1 and origin to 0
     //##
     virtual void SetIdentity();
 
@@ -176,6 +223,7 @@ namespace mitk {
     //## then other is post-composed with self; that is the resulting
     //## transformation consists of first applying self to the source,
     //## followed by other.
+    //## This method also changes m_spacing.
     void Compose( const BaseGeometry::TransformType * other, bool pre = 0 );
 
     //##Documentation
@@ -295,7 +343,7 @@ namespace mitk {
     //## via an itk::Image. ITK v3.8 and older did not support rotated (tilted)
     //## images, i.e., ITK images are always parallel to the coordinate axes.
     //## When accessing a (possibly rotated) mitk::Image via an itk::Image
-    //## the rotational part of the transformation in the Geometry3D is
+    //## the rotational part of the transformation in the BaseGeometry is
     //## simply discarded; in other word: only the origin and spacing is
     //## used by ITK, not the complete matrix available in MITK.
     //## With WorldToItkPhysicalPoint you can convert an MITK world
@@ -452,7 +500,6 @@ namespace mitk {
       return IsIndexInside(pt_index);
     }
 
-
     // ********************************* Image Geometry ********************************
     //##Documentation
     //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
@@ -464,7 +511,7 @@ namespace mitk {
     //## For more information, see SetImageGeometry
     itkGetConstMacro(ImageGeometry, bool);
     //##Documentation
-    //## @brief Define that this Geometry3D is refering to an Image
+    //## @brief Define that this BaseGeometry is refering to an Image
     //##
     //## A geometry referring to an Image needs a slightly different
     //## definition of the position of the corners (see GetCornerPoint).
@@ -511,11 +558,14 @@ namespace mitk {
 
     static const std::string GetTransformAsString( TransformType* transformType );
 
+    //##Documentation
+    //## @brief Pre- and Post-functions are empty in BaseGeometry
+    //##
+    //## These virtual functions allow for a different beahiour in subclasses.
     virtual void PreSetBounds(const BoundsArrayType& bounds);
 
     virtual void PostInitialize();
     virtual void PostInitializeGeometry(Self * newGeometry) const;
-
 
     virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
 
@@ -535,11 +585,19 @@ namespace mitk {
 
   private:
     // ********************************** Variables **********************************
-
+    //##Documentation
+    //## @brief Spacing, measurement of the resolution
+    //##
     mitk::Vector3D m_Spacing;
 
+    //##Documentation
+    //## @brief Index to World Transform, contains a transformation matrix to convert
+    //## points from indes coordinates to world coordinates (mm). The Spacing is included in this variable.
     AffineTransform3D::Pointer m_IndexToWorldTransform;
 
+    //##Documentation
+    //## @brief Bounding Box, which is axes-parallel in intrinsic coordinates
+    //## (often integer indices of pixels)
     BoundingBoxPointer m_BoundingBox;
 
     vtkMatrixToLinearTransform* m_VtkIndexToWorldTransform;
@@ -563,7 +621,6 @@ namespace mitk {
 
     bool m_ImageGeometry;
 
-    //    DEPRECATED(VnlQuaternionType m_RotationQuaternion);
   };
 
   // ********************************** Equal Functions **********************************

@@ -88,7 +88,6 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
         itkWarningMacro(<<"Error on write: TimeGeometry invalid of unstructured grid " << filename << ".");
         filename <<  m_FileName.c_str() << "_T" << t << GetDefaultExtension();
       }
-      //???xxx??? geometry->TransferItkToVtkTransform();
       transformPointSet->SetInputData(input->GetVtkUnstructuredGrid(t));
       transformPointSet->SetTransform(geometry->GetVtkTransform());
       transformPointSet->UpdateWholeExtent();
@@ -103,7 +102,6 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
   else
   {
     geometry = input->GetGeometry();
-    //???xxx??? geometry->TransferItkToVtkTransform();
     transformPointSet->SetInputData(input->GetVtkUnstructuredGrid());
     transformPointSet->SetTransform(geometry->GetVtkTransform());
     transformPointSet->UpdateWholeExtent();

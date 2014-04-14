@@ -14,15 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//******************************* form Geometry2D **************
 
   /**
-  * \brief Describes the geometry of a two-dimensional object
+  * \brief Describes the geometry of a plane object
   *
   * Describes a two-dimensional manifold, i.e., to put it simply,
   * an object that can be described using a 2D coordinate-system.
   *
-  * Geometry2D can map points between 3D world coordinates
+  * PlaneGeometry can map points between 3D world coordinates
   * (in mm) and the described 2D coordinate-system (in mm) by first projecting
   * the 3D point onto the 2D manifold and then calculating the 2D-coordinates
   * (in mm). These 2D-mm-coordinates can be further converted into
@@ -31,26 +30,23 @@ See LICENSE.txt or http://www.mitk.org for details.
   * (e.g., [0,0]..[width, height]), which is the bounding box (bounding range
   * in z-direction always [0]..[1]).
   *
-  * A Geometry2D describes the 2D representation within a 3D object and is
-  * therefore itself a Geometry3D (derived from Geometry3D). For example,
+  * A PlaneGeometry describes the 2D representation within a 3D object and is
+  * therefore itself a Geometry3D (derived from BaseGeometry). For example,
   * a single CT-image (slice) is 2D in the sense that you can access the
   * pixels using 2D-coordinates, but is also 3D, as the pixels are really
   * voxels, thus have an extension (thickness) in the 3rd dimension.
   *
-  * Most often, instances of Geometry2D will be used to descibe a plane,
-  * which is represented by the sub-class PlaneGeometry, but curved
-  * surfaces are also possible.
   *
-  * Optionally, a reference Geometry3D can be specified, which usually would
+  * Optionally, a reference BaseGeometry can be specified, which usually would
   * be the geometry associated with the underlying dataset. This is currently
   * used for calculating the intersection of inclined / rotated planes
-  * (represented as Geometry2D) with the bounding box of the associated
-  * Geometry3D.
+  * (represented as PlaneGeometry) with the bounding box of the associated
+  * BaseGeometry.
   *
-  * \warning The Geometry2Ds are not necessarily up-to-date and not even
+  * \warning The PlaneGeometry are not necessarily up-to-date and not even
   * initialized. As described in the previous paragraph, one of the
   * Generate-/Copy-/UpdateOutputInformation methods have to initialize it.
-  * mitk::BaseData::GetGeometry2D() makes sure, that the Geometry2D is
+  * mitk::BaseData::GetGeometry2D() makes sure, that the PlaneGeometry is
   * up-to-date before returning it (by setting the update extent appropriately
   * and calling UpdateOutputInformation).
   *
@@ -131,7 +127,7 @@ namespace mitk {
 
     /**
     * \brief Initialize a plane with orientation \a planeorientation
-    * (default: axial) with respect to \a geometry3D (default: identity).
+    * (default: axial) with respect to \a BaseGeometry (default: identity).
     * Spacing also taken from \a geometry3D.
     *
     * \warning A former version of this method created a geometry with unit
@@ -152,8 +148,8 @@ namespace mitk {
 
     /**
     * \brief Initialize a plane with orientation \a planeorientation
-    * (default: axial) with respect to \a geometry3D (default: identity).
-    * Spacing also taken from \a geometry3D.
+    * (default: axial) with respect to \a BaseGeometry (default: identity).
+    * Spacing also taken from \a BaseGeometry.
     *
     * \param top if \a true, create plane at top, otherwise at bottom
     * (for PlaneOrientation Axial, for other plane locations respectively)
@@ -266,6 +262,10 @@ namespace mitk {
 
     virtual ScalarType SignedDistance( const Point3D& pt3d_mm ) const;
 
+    /**
+    * \brief Calculates, whether a point is below or above the plane. There are two different
+    *calculation methods, with or without consideration of the bounding box.
+    */
     virtual bool IsAbove( const Point3D& pt3d_mm , bool considerBoundingBox=false) const;
 
     /**
@@ -408,8 +408,6 @@ namespace mitk {
     /** Implements operation to re-orient the plane */
     virtual void ExecuteOperation( Operation *operation );
 
-    //******************************** functions from Geometry2D **********************
-
         /**
     * \brief Project a 3D point given in mm (\a pt3d_mm) onto the 2D
     * geometry. The result is a 2D point in mm (\a pt2d_mm).
@@ -538,7 +536,6 @@ namespace mitk {
 
     virtual void PreSetIndexToWorldTransform( AffineTransform3D *transform);
 
-    //******************** from Geometry2D *********************
     virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
 
     virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);

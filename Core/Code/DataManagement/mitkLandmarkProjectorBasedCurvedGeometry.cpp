@@ -19,12 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkAbstractTransform.h>
 
 mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry()
-  : m_LandmarkProjector(NULL), m_InterpolatingAbstractTransform(NULL)
+  : m_LandmarkProjector(NULL), m_InterpolatingAbstractTransform(NULL), m_TargetLandmarks(NULL)
 {
 }
 
 mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry(const mitk::LandmarkProjectorBasedCurvedGeometry& other) : Superclass(other)
 {
+  SetTargetLandmarks(other.m_TargetLandmarks);
   this->SetLandmarkProjector(other.m_LandmarkProjector);
   this->ComputeGeometry();
 }

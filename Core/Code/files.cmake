@@ -157,7 +157,6 @@ set(CPP_FILES
   DataManagement/mitkImageDescriptor.cpp
   DataManagement/mitkImageVtkAccessor.cpp
   DataManagement/mitkImageStatisticsHolder.cpp
-  DataManagement/mitkLandmarkBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp
   DataManagement/mitkLevelWindow.cpp

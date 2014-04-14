@@ -277,7 +277,6 @@ void QmitkInteractiveTransformationWidget::OnResetGeometry()
   qApp->processEvents();
 
   // reset the input to its initial state.
-  //???xxx??? m_ResetGeometry->TransferItkToVtkTransform();
   m_Geometry->SetIdentity();
   m_Geometry->Compose(m_ResetGeometry->GetVtkTransform()->GetMatrix());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

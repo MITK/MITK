@@ -55,7 +55,6 @@ namespace mitk {
     Point(const TPointValueType & v):itk::Point<TCoordRep, NPointDimension>(v) {}
 
 
-
     Point<TCoordRep, NPointDimension>(const mitk::Point<TCoordRep, NPointDimension>& r) : itk::Point<TCoordRep, NPointDimension>(r) {}
     Point<TCoordRep, NPointDimension>(const TCoordRep r[NPointDimension]):itk::Point<TCoordRep, NPointDimension>(r) {}
     Point<TCoordRep, NPointDimension>(const TCoordRep & v):itk::Point<TCoordRep, NPointDimension>(v) {}
@@ -103,6 +102,24 @@ namespace mitk {
   typedef Point<int,2> Point2I;
   typedef Point<int,3> Point3I;
   typedef Point<int,4> Point4I;
+/**
+  inline void FillVector3D(Point<mitk::ScalarType, 3>& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
+  {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+  }
+
+  inline void FillVector4D(Point<mitk::ScalarType, 4>& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
+  {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    out[4] = t;
+  }
+  */
+
+
 
 } // namespace mitk
 

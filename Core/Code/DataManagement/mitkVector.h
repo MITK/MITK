@@ -148,6 +148,7 @@ namespace mitk
   }; // end mitk::Vector
 
   // convenience typedefs for often used mitk::Vector representations.
+
   typedef Vector<ScalarType,2> Vector2D;
   typedef Vector<ScalarType,3> Vector3D;
   typedef Vector<ScalarType,4> Vector4D;
@@ -155,6 +156,72 @@ namespace mitk
   // other vector types used in MITK
   typedef vnl_vector<ScalarType> VnlVector;
   typedef vnl_vector_ref<ScalarType> VnlVectorRef;
+
+  // The FillVector3D and FillVector4D methods are implemented for all common vector types here
+  // (mitk::Vector, vnl_vector and vnl_vector_ref)
+
+  template <class Tout>
+  inline void FillVector3D(Tout& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
+  {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+  }
+
+  template <class Tout>
+  inline void FillVector4D(Tout& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
+  {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    out[3] = t;
+  }
+
+/*
+  inline void FillVector3D(Vector<mitk::ScalarType, 3>& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
+  {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+  }
+
+  inline void FillVector4D(Vector<mitk::ScalarType, 4>& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
+  {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+    out[4] = t;
+  }
+
+  inline void FillVector3D(VnlVector& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
+  {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+  }
+
+  inline void FillVector4D(VnlVector& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
+  {
+    FillVector3D(out, x, y, z);
+    out[4] = t;
+  }
+
+  inline void FillVector3D(VnlVectorRef& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
+  {
+    out[0] = x;
+    out[1] = y;
+    out[2] = z;
+  }
+
+  inline void FillVector4D(VnlVectorRef& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
+  {
+    FillVector3D(out, x, y, z);
+    out[4] = t;
+  }
+  */
+
+
+
 
 } // end namespace mitk
 

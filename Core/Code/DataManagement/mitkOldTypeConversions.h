@@ -24,12 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVector.h"
 
 
-
-
-
-#include "mitkVector.h"
-
-
 template <class T> class VectorTraits {
 public:
   typedef T ValueType;
@@ -156,22 +150,6 @@ public:
 namespace mitk
 {
 
-
-  template <class Tout>
-  inline void FillVector3D(Tout& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
-  {
-    out[0] = (typename VectorTraits<Tout>::ValueType)x;
-    out[1] = (typename VectorTraits<Tout>::ValueType)y;
-    out[2] = (typename VectorTraits<Tout>::ValueType)z;
-  }
-  template <class Tout>
-  inline void FillVector4D(Tout& out, mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z, mitk::ScalarType t)
-  {
-    out[0] = (typename VectorTraits<Tout>::ValueType)x;
-    out[1] = (typename VectorTraits<Tout>::ValueType)y;
-    out[2] = (typename VectorTraits<Tout>::ValueType)z;
-    out[3] = (typename VectorTraits<Tout>::ValueType)t;
-  }
 
   template <class Tin, class Tout>
   inline void itk2vtk(const Tin& in, Tout& out)

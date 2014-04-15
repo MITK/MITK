@@ -119,7 +119,17 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     /** @brief This slot is called if the user cancels the creation of a new tool. */
     void OnAddSingleToolCanceled();
 
+  protected slots:
 
+   //help slots for enable/disable buttons
+   void DisableLoggingButtons();
+   void EnableLoggingButtons();
+   void DisableOptionsButtons();
+   void EnableOptionsButtons();
+   void EnableTrackingConfigurationButtons();
+   void DisableTrackingConfigurationButtons();
+   void EnableTrackingControls();
+   void DisableTrackingControls();
 
   protected:
 
@@ -141,8 +151,6 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     /** @brief reinits the view globally. */
     void GlobalReinit();
 
-
-
    //members for the filter pipeline
    mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource; ///> member for the source of the IGT pipeline
    mitk::TrackingDeviceData m_TrackingDeviceData; ///> stores the tracking device data as long as this is not handled by the tracking device configuration widget
@@ -152,13 +160,6 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    /** @brief This timer updates the IGT pipline and also the logging filter if logging is activated.*/
    QTimer* m_TrackingTimer;
 
-   //help methods for enable/disable buttons
-   void DisableLoggingButtons();
-   void EnableLoggingButtons();
-   void DisableOptionsButtons();
-   void EnableOptionsButtons();
-   void EnableTrackingConfigurationButtons();
-   void DisableTrackingConfigurationButtons();
    /** Replaces the current navigation tool storage which is stored in m_toolStorage.
     *  Basically handles the microservice stuff: unregisteres the old storage, then
     *  replaces the storage and registers the new one.

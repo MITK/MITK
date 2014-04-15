@@ -84,18 +84,25 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_ChooseFile, SIGNAL(clicked()), this, SLOT(OnChooseFileClicked()));
     connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
     connect( m_Controls->m_StopLogging, SIGNAL(clicked()), this, SLOT(StopLogging()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
     connect( m_Controls->m_VolumeSelectionBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(OnTrackingVolumeChanged(QString)));
     connect( m_Controls->m_ShowTrackingVolume, SIGNAL(clicked()), this, SLOT(OnShowTrackingVolumeChanged()));
     connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
     connect( m_Controls->m_ResetTools, SIGNAL(clicked()), this, SLOT(OnResetTools()));
-
     connect( m_Controls->m_AddSingleTool, SIGNAL(clicked()), this, SLOT(OnAddSingleTool()));
     connect( m_Controls->m_NavigationToolCreationWidget, SIGNAL(NavigationToolFinished()), this, SLOT(OnAddSingleToolFinished()));
     connect( m_Controls->m_NavigationToolCreationWidget, SIGNAL(Canceled()), this, SLOT(OnAddSingleToolCanceled()));
-
     connect( m_Controls->m_csvFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
     connect( m_Controls->m_xmlFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
+
+    //connections for the tracking device configuration widget
+    connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
+    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressStarted()), this, SLOT(DisableOptionsButtons()));
+    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressStarted()), this, SLOT(DisableTrackingConfigurationButtons()));
+    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressStarted()), this, SLOT(DisableTrackingControls()));
+    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableOptionsButtons()));
+    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableTrackingConfigurationButtons()));
+    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableTrackingControls()));
+
     //initialize widgets
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
     m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
@@ -790,6 +797,16 @@ void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
     m_Controls->m_UpdateRate->setEnabled(true);
     m_Controls->m_ShowToolQuaternions->setEnabled(true);
     m_Controls->m_OptionsUpdateRateLabel->setEnabled(true);
+}
+
+void QmitkMITKIGTTrackingToolboxView::EnableTrackingControls()
+{
+    m_Controls->m_TrackingControlsGroupBox->setEnabled(true);
+}
+
+void QmitkMITKIGTTrackingToolboxView::DisableTrackingControls()
+{
+    m_Controls->m_TrackingControlsGroupBox->setEnabled(false);
 }
 
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()

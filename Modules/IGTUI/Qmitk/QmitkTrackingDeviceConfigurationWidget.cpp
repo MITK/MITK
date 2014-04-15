@@ -258,15 +258,11 @@ void QmitkTrackingDeviceConfigurationWidget::EnableUserReset(bool enable)
 void QmitkTrackingDeviceConfigurationWidget::TestConnection()
 {
 this->setEnabled(false);
-
 //construct a tracking device:
 mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
-
 m_TestConnectionWorker->SetTrackingDevice(testTrackingDevice);
-
 m_TestConnectionWorkerThread->start();
-
-
+emit ProgressStarted();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::TestConnectionFinished(bool connected, QString output)
@@ -275,6 +271,7 @@ m_TestConnectionWorkerThread->quit();
 AddOutput(output.toStdString());
 MITK_INFO << "Test connection: " << connected;
 this->setEnabled(true);
+emit ProgressFinished();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::Finished()
@@ -309,6 +306,7 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPorts()
   this->setEnabled(false);
   AddOutput("<br>Scanning...");
   m_ScanPortsWorkerThread->start();
+  emit ProgressStarted();
   }
 
 void QmitkTrackingDeviceConfigurationWidget::AutoScanPortsFinished(int PolarisPort, int AuroraPort, QString result, int PortTypePolaris, int PortTypeAurora)
@@ -324,6 +322,7 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPortsFinished(int PolarisPo
   m_Controls->m_portSpinBoxAurora->setValue(AuroraPort);
   AddOutput(result.toStdString());
   this->setEnabled(true);
+  emit ProgressFinished();
   }
 
 void QmitkTrackingDeviceConfigurationWidget::SetMTCalibrationFileClicked()
@@ -535,6 +534,7 @@ void QmitkTrackingDeviceConfigurationWidgetConnectionWorker::TestConnectionThrea
 MITK_INFO << "Testing Connection!";
 QString output;
 bool connected = false;
+mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
 try
   {
   if (!m_TrackingDevice->IsDeviceInstalled())
@@ -547,14 +547,18 @@ try
     output = "<br>testing connection <br>  ...";
     m_TrackingDevice->OpenConnection();
     output += "OK";
+    mitk::ProgressBar::GetInstance()->Progress();
 
     //try start/stop tracking
     output += "<br>testing tracking <br>  ...";
     m_TrackingDevice->StartTracking();
+    mitk::ProgressBar::GetInstance()->Progress();
     m_TrackingDevice->StopTracking();
+    mitk::ProgressBar::GetInstance()->Progress();
 
     //try close connection
     m_TrackingDevice->CloseConnection();
+    mitk::ProgressBar::GetInstance()->Progress();
     output += "OK";
     connected = true;
     }
@@ -564,7 +568,7 @@ catch(mitk::IGTException &e)
   output += "ERROR!";
   MITK_WARN << "Error while testing connection / start tracking of the device: " << e.GetDescription();
   }
-
+mitk::ProgressBar::GetInstance()->Progress(4);
 emit ConnectionTested(connected,output);
 }
 

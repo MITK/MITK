@@ -115,6 +115,12 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     /* @brief This signal is sent if the tracking device was changed. */
     void TrackingDeviceSelectionChanged();
 
+    /* @brief This signal is sent if an internal thread (caused by an action of the user) was started. The widget is blocked until the progress ends.*/
+    void ProgressStarted();
+
+    /* @brief This signal is sent if a progress which was started before ends.*/
+    void ProgressFinished();
+
   protected:
 
     /// \brief Creation of the connections
@@ -216,7 +222,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 
 
 /**
- * TODO
+ * Worker thread class for test connection.
  */
 class QmitkTrackingDeviceConfigurationWidgetConnectionWorker : public QObject
 {
@@ -237,6 +243,9 @@ class QmitkTrackingDeviceConfigurationWidgetConnectionWorker : public QObject
     mitk::TrackingDevice::Pointer m_TrackingDevice;
 };
 
+/**
+ * Worker thread class for scan ports.
+ */
 class QmitkTrackingDeviceConfigurationWidgetScanPortsWorker : public QObject
 {
   Q_OBJECT

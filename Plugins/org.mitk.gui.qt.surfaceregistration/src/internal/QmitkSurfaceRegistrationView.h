@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class SurfaceRegistrationViewData;
 
 /**
-  * \brief Implemenation of a worker thred class.
+  * \brief Implemenation of a worker thread class.
   *
   *        Worker class that runs the registration
   *        in a seperate QThread to prevent the registration from blocking the

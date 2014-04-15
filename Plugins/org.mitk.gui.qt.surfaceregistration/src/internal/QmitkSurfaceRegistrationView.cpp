@@ -26,16 +26,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QThread>
 
+// MITK
 #include <mitkSurface.h>
 #include <mitkPointSet.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkAnisotropicIterativeClosestPointRegistration.h>
 #include <mitkCovarianceMatrixCalculator.h>
 #include <mitkAnisotropicRegistrationCommon.h>
+
+// vtk
+#include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
+#include <vtkCleanPolyData.h>
 
 const std::string QmitkSurfaceRegistrationView::VIEW_ID = "org.mitk.views.a-icpregistration";
 
+ /**
+   * @brief Pimpl holding the datastructures used by the
+   *        QmitkSurfaceRegistrationView.
+   */
 class SurfaceRegistrationViewData
 {
 
@@ -52,10 +61,13 @@ public:
   // covariance matrix calculator
   mitk::CovarianceMatrixCalculator::Pointer m_MatrixCalculator;
 
+  vtkSmartPointer<vtkCleanPolyData> m_CleanPolyData;
+
   mitk::Surface::Pointer m_MovingSurface;
 
   mitk::Surface::Pointer m_FixedSurface;
 
+  // c tor
   SurfaceRegistrationViewData()
    : m_RegistrationThread(new QThread()),
      m_Worker(new UIWorker()),
@@ -64,11 +76,13 @@ public:
      m_TrimmFactor(0.0),
      m_AICP(mitk::AnisotropicIterativeClosestPointRegistration::New()),
      m_MatrixCalculator(mitk::CovarianceMatrixCalculator::New()),
+     m_CleanPolyData(vtkSmartPointer<vtkCleanPolyData>::New()),
      m_MovingSurface(NULL),
      m_FixedSurface(NULL)
   {
   }
 
+  // cleanup
   ~SurfaceRegistrationViewData()
   {
     if ( m_RegistrationThread )
@@ -78,6 +92,9 @@ public:
 
     m_AICP = NULL;
     m_MatrixCalculator = NULL;
+    m_CleanPolyData = NULL;
+    m_MovingSurface = NULL;
+    m_FixedSurface = NULL;
   }
 };
 
@@ -192,7 +209,7 @@ void QmitkSurfaceRegistrationView::OnEnableTrimming()
     // disable trimming options
     m_Controls.m_TrimmFactorLabel->setEnabled(false);
     m_Controls.m_TrimmFactorSpinbox->setEnabled(false);
-    }
+  }
 }
 
 void QmitkSurfaceRegistrationView::OnRegistrationFinished()
@@ -200,12 +217,22 @@ void QmitkSurfaceRegistrationView::OnRegistrationFinished()
   typedef itk::Matrix<double,3,3> Matrix3x3;
   typedef itk::Vector<double,3> TranslationVector;
 
+  double tre = -1.0;
   Matrix3x3 rotation = d->m_AICP->GetRotation();
   TranslationVector translation = d->m_AICP->GetTranslation();
 
+  // exit the thread
   d->m_RegistrationThread->quit();
 
-  double tre = -1.0;
+  // Visualization:
+  // transform the fixed surface with the inverse transform
+  // onto the moving surface.
+  rotation = rotation.GetInverse();
+  translation = (rotation * translation) * -1.0;
+
+  MITK_INFO << "Rotation: \n" << rotation << "Translation: " << translation;
+  MITK_INFO << "FRE: " << d->m_AICP->GetFRE();
+
   // compute TRE
   if ( m_Controls.m_EnableTreCalculation->isChecked() )
   {
@@ -218,25 +245,27 @@ void QmitkSurfaceRegistrationView::OnRegistrationFinished()
     // sanity check
     if ( movingTargets.IsNotNull() && fixedTargets.IsNotNull() )
     {
+      // swap the moving and the fixed point set, since we use the inverse
+      // transform
       tre = mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(
-                                                                  movingTargets,
                                                                   fixedTargets,
+                                                                  movingTargets,
                                                                   rotation,
                                                                   translation
                                                                 );
       MITK_INFO << "TRE: " << tre;
+
+      // transform the fixed point set
+      for ( int i = 0; i < fixedTargets->GetSize(); ++i )
+      {
+        mitk::Point3D p = fixedTargets->GetPoint(i);
+
+        p = rotation * p + translation;
+
+        fixedTargets->SetPoint(i,p);
+      }
     }
   }
-
-  // Visualization:
-  // transform the fixed surface with the inverse transform
-  // onto the moving surface.
-  rotation = rotation.GetInverse();
-  translation = (rotation * translation) * -1.0;
-
-  MITK_INFO << "Rotation: \n" << rotation << "Translation: " << translation;
-  MITK_INFO << "FRE: " << d->m_AICP->GetFRE();
-
   // display result in textbox ( the inverse transform )
   QString text("");
   std::ostringstream oss;
@@ -294,24 +323,45 @@ void UIWorker::RegistrationThreadFunc()
   typedef itk::Vector<double,3> TranslationVector;
   typedef std::vector<Matrix3x3> CovarianceMatrixList;
 
+  // moving surface
+  mitk::Surface::Pointer X = mitk::Surface::New();
+  // helper
+  vtkPolyData* data_X = vtkPolyData::New();
+  // fixed surface
+  mitk::Surface::Pointer Y = mitk::Surface::New();
+  // helper
+  vtkPolyData* data_Y = vtkPolyData::New();
+
+  // clean the poly data to prevent manifold edges and duplicated vertices
+  d->m_CleanPolyData->SetInputData(d->m_MovingSurface->GetVtkPolyData());
+  d->m_CleanPolyData->Update();
+  // copy the polys
+  data_X->DeepCopy(d->m_CleanPolyData->GetOutput());
+  X->SetVtkPolyData(data_X);
+
+  d->m_CleanPolyData->SetInputData(d->m_FixedSurface->GetVtkPolyData());
+  d->m_CleanPolyData->Update();
+  data_Y->DeepCopy(d->m_CleanPolyData->GetOutput());
+  Y->SetVtkPolyData(data_Y);
+
   // compute the covariance matrices for the moving surface (X)
-  d->m_MatrixCalculator->SetInputSurface(d->m_MovingSurface);
+  d->m_MatrixCalculator->SetInputSurface(X);
   d->m_MatrixCalculator->ComputeCovarianceMatrices();
   CovarianceMatrixList sigmas_X = d->m_MatrixCalculator->GetCovarianceMatrices();
-  double meanVarX = d->m_MatrixCalculator->GetMeanVariance();
+  const double meanVarX = d->m_MatrixCalculator->GetMeanVariance();
 
   // compute the covariance matrices for the fixed surface (Y)
-  d->m_MatrixCalculator->SetInputSurface(d->m_FixedSurface);
+  d->m_MatrixCalculator->SetInputSurface(Y);
   d->m_MatrixCalculator->ComputeCovarianceMatrices();
   CovarianceMatrixList sigmas_Y = d->m_MatrixCalculator->GetCovarianceMatrices();
-  double meanVarY = d->m_MatrixCalculator->GetMeanVariance();
+  const double meanVarY = d->m_MatrixCalculator->GetMeanVariance();
 
   // the FRE normalization factor
-  double normalizationFactor = sqrt( meanVarX + meanVarY);
+  const double normalizationFactor = sqrt( meanVarX + meanVarY);
 
   // set up parameters
-  d->m_AICP->SetMovingSurface(d->m_MovingSurface);
-  d->m_AICP->SetFixedSurface(d->m_FixedSurface);
+  d->m_AICP->SetMovingSurface(X);
+  d->m_AICP->SetFixedSurface(Y);
   d->m_AICP->SetCovarianceMatricesMovingSurface(sigmas_X);
   d->m_AICP->SetCovarianceMatricesFixedSurface(sigmas_Y);
   d->m_AICP->SetFRENormalizationFactor(normalizationFactor);
@@ -321,6 +371,9 @@ void UIWorker::RegistrationThreadFunc()
 
   // run the algorithm
   d->m_AICP->Update();
+
+  data_X->Delete();
+  data_Y->Delete();
 
   emit RegistrationFinished();
 }

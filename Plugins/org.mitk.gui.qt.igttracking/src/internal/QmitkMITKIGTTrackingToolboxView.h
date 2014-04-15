@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //QT headers
 #include <QTimer>
 
+class QmitkMITKIGTTrackingToolboxViewWorker;
+
 /*!
   \brief QmitkMITKIGTTrackingToolboxView
 
@@ -131,6 +133,9 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void EnableTrackingControls();
    void DisableTrackingControls();
 
+   //slots for worker thread
+   void OnAutoDetectToolsFinished();
+
   protected:
 
     Ui::QmitkMITKIGTTrackingToolboxViewControls* m_Controls;
@@ -166,6 +171,50 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     */
    void ReplaceCurrentToolStorage(mitk::NavigationToolStorage::Pointer newStorage, std::string newStorageName);
 
+   //members for worker thread
+   QThread* m_WorkerThread;
+   QmitkMITKIGTTrackingToolboxViewWorker* m_Worker;
+
+};
+
+
+/**
+ * Worker thread class for this view.
+ */
+class QmitkMITKIGTTrackingToolboxViewWorker : public QObject
+{
+  Q_OBJECT
+
+public:
+  enum WorkerMethod{
+    eAutoDetectTools = 0,
+    eConnectDevice = 1,
+    eStartTracking = 2,
+    eStopTracking = 3,
+    eDisconnectDevice = 4
+  };
+
+  void SetWorkerMethod(WorkerMethod w);
+  void SetTrackingDevice(mitk::TrackingDevice::Pointer t);
+  void SetDataStorage(mitk::DataStorage::Pointer d);
+
+  itkGetMacro(NavigationToolStorage,mitk::NavigationToolStorage::Pointer);
+
+  public slots:
+    void ThreadFunc();
+
+  signals:
+    void AutoDetectToolsFinished();
+
+
+  protected:
+
+    mitk::TrackingDevice::Pointer m_TrackingDevice;
+    WorkerMethod m_WorkerMethod;
+    mitk::DataStorage::Pointer m_DataStorage;
+    mitk::NavigationToolStorage::Pointer m_NavigationToolStorage;
+
+    void AutoDetectTools();
 };
 
 

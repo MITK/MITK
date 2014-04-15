@@ -54,10 +54,17 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_tracking = false;
   m_logging = false;
   m_loggedFrames = 0;
+
+  //initialize worker thread
+  m_WorkerThread = new QThread();
+  m_Worker = new QmitkMITKIGTTrackingToolboxViewWorker();
 }
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
 {
+//clean up worker thread
+if(m_WorkerThread) delete m_WorkerThread;
+if(m_Worker) delete m_Worker;
 //remove the tracking volume
 this->GetDataStorage()->Remove(m_TrackingVolumeNode);
 //remove the tool storage
@@ -102,6 +109,14 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableOptionsButtons()));
     connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableTrackingConfigurationButtons()));
     connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableTrackingControls()));
+
+    //connect worker thread
+    connect(m_Worker, SIGNAL(AutoDetectToolsFinished()), this, SLOT(OnAutoDetectToolsFinished()) );
+    connect(m_WorkerThread,SIGNAL(started()), m_Worker, SLOT(ThreadFunc()) );
+
+    //move the worker to the thread
+    m_Worker->moveToThread(m_WorkerThread);
+
 
     //initialize widgets
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
@@ -459,32 +474,25 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora)
     {
     DisableTrackingConfigurationButtons();
-    mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
-    currentDevice->OpenConnection();
-    currentDevice->StartTracking();
-    mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New(this->GetDataStorage());
-    for (int i=0; i<currentDevice->GetToolCount(); i++)
-      {
-      //create a navigation tool with sphere as surface
-      std::stringstream toolname;
-      toolname << "AutoDetectedTool" << i;
-      mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
-      newTool->SetSerialNumber(dynamic_cast<mitk::NDIPassiveTool*>(currentDevice->GetTool(i))->GetSerialNumber());
-      newTool->SetIdentifier(toolname.str());
-      newTool->SetTrackingDeviceType(mitk::NDIAurora);
-      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-      mitk::Surface::Pointer mySphere = mitk::Surface::New();
-      vtkSphereSource *vtkData = vtkSphereSource::New();
-      vtkData->SetRadius(3.0f);
-      vtkData->SetCenter(0.0, 0.0, 0.0);
-      vtkData->Update();
-      mySphere->SetVtkPolyData(vtkData->GetOutput());
-      vtkData->Delete();
-      newNode->SetData(mySphere);
-      newNode->SetName(toolname.str());
-      newTool->SetDataNode(newNode);
-      autoDetectedStorage->AddTool(newTool);
-      }
+    m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eAutoDetectTools);
+    m_Worker->SetTrackingDevice(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
+    m_Worker->SetDataStorage(this->GetDataStorage());
+    m_WorkerThread->start();
+    DisableTrackingConfigurationButtons();
+    DisableTrackingControls();
+    m_Controls->m_configurationWidget->setEnabled(false);
+    }
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished()
+{
+    m_WorkerThread->quit();
+    EnableTrackingControls();
+    EnableTrackingConfigurationButtons();
+    m_Controls->m_configurationWidget->setEnabled(true);
+
+    mitk::NavigationToolStorage::Pointer autoDetectedStorage = m_Worker->GetNavigationToolStorage();
+
     //save detected tools
     this->ReplaceCurrentToolStorage(autoDetectedStorage,"Autodetected NDI Aurora Storage");
     //update label
@@ -493,8 +501,7 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
     //update tool preview
     m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
     m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
-    currentDevice->StopTracking();
-    currentDevice->CloseConnection();
+
 
     EnableTrackingConfigurationButtons();
 
@@ -541,7 +548,6 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
         }
       }
 
-    }
 }
 
 void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
@@ -837,3 +843,78 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
     m_toolStorage->SetName(newStorageName);
     m_toolStorage->RegisterAsMicroservice("no tracking device");
 }
+
+void QmitkMITKIGTTrackingToolboxViewWorker::SetWorkerMethod(WorkerMethod w)
+{
+  m_WorkerMethod = w;
+}
+
+void QmitkMITKIGTTrackingToolboxViewWorker::SetTrackingDevice(mitk::TrackingDevice::Pointer t)
+{
+  m_TrackingDevice = t;
+}
+
+void QmitkMITKIGTTrackingToolboxViewWorker::SetDataStorage(mitk::DataStorage::Pointer d)
+{
+  m_DataStorage = d;
+}
+
+void QmitkMITKIGTTrackingToolboxViewWorker::ThreadFunc()
+{
+  switch(m_WorkerMethod)
+  {
+  case eAutoDetectTools:
+    this->AutoDetectTools();
+    break;
+  case eConnectDevice:
+    break;
+  case eStartTracking:
+    break;
+  case eStopTracking:
+    break;
+  case eDisconnectDevice:
+    break;
+  default:
+    break;
+  }
+}
+
+void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
+ {
+ mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New(m_DataStorage);
+ mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_TrackingDevice.GetPointer());
+  currentDevice->OpenConnection();
+  currentDevice->StartTracking();
+
+
+
+  for (int i=0; i<currentDevice->GetToolCount(); i++)
+    {
+    //create a navigation tool with sphere as surface
+    std::stringstream toolname;
+    toolname << "AutoDetectedTool" << i;
+    mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
+    newTool->SetSerialNumber(dynamic_cast<mitk::NDIPassiveTool*>(currentDevice->GetTool(i))->GetSerialNumber());
+    newTool->SetIdentifier(toolname.str());
+    newTool->SetTrackingDeviceType(mitk::NDIAurora);
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    mitk::Surface::Pointer mySphere = mitk::Surface::New();
+    vtkSphereSource *vtkData = vtkSphereSource::New();
+    vtkData->SetRadius(3.0f);
+    vtkData->SetCenter(0.0, 0.0, 0.0);
+    vtkData->Update();
+    mySphere->SetVtkPolyData(vtkData->GetOutput());
+    vtkData->Delete();
+    newNode->SetData(mySphere);
+    newNode->SetName(toolname.str());
+    newTool->SetDataNode(newNode);
+    autoDetectedStorage->AddTool(newTool);
+    }
+
+  m_NavigationToolStorage = autoDetectedStorage;
+
+  currentDevice->StopTracking();
+  currentDevice->CloseConnection();
+
+  emit AutoDetectToolsFinished();
+ }

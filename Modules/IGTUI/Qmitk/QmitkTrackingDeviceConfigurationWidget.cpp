@@ -170,7 +170,7 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_SetOptitrackCalibrationFile), SIGNAL(clicked()), this, SLOT(SetOptitrackCalibrationFileClicked()) );
 
     //slots for the worker thread
-    connect(m_Worker, SIGNAL(PortsScanned(int,int,QString)), this, SLOT(AutoScanPortsFinished(int,int,QString)) );
+    connect(m_Worker, SIGNAL(PortsScanned(int,int,QString,int,int)), this, SLOT(AutoScanPortsFinished(int,int,QString,int,int)) );
     connect(m_WorkerThread,SIGNAL(started()), m_Worker, SLOT(ScanPortsThreadFunc()) );
 
     //move the worker to the thread
@@ -321,9 +321,15 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPorts()
   m_WorkerThread->start();
   }
 
-void QmitkTrackingDeviceConfigurationWidget::AutoScanPortsFinished(int PolarisPort, int AuroraPort, QString result)
+void QmitkTrackingDeviceConfigurationWidget::AutoScanPortsFinished(int PolarisPort, int AuroraPort, QString result, int PortTypePolaris, int PortTypeAurora)
   {
   m_WorkerThread->quit();
+  #ifdef WIN32
+    if((PortTypePolaris!=-1)||(PortTypeAurora!=-1)) {MITK_WARN << "Port type is specified although this should not be the case for Windows. Ignoring port type.";}
+  #else //linux systems
+    if (PortTypePolaris!=-1) {m_Controls->portTypePolaris->setCurrentIndex(PortTypePolaris);}
+    if (PortTypeAurora!=-1)  {m_Controls->portTypeAurora->setCurrentIndex(PortTypeAurora);}
+  #endif
   m_Controls->m_portSpinBoxPolaris->setValue(PolarisPort);
   m_Controls->m_portSpinBoxAurora->setValue(AuroraPort);
   AddOutput(result.toStdString());
@@ -541,6 +547,8 @@ void QmitkTrackingDeviceConfigurationWorker::ScanPortsThreadFunc()
 {
   int PolarisPort = -1;
   int AuroraPort = -1;
+  int PortTypePolaris = -1;
+  int PortTypeAurora = -1;
 
   QString result = "<br>Found Devices:";
   int resultSize = result.size(); //remember size of result: if it stays the same no device were found
@@ -579,10 +587,12 @@ void QmitkTrackingDeviceConfigurationWorker::ScanPortsThreadFunc()
       case mitk::NDIPolaris:
         result += "<br>" + devName + ": " + "NDI Polaris";
         m_Controls->m_portSpinBoxPolaris->setValue(i);
+        PortTypePolaris = 1;
         break;
       case mitk::NDIAurora:
         result += "<br>" + devName + ": " + "NDI Aurora";
         m_Controls->m_portSpinBoxAurora->setValue(i);
+        PortTypeAurora = 1;
         break;
       }
 
@@ -596,10 +606,12 @@ void QmitkTrackingDeviceConfigurationWorker::ScanPortsThreadFunc()
       case mitk::NDIPolaris:
         result += "<br>" + devName + ": " + "NDI Polaris";
         m_Controls->m_portSpinBoxPolaris->setValue(i);
+        PortTypePolaris = 0;
         break;
       case mitk::NDIAurora:
         result += "<br>" + devName + ": " + "NDI Aurora";
         m_Controls->m_portSpinBoxAurora->setValue(i);
+        PortTypeAurora = 0;
         break;
       }
 
@@ -608,7 +620,7 @@ void QmitkTrackingDeviceConfigurationWorker::ScanPortsThreadFunc()
 
   if ( result.size() == resultSize) result += "<br>none";
 
-  emit PortsScanned(PolarisPort,AuroraPort,result);
+  emit PortsScanned(PolarisPort,AuroraPort,result,PortTypePolaris,PortTypeAurora);
 }
 
 mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWorker::ScanPort(QString port)

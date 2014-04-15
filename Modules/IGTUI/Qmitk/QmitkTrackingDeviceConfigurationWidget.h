@@ -44,8 +44,10 @@ class QmitkTrackingDeviceConfigurationWorker : public QObject
     /**
      * @param PolarisPort Returns the port, returns -1 if no device was found.
      * @param AuroraPort Returns the port, returns -1 if no device was found.
+     * @param PortTypePolaris Returns the port type (0=usb,1=tty), returns -1 if the port type is not specified, e.g, in case of Windows.
+     * @param PortTypeAurora Returns the port type (0=usb,1=tty), returns -1 if the port type is not specified, e.g, in case of Windows.
      */
-    void PortsScanned(int PolarisPort, int AuroraPort, QString result);
+    void PortsScanned(int PolarisPort, int AuroraPort, QString result, int PortTypePolaris, int PortTypeAurora);
 
   protected:
 
@@ -222,7 +224,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     void AutoScanPorts();
 
     /** This slot is called when the port scanning is finished. */
-    void AutoScanPortsFinished(int PolarisPort, int AuroraPort, QString result);
+    void AutoScanPortsFinished(int PolarisPort, int AuroraPort, QString result, int PortTypePolaris, int PortTypeAurora);
 
     /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_MTCalibrationFile.*/
     void SetMTCalibrationFileClicked();

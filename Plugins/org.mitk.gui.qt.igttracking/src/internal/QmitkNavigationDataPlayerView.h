@@ -76,12 +76,12 @@ protected:
   /**
   * \brief configures the player according to the checkboxes set in the GUI
   */
-  void ConfigurePlayer(mitk::NavigationDataPlayerBase::Pointer player);
+  void ConfigurePlayer();
 
   /**
   * \brief Creates the Rendering Pipeline necessary to Render the images
   */
-  void CreatePipeline(mitk::NavigationDataPlayerBase::Pointer player);
+  void CreatePipeline();
 
   /**
   * \brief Destroys the Rendering Pipeline (but not the player)
@@ -95,6 +95,7 @@ protected:
   mitk::NavigationDataObjectVisualizationFilter::Pointer m_VisFilter;
   std::vector<mitk::DataNode::Pointer> m_RenderingNodes;
   mitk::NavigationDataPlayerBase::Pointer m_Player;
+  mitk::NavigationDataSet::Pointer m_Data;
 
   QmitkStdMultiWidget* m_MultiWidget;
   QmitkIGTPlayerWidget* m_PlayerWidget; ///< this bundle's playback widget

@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataPlayer.h>
 
 // VTK
-#include <vtkConeSource.h>
+#include <vtkSphereSource.h>
 
 const std::string QmitkNavigationDataPlayerView::VIEW_ID = "org.mitk.views.navigationdataplayer";
 
@@ -87,28 +87,19 @@ void QmitkNavigationDataPlayerView::OnPlayingStarted()
 }
 
 void QmitkNavigationDataPlayerView::OnOpenFile(){
-  mitk::NavigationDataSet::Pointer data;
   mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
 
-  // FIXME Filter for correct Files
+  // FIXME Filter for correct Files and use correct Reader
   QString fileName = QFileDialog::getOpenFileName(NULL, "Open Navigation Data Set", "", "");
-  data = reader->Read(fileName.toStdString());
+  m_Data = reader->Read(fileName.toStdString());
 
   // Update Labels
   m_Controls->m_LblFilePath->setText(fileName);
-  m_Controls->m_LblFrames->setText(QString::number(data->Size()));
-  m_Controls->m_LblTools->setText(QString::number(data->GetNumberOfTools()));
+  m_Controls->m_LblFrames->setText(QString::number(m_Data->Size()));
+  m_Controls->m_LblTools->setText(QString::number(m_Data->GetNumberOfTools()));
 
-  if (m_Controls->m_RdbSequential->isChecked())
-  {
-    mitk::NavigationDataSequentialPlayer::Pointer seqPlayer = mitk::NavigationDataSequentialPlayer::New();
-    seqPlayer->SetNavigationDataSet(data);
-    m_Controls->m_SequentialWidget->SetPlayer(seqPlayer);
-    m_Player = seqPlayer;
-  } else {
-  }
-
-  CreatePipeline(m_Player);
+  // Initialize Widgets and create Player
+  OnSelectPlayer();
 }
 
 void QmitkNavigationDataPlayerView::OnSelectPlayer(){
@@ -116,13 +107,24 @@ void QmitkNavigationDataPlayerView::OnSelectPlayer(){
   {
     m_Controls->m_SequentialWidget->setVisible(true);
     m_Controls->m_TimedWidget->setVisible(false);
+    mitk::NavigationDataSequentialPlayer::Pointer seqPlayer = mitk::NavigationDataSequentialPlayer::New();
+    seqPlayer->SetNavigationDataSet(m_Data);
+    m_Controls->m_SequentialWidget->SetPlayer(seqPlayer);
+    m_Player = seqPlayer;
   } else {
     m_Controls->m_SequentialWidget->setVisible(false);
     m_Controls->m_TimedWidget->setVisible(true);
+    mitk::NavigationDataPlayer::Pointer timedPlayer = mitk::NavigationDataPlayer::New();
+    timedPlayer->SetNavigationDataSet(m_Data);
+    m_Controls->m_TimedWidget->SetPlayer(timedPlayer);
+    m_Player = timedPlayer;
   }
+
+  // SetupRenderingPipeline
+  OnSetDisplay();
 }
 
-void ConfigurePlayer(mitk::NavigationDataPlayerBase::Pointer player){
+void ConfigurePlayer(){
   // FIXME: Why is repeat not available in the base class?
   // TODO finish method
 }
@@ -147,31 +149,30 @@ void QmitkNavigationDataPlayerView::OnSetDisplay(){
   DestroyPipeline();
   if ( (m_Controls->m_ChkDisplay->isChecked()) && ( m_Player.IsNotNull() ))
   {
-    CreatePipeline(m_Player);
+    CreatePipeline();
   }
 }
 
-void QmitkNavigationDataPlayerView::CreatePipeline(mitk::NavigationDataPlayerBase::Pointer player){
+void QmitkNavigationDataPlayerView::CreatePipeline(){
   m_VisFilter = mitk::NavigationDataObjectVisualizationFilter::New();
 
-  for (unsigned int i = 0 ; i < player->GetNumberOfIndexedOutputs(); i++ ) {
+  for (unsigned int i = 0 ; i < m_Player->GetNumberOfIndexedOutputs(); i++ ) {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     // TODO Give Nodes a proper name
-    m_VisFilter->SetInput(i, player->GetOutput(i));
+    m_VisFilter->SetInput(i, m_Player->GetOutput(i));
 
     //create small sphere and use it as surface
     mitk::Surface::Pointer mySphere = mitk::Surface::New();
-    vtkConeSource *vtkData = vtkConeSource::New();
-    vtkData->SetAngle(5.0);
-    vtkData->SetResolution(50);
-    vtkData->SetHeight(6.0f);
-    vtkData->SetRadius(2.0f);
+    vtkSphereSource *vtkData = vtkSphereSource::New();
+    vtkData->SetRadius(5.0f);
     vtkData->SetCenter(0.0, 0.0, 0.0);
     vtkData->Update();
     mySphere->SetVtkPolyData(vtkData->GetOutput());
     vtkData->Delete();
     node->SetData(mySphere);
     m_VisFilter->SetRepresentationObject(i, mySphere);
+
+    // Add Node to DataStorageand to local list of Nodes
     GetDataStorage()->Add(node);
     m_RenderingNodes.push_back(node);
   }

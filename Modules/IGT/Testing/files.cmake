@@ -7,10 +7,11 @@ set(MODULE_TESTS
    # no test is forgotten after it was commented out. If there is no bug for your current problem, please add a new one and
    # mark it as critical.
 
-   ################## DISABLED TESTS #################################################
-   # mitkNavigationToolStorageDeserializerTest.cpp # disabled because of bug 17303
-   # mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # disabled because of bug 17181
-
+   ################## ON THE FENCE TESTS #################################################
+   mitkNavigationToolStorageDeserializerTest.cpp # This test was disabled because of bug 17303.
+  # Has been activated to test if bug has been fixed. If it proves to be stable move to RUNNING TESTS
+   mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # This test was disabled because of bug 17181.
+  # Has been activated to test if bug has been fixed. If it proves to be stable move to RUNNING TESTS
    ################# RUNNING TESTS ###################################################
    mitkCameraVisualizationTest.cpp
    mitkClaronInterfaceTest.cpp

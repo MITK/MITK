@@ -53,7 +53,7 @@ public:
 private:
   mitk::NavigationDataSequentialPlayer::Pointer m_Player;
 
-  QTimer*                                       m_UpdateTimer;
+  QTimer* m_UpdateTimer;
 
   Ui::QmitkNavigationDataSequentialPlayerControlWidget *ui;
 };

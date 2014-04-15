@@ -31,6 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataSequentialPlayer.h>
 #include <mitkNavigationDataPlayer.h>
 
+// VTK
+#include <vtkConeSource.h>
+
 const std::string QmitkNavigationDataPlayerView::VIEW_ID = "org.mitk.views.navigationdataplayer";
 
 QmitkNavigationDataPlayerView::QmitkNavigationDataPlayerView()
@@ -71,6 +74,12 @@ void QmitkNavigationDataPlayerView::CreateConnections()
   connect( m_Controls->m_RdbSequential, SIGNAL(released()), this, SLOT(OnSelectPlayer()) );
   connect( m_Controls->m_RdbTimeBased, SIGNAL(released()), this, SLOT(OnSelectPlayer()) );
   connect( m_Controls->m_BtnOpenFile, SIGNAL(released()), this, SLOT(OnOpenFile()) );
+  connect( m_Controls->m_ChkDisplay, SIGNAL(released()), this, SLOT(OnSetDisplay()) );
+  connect( m_Controls->m_chkRepeat, SIGNAL(released()), this, SLOT(OnSetRepeat()) );
+  connect( m_Controls->m_ChkMicroservice, SIGNAL(released()), this, SLOT(OnSetMicroservice()) );
+
+  connect( m_Controls->m_SequentialWidget, SIGNAL(SignalUpdate()), this, SLOT(OnUpdate()) );
+  connect( m_Controls->m_TimedWidget, SIGNAL(SignalUpdate()), this, SLOT(OnUpdate()) );
 }
 
 void QmitkNavigationDataPlayerView::OnPlayingStarted()
@@ -80,7 +89,6 @@ void QmitkNavigationDataPlayerView::OnPlayingStarted()
 void QmitkNavigationDataPlayerView::OnOpenFile(){
   mitk::NavigationDataSet::Pointer data;
   mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-  mitk::NavigationDataSequentialPlayer::Pointer seqPlayer = mitk::NavigationDataSequentialPlayer::New();
 
   // FIXME Filter for correct Files
   QString fileName = QFileDialog::getOpenFileName(NULL, "Open Navigation Data Set", "", "");
@@ -94,9 +102,13 @@ void QmitkNavigationDataPlayerView::OnOpenFile(){
   if (m_Controls->m_RdbSequential->isChecked())
   {
     mitk::NavigationDataSequentialPlayer::Pointer seqPlayer = mitk::NavigationDataSequentialPlayer::New();
+    seqPlayer->SetNavigationDataSet(data);
     m_Controls->m_SequentialWidget->SetPlayer(seqPlayer);
+    m_Player = seqPlayer;
   } else {
   }
+
+  CreatePipeline(m_Player);
 }
 
 void QmitkNavigationDataPlayerView::OnSelectPlayer(){
@@ -110,11 +122,65 @@ void QmitkNavigationDataPlayerView::OnSelectPlayer(){
   }
 }
 
+void ConfigurePlayer(mitk::NavigationDataPlayerBase::Pointer player){
+  // FIXME: Why is repeat not available in the base class?
+  // TODO finish method
+}
+
 void QmitkNavigationDataPlayerView::OnSetRepeat(){
+  MITK_WARN << "Repeat not yet supported";
 }
 
 void QmitkNavigationDataPlayerView::OnSetMicroservice(){
+  MITK_WARN << "Register as Microservice not yet supported";
+}
+
+void QmitkNavigationDataPlayerView::OnUpdate(){
+  m_VisFilter->Update();
+  for (unsigned int i = 0; i < m_RenderingNodes.size(); i++){
+    m_RenderingNodes[i]->Update();
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkNavigationDataPlayerView::OnSetDisplay(){
+  DestroyPipeline();
+  if ( (m_Controls->m_ChkDisplay->isChecked()) && ( m_Player.IsNotNull() ))
+  {
+    CreatePipeline(m_Player);
+  }
+}
+
+void QmitkNavigationDataPlayerView::CreatePipeline(mitk::NavigationDataPlayerBase::Pointer player){
+  m_VisFilter = mitk::NavigationDataObjectVisualizationFilter::New();
+
+  for (unsigned int i = 0 ; i < player->GetNumberOfIndexedOutputs(); i++ ) {
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    // TODO Give Nodes a proper name
+    m_VisFilter->SetInput(i, player->GetOutput(i));
+
+    //create small sphere and use it as surface
+    mitk::Surface::Pointer mySphere = mitk::Surface::New();
+    vtkConeSource *vtkData = vtkConeSource::New();
+    vtkData->SetAngle(5.0);
+    vtkData->SetResolution(50);
+    vtkData->SetHeight(6.0f);
+    vtkData->SetRadius(2.0f);
+    vtkData->SetCenter(0.0, 0.0, 0.0);
+    vtkData->Update();
+    mySphere->SetVtkPolyData(vtkData->GetOutput());
+    vtkData->Delete();
+    node->SetData(mySphere);
+    m_VisFilter->SetRepresentationObject(i, mySphere);
+    GetDataStorage()->Add(node);
+    m_RenderingNodes.push_back(node);
+  }
+}
+
+void QmitkNavigationDataPlayerView::DestroyPipeline(){
+  m_VisFilter = NULL;
+  for (unsigned int i = 0; i < m_RenderingNodes.size(); i++){
+    this->GetDataStorage()->Remove(m_RenderingNodes[i]);
+  }
+  m_RenderingNodes.clear();
 }

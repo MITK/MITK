@@ -23,15 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkFunctionality.h>
 #include <QmitkIGTPlayerWidget.h>
 
-#include <mitkLineVtkMapper3D.h>
-#include <mitkSplineVtkMapper3D.h>
-
 // ui
 #include "ui_QmitkNavigationDataPlayerViewControls.h"
 
 //mitk
-#include "MitkIGTUIExports.h"
-#include <mitkColorSequenceCycleH.h>
 #include <mitkNavigationDataObjectVisualizationFilter.h>
 
 /*!
@@ -74,17 +69,32 @@ public:
     void OnSetRepeat();
     void OnSetMicroservice();
     void OnSetDisplay();
+    void OnUpdate();
 
 protected:
 
-  enum TrajectoryStyle {
-    Points = 1,
-    Splines = 2
-  };
+  /**
+  * \brief configures the player according to the checkboxes set in the GUI
+  */
+  void ConfigurePlayer(mitk::NavigationDataPlayerBase::Pointer player);
+
+  /**
+  * \brief Creates the Rendering Pipeline necessary to Render the images
+  */
+  void CreatePipeline(mitk::NavigationDataPlayerBase::Pointer player);
+
+  /**
+  * \brief Destroys the Rendering Pipeline (but not the player)
+  */
+  void DestroyPipeline();
 
   void CreateBundleWidgets(QWidget* parent);
 
   Ui::QmitkNavigationDataPlayerViewControls* m_Controls;
+
+  mitk::NavigationDataObjectVisualizationFilter::Pointer m_VisFilter;
+  std::vector<mitk::DataNode::Pointer> m_RenderingNodes;
+  mitk::NavigationDataPlayerBase::Pointer m_Player;
 
   QmitkStdMultiWidget* m_MultiWidget;
   QmitkIGTPlayerWidget* m_PlayerWidget; ///< this bundle's playback widget

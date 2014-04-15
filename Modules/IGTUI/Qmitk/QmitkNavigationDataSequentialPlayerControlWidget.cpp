@@ -24,6 +24,8 @@ QmitkNavigationDataSequentialPlayerControlWidget::QmitkNavigationDataSequentialP
   ui(new Ui::QmitkNavigationDataSequentialPlayerControlWidget)
 {
   ui->setupUi(this);
+  m_UpdateTimer = new QTimer();
+  connect( m_UpdateTimer, SIGNAL(timeout()), this, SLOT(OnUpdate()) );
 }
 
 QmitkNavigationDataSequentialPlayerControlWidget::~QmitkNavigationDataSequentialPlayerControlWidget()

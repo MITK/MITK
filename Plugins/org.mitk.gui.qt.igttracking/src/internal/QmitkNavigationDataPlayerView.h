@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkNavigationDataPlayerViewControls.h"
 
 //mitk
+#include "MitkIGTUIExports.h"
 #include <mitkColorSequenceCycleH.h>
 #include <mitkNavigationDataObjectVisualizationFilter.h>
 

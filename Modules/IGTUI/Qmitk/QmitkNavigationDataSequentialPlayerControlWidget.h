@@ -19,14 +19,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWidget>
 #include "mitkNavigationDataSequentialPlayer.h"
+#include "MitkIGTUIExports.h"
 
 class QTimer;
 
 namespace Ui {
-class QmitkNavigationDataSequentialPlayerControlWidget;
+  class QmitkNavigationDataSequentialPlayerControlWidget;
 }
 
-class QmitkNavigationDataSequentialPlayerControlWidget : public QWidget
+class MitkIGTUI_EXPORT QmitkNavigationDataSequentialPlayerControlWidget : public QWidget
 {
   Q_OBJECT
 
@@ -34,14 +35,14 @@ signals:
   void SignalUpdate();
   void SignalEndReached();
 
-public slots:
-  void OnStop();
-  void OnPlayPause();
-  void OnRestart();
+  public slots:
+    void OnStop();
+    void OnPlayPause();
+    void OnRestart();
 
-protected slots:
-  void OnUpdate();
-  void OnUpdateIntervalChanged(int);
+    protected slots:
+      void OnUpdate();
+      void OnUpdateIntervalChanged(int);
 
 public:
   explicit QmitkNavigationDataSequentialPlayerControlWidget(QWidget *parent = 0);

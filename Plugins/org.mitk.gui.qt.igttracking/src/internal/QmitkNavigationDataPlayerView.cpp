@@ -139,9 +139,6 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
 
 void QmitkNavigationDataPlayerView::OnUpdate(){
   m_VisFilter->Update();
-  for (unsigned int i = 0; i < m_RenderingNodes.size(); i++){
-    m_RenderingNodes[i]->Update();
-  }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

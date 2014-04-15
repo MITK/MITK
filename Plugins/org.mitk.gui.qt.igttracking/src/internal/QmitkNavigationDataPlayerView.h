@@ -60,15 +60,38 @@ public:
   protected slots:
 
     /*!
-    \brief TODO
+    \brief FIXME not currently used
     */
     void OnPlayingStarted();
 
+    /*!
+    \brief loads a file and triggers creation of players and the pipeline
+    */
     void OnOpenFile();
+
+    /*!
+    \brief Creates the correct player and displays the according widget
+    */
     void OnSelectPlayer();
+
+    /*!
+    \brief FIXME not currently used
+    */
     void OnSetRepeat();
+
+    /*!
+    \brief FIXME not currently used
+    */
     void OnSetMicroservice();
+
+    /*!
+    \brief Triggers the creation and destruction of the rendering pipeline
+    */
     void OnSetDisplay();
+
+    /*!
+    \brief FIXME not currently used
+    */
     void OnUpdate();
 
 protected:

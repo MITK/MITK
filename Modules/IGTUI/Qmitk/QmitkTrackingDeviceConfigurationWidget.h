@@ -18,11 +18,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKTRACKINGDEVICECONFIGURATIONWIDGET_H
 
 #include <QWidget>
+#include <QThread>
 #include "MitkIGTUIExports.h"
 #include "ui_QmitkTrackingDeviceConfigurationWidgetControls.h"
 #include "mitkTrackingDevice.h"
 #include <mitkIPersistenceService.h>
 
+/**
+ * TODO
+ */
+class QmitkTrackingDeviceConfigurationWorker : public QObject
+{
+  Q_OBJECT
+
+  public slots:
+
+    void TestConnectionThreadFunc();
+
+    void ScanPortsThreadFunc();
+
+  signals:
+
+    void ConnectionTested();
+
+    /**
+     * @param PolarisPort Returns the port, returns -1 if no device was found.
+     * @param AuroraPort Returns the port, returns -1 if no device was found.
+     */
+    void PortsScanned(int PolarisPort, int AuroraPort, QString result);
+
+  protected:
+
+    /** @brief   Scans the given port for a NDI tracking device.
+      * @return  Returns the type of the device if one was found. Returns TrackingSystemInvalid if none was found.
+      */
+    mitk::TrackingDeviceType ScanPort(QString port);
+};
 
 //itk headers
 
@@ -136,15 +167,13 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
     typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;
 
+    QmitkTrackingDeviceConfigurationWorker* m_Worker;
+    QThread* m_WorkerThread;
+
     //######################### internal help methods #######################################
     void ResetOutput();
     void AddOutput(std::string s);
     mitk::TrackingDevice::Pointer ConstructTrackingDevice();
-
-    /** @brief   Scans the given port for a NDI tracking device.
-      * @return  Returns the type of the device if one was found. Returns TrackingSystemInvalid if none was found.
-      */
-    mitk::TrackingDeviceType ScanPort(QString port);
 
     void StoreUISettings();
     void LoadUISettings();
@@ -191,6 +220,9 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      *        it selects the right type and sets the corresponding port in the widget.
      */
     void AutoScanPorts();
+
+    /** This slot is called when the port scanning is finished. */
+    void AutoScanPortsFinished(int PolarisPort, int AuroraPort, QString result);
 
     /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_MTCalibrationFile.*/
     void SetMTCalibrationFileClicked();

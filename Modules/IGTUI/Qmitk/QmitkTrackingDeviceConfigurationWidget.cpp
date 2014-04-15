@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkOptitrackTrackingDevice.h>
 #include <mitkIGTException.h>
 #include <mitkSerialCommunication.h>
+#include <mitkProgressBar.h>
 #include <qscrollbar.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
@@ -33,6 +34,10 @@ const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.vi
 QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
+  //initialize worker thread
+  m_Worker = new QmitkTrackingDeviceConfigurationWorker();
+  m_WorkerThread = new QThread();
+
   m_Controls = NULL;
   CreateQtPartControl(this);
   CreateConnections();
@@ -134,6 +139,8 @@ switch(style)
 QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget()
 {
 StoreUISettings();
+if (m_Worker) delete m_Worker;
+if (m_WorkerThread) delete m_WorkerThread;
 }
 
 void QmitkTrackingDeviceConfigurationWidget::CreateQtPartControl(QWidget *parent)
@@ -162,6 +169,12 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_SetMTCalibrationFile), SIGNAL(clicked()), this, SLOT(SetMTCalibrationFileClicked()) );
     connect( (QObject*)(m_Controls->m_SetOptitrackCalibrationFile), SIGNAL(clicked()), this, SLOT(SetOptitrackCalibrationFileClicked()) );
 
+    //slots for the worker thread
+    connect(m_Worker, SIGNAL(PortsScanned(int,int,QString)), this, SLOT(AutoScanPortsFinished(int,int,QString)) );
+    connect(m_WorkerThread,SIGNAL(started()), m_Worker, SLOT(ScanPortsThreadFunc()) );
+
+    //move the worker to the thread
+    m_Worker->moveToThread(m_WorkerThread);
 
     //set a few UI components depending on Windows / Linux
     #ifdef WIN32
@@ -305,74 +318,15 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPorts()
   {
   this->setEnabled(false);
   AddOutput("<br>Scanning...");
+  m_WorkerThread->start();
+  }
 
-  QString result = "<br>Found Devices:";
-  int resultSize = result.size(); //remember size of result: if it stays the same no device were found
-
-  #ifdef WIN32
-    QString devName;
-    for (unsigned int i = 1; i < 20; ++i)
-    {
-      if (i<10) devName = QString("COM%1").arg(i);
-      else devName = QString("\\\\.\\COM%1").arg(i); // prepend "\\.\ to COM ports >9, to be able to allow connection"
-      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
-      switch (scannedPort)
-      {
-      case mitk::NDIPolaris:
-        result += "<br>" + devName + ": " + "NDI Polaris";
-        m_Controls->m_portSpinBoxPolaris->setValue(i);
-        break;
-      case mitk::NDIAurora:
-        result += "<br>" + devName + ": " + "NDI Aurora";
-        m_Controls->m_portSpinBoxAurora->setValue(i);
-        break;
-      }
-    }
-  #else //linux systems
-    for(unsigned int i = 1; i < 6; ++i)
-    {
-      QString devName = QString("/dev/ttyS%1").arg(i);
-      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
-      switch (scannedPort)
-      {
-      case mitk::NDIPolaris:
-        result += "<br>" + devName + ": " + "NDI Polaris";
-        m_Controls->m_portSpinBoxPolaris->setValue(i);
-        m_Controls->portTypePolaris->setCurrentIndex(1);
-        break;
-      case mitk::NDIAurora:
-        result += "<br>" + devName + ": " + "NDI Aurora";
-        m_Controls->m_portSpinBoxAurora->setValue(i);
-        m_Controls->portTypeAurora->setCurrentIndex(1);
-        break;
-      }
-
-    }
-    for(unsigned int i = 0; i <7; ++i)
-    {
-      QString devName = QString("/dev/ttyUSB%1").arg(i);
-      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
-      switch (scannedPort)
-      {
-      case mitk::NDIPolaris:
-        result += "<br>" + devName + ": " + "NDI Polaris";
-        m_Controls->m_portSpinBoxPolaris->setValue(i);
-        m_Controls->portTypePolaris->setCurrentIndex(0);
-        break;
-      case mitk::NDIAurora:
-        result += "<br>" + devName + ": " + "NDI Aurora";
-        m_Controls->m_portSpinBoxAurora->setValue(i);
-        m_Controls->portTypeAurora->setCurrentIndex(0);
-        break;
-      }
-
-    }
-  #endif
-
-  if ( result.size() == resultSize) result += "<br>none";
-
+void QmitkTrackingDeviceConfigurationWidget::AutoScanPortsFinished(int PolarisPort, int AuroraPort, QString result)
+  {
+  m_WorkerThread->quit();
+  m_Controls->m_portSpinBoxPolaris->setValue(PolarisPort);
+  m_Controls->m_portSpinBoxAurora->setValue(AuroraPort);
   AddOutput(result.toStdString());
-
   this->setEnabled(true);
   }
 
@@ -543,17 +497,6 @@ void QmitkTrackingDeviceConfigurationWidget::EnableAdvancedUserControl(bool enab
   m_Controls->m_finishedButton->setVisible(enable);
   }
 
-mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidget::ScanPort(QString port)
-{
-  mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();
-  tracker->SetDeviceName(port.toStdString());
-  mitk::TrackingDeviceType returnValue = mitk::TrackingSystemInvalid;
-  try
-  {returnValue = tracker->TestConnection();}
-  catch (mitk::IGTException)
-  {}//do nothing: there is simply no device on this port
-  return returnValue;
-}
 
 void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
 {
@@ -591,3 +534,91 @@ m_Controls->m_trackingDeviceChooser->setCurrentIndex(SelectedDevice);
 m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(m_MTCalibrationFile.c_str()));
 }
 
+void QmitkTrackingDeviceConfigurationWorker::TestConnectionThreadFunc()
+{}
+
+void QmitkTrackingDeviceConfigurationWorker::ScanPortsThreadFunc()
+{
+  int PolarisPort = -1;
+  int AuroraPort = -1;
+
+  QString result = "<br>Found Devices:";
+  int resultSize = result.size(); //remember size of result: if it stays the same no device were found
+
+  #ifdef WIN32
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(19);
+
+    QString devName;
+    for (unsigned int i = 1; i < 20; ++i)
+    {
+      QString statusOutput = "Scanning Port #" + QString::number(i);
+      MITK_INFO << statusOutput.toStdString().c_str();
+      if (i<10) devName = QString("COM%1").arg(i);
+      else devName = QString("\\\\.\\COM%1").arg(i); // prepend "\\.\ to COM ports >9, to be able to allow connection"
+      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
+      switch (scannedPort)
+      {
+      case mitk::NDIPolaris:
+        result += "<br>" + devName + ": " + "NDI Polaris";
+        PolarisPort = i;
+        break;
+      case mitk::NDIAurora:
+        result += "<br>" + devName + ": " + "NDI Aurora";
+        AuroraPort = i;
+        break;
+      }
+      mitk::ProgressBar::GetInstance()->Progress();
+    }
+  #else //linux systems
+    for(unsigned int i = 1; i < 6; ++i)
+    {
+      QString devName = QString("/dev/ttyS%1").arg(i);
+      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
+      switch (scannedPort)
+      {
+      case mitk::NDIPolaris:
+        result += "<br>" + devName + ": " + "NDI Polaris";
+        m_Controls->m_portSpinBoxPolaris->setValue(i);
+        break;
+      case mitk::NDIAurora:
+        result += "<br>" + devName + ": " + "NDI Aurora";
+        m_Controls->m_portSpinBoxAurora->setValue(i);
+        break;
+      }
+
+    }
+    for(unsigned int i = 0; i <7; ++i)
+    {
+      QString devName = QString("/dev/ttyUSB%1").arg(i);
+      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
+      switch (scannedPort)
+      {
+      case mitk::NDIPolaris:
+        result += "<br>" + devName + ": " + "NDI Polaris";
+        m_Controls->m_portSpinBoxPolaris->setValue(i);
+        break;
+      case mitk::NDIAurora:
+        result += "<br>" + devName + ": " + "NDI Aurora";
+        m_Controls->m_portSpinBoxAurora->setValue(i);
+        break;
+      }
+
+    }
+  #endif
+
+  if ( result.size() == resultSize) result += "<br>none";
+
+  emit PortsScanned(PolarisPort,AuroraPort,result);
+}
+
+mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWorker::ScanPort(QString port)
+{
+  mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();
+  tracker->SetDeviceName(port.toStdString());
+  mitk::TrackingDeviceType returnValue = mitk::TrackingSystemInvalid;
+  try
+  {returnValue = tracker->TestConnection();}
+  catch (mitk::IGTException)
+  {}//do nothing: there is simply no device on this port
+  return returnValue;
+}

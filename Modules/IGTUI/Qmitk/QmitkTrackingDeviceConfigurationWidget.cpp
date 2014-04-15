@@ -35,8 +35,8 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   : QWidget(parent, f)
 {
   //initialize worker thread
-  m_TestConnectionWorker = new TestConnectionWorker();
-  m_ScanPortsWorker = new ScanPortsWorker();
+  m_TestConnectionWorker = new QmitkTrackingDeviceConfigurationWidgetConnectionWorker();
+  m_ScanPortsWorker = new QmitkTrackingDeviceConfigurationWidgetScanPortsWorker();
   m_ScanPortsWorkerThread = new QThread();
   m_TestConnectionWorkerThread = new QThread();
 
@@ -530,7 +530,7 @@ m_Controls->m_trackingDeviceChooser->setCurrentIndex(SelectedDevice);
 m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(m_MTCalibrationFile.c_str()));
 }
 
-void TestConnectionWorker::TestConnectionThreadFunc()
+void QmitkTrackingDeviceConfigurationWidgetConnectionWorker::TestConnectionThreadFunc()
 {
 MITK_INFO << "Testing Connection!";
 QString output;
@@ -568,7 +568,7 @@ catch(mitk::IGTException &e)
 emit ConnectionTested(connected,output);
 }
 
-void ScanPortsWorker::ScanPortsThreadFunc()
+void QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPortsThreadFunc()
 {
   int PolarisPort = -1;
   int AuroraPort = -1;
@@ -648,7 +648,7 @@ void ScanPortsWorker::ScanPortsThreadFunc()
   emit PortsScanned(PolarisPort,AuroraPort,result,PortTypePolaris,PortTypeAurora);
 }
 
-mitk::TrackingDeviceType ScanPortsWorker::ScanPort(QString port)
+mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPort(QString port)
 {
   mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();
   tracker->SetDeviceName(port.toStdString());
@@ -660,7 +660,7 @@ mitk::TrackingDeviceType ScanPortsWorker::ScanPort(QString port)
   return returnValue;
 }
 
-void TestConnectionWorker::SetTrackingDevice(mitk::TrackingDevice::Pointer t)
+void QmitkTrackingDeviceConfigurationWidgetConnectionWorker::SetTrackingDevice(mitk::TrackingDevice::Pointer t)
 {
   m_TrackingDevice = t;
 }

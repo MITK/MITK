@@ -24,52 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDevice.h"
 #include <mitkIPersistenceService.h>
 
-/**
- * TODO
- */
-class TestConnectionWorker : public QObject
-{
-  Q_OBJECT
-
-  public:
-
-  void SetTrackingDevice(mitk::TrackingDevice::Pointer t);
-
-  public slots:
-
-    void TestConnectionThreadFunc();
-  signals:
-
-    void ConnectionTested(bool connected, QString output);
-
-  protected:
-    mitk::TrackingDevice::Pointer m_TrackingDevice;
-};
-
-class ScanPortsWorker : public QObject
-{
-  Q_OBJECT
-
-  public slots:
-    void ScanPortsThreadFunc();
-
-  signals:
-
-   /**
-     * @param PolarisPort Returns the port, returns -1 if no device was found.
-     * @param AuroraPort Returns the port, returns -1 if no device was found.
-     * @param PortTypePolaris Returns the port type (0=usb,1=tty), returns -1 if the port type is not specified, e.g, in case of Windows.
-     * @param PortTypeAurora Returns the port type (0=usb,1=tty), returns -1 if the port type is not specified, e.g, in case of Windows.
-     */
-    void PortsScanned(int PolarisPort, int AuroraPort, QString result, int PortTypePolaris, int PortTypeAurora);
-
-  protected:
-
-    /** @brief   Scans the given port for a NDI tracking device.
-      * @return  Returns the type of the device if one was found. Returns TrackingSystemInvalid if none was found.
-      */
-    mitk::TrackingDeviceType ScanPort(QString port);
-};
+class QmitkTrackingDeviceConfigurationWidgetConnectionWorker;
+class QmitkTrackingDeviceConfigurationWidgetScanPortsWorker;
 
 //itk headers
 
@@ -183,8 +139,8 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
     typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;
 
-    ScanPortsWorker* m_ScanPortsWorker;
-    TestConnectionWorker* m_TestConnectionWorker;
+    QmitkTrackingDeviceConfigurationWidgetScanPortsWorker* m_ScanPortsWorker;
+    QmitkTrackingDeviceConfigurationWidgetConnectionWorker* m_TestConnectionWorker;
     QThread* m_ScanPortsWorkerThread;
     QThread* m_TestConnectionWorkerThread;
 
@@ -252,5 +208,57 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 
   private:
     PERSISTENCE_GET_SERVICE_METHOD_MACRO
+};
+
+//###################################################################################################
+//############ PRIVATE WORKER CLASSES FOR THREADS ###################################################
+//###################################################################################################
+
+
+/**
+ * TODO
+ */
+class QmitkTrackingDeviceConfigurationWidgetConnectionWorker : public QObject
+{
+  Q_OBJECT
+
+  public:
+
+  void SetTrackingDevice(mitk::TrackingDevice::Pointer t);
+
+  public slots:
+
+    void TestConnectionThreadFunc();
+  signals:
+
+    void ConnectionTested(bool connected, QString output);
+
+  protected:
+    mitk::TrackingDevice::Pointer m_TrackingDevice;
+};
+
+class QmitkTrackingDeviceConfigurationWidgetScanPortsWorker : public QObject
+{
+  Q_OBJECT
+
+  public slots:
+    void ScanPortsThreadFunc();
+
+  signals:
+
+   /**
+     * @param PolarisPort Returns the port, returns -1 if no device was found.
+     * @param AuroraPort Returns the port, returns -1 if no device was found.
+     * @param PortTypePolaris Returns the port type (0=usb,1=tty), returns -1 if the port type is not specified, e.g, in case of Windows.
+     * @param PortTypeAurora Returns the port type (0=usb,1=tty), returns -1 if the port type is not specified, e.g, in case of Windows.
+     */
+    void PortsScanned(int PolarisPort, int AuroraPort, QString result, int PortTypePolaris, int PortTypeAurora);
+
+  protected:
+
+    /** @brief   Scans the given port for a NDI tracking device.
+      * @return  Returns the type of the device if one was found. Returns TrackingSystemInvalid if none was found.
+      */
+    mitk::TrackingDeviceType ScanPort(QString port);
 };
 #endif

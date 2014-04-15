@@ -65,9 +65,15 @@ public:
   protected slots:
 
     /*!
-    \brief Cleans trajectory data before playing is started
+    \brief TODO
     */
     void OnPlayingStarted();
+
+    void OnOpenFile();
+    void OnSelectPlayer();
+    void OnSetRepeat();
+    void OnSetMicroservice();
+    void OnSetDisplay();
 
 protected:
 
@@ -83,25 +89,7 @@ protected:
   QmitkStdMultiWidget* m_MultiWidget;
   QmitkIGTPlayerWidget* m_PlayerWidget; ///< this bundle's playback widget
 
-  mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< this filter visualizes the navigation data
-
-  std::vector<mitk::DataNode::Pointer> m_RepresentationObjects; ///< vector for current visualization objects
-
-  mitk::DataNode::Pointer m_Trajectory; ///< main trajectory visualization DataNode
-  mitk::PointSet::Pointer m_TrajectoryPointSet; ///< PointSet with all points for trajectory
-  int m_TrajectoryIndex;  ///< trajectory tool index
-
-  bool m_ReloadData;  ///< flag needed for refresh of visualization if needed
-  bool m_ShowTrajectory;  ///< flag needed for trajectory visualization
-
-  mitk::SplineVtkMapper3D::Pointer m_SplineMapper; ///< spline trajectory mapper
-  mitk::PointSetVtkMapper3D::Pointer m_PointSetMapper; ///< standard trajectroy mapper
-
 private:
-  /**
-  \brief Returns color from colorcycle with given index
-  */
-  mitk::Color GetColorCircleColor(int index);
 };
 
 #endif // _QMITKNAVIGATIONDATAPLAYERVIEW_H_INCLUDED

@@ -35,8 +35,10 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   : QWidget(parent, f)
 {
   //initialize worker thread
-  m_Worker = new QmitkTrackingDeviceConfigurationWorker();
-  m_WorkerThread = new QThread();
+  m_TestConnectionWorker = new TestConnectionWorker();
+  m_ScanPortsWorker = new ScanPortsWorker();
+  m_ScanPortsWorkerThread = new QThread();
+  m_TestConnectionWorkerThread = new QThread();
 
   m_Controls = NULL;
   CreateQtPartControl(this);
@@ -139,8 +141,10 @@ switch(style)
 QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget()
 {
 StoreUISettings();
-if (m_Worker) delete m_Worker;
-if (m_WorkerThread) delete m_WorkerThread;
+if (m_ScanPortsWorker) delete m_ScanPortsWorker;
+if (m_TestConnectionWorker) delete m_TestConnectionWorker;
+if (m_ScanPortsWorkerThread) delete m_ScanPortsWorkerThread;
+if (m_TestConnectionWorkerThread) delete m_TestConnectionWorkerThread;
 }
 
 void QmitkTrackingDeviceConfigurationWidget::CreateQtPartControl(QWidget *parent)
@@ -170,11 +174,14 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_SetOptitrackCalibrationFile), SIGNAL(clicked()), this, SLOT(SetOptitrackCalibrationFileClicked()) );
 
     //slots for the worker thread
-    connect(m_Worker, SIGNAL(PortsScanned(int,int,QString,int,int)), this, SLOT(AutoScanPortsFinished(int,int,QString,int,int)) );
-    connect(m_WorkerThread,SIGNAL(started()), m_Worker, SLOT(ScanPortsThreadFunc()) );
+    connect(m_ScanPortsWorker, SIGNAL(PortsScanned(int,int,QString,int,int)), this, SLOT(AutoScanPortsFinished(int,int,QString,int,int)) );
+    connect(m_TestConnectionWorker, SIGNAL(ConnectionTested(bool,QString)), this, SLOT(TestConnectionFinished(bool,QString)) );
+    connect(m_ScanPortsWorkerThread,SIGNAL(started()), m_ScanPortsWorker, SLOT(ScanPortsThreadFunc()) );
+    connect(m_TestConnectionWorkerThread,SIGNAL(started()), m_TestConnectionWorker, SLOT(TestConnectionThreadFunc()) );
 
     //move the worker to the thread
-    m_Worker->moveToThread(m_WorkerThread);
+    m_ScanPortsWorker->moveToThread(m_ScanPortsWorkerThread);
+    m_TestConnectionWorker->moveToThread(m_TestConnectionWorkerThread);
 
     //set a few UI components depending on Windows / Linux
     #ifdef WIN32
@@ -255,35 +262,18 @@ this->setEnabled(false);
 //construct a tracking device:
 mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
 
-try
-  {
-  if (!testTrackingDevice->IsDeviceInstalled())
-     {
-     AddOutput("ERROR: Device is not installed!");
-     }
-  else
-    {
-    //test connection and start tracking, generate output
-    AddOutput("<br>testing connection <br>  ...");
-    testTrackingDevice->OpenConnection();
-    AddOutput("OK");
+m_TestConnectionWorker->SetTrackingDevice(testTrackingDevice);
 
-    //try start/stop tracking
-    AddOutput("<br>testing tracking <br>  ...");
-    testTrackingDevice->StartTracking();
-    testTrackingDevice->StopTracking();
+m_TestConnectionWorkerThread->start();
 
-    //try close connection
-    testTrackingDevice->CloseConnection();
-    AddOutput("OK");
-    }
-  }
-catch(mitk::IGTException &e)
-  {
-  AddOutput("ERROR!");
-  MITK_WARN << "Error while testing connection / start tracking of the device: " << e.GetDescription();
-  }
 
+}
+
+void QmitkTrackingDeviceConfigurationWidget::TestConnectionFinished(bool connected, QString output)
+{
+m_TestConnectionWorkerThread->quit();
+AddOutput(output.toStdString());
+MITK_INFO << "Test connection: " << connected;
 this->setEnabled(true);
 }
 
@@ -318,12 +308,12 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPorts()
   {
   this->setEnabled(false);
   AddOutput("<br>Scanning...");
-  m_WorkerThread->start();
+  m_ScanPortsWorkerThread->start();
   }
 
 void QmitkTrackingDeviceConfigurationWidget::AutoScanPortsFinished(int PolarisPort, int AuroraPort, QString result, int PortTypePolaris, int PortTypeAurora)
   {
-  m_WorkerThread->quit();
+  m_ScanPortsWorkerThread->quit();
   #ifdef WIN32
     if((PortTypePolaris!=-1)||(PortTypeAurora!=-1)) {MITK_WARN << "Port type is specified although this should not be the case for Windows. Ignoring port type.";}
   #else //linux systems
@@ -540,10 +530,45 @@ m_Controls->m_trackingDeviceChooser->setCurrentIndex(SelectedDevice);
 m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(m_MTCalibrationFile.c_str()));
 }
 
-void QmitkTrackingDeviceConfigurationWorker::TestConnectionThreadFunc()
-{}
+void TestConnectionWorker::TestConnectionThreadFunc()
+{
+MITK_INFO << "Testing Connection!";
+QString output;
+bool connected = false;
+try
+  {
+  if (!m_TrackingDevice->IsDeviceInstalled())
+     {
+     output = "ERROR: Device is not installed!";
+     }
+  else
+    {
+    //test connection and start tracking, generate output
+    output = "<br>testing connection <br>  ...";
+    m_TrackingDevice->OpenConnection();
+    output += "OK";
 
-void QmitkTrackingDeviceConfigurationWorker::ScanPortsThreadFunc()
+    //try start/stop tracking
+    output += "<br>testing tracking <br>  ...";
+    m_TrackingDevice->StartTracking();
+    m_TrackingDevice->StopTracking();
+
+    //try close connection
+    m_TrackingDevice->CloseConnection();
+    output += "OK";
+    connected = true;
+    }
+  }
+catch(mitk::IGTException &e)
+  {
+  output += "ERROR!";
+  MITK_WARN << "Error while testing connection / start tracking of the device: " << e.GetDescription();
+  }
+
+emit ConnectionTested(connected,output);
+}
+
+void ScanPortsWorker::ScanPortsThreadFunc()
 {
   int PolarisPort = -1;
   int AuroraPort = -1;
@@ -623,7 +648,7 @@ void QmitkTrackingDeviceConfigurationWorker::ScanPortsThreadFunc()
   emit PortsScanned(PolarisPort,AuroraPort,result,PortTypePolaris,PortTypeAurora);
 }
 
-mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWorker::ScanPort(QString port)
+mitk::TrackingDeviceType ScanPortsWorker::ScanPort(QString port)
 {
   mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();
   tracker->SetDeviceName(port.toStdString());
@@ -633,4 +658,9 @@ mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWorker::ScanPort(QStrin
   catch (mitk::IGTException)
   {}//do nothing: there is simply no device on this port
   return returnValue;
+}
+
+void TestConnectionWorker::SetTrackingDevice(mitk::TrackingDevice::Pointer t)
+{
+  m_TrackingDevice = t;
 }

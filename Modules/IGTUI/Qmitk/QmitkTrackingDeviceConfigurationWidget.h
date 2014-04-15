@@ -27,21 +27,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
  * TODO
  */
-class QmitkTrackingDeviceConfigurationWorker : public QObject
+class TestConnectionWorker : public QObject
 {
   Q_OBJECT
+
+  public:
+
+  void SetTrackingDevice(mitk::TrackingDevice::Pointer t);
 
   public slots:
 
     void TestConnectionThreadFunc();
+  signals:
 
+    void ConnectionTested(bool connected, QString output);
+
+  protected:
+    mitk::TrackingDevice::Pointer m_TrackingDevice;
+};
+
+class ScanPortsWorker : public QObject
+{
+  Q_OBJECT
+
+  public slots:
     void ScanPortsThreadFunc();
 
   signals:
 
-    void ConnectionTested();
-
-    /**
+   /**
      * @param PolarisPort Returns the port, returns -1 if no device was found.
      * @param AuroraPort Returns the port, returns -1 if no device was found.
      * @param PortTypePolaris Returns the port type (0=usb,1=tty), returns -1 if the port type is not specified, e.g, in case of Windows.
@@ -169,8 +183,10 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
     typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;
 
-    QmitkTrackingDeviceConfigurationWorker* m_Worker;
-    QThread* m_WorkerThread;
+    ScanPortsWorker* m_ScanPortsWorker;
+    TestConnectionWorker* m_TestConnectionWorker;
+    QThread* m_ScanPortsWorkerThread;
+    QThread* m_TestConnectionWorkerThread;
 
     //######################### internal help methods #######################################
     void ResetOutput();
@@ -190,6 +206,8 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      *        try to open a connection and start tracking. The user can see the result of the connection test on the small output window.
      */
     void TestConnection();
+
+    void TestConnectionFinished(bool connected, QString output);
 
     /* @brief This method is called when the user presses the button "finished". A new tracking device will be created in this case and will then
      *        then be availiable by calling GetTrackingDevice(). Also a signal TrackingDeviceConfigurationFinished() will be emitted. After this the

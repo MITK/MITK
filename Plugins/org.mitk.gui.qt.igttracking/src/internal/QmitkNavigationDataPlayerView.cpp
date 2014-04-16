@@ -152,11 +152,12 @@ void QmitkNavigationDataPlayerView::OnSetDisplay(){
 
 void QmitkNavigationDataPlayerView::CreatePipeline(){
   m_VisFilter = mitk::NavigationDataObjectVisualizationFilter::New();
+  m_VisFilter->ConnectTo(m_Player);
 
   for (unsigned int i = 0 ; i < m_Player->GetNumberOfIndexedOutputs(); i++ ) {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
-    // TODO Give Nodes a proper name
-    m_VisFilter->SetInput(i, m_Player->GetOutput(i));
+    QString name = "Recorded Tool " + QString::number(i);
+    node->SetName(name.toStdString());
 
     //create small sphere and use it as surface
     mitk::Surface::Pointer mySphere = mitk::Surface::New();

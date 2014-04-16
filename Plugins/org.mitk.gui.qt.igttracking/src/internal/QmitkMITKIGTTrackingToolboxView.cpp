@@ -913,13 +913,23 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ThreadFunc()
 
 void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
  {
- mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
+mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
  mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New(m_DataStorage);
  mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_TrackingDevice.GetPointer());
-  currentDevice->OpenConnection();
-  mitk::ProgressBar::GetInstance()->Progress();
-  currentDevice->StartTracking();
-  mitk::ProgressBar::GetInstance()->Progress();
+try
+      {
+      currentDevice->OpenConnection();
+      mitk::ProgressBar::GetInstance()->Progress();
+      currentDevice->StartTracking();
+      }
+    catch(mitk::Exception& e)
+      {
+      QString message = QString("Warning, can not auto-detect tools! (") + QString(e.GetDescription()) + QString(")");
+      //MessageBox(message.toStdString()); //TODO: give message to the user here!
+      MITK_WARN << message.toStdString();
+      mitk::ProgressBar::GetInstance()->Progress(4);
+      return;
+      }
 
   for (int i=0; i<currentDevice->GetToolCount(); i++)
     {

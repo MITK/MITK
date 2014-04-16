@@ -112,6 +112,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
     //connect worker thread
     connect(m_Worker, SIGNAL(AutoDetectToolsFinished()), this, SLOT(OnAutoDetectToolsFinished()) );
+    connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool,QString)), this, SLOT(OnConnectFinished(bool,QString)) );
     connect(m_WorkerThread,SIGNAL(started()), m_Worker, SLOT(ThreadFunc()) );
 
     //move the worker to the thread
@@ -218,6 +219,7 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
 
 void QmitkMITKIGTTrackingToolboxView::OnConnect()
   {
+  MITK_INFO << "Connect Clicked";
   //check if everything is ready to start tracking
   if (this->m_toolStorage.IsNull())
   {
@@ -230,72 +232,52 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
     return;
   }
 
-  //build the IGT pipeline
-  mitk::TrackingDevice::Pointer trackingDevice = this->m_Controls->m_configurationWidget->GetTrackingDevice();
-  trackingDevice->SetData(m_TrackingDeviceData);
-
-  //set device to rotation mode transposed becaus we are working with VNL style quaternions
-  if(m_Controls->m_InverseMode->isChecked())
-    trackingDevice->SetRotationMode(mitk::TrackingDevice::RotationTransposed);
-
-  //Get Tracking Volume Data
+  //parse tracking device data
   mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
-
   QString qstr =  m_Controls->m_VolumeSelectionBox->currentText();
   if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
     std::string str = qstr.toStdString();
     data = mitk::GetDeviceDataByName(str); //Data will be set later, after device generation
   }
 
-  //Create Navigation Data Source with the factory class
-  mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
-  m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
+  //initialize worker thread
+  m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eConnectDevice);
+  m_Worker->SetTrackingDevice(this->m_Controls->m_configurationWidget->GetTrackingDevice());
+  m_Worker->SetInverseMode(m_Controls->m_InverseMode->isChecked());
+  m_Worker->SetNavigationToolStorage(this->m_toolStorage);
+  m_Worker->SetTrackingDeviceData(data);
 
-  if ( m_TrackingDeviceSource.IsNull() )
-  {
-    MessageBox(std::string("Cannot connect to device: ") + myTrackingDeviceSourceFactory->GetErrorMessage());
-    return;
+  //start worker thread
+  m_WorkerThread->start();
+
+  //disable buttons
+  this->DisableTrackingConfigurationButtons();
+  this->DisableTrackingControls();
+  this->DisableOptionsButtons();
+  m_Controls->m_configurationWidget->setEnabled(false);
   }
 
-  //set filter to rotation mode transposed becaus we are working with VNL style quaternions
-  if(m_Controls->m_InverseMode->isChecked())
-    m_ToolVisualizationFilter->SetRotationMode(mitk::NavigationDataObjectVisualizationFilter::RotationTransposed);
-
-  //First check if the created object is valid
-  if (m_TrackingDeviceSource.IsNull())
+void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString errorMessage)
   {
-    MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
-    return;
-  }
+  m_WorkerThread->quit();
 
-  MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
+  //enable buttons
+  this->EnableTrackingConfigurationButtons();
+  this->EnableTrackingControls();
+  this->EnableOptionsButtons();
+  m_Controls->m_configurationWidget->setEnabled(true);
 
-  //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
-  mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();
-  if ((toolsInNewOrder.IsNotNull()) && (toolsInNewOrder->GetToolCount() > 0))
+  if (!success)
     {
-    //so delete the old tools in wrong order and add them in the right order
-    //we cannot simply replace the tool storage because the new storage is
-    //not correctly initialized with the right data storage
-    m_toolStorage->DeleteAllTools();
-    for (int i=0; i < toolsInNewOrder->GetToolCount(); i++) {m_toolStorage->AddTool(toolsInNewOrder->GetTool(i));}
-    }
-
-  //connect to device
-  try
-    {
-    m_TrackingDeviceSource->Connect();
-    //Microservice registration:
-    m_TrackingDeviceSource->RegisterAsMicroservice();
-    m_toolStorage->UnRegisterMicroservice();
-    m_toolStorage->RegisterAsMicroservice(m_TrackingDeviceSource->GetMicroserviceID());
-    m_toolStorage->LockStorage();
-    }
-  catch (...) //todo: change to mitk::IGTException
-    {
-    MessageBox("Error on connecting the tracking device.");
+    MITK_WARN << errorMessage.toStdString();
+    MessageBox(errorMessage.toStdString());
     return;
     }
+
+  //get data from worker thread
+  m_TrackingDeviceSource = m_Worker->GetTrackingDeviceSource();
+  m_TrackingDeviceData = m_Worker->GetTrackingDeviceData();
+  m_ToolVisualizationFilter = m_Worker->GetToolVisualizationFilter();
 
   //enable/disable Buttons
   m_Controls->m_Disconnect->setEnabled(true);
@@ -859,6 +841,21 @@ void QmitkMITKIGTTrackingToolboxViewWorker::SetDataStorage(mitk::DataStorage::Po
   m_DataStorage = d;
 }
 
+void QmitkMITKIGTTrackingToolboxViewWorker::SetInverseMode(bool mode)
+{
+  m_InverseMode = mode;
+}
+
+void QmitkMITKIGTTrackingToolboxViewWorker::SetTrackingDeviceData(mitk::TrackingDeviceData d)
+{
+  m_TrackingDeviceData = d;
+}
+
+void QmitkMITKIGTTrackingToolboxViewWorker::SetNavigationToolStorage(mitk::NavigationToolStorage::Pointer n)
+{
+  m_NavigationToolStorage = n;
+}
+
 void QmitkMITKIGTTrackingToolboxViewWorker::ThreadFunc()
 {
   switch(m_WorkerMethod)
@@ -867,14 +864,19 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ThreadFunc()
     this->AutoDetectTools();
     break;
   case eConnectDevice:
+    this->ConnectDevice();
     break;
   case eStartTracking:
+    this->StartTracking();
     break;
   case eStopTracking:
+    this->StopTracking();
     break;
   case eDisconnectDevice:
+    this->DisconnectDevice();
     break;
   default:
+    MITK_WARN << "Undefined worker method was set ... something went wrong!";
     break;
   }
 }
@@ -885,8 +887,6 @@ void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
  mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_TrackingDevice.GetPointer());
   currentDevice->OpenConnection();
   currentDevice->StartTracking();
-
-
 
   for (int i=0; i<currentDevice->GetToolCount(); i++)
     {
@@ -918,3 +918,88 @@ void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
 
   emit AutoDetectToolsFinished();
  }
+
+void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
+{
+  std::string message = "";
+
+  //build the IGT pipeline
+  mitk::TrackingDevice::Pointer trackingDevice = m_TrackingDevice;
+  trackingDevice->SetData(m_TrackingDeviceData);
+
+  //set device to rotation mode transposed becaus we are working with VNL style quaternions
+  if(m_InverseMode)
+    {trackingDevice->SetRotationMode(mitk::TrackingDevice::RotationTransposed);}
+
+  //Get Tracking Volume Data
+  mitk::TrackingDeviceData data = m_TrackingDeviceData;
+
+  //Create Navigation Data Source with the factory class
+  mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(m_NavigationToolStorage,trackingDevice);
+  m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(m_ToolVisualizationFilter);
+
+  if ( m_TrackingDeviceSource.IsNull() )
+  {
+    message = std::string("Cannot connect to device: ") + myTrackingDeviceSourceFactory->GetErrorMessage();
+    emit ConnectDeviceFinished(false,QString(message.c_str()));
+    return;
+  }
+
+  //set filter to rotation mode transposed becaus we are working with VNL style quaternions
+  if(m_InverseMode)
+    m_ToolVisualizationFilter->SetRotationMode(mitk::NavigationDataObjectVisualizationFilter::RotationTransposed);
+
+  //First check if the created object is valid
+  if (m_TrackingDeviceSource.IsNull())
+  {
+    message = myTrackingDeviceSourceFactory->GetErrorMessage();
+    emit ConnectDeviceFinished(false,QString(message.c_str()));
+    return;
+  }
+
+  MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
+
+  //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
+  mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();
+  if ((toolsInNewOrder.IsNotNull()) && (toolsInNewOrder->GetToolCount() > 0))
+    {
+    //so delete the old tools in wrong order and add them in the right order
+    //we cannot simply replace the tool storage because the new storage is
+    //not correctly initialized with the right data storage
+    m_NavigationToolStorage->DeleteAllTools();
+    for (int i=0; i < toolsInNewOrder->GetToolCount(); i++) {m_NavigationToolStorage->AddTool(toolsInNewOrder->GetTool(i));}
+    }
+
+  //connect to device
+  try
+    {
+    m_TrackingDeviceSource->Connect();
+    //Microservice registration:
+    m_TrackingDeviceSource->RegisterAsMicroservice();
+    m_NavigationToolStorage->UnRegisterMicroservice();
+    m_NavigationToolStorage->RegisterAsMicroservice(m_TrackingDeviceSource->GetMicroserviceID());
+    m_NavigationToolStorage->LockStorage();
+    }
+  catch (...) //todo: change to mitk::IGTException
+    {
+    message = "Error on connecting the tracking device.";
+    emit ConnectDeviceFinished(false,QString(message.c_str()));
+    return;
+    }
+  emit ConnectDeviceFinished(true,QString(message.c_str()));
+}
+
+void QmitkMITKIGTTrackingToolboxViewWorker::StartTracking()
+{
+
+}
+
+void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
+{
+
+}
+
+void QmitkMITKIGTTrackingToolboxViewWorker::DisconnectDevice()
+{
+
+}

@@ -135,6 +135,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
    //slots for worker thread
    void OnAutoDetectToolsFinished();
+   void OnConnectFinished(bool success, QString errorMessage);
 
   protected:
 
@@ -197,14 +198,25 @@ public:
   void SetWorkerMethod(WorkerMethod w);
   void SetTrackingDevice(mitk::TrackingDevice::Pointer t);
   void SetDataStorage(mitk::DataStorage::Pointer d);
+  void SetInverseMode(bool mode);
+  void SetTrackingDeviceData(mitk::TrackingDeviceData d);
+  void SetNavigationToolStorage(mitk::NavigationToolStorage::Pointer n);
 
   itkGetMacro(NavigationToolStorage,mitk::NavigationToolStorage::Pointer);
+
+  itkGetMacro(TrackingDeviceSource,mitk::TrackingDeviceSource::Pointer);
+  itkGetMacro(TrackingDeviceData,mitk::TrackingDeviceData);
+  itkGetMacro(ToolVisualizationFilter,mitk::NavigationDataObjectVisualizationFilter::Pointer);
 
   public slots:
     void ThreadFunc();
 
   signals:
     void AutoDetectToolsFinished();
+    void ConnectDeviceFinished(bool success, QString errorMessage);
+    void StartTrackingFinished();
+    void StopTrackingFinished();
+    void DisconnectDeviceFinished();
 
 
   protected:
@@ -214,7 +226,17 @@ public:
     mitk::DataStorage::Pointer m_DataStorage;
     mitk::NavigationToolStorage::Pointer m_NavigationToolStorage;
 
+    //members for the filter pipeline which is created in the worker thread during ConnectDevice()
+    mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource; ///> member for the source of the IGT pipeline
+    mitk::TrackingDeviceData m_TrackingDeviceData; ///> stores the tracking device data as long as this is not handled by the tracking device configuration widget
+    mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter; ///> holds the tool visualization filter (second filter of the IGT pipeline)
+    bool m_InverseMode;
+
     void AutoDetectTools();
+    void ConnectDevice();
+    void StartTracking();
+    void StopTracking();
+    void DisconnectDevice();
 };
 
 

@@ -728,3 +728,37 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
   }
 }
 
+bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
+{
+  //check geometries
+  if ( this->GetGeometry2D() && other.GetGeometry2D() )
+  {
+    if( !Equal(*(this->GetGeometry2D()), *(other.GetGeometry2D()), mitk::eps, true))
+    {
+      return false;
+    }
+  }
+  else
+  {
+    return false;
+  }
+
+  //check isPlaced member
+  if ( this->m_FigurePlaced != other.m_FigurePlaced)
+  {
+    return false;
+  }
+
+  //check control points
+  if (this->m_ControlPoints != other.m_ControlPoints)
+  {
+    return false;
+  }
+
+  return true;
+}
+
+bool mitk::Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose )
+{
+  return leftHandSide.Equals(rightHandSide);
+}

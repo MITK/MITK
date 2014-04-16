@@ -83,6 +83,7 @@ protected:
   const unsigned int FEATURE_ID_CIRCUMFERENCE;
   const unsigned int FEATURE_ID_AREA;
 
+  virtual bool Equals(mitk::PlanarFigure& other);
 
 private:
 

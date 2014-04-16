@@ -283,6 +283,11 @@ public:
   * the points are constrained by the image bounds. */
   virtual Point2D ApplyControlPointConstraints( unsigned int /*index*/, const Point2D& point );
 
+  /**
+  * \brief Compare two PlanarFigure objects
+  * Note: all subclasses have to implement the method on their own.
+  */
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 
 protected:
@@ -412,6 +417,8 @@ private:
   std::pair<double, unsigned int> m_DisplaySize;
 
 };
+
+MITK_CORE_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );
 
 } // namespace mitk
 

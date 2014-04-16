@@ -14,6 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+//testing headers
+#include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
+
 #include <mitkNavigationDataRecorder.h>
 #include <mitkNavigationDataPlayer.h>
 #include <mitkNavigationData.h>
@@ -33,26 +37,47 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTException.h"
 #include "mitkIGTIOException.h"
 
-class mitkNavigationDataSetReaderWriterTestClass
+class mitkNavigationDataSetReaderWriterTestSuite : public mitk::TestFixture
 {
+  CPPUNIT_TEST_SUITE(mitkNavigationDataSetReaderWriterTestSuite);
+  MITK_TEST(TestCompareFunction);
+  MITK_TEST(TestReadWrite);
+  CPPUNIT_TEST_SUITE_END();
+private:
+  std::string pathRead;
+  std::string pathWrite;
+  std::string pathWrong;
+  mitk::NavigationDataSetWriterXML writer;
+  mitk::NavigationDataReaderXML::Pointer reader;
+  mitk::NavigationDataSet::Pointer set;
 public:
+  void setUp()
+  {
+    pathRead = GetTestDataFilePath("IGT-Data/NavigationDataSet.xml");
 
-  static void TestReadWrite()
+    pathWrite = pathRead;
+    pathWrite.insert(pathWrite.end()-4,'2');;//Insert X: IGT-Data/NavigationDataSet2.xml
+
+    pathWrong = pathRead;
+    pathWrong.insert(pathWrong.end()-4,'X');;//Insert X: IGT-Data/NavigationDataSetX.xml
+
+    reader = mitk::NavigationDataReaderXML::New();
+  }
+
+  void tearDown()
+  {
+  }
+  void TestReadWrite()
   {
     // Aim is to read an xml into a pointset, write that xml again, and compare the output
 
-    mitk::NavigationDataSetWriterXML writer;
-    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    set = reader->Read(pathRead);
+    writer.Write(pathWrite, set);
 
-    std::string path = "F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml";
-    mitk::NavigationDataSet::Pointer set = reader->Read(path);
-    writer.Write("F://Build//MITK-Data//IGT-Data//NavigationDataSet2.xml", set);
-
-    MITK_TEST_CONDITION_REQUIRED(mitkNavigationDataSetReaderWriterTestClass::CompareFiles("F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml",
-      "F://Build//MITK-Data//IGT-Data//NavigationDataSet2.xml"), "Testing if read/write cycle creates identical files");
+    CPPUNIT_ASSERT_MESSAGE( "Testing if read/write cycle creates identical files", CompareFiles(pathRead, pathWrite));
   }
 
-  static bool CompareFiles(std::string file1, std::string file2)
+  bool CompareFiles(std::string file1, std::string file2)
   {
     FILE* f1 = fopen (file1.c_str() , "r");
     FILE* f2 = fopen (file2.c_str() , "r");
@@ -71,20 +96,13 @@ public:
 
     return feof(f1) && feof(f2);
   }
+
+  void TestCompareFunction()
+  {
+    CPPUNIT_ASSERT_MESSAGE( "Asserting that compare function for files works correctly - Positive Test", CompareFiles(pathRead,
+      pathRead));
+    CPPUNIT_ASSERT_MESSAGE("Asserting that compare function for files works correctly - Negative Test", ! CompareFiles(pathRead,
+      pathWrong) );
+  }
 };
-
-/**Documentation
-*  test for the class "NavigationDataRecorder".
-*/
-int mitkNavigationDataSetReaderWriterTest(int /* argc */, char* /*argv*/[])
-{
-  MITK_TEST_BEGIN("NavigationDataRecorder");
-
-  MITK_TEST_CONDITION_REQUIRED(mitkNavigationDataSetReaderWriterTestClass::CompareFiles("F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml",
-    "F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml"), "Asserting that compare function for files works correctly - Positive Test");
-  MITK_TEST_CONDITION_REQUIRED(! mitkNavigationDataSetReaderWriterTestClass::CompareFiles("F://Build//MITK-Data//IGT-Data//NavigationDataSet.xml",
-    "F://Build//MITK-Data//IGT-Data//SROMFile.rom"), "Asserting that compare function for files works correctly - Negative Test");
-  mitkNavigationDataSetReaderWriterTestClass::TestReadWrite();
-
-  MITK_TEST_END();
-};
+MITK_TEST_SUITE_REGISTRATION(mitkNavigationDataSetReaderWriter)

@@ -134,7 +134,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void DisableTrackingControls();
 
    //slots for worker thread
-   void OnAutoDetectToolsFinished();
+   void OnAutoDetectToolsFinished(bool success, QString errorMessage);
    void OnConnectFinished(bool success, QString errorMessage);
    void OnStartTrackingFinished(bool success, QString errorMessage);
    void OnStopTrackingFinished(bool success, QString errorMessage);
@@ -215,7 +215,7 @@ public:
     void ThreadFunc();
 
   signals:
-    void AutoDetectToolsFinished();
+    void AutoDetectToolsFinished(bool success, QString errorMessage);
     void ConnectDeviceFinished(bool success, QString errorMessage);
     void StartTrackingFinished(bool success, QString errorMessage);
     void StopTrackingFinished(bool success, QString errorMessage);

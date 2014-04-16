@@ -101,6 +101,6 @@ void mitk::NavigationDataToNavigationDataFilter::CreateOutputsForAllInputs()
     {
       mitk::NavigationData::Pointer newOutput = mitk::NavigationData::New();
       this->SetNthOutput(idx, newOutput);
+      this->Modified();
     }
-    this->Modified();
 }

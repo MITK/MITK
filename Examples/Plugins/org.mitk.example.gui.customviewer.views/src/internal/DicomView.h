@@ -67,7 +67,7 @@ protected Q_SLOTS:
    * node to the data storage. Subsequently switches to the ViewerPerspective for further
    * data examination.
    */
-  void AddDataNodeFromDICOM(const QStringList& Properties);
+  void AddDataNodeFromDICOM(QHash<QString, QVariant> eventProperties);
 
 protected:
 

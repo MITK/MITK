@@ -97,12 +97,10 @@ protected:
   QmitkStdMultiWidget* m_MultiWidget;
 
   template<int L>
-  void TemplatedAnalyticalQBallReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols,
-    float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes, int normalization);
+  void TemplatedAnalyticalQBallReconstruction(mitk::DataNode* dataNodePointer, float lambda, int normalization);
 
   template<int L>
-  void TemplatedMultiQBallReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols,
-    float lambda, const mitk::DataNode * , std::vector<mitk::DataNode::Pointer>* nodes);
+  void TemplatedMultiQBallReconstruction(float lambda, mitk::DataNode*);
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 

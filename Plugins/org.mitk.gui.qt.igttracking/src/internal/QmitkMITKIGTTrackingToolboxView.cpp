@@ -114,6 +114,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     //connect worker thread
     connect(m_Worker, SIGNAL(AutoDetectToolsFinished()), this, SLOT(OnAutoDetectToolsFinished()) );
     connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool,QString)), this, SLOT(OnConnectFinished(bool,QString)) );
+    connect(m_Worker, SIGNAL(StartTrackingFinished(bool,QString)), this, SLOT(OnStartTrackingFinished(bool,QString)) );
     connect(m_WorkerThread,SIGNAL(started()), m_Worker, SLOT(ThreadFunc()) );
 
     //move the worker to the thread
@@ -308,15 +309,22 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnect()
 
 void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
 {
-  try
-    {
-    m_TrackingDeviceSource->StartTracking();
-    }
-  catch (...) //todo: change to mitk::IGTException
-    {
-    MessageBox("Error while starting the tracking device!");
+  m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eStartTracking);
+  m_WorkerThread->start();
+  this->m_Controls->m_MainWidget->setEnabled(false);
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QString errorMessage)
+{
+  m_WorkerThread->quit();
+  this->m_Controls->m_MainWidget->setEnabled(true);
+
+  if(!success)
+  {
+    MessageBox(errorMessage.toStdString());
+    MITK_WARN << errorMessage.toStdString();
     return;
-    }
+  }
 
   m_TrackingTimer->start(1000/(m_Controls->m_UpdateRate->value()));
   m_Controls->m_TrackingControlLabel->setText("Status: tracking");
@@ -997,7 +1005,18 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
 
 void QmitkMITKIGTTrackingToolboxViewWorker::StartTracking()
 {
-
+  QString errorMessage = "";
+  try
+    {
+    m_TrackingDeviceSource->StartTracking();
+    }
+  catch (...) //todo: change to mitk::IGTException
+    {
+    errorMessage += "Error while starting the tracking device!";
+    emit StartTrackingFinished(false,errorMessage);
+    return;
+    }
+  emit StartTrackingFinished(true,errorMessage);
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()

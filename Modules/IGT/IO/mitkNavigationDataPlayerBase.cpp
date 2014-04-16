@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTException.h"
 
 mitk::NavigationDataPlayerBase::NavigationDataPlayerBase()
-  : m_NumberOfOutputs(0)
 {
   m_Name ="Navigation Data Player Source";
 }
@@ -66,7 +65,7 @@ void mitk::NavigationDataPlayerBase::InitPlayer()
       << "NavigationDataSet has to be set before initializing player.";
   }
 
-  if (m_NumberOfOutputs == 0)
+  if (GetNumberOfOutputs() == 0)
   {
     int requiredOutputs = m_NavigationDataSet->GetNumberOfTools();
     this->SetNumberOfRequiredOutputs(requiredOutputs);
@@ -78,7 +77,7 @@ void mitk::NavigationDataPlayerBase::InitPlayer()
       this->Modified();
     }
   }
-  else if (m_NumberOfOutputs != m_NavigationDataSet->GetNumberOfTools())
+  else if (GetNumberOfOutputs() != m_NavigationDataSet->GetNumberOfTools())
   {
     mitkThrowException(mitk::IGTException)
       << "Number of tools cannot be changed in existing player. Please create "

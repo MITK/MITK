@@ -77,7 +77,7 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
   }
   else
   {
-    for (unsigned int index = 0; index < m_NumberOfOutputs; index++)
+    for (unsigned int index = 0; index < GetNumberOfOutputs(); index++)
     {
       mitk::NavigationData* output = this->GetOutput(index);
       if( !output ) { mitkThrowException(mitk::IGTException) << "Output of index "<<index<<" is null."; }

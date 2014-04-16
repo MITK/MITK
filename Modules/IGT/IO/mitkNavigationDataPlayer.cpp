@@ -25,18 +25,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationDataPlayer::NavigationDataPlayer()
   : m_CurPlayerState(PlayerStopped),
-    m_StartPlayingTimeStamp(0.0), m_PauseTimeStamp(0.0)
+  m_StartPlayingTimeStamp(0.0), m_PauseTimeStamp(0.0)
 {
   // to get a start time
   mitk::IGTTimeStamp::GetInstance()->Start(this);
 }
 
-
 mitk::NavigationDataPlayer::~NavigationDataPlayer()
 {
   StopPlaying();
 }
-
 
 void mitk::NavigationDataPlayer::GenerateData()
 {
@@ -50,7 +48,6 @@ void mitk::NavigationDataPlayer::GenerateData()
 
   // get elapsed time since start of playing
   m_TimeStampSinceStart = mitk::IGTTimeStamp::GetInstance()->GetElapsed() - m_StartPlayingTimeStamp;
-
 
   // iterate through all NavigationData objects of the given tool index
   // till the timestamp of the NavigationData is greater then the given timestamp
@@ -72,7 +69,7 @@ void mitk::NavigationDataPlayer::GenerateData()
     return;
   }
 
-  for (unsigned int index = 0; index < m_NumberOfOutputs; index++)
+  for (unsigned int index = 0; index < GetNumberOfOutputs(); index++)
   {
     mitk::NavigationData* output = this->GetOutput(index);
     if( !output ) { mitkThrowException(mitk::IGTException) << "Output of index "<<index<<" is null."; }
@@ -87,7 +84,6 @@ void mitk::NavigationDataPlayer::GenerateData()
     this->StopPlaying();
   }
 }
-
 
 void mitk::NavigationDataPlayer::UpdateOutputInformation()
 {
@@ -107,7 +103,7 @@ void mitk::NavigationDataPlayer::StartPlaying()
   // timestamp for indicating playing start is set to the past
   // so that the first navigation data object will be shown NOW
   m_StartPlayingTimeStamp = mitk::IGTTimeStamp::GetInstance()->GetElapsed()
-      - m_NavigationDataSet->Begin()->at(0)->GetIGTTimeStamp();
+    - m_NavigationDataSet->Begin()->at(0)->GetIGTTimeStamp();
 }
 
 void mitk::NavigationDataPlayer::StopPlaying()
@@ -142,7 +138,7 @@ void mitk::NavigationDataPlayer::Resume()
 
     // in this case m_StartPlayingTimeStamp is set to the total elapsed time with NO playback
     m_StartPlayingTimeStamp = mitk::IGTTimeStamp::GetInstance()->GetElapsed()
-        - (m_PauseTimeStamp - m_StartPlayingTimeStamp);
+      - (m_PauseTimeStamp - m_StartPlayingTimeStamp);
   }
   else
   {

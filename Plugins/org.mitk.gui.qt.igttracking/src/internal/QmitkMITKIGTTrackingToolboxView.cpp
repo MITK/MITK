@@ -116,6 +116,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool,QString)), this, SLOT(OnConnectFinished(bool,QString)) );
     connect(m_Worker, SIGNAL(StartTrackingFinished(bool,QString)), this, SLOT(OnStartTrackingFinished(bool,QString)) );
     connect(m_Worker, SIGNAL(StopTrackingFinished(bool,QString)), this, SLOT(OnStopTrackingFinished(bool,QString)) );
+    connect(m_Worker, SIGNAL(DisconnectDeviceFinished(bool,QString)), this, SLOT(OnDisconnectFinished(bool,QString)) );
     connect(m_WorkerThread,SIGNAL(started()), m_Worker, SLOT(ThreadFunc()) );
 
     //move the worker to the thread
@@ -290,11 +291,22 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
 
 void QmitkMITKIGTTrackingToolboxView::OnDisconnect()
   {
-  if (m_tracking) this->OnStopTracking();
+  m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eDisconnectDevice);
+  m_WorkerThread->start();
+  m_Controls->m_MainWidget->setEnabled(false);
+  }
 
-  m_TrackingDeviceSource->Disconnect();
-  m_TrackingDeviceSource->UnRegisterMicroservice();
-  m_toolStorage->UnLockStorage();
+void QmitkMITKIGTTrackingToolboxView::OnDisconnectFinished(bool success, QString errorMessage)
+  {
+  m_WorkerThread->quit();
+  m_Controls->m_MainWidget->setEnabled(true);
+
+  if (!success)
+    {
+    MITK_WARN << errorMessage.toStdString();
+    MessageBox(errorMessage.toStdString());
+    return;
+    }
 
   //enable/disable Buttons
   m_Controls->m_Disconnect->setEnabled(false);
@@ -305,7 +317,6 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnect()
   EnableTrackingConfigurationButtons();
   m_Controls->m_configurationWidget->Reset();
   m_Controls->m_TrackingControlLabel->setText("Status: disconnected");
-
   }
 
 void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
@@ -1042,7 +1053,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
   {
   m_TrackingDeviceSource->StopTracking();
   }
-  catch(mitk::IGTException& e)
+  catch(mitk::Exception& e)
   {
     emit StopTrackingFinished(false, e.GetDescription());
   }
@@ -1052,5 +1063,16 @@ void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
 
 void QmitkMITKIGTTrackingToolboxViewWorker::DisconnectDevice()
 {
-
+  try
+    {
+    if (m_TrackingDeviceSource->IsTracking()) {m_TrackingDeviceSource->StopTracking();}
+    m_TrackingDeviceSource->Disconnect();
+    m_TrackingDeviceSource->UnRegisterMicroservice();
+    m_NavigationToolStorage->UnLockStorage();
+    }
+  catch(mitk::Exception& e)
+    {
+    emit DisconnectDeviceFinished(false, e.GetDescription());
+    }
+  emit DisconnectDeviceFinished(true, "");
 }

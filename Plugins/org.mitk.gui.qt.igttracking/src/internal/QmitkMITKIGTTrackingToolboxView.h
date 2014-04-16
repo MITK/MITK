@@ -138,6 +138,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void OnConnectFinished(bool success, QString errorMessage);
    void OnStartTrackingFinished(bool success, QString errorMessage);
    void OnStopTrackingFinished(bool success, QString errorMessage);
+   void OnDisconnectFinished(bool success, QString errorMessage);
 
   protected:
 

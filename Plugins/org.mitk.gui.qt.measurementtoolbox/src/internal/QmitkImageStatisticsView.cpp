@@ -238,7 +238,7 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
       .arg( statistics.Max, 0, 'f', 10 )
       .arg( statistics.Min, 0, 'f', 10 )
       .arg( statistics.N )
-      .arg( m_Controls->m_StatisticsTable->item( 0, 6 )->text() );
+      .arg( m_Controls->m_StatisticsTable->item( 0, 6 )->text().toDouble(), 0, 'f', 10 );
 
     QApplication::clipboard()->setText(
       clipboard, QClipboard::Clipboard );

@@ -21,10 +21,12 @@ set(MODULE_TESTS
    mitkNavigationDataDisplacementFilterTest.cpp
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp
+   mitkNavigationDataSetTest.cpp
    mitkNavigationDataTest.cpp
    mitkNavigationDataRecorderTest.cpp
    mitkNavigationDataReferenceTransformFilterTest.cpp
    mitkNavigationDataSequentialPlayerTest.cpp
+   mitkNavigationDataSetReaderWriterTest.cpp
    mitkNavigationDataSourceTest.cpp
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp

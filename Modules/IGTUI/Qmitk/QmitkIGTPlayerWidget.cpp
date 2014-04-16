@@ -26,23 +26,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkIGTException.h>
-
+#include "mitkNavigationDataReaderXML.h"
 
 //qt headers
 #include <qfiledialog.h>
 #include <qmessagebox.h>
 #include <qtimer.h>
 
-
 QmitkIGTPlayerWidget::QmitkIGTPlayerWidget(QWidget* parent, Qt::WindowFlags f)
-: QWidget(parent, f)
-,m_RealTimePlayer(NULL)
-,m_SequentialPlayer(NULL)
-,m_StartTime(-1.0)
-,m_CurrentSequentialPointNumber(0)
+  : QWidget(parent, f),
+  m_RealTimePlayer(mitk::NavigationDataPlayer::New()),
+  m_SequentialPlayer(mitk::NavigationDataSequentialPlayer::New()),
+  m_StartTime(-1.0),
+  m_CurrentSequentialPointNumber(0),
+  m_Controls(new Ui::QmitkIGTPlayerWidgetControls)
 {
-  m_Controls = NULL;
-  CreateQtPartControl(this);
+  m_Controls->setupUi(this);
+  m_PlayingTimer = new QTimer(this); // initialize update timer
+
   CreateConnections();
 
   m_Controls->samplePositionHorizontalSlider->setVisible(false);
@@ -50,54 +51,35 @@ QmitkIGTPlayerWidget::QmitkIGTPlayerWidget(QWidget* parent, Qt::WindowFlags f)
   this->ResetLCDNumbers(); // reset lcd numbers at start
 }
 
-
 QmitkIGTPlayerWidget::~QmitkIGTPlayerWidget()
 {
   m_PlayingTimer->stop();
-  m_RealTimePlayer = NULL;
-  m_PlayingTimer = NULL;
-}
 
-void QmitkIGTPlayerWidget::CreateQtPartControl(QWidget *parent)
-{
-  if (!m_Controls)
-  {
-    // create GUI widgets
-    m_Controls = new Ui::QmitkIGTPlayerWidgetControls;
-    m_Controls->setupUi(parent);
-
-    m_PlayingTimer = new QTimer(this); // initialize update timer
-   }
-
+  delete m_Controls;
 }
 
 void QmitkIGTPlayerWidget::CreateConnections()
 {
-  if ( m_Controls )
-  {
-    connect( (QObject*)(m_Controls->selectPushButton), SIGNAL(clicked()), this, SLOT(OnSelectPressed()) ); // open file dialog
-    connect( (QObject*)(m_Controls->playPushButton), SIGNAL(clicked(bool)), this, SLOT(OnPlayButtonClicked(bool)) ); // play button
-    connect( (QObject*)(m_PlayingTimer), SIGNAL(timeout()), this, SLOT(OnPlaying()) ); // update timer
-    connect( (QObject*) (m_Controls->beginPushButton), SIGNAL(clicked()), this, SLOT(OnGoToBegin()) ); // reset player and go to begin
-    connect( (QObject*) (m_Controls->stopPushButton), SIGNAL(clicked()), this, SLOT(OnGoToEnd()) ); // reset player
-    // pass this widgets protected combobox signal to public signal
-    connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
-    // pass this widgets protected checkbox signal to public signal
-    connect( m_Controls->splineModeCheckBox, SIGNAL(toggled(bool)), this, SIGNAL(SignalSplineModeToggled(bool)) );
-    connect( m_Controls->sequencialModeCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnSequencialModeToggled(bool)) );
+  connect( (QObject*)(m_Controls->playPushButton), SIGNAL(clicked(bool)), this, SLOT(OnPlayButtonClicked(bool)) ); // play button
+  connect( (QObject*)(m_PlayingTimer), SIGNAL(timeout()), this, SLOT(OnPlaying()) ); // update timer
+  connect( (QObject*) (m_Controls->beginPushButton), SIGNAL(clicked()), this, SLOT(OnGoToBegin()) ); // reset player and go to begin
+  connect( (QObject*) (m_Controls->stopPushButton), SIGNAL(clicked()), this, SLOT(OnGoToEnd()) ); // reset player
+  // pass this widgets protected combobox signal to public signal
+  connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
+  // pass this widgets protected checkbox signal to public signal
+  connect( m_Controls->splineModeCheckBox, SIGNAL(toggled(bool)), this, SIGNAL(SignalSplineModeToggled(bool)) );
+  //connect( m_Controls->sequencialModeCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnSequencialModeToggled(bool)) );
 
-    connect( m_Controls->samplePositionHorizontalSlider, SIGNAL(sliderPressed()), this, SLOT(OnSliderPressed()) );
-    connect( m_Controls->samplePositionHorizontalSlider, SIGNAL(sliderReleased()), this, SLOT(OnSliderReleased()) );
+  connect( m_Controls->samplePositionHorizontalSlider, SIGNAL(sliderPressed()), this, SLOT(OnSliderPressed()) );
+  connect( m_Controls->samplePositionHorizontalSlider, SIGNAL(sliderReleased()), this, SLOT(OnSliderReleased()) );
 
-  }
+  connect( m_Controls->m_OpenFileButton, SIGNAL(clicked()), this, SLOT(OnOpenFileButtonPressed()) );
 }
-
 
 bool QmitkIGTPlayerWidget::IsTrajectoryInSplineMode()
 {
   return m_Controls->splineModeCheckBox->isChecked();
 }
-
 
 bool QmitkIGTPlayerWidget::CheckInputFileValid()
 {
@@ -112,7 +94,6 @@ bool QmitkIGTPlayerWidget::CheckInputFileValid()
 
   return true;
 }
-
 
 unsigned int QmitkIGTPlayerWidget::GetNumberOfTools()
 {
@@ -134,7 +115,6 @@ unsigned int QmitkIGTPlayerWidget::GetNumberOfTools()
   return result;
 }
 
-
 void QmitkIGTPlayerWidget::SetUpdateRate(unsigned int msecs)
 {
   m_PlayingTimer->setInterval((int) msecs); // set update timer update rate
@@ -142,10 +122,32 @@ void QmitkIGTPlayerWidget::SetUpdateRate(unsigned int msecs)
 
 void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
 {
-
+  if ( ! checked )
+  {
+    if ( this->GetCurrentPlaybackMode() == RealTimeMode )
+    {
+      m_RealTimePlayer->StopPlaying();
+    }
+    else if ( this->GetCurrentPlaybackMode() == SequentialMode )
+    {
+      //      m_SequentialPlayer->
+    }
+  }
 
   if(CheckInputFileValid())  // no playing possible without valid input file
   {
+    switch ( this->GetCurrentPlaybackMode() )
+    {
+    case RealTimeMode:
+      {
+        break;
+      }
+    case SequentialMode:
+      {
+        break;
+      }
+    }
+
     PlaybackMode currentMode = this->GetCurrentPlaybackMode();
     bool isRealTimeMode = currentMode == RealTimeMode;
     bool isSequentialMode = currentMode == SequentialMode;
@@ -154,37 +156,52 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
     {
       if( (isRealTimeMode && m_RealTimePlayer.IsNull()) || (isSequentialMode && m_SequentialPlayer.IsNull()))  // start play
       {
+        mitk::NavigationDataSet::Pointer navigationDataSet;
+        try
+        {
+          mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+          navigationDataSet = reader->Read(m_CmpFilename.toStdString());
+        }
+        catch(mitk::IGTException)
+        {
+          std::string errormessage = "Error during start playing. Invalid or wrong file?";
+          QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+          m_Controls->playPushButton->setChecked(false);
+          m_RealTimePlayer = NULL;
+          return;
+        }
+
         if(isRealTimeMode)
         {
           m_RealTimePlayer = mitk::NavigationDataPlayer::New();
-          m_RealTimePlayer->SetFileName(m_CmpFilename.toStdString());
+          m_RealTimePlayer->SetNavigationDataSet(navigationDataSet);
           try
-            {
+          {
             m_RealTimePlayer->StartPlaying();
-            }
+          }
           catch(mitk::IGTException)
-            {
+          {
             std::string errormessage = "Error during start playing. Invalid or wrong file?";
             QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
             m_Controls->playPushButton->setChecked(false);
             m_RealTimePlayer = NULL;
             return;
-            }
+          }
         }
         else if(isSequentialMode)
         {
           m_SequentialPlayer = mitk::NavigationDataSequentialPlayer::New();
           try
           {
-          m_SequentialPlayer->SetFileName(m_CmpFilename.toStdString());
+            m_SequentialPlayer->SetNavigationDataSet(navigationDataSet);
           }
           catch(mitk::IGTException)
           {
-           std::string errormessage = "Error during start playing. Invalid or wrong file type?";
-           QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
-           m_Controls->playPushButton->setChecked(false);
-           m_RealTimePlayer = NULL;
-           return;
+            std::string errormessage = "Error during start playing. Invalid or wrong file type?";
+            QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+            m_Controls->playPushButton->setChecked(false);
+            m_RealTimePlayer = NULL;
+            return;
           }
 
           m_Controls->samplePositionHorizontalSlider->setMinimum(0);
@@ -219,16 +236,17 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
   }
 
   else
+  {
     m_Controls->playPushButton->setChecked(false); // uncheck play button if file unvalid
+  }
 }
-
 
 QmitkIGTPlayerWidget::PlaybackMode QmitkIGTPlayerWidget::GetCurrentPlaybackMode()
 {
-  if(m_Controls->sequencialModeCheckBox->isChecked())
-    return SequentialMode;
-  else
-    return RealTimeMode;
+  /*if(m_Controls->sequencialModeCheckBox->isChecked())
+  return SequentialMode;
+  else*/
+  return RealTimeMode;
 }
 
 QTimer*  QmitkIGTPlayerWidget::GetPlayingTimer()
@@ -241,7 +259,6 @@ void QmitkIGTPlayerWidget::OnStopPlaying()
   this->StopPlaying();
 }
 
-
 void QmitkIGTPlayerWidget::StopPlaying()
 {
   m_PlayingTimer->stop();
@@ -250,9 +267,6 @@ void QmitkIGTPlayerWidget::StopPlaying()
   if(m_RealTimePlayer.IsNotNull())
     m_RealTimePlayer->StopPlaying();
 
-  m_RealTimePlayer = NULL;
-  m_SequentialPlayer = NULL;
-
   m_StartTime = -1;  // set starttime back
   m_CurrentSequentialPointNumber = 0;
   m_Controls->samplePositionHorizontalSlider->setSliderPosition(m_CurrentSequentialPointNumber);
@@ -260,61 +274,72 @@ void QmitkIGTPlayerWidget::StopPlaying()
 
   this->ResetLCDNumbers();
   m_Controls->playPushButton->setChecked(false); // set play button unchecked
-
 }
 
 void QmitkIGTPlayerWidget::OnPlaying()
 {
-  PlaybackMode currentMode = this->GetCurrentPlaybackMode();
-  bool isRealTimeMode = currentMode == RealTimeMode;
-  bool isSequentialMode = currentMode == SequentialMode;
-
-  if(isRealTimeMode && m_RealTimePlayer.IsNull())
-    return;
-
-  else if(isSequentialMode && m_SequentialPlayer.IsNull())
-    return;
-
-  if(isRealTimeMode && m_StartTime < 0)
-    m_StartTime = m_RealTimePlayer->GetOutput()->GetTimeStamp(); // get playback start time
-
-
-
-  if(isRealTimeMode && !m_RealTimePlayer->IsAtEnd())
+  switch ( this->GetCurrentPlaybackMode() )
   {
-    m_RealTimePlayer->Update(); // update player
+  case RealTimeMode:
+    {
+      if ( m_RealTimePlayer.IsNull() ) { return; }
 
-    int msc = (int) (m_RealTimePlayer->GetOutput()->GetTimeStamp() - m_StartTime);
+      if ( m_StartTime < 0 )
+      {
+        // get playback start time
+        m_StartTime = m_RealTimePlayer->GetOutput()->GetTimeStamp();
+      }
 
-    // calculation for playing time display
-    int ms = msc % 1000;
-    msc = (msc - ms) / 1000;
-    int s = msc % 60;
-    int min = (msc-s) / 60;
+      if( ! m_RealTimePlayer->IsAtEnd() )
+      {
+        m_RealTimePlayer->Update(); // update player
 
-    // set lcd numbers
-    m_Controls->msecLCDNumber->display(ms);
-    m_Controls->secLCDNumber->display(s);
-    m_Controls->minLCDNumber->display(min);
+        int msc = (int) (m_RealTimePlayer->GetOutput()->GetTimeStamp() - m_StartTime);
 
-    emit SignalPlayerUpdated(); // player successfully updated
+        // calculation for playing time display
+        int ms = msc % 1000;
+        msc = (msc - ms) / 1000;
+        int s = msc % 60;
+        int min = (msc-s) / 60;
+
+        // set lcd numbers
+        m_Controls->msecLCDNumber->display(ms);
+        m_Controls->secLCDNumber->display(s);
+        m_Controls->minLCDNumber->display(min);
+
+        emit SignalPlayerUpdated(); // player successfully updated
+      }
+      else
+      {
+        this->StopPlaying(); // if player is at EOF
+      }
+
+      break;
+    }
+  case SequentialMode:
+    {
+      if ( m_SequentialPlayer.IsNull() ) { return; }
+
+      if ( m_CurrentSequentialPointNumber < m_SequentialPlayer->GetNumberOfSnapshots() )
+      {
+        m_SequentialPlayer->Update(); // update sequential player
+
+        m_Controls->samplePositionHorizontalSlider->setSliderPosition(m_CurrentSequentialPointNumber++); // refresh slider position
+        m_Controls->sampleLCDNumber->display(static_cast<int>(m_CurrentSequentialPointNumber));
+
+        //for debugging purposes
+        //std::cout << "Sample: " << m_CurrentSequentialPointNumber << " X: " << m_SequentialPlayer->GetOutput()->GetPosition()[0] << " Y: " << m_SequentialPlayer->GetOutput()->GetPosition()[1] << " Y: " << m_SequentialPlayer->GetOutput()->GetPosition()[2] << std::endl;
+
+        emit SignalPlayerUpdated(); // player successfully updated
+      }
+      else
+      {
+        this->StopPlaying(); // if player is at EOF
+      }
+
+      break;
+    }
   }
-  else if(isSequentialMode && (m_CurrentSequentialPointNumber < m_SequentialPlayer->GetNumberOfSnapshots()))
-  {
-    m_SequentialPlayer->Update(); // update sequential player
-
-    m_Controls->samplePositionHorizontalSlider->setSliderPosition(m_CurrentSequentialPointNumber++); // refresh slider position
-    m_Controls->sampleLCDNumber->display(static_cast<int>(m_CurrentSequentialPointNumber));
-
-    //for debugging purposes
-    //std::cout << "Sample: " << m_CurrentSequentialPointNumber << " X: " << m_SequentialPlayer->GetOutput()->GetPosition()[0] << " Y: " << m_SequentialPlayer->GetOutput()->GetPosition()[1] << " Y: " << m_SequentialPlayer->GetOutput()->GetPosition()[2] << std::endl;
-
-    emit SignalPlayerUpdated(); // player successfully updated
-
-  }
-  else
-    this->StopPlaying(); // if player is at EOF
-
 }
 
 const std::vector<mitk::NavigationData::Pointer> QmitkIGTPlayerWidget::GetNavigationDatas()
@@ -349,7 +374,6 @@ const mitk::PointSet::Pointer QmitkIGTPlayerWidget::GetNavigationDatasPointSet()
   PlaybackMode currentMode = this->GetCurrentPlaybackMode();
   bool isRealTimeMode = currentMode == RealTimeMode;
   bool isSequentialMode = currentMode == SequentialMode;
-
 
   if( (isRealTimeMode && m_RealTimePlayer.IsNotNull()) || (isSequentialMode && m_SequentialPlayer.IsNotNull()))
   {
@@ -396,10 +420,10 @@ const mitk::PointSet::PointType QmitkIGTPlayerWidget::GetNavigationDataPoint(uns
   {
     mitk::NavigationData::PositionType position;
 
-      if(isRealTimeMode)
-        position = m_RealTimePlayer->GetOutput(index)->GetPosition();
-      else if(isSequentialMode)
-        position = m_SequentialPlayer->GetOutput(index)->GetPosition();
+    if(isRealTimeMode)
+      position = m_RealTimePlayer->GetOutput(index)->GetPosition();
+    else if(isSequentialMode)
+      position = m_SequentialPlayer->GetOutput(index)->GetPosition();
 
     result[0] = position[0];
     result[1] = position[1];
@@ -409,57 +433,45 @@ const mitk::PointSet::PointType QmitkIGTPlayerWidget::GetNavigationDataPoint(uns
   return result;
 }
 
-
-void QmitkIGTPlayerWidget::SetInputFileName(const QString& inputFileName)
+/*void QmitkIGTPlayerWidget::SetRealTimePlayer( mitk::NavigationDataPlayer::Pointer player )
 {
-  this->OnGoToEnd(); /// stops playing and resets lcd numbers
-
-  QString oldName = m_CmpFilename;
-  m_CmpFilename.clear();
-
-  m_CmpFilename = inputFileName;
-
-  QFile file(m_CmpFilename);
-  if(m_CmpFilename.isEmpty() || !file.exists())
-  {
-    QMessageBox::warning(NULL, "Warning", QString("Please enter valid path! Using previous path again."));
-    m_CmpFilename=oldName;
-    m_Controls->inputFileLineEdit->setText(m_CmpFilename);
-  }
-}
-
-void QmitkIGTPlayerWidget::SetRealTimePlayer( mitk::NavigationDataPlayer::Pointer player )
-{
-  if(player.IsNotNull())
-    m_RealTimePlayer = player;
+if(player.IsNotNull())
+m_RealTimePlayer = player;
 }
 
 void QmitkIGTPlayerWidget::SetSequentialPlayer( mitk::NavigationDataSequentialPlayer::Pointer player )
 {
-  if(player.IsNotNull())
-    m_SequentialPlayer = player;
-}
+if(player.IsNotNull())
+m_SequentialPlayer = player;
+}*/
 
-
-
-void QmitkIGTPlayerWidget::OnSelectPressed()
+void QmitkIGTPlayerWidget::OnOpenFileButtonPressed()
 {
+  QString filename = QFileDialog::getOpenFileName(this, "Load tracking data", QDir::currentPath(),"XML files (*.xml)");
+  QFile file(filename);
 
-  QString oldName = m_CmpFilename;
-  m_CmpFilename.clear();
-  m_CmpFilename = QFileDialog::getOpenFileName(this, "Load tracking data", QDir::currentPath(),"XML files (*.xml)");
-
-  if (m_CmpFilename.isEmpty())//if something went wrong or user pressed cancel in the save dialog
-    m_CmpFilename=oldName;
-  else
+  // if something went wrong or user pressed cancel in the save dialog
+  if ( filename.isEmpty()  || ! file.exists() )
   {
-    this->OnGoToEnd(); /// stops playing and resets lcd numbers
-    emit SignalInputFileChanged();
+    QMessageBox::warning(NULL, "Warning", QString("Please enter valid path. Using previous path again."));
+    return;
   }
 
-  m_Controls->inputFileLineEdit->setText(m_CmpFilename);
-}
+  m_CmpFilename = filename;
 
+  this->OnGoToEnd(); /// stops playing and resets lcd numbers
+
+  m_Controls->m_ActiveFileLabel->setText(m_CmpFilename);
+
+  emit SignalInputFileChanged();
+
+  mitk::NavigationDataReaderInterface::Pointer navigationDataReader = mitk::NavigationDataReaderXML::New().GetPointer();
+  mitk::NavigationDataSet::Pointer navigationDataSet = navigationDataReader->Read(m_CmpFilename.toStdString());
+  m_RealTimePlayer->SetNavigationDataSet(navigationDataSet);
+  m_SequentialPlayer->SetNavigationDataSet(navigationDataSet);
+
+  m_Controls->m_PlayerControlsGroupBox->setEnabled(true);
+}
 
 void QmitkIGTPlayerWidget::OnGoToEnd()
 {
@@ -467,10 +479,7 @@ void QmitkIGTPlayerWidget::OnGoToEnd()
 
   // reset lcd numbers
   this->ResetLCDNumbers();
-
-
 }
-
 
 void QmitkIGTPlayerWidget::OnGoToBegin()
 {
@@ -492,12 +501,10 @@ void QmitkIGTPlayerWidget::OnGoToBegin()
 
 void QmitkIGTPlayerWidget::ResetLCDNumbers()
 {
-    m_Controls->minLCDNumber->display(QString("00"));
-    m_Controls->secLCDNumber->display(QString("00"));
-    m_Controls->msecLCDNumber->display(QString("000"));
+  m_Controls->minLCDNumber->display(QString("00"));
+  m_Controls->secLCDNumber->display(QString("00"));
+  m_Controls->msecLCDNumber->display(QString("000"));
 }
-
-
 
 void QmitkIGTPlayerWidget::SetTrajectoryNames(const QStringList toolNames)
 {
@@ -516,10 +523,9 @@ void QmitkIGTPlayerWidget::SetTrajectoryNames(const QStringList toolNames)
   connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
 }
 
-
 int QmitkIGTPlayerWidget::GetResolution()
 {
-   return m_Controls->resolutionSpinBox->value();  // return currently selected trajectory resolution
+  return m_Controls->resolutionSpinBox->value();  // return currently selected trajectory resolution
 }
 
 void QmitkIGTPlayerWidget::ClearTrajectorySelectCombobox()
@@ -533,23 +539,19 @@ void QmitkIGTPlayerWidget::ClearTrajectorySelectCombobox()
   connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
 }
 
-
-
 void QmitkIGTPlayerWidget::OnSequencialModeToggled(bool toggled)
 {
-    this->StopPlaying(); // stop playing when mode is changed
+  this->StopPlaying(); // stop playing when mode is changed
 
-    if(toggled)
-    {
-      m_Controls->samplePositionHorizontalSlider->setEnabled(true); // enable slider if sequential mode
-    }
-    else if(!toggled)
-    {
-      m_Controls->samplePositionHorizontalSlider->setSliderPosition(0); // set back and disable slider
-      m_Controls->samplePositionHorizontalSlider->setDisabled(true);
-    }
-
-
+  if(toggled)
+  {
+    m_Controls->samplePositionHorizontalSlider->setEnabled(true); // enable slider if sequential mode
+  }
+  else if(!toggled)
+  {
+    m_Controls->samplePositionHorizontalSlider->setSliderPosition(0); // set back and disable slider
+    m_Controls->samplePositionHorizontalSlider->setDisabled(true);
+  }
 }
 
 void QmitkIGTPlayerWidget::OnSliderReleased()

@@ -18,19 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNavigationDataPlayerBase_H_HEADER_INCLUDED_
 #define MITKNavigationDataPlayerBase_H_HEADER_INCLUDED_
 
-#include <mitkNavigationDataSource.h>
-#include "tinyxml.h"
-
+#include "mitkNavigationDataSource.h"
+#include "mitkNavigationDataSet.h"
 
 namespace mitk{
 
   /**Documentation
-  * \brief This class is a slightly changed reimplementation of the
-  * NavigationDataPlayer which does not care about timestamps and just
-  * outputs the navigationdatas in their sequential order
-  *
-  * \ingroup IGT
-  */
+   * \brief Base class for using mitk::NavigationData as a filter source.
+   * Subclasses can play objects of mitk::NavigationDataSet.
+   *
+   * \ingroup IGT
+   */
   class MitkIGT_EXPORT NavigationDataPlayerBase
     : public NavigationDataSource
   {
@@ -38,40 +36,70 @@ namespace mitk{
     mitkClassMacro(NavigationDataPlayerBase, NavigationDataSource);
 
     /**
-    * \brief Used for pipeline update just to tell the pipeline that we always have to update
-    */
+     * \brief Used for pipeline update just to tell the pipeline that we always have to update.
+     */
     virtual void UpdateOutputInformation();
 
-    /** @return Returns an error message if there was one (e.g. if the stream is invalid).
-     *          Returns an empty string if there was no error in the current stream.
+    itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer);
+
+    /**
+      * \brief Set mitk::NavigationDataSet for playing.
+      * Player is initialized by call to mitk::NavigationDataPlayerBase::InitPlayer()
+      * inside this method. Method must be called before this object can be used as
+      * a filter source.
+      *
+      * @param navigationDataSet mitk::NavigationDataSet which will be played by this player.
+      */
+    void SetNavigationDataSet(NavigationDataSet::Pointer navigationDataSet);
+
+    /**
+     * \brief Getter for the size of the mitk::NavigationDataSet used in this object.
+     *
+     * @return Returns the number of navigation data snapshots available in the player.
      */
-    itkGetStringMacro(ErrorMessage);
+    unsigned int GetNumberOfSnapshots();
 
-    /** @return Retruns if the current stream is valid or not. */
-    itkGetMacro(StreamValid,bool);
+    unsigned int GetCurrentSnapshotNumber();
 
-   /**
-    * \brief This method checks if player arrived at end of file.
-    *
-    *\warning This method is not tested yet. It is not save to use!
-    */
+    /**
+     * \brief This method checks if player arrived at end of file.
+     *
+     * @return true if last mitk::NavigationData object is in the outputs, false otherwise
+     */
     bool IsAtEnd();
 
   protected:
     NavigationDataPlayerBase();
     virtual ~NavigationDataPlayerBase();
-    virtual void GenerateData() = 0;
-
 
     /**
-    * \brief Creates NavigationData from XML element and returns it
-    * @throw mitk::Exception Throws an exception if elem is NULL.
-    */
-    mitk::NavigationData::Pointer ReadNavigationData(TiXmlElement* elem);
+      * \brief Every subclass hast to implement this method. See ITK filter documentation for details.
+      */
+    virtual void GenerateData() = 0;
 
-    bool m_StreamValid;                       ///< stores if the input stream is valid or not
-    std::string m_ErrorMessage;               ///< stores the error message if the stream is invalid
+    /**
+     * \brief Initializes the outputs of this NavigationDataSource.
+     */
+    void InitPlayer();
 
+    /**
+      * \brief Convenience method for subclasses.
+      * When there are no further mitk::NavigationData objects available, this
+      * method can be called in the implementation of mitk::NavigationDataPlayerBase::GenerateData().
+      */
+    void GraftEmptyOutput();
+
+    NavigationDataSet::Pointer m_NavigationDataSet;
+
+    /**
+      * \brief Iterator always points to the NavigationData object which is in the outputs at the moment.
+      */
+    mitk::NavigationDataSet::NavigationDataSetIterator m_NavigationDataSetIterator;
+
+    /**
+      * \brief Stores the number of outputs known from NavigationDataSet.
+      */
+    unsigned int m_NumberOfOutputs;
   };
 } // namespace mitk
 

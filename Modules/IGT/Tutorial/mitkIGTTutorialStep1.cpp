@@ -127,12 +127,12 @@ int main(int  /*argc*/, char*  /*argv*/[])
   std::cout << "Record to file: " << filename.str() << "-0.xml ..." << std::endl;
 
   mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
-  recorder->SetFileName(filename.str());
+  //xxxxxxxxxxxxxxxxxxrecorder->SetFileName(filename.str());//TODO!!!!!!!!!!!!!
 
   //now every output of the displacer object is connected to the recorder object
   for (unsigned int i = 0; i < displacer->GetNumberOfOutputs(); i++)
   {
-    recorder->AddNavigationData(displacer->GetOutput(i));  // here we connect to the recorder
+    //xxxxxxxxrecorder->AddNavigationData(displacer->GetOutput(i));  // here we connect to the recorder
   }
 
   recorder->StartRecording(); //after finishing the settings you can start the recording mechanism
@@ -166,7 +166,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
   //this is first part of the file name the .xml extension and an counter is added automatically
-  player->SetFileName(filename.str());
+  //xxxxxxxxxxxxxxxxxxx TODO !!!!!!!!! player->SetFileName(filename.str());
   player->StartPlaying(); //this starts the player
                           //From now on the player provides NavigationDatas in the order and
                           //correct time as they were recorded

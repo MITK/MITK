@@ -61,9 +61,9 @@ int QmitkImageStatisticsCalculationThread::GetTimeStep()
   return this->m_TimeStep;
 }
 
-mitk::ImageStatisticsCalculator::Statistics QmitkImageStatisticsCalculationThread::GetStatisticsData()
+std::vector<mitk::ImageStatisticsCalculator::Statistics> QmitkImageStatisticsCalculationThread::GetStatisticsData()
 {
-  return this->m_StatisticsStruct;
+  return this->m_StatisticsVector;
 }
 
 mitk::Image::Pointer QmitkImageStatisticsCalculationThread::GetStatisticsImage()
@@ -87,9 +87,12 @@ std::string QmitkImageStatisticsCalculationThread::GetLastErrorMessage()
 }
 
 QmitkImageStatisticsCalculationThread::HistogramType::Pointer
-QmitkImageStatisticsCalculationThread::GetTimeStepHistogram()
+QmitkImageStatisticsCalculationThread::GetTimeStepHistogram(unsigned int t)
 {
-  return this->m_TimeStepHistogram;
+  if (t >= this->m_HistogramVector.size())
+    return NULL;
+
+  return this->m_HistogramVector[t];
 }
 
 bool QmitkImageStatisticsCalculationThread::GetStatisticsChangedFlag()
@@ -143,39 +146,45 @@ void QmitkImageStatisticsCalculationThread::run()
 
   calculator->SetDoIgnorePixelValue(this->m_IgnoreZeros);
   calculator->SetIgnorePixelValue(0);
-  try
+
+  for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
   {
-    statisticChanged = calculator->ComputeStatistics(m_TimeStep);
+    try
+    {
+      statisticChanged = calculator->ComputeStatistics(i);
+    }
+    catch ( mitk::Exception& e)
+    {
+      //m_message = e.GetDescription();
+      MITK_ERROR<< "MITK Exception: " << e.what();
+      statisticCalculationSuccessful = false;
+    }
+    catch ( const std::runtime_error &e )
+    {
+      //m_message = "Failure: " + std::string(e.what());
+      MITK_ERROR<< "Runtime Exception: " << e.what();
+      statisticCalculationSuccessful = false;
+    }
+    catch ( const std::exception &e )
+    {
+      //m_message = "Failure: " + std::string(e.what());
+      MITK_ERROR<< "Standard Exception: " << e.what();
+      statisticCalculationSuccessful = false;
+    }
   }
-  catch ( mitk::Exception& e)
-  {
-    //m_message = e.GetDescription();
-    MITK_ERROR<< "MITK Exception: " << e.what();
-    statisticCalculationSuccessful = false;
-  }
-  catch ( const std::runtime_error &e )
-  {
-    //m_message = "Failure: " + std::string(e.what());
-    MITK_ERROR<< "Runtime Exception: " << e.what();
-    statisticCalculationSuccessful = false;
-  }
-  catch ( const std::exception &e )
-  {
-    //m_message = "Failure: " + std::string(e.what());
-    MITK_ERROR<< "Standard Exception: " << e.what();
-    statisticCalculationSuccessful = false;
-  }
+
   this->m_StatisticChanged = statisticChanged;
   this->m_CalculationSuccessful = statisticCalculationSuccessful;
 
   if(statisticCalculationSuccessful)
   {
-    this->m_StatisticsStruct = calculator->GetStatistics(m_TimeStep);
+    this->m_StatisticsVector.clear();
+    this->m_HistogramVector.clear();
 
-    if(this->m_TimeStepHistogram.IsNotNull())
+    for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
     {
-      this->m_TimeStepHistogram = NULL;
+      this->m_StatisticsVector.push_back(calculator->GetStatistics(i));
+      this->m_HistogramVector.push_back((HistogramType*)calculator->GetHistogram(i));
     }
-    this->m_TimeStepHistogram = (HistogramType*) calculator->GetHistogram(m_TimeStep);
   }
 }

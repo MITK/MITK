@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <Poco/Path.h>
 
+
+
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
 
 QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(QWidget* parent, Qt::WindowFlags f)
@@ -44,6 +46,8 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   CreateQtPartControl(this);
   CreateConnections();
   m_MTCalibrationFile = "";
+
+
 
   //reset a few things
   ResetOutput();
@@ -468,7 +472,7 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackingDevice()
   {
   if (!m_AdvancedUserControl) m_TrackingDevice = ConstructTrackingDevice();
-  if (!m_TrackingDevice->IsDeviceInstalled()) return NULL;
+  if (m_TrackingDevice.IsNull() || !m_TrackingDevice->IsDeviceInstalled()) return NULL;
   else return this->m_TrackingDevice;
   }
 
@@ -522,6 +526,11 @@ propList->Get("PolarisPortWin",portPolarisWin);
 propList->Get("AuroraPortWin",portAuroraWin);
 propList->Get("MTCalibrationFile",m_MTCalibrationFile);
 propList->Get("SelectedDevice",SelectedDevice);
+if (SelectedDevice<0)
+  {
+  MITK_ERROR << "Loaded data from persistence service is invalid (SelectedDevice:" <<SelectedDevice<<"): aborted to restore data!";
+  return;
+  }
 m_Controls->m_portSpinBoxPolaris->setValue(portPolarisWin);
 m_Controls->m_portSpinBoxAurora->setValue(portAuroraWin);
 m_Controls->m_TrackingSystemWidget->setCurrentIndex(SelectedDevice);

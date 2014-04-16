@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="m_grpbxFile">
      <property name="title">
       <string>File Management</string>
      </property>
@@ -76,7 +76,10 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="m_grpbxSettings">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="title">
       <string>Settings</string>
      </property>
@@ -136,7 +139,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_3">
+    <widget class="QGroupBox" name="m_grpbxControls">
      <property name="title">
       <string>Player Controls</string>
      </property>

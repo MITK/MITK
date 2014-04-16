@@ -111,6 +111,13 @@ protected:
   */
   void DestroyPipeline();
 
+  /**
+  * \brief Makes player component active or inactive.
+  *
+  * Used to activate all components once data is loaded
+  */
+  void SetInteractionComponentsEnabledState(bool isActive);
+
   void CreateBundleWidgets(QWidget* parent);
 
   Ui::QmitkNavigationDataPlayerViewControls* m_Controls;

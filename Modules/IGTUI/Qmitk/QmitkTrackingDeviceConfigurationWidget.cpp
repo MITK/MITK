@@ -615,12 +615,12 @@ void QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPortsThreadFunc(
       {
       case mitk::NDIPolaris:
         result += "<br>" + devName + ": " + "NDI Polaris";
-        m_Controls->m_portSpinBoxPolaris->setValue(i);
+        PolarisPort = i;
         PortTypePolaris = 1;
         break;
       case mitk::NDIAurora:
         result += "<br>" + devName + ": " + "NDI Aurora";
-        m_Controls->m_portSpinBoxAurora->setValue(i);
+        AuroraPort = i;
         PortTypeAurora = 1;
         break;
       }
@@ -634,12 +634,12 @@ void QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPortsThreadFunc(
       {
       case mitk::NDIPolaris:
         result += "<br>" + devName + ": " + "NDI Polaris";
-        m_Controls->m_portSpinBoxPolaris->setValue(i);
+        PolarisPort = i;
         PortTypePolaris = 0;
         break;
       case mitk::NDIAurora:
         result += "<br>" + devName + ": " + "NDI Aurora";
-        m_Controls->m_portSpinBoxAurora->setValue(i);
+        AuroraPort = i;
         PortTypeAurora = 0;
         break;
       }

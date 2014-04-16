@@ -112,7 +112,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableTrackingControls()));
 
     //connect worker thread
-    connect(m_Worker, SIGNAL(AutoDetectToolsFinished()), this, SLOT(OnAutoDetectToolsFinished()) );
+    connect(m_Worker, SIGNAL(AutoDetectToolsFinished(bool,QString)), this, SLOT(OnAutoDetectToolsFinished(bool,QString)) );
     connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool,QString)), this, SLOT(OnConnectFinished(bool,QString)) );
     connect(m_Worker, SIGNAL(StartTrackingFinished(bool,QString)), this, SLOT(OnStartTrackingFinished(bool,QString)) );
     connect(m_Worker, SIGNAL(StopTrackingFinished(bool,QString)), this, SLOT(OnStopTrackingFinished(bool,QString)) );
@@ -496,12 +496,20 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
     }
 }
 
-void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished()
+void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QString errorMessage)
 {
     m_WorkerThread->quit();
 
     //enable controls again
     this->m_Controls->m_MainWidget->setEnabled(true);
+
+    if(!success)
+    {
+      MITK_WARN << errorMessage.toStdString();
+      MessageBox(errorMessage.toStdString());
+      EnableTrackingConfigurationButtons();
+      return;
+    }
 
     mitk::NavigationToolStorage::Pointer autoDetectedStorage = m_Worker->GetNavigationToolStorage();
 
@@ -926,8 +934,10 @@ try
       {
       QString message = QString("Warning, can not auto-detect tools! (") + QString(e.GetDescription()) + QString(")");
       //MessageBox(message.toStdString()); //TODO: give message to the user here!
+
       MITK_WARN << message.toStdString();
       mitk::ProgressBar::GetInstance()->Progress(4);
+      emit AutoDetectToolsFinished(false,message.toStdString().c_str());
       return;
       }
 
@@ -960,7 +970,7 @@ try
   mitk::ProgressBar::GetInstance()->Progress();
   currentDevice->CloseConnection();
 
-  emit AutoDetectToolsFinished();
+  emit AutoDetectToolsFinished(true,"");
   mitk::ProgressBar::GetInstance()->Progress(4);
  }
 

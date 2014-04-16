@@ -18,11 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKTRACKINGDEVICECONFIGURATIONWIDGET_H
 
 #include <QWidget>
+#include <QThread>
 #include "MitkIGTUIExports.h"
 #include "ui_QmitkTrackingDeviceConfigurationWidgetControls.h"
 #include "mitkTrackingDevice.h"
 #include <mitkIPersistenceService.h>
 
+class QmitkTrackingDeviceConfigurationWidgetConnectionWorker;
+class QmitkTrackingDeviceConfigurationWidgetScanPortsWorker;
 
 //itk headers
 
@@ -112,6 +115,12 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     /* @brief This signal is sent if the tracking device was changed. */
     void TrackingDeviceSelectionChanged();
 
+    /* @brief This signal is sent if an internal thread (caused by an action of the user) was started. The widget is blocked until the progress ends.*/
+    void ProgressStarted();
+
+    /* @brief This signal is sent if a progress which was started before ends.*/
+    void ProgressFinished();
+
   protected:
 
     /// \brief Creation of the connections
@@ -136,15 +145,15 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
     typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;
 
+    QmitkTrackingDeviceConfigurationWidgetScanPortsWorker* m_ScanPortsWorker;
+    QmitkTrackingDeviceConfigurationWidgetConnectionWorker* m_TestConnectionWorker;
+    QThread* m_ScanPortsWorkerThread;
+    QThread* m_TestConnectionWorkerThread;
+
     //######################### internal help methods #######################################
     void ResetOutput();
     void AddOutput(std::string s);
     mitk::TrackingDevice::Pointer ConstructTrackingDevice();
-
-    /** @brief   Scans the given port for a NDI tracking device.
-      * @return  Returns the type of the device if one was found. Returns TrackingSystemInvalid if none was found.
-      */
-    mitk::TrackingDeviceType ScanPort(QString port);
 
     void StoreUISettings();
     void LoadUISettings();
@@ -159,6 +168,8 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      *        try to open a connection and start tracking. The user can see the result of the connection test on the small output window.
      */
     void TestConnection();
+
+    void TestConnectionFinished(bool connected, QString output);
 
     /* @brief This method is called when the user presses the button "finished". A new tracking device will be created in this case and will then
      *        then be availiable by calling GetTrackingDevice(). Also a signal TrackingDeviceConfigurationFinished() will be emitted. After this the
@@ -192,6 +203,9 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      */
     void AutoScanPorts();
 
+    /** This slot is called when the port scanning is finished. */
+    void AutoScanPortsFinished(int PolarisPort, int AuroraPort, QString result, int PortTypePolaris, int PortTypeAurora);
+
     /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_MTCalibrationFile.*/
     void SetMTCalibrationFileClicked();
 
@@ -200,5 +214,60 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 
   private:
     PERSISTENCE_GET_SERVICE_METHOD_MACRO
+};
+
+//###################################################################################################
+//############ PRIVATE WORKER CLASSES FOR THREADS ###################################################
+//###################################################################################################
+
+
+/**
+ * Worker thread class for test connection.
+ */
+class QmitkTrackingDeviceConfigurationWidgetConnectionWorker : public QObject
+{
+  Q_OBJECT
+
+  public:
+
+  void SetTrackingDevice(mitk::TrackingDevice::Pointer t);
+
+  public slots:
+
+    void TestConnectionThreadFunc();
+  signals:
+
+    void ConnectionTested(bool connected, QString output);
+
+  protected:
+    mitk::TrackingDevice::Pointer m_TrackingDevice;
+};
+
+/**
+ * Worker thread class for scan ports.
+ */
+class QmitkTrackingDeviceConfigurationWidgetScanPortsWorker : public QObject
+{
+  Q_OBJECT
+
+  public slots:
+    void ScanPortsThreadFunc();
+
+  signals:
+
+   /**
+     * @param PolarisPort Returns the port, returns -1 if no device was found.
+     * @param AuroraPort Returns the port, returns -1 if no device was found.
+     * @param PortTypePolaris Returns the port type (0=usb,1=tty), returns -1 if the port type is not specified, e.g, in case of Windows.
+     * @param PortTypeAurora Returns the port type (0=usb,1=tty), returns -1 if the port type is not specified, e.g, in case of Windows.
+     */
+    void PortsScanned(int PolarisPort, int AuroraPort, QString result, int PortTypePolaris, int PortTypeAurora);
+
+  protected:
+
+    /** @brief   Scans the given port for a NDI tracking device.
+      * @return  Returns the type of the device if one was found. Returns TrackingSystemInvalid if none was found.
+      */
+    mitk::TrackingDeviceType ScanPort(QString port);
 };
 #endif

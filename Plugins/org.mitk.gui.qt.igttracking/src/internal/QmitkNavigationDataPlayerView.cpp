@@ -80,6 +80,8 @@ void QmitkNavigationDataPlayerView::CreateConnections()
 
   connect( m_Controls->m_SequentialWidget, SIGNAL(SignalUpdate()), this, SLOT(OnUpdate()) );
   connect( m_Controls->m_TimedWidget, SIGNAL(SignalUpdate()), this, SLOT(OnUpdate()) );
+
+  SetInteractionComponentsEnabledState(false);
 }
 
 void QmitkNavigationDataPlayerView::OnPlayingStarted()
@@ -100,6 +102,7 @@ void QmitkNavigationDataPlayerView::OnOpenFile(){
 
   // Initialize Widgets and create Player
   OnSelectPlayer();
+  SetInteractionComponentsEnabledState(true);
 }
 
 void QmitkNavigationDataPlayerView::OnSelectPlayer(){
@@ -182,4 +185,9 @@ void QmitkNavigationDataPlayerView::DestroyPipeline(){
     this->GetDataStorage()->Remove(m_RenderingNodes[i]);
   }
   m_RenderingNodes.clear();
+}
+
+void QmitkNavigationDataPlayerView::SetInteractionComponentsEnabledState(bool isActive){
+  m_Controls->m_grpbxSettings->setEnabled(isActive);
+  m_Controls->m_grpbxControls->setEnabled(isActive);
 }

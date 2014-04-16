@@ -106,13 +106,13 @@
         <property name="minimumSize">
          <size>
           <width>100</width>
-          <height>175</height>
+          <height>180</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>170</height>
+          <height>16777215</height>
          </size>
         </property>
         <property name="verticalScrollBarPolicy">
@@ -135,6 +135,9 @@
         </property>
         <property name="cornerButtonEnabled">
          <bool>false</bool>
+        </property>
+        <property name="rowCount">
+         <number>7</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -212,7 +215,7 @@
         </row>
         <column>
          <property name="text">
-          <string>Component 1</string>
+          <string>0</string>
          </property>
         </column>
        </widget>

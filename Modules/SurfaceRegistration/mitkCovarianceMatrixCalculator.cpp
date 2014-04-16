@@ -119,10 +119,15 @@ void mitk::CovarianceMatrixCalculator::ComputeCovarianceMatrices()
 
   d->m_PolyData = d->m_Input->GetVtkPolyData();
 
-  // compute surface normals
+  // TODO:
+  //normals = d->m_PolyData->GetPointData()->GetNormals();
+  //// compute surface normals if the surface has no normals
+  //if ( normals == NULL )
+  //{
   d->m_PolyDataNormals->SetInputData(d->m_PolyData);
   d->m_PolyDataNormals->Update();
   normals = d->m_PolyDataNormals->GetOutput()->GetPointData()->GetNormals();
+  //}
 
   if( d->m_EnableNormalization )
     normalizationValue = 1.5;
@@ -152,7 +157,7 @@ void mitk::CovarianceMatrixCalculator::ComputeCovarianceMatrices()
 
     d->m_MeanVariance += ( variances[0] + variances[1] + variances[2] );
     // compute the covariance matrix and save it
-    CovarianceMatrix covarianceMatrix = ComputeCovarianceMatrix(mat, variances, normalizationValue);
+    const CovarianceMatrix covarianceMatrix = ComputeCovarianceMatrix(mat, variances, normalizationValue);
     m_CovarianceMatrixList.push_back(covarianceMatrix);
   }
 

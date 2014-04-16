@@ -105,7 +105,7 @@ public:
   void SetInputSurface (Surface *input);
 
 
-  /** Method that compites the covariance matrices for the input surface.
+  /** Method that computes the covariance matrices for the input surface.
     * @throws std::exception If the input surface is not set.
     */
   void ComputeCovarianceMatrices();

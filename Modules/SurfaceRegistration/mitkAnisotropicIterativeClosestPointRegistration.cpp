@@ -216,7 +216,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
 
     k = k + 1;
 
-    MITK_INFO << "iteration: " << k;
+    MITK_DEBUG << "iteration: " << k;
 
     do {
       // search correspondences
@@ -303,7 +303,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::Update()
     stepSize = ( stepSize == 0 ) ? 1 : stepSize;
     mitk::ProgressBar::GetInstance()->Progress(stepSize);
 
-  } while ( diff >= m_Threshold && k < m_MaxIterations );
+  } while ( diff > m_Threshold && k < m_MaxIterations );
 
   m_NumberOfIterations = k;
 

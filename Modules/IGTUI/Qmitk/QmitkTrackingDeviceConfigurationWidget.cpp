@@ -516,11 +516,10 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
 {
 std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
 if (!this->GetPeristenceService())
-  {
-  MITK_ERROR << "Persistence service not available, could not load UI settings!";
-  return;
-  }
+  {MITK_ERROR << "Persistence service not available, could not load UI settings!"; return;}
 mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+if (propList.IsNull())
+  {MITK_ERROR << "Property list for this UI (" << id <<") is not available, could not load UI settings!"; return;}
 int portPolarisWin,portAuroraWin,SelectedDevice;
 propList->Get("PolarisPortWin",portPolarisWin);
 propList->Get("AuroraPortWin",portAuroraWin);

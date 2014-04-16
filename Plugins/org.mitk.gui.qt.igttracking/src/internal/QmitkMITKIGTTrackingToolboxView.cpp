@@ -115,6 +115,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect(m_Worker, SIGNAL(AutoDetectToolsFinished()), this, SLOT(OnAutoDetectToolsFinished()) );
     connect(m_Worker, SIGNAL(ConnectDeviceFinished(bool,QString)), this, SLOT(OnConnectFinished(bool,QString)) );
     connect(m_Worker, SIGNAL(StartTrackingFinished(bool,QString)), this, SLOT(OnStartTrackingFinished(bool,QString)) );
+    connect(m_Worker, SIGNAL(StopTrackingFinished(bool,QString)), this, SLOT(OnStopTrackingFinished(bool,QString)) );
     connect(m_WorkerThread,SIGNAL(started()), m_Worker, SLOT(ThreadFunc()) );
 
     //move the worker to the thread
@@ -356,7 +357,23 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
 {
   if (!m_tracking) return;
   m_TrackingTimer->stop();
-  m_TrackingDeviceSource->StopTracking();
+
+  m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eStopTracking);
+  m_WorkerThread->start();
+  m_Controls->m_MainWidget->setEnabled(false);
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QString errorMessage)
+  {
+  m_WorkerThread->quit();
+  m_Controls->m_MainWidget->setEnabled(true);
+  if(!success)
+    {
+      MessageBox(errorMessage.toStdString());
+      MITK_WARN << errorMessage.toStdString();
+      return;
+    }
+
   m_Controls->m_TrackingControlLabel->setText("Status: connected");
   if (m_logging) StopLogging();
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
@@ -1021,6 +1038,15 @@ void QmitkMITKIGTTrackingToolboxViewWorker::StartTracking()
 
 void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
 {
+  try
+  {
+  m_TrackingDeviceSource->StopTracking();
+  }
+  catch(mitk::IGTException& e)
+  {
+    emit StopTrackingFinished(false, e.GetDescription());
+  }
+  emit StopTrackingFinished(true, "");
 
 }
 

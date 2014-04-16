@@ -35,7 +35,6 @@ void mitk::NavigationDataPlayerBase::UpdateOutputInformation()
   Superclass::UpdateOutputInformation();
 }
 
-
 bool mitk::NavigationDataPlayerBase::IsAtEnd()
 {
   return m_NavigationDataSetIterator == m_NavigationDataSet->End();
@@ -64,31 +63,26 @@ void mitk::NavigationDataPlayerBase::InitPlayer()
   if ( m_NavigationDataSet.IsNull() )
   {
     mitkThrowException(mitk::IGTException)
-        << "NavigationDataSet has to be set before initializing player.";
+      << "NavigationDataSet has to be set before initializing player.";
   }
-
 
   if (m_NumberOfOutputs == 0)
   {
-    m_NumberOfOutputs = m_NavigationDataSet->GetNumberOfTools();
-    this->SetNumberOfRequiredOutputs(m_NumberOfOutputs);
+    int requiredOutputs = m_NavigationDataSet->GetNumberOfTools();
+    this->SetNumberOfRequiredOutputs(requiredOutputs);
 
-    for (unsigned int n = 0; n < m_NumberOfOutputs; ++n)
+    for (unsigned int n = this->GetNumberOfOutputs(); n < requiredOutputs; ++n)
     {
-      mitk::NavigationData* output = this->GetOutput(n);
-      if (!output)
-      {
-        DataObjectPointer newOutput = this->MakeOutput(n);
-        this->SetNthOutput(n, newOutput);
-        this->Modified();
-      }
+      DataObjectPointer newOutput = this->MakeOutput(n);
+      this->SetNthOutput(n, newOutput);
+      this->Modified();
     }
   }
   else if (m_NumberOfOutputs != m_NavigationDataSet->GetNumberOfTools())
   {
     mitkThrowException(mitk::IGTException)
-        << "Number of tools cannot be changed in existing player. Please create "
-        << "a new player, if the NavigationDataSet has another number of tools now.";
+      << "Number of tools cannot be changed in existing player. Please create "
+      << "a new player, if the NavigationDataSet has another number of tools now.";
   }
 
   this->Modified();

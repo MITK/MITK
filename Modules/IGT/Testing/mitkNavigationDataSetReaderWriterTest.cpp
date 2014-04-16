@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //testing headers
-#include <mitkTestingMacros.h>
+//#include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
 
 #include <mitkNavigationDataRecorder.h>
@@ -43,23 +43,26 @@ class mitkNavigationDataSetReaderWriterTestSuite : public mitk::TestFixture
   MITK_TEST(TestCompareFunction);
   MITK_TEST(TestReadWrite);
   CPPUNIT_TEST_SUITE_END();
+
 private:
+
   std::string pathRead;
   std::string pathWrite;
   std::string pathWrong;
   mitk::NavigationDataSetWriterXML writer;
   mitk::NavigationDataReaderXML::Pointer reader;
   mitk::NavigationDataSet::Pointer set;
+
 public:
+
   void setUp()
   {
-    pathRead = GetTestDataFilePath("IGT-Data/NavigationDataSet.xml");
+    pathRead = GetTestDataFilePath("IGT-Data/RecordedNavigationData.xml");
 
     pathWrite = pathRead;
     pathWrite.insert(pathWrite.end()-4,'2');;//Insert X: IGT-Data/NavigationDataSet2.xml
 
-    pathWrong = pathRead;
-    pathWrong.insert(pathWrong.end()-4,'X');;//Insert X: IGT-Data/NavigationDataSetX.xml
+    pathWrong = GetTestDataFilePath("IGT-Data/NavigationDataTestData.xml");
 
     reader = mitk::NavigationDataReaderXML::New();
   }
@@ -67,6 +70,7 @@ public:
   void tearDown()
   {
   }
+
   void TestReadWrite()
   {
     // Aim is to read an xml into a pointset, write that xml again, and compare the output

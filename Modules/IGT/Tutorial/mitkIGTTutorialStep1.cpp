@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataDisplacementFilter.h"
 #include <mitkNavigationDataRecorder.h>
 #include <mitkNavigationDataPlayer.h>
+#include <mitkNavigationDataReaderXML.h>
+#include <mitkNavigationDataSetWriterXML.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -29,8 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## \brief A small console tutorial about MITK-IGT
 int main(int  /*argc*/, char*  /*argv*/[])
 {
-
-
   //*************************************************************************
   // What we will do...
   //*************************************************************************
@@ -40,7 +40,6 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //filter which just displaces the positions with an offset. After that we use a recorder
   //to store this new positions and other information to disc in a XML file. After that we use
   //another source (NavigationDataPlayer) to replay the recorded data.
-
 
   //*************************************************************************
   // Part I: Basic initialization of the source and tracking device
@@ -74,10 +73,9 @@ int main(int  /*argc*/, char*  /*argv*/[])
   source->SetTrackingDevice(tracker); //here we set the device for the pipeline source
 
   source->Connect();        //here we connect to the tracking system
-                            //Note we do not call this on the TrackingDevice object
+  //Note we do not call this on the TrackingDevice object
   source->StartTracking();  //start the tracking
-                            //Now the source generates outputs.
-
+  //Now the source generates outputs.
 
   //*************************************************************************
   // Part II: Create a NavigationDataToNavigationDataFilter
@@ -107,14 +105,12 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //  displacer->SetInput(i, source->GetOutput(i));  //here we connect to the displacement filter
   //}
 
-
   //*************************************************************************
   // Part III: Record the data with the NavigationDataRecorder
   //*************************************************************************
 
-  //The next part of our pipeline is the recorder. The recorder needs a filename. Otherwise the output
-  //is redirected to the console. The input of the recorder is the output of the displacement filter
-  //and the output is a XML file with the name "Test Output-0.xml".
+  //The next part of our pipeline is the recorder. The input of the recorder is the output of the displacement filter
+  //and the output is a XML file with the name "Test Output-0.xml", which is written with a NavigationDataSetWriter.
 
   std::cout << "Start Recording ..." << std::endl;
 
@@ -127,29 +123,28 @@ int main(int  /*argc*/, char*  /*argv*/[])
   std::cout << "Record to file: " << filename.str() << "-0.xml ..." << std::endl;
 
   mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
-  //xxxxxxxxxxxxxxxxxxrecorder->SetFileName(filename.str());//TODO!!!!!!!!!!!!!
 
-  //now every output of the displacer object is connected to the recorder object
-  for (unsigned int i = 0; i < displacer->GetNumberOfOutputs(); i++)
-  {
-    //xxxxxxxxrecorder->AddNavigationData(displacer->GetOutput(i));  // here we connect to the recorder
-  }
+  //now the output of the displacer object is connected to the recorder object
+  recorder->ConnectTo(displacer);
 
   recorder->StartRecording(); //after finishing the settings you can start the recording mechanism
-                              //now every update of the recorder stores one line into the file for
-                              //each added NavigationData
-
+  //now every update of the recorder stores one line into the file for
+  //each added NavigationData
 
   for (unsigned int x = 0; x < 100; x++) //write 100 datasets
   {
     recorder->Update(); //the update causes one line in the XML file for every tool
-                        //in this case two lines
+    //in this case two lines
     itksys::SystemTools::Delay(100);         //sleep a little
   }
   recorder->StopRecording(); //to get proper XML files you should stop recording
-                             //if your application crashes during recording no data
-                             //will be lost it is all stored to disc
+  //if your application crashes during recording no data
+  //will be lost it is all stored to disc
 
+  //The writer needs a filename. Otherwise the output
+  //is redirected to the console.
+  mitk::NavigationDataSetWriterXML writer;
+  writer.Write(filename.str(),recorder->GetNavigationDataSet());
 
   //*************************************************************************
   // Part IV: Play the data with the NavigationDataPlayer
@@ -157,19 +152,22 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   //The recording is finished now so now we can play the data. The NavigationDataPlayer is similar
   //to the TrackingDevice source. It also derives from NavigationDataSource. So you can use a player
-  //instead of a TrackingDeviceSource. The input of this player is the filename and the output are
-  //NavigationData object.
+  //instead of a TrackingDeviceSource. The input of this player is a NavigationDataSet, which we
+  //read with a NavigationDataReader.
 
   filename << "-0.xml";
   std::cout << "Start playing from file: " << filename.str() << " ..." << std::endl;
 
-
   mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
+
+  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
   //this is first part of the file name the .xml extension and an counter is added automatically
-  //xxxxxxxxxxxxxxxxxxx TODO !!!!!!!!! player->SetFileName(filename.str());
+  mitk::NavigationDataSet::Pointer naviDataSet = reader->Read(filename.str());
+  player->SetNavigationDataSet(naviDataSet);
+
   player->StartPlaying(); //this starts the player
-                          //From now on the player provides NavigationDatas in the order and
-                          //correct time as they were recorded
+  //From now on the player provides NavigationDatas in the order and
+  //correct time as they were recorded
 
   //this connects the outputs of the player to the NavigationData objects
   mitk::NavigationData::Pointer nd = player->GetOutput();
@@ -191,7 +189,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
     }
   }
   player->StopPlaying(); //This stops the player
-                         //With another call of StartPlaying the player will start again at the beginning of the file
+  //With another call of StartPlaying the player will start again at the beginning of the file
 
   itksys::SystemTools::Delay(2000);
   std::cout << "finished" << std::endl;

@@ -451,10 +451,21 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 {
 if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora)
     {
-    DisableTrackingConfigurationButtons();
+
     mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());
-    currentDevice->OpenConnection();
-    currentDevice->StartTracking();
+    try
+      {
+      currentDevice->OpenConnection();
+      currentDevice->StartTracking();
+      }
+    catch(mitk::Exception& e)
+      {
+      QString message = QString("Warning, can not auto-detect tools! (") + QString(e.GetDescription()) + QString(")");
+      MessageBox(message.toStdString());
+      MITK_WARN << message.toStdString();
+      return;
+      }
+    DisableTrackingConfigurationButtons();
     mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New(this->GetDataStorage());
     for (int i=0; i<currentDevice->GetToolCount(); i++)
       {

@@ -56,7 +56,6 @@ public:
   double m_TrimmFactor;
   double m_SearchRadius;
   bool m_EnableFRENormalization;
-  bool m_EnableCovarianceMatrixNormalization;
   bool m_EnableInverseTransform;
 
   // anisotropic registration
@@ -79,8 +78,7 @@ public:
      m_MaxIterations(1000),
      m_TrimmFactor(0.0),
      m_SearchRadius(30.0),
-     m_EnableFRENormalization(false),
-     m_EnableCovarianceMatrixNormalization(false),
+     m_EnableFRENormalization(true),
      m_EnableInverseTransform(true),
      m_AICP(mitk::AnisotropicIterativeClosestPointRegistration::New()),
      m_MatrixCalculator(mitk::CovarianceMatrixCalculator::New()),
@@ -144,6 +142,7 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
   m_Controls.m_SearchRadius->setToolTip("Set the search radius in mm for the calculation of the correspondences.");
   m_Controls.m_RegisterSurfaceButton->setToolTip("Start the registration.");
   m_Controls.m_EnableInverseTransform->setToolTip("The inverse transform will transform the fixed onto the moving surface.");
+  m_Controls.m_EnableFRENormalization->setToolTip("Normalization of the Fiducial Registration Error.");
 
   // init combo boxes
   m_Controls.m_FixedSurfaceComboBox->SetDataStorage(this->GetDataStorage());
@@ -171,10 +170,10 @@ void QmitkSurfaceRegistrationView::OnStartRegistration()
   d->m_Threshold = m_Controls.m_ThresholdSpinbox->value();
   d->m_MaxIterations = m_Controls.m_MaxIterationsSpinbox->value();
   d->m_EnableFRENormalization = m_Controls.m_EnableFRENormalization->isChecked();
-  d->m_EnableCovarianceMatrixNormalization = m_Controls.m_EnableCovarianceMatrixNormalization->isChecked();
   d->m_SearchRadius = m_Controls.m_SearchRadius->value();
   d->m_TrimmFactor = 0.0;
   d->m_EnableInverseTransform = m_Controls.m_EnableInverseTransform->isChecked();
+  d->m_EnableFRENormalization = m_Controls.m_EnableFRENormalization->isChecked();
 
   if ( m_Controls.m_EnableTrimming->isChecked() )
   {
@@ -394,7 +393,10 @@ void UIWorker::RegistrationThreadFunc()
   const double meanVarY = d->m_MatrixCalculator->GetMeanVariance();
 
   // the FRE normalization factor
-  const double normalizationFactor = sqrt( meanVarX + meanVarY);
+  double normalizationFactor = 1.0;
+
+  if ( d->m_EnableFRENormalization )
+   normalizationFactor = sqrt( meanVarX + meanVarY);
 
   // set up parameters
   d->m_AICP->SetMovingSurface(X);

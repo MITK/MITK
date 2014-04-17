@@ -79,6 +79,7 @@ public:
     writer.Write(pathWrite, set);
 
     CPPUNIT_ASSERT_MESSAGE( "Testing if read/write cycle creates identical files", CompareFiles(pathRead, pathWrite));
+    remove(pathWrite.c_str());
   }
 
   bool CompareFiles(std::string file1, std::string file2)

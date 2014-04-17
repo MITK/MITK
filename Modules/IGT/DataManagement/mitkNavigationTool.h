@@ -89,7 +89,21 @@ namespace mitk {
     bool IsToolTipSet();
 
     //Tool Landmarks:
-    /** @return Returns the tool registration landmarks which represent markers / special points on a
+    /** For overview, here are descriptons of the two types of tool landmarks:
+     *
+     *  tool calibration landmarks: These landmarks may be used clearly define the tools pose only by
+     *  using landmarks in the tool coordinate system. E.g., two landmarks for a 5DoF tool and three
+     *  landmarks for a 6DoF tool. These landmarks may be used, e.g., for a point based registration
+     *  of a tool from image space to tracking space.
+     *
+     *  tool registration landmarks: These landmarks are designed for representing defined landmarks
+     *  on a tools surface. The number of these landmarks might exeed the number of tool calibration
+     *  landmarks for reasons of redundancy and averaging. They are used for, e.g., manually registering
+     *  the pose of a tool by visual markers in a CT scan. If you would use these landmarks to do a
+     *  point based registration from image space to tracking space later, you might overweight the
+     *  tool because of two many landmarks compared to other markers.
+     *
+     *  @return Returns the tool registration landmarks which represent markers / special points on a
      *          tool that can be used for registration. The landmarks should be given in tool coordinates.
      *          If there are no landmarks defined for this tool the method returns an empty point set.
      */

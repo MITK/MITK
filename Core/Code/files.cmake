@@ -59,7 +59,7 @@ set(H_FILES
   DataManagement/mitkImageToItk.txx
   DataManagement/mitkTimeSlicedGeometry.h # Deprecated, empty for compatibilty reasons.
   DataManagement/mitkPropertyListReplacedObserver.cpp
-  DataManagement/mitkOldTypeConversions.h
+  DataManagement/mitkVectorDeprecated.h
   DataManagement/mitkArray.h
   DataManagement/mitkQuaternion.h
   DataManagement/mitkTypes.h

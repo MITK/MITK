@@ -535,16 +535,13 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
 
       mitk::VnlVector normal = _PlaneGeometry->GetNormalVnl();
 
-      mitk::Geometry2D::ConstPointer worldGeometry1 = RenderWindow1->GetRenderer()->GetCurrentWorldGeometry2D();
-      mitk::PlaneGeometry::ConstPointer _Plane1 = dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry1.GetPointer() );
+      mitk::PlaneGeometry::ConstPointer _Plane1 = RenderWindow1->GetRenderer()->GetCurrentWorldGeometry2D();
       mitk::VnlVector normal1 = _Plane1->GetNormalVnl();
 
-      mitk::Geometry2D::ConstPointer worldGeometry2 = RenderWindow2->GetRenderer()->GetCurrentWorldGeometry2D();
-      mitk::PlaneGeometry::ConstPointer _Plane2 = dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry2.GetPointer() );
+      mitk::PlaneGeometry::ConstPointer _Plane2 = RenderWindow2->GetRenderer()->GetCurrentWorldGeometry2D();
       mitk::VnlVector normal2 = _Plane2->GetNormalVnl();
 
-      mitk::Geometry2D::ConstPointer worldGeometry3 = RenderWindow3->GetRenderer()->GetCurrentWorldGeometry2D();
-      mitk::PlaneGeometry::ConstPointer _Plane3 = dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry3.GetPointer() );
+      mitk::PlaneGeometry::ConstPointer _Plane3 = RenderWindow3->GetRenderer()->GetCurrentWorldGeometry2D();
       mitk::VnlVector normal3 = _Plane3->GetNormalVnl();
 
       normal[0]  = fabs(normal[0]);  normal[1]  = fabs(normal[1]);  normal[2]  = fabs(normal[2]);

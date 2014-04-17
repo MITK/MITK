@@ -110,7 +110,7 @@ namespace mitk
   }
 
   template <class TTransformType>
-  void GetWorldToItkPhysicalTransform(const mitk::Geometry3D * geometry, TTransformType* itkTransform)
+  void GetWorldToItkPhysicalTransform(const mitk::BaseGeometry * geometry, TTransformType* itkTransform)
   {
     if(itkTransform==NULL)
       return;

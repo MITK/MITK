@@ -96,7 +96,6 @@ set(MODULE_TESTS
   mitkPointTypeConversionTest.cpp
   mitkTypeVectorConversionTest.cpp
   mitkTypeMatrixConversionTest.cpp
-  mitkTypeOperationTest.cpp
   mitkSurfaceToImageFilterTest.cpp
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp

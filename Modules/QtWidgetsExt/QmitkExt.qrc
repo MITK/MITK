@@ -8,6 +8,8 @@
         <file>PlanarRectangle_48.png</file>
         <file>PlanarCircle_48.png</file>
         <file>PlanarDoubleEllipse_48.png</file>
+        <file>PlanarEllipse_48.png</file>
+        <file>PlanarSubdivisionPolygon_48.png</file>
         <file>icon_seedpoint.png</file>
     </qresource>
 </RCC>

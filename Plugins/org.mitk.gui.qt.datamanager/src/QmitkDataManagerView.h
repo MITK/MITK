@@ -44,6 +44,7 @@ class QSignalMapper;
 
 class QmitkDnDFrameWidget;
 class QmitkDataStorageTreeModel;
+class QmitkDataStorageFilterProxyModel;
 class QmitkDataManagerItemDelegate;
 
 ///
@@ -201,6 +202,8 @@ protected:
   /// \brief A plain widget as the base pane.
   ///
   QmitkDataStorageTreeModel* m_NodeTreeModel;
+  QmitkDataStorageFilterProxyModel* m_FilterModel;
+
   ///
   /// Holds the preferences for the datamanager.
   ///

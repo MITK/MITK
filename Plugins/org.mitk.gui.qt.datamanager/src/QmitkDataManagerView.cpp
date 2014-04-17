@@ -40,9 +40,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 //## Qmitk
 #include <QmitkDnDFrameWidget.h>
-#include <QmitkDataStorageTableModel.h>
 #include <QmitkIOUtil.h>
 #include <QmitkDataStorageTreeModel.h>
+#include <QmitkDataStorageFilterProxyModel.h>
 #include <QmitkCustomVariants.h>
 #include "src/internal/QmitkNodeTableViewKeyFilter.h"
 #include "src/internal/QmitkInfoDialog.h"
@@ -82,6 +82,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QColorDialog>
 #include <QSizePolicy>
 #include <QSignalMapper>
+#include <QSortFilterProxyModel>
 
 #include "mitkDataNodeObject.h"
 #include "mitkIContextMenuAction.h"
@@ -128,11 +129,14 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeModel->setParent( parent );
   m_NodeTreeModel->SetPlaceNewNodesOnTop(
       prefs->GetBool("Place new nodes on top", true) );
-  m_NodeTreeModel->SetShowHelperObjects(
-    prefs->GetBool("Show helper objects", false) );
-  m_NodeTreeModel->SetShowNodesContainingNoData(
-    prefs->GetBool("Show nodes containing no data", false) );
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
+
+  m_FilterModel = new QmitkDataStorageFilterProxyModel();
+  m_FilterModel->setSourceModel(m_NodeTreeModel);
+  m_FilterModel->SetShowHelperObjects(
+      prefs->GetBool("Show helper objects", false));
+  m_FilterModel->SetShowNodesContainingNoData(
+      prefs->GetBool("Show nodes containing no data", false));
 
   //# Tree View (experimental)
   m_NodeTreeView = new QTreeView;
@@ -144,7 +148,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeView->setDropIndicatorShown(true);
   m_NodeTreeView->setAcceptDrops(true);
   m_NodeTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_NodeTreeView->setModel(m_NodeTreeModel);
+  m_NodeTreeView->setModel(m_FilterModel);
   m_NodeTreeView->setTextElideMode(Qt::ElideMiddle);
   m_NodeTreeView->installEventFilter(new QmitkNodeTableViewKeyFilter(this));
 
@@ -425,11 +429,11 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
   if( m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() !=  prefs->GetBool("Place new nodes on top", true) )
     m_NodeTreeModel->SetPlaceNewNodesOnTop( !m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() );
 
-  if( m_NodeTreeModel->GetShowHelperObjectsFlag()!= prefs->GetBool("Show helper objects", false) )
-    m_NodeTreeModel->SetShowHelperObjects( !m_NodeTreeModel->GetShowHelperObjectsFlag() );
+  if( m_FilterModel->GetShowHelperObjectsFlag()!= prefs->GetBool("Show helper objects", false) )
+      m_FilterModel->SetShowHelperObjects(!m_FilterModel->GetShowHelperObjectsFlag());
 
-  if( m_NodeTreeModel->GetShowNodesContainingNoDataFlag()!= prefs->GetBool("Show nodes containing no data", false) )
-    m_NodeTreeModel->SetShowNodesContainingNoData( !m_NodeTreeModel->GetShowNodesContainingNoDataFlag() );
+  if (m_FilterModel->GetShowNodesContainingNoDataFlag() != prefs->GetBool("Show nodes containing no data", false))
+      m_FilterModel->SetShowNodesContainingNoData(!m_FilterModel->GetShowNodesContainingNoDataFlag());
 
   m_GlobalReinitOnNodeDelete = prefs->GetBool("Call global reinit if node is deleted", true);
 
@@ -444,7 +448,8 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
 
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )
 {
-  QModelIndex selected = m_NodeTreeView->indexAt ( pos );
+  QModelIndex selectedProxy = m_NodeTreeView->indexAt ( pos );
+  QModelIndex selected = m_FilterModel->mapToSource(selectedProxy);
   mitk::DataNode::Pointer node = m_NodeTreeModel->GetNode(selected);
   QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
 
@@ -476,8 +481,8 @@ void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos
 
 void QmitkDataManagerView::OpacityChanged(int value)
 {
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-  if(node)
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (node)
   {
     float opacity = static_cast<float>(value)/100.0f;
     node->SetFloatProperty("opacity", opacity);
@@ -487,8 +492,8 @@ void QmitkDataManagerView::OpacityChanged(int value)
 
 void QmitkDataManagerView::OpacityActionChanged()
 {
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-  if(node)
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (node)
   {
     float opacity = 0.0;
     if(node->GetFloatProperty("opacity", opacity))
@@ -500,8 +505,8 @@ void QmitkDataManagerView::OpacityActionChanged()
 
 void QmitkDataManagerView::ColorChanged()
  {
-   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-   if(node)
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (node)
    {
     mitk::Color color;
     mitk::ColorProperty::Pointer colorProp;
@@ -521,8 +526,8 @@ void QmitkDataManagerView::ColorChanged()
 
 void QmitkDataManagerView::ColorActionChanged()
 {
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-  if(node)
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (node)
   {
     mitk::Color color;
     mitk::ColorProperty::Pointer colorProp;
@@ -544,8 +549,8 @@ void QmitkDataManagerView::ColorActionChanged()
 
 void QmitkDataManagerView::TextureInterpolationChanged()
 {
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-  if(node)
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (node)
   {
     bool textureInterpolation = false;
     node->GetBoolProperty("texture interpolation", textureInterpolation);
@@ -555,8 +560,8 @@ void QmitkDataManagerView::TextureInterpolationChanged()
 
 void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
 {
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-  if(node)
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (node)
   {
     node->SetBoolProperty("texture interpolation", checked);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -566,8 +571,8 @@ void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
 
 void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
 {
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-  if(!node)
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (!node)
     return;
 
   mitk::LookupTableProperty::Pointer lookupTableProperty =
@@ -595,8 +600,8 @@ void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
 
 void QmitkDataManagerView::ColormapMenuAboutToShow()
 {
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-  if(!node)
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (!node)
     return;
 
   mitk::LookupTableProperty::Pointer lookupTableProperty =
@@ -637,8 +642,8 @@ void QmitkDataManagerView::ColormapMenuAboutToShow()
 
 void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
 {
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
-  if(!node)
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (!node)
     return;
 
   mitk::EnumerationProperty* representationProp =
@@ -669,7 +674,7 @@ void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
 
 void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ )
 {
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
   if(!node)
     return;
 
@@ -701,7 +706,11 @@ void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ 
 
 void QmitkDataManagerView::SaveSelectedNodes( bool )
 {
-  QModelIndexList indexesOfSelectedRows = m_NodeTreeView->selectionModel()->selectedRows();
+  QModelIndexList indexesOfSelectedRowsFiltered = m_NodeTreeView->selectionModel()->selectedRows();
+  QModelIndexList indexesOfSelectedRows;
+  for (int i = 0; i < indexesOfSelectedRowsFiltered.size(); ++i) {
+      indexesOfSelectedRows.push_back(m_FilterModel->mapToSource(indexesOfSelectedRowsFiltered[i]));
+  }
 
   mitk::DataNode* node = 0;
   unsigned int indexesOfSelectedRowsSize = indexesOfSelectedRows.size();
@@ -758,7 +767,11 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
 
 void QmitkDataManagerView::RemoveSelectedNodes( bool )
 {
-  QModelIndexList indexesOfSelectedRows = m_NodeTreeView->selectionModel()->selectedRows();
+    QModelIndexList indexesOfSelectedRowsFiltered = m_NodeTreeView->selectionModel()->selectedRows();
+    QModelIndexList indexesOfSelectedRows;
+    for (int i = 0; i < indexesOfSelectedRowsFiltered.size(); ++i) {
+        indexesOfSelectedRows.push_back(m_FilterModel->mapToSource(indexesOfSelectedRowsFiltered[i]));
+    }
   if(indexesOfSelectedRows.size() < 1)
   {
     return;
@@ -962,17 +975,17 @@ void QmitkDataManagerView::OtsuFilter( bool )
 void QmitkDataManagerView::NodeTreeViewRowsRemoved (
   const QModelIndex & /*parent*/, int /*start*/, int /*end*/ )
 {
-  m_CurrentRowCount = m_NodeTreeModel->rowCount();
+  m_CurrentRowCount = m_FilterModel->rowCount();
 }
 void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent, int, int )
 {
   m_NodeTreeView->setExpanded(parent, true);
 
   // a new row was inserted
-  if( m_CurrentRowCount == 0 && m_NodeTreeModel->rowCount() == 1 )
+  if( m_CurrentRowCount == 0 && m_FilterModel->rowCount() == 1 )
   {
     this->OpenRenderWindowPart();
-    m_CurrentRowCount = m_NodeTreeModel->rowCount();
+    m_CurrentRowCount = m_FilterModel->rowCount();
     /*
     std::vector<mitk::DataNode*> nodes = m_NodeTreeModel->GetNodeSet();
     if(nodes.size() == 1)

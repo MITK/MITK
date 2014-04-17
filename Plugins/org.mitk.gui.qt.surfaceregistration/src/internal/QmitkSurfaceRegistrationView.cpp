@@ -143,6 +143,7 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
   m_Controls.m_RegisterSurfaceButton->setToolTip("Start the registration.");
   m_Controls.m_EnableInverseTransform->setToolTip("The inverse transform will transform the fixed onto the moving surface.");
   m_Controls.m_EnableFRENormalization->setToolTip("Normalization of the Fiducial Registration Error.");
+  m_Controls.m_EnableTrimming->setToolTip("Enables the trimmed version of the algorithm.");
 
   // init combo boxes
   m_Controls.m_FixedSurfaceComboBox->SetDataStorage(this->GetDataStorage());

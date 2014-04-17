@@ -76,25 +76,9 @@ namespace mitk {
       mitk::FromArray<ArrayType, TCoordRep, NPointDimension>(*thisP, array);
     }
 
-    /**
-     * Copies the elements of this point to an array of type ArrayType
-     * Note that this method will assign doubles to floats without complaining!
-     *
-     * @return the array holding the elements of this. Only requirement is that it overloads the [] operator
-     */
-    template <typename ArrayType >
-    ArrayType ToArray()
-    {
-      ArrayType result = mitk::ToArray<ArrayType, TCoordRep, NPointDimension>(*this);
-      return result;
-    }
 
     /**
      * Copies the values stored in this point into the array array.
-     * This method has to be used over the version returning the array when
-     * copying to pod arrays.
-     * Furthermore, the syntax may be a little bit nicer because ArrayType can be
-     * inferred from the parameter.
      *
      * @param array the array which should store the values of this.
      */

@@ -94,6 +94,7 @@ set(MODULE_TESTS
   mitkLookupTableTest.cpp
   mitkSTLFileReaderTest.cpp
   mitkSurfaceToImageFilterTest.cpp
+  mitkBaseGeometryTest.cpp
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
 )

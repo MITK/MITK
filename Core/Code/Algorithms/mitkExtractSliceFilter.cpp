@@ -413,8 +413,8 @@ void mitk::ExtractSliceFilter::GenerateData(){
     //the originalGeometry is the Geometry of the result slice
 
 //    mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
-//    Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
-    Geometry2D::Pointer originalGeometry = m_WorldGeometry->Clone();
+//    PlaneGeometry::Pointer originalGeometry = dynamic_cast<PlaneGeometry*>( originalGeometryAGF.GetPointer() );
+    PlaneGeometry::Pointer originalGeometry = m_WorldGeometry->Clone();
 
     originalGeometry->GetIndexToWorldTransform()->SetMatrix(m_WorldGeometry->GetIndexToWorldTransform()->GetMatrix());
 
@@ -477,7 +477,7 @@ bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(double bounds[6]){
 }
 
 
-bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const Geometry3D *boundingGeometry,
+bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const BaseGeometry *boundingGeometry,
                                                      const PlaneGeometry *planeGeometry, double *bounds )
 {
   bool b =  mitk::PlaneClipping::CalculateClippedPlaneBounds(boundingGeometry, planeGeometry, bounds);

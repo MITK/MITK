@@ -127,7 +127,7 @@ public:
   *
   * @todo Appropriate setting of the update extent is missing.
   */
-  const mitk::Geometry3D* GetUpdatedGeometry(int t=0);
+  const mitk::BaseGeometry* GetUpdatedGeometry(int t=0);
 
   //##Documentation
   //## @brief Return the geometry, which is a TimeGeometry, of the data
@@ -137,7 +137,7 @@ public:
   //## be sure that the geometry is up-to-date.
   //##
   //## Normally used in GenerateOutputInformation of subclasses of BaseProcess.
-  mitk::Geometry3D* GetGeometry(int t=0) const
+  mitk::BaseGeometry* GetGeometry(int t=0) const
   {
     if(m_TimeGeometry.IsNull())
       return NULL;
@@ -266,7 +266,7 @@ public:
   * during initialization.
   * \sa SetClonedGeometry
   */
-  virtual void SetGeometry(Geometry3D* aGeometry3D);
+  virtual void SetGeometry(BaseGeometry* aGeometry3D);
 
   /**
   * \brief Set the TimeGeometry of the data, which will be referenced (not copied!).
@@ -285,7 +285,7 @@ public:
   *
   * \sa SetGeometry
   */
-  virtual void SetClonedGeometry(const Geometry3D* aGeometry3D);
+  virtual void SetClonedGeometry(const BaseGeometry* aGeometry3D);
 
     /**
   * \brief Set a clone of the provided TimeGeometry as TimeGeometry of the data.
@@ -298,7 +298,7 @@ public:
   //## @brief Set a clone of the provided geometry as Geometry3D of a given time step.
   //##
   //## \sa SetGeometry
-  virtual void SetClonedGeometry(const Geometry3D* aGeometry3D, unsigned int time);
+  virtual void SetClonedGeometry(const BaseGeometry* aGeometry3D, unsigned int time);
 
   //##Documentation
   //## @brief Get the data's property list

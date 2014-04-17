@@ -45,7 +45,7 @@ mitk::ContourModel::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* s
 }
 
 
-mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
+mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, Contour* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
 {
   mitk::Contour::PointsContainerIterator it = contourIn2D->GetPoints()->Begin();
   mitk::Contour::PointsContainerIterator end = contourIn2D->GetPoints()->End();

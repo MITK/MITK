@@ -56,8 +56,8 @@ void mitk::BoundingObjectToSegmentationFilter::GenerateData()
   {
      //create region for boundingobject
     mitk::BoundingObject::Pointer boundingObject = m_boundingObjectGroup->GetBoundingObjects().at(i);
-    mitk::Geometry3D::Pointer boGeometry = boundingObject->GetGeometry();
-    mitk::Geometry3D::Pointer inputImageGeometry = inputImage->GetSlicedGeometry();
+    mitk::BaseGeometry::Pointer boGeometry = boundingObject->GetGeometry();
+    mitk::BaseGeometry::Pointer inputImageGeometry = inputImage->GetSlicedGeometry();
     mitk::BoundingBox::Pointer boToIm = boGeometry->CalculateBoundingBoxRelativeToTransform(inputImageGeometry->GetIndexToWorldTransform());
 
     mitk::BoundingBox::ConstPointer imgBB = inputImageGeometry->GetBoundingBox();

@@ -14,48 +14,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkDisplayGeometry.h"
 
 itk::LightObject::Pointer mitk::DisplayGeometry::InternalClone() const
 {
-//  itkExceptionMacro(<<"calling mitk::DisplayGeometry::Clone does not make much sense.");
+  //  itkExceptionMacro(<<"calling mitk::DisplayGeometry::Clone does not make much sense.");
   DisplayGeometry* returnValue = const_cast<DisplayGeometry *>(this);
   return returnValue;
 }
 
 bool mitk::DisplayGeometry::IsValid() const
 {
-  return m_Valid && m_WorldGeometry.IsNotNull() && m_WorldGeometry->IsValid();
+  return m_WorldGeometry.IsNotNull() && m_WorldGeometry->IsValid();
 }
 
 unsigned long mitk::DisplayGeometry::GetMTime() const
 {
-  if((m_WorldGeometry.IsNotNull()) && (Geometry2D::GetMTime() < m_WorldGeometry->GetMTime()))
+  if((m_WorldGeometry.IsNotNull()) && (PlaneGeometry::GetMTime() < m_WorldGeometry->GetMTime()))
   {
     Modified();
   }
-  return Geometry2D::GetMTime();
+  return PlaneGeometry::GetMTime();
 }
 
 const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
 {
   if(m_WorldGeometry.IsNull())
   {
-    return m_TimeBounds;
+    return this->GetTimeBounds();
   }
 
   return m_WorldGeometry->GetTimeBounds();
 }
 
-
-
-
-
-
 // size definition methods
 
-void mitk::DisplayGeometry::SetWorldGeometry(const Geometry2D* aWorldGeometry)
+void mitk::DisplayGeometry::SetWorldGeometry(const PlaneGeometry* aWorldGeometry)
 {
   m_WorldGeometry = aWorldGeometry;
 
@@ -145,10 +139,6 @@ unsigned int mitk::DisplayGeometry::GetDisplayHeight() const
   return (unsigned int)m_SizeInDisplayUnits[1];
 }
 
-
-
-
-
 // zooming, panning, restriction of both
 
 void mitk::DisplayGeometry::SetConstrainZoomingAndPanning(bool constrain)
@@ -200,7 +190,6 @@ bool mitk::DisplayGeometry::Zoom(ScalarType factor, const Point2D& centerInDispl
   }
 }
 
-
 // Zooms with a factor (1.0=identity) around the specified center, but tries (if its within view contraints) to match the center in display units with the center in world coordinates.
 bool mitk::DisplayGeometry::ZoomWithFixedWorldCoordinates(ScalarType factor, const Point2D& focusDisplayUnits, const Point2D& focusUnitsInMM )
 {
@@ -210,7 +199,6 @@ bool mitk::DisplayGeometry::ZoomWithFixedWorldCoordinates(ScalarType factor, con
   SetOriginInMM(focusUnitsInMM.GetVectorFromOrigin()-focusDisplayUnits.GetVectorFromOrigin()*m_ScaleFactorMMPerDisplayUnit);
   return true;
 }
-
 
 bool mitk::DisplayGeometry::MoveBy(const Vector2D& shiftInDisplayUnits)
 {
@@ -232,8 +220,8 @@ void mitk::DisplayGeometry::Fit()
   ScalarType w = width;
   ScalarType h = height;
 
-  const ScalarType& widthInMM = m_WorldGeometry->GetParametricExtentInMM(0);
-  const ScalarType& heightInMM = m_WorldGeometry->GetParametricExtentInMM(1);
+  const ScalarType& widthInMM = m_WorldGeometry->GetExtentInMM(0);
+  const ScalarType& heightInMM = m_WorldGeometry->GetExtentInMM(1);
   ScalarType aspRatio=((ScalarType)widthInMM)/heightInMM;
 
   ScalarType x = (ScalarType)w/widthInMM;
@@ -262,10 +250,6 @@ void mitk::DisplayGeometry::Fit()
 
   Modified();
 }
-
-
-
-
 
 // conversion methods
 
@@ -347,7 +331,7 @@ bool mitk::DisplayGeometry::Project(const Point3D &pt3d_mm, Point3D &projectedPt
   {
     return false;
   }
- }
+}
 
 bool mitk::DisplayGeometry::Project(const Point3D & atPt3d_mm, const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const
 {
@@ -363,14 +347,14 @@ bool mitk::DisplayGeometry::Project(const Point3D & atPt3d_mm, const Vector3D &v
 
 bool mitk::DisplayGeometry::Project(const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const
 {
-   if(m_WorldGeometry.IsNotNull())
-   {
-      return m_WorldGeometry->Project(vec3d_mm, projectedVec3d_mm);
-   }
-   else
-   {
-      return false;
-   }
+  if(m_WorldGeometry.IsNotNull())
+  {
+    return m_WorldGeometry->Project(vec3d_mm, projectedVec3d_mm);
+  }
+  else
+  {
+    return false;
+  }
 }
 
 bool mitk::DisplayGeometry::Map(const Point3D &pt3d_mm, Point2D &pt2d_mm) const
@@ -410,18 +394,14 @@ void mitk::DisplayGeometry::Map(const Point2D & atPt2d_mm, const Vector2D &vec2d
   m_WorldGeometry->Map(atPt2d_mm, vec2d_mm, vec3d_mm);
 }
 
-
-
-
-
 // protected methods
 
 mitk::DisplayGeometry::DisplayGeometry()
-:m_ScaleFactorMMPerDisplayUnit(1.0)
-,m_WorldGeometry(NULL)
-,m_ConstrainZoomingAndPanning(true)
-,m_MaxWorldViewPercentage(1.0)
-,m_MinWorldViewPercentage(0.1)
+  :m_ScaleFactorMMPerDisplayUnit(1.0)
+  ,m_WorldGeometry(NULL)
+  ,m_ConstrainZoomingAndPanning(true)
+  ,m_MaxWorldViewPercentage(1.0)
+  ,m_MinWorldViewPercentage(0.1)
 {
   m_OriginInMM.Fill(0.0);
   m_OriginInDisplayUnits.Fill(0.0);
@@ -451,8 +431,8 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
   float displayWidthMM  = m_SizeInDisplayUnits[0] * m_ScaleFactorMMPerDisplayUnit;
   float displayHeightMM = m_SizeInDisplayUnits[1] * m_ScaleFactorMMPerDisplayUnit;
 
-  float worldWidthMM  = m_WorldGeometry->GetParametricExtentInMM(0);
-  float worldHeightMM = m_WorldGeometry->GetParametricExtentInMM(1);
+  float worldWidthMM  = m_WorldGeometry->GetExtentInMM(0);
+  float worldHeightMM = m_WorldGeometry->GetExtentInMM(1);
 
   // reserve variables for the correction logic to save a corrected origin and zoom factor
   Vector2D newOrigin = m_OriginInMM;
@@ -530,16 +510,15 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
   //
   // In both situations we center the not-maxed out direction
   //
-if ( zoomXtooSmall && zoomYtooSmall )
-    {
-      // determine and set the bigger scale factor
-      float fx = worldWidthMM * m_MaxWorldViewPercentage / displayWidthPx;
-      float fy = worldHeightMM * m_MaxWorldViewPercentage / displayHeightPx;
-      newScaleFactor = fx > fy ? fx : fy;
+  if ( zoomXtooSmall && zoomYtooSmall )
+  {
+    // determine and set the bigger scale factor
+    float fx = worldWidthMM * m_MaxWorldViewPercentage / displayWidthPx;
+    float fy = worldHeightMM * m_MaxWorldViewPercentage / displayHeightPx;
+    newScaleFactor = fx > fy ? fx : fy;
 
-      correctZooming = true;
-    }
-
+    correctZooming = true;
+  }
 
   // actually execute correction
   if (correctZooming)
@@ -574,7 +553,6 @@ if ( zoomXtooSmall && zoomYtooSmall )
     }
   }
 
-
   if (worldHeightMM<displayHeightMM)
   {
     // zoomed out too much in y (but tolerated because x is still ok)
@@ -590,17 +568,16 @@ if ( zoomXtooSmall && zoomYtooSmall )
       newOrigin[1] = worldHeightMM - displayHeightMM;
       correctPanning = true;
     }
-  // make sure bottom display border inside our world
+    // make sure bottom display border inside our world
     else
-    if (displayYMM < 0)
-    {
-      newOrigin[1] = 0;
-      correctPanning = true;
-    }
-
+      if (displayYMM < 0)
+      {
+        newOrigin[1] = 0;
+        correctPanning = true;
+      }
   }
 
- if (correctPanning)
+  if (correctPanning)
   {
     SetOriginInMM( newOrigin );
   }
@@ -634,4 +611,3 @@ void mitk::DisplayGeometry::PrintSelf(std::ostream& os, itk::Indent indent) cons
 
   Superclass::PrintSelf(os,indent);
 }
-

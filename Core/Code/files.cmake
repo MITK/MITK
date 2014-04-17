@@ -128,6 +128,7 @@ set(CPP_FILES
   DataManagement/mitkAnnotationProperty.cpp
   DataManagement/mitkApplicationCursor.cpp
   DataManagement/mitkBaseData.cpp
+  DataManagement/mitkBaseGeometry.cpp
   DataManagement/mitkBaseProperty.cpp
   DataManagement/mitkClippingProperty.cpp
   DataManagement/mitkChannelDescriptor.cpp
@@ -139,7 +140,6 @@ set(CPP_FILES
 # DataManagement/mitkDataTreeStorage.cpp
   DataManagement/mitkDisplayGeometry.cpp
   DataManagement/mitkEnumerationProperty.cpp
-  DataManagement/mitkGeometry2D.cpp
   DataManagement/mitkGeometry2DData.cpp
   DataManagement/mitkGeometry3D.cpp
   DataManagement/mitkGeometryData.cpp
@@ -155,7 +155,6 @@ set(CPP_FILES
   DataManagement/mitkImageDescriptor.cpp
   DataManagement/mitkImageVtkAccessor.cpp
   DataManagement/mitkImageStatisticsHolder.cpp
-  DataManagement/mitkLandmarkBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp
   DataManagement/mitkLevelWindow.cpp

@@ -77,7 +77,7 @@ public:
   * The default behavior is to set the geometry by
   * the itk::Image::GetDirection() information.
   */
-  void SetGeometry(const Geometry3D* geometry);
+  void SetGeometry(const BaseGeometry* geometry);
 
 protected:
   ITKImageImport();
@@ -97,7 +97,7 @@ protected:
   typedef itk::ImageToImageFilterDetail::ImageRegionCopier<itkGetStaticConstMacro(InputImageDimension),
   itkGetStaticConstMacro(RegionDimension)> OutputToInputRegionCopierType;
 
-  Geometry3D::Pointer m_Geometry;
+  BaseGeometry::Pointer m_Geometry;
 };
 
 /**
@@ -116,7 +116,7 @@ protected:
 * \sa itk::Image::CastToMitkImage
 */
 template <typename ItkOutputImageType>
-Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, const Geometry3D* geometry = NULL, bool update = true);
+Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, const BaseGeometry* geometry = NULL, bool update = true);
 
 /**
 * @brief Imports an itk::Image (with a specific type) as an mitk::Image.
@@ -148,7 +148,7 @@ Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkim
 * \sa GrabItkImageMemory
 */
 template <typename ItkOutputImageType>
-Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const Geometry3D* geometry = NULL, bool update = true);
+Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const BaseGeometry* geometry = NULL, bool update = true);
 
 /**
 * @brief Grabs the memory of an itk::Image (with a specific type)
@@ -166,7 +166,7 @@ Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const Geometry
 * \sa ImportItkImage
 */
 template <typename ItkOutputImageType>
-Image::Pointer GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimage, mitk::Image* mitkImage = NULL, const Geometry3D* geometry = NULL, bool update = true);
+Image::Pointer GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimage, mitk::Image* mitkImage = NULL, const BaseGeometry* geometry = NULL, bool update = true);
 
 /**
 * @brief Grabs the memory of an itk::Image (with a specific type)
@@ -184,7 +184,7 @@ Image::Pointer GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimag
 * \sa ImportItkImage
 */
 template <typename ItkOutputImageType>
-Image::Pointer GrabItkImageMemory(ItkOutputImageType* itkimage, mitk::Image* mitkImage = NULL, const Geometry3D* geometry = NULL, bool update = true);
+Image::Pointer GrabItkImageMemory(ItkOutputImageType* itkimage, mitk::Image* mitkImage = NULL, const BaseGeometry* geometry = NULL, bool update = true);
 
 } // namespace mitk
 

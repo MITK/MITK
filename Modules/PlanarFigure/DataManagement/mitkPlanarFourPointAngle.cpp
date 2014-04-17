@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarFourPointAngle.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 
 mitk::PlanarFourPointAngle::PlanarFourPointAngle()

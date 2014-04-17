@@ -238,7 +238,7 @@ public:
   //## initialize new (or re-initialize) image information by a Geometry3D
   //##
   //## @param tDim defines the number of time steps for which the Image should be initialized
-  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=1);
+  virtual void Initialize(const mitk::PixelType& type, const mitk::BaseGeometry& geometry, unsigned int channels = 1, int tDim=1);
 
   /**
   * initialize new (or re-initialize) image information by a Geometry3D
@@ -256,13 +256,13 @@ public:
   virtual void Initialize(const mitk::PixelType& type, const mitk::TimeGeometry& geometry, unsigned int channels = 1, int tDim=-1 );
 
   //##Documentation
-  //## initialize new (or re-initialize) image information by a Geometry2D and number of slices
+  //## initialize new (or re-initialize) image information by a PlaneGeometry and number of slices
   //##
   //## Initializes the bounding box according to the width/height of the
-  //## Geometry2D and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
-  //## The spacing is calculated from the Geometry2D.
+  //## PlaneGeometry and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
+  //## The spacing is calculated from the PlaneGeometry.
   //## \sa SlicedGeometry3D::InitializeEvenlySpaced
-  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=1);
+  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by another
@@ -275,7 +275,7 @@ public:
 
   //##Documentation
   //## initialize new (or re-initialize) image information by @a pic.
-  //## Dimensions and @a Geometry3D /@a Geometry2D are set according
+  //## Dimensions and @a Geometry3D /@a PlaneGeometry are set according
   //## to the tags in @a pic.
   //## Only the header is used, not the data vector! Use SetPicVolume(pic)
   //## to set the data vector.
@@ -472,7 +472,7 @@ public:
 
   /** \brief Sets a geometry to an image.
     */
-  virtual void SetGeometry(Geometry3D* aGeometry3D);
+  virtual void SetGeometry(BaseGeometry* aGeometry3D);
 
   /**
   * @warning for internal use only

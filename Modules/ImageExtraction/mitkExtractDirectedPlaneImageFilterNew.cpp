@@ -176,7 +176,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     origin[2] -= xTranlation*right[2]+yTranlation*bottom[2];
 
     //Putting it together for the new geometry
-    mitk::Geometry3D::Pointer newSliceGeometryTest = dynamic_cast<Geometry3D*>(m_CurrentWorldGeometry2D->Clone().GetPointer());
+    mitk::BaseGeometry::Pointer newSliceGeometryTest = dynamic_cast<BaseGeometry*>(m_CurrentWorldGeometry2D->Clone().GetPointer());
     newSliceGeometryTest->ChangeImageGeometryConsideringOriginOffset(true);
 
     //Workaround because of BUG (#6505)

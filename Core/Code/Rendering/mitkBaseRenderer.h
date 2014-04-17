@@ -18,7 +18,7 @@
 #define BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
 
 #include "mitkDataStorage.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkTimeGeometry.h"
 #include "mitkDisplayGeometry.h"
 #include "mitkGeometry2DData.h"
@@ -179,7 +179,7 @@ namespace mitk
     //## (maximal) area to be rendered.
     //##
     //## Depending of the type of the passed Geometry3D more or less information can be extracted:
-    //## \li if it is a Geometry2D (which is a sub-class of Geometry3D), m_CurrentWorldGeometry2D is
+    //## \li if it is a PlaneGeometry (which is a sub-class of Geometry3D), m_CurrentWorldGeometry2D is
     //## also set to point to it. m_WorldTimeGeometry is set to NULL.
     //## \li if it is a TimeGeometry, m_WorldTimeGeometry is also set to point to it.
     //## If m_WorldTimeGeometry contains instances of SlicedGeometry3D, m_CurrentWorldGeometry2D is set to
@@ -193,7 +193,7 @@ namespace mitk
     //## \sa m_WorldGeometry
     //## \sa m_WorldTimeGeometry
     //## \sa m_CurrentWorldGeometry2D
-    virtual void SetWorldGeometry3D(Geometry3D* geometry);
+    virtual void SetWorldGeometry3D(BaseGeometry* geometry);
     virtual void SetWorldTimeGeometry(mitk::TimeGeometry* geometry);
 
     /**
@@ -201,18 +201,18 @@ namespace mitk
     */
     DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry* geometry));
 
-    itkGetConstObjectMacro(WorldGeometry, Geometry3D)
-    itkGetObjectMacro(WorldGeometry, Geometry3D)
+    itkGetConstObjectMacro(WorldGeometry, BaseGeometry)
+    itkGetObjectMacro(WorldGeometry, BaseGeometry)
     itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
     itkGetObjectMacro(WorldTimeGeometry, TimeGeometry)
 
     //##Documentation
     //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
-    itkGetConstObjectMacro(CurrentWorldGeometry, Geometry3D)
+    itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry)
 
     //##Documentation
     //## @brief Get the current 2D-worldgeometry (m_CurrentWorldGeometry2D) used for 2D-rendering
-    itkGetConstObjectMacro(CurrentWorldGeometry2D, Geometry2D)
+    itkGetConstObjectMacro(CurrentWorldGeometry2D, PlaneGeometry)
 
     //##Documentation
     //## Calculates the bounds of the DataStorage (if it contains any valid data),
@@ -230,7 +230,7 @@ namespace mitk
     //##Documentation
     //## @brief Set/Get the DisplayGeometry (for 2D rendering)
     //##
-    //## The DisplayGeometry describes which part of the Geometry2D m_CurrentWorldGeometry2D
+    //## The DisplayGeometry describes which part of the PlaneGeometry m_CurrentWorldGeometry2D
     //## is displayed.
     virtual void SetDisplayGeometry(DisplayGeometry* geometry2d);
 
@@ -507,11 +507,11 @@ namespace mitk
 
     //##Documentation
     //## @brief Sets m_CurrentWorldGeometry2D
-    virtual void SetCurrentWorldGeometry2D(Geometry2D* geometry2d);
+    virtual void SetCurrentWorldGeometry2D(PlaneGeometry* geometry2d);
 
     //##Documentation
     //## @brief Sets m_CurrentWorldGeometry
-    virtual void SetCurrentWorldGeometry(Geometry3D* geometry);
+    virtual void SetCurrentWorldGeometry(BaseGeometry* geometry);
 
     //##Documentation
     //## @brief This method is called during the rendering process to update or render the Overlays
@@ -526,7 +526,7 @@ namespace mitk
     //## directly from the geometry of an image-slice and thus it would be
     //## very strange when suddenly the image-slice changes its geometry).
     //## \sa SetWorldGeometry
-    Geometry3D::Pointer m_WorldGeometry;
+    BaseGeometry::Pointer m_WorldGeometry;
 
     itk::SmartPointer<OverlayManager> m_OverlayManager;
 
@@ -541,7 +541,7 @@ namespace mitk
 
     //##Documentation
     //## Pointer to the current 3D-worldgeometry.
-    Geometry3D::Pointer m_CurrentWorldGeometry;
+    BaseGeometry::Pointer m_CurrentWorldGeometry;
 
     //##Documentation
     //## Pointer to the current 2D-worldgeometry. The 2D-worldgeometry
@@ -551,7 +551,7 @@ namespace mitk
     //## It is const, since we are not allowed to change it (it may be taken
     //## directly from the geometry of an image-slice and thus it would be
     //## very strange when suddenly the image-slice changes its geometry).
-    Geometry2D::Pointer m_CurrentWorldGeometry2D;
+    PlaneGeometry::Pointer m_CurrentWorldGeometry2D;
 
     //##Documentation
     //## Pointer to the displaygeometry. The displaygeometry describes the

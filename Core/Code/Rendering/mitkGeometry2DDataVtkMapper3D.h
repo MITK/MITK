@@ -43,11 +43,11 @@ class ImageVtkMapper2D;
 class DataStorage;
 
 /**
- *  \brief Vtk-based mapper to display a Geometry2D in a 3D window
+ *  \brief Vtk-based mapper to display a PlaneGeometry in a 3D window
  *  \ingroup Mapper
  *
- *  Uses a Geometry2DDataToSurfaceFilter object to create a vtkPolyData representation of a given Geometry2D instance.
- *  Geometry2D may either contain a common flat plane or a curved plane (ThinPlateSplineCurvedGeometry).
+ *  Uses a Geometry2DDataToSurfaceFilter object to create a vtkPolyData representation of a given PlaneGeometry instance.
+ *  PlaneGeometry may either contain a common flat plane or a curved plane (ThinPlateSplineCurvedGeometry).
  *
  *  The vtkPolyData object is then decorated by a colored tube on the edges and by image textures if possible
  *  (currently this requires that there is a 2D render window rendering the same geometry as this mapper).

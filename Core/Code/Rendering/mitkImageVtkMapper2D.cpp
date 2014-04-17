@@ -129,7 +129,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   }
 
   //check if there is a valid worldGeometry
-  const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldGeometry2D();
   if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->HasReferenceGeometry() ))
   {
     return;
@@ -991,7 +991,7 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)
   }
 }
 
-bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
+bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage( const PlaneGeometry* renderingGeometry, SlicedGeometry3D* imageGeometry )
 {
   // if either one of the two geometries is NULL we return true
   // for safety reasons

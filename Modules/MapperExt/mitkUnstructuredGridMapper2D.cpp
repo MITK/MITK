@@ -141,7 +141,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
   vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform();
   vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
 
-  Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
   PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
 
   Point3D point;

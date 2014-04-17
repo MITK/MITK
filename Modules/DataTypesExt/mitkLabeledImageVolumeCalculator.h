@@ -76,7 +76,7 @@ protected:
   void _InternalCalculateVolumes(
     itk::Image< TPixel, VImageDimension > *image,
     LabeledImageVolumeCalculator *volumeCalculator,
-    Geometry3D *geometry );
+    BaseGeometry *geometry );
 
 
   ImageTimeSelector::Pointer m_InputTimeSelector;

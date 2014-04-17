@@ -467,13 +467,13 @@ void mitk::BaseRenderer::SetWorldTimeGeometry(mitk::TimeGeometry* geometry)
     if (m_TimeStep >= m_WorldTimeGeometry->CountTimeSteps())
         m_TimeStep = m_WorldTimeGeometry->CountTimeSteps() - 1;
 
-    Geometry3D* geometry3d;
+    BaseGeometry* geometry3d;
     geometry3d = m_WorldTimeGeometry->GetGeometryForTimeStep(m_TimeStep);
     SetWorldGeometry3D(geometry3d);
   }
 }
 
-void mitk::BaseRenderer::SetWorldGeometry3D(mitk::Geometry3D* geometry)
+void mitk::BaseRenderer::SetWorldGeometry3D(mitk::BaseGeometry* geometry)
 {
   itkDebugMacro("setting WorldGeometry3D to " << geometry);
 
@@ -486,7 +486,7 @@ void mitk::BaseRenderer::SetWorldGeometry3D(mitk::Geometry3D* geometry)
     SlicedGeometry3D* slicedWorldGeometry;
     slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(geometry);
 
-    Geometry2D::Pointer geometry2d;
+    PlaneGeometry::Pointer geometry2d;
     if (slicedWorldGeometry != NULL)
     {
       if (m_Slice >= slicedWorldGeometry->GetSlices() && (m_Slice != 0))
@@ -502,7 +502,7 @@ void mitk::BaseRenderer::SetWorldGeometry3D(mitk::Geometry3D* geometry)
     }
     else
     {
-      geometry2d = dynamic_cast<Geometry2D*>(geometry);
+      geometry2d = dynamic_cast<PlaneGeometry*>(geometry);
       if (geometry2d.IsNull())
       {
         PlaneGeometry::Pointer plane = PlaneGeometry::New();
@@ -529,7 +529,7 @@ void mitk::BaseRenderer::SetDisplayGeometry(mitk::DisplayGeometry* geometry2d)
   }
 }
 
-void mitk::BaseRenderer::SetCurrentWorldGeometry2D(mitk::Geometry2D* geometry2d)
+void mitk::BaseRenderer::SetCurrentWorldGeometry2D(mitk::PlaneGeometry* geometry2d)
 {
   if (m_CurrentWorldGeometry2D != geometry2d)
   {
@@ -547,7 +547,7 @@ void mitk::BaseRenderer::SendUpdateSlice()
   m_CurrentWorldGeometry2DUpdateTime.Modified();
 }
 
-void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::Geometry3D* geometry)
+void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::BaseGeometry* geometry)
 {
   m_CurrentWorldGeometry = geometry;
   if (geometry == NULL)
@@ -605,7 +605,7 @@ void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject & geometryUpdateE
     SlicedGeometry3D* slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(m_CurrentWorldGeometry.GetPointer());
     if (slicedWorldGeometry)
     {
-      Geometry2D* geometry2D = slicedWorldGeometry->GetGeometry2D(m_Slice);
+      PlaneGeometry* geometry2D = slicedWorldGeometry->GetGeometry2D(m_Slice);
 
       SetCurrentWorldGeometry2D(geometry2D); // calls Modified()
     }

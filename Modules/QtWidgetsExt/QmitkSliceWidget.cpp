@@ -155,8 +155,9 @@ void QmitkSliceWidget::InitWidget(
     return;
   }
 
-  mitk::Geometry3D::Pointer geometry =
-    static_cast<mitk::Geometry3D*> (m_SlicedGeometry->Clone().GetPointer());
+
+  mitk::BaseGeometry::Pointer geometry =
+          static_cast<mitk::BaseGeometry*> (m_SlicedGeometry->Clone().GetPointer());
 
   const mitk::BoundingBox::Pointer boundingbox =
     m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);

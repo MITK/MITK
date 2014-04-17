@@ -31,7 +31,7 @@ mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
 }
 
 mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
-    const mitk::Geometry3D* geometry,
+    const mitk::BaseGeometry* geometry,
     mitk::Image::Pointer image)
 : m_PlaneGeometry(NULL)
 , m_Geometry3D(NULL)
@@ -84,7 +84,7 @@ mitk::ClippedSurfaceBoundsCalculator::SetInput(
 
 void
 mitk::ClippedSurfaceBoundsCalculator::SetInput(
-    const mitk::Geometry3D* geometry,
+    const mitk::BaseGeometry* geometry,
     mitk::Image* image)
 {
   if(geometry && image)

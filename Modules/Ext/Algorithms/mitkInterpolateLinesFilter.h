@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkExtExports.h"
 #include "mitkSurfaceSource.h"
 #include "mitkMesh.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 class vtkPolyData;
 class vtkPoints;
@@ -35,12 +35,12 @@ namespace mitk {
 //##Documentation
 //## @brief Interpolate additional points on lines
 //##
-//## If a Geometry2D is set (by SetGeometryForInterpolation),
-//## we do an interpolation in the 2D-space of the Geometry2D:
+//## If a PlaneGeometry is set (by SetGeometryForInterpolation),
+//## we do an interpolation in the 2D-space of the PlaneGeometry:
 //## Map two neighboring original points on
-//## the Geometry2D, resulting in two 2D-points, interpolate
+//## the PlaneGeometry, resulting in two 2D-points, interpolate
 //## in 2D between them, and map them back via the
-//## Geometry2D in the 3D-world.
+//## PlaneGeometry in the 3D-world.
 //## @ingroup Process
 class MitkExt_EXPORT InterpolateLinesFilter : public SurfaceSource
 {
@@ -70,12 +70,12 @@ public:
   //## @brief Get/set geometry for interpolation
   //##
   //## If this is set (not NULL), we do an interpolation in the
-  //## 2D-space of the Geometry2D: Map two neighboring original
-  //## points on the Geometry2D, resulting in two 2D-points,
+  //## 2D-space of the PlaneGeometry: Map two neighboring original
+  //## points on the PlaneGeometry, resulting in two 2D-points,
   //## interpolate in 2D between them, and map them back via the
-  //## Geometry2D in the 3D-world.
-  itkGetConstObjectMacro(GeometryForInterpolation, mitk::Geometry2D);
-  itkSetObjectMacro(GeometryForInterpolation, mitk::Geometry2D);
+  //## PlaneGeometry in the 3D-world.
+  itkGetConstObjectMacro(GeometryForInterpolation, mitk::PlaneGeometry);
+  itkSetObjectMacro(GeometryForInterpolation, mitk::PlaneGeometry);
 
   //##Documentation
   //## @brief Get the overall length of the interpolated lines
@@ -94,7 +94,7 @@ protected:
   //##
   unsigned int m_SplineResolution;
 
-  mitk::Geometry2D::Pointer m_GeometryForInterpolation;
+  mitk::PlaneGeometry::Pointer m_GeometryForInterpolation;
   vtkCardinalSpline *m_SpX, *m_SpY, *m_SpZ;
 
   ScalarType m_Length;

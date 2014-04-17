@@ -88,7 +88,7 @@ void QmitkNavigationToolCreationAdvancedWidget::ReInitialize()
    m_ManipulatedToolTip = NULL;
    m_ToolTipSurface = NULL;
    m_SurfaceNodeName = "";
-   mitk::Geometry3D::Pointer emptyGeo = mitk::Geometry3D::New();
+   mitk::BaseGeometry::Pointer emptyGeo = mitk::Geometry3D::New();
    m_Controls->m_InteractiveTransformation->SetGeometry(emptyGeo,emptyGeo);
 
    //call initialization method
@@ -145,7 +145,7 @@ void QmitkNavigationToolCreationAdvancedWidget::RetrieveAndInitializeDataForTool
 
     m_ManipulatedToolTip = m_ToolTipSurface->Clone();
 
-    mitk::Geometry3D::Pointer defaultGeo = mitk::Geometry3D::New();
+    mitk::BaseGeometry::Pointer defaultGeo = mitk::Geometry3D::New();
     defaultGeo->SetIndexToWorldTransform(m_DefaultToolTip);
 
     m_Controls->m_InteractiveTransformation->SetGeometry(m_ManipulatedToolTip->GetGeometry(),defaultGeo);

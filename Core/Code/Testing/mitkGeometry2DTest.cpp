@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVector.h>
 
 
-mitk::Geometry2D::Pointer  createGeometry2D()
+mitk::PlaneGeometry::Pointer  createGeometry2D()
 {
    mitk::Vector3D mySpacing;
    mySpacing[0] = 31;
@@ -48,7 +48,7 @@ mitk::Geometry2D::Pointer  createGeometry2D()
 
    myTransform->SetMatrix(transMatrix);
 
-   mitk::Geometry2D::Pointer geometry2D = mitk::Geometry2D::New();
+   mitk::PlaneGeometry::Pointer geometry2D = mitk::PlaneGeometry::New();
    geometry2D->SetIndexToWorldTransform(myTransform);
    geometry2D->SetSpacing(mySpacing);
    geometry2D->SetOrigin(myOrigin);
@@ -57,11 +57,11 @@ mitk::Geometry2D::Pointer  createGeometry2D()
 
 int testGeometry2DCloning()
 {
-  mitk::Geometry2D::Pointer geometry2D = createGeometry2D();
+  mitk::PlaneGeometry::Pointer geometry2D = createGeometry2D();
 
   try
   {
-    mitk::Geometry2D::Pointer clone = geometry2D->Clone();
+    mitk::PlaneGeometry::Pointer clone = geometry2D->Clone();
     itk::Matrix<mitk::ScalarType,3,3> matrix = clone->GetIndexToWorldTransform()->GetMatrix();
     MITK_TEST_CONDITION(matrix[0][0] == 31, "Test if matrix element exists...");
 
@@ -109,17 +109,17 @@ int testGeometry2DInitializeOrder()
 
    myTransform->SetMatrix(transMatrix);
 
-   mitk::Geometry2D::Pointer geometry2D1 = mitk::Geometry2D::New();
+   mitk::PlaneGeometry::Pointer geometry2D1 = mitk::PlaneGeometry::New();
    geometry2D1->SetIndexToWorldTransform(myTransform);
    geometry2D1->SetSpacing(mySpacing);
    geometry2D1->SetOrigin(myOrigin);
 
-   mitk::Geometry2D::Pointer geometry2D2 = mitk::Geometry2D::New();
+   mitk::PlaneGeometry::Pointer geometry2D2 = mitk::PlaneGeometry::New();
    geometry2D2->SetSpacing(mySpacing);
    geometry2D2->SetOrigin(myOrigin);
    geometry2D2->SetIndexToWorldTransform(myTransform);
 
-   mitk::Geometry2D::Pointer geometry2D3 = mitk::Geometry2D::New();
+   mitk::PlaneGeometry::Pointer geometry2D3 = mitk::PlaneGeometry::New();
    geometry2D3->SetIndexToWorldTransform(myTransform);
    geometry2D3->SetSpacing(mySpacing);
    geometry2D3->SetOrigin(myOrigin);

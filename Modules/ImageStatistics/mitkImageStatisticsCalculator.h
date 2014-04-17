@@ -207,7 +207,7 @@ protected:
   /** \brief If the passed vector matches any of the three principal axes
    * of the passed geometry, the ínteger value corresponding to the axis
    * is set and true is returned. */
-  bool GetPrincipalAxis( const Geometry3D *geometry, Vector3D vector,
+  bool GetPrincipalAxis( const BaseGeometry *geometry, Vector3D vector,
     unsigned int &axis );
 
   template < typename TPixel, unsigned int VImageDimension >

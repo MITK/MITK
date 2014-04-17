@@ -53,7 +53,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
       ScalarType timeInMS = 0;
       if(stateEvent->GetEvent()->GetSender()!=NULL)
       {
-        const Geometry2D* worldGeometry = stateEvent->GetEvent()->GetSender()->GetCurrentWorldGeometry2D();
+        const PlaneGeometry* worldGeometry = stateEvent->GetEvent()->GetSender()->GetCurrentWorldGeometry2D();
         assert( worldGeometry != NULL );
         timeInMS = worldGeometry->GetTimeBounds()[ 0 ];
       }

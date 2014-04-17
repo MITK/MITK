@@ -52,9 +52,9 @@ void mitk::InterpolateLinesFilter::GenerateOutputInformation()
   if(input.IsNull()) return;
 
   if(m_GeometryForInterpolation.IsNotNull())
-    output->SetGeometry(static_cast<Geometry3D*>(m_GeometryForInterpolation->Clone().GetPointer()));
+    output->SetGeometry(static_cast<BaseGeometry*>(m_GeometryForInterpolation->Clone().GetPointer()));
   else
-    output->SetGeometry(static_cast<Geometry3D*>(input->GetGeometry()->Clone().GetPointer()));
+    output->SetGeometry(static_cast<BaseGeometry*>(input->GetGeometry()->Clone().GetPointer()));
 }
 
 void mitk::InterpolateLinesFilter::GenerateData()

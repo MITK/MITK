@@ -30,7 +30,7 @@ namespace mitk {
 class BaseRenderer;
 
 /**
- * \brief OpenGL-based mapper to display a Geometry2D in a 2D window
+ * \brief OpenGL-based mapper to display a PlaneGeometry in a 2D window
  *
  * Currently implemented for mapping on PlaneGeometry.
  * The result is normally a line. An important usage of this class is to show

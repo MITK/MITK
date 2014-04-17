@@ -145,7 +145,7 @@ private:
   long m_PointSetAddObserverTag;
 
   template < typename TPixel, unsigned int VImageDimension >
-  void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint );
+  void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint );
 
   template < typename TPixel, unsigned int VImageDimension >
   void ITKThresholding( itk::Image< TPixel, VImageDimension >* inputImage );

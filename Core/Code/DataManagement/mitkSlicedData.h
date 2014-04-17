@@ -34,7 +34,7 @@ class SlicedGeometry3D;
 //## @brief Super class of data objects consisting of slices
 //##
 //## Super class of data objects consisting of slices, e.g., images or a stack
-//## of contours. (GetGeometry will return a Geometry3D containing Geometry2D
+//## of contours. (GetGeometry will return a Geometry3D containing PlaneGeometry
 //## objects).
 //##
 //## SlicedData-objects have geometries of type SlicedGeometry3D or sub-classes.
@@ -153,16 +153,16 @@ public:
   }
 
   ////##Documentation
-  ////## @brief Return the Geometry2D of the slice (@a s, @a t).
+  ////## @brief Return the PlaneGeometry of the slice (@a s, @a t).
   ////##
   ////## The method does not simply call GetGeometry()->GetGeometry2D(). Before doing this, it
-  ////## makes sure that the Geometry2D is up-to-date before returning it (by
+  ////## makes sure that the PlaneGeometry is up-to-date before returning it (by
   ////## setting the update extent appropriately and calling
   ////## UpdateOutputInformation).
   ////##
   ////## @warning GetGeometry2D not yet completely implemented.
   ////## @todo Appropriate setting of the update extent is missing.
-  //virtual const mitk::Geometry2D* GetGeometry2D(int s, int t=0) const;
+  //virtual const mitk::PlaneGeometry* GetGeometry2D(int s, int t=0) const;
 
   //##Documentation
   //## @brief Convenience access method for the geometry, which is of type SlicedGeometry3D (or a sub-class of it).
@@ -189,7 +189,7 @@ public:
   //##
   //## @warning This method will normally be called internally by the sub-class of SlicedData
   //## during initialization.
-  virtual void SetGeometry(Geometry3D* aGeometry3D);
+  virtual void SetGeometry(BaseGeometry* aGeometry3D);
 
   //##Documentation
   //## @brief Convenience method for setting the origin of

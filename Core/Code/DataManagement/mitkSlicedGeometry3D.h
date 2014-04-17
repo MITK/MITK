@@ -14,21 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 
-#include "mitkGeometry3D.h"
+#include "mitkBaseGeometry.h"
 #include "mitkPlaneGeometry.h"
 
 namespace mitk {
+  class SliceNavigationController;
+  class NavigationController;
 
-class SliceNavigationController;
-class NavigationController;
-
-/** \brief Describes the geometry of a data object consisting of slices.
+  /** \brief Describes the geometry of a data object consisting of slices.
  *
- * A Geometry2D can be requested for each slice. In the case of
+  * A PlaneGeometry can be requested for each slice. In the case of
  * \em evenly-spaced, \em plane geometries (m_EvenlySpaced==true),
  * only the 2D-geometry of the first slice has to be set (to an instance of
  * PlaneGeometry). The 2D geometries of the other slices are calculated
@@ -64,19 +62,19 @@ class NavigationController;
  *
  * \ingroup Geometry
  */
-class MITK_CORE_EXPORT SlicedGeometry3D : public mitk::Geometry3D
-{
-public:
-  mitkClassMacro(SlicedGeometry3D, Geometry3D);
+  class MITK_CORE_EXPORT SlicedGeometry3D : public mitk::BaseGeometry
+  {
+  public:
+    mitkClassMacro(SlicedGeometry3D, BaseGeometry);
 
   /** Method for creation through the object factory. */
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
   /**
-   * \brief Returns the Geometry2D of the slice (\a s).
+    * \brief Returns the PlaneGeometry of the slice (\a s).
    *
-   * If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored
+    * If (a) m_EvenlySpaced==true, (b) we don't have a PlaneGeometry stored
    * for the requested slice, and (c) the first slice (s=0)
    * is a PlaneGeometry instance, then we calculate the geometry of the
    * requested as the plane of the first slice shifted by m_Spacing[3]*s
@@ -94,20 +92,16 @@ public:
    * \sa itk::DataObject::CopyInformation() and
    * \sa itk::DataObject::UpdateOutputInformation().
    */
-  virtual mitk::Geometry2D* GetGeometry2D( int s ) const;
-
+    virtual mitk::PlaneGeometry* GetGeometry2D( int s ) const;
 
   /**
-   * \brief Set Geometry2D of slice \a s.
+    * \brief Set PlaneGeometry of slice \a s.
    */
-  virtual bool SetGeometry2D( mitk::Geometry2D *geometry2D, int s );
+    virtual bool SetGeometry2D( mitk::PlaneGeometry *geometry2D, int s );
 
   //##Documentation
   //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
   virtual void ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry );
-
-  virtual void SetTimeBounds( const mitk::TimeBounds& timebounds );
-
 
   virtual const mitk::BoundingBox* GetBoundingBox() const;
 
@@ -116,20 +110,12 @@ public:
    */
   itkGetConstMacro( Slices, unsigned int );
 
-
   /**
    * \brief Check whether a slice exists
    */
   virtual bool IsValidSlice( int s = 0 ) const;
 
-  virtual void SetReferenceGeometry( Geometry3D *referenceGeometry );
-
-  /**
-   * \brief Set the spacing (m_Spacing), in direction of the plane normal.
-   *
-   * INTERNAL METHOD.
-   */
-  virtual void SetSpacing( const mitk::Vector3D &aSpacing );
+    virtual void SetReferenceGeometry( BaseGeometry *referenceGeometry );
 
   /**
    * \brief Set the SliceNavigationController corresponding to this sliced
@@ -146,7 +132,7 @@ public:
    * \brief Set/Get whether the SlicedGeometry3D is evenly-spaced
    * (m_EvenlySpaced)
    *
-   * If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored for
+    * If (a) m_EvenlySpaced==true, (b) we don't have a PlaneGeometry stored for
    * the requested slice, and (c) the first slice (s=0) is a PlaneGeometry
    * instance, then we calculate the geometry of the requested as the plane
    * of the first slice shifted by m_Spacing.z * s in the direction of
@@ -189,25 +175,25 @@ public:
 
   /**
    * \brief Completely initialize this instance as evenly-spaced with slices
-   * parallel to the provided Geometry2D that is used as the first slice and
+    * parallel to the provided PlaneGeometry that is used as the first slice and
    * for spacing calculation.
    *
    * Initializes the bounding box according to the width/height of the
-   * Geometry2D and \a slices. The spacing is calculated from the Geometry2D.
+    * PlaneGeometry and \a slices. The spacing is calculated from the PlaneGeometry.
    */
-  virtual void InitializeEvenlySpaced( mitk::Geometry2D *geometry2D,
+    virtual void InitializeEvenlySpaced( mitk::PlaneGeometry *geometry2D,
     unsigned int slices, bool flipped=false );
 
   /**
    * \brief Completely initialize this instance as evenly-spaced with slices
-   * parallel to the provided Geometry2D that is used as the first slice and
+    * parallel to the provided PlaneGeometry that is used as the first slice and
    * for spacing calculation (except z-spacing).
    *
    * Initializes the bounding box according to the width/height of the
-   * Geometry2D and \a slices. The x-/y-spacing is calculated from the
-   * Geometry2D.
+    * PlaneGeometry and \a slices. The x-/y-spacing is calculated from the
+    * PlaneGeometry.
    */
-  virtual void InitializeEvenlySpaced( mitk::Geometry2D *geometry2D,
+    virtual void InitializeEvenlySpaced( mitk::PlaneGeometry *geometry2D,
     mitk::ScalarType zSpacing, unsigned int slices, bool flipped=false );
 
   /**
@@ -228,10 +214,9 @@ public:
    * \param rotate rotates the plane by 180 degree around its normal (the
    * definition of rotated vs not rotated is somewhat arbitrary)
    */
-  virtual void InitializePlanes( const mitk::Geometry3D *geometry3D,
+    virtual void InitializePlanes( const mitk::BaseGeometry *geometry3D,
     mitk::PlaneGeometry::PlaneOrientation planeorientation, bool top=true,
     bool frontside=true, bool rotated=false );
-
 
   virtual void SetImageGeometry(const bool isAnImageGeometry);
 
@@ -239,13 +224,23 @@ public:
 
   static double CalculateSpacing( const mitk::Vector3D spacing, const mitk::Vector3D &d );
 
-protected:
+  protected:
   SlicedGeometry3D();
 
   SlicedGeometry3D(const SlicedGeometry3D& other);
 
   virtual ~SlicedGeometry3D();
 
+    virtual void PreSetBounds(const BoundsArrayType& bounds){};
+
+    virtual void PostSetTimeBounds( const mitk::TimeBounds& timebounds );
+
+    /**
+    * \brief Set the spacing (m_Spacing), in direction of the plane normal.
+    *
+    * INTERNAL METHOD.
+    */
+    virtual void PreSetSpacing( const mitk::Vector3D &aSpacing );
 
   /**
    * Reinitialize plane stack after rotation. More precisely, the first plane
@@ -263,8 +258,7 @@ protected:
   virtual void ReinitializePlanes( const Point3D &center,
     const Point3D &referencePoint );
 
-
-  ScalarType GetLargestExtent( const Geometry3D *geometry );
+    ScalarType GetLargestExtent( const BaseGeometry *geometry );
 
   void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
@@ -274,23 +268,19 @@ protected:
    */
   double CalculateSpacing( const mitk::Vector3D &direction ) const;
 
-
-
   /** The extent of the slice stack, i.e. the number of slices, depends on the
    * plane normal. For rotated geometries, the geometry's transform needs to
    * be accounted in this calculation.
    */
   mitk::Vector3D AdjustNormal( const mitk::Vector3D &normal ) const;
 
-
   /**
    * Container for the 2D-geometries contained within this SliceGeometry3D.
    */
-  mutable std::vector<Geometry2D::Pointer> m_Geometry2Ds;
-
+    mutable std::vector<PlaneGeometry::Pointer> m_Geometry2Ds;
 
   /**
-   * If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored
+    * If (a) m_EvenlySpaced==true, (b) we don't have a PlaneGeometry stored
    * for the requested slice, and (c) the first slice (s=0)
    * is a PlaneGeometry instance, then we calculate the geometry of the
    * requested as the plane of the first slice shifted by m_Spacing.z*s
@@ -312,14 +302,13 @@ protected:
   unsigned int m_Slices;
 
   /** Underlying Geometry3D for this SlicedGeometry */
-  mitk::Geometry3D *m_ReferenceGeometry;
+    mitk::BaseGeometry *m_ReferenceGeometry;
 
   /** SNC correcsponding to this geometry; used to reflect changes in the
    * number of slices due to rotation. */
   //mitk::NavigationController *m_NavigationController;
   mitk::SliceNavigationController *m_SliceNavigationController;
-};
-
+  };
 } // namespace mitk
 
 #endif /* MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD */

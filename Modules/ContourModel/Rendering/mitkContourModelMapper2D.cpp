@@ -137,7 +137,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
 
   //check for the worldgeometry from the current render window
-  mitk::PlaneGeometry* currentWorldGeometry = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(renderer->GetCurrentWorldGeometry2D()));
+  mitk::PlaneGeometry* currentWorldGeometry = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::PlaneGeometry*>(renderer->GetCurrentWorldGeometry2D()));
 
   if(currentWorldGeometry)
   {

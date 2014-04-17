@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarFigure.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 #include <mitkProportionalTimeGeometry.h>
 
@@ -74,14 +74,14 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
 }
 
 
-void mitk::PlanarFigure::SetGeometry2D( mitk::Geometry2D *geometry )
+void mitk::PlanarFigure::SetGeometry2D( mitk::PlaneGeometry *geometry )
 {
   this->SetGeometry( geometry );
-  m_Geometry2D = dynamic_cast<Geometry2D *>(GetGeometry(0));//geometry;
+  m_Geometry2D = dynamic_cast<PlaneGeometry *>(GetGeometry(0));//geometry;
 }
 
 
-const mitk::Geometry2D *mitk::PlanarFigure::GetGeometry2D() const
+const mitk::PlaneGeometry *mitk::PlanarFigure::GetGeometry2D() const
 {
   return m_Geometry2D;
 }
@@ -443,7 +443,7 @@ void mitk::PlanarFigure::EvaluateFeatures()
 
 void mitk::PlanarFigure::UpdateOutputInformation()
 {
-  // Bounds are NOT calculated here, since the Geometry2D defines a fixed
+  // Bounds are NOT calculated here, since the PlaneGeometry defines a fixed
   // frame (= bounds) for the planar figure.
   Superclass::UpdateOutputInformation();
   this->GetTimeGeometry()->Update();
@@ -560,7 +560,7 @@ void mitk::PlanarFigure::DeactivateFeature( unsigned int index )
 
 void mitk::PlanarFigure::InitializeTimeGeometry( unsigned int timeSteps )
 {
-  mitk::Geometry2D::Pointer geometry2D = mitk::Geometry2D::New();
+  mitk::PlaneGeometry::Pointer geometry2D = mitk::PlaneGeometry::New();
   geometry2D->Initialize();
 
   if ( timeSteps > 1 )
@@ -679,7 +679,7 @@ void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
   m_NumberOfControlPoints       = oldFigure->m_NumberOfControlPoints;
 
   //copy geometry 2D of planar figure
-  Geometry2D::Pointer affineGeometry = oldFigure->m_Geometry2D->Clone();
+  PlaneGeometry::Pointer affineGeometry = oldFigure->m_Geometry2D->Clone();
   SetGeometry2D(affineGeometry.GetPointer());
 
   for(unsigned long index=0; index < oldFigure->GetNumberOfControlPoints(); index++)

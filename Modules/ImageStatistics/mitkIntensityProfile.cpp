@@ -54,7 +54,7 @@ static IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, i
 {
   IntensityProfile::Pointer intensityProfile = IntensityProfile::New();
   itk::PolyLineParametricPath<3>::InputType input = path->StartOfInput();
-  Geometry3D* imageGeometry = image->GetGeometry();
+  BaseGeometry* imageGeometry = image->GetGeometry();
   const PixelType pixelType = image->GetPixelType();
 
   IntensityProfile::MeasurementVectorType measurementVector;
@@ -165,7 +165,7 @@ static IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, i
 class AddPolyLineElementToPath
 {
 public:
-  AddPolyLineElementToPath(const Geometry2D* planarFigureGeometry, const Geometry3D* imageGeometry, itk::PolyLineParametricPath<3>::Pointer path)
+  AddPolyLineElementToPath(const PlaneGeometry* planarFigureGeometry, const BaseGeometry* imageGeometry, itk::PolyLineParametricPath<3>::Pointer path)
     : m_PlanarFigureGeometry(planarFigureGeometry),
       m_ImageGeometry(imageGeometry),
       m_Path(path)
@@ -181,8 +181,8 @@ public:
   }
 
 private:
-  const Geometry2D* m_PlanarFigureGeometry;
-  const Geometry3D* m_ImageGeometry;
+  const PlaneGeometry* m_PlanarFigureGeometry;
+  const BaseGeometry* m_ImageGeometry;
   itk::PolyLineParametricPath<3>::Pointer m_Path;
 
   Point3D m_WorldPoint;
@@ -190,7 +190,7 @@ private:
   itk::PolyLineParametricPath<3>::ContinuousIndexType m_Vertex;
 };
 
-static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPlanarFigure(Geometry3D* imageGeometry, PlanarFigure* planarFigure)
+static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPlanarFigure(BaseGeometry* imageGeometry, PlanarFigure* planarFigure)
 {
   itk::PolyLineParametricPath<3>::Pointer path = itk::PolyLineParametricPath<3>::New();
   const PlanarFigure::PolyLineType polyLine = planarFigure->GetPolyLine(0);
@@ -201,7 +201,7 @@ static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPlanarFigure(Geomet
   return path;
 }
 
-static void AddPointToPath(const Geometry3D* imageGeometry, const Point3D& point, itk::PolyLineParametricPath<3>::Pointer path)
+static void AddPointToPath(const BaseGeometry* imageGeometry, const Point3D& point, itk::PolyLineParametricPath<3>::Pointer path)
 {
   Point3D continuousIndexPoint;
   imageGeometry->WorldToIndex(point, continuousIndexPoint);
@@ -212,7 +212,7 @@ static void AddPointToPath(const Geometry3D* imageGeometry, const Point3D& point
   path->AddVertex(vertex);
 }
 
-static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPoints(Geometry3D* imageGeometry, const Point3D& startPoint, const Point3D& endPoint)
+static itk::PolyLineParametricPath<3>::Pointer CreatePathFromPoints(BaseGeometry* imageGeometry, const Point3D& startPoint, const Point3D& endPoint)
 {
   itk::PolyLineParametricPath<3>::Pointer path = itk::PolyLineParametricPath<3>::New();
 

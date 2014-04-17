@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 
 template <typename TScalarType>
-int testExpectedIndexBoundingBox(mitk::Geometry3D* geometry, TScalarType expectedIndexBounds[6])
+int testExpectedIndexBoundingBox(mitk::BaseGeometry* geometry, TScalarType expectedIndexBounds[6])
 {
   mitk::BoundingBox* bb = const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox());
   mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
@@ -44,7 +44,7 @@ int testExpectedIndexBoundingBox(mitk::Geometry3D* geometry, TScalarType expecte
 }
 
 template <typename TScalarType>
-int testExpectedAxisParallelBoundingBox(mitk::Geometry3D* geometry, TScalarType expectedAxisParallelBounds[6])
+int testExpectedAxisParallelBoundingBox(mitk::BaseGeometry* geometry, TScalarType expectedAxisParallelBounds[6])
 {
   mitk::BoundingBox::Pointer bb = geometry->CalculateBoundingBoxRelativeToTransform(NULL);
   mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
@@ -85,7 +85,7 @@ int testSurfaceBoundingBoxConsistency(mitk::Surface* surface, bool expectIdentit
   int i;
   if(expectIdentityTransform == false)
   {
-    mitk::Geometry2D::Pointer geometry = mitk::Geometry2D::New();
+    mitk::PlaneGeometry::Pointer geometry = mitk::PlaneGeometry::New();
     geometry->SetFloatBounds(bounds);
     geometry->SetIndexToWorldTransform(surface->GetGeometry()->GetIndexToWorldTransform());
     mitk::BoundingBox::BoundsArrayType bb = const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetBounds();

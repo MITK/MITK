@@ -71,7 +71,7 @@ namespace mitk {
  }
 
 class PlaneGeometry;
-class Geometry3D;
+class BaseGeometry;
 class BaseRenderer;
 
 /**
@@ -86,7 +86,7 @@ class BaseRenderer;
  *
  * The SliceNavigationController holds has Steppers (one for the slice, a
  * second for the time step), which control the selection of a single
- * Geometry2D from the TimeGeometry. SliceNavigationController generates
+ * PlaneGeometry from the TimeGeometry. SliceNavigationController generates
  * ITK events to tell observers, like a BaseRenderer,  when the selected slice
  * or timestep changes.
  *
@@ -170,7 +170,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
 
     /**
      * \brief Possible view directions, \a Original will uses
-     * the Geometry2D instances in a SlicedGeometry3D provided
+     * the PlaneGeometry instances in a SlicedGeometry3D provided
      * as input world geometry (by SetInputWorldGeometry).
      */
     enum ViewDirection
@@ -188,8 +188,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
      * Any previous previous set input geometry (3D or Time) will
      * be ignored in future.
      */
-    void SetInputWorldGeometry3D(const mitk::Geometry3D* geometry);
-    itkGetConstObjectMacro(InputWorldGeometry3D, mitk::Geometry3D);
+    void SetInputWorldGeometry3D(const mitk::BaseGeometry* geometry);
+    itkGetConstObjectMacro(InputWorldGeometry3D, mitk::BaseGeometry);
 
 
     /**
@@ -455,7 +455,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     mitk::TimeGeometry *GetCreatedWorldGeometry();
 
     /** \brief Returns the Geometry3D of the currently selected time step. */
-    const mitk::Geometry3D *GetCurrentGeometry3D();
+    const mitk::BaseGeometry *GetCurrentGeometry3D();
 
 
     /** \brief Returns the currently selected Plane in the current
@@ -556,7 +556,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
       }
     };
 */
-    mitk::Geometry3D::ConstPointer m_InputWorldGeometry3D;
+    mitk::BaseGeometry::ConstPointer m_InputWorldGeometry3D;
     mitk::TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
 
     mitk::TimeGeometry::Pointer m_CreatedWorldGeometry;

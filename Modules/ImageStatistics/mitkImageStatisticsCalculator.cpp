@@ -603,13 +603,13 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
         throw std::runtime_error( "Masking not possible for non-closed figures" );
       }
 
-      const Geometry3D *imageGeometry = timeSliceImage->GetGeometry();
+      const BaseGeometry *imageGeometry = timeSliceImage->GetGeometry();
       if ( imageGeometry == NULL )
       {
         throw std::runtime_error( "Image geometry invalid!" );
       }
 
-      const Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+      const PlaneGeometry *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
       if ( planarFigureGeometry2D == NULL )
       {
         throw std::runtime_error( "Planar-Figure not yet initialized!" );
@@ -688,7 +688,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
 
 bool ImageStatisticsCalculator::GetPrincipalAxis(
-  const Geometry3D *geometry, Vector3D vector,
+  const BaseGeometry *geometry, Vector3D vector,
   unsigned int &axis )
 {
   vector.Normalize();
@@ -1089,16 +1089,15 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
   // These points are used by the vtkLassoStencilSource to create
   // a vtkImageStencil.
-  const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+  const mitk::PlaneGeometry *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
   const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
-
+  const mitk::BaseGeometry *imageGeometry3D = m_Image->GetGeometry( 0 );
   // If there is a second poly line in a closed planar figure, treat it as a hole.
   PlanarFigure::PolyLineType planarFigureHolePolyline;
 
   if (m_PlanarFigure->GetPolyLinesSize() == 2)
     planarFigureHolePolyline = m_PlanarFigure->GetPolyLine(1);
 
-  const mitk::Geometry3D *imageGeometry3D = m_Image->GetGeometry( 0 );
 
   // Determine x- and y-dimensions depending on principal axis
   int i0, i1;

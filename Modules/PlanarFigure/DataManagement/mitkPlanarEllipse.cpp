@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 #include "mitkPlanarEllipse.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
 #include <algorithm>

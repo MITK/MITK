@@ -167,7 +167,7 @@ void mitk::PickingTool::OnPointAdded()
 
 
   template<typename TPixel, unsigned int VImageDimension>
-  void mitk::PickingTool::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint)
+  void mitk::PickingTool::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint)
   {
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
     typedef typename InputImageType::IndexType IndexType;

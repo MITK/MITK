@@ -68,16 +68,16 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   }
 
   // Get 2D geometry frame of PlanarFigure
-  mitk::Geometry2D *planarFigureGeometry2D =
-    dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
+  mitk::PlaneGeometry *planarFigureGeometry2D =
+    dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
   if ( planarFigureGeometry2D == NULL )
   {
-    MITK_ERROR << "PlanarFigure does not have valid Geometry2D!";
+    MITK_ERROR << "PlanarFigure does not have valid PlaneGeometry!";
     return;
   }
 
   // Get current world 2D geometry from renderer
-  const mitk::Geometry2D *rendererGeometry2D = renderer->GetCurrentWorldGeometry2D();
+  const mitk::PlaneGeometry *rendererGeometry2D = renderer->GetCurrentWorldGeometry2D();
 
   // If the PlanarFigure geometry is a plane geometry, check if current
   // world plane is parallel to and within the planar figure geometry bounds
@@ -175,8 +175,8 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
   mitk::PlanarFigure::PolyLineType vertices,
   bool closed,
   Point2D& anchorPoint,
-  const Geometry2D* planarFigureGeometry2D,
-  const Geometry2D* rendererGeometry2D,
+  const PlaneGeometry* planarFigureGeometry2D,
+  const PlaneGeometry* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
   mitk::Point2D rightMostPoint;
@@ -222,8 +222,8 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
 void mitk::PlanarFigureMapper2D::DrawMainLines(
   mitk::PlanarFigure* figure,
   Point2D& anchorPoint,
-  const Geometry2D* planarFigureGeometry2D,
-  const Geometry2D* rendererGeometry2D,
+  const PlaneGeometry* planarFigureGeometry2D,
+  const PlaneGeometry* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
   unsigned short numberOfPolyLines = figure->GetPolyLinesSize();
@@ -241,8 +241,8 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
 void mitk::PlanarFigureMapper2D::DrawHelperLines(
   mitk::PlanarFigure* figure,
   Point2D& anchorPoint,
-  const Geometry2D* planarFigureGeometry2D,
-  const Geometry2D* rendererGeometry2D,
+  const PlaneGeometry* planarFigureGeometry2D,
+  const PlaneGeometry* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
   unsigned short numberOfHelperPolyLines = figure->GetHelperPolyLinesSize();
@@ -272,8 +272,8 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
 void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
   const mitk::Point2D &point2D,
   mitk::Point2D &displayPoint,
-  const mitk::Geometry2D *objectGeometry,
-  const mitk::Geometry2D *rendererGeometry,
+  const mitk::PlaneGeometry *objectGeometry,
+  const mitk::PlaneGeometry *rendererGeometry,
   const mitk::DisplayGeometry *displayGeometry )
 {
   mitk::Point3D point3D;
@@ -295,8 +295,8 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
   float markerOpacity,
   float lineWidth,
   PlanarFigureControlPointStyleProperty::Shape shape,
-  const mitk::Geometry2D *objectGeometry,
-  const mitk::Geometry2D *rendererGeometry,
+  const mitk::PlaneGeometry *objectGeometry,
+  const mitk::PlaneGeometry *rendererGeometry,
   const mitk::DisplayGeometry *displayGeometry )
 {
   mitk::Point2D displayPoint;
@@ -599,8 +599,8 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
 
 void mitk::PlanarFigureMapper2D::RenderControlPoints( mitk::PlanarFigure * planarFigure,
                                                       PlanarFigureDisplayMode lineDisplayMode,
-                                                      mitk::Geometry2D * planarFigureGeometry2D,
-                                                      const mitk::Geometry2D * rendererGeometry2D,
+                                                      mitk::PlaneGeometry * planarFigureGeometry2D,
+                                                      const mitk::PlaneGeometry * rendererGeometry2D,
                                                       mitk::DisplayGeometry * displayGeometry )
 {
   bool isEditable = true;
@@ -759,8 +759,8 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFi
 void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDisplayMode,
                                               mitk::PlanarFigure * planarFigure,
                                               mitk::Point2D &anchorPoint,
-                                              mitk::Geometry2D * planarFigureGeometry2D,
-                                              const mitk::Geometry2D * rendererGeometry2D,
+                                              mitk::PlaneGeometry * planarFigureGeometry2D,
+                                              const mitk::PlaneGeometry * rendererGeometry2D,
                                               mitk::DisplayGeometry * displayGeometry )
 {
   glLineStipple(1, 0x00FF);

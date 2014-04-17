@@ -96,7 +96,7 @@ public:
   //## Uses the IndexToWorldTransform and bounding box of the
   //## provided geometry.
   //## \sa CalculateFrameGeometry
-  virtual void SetFrameGeometry(const mitk::Geometry3D* frameGeometry);
+  virtual void SetFrameGeometry(const mitk::BaseGeometry* frameGeometry);
 
 protected:
   PlanesPerpendicularToLinesFilter();
@@ -126,7 +126,7 @@ protected:
   //##
   SlicedGeometry3D::Pointer m_CreatedGeometries;
 
-  mitk::Geometry3D::Pointer m_FrameGeometry;
+  mitk::BaseGeometry::Pointer m_FrameGeometry;
 
 private:
   std::deque<mitk::PlaneGeometry::Pointer> planes;
@@ -136,7 +136,7 @@ private:
   VnlVector targetRight;
   Vector3D targetSpacing;
   ScalarType halfWidthInMM, halfHeightInMM;
-  mitk::Geometry3D::BoundsArrayType bounds;
+  mitk::BaseGeometry::BoundsArrayType bounds;
   Point3D origin;
 };
 

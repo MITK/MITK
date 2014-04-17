@@ -45,10 +45,10 @@ class Geometry2DData;
  *
  *  Currently implemented for PlaneGeometry and AbstractTransformGeometry.
  *  Currently, this class does not really have subclasses, but does the job
- *  for itself. It checks which kind of Geometry2D is stored in the
+ *  for itself. It checks which kind of PlaneGeometry is stored in the
  *  Geometry2DData and - if it knows how - it generates the respective
  *  Surface. Of course, this has the disadvantage that for any new type of
- *  Geometry2D this class (Geometry2DDataToSurfaceFilter) has to be
+ *  PlaneGeometry this class (Geometry2DDataToSurfaceFilter) has to be
  *  changed/extended. The idea is to move the type specific generation code in
  *  subclasses, and internally (within this class) use a factory to create an
  *  instance of the required subclass and delegate the surface generation to
@@ -160,11 +160,11 @@ class MITK_CORE_EXPORT Geometry2DDataToSurfaceFilter : public SurfaceSource
 
     virtual ~Geometry2DDataToSurfaceFilter();
 
-    /** \brief Source to create the vtk-representation of the parameter space rectangle of the Geometry2D
+    /** \brief Source to create the vtk-representation of the parameter space rectangle of the PlaneGeometry
      */
     vtkPlaneSource* m_PlaneSource;
 
-    /** \brief Filter to create the vtk-representation of the Geometry2D, which is a
+    /** \brief Filter to create the vtk-representation of the PlaneGeometry, which is a
      *  transformation of the m_PlaneSource
      */
     vtkTransformPolyDataFilter* m_VtkTransformPlaneFilter;

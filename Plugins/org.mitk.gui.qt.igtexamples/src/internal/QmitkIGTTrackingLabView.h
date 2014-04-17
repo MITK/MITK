@@ -166,11 +166,9 @@ void DestroyIGTPipeline();
 // is done in the methods OnPermanentRegistration(), OnPointSetRecording() and OnVirtualCamera().
 // The pipline is updated in the method UpdateTimer(). When the complete pipeline is active, it is
 // structured as follows:
-//           -> m_PermanentRegistrationFilter
-//          /
+//          ,-> m_PermanentRegistrationFilter
 // m_Source -> m_Visualizer
-//          \
-//           -> m_VirtualView
+//          `-> m_VirtualView
 mitk::TrackingDeviceSource::Pointer m_Source;                                         ///< source that connects to the tracking device
 mitk::NavigationDataObjectVisualizationFilter::Pointer m_PermanentRegistrationFilter; ///< this filter transforms from tracking coordinates into mitk world coordinates if needed it is interconnected before the FiducialEegistrationFilter
 mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer;                  ///< visualization filter

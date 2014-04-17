@@ -83,8 +83,7 @@ namespace mitk
         ReadDicomFile(char* filename)
   {
     DcmFileFormat file;
-    OFCondition outp;
-    outp = file.loadFile(filename, EXS_Unknown);
+    OFCondition outp = file.loadFile(filename, EXS_Unknown);
     if(outp.good())
     {
       DcmDataset *dataset = file.getDataset();
@@ -203,9 +202,10 @@ namespace mitk
       std::deque<mitk::ContourModelSet::Pointer> x;
       return x;
     }
+    mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
     do
     {
-      mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
+//      mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
       DRTROIContourSequence::Item &currentRoiObject =
               roiContourSeqObject.getCurrentItem();
       if(!currentRoiObject.isValid())
@@ -272,10 +272,11 @@ namespace mitk
       }
       refROI->ContourModelSet = contourSet;
       contourSet->SetProperty("name", mitk::StringProperty::New(refROI->Name));
-      contourModelSetVector.push_back(contourSet);
+//      contourModelSetVector.push_back(contourSet);
 
     }
     while(roiContourSeqObject.gotoNextItem().good());
+    contourModelSetVector.push_back(contourSet);
 
     return contourModelSetVector;
   }
@@ -323,8 +324,7 @@ namespace mitk
     return resultUid;
   }
 
-  mitk::DataNode::Pointer DicomRTReader::
-        LoadRTDose(DcmDataset* dataset, char* filename)
+  mitk::DataNode::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset, char* filename)
   {
     std::string name = filename;
     itk::FilenamesContainer file;
@@ -333,105 +333,34 @@ namespace mitk
     mitk::DicomSeriesReader* reader = new mitk::DicomSeriesReader;
 
     mitk::DataNode::Pointer originalNode = reader->LoadDicomSeries(file,false);
-    mitk::Image::Pointer originalImage =
-            dynamic_cast<mitk::Image*>(originalNode->GetData());
+    mitk::Image::Pointer originalImage = dynamic_cast<mitk::Image*>(originalNode->GetData());
 
-    mitk::Geometry3D::Pointer geo = originalImage->GetGeometry()->Clone();
+//    mitk::Geometry3D::Pointer geo = originalImage->GetGeometry()->Clone();
 
     DRTDoseIOD doseObject;
-
     OFCondition result = doseObject.read(*dataset);
+
     if(result.bad())
     {
       MITK_ERROR << "Error reading the Dataset" << endl;
       return 0;
     }
 
-    Uint16 rows, columns, frames, planarConfig, samplesPP;
-    OFString nrframes, doseUnits, doseType, summationType,
-            gridScaling, photoInterpret, lutShape;
-    Uint16 &rows_ref = rows;
-    Uint16 &columns_ref = columns;
+    OFString gridScaling;
     Float32 gridscale;
-    const Uint16 *pixelData = NULL;
-    unsigned long count = 0;
 
-    doseObject.getRows(rows_ref);
-    doseObject.getColumns(columns_ref);
-    doseObject.getNumberOfFrames(nrframes);
-    doseObject.getDoseUnits(doseUnits);
-    doseObject.getDoseType(doseType);
-    doseObject.getDoseSummationType(summationType);
     doseObject.getDoseGridScaling(gridScaling);
-    doseObject.getPhotometricInterpretation(photoInterpret);
-    doseObject.getPlanarConfiguration(planarConfig);
-    doseObject.getSamplesPerPixel(samplesPP);
-    doseObject.getPresentationLUTShape(lutShape);
-
     gridscale = OFStandard::atof(gridScaling.c_str());
-    frames = atoi(nrframes.c_str());
 
-    dataset->findAndGetUint16Array(DCM_PixelData, pixelData, &count);
-
-    mitk::Image::Pointer image = mitk::Image::New();
-    mitk::PixelType pt = mitk::MakeScalarPixelType<float>();
-    unsigned int dim[] = {columns,rows,frames};
-
-    image->Initialize( pt, 3, dim);
-    image->SetSpacing(1.0);
-    mitk::Point3D m_origin;
-    m_origin[0] = 0.0;
-    m_origin[1] = 0.0;
-    m_origin[2] = 0.0;
-    image->SetOrigin(m_origin);
-
-//    mitk::IOUtil* io = new mitk::IOUtil();
-    mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-    nodeReader->SetFileName(name);
-    nodeReader->Update();
-    mitk::DataNode::Pointer superNode = nodeReader->GetOutput();
-    mitk::Image::Pointer superImage = dynamic_cast<mitk::Image*>(superNode->GetData());
-
-    MITK_INFO << "SuperImagePixelType: " << superImage->GetPixelType().GetTypeAsString() << endl;
-
-//    mitk::ImagePixelWriteAccessor<unsigned int,3> accessor(superImage);
-//    unsigned int* pixelAccessData = accessor.GetData();
-
-    AccessByItk_1(superImage, MultiplayGridScaling, gridscale);
-
-//    int pixelNumber = 300;
-
-//    for(int i=0;i<pixelNumber;++i)
-//    {
-//      *pixelAccessData *= gridscale;
-//      pixelAccessData++;
-//    }
-
-    //HELP CAST UND DEPRECATED
-//    float* pixel = reinterpret_cast<float*>(image->GetData());
-//    float* pixel = (float*)image->GetData();
-//    int size = dim[0]*dim[1]*dim[2];
-
-//    for(int i=0; i<size; ++i, ++pixel)
-//    {
-//      imageData->GetScalar
-//      *pixel=pixelData[i] * gridscale;
-//    }
-
-    image->SetGeometry(geo);
+    AccessByItk_1(originalImage, MultiplayGridScaling, gridscale);
 
     double prescripeDose = this->GetMaxDoseValue(dataset);
 
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    superNode->SetName("DicomRT Dosis");
-    superNode->SetFloatProperty(mitk::rt::Constants::
-                           PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
-    superNode->SetFloatProperty(mitk::rt::Constants::
-                           REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
-    superNode->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),true);
-    node->SetData(superImage);
-
-    return superNode;
+    originalNode->SetName("RT Dose");
+    originalNode->SetFloatProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
+    originalNode->SetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
+    originalNode->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),true);
+    return originalNode;
   }
 
   template<typename TPixel, unsigned int VImageDimension>
@@ -442,7 +371,6 @@ namespace mitk
     for(it=it.Begin(); !it.IsAtEnd(); ++it)
     {
       it.Set(it.Get()*gridscale);
-//      it.Set(50.0);
     }
   }
 

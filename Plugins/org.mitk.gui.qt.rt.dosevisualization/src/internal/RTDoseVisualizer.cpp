@@ -511,7 +511,7 @@ mitk::Image::Pointer RTDoseVisualizer::GetExtractedSlice(mitk::Image::Pointer im
   mitk::ExtractSliceFilter::Pointer extractFilter = mitk::ExtractSliceFilter::New();
   extractFilter->SetInput(image);
   extractFilter->SetWorldGeometry(this->GetGeometry2D("axial"));
-  extractFilter->SetResliceTransformByGeometry( image->GetGeometry() );
+  extractFilter->SetResliceTransformByGeometry( image->GetTimeGeometry()->GetGeometryForTimeStep(0) );
   extractFilter->Update();
   mitk::Image::Pointer reslicedImage = extractFilter->GetOutput();
   return reslicedImage;
@@ -556,13 +556,16 @@ void RTDoseVisualizer::UpdateStdIsolines()
   {
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     mitk::Image::Pointer reslicedImage = this->GetExtractedSlice(image);
+//    reslicedImage->GetGeometry()->GetIndexToWorldTransform()->SetMatrix(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix());
 
     float pref;
     m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
 
+    unsigned int count (0);
     for(mitk::IsoDoseLevelSet::ConstIterator doseIT = isoDoseLevelSet->Begin(); doseIT!=isoDoseLevelSet->End();++doseIT)
     {
       if(doseIT->GetVisibleIsoLine()){
+        ++count;
         vtkSmartPointer<vtkContourFilter> isolineFilter = vtkSmartPointer<vtkContourFilter>::New();
         isolineFilter->SetInputData(reslicedImage->GetVtkImageData());
         isolineFilter->GenerateValues(1,doseIT->GetDoseValue()*pref,doseIT->GetDoseValue()*pref);
@@ -572,9 +575,12 @@ void RTDoseVisualizer::UpdateStdIsolines()
 
         mitk::Surface::Pointer surface = mitk::Surface::New();
         surface->SetVtkPolyData(polyData);
-        surface->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial"))->Clone());
-        surface->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing());
-        surface->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
+        surface->SetGeometry(reslicedImage->GetGeometry()->Clone());
+        mitk::Vector3D spacing;
+        spacing.Fill(1);
+        surface->GetGeometry()->SetSpacing(spacing);
+//        surface->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
+
 
         mitk::DataNode::Pointer isoNode = mitk::DataNode::New();
         isoNode->SetData(surface);
@@ -584,7 +590,11 @@ void RTDoseVisualizer::UpdateStdIsolines()
         isoNode->SetMapper(1,mapper);
         isoNode->SetColor(color);
         isoNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
-        isoNode->SetName("StdIsoline");
+        isoNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false) );
+        std::stringstream strstr;
+        strstr<<"StdIsoline_";
+        strstr<<count;
+        isoNode->SetName(strstr.str());
         isoNode->SetBoolProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),true);
         m_StdIsoLines.push_back(isoNode);
         this->GetDataStorage()->Add(isoNode);

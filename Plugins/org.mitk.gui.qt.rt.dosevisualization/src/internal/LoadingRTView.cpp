@@ -126,6 +126,7 @@ void LoadingRTView::LoadRTDoseFile()
 
   GetDataStorage()->Add(mitkImage);
 
-  mitk::TimeGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
+//  mitk::TimeGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+//  mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );
 }

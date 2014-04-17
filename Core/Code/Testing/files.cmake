@@ -94,8 +94,8 @@ set(MODULE_TESTS
   mitkLookupTableTest.cpp
   mitkSTLFileReaderTest.cpp
   mitkPointTypeConversionTest.cpp
-  mitkTypeVectorConversionTest.cpp
-  mitkTypeMatrixConversionTest.cpp
+  mitkVectorTypeConversionTest.cpp
+  mitkMatrixTypeConversionTest.cpp
   mitkSurfaceToImageFilterTest.cpp
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp

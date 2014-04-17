@@ -62,17 +62,40 @@ namespace mitk
     using itk::Matrix<T, NRows, NColumns>::operator=;
 
 
+    /**
+     * Copies the elements from array array to this.
+     * Note that this method will assign doubles to floats without complaining!
+     *
+     * @param array the array whose values shall be copied. Must overload [] operator.
+     */
+    template <typename ArrayType >
+    void FromArray(const ArrayType& array)
+    {
+      for (unsigned i = 0; i < NRows; i++)
+      {
+        for (unsigned j = 0; j < NColumns; j++)
+        {
+          (*this)[i][j] = array[i][j];
+        }
+      }
+    };
 
     /**
      * Warning: Array must have same dimension as Matrix
      */
-    void CopyToArray(ScalarType const array_p[NRows][NColumns]) const
+    template <typename ArrayType>
+    void ToArray(ArrayType array) const
     {
-      for (int i = 0; i < this->GetPointDimension(); i++)
+      for (unsigned i = 0; i < NRows; i++)
       {
-        array_p[i] = this->GetElement(i);
+        for (unsigned j = 0; j < NColumns; j++)
+        {
+          array[i][j] = (*this)[i][j];
+        }
       }
     }
+
+
   };
 
   typedef Matrix<ScalarType,2,2> Matrix2D;

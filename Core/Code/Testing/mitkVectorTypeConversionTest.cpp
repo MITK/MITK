@@ -31,11 +31,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace mitk;
 
 
-class VectorTypeConversionTestSuite : public mitk::TestFixture
+class mitkVectorTypeConversionTestSuite : public mitk::TestFixture
 
 {
 
-  CPPUNIT_TEST_SUITE(VectorTypeConversionTestSuite);
+  CPPUNIT_TEST_SUITE(mitkVectorTypeConversionTestSuite);
 
   MITK_TEST(Point2Vector);
 
@@ -76,6 +76,24 @@ private:
 
   float epsDouble2Float;
 
+  /**
+   * @brief Convenience method to test if one vector has been assigned successfully to the other.
+   *
+   * More specifically, tests if v1 = v2 was performed correctly.
+   *
+   * @param v1    The vector v1 of the assignment v1 = v2
+   * @param v2    The vector v2 of the assignment v1 = v2
+   * @param v1Name        The type name of v1 (e.g.: mitk::Vector3D). Necessary for the correct test output.
+   * @param v2Name        The type name of v2 (e.g.: mitk::Vector3D). Necessary for the correct test output.
+  *  @param eps   defines the allowed tolerance when testing for equality.
+   */
+  template <typename T1, typename T2>
+  void TestForEquality(T1 v1, T2 v2, std::string v1Name, std::string v2Name, ScalarType eps = mitk::eps)
+  {
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("\nAssigning " + v2Name + " to " + v1Name + ":\n both are equal", true,
+        EqualArray(v1, v2, 3, eps));
+  }
+
 public:
 
 
@@ -91,25 +109,6 @@ public:
   {
 
   }
-
-  /**
-   * @brief Convenience method to test if one vector has been assigned successfully to the other.
-   *
-   * More specifically, tests if v1 = v2 was performed correctly.
-   *
-   * @param v1    The vector v1 of the assignment v1 = v2
-   * @param v2    The vector v2 of the assignment v1 = v2
-   * @param v1Name        The type name of v1 (e.g.: mitk::Vector3D). Necessary for the correct test output.
-   * @param v2Name        The type name of v2 (e.g.: mitk::Vector3D). Necessary for the correct test output.
-  *  @param eps   defines the allowed tolerance when testing for equality.
-   */
-  template <typename T1, typename T2>
-  void TestForEquality(T1 v1, T2 v2, std::string v1Name, std::string v2Name, ScalarType eps = mitk::eps)
-  {
-    CPPUNIT_ASSERT_ASSERTION_PASS_MESSAGE("\nAssigning " + v2Name + " to " + v1Name + ":\n both are equal",  EqualArray(v1, v2, 3, eps));
-  }
-
-
 
 
   void Pod2Mitk(void)
@@ -262,4 +261,4 @@ public:
 
 };
 
-MITK_TEST_SUITE_REGISTRATION(VectorTypeConversion)
+MITK_TEST_SUITE_REGISTRATION(mitkVectorTypeConversion)

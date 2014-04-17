@@ -51,6 +51,8 @@ CreateConnections();
 
 QmitkNavigationToolCreationWidget::~QmitkNavigationToolCreationWidget()
 {
+m_Controls->m_CalibrationLandmarksList->SetPointSetNode(NULL);
+m_Controls->m_RegistrationLandmarksList->SetPointSetNode(NULL);
 delete m_AdvancedWidget;
 }
 

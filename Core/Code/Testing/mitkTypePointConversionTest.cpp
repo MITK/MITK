@@ -37,6 +37,26 @@ static void Setup(void)
   a_vtkPoints->Initialize();
 }
 
+
+/**
+ * @brief Convenience method to test if one vector has been assigned successfully to the other.
+ *
+ * More specifically, tests if v1 = v2 was performed correctly.
+ *
+ * @param v1    The vector v1 of the assignment v1 = v2
+ * @param v2    The vector v2 of the assignment v1 = v2
+ * @param v1Name        The type name of v1 (e.g.: mitk::Vector3D). Necessary for the correct test output.
+ * @param v2Name        The type name of v2 (e.g.: mitk::Vector3D). Necessary for the correct test output.
+*  @param eps   defines the allowed tolerance when testing for equality.
+ */
+template <typename T1, typename T2>
+static void TestForEquality(T1 v1, T2 v2, std::string v1Name, std::string v2Name, ScalarType eps = mitk::eps)
+{
+  MITK_TEST_CONDITION( EqualArray(v1, v2, 3, eps),  "\nAssigning " << v2Name << " to " << v1Name << ":\n both are equal")
+}
+
+
+
 static void Test_Mitk2Itk_PointCompatibility()
 {
   Setup();
@@ -46,8 +66,7 @@ static void Test_Mitk2Itk_PointCompatibility()
 
   itkPoint3D = point3D;
 
-  MITK_TEST_CONDITION(itkPoint3D == point3D, "mitk point assigned to itk point")
-  MITK_TEST_CONDITION(itkPoint3D == valuesToCopy, "correct values were assigned")
+  TestForEquality(itkPoint3D, point3D, "itk::Point", "mitk:Point");
 }
 
 
@@ -60,8 +79,7 @@ static void Test_Itk2Mitk_PointCompatibility()
 
   point3D = itkPoint3D;
 
-  MITK_TEST_CONDITION(point3D == itkPoint3D, "itk point assigned to mitk point")
-  MITK_TEST_CONDITION(point3D == valuesToCopy, "correct values were assigned")
+  TestForEquality(point3D, itkPoint3D, "mitk:Point", "itk::Point");
 }
 
 
@@ -76,23 +94,8 @@ static void Test_Vtk2Mitk_PointCompatibility()
 
   point3D = vtkPoint;
 
-  MITK_TEST_CONDITION(point3D == vtkPoint, "vtkPoint assigned to mitk point")
-  MITK_TEST_CONDITION(point3D == valuesToCopy, "correct values were assigned")
-}
+  TestForEquality(point3D, vtkPoint, "mitk:Point", "vtkPoint");
 
-static void Test_Mitk2Vtk_PointCompatibility()
-{
-  Setup();
-  double vtkPoint[3];
-  mitk::Point3D point3D = valuesToCopy;
-
-  //a_vtkPoints->InsertNextPoint(point3D.GetAsArray());
- // a_vtkPoints->GetPoint(0, vtkPoint);
-
-  MITK_TEST_CONDITION(point3D == vtkPoint, "MITK point assigned to VTK point")
-  MITK_TEST_CONDITION(Equal(vtkPoint[0], valuesToCopy[0])
-    && Equal(vtkPoint[1], valuesToCopy[1])
-    && Equal(vtkPoint[2], valuesToCopy[2]), "correct values were assigned")
 }
 
 
@@ -101,41 +104,33 @@ static void Test_Mitk2Pod_PointCompatibility()
   ScalarType podPoint[] = {1.0, 2.0, 3.0};
   mitk::Point3D point3D = valuesToCopy;
 
-  point3D.CopyToArray(podPoint);
+  point3D.ToArray(podPoint);
 
-  MITK_TEST_CONDITION(point3D  == podPoint, "MITK point assigned to POD point")
-  MITK_TEST_CONDITION(Equal(podPoint[0], valuesToCopy[0])
-    && Equal(podPoint[1], valuesToCopy[1])
-    && Equal(podPoint[2], valuesToCopy[2]), "correct values were assigned")
+  TestForEquality(podPoint, point3D, "POD point", "mitk::Point");
 
 }
 
 static void Test_Pod2Mitk_PointCompatibility()
 {
-  mitk::Point3D point3D = originalValues;
+  itk::Point<double, 3> point3D = originalValues;
   ScalarType podPoint[] = {4.0, 5.0, 6.0};
 
   point3D = podPoint;
 
-  MITK_TEST_CONDITION(point3D == podPoint, "POD point assigned to MITK point")
-  MITK_TEST_CONDITION(point3D == valuesToCopy, "correct values were assigned")
+  TestForEquality(point3D, podPoint, "mitk::Point3D", "POD point");
 }
 
 
-
-static void Test_Mitk2Vnl_PointCompatibility()
+static void Test_Point2Vector()
 {
-  Setup();
+  itk::Point<double, 3> point3D   = valuesToCopy;
+  itk::Vector<double, 3> vector3D = originalValues;
 
-  //vnl_vector_fixed<ScalarType, 3> copiedPoint;
+  point3D = vector3D;
 
-  //  copiedPoint = mitk2vnl(point3D);
-
-  //MITK_TEST_CONDITION(
-  //     Equal(static_cast<ScalarType>(copiedPoint[0]), point3D[0])
-  //  && Equal(static_cast<ScalarType>(copiedPoint[1]), point3D[1])
-  //  && Equal(static_cast<ScalarType>(copiedPoint[2]), point3D[2]), "mitk point assigned to vnl point")
+  TestForEquality(point3D, vector3D, "mitk::Point", "mitk::Vector");
 }
+
 
 
 /**
@@ -146,13 +141,12 @@ int mitkTypePointConversionTest(int /*argc*/ , char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("PointConversionTest")
 
+  Test_Point2Vector();
+
   Test_Mitk2Itk_PointCompatibility();
   Test_Itk2Mitk_PointCompatibility();
 
   Test_Vtk2Mitk_PointCompatibility();
-  Test_Mitk2Vtk_PointCompatibility();
-
-  Test_Mitk2Vnl_PointCompatibility();
 
   Test_Mitk2Pod_PointCompatibility();
   Test_Pod2Mitk_PointCompatibility();

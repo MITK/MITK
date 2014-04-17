@@ -18,14 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKTYPEDEFS_H_
 
 
-#include <itkIndex.h>
-#include <itkContinuousIndex.h>
-#include <itkVector.h>
-#include <itkMatrix.h>
-#include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
-#include <utility>
-
 #include "mitkConstants.h"
 
 namespace mitk {

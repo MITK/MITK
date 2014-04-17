@@ -19,9 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKOLDTYPECONVERSIONS_H_
 
 #include <vnl/vnl_quaternion.h>
+#include <itkIndex.h>
+
 
 #include "mitkConstants.h"
 #include "mitkVector.h"
+#include "mitkPoint.h"
+#include "mitkMatrix.h"
 
 
 template <class T> class VectorTraits {
@@ -177,14 +181,6 @@ namespace mitk
 
   template <class Tin, class Tout>
   inline void vtk2vnl(const Tin *in, vnl_vector<Tout>& out)
-  {
-    unsigned int i;
-    for(i=0; i<out.size();++i)
-      out[i]=(Tout) (in[i]);
-  }
-
-  template <class Tin, class Tout>
-  inline void vtk2vnlref(const Tin *in, vnl_vector_ref<Tout>& out)
   {
     unsigned int i;
     for(i=0; i<out.size();++i)

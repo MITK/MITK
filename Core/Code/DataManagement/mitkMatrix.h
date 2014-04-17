@@ -79,9 +79,6 @@ namespace mitk
   typedef Matrix<ScalarType,3,3> Matrix3D;
   typedef Matrix<ScalarType,4,4> Matrix4D;
 
-  // other matrix types used in mitk code
-  typedef vnl_matrix_fixed<ScalarType, 3, 3> VnlMatrix3D;
-
 
 
   /*!

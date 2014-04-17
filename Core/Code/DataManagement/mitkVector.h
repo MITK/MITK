@@ -156,7 +156,6 @@ namespace mitk
 
   // other vector types used in MITK
   typedef vnl_vector<ScalarType> VnlVector;
-  typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
   // The equal methods to compare vectors for equality are below:
 

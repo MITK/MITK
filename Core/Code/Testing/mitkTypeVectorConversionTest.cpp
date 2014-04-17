@@ -18,16 +18,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVector.h"
 
-#include <vnl/vnl_vector_ref.h>
+
 #include <vnl/vnl_vector_fixed_ref.h>
 #include "vnl/vnl_math.h"
 
 #include "mitkTestingMacros.h"
 #include "mitkConstants.h"
 #include "mitkVector.h"
-#include "mitkTypes.h" // for Equals
+#include "mitkPoint.h"
 
 using namespace mitk;
+
+
 
 /**
  * these static variables are used in the test functions
@@ -201,6 +203,15 @@ static void Test_FromArray_DifferentType(void)
   TestForEquality(vector3D, podArray, "mitk::Vector3D", "float POD", epsDouble2Float);
 }
 
+static void Test_vector2point()
+{
+  mitk::Point3D point3D   = originalValues;
+  mitk::Vector3D vector3D = valuesToCopy;
+
+  vector3D = point3D.GetVectorFromOrigin();
+
+  TestForEquality(point3D, vector3D, "mitk::Point3D", "mitk::Vector3D");
+}
 
 
 /**
@@ -215,6 +226,8 @@ int mitkTypeVectorConversionTest(int /*argc*/ , char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("VectorConversionTest")
+
+  Test_vector2point();
 
   Test_pod2mitk();
   Test_mitk2pod();

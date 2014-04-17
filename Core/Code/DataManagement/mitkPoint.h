@@ -62,39 +62,48 @@ namespace mitk {
     Point<TCoordRep, NPointDimension>(const TCoordRep & v):itk::Point<TCoordRep, NPointDimension>(v) {}
     Point<TCoordRep, NPointDimension>(const itk::Point<TCoordRep, NPointDimension> & p) : itk::Point<TCoordRep, NPointDimension>(p) {}
 
-    /** Pass-through assignment operator for the Array base class. */
-    /**
-     * Assignment Operator
-     */
-    Point< TCoordRep, NPointDimension > &
-    operator=(const Point & r)
-    {
-      itk::Point<TCoordRep, NPointDimension>::operator=(r);
-      return *this;
-    }
-
 
     /**
-     * Assignment from a plain array
+     * Copies the elements from array array to this.
+     * Note that this method will assign doubles to floats without complaining!
+     *
+     * @param array the array whose values shall be copied. Must overload [] operator.
      */
-    Point< TCoordRep, NPointDimension > &
-    operator=(const TCoordRep r[NPointDimension])
+    template <typename ArrayType >
+    void FromArray(const ArrayType& array)
     {
-      itk::Point<TCoordRep, NPointDimension>::operator=(r);
-      return *this;
+      itk::FixedArray<TCoordRep, NPointDimension>* thisP = dynamic_cast<itk::FixedArray<TCoordRep, NPointDimension>* >(this);
+      mitk::FromArray<ArrayType, TCoordRep, NPointDimension>(*thisP, array);
     }
-
 
     /**
-     * Warning: Array must have same dimension as Point
+     * Copies the elements of this point to an array of type ArrayType
+     * Note that this method will assign doubles to floats without complaining!
+     *
+     * @return the array holding the elements of this. Only requirement is that it overloads the [] operator
      */
-    void CopyToArray(ScalarType array_p[NPointDimension]) const
+    template <typename ArrayType >
+    ArrayType ToArray()
     {
-      for (unsigned int i = 0; i < this->GetPointDimension(); i++)
-        {
-          array_p[i] = this->GetElement(i);
-        }
+      ArrayType result = mitk::ToArray<ArrayType, TCoordRep, NPointDimension>(*this);
+      return result;
     }
+
+    /**
+     * Copies the values stored in this point into the array array.
+     * This method has to be used over the version returning the array when
+     * copying to pod arrays.
+     * Furthermore, the syntax may be a little bit nicer because ArrayType can be
+     * inferred from the parameter.
+     *
+     * @param array the array which should store the values of this.
+     */
+    template <typename ArrayType >
+    void ToArray(ArrayType array)
+    {
+      mitk::ToArray<ArrayType, TCoordRep, NPointDimension>(array, *this);
+    }
+
   };
 
   typedef Point<ScalarType,2> Point2D;

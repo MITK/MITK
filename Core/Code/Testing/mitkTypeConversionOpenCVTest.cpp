@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVector.h"
 
-#include <vnl/vnl_vector_ref.h>
+
 #include <vnl/vnl_vector_fixed_ref.h>
 #include "vnl/vnl_math.h"
 

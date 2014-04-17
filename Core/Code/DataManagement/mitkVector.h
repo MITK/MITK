@@ -110,7 +110,7 @@ namespace mitk
      * Copies the elements of this vector to an array of type ArrayType
      * Note that this method will assign doubles to floats without complaining!
      *
-     * @return the array holding the elements of this. Only requierement is that it overloads the [] operator
+     * @return the array holding the elements of this. Only requirement is that it overloads the [] operator
      */
     template <typename ArrayType >
     ArrayType ToArray()

@@ -96,6 +96,8 @@ m_Controls->m_Surface_Use_Sphere->setChecked(true);
 m_AdvancedWidget->SetDataStorage(m_DataStorage);
 m_Controls->m_IdentifierEdit->setText(supposedIdentifier.c_str());
 this->InitializeUIToolLandmarkLists();
+m_Controls->m_CalibrationLandmarksList->EnableEditButton(false);
+m_Controls->m_RegistrationLandmarksList->EnableEditButton(false);
 }
 
 void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable)

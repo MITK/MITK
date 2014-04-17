@@ -42,7 +42,7 @@ class mitkPointTypeConversionTestSuite : public mitk::TestFixture
   MITK_TEST(Mitk2Pod_PointCompatibility);
   MITK_TEST(Pod2Mitk_PointCompatibility);
 
-  MITK_TEST(Point2Vector);
+  MITK_TEST(Vector2Point);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -61,13 +61,13 @@ public:
     FillVector3D(originalValues, 1.0, 2.0, 3.0);
     FillVector3D(valuesToCopy,   4.0, 5.0, 6.0);
 
-    vtkSmartPointer<vtkPoints>   a_vtkPoints = vtkSmartPointer<vtkPoints>::New();
+    a_vtkPoints = vtkSmartPointer<vtkPoints>::New();
     a_vtkPoints->Initialize();
   }
 
   void tearDown(void)
   {
-    a_vtkPoints = NULL;
+ //   a_vtkPoints = NULL;
   }
 
 
@@ -148,7 +148,7 @@ public:
   }
 
 
-  void Point2Vector()
+  void Vector2Point()
   {
     itk::Point<double, 3> point3D   = valuesToCopy;
     itk::Vector<double, 3> vector3D = originalValues;

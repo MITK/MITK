@@ -63,13 +63,19 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
 {
-//clean up worker thread
-if(m_WorkerThread) delete m_WorkerThread;
-if(m_Worker) delete m_Worker;
-//remove the tracking volume
-this->GetDataStorage()->Remove(m_TrackingVolumeNode);
-//remove the tool storage
-m_toolStorage->UnRegisterMicroservice();
+try
+  {
+  //clean up worker thread
+  if(m_WorkerThread) {delete m_WorkerThread;}
+  if(m_Worker) {delete m_Worker;}
+  //remove the tracking volume
+  this->GetDataStorage()->Remove(m_TrackingVolumeNode);
+  //remove the tool storage
+  if(m_toolStorage) {m_toolStorage->UnRegisterMicroservice();}
+  if(m_TrackingDeviceSource) {m_TrackingDeviceSource->UnRegisterMicroservice();}
+  }
+catch(std::exception& e) {MITK_WARN << "Unexpected exception during clean up of tracking toolbox view: " << e.what();}
+catch(...) {MITK_WARN << "Unexpected unknown error during clean up of tracking toolbox view!";}
 }
 
 

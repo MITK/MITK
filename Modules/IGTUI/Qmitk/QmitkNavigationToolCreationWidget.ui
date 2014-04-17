@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>371</height>
+    <width>254</width>
+    <height>309</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -71,8 +71,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>340</width>
-        <height>205</height>
+        <width>236</width>
+        <height>90</height>
        </rect>
       </property>
       <attribute name="label">
@@ -160,8 +160,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>340</width>
-        <height>205</height>
+        <width>310</width>
+        <height>113</height>
        </rect>
       </property>
       <attribute name="label">
@@ -265,13 +265,55 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="page_4">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>232</width>
+        <height>85</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>Tool Landmarks</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QTabWidget" name="m_RegistrationLandmarksTab">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tab">
+          <attribute name="title">
+           <string>Calibration Landmarks</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QmitkPointListWidget" name="m_CalibrationLandmarksList" native="true"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_2">
+          <attribute name="title">
+           <string>Registration Landmarks</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QmitkPointListWidget" name="m_RegistrationLandmarksList" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="page_3">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>340</width>
-        <height>129</height>
+        <width>281</width>
+        <height>152</height>
        </rect>
       </property>
       <attribute name="label">
@@ -475,6 +517,12 @@
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>
    <header>QmitkDataStorageComboBox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkPointListWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkPointListWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

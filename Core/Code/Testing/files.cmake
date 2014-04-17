@@ -93,7 +93,7 @@ set(MODULE_TESTS
   mitkInteractionEventTest.cpp
   mitkLookupTableTest.cpp
   mitkSTLFileReaderTest.cpp
-  mitkTypePointConversionTest.cpp
+  mitkPointTypeConversionTest.cpp
   mitkTypeVectorConversionTest.cpp
   mitkTypeMatrixConversionTest.cpp
   mitkTypeOperationTest.cpp

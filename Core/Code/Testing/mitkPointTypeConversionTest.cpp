@@ -29,10 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace mitk;
 
 
-class mitkPointTypeConversionsTestSuite : public mitk::TestFixture
+class mitkPointTypeConversionTestSuite : public mitk::TestFixture
 {
 
-  CPPUNIT_TEST_SUITE(mitkPointTypeConversionsTestSuite);
+  CPPUNIT_TEST_SUITE(mitkPointTypeConversionTestSuite);
 
   MITK_TEST(Mitk2Itk_PointCompatibility);
   MITK_TEST(Itk2Mitk_PointCompatibility);
@@ -161,6 +161,6 @@ public:
 };
 
 
-MITK_TEST_SUITE_REGISTRATION(mitkPointTypeConversions)
+MITK_TEST_SUITE_REGISTRATION(mitkPointTypeConversion)
 
 

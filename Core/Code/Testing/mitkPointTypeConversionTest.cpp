@@ -34,6 +34,8 @@ class mitkPointTypeConversionTestSuite : public mitk::TestFixture
 
   CPPUNIT_TEST_SUITE(mitkPointTypeConversionTestSuite);
 
+  MITK_TEST(Vector2Point);
+
   MITK_TEST(Mitk2Itk_PointCompatibility);
   MITK_TEST(Itk2Mitk_PointCompatibility);
 
@@ -41,8 +43,6 @@ class mitkPointTypeConversionTestSuite : public mitk::TestFixture
 
   MITK_TEST(Mitk2Pod_PointCompatibility);
   MITK_TEST(Pod2Mitk_PointCompatibility);
-
-  MITK_TEST(Vector2Point);
 
   CPPUNIT_TEST_SUITE_END();
 

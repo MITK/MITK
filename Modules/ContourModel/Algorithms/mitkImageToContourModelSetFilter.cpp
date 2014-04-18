@@ -21,9 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkContourExtractor2DImageFilter.h"
 
 mitk::ImageToContourModelSetFilter::ImageToContourModelSetFilter() :
-m_UseProgressBar(false),
-m_ProgressStepSize(1),
-m_SliceGeometry(NULL)
+m_SliceGeometry(NULL),
+m_UseProgressBar(false)
 {
 }
 
@@ -32,7 +31,7 @@ mitk::ImageToContourModelSetFilter::~ImageToContourModelSetFilter()
 
 }
 
-void mitk::ImageToContourModelSetFilter::SetInput ( const mitk::ImageToContourModelSetFilter::InputType* input )
+void mitk::ImageToContourModelSetFilter::SetInput ( const InputType* input )
 {
   this->ProcessObject::SetNthInput ( 0, const_cast<InputType*> ( input ) );
   this->Modified();

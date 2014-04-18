@@ -66,9 +66,7 @@ public:
     mitk::ComputeContourSetNormalsFilter::Pointer m_NormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
     mitk::CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter = mitk::CreateDistanceImageFromSurfaceFilter::New();
 
-    itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-    AccessFixedDimensionByItk_1( segmentationImage, GetImageBase, 3, itkImage );
-    m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
+    m_InterpolateSurfaceFilter->SetReferenceImage( segmentationImage );
 
     for (unsigned int j = 0; j < contourList.size(); j++)
     {
@@ -109,9 +107,7 @@ public:
     mitk::CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter = mitk::CreateDistanceImageFromSurfaceFilter::New();
 
     m_NormalsFilter->SetSegmentationBinaryImage(segmentationImage);
-    itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-    AccessFixedDimensionByItk_1( segmentationImage, GetImageBase, 3, itkImage );
-    m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
+    m_InterpolateSurfaceFilter->SetReferenceImage( segmentationImage );
 
     for (unsigned int j = 0; j < contourList.size(); j++)
     {

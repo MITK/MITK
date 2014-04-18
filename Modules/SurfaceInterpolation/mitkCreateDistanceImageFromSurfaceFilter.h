@@ -90,6 +90,7 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    using itk::ProcessObject::SetInput;
     virtual void SetInput( const mitk::Surface* surface );
 
     virtual void SetInput( unsigned int idx, const mitk::Surface* surface );

@@ -46,6 +46,7 @@ namespace mitk {
     typedef itk::PolyLineParametricPath<2> PolyLineParametricPath2D;
     typedef PolyLineParametricPath2D::VertexListType ContourPath;
 
+    using itk::ProcessObject::SetInput;
     virtual void SetInput( const InputType *input);
 
     const InputType* GetInput(void);
@@ -73,7 +74,6 @@ namespace mitk {
   private:
    const Geometry3D* m_SliceGeometry;
    bool m_UseProgressBar;
-   unsigned int m_ProgressStepSize;
 
    double m_ContourValue;
 

@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter() :
+m_ActiveLabel(-1),
 m_MaxSpacing(5),
 m_UseProgressBar(false),
-m_ProgressStepSize(1),
-m_ActiveLabel(-1)
+m_ProgressStepSize(1)
 {
   mitk::Surface::Pointer output = mitk::Surface::New();
   this->SetNthOutput(0, output.GetPointer());

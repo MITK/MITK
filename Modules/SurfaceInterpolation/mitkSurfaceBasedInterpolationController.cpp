@@ -37,10 +37,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 mitk::SurfaceBasedInterpolationController::SurfaceBasedInterpolationController() :
-m_ActiveLabel(0),
-m_WorkingImage(NULL),
 m_MinSpacing(1.0),
-m_MaxSpacing(1.0)
+m_MaxSpacing(1.0),
+m_WorkingImage(NULL),
+m_ActiveLabel(0)
 {
   this->Initialize();
 }

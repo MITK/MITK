@@ -138,8 +138,6 @@ namespace mitk
 
 //    vtkSmartPointer<vtkPolyData> m_PolyData;
 
-    unsigned int m_DistImageVolume;
-
     ContourListMap m_MapOfContourLists;
 
     mitk::Surface::Pointer m_InterpolationResult;

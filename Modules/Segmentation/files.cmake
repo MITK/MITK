@@ -68,7 +68,7 @@ set(CPP_FILES
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
-  Interactions/mitkOtsuMultipleThresholdTool3D.cpp
+  Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkAutoThresholdTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkPixelManipulationTool.cpp

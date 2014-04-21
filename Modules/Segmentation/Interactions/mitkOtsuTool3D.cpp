@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkOtsuMultipleThresholdTool3D.h"
+#include "mitkOtsuTool3D.h"
 
 // mitk
 #include "mitkLabelSetImage.h"
@@ -39,30 +39,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, OtsuMultipleThresholdTool3D, "Multiple Otsu Segmentation");
+  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, OtsuTool3D, "Multiple Otsu Segmentation");
 }
 
-mitk::OtsuMultipleThresholdTool3D::OtsuMultipleThresholdTool3D() : SegTool3D("dummy"), m_NumberOfRegions(3)
+mitk::OtsuTool3D::OtsuTool3D() : SegTool3D("dummy"), m_NumberOfRegions(3)
 {
 }
 
-mitk::OtsuMultipleThresholdTool3D::~OtsuMultipleThresholdTool3D()
+mitk::OtsuTool3D::~OtsuTool3D()
 {
 
 }
 
-void mitk::OtsuMultipleThresholdTool3D::SetNumberOfRegions(int value)
+void mitk::OtsuTool3D::SetNumberOfRegions(int value)
 {
   if (value>1 && value<5)
     m_NumberOfRegions = value;
 }
 
-int mitk::OtsuMultipleThresholdTool3D::GetNumberOfRegions()
+int mitk::OtsuTool3D::GetNumberOfRegions()
 {
   return m_NumberOfRegions;
 }
 
-void mitk::OtsuMultipleThresholdTool3D::UpdatePreview(int region)
+void mitk::OtsuTool3D::UpdatePreview(int region)
 {
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
@@ -99,19 +99,19 @@ void mitk::OtsuMultipleThresholdTool3D::UpdatePreview(int region)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-const char** mitk::OtsuMultipleThresholdTool3D::GetXPM() const
+const char** mitk::OtsuTool3D::GetXPM() const
 {
   return NULL;
 }
 
-us::ModuleResource mitk::OtsuMultipleThresholdTool3D::GetIconResource() const
+us::ModuleResource mitk::OtsuTool3D::GetIconResource() const
 {
   us::Module* module = us::GetModuleContext()->GetModule();
   us::ModuleResource resource = module->GetResource("Otsu_48x48.png");
   return resource;
 }
 
-void mitk::OtsuMultipleThresholdTool3D::Activated()
+void mitk::OtsuTool3D::Activated()
 {
   Superclass::Activated();
 
@@ -146,7 +146,7 @@ void mitk::OtsuMultipleThresholdTool3D::Activated()
   m_PreviewNode->SetColor(1.0, 0.0, 0.0);
 }
 
-void mitk::OtsuMultipleThresholdTool3D::Deactivated()
+void mitk::OtsuTool3D::Deactivated()
 {
   Superclass::Deactivated();
 
@@ -156,7 +156,7 @@ void mitk::OtsuMultipleThresholdTool3D::Deactivated()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::OtsuMultipleThresholdTool3D::Run()
+void mitk::OtsuTool3D::Run()
 {
   m_ReferenceNode = m_ToolManager->GetReferenceData(0);
   assert(m_ReferenceNode);
@@ -200,13 +200,13 @@ void mitk::OtsuMultipleThresholdTool3D::Run()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-const char* mitk::OtsuMultipleThresholdTool3D::GetName() const
+const char* mitk::OtsuTool3D::GetName() const
 {
   return "Multiple Otsu";
 }
 
 template <typename ImageType>
-void mitk::OtsuMultipleThresholdTool3D::InternalUpdatePreview(const ImageType* input, int region)
+void mitk::OtsuTool3D::InternalUpdatePreview(const ImageType* input, int region)
 {
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
 
@@ -242,7 +242,7 @@ void mitk::OtsuMultipleThresholdTool3D::InternalUpdatePreview(const ImageType* i
 }
 
 template < typename TPixel, unsigned int VDimension >
-void mitk::OtsuMultipleThresholdTool3D::InternalRun( itk::Image<TPixel, VDimension>* input )
+void mitk::OtsuTool3D::InternalRun( itk::Image<TPixel, VDimension>* input )
 {
   typedef itk::Image< TPixel, VDimension > InputImageType;
   typedef itk::Image< LabelSetImage::PixelType, VDimension > OutputImageType;

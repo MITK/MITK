@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkOtsuMultipleThresholdTool3DGUI_h_Included
+#ifndef QmitkOtsuTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
 #include <MitkSegmentationUIExports.h>
-#include "ui_QmitkOtsuMultipleThresholdTool3DGUIControls.h"
+#include "ui_QmitkOtsuWidgetControls.h"
 
 namespace mitk {
-  class OtsuMultipleThresholdTool3D;
+  class OtsuTool3D;
 }
 
 //class QListWidgetItem;
@@ -34,12 +34,12 @@ namespace mitk {
 
   Last contributor: $Author$
 */
-class MitkSegmentationUI_EXPORT QmitkOtsuMultipleThresholdTool3DGUI : public QmitkToolGUI
+class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
-    mitkClassMacro(QmitkOtsuMultipleThresholdTool3DGUI, QmitkToolGUI);
+    mitkClassMacro(QmitkOtsuTool3DGUI, QmitkToolGUI);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -59,14 +59,14 @@ class MitkSegmentationUI_EXPORT QmitkOtsuMultipleThresholdTool3DGUI : public Qmi
 
   protected:
 
-    QmitkOtsuMultipleThresholdTool3DGUI();
-    virtual ~QmitkOtsuMultipleThresholdTool3DGUI();
+    QmitkOtsuTool3DGUI();
+    virtual ~QmitkOtsuTool3DGUI();
 
     void BusyStateChanged(bool);
 
-    mitk::OtsuMultipleThresholdTool3D* m_OtsuMultipleThresholdTool3D;
+    mitk::OtsuTool3D* m_OtsuMultipleThresholdTool3D;
 
-    Ui_QmitkOtsuMultipleThresholdTool3DGUIControls m_Controls;
+    Ui_QmitkOtsuTool3DGUIControls m_Controls;
 
     int m_NumberOfRegions;
 

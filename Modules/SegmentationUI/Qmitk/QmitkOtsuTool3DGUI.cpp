@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkOtsuMultipleThresholdTool3DGUI.h"
+#include "QmitkOtsuTool3DGUI.h"
 
 #include "mitkOtsuMultipleThresholdTool3D.h"
 
@@ -23,9 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication.h>
 #include <QMessageBox>
 
-MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkOtsuMultipleThresholdTool3DGUI, "")
+MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkOtsuTool3DGUI, "")
 
-QmitkOtsuMultipleThresholdTool3DGUI::QmitkOtsuMultipleThresholdTool3DGUI() : QmitkToolGUI(), m_NumberOfRegions(0), m_OtsuMultipleThresholdTool3D(NULL)
+QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkToolGUI(), m_NumberOfRegions(0), m_OtsuMultipleThresholdTool3D(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -44,15 +44,15 @@ QmitkOtsuMultipleThresholdTool3DGUI::QmitkOtsuMultipleThresholdTool3DGUI() : Qmi
 //  connect( m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
 }
 
-QmitkOtsuMultipleThresholdTool3DGUI::~QmitkOtsuMultipleThresholdTool3DGUI()
+QmitkOtsuTool3DGUI::~QmitkOtsuTool3DGUI()
 {
   if (m_OtsuMultipleThresholdTool3D)
   {
-    m_OtsuMultipleThresholdTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkOtsuMultipleThresholdTool3DGUI, bool>( this, &QmitkOtsuMultipleThresholdTool3DGUI::BusyStateChanged );
+    m_OtsuMultipleThresholdTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkOtsuTool3DGUI, bool>( this, &QmitkOtsuTool3DGUI::BusyStateChanged );
   }
 }
 
-void QmitkOtsuMultipleThresholdTool3DGUI::OnItemSelectionChanged(QListWidgetItem* item)
+void QmitkOtsuTool3DGUI::OnItemSelectionChanged(QListWidgetItem* item)
 {
   if (m_SelectedItem == item)
   {
@@ -70,11 +70,11 @@ void QmitkOtsuMultipleThresholdTool3DGUI::OnItemSelectionChanged(QListWidgetItem
   }
 }
 
-void QmitkOtsuMultipleThresholdTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
+void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
   if (m_OtsuMultipleThresholdTool3D)
   {
-    m_OtsuMultipleThresholdTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkOtsuMultipleThresholdTool3DGUI, bool>( this, &QmitkOtsuMultipleThresholdTool3DGUI::BusyStateChanged );
+    m_OtsuMultipleThresholdTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkOtsuTool3DGUI, bool>( this, &QmitkOtsuTool3DGUI::BusyStateChanged );
   }
 
   m_OtsuMultipleThresholdTool3D = dynamic_cast<mitk::OtsuMultipleThresholdTool3D*>( tool );
@@ -83,11 +83,11 @@ void QmitkOtsuMultipleThresholdTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
   {
     m_Controls.m_sbNumberOfRegions->setValue(m_OtsuMultipleThresholdTool3D->GetNumberOfRegions());
 
-    m_OtsuMultipleThresholdTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkOtsuMultipleThresholdTool3DGUI, bool>( this, &QmitkOtsuMultipleThresholdTool3DGUI::BusyStateChanged );
+    m_OtsuMultipleThresholdTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkOtsuTool3DGUI, bool>( this, &QmitkOtsuTool3DGUI::BusyStateChanged );
   }
 }
 
-void QmitkOtsuMultipleThresholdTool3DGUI::OnAcceptPreview()
+void QmitkOtsuTool3DGUI::OnAcceptPreview()
 {
   if (m_OtsuMultipleThresholdTool3D)
   {
@@ -103,7 +103,7 @@ void QmitkOtsuMultipleThresholdTool3DGUI::OnAcceptPreview()
   }
 }
 
-void QmitkOtsuMultipleThresholdTool3DGUI::OnRun()
+void QmitkOtsuTool3DGUI::OnRun()
 {
   if( m_NumberOfRegions == m_Controls.m_sbNumberOfRegions->value() )
   {
@@ -141,7 +141,7 @@ void QmitkOtsuMultipleThresholdTool3DGUI::OnRun()
   }
 }
 
-void QmitkOtsuMultipleThresholdTool3DGUI::OnCancel()
+void QmitkOtsuTool3DGUI::OnCancel()
 {
   if (m_OtsuMultipleThresholdTool3D)
   {
@@ -149,7 +149,7 @@ void QmitkOtsuMultipleThresholdTool3DGUI::OnCancel()
   }
 }
 
-void QmitkOtsuMultipleThresholdTool3DGUI::OnShowInformation( bool value )
+void QmitkOtsuTool3DGUI::OnShowInformation( bool value )
 {
   if (value)
     m_Controls.m_InformationWidget->show();
@@ -157,7 +157,7 @@ void QmitkOtsuMultipleThresholdTool3DGUI::OnShowInformation( bool value )
     m_Controls.m_InformationWidget->hide();
 }
 
-void QmitkOtsuMultipleThresholdTool3DGUI::BusyStateChanged(bool value)
+void QmitkOtsuTool3DGUI::BusyStateChanged(bool value)
 {
   if (value)
     QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );

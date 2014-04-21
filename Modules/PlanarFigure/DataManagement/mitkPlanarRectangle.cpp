@@ -87,14 +87,10 @@ void mitk::PlanarRectangle::PlaceFigure( const mitk::Point2D &point )
 
 void mitk::PlanarRectangle::GeneratePolyLine()
 {
-  // TODO: start polygon at specified initalize point...
+  this->ClearPolyLines();
 
-  ClearPolyLines();
-
-  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
-  {
-    AppendPointToPolyLine( 0, PolyLineElement( GetControlPoint(i), i ) );
-  }
+  for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
+    this->AppendPointToPolyLine(0, this->GetControlPoint(i));
 }
 
 void mitk::PlanarRectangle::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)

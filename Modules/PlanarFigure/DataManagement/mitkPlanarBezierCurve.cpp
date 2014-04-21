@@ -73,7 +73,7 @@ void mitk::PlanarBezierCurve::GenerateHelperPolyLine(double, unsigned int)
   unsigned int numHelperPolyLinePoints = m_ControlPoints.size();
 
   for (unsigned int i = 0; i < numHelperPolyLinePoints; ++i)
-    this->AppendPointToHelperPolyLine(0, PolyLineElement(m_ControlPoints[i], i));
+    this->AppendPointToHelperPolyLine(0, m_ControlPoints[i]);
 }
 
 void mitk::PlanarBezierCurve::GeneratePolyLine()
@@ -83,7 +83,7 @@ void mitk::PlanarBezierCurve::GeneratePolyLine()
   const unsigned int numPolyLinePoints = m_NumberOfSegments + 1;
 
   for (unsigned int i = 0; i < numPolyLinePoints; ++i)
-    this->AppendPointToPolyLine(0, PolyLineElement(this->ComputeDeCasteljauPoint(i / static_cast<ScalarType>(m_NumberOfSegments)), i));
+    this->AppendPointToPolyLine(0, this->ComputeDeCasteljauPoint(i / static_cast<ScalarType>(m_NumberOfSegments)));
 }
 
 mitk::Point2D mitk::PlanarBezierCurve::ComputeDeCasteljauPoint(mitk::ScalarType t)

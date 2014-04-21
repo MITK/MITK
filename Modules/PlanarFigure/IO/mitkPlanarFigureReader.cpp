@@ -59,6 +59,7 @@ mitk::PlanarFigureReader::~PlanarFigureReader()
 
 void mitk::PlanarFigureReader::GenerateData()
 {
+MITK_INFO << "PlanarFigureReader::GenerateData()";
   m_Success = false;
   this->SetNumberOfIndexedOutputs(0); // reset all outputs, we add new ones depending on the file content
 
@@ -323,6 +324,7 @@ void mitk::PlanarFigureReader::GenerateData()
         Point2D p;
         p.SetElement(0, x);
         p.SetElement(1, y);
+MITK_INFO << "Vertex " << id << ": (" << p[0] << ", " << p[1] << ")";
         if (first == true)  // needed to set m_FigurePlaced to true
         {
           planarFigure->PlaceFigure(p);

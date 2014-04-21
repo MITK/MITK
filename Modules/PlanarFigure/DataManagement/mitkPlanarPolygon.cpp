@@ -67,12 +67,8 @@ void mitk::PlanarPolygon::GeneratePolyLine()
 {
   this->ClearPolyLines();
 
-  for ( ControlPointListType::size_type i=0; i<m_ControlPoints.size(); i++ )
-  {
-    Point2D pnt = m_ControlPoints.at( i );
-    PolyLineElement elem(pnt,i);
-    this->AppendPointToPolyLine( 0, elem );
-  }
+  for (ControlPointListType::size_type i = 0; i < m_ControlPoints.size(); ++i)
+    this->AppendPointToPolyLine(0, this->GetControlPoint(i));
 }
 
 void mitk::PlanarPolygon::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)

@@ -251,11 +251,11 @@ void mitk::PlanarEllipse::GeneratePolyLine()
 
         // ... and append it to the PolyLine.
         // No extending supported here, so we can set the index of the PolyLineElement to '0'
-        AppendPointToPolyLine( 0, PolyLineElement( polyLinePoint, 0 ) );
+        this->AppendPointToPolyLine(0, polyLinePoint);
     }
 
-    AppendPointToPolyLine( 1, PolyLineElement( centerPoint, 0 ) );
-    AppendPointToPolyLine( 1, PolyLineElement( GetControlPoint( 3 ), 0 ) );
+    this->AppendPointToPolyLine(1, centerPoint);
+    this->AppendPointToPolyLine(1, this->GetControlPoint(3));
 }
 
 void mitk::PlanarEllipse::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)

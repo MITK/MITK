@@ -36,14 +36,9 @@ mitk::PlanarFourPointAngle::~PlanarFourPointAngle()
 void mitk::PlanarFourPointAngle::GeneratePolyLine()
 {
   this->ClearPolyLines();
-  // TODO: start line at specified start point...
-  // Generate poly-line
 
-  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
-  {
-    int index = i/2;
-    this->AppendPointToPolyLine( index, PolyLineElement( GetControlPoint( i ), i ) );
-  }
+  for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
+    this->AppendPointToPolyLine(i / 2, this->GetControlPoint(i));
 }
 
 void mitk::PlanarFourPointAngle::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)

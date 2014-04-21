@@ -242,7 +242,7 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const 
   PolyLineType::iterator iter;
   for( iter = tempList.begin(); iter != tempList.end(); ++iter )
   {
-    polyLinePoints.push_back((*iter).Point);
+    polyLinePoints.push_back(*iter);
   }
 
   for ( ControlPointListType::size_type i=0; i<polyLinePoints.size()-1; i++ )

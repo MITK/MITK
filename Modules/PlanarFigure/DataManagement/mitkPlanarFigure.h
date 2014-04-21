@@ -64,7 +64,7 @@ public:
     *
     * \deprecatedSince{2014_06} "struct PolyLineElement {...};" will be changed to "typedef Point2D PolyLineElement;".
     */
-  struct PolyLineElement
+  struct MitkPlanarFigure_EXPORT PolyLineElement
   {
     DEPRECATED(PolyLineElement(Point2D point, int index));
     PolyLineElement(const Point2D& point);

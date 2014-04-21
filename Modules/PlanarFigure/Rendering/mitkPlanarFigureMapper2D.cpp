@@ -188,7 +188,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
   {
     // Draw this 2D point as OpenGL vertex
     mitk::Point2D displayPoint;
-    this->TransformObjectToDisplay( iter->Point, displayPoint,
+    this->TransformObjectToDisplay( *iter, displayPoint,
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
     pointlist.push_back(displayPoint);

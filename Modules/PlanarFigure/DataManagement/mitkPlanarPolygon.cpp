@@ -82,27 +82,21 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   double circumference = 0.0;
   unsigned int i,j;
 
-  ControlPointListType polyLinePoints;
-  polyLinePoints.clear();
-  PolyLineType::iterator iter;
-  for( iter = m_PolyLines[0].begin(); iter != m_PolyLines[0].end(); ++iter )
-  {
-    polyLinePoints.push_back((*iter).Point);
-  }
+  PolyLineType polyLine = m_PolyLines[0];
 
-  if(polyLinePoints.empty())
+  if(polyLine.empty())
     return;
 
-  for ( i = 0; i <(polyLinePoints.size()-1); ++i )
+  for ( i = 0; i <(polyLine.size()-1); ++i )
   {
-    circumference += polyLinePoints[i].EuclideanDistanceTo(
-      polyLinePoints[i + 1] );
+    circumference += static_cast<Point2D>(polyLine[i]).EuclideanDistanceTo(
+      static_cast<Point2D>(polyLine[i + 1]) );
   }
 
   if ( this->IsClosed() )
   {
-    circumference += polyLinePoints[i].EuclideanDistanceTo(
-      polyLinePoints.front() );
+    circumference += static_cast<Point2D>(polyLine[i]).EuclideanDistanceTo(
+      static_cast<Point2D>(polyLine.front()) );
   }
 
   this->SetQuantity( FEATURE_ID_CIRCUMFERENCE, circumference );
@@ -115,28 +109,28 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
   {
     // does PlanarPolygon overlap/intersect itself?
-    unsigned int numberOfPoints = polyLinePoints.size();
+    unsigned int numberOfPoints = polyLine.size();
     if( numberOfPoints >= 4)
     {
       for ( i = 0; i < (numberOfPoints - 1); ++i )
       {
         // line 1
-        Point2D p0 = polyLinePoints[i];
-        Point2D p1 = polyLinePoints[i + 1];
+        Point2D p0 = polyLine[i];
+        Point2D p1 = polyLine[i + 1];
 
         // check for intersection with all other lines
         for (j = i+1; j < (numberOfPoints - 1); ++j )
         {
-          Point2D p2 = polyLinePoints[j];
-          Point2D p3 = polyLinePoints[j + 1];
+          Point2D p2 = polyLine[j];
+          Point2D p3 = polyLine[j + 1];
           intersection = CheckForLineIntersection(p0,p1,p2,p3);
           if (intersection) break;
         }
         if (intersection) break; // only because the inner loop might have changed "intersection"
 
         // last line from p_x to p_0
-        Point2D p2 = polyLinePoints.front();
-        Point2D p3 = polyLinePoints.back();
+        Point2D p2 = polyLine.front();
+        Point2D p3 = polyLine.back();
 
         intersection = CheckForLineIntersection(p0,p1,p2,p3);
         if (intersection) break;
@@ -144,10 +138,10 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
    }
 
     // calculate area
-    for ( i = 0; i < polyLinePoints.size(); ++i )
+    for ( i = 0; i < polyLine.size(); ++i )
     {
-      Point2D p0 = polyLinePoints[i];
-      Point2D p1 = polyLinePoints[ (i + 1) % polyLinePoints.size() ];
+      Point2D p0 = polyLine[i];
+      Point2D p1 = polyLine[ (i + 1) % polyLine.size() ];
 
       area += p0[0] * p1[1] - p1[0] * p0[1];
     }

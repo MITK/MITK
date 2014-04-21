@@ -174,7 +174,7 @@ public:
 
   void operator()(const PlanarFigure::PolyLineElement& polyLineElement)
   {
-    m_PlanarFigureGeometry->Map(polyLineElement.Point, m_WorldPoint);
+    m_PlanarFigureGeometry->Map(polyLineElement, m_WorldPoint);
     m_ImageGeometry->WorldToIndex(m_WorldPoint, m_ContinuousIndexPoint);
     m_Vertex.CastFrom(m_ContinuousIndexPoint);
     m_Path->AddVertex(m_Vertex);

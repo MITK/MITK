@@ -271,9 +271,8 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
   for( iter = planarPolyLine.begin(); iter != planarPolyLine.end(); iter++ )
   {
     // ... determine the world-coordinates
-    mitk::Point2D polyLinePoint = iter->Point;
     mitk::Point3D pointInWorldCoordiantes;
-    figureGeometry->Map( polyLinePoint, pointInWorldCoordiantes );
+    figureGeometry->Map( *iter, pointInWorldCoordiantes );
 
     // and add them as new points to the vtkPoints
     points->InsertNextPoint( pointInWorldCoordiantes[0], pointInWorldCoordiantes[1], pointInWorldCoordiantes[2] );

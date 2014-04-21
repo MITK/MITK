@@ -22,6 +22,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "algorithm"
 
+mitk::PlanarFigure::PolyLineElement::PolyLineElement(Point2D point, int index)
+  : Point(point),
+    Index(index)
+{
+}
+
+mitk::PlanarFigure::PolyLineElement::PolyLineElement(const Point2D& point)
+  : Point(point),
+    Index(-1)
+{
+}
+
+mitk::PlanarFigure::PolyLineElement::operator mitk::Point2D&()
+{
+  return Point;
+}
+
+mitk::PlanarFigure::PolyLineElement::operator const mitk::Point2D&() const
+{
+  return Point;
+}
 
 mitk::PlanarFigure::PlanarFigure()
 : m_SelectedControlPoint( -1 ),
@@ -706,7 +727,10 @@ void mitk::PlanarFigure::AppendPointToPolyLine( unsigned int index, PolyLineElem
 {
   if ( index < m_PolyLines.size() )
   {
-    m_PolyLines.at( index ).push_back( element );
+    if(element.Index == -1)
+      element.Index = m_PolyLines[index].size();
+
+    m_PolyLines[index].push_back(element);
     m_PolyLineUpToDate = false;
   }
   else
@@ -719,7 +743,10 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
 {
   if ( index < m_HelperPolyLines.size() )
   {
-    m_HelperPolyLines.at( index ).push_back( element );
+    if(element.Index == -1)
+      element.Index = m_HelperPolyLines[index].size();
+
+    m_HelperPolyLines[index].push_back(element);
     m_HelperLinesUpToDate = false;
   }
   else

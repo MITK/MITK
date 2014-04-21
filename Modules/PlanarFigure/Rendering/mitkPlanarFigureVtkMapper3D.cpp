@@ -139,7 +139,7 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
       for (PolyLine::const_iterator polyLineIt = polyLine.begin(); polyLineIt != polyLineEnd; ++polyLineIt)
       {
         Point3D point;
-        planeGeometry->Map(polyLineIt->Point, point);
+        planeGeometry->Map(*polyLineIt, point);
         points->InsertNextPoint(point.GetDataPointer());
       }
 

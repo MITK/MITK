@@ -772,7 +772,7 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
     for ( VertexContainerType::const_iterator it = polyLine.begin(); it != polyLine.end(); ++it )
     {
       // Get plane coordinates of this point of polyline (if possible)
-      if ( !this->TransformObjectToDisplay( it->Point,
+      if ( !this->TransformObjectToDisplay( *it,
                                             polyLinePoint,
                                             planarFigureGeometry,
                                             rendererGeometry,

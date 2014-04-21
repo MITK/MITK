@@ -35,8 +35,8 @@ static mitk::Point2D GetCenterPoint(const mitk::PlanarFigure::PolyLineType& poly
 
   for (mitk::PlanarFigure::PolyLineType::const_iterator polyLineIter = polyLine.begin(); polyLineIter != polyLineEnd; ++polyLineIter)
   {
-    centerPoint[0] += polyLineIter->Point[0];
-    centerPoint[1] += polyLineIter->Point[1];
+    centerPoint[0] += static_cast<mitk::Point2D>(*polyLineIter)[0];
+    centerPoint[1] += static_cast<mitk::Point2D>(*polyLineIter)[1];
   }
 
   size_t numPoints = polyLine.size();
@@ -173,7 +173,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
     for (PolyLineConstIter polyLineIter = polyLine.begin(); polyLineIter != polyLineEnd; ++polyLineIter)
     {
       Point3D point;
-      planeGeometry->Map(polyLineIter->Point, point);
+      planeGeometry->Map(*polyLineIter, point);
       crossSection.push_back(point);
     }
 

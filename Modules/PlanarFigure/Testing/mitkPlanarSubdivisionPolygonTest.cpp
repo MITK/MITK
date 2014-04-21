@@ -79,13 +79,13 @@ static void TestPlanarSubdivisionPolygonPlacement( mitk::PlanarSubdivisionPolygo
   bool correctPoint = true;
   iter = polyLine0.begin();
 
-  if( iter->Point != p0 ){ correctPoint = false; }
+  if( static_cast<mitk::Point2D>(*iter) != p0 ){ correctPoint = false; }
   advance(iter, 32);
-  if( iter->Point != p1 ){ correctPoint = false; }
+  if( static_cast<mitk::Point2D>(*iter) != p1 ){ correctPoint = false; }
   advance(iter, 32);
-  if( iter->Point != p2 ){ correctPoint = false; }
+  if( static_cast<mitk::Point2D>(*iter) != p2 ){ correctPoint = false; }
   advance(iter, 32);
-  if( iter->Point != p3 ){ correctPoint = false; }
+  if( static_cast<mitk::Point2D>(*iter) != p3 ){ correctPoint = false; }
   MITK_TEST_CONDITION( correctPoint, "Test if control points are in correct order in polyline" );
 
 
@@ -100,19 +100,19 @@ static void TestPlanarSubdivisionPolygonPlacement( mitk::PlanarSubdivisionPolygo
 
   mitk::ScalarType testEps = 1E-5;
 
-  if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > testEps ){ correctPoint = false; }
+  if( (static_cast<mitk::Point2D>(*iter)[0] - testPoint[0]) + (static_cast<mitk::Point2D>(*iter)[1] - testPoint[1]) > testEps ){ correctPoint = false; }
 
   testPoint[0] = 39.624;
   testPoint[1] = 19.3268;
   iter = polyLine0.begin();
   advance(iter, 10);
-  if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > testEps ){ correctPoint = false; }
+  if( (static_cast<mitk::Point2D>(*iter)[0] - testPoint[0]) + (static_cast<mitk::Point2D>(*iter)[1] - testPoint[1]) > testEps ){ correctPoint = false; }
 
   testPoint[0] = 71.2887;
   testPoint[1] = 77.5248;
   iter = polyLine0.begin();
   advance(iter, 67);
-  if( (iter->Point[0] - testPoint[0]) + (iter->Point[1] - testPoint[1]) > testEps ){ correctPoint = false; }
+  if( (static_cast<mitk::Point2D>(*iter)[0] - testPoint[0]) + (static_cast<mitk::Point2D>(*iter)[1] - testPoint[1]) > testEps ){ correctPoint = false; }
 
   MITK_TEST_CONDITION( correctPoint, "Test if subdivision points are calculated correctly" )
 

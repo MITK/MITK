@@ -34,6 +34,23 @@ mitk::PlanarFigure::PolyLineElement::PolyLineElement(const Point2D& point)
 {
 }
 
+mitk::PlanarFigure::PolyLineElement::PolyLineElement(const PolyLineElement &other)
+  : Point(other.Point),
+    Index(other.Index)
+{
+}
+
+mitk::PlanarFigure::PolyLineElement& mitk::PlanarFigure::PolyLineElement::operator=(const PolyLineElement &other)
+{
+  if (this != &other)
+  {
+    Point = other.Point;
+    Index = other.Index;
+  }
+
+  return *this;
+}
+
 mitk::PlanarFigure::PolyLineElement::operator mitk::Point2D&()
 {
   return Point;

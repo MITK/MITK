@@ -69,6 +69,9 @@ public:
     DEPRECATED(PolyLineElement(Point2D point, int index));
     PolyLineElement(const Point2D& point);
 
+    PolyLineElement(const PolyLineElement &other);
+    PolyLineElement& operator=(const PolyLineElement &other);
+
     operator Point2D&();
     operator const Point2D&() const;
 

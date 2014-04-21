@@ -53,9 +53,9 @@ static void TestPlanarArrowPlacement( mitk::PlanarArrow::Pointer PlanarArrow )
 
 
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = iter->Point;
+  const mitk::Point2D& pp0 = *iter;
   iter++;
-  const mitk::Point2D& pp1 = iter->Point;
+  const mitk::Point2D& pp1 = *iter;
   MITK_TEST_CONDITION( (pp0 == p0) && (pp1 == p1), "Correct polyline 1" );
 
 

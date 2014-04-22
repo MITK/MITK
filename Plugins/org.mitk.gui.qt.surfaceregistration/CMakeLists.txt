@@ -1,0 +1,7 @@
+project(org_mitk_gui_qt_surfaceregistration)
+
+MACRO_CREATE_MITK_CTK_PLUGIN(
+  EXPORT_DIRECTIVE SURFACEREGISTRATION_EXPORT
+  EXPORTED_INCLUDE_SUFFIXES src
+  MODULE_DEPENDS MitkQtWidgetsExt MitkSurfaceRegistration
+)

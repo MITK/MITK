@@ -1,0 +1,85 @@
+/**
+\page org_mitk_gui_qt_surfaceregistration The Surfaceregistration Plugin
+
+\image html icon.xpm "Icon of the Surfaceregistration Plugin"
+
+\tableofcontents
+
+\section org_mitk_gui_qt_surfaceregistrationOverview Overview
+TODO: image
+The Surfaceregistration plugin allows the user to compute a transformation
+between two surfaces and align them in 3D. It performs the
+registration with the anisotriopic iterative closest point algorithm (A-ICP)
+presented in "Convergent Iterative Closest-Point Algorithm to Accomodate
+Anisotropic and Inhomogenous Localization Error.", IEEE T Pattern Anal 34 (8),
+1520-1532, 2012. The algorithm computes a translation and rotation matrix
+and transforms one surface onto the other. Also it is possible to compute
+the target registration error (TRE) between the two aligned surfaces with a given
+set of target points. In order to run the algorithm the surfaces need to be initially
+aligned, to be able to run the fine registration with the A-ICP algorithm.
+
+\section org_mitk_gui_qt_surfaceregistrationUsage Usage
+TODO: image
+To run a registration load two surfaces into the datamanager and select the moving and fixed
+surface used for the registration with the associated combo boxes.
+Once the <b>Register Surfaces</b> button is pressed the registration is started.
+
+\section org_mitk_gui_qt_surfaceregistrationTargetRegistrationErrorCalculation Target Registration Error Calculation
+TODO: image
+To compute the target registration error, enable the TRE calculation via the checkbox in the target registration
+view. Once the tre computation is enabled the combo boxes are activated. Select the
+right point sets stored in the datamanager to compute the TRE.
+
+\section org_mitk_gui_qt_surfaceregistrationRegistrationSettings Registration Settings
+TODO: image
+To tune the registration process several the following additional options are available:
+<ul>
+<li>A trimmed version of the algorithm
+<li>Set the threshold for the algorithm to converge
+<li>Limit the iterations
+<li>Set the search radius
+<li>Enable/disable FRE normalization
+<li>Compute the inverse transformation
+</ul>
+
+\subsection org_mitk_gui_qt_surfaceregistrationTrimmedRegistration Trimmed Registration
+
+This option enables a trimmed version of the algorithm to register partial overlapping
+surfaces. Once the option is enabled the user can specifie the trimm factor.
+Valid values for the trim factor lie between 0 an 1.
+The trimmed version of the algorithm uses only a fixed percentage of all correspondences found
+during one iteration. Only the best correspondences will be used during the registration process.
+
+\subsection org_mitk_gui_qt_surfaceregistrationThreshold Threshold
+
+The user can specifie a threshold that is used as a termination constraint for the algorithm.
+The termination constraint of the algorithm is the change of the fiducial registration error (FRE)
+between to registrations. Once this change falls under a pre-defined threshold the algorithm terminates.
+Larger values can speedup the registration process at the cost of a more accurate result.
+
+
+\subsection org_mitk_gui_qt_surfaceregistrationMaximumIterations Maximum Iterations
+
+The maximum amount of iterations used by the algorithm can be specified by the user.
+Once the algorithm reaches the maximum amount of iterations it will stop.
+
+\subsection org_mitk_gui_qt_surfaceregistrationSearchRadius Search Radius
+
+The user can specifie the search radius in mm used during the correspondence search
+in a kd tree. A small radius can speedup the algorithm but can in addition also lead
+in bad correspondences and therefor in an incorrect alignment of the
+surfaces.
+
+\subsection org_mitk_gui_qt_surfaceregistrationFRENormalization FRE normalization
+
+Enable/disables the normalization of the fiducial registration error.
+
+\subsection org_mitk_gui_qt_surfaceregistrationInverseTransformation Inverse Transformation
+
+This option computes the inversion of the transformation and the plugin will move
+the fixed onto the moving surface if the option is enabled.
+
+
+
+
+*/

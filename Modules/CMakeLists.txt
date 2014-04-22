@@ -30,7 +30,6 @@ set(module_dirs
     IGTBase
     IGT
     CameraCalibration
-    IGTUI
     RigidRegistration
     RigidRegistrationUI
     DeformableRegistration
@@ -43,7 +42,6 @@ set(module_dirs
     ToFProcessing
     ToFUI
     US
-    ClippingTools
     USUI
     DicomUI
     Simulation

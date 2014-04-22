@@ -70,7 +70,7 @@ mitk::PlanarFigureActivator::start(ctkPluginContext* /*context*/)
   mitk::NodePredicateDataType::Pointer isPlanarBezierCurve = mitk::NodePredicateDataType::New("PlanarBezierCurve");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor("PlanarBezierCurve", ":/QtWidgetsExt/PlanarBezierCurve_48.png", isPlanarBezierCurve, descriptorManager));
 
-  // Adding "PlanarSubdiviionPolygon"
+  // Adding "PlanarSubdivisionPolygon"
   mitk::NodePredicateDataType::Pointer isPlanarSubdivisionPolygon = mitk::NodePredicateDataType::New("PlanarSubdivisionPolygon");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor("PlanarSubdivisionPolygon", ":/QtWidgetsExt/PlanarSubdivisionPolygon_48.png", isPlanarSubdivisionPolygon, descriptorManager));
 }

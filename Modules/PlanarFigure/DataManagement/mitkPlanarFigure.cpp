@@ -16,11 +16,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarFigure.h"
-#include "mitkGeometry2D.h"
-#include "mitkProperties.h"
+#include <mitkGeometry2D.h>
+#include <mitkProperties.h>
 #include <mitkProportionalTimeGeometry.h>
 
-#include "algorithm"
+#include <algorithm>
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif __clang__
+#  pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif _MSC_VER
+#  pragma warning (push)
+#  pragma warning (disable: 4996)
+#endif
 
 mitk::PlanarFigure::PolyLineElement::PolyLineElement(Point2D point, int index)
   : Point(point),
@@ -739,7 +748,6 @@ void mitk::PlanarFigure::SetNumberOfHelperPolyLines( unsigned int numberOfHerlpe
   m_HelperPolyLines.resize(numberOfHerlperPolyLines);
 }
 
-
 void mitk::PlanarFigure::AppendPointToPolyLine( unsigned int index, PolyLineElement element )
 {
   if ( index < m_PolyLines.size() )
@@ -772,3 +780,10 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
   }
 }
 
+#ifdef __GNUC__
+#  pragma GCC diagnostic error "-Wdeprecated-declarations"
+#elif __clang__
+#  pragma clang diagnostic error "-Wdeprecated-declarations"
+#elif _MSC_VER
+#  pragma warning (pop)
+#endif

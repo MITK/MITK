@@ -37,6 +37,10 @@ mitk::PlanarFigureActivator::start(ctkPluginContext* /*context*/)
   mitk::NodePredicateDataType::Pointer isPlanarCircle = mitk::NodePredicateDataType::New("PlanarCircle");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarCircle"), QString(":/QtWidgetsExt/PlanarCircle_48.png"), isPlanarCircle, descriptorManager));
 
+  // Adding "PlanarEllipse"
+  mitk::NodePredicateDataType::Pointer isPlanarEllipse = mitk::NodePredicateDataType::New("PlanarEllipse");
+  descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarEllipse"), QString(":/QtWidgetsExt/PlanarEllipse_48.png"), isPlanarEllipse, descriptorManager));
+
   // Adding "PlanarAngle"
   mitk::NodePredicateDataType::Pointer isPlanarAngle = mitk::NodePredicateDataType::New("PlanarAngle");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarAngle"), QString(":/QtWidgetsExt/PlanarAngle_48.png"), isPlanarAngle, descriptorManager));
@@ -65,6 +69,10 @@ mitk::PlanarFigureActivator::start(ctkPluginContext* /*context*/)
   // Adding "PlanarBezierCurve"
   mitk::NodePredicateDataType::Pointer isPlanarBezierCurve = mitk::NodePredicateDataType::New("PlanarBezierCurve");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor("PlanarBezierCurve", ":/QtWidgetsExt/PlanarBezierCurve_48.png", isPlanarBezierCurve, descriptorManager));
+
+  // Adding "PlanarSubdivisionPolygon"
+  mitk::NodePredicateDataType::Pointer isPlanarSubdivisionPolygon = mitk::NodePredicateDataType::New("PlanarSubdivisionPolygon");
+  descriptorManager->AddDescriptor(new QmitkNodeDescriptor("PlanarSubdivisionPolygon", ":/QtWidgetsExt/PlanarSubdivisionPolygon_48.png", isPlanarSubdivisionPolygon, descriptorManager));
 }
 
 void

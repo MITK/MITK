@@ -23,7 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 mitk::PlanarEllipse::PlanarEllipse()
-    : m_MinRadius(0),
+    : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
+      FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
+      m_MinRadius(0),
       m_MaxRadius(100),
       m_MinMaxRadiusContraintsActive(false),
       m_TreatAsCircle(true)
@@ -265,7 +267,10 @@ void mitk::PlanarEllipse::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, un
 
 void mitk::PlanarEllipse::EvaluateFeaturesInternal()
 {
+  Point2D centerPoint = this->GetControlPoint(0);
 
+  this->SetQuantity(FEATURE_ID_MAJOR_AXIS, 2 * centerPoint.EuclideanDistanceTo(this->GetControlPoint(1)));
+  this->SetQuantity(FEATURE_ID_MINOR_AXIS, 2 * centerPoint.EuclideanDistanceTo(this->GetControlPoint(2)));
 }
 
 

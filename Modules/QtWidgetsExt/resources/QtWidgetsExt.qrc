@@ -33,11 +33,13 @@
     <file>PlanarBezierCurve_48.png</file>
     <file>PlanarCircle_48.png</file>
     <file>PlanarDoubleEllipse_48.png</file>
+    <file>PlanarEllipse_48.png</file>
     <file>PlanarFourPointAngle_48.png</file>
     <file>PlanarLine_48.png</file>
     <file>PlanarPath_48.png</file>
     <file>PlanarPolygon_48.png</file>
     <file>PlanarRectangle_48.png</file>
+    <file>PlanarSubdivisionPolygon_48.png</file>
     <file>play.xpm</file>
     <file>stop.xpm</file>
   </qresource>

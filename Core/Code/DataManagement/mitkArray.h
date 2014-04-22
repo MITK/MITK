@@ -119,7 +119,7 @@ namespace mitk {
   /**
    * Compares two ArrayTypes of size size.
    * ArrayTypes are all Objects/Types who have a [] operator. Pay attention not to set size higher
-   * than the actual size of the ArrayType. For POD arrays like float array[4] this will lead to unexpected results.
+   * than the actual size of the ArrayType as this will lead to unexpected results.
    */
   template <typename TArrayType1, typename TArrayType2>
     inline bool EqualArray(TArrayType1& arrayType1, TArrayType2& arrayType2, int size, ScalarType eps = mitk::eps, bool verbose = false)

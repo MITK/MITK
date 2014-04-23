@@ -20,9 +20,9 @@ namespace mitk
 {
 ToFImageGrabber::ToFImageGrabber():
   m_ToFCameraDevice(NULL),
-  m_CaptureWidth(204),
-  m_CaptureHeight(204),
-  m_PixelNumber(41616),
+  m_CaptureWidth(-1),
+  m_CaptureHeight(-1),
+  m_PixelNumber(-1),
   m_RGBImageWidth(0),
   m_RGBImageHeight(0),
   m_RGBPixelNumber(0),
@@ -33,11 +33,7 @@ ToFImageGrabber::ToFImageGrabber():
   m_AmplitudeArray(NULL),
   m_SourceDataArray(NULL),
   m_RgbDataArray(NULL),
-  m_DeviceObserverTag(),
-  m_DistanceImageInitialized(false),
-  m_IntensityImageInitialized(false),
-  m_AmplitudeImageInitialized(false),
-  m_RGBImageInitialized(false)
+  m_DeviceObserverTag()
 {
   // Create the output. We use static_cast<> here because we know the default
   // output must be of type TOutputImage
@@ -128,13 +124,7 @@ bool ToFImageGrabber::ConnectCamera()
 
 bool ToFImageGrabber::DisconnectCamera()
 {
-  bool success = m_ToFCameraDevice->DisconnectCamera();
-  // reset initialized flag of outputs to allow reinitializing when using new device
-  m_DistanceImageInitialized = false;
-  m_IntensityImageInitialized = false;
-  m_AmplitudeImageInitialized = false;
-  m_RGBImageInitialized = false;
-  return success;
+  return m_ToFCameraDevice->DisconnectCamera();
 }
 
 void ToFImageGrabber::StartCamera()

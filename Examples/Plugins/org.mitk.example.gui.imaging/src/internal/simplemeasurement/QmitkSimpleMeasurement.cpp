@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkGlobalInteraction.h>
 #include <mitkPointSet.h>
-//#include <mitkPointSetInteractor.h>
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 #include <mitkIDataStorageService.h>
@@ -53,7 +52,6 @@ QmitkSimpleMeasurement::~QmitkSimpleMeasurement()
   if (m_PointSetInteractor.IsNotNull())
   {
     m_SelectedPointSetNode->SetDataInteractor(NULL);
-    //mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor.GetPointer());
   }
 }
 
@@ -80,7 +78,6 @@ void QmitkSimpleMeasurement::ActivatedZombieView(berry::SmartPointer<berry::IWor
   if (m_PointSetInteractor.IsNotNull())
   {
     m_SelectedPointSetNode->SetDataInteractor(NULL);
-    //mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor.GetPointer());
   }
 }
 
@@ -197,7 +194,6 @@ void QmitkSimpleMeasurement::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
   if (m_PointSetInteractor.IsNotNull())
   {
     m_SelectedPointSetNode->SetDataInteractor(NULL);
-    //mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor.GetPointer());
   }
 
   bool pointsetCreatedByThis = false;

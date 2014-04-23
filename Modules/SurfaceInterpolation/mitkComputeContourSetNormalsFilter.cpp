@@ -19,12 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImagePixelReadAccessor.h"
 
 
-mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
+mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter() :
+m_MaxSpacing(5),
+m_UseProgressBar(false),
+m_ProgressStepSize(1),
+m_ActiveLabel(-1)
 {
-  m_MaxSpacing = 5;
-  this->m_UseProgressBar = false;
-  this->m_ProgressStepSize = 1;
-
   mitk::Surface::Pointer output = mitk::Surface::New();
   this->SetNthOutput(0, output.GetPointer());
 }
@@ -36,7 +36,14 @@ mitk::ComputeContourSetNormalsFilter::~ComputeContourSetNormalsFilter()
 void mitk::ComputeContourSetNormalsFilter::GenerateData()
 {
   unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
-  this->CreateOutputsForAllInputs(numberOfInputs);
+  //this->CreateOutputsForAllInputs(numberOfInputs);
+
+  if (numberOfInputs == 0)
+  {
+    MITK_ERROR << "No input available. Please set an input!";
+    itkExceptionMacro("mitk::ComputeContourSetNormalsFilter: No input available. Please set an input!");
+    return;
+  }
 
   //Iterating over each input
   for(unsigned int i = 0; i < numberOfInputs; i++)
@@ -141,7 +148,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
         finalNormal[2] = (vertexNormal[2] + vertexNormalTemp[2])*0.5;
 
         //Here we determine the direction of the normal
-        if (m_SegmentationBinaryImage)
+        if (j == 0 && m_WorkingImage)
         {
           Point3D worldCoord;
           worldCoord[0] = p1[0]+finalNormal[0]*m_MaxSpacing;
@@ -149,18 +156,18 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
           worldCoord[2] = p1[2]+finalNormal[2]*m_MaxSpacing;
 
           double val = 0.0;
-          mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
+          mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_WorkingImage);
           mitk::Index3D idx;
-          m_SegmentationBinaryImage->GetGeometry()->WorldToIndex(worldCoord, idx);
+          m_WorkingImage->GetGeometry()->WorldToIndex(worldCoord, idx);
           val = readAccess.GetPixelByIndexSafe(idx);
 
-          if (val == 0.0)
+          if (val == m_ActiveLabel)
           {
-              ++m_PositiveNormalCounter;
+            ++m_PositiveNormalCounter;
           }
           else
           {
-              ++m_NegativeNormalCounter;
+            ++m_NegativeNormalCounter;
           }
         }
 
@@ -208,8 +215,6 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
       m_NegativeNormalCounter = 0;
       m_PositiveNormalCounter = 0;
       offSet += cellSize;
-
-
     }//end for all cells
 
     Surface::Pointer surface = this->GetOutput(i);
@@ -221,6 +226,11 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
     mitk::ProgressBar::GetInstance()->Progress(this->m_ProgressStepSize);
 }
 
+void mitk::ComputeContourSetNormalsFilter::SetSegmentationBinaryImage(Image* image, int activeLabel)
+{
+  m_WorkingImage = image;
+  m_ActiveLabel = activeLabel;
+}
 
 mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface()
 {
@@ -289,7 +299,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
 
 void mitk::ComputeContourSetNormalsFilter::SetMaxSpacing(double maxSpacing)
 {
-    m_MaxSpacing = maxSpacing;
+  m_MaxSpacing = maxSpacing;
 }
 
 void mitk::ComputeContourSetNormalsFilter::GenerateOutputInformation()

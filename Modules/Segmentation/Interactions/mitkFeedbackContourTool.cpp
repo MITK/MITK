@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataStorage.h"
 #include "mitkBaseRenderer.h"
-
+#include "mitkContourUtils.h"
 #include "mitkRenderingManager.h"
 
 mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
@@ -34,20 +34,38 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
   m_FeedbackContour->SetClosed(true);
   m_FeedbackContourNode = DataNode::New();
   m_FeedbackContourNode->SetData( m_FeedbackContour );
-  m_FeedbackContourNode->SetProperty("name", StringProperty::New("One of FeedbackContourTool's feedback nodes"));
+  m_FeedbackContourNode->SetName("feedback contour");
   m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("helper object", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("layer", IntProperty::New(1000));
-  m_FeedbackContourNode->SetProperty("contour.project-onto-plane", BoolProperty::New(false));
-  m_FeedbackContourNode->SetProperty("contour.width", FloatProperty::New(1.0));
+  m_FeedbackContourNode->SetProperty("contour.project-onto-plane", BoolProperty::New(true));
+  m_FeedbackContourNode->SetProperty("contour.width", FloatProperty::New(2.0));
 
-  this->Disable3dRendering();
-
-  SetFeedbackContourColorDefault();
+  this->SetFeedbackContourColorDefault();
 }
 
 mitk::FeedbackContourTool::~FeedbackContourTool()
 {
+}
+
+void mitk::FeedbackContourTool::Activated()
+{
+  this->Disable3DRendering();
+
+  DataStorage* storage = m_ToolManager->GetDataStorage();
+  assert (storage);
+  storage->Add( m_FeedbackContourNode );
+
+  Superclass::Activated();
+}
+
+void mitk::FeedbackContourTool::Deactivated()
+{
+  DataStorage* storage = m_ToolManager->GetDataStorage();
+  assert (storage);
+  storage->Remove( m_FeedbackContourNode );
+
+  Superclass::Deactivated();
 }
 
 void mitk::FeedbackContourTool::SetFeedbackContourColor( float r, float g, float b )
@@ -67,59 +85,22 @@ mitk::ContourModel* mitk::FeedbackContourTool::GetFeedbackContour()
 
 void mitk::FeedbackContourTool::SetFeedbackContour(ContourModel& contour)
 {
-  // begin of temporary fix for 3m3 release
-  this->Disable3dRendering();
-  //end of temporary fix for 3m3 release
-
   m_FeedbackContour = &contour;
+  m_FeedbackContour->Modified();
   m_FeedbackContourNode->SetData( m_FeedbackContour );
 }
 
 void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
 {
-  // begin of temporary fix for 3m3 release
-  this->Disable3dRendering();
-  //end of temporary fix for 3m3 release
-
   if ( m_FeedbackContourVisible == visible )
     return; // nothing changed
 
-  if ( DataStorage* storage = m_ToolManager->GetDataStorage() )
-  {
-    if (visible)
-    {
-      storage->Add( m_FeedbackContourNode );
-    }
-    else
-    {
-      storage->Remove( m_FeedbackContourNode );
-    }
-  }
-
   m_FeedbackContourVisible = visible;
+
+  m_FeedbackContourNode->SetVisibility(m_FeedbackContourVisible);
 }
 
-mitk::ContourModel::Pointer mitk::FeedbackContourTool::ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, bool correctionForIpSegmentation, bool constrainToInside)
-{
-  return mitk::ContourModelUtils::ProjectContourTo2DSlice(slice, contourIn3D, correctionForIpSegmentation, constrainToInside);
-}
-
-mitk::ContourModel::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation)
-{
-  return mitk::ContourModelUtils::BackProjectContourFrom2DSlice(sliceGeometry, contourIn2D, correctionForIpSegmentation);
-}
-
-void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedContour, Image* sliceImage, int paintingPixelValue )
-{
-  this->FillContourInSlice(projectedContour, 0, sliceImage, paintingPixelValue);
-}
-
-void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue )
-{
-  mitk::ContourModelUtils::FillContourInSlice(projectedContour, timeStep, sliceImage, paintingPixelValue);
-}
-
-void mitk::FeedbackContourTool::Disable3dRendering()
+void mitk::FeedbackContourTool::Disable3DRendering()
 {
   // set explicitly visible=false for all 3D renderer (that exist already ...)
   const RenderingManager::RenderWindowVector& renderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();

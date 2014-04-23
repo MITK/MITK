@@ -38,6 +38,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.remeshing:OFF
   org.mitk.gui.qt.segmentation:OFF
+  org.mitk.gui.qt.multilabelsegmentation:OFF
   org.mitk.gui.qt.simulation:OFF
   org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.tofutil:OFF

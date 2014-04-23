@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
-#include "mitkSegmentationInterpolationController.h"
+//#include "mitkSegmentationInterpolationController.h"
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkOperationEvent.h"
 #include "mitkInteractionConst.h"
@@ -112,14 +112,14 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
   //MITK_INFO << "Overwriting slice " << m_SliceIndex << " in dimension " << m_SliceDimension << " at time step " << m_TimeStep << std::endl;
   // this will do a long long if/else to find out both pixel types
   AccessFixedDimensionByItk( input3D, ItkImageSwitch, 3 );
-
+/*
   SegmentationInterpolationController* interpolator = SegmentationInterpolationController::InterpolatorForImage( input );
   if (interpolator)
   {
     interpolator->BlockModified(true);
     interpolator->SetChangedSlice( m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex, m_TimeStep );
   }
-
+*/
   if ( m_CreateUndoInformation )
   {
     // create do/undo operations (we don't execute the doOp here, because it has already been executed during calculation of the diff image
@@ -132,11 +132,12 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
 
   // this image is modified (good to know for the renderer)
   input->Modified();
-
+/*
   if (interpolator)
   {
     interpolator->BlockModified(false);
   }
+  */
 }
 
 // basically copied from mitk/Core/Algorithms/mitkImageAccessByItk.h

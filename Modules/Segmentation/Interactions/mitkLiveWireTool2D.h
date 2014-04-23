@@ -77,6 +77,7 @@ class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
     virtual void Activated();
     virtual void Deactivated();
 
+
     /// \brief Initialize tool
     virtual bool OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent );
 
@@ -101,54 +102,53 @@ class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
     /// \brief Finish contour interaction.
     void FinishTool();
 
-    /** \brief Enable interaction with contours.
-    * Contours that are created by the tool can be edited using LiveWire functionality.
-    * Points can thus be inserted, moved or deleted.
-    * \param on true to have interaction enabled.
+     /** \brief Enable interaction with contours.
+     * Contours that are created by the tool can be edited using LiveWire functionality.
+     * Points can thus be inserted, moved or deleted.
+     * \param on true to have interaction enabled.
     */
-    void EnableContourLiveWireInteraction(bool on);
+     void EnableContourLiveWireInteraction(bool on);
 
+     //the contour already set by the user
+     mitk::ContourModel::Pointer m_Contour;
 
-    //the contour already set by the user
-    mitk::ContourModel::Pointer m_Contour;
+     //the corresponding datanode
+     mitk::DataNode::Pointer m_ContourModelNode;
 
-    //the corresponding datanode
-    mitk::DataNode::Pointer m_ContourModelNode;
+     //the current LiveWire computed contour
+     mitk::ContourModel::Pointer m_LiveWireContour;
 
-    //the current LiveWire computed contour
-    mitk::ContourModel::Pointer m_LiveWireContour;
+     //the corresponding datanode
+     mitk::DataNode::Pointer m_LiveWireContourNode;
 
-    //the corresponding datanode
-    mitk::DataNode::Pointer m_LiveWireContourNode;
+     // the contour for the editing portion
+     mitk::ContourModel::Pointer m_EditingContour;
 
-    // the contour for the editing portion
-    mitk::ContourModel::Pointer m_EditingContour;
+     //the corresponding datanode
+     mitk::DataNode::Pointer m_EditingContourNode;
 
-    //the corresponding datanode
-    mitk::DataNode::Pointer m_EditingContourNode;
+     // the corresponding contour interactor
+     mitk::ContourModelLiveWireInteractor::Pointer m_ContourInteractor;
 
-    // the corresponding contour interactor
-    mitk::ContourModelLiveWireInteractor::Pointer m_ContourInteractor;
+     //the current reference image
+     mitk::Image::Pointer m_WorkingSlice;
 
-    //the current reference image
-    mitk::Image::Pointer m_WorkingSlice;
+     // the filter for live wire calculation
+     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
 
-    // the filter for live wire calculation
-    mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
+     bool m_CreateAndUseDynamicCosts;
 
-    bool m_CreateAndUseDynamicCosts;
+     std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> > m_WorkingContours;
+     std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> > m_EditingContours;
+     std::vector< mitk::ContourModelLiveWireInteractor::Pointer > m_LiveWireInteractors;
 
-    std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> > m_WorkingContours;
-    std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> > m_EditingContours;
-    std::vector< mitk::ContourModelLiveWireInteractor::Pointer > m_LiveWireInteractors;
+     template<typename TPixel, unsigned int VImageDimension>
+     void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex);
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex);
-
-  private:
-    void RemoveHelperObjects();
-    void ReleaseHelperObjects();
-    void ReleaseInteractors();
+private:
+     void RemoveHelperObjects();
+     void ReleaseHelperObjects();
+     void ReleaseInteractors();
 };
 
 } // namespace

@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkNeverTranslucentTexture_h
 #define mitkNeverTranslucentTexture_h
 
-#include <MitkCoreExports.h>
-
 #include <vtkOpenGLTexture.h>
+
+#include <MitkCoreExports.h>
 
 #include <vtkObjectFactory.h>
 
@@ -48,15 +48,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   \sa ImageVtkMapper2D
 */
-/* NOT exported, this is a 2D image mapper helper */
 
-class vtkNeverTranslucentTexture : public vtkOpenGLTexture
+class MITK_CORE_EXPORT vtkNeverTranslucentTexture : public vtkOpenGLTexture
 {
 public:
 
-  static vtkNeverTranslucentTexture* New();
-  vtkTypeMacro(vtkNeverTranslucentTexture, vtkTexture);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkTypeMacro(vtkNeverTranslucentTexture,vtkOpenGLTexture);
+
+  static vtkNeverTranslucentTexture *New();
 
   /**
     \brief The FIX (see class description).
@@ -71,13 +70,17 @@ public:
 
 protected:
 
+    /** Default constructor. */
   vtkNeverTranslucentTexture();
+  /** Default deconstructor. */
+  ~vtkNeverTranslucentTexture();
 
 private:
 
   vtkNeverTranslucentTexture(const vtkNeverTranslucentTexture&);  // Not implemented.
   void operator=(const vtkNeverTranslucentTexture&);  // Not implemented.
 };
+
 
 /**
   \brief Factory for vtkNeverTranslucentTexture (see this class!).

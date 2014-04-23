@@ -1,0 +1,10 @@
+<RCC>
+  <qresource prefix="/MultiLabelSegmentationUtilities">
+     <file>BooleanOperations_48x48.png</file>
+     <file>ImageMasking_48x48.png</file>
+     <file>MorphologicalOperations_48x48.png</file>
+     <file>SurfaceToImage_48x48.png</file>
+     <file>MultiLabelSegmentationUtilities_48x48.png</file>
+     <file>CTKWidgets_48x48.png</file>
+  </qresource>
+</RCC>

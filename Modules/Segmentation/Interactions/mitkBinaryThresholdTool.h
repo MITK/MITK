@@ -17,10 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkBinaryThresholdTool_h_Included
 #define mitkBinaryThresholdTool_h_Included
 
-#include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
-#include "mitkAutoSegmentationTool.h"
-#include "mitkDataNode.h"
+#include "mitkSegTool3D.h"
 
 #include <itkImage.h>
 
@@ -32,7 +30,7 @@ namespace mitk
 {
 
   /**
-  \brief Calculates the segmented volumes for binary images.
+  \brief A tool for image thresholding.
 
   \ingroup ToolManagerEtAl
   \sa mitk::Tool
@@ -40,14 +38,14 @@ namespace mitk
 
   Last contributor: $Author$
   */
-  class MitkSegmentation_EXPORT BinaryThresholdTool : public AutoSegmentationTool
+  class MitkSegmentation_EXPORT BinaryThresholdTool : public SegTool3D
   {
   public:
 
-    Message3<double,double, bool> IntervalBordersChanged;
-    Message1<double>     ThresholdingValueChanged;
+    Message3<mitk::ScalarType, mitk::ScalarType, bool> IntervalBordersChanged;
+    Message1<mitk::ScalarType>                         ThresholdingValueChanged;
 
-    mitkClassMacro(BinaryThresholdTool, AutoSegmentationTool);
+    mitkClassMacro(BinaryThresholdTool, SegTool3D);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -58,32 +56,28 @@ namespace mitk
     virtual void Activated();
     virtual void Deactivated();
 
-    virtual void SetThresholdValue(double value);
-    virtual void AcceptCurrentThresholdValue();
-    virtual void CancelThresholding();
+    /// \brief Sets the current threshold value from GUI.
+    virtual void SetThresholdValue(mitk::ScalarType value);
 
+    /// \brief Adds the preview image to the current working image.
+    virtual void AcceptPreview();
+
+    /// \brief Creates a new label out of the the current preview image.
+    virtual void CreateNewLabel(const std::string& name, const mitk::Color& color);
 
   protected:
 
     BinaryThresholdTool(); // purposely hidden
     virtual ~BinaryThresholdTool();
 
-    void SetupPreviewNodeFor( DataNode* nodeForThresholding );
+    template <typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
+    void InternalAcceptPreview( itk::Image<TPixel1, VDimension1>* targetImage, const itk::Image<TPixel2, VDimension2>* sourceImage );
 
-    void CreateNewSegmentationFromThreshold(DataNode* node);
-
-    void OnRoiDataChanged();
-
-    template <typename TPixel, unsigned int VImageDimension>
-    void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep );
-
-    DataNode::Pointer m_ThresholdFeedbackNode;
-    DataNode::Pointer m_OriginalImageNode;
     DataNode::Pointer m_NodeForThresholding;
 
-    double m_SensibleMinimumThresholdValue;
-    double m_SensibleMaximumThresholdValue;
-    double m_CurrentThresholdValue;
+    mitk::ScalarType m_SensibleMinimumThresholdValue;
+    mitk::ScalarType m_SensibleMaximumThresholdValue;
+    mitk::ScalarType m_CurrentThresholdValue;
     bool m_IsFloatImage;
 
   };

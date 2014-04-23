@@ -44,7 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFutureWatcher>
 #include <QTimer>
 
-
 namespace mitk
 {
   class PlaneGeometry;

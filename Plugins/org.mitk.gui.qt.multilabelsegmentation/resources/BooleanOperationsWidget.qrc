@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="/MultiLabelSegmentationUtilities/BooleanOperations">
+     <file>BooleanDifference_48x48.png</file>
+     <file>BooleanIntersection_48x48.png</file>
+     <file>BooleanUnion_48x48.png</file>
+  </qresource>
+</RCC>

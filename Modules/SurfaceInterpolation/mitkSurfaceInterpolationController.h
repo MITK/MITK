@@ -53,6 +53,7 @@ namespace mitk
  class MitkSurfaceInterpolation_EXPORT SurfaceInterpolationController : public itk::Object
  {
 
+
   public:
 
     mitkClassMacro(SurfaceInterpolationController, itk::Object)

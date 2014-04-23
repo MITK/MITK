@@ -255,9 +255,9 @@ void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationLi
   m_SelectedSegmentation = segmentation;
 
 
-  itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-  AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
-  m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
+//  itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
+//  AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
+  m_InterpolateSurfaceFilter->SetReferenceImage( m_SelectedSegmentation );
 
   if (it == m_MapOfContourLists.end())
   {

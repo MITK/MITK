@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSegmentationInterpolationController_h_Included
 #define mitkSegmentationInterpolationController_h_Included
 
-#include "mitkCommon.h"
+//#include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
 #include "mitkImage.h"
 
@@ -63,6 +63,7 @@ class Image;
 
   $Author$
 */
+
 class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::Object
 {
   public:

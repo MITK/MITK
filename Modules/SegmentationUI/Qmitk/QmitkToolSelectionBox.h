@@ -60,12 +60,11 @@ class MitkSegmentationUI_EXPORT QmitkToolSelectionBox : public QWidget
 
   public:
 
-    enum EnabledMode { EnabledWithReferenceAndWorkingDataVisible, EnabledWithReferenceData, EnabledWithWorkingData, AlwaysEnabled };
+    enum EnabledMode { EnabledWithReferenceAndWorkingDataVisible, EnabledWithReferenceDataVisible, EnabledWithWorkingDataVisible, AlwaysEnabled };
 
     QmitkToolSelectionBox(QWidget* parent = 0, mitk::DataStorage* storage = 0);
     virtual ~QmitkToolSelectionBox();
 
-    mitk::ToolManager* GetToolManager();
     void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
 
     void setTitle( const QString& title );

@@ -18,16 +18,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkConfirmSegmentationDialog.h"
 
+#include "mitkStepper.h"
+#include "mitkBaseRenderer.h"
+
 #include <qlabel.h>
-#include <ctkSliderWidget.h>
-#include <ctkRangeWidget.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <QGroupBox>
 #include <QApplication>
 #include <QMessageBox>
-#include "mitkStepper.h"
-#include "mitkBaseRenderer.h"
+
+#include <ctkSliderWidget.h>
+#include <ctkRangeWidget.h>
 
 
 MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkFastMarchingTool3DGUI, "")
@@ -150,7 +152,6 @@ m_TimeIsConnected(false)
   m_slStoppingValue->setPageStep(10);
   m_slStoppingValue->setSingleStep(1);
   m_slStoppingValue->setValue(2000);
-  m_slStoppingValue->setDecimals(0);
   m_slStoppingValue->setTracking(false);
   m_slStoppingValue->setToolTip("The \"stopping value\" parameter in the fast marching 3D algorithm");
   connect( m_slStoppingValue, SIGNAL(valueChanged(double)), this, SLOT(OnStoppingValueChanged(double)));
@@ -173,10 +174,9 @@ m_TimeIsConnected(false)
 
   m_slwThreshold = new ctkRangeWidget(this);
   m_slwThreshold->setMinimum(-100);
-  m_slwThreshold->setMaximum(5000);
+  m_slwThreshold->setMaximum(500);
   m_slwThreshold->setMinimumValue(-100);
   m_slwThreshold->setMaximumValue(2000);
-  m_slwThreshold->setDecimals(0);
   m_slwThreshold->setTracking(false);
   m_slwThreshold->setToolTip("The lower and upper thresholds for the final thresholding");
   connect( m_slwThreshold, SIGNAL(valuesChanged(double, double)), this, SLOT(OnThresholdChanged(double, double)));
@@ -187,9 +187,8 @@ m_TimeIsConnected(false)
   widgetLayout->addWidget(m_btClearSeeds);
   connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
-  m_btConfirm = new QPushButton("Confirm Segmentation");
+  m_btConfirm = new QPushButton("Accept");
   m_btConfirm->setToolTip("Incorporate current result in your working session.");
-  m_btConfirm->setEnabled(false);
   widgetLayout->addWidget(m_btConfirm);
   connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
 
@@ -207,7 +206,6 @@ QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
-    m_FastMarchingTool->RemoveReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
   }
 }
 
@@ -216,7 +214,6 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
-    m_FastMarchingTool->RemoveReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
   }
 
   m_FastMarchingTool = dynamic_cast<mitk::FastMarchingTool3D*>( tool );
@@ -224,7 +221,6 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkFastMarchingTool3DGUI, bool>( this, &QmitkFastMarchingTool3DGUI::BusyStateChanged );
-    m_FastMarchingTool->AddReadyListener(mitk::MessageDelegate<QmitkFastMarchingTool3DGUI>(this, &QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady) );
 
     //listen to timestep change events
     mitk::BaseRenderer::Pointer renderer;
@@ -300,6 +296,7 @@ void QmitkFastMarchingTool3DGUI::OnStoppingValueChanged(double value)
 
 void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
 {
+/*
   QmitkConfirmSegmentationDialog dialog;
   QString segName = QString::fromStdString(m_FastMarchingTool->GetCurrentSegmentationName());
 
@@ -317,6 +314,7 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
   case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
     return;
   }
+*/
   if (m_FastMarchingTool.IsNotNull())
   {
     m_btConfirm->setEnabled(false);
@@ -326,33 +324,26 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
 
 void QmitkFastMarchingTool3DGUI::SetStepper(mitk::Stepper *stepper)
 {
-    this->m_TimeStepper = stepper;
+  this->m_TimeStepper = stepper;
 }
 
 void QmitkFastMarchingTool3DGUI::Refetch()
 {
   //event from image navigator recieved - timestep has changed
-    m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
+  m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
 }
 
 void QmitkFastMarchingTool3DGUI::OnClearSeeds()
 {
   //event from image navigator recieved - timestep has changed
-   m_FastMarchingTool->ClearSeeds();
-   m_btConfirm->setEnabled(false);
-   this->Update();
+  m_FastMarchingTool->ClearSeeds();
+  this->Update();
 }
 
 void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
 {
   if (value)
-      QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
+    QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
   else
-      QApplication::restoreOverrideCursor();
-}
-
-void QmitkFastMarchingTool3DGUI::OnFastMarchingToolReady()
-{
-  this->setEnabled(true);
-  this->m_btConfirm->setEnabled(true);
+    QApplication::restoreOverrideCursor();
 }

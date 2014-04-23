@@ -13,51 +13,61 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef MITKOTSUTOOL3D_H
-#define MITKOTSUTOOL3D_H
+#ifndef mitkOtsuTool3D_H
+#define mitkOtsuTool3D_H
 
-#include <MitkSegmentationExports.h>
-#include "mitkAutoSegmentationTool.h"
+#include "mitkSegTool3D.h"
+#include "MitkSegmentationExports.h"
+
+#include "itkImage.h"
 
 namespace us {
 class ModuleResource;
 }
 
 namespace mitk{
-  class MitkSegmentation_EXPORT OtsuTool3D : public AutoSegmentationTool
+  class MitkSegmentation_EXPORT OtsuTool3D : public SegTool3D
   {
     public:
 
-    mitkClassMacro(OtsuTool3D, AutoSegmentationTool);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      mitkClassMacro(OtsuTool3D, SegTool3D);
+      itkNewMacro(OtsuTool3D);
 
-      virtual const char* GetName() const;
+      /* icon stuff */
       virtual const char** GetXPM() const;
-    us::ModuleResource GetIconResource() const;
+      virtual const char* GetName() const;
+      us::ModuleResource GetIconResource() const;
 
+      /// \brief Adds actions related to multi label preview image and node
       virtual void Activated();
+
+      /// \brief Adds actions related to multi label preview image and node
       virtual void Deactivated();
 
+      /// \brief Executes the tool.
       void RunSegmentation( int regions, bool useValley, int numberOfBins);
-      void ConfirmSegmentation();
-      //void UpdateBinaryPreview(int regionID);
-      void UpdateBinaryPreview(std::vector<int> regionIDs);
       void UpdateVolumePreview(bool volumeRendering);
-      void ShowMultiLabelResultNode(bool);
+      /// \brief Updates the preview image with the current region selection.
+      void UpdatePreview(std::vector<int> regionIDs);
 
     protected:
       OtsuTool3D();
       virtual ~OtsuTool3D();
 
-      mitk::Image::Pointer m_OriginalImage;
-      //holds the user selected binary segmentation
-      mitk::DataNode::Pointer m_BinaryPreviewNode;
-      //holds the multilabel result as a preview image
-      mitk::DataNode::Pointer m_MultiLabelResultNode;
-      //holds the user selected binary segmentation masked original image
-      mitk::DataNode::Pointer m_MaskedImagePreviewNode;
+      mitk::DataNode::Pointer m_MultiLabelNode;
+      mitk::Image::Pointer m_MultiLabelImage;
 
-  };//class
+      template < typename TPixel, unsigned int VDimension >
+      void InternalRun( itk::Image<TPixel, VDimension>* input, int regions, bool useValley, int numberOfBins );
+
+      template <typename ImageType1, typename ImageType2>
+      void InternalAcceptPreview( ImageType1* targetImage, const ImageType2* sourceImage );
+
+      template <typename ImageType>
+      void InternalUpdatePreview( const ImageType* input, std::vector<int> regionIDs);
+
+  };
+
 }//namespace
-#endif
+
+#endif //mitkOtsuTool3D_H

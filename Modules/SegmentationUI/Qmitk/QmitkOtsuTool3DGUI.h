@@ -15,22 +15,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #ifndef QmitkOtsuTool3DGUI_h_Included
-#define QmitkOtsuTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
 #include <MitkSegmentationUIExports.h>
-#include "mitkOtsuTool3D.h"
-#include <QListWidget>
-#include <QPushButton>
-#include "ui_QmitkOtsuToolWidgetControls.h"
+#include "ui_QmitkOtsuWidgetControls.h"
 
-class QSpinBox;
-class QLabel;
+namespace mitk {
+  class OtsuTool3D;
+}
+
+//class QListWidgetItem;
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::.
-  \sa mitk::
+  \brief GUI for mitk::OtsuTool3D
 
   This GUI shows ...
 
@@ -45,21 +43,19 @@ class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-  signals:
-
-  public slots:
-
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);
 
-    void OnSpinboxValueAccept();
+    void OnRun();
 
-    void OnSegmentationRegionAccept();
+    void OnCancel();
 
     void OnItemSelectionChanged();
 
-    void OnVolumePreviewChecked(int);
+    void OnAcceptPreview();
+
+    void OnShowInformation(bool);
 
   private slots:
 
@@ -70,9 +66,11 @@ class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
     QmitkOtsuTool3DGUI();
     virtual ~QmitkOtsuTool3DGUI();
 
-    mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
+    void BusyStateChanged(bool);
 
-    Ui_QmitkOtsuToolWidgetControls m_Controls;
+    mitk::OtsuTool3D* m_OtsuMultipleThresholdTool3D;
+
+    Ui_QmitkOtsuTool3DGUIControls m_Controls;
 
     int m_NumberOfRegions;
 

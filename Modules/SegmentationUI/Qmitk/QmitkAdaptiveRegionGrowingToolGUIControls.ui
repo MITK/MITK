@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>264</width>
-    <height>171</height>
+    <height>170</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -40,6 +40,9 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="styleSheet">
+      <string notr="true">color:rgb(255, 0, 0)</string>
+     </property>
      <property name="text">
       <string>Shift+Click to place seedpoint</string>
      </property>
@@ -70,7 +73,9 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="ctkRangeWidget" name="m_ThresholdSlider" native="true"/>
+       <widget class="ctkRangeWidget" name="m_ThresholdSlider" native="true">
+        <zorder>m_lblSetSeedpoint</zorder>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -198,7 +203,7 @@ p, li { white-space: pre-wrap; }
       <string>Press to confirm the segmentation and calculate 3D representation.</string>
      </property>
      <property name="text">
-      <string>&amp;Confirm Segmentation</string>
+      <string>&amp;Confirm segmentation</string>
      </property>
      <property name="shortcut">
       <string>Alt+C</string>

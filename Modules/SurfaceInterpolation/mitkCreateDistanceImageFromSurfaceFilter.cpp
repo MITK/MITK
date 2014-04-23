@@ -16,6 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 
+#include <mitkImageAccessByItk.h>
+
+#include "vtkSmartPointer.h"
+#include "vtkDoubleArray.h"
+#include "vtkCellArray.h"
+#include "vtkCellData.h"
+#include "vtkPolyData.h"
+
 mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImageFromSurfaceFilter()
 {
   m_DistanceImageVolume = 50000;
@@ -63,7 +71,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
 
   if (numberOfInputs == 0)
   {
-    MITK_ERROR << "mitk::CreateDistanceImageFromSurfaceFilter: No input available. Please set an input!" << std::endl;
+    MITK_ERROR << "No input available. Please set an input!" << std::endl;
     itkExceptionMacro("mitk::CreateDistanceImageFromSurfaceFilter: No input available. Please set an input!");
     return;
   }
@@ -357,9 +365,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   DistanceImageType::IndexType _size;
   _size.Fill(-1);
   _size += sizeOfRegion;
-  double center [3] = {_size[0]/2.0, _size[1]/2.0, _size[2]/2.0};
-  MITK_INFO<<"Size: ["<<_size[0]<<","<<_size[1]<<","<<_size[2]<<"] Center: ["<<center[0]<<","<<center[1]<<","<<center[2]<<"]";
-
 
   //Set every pixel inside the surface to -10 except the edge point (so that the received surface is closed)
   while (!imgRegionIterator.IsAtEnd()) {
@@ -434,7 +439,7 @@ double mitk::CreateDistanceImageFromSurfaceFilter::CalculateDistanceValue(PointT
   InterpolationWeights::iterator weightsIter;
 
   for ( centerIter=m_Centers.begin(), weightsIter=m_Weights.begin();
-    centerIter!=m_Centers.end() && weightsIter!=m_Weights.end();
+    centerIter!=m_Centers.end(), weightsIter!=m_Weights.end();
     centerIter++, weightsIter++ )
   {
     p1 = *centerIter;
@@ -548,9 +553,16 @@ void mitk::CreateDistanceImageFromSurfaceFilter::SetProgressStepSize(unsigned in
   this->m_ProgressStepSize = stepSize;
 }
 
-void mitk::CreateDistanceImageFromSurfaceFilter::SetReferenceImage( itk::ImageBase<3>::Pointer referenceImage )
+void mitk::CreateDistanceImageFromSurfaceFilter::SetReferenceImage(const mitk::Image* image)//itk::ImageBase<3>::Pointer referenceImage )
 {
- m_ReferenceImage = referenceImage;
+  m_ReferenceImage = itk::ImageBase<3>::New();
+  AccessFixedDimensionByItk_1( image, GetImageBase, 3, m_ReferenceImage );
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void mitk::CreateDistanceImageFromSurfaceFilter::GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& output)
+{
+  output->Graft(input);
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::DetermineBounds( DistanceImageType::PointType &minPointInWorldCoordinates,

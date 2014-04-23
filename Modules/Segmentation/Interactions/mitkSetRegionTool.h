@@ -52,7 +52,7 @@ class MitkSegmentation_EXPORT SetRegionTool : public FeedbackContourTool
 
   protected:
 
-    SetRegionTool(int paintingPixelValue = 1); // purposely hidden
+    SetRegionTool(); // purposely hidden
     virtual ~SetRegionTool();
 
     void ConnectActionsAndFunctions();
@@ -62,15 +62,11 @@ class MitkSegmentation_EXPORT SetRegionTool : public FeedbackContourTool
 
     virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
     virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );
-    virtual bool OnInvertLogic  ( StateMachineAction*, InteractionEvent* );
 
-    int m_PaintingPixelValue;
+    bool m_LogicInverted;
 
     bool m_FillContour;
     bool m_StatusFillWholeSlice;
-
-    ContourModel::Pointer m_SegmentationContourInWorldCoordinates;
-    ContourModel::Pointer m_WholeImageContourInWorldCoordinates;
 };
 
 } // namespace

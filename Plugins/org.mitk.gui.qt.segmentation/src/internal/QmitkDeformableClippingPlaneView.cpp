@@ -565,7 +565,6 @@ void QmitkDeformableClippingPlaneView::OnTranslationMode(bool check)
   { //uncheck all other buttons
     m_Controls.rotationPushButton->setChecked(false);
     m_Controls.deformationPushButton->setChecked(false);
-
     mitk::AffineDataInteractor3D::Pointer affineDataInteractor = mitk::AffineDataInteractor3D::New();
     affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
     affineDataInteractor->SetEventConfig("AffineTranslationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
@@ -581,7 +580,6 @@ void QmitkDeformableClippingPlaneView::OnRotationMode(bool check)
   { //uncheck all other buttons
     m_Controls.translationPushButton->setChecked(false);
     m_Controls.deformationPushButton->setChecked(false);
-
     mitk::AffineDataInteractor3D::Pointer affineDataInteractor = mitk::AffineDataInteractor3D::New();
     affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
     affineDataInteractor->SetEventConfig("AffineRotationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
@@ -597,7 +595,6 @@ void QmitkDeformableClippingPlaneView::OnDeformationMode(bool check)
   { //uncheck all other buttons
     m_Controls.translationPushButton->setChecked(false);
     m_Controls.rotationPushButton->setChecked(false);
-
     mitk::SurfaceDeformationDataInteractor3D::Pointer surfaceDataInteractor = mitk::SurfaceDeformationDataInteractor3D::New();
     surfaceDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
     surfaceDataInteractor->SetEventConfig("AffineDeformationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));

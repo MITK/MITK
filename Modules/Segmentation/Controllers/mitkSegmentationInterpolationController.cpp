@@ -509,12 +509,11 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
   // interpolation algorithm can use e.g. itk::ImageSliceConstIteratorWithIndex to
   //   inspect the original patient image at appropriate positions
 
-  mitk::SegmentationInterpolationAlgorithm::Pointer algorithm = mitk::ShapeBasedInterpolationAlgorithm::New().GetPointer();
-  return algorithm->Interpolate( lowerMITKSlice.GetPointer(), lowerBound,
+  mitk::ShapeBasedInterpolationAlgorithm::Pointer algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
+  algorithm->Interpolate( lowerMITKSlice.GetPointer(), lowerBound,
                                  upperMITKSlice.GetPointer(), upperBound,
                                  sliceIndex,
-                                 sliceDimension,
-                                 resultImage,
-                                 timeStep,
-                                 m_ReferenceImage );
+                                 resultImage);
+
+  return resultImage;
 }

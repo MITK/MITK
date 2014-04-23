@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
-#include "mitkSegmentationInterpolationController.h"
+//#include "mitkSegmentationInterpolationController.h"
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkOperationEvent.h"
 #include "mitkInteractionConst.h"

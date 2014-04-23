@@ -18,13 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGlobalInteraction.h"
 #include "mitkCoreObjectFactory.h"
 
-#include <itkObjectFactoryBase.h>
 #include <itkCommand.h>
-
-#include <list>
-
-#include "mitkInteractionEventObserver.h"
-#include "mitkDisplayInteractor.h"
 #include "mitkSegTool2D.h"
 
 #include "usGetModuleContext.h"

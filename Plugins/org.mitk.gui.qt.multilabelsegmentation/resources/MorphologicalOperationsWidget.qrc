@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="/SegmentationUtilities/MorphologicalOperations">
+     <file>Dilate_48x48.png</file>
+     <file>Erode_48x48.png</file>
+     <file>Closing_48x48.png</file>
+     <file>Opening_48x48.png</file>
+     <file>FillHoles_48x48.png</file>
+  </qresource>
+</RCC>

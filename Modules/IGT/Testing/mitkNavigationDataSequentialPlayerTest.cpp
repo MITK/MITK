@@ -44,6 +44,7 @@ private:
   vnl_vector<mitk::ScalarType> tTool1Snapshot2;
   mitk::Quaternion qTool0Snapshot0;
   mitk::Quaternion qTool1Snapshot1;
+  mitk::NavigationDataSet::Pointer NavigationDataSet;
 
   mitk::NavigationDataSequentialPlayer::Pointer player;
 
@@ -56,6 +57,9 @@ public:
     mitk::Quaternion qTool1Snapshot1;
 
     player = mitk::NavigationDataSequentialPlayer::New();
+    std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2ToolsDouble.xml");
+    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    NavigationDataSet =reader->Read(file);
   }
 
   void tearDown()
@@ -64,14 +68,12 @@ public:
 
   bool runLoop()
   {
-    bool success = true;
+    player->Update();
     mitk::NavigationData::Pointer nd0;
     mitk::NavigationData::Pointer nd1;
     for(unsigned int i=0; i<player->GetNumberOfSnapshots(); ++i)
     {
-      player->GoToNextSnapshot();
-      player->Update();
-      nd0 = player->GetOutput();
+      nd0 = player->GetOutput(0);
       nd1 = player->GetOutput(1);
 
       // test some values
@@ -79,19 +81,28 @@ public:
 
       if(i==0)
       {
-        if (!(qTool0Snapshot0.as_vector() == nd0->GetOrientation().as_vector())) {success = false;}
+        mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(0,0);
+        mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(1,0);
+        if (!(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector())) {return false;}
+        if (!(ref1->GetOrientation().as_vector() == nd1->GetOrientation().as_vector())) {return false;}
+        if (!(ref0->GetPosition().GetVnlVector() == nd0->GetPosition().GetVnlVector())) {return false;}
+        if (!(ref1->GetPosition().GetVnlVector() == nd1->GetPosition().GetVnlVector())) {return false;}
       }
       else if(i==1)
       {
-        if (!(tTool0Snapshot1 == nd0->GetPosition().GetVnlVector())) {success = false;}
-        else if (!(qTool1Snapshot1.as_vector() == nd1->GetOrientation().as_vector())) {success = false;}
+        if (!(tTool0Snapshot1 == nd0->GetPosition().GetVnlVector())) {return false;}
+        else if (!(qTool1Snapshot1.as_vector() == nd1->GetOrientation().as_vector())) {return false;}
       }
       else if(i==2) // should be repeated
       {
-        if (!(tTool1Snapshot2 == nd1->GetPosition().GetVnlVector())) {success = false;}
+        if (!(tTool1Snapshot2 == nd1->GetPosition().GetVnlVector())) {return false;}
       }
+
+      // Goto next Snapshot
+      player->GoToNextSnapshot();
+      player->Update();
     }
-    return success;
+    return true;
   }
 
   void TestStandardWorkflow()
@@ -116,15 +127,14 @@ public:
     qTool1Snapshot1 = mitk::Quaternion(qVec);
 
     //test SetXMLString()
-    std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2ToolsDouble.xml");
-    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-    player->SetNavigationDataSet(reader->Read(file));
+    player->SetNavigationDataSet(NavigationDataSet);
 
     MITK_TEST_CONDITION(player->GetNumberOfSnapshots() == 3,"Testing method SetXMLString with 3 navigation datas.");
     MITK_TEST_CONDITION(player->GetNumberOfIndexedOutputs() == 2,"Testing number of outputs");
 
     //rest repeat
     player->SetRepeat(true);
+
     MITK_TEST_CONDITION(runLoop(),"Testing first run.");
     MITK_TEST_CONDITION(runLoop(),"Testing second run."); //repeat is on should work a second time
 

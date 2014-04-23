@@ -74,7 +74,7 @@ int mitkPersistenceTest(int /*argc*/, char* /*argv*/[])
 {
     MITK_TEST_BEGIN("PersistenceTest")
     // dummy load of SceneIO, otherwise PersistenceService won't be available
-    mitk::PersistenceService::LoadModule();
+    //mitk::PersistenceService::LoadModule();
 
     MITK_INFO << "Testing availability of the PersistenceService.";
     PERSISTENCE_GET_SERVICE_MACRO

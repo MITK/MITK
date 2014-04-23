@@ -26,95 +26,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 
 
-/**
- * TestSuite for PointSet which tests properties on an empty PointSet
- */
-class mitkPointSetBasicsTestSuite : public mitk::TestFixture
-{
-
-  CPPUNIT_TEST_SUITE(mitkPointSetBasicsTestSuite);
-
-  MITK_TEST(TestInstantiation);
-  MITK_TEST(TestIsEmpty);
-  MITK_TEST(TestGetITKPointSet);
-  MITK_TEST(TestGetSizeIsZero);
-  MITK_TEST(TestAddPointDirectly);
-
-  CPPUNIT_TEST_SUITE_END();
-
-private:
-
-  mitk::PointSet::Pointer pointSet;
-
-public:
-
-  void Setup()
-  {
-    //Create PointSet
-    pointSet = mitk::PointSet::New();
-  }
-
-  void TearDown()
-  {
-    pointSet = NULL;
-  }
-
-  void TestInstantiation()
-  {
-    MITK_TEST_CONDITION_REQUIRED(pointSet.IsNotNull(),"Testing instantiation")
-  }
-
-  void TestGetITKPointSet()
-  {
-    //try to get the itkPointSet
-    mitk::PointSet::DataType::Pointer itkdata = NULL;
-    itkdata = pointSet->GetPointSet();
-    MITK_TEST_CONDITION( itkdata.IsNotNull(), "try to get the itkPointSet from a newly created PointSet" )
-  }
-
-  void TestGetSizeIsZero()
-  {
-    //fresh PointSet has to be empty!
-    MITK_TEST_CONDITION( pointSet->GetSize() == 0, "check if the PointSet size is 0 " )
-  }
-
-  void TestIsEmpty()
-  {
-    MITK_TEST_CONDITION(pointSet->IsEmptyTimeStep(0), "check if the PointSet is empty" )
-  }
-
-  void TestAddPointDirectly()
-  {
-    //add a point directly
-    int id=0;
-    mitk::Point3D point;
-    mitk::FillVector3D(point, 1.0, 2.0, 3.0);
-    ++id;
-    pointSet->GetPointSet()->GetPoints()->InsertElement(id, point);
-
-    MITK_TEST_CONDITION( pointSet->GetSize()==1 ||pointSet->IndexExists(id), "check if added points exists" )
-
-    mitk::Point3D tempPoint;
-
-    tempPoint.Fill(0);
-    tempPoint = pointSet->GetPoint(id);
-
-    MITK_TEST_CONDITION( point == tempPoint, "check if added point contains real value" )
-  }
-
-
-
-};
-
-MITK_TEST_SUITE_REGISTRATION(mitkPointSetBasics)
-
 
 /**
  * TestSuite for PointSet stuff not only operating on an empty PointSet
  */
-class mitkPointSetAdvancedTestSuite : public mitk::TestFixture
+class mitkPointSetTestSuite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkPointSetAdvancedTestSuite);
+  CPPUNIT_TEST_SUITE(mitkPointSetTestSuite);
 
   MITK_TEST(TestIsNotEmpty);
   MITK_TEST(TestSetSelectInfo);
@@ -137,7 +55,7 @@ private:
 
 public:
 
-  void Setup()
+  void setUp()
   {
     //Create PointSet
     pointSet = mitk::PointSet::New();
@@ -164,7 +82,7 @@ public:
   }
 
 
-  void TearDown()
+  void tearDown()
   {
     pointSet = NULL;
   }
@@ -172,7 +90,8 @@ public:
   void TestIsNotEmpty()
   {
     //PointSet can not be empty!
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "check if the PointSet is not empty ", true, !pointSet->IsEmptyTimeStep(0) );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE( "check if the PointSet is not empty ",
+        true, !pointSet->IsEmptyTimeStep(0) );
 
         /*
     std::cout << "check if the PointSet is not empty ";
@@ -190,7 +109,8 @@ public:
     //check SetSelectInfo
     pointSet->SetSelectInfo(4, true);
 
-    MITK_TEST_CONDITION(pointSet->GetSelectInfo(4) , "check SetSelectInfo" )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check SetSelectInfo",
+        true, pointSet->GetSelectInfo(4));
     /*
       if (!pointSet->GetSelectInfo(2))
       {
@@ -205,7 +125,8 @@ public:
   void TestSearchSelectedPoint()
   {
     // check SearchSelectedPoint
-    MITK_TEST_CONDITION(pointSet->SearchSelectedPoint() == (int) selectedPointId , "check SearchSelectedPoint " )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check SearchSelectedPoint ",
+        true, pointSet->SearchSelectedPoint() == (int) selectedPointId);
 
           /*
       if( pointSet->SearchSelectedPoint() != 4)
@@ -221,7 +142,9 @@ public:
   {
 
     // check GetNumeberOfSelected
-    MITK_TEST_CONDITION(pointSet->GetNumberOfSelected() == 1 , "check GetNumeberOfSelected " )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check GetNumeberOfSelected ",
+        true, pointSet->GetNumberOfSelected() == 1);
+
           /*
       if(pointSet->GetNumberOfSelected() != 1)
       {
@@ -242,7 +165,8 @@ public:
 
     pointSet->GetPointIfExists(4, &tmpPoint);
 
-    MITK_TEST_CONDITION(tmpPoint == point4, "check GetPointIfExists: " )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check GetPointIfExists: ",
+        true, tmpPoint == point4);
     /*
       if (tmpPoint != point5)
       {
@@ -262,7 +186,8 @@ public:
     pointSet->SwapPointPosition(1, true);
     tempPoint = pointSet->GetPoint(0);
 
-    MITK_TEST_CONDITION( point == tempPoint, "check SwapPointPosition upwards" )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check SwapPointPosition upwards",
+        true, point == tempPoint);
 
     /*
       if(point != tempPoint)
@@ -278,7 +203,8 @@ public:
   void TestSwapPointPositionUpwardsNotPossible()
   {
     //Check SwapPointPosition upwards not possible
-    MITK_TEST_CONDITION( pointSet->SwapPointPosition(0, true)==false, "check SwapPointPosition upwards not possible" )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check SwapPointPosition upwards not possible",
+        false, pointSet->SwapPointPosition(0, true));
 
     /*
 if(pointSet->SwapPointPosition(0, true))
@@ -299,7 +225,8 @@ std::cout<<"[PASSED]"<<std::endl;
     pointSet->SwapPointPosition(0, false);
     tempPoint = pointSet->GetPoint(1);
 
-    MITK_TEST_CONDITION( point == tempPoint, "check SwapPointPosition down" )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check SwapPointPosition down",
+        true, point == tempPoint);
 
     /*
 if(point != tempPoint)
@@ -322,7 +249,8 @@ std::cout<<"[PASSED]"<<std::endl;
 
 
     //Check SwapPointPosition downwards not possible
-    MITK_TEST_CONDITION(!pointSet2->SwapPointPosition(id, false), "check SwapPointPosition downwards not possible" )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check SwapPointPosition downwards not possible",
+        false, pointSet2->SwapPointPosition(id, false));
 
     /*
 if(pointSet->SwapPointPosition(1, false))
@@ -347,14 +275,16 @@ std::cout<<"[PASSED]"<<std::endl;
     pointSet->InsertPoint(11, p11);
     pointSet->InsertPoint(12, p12);
 
-    MITK_TEST_CONDITION((pointSet->IndexExists(10) == true) || (pointSet->IndexExists(11) == true) || (pointSet->IndexExists(12) == true), "add points with id 10, 11, 12: " )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("add points with id 10, 11, 12: ",
+        true, (pointSet->IndexExists(10) == true) || (pointSet->IndexExists(11) == true) || (pointSet->IndexExists(12) == true));
 
     //check OpREMOVE  ExecuteOperation
     int id = 11;
     mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, point, id);
     pointSet->ExecuteOperation(doOp);
 
-    MITK_TEST_CONDITION(!pointSet->IndexExists(id), "remove point id 11: ")
+    CPPUNIT_ASSERT_EQUAL_MESSAGE( "remove point id 11: ",
+        false, pointSet->IndexExists(id));
 
     /*
       if(pointSet->IndexExists(id))
@@ -378,7 +308,8 @@ std::cout<<"[PASSED]"<<std::endl;
     mitk::PointSet::PointType newP10 = pointSet->GetPoint(10);
     mitk::PointSet::PointType newP12 = pointSet->GetPoint(12);
 
-    MITK_TEST_CONDITION(((newP10 == p12) && (newP12 == p10)) == true, "check PointOperation OpMOVEPOINTUP for point id 12:" )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check PointOperation OpMOVEPOINTUP for point id 12:",
+        true, ((newP10 == p12) && (newP12 == p10)));
 
     //check OpMOVEPOINTDOWN  ExecuteOperation
     doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, p10, 10);
@@ -387,7 +318,8 @@ std::cout<<"[PASSED]"<<std::endl;
     newP10 = pointSet->GetPoint(10);
     newP12 = pointSet->GetPoint(12);
 
-    MITK_TEST_CONDITION(((newP10 == p10) && (newP12 == p12)) == true, "check PointOperation OpMOVEPOINTDOWN for point id 10: ")
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check PointOperation OpMOVEPOINTDOWN for point id 10: ",
+        true, ((newP10 == p10) && (newP12 == p12)));
   }
 
 
@@ -401,7 +333,8 @@ std::cout<<"[PASSED]"<<std::endl;
     pointSet->SetPoint(5, point5, mitk::PTEDGE );
     tempPoint = pointSet->GetPoint(5);
 
-    MITK_TEST_CONDITION(tempPoint == point5, "check InsertPoint with PointSpecification" )
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("check InsertPoint with PointSpecification" ,
+        true, tempPoint == point5);
     /*
       if (tempPoint != point5)
       {
@@ -416,257 +349,9 @@ std::cout<<"[PASSED]"<<std::endl;
 };
 
 
-MITK_TEST_SUITE_REGISTRATION(mitkPointSetAdvanced)
+MITK_TEST_SUITE_REGISTRATION(mitkPointSet)
 
 
-/**
- * TestSuite for all PointSet manipulations done by PointOperations
- */
-class mitkPointSetPointOperationsTestSuite : public mitk::TestFixture
-{
-  CPPUNIT_TEST_SUITE(mitkPointSetPointOperationsTestSuite);
-
-  MITK_TEST(TestCreateOperationAndAddPoint);
-  MITK_TEST(TestPointOperationOpMove);
-  MITK_TEST(TestPointOperationOpRemove);
-  MITK_TEST(TestPointOperationOpSelectPoint);
-  MITK_TEST(TestOpDeselectPoint);
-  MITK_TEST(TestOpMovePointUp);
-  MITK_TEST(TestOpMovePointDown);
-  MITK_TEST(TestOpMovePointUpOnFirstPoint);
-
-  CPPUNIT_TEST_SUITE_END();
-
-private:
-
-  mitk::PointSet::Pointer pointSet;
-
-public:
-
-  void Setup()
-  {
-    //Create PointSet
-    pointSet = mitk::PointSet::New();
-
-    // add some points
-    mitk::Point3D point2, point3, point4;
-    point2.Fill(3);
-    point3.Fill(4);
-    point4.Fill(5);
-    pointSet->InsertPoint(2,point2);
-    pointSet->InsertPoint(3,point3);
-    pointSet->InsertPoint(4,point4);
-  }
-
-  void TearDown()
-  {
-    pointSet = NULL;
-  }
-
-  void TestCreateOperationAndAddPoint()
-  {
-    int id = 0;
-    mitk::Point3D point;
-    point.Fill(1);
-
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpINSERT, point, id);
-    pointSet->ExecuteOperation(doOp);
-    MITK_TEST_CONDITION( pointSet->GetSize()==1 && pointSet->IndexExists(id), "check if added points exists" )
-
-      delete doOp;
-
-    mitk::Point3D tempPoint;
-    tempPoint.Fill(0);
-
-    tempPoint = pointSet->GetPoint(id);
-
-    MITK_TEST_CONDITION( point == tempPoint, "check if added point contains real value" )
-  }
-
-
-  void TestPointOperationOpMove()
-  {
-    //check opMOVE  ExecuteOperation
-    int id=1;
-    mitk::Point3D point1;
-    mitk::Point3D tempPoint;
-    point1.Fill(2);
-
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVE, point1, id);
-    pointSet->ExecuteOperation(doOp);
-    tempPoint = pointSet->GetPoint(id);
-
-    MITK_TEST_CONDITION(tempPoint == point1 , "check PointOperation OpMove " )
-    delete doOp;
-    /*
-    if (tempPoint != point1)
-    {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-    }
-    delete doOp;
-    std::cout<<"[PASSED]"<<std::endl;
-     */
-  }
-
-
-  void TestPointOperationOpRemove()
-  {
-    //check OpREMOVE  ExecuteOperation
-    int id=0;
-    mitk::Point3D point;
-    mitk::Point3D tempPoint;
-
-    point = pointSet->GetPoint(id);
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, point, id);
-    pointSet->ExecuteOperation(doOp);
-    tempPoint = pointSet->GetPoint(id);
-
-    MITK_TEST_CONDITION(!pointSet->IndexExists(id) , "check PointOperation OpREMOVE " )
-    delete doOp;
-    /*
-    if(pointSet->IndexExists(id))
-    {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-    }
-    delete doOp;
-    std::cout<<"[PASSED]"<<std::endl;
-     */
-  }
-
-
-  void TestPointOperationOpSelectPoint()
-  {
-    mitk::Point3D point3;
-    //check OpSELECTPOINT  ExecuteOperation
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpSELECTPOINT, point3,3);
-    pointSet->ExecuteOperation(doOp);
-
-    MITK_TEST_CONDITION(pointSet->GetSelectInfo(3) , "check PointOperation OpSELECTPOINT " )
-    delete doOp;
-    /*
-    if (!pointSet->GetSelectInfo(4))
-    {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-    }
-    delete doOp;
-    std::cout<<"[PASSED]"<<std::endl;
-     */
-  }
-
-
-  void TestOpDeselectPoint()
-  {
-    //check OpDESELECTPOINT  ExecuteOperation
-    mitk::Point3D point4;
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpDESELECTPOINT, point4,4);
-    pointSet->ExecuteOperation(doOp);
-
-    MITK_TEST_CONDITION(!pointSet->GetSelectInfo(4) , "check PointOperation OpDESELECTPOINT " )
-    MITK_TEST_CONDITION(pointSet->GetNumberOfSelected() == 0 , "check GetNumeberOfSelected " )
-    delete doOp;
-    /*
-    if (pointSet->GetSelectInfo(4))
-    {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-    }
-    delete doOp;
-    std::cout<<"[PASSED]"<<std::endl;
-
-
-    if(pointSet->GetNumberOfSelected() != 0)
-    {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
-     */
-  }
-
-  void TestOpMovePointUp()
-  {
-    //check OpMOVEPOINTUP  ExecuteOperation
-    int id = 4;
-    mitk::Point3D point4;
-    mitk::Point3D point;
-    mitk::Point3D tempPoint;
-
-    point = pointSet->GetPoint(id);
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP, point4, id);
-    pointSet->ExecuteOperation(doOp);
-    tempPoint = pointSet->GetPoint(id-1);
-
-    MITK_TEST_CONDITION(tempPoint == point , "check PointOperation OpMOVEPOINTUP " )
-    delete doOp;
-    /*
-    if (tempPoint != point)
-    {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-    }
-    delete doOp;
-    std::cout<<"[PASSED]"<<std::endl;
-     */
-  }
-
-  void TestOpMovePointDown()
-  {
-    //check OpMOVEPOINTDown  ExecuteOperation
-
-    int id = 2;
-    mitk::Point3D point;
-    mitk::Point3D point2;
-    mitk::Point3D tempPoint;
-
-    point = pointSet->GetPoint(id);
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, point2, id);
-    pointSet->ExecuteOperation(doOp);
-    tempPoint = pointSet->GetPoint(id+1);
-
-    MITK_TEST_CONDITION(tempPoint == point , "check PointOperation OpMOVEPOINTDOWN " )
-    delete doOp;
-    /*
-    if (tempPoint != point)
-    {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
-     */
-  }
-
-  void TestOpMovePointUpOnFirstPoint()
-  {
-    //check OpMOVEPOINTUP  on first point ExecuteOperation
-
-    mitk::PointSet::PointType p1 = pointSet->GetPoint(1);
-    mitk::PointSet::PointType p2 = pointSet->GetPoint(2);
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP, p1, 1);
-    pointSet->ExecuteOperation(doOp);
-    delete doOp;
-
-    mitk::PointSet::PointType newP1 = pointSet->GetPoint(1);
-    mitk::PointSet::PointType newP2 = pointSet->GetPoint(2);
-
-    MITK_TEST_CONDITION(((newP1 == p1) && (newP2 == p2)) == true, "check PointOperation OpMOVEPOINTUP for point id 1: ")
-
-    /*
-      if (((newP1 == p1) && (newP2 == p2)) == false)
-      {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-      }
-      std::cout<<"[PASSED]"<<std::endl;
-     */
-  }
-
-
-};
-
-MITK_TEST_SUITE_REGISTRATION(mitkPointSetPointOperations)
 
 
 

@@ -96,6 +96,11 @@ void ToFCameraMITKPlayerController::CleanUp()
   this->m_IntensityArray = NULL;
   delete[] this->m_RGBArray;
   this->m_RGBArray = NULL;
+
+  this->m_DistanceImageFileName = "";
+  this->m_AmplitudeImageFileName = "";
+  this->m_IntensityImageFileName = "";
+  this->m_RGBImageFileName = "";
 }
 
 bool ToFCameraMITKPlayerController::OpenCameraConnection()

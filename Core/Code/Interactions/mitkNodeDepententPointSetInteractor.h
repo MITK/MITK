@@ -40,6 +40,11 @@ namespace mitk
    * See bug #6047 for further information and a patch to test this class embedded in tutorial Step 5.
    * \ingroup Interaction
    */
+
+  /**
+  * \deprecatedSince{2014_03} mitk::ConnectPointsInteractor is deprecated. Needs to be updated to the new interaction-framework.
+  * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+  */
   class MITK_CORE_EXPORT NodeDepententPointSetInteractor : public PointSetInteractor
   {
   public:

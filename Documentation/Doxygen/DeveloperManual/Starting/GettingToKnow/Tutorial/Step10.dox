@@ -5,27 +5,28 @@
 \tableofcontents
 
 
-\section HowToUseDataInteractor How to use an existing DataInteractor
+\section HowToUseDataInteractor Step 01 - How to use an existing DataInteractor in your Module/Plugin/...
 
 MITK provides finished DataInteractors for a variety of tasks, they can be found in Code/Core/Interactors. They can be used with
 state machine patterns and config files located under Resources/Interactions.
-
 
 A mitk::DataInteractor consists of four parts. The class describing the functionality and two XML files; one describes the state machine pattern, that is the workflow of an interaction and
 the second describes the user events which trigger an action. Lastly every mitk::DataInteractor works on a mitk::DataNode in which it stores and manipulates data.
 To use a mitk::DataInteractor these parts have to be brought together.
 
 
+** TODO add code of mitk::PointSetDataInteractor Plugin ..
+
 <b>This code demonstrates the use of an existing mitk::DataInteractor exemplary for the mitk::PointSetDataInteractor:</b>
 
-First we need a mitk::DataNode that is added to the mitk::DataStorage.
+First we need a mitk::DataNode in which the PointSets is stored. It has to be added to the mitk::DataStorage.
 \code
 
   mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
   GetDataStorage()->Add(dataNode.GetPointer());
 \endcode
 
-Then we create an instance of a mitk::PointSetDataInteractor and load a statemachine pattern as well as a configuration
+Then we create an instance of a mitk::PointSetDataInteractor and load a predefined statemachine pattern as well as a configuration
 for it:
 
 \code
@@ -41,6 +42,42 @@ Lastly the mitk::DataNode is added to the mitk::DataInteractor
 \endcode
 
 now the mitk::DataInteractor is ready for usage.
+
+
+
+\section HowToModifyInteraction Step 02 - How to modify the behaviour of a DataInteractor
+
+The behavior of a mitk::DataInteractor is determined by two aspects. One, the state machine pattern which describes the flow/order of actions
+that are performed. Secondly the configuration which determines which user interaction triggers the actions.
+
+
+\subsection ModifyDisplayInteractorBehavior How to modify the display interactor behavior
+
+Sometimes it may be desirable to change the behaviour of the mitk::DisplayInteractor which controls zooming, panning and scrolling, e.g. when a
+Tool is activated that reacts to the same events. Changing the behavior of the DisplayInteractor (or possibly any other EventHandler) can be achieved from anywhere
+in the code by requesting the InteractionEventObserver and assigning an alternative configuration to it, as demonstrated in this example:
+
+\code
+
+std::ifstream* configStream = new std::ifstream( #path to alternative configuration file# );
+mitk::EventConfig newConfig(configStream);
+
+// Requesting all registered EventObservers
+std::list<mitk::ServiceReference> listEventObserver = GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
+
+for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+{
+    DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(GetModuleContext()->GetService<InteractionEventObserver>(*it));
+    // filtering: only adjust the DisplayInteractor
+    if (displayInteractor != NULL)
+    {
+        displayInteractor->SetEventConfig(newConfig);
+    }
+}
+
+\endcode
+
+
 
 \section SectionImplementationDataInteractor How to implement a new DataInteractor
 

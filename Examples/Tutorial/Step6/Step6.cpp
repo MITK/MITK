@@ -23,9 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 
-#include "mitkGlobalInteraction.h"
 #include "mitkPointSet.h"
-#include "mitkPointSetInteractor.h"
+#include "mitkPointSetDataInteractor.h"
 
 #include "mitkImageAccessByItk.h"
 
@@ -86,13 +85,18 @@ void Step6::Initialize()
 
   // as in Step5, create PointSet (now as a member m_Seeds) and
   // associate a interactor to it
+
   m_Seeds = mitk::PointSet::New();
   mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
   pointSetNode->SetData(m_Seeds);
   pointSetNode->SetProperty("layer", mitk::IntProperty::New(2));
   m_DataStorage->Add(pointSetNode);
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(
-      mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode));
+
+  // Create PointSetDataInteractor
+  mitk::PointSetDataInteractor::Pointer interactor = mitk::PointSetDataInteractor::New();
+  interactor->LoadStateMachine("PointSet.xml");
+  interactor->SetEventConfig("PointSetConfig.xml");
+  interactor->SetDataNode(pointSetNode);
 }
 
 int Step6::GetThresholdMin()

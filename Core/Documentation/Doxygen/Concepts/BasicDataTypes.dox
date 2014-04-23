@@ -1,28 +1,28 @@
 /**
-\page BasicDataTypesPage Low level data types in MITK and their usage.
+\page BasicDataTypesPage Low level MITK data types and their usage.
 
-This page describes how to use very foundational data-tyes in mitk like mitk::Vector, mitk::Point and mitk::Matrix and 
+This page describes how to use very foundational data-tyes in MITK like mitk::Vector, mitk::Point and mitk::Matrix and 
 how they can interact.
 
 \tableofcontents
 
-\section Structure
+\section Structure Structure
 
 The previously known, monolythic structure of putting every basic type into mitkVector.h has been broken and 
 mitkVector.h has been split up into several, more atomic files, namely:
 
 -# mitkConstants.h : contains basic constants like mitk::ScalarType or mitk::eps
--# mitkArray.h : copy from and to types which implement the [] operator, like e.g. Plain Old Datatypes (POD) or the opencv vector
--# mitkPoint.h : the mitk::Point class. This is basically the itk::Point with the added ToArray and FromArray members to conveniently copy from and to ArrayTypes.
--# mitkVector.h : the mitk::Vector class. This is an itk::Vector, but with the possiblity to implicicly convert to vnl_vector and vnl_vector_fixed
--# mitkMatrix.h : the mitk::Matrix class. This is an itk::Matrix with the added ToArray and FromArray members to conveniently copy from and to ArrayTypes.
+-# mitkArray.h : copy itk::FixedArrays (like itk::Point and itk::Vector) from and to types which implement the [] operator (array-types), like e.g. Plain Old Datatypes (POD) or the opencv vector
+-# mitkPoint.h : the mitk::Point class. This is basically the itk::Point with the added ToArray and FromArray members to conveniently copy from and to array-types. In MITK, a point is considered a fixed geometric location and thus cannot be summed or multiplied.
+-# mitkVector.h : the mitk::Vector class. This is an itk::Vector, but with the possiblity to implicitly convert to vnl_vector and vnl_vector_fixed. In MITK, vectors denote directions and can be summed or multiplied with scalars. 
+-# mitkMatrix.h : the mitk::Matrix class. This is an itk::Matrix with the added ToArray and FromArray members to conveniently copy from and to array-types.
 -# mitkQuaternion.h : a typedef to vnl_quaternion. 
 -# mitkTypes.h : this file includes all of the above as a convenience header
 
 The Equal methods to compare Points, Vectors, Matrices, ... have been moved into the respective files. 
 E.g., if you want to compare two vectors simply use the Equal method provided by mitkVector.h.
 
-\section Conversion between the data-types
+\section Conversion Conversion between the data-types
 
 If you want to convert a mitk::Vector from or to a vnl_vector or a vnl_vector_fixed, simply write
 
@@ -32,7 +32,7 @@ If you want to convert a mitk::Vector from or to a vnl_vector or a vnl_vector_fi
 \endcode
 
 Unfortunately this mechanism couldn't be implemented to every type of conversion. But in any case, the ToArray and FromArray member
-functions can be used to convert to types which have the []-operator implemented. E.g.,
+functions can be used to convert to array-types. E.g.,
 
 \code
   cv::Vec3d cvVec3D;
@@ -41,7 +41,7 @@ functions can be used to convert to types which have the []-operator implemented
   mitkVector3D_2.FromArray(cvVec3D);
 \endcode
 
-Unfortunately, no implicic conversion from mitk::Point to mitk::Vector could be implemented, as this would break with itk's
+No implicit conversion from mitk::Point to mitk::Vector was implemented as this would break with itk's
 concept of separating points and vectors. If you want to convert, use:
 
 \code

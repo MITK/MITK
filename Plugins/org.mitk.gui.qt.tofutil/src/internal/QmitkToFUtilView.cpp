@@ -300,18 +300,6 @@ void QmitkToFUtilView::OnToFCameraStarted()
     // initial update of image grabber
     this->m_ToFImageGrabber->Update();
 
-    this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
-    this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
-    this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
-
-    // initial update of composite filter
-    this->m_ToFCompositeFilter->Update();
-    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput();
-    this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
-
-    std::string rgbFileName;
-    m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
-
     bool hasRGBImage = false;
     m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasRGBImage",hasRGBImage);
 
@@ -321,6 +309,19 @@ void QmitkToFUtilView::OnToFCameraStarted()
     bool hasAmplitudeImage = false;
     m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasAmplitudeImage",hasAmplitudeImage);
 
+    this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
+    if(hasAmplitudeImage)
+      this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
+    if(hasIntensityImage)
+      this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
+
+    // initial update of composite filter
+    this->m_ToFCompositeFilter->Update();
+    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput();
+    this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
+
+    std::string rgbFileName;
+    m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
 
     if(hasRGBImage || (rgbFileName!=""))
     {

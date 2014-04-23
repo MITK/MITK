@@ -171,6 +171,9 @@ namespace mitk
     */
     virtual void AllocateImageArrays();
 
+
+    void InitializeImages();
+
     ToFCameraDevice::Pointer m_ToFCameraDevice; ///< Device allowing access to ToF image data
     int m_CaptureWidth; ///< Width of the captured ToF image
     int m_CaptureHeight; ///< Height of the captured ToF image

@@ -14,6 +14,6 @@ set(MODULE_CUSTOM_TESTS
 if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
 set(MODULE_TESTS
   ${MODULE_TESTS}
-  mitkPlanarFigureMeasurementTest.cpp
+  mitkPlanarFigureInteractionTest.cpp
 )
 endif()

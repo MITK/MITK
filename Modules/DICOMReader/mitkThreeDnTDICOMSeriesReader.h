@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
 
-#include "DICOMReaderExports.h"
+#include "MitkDICOMReaderExports.h"
 
 namespace mitk
 {
@@ -42,7 +42,7 @@ namespace mitk
     - \b "3D+t": true if the image is 3D+t
     - \b "timesteps": number of timesteps of an image (only defined if "3D+t" is true)
 */
-class DICOMReader_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMReader
+class MitkDICOMReader_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGDCMReader
 {
   public:
 

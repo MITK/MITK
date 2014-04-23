@@ -18,12 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkClassicDICOMSeriesReader.h"
 
-#include "DICOMTestingExports.h"
+#include "MitkDICOMTestingExports.h"
 
 namespace mitk
 {
 
-class DICOMTesting_EXPORT TestDICOMLoading
+class MitkDICOMTesting_EXPORT TestDICOMLoading
 {
   public:
 

@@ -41,7 +41,7 @@ namespace mitk
   The simplest and most generic form of sorting is implemented in
   sub-class DICOMTagBasedSorter.
 */
-class DICOMReader_EXPORT DICOMDatasetSorter : public itk::LightObject
+class MitkDICOMReader_EXPORT DICOMDatasetSorter : public itk::LightObject
 {
   public:
 

@@ -32,7 +32,7 @@ namespace mitk
     from gdcm::Scanner. The scanning results will be used to implement the tag
     access methods of DICOMDatasetAccess.
   */
-  class DICOMReader_EXPORT DICOMGDCMImageFrameInfo : public itk::LightObject, public DICOMDatasetAccess
+  class MitkDICOMReader_EXPORT DICOMGDCMImageFrameInfo : public itk::LightObject, public DICOMDatasetAccess
   {
     public:
 

@@ -39,7 +39,7 @@ namespace mitk
        is completely understood, the workaround fixes the problem of images that
        appear upside-down.
 */
-class DICOMReader_EXPORT NormalDirectionConsistencySorter : public DICOMDatasetSorter
+class MitkDICOMReader_EXPORT NormalDirectionConsistencySorter : public DICOMDatasetSorter
 {
   public:
 

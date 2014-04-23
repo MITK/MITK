@@ -48,7 +48,7 @@ namespace mitk
     results, care should be taken that all the tags and files of interst
     are communicated to DICOMGDCMTagScanner before requesting the results!
   */
-  class DICOMReader_EXPORT DICOMGDCMTagScanner : public DICOMTagCache
+  class MitkDICOMReader_EXPORT DICOMGDCMTagScanner : public DICOMTagCache
   {
     public:
 

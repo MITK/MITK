@@ -54,7 +54,7 @@ namespace mitk
  Detailed implementation in AnalyzeFileForITKImageSeriesReaderSpacingAssumption().
 
 */
-class DICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
+class MitkDICOMReader_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
 {
   public:
 

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkThreeDnTDICOMSeriesReader.h"
 
-#include "DICOMReaderExports.h"
+#include "MitkDICOMReaderExports.h"
 
 namespace mitk
 {
@@ -58,14 +58,14 @@ namespace mitk
   If multiple images occupy the same position in space, it is assumed that this indicated a 3D+t image.
 
 */
-class DICOMReader_EXPORT ClassicDICOMSeriesReader : public ThreeDnTDICOMSeriesReader
+class MitkDICOMReader_EXPORT ClassicDICOMSeriesReader : public ThreeDnTDICOMSeriesReader
 {
   public:
 
     mitkClassMacro( ClassicDICOMSeriesReader, DICOMITKSeriesGDCMReader );
     mitkCloneMacro( ClassicDICOMSeriesReader );
     itkNewMacro( ClassicDICOMSeriesReader );
-    
+
     virtual bool operator==(const DICOMFileReader& other) const;
 
   protected:

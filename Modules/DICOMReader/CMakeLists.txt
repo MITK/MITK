@@ -1,6 +1,6 @@
 
-MITK_CREATE_MODULE(DICOMReader
-  DEPENDS Mitk
+MITK_CREATE_MODULE(
+  DEPENDS MitkCore
 )
 
 add_subdirectory(Testing)

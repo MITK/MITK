@@ -286,7 +286,7 @@ public:
   }
 
   /**
-    * Set the covariance matrices of thefixed surface. The algorithm
+    * Set the covariance matrices of the fixed surface. The algorithm
     * need the same amount of covariance and points available in the surface.
     * The covariance matrix for every vertex in a Surface can be calculated by
     * the CovarianceMatrixCalculator. It is also possible to define

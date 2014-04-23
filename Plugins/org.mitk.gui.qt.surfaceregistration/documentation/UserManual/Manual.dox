@@ -6,80 +6,86 @@
 \tableofcontents
 
 \section org_mitk_gui_qt_surfaceregistrationOverview Overview
-TODO: image
+
 The Surfaceregistration plugin allows the user to compute a transformation
-between two surfaces and align them in 3D. It performs the
-registration with the anisotriopic iterative closest point algorithm (A-ICP)
-presented in "Convergent Iterative Closest-Point Algorithm to Accomodate
+between two surfaces and align them in 3D space. It performs the
+registration with the anisotropic iterative closest point algorithm (A-ICP)
+presented in L. Maier-Hein et al. "Convergent Iterative Closest-Point Algorithm to Accomodate
 Anisotropic and Inhomogenous Localization Error.", IEEE T Pattern Anal 34 (8),
-1520-1532, 2012. The algorithm computes a translation and rotation matrix
-and transforms one surface onto the other. Also it is possible to compute
+1520-1532, 2012. With the plugin it's also possible to compute
 the target registration error (TRE) between the two aligned surfaces with a given
-set of target points. In order to run the algorithm the surfaces need to be initially
-aligned, to be able to run the fine registration with the A-ICP algorithm.
+set of target points. In order to register the surfaces they need to be initially
+aligned to be able to run the fine registration with the A-ICP algorithm.
+
+TODO: image
 
 \section org_mitk_gui_qt_surfaceregistrationUsage Usage
-TODO: image
-To run a registration load two surfaces into the datamanager and select the moving and fixed
-surface used for the registration with the associated combo boxes.
-Once the <b>Register Surfaces</b> button is pressed the registration is started.
+
+In order to run a registration at least two surfaces need to be loaded into
+the data manager. Once the surfaces are loaded, a moving and a
+fixed surface can be selected in the associated combo boxes of the plugin.
+When the <b>Register Surfaces</b> button is pressed the registration is started
+and the moving surface is transformed onto the fixed surface.
+
+\image html QmitkSurfaceRegistration_Input.png "Select the surfaces to register."
 
 \section org_mitk_gui_qt_surfaceregistrationTargetRegistrationErrorCalculation Target Registration Error Calculation
-TODO: image
-To compute the target registration error, enable the TRE calculation via the checkbox in the target registration
-view. Once the tre computation is enabled the combo boxes are activated. Select the
-right point sets stored in the datamanager to compute the TRE.
+
+To compute the target registration error, enable the calculation via the checkbox
+in the target registration view. Once the TRE computation is enabled the
+combo boxes are activated to select the according target point sets.
+
+\image html QmitkSurfaceRegistration_TRECalculation.png "Usage of the TRE calculation view."
 
 \section org_mitk_gui_qt_surfaceregistrationRegistrationSettings Registration Settings
-TODO: image
-To tune the registration process several the following additional options are available:
+
+The following additional settings are available in the plugin to configure the algorithm:
 <ul>
-<li>A trimmed version of the algorithm
-<li>Set the threshold for the algorithm to converge
-<li>Limit the iterations
-<li>Set the search radius
-<li>Enable/disable FRE normalization
-<li>Compute the inverse transformation
+  <li>A trimmed version of the algorithm
+  <li>Set the threshold for the algorithm to converge
+  <li>Limit the iterations
+  <li>Set the search radius
+  <li>Enable/disable FRE normalization
+  <li>Compute the inverse transformation
 </ul>
+
+\image html QmitkSurfaceRegistration_Settings.png "Additional registration settings."
 
 \subsection org_mitk_gui_qt_surfaceregistrationTrimmedRegistration Trimmed Registration
 
 This option enables a trimmed version of the algorithm to register partial overlapping
-surfaces. Once the option is enabled the user can specifie the trimm factor.
+surfaces. Once the option is enabled the user can specify the trimm factor.
 Valid values for the trim factor lie between 0 an 1.
 The trimmed version of the algorithm uses only a fixed percentage of all correspondences found
 during one iteration. Only the best correspondences will be used during the registration process.
 
 \subsection org_mitk_gui_qt_surfaceregistrationThreshold Threshold
 
-The user can specifie a threshold that is used as a termination constraint for the algorithm.
-The termination constraint of the algorithm is the change of the fiducial registration error (FRE)
-between to registrations. Once this change falls under a pre-defined threshold the algorithm terminates.
+The user can specify the threshold which is used as a termination constraint for the algorithm.
+When the the change of the fiducial registration error (FRE)
+between to registrations falls under the specified threshold the algorithm terminates.
 Larger values can speedup the registration process at the cost of a more accurate result.
-
 
 \subsection org_mitk_gui_qt_surfaceregistrationMaximumIterations Maximum Iterations
 
 The maximum amount of iterations used by the algorithm can be specified by the user.
-Once the algorithm reaches the maximum amount of iterations it will stop.
+Once the algorithm reaches the maximum amount of iterations it will stop the registration process.
 
 \subsection org_mitk_gui_qt_surfaceregistrationSearchRadius Search Radius
 
-The user can specifie the search radius in mm used during the correspondence search
-in a kd tree. A small radius can speedup the algorithm but can in addition also lead
-in bad correspondences and therefor in an incorrect alignment of the
-surfaces.
+The user can specify the search radius in mm used during the correspondence search
+in a kd tree. The default value is 30 mm. A small radius can speedup the
+algorithm but can in addition also lead in bad correspondences and therefore in an incorrect
+alignment of the surfaces.
 
 \subsection org_mitk_gui_qt_surfaceregistrationFRENormalization FRE normalization
 
-Enable/disables the normalization of the fiducial registration error.
+Enable/disables the normalization of the fiducial registration error. The default value is true
 
 \subsection org_mitk_gui_qt_surfaceregistrationInverseTransformation Inverse Transformation
 
-This option computes the inversion of the transformation and the plugin will move
-the fixed onto the moving surface if the option is enabled.
-
-
-
+This option computes the inverse transformation and the plugin will move
+the fixed onto the moving surface if the option is enabled. The default value is true.
 
 */
+

@@ -60,7 +60,13 @@ public:
     pathRead = GetTestDataFilePath("IGT-Data/RecordedNavigationData.xml");
 
     pathWrite = pathRead;
-    pathWrite.insert(pathWrite.end()-4,'2');;//Insert X: IGT-Data/NavigationDataSet2.xml
+    pathWrite.insert(pathWrite.end()-4,'2');;//Insert 2: IGT-Data/NavigationDataSet2.xml
+    std::ifstream FileTest(pathWrite.c_str());
+    if(FileTest){
+      //remove file if it already exists. TODO: Löschen funktioniert nicht!!!! xxxxxxxxxxxxxxxx
+      FileTest.close();
+      std::remove(pathWrite.c_str());
+    }
 
     pathWrong = GetTestDataFilePath("IGT-Data/NavigationDataTestData.xml");
 
@@ -95,11 +101,15 @@ public:
 
       if (r1 != r2 ||
         memcmp(buf1, buf2, r1)) {
+          fclose(f1);
+          fclose(f2);
           return false;  // Files are not equal
       }
     } while (!feof(f1) && !feof(f2));
-
-    return feof(f1) && feof(f2);
+    bool returnValue = feof(f1) && feof(f2);
+    fclose(f1);
+    fclose(f2);
+    return returnValue;
   }
 
   void TestCompareFunction()

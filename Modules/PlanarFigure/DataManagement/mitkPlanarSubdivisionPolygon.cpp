@@ -130,3 +130,20 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
   }
   subdivisionPoints.clear();
 }
+
+ bool mitk::PlanarSubdivisionPolygon::Equals(mitk::PlanarFigure& other)
+ {
+   mitk::PlanarSubdivisionPolygon* otherSubDivPoly = dynamic_cast<mitk::PlanarSubdivisionPolygon*>(&other);
+   if ( otherSubDivPoly )
+   {
+     if ( this->m_SubdivisionRounds != otherSubDivPoly->m_SubdivisionRounds)
+       return false;
+     if ( std::abs(this->m_TensionParameter - otherSubDivPoly->m_TensionParameter) > mitk::eps)
+       return false;
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

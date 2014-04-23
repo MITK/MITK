@@ -63,6 +63,8 @@ public:
 
   void SetArrowTipScaleFactor( float scale );
 
+  virtual bool Equals(mitk::PlanarFigure& other);
+
 protected:
   PlanarArrow();
   virtual ~PlanarArrow();

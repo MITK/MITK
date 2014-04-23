@@ -95,6 +95,8 @@ public:
       m_MinMaxRadiusContraintsActive = active;
   }
 
+  virtual bool Equals(mitk::PlanarFigure& other);
+
 protected:
   PlanarCircle();
   virtual ~PlanarCircle();

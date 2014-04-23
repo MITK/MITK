@@ -163,3 +163,16 @@ void mitk::PlanarCircle::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
 }
+
+ bool mitk::PlanarCircle::Equals(mitk::PlanarFigure& other)
+ {
+   mitk::PlanarCircle* otherCircle = dynamic_cast<mitk::PlanarCircle*>(&other);
+   if ( otherCircle )
+   {
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

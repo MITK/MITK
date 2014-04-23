@@ -102,6 +102,8 @@ public:
       m_TreatAsCircle = active;
   }
 
+  virtual bool Equals(mitk::PlanarFigure& other);
+
 protected:
   PlanarEllipse();
   virtual ~PlanarEllipse();

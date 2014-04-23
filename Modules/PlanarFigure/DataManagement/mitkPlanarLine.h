@@ -61,6 +61,7 @@ public:
     return 2;
   }
 
+  virtual bool Equals(mitk::PlanarFigure& other);
 
 protected:
   PlanarLine();

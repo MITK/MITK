@@ -85,6 +85,8 @@ public:
   void IncreaseSubdivisions();
   void DecreaseSubdivisions();
 
+  virtual bool Equals(mitk::PlanarFigure& other);
+
 protected:
   PlanarSubdivisionPolygon();
   virtual ~PlanarSubdivisionPolygon();

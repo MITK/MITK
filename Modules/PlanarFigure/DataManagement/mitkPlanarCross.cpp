@@ -343,8 +343,20 @@ void mitk::PlanarCross::EvaluateFeaturesInternal()
   this->SetQuantity( FEATURE_ID_SHORTAXISDIAMETER, shortAxisDiameter );
 }
 
-
 void mitk::PlanarCross::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
 }
+
+ bool mitk::PlanarCross::Equals(mitk::PlanarFigure& other)
+ {
+   mitk::PlanarCross* otherCross = dynamic_cast<mitk::PlanarCross*>(&other);
+   if ( otherCross )
+   {
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

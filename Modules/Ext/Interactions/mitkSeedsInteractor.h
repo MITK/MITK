@@ -37,7 +37,7 @@ namespace mitk {
   * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
   */
 
-  class MitkExt_EXPORT SeedsInteractor : public Interactor
+  class DEPRECATED() MitkExt_EXPORT SeedsInteractor : public Interactor
   {
   public:
     mitkClassMacro(SeedsInteractor, Interactor);

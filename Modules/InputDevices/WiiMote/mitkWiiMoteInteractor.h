@@ -35,7 +35,7 @@ namespace mitk
   * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
   */
 
-class mitkWiiMote_EXPORT WiiMoteInteractor: public mitk::Interactor
+class DEPRECATED() mitkWiiMote_EXPORT WiiMoteInteractor: public mitk::Interactor
 {
 
 public:

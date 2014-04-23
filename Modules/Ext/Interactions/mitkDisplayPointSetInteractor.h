@@ -41,7 +41,7 @@ namespace mitk
   * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
   */
 
-  class MitkExt_EXPORT DisplayPointSetInteractor : public PointSetInteractor
+  class DEPRECATED() MitkExt_EXPORT DisplayPointSetInteractor : public PointSetInteractor
   {
   public:
     mitkClassMacro(DisplayPointSetInteractor, PointSetInteractor);

@@ -424,10 +424,27 @@ mitk::DICOMImageBlockDescriptor
 {
   double d;
   std::string trimmedstring(str);
-  trimmedstring = trimmedstring.erase(trimmedstring.find_last_not_of(" \n\r\t")+1);
+  try
+  {
+    trimmedstring = trimmedstring.erase(trimmedstring.find_last_not_of(" \n\r\t")+1);
+  }
+  catch(...)
+  {
+    // no last not of
+  }
 
-  std::istringstream converter(trimmedstring);
-  if ( !trimmedstring.empty() && (converter >> d) && converter.eof() )
+  std::string firstcomponent(trimmedstring);
+  try
+  {
+    firstcomponent = trimmedstring.erase(trimmedstring.find_first_of("\\"));
+  }
+  catch(...)
+  {
+    // no last not of
+  }
+
+  std::istringstream converter(firstcomponent);
+  if ( !firstcomponent.empty() && (converter >> d) && converter.eof() )
   {
     return d;
   }
@@ -458,6 +475,7 @@ mitk::DICOMImageBlockDescriptor
   mitkImage->SetProperty( propertyKeySliceLocation.c_str(), this->GetProperty("sliceLocationForSlices") );
   mitkImage->SetProperty( propertyKeyInstanceNumber.c_str(), this->GetProperty("instanceNumberForSlices") );
   mitkImage->SetProperty( propertyKeySOPInstanceUID.c_str(), this->GetProperty("SOPInstanceUIDForSlices") );
+  mitkImage->SetProperty( "files", this->GetProperty("filenamesForSlices") );
 
 
   // second part: add properties that describe the whole image block
@@ -502,6 +520,11 @@ mitk::DICOMImageBlockDescriptor
 
   mitkImage->SetProperty("dicom.study.StudyDescription", this->GetProperty("studyDescription") );
   mitkImage->SetProperty("dicom.series.SeriesDescription", this->GetProperty("seriesDescription") );
+
+  mitkImage->SetProperty("dicom.pixel.Rows", this->GetProperty("rows") );
+  mitkImage->SetProperty("dicom.pixel.Columns", this->GetProperty("columns") );
+
+
 
   // third part: get something from ImageIO. BUT this needs to be created elsewhere. or not at all!
 
@@ -687,6 +710,8 @@ mitk::DICOMImageBlockDescriptor
     storeTagValueToProperty(modality,0x0008,0x0060)
     storeTagValueToProperty(sequenceName,0x0018,0x0024)
     storeTagValueToProperty(orientation,0x0020,0x0037)
+    storeTagValueToProperty(rows,0x0028,0x0010)
+    storeTagValueToProperty(columns,0x0028,0x0011)
 
     storeTagValueRangeToProperty(sliceLocation,0x0020,0x1041)
     storeTagValueRangeToProperty(acquisitionNumber,0x0020,0x0012)
@@ -707,6 +732,7 @@ mitk::DICOMImageBlockDescriptor
     StringLookupTable sliceLocationForSlices;
     StringLookupTable instanceNumberForSlices;
     StringLookupTable SOPInstanceUIDForSlices;
+    StringLookupTable filenamesForSlices;
 
     const DICOMTag tagSliceLocation(0x0020,0x1041);
     const DICOMTag tagInstanceNumber(0x0020,0x0013);
@@ -726,16 +752,21 @@ mitk::DICOMImageBlockDescriptor
       std::string sopInstanceUID = m_TagCache->GetTagValue( *frameIter, tagSOPInstanceNumber );
       SOPInstanceUIDForSlices.SetTableValue(slice, sopInstanceUID);
 
+      std::string filename = (*frameIter)->Filename;
+      filenamesForSlices.SetTableValue(slice, filename);
+
       MITK_DEBUG << "Tag info for slice " << slice
                  << ": SL '" << sliceLocation
                  << "' IN '" << instanceNumber
                  << "' SOP instance UID '" << sopInstanceUID << "'";
 
-      // add property or properties with proper names
-      const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty( "sliceLocationForSlices", StringLookupTableProperty::New( sliceLocationForSlices ) );
-      const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty( "instanceNumberForSlices",    StringLookupTableProperty::New( instanceNumberForSlices ) );
-      const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty( "SOPInstanceUIDForSlices", StringLookupTableProperty::New( SOPInstanceUIDForSlices ) );
     }
+    // add property or properties with proper names
+    const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty( "sliceLocationForSlices", StringLookupTableProperty::New( sliceLocationForSlices ) );
+    const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty( "instanceNumberForSlices",    StringLookupTableProperty::New( instanceNumberForSlices ) );
+    const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty( "SOPInstanceUIDForSlices", StringLookupTableProperty::New( SOPInstanceUIDForSlices ) );
+    const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty( "filenamesForSlices", StringLookupTableProperty::New( filenamesForSlices ) );
+
 
     m_PropertiesOutOfDate = false;
   }

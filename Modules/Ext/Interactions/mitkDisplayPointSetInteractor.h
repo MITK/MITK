@@ -35,6 +35,12 @@ namespace mitk
    * Points can be added, removed and moved.
    * \ingroup Interaction
    */
+
+  /**
+  * \deprecatedSince{2014_03} mitk::DisplayPointSetInteractor is deprecated. Needs to be updated to the new interaction-framework.
+  * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+  */
+
   class MitkExt_EXPORT DisplayPointSetInteractor : public PointSetInteractor
   {
   public:

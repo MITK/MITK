@@ -137,53 +137,6 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QCheckBox" name="m_EnableTrimming">
-          <property name="text">
-           <string>Enable Trimming</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="m_TrimmFactorLabel">
-          <property name="text">
-           <string>Trimmfactor:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QDoubleSpinBox" name="m_TrimmFactorSpinbox">
-          <property name="decimals">
-           <number>2</number>
-          </property>
-          <property name="maximum">
-           <double>0.990000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.500000000000000</double>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
          <spacer name="horizontalSpacer_4">
@@ -295,19 +248,16 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_14">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QCheckBox" name="m_EnableFRENormalization">
+         <widget class="QCheckBox" name="m_EnableTrimming">
           <property name="text">
-           <string>Enable FRE normalization</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
+           <string>Enable Trimming</string>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_7">
+         <spacer name="horizontalSpacer_3">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -319,32 +269,28 @@
           </property>
          </spacer>
         </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_11">
         <item>
-         <widget class="QCheckBox" name="m_EnableInverseTransform">
+         <widget class="QLabel" name="m_TrimmFactorLabel">
           <property name="text">
-           <string>Inverse Transformation</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
+           <string>Overlap:</string>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_10">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+         <widget class="QDoubleSpinBox" name="m_TrimmFactorSpinbox">
+          <property name="decimals">
+           <number>2</number>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
+          <property name="maximum">
+           <double>0.990000000000000</double>
           </property>
-         </spacer>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.500000000000000</double>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

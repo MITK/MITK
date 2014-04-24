@@ -55,8 +55,6 @@ public:
   double m_MaxIterations;
   double m_TrimmFactor;
   double m_SearchRadius;
-  bool m_EnableFRENormalization;
-  bool m_EnableInverseTransform;
 
   // anisotropic registration
   mitk::AnisotropicIterativeClosestPointRegistration::Pointer m_AICP;
@@ -78,8 +76,6 @@ public:
      m_MaxIterations(1000),
      m_TrimmFactor(0.0),
      m_SearchRadius(30.0),
-     m_EnableFRENormalization(true),
-     m_EnableInverseTransform(true),
      m_AICP(mitk::AnisotropicIterativeClosestPointRegistration::New()),
      m_MatrixCalculator(mitk::CovarianceMatrixCalculator::New()),
      m_CleanPolyData(vtkSmartPointer<vtkCleanPolyData>::New()),
@@ -141,9 +137,8 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
   m_Controls.m_MaxIterationsSpinbox->setToolTip("The maximum number of iterations used by the algorithm.");
   m_Controls.m_SearchRadius->setToolTip("Set the search radius in mm for the calculation of the correspondences.");
   m_Controls.m_RegisterSurfaceButton->setToolTip("Start the registration.");
-  m_Controls.m_EnableInverseTransform->setToolTip("The inverse transform will transform the fixed onto the moving surface.");
-  m_Controls.m_EnableFRENormalization->setToolTip("Normalization of the Fiducial Registration Error.");
   m_Controls.m_EnableTrimming->setToolTip("Enables the trimmed version of the algorithm.");
+  m_Controls.m_TrimmFactorSpinbox->setToolTip("Set teh overlapping part of the surface in %. The valid range is between 0 and 1.");
   m_Controls.m_MovingTargets->setToolTip("Select the targets for the moving surface.");
   m_Controls.m_FixedTargets->setToolTip("Select the targets for the fixed surface.");
 
@@ -200,11 +195,8 @@ void QmitkSurfaceRegistrationView::OnStartRegistration()
 {
   d->m_Threshold = m_Controls.m_ThresholdSpinbox->value();
   d->m_MaxIterations = m_Controls.m_MaxIterationsSpinbox->value();
-  d->m_EnableFRENormalization = m_Controls.m_EnableFRENormalization->isChecked();
   d->m_SearchRadius = m_Controls.m_SearchRadius->value();
   d->m_TrimmFactor = 0.0;
-  d->m_EnableInverseTransform = m_Controls.m_EnableInverseTransform->isChecked();
-  d->m_EnableFRENormalization = m_Controls.m_EnableFRENormalization->isChecked();
 
   if ( m_Controls.m_EnableTrimming->isChecked() )
   {
@@ -223,7 +215,9 @@ void QmitkSurfaceRegistrationView::OnStartRegistration()
   // sanity check
   if ( d->m_FixedSurface.IsNull() || d->m_MovingSurface.IsNull() )
   {
-    MITK_ERROR << "Input surface not set.";
+    QMessageBox msg;
+    msg.setIcon(QMessageBox::Critical);
+    msg.setText("Input surfaces are NULL.");
     return;
   }
 
@@ -255,7 +249,6 @@ void QmitkSurfaceRegistrationView::OnEnableTreCalculation()
 
 void QmitkSurfaceRegistrationView::OnEnableTrimming()
 {
-  MITK_INFO << "enable trimming";
   if ( m_Controls.m_EnableTrimming->isChecked() )
   {
     // disable trimming options
@@ -276,21 +269,9 @@ void QmitkSurfaceRegistrationView::OnRegistrationFinished()
   double tre = -1.0;
   Matrix3x3 rotation = d->m_AICP->GetRotation();
   TranslationVector translation = d->m_AICP->GetTranslation();
-  mitk::Surface* surfaceToTransform = d->m_MovingSurface.GetPointer();
 
   // exit the thread
   d->m_RegistrationThread->quit();
-
-  // Visualization:
-  // transform the fixed surface with the inverse transform
-  // onto the moving surface if the option is enabled.
-
-  if ( d->m_EnableInverseTransform )
-  {
-    rotation = rotation.GetInverse();
-    translation = (rotation * translation) * -1.0;
-    surfaceToTransform = d->m_FixedSurface.GetPointer();
-  }
 
   MITK_INFO << "Rotation: \n" << rotation << "Translation: " << translation;
   MITK_INFO << "FRE: " << d->m_AICP->GetFRE();
@@ -303,14 +284,6 @@ void QmitkSurfaceRegistrationView::OnRegistrationFinished()
 
     mitk::PointSet* fixedTargets = dynamic_cast<mitk::PointSet*> (
           m_Controls.m_FixedTargets->GetSelectedNode()->GetData() );
-
-    // swap the targets if the inverse transform is enabled
-    if ( d->m_EnableInverseTransform )
-    {
-      mitk::PointSet* tmp = movingTargets;
-      movingTargets = fixedTargets;
-      fixedTargets = tmp;
-    }
 
     // sanity check
     if ( movingTargets && fixedTargets )
@@ -366,14 +339,14 @@ void QmitkSurfaceRegistrationView::OnRegistrationFinished()
   m_Controls.m_TextEdit->append(text);
 
   mitk::AnisotropicRegistrationCommon::TransformPoints (
-          surfaceToTransform->GetVtkPolyData()->GetPoints(),
-          surfaceToTransform->GetVtkPolyData()->GetPoints(),
+          d->m_MovingSurface->GetVtkPolyData()->GetPoints(),
+          d->m_MovingSurface->GetVtkPolyData()->GetPoints(),
           rotation,
           translation
         );
 
   // set modified flag to update rendering
-  surfaceToTransform->GetVtkPolyData()->Modified();
+  d->m_MovingSurface->GetVtkPolyData()->Modified();
 
   // reanable registration button
   m_Controls.m_RegisterSurfaceButton->setEnabled(true);
@@ -427,10 +400,7 @@ void UIWorker::RegistrationThreadFunc()
   const double meanVarY = d->m_MatrixCalculator->GetMeanVariance();
 
   // the FRE normalization factor
-  double normalizationFactor = 1.0;
-
-  if ( d->m_EnableFRENormalization )
-   normalizationFactor = sqrt( meanVarX + meanVarY);
+  const double normalizationFactor = sqrt( meanVarX + meanVarY);
 
   // set up parameters
   d->m_AICP->SetMovingSurface(X);

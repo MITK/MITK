@@ -82,7 +82,7 @@ public:
       if(i==0)
       {
         mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(0,0);
-        mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(1,0);
+        mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(0,1);
         if (!(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector())) {return false;}
         if (!(ref1->GetOrientation().as_vector() == nd1->GetOrientation().as_vector())) {return false;}
         if (!(ref0->GetPosition().GetVnlVector() == nd0->GetPosition().GetVnlVector())) {return false;}
@@ -90,12 +90,21 @@ public:
       }
       else if(i==1)
       {
-        if (!(tTool0Snapshot1 == nd0->GetPosition().GetVnlVector())) {return false;}
-        else if (!(qTool1Snapshot1.as_vector() == nd1->GetOrientation().as_vector())) {return false;}
+        mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(1,0);
+        mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(1,1);
+        if (!(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector())) {return false;}
+        if (!(ref1->GetOrientation().as_vector() == nd1->GetOrientation().as_vector())) {return false;}
+        if (!(ref0->GetPosition().GetVnlVector() == nd0->GetPosition().GetVnlVector())) {return false;}
+        if (!(ref1->GetPosition().GetVnlVector() == nd1->GetPosition().GetVnlVector())) {return false;}
       }
       else if(i==2) // should be repeated
       {
-        if (!(tTool1Snapshot2 == nd1->GetPosition().GetVnlVector())) {return false;}
+        mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(2,0);
+        mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(2,1);
+        if (!(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector())) {return false;}
+        if (!(ref1->GetOrientation().as_vector() == nd1->GetOrientation().as_vector())) {return false;}
+        if (!(ref0->GetPosition().GetVnlVector() == nd0->GetPosition().GetVnlVector())) {return false;}
+        if (!(ref1->GetPosition().GetVnlVector() == nd1->GetPosition().GetVnlVector())) {return false;}
       }
 
       // Goto next Snapshot

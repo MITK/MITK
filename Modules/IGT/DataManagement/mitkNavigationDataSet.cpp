@@ -63,7 +63,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
     return NULL;
   }
 
-  return m_NavigationDataVectors.at(toolIndex).at(index);
+  return m_NavigationDataVectors.at(index).at(toolIndex);
 }
 
 // Method not yet supported, code below compiles but delivers wrong results

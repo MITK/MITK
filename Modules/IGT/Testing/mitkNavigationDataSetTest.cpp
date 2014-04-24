@@ -65,9 +65,9 @@ static void TestSetAndGet()
 
   MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(0, 0) == nd11,
     "First NavigationData object for tool 0 should be the same as added previously.");
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(0, 1) == nd12,
+  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(0, 1) == nd21,
     "Second NavigationData object for tool 0 should be the same as added previously.");
-  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(1, 0) == nd21,
+  MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(1, 0) == nd12,
     "First NavigationData object for tool 0 should be the same as added previously.");
   MITK_TEST_CONDITION_REQUIRED(navigationDataSet->GetNavigationDataForIndex(1, 1) == nd22,
     "Second NavigationData object for tool 0 should be the same as added previously.");
@@ -82,8 +82,8 @@ static void TestSetAndGet()
 }
 
 /**
-  *
-  */
+*
+*/
 int mitkNavigationDataSetTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationDataSet");

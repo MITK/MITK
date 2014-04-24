@@ -140,7 +140,6 @@ public:
     player->SetNavigationDataSet(NavigationDataSet);
     mitk::NavigationData::PositionType nd1 = player->GetOutput(0)->GetPosition();
     player->SetNavigationDataSet(NavigationDataSet);
-    player->Update();
     mitk::NavigationData::PositionType nd2 = player->GetOutput(0)->GetPosition();
 
     MITK_TEST_CONDITION(nd1 == nd2, "First output must be the same after setting same navigation data again.");

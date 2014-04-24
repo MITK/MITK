@@ -42,6 +42,7 @@ class mitkNavigationDataSetReaderWriterTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkNavigationDataSetReaderWriterTestSuite);
   MITK_TEST(TestCompareFunction);
   MITK_TEST(TestReadWrite);
+  MITK_TEST(TestSetXMLStringException);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -112,9 +113,25 @@ public:
     return returnValue;
   }
 
+  void TestSetXMLStringException()
+  {
+    bool exceptionThrown3=false;
+    try
+    {
+      std::string file = GetTestDataFilePath("IGT-Data/InvalidVersionNavigationDataTestData.xml");
+      mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+      reader->Read(file);
+    }
+    catch(mitk::IGTIOException)
+    {
+      exceptionThrown3=true;
+    }
+    MITK_TEST_CONDITION(exceptionThrown3, "Reading an invalid XML string and expecting a exception");
+  }
+
   void TestCompareFunction()
   {
-    CPPUNIT_ASSERT_MESSAGE( "Asserting that compare function for files works correctly - Positive Test", CompareFiles(pathRead,
+    CPPUNIT_ASSERT_MESSAGE("Asserting that compare function for files works correctly - Positive Test", CompareFiles(pathRead,
       pathRead));
     CPPUNIT_ASSERT_MESSAGE("Asserting that compare function for files works correctly - Negative Test", ! CompareFiles(pathRead,
       pathWrong) );

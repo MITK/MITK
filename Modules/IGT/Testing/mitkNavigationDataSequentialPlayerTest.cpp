@@ -33,7 +33,6 @@ class mitkNavigationDataSequentialPlayerTestSuite : public mitk::TestFixture
   MITK_TEST(TestStandardWorkflow);
   MITK_TEST(TestRestartWithNewNavigationDataSet);
   MITK_TEST(TestGoToSnapshotException);
-  MITK_TEST(TestSetXMLStringException);
   MITK_TEST(TestDoubleUpdate);
   CPPUNIT_TEST_SUITE_END();
 
@@ -98,7 +97,6 @@ public:
 
       // Goto next Snapshot
       player->GoToNextSnapshot();
-      player->Update();
     }
     return true;
   }
@@ -154,7 +152,7 @@ public:
   {
     //testing GoToSnapShot for exception
     mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer2 = mitk::NavigationDataSequentialPlayer::New();
-    std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2Tools.xml", "Modules/IGT/Testing/Data");
+    std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2Tools.xml");
     mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
     myTestPlayer2->SetNavigationDataSet(reader->Read(file));
 
@@ -171,32 +169,13 @@ public:
     MITK_TEST_CONDITION(exceptionThrown2, "Testing if exception is thrown when GoToSnapShot method is called with an index that doesn't exist.");
   }
 
-  void TestSetXMLStringException()
-  {
-    mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer3 = mitk::NavigationDataSequentialPlayer::New();
-
-    bool exceptionThrown3=false;
-
-    //The string above XML_INVALID_TESTSTRING is a wrong string, some element were deleted in above
-    try
-    {
-      std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("InvalidVersionNavigationDataTestData.xml", "Modules/IGT/Testing/Data");
-      mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-      myTestPlayer3->SetNavigationDataSet(reader->Read(file));
-    }
-    catch(mitk::IGTIOException)
-    {
-      exceptionThrown3=true;
-    }
-    MITK_TEST_CONDITION(exceptionThrown3, "Testing SetXMLString method with an invalid XML string.");
-  }
-
   void TestDoubleUpdate()
   {
-    std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2Tools.xml", "Modules/IGT/Testing/Data");
+    //std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2Tools.xml");
 
-    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-    player->SetNavigationDataSet(reader->Read(file));
+    //mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    //player->SetNavigationDataSet(reader->Read(file));
+    player->SetNavigationDataSet(NavigationDataSet);
 
     player->Update();
     mitk::Quaternion nd1Orientation = player->GetOutput()->GetOrientation();

@@ -177,6 +177,7 @@ void QmitkNavigationDataPlayerView::CreatePipeline(){
     GetDataStorage()->Add(node);
     m_RenderingNodes.push_back(node);
   }
+  m_VisFilter->Update();
 }
 
 void QmitkNavigationDataPlayerView::DestroyPipeline(){

@@ -124,9 +124,12 @@ void LoadingRTView::LoadRTDoseFile()
   mitk::DataNode::Pointer mitkImage = mitk::DataNode::New();
   mitkImage = _DicomRTReader->LoadRTDose(dataset,ncFilename);
 
-  GetDataStorage()->Add(mitkImage);
+  if(mitkImage.IsNotNull())
+  {
+    GetDataStorage()->Add(mitkImage);
+  }
 
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
+//  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
 //  mitk::TimeGeometry::Pointer geo3 = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
 //  mitk::RenderingManager::GetInstance()->InitializeViews( geo3 );
 }

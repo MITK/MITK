@@ -434,7 +434,8 @@ void RTDoseVisualizer::OnConvertButtonClicked()
     selectedNode = dataNodes[0];
   }
 
-  if(selectedNode)
+  bool isDoseNode = false;
+  if(selectedNode && selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),isDoseNode) && isDoseNode)
   {
     selectedNode->SetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(), true);
     selectedNode->SetBoolProperty(mitk::rt::Constants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(), true);
@@ -445,8 +446,6 @@ void RTDoseVisualizer::OnConvertButtonClicked()
     mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(clonedPreset);
     selectedNode->SetProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),levelSetProp);
 
-
-    double hsvValue = 0.002778;
     float prescribed;
     m_selectedNode->GetFloatProperty(mitk::rt::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescribed);
 
@@ -454,13 +453,8 @@ void RTDoseVisualizer::OnConvertButtonClicked()
 
     mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = this->m_Presets[this->m_selectedPresetName];
 
-    MITK_INFO << "FUNCTION PRESCRIBE " << prescribed << endl;
-
-
     float pref;
     m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-    mitk::Image::Pointer reslicedImage = this->GetExtractedSlice(image);
 
     //Generating the Colorwash
     for(mitk::IsoDoseLevelSet::ConstIterator setIT = isoDoseLevelSet->Begin(); setIT != isoDoseLevelSet->End(); ++setIT)
@@ -495,7 +489,17 @@ void RTDoseVisualizer::OnConvertButtonClicked()
 
     UpdateBySelectedNode();
 
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+//    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+//    if ( renderWindow != NULL && selectedNode->GetData()->GetTimeGeometry()->IsValid() )
+//    {
+//         renderWindow->GetRenderingManager()->InitializeViews(
+//             selectedNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+//         renderWindow->GetRenderingManager()->RequestUpdateAll();
+//    }
+
+//    this->RequestRenderWindowUpdate();
+
+//    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   }
 }
 
@@ -532,9 +536,13 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
 
   mitk::Surface::Pointer isoline = mitk::Surface::New();
   isoline->SetVtkPolyData(polyData);
-  isoline->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial")->Clone().GetPointer()));
-  isoline->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing());
-  isoline->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
+//  isoline->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial")->Clone().GetPointer()));
+  isoline->SetGeometry(reslicedImage->GetGeometry()->Clone());
+  mitk::Vector3D spacing;
+  spacing.Fill(1);
+  isoline->GetGeometry()->SetSpacing(spacing);
+//  isoline->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing());
+//  isoline->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
 
   mitk::DataNode::Pointer isolineNode = mitk::DataNode::New();
   isolineNode->SetData(isoline);
@@ -542,6 +550,7 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
   isolineNode->SetMapper(1, mapper);
   isolineNode->SetName("Isoline1");
   isolineNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
+  isolineNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   isolineNode->SetBoolProperty(mitk::rt::Constants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(),true);
   m_FreeIsoline = isolineNode;
   this->GetDataStorage()->Add(isolineNode);

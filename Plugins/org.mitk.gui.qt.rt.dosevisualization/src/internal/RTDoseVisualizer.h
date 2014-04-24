@@ -43,6 +43,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkContourFilter.h>
 
+#include <mitkIRenderingManager.h>
+#include <mitkIRenderWindowPart.h>
+
 /*forward declarations*/
 class QmitkIsoDoseLevelSetModel;
 class QmitkDoseColorDelegate;

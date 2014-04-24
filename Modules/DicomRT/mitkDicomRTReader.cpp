@@ -333,9 +333,14 @@ namespace mitk
     mitk::DicomSeriesReader* reader = new mitk::DicomSeriesReader;
 
     mitk::DataNode::Pointer originalNode = reader->LoadDicomSeries(file,false);
-    mitk::Image::Pointer originalImage = dynamic_cast<mitk::Image*>(originalNode->GetData());
 
-//    mitk::Geometry3D::Pointer geo = originalImage->GetGeometry()->Clone();
+    if(originalNode.IsNull())
+    {
+      MITK_ERROR << "Error reading the dcm file" << endl;
+      return 0;
+    }
+
+    mitk::Image::Pointer originalImage = dynamic_cast<mitk::Image*>(originalNode->GetData());
 
     DRTDoseIOD doseObject;
     OFCondition result = doseObject.read(*dataset);
@@ -380,7 +385,7 @@ namespace mitk
     OFCondition result = doseObject.read(*dataSet);
     if(result.bad())
     {
-      std::cout << "Error reading the RT Dose dataset\n\n";
+      MITK_ERROR << "Error reading the RT Dose dataset" << endl;
       return 0;
     }
 
@@ -399,8 +404,6 @@ namespace mitk
 
     frames = atoi(nrframes.c_str());
     gridscale = OFStandard::atof(gridScaling.c_str());
-    MITK_INFO << "Gridscale " << gridscale << endl;
-    MITK_INFO << "As String: " << gridScaling << endl;
     dataSet->findAndGetUint16Array(DCM_PixelData, pixelData, 0);
 
     int size = columns*rows*frames;

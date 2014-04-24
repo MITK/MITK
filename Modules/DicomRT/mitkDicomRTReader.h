@@ -105,6 +105,8 @@ namespace mitk
     template<typename TPixel, unsigned int VImageDimension>
     void MultiplayGridScaling( itk::Image< TPixel, VImageDimension>* image, Float32 gridscale);
 
+    void UpdateStdIsolines(Image::Pointer image);
+
     /**
      * @brief Get the maximum dose value from the dose file
      * @param dataSet The DcmDataset of the DicomRTDose file

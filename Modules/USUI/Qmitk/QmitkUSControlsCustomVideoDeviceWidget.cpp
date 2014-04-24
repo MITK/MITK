@@ -23,18 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkUSControlsCustomVideoDeviceWidget::QmitkUSControlsCustomVideoDeviceWidget(QWidget *parent)
   : QmitkUSAbstractCustomWidget(parent), ui(new Ui::QmitkUSControlsCustomVideoDeviceWidget)
 {
-  ui->setupUi(this);
-
-  connect( ui->crop_left, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-  connect( ui->crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-  connect( ui->crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-  connect( ui->crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-
   m_Cropping.left = 0;
   m_Cropping.top = 0;
   m_Cropping.right = 0;
   m_Cropping.bottom = 0;
-
 }
 
 QmitkUSControlsCustomVideoDeviceWidget::~QmitkUSControlsCustomVideoDeviceWidget()
@@ -77,6 +69,16 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnDeviceSet()
   ui->crop_right->setEnabled(m_ControlInterface.IsNotNull());
   ui->crop_bot->setEnabled(m_ControlInterface.IsNotNull());
   ui->crop_top->setEnabled(m_ControlInterface.IsNotNull());
+}
+
+void QmitkUSControlsCustomVideoDeviceWidget::Initialize()
+{
+  ui->setupUi(this);
+
+  connect( ui->crop_left, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
+  connect( ui->crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
+  connect( ui->crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
+  connect( ui->crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
 }
 
 void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()

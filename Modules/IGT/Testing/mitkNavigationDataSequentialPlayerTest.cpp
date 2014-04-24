@@ -32,7 +32,6 @@ class mitkNavigationDataSequentialPlayerTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkNavigationDataSequentialPlayerTestSuite);
   MITK_TEST(TestStandardWorkflow);
   MITK_TEST(TestRestartWithNewNavigationDataSet);
-  MITK_TEST(TestSetFileNameException);
   MITK_TEST(TestGoToSnapshotException);
   MITK_TEST(TestSetXMLStringException);
   MITK_TEST(TestDoubleUpdate);
@@ -40,22 +39,12 @@ class mitkNavigationDataSequentialPlayerTestSuite : public mitk::TestFixture
 
 private:
   /** Members used inside the different test methods. All members are initialized via setUp().*/
-  vnl_vector<mitk::ScalarType> tTool0Snapshot1;
-  vnl_vector<mitk::ScalarType> tTool1Snapshot2;
-  mitk::Quaternion qTool0Snapshot0;
-  mitk::Quaternion qTool1Snapshot1;
   mitk::NavigationDataSet::Pointer NavigationDataSet;
-
   mitk::NavigationDataSequentialPlayer::Pointer player;
 
 public:
 
   void setUp(){
-    tTool0Snapshot1 = vnl_vector<mitk::ScalarType>(3);
-    tTool1Snapshot2 = vnl_vector<mitk::ScalarType>(3);
-    mitk::Quaternion qTool0Snapshot0;
-    mitk::Quaternion qTool1Snapshot1;
-
     player = mitk::NavigationDataSequentialPlayer::New();
     std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2ToolsDouble.xml");
     mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
@@ -116,26 +105,7 @@ public:
 
   void TestStandardWorkflow()
   {
-    // create test values valid for the xml data above
-    tTool0Snapshot1[0] = -336.65;
-    tTool0Snapshot1[1] = 138.5;
-    tTool0Snapshot1[2]= -2061.07;
-    tTool1Snapshot2[0] = -56.93;
-    tTool1Snapshot2[1] = 233.79;
-    tTool1Snapshot2[2]= -2042.6;
-    vnl_vector_fixed<mitk::ScalarType,4> qVec;
-    qVec[0] = 0.0085;
-    qVec[1] = -0.0576;
-    qVec[2]= -0.0022;
-    qVec[3]= 0.9982;
-    qTool0Snapshot0 = mitk::Quaternion(qVec);
-    qVec[0] = 0.4683;
-    qVec[1] = 0.0188;
-    qVec[2]= -0.8805;
-    qVec[3]= 0.0696;
-    qTool1Snapshot1 = mitk::Quaternion(qVec);
-
-    //test SetXMLString()
+    // Set NavigationDatas for player
     player->SetNavigationDataSet(NavigationDataSet);
 
     MITK_TEST_CONDITION(player->GetNumberOfSnapshots() == 3,"Testing method SetXMLString with 3 navigation datas.");
@@ -150,75 +120,35 @@ public:
     // now test the go to snapshot function
     player->GoToSnapshot(2);
     mitk::NavigationData::Pointer nd1 = player->GetOutput(1);
-    MITK_TEST_CONDITION(tTool1Snapshot2 == nd1->GetPosition().GetVnlVector(),
+    mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(2,1);
+    MITK_TEST_CONDITION(ref1->GetPosition().GetVnlVector() == nd1->GetPosition().GetVnlVector(),
       "Testing GoToSnapshot() [1]");
 
-    MITK_TEST_OUTPUT( << tTool1Snapshot2 << "\t" << nd1->GetPosition().GetVnlVector());
+    //MITK_TEST_OUTPUT( << "Reference:" << ref1->GetPosition().GetVnlVector() << "\tObserved: " << nd1->GetPosition().GetVnlVector());
 
     player->GoToSnapshot(0);
     mitk::NavigationData::Pointer nd0 = player->GetOutput();
-    MITK_TEST_CONDITION(qTool0Snapshot0.as_vector() == nd0->GetOrientation().as_vector(),
+    mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(0,0);
+    MITK_TEST_CONDITION(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector(),
       "Testing GoToSnapshot() [2]");
 
-    MITK_TEST_OUTPUT( << qTool0Snapshot0.as_vector() << "\t" <<nd0->GetOrientation().as_vector() );
-
-    player->GoToSnapshot(2);
-
-    // and a third time
-    MITK_TEST_CONDITION(runLoop(),"Tested if repeat works again.");
+    //MITK_TEST_OUTPUT( << "Reference" << ref0->GetPosition().GetVnlVector() << "\tObserved:" <<nd0->GetOrientation().as_vector() );
   }
 
   void TestRestartWithNewNavigationDataSet()
   {
-    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-
-    mitk::NavigationDataSequentialPlayer::Pointer player(mitk::NavigationDataSequentialPlayer::New());
-
-    std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData_2ToolsDouble.xml", "Modules/IGT/Testing/Data");
-
-    player->SetNavigationDataSet(reader->Read(file));
+    player->SetNavigationDataSet(NavigationDataSet);
     mitk::NavigationData::PositionType nd1 = player->GetOutput(0)->GetPosition();
-    player->SetNavigationDataSet(reader->Read(file));
+    player->SetNavigationDataSet(NavigationDataSet);
     player->Update();
     mitk::NavigationData::PositionType nd2 = player->GetOutput(0)->GetPosition();
 
     MITK_TEST_CONDITION(nd1 == nd2, "First output must be the same after setting same navigation data again.");
 
     // setting new NavigationDataSet with different tool count should result in an exception
-    file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestData.xml", "Modules/IGT/Testing/Data");
+    std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData.xml");
+    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
     MITK_TEST_FOR_EXCEPTION(mitk::IGTException, player->SetNavigationDataSet(reader->Read(file)));
-  }
-
-  void TestSetFileNameException()
-  { //testing exception if file name hasnt been set
-    mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer = mitk::NavigationDataSequentialPlayer::New();
-    bool exceptionThrown=false;
-    try
-    {
-      mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-      myTestPlayer->SetNavigationDataSet(reader->Read(""));
-    }
-    catch(mitk::IGTIOException)
-    {
-      exceptionThrown=true;
-      MITK_TEST_OUTPUT(<<"Tested exception for the case when file version is wrong in SetFileName. Application should not crash.");
-    }
-    MITK_TEST_CONDITION(exceptionThrown, "Testing SetFileName method if exception (if file name hasnt been set) was thrown.");
-
-    //testing ReInItXML method if data element is not found
-    mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer1 = mitk::NavigationDataSequentialPlayer::New();
-    std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestDataInvalidTags.xml", "Modules/IGT/Testing/Data");
-    bool exceptionThrown1=false;
-    try
-    {
-      mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-      myTestPlayer1->SetNavigationDataSet(reader->Read(file));
-    }
-    catch(mitk::IGTException)
-    {
-      exceptionThrown1=true;
-    }
-    MITK_TEST_CONDITION(exceptionThrown1, "Testing SetFileName method if exception (if data element not found) was thrown.");
   }
 
   void TestGoToSnapshotException()

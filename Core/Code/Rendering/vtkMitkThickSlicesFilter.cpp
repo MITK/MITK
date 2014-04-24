@@ -31,7 +31,7 @@ vtkCxxRevisionMacro(vtkMitkThickSlicesFilter, "$Revision: 1.00 $");
 vtkStandardNewMacro(vtkMitkThickSlicesFilter);
 
 //----------------------------------------------------------------------------
-// Construct an instance of vtkMitkThickSlicesFilter fitler.
+// Construct an instance of vtkMitkThickSlicesFilter filter.
 vtkMitkThickSlicesFilter::vtkMitkThickSlicesFilter()
 {
   this->HandleBoundaries = 1;
@@ -285,6 +285,63 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
       }
     }
     break;
+
+  case vtkMitkThickSlicesFilter::MINIP:
+    {
+      for (idxY = 0; idxY <= maxY; idxY++)
+      {
+        for (idxX = 0; idxX <= maxX; idxX++)
+        {
+          T mip = inPtr[_minZ*inIncs[2]];
+
+          for(int z = _minZ+1; z<= _maxZ;z++)
+          {
+            T value = inPtr[z*inIncs[2]];
+            if(value < mip)
+              mip=value;
+          }
+
+          // do X axis
+          *outPtr = mip;
+          outPtr++;
+          inPtr++;
+        }
+        outPtr += outIncY;
+        inPtr += inIncY;
+      }
+    }
+    break;
+
+  case vtkMitkThickSlicesFilter::MEAN:
+    {
+      const int size = _maxZ-_minZ;
+
+      //MEAN
+      for (idxY = 0; idxY <= maxY; idxY++)
+      {
+        for (idxX = 0; idxX <= maxX; idxX++)
+        {
+          T sum = 0;
+          for(int z = _minZ+1; z<= _maxZ;z++)
+          {
+            T value = inPtr[z*inIncs[2]];
+            sum += value;
+          }
+
+          T mip = sum/size;
+
+          // do X axis
+          *outPtr = mip;
+          outPtr++;
+          inPtr++;
+        }
+        outPtr += outIncY;
+        inPtr += inIncY;
+      }
+    }
+    break;
+
+
   }
 
 }

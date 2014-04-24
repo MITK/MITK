@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKNavigationDataSequentialPlayer_H_HEADER_INCLUDED_
 #define MITKNavigationDataSequentialPlayer_H_HEADER_INCLUDED_
 
@@ -22,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   /**Documentation
   * \brief This class is a slightly changed reimplementation of the
   * NavigationDataPlayer which does not care about timestamps and just
@@ -38,13 +36,13 @@ namespace mitk
     itkNewMacro(Self);
 
     /**
-     * \brief Set to true if the data player should repeat the outputs.
-     */
+    * \brief Set to true if the data player should repeat the outputs.
+    */
     itkSetMacro(Repeat, bool);
 
     /**
-     * \return Returns if the data player should repeat the outputs.
-     */
+    * \return Returns if the data player should repeat the outputs.
+    */
     itkGetMacro(Repeat, bool);
 
     /**
@@ -52,6 +50,7 @@ namespace mitk
     * E.g. if you want to have the NavData of snapshot
     * 18 then you can call GoToSnapshot(17). Index begins at 0.
     * You can only go back if m_Repeat is set true.
+    * This method internally calls GenerateData, so outputs are refreshed automatically
     *
     * Filter output is updated inside the function.
     *
@@ -60,12 +59,12 @@ namespace mitk
     void GoToSnapshot(unsigned int i);
 
     /**
-     * \brief Advance the output to the next snapshot of mitk::NavigationData.
-     * Filter output is updated inside the function.
-     *
-     * \return false if no next snapshot is available (happens only if m_Repeat is set to false).
-     * @throw mitk::IGTException Throws an exception if an output is null.
-     */
+    * \brief Advance the output to the next snapshot of mitk::NavigationData.
+    * Filter output is updated inside the function.
+    *
+    * \return false if no next snapshot is available (happens only if m_Repeat is set to false).
+    * @throw mitk::IGTException Throws an exception if an output is null.
+    */
     bool GoToNextSnapshot();
 
     /**
@@ -79,15 +78,15 @@ namespace mitk
     virtual ~NavigationDataSequentialPlayer();
 
     /**
-     * \brief Does nothing.
-     * mitk::NavigationDataSequentialPlayer::GoToNextSnapshot() should be called
-     * for generating next data.
-     */
+    * \brief Does nothing.
+    * mitk::NavigationDataSequentialPlayer::GoToNextSnapshot() should be called
+    * for generating next data.
+    */
     virtual void GenerateData();
 
     /**
-      * \brief If the player should repeat outputs. Default is false.
-      */
+    * \brief If the player should repeat outputs. Default is false.
+    */
     bool m_Repeat;
   };
 } // namespace mitk

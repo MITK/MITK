@@ -45,7 +45,7 @@ void mitk::NavigationDataSequentialPlayer::GoToSnapshot(unsigned int i)
   m_NavigationDataSetIterator = m_NavigationDataSet->Begin() + ( i % this->GetNumberOfSnapshots() );
 
   // set outputs to selected snapshot
-  this->GoToNextSnapshot();
+  this->GenerateData();
 }
 
 bool mitk::NavigationDataSequentialPlayer::GoToNextSnapshot()
@@ -68,6 +68,7 @@ bool mitk::NavigationDataSequentialPlayer::GoToNextSnapshot()
       return false;
     }
   }
+  this->GenerateData();
   return true;
 }
 

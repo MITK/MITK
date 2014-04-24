@@ -202,10 +202,9 @@ namespace mitk
       std::deque<mitk::ContourModelSet::Pointer> x;
       return x;
     }
-    mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
     do
     {
-//      mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
+      mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
       DRTROIContourSequence::Item &currentRoiObject =
               roiContourSeqObject.getCurrentItem();
       if(!currentRoiObject.isValid())
@@ -272,11 +271,10 @@ namespace mitk
       }
       refROI->ContourModelSet = contourSet;
       contourSet->SetProperty("name", mitk::StringProperty::New(refROI->Name));
-//      contourModelSetVector.push_back(contourSet);
+      contourModelSetVector.push_back(contourSet);
 
     }
     while(roiContourSeqObject.gotoNextItem().good());
-    contourModelSetVector.push_back(contourSet);
 
     return contourModelSetVector;
   }

@@ -144,6 +144,8 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
   m_Controls.m_EnableInverseTransform->setToolTip("The inverse transform will transform the fixed onto the moving surface.");
   m_Controls.m_EnableFRENormalization->setToolTip("Normalization of the Fiducial Registration Error.");
   m_Controls.m_EnableTrimming->setToolTip("Enables the trimmed version of the algorithm.");
+  m_Controls.m_MovingTargets->setToolTip("Select the targets for the moving surface.");
+  m_Controls.m_FixedTargets->setToolTip("Select the targets for the fixed surface.");
 
   // init combo boxes
   m_Controls.m_FixedSurfaceComboBox->SetDataStorage(this->GetDataStorage());
@@ -166,6 +168,34 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
   m_Controls.m_TrimmFactorSpinbox->setEnabled(false);
 }
 
+
+bool QmitkSurfaceRegistrationView::CheckInput()
+{
+  QMessageBox msg;
+  msg.setIcon(QMessageBox::Critical);
+
+  if ( m_Controls.m_MovingSurfaceComboBox->GetSelectedNode().IsNull() ||
+        m_Controls.m_FixedSurfaceComboBox->GetSelectedNode().IsNull() )
+  {
+    msg.setText("No Surfaces selected.");
+    msg.exec();
+    return false;
+  }
+
+  if ( m_Controls.m_EnableTreCalculation->isChecked() )
+  {
+    if ( m_Controls.m_FixedTargets->GetSelectedNode().IsNull() ||
+           m_Controls.m_MovingTargets->GetSelectedNode().IsNull() )
+    {
+      msg.setText("TRE calculation is enabled, but no target points are selected.");
+      msg.exec();
+      return false;
+    }
+  }
+
+  return true;
+}
+
 void QmitkSurfaceRegistrationView::OnStartRegistration()
 {
   d->m_Threshold = m_Controls.m_ThresholdSpinbox->value();
@@ -181,6 +211,9 @@ void QmitkSurfaceRegistrationView::OnStartRegistration()
     d->m_TrimmFactor = m_Controls.m_TrimmFactorSpinbox->value();
   }
 
+  if (! CheckInput() )
+    return;
+
   d->m_MovingSurface = dynamic_cast<mitk::Surface*>(
             m_Controls.m_MovingSurfaceComboBox->GetSelectedNode()->GetData() );
 
@@ -190,7 +223,7 @@ void QmitkSurfaceRegistrationView::OnStartRegistration()
   // sanity check
   if ( d->m_FixedSurface.IsNull() || d->m_MovingSurface.IsNull() )
   {
-    MITK_ERROR << "Input surface not set";
+    MITK_ERROR << "Input surface not set.";
     return;
   }
 

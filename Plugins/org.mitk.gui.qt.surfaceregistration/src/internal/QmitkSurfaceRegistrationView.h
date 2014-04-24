@@ -112,6 +112,10 @@ class QmitkSurfaceRegistrationView : public QmitkAbstractView
   private:
 
     SurfaceRegistrationViewData* d;
+
+    /** Check for the correct input data.*/
+    bool CheckInput();
+
 };
 
 #endif // QmitkSurfaceRegistrationView_h

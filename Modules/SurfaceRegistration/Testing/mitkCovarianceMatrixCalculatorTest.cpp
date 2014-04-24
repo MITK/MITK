@@ -23,6 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestFixture.h>
 
+/** Test class to test the computation of covariance matrices
+  * for the A-ICP algorithm. The test runs the CM_PCA method.
+  */
 class mitkCovarianceMatrixCalculatorTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkCovarianceMatrixCalculatorTestSuite);

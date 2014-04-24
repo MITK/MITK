@@ -565,7 +565,8 @@ void RTDoseVisualizer::UpdateStdIsolines()
   {
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
     mitk::Image::Pointer reslicedImage = this->GetExtractedSlice(image);
-//    reslicedImage->GetGeometry()->GetIndexToWorldTransform()->SetMatrix(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix());
+
+    reslicedImage->SetSpacing(image->GetGeometry()->GetSpacing());
 
     float pref;
     m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
@@ -606,7 +607,7 @@ void RTDoseVisualizer::UpdateStdIsolines()
         isoNode->SetName(strstr.str());
         isoNode->SetBoolProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),true);
         m_StdIsoLines.push_back(isoNode);
-        this->GetDataStorage()->Add(isoNode);
+        this->GetDataStorage()->Add(isoNode, m_selectedNode);
       }
     }
   }

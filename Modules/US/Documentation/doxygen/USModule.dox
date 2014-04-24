@@ -12,11 +12,11 @@ The main features are:
   <li> USVideoDevice class which allows to connect any ultrasound device with a video-out via a Frame grabber
   <ul>
     <li> Fast image preprocessing capabilities (Grey Scale Conversion, Cropping) via OpenCV
-	<li> Advanced image processing functions via mitk filters.
+        <li> Advanced image processing functions via mitk filters.
   </ul>
   <li> Connection of API-Enabled devices (specifically the Telemed LogicScan 128 is implemented)
   <ul>
-	<li> Control of API-enabled Devices via MITK (Widgets for basic B mode controls and probe selection are available)
+        <li> Control of API-enabled Devices via MITK (Widgets for basic B mode controls and probe selection are available)
   </ul>
   <li> Designed to interact with the \link IGTGeneralModulePage IGT Module \endlink for tracking functionality.
 </ul>
@@ -94,7 +94,8 @@ graphical user interface is integrated into the Ultrasound Plugin.
 \subsection USHardwareTelemedInstall Install the Telemed SDK
 
 The Telemed SDK cannot be shipped with MITK due to legal issues. Instead it can
-be obtained directly from Telemed.
+be obtained directly from Telemed. MITK was tested with API version 3.9.0
+(2013-02-04).
 The following packages must be installed:
 <ul>
   <li>Telemed Drivers Package (MITK was tested with version 1.13.7)</li>

@@ -52,8 +52,8 @@ The following additional settings are available in the plugin to configure the a
 \subsection org_mitk_gui_qt_aicpregistrationTrimmedRegistration Trimmed Registration
 
 This option enables a trimmed version of the algorithm to register partial overlapping
-surfaces. Once the option is enabled the user can specify the trimm factor.
-Valid values for the trim factor lie between 0 an 1.
+surfaces. Once the option is enabled the user can specify the overlapping part of the surface.
+Valid values for the overlapping part lie between 0 an 1.
 The trimmed version of the algorithm uses only a fixed percentage of all correspondences found
 during one iteration. Only the best correspondences will be used during the registration process.
 

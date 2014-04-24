@@ -26,7 +26,7 @@ QmitkNavigationDataPlayerControlWidget::QmitkNavigationDataPlayerControlWidget(Q
 {
   ui->setupUi(this);
 
-  connect(m_UpdateTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
+  connect(m_UpdateTimer, SIGNAL(timeout()), this, SLOT(OnUpdate()));
 }
 
 QmitkNavigationDataPlayerControlWidget::~QmitkNavigationDataPlayerControlWidget()

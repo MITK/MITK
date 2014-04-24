@@ -1,6 +1,7 @@
 
 set(CPP_FILES
   mitkUSUIActivator.cpp
+  mitkUSUICustomWidgetFactory.cpp
   Qmitk/QmitkUSDeviceManagerWidget.cpp
   Qmitk/QmitkUSNewVideoDeviceWidget.cpp
   Qmitk/QmitkUSControlsBModeWidget.cpp

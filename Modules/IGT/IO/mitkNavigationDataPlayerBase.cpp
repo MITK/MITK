@@ -85,6 +85,7 @@ void mitk::NavigationDataPlayerBase::InitPlayer()
   }
 
   this->Modified();
+  this->GenerateData();
 }
 
 void mitk::NavigationDataPlayerBase::GraftEmptyOutput()

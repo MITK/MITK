@@ -77,6 +77,7 @@ namespace mitk{
 
     /**
     * \brief Initializes the outputs of this NavigationDataSource.
+    * Aftwer calling this method, the first Navigationdata from the loaded Navigationdataset is loaded into the outputs.
     */
     void InitPlayer();
 

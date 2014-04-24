@@ -50,6 +50,12 @@ void mitk::NavigationDataSequentialPlayer::GoToSnapshot(unsigned int i)
 
 bool mitk::NavigationDataSequentialPlayer::GoToNextSnapshot()
 {
+  if (m_NavigationDataSetIterator == m_NavigationDataSet->End())
+  {
+    MITK_WARN("NavigationDataSequentialPlayer") << "Cannot go to next snapshot, already at end of NavigationDataset. Ignoring...";
+    return false;
+  }
+  ++m_NavigationDataSetIterator;
   if ( m_NavigationDataSetIterator == m_NavigationDataSet->End() )
   {
     if ( m_Repeat )
@@ -62,9 +68,6 @@ bool mitk::NavigationDataSequentialPlayer::GoToNextSnapshot()
       return false;
     }
   }
-
-  ++m_NavigationDataSetIterator;
-
   return true;
 }
 

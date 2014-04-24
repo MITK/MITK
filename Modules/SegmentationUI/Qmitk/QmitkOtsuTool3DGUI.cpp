@@ -33,7 +33,7 @@ QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkToolGUI(), m_NumberOfRegions(0),
 
   connect( m_Controls.m_pbRun, SIGNAL(clicked()), this, SLOT(OnRun()) );
   connect( m_Controls.m_pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()) );
-  connect(m_Controls.m_selectionListWidget, SIGNAL(itemSelectionChanged()),
+  connect(m_Controls.m_SelectionListWidget, SIGNAL(itemSelectionChanged()),
           this, SLOT(OnItemSelectionChanged()));
   connect( m_Controls.m_pbAcceptPreview, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
 //  connect( m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
@@ -53,7 +53,7 @@ QmitkOtsuTool3DGUI::~QmitkOtsuTool3DGUI()
 
 void QmitkOtsuTool3DGUI::OnItemSelectionChanged()
 {
-  m_SelectedItems = m_Controls.m_selectionListWidget->selectedItems();
+  m_SelectedItems = m_Controls.m_SelectionListWidget->selectedItems();
 
   if (m_SelectedItems.size() == 0)
   {
@@ -88,12 +88,10 @@ void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
     m_OtsuMultipleThresholdTool3D->CurrentlyBusy -= mitk::MessageDelegate1<QmitkOtsuTool3DGUI, bool>( this, &QmitkOtsuTool3DGUI::BusyStateChanged );
   }
 
-  m_OtsuMultipleThresholdTool3D = dynamic_cast<mitk::OtsuMultipleThresholdTool3D*>( tool );
+  m_OtsuMultipleThresholdTool3D = dynamic_cast<mitk::OtsuTool3D*>( tool );
 
   if (m_OtsuMultipleThresholdTool3D)
   {
-    m_Controls.m_sbNumberOfRegions->setValue(m_OtsuMultipleThresholdTool3D->GetNumberOfRegions());
-
     m_OtsuMultipleThresholdTool3D->CurrentlyBusy += mitk::MessageDelegate1<QmitkOtsuTool3DGUI, bool>( this, &QmitkOtsuTool3DGUI::BusyStateChanged );
   }
 }
@@ -138,7 +136,7 @@ void QmitkOtsuTool3DGUI::OnRun()
         if (proceed != QMessageBox::Ok) return;
       }
       this->setCursor(Qt::WaitCursor);
-      m_OtsuMultipleThresholdTool3D->Run( m_NumberOfRegions, m_UseValleyEmphasis, m_NumberOfBins );
+      m_OtsuMultipleThresholdTool3D->RunSegmentation( m_NumberOfRegions, m_UseValleyEmphasis, m_NumberOfBins );
       this->setCursor(Qt::ArrowCursor);
     }
     catch( ... )

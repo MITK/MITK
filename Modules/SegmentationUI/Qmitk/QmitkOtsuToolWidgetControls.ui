@@ -426,7 +426,7 @@ p, li { white-space: pre-wrap; }
    <header>ctkExpandButton.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
   <include location="../resources/SegmentationUI.qrc"/>
  </resources>
  <connections/>

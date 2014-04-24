@@ -25,46 +25,50 @@ namespace us {
 class ModuleResource;
 }
 
-namespace mitk{
+namespace mitk
+{
+
   class MitkSegmentation_EXPORT OtsuTool3D : public SegTool3D
   {
-    public:
+  public:
 
-      mitkClassMacro(OtsuTool3D, SegTool3D);
-      itkNewMacro(OtsuTool3D);
+    mitkClassMacro(OtsuTool3D, SegTool3D);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self)
 
-      /* icon stuff */
-      virtual const char** GetXPM() const;
-      virtual const char* GetName() const;
-      us::ModuleResource GetIconResource() const;
+    /* icon stuff */
+    virtual const char** GetXPM() const;
+    virtual const char* GetName() const;
+    us::ModuleResource GetIconResource() const;
 
-      /// \brief Adds actions related to multi label preview image and node
-      virtual void Activated();
+    /// \brief Adds actions related to multi label preview image and node
+    virtual void Activated();
 
-      /// \brief Adds actions related to multi label preview image and node
-      virtual void Deactivated();
+    /// \brief Adds actions related to multi label preview image and node
+    virtual void Deactivated();
 
-      /// \brief Executes the tool.
-      void RunSegmentation( int regions, bool useValley, int numberOfBins);
-      void UpdateVolumePreview(bool volumeRendering);
-      /// \brief Updates the preview image with the current region selection.
-      void UpdatePreview(std::vector<int> regionIDs);
+    /// \brief Executes the tool.
+    void RunSegmentation( int regions, bool useValley, int numberOfBins);
+    void UpdateVolumePreview(bool volumeRendering);
+    /// \brief Updates the preview image with the current region selection.
+    void UpdatePreview(std::vector<int> regionIDs);
 
-    protected:
-      OtsuTool3D();
-      virtual ~OtsuTool3D();
+  protected:
+    OtsuTool3D();
+    virtual ~OtsuTool3D();
 
-      mitk::DataNode::Pointer m_MultiLabelNode;
-      mitk::Image::Pointer m_MultiLabelImage;
+    mitk::DataNode::Pointer m_MultiLabelNode;
+    mitk::Image::Pointer m_MultiLabelImage;
+    std::vector<int> m_RegionIDs;
 
-      template < typename TPixel, unsigned int VDimension >
-      void InternalRun( itk::Image<TPixel, VDimension>* input, int regions, bool useValley, int numberOfBins );
+    template < typename TPixel, unsigned int VDimension >
+    void InternalRun( itk::Image<TPixel, VDimension>* input, int regions, bool useValley, int numberOfBins );
 
-      template <typename ImageType1, typename ImageType2>
-      void InternalAcceptPreview( ImageType1* targetImage, const ImageType2* sourceImage );
+//    template <typename ImageType1, typename ImageType2>
+//    void InternalAcceptPreview( ImageType1* targetImage, const ImageType2* sourceImage );
 
-      template <typename ImageType>
-      void InternalUpdatePreview( const ImageType* input, std::vector<int> regionIDs);
+    template <typename TPixel, unsigned int VImageDimension>
+    void InternalUpdatePreview( const itk::Image<TPixel, VImageDimension>* input);
 
   };
 

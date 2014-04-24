@@ -169,11 +169,14 @@ void mitk::OtsuTool3D::UpdatePreview(std::vector<int> regionIDs)
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
+  m_RegionIDs = regionIDs;
+
   CurrentlyBusy.Send(true);
 
   try
   {
-    AccessByItk_1( m_MultiLabelImage, InternalUpdatePreview, regionIDs);
+    // Fixed pixel type due to itk::OrFilter which is used for update preview
+    AccessFixedPixelTypeByItk( m_MultiLabelImage, InternalUpdatePreview, (unsigned char) );
   }
   catch( itk::ExceptionObject & e )
   {
@@ -201,19 +204,21 @@ void mitk::OtsuTool3D::UpdatePreview(std::vector<int> regionIDs)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-template <typename ImageType>
-void mitk::OtsuTool3D::InternalUpdatePreview(const ImageType* input, std::vector<int> regionIDs)
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::OtsuTool3D::InternalUpdatePreview(const itk::Image<TPixel, VImageDimension>* input)
 {
+  typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::BinaryThresholdImageFilter< ImageType, ImageType > ThresholdFilterType;
-  ImageType::Pointer itkBinaryTempImage1;
-  ImageType::Pointer itkBinaryTempImage2;
-  ImageType::Pointer itkBinaryResultImage;
+
+  typename ImageType::Pointer itkBinaryTempImage1;
+  typename ImageType::Pointer itkBinaryTempImage2;
+  typename ImageType::Pointer itkBinaryResultImage;
 
   typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
 
   filter->SetInput(input);
-  filter->SetLowerThreshold(regionIDs[0]);
-  filter->SetUpperThreshold(regionIDs[0]);
+  filter->SetLowerThreshold(m_RegionIDs[0]);
+  filter->SetUpperThreshold(m_RegionIDs[0]);
   filter->SetInsideValue(1);
   filter->SetOutsideValue(0);
 
@@ -233,10 +238,10 @@ void mitk::OtsuTool3D::InternalUpdatePreview(const ImageType* input, std::vector
   filter->Update();
   itkBinaryTempImage2 = filter->GetOutput();
 
-  itk::OrImageFilter<ImageType, ImageType>::Pointer orFilter = itk::OrImageFilter<ImageType, ImageType>::New();
+  typename itk::OrImageFilter< ImageType, ImageType>::Pointer orFilter = itk::OrImageFilter< ImageType, ImageType>::New();
 
   // if more than one region id is used compute the union of all given binary regions
-  for (std::vector<int>::iterator it = regionIDs.begin() ; it != regionIDs.end(); ++it)
+  for (std::vector<int>::iterator it = m_RegionIDs.begin() ; it != m_RegionIDs.end(); ++it)
   {
     filter->SetLowerThreshold(*it);
     filter->SetUpperThreshold(*it);
@@ -274,7 +279,7 @@ void mitk::OtsuTool3D::InternalRun( itk::Image<TPixel, VDimension>* input, int r
   typename OtsuFilterType::Pointer otsuFilter = OtsuFilterType::New();
   otsuFilter->SetNumberOfThresholds( regions - 1 );
   otsuFilter->SetValleyEmphasis( useValley );
-  otsuFilter->SetNumberOfBins( numberOfBins );
+  otsuFilter->SetNumberOfHistogramBins( numberOfBins );
   otsuFilter->SetInput( input );
 
   if (m_ProgressCommand.IsNotNull())

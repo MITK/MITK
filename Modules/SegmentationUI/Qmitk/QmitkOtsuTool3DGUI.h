@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUI.h"
 #include <MitkSegmentationUIExports.h>
-#include "ui_QmitkOtsuWidgetControls.h"
+#include "ui_QmitkOtsuToolWidgetControls.h"
 
 namespace mitk {
   class OtsuTool3D;
@@ -70,7 +70,7 @@ class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     mitk::OtsuTool3D* m_OtsuMultipleThresholdTool3D;
 
-    Ui_QmitkOtsuTool3DGUIControls m_Controls;
+    Ui_QmitkOtsuWidgetControls m_Controls;
 
     int m_NumberOfRegions;
 

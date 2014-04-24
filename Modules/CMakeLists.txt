@@ -50,7 +50,7 @@ set(module_dirs
     Persistence
     IGTUI
     VtkShaders
-    SurfaceRegistration
+    AnisotropicRegistration
 )
 
 if(MITK_ENABLE_PIC_READER)

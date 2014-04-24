@@ -15,17 +15,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QmitkSurfaceRegistrationView_h
-#define QmitkSurfaceRegistrationView_h
+#ifndef QmitkAICPRegistrationView_h
+#define QmitkAICPRegistrationView_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
 #include <QWidget>
-#include "ui_QmitkSurfaceRegistrationViewControls.h"
+#include "ui_QmitkAICPRegistrationViewControls.h"
 
 // forwarddeclaration
-class SurfaceRegistrationViewData;
+class AICPRegistrationViewData;
 
 /**
   * \brief Implemenation of a worker thread class.
@@ -40,7 +40,7 @@ class UIWorker : public QObject
 
   private:
     /** Pimpl with the registration data.*/
-    SurfaceRegistrationViewData* d;
+    AICPRegistrationViewData* d;
 
   public slots:
 
@@ -55,18 +55,18 @@ class UIWorker : public QObject
   public:
 
     /** Set the data used for the registration.*/
-    void SetRegistrationData(SurfaceRegistrationViewData* data);
+    void SetRegistrationData(AICPRegistrationViewData* data);
 };
 
 /**
-  \brief QmitkSurfaceRegistrationView provides a simple UI to register two
+  \brief QmitkAICPRegistrationView provides a simple UI to register two
          surfaces with the AnisotropicIterativeClosestPointRegistration
          algorithm.
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
-class QmitkSurfaceRegistrationView : public QmitkAbstractView
+class QmitkAICPRegistrationView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -76,9 +76,9 @@ class QmitkSurfaceRegistrationView : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
-    QmitkSurfaceRegistrationView();
+    QmitkAICPRegistrationView();
 
-    ~QmitkSurfaceRegistrationView();
+    ~QmitkAICPRegistrationView();
 
   protected slots:
 
@@ -107,15 +107,15 @@ class QmitkSurfaceRegistrationView : public QmitkAbstractView
 
     virtual void SetFocus();
 
-    Ui::QmitkSurfaceRegistrationViewControls m_Controls;
+    Ui::QmitkAICPRegistrationViewControls m_Controls;
 
   private:
 
-    SurfaceRegistrationViewData* d;
+    AICPRegistrationViewData* d;
 
     /** Check for the correct input data.*/
     bool CheckInput();
 
 };
 
-#endif // QmitkSurfaceRegistrationView_h
+#endif // QmitkAICPRegistrationView_h

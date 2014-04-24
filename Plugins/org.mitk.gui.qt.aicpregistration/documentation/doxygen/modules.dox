@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_aicperegistration org.mitk.gui.qt.surfaceregistration
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_aicpregistration_internal Internal
+  \ingroup org_mitk_gui_qt_aicpregistration
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.aicpregistration plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

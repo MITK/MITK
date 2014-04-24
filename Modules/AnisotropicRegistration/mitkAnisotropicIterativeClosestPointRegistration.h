@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVector.h>
 
 //EXPORTS
-#include "MitkSurfaceRegistrationExports.h"
+#include "MitkAnisotropicRegistrationExports.h"
 
 // STL
 #include <vector>
@@ -114,7 +114,7 @@ class WeightedPointTransform;
   * \endcode
   *
   */
-class MitkSurfaceRegistration_EXPORT AnisotropicIterativeClosestPointRegistration : public itk::Object
+class MitkAnisotropicRegistration_EXPORT AnisotropicIterativeClosestPointRegistration : public itk::Object
 {
 
 protected:
@@ -247,7 +247,8 @@ public:
   itkGetMacro(NumberOfIterations, unsigned int)
 
   /**
-    * Factor that trimms the point set in percent.E.g. 0.4 will use 40 precent
+    * Factor that trimms the point set in percent for
+    * partial overalpping surfaces. E.g. 0.4 will use 40 precent
     * of the point set. To enable the trimmed version a
     * factor > 0 and < 1 must be set. The default value is 0.0.
     */

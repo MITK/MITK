@@ -15,24 +15,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "org_mitk_gui_qt_surfaceregistration_Activator.h"
+#include "org_mitk_gui_qt_aicpregistration_Activator.h"
 
 #include <QtPlugin>
 
-#include "QmitkSurfaceRegistrationView.h"
+#include "QmitkAICPRegistrationView.h"
 
 namespace mitk {
 
-void org_mitk_gui_qt_surfaceregistration_Activator::start(ctkPluginContext* context)
+void org_mitk_gui_qt_aicpregistration_Activator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkSurfaceRegistrationView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkAICPRegistrationView, context)
 }
 
-void org_mitk_gui_qt_surfaceregistration_Activator::stop(ctkPluginContext* context)
+void org_mitk_gui_qt_aicpregistration_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_surfaceregistration, mitk::org_mitk_gui_qt_surfaceregistration_Activator)
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_aicpregistration, mitk::org_mitk_gui_qt_aicpregistration_Activator)

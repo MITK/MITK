@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMatrix.h>
 #include <mitkVector.h>
 
-#include <MitkSurfaceRegistrationExports.h>
+#include <MitkAnisotropicRegistrationExports.h>
 
 // forward declarations
 class vtkPoints;
@@ -44,7 +44,7 @@ class PointSet;
  * (@ref PropagateMatrices()) and compute the target registration error (TRE)
  * (@ref ComputeTargetRegistrationError()).
  */
-class MitkSurfaceRegistration_EXPORT  AnisotropicRegistrationCommon
+class MitkAnisotropicRegistration_EXPORT  AnisotropicRegistrationCommon
 {
 
 protected:

@@ -15,14 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef org_mitk_gui_qt_surfaceregistration_Activator_h
-#define org_mitk_gui_qt_surfaceregistration_Activator_h
+#ifndef org_mitk_gui_qt_aicpregistration_Activator_h
+#define org_mitk_gui_qt_aicpregistration_Activator_h
 
 #include <ctkPluginActivator.h>
 
 namespace mitk {
 
-class org_mitk_gui_qt_surfaceregistration_Activator :
+class org_mitk_gui_qt_aicpregistration_Activator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT

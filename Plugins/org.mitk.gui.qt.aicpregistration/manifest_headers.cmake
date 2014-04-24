@@ -1,4 +1,4 @@
-set(Plugin-Name "Surfaceregistration")
+set(Plugin-Name "AICPRegistration")
 set(Plugin-Version "0.1")
 set(Plugin-Vendor "DKFZ, Medical and Biological Informatics")
 set(Plugin-ContactAddress "")

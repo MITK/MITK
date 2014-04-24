@@ -3,17 +3,17 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  org_mitk_gui_qt_surfaceregistration_Activator.cpp
-  QmitkSurfaceRegistrationView.cpp
+  org_mitk_gui_qt_aicpregistration_Activator.cpp
+  QmitkAICPRegistrationView.cpp
 )
 
 set(UI_FILES
-  src/internal/QmitkSurfaceRegistrationViewControls.ui
+  src/internal/QmitkAICPRegistrationViewControls.ui
 )
 
 set(MOC_H_FILES
-  src/internal/org_mitk_gui_qt_surfaceregistration_Activator.h
-  src/internal/QmitkSurfaceRegistrationView.h
+  src/internal/org_mitk_gui_qt_aicpregistration_Activator.h
+  src/internal/QmitkAICPRegistrationView.h
 )
 
 # list of resource files which can be used by the plug-in

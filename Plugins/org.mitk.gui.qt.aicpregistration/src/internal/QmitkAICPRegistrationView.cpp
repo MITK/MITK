@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 // Qmitk
-#include "QmitkSurfaceRegistrationView.h"
+#include "QmitkAICPRegistrationView.h"
 
 // Qt
 #include <QMessageBox>
@@ -39,13 +39,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkCleanPolyData.h>
 
-const std::string QmitkSurfaceRegistrationView::VIEW_ID = "org.mitk.views.surfaceregistration";
+const std::string QmitkAICPRegistrationView::VIEW_ID = "org.mitk.views.aicpregistration";
 
  /**
    * @brief Pimpl holding the datastructures used by the
-   *        QmitkSurfaceRegistrationView.
+   *        QmitkAICPRegistrationView.
    */
-class SurfaceRegistrationViewData
+class AICPRegistrationViewData
 {
 
 public:
@@ -69,7 +69,7 @@ public:
   mitk::Surface::Pointer m_FixedSurface;
 
   // c tor
-  SurfaceRegistrationViewData()
+  AICPRegistrationViewData()
    : m_RegistrationThread(new QThread()),
      m_Worker(new UIWorker()),
      m_Threshold(0.00001),
@@ -85,7 +85,7 @@ public:
   }
 
   // cleanup
-  ~SurfaceRegistrationViewData()
+  ~AICPRegistrationViewData()
   {
     if ( m_RegistrationThread )
       delete m_RegistrationThread;
@@ -100,20 +100,20 @@ public:
   }
 };
 
-QmitkSurfaceRegistrationView::QmitkSurfaceRegistrationView()
+QmitkAICPRegistrationView::QmitkAICPRegistrationView()
 {
-  d = new SurfaceRegistrationViewData();
+  d = new AICPRegistrationViewData();
 }
 
-QmitkSurfaceRegistrationView::~QmitkSurfaceRegistrationView()
+QmitkAICPRegistrationView::~QmitkAICPRegistrationView()
 {
   if ( d )
     delete d;
 }
 
-void QmitkSurfaceRegistrationView::SetFocus(){}
+void QmitkAICPRegistrationView::SetFocus(){}
 
-void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
+void QmitkAICPRegistrationView::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
@@ -164,7 +164,7 @@ void QmitkSurfaceRegistrationView::CreateQtPartControl( QWidget *parent )
 }
 
 
-bool QmitkSurfaceRegistrationView::CheckInput()
+bool QmitkAICPRegistrationView::CheckInput()
 {
   QMessageBox msg;
   msg.setIcon(QMessageBox::Critical);
@@ -191,7 +191,7 @@ bool QmitkSurfaceRegistrationView::CheckInput()
   return true;
 }
 
-void QmitkSurfaceRegistrationView::OnStartRegistration()
+void QmitkAICPRegistrationView::OnStartRegistration()
 {
   d->m_Threshold = m_Controls.m_ThresholdSpinbox->value();
   d->m_MaxIterations = m_Controls.m_MaxIterationsSpinbox->value();
@@ -239,7 +239,7 @@ void QmitkSurfaceRegistrationView::OnStartRegistration()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSurfaceRegistrationView::OnEnableTreCalculation()
+void QmitkAICPRegistrationView::OnEnableTreCalculation()
 {
   if ( m_Controls.m_EnableTreCalculation->isChecked() )
     m_Controls.m_TargetSelectFrame->setEnabled(true);
@@ -247,7 +247,7 @@ void QmitkSurfaceRegistrationView::OnEnableTreCalculation()
     m_Controls.m_TargetSelectFrame->setEnabled(false);
 }
 
-void QmitkSurfaceRegistrationView::OnEnableTrimming()
+void QmitkAICPRegistrationView::OnEnableTrimming()
 {
   if ( m_Controls.m_EnableTrimming->isChecked() )
   {
@@ -261,7 +261,7 @@ void QmitkSurfaceRegistrationView::OnEnableTrimming()
   }
 }
 
-void QmitkSurfaceRegistrationView::OnRegistrationFinished()
+void QmitkAICPRegistrationView::OnRegistrationFinished()
 {
   typedef itk::Matrix<double,3,3> Matrix3x3;
   typedef itk::Vector<double,3> TranslationVector;
@@ -355,7 +355,7 @@ void QmitkSurfaceRegistrationView::OnRegistrationFinished()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void UIWorker::SetRegistrationData(SurfaceRegistrationViewData *data)
+void UIWorker::SetRegistrationData(AICPRegistrationViewData *data)
 {
   this->d = data;
 }

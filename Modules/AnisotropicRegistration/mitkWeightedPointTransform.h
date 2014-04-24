@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __WEIGHTEDPOINTTRANSFORM_H__
 
 //EXPORTS
-#include "MitkSurfaceRegistrationExports.h"
+#include "MitkAnisotropicRegistrationExports.h"
 
 //ITK
 #include <itkVariableSizeMatrix.h>
@@ -52,7 +52,7 @@ namespace mitk
  * The implemantion was originally ported to C/C++ by A. Franz.
  *
  */
-class MitkSurfaceRegistration_EXPORT WeightedPointTransform : public itk::Object
+class MitkAnisotropicRegistration_EXPORT WeightedPointTransform : public itk::Object
 {
   /** Definition of a 3x3 matrix.*/
   typedef itk::Matrix<double,3,3> Matrix3x3;
@@ -223,7 +223,7 @@ protected:
   double CalculateConfigChange( vtkPoints* X, vtkPoints* X_new );
 
   /**
-   * @brief This method performs a variant of the weighted point register alogorithm presented by
+   * @brief This method performs a variant of the weighted point register algorithm presented by
    *        A. Danilchenko, R. Balachandran and J. M. Fitzpatrick in January 2010. (Modified in January 2011)
    *        converted to C++ by Alfred Franz in March/April 2010
    *

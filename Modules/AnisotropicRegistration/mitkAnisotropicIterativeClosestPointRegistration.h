@@ -231,6 +231,9 @@ public:
    *  \code{.cpp}
    *  double FRENormalizationFactor = sqrt ( MeanVarianceX + MeanVarianceY );
    *  \endcode
+   *
+   *  if no FRE normalization is used the normalization factor is set to 1.0
+   *  as default value.
    */
   itkSetMacro(FRENormalizationFactor, double)
 

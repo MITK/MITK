@@ -250,7 +250,7 @@ public:
 
   /**
     * Factor that trimms the point set in percent for
-    * partial overalpping surfaces. E.g. 0.4 will use 40 precent
+    * partial overlapping surfaces. E.g. 0.4 will use 40 precent
     * of the point set. To enable the trimmed version a
     * factor > 0 and < 1 must be set. The default value is 0.0.
     */

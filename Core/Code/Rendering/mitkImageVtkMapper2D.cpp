@@ -239,9 +239,12 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
     Vector3D normInIndex, normal;
 
-    if ( planeGeometry != NULL ){
+    if ( planeGeometry != NULL )
+    {
       normal = planeGeometry->GetNormal();
-    }else{
+    }
+    else
+    {
       const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
       if(abstractGeometry != NULL)
         normal = abstractGeometry->GetPlane()->GetNormal();
@@ -254,9 +257,68 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
     dataZSpacing = 1.0 / normInIndex.GetNorm();
 
+    // number of slices that are prepended to the current slice
+    int negativeThickSlicesNum( -thickSlicesNum );
+
+    // number of slices that are appended to the current slice
+    int positiveThickSlicesNum( thickSlicesNum );
+
+
+    bool enableBorderCorrection( true );
+    if ( enableBorderCorrection )
+    {
+      mitk::SlicedGeometry3D::Pointer imageGeometry = input->GetSlicedGeometry( this->GetTimestep() );
+
+      // Calculate the distance to the furthest cornerpoints on both sides of the rendering-geometry
+      ScalarType maxNegativeDistance = 0;
+      ScalarType maxPositiveDistance = 0;
+      for( int i=1; i<8; i++ )
+      {
+        mitk::Point3D cornerPoint = imageGeometry->GetCornerPoint( i );
+
+        // get the distance to the each cornerpoint
+        ScalarType distance = worldGeometry->Distance( cornerPoint );
+
+        // and store the largest one for each direction
+        if ( worldGeometry->IsAbove( cornerPoint ) )
+          maxPositiveDistance = std::max( maxPositiveDistance, distance );
+        else
+          maxNegativeDistance = std::max( maxNegativeDistance, distance );
+      }
+
+      // Calculate how many slices fit into that distance
+      int maxNegativeSlices = maxNegativeDistance / dataZSpacing;
+      int maxPositiveSlices = maxPositiveDistance / dataZSpacing;
+
+      // If the desired number of slices to append is greater than the number of
+      // possibly appended slices ...
+      if ( maxNegativeSlices < thickSlicesNum )
+      {
+        // ... we use that maximum number of slices for that direction
+        negativeThickSlicesNum = maxNegativeDistance / dataZSpacing * -1;
+
+        // and adapt the number of slices to append to the other direction accordingly
+        positiveThickSlicesNum = std::min( maxPositiveSlices, (2*thickSlicesNum)+negativeThickSlicesNum );
+      }
+
+      // If the desired number of slices to append in the other direction is greater than the number of
+      // possibly appended slices ...
+      if ( maxPositiveSlices < thickSlicesNum )
+      {
+        // ... we use that maximum number of slices for that direction
+        positiveThickSlicesNum = maxPositiveDistance / dataZSpacing;
+
+        // and adapt the number of slices to append to the other direction accordingly
+        negativeThickSlicesNum = std::min( maxNegativeSlices, (2*thickSlicesNum)-positiveThickSlicesNum );
+
+        // As this is the other direction we have to multiply with -1
+        negativeThickSlicesNum *= -1;
+      }
+    }
+
     localStorage->m_Reslicer->SetOutputDimensionality( 3 );
     localStorage->m_Reslicer->SetOutputSpacingZDirection(dataZSpacing);
-    localStorage->m_Reslicer->SetOutputExtentZDirection( -thickSlicesNum, 0+thickSlicesNum );
+    localStorage->m_Reslicer->SetOutputExtentZDirection( negativeThickSlicesNum, positiveThickSlicesNum );
 
     // Do the reslicing. Modified() is called to make sure that the reslicer is
     // executed even though the input geometry information did not change; this
@@ -274,7 +336,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   }
   else
   {
-    //this is needed when thick mode was enable bevore. These variable have to be reset to default values
+    //this is needed when thick mode was enable before. These variable have to be reset to default values
     localStorage->m_Reslicer->SetOutputDimensionality( 2 );
     localStorage->m_Reslicer->SetOutputSpacingZDirection(1.0);
     localStorage->m_Reslicer->SetOutputExtentZDirection( 0, 0 );

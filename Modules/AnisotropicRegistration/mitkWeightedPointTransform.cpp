@@ -313,7 +313,6 @@ void mitk::WeightedPointTransform::WeightedPointRegister(
 
     n++;
 
-    //TODO RUN-TIME: is calculated twice in first iteration
     calculateWeightMatrices(Sigma_X,Sigma_Y,W,TransformationR);
 
     //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

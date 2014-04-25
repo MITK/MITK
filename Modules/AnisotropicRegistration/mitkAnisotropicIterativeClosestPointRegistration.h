@@ -61,6 +61,8 @@ class WeightedPointTransform;
   * vertices. In addition vtkCleanPolyData can be used to ensure a correct
   * Surface representation.
   *
+  * \note The correspondence search is accelerated when OpenMP is enabled.
+  *
   * \b Example:
   *
   *

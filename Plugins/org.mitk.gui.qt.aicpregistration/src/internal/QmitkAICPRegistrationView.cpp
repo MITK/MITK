@@ -172,7 +172,9 @@ bool QmitkAICPRegistrationView::CheckInput()
   if ( m_Controls.m_MovingSurfaceComboBox->GetSelectedNode().IsNull() ||
         m_Controls.m_FixedSurfaceComboBox->GetSelectedNode().IsNull() )
   {
-    msg.setText("No Surfaces selected.");
+    const char* message = "No Surfaces selected.";
+    MITK_ERROR << message;
+    msg.setText(message);
     msg.exec();
     return false;
   }
@@ -182,12 +184,12 @@ bool QmitkAICPRegistrationView::CheckInput()
     if ( m_Controls.m_FixedTargets->GetSelectedNode().IsNull() ||
            m_Controls.m_MovingTargets->GetSelectedNode().IsNull() )
     {
-      msg.setText("TRE calculation is enabled, but no target points are selected.");
+      const char* message = "TRE calculation is enabled, but no target points are selected.";
+      msg.setText(message);
       msg.exec();
       return false;
     }
   }
-
   return true;
 }
 
@@ -215,9 +217,11 @@ void QmitkAICPRegistrationView::OnStartRegistration()
   // sanity check
   if ( d->m_FixedSurface.IsNull() || d->m_MovingSurface.IsNull() )
   {
+    const char* message = "Input surfaces are NULL.";
     QMessageBox msg;
     msg.setIcon(QMessageBox::Critical);
-    msg.setText("Input surfaces are NULL.");
+    msg.setText(message);
+    MITK_ERROR << message;
     return;
   }
 
@@ -280,10 +284,10 @@ void QmitkAICPRegistrationView::OnRegistrationFinished()
   if ( m_Controls.m_EnableTreCalculation->isChecked() )
   {
     mitk::PointSet* movingTargets = dynamic_cast<mitk::PointSet*> (
-          m_Controls.m_MovingTargets->GetSelectedNode()->GetData() );
+                     m_Controls.m_MovingTargets->GetSelectedNode()->GetData() );
 
     mitk::PointSet* fixedTargets = dynamic_cast<mitk::PointSet*> (
-          m_Controls.m_FixedTargets->GetSelectedNode()->GetData() );
+                      m_Controls.m_FixedTargets->GetSelectedNode()->GetData() );
 
     // sanity check
     if ( movingTargets && fixedTargets )

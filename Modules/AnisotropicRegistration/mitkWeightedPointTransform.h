@@ -51,6 +51,8 @@ namespace mitk
  * by an unweighted point based registration algorithm as an initial estimate.
  * The implemantion was originally ported to C/C++ by A. Franz.
  *
+ * \note Some methods are accelerated when OpenMP is enabled.
+ *
  */
 class MitkAnisotropicRegistration_EXPORT WeightedPointTransform : public itk::Object
 {
@@ -229,8 +231,8 @@ protected:
    *
    * @param X                (input) the moving point set
    * @param Y                (input) the fixed (static) point set
-   * @param Sigma_X          (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair of points in X (inverted and squared TODO: describe better)
-   * @param Sigma_Y          (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair of points in Y (inverted and squared TODO: describe better)
+   * @param Sigma_X          (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair of points in X
+   * @param Sigma_Y          (input) a 3-by-3-by-N array, each page containing the weighting matrix for the Nth pair of points in Y
    * @param Threshold        (input) the relative size of the change to the moving set above which the iteration continues
    * @param MaxIterations    (input) the maximum number of iterations allowed
    * @param Threshold        (input) the threshold used to terminate the algorithm

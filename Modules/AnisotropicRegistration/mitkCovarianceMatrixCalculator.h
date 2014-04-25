@@ -39,7 +39,7 @@ struct CovarianceMatrixCalculatorData;
  * {@link Surface} used in the A-ICP algorithm.
  *
  * Computes a covariance matrix for every vertex in a given {@link Surface}
- * based on it's direct neighbours and saves them in a CovarianceMatrixList.
+ * based on it's direct neighbours and saves them into a CovarianceMatrixList.
  * The Class implements the CM_PCA method presented by
  * L. Maier-Hein et al. in "Convergent Iterative Closest-Point Algorithm
  * to Accomodate Anisotropic and Inhomogenous Localization Error.",
@@ -67,6 +67,18 @@ protected:
   /** List that stores the computed covariance matrices. */
   CovarianceMatrixList m_CovarianceMatrixList;
 
+  /** This method projects all surrounding vertices of given vertex in a Surface
+    * in the normal direction onto a plane and computes a primary component
+    * analysis on the projected vertices. In the next step a orthonormal
+    * system is created.
+    *
+    * @param The index of the input Vertex in the Surface.
+    * @param The normal of the input Vertex.
+    * @param Output CovarianceMatrix of the principal component analysis.
+    * @param Output. Variances along the axes of the createt Orthonormal system.
+    * @param Output. The current Vertex in the surface
+    *
+    */
   void ComputeOrthonormalCoordinateSystem( const int index,
                                            Vertex normal,
                                            CovarianceMatrix &principalComponents,

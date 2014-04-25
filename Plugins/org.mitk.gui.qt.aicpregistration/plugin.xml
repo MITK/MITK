@@ -5,7 +5,7 @@
     <view id="org.mitk.views.aicpregistration"
           name="AICP-Registration"
           class="QmitkAICPRegistrationView"
-          icon="resources/icon.xpm" />
+          icon="resources/QmitkAICPRegistration_Icon.xpm" />
   </extension>
 
 </plugin>

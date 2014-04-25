@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_aicpregistration The Anisotropic Iterative Closest Point Registration Plugin
 
-\image html icon.xpm "Icon of the A-ICP Registration Plugin"
+\image html QmitkAICPRegistration_Icon.xpm "Icon of the A-ICP Registration Plugin"
 
 \tableofcontents
 

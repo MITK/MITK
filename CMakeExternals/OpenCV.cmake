@@ -43,7 +43,7 @@ if(MITK_USE_OpenCV)
     # 12-09-11, muellerm, removed automatic usage again, since this will struggle with the MITK Qt application object
     if(MITK_USE_QT)
       list(APPEND additional_cmake_args
-           -DWITH_QT:BOOL=ON
+           -DWITH_QT:BOOL=OFF
            -DWITH_QT_OPENGL:BOOL=OFF
            -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
           )

@@ -81,6 +81,9 @@ public:
     /** \brief  Called when the statistics update is finished, sets the results to GUI.*/
     void OnThreadedStatisticsCalculationEnds();
 
+    /** \brief Update bin size for histogram resolution. */
+    void OnHistogramBinSizeSliderValueChanged(int);
+
     protected slots:
       /** \brief  Saves the histogram to the clipboard */
       void OnClipboardHistogramButtonClicked();

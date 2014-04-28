@@ -67,7 +67,8 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_PlanarFigureAxis (0),
   m_PlanarFigureSlice (0),
   m_PlanarFigureCoordinate0 (0),
-  m_PlanarFigureCoordinate1 (0)
+  m_PlanarFigureCoordinate1 (0),
+  m_HistogramBinSize(1)
 {
   m_EmptyHistogram = HistogramType::New();
   m_EmptyHistogram->SetMeasurementVectorSize(1);
@@ -237,6 +238,15 @@ bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
   return m_DoIgnorePixelValue;
 }
 
+void ImageStatisticsCalculator::SetHistogramBinSize(unsigned int size)
+{
+  this->m_HistogramBinSize = size;
+}
+
+unsigned int ImageStatisticsCalculator::GetHistogramBinSize()
+{
+  return this->m_HistogramBinSize;
+}
 bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 {
 
@@ -778,11 +788,13 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
 
   statisticsContainer->push_back( statistics );
 
-   // Calculate histogram
+  // Calculate histogram
+  unsigned int numberOfBins = std::floor( ( (statistics.Max - statistics.Min + 1) / m_HistogramBinSize) + 0.5 );
+
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );
   histogramGenerator->SetMarginalScale( 100 );
-  histogramGenerator->SetNumberOfBins( 768 );
+  histogramGenerator->SetNumberOfBins( numberOfBins );
   histogramGenerator->SetHistogramMin( statistics.Min );
   histogramGenerator->SetHistogramMax( statistics.Max );
   histogramGenerator->Compute();
@@ -950,7 +962,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
   statisticsFilter->Update();
 
-  int numberOfBins = ( m_DoIgnorePixelValue && (m_MaskingMode == MASKING_MODE_NONE) ) ? 768 : 384;
+  int numberOfBins = std::floor( ( (statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1) / m_HistogramBinSize) + 0.5 );
+
   typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
   labelStatisticsFilter = LabelStatisticsFilterType::New();
   labelStatisticsFilter->SetInput( adaptedImage );

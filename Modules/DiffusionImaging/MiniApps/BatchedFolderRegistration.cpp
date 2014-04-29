@@ -29,10 +29,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK
 #include <itksys/SystemTools.hxx>
 #include <itkDirectory.h>
+#include "itkWindowedSincInterpolateImageFunction.h"
+#include "itkIdentityTransform.h"
+#include "itkResampleImageFilter.h"
 
 
 typedef std::vector<std::string> FileListType;
-
+typedef itk::Image<double, 3> InputImageType;
 
 static std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
@@ -85,6 +88,79 @@ static std::string GetSavePath(std::string outputFolder, std::string fileName)
 
   return savePathAndFileName;
 }
+
+
+
+static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing)
+{
+  InputImageType::Pointer itkImage = InputImageType::New();
+  CastToItkImage(input,itkImage);
+
+  /**
+   * 1) Resampling
+   *
+   */
+  // Identity transform.
+  // We don't want any transform on our image except rescaling which is not
+  // specified by a transform but by the input/output spacing as we will see
+  // later.
+  // So no transform will be specified.
+  typedef itk::IdentityTransform<double, 3> T_Transform;
+
+    // The resampler type itself.
+  typedef itk::ResampleImageFilter<InputImageType, InputImageType>  T_ResampleFilter;
+
+  // Prepare the resampler.
+  // Instantiate the transform and specify it should be the id transform.
+  T_Transform::Pointer _pTransform = T_Transform::New();
+  _pTransform->SetIdentity();
+
+  // Instantiate the resampler. Wire in the transform and the interpolator.
+  T_ResampleFilter::Pointer _pResizeFilter = T_ResampleFilter::New();
+  _pResizeFilter->SetTransform(_pTransform);
+
+  // Set the output origin.
+  _pResizeFilter->SetOutputOrigin(itkImage->GetOrigin());
+
+  // Compute the size of the output.
+  // The size (# of pixels) in the output is recomputed using
+  // the ratio of the input and output sizes.
+  InputImageType::SpacingType inputSpacing = itkImage->GetSpacing();
+  InputImageType::SpacingType outputSpacing;
+  const InputImageType::RegionType& inputSize = itkImage->GetLargestPossibleRegion();
+
+  InputImageType::SizeType outputSize;
+  typedef InputImageType::SizeType::SizeValueType SizeValueType;
+
+  // Set the output spacing.
+  outputSpacing[0] = spacing[0];
+  outputSpacing[1] = spacing[1];
+  outputSpacing[2] = spacing[2];
+
+  outputSize[0] = static_cast<SizeValueType>(inputSize.GetSize()[0] * inputSpacing[0] / outputSpacing[0] + .5);
+  outputSize[1] = static_cast<SizeValueType>(inputSize.GetSize()[1] * inputSpacing[1] / outputSpacing[1] + .5);
+  outputSize[2] = static_cast<SizeValueType>(inputSize.GetSize()[2] * inputSpacing[2] / outputSpacing[2] + .5);
+
+  _pResizeFilter->SetOutputSpacing(outputSpacing);
+  _pResizeFilter->SetSize(outputSize);
+
+
+  typedef itk::WindowedSincInterpolateImageFunction< InputImageType, 3> WindowedSincInterpolatorType;
+  WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
+  _pResizeFilter->SetInterpolator(sinc_interpolator);
+
+  // Specify the input.
+  _pResizeFilter->SetInput(itkImage);
+  _pResizeFilter->Update();
+
+  mitk::Image::Pointer image = mitk::Image::New();
+  image->InitializeByItk(_pResizeFilter->GetOutput());
+  mitk::GrabItkImageMemory( _pResizeFilter->GetOutput(), image);
+
+  return image;
+}
+
+
 
 /// Build a derived file name from moving images e.g. xxx_T2.nrrd becomes xxx_GTV.nrrd
 static FileListType CreateDerivedFileList(std::string baseFN, std::string baseSuffix, std::vector<std::string> derivedPatterns)
@@ -162,8 +238,7 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   parser.addArgument("moving", "m", ctkCommandLineParser::String, "Suffix for moving images",us::Any(),false);
   parser.addArgument("derived", "d", ctkCommandLineParser::String, "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
   parser.addArgument("silent", "s", ctkCommandLineParser::Bool, "No xml progress output.");
-  // Feature currently disabled
-  //parser.addArgument("resample", "r", QVariant::String, "Reference Image for resampling (optional), is not applied to tensor data");
+  parser.addArgument("resample", "r", ctkCommandLineParser::String, "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
@@ -208,6 +283,20 @@ int BatchedFolderRegistration( int argc, char* argv[] )
     derPatterns = split(arg ,',');
   }
 
+
+  std::vector<std::string> spacings;
+  float spacing[3];
+  bool doResampling = false;
+  if (parsedArgs.count("resample") || parsedArgs.count("d") )
+  {
+    std::string arg =  us::any_cast<string>(parsedArgs["resample"]);
+    spacings = split(arg ,',');
+    spacing[0] = atoi(spacings.at(0).c_str());
+    spacing[1] = atoi(spacings.at(1).c_str());
+    spacing[2] = atoi(spacings.at(2).c_str());
+    doResampling = true;
+  }
+
   MITK_INFO << "Input Folder : " << inputPath;
   MITK_INFO << "Looking for reference image ...";
   FileListType referenceFileList = CreateFileList(inputPath,refPattern);
@@ -223,6 +312,12 @@ int BatchedFolderRegistration( int argc, char* argv[] )
 
   MITK_INFO << "Loading Reference (fixed) image: " << referenceFileName;
   mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(referenceFileName);
+  mitk::Image::Pointer resampleReference = NULL;
+  if (doResampling)
+  {
+    refImage = ResampleBySpacing(refImage,spacing);
+    resampleReference = refImage;
+  }
 
   if (refImage.IsNull())
     MITK_ERROR << "Loaded fixed image is NULL";
@@ -293,7 +388,7 @@ int BatchedFolderRegistration( int argc, char* argv[] )
       // Store transformation,  apply it to morph file
       MITK_INFO << "----------Registering moving image to reference----------";
       mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, referenceMask);
-      mitk::RegistrationWrapper::ApplyTransformationToImage(movingImage, transf,offset, NULL); // , resampleImage
+      mitk::RegistrationWrapper::ApplyTransformationToImage(movingImage, transf,offset, resampleReference); // , resampleImage
 
       savePathAndFileName = GetSavePath(outputPath, fileMorphName);
       std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
@@ -321,7 +416,7 @@ int BatchedFolderRegistration( int argc, char* argv[] )
       MITK_INFO << "----Processing derived resource " << derivedResourceFilename << " ...";
       mitk::Image::Pointer derivedMovingResource = mitk::IOUtil::LoadImage(derivedResourceFilename);
       // Apply transformation to derived resource, treat derived resource as binary
-      mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, NULL, true);
+      mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, resampleReference, true);
 
       savePathAndFileName = GetSavePath(outputPath, derivedResourceFilename);
       std::string fileType = itksys::SystemTools::GetFilenameExtension(derivedResourceFilename);

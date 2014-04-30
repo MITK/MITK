@@ -128,10 +128,10 @@ mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_openMeAloneTransformed640x480 mi
                          ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAloneTransformedPoints640x480REF.png #corresponding reference screenshot
 )
-mitkAddCustomModuleTest(mitkSurfaceDepthSortingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthSortingTest
-                        ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Stanford_bunnySTLDepthSorting640x480REF.png #corresponding reference screenshot
-)
+#mitkAddCustomModuleTest(mitkSurfaceDepthSortingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthSortingTest
+#                        ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl
+#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Stanford_bunnySTLDepthSorting640x480REF.png
+#)
 if(NOT APPLE)
 mitkAddCustomModuleTest(mitkSurfaceDepthPeelingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthPeelingTest
                         ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl

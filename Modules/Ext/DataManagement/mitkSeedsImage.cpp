@@ -46,7 +46,6 @@ void mitk::SeedsImage::Initialize()
 
 void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
 {
-  //mitkCheckOperationTypeMacro(SeedsOperation, operation, seedsOp);
   m_Spacing = this->GetGeometry()->GetSpacing();
   for(unsigned int i=0; i<this->GetDimension(); i++)
     orig_size[i] = this->GetDimension(i);

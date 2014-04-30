@@ -61,7 +61,15 @@ mitk::TimeBounds mitk::ProportionalTimeGeometry::GetTimeBounds () const
 
 mitk::TimePointType  mitk::ProportionalTimeGeometry::GetMinimumTimePoint(TimeStepType step) const
 {
-  TimePointType timePoint = m_FirstTimePoint + m_StepDuration * step;
+  TimePointType timePoint;
+  if (step == 0)
+  {
+    timePoint = m_FirstTimePoint;
+  }
+  else
+  {
+    timePoint = m_FirstTimePoint + m_StepDuration * step;
+  }
   if (timePoint >std::numeric_limits<TimePointType>().max())
     timePoint = std::numeric_limits<TimePointType>().max();
   return timePoint;
@@ -209,7 +217,7 @@ void mitk::ProportionalTimeGeometry::Initialize (Geometry3D* geometry, TimeStepT
   m_StepDuration = 1.0;
   if (timeSteps < 2)
   {
-    m_FirstTimePoint = -std::numeric_limits<mitk::TimePointType>().max();
+    m_FirstTimePoint = -std::numeric_limits<double>::max();
     m_StepDuration = std::numeric_limits<mitk::TimePointType>().infinity();
   }
 
@@ -241,6 +249,7 @@ void mitk::ProportionalTimeGeometry::PrintSelf(std::ostream& os, itk::Indent ind
   os << indent << " TimeSteps: " << this->CountTimeSteps() << std::endl;
   os << indent << " FirstTimePoint: " << this->GetFirstTimePoint() << std::endl;
   os << indent << " StepDuration: " << this->GetStepDuration() << " ms" << std::endl;
+  os << indent << " Time Bounds: " << this->GetTimeBounds()[0] << " - " << this->GetTimeBounds()[1] << std::endl;
 
   os << std::endl;
   os << indent << " GetGeometryForTimeStep(0): ";

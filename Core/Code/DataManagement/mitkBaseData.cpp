@@ -49,12 +49,6 @@ void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
   mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
   g3d->Initialize();
 
- if ( timeSteps > 1 )
- {
-    mitk::ScalarType timeBounds[] = {0.0, 1.0};
-    g3d->SetTimeBounds( timeBounds );
- }
-
   // The geometry is propagated automatically to the other items,
   // if EvenlyTimed is true...
   //Old timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );

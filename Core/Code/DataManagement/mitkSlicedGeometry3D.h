@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometry.h"
 
 namespace mitk {
-
 class SliceNavigationController;
 class NavigationController;
 
@@ -106,7 +105,7 @@ public:
   //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
   virtual void ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry );
 
-  virtual void SetTimeBounds( const mitk::TimeBounds& timebounds );
+  //virtual void SetTimeBounds( const mitk::TimeBounds& timebounds );
 
 
   virtual const mitk::BoundingBox* GetBoundingBox() const;
@@ -319,7 +318,6 @@ protected:
   //mitk::NavigationController *m_NavigationController;
   mitk::SliceNavigationController *m_SliceNavigationController;
 };
-
 } // namespace mitk
 
 #endif /* MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD */

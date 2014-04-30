@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 /**
  \brief Describes the geometry on the display/screen for 2D display.
 
@@ -65,7 +64,6 @@ namespace mitk
 */
 class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
 {
-
   public:
 
     mitkClassMacro(DisplayGeometry,Geometry2D);
@@ -82,7 +80,7 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     /// \return this objects modified time.
     virtual unsigned long GetMTime() const;
 
-    virtual const TimeBounds& GetTimeBounds() const;
+    //virtual const TimeBounds& GetTimeBounds() const;
 
 
 
@@ -234,8 +232,6 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     float m_MaxWorldViewPercentage;
     float m_MinWorldViewPercentage;
 };
-
 } // namespace
 
 #endif // include guard
-

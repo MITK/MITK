@@ -249,7 +249,8 @@ mitk::SlicedGeometry3D::InitializeEvenlySpaced(
   this->SetGeometry2D( geometry2D, 0 );
   this->SetSpacing( spacing );
   this->SetEvenlySpaced();
-  this->SetTimeBounds( geometry2D->GetTimeBounds() );
+
+  //this->SetTimeBounds( geometry2D->GetTimeBounds() );
 
   assert(m_IndexToWorldTransform.GetPointer()
          != geometry2D->GetIndexToWorldTransform()); // (**) see above.
@@ -653,21 +654,21 @@ mitk::SlicedGeometry3D
 }
 
 
-void
-mitk::SlicedGeometry3D::SetTimeBounds( const mitk::TimeBounds& timebounds )
-{
-  Superclass::SetTimeBounds( timebounds );
-
-  unsigned int s;
-  for ( s = 0; s < m_Slices; ++s )
-  {
-    if(m_Geometry2Ds[s].IsNotNull())
-    {
-      m_Geometry2Ds[s]->SetTimeBounds( timebounds );
-    }
-  }
-  m_TimeBounds = timebounds;
-}
+//void
+//mitk::SlicedGeometry3D::SetTimeBounds( const mitk::TimeBounds& timebounds )
+//{
+//  Superclass::SetTimeBounds( timebounds );
+//
+//  unsigned int s;
+//  for ( s = 0; s < m_Slices; ++s )
+//  {
+//    if(m_Geometry2Ds[s].IsNotNull())
+//    {
+//      m_Geometry2Ds[s]->SetTimeBounds( timebounds );
+//    }
+//  }
+//  m_TimeBounds = timebounds;
+//}
 
 
 itk::LightObject::Pointer
@@ -776,7 +777,6 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
           RotationOperation *rotOp = dynamic_cast< RotationOperation * >( operation );
           Geometry3D::ExecuteOperation( rotOp);
         }
-
       }
     }
     else
@@ -1052,4 +1052,3 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
 
   this->Modified();
 }
-

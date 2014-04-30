@@ -127,15 +127,15 @@ void mitk::Geometry3D::SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatr
   m_VtkMatrix->DeepCopy(vtkmatrix);
   TransferVtkToItkTransform();
 }
-
-void mitk::Geometry3D::SetTimeBounds(const TimeBounds& timebounds)
-{
-  if(m_TimeBounds != timebounds)
-  {
-    m_TimeBounds = timebounds;
-    Modified();
-  }
-}
+//
+//void mitk::Geometry3D::SetTimeBounds(const TimeBounds& timebounds)
+//{
+//  if(m_TimeBounds != timebounds)
+//  {
+//    m_TimeBounds = timebounds;
+//    Modified();
+//  }
+//}
 
 void mitk::Geometry3D::SetFloatBounds(const float bounds[6])
 {

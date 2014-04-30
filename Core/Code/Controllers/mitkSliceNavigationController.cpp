@@ -49,7 +49,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 namespace mitk {
-
 SliceNavigationController::SliceNavigationController( const char *type )
 : BaseController( type ),
   m_InputWorldGeometry3D( NULL ),
@@ -337,12 +336,14 @@ SliceNavigationController::Update(
 
       assert( worldTimeGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() ).IsNotNull() );
 
-      slicedWorldGeometry->SetTimeBounds(
-        worldTimeGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() )->GetTimeBounds() );
+      TimePointType minimumTimePoint = worldTimeGeometry->TimeStepToTimePoint(this->GetTime()->GetPos());
+      TimePointType stepDuration = worldTimeGeometry->TimeStepToTimePoint(this->GetTime()->GetPos()+1)-worldTimeGeometry->TimeStepToTimePoint(this->GetTime()->GetPos());
 
       //@todo implement for non-evenly-timed geometry!
       m_CreatedWorldGeometry = ProportionalTimeGeometry::New();
       dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())->Initialize(slicedWorldGeometry, worldTimeGeometry->CountTimeSteps());
+      dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())->GetMinimumTimePoint(minimumTimePoint);
+      dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())->SetStepDuration(stepDuration);
     }
   }
 
@@ -622,7 +623,6 @@ SliceNavigationController::AdjustSliceStepperRange()
   {
     m_Slice->InvalidateRange();
   }
-
 }
 
 
@@ -810,9 +810,7 @@ SliceNavigationController
 
                 statusText = stream.str();
                 mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
-
               }
-
             }
             ok = true;
             break;
@@ -835,6 +833,4 @@ SliceNavigationController
 
   return false;
 }
-
 } // namespace
-

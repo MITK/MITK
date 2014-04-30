@@ -67,33 +67,13 @@ public:
       // test some values
       if(nd0.IsNull() || nd1.IsNull()) return false;
 
-      if(i==0)
-      {
-        mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(0,0);
-        mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(0,1);
-        if (!(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector())) {return false;}
-        if (!(ref1->GetOrientation().as_vector() == nd1->GetOrientation().as_vector())) {return false;}
-        if (!(ref0->GetPosition().GetVnlVector() == nd0->GetPosition().GetVnlVector())) {return false;}
-        if (!(ref1->GetPosition().GetVnlVector() == nd1->GetPosition().GetVnlVector())) {return false;}
-      }
-      else if(i==1)
-      {
-        mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(1,0);
-        mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(1,1);
-        if (!(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector())) {return false;}
-        if (!(ref1->GetOrientation().as_vector() == nd1->GetOrientation().as_vector())) {return false;}
-        if (!(ref0->GetPosition().GetVnlVector() == nd0->GetPosition().GetVnlVector())) {return false;}
-        if (!(ref1->GetPosition().GetVnlVector() == nd1->GetPosition().GetVnlVector())) {return false;}
-      }
-      else if(i==2) // should be repeated
-      {
-        mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(2,0);
-        mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(2,1);
-        if (!(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector())) {return false;}
-        if (!(ref1->GetOrientation().as_vector() == nd1->GetOrientation().as_vector())) {return false;}
-        if (!(ref0->GetPosition().GetVnlVector() == nd0->GetPosition().GetVnlVector())) {return false;}
-        if (!(ref1->GetPosition().GetVnlVector() == nd1->GetPosition().GetVnlVector())) {return false;}
-      }
+      //Compare data
+      mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(i,0);
+      mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(i,1);
+      if (!(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector())) {return false;}
+      if (!(ref1->GetOrientation().as_vector() == nd1->GetOrientation().as_vector())) {return false;}
+      if (!(ref0->GetPosition().GetVnlVector() == nd0->GetPosition().GetVnlVector())) {return false;}
+      if (!(ref1->GetPosition().GetVnlVector() == nd1->GetPosition().GetVnlVector())) {return false;}
 
       // Goto next Snapshot
       player->GoToNextSnapshot();
@@ -106,7 +86,7 @@ public:
     // Set NavigationDatas for player
     player->SetNavigationDataSet(NavigationDataSet);
 
-    MITK_TEST_CONDITION(player->GetNumberOfSnapshots() == 3,"Testing method SetXMLString with 3 navigation datas.");
+    MITK_TEST_CONDITION(player->GetNumberOfSnapshots() == 3,"Testing if player reports correct number of Snapshots");
     MITK_TEST_CONDITION(player->GetNumberOfIndexedOutputs() == 2,"Testing number of outputs");
 
     //rest repeat

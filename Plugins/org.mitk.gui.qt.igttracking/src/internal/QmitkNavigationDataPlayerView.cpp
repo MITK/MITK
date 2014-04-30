@@ -143,7 +143,6 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
     m_ToolStorage = mitk::NavigationToolStorage::New();
     for (int i = 0; i < m_Player->GetNumberOfIndexedOutputs(); i++)
     {
-      MITK_INFO << "Output" << i;
       mitk::NavigationTool::Pointer currentDummyTool = mitk::NavigationTool::New();
       mitk::VirtualTrackingTool::Pointer dummyTool = mitk::VirtualTrackingTool::New();
       std::stringstream name;

@@ -23,32 +23,58 @@ class mitkLineTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkLineTestSuite);
-  MITK_TEST(TestTempMethods);
+  MITK_TEST(Test2DLine);
+  MITK_TEST(Test3DLine);
   CPPUNIT_TEST_SUITE_END();
 
 private:
 
-  mitk::Line<double,2> m_Line;
+  mitk::Line<double,2> m_2DLine;
+  mitk::Line<double,3> m_3DLine;
 
 public:
 
   void setUp()
   {
-    m_Line = mitk::Line<double,2>();
+    //set up simple 2D Line
+    m_2DLine = mitk::Line<double,2>();
     itk::Point<double,2> p;
     p[0] = 1;
     p[1] = 2;
-    m_Line.SetPoint(p);
+    m_2DLine.SetPoint(p);
 
     itk::Vector<double,2> direction;
     direction[0] = 0;
     direction[1] = 1;
-    m_Line.SetDirection(direction);
+    m_2DLine.SetDirection(direction);
+
+    //set up simple 3D Line
+    m_3DLine = mitk::Line<double,3>();
+    mitk::Point3D p3D;
+    mitk::FillVector3D(p3D,0,1,2);
+    m_3DLine.SetPoint(p3D);
+
+    mitk::Vector3D direction3D;
+    mitk::FillVector3D(direction3D,4,5,6);
+    m_3DLine.SetDirection(direction3D);
   }
 
-  void TestTempMethods()
+  void Test2DLine()
   {
-    CPPUNIT_ASSERT(m_Line.GetPoint()[0]==1);
+    CPPUNIT_ASSERT_MESSAGE("Testing 2D Line (point[0])",m_2DLine.GetPoint()[0]==1);
+    CPPUNIT_ASSERT_MESSAGE("Testing 2D Line (point[1])",m_2DLine.GetPoint()[1]==2);
+    CPPUNIT_ASSERT_MESSAGE("Testing 2D Line (direction[0])",m_2DLine.GetDirection()[0]==0);
+    CPPUNIT_ASSERT_MESSAGE("Testing 2D Line (direction[1])",m_2DLine.GetDirection()[1]==1);
+  }
+
+  void Test3DLine()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing 3D Line (point[0])",m_3DLine.GetPoint()[0]==0);
+    CPPUNIT_ASSERT_MESSAGE("Testing 3D Line (point[1])",m_3DLine.GetPoint()[1]==1);
+    CPPUNIT_ASSERT_MESSAGE("Testing 3D Line (point[2])",m_3DLine.GetPoint()[2]==2);
+    CPPUNIT_ASSERT_MESSAGE("Testing 3D Line (direction[0])",m_3DLine.GetDirection()[0]==4);
+    CPPUNIT_ASSERT_MESSAGE("Testing 3D Line (direction[1])",m_3DLine.GetDirection()[1]==5);
+    CPPUNIT_ASSERT_MESSAGE("Testing 3D Line (direction[2])",m_3DLine.GetDirection()[2]==6);
   }
 
 

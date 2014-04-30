@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataReaderXML.h>
 #include <mitkNavigationDataSequentialPlayer.h>
 #include <mitkNavigationDataPlayer.h>
+#include <mitkVirtualTrackingTool.h>
 
 // VTK
 #include <vtkSphereSource.h>
@@ -137,7 +138,30 @@ void QmitkNavigationDataPlayerView::OnSetRepeat(){
 }
 
 void QmitkNavigationDataPlayerView::OnSetMicroservice(){
-  MITK_WARN << "Register as Microservice not yet supported";
+  if(m_Controls->m_ChkMicroservice->isChecked())
+  {
+    m_ToolStorage = mitk::NavigationToolStorage::New();
+    for (int i = 0; i < m_Player->GetNumberOfIndexedOutputs(); i++)
+    {
+      MITK_INFO << "Output" << i;
+      mitk::NavigationTool::Pointer currentDummyTool = mitk::NavigationTool::New();
+      mitk::VirtualTrackingTool::Pointer dummyTool = mitk::VirtualTrackingTool::New();
+      std::stringstream name;
+      name << "Virtual Tool " << i;
+      dummyTool->SetToolName(name.str());
+      currentDummyTool->SetTrackingTool(dummyTool.GetPointer());
+      currentDummyTool->SetDataNode(m_RenderingNodes.at(i));
+      currentDummyTool->SetIdentifier(name.str());
+      m_ToolStorage->AddTool(currentDummyTool);
+    }
+    m_Player->RegisterAsMicroservice();
+    m_ToolStorage->SetName("NavigationDataPlayer Tool Storage");
+    m_ToolStorage->RegisterAsMicroservice(m_Player->GetMicroserviceID());
+  } else {
+    if (m_ToolStorage.IsNotNull()) m_ToolStorage->UnRegisterMicroservice();
+    m_ToolStorage = NULL;
+    m_Player->UnRegisterMicroservice();
+  }
 }
 
 void QmitkNavigationDataPlayerView::OnUpdate(){

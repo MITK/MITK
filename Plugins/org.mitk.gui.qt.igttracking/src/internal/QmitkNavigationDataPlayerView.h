@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk
 #include <mitkNavigationDataObjectVisualizationFilter.h>
+#include <mitkNavigationToolStorage.h>
 
 /*!
 \brief QmitkNavigationDataPlayerView
@@ -126,6 +127,7 @@ protected:
   std::vector<mitk::DataNode::Pointer> m_RenderingNodes;
   mitk::NavigationDataPlayerBase::Pointer m_Player;
   mitk::NavigationDataSet::Pointer m_Data;
+  mitk::NavigationToolStorage::Pointer m_ToolStorage;
 
   QmitkStdMultiWidget* m_MultiWidget;
   QmitkIGTPlayerWidget* m_PlayerWidget; ///< this bundle's playback widget

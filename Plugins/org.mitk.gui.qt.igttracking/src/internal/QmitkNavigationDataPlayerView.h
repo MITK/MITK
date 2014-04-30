@@ -75,9 +75,9 @@ public:
     void OnSelectPlayer();
 
     /*!
-    \brief FIXME not currently used
+    \brief Changes the repeat mode of the selected player
     */
-    void OnSetRepeat();
+    void OnSetRepeat(int);
 
     /*!
     \brief FIXME not currently used

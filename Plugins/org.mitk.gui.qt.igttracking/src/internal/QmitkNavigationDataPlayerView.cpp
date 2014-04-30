@@ -75,13 +75,14 @@ void QmitkNavigationDataPlayerView::CreateConnections()
   connect( m_Controls->m_RdbTimeBased, SIGNAL(released()), this, SLOT(OnSelectPlayer()) );
   connect( m_Controls->m_BtnOpenFile, SIGNAL(released()), this, SLOT(OnOpenFile()) );
   connect( m_Controls->m_ChkDisplay, SIGNAL(released()), this, SLOT(OnSetDisplay()) );
-  connect( m_Controls->m_chkRepeat, SIGNAL(released()), this, SLOT(OnSetRepeat()) );
+  connect( m_Controls->m_chkRepeat, SIGNAL(stateChanged(int)), this, SLOT(OnSetRepeat(int)) );
   connect( m_Controls->m_ChkMicroservice, SIGNAL(released()), this, SLOT(OnSetMicroservice()) );
 
   connect( m_Controls->m_SequentialWidget, SIGNAL(SignalUpdate()), this, SLOT(OnUpdate()) );
   connect( m_Controls->m_TimedWidget, SIGNAL(SignalUpdate()), this, SLOT(OnUpdate()) );
 
-  SetInteractionComponentsEnabledState(false);
+  this->SetInteractionComponentsEnabledState(false);
+
 }
 
 void QmitkNavigationDataPlayerView::OnPlayingStarted()
@@ -101,11 +102,12 @@ void QmitkNavigationDataPlayerView::OnOpenFile(){
   m_Controls->m_LblTools->setText(QString::number(m_Data->GetNumberOfTools()));
 
   // Initialize Widgets and create Player
-  OnSelectPlayer();
-  SetInteractionComponentsEnabledState(true);
+  this->OnSelectPlayer();
+  this->SetInteractionComponentsEnabledState(true);
 }
 
-void QmitkNavigationDataPlayerView::OnSelectPlayer(){
+void QmitkNavigationDataPlayerView::OnSelectPlayer()
+{
   if (m_Controls->m_RdbSequential->isChecked())
   {
     m_Controls->m_SequentialWidget->setVisible(true);
@@ -123,17 +125,23 @@ void QmitkNavigationDataPlayerView::OnSelectPlayer(){
     m_Player = timedPlayer;
   }
 
+  this->ConfigurePlayer();
+
   // SetupRenderingPipeline
-  OnSetDisplay();
+  this->OnSetDisplay();
 }
 
-void ConfigurePlayer(){
-  // FIXME: Why is repeat not available in the base class?
+void QmitkNavigationDataPlayerView::ConfigurePlayer()
+{
+  // set repeat mode according to the checkbox
+  m_Player->SetRepeat( m_Controls->m_chkRepeat->isChecked() );
+
   // TODO finish method
 }
 
-void QmitkNavigationDataPlayerView::OnSetRepeat(){
-  MITK_WARN << "Repeat not yet supported";
+void QmitkNavigationDataPlayerView::OnSetRepeat(int checkState)
+{
+  m_Player->SetRepeat(checkState != 0);
 }
 
 void QmitkNavigationDataPlayerView::OnSetMicroservice(){

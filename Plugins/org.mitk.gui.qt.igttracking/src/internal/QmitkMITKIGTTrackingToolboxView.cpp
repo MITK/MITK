@@ -128,7 +128,6 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     //move the worker to the thread
     m_Worker->moveToThread(m_WorkerThread);
 
-
     //initialize widgets
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
     m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
@@ -152,7 +151,18 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
 
     //Update List of available models for selected tool.
-    std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
+    std::vector<mitk::TrackingDeviceData> Compatibles;
+    if ( (m_Controls == NULL) || //check all these stuff for NULL, latterly this causes crashes from time to time
+         (m_Controls->m_configurationWidget == NULL) ||
+         (m_Controls->m_configurationWidget->GetTrackingDevice().IsNull()))
+      {
+      MITK_ERROR << "Couldn't get current tracking device or an object is NULL, something went wrong!";
+      return;
+      }
+    else
+      {
+      Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
+      }
     m_Controls->m_VolumeSelectionBox->clear();
     for(int i = 0; i < Compatibles.size(); i++)
     {
@@ -166,8 +176,6 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
     //set home directory as default path for logfile
     m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(QDir::homePath()) + QDir::separator() + "logfile.csv");
-
-
   }
 }
 

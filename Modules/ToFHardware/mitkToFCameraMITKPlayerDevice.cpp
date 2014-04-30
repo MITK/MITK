@@ -65,14 +65,7 @@ bool ToFCameraMITKPlayerDevice::DisconnectCamera()
   if (ok)
   {
     m_CameraConnected = false;
-//    m_PropertyList->DeleteProperty("HasAmplitudeImage");
-//    m_PropertyList->DeleteProperty("HasIntensityImage");
-//    m_PropertyList->DeleteProperty("HasRGBImage");
-//    m_PropertyList->DeleteProperty("DistanceImageFileName");
-//    m_PropertyList->DeleteProperty("AmplitudeImageFileName");
-//    m_PropertyList->DeleteProperty("IntensityImageFileName");
-//    m_PropertyList->DeleteProperty("RGBImageFileName");
-//    m_PropertyList->DeleteProperty("RGBImageHasDifferentResolution");
+    m_PropertyList->Clear();
   }
   return ok;
 }

@@ -150,7 +150,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       {
         MITK_INFO<< "Kinect is connected here";
         //If the particular property is selected, the suitable data-node will be generated
-        this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());//--------------------------------------------------------
+        this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_KinectParameterWidget->IsAcquisitionModeRGB());
         this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_KinectParameterWidget->IsAcquisitionModeIR());
       }
 

@@ -245,6 +245,16 @@ void QmitkToFUtilView::ResetGUIToDefault()
 
 void QmitkToFUtilView::OnToFCameraDisconnected()
 {
+  this->GetDataStorage()->Remove(m_DistanceImageNode);
+  if(m_RGBImageNode)
+    this->GetDataStorage()->Remove(m_RGBImageNode);
+  if(m_AmplitudeImageNode)
+    this->GetDataStorage()->Remove(m_AmplitudeImageNode);
+  if(m_IntensityImageNode)
+    this->GetDataStorage()->Remove(m_IntensityImageNode);
+  if(m_SurfaceNode)
+    this->GetDataStorage()->Remove(m_SurfaceNode);
+
   m_Controls->m_ToFRecorderWidget->OnStop();
   m_Controls->m_ToFRecorderWidget->setEnabled(false);
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);

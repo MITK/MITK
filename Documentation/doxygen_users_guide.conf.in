@@ -598,7 +598,8 @@ FILE_VERSION_FILTER    =
 # You can optionally specify a file name after the option, if omitted
 # DoxygenLayout.xml will be used as the name of the layout file.
 
-LAYOUT_FILE            = @MITK_SOURCE_DIR@/Documentation/MITKDoxygenLayout.xml
+LAYOUT_FILE            =
+# @MITK_SOURCE_DIR@/Documentation/MITKDoxygenLayout.xml
 
 # The CITE_BIB_FILES tag can be used to specify one or more bib files
 # containing the references data. This must be a list of .bib files. The
@@ -671,7 +672,8 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = @MITK_SOURCE_DIR@/Plugins/ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/UserManual/
+                         @MITK_SOURCE_DIR@/Documentation/Doxygen/UserManual/ \
+                         @MITK_SOURCE_DIR@/Examples/Plugins/
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -753,7 +755,9 @@ EXAMPLE_RECURSIVE      = YES
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/UserManual/
+IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/UserManual/ \
+                         @MITK_SOURCE_DIR@/Plugins/ \
+                         @MITK_SOURCE_DIR@/Examples/Plugins/
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

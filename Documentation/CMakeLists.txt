@@ -124,6 +124,8 @@ configure_file(Doxygen/MainPage.dox.in
                ${CMAKE_CURRENT_BINARY_DIR}/Doxygen/MainPage.dox)
 configure_file(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
+configure_file(doxygen_users_guide.conf.in
+               ${CMAKE_CURRENT_BINARY_DIR}/doxygen_users_guide.conf)
 
 if(MITK_DOXYGEN_BUILD_ALWAYS)
   set(_doc_in_all "ALL")

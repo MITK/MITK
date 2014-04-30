@@ -38,6 +38,12 @@ mitk::NavigationDataPlayer::~NavigationDataPlayer()
 
 void mitk::NavigationDataPlayer::GenerateData()
 {
+  if ( m_NavigationDataSet->Size() == 0 )
+  {
+    MITK_WARN << "Cannot do anything with empty set of navigation datas.";
+    return;
+  }
+
   //Only produce new output if the player is started
   if (m_CurPlayerState != PlayerRunning)
   {
@@ -49,24 +55,22 @@ void mitk::NavigationDataPlayer::GenerateData()
   // get elapsed time since start of playing
   m_TimeStampSinceStart = mitk::IGTTimeStamp::GetInstance()->GetElapsed() - m_StartPlayingTimeStamp;
 
+  // add offset of the first navigation data to the timestamp to start playing
+  // imediatly with the first navigation data (not to wait till the first time
+  // stamp is reached)
+  TimeStampType timeStampSinceStartWithOffset = m_TimeStampSinceStart
+      + m_NavigationDataSet->Begin()->at(0)->GetIGTTimeStamp();
+
   // iterate through all NavigationData objects of the given tool index
   // till the timestamp of the NavigationData is greater then the given timestamp
   for (; m_NavigationDataSetIterator != m_NavigationDataSet->End(); ++m_NavigationDataSetIterator)
   {
-    if ( m_NavigationDataSetIterator->at(0)->GetIGTTimeStamp() > m_TimeStampSinceStart)
+    // test if the timestamp of the successor is greater than the time stamp
+    if ( m_NavigationDataSetIterator+1 == m_NavigationDataSet->End() ||
+        (m_NavigationDataSetIterator+1)->at(0)->GetIGTTimeStamp() > timeStampSinceStartWithOffset )
     {
       break;
     }
-  }
-
-  // first element was greater than timestamp -> return null
-  if ( m_NavigationDataSetIterator == m_NavigationDataSet->Begin() )
-  {
-    MITK_WARN("NavigationDataSet") << "No NavigationData was recorded before given timestamp.";
-
-    //The output is not at this time
-    this->GraftEmptyOutput();
-    return;
   }
 
   for (unsigned int index = 0; index < GetNumberOfOutputs(); index++)
@@ -74,14 +78,16 @@ void mitk::NavigationDataPlayer::GenerateData()
     mitk::NavigationData* output = this->GetOutput(index);
     if( !output ) { mitkThrowException(mitk::IGTException) << "Output of index "<<index<<" is null."; }
 
-    mitk::NavigationDataSet::NavigationDataSetIterator curIterator = m_NavigationDataSetIterator-1;
-    output->Graft(curIterator->at(index));
+    output->Graft(m_NavigationDataSetIterator->at(index));
   }
 
   // stop playing if the last NavigationData objects were grafted
-  if (m_NavigationDataSetIterator == m_NavigationDataSet->End())
+  if (m_NavigationDataSetIterator+1 == m_NavigationDataSet->End())
   {
     this->StopPlaying();
+
+    // start playing again if repeat is enabled
+    if ( m_Repeat ) { this->StartPlaying(); }
   }
 }
 
@@ -100,19 +106,17 @@ void mitk::NavigationDataPlayer::StartPlaying()
   m_CurPlayerState = PlayerRunning;
   m_NavigationDataSetIterator = m_NavigationDataSet->Begin();
 
-  // timestamp for indicating playing start is set to the past
-  // so that the first navigation data object will be shown NOW
-  m_StartPlayingTimeStamp = mitk::IGTTimeStamp::GetInstance()->GetElapsed()
-    - m_NavigationDataSet->Begin()->at(0)->GetIGTTimeStamp();
+  // reset playing timestamps
+  m_PauseTimeStamp = 0;
+  m_TimeStampSinceStart = 0;
+
+  // timestamp for indicating playing start set to current elapsed time
+  m_StartPlayingTimeStamp = mitk::IGTTimeStamp::GetInstance()->GetElapsed();
 }
 
 void mitk::NavigationDataPlayer::StopPlaying()
 {
   m_CurPlayerState = PlayerStopped;
-
-  // reset playing timestamps
-  m_StartPlayingTimeStamp = 0;
-  m_PauseTimeStamp = 0;
 }
 
 void mitk::NavigationDataPlayer::Pause()

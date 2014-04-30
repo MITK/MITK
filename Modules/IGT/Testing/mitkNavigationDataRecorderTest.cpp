@@ -31,13 +31,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkNavigationDataRecorderTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkNavigationDataRecorderTestSuite);
-  MITK_TEST(PlayAndRecord);
+  MITK_TEST(TestRecording);
+  MITK_TEST(TestStopRecording);
+  MITK_TEST(TestLimiting);
 
   CPPUNIT_TEST_SUITE_END();
 
 private:
   mitk::NavigationDataSet::Pointer m_NavigationDataSet;
   mitk::NavigationDataSequentialPlayer::Pointer m_Player;
+  mitk::NavigationDataRecorder::Pointer m_Recorder;
 
 public:
 
@@ -49,54 +52,71 @@ public:
 
     m_Player = mitk::NavigationDataSequentialPlayer::New();
     m_Player->SetNavigationDataSet(m_NavigationDataSet);
+
+    m_Recorder = mitk::NavigationDataRecorder::New();
+    m_Recorder->SetStandardizeTime(false);
+
+    // connect player to recorder
+    m_Recorder->ConnectTo(m_Player);
   }
 
   void tearDown()
   {
   }
 
-  void PlayAndRecord()
+  void TestRecording()
+  {
+    m_Recorder->StartRecording();
+    while (!m_Player->IsAtEnd())
+    {
+      m_Recorder->Update();
+      m_Player->GoToNextSnapshot();
+    }
+
+    mitk::NavigationDataSet::Pointer recordedData = m_Recorder->GetNavigationDataSet();
+
+    MITK_TEST_CONDITION_REQUIRED(recordedData->Size() == m_NavigationDataSet->Size(), "Test if recorded Dataset is of equal size as original");
+    MITK_TEST_CONDITION_REQUIRED(compareDataSet(recordedData), "Test recorded dataset for equality with reference");
+  }
+
+  void TestStopRecording()
   {
     // Aim is to read an xml into a pointset, play that set with a sequentialplayer, record it
     // again, write the result to xml , and compare the output
 
-    mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
-    recorder->SetStandardizeTime(false);
-
-    // connect player to recorder
-    recorder->ConnectTo(m_Player);
-
-    recorder->StartRecording();
-    while (!m_Player->IsAtEnd())
+    m_Recorder->StartRecording();
+    int i = 0;
+    while (i < 5)
     {
-      recorder->Update();
+      m_Recorder->Update();
       m_Player->GoToNextSnapshot();
+      i++;
     }
 
-    mitk::NavigationDataSet::Pointer recordedData = recorder->GetNavigationDataSet();
+    m_Recorder->StopRecording();
+    MITK_TEST_CONDITION_REQUIRED(! m_Recorder->GetRecording(), "Test if StopRecording is working, part 1");
+    while (i < 5)
+    {
+      m_Recorder->Update();
+      m_Player->GoToNextSnapshot();
+      i++;
+    }
 
-    MITK_TEST_CONDITION_REQUIRED(recordedData->Size() == m_NavigationDataSet->Size(), "Test if recorded Dataset is of equal size as original");
-    MITK_TEST_CONDITION_REQUIRED(compareDataSet(recordedData), "Test recorded dataset for equality with reference");
+    MITK_TEST_CONDITION_REQUIRED(m_Recorder->GetNavigationDataSet()->Size() == 5, "Test if StopRecording is working, part 2");
+  }
 
-    recorder->StopRecording();
-    MITK_TEST_CONDITION_REQUIRED(! recorder->GetRecording(), "Test if StopRecording is working");
-    recorder->ResetRecording();
-    MITK_TEST_CONDITION_REQUIRED(recorder->GetNavigationDataSet()->Size() == 0, "Test correct reset of recorder");
-
-    //Reset Player
-    //player = mitk::NavigationDataSequentialPlayer::New();
-    m_Player->SetNavigationDataSet(m_NavigationDataSet);
-
+  void TestLimiting()
+  {
     // Check if Limiting recording works
-    recorder->SetRecordCountLimit(100);
-    recorder->StartRecording();
+    m_Recorder->SetRecordCountLimit(30);
+    m_Recorder->StartRecording();
     while (!m_Player->IsAtEnd())
     {
-      recorder->Update();
+      m_Recorder->Update();
       m_Player->GoToNextSnapshot();
     }
 
-    MITK_TEST_CONDITION_REQUIRED(recorder->GetNavigationDataSet()->Size() == 100, "Test if SetRecordCountLimit works as intended.");
+    MITK_TEST_CONDITION_REQUIRED(m_Recorder->GetNavigationDataSet()->Size() == 30, "Test if SetRecordCountLimit works as intended.");
   }
 
 private:

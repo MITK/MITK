@@ -174,6 +174,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageToItkTest.cpp
     mitkImageSliceSelectorTest.cpp
     mitkSurfaceDepthPeelingTest.cpp
+    mitkSurfaceDepthSortingTest.cpp
 )
 
 set(MODULE_RESOURCE_FILES

@@ -36,16 +36,6 @@ namespace mitk
     itkNewMacro(Self);
 
     /**
-    * \brief Set to true if the data player should repeat the outputs.
-    */
-    itkSetMacro(Repeat, bool);
-
-    /**
-    * \return Returns if the data player should repeat the outputs.
-    */
-    itkGetMacro(Repeat, bool);
-
-    /**
     * \brief Advance the output to the i-th snapshot of mitk::NavigationData.
     * E.g. if you want to have the NavData of snapshot
     * 18 then you can call GoToSnapshot(17). Index begins at 0.
@@ -83,11 +73,6 @@ namespace mitk
     * for generating next data.
     */
     virtual void GenerateData();
-
-    /**
-    * \brief If the player should repeat outputs. Default is false.
-    */
-    bool m_Repeat;
   };
 } // namespace mitk
 

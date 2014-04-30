@@ -21,9 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataSet.h"
 
 namespace mitk{
-  /**Documentation
+  /**
   * \brief Base class for using mitk::NavigationData as a filter source.
   * Subclasses can play objects of mitk::NavigationDataSet.
+  *
+  * Each subclass has to check the state of m_Repeat and do or do not repeat
+  * the playing accordingly.
   *
   * \ingroup IGT
   */
@@ -31,14 +34,24 @@ namespace mitk{
     : public NavigationDataSource
   {
   public:
-    mitkClassMacro(NavigationDataPlayerBase, NavigationDataSource);
+    mitkClassMacro(NavigationDataPlayerBase, NavigationDataSource)
+
+    /**
+    * \brief Set to true if the data player should repeat the outputs.
+    */
+    itkSetMacro(Repeat, bool)
+
+    /**
+    * \return Returns if the data player should repeat the outputs.
+    */
+    itkGetMacro(Repeat, bool)
 
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update.
     */
     virtual void UpdateOutputInformation();
 
-    itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer);
+    itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer)
 
     /**
     * \brief Set mitk::NavigationDataSet for playing.
@@ -87,6 +100,11 @@ namespace mitk{
     * method can be called in the implementation of mitk::NavigationDataPlayerBase::GenerateData().
     */
     void GraftEmptyOutput();
+
+    /**
+    * \brief If the player should repeat outputs. Default is false.
+    */
+    bool m_Repeat;
 
     NavigationDataSet::Pointer m_NavigationDataSet;
 

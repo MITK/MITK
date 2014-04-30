@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTIOException.h"
 
 mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer()
-  : m_Repeat(false)
 {
 }
 

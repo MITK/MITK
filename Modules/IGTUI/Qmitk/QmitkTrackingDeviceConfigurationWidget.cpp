@@ -47,8 +47,6 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   CreateConnections();
   m_MTCalibrationFile = "";
 
-
-
   //reset a few things
   ResetOutput();
   AddOutput("<br>NDI Polaris selected");
@@ -535,6 +533,7 @@ m_Controls->m_portSpinBoxAurora->setValue(portAuroraWin);
 m_Controls->m_TrackingSystemWidget->setCurrentIndex(SelectedDevice);
 m_Controls->m_trackingDeviceChooser->setCurrentIndex(SelectedDevice);
 m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(m_MTCalibrationFile.c_str()));
+MITK_INFO << "Sucessfully restored UI settings";
 }
 
 void QmitkTrackingDeviceConfigurationWidgetConnectionWorker::TestConnectionThreadFunc()

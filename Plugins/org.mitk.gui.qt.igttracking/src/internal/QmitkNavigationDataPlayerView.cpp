@@ -93,7 +93,7 @@ void QmitkNavigationDataPlayerView::OnOpenFile(){
   mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
 
   // FIXME Filter for correct Files and use correct Reader
-  QString fileName = QFileDialog::getOpenFileName(NULL, "Open Navigation Data Set", "", "");
+  QString fileName = QFileDialog::getOpenFileName(NULL, "Open Navigation Data Set", "", "XML files (*.xml)"); //"XML files (*.xml);; Csv files (*.csv)" for additional csv files. Not supported yet.
   m_Data = reader->Read(fileName.toStdString());
 
   // Update Labels

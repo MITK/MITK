@@ -9,7 +9,7 @@ This view can be used to locally explore data resulting from preprocessing with 
 
 This document will tell you how to use this view, but it is assumed that you already know how to use MITK in general and how to work with the TBSS view of FSL.
 
-If you encounter problems using the view, please have a look at the \ref QmitkTractbasedSpatialStatisticsUserManualTrouble page.
+If you encounter problems using the view, please have a look at the \ref QmitkTractbasedSpatialStatisticsUserManualTroubleshooting page.
 
 \tableofcontents
 

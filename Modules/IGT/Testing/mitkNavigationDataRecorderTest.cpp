@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataSet.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 
 #include <mitkNavigationDataReaderXML.h>
 #include <mitkNavigationDataSetWriterXML.h>
@@ -27,17 +28,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTException.h"
 #include "mitkIGTIOException.h"
 
-class mitkNavigationDataRecorderTestClass
+class mitkNavigationDataRecorderTestSuite : public mitk::TestFixture
 {
+  CPPUNIT_TEST_SUITE(mitkNavigationDataRecorderTestSuite);
+  MITK_TEST(PlayAndRecord);
+
+  CPPUNIT_TEST_SUITE_END();
+
+private:
+
 public:
 
-  static void PlayAndRecord()
+  void setUp()
+  {
+  }
+
+  void tearDown()
+  {
+  }
+
+  void PlayAndRecord()
   {
     // Aim is to read an xml into a pointset, play that set with a sequentialplayer, record it
     // again, write the result to xml , and compare the output
 
     mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-    std::string path = "F://Build//MITK-Data//IGT-Data//RecordedNavigationData.xml";
+    std::string path = GetTestDataFilePath("IGT-Data/RecordedNavigationData.xml");
     mitk::NavigationDataSet::Pointer set = reader->Read(path);
 
     mitk::NavigationDataSequentialPlayer::Pointer player = mitk::NavigationDataSequentialPlayer::New();
@@ -107,15 +123,4 @@ public:
     return feof(f1) && feof(f2);
   }
 };
-
-/**Documentation
-*  test for the class "NavigationDataRecorder".
-*/
-int mitkNavigationDataRecorderTest(int /* argc */, char* /*argv*/[])
-{
-  MITK_TEST_BEGIN("NavigationDataRecorder");
-
-  mitkNavigationDataRecorderTestClass::PlayAndRecord();
-  // always end with this!
-  MITK_TEST_END();
-}
+MITK_TEST_SUITE_REGISTRATION(mitkNavigationDataRecorder)

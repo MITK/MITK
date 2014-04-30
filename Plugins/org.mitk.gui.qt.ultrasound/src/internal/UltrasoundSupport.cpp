@@ -101,12 +101,12 @@ void UltrasoundSupport::DisplayImage()
     m_ImageAlreadySetToNode = true;
   }
 
-  if ( curOutput.GetPointer() != m_Node->GetData() )
+  /*if ( curOutput.GetPointer() != m_Node->GetData() )
   {
     MITK_INFO << "Data Node of the ultrasound image stream was changed by another plugin. Stop viewing.";
     this->StopViewing();
     return;
-  }
+  }*/
 
   this->RequestRenderWindowUpdate();
 

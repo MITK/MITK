@@ -8,11 +8,13 @@ set(MODULE_TESTS
    # mark it as critical.
 
    ################## ON THE FENCE TESTS #################################################
-   mitkNavigationToolStorageDeserializerTest.cpp # This test was disabled because of bug 17303.
-  # Has been activated to test if bug has been fixed. If it proves to be stable move to RUNNING TESTS
-   mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # This test was disabled because of bug 17181.
-  # Has been activated to test if bug has been fixed. If it proves to be stable move to RUNNING TESTS
-   ################# RUNNING TESTS ###################################################
+   # none
+
+   ################## DISABLED TESTS #####################################################
+   # mitkNavigationToolStorageDeserializerTest.cpp # This test was disabled because of bug 17303.
+   # mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # This test was disabled because of bug 17181.
+
+   ################# RUNNING TESTS #######################################################
    mitkCameraVisualizationTest.cpp
    mitkClaronInterfaceTest.cpp
    mitkClaronToolTest.cpp

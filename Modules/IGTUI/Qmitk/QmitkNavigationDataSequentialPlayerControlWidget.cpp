@@ -43,6 +43,12 @@ void QmitkNavigationDataSequentialPlayerControlWidget::SetPlayer(mitk::Navigatio
 void QmitkNavigationDataSequentialPlayerControlWidget::OnStop()
 {
   m_UpdateTimer->stop();
+  m_Player->GoToSnapshot(0);
+
+  this->UpdatePlayerDisplay();
+
+  // make sure that the play/pause button is not checked after stopping
+  ui->playPushButton->setChecked(false);
 }
 
 void QmitkNavigationDataSequentialPlayerControlWidget::OnPlayPause()
@@ -53,6 +59,8 @@ void QmitkNavigationDataSequentialPlayerControlWidget::OnPlayPause()
   }
   else
   {
+    if ( m_Player->IsAtEnd() ) { m_Player->GoToSnapshot(0); }
+
     m_UpdateTimer->start(ui->updateIntervalSpinBox->value());
   }
 }
@@ -64,24 +72,32 @@ void QmitkNavigationDataSequentialPlayerControlWidget::OnRestart()
 
 void QmitkNavigationDataSequentialPlayerControlWidget::OnUpdate()
 {
-  m_Player->GoToNextSnapshot();
-  m_Player->Update();
-
-  int currentSnapshotNumber = static_cast<int>(m_Player->GetCurrentSnapshotNumber());
-
-  ui->sampleLCDNumber->display(currentSnapshotNumber);
-
-  ui->samplePositionHorizontalSlider->setValue(currentSnapshotNumber);
-
-  emit SignalUpdate();
-
-  if ( m_Player->GetCurrentSnapshotNumber() == m_Player->GetNumberOfSnapshots() - 1 )
+  // if the last snapshot was reached
+  if ( ! m_Player->GoToNextSnapshot() )
   {
+    m_UpdateTimer->stop();
+    ui->playPushButton->setChecked(false);
+
     emit SignalEndReached();
   }
+
+  m_Player->Update();
+
+  this->UpdatePlayerDisplay();
+
+  emit SignalUpdate();
 }
 
 void QmitkNavigationDataSequentialPlayerControlWidget::OnUpdateIntervalChanged(int value)
 {
   m_UpdateTimer->setInterval(value);
+}
+
+void QmitkNavigationDataSequentialPlayerControlWidget::UpdatePlayerDisplay()
+{
+  int currentSnapshotNumber = static_cast<int>(m_Player->GetCurrentSnapshotNumber());
+
+  ui->sampleLCDNumber->display(currentSnapshotNumber);
+
+  ui->samplePositionHorizontalSlider->setValue(currentSnapshotNumber);
 }

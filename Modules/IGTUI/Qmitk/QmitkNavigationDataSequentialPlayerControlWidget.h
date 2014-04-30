@@ -35,20 +35,23 @@ signals:
   void SignalUpdate();
   void SignalEndReached();
 
-  public slots:
-    void OnStop();
-    void OnPlayPause();
-    void OnRestart();
+public slots:
+  void OnStop();
+  void OnPlayPause();
+  void OnRestart();
 
-    protected slots:
-      void OnUpdate();
-      void OnUpdateIntervalChanged(int);
+protected slots:
+  void OnUpdate();
+  void OnUpdateIntervalChanged(int);
 
 public:
   explicit QmitkNavigationDataSequentialPlayerControlWidget(QWidget *parent = 0);
   ~QmitkNavigationDataSequentialPlayerControlWidget();
 
   void SetPlayer(mitk::NavigationDataSequentialPlayer::Pointer player);
+
+protected:
+  void UpdatePlayerDisplay();
 
 private:
   mitk::NavigationDataSequentialPlayer::Pointer m_Player;

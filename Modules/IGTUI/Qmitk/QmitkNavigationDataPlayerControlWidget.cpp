@@ -38,13 +38,17 @@ void QmitkNavigationDataPlayerControlWidget::SetPlayer(mitk::NavigationDataPlaye
 {
   m_Player = player;
 
-  ui->samplePositionHorizontalSlider->setMaximum(player->GetNumberOfSnapshots());
+  ui->samplePositionHorizontalSlider->setMaximum(player->GetNumberOfSnapshots()-1);
 }
 
 void QmitkNavigationDataPlayerControlWidget::OnStop()
 {
   m_UpdateTimer->stop();
   m_Player->StopPlaying();
+
+  ui->playPushButton->setChecked(false);
+
+  this->OnUpdate();
 }
 
 void QmitkNavigationDataPlayerControlWidget::OnPlayPause()
@@ -96,6 +100,9 @@ void QmitkNavigationDataPlayerControlWidget::OnUpdate()
 
   if ( m_Player->GetCurrentPlayerState() == mitk::NavigationDataPlayer::PlayerStopped )
   {
+    m_UpdateTimer->stop();
+    ui->playPushButton->setChecked(false);
+
     emit SignalEndReached();
   }
 }

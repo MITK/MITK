@@ -73,6 +73,11 @@ public:
       m_Player->GoToNextSnapshot();
     }
 
+    mitk::NavigationDataSet::Pointer recordedData = recorder->GetNavigationDataSet();
+
+    MITK_TEST_CONDITION_REQUIRED(recordedData->Size() == m_NavigationDataSet->Size(), "Test if recorded Dataset is of equal size as original");
+    MITK_TEST_CONDITION_REQUIRED(compareDataSet(recordedData), "Test recorded dataset for equality with reference");
+
     recorder->StopRecording();
     MITK_TEST_CONDITION_REQUIRED(! recorder->GetRecording(), "Test if StopRecording is working");
     recorder->ResetRecording();
@@ -92,6 +97,27 @@ public:
     }
 
     MITK_TEST_CONDITION_REQUIRED(recorder->GetNavigationDataSet()->Size() == 100, "Test if SetRecordCountLimit works as intended.");
+  }
+
+private:
+
+  /*
+  * private hepler method that compares the recorded Dataset against the member variable.
+  * This is a reasonable test only under the assumption that the Data should be equal from coyping - It does not consider
+  * homonymus Quaternions and NO FLOAT ROUNDING ISSUES
+  */
+  bool compareDataSet(mitk::NavigationDataSet::Pointer recorded)
+  {
+    for (unsigned int tool = 0; tool < recorded->GetNumberOfTools(); tool++){
+      for (unsigned int i = 0; i < recorded->Size(); i++)
+      {
+        mitk::NavigationData::Pointer ref = m_NavigationDataSet->GetNavigationDataForIndex(i,tool);
+        mitk::NavigationData::Pointer rec = recorded->GetNavigationDataForIndex(i,tool);
+        if (!(ref->GetOrientation().as_vector() == rec->GetOrientation().as_vector())) {return false;}
+        if (!(ref->GetPosition().GetVnlVector() == rec->GetPosition().GetVnlVector())) {return false;}
+      }
+    }
+    return true;
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkNavigationDataRecorder)

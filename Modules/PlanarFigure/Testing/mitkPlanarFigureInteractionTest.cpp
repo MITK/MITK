@@ -21,21 +21,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkInteractionTestHelper.h>
 #include <mitkPlanarFigureInteractor.h>
-#include <mitkPlanarRectangle.h>
+#include <mitkPlanarFigureReader.h>
+
+#include <mitkPlanarAngle.h>
+#include <mitkPlanarArrow.h>
+#include <mitkPlanarBezierCurve.h>
 #include <mitkPlanarCircle.h>
+#include <mitkPlanarDoubleEllipse.h>
+#include <mitkPlanarEllipse.h>
+#include <mitkPlanarFourPointAngle.h>
+#include <mitkPlanarLine.h>
+#include <mitkPlanarPolygon.h>
+#include <mitkPlanarRectangle.h>
 
 #include "usModuleRegistry.h"
-#include "mitkPlanarFigureReader.h"
-#include "mitkPlanarFigureWriter.h"
-
-
 
 class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkPlanarFigureInteractionTestSuite);
-  MITK_TEST(RectangleInteraction);
-  MITK_TEST(CircleInteraction);
+  MITK_TEST(AngleInteractionCreate);
+  // MITK_TEST(ArrowInteractionCreate);
+  MITK_TEST(BezierCurveInteractionCreate);
+  MITK_TEST(CircleInteractionCreate);
+  // MITK_TEST(CrossInteractionCreate);
+  MITK_TEST(DoubleEllipseInteractionCreate);
+  //MITK_TEST(EllipseInteractionCreate);
+  MITK_TEST(PlanarFourPointAngleInteractionCreate);
+  MITK_TEST(PlanarLineInteractionCreate);
+  MITK_TEST(PlanarPolygonInteractionCreate);
+  MITK_TEST(NonClosedPlanarPolygonInteractionCreate);
+  MITK_TEST(RectangleInteractionCreate);
+
+
   CPPUNIT_TEST_SUITE_END();
 
 
@@ -96,18 +114,89 @@ public:
 
   }
 
-  void RectangleInteraction()
+  void AngleInteractionCreate()
   {
     mitk::PlanarFigure::Pointer figure;
-    figure = mitk::PlanarRectangle::New();
-    RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_PlanarRectangle_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarRectangle_Create.pf");
+    figure = mitk::PlanarAngle::New();
+    RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_PlanarAngle_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarAngle_Create.pf");
+  }
+  // TODO:
+  //void ArrowInteractionCreate()
+  //{
+  //  mitk::PlanarFigure::Pointer figure;
+  //  figure = mitk::PlanarArrow::New();
+  //  RunTest(figure, "InteractionTestDaa/Interactions/PlanarFigureInteractor_PlanarArrow_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarArrow_Create.pf");
+  //}
+
+  void BezierCurveInteractionCreate()
+  {
+    mitk::PlanarFigure::Pointer figure;
+    figure = mitk::PlanarBezierCurve::New();
+    RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_PlanarCircle_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarCircle_Create.pf");
   }
 
-  void CircleInteraction()
+  void CircleInteractionCreate()
   {
     mitk::PlanarFigure::Pointer figure;
     figure = mitk::PlanarCircle::New();
     RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_PlanarCircle_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarCircle_Create.pf");
+  }
+
+  // TODO:
+  //void CrossInteractionCreate()
+  //{
+  //  mitk::PlanarFigure::Pointer figure;
+  //  figure = mitk::PlanarCross::New();
+  //  RunTest(figure, "InteractionTestDaa/Interactions/PlanarFigureInteractor_PlanarCross_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarCross_Create.pf");
+  //}
+
+  void DoubleEllipseInteractionCreate()
+  {
+    mitk::PlanarFigure::Pointer figure;
+    figure = mitk::PlanarDoubleEllipse::New();
+    RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_PlanarDoubleEllipse_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarDoubleEllipse_Create.pf");
+  }
+
+  void EllipseInteractionCreate()
+  {
+    mitk::PlanarFigure::Pointer figure;
+    figure = mitk::PlanarEllipse::New();
+    RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_PlanarEllipse_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarEllipse_Create.pf");
+  }
+
+  void PlanarFourPointAngleInteractionCreate()
+  {
+    mitk::PlanarFigure::Pointer figure;
+    figure = mitk::PlanarFourPointAngle::New();
+    RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_PlanarFourPointAngle_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarFourPointAngle_Create.pf");
+  }
+
+  void PlanarLineInteractionCreate()
+  {
+    mitk::PlanarFigure::Pointer figure;
+    figure = mitk::PlanarLine::New();
+    RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_PlanarLine_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarLine_Create.pf");
+  }
+
+  void PlanarPolygonInteractionCreate()
+  {
+    mitk::PlanarFigure::Pointer figure;
+    figure = mitk::PlanarPolygon::New();
+    RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_PlanarPolygon_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarPolygon_Create.pf");
+  }
+
+  void NonClosedPlanarPolygonInteractionCreate()
+  {
+    mitk::PlanarFigure::Pointer figure;
+    figure = mitk::PlanarPolygon::New();
+    RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_NonClosedPlanarPolygon_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_NonClosedPlanarPolygon_Create.pf");
+  }
+
+  void RectangleInteractionCreate()
+  {
+    mitk::PlanarFigure::Pointer figure;
+    figure = mitk::PlanarRectangle::New();
+    RunTest(figure, "InteractionTestData/Interactions/PlanarFigureInteractor_PlanarRectangle_Create.xml", "InteractionTestData/ReferenceData/PlanarFigureInteractor_PlanarRectangle_Create.pf");
   }
 
 };

@@ -29,16 +29,13 @@ const std::string mitk::NavigationDataSource::US_PROPKEY_ID = US_INTERFACE_NAME 
 const std::string mitk::NavigationDataSource::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 
 mitk::NavigationDataSource::NavigationDataSource()
-: itk::ProcessObject(), m_Name("NavigationDataSource (no defined type)")
+  : itk::ProcessObject(), m_Name("NavigationDataSource (no defined type)")
 {
-
 }
-
 
 mitk::NavigationDataSource::~NavigationDataSource()
 {
 }
-
 
 mitk::NavigationData* mitk::NavigationDataSource::GetOutput()
 {
@@ -47,7 +44,6 @@ mitk::NavigationData* mitk::NavigationDataSource::GetOutput()
 
   return static_cast<NavigationData*>(this->ProcessObject::GetPrimaryOutput());
 }
-
 
 mitk::NavigationData* mitk::NavigationDataSource::GetOutput(DataObjectPointerArraySizeType idx)
 {
@@ -58,7 +54,6 @@ mitk::NavigationData* mitk::NavigationDataSource::GetOutput(DataObjectPointerArr
   }
   return out;
 }
-
 
 mitk::NavigationData* mitk::NavigationDataSource::GetOutput(const std::string& navDataName)
 {
@@ -90,9 +85,8 @@ void mitk::NavigationDataSource::RegisterAsMicroservice(){
   m_ServiceRegistration = context->RegisterService(this, props);
 }
 
-
 void mitk::NavigationDataSource::UnRegisterMicroservice(){
-  m_ServiceRegistration.Unregister();
+  if (m_ServiceRegistration != NULL) m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
 }
 
@@ -104,7 +98,6 @@ void mitk::NavigationDataSource::GraftOutput(itk::DataObject *graft)
 {
   this->GraftNthOutput(0, graft);
 }
-
 
 void mitk::NavigationDataSource::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
 {
@@ -130,19 +123,18 @@ void mitk::NavigationDataSource::GraftNthOutput(unsigned int idx, itk::DataObjec
 
 itk::DataObject::Pointer mitk::NavigationDataSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-    return mitk::NavigationData::New().GetPointer();
+  return mitk::NavigationData::New().GetPointer();
 }
 
 itk::DataObject::Pointer mitk::NavigationDataSource::MakeOutput( const DataObjectIdentifierType & name )
 {
   itkDebugMacro("MakeOutput(" << name << ")");
   if( this->IsIndexedOutputName(name) )
-    {
+  {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
-    }
+  }
   return static_cast<itk::DataObject *>(mitk::NavigationData::New().GetPointer());
 }
-
 
 mitk::PropertyList::ConstPointer mitk::NavigationDataSource::GetParameters() const
 {

@@ -108,6 +108,9 @@ the delivered examples (samples_cpp_vs2005).
 
 \subsection USHardwareTelemedEnable Enable the Telemed API
 
+The Telemed API is available for Windows only and does not work with software
+compiled for 64 bit. Therefore, you need a 32 bit build of MITK on Windows.
+
 To use a Telemed device, activate the corresponding CMake flag:
 MITK_USE_US_TELEMED_SDK. After a run of CMake the new CMake variable
 MITK_US_TELEMED_SDK_PATH has to be set to a directory containing the header

@@ -17,11 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkNavigationDataPlayerView_h
 #define QmitkNavigationDataPlayerView_h
 
-#include <berryISelectionListener.h>
-
 //Qmitk
-#include <QmitkFunctionality.h>
-#include <QmitkIGTPlayerWidget.h>
+#include <QmitkAbstractView.h>
 
 // ui
 #include "ui_QmitkNavigationDataPlayerViewControls.h"
@@ -38,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class QmitkNavigationDataPlayerView : public QmitkFunctionality
+class QmitkNavigationDataPlayerView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -52,11 +49,12 @@ public:
   virtual ~QmitkNavigationDataPlayerView();
 
   virtual void CreateQtPartControl(QWidget *parent);
+  void SetFocus();
 
   /**
   \brief This method creates this bundle's SIGNAL and SLOT connections
   */
-  virtual void CreateConnections();
+  void CreateConnections();
 
   protected slots:
 
@@ -119,8 +117,6 @@ protected:
   */
   void SetInteractionComponentsEnabledState(bool isActive);
 
-  void CreateBundleWidgets(QWidget* parent);
-
   Ui::QmitkNavigationDataPlayerViewControls* m_Controls;
 
   mitk::NavigationDataObjectVisualizationFilter::Pointer m_VisFilter;
@@ -128,9 +124,6 @@ protected:
   mitk::NavigationDataPlayerBase::Pointer m_Player;
   mitk::NavigationDataSet::Pointer m_Data;
   mitk::NavigationToolStorage::Pointer m_ToolStorage;
-
-  QmitkStdMultiWidget* m_MultiWidget;
-  QmitkIGTPlayerWidget* m_PlayerWidget; ///< this bundle's playback widget
 
 private:
 };

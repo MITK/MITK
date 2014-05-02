@@ -14,13 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-
 // Qmitk
 #include "QmitkNavigationDataPlayerView.h"
-#include "QmitkStdMultiWidget.h"
 
 // QT
 #include <QFileDialog>
@@ -39,9 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkNavigationDataPlayerView::VIEW_ID = "org.mitk.views.navigationdataplayer";
 
 QmitkNavigationDataPlayerView::QmitkNavigationDataPlayerView()
-  : QmitkFunctionality()
-  , m_Controls( 0 )
-  , m_MultiWidget( NULL )
+  : m_Controls( 0 )
 {
 }
 
@@ -58,7 +51,6 @@ void QmitkNavigationDataPlayerView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkNavigationDataPlayerViewControls;
     m_Controls->setupUi( parent );
 
-    this->CreateBundleWidgets( parent );
     this->CreateConnections();
 
     // make deselected Player invisible
@@ -66,9 +58,12 @@ void QmitkNavigationDataPlayerView::CreateQtPartControl( QWidget *parent )
   }
 }
 
-void QmitkNavigationDataPlayerView::CreateBundleWidgets(QWidget* parent)
+void QmitkNavigationDataPlayerView::SetFocus()
 {
-  //m_PlayerWidget = new QmitkIGTPlayerWidget( parent );   // this bundle's ND player widget
+  if ( m_Controls )
+  {
+    m_Controls->m_grpbxControls->setFocus();
+  }
 }
 
 void QmitkNavigationDataPlayerView::CreateConnections()
@@ -106,6 +101,7 @@ void QmitkNavigationDataPlayerView::OnOpenFile(){
     MITK_WARN("NavigationDataPlayerView") << "could not open file " << fileName.toStdString();
     QMessageBox::critical(0, "Error Reading File", "The file '" + fileName
                           +"' could not be read.\n" + e.GetDescription() );
+    return;
   }
 
   // Update Labels
@@ -160,7 +156,8 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
   if(m_Controls->m_ChkMicroservice->isChecked())
   {
     m_ToolStorage = mitk::NavigationToolStorage::New();
-    for (int i = 0; i < m_Player->GetNumberOfIndexedOutputs(); i++)
+    for (itk::ProcessObject::DataObjectPointerArraySizeType i = 0;
+         i < m_Player->GetNumberOfIndexedOutputs(); i++)
     {
       mitk::NavigationTool::Pointer currentDummyTool = mitk::NavigationTool::New();
       mitk::VirtualTrackingTool::Pointer dummyTool = mitk::VirtualTrackingTool::New();

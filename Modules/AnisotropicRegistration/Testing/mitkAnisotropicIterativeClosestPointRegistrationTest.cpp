@@ -65,11 +65,11 @@ public:
     mitk::CovarianceMatrixCalculator::Pointer matrixCalculator
                                       = mitk::CovarianceMatrixCalculator::New();
 
-    m_MovingSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("AICPRegistration/head_red.stl"));
-    m_FixedSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("AICPRegistration/head_green.stl"));
+    m_MovingSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("AICPRegistration/head_green.stl"));
+    m_FixedSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("AICPRegistration/head_red.stl"));
 
-    m_TargetsMovingSurface = mitk::IOUtil::LoadPointSet(GetTestDataFilePath("AICPRegistration/targets_head_red.mps"));
-    m_TargetsFixedSurface = mitk::IOUtil::LoadPointSet(GetTestDataFilePath("AICPRegistration/targets_head_green.mps"));
+    m_TargetsMovingSurface = mitk::IOUtil::LoadPointSet(GetTestDataFilePath("AICPRegistration/targets_head_green.mps"));
+    m_TargetsFixedSurface = mitk::IOUtil::LoadPointSet(GetTestDataFilePath("AICPRegistration/targets_head_red.mps"));
 
     // compute covariance matrices
     matrixCalculator->SetInputSurface(m_MovingSurface);
@@ -99,8 +99,8 @@ public:
 
   void testAicpRegistration()
   {
-    const double expFRE = 2.51105;
-    const double expTRE = 0.0100366;
+    const double expFRE = 27.5799;
+    const double expTRE = 1.68835;
     mitk::AnisotropicIterativeClosestPointRegistration::Pointer aICP =
                       mitk::AnisotropicIterativeClosestPointRegistration::New();
 
@@ -143,8 +143,8 @@ public:
                       mitk::AnisotropicIterativeClosestPointRegistration::New();
 
     // Swap X and Y for partial overlapping registration
-    aICP->SetMovingSurface(m_FixedSurface);
-    aICP->SetFixedSurface(m_MovingSurface);
+    aICP->SetMovingSurface(m_MovingSurface);
+    aICP->SetFixedSurface(m_FixedSurface);
     aICP->SetCovarianceMatricesMovingSurface(m_SigmasFixedSurface);
     aICP->SetCovarianceMatricesFixedSurface(m_SigmasMovingSurface);
     aICP->SetFRENormalizationFactor(m_FRENormalizationFactor);
@@ -161,8 +161,8 @@ public:
 
     // compute the target registration Error
     const double tre = mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(
-                                                                                     m_TargetsFixedSurface.GetPointer(),
                                                                                      m_TargetsMovingSurface.GetPointer(),
+                                                                                     m_TargetsFixedSurface.GetPointer(),
                                                                                      aICP->GetRotation(),
                                                                                      aICP->GetTranslation()
                                                                                    );

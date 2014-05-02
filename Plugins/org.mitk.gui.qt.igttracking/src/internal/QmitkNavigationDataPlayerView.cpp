@@ -183,8 +183,11 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
 }
 
 void QmitkNavigationDataPlayerView::OnUpdate(){
-  m_VisFilter->Update();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (m_VisFilter.IsNotNull())
+  {
+    m_VisFilter->Update();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void QmitkNavigationDataPlayerView::OnSetDisplay(){

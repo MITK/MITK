@@ -62,12 +62,14 @@ void QmitkNavigationDataSequentialPlayerControlWidget::OnPlayPause()
     if ( m_Player->IsAtEnd() ) { m_Player->GoToSnapshot(0); }
 
     m_UpdateTimer->start(ui->updateIntervalSpinBox->value());
+    if ( ! ui->playPushButton->isChecked() ) { ui->playPushButton->setChecked(true); }
   }
 }
 
 void QmitkNavigationDataSequentialPlayerControlWidget::OnRestart()
 {
-  m_Player->GoToSnapshot(0);
+  this->OnStop();
+  this->OnPlayPause();
 }
 
 void QmitkNavigationDataSequentialPlayerControlWidget::OnUpdate()

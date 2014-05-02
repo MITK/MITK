@@ -48,7 +48,7 @@ void QmitkNavigationDataPlayerControlWidget::OnStop()
 
   ui->playPushButton->setChecked(false);
 
-  this->OnUpdate();
+  this->ResetPlayerDisplay();
 }
 
 void QmitkNavigationDataPlayerControlWidget::OnPlayPause()
@@ -59,6 +59,7 @@ void QmitkNavigationDataPlayerControlWidget::OnPlayPause()
   {
     m_Player->StartPlaying();
     if ( ! m_UpdateTimer->isActive() ) { m_UpdateTimer->start(10); }
+    if ( ! ui->playPushButton->isChecked() ) { ui->playPushButton->setChecked(true); }
     break;
   }
   case mitk::NavigationDataPlayer::PlayerPaused:
@@ -76,8 +77,8 @@ void QmitkNavigationDataPlayerControlWidget::OnPlayPause()
 
 void QmitkNavigationDataPlayerControlWidget::OnRestart()
 {
-  m_Player->StopPlaying();
-  m_Player->StartPlaying();
+  this->OnStop();
+  this->OnPlayPause();
 }
 
 void QmitkNavigationDataPlayerControlWidget::OnUpdate()
@@ -108,4 +109,14 @@ void QmitkNavigationDataPlayerControlWidget::OnUpdate()
 
     emit SignalEndReached();
   }
+}
+
+void QmitkNavigationDataPlayerControlWidget::ResetPlayerDisplay()
+{
+  // set lcd numbers
+  ui->msecLCDNumber->display(0);
+  ui->secLCDNumber->display(0);
+  ui->minLCDNumber->display(0);
+
+  ui->samplePositionHorizontalSlider->setValue(0);
 }

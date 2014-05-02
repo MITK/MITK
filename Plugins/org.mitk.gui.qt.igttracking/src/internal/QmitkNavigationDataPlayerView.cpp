@@ -84,7 +84,6 @@ void QmitkNavigationDataPlayerView::CreateConnections()
   connect( m_Controls->m_TimedWidget, SIGNAL(SignalUpdate()), this, SLOT(OnUpdate()) );
 
   this->SetInteractionComponentsEnabledState(false);
-
 }
 
 void QmitkNavigationDataPlayerView::OnPlayingStarted()
@@ -102,8 +101,9 @@ void QmitkNavigationDataPlayerView::OnOpenFile(){
   {
     m_Data = reader->Read(fileName.toStdString());
   }
-  catch (const mitk::Exception &e )
+  catch ( const mitk::Exception &e )
   {
+    MITK_WARN("NavigationDataPlayerView") << "could not open file " << fileName.toStdString();
     QMessageBox::critical(0, "Error Reading File", "The file '" + fileName
                           +"' could not be read.\n" + e.GetDescription() );
   }
@@ -201,7 +201,7 @@ void QmitkNavigationDataPlayerView::CreatePipeline(){
 
   for (unsigned int i = 0 ; i < m_Player->GetNumberOfIndexedOutputs(); i++ ) {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
-    QString name = "Recorded Tool " + QString::number(i);
+    QString name = "Recorded Tool " + QString::number(i + 1);
     node->SetName(name.toStdString());
 
     //create small sphere and use it as surface

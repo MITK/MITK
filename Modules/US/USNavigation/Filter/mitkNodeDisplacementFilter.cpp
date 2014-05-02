@@ -112,6 +112,30 @@ See LICENSE.txt or http://www.mitk.org for details.
     m_SelectedInput = i;
   }
 
+  mitk::NavigationData::Pointer mitk::NodeDisplacementFilter::GetRawDisplacementNavigationData(unsigned int i)
+  {
+    mitk::NavigationData::Pointer returnValue = mitk::NavigationData::New();
+    if(m_Nodes.at(i).IsNotNull())
+      {
+      try
+        {
+          returnValue = mitk::NavigationData::New(m_Nodes.at(i)->GetData()->GetGeometry()->GetIndexToWorldTransform());
+        }
+      catch (mitk::Exception& e)
+        {
+          returnValue->SetDataValid(false);
+          MITK_WARN << "Excetion while returning navigation data: " << e.GetDescription();
+        }
+      }
+    else
+      {
+        returnValue->SetDataValid(false);
+        MITK_WARN << "Node Nr. " << i << " does not exist!";
+      }
+
+    return returnValue;
+  }
+
   void mitk::NodeDisplacementFilter::GenerateData()
   {
     // copy the navigation data from the inputs to the outputs

@@ -75,6 +75,9 @@ namespace mitk {
     */
     virtual mitk::DataNode::Pointer GetNode (unsigned int i = 0);
 
+    /** @return Returns the current pose in world coordinates of node i as raw navigation data. */
+    virtual mitk::NavigationData::Pointer GetRawDisplacementNavigationData(unsigned int i = 0);
+
     /**
     * \brief Returns a vector containing all nodes that have been added to this filter.
     *

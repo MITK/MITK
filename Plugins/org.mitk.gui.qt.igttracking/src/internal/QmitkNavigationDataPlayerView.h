@@ -32,8 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
-\sa QmitkFunctionality
-\ingroup Functionalities
 */
 class QmitkNavigationDataPlayerView : public QmitkAbstractView
 {
@@ -56,12 +54,7 @@ public:
   */
   void CreateConnections();
 
-  protected slots:
-
-    /*!
-    \brief FIXME not currently used
-    */
-    void OnPlayingStarted();
+protected slots:
 
     /*!
     \brief loads a file and triggers creation of players and the pipeline
@@ -79,7 +72,7 @@ public:
     void OnSetRepeat(int);
 
     /*!
-    \brief FIXME not currently used
+    \brief Registers or unregisters a virtual tracking device for the player.
     */
     void OnSetMicroservice();
 
@@ -89,7 +82,7 @@ public:
     void OnSetDisplay();
 
     /*!
-    \brief FIXME not currently used
+    \brief Updates the visualization
     */
     void OnUpdate();
 

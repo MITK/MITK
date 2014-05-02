@@ -81,10 +81,6 @@ void QmitkNavigationDataPlayerView::CreateConnections()
   this->SetInteractionComponentsEnabledState(false);
 }
 
-void QmitkNavigationDataPlayerView::OnPlayingStarted()
-{
-}
-
 void QmitkNavigationDataPlayerView::OnOpenFile(){
   mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
 
@@ -143,8 +139,6 @@ void QmitkNavigationDataPlayerView::ConfigurePlayer()
 {
   // set repeat mode according to the checkbox
   m_Player->SetRepeat( m_Controls->m_chkRepeat->isChecked() );
-
-  // TODO finish method
 }
 
 void QmitkNavigationDataPlayerView::OnSetRepeat(int checkState)

@@ -35,7 +35,7 @@ namespace mitk {
   public:
     mitkClassMacro(NavigationDataPlayer, NavigationDataPlayerBase);
     itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkCloneMacro(Self)
 
       enum PlayerState { PlayerStopped, PlayerRunning, PlayerPaused };
     typedef mitk::NavigationData::TimeStampType TimeStampType;
@@ -55,11 +55,9 @@ namespace mitk {
     void StartPlaying();
 
     /**
-    * \brief Stops the player and closes the stream. After a call of StopPlaying()
-    * StartPlaying() must be called to get new output data
-    *
-    * \warning the output is generated in this method because we know first about the number of output after
-    * reading the first lines of the XML file. Therefore you should assign your output after the call of this method
+    * \brief Stops the player and closes the stream.
+    * After a call of StopPlaying(), StartPlaying() must be called to get new
+    * output data.
     */
     void StopPlaying();
 

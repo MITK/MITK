@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // QT
 #include <QFileDialog>
+#include <QMessageBox>
 
 //mitk
 #include <mitkNavigationDataSet.h>
@@ -95,7 +96,17 @@ void QmitkNavigationDataPlayerView::OnOpenFile(){
 
   // FIXME Filter for correct Files and use correct Reader
   QString fileName = QFileDialog::getOpenFileName(NULL, "Open Navigation Data Set", "", "XML files (*.xml)"); //"XML files (*.xml);; Csv files (*.csv)" for additional csv files. Not supported yet.
-  m_Data = reader->Read(fileName.toStdString());
+  if ( fileName.isNull() ) { return; } // user pressed cancel
+
+  try
+  {
+    m_Data = reader->Read(fileName.toStdString());
+  }
+  catch (const mitk::Exception &e )
+  {
+    QMessageBox::critical(0, "Error Reading File", "The file '" + fileName
+                          +"' could not be read.\n" + e.GetDescription() );
+  }
 
   // Update Labels
   m_Controls->m_LblFilePath->setText(fileName);

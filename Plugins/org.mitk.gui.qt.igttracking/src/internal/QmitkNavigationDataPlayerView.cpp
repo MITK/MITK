@@ -83,7 +83,6 @@ void QmitkNavigationDataPlayerView::CreateConnections()
   connect( m_Controls->m_TimedWidget, SIGNAL(SignalUpdate()), this, SLOT(OnUpdate()) );
 
   this->SetInteractionComponentsEnabledState(false);
-
 }
 
 void QmitkNavigationDataPlayerView::OnPlayingStarted()
@@ -95,7 +94,13 @@ void QmitkNavigationDataPlayerView::OnOpenFile(){
 
   // FIXME Filter for correct Files and use correct Reader
   QString fileName = QFileDialog::getOpenFileName(NULL, "Open Navigation Data Set", "", "XML files (*.xml)"); //"XML files (*.xml);; Csv files (*.csv)" for additional csv files. Not supported yet.
-  m_Data = reader->Read(fileName.toStdString());
+  if ( (fileName == 0) || (fileName.isEmpty()) ) return;
+  try
+  {
+    m_Data = reader->Read(fileName.toStdString());
+  } catch (...) {
+    MITK_WARN("NavigationDataPlayerView") << "could not open file " << fileName.toStdString();
+  }
 
   // Update Labels
   m_Controls->m_LblFilePath->setText(fileName);
@@ -190,7 +195,7 @@ void QmitkNavigationDataPlayerView::CreatePipeline(){
 
   for (unsigned int i = 0 ; i < m_Player->GetNumberOfIndexedOutputs(); i++ ) {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
-    QString name = "Recorded Tool " + QString::number(i);
+    QString name = "Recorded Tool " + QString::number(i + 1);
     node->SetName(name.toStdString());
 
     //create small sphere and use it as surface

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>407</width>
-    <height>95</height>
+    <height>106</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,15 +67,20 @@
      </item>
      <item>
       <widget class="QSpinBox" name="updateIntervalSpinBox">
+       <property name="suffix">
+        <string> ms</string>
+       </property>
        <property name="minimum">
         <number>1</number>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>ms</string>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+       <property name="singleStep">
+        <number>20</number>
+       </property>
+       <property name="value">
+        <number>40</number>
        </property>
       </widget>
      </item>

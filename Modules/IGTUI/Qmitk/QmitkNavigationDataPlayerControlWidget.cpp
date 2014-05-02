@@ -59,14 +59,17 @@ void QmitkNavigationDataPlayerControlWidget::OnPlayPause()
   {
     m_Player->StartPlaying();
     if ( ! m_UpdateTimer->isActive() ) { m_UpdateTimer->start(10); }
+    break;
   }
   case mitk::NavigationDataPlayer::PlayerPaused:
   {
-    m_Player->Pause();
+    m_Player->Resume();
+    break;
   }
   case mitk::NavigationDataPlayer::PlayerRunning:
   {
-    m_Player->Resume();
+    m_Player->Pause();
+    break;
   }
   }
 }

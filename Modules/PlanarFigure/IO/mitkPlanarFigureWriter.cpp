@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPlanarFigureWriter.h"
 #include "mitkBasePropertySerializer.h"
-
+#include "mitkPlaneGeometry.h"
 #include <tinyxml.h>
 
 

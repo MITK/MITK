@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //! [includes]
 #include "mitkPointSet.h"
 #include "mitkIRenderWindowPartListener.h"
+#include <itkImage.h>
 
 class QmitkPointListWidget;
 //! [includes]

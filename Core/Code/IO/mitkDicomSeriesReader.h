@@ -138,7 +138,7 @@ namespace mitk
  // final step: load into DataNode (can result in 3D+t image)
  DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( oneBlockSorted );
 
- Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+ itk::SmartPointer<Image> image = dynamic_cast<mitk::Image*>( node->GetData() );
 \endcode
 
  \section DicomSeriesReader_sorting Logic for sorting 2D slices from DICOM images into 3D+t blocks for mitk::Image
@@ -304,6 +304,9 @@ Stacked slices:
 
  \todo refactor all the protected helper objects/methods into a separate header so we compile faster
 */
+
+class Image;
+
 class MITK_CORE_EXPORT DicomSeriesReader
 {
 public:
@@ -533,7 +536,7 @@ public:
                                            bool load4D = true,
                                            bool correctGantryTilt = true,
                                            UpdateCallBackMethod callback = 0,
-                                           Image::Pointer preLoadedImageBlock = 0);
+                                           itk::SmartPointer<Image> preLoadedImageBlock = 0);
 
   /**
     \brief See LoadDicomSeries! Just a slightly different interface.
@@ -547,7 +550,7 @@ public:
                               bool load4D = true,
                               bool correctGantryTilt = true,
                               UpdateCallBackMethod callback = 0,
-                              Image::Pointer preLoadedImageBlock = 0);
+                              itk::SmartPointer<Image> preLoadedImageBlock = 0);
 
 protected:
 
@@ -816,7 +819,7 @@ protected:
   /**
    \brief Read a Philips3D ultrasound DICOM file and put into an mitk::Image.
   */
-  static bool ReadPhilips3DDicom(const std::string &filename, mitk::Image::Pointer output_image);
+  static bool ReadPhilips3DDicom(const std::string &filename, itk::SmartPointer<Image> output_image);
 
   /**
     \brief Construct a UID that takes into account sorting criteria from GetSeries().
@@ -873,7 +876,7 @@ protected:
   */
   static
   void
-  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock);
+  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, itk::SmartPointer<Image> preLoadedImageBlock);
 
   /**
     \brief Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.
@@ -882,35 +885,35 @@ protected:
   */
   template <typename PixelType>
   static
-  Image::Pointer
-  LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+  itk::SmartPointer<Image>
+  LoadDICOMByITK( const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, itk::SmartPointer<Image> preLoadedImageBlock);
 
   static
-  Image::Pointer MultiplexLoadDICOMByITK(const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+  itk::SmartPointer<Image> MultiplexLoadDICOMByITK(const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, itk::SmartPointer<Image> preLoadedImageBlock);
 
   static
-  Image::Pointer MultiplexLoadDICOMByITKScalar(const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+  itk::SmartPointer<Image> MultiplexLoadDICOMByITKScalar(const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, itk::SmartPointer<Image> preLoadedImageBlock);
 
   static
-  Image::Pointer MultiplexLoadDICOMByITKRGBPixel(const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+  itk::SmartPointer<Image> MultiplexLoadDICOMByITKRGBPixel(const StringContainer&, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, itk::SmartPointer<Image> preLoadedImageBlock);
 
 
   template <typename PixelType>
   static
-  Image::Pointer
-  LoadDICOMByITK4D( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+  itk::SmartPointer<Image>
+  LoadDICOMByITK4D( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, itk::SmartPointer<Image> preLoadedImageBlock);
 
   static
-  Image::Pointer
-  MultiplexLoadDICOMByITK4D( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+  itk::SmartPointer<Image>
+  MultiplexLoadDICOMByITK4D( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, itk::SmartPointer<Image> preLoadedImageBlock);
 
   static
-  Image::Pointer
-  MultiplexLoadDICOMByITK4DScalar( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+  itk::SmartPointer<Image>
+  MultiplexLoadDICOMByITK4DScalar( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, itk::SmartPointer<Image> preLoadedImageBlock);
 
   static
-  Image::Pointer
-  MultiplexLoadDICOMByITK4DRGBPixel( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock);
+  itk::SmartPointer<Image>
+  MultiplexLoadDICOMByITK4DRGBPixel( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, itk::SmartPointer<Image> preLoadedImageBlock);
 
 
 

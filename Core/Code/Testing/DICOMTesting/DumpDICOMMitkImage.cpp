@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkTestDICOMLoading.h"
+#include "mitkImage.h"
 
 int main(int argc, char** argv)
 {

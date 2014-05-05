@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkLine.h"
 #include "mitkNodePredicateDataType.h"
-
+#include "mitkSlicedGeometry3D.h"
 #include "mitkResliceMethodProperty.h"
 
 

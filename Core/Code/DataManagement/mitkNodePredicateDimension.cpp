@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNodePredicateDimension.h"
-
+#include "mitkImage.h"
 #include "mitkDataNode.h"
 
 

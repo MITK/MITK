@@ -58,6 +58,9 @@ namespace mitk
  * @ingroup PSIO
  * @ingroup Process
  */
+
+class TimeSlicedGeometry;
+
 class MitkContourModel_EXPORT ContourModelWriter : public mitk::FileWriterWithInformation
 {
 public:

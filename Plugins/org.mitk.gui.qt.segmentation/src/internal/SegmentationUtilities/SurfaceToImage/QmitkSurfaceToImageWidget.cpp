@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProgressBar.h>
 #include <mitkProperties.h>
 #include <mitkSurfaceToImageFilter.h>
+#include <mitkSurface.h>
+#include <mitkImage.h>
 
 #include <qmessagebox.h>
 

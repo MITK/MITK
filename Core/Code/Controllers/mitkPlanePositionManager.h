@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorage.h"
 
 #include <usServiceInterface.h>
+#include <mitkGeometry2D.h>
 
 class MitkCoreActivator;
 

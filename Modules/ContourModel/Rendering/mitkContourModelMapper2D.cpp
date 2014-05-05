@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTubeFilter.h>
 #include <vtkSphereSource.h>
 
+#include <mitkPlaneGeometry.h>
 
 mitk::ContourModelMapper2D::ContourModelMapper2D()
 {

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorage.h"
 #include "mitkPointSetInteractor.h"
 #include "mitkPointSet.h"
+#include "itkImage.h"
 
 namespace us {
 class ModuleResource;

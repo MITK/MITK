@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef DATATREENODE_H_HEADER_INCLUDED_C1E14338
 #define DATATREENODE_H_HEADER_INCLUDED_C1E14338
 
-#include "mitkImageSource.h"
 #include "mitkBaseData.h"
 //#include "mitkMapper.h"
 #include "mitkInteractor.h"

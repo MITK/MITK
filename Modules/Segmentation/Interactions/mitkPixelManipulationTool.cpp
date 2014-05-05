@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPixelManipulationTool.h"
 
 #include "mitkToolManager.h"
-
+#include "mitkImage.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkProperties.h"

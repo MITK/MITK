@@ -44,6 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 #include <QmitkRenderWindow.h>
+#include <mitkImage.h>
 
 #include "mitkPluginActivator.h"
 #include "usModuleRegistry.h"

@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNodeFactory.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkDicomSeriesReader.h"
-
+#include "mitkImage.h"
 #include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
 

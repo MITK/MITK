@@ -106,7 +106,7 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::ReadNavigationDa
 
   do
     {
-      std::vector<mitk::NavigationData::Pointer> navDatas(m_NumberOfOutputs, NULL);
+      std::vector<mitk::NavigationData::Pointer> navDatas(m_NumberOfOutputs);
       for (unsigned int n = 0; n < m_NumberOfOutputs; ++n)
       {
         curNavigationData = this->ReadVersion1();

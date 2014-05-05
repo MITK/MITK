@@ -50,38 +50,9 @@ mitk::USDevice::Pointer QmitkUSAbstractCustomWidget::GetDevice() const
 QmitkUSAbstractCustomWidget* QmitkUSAbstractCustomWidget::CloneForQt(QWidget* parent) const
 {
   QmitkUSAbstractCustomWidget* clonedWidget = this->Clone(parent);
+  clonedWidget->Initialize(); // initialize the Qt stuff of the widget
   clonedWidget->m_IsClonedForQt = true; // set flag that this object was really cloned
   return clonedWidget;
-}
-
-us::ServiceRegistration<QmitkUSAbstractCustomWidget> QmitkUSAbstractCustomWidget::RegisterService(us::ModuleContext* context)
-{
-  if (this->m_PrototypeServiceFactory) { return us::ServiceRegistration<QmitkUSAbstractCustomWidget>(); }
-
-  // create an us::PrototypeServiceFactory which is user on any following call
-  // to QmitkUSAbstractCustomWidget::RegisterService(); this factory uses the
-  // clone method of the concrete subclass which should be created
-  struct PrototypeFactory : public us::PrototypeServiceFactory
-  {
-    QmitkUSAbstractCustomWidget* const m_Prototype;
-
-    PrototypeFactory(QmitkUSAbstractCustomWidget* prototype)
-      : m_Prototype(prototype) {}
-
-    us::InterfaceMap GetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/)
-    {
-      return us::MakeInterfaceMap<QmitkUSAbstractCustomWidget>(m_Prototype->Clone());
-    }
-
-    void UngetService(us::Module*, const us::ServiceRegistrationBase&, const us::InterfaceMap& service)
-    {
-      delete us::ExtractInterface<QmitkUSAbstractCustomWidget>(service);
-    }
-  };
-
-  m_PrototypeServiceFactory = new PrototypeFactory(this);
-
-  return context->RegisterService<QmitkUSAbstractCustomWidget>(this->m_PrototypeServiceFactory, this->GetServiceProperties());
 }
 
 us::ServiceProperties QmitkUSAbstractCustomWidget::GetServiceProperties() const

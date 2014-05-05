@@ -166,19 +166,19 @@ const char* SliceNavigationController::GetViewDirectionAsString()
     const char* viewDirectionString;
     switch(m_ViewDirection)
     {
-    case 0:
+    case SliceNavigationController::Axial:
         viewDirectionString = "Axial";
         break;
 
-    case 1:
+    case SliceNavigationController::Sagittal:
         viewDirectionString = "Sagittal";
         break;
 
-    case 2:
-        viewDirectionString = "Frontal";
+    case SliceNavigationController::Frontal:
+        viewDirectionString = "Coronal";
         break;
 
-    case 3:
+    case SliceNavigationController::Original:
         viewDirectionString = "Original";
         break;
 

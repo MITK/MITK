@@ -971,7 +971,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
   SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
 
   // re-initialize PlaneGeometry with origin and direction
-  PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(slicedGeometry->GetGeometry2D(0));
+  PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(slicedGeometry->GetPlaneGeometry(0));
   planeGeometry->SetOrigin(origin);
 
   // re-initialize SlicedGeometry3D

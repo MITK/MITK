@@ -271,7 +271,7 @@ bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
   if (!workingNode) return false;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
-  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
   if ( !image || !planeGeometry ) return false;
 
   Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );

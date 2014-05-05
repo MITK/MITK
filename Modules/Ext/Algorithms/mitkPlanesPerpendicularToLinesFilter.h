@@ -41,7 +41,7 @@ namespace mitk {
 //##  perpendicularPlanes->SetFrameGeometry(imagegeometry);
 //##  perpendicularPlanes->Update();
 //##
-//## To get one single plane out of these use SlicedGeometry3D->GetGeometry2D(int slicenumber).
+//## To get one single plane out of these use SlicedGeometry3D->GetPlaneGeometry(int slicenumber).
 
 
 

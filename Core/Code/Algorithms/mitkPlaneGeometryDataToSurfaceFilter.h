@@ -38,17 +38,17 @@ class vtkClipPolyData;
 
 namespace mitk {
 
-class Geometry2DData;
+class PlaneGeometryData;
 
-/** \brief Superclass of all classes having a Geometry2DData as input and
+/** \brief Superclass of all classes having a PlaneGeometryData as input and
  *  generating Images as output
  *
  *  Currently implemented for PlaneGeometry and AbstractTransformGeometry.
  *  Currently, this class does not really have subclasses, but does the job
  *  for itself. It checks which kind of PlaneGeometry is stored in the
- *  Geometry2DData and - if it knows how - it generates the respective
+ *  PlaneGeometryData and - if it knows how - it generates the respective
  *  Surface. Of course, this has the disadvantage that for any new type of
- *  PlaneGeometry this class (Geometry2DDataToSurfaceFilter) has to be
+ *  PlaneGeometry this class (PlaneGeometryDataToSurfaceFilter) has to be
  *  changed/extended. The idea is to move the type specific generation code in
  *  subclasses, and internally (within this class) use a factory to create an
  *  instance of the required subclass and delegate the surface generation to
@@ -58,10 +58,10 @@ class Geometry2DData;
  *  \todo make extension easier
  *  \ingroup Process
  */
-class MITK_CORE_EXPORT Geometry2DDataToSurfaceFilter : public SurfaceSource
+class MITK_CORE_EXPORT PlaneGeometryDataToSurfaceFilter : public SurfaceSource
 {
   public:
-    mitkClassMacro(Geometry2DDataToSurfaceFilter, SurfaceSource);
+    mitkClassMacro(PlaneGeometryDataToSurfaceFilter, SurfaceSource);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -69,12 +69,12 @@ class MITK_CORE_EXPORT Geometry2DDataToSurfaceFilter : public SurfaceSource
 
     virtual void GenerateData();
 
-    const Geometry2DData *GetInput(void);
-    const Geometry2DData *GetInput(unsigned int idx);
+    const PlaneGeometryData *GetInput(void);
+    const PlaneGeometryData *GetInput(unsigned int idx);
 
-    virtual void SetInput(const Geometry2DData *image);
+    virtual void SetInput(const PlaneGeometryData *image);
     using itk::ProcessObject::SetInput;
-    virtual void SetInput(unsigned int index, const Geometry2DData *image);
+    virtual void SetInput(unsigned int index, const PlaneGeometryData *image);
 
     /** \brief If \a true (default), use Geometry3D::GetParametricBounds() to define the resolution in parameter space,
      *  otherwise use m_XResolution and m_YResolution
@@ -156,9 +156,9 @@ class MITK_CORE_EXPORT Geometry2DDataToSurfaceFilter : public SurfaceSource
 
   protected:
 
-    Geometry2DDataToSurfaceFilter();
+    PlaneGeometryDataToSurfaceFilter();
 
-    virtual ~Geometry2DDataToSurfaceFilter();
+    virtual ~PlaneGeometryDataToSurfaceFilter();
 
     /** \brief Source to create the vtk-representation of the parameter space rectangle of the PlaneGeometry
      */

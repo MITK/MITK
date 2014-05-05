@@ -298,7 +298,7 @@ void mitk::PlanarFigureReader::GenerateData()
 
         Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
         planeGeo->SetOrigin( origin );
-        planarFigure->SetGeometry2D(planeGeo);
+        planarFigure->SetPlaneGeometry(planeGeo);
       }
       catch (...)
       {

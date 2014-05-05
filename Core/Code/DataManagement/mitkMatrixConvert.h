@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD
 
-#include "mitkGeometry3D.h"
 #include "mitkBaseGeometry.h"
 #include "mitkItkMatrixHack.h"
 #include <vtkMatrix4x4.h>

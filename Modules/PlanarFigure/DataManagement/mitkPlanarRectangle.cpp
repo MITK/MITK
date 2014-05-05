@@ -118,7 +118,7 @@ void mitk::PlanarRectangle::EvaluateFeaturesInternal()
 
   // Calculate rectangle area (well, done a bit clumsy...)
   double area = 0.0;
-  if ( this->GetGeometry2D() != NULL )
+  if ( this->GetPlaneGeometry() != NULL )
   {
     for ( i = 0; i < this->GetNumberOfControlPoints(); ++i )
     {

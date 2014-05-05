@@ -939,10 +939,10 @@ bool mitk::Equal( const mitk::BaseGeometry::BoundingBoxType& leftHandSide, const
 {
   bool result = true;
 
-  Geometry3D::BoundsArrayType rightBounds = rightHandSide.GetBounds();
-  Geometry3D::BoundsArrayType leftBounds = leftHandSide.GetBounds();
-  Geometry3D::BoundsArrayType::Iterator itLeft = leftBounds.Begin();
-  for( Geometry3D::BoundsArrayType::Iterator itRight = rightBounds.Begin(); itRight != rightBounds.End(); ++itRight)
+  BaseGeometry::BoundsArrayType rightBounds = rightHandSide.GetBounds();
+  BaseGeometry::BoundsArrayType leftBounds = leftHandSide.GetBounds();
+  BaseGeometry::BoundsArrayType::Iterator itLeft = leftBounds.Begin();
+  for( BaseGeometry::BoundsArrayType::Iterator itRight = rightBounds.Begin(); itRight != rightBounds.End(); ++itRight)
   {
     if(( !mitk::Equal( *itLeft, *itRight, eps )) )
     {

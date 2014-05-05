@@ -82,7 +82,7 @@ int mitkPlanarArrowTest(int /* argc */, char* /*argv*/[])
   // **************************************************************************
   // 1. Instantiation and basic tests
   mitk::PlanarArrow::Pointer PlanarArrow = mitk::PlanarArrow::New();
-  PlanarArrow->SetGeometry2D( planeGeometry );
+  PlanarArrow->SetPlaneGeometry( planeGeometry );
 
   // first test: did this work?
   MITK_TEST_CONDITION_REQUIRED( PlanarArrow.IsNotNull(), "Testing instantiation" );

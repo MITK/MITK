@@ -167,7 +167,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   //
   // get the world time
   //
-  PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
   assert( worldGeometry.IsNotNull() );
 
   ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
@@ -241,7 +241,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }
     else
     {
-      AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldGeometry2D());
+      AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldPlaneGeometry());
       if(worldAbstractGeometry.IsNotNull())
       {
         AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeGeometry()->GetGeometryForTimeStep(0).GetPointer());

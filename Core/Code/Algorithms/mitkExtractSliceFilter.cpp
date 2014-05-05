@@ -198,7 +198,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
       m_Reslicer->SetResliceTransform(m_ResliceTransform->GetVtkTransform()->GetLinearInverse());
 
 
-    // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D),
+    // Set background level to TRANSLUCENT (see PlaneGeometryDataVtkMapper3D),
     // else the background of the image turns out gray
     m_Reslicer->SetBackgroundLevel( -32768 );
 
@@ -247,7 +247,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
       m_Reslicer->SetResliceTransform( composedResliceTransform );
 
       // Set background level to BLACK instead of translucent, to avoid
-      // boundary artifacts (see Geometry2DDataVtkMapper3D)
+      // boundary artifacts (see PlaneGeometryDataVtkMapper3D)
       m_Reslicer->SetBackgroundLevel( -1023 );
     }
     else

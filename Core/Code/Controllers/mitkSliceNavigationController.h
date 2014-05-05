@@ -78,10 +78,10 @@ class BaseRenderer;
  * \brief Controls the selection of the slice the associated BaseRenderer
  * will display
  *
- * A SliceNavigationController takes a Geometry3D or a TimeGeometry as input world geometry
+ * A SliceNavigationController takes a BaseGeometry or a TimeGeometry as input world geometry
  * (TODO what are the exact requirements?) and generates a TimeGeometry
  * as output. The TimeGeometry holds a number of SlicedGeometry3Ds and
- * these in turn hold a series of Geometry2Ds. One of these Geometry2Ds is
+ * these in turn hold a series of PlaneGeometries. One of these PlaneGeometries is
  * selected as world geometry for the BaseRenderers associated to 2D views.
  *
  * The SliceNavigationController holds has Steppers (one for the slice, a
@@ -101,7 +101,7 @@ class BaseRenderer;
  * sliceCtrl = mitk::SliceNavigationController::New();
  *
  * // Tell the navigator the geometry to be sliced (with geometry a
- * // Geometry3D::ConstPointer)
+ * // BaseGeometry::ConstPointer)
  * sliceCtrl->SetInputWorldGeometry(geometry.GetPointer());
  *
  * // Tell the navigator in which direction it shall slice the data
@@ -454,12 +454,12 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     /** \brief Returns the TimeGeometry created by the SNC. */
     mitk::TimeGeometry *GetCreatedWorldGeometry();
 
-    /** \brief Returns the Geometry3D of the currently selected time step. */
+    /** \brief Returns the BaseGeometry of the currently selected time step. */
     const mitk::BaseGeometry *GetCurrentGeometry3D();
 
 
     /** \brief Returns the currently selected Plane in the current
-     * Geometry3D (if existent).
+     * BaseGeometry (if existent).
      */
     const mitk::PlaneGeometry *GetCurrentPlaneGeometry();
 

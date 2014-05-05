@@ -393,7 +393,7 @@ namespace mitk
     virtual const mitk::BaseGeometry* GetUpdatedGeometry (int t=0);
 
     /**
-    \brief Get the Geometry3D for timestep t.
+    \brief Get the BaseGeometry for timestep t.
     */
     virtual mitk::BaseGeometry* GetGeometry (int t=0) const;
 

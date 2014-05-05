@@ -418,7 +418,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionE
             {
               FeedbackContourTool::FillContourInSlice( projectedContour, timestep, m_WorkingSlice, m_PaintingPixelValue );
 
-              const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+              const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
 
               //MITK_DEBUG << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
 

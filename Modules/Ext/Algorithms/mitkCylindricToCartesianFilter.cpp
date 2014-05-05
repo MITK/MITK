@@ -355,8 +355,8 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
   }
   delete [] tmpDimensions;
 
-  //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
-  //set the timebounds - after SetGeometry2D, so that the already created PlaneGeometry will also receive this timebounds.
+  //output->GetSlicedGeometry()->SetPlaneGeometry(mitk::Image::BuildStandardPlanePlaneGeometry(output->GetSlicedGeometry(), tmpDimensions).GetPointer(), 0);
+  //set the timebounds - after SetPlaneGeometry, so that the already created PlaneGeometry will also receive this timebounds.
   //@fixme!!! will not work for not evenly timed data!
   output->GetSlicedGeometry()->SetTimeBounds(input->GetSlicedGeometry()->GetTimeBounds());
 

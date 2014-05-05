@@ -114,10 +114,10 @@ struct SelListenerPointBasedRegistration : ISelectionListener
             mitk::TNodePredicateDataType<mitk::BaseData>::Pointer isBaseData(mitk::TNodePredicateDataType<mitk::BaseData>::New());
             mitk::TNodePredicateDataType<mitk::PointSet>::Pointer isPointSet(mitk::TNodePredicateDataType<mitk::PointSet>::New());
             mitk::NodePredicateNot::Pointer notPointSet = mitk::NodePredicateNot::New(isPointSet);
-            mitk::TNodePredicateDataType<mitk::Geometry2DData>::Pointer isGeometry2DData(mitk::TNodePredicateDataType<mitk::Geometry2DData>::New());
-            mitk::NodePredicateNot::Pointer notGeometry2DData = mitk::NodePredicateNot::New(isGeometry2DData);
-            mitk::NodePredicateAnd::Pointer notPointSetAndNotGeometry2DData = mitk::NodePredicateAnd::New( notPointSet, notGeometry2DData );
-            mitk::NodePredicateAnd::Pointer predicate = mitk::NodePredicateAnd::New( isBaseData, notPointSetAndNotGeometry2DData );
+            mitk::TNodePredicateDataType<mitk::PlaneGeometryData>::Pointer isPlaneGeometryData(mitk::TNodePredicateDataType<mitk::PlaneGeometryData>::New());
+            mitk::NodePredicateNot::Pointer notPlaneGeometryData = mitk::NodePredicateNot::New(isPlaneGeometryData);
+            mitk::NodePredicateAnd::Pointer notPointSetAndNotPlaneGeometryData = mitk::NodePredicateAnd::New( notPointSet, notPlaneGeometryData );
+            mitk::NodePredicateAnd::Pointer predicate = mitk::NodePredicateAnd::New( isBaseData, notPointSetAndNotPlaneGeometryData );
 
 
             mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = m_View->GetDataStorage()->GetSubset(predicate);
@@ -1336,7 +1336,7 @@ void QmitkPointBasedRegistrationView::SetImagesVisible(berry::ISelection::ConstP
     for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
       ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
     {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
+      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::PlaneGeometryData*>(nodeIt->Value()->GetData())==NULL)
       {
         nodeIt->Value()->SetVisibility(true);
       }
@@ -1349,7 +1349,7 @@ void QmitkPointBasedRegistrationView::SetImagesVisible(berry::ISelection::ConstP
     for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
       ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
     {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
+      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::PlaneGeometryData*>(nodeIt->Value()->GetData())==NULL)
       {
         nodeIt->Value()->SetVisibility(false);
       }

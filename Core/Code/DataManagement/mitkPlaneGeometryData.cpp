@@ -15,32 +15,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkGeometry2DData.h"
+#include "mitkPlaneGeometryData.h"
 #include "mitkBaseProcess.h"
 #include <mitkProportionalTimeGeometry.h>
 
-mitk::Geometry2DData::Geometry2DData()
+mitk::PlaneGeometryData::PlaneGeometryData()
 {
 }
 
-mitk::Geometry2DData::~Geometry2DData()
+mitk::PlaneGeometryData::~PlaneGeometryData()
 {
 }
 
-void mitk::Geometry2DData::SetGeometry(mitk::BaseGeometry *geometry)
+void mitk::PlaneGeometryData::SetGeometry(mitk::BaseGeometry *geometry)
 {
   if(geometry==NULL)
-    SetGeometry2D(NULL);
+    SetPlaneGeometry(NULL);
   else
   {
     PlaneGeometry* geometry2d = dynamic_cast<PlaneGeometry*>(geometry);
     if(geometry2d==NULL)
-      itkExceptionMacro(<<"Trying to set a geometry which is not a PlaneGeometry into Geometry2DData.");
-    SetGeometry2D(geometry2d);
+      itkExceptionMacro(<<"Trying to set a geometry which is not a PlaneGeometry into PlaneGeometryData.");
+    SetPlaneGeometry(geometry2d);
   }
 }
 
-void mitk::Geometry2DData::SetGeometry2D(mitk::PlaneGeometry *geometry2d)
+void mitk::PlaneGeometryData::SetPlaneGeometry(mitk::PlaneGeometry *geometry2d)
 {
   if(geometry2d != NULL)
   {
@@ -53,35 +53,35 @@ void mitk::Geometry2DData::SetGeometry2D(mitk::PlaneGeometry *geometry2d)
     Superclass::SetGeometry(geometry2d);
 }
 
-void mitk::Geometry2DData::UpdateOutputInformation()
+void mitk::PlaneGeometryData::UpdateOutputInformation()
 {
   Superclass::UpdateOutputInformation();
 }
 
-void mitk::Geometry2DData::SetRequestedRegionToLargestPossibleRegion()
+void mitk::PlaneGeometryData::SetRequestedRegionToLargestPossibleRegion()
 {
 
 }
 
-bool mitk::Geometry2DData::RequestedRegionIsOutsideOfTheBufferedRegion()
+bool mitk::PlaneGeometryData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  if(GetGeometry2D()==NULL) return true;
+  if(GetPlaneGeometry()==NULL) return true;
 
   return false;
 }
 
-bool mitk::Geometry2DData::VerifyRequestedRegion()
+bool mitk::PlaneGeometryData::VerifyRequestedRegion()
 {
-  if(GetGeometry2D()==NULL) return false;
+  if(GetPlaneGeometry()==NULL) return false;
 
   return true;
 }
 
-void mitk::Geometry2DData::SetRequestedRegion( const itk::DataObject *)
+void mitk::PlaneGeometryData::SetRequestedRegion( const itk::DataObject *)
 {
 
 }
 
-void mitk::Geometry2DData::CopyInformation(const itk::DataObject *)
+void mitk::PlaneGeometryData::CopyInformation(const itk::DataObject *)
 {
 }

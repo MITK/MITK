@@ -223,7 +223,7 @@ void mitk::PicHelper::InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, uns
   }
 }
 
-bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, SlicedGeometry3D* slicedgeometry)
+bool mitk::PicHelper::SetPlaneGeometry(const mitkIpPicDescriptor* aPic, int s, SlicedGeometry3D* slicedgeometry)
 {
   mitkIpPicDescriptor* pic = const_cast<mitkIpPicDescriptor*>(aPic);
   if((pic!=NULL) && (slicedgeometry->IsValidSlice(s)))
@@ -272,7 +272,7 @@ bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, Slic
           mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
           planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], rightDV.GetVnlVector(), bottomDV.GetVnlVector(), &spacing);
           planegeometry->SetOrigin(origin);
-          slicedgeometry->SetGeometry2D(planegeometry, s);
+          slicedgeometry->SetPlaneGeometry(planegeometry, s);
         }
 
         zPosition += pixelSize[2] / 2.0f;  // second half slice thickness
@@ -288,7 +288,7 @@ bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, Slic
       mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
       planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], rightDV.GetVnlVector(), bottomDV.GetVnlVector(), &slicedgeometry->GetSpacing());
       planegeometry->SetOrigin(origin);
-      slicedgeometry->SetGeometry2D(planegeometry, s);
+      slicedgeometry->SetPlaneGeometry(planegeometry, s);
     }
     return true;
   }

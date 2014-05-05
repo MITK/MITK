@@ -16,14 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkGL.h"
-#include "mitkGeometry2DDataMapper2D.h"
+#include "mitkPlaneGeometryDataMapper2D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkPlaneOrientationProperty.h"
-#include "mitkGeometry2DDataToSurfaceFilter.h"
+#include "mitkPlaneGeometryDataToSurfaceFilter.h"
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkLine.h"
 #include "mitkNodePredicateDataType.h"
@@ -31,25 +31,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkResliceMethodProperty.h"
 
 
-mitk::Geometry2DDataMapper2D::Geometry2DDataMapper2D()
+mitk::PlaneGeometryDataMapper2D::PlaneGeometryDataMapper2D()
 : m_SurfaceMapper( NULL ), m_DataStorage(NULL), m_ParentNode(NULL),
-  m_OtherGeometry2Ds(), m_RenderOrientationArrows( false ),
+  m_OtherPlaneGeometries(), m_RenderOrientationArrows( false ),
   m_ArrowOrientationPositive( true )
 {
 }
 
 
-mitk::Geometry2DDataMapper2D::~Geometry2DDataMapper2D()
+mitk::PlaneGeometryDataMapper2D::~PlaneGeometryDataMapper2D()
 {
 }
 
 
-const mitk::Geometry2DData* mitk::Geometry2DDataMapper2D::GetInput(void)
+const mitk::PlaneGeometryData* mitk::PlaneGeometryDataMapper2D::GetInput(void)
 {
-  return static_cast<const Geometry2DData * > ( GetDataNode()->GetData() );
+  return static_cast<const PlaneGeometryData * > ( GetDataNode()->GetData() );
 }
 
-void mitk::Geometry2DDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
+void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
@@ -58,12 +58,12 @@ void mitk::Geometry2DDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* r
 
   ls->UpdateGenerateDataTime();
 
-  // collect all Geometry2DDatas accessible from the DataStorage
-  m_OtherGeometry2Ds.clear();
+  // collect all PlaneGeometryDatas accessible from the DataStorage
+  m_OtherPlaneGeometries.clear();
   if (m_DataStorage.IsNull())
     return;
 
-  mitk::NodePredicateDataType::Pointer p = mitk::NodePredicateDataType::New("Geometry2DData");
+  mitk::NodePredicateDataType::Pointer p = mitk::NodePredicateDataType::New("PlaneGeometryData");
   mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetDerivations(m_ParentNode, p, false);
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
@@ -74,18 +74,18 @@ void mitk::Geometry2DDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* r
     if (data == NULL)
       continue;
 
-    Geometry2DData* geometry2dData = dynamic_cast<Geometry2DData*>(data);
+    PlaneGeometryData* geometry2dData = dynamic_cast<PlaneGeometryData*>(data);
     if(geometry2dData == NULL)
       continue;
 
-    PlaneGeometry* planegeometry = dynamic_cast<PlaneGeometry*>(geometry2dData->GetGeometry2D());
+    PlaneGeometry* planegeometry = dynamic_cast<PlaneGeometry*>(geometry2dData->GetPlaneGeometry());
     if (planegeometry != NULL)
-      m_OtherGeometry2Ds.push_back(it->Value());
+      m_OtherPlaneGeometries.push_back(it->Value());
   }
 }
 
 
-void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
+void mitk::PlaneGeometryDataMapper2D::Paint(BaseRenderer *renderer)
 {
   bool visible = true;
 
@@ -93,21 +93,21 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
   if(!visible) return;
 
-  Geometry2DData::Pointer input = const_cast< Geometry2DData * >(this->GetInput());
+  PlaneGeometryData::Pointer input = const_cast< PlaneGeometryData * >(this->GetInput());
 
   // intersecting with ourself?
-  if ( input.IsNull() || (this->GetInput()->GetGeometry2D() ==
-       renderer->GetCurrentWorldGeometry2D()) )
+  if ( input.IsNull() || (this->GetInput()->GetPlaneGeometry() ==
+       renderer->GetCurrentWorldPlaneGeometry()) )
   {
     return; // do nothing!
   }
 
   const PlaneGeometry *inputPlaneGeometry =
-    dynamic_cast< const PlaneGeometry * >( input->GetGeometry2D() );
+    dynamic_cast< const PlaneGeometry * >( input->GetPlaneGeometry() );
 
   const PlaneGeometry *worldPlaneGeometry =
     dynamic_cast< const PlaneGeometry* >(
-    renderer->GetCurrentWorldGeometry2D() );
+    renderer->GetCurrentWorldPlaneGeometry() );
 
   if ( worldPlaneGeometry && inputPlaneGeometry
     && inputPlaneGeometry->GetReferenceGeometry() )
@@ -186,15 +186,15 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         std::vector< ScalarType > mainLineParams;
         std::vector< ScalarType > primaryHelperLineParams;
         std::vector< ScalarType > secondaryHelperLineParams;
-        mainLineParams.reserve( m_OtherGeometry2Ds.size() + 2 );
+        mainLineParams.reserve( m_OtherPlaneGeometries.size() + 2 );
         mainLineParams.push_back( 0.0 );
         mainLineParams.push_back( 1.0 );
 
-        primaryHelperLineParams.reserve( m_OtherGeometry2Ds.size() + 2 );
+        primaryHelperLineParams.reserve( m_OtherPlaneGeometries.size() + 2 );
         primaryHelperLineParams.push_back( 0.0 );
         primaryHelperLineParams.push_back( 1.0 );
 
-        secondaryHelperLineParams.reserve( m_OtherGeometry2Ds.size() + 2 );
+        secondaryHelperLineParams.reserve( m_OtherPlaneGeometries.size() + 2 );
         secondaryHelperLineParams.push_back( 0.0 );
         secondaryHelperLineParams.push_back( 1.0 );
 
@@ -203,8 +203,8 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         // calculate the positions of intersection with the line to be
         // rendered; these positions will be stored in lineParams to form a
         // gap afterwards.
-        NodesVectorType::iterator otherPlanesIt = m_OtherGeometry2Ds.begin();
-        NodesVectorType::iterator otherPlanesEnd = m_OtherGeometry2Ds.end();
+        NodesVectorType::iterator otherPlanesIt = m_OtherPlaneGeometries.begin();
+        NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
 
         //int mainLineThickSlicesMode = 0;
         int mainLineThickSlicesNum = 1;
@@ -216,8 +216,8 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         while ( otherPlanesIt != otherPlanesEnd )
         {
           PlaneGeometry *otherPlane = static_cast< PlaneGeometry * >(
-            static_cast< Geometry2DData * >(
-            (*otherPlanesIt)->GetData() )->GetGeometry2D() );
+            static_cast< PlaneGeometryData * >(
+            (*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
 
           // if we have found the correct node
           if ( (otherPlane == inputPlaneGeometry)
@@ -280,12 +280,12 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         // by default, there is no gap for the helper lines
         ScalarType gapSize = 0.0;
 
-        otherPlanesIt = m_OtherGeometry2Ds.begin();
+        otherPlanesIt = m_OtherPlaneGeometries.begin();
         while ( otherPlanesIt != otherPlanesEnd )
         {
           PlaneGeometry *otherPlane = static_cast< PlaneGeometry * >(
-            static_cast< Geometry2DData * >(
-              (*otherPlanesIt)->GetData() )->GetGeometry2D() );
+            static_cast< PlaneGeometryData * >(
+              (*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
 
 
           // Just as with the original line, calculate the intersection with
@@ -383,7 +383,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
   }
   else
   {
-    Geometry2DDataToSurfaceFilter::Pointer surfaceCreator;
+    PlaneGeometryDataToSurfaceFilter::Pointer surfaceCreator;
     SmartPointerProperty::Pointer surfacecreatorprop;
     surfacecreatorprop = dynamic_cast< SmartPointerProperty * >(
       GetDataNode()->GetProperty(
@@ -391,11 +391,11 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
     if( (surfacecreatorprop.IsNull()) ||
         (surfacecreatorprop->GetSmartPointer().IsNull()) ||
-        ((surfaceCreator = dynamic_cast< Geometry2DDataToSurfaceFilter * >(
+        ((surfaceCreator = dynamic_cast< PlaneGeometryDataToSurfaceFilter * >(
           surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull())
       )
     {
-      surfaceCreator = Geometry2DDataToSurfaceFilter::New();
+      surfaceCreator = PlaneGeometryDataToSurfaceFilter::New();
       surfacecreatorprop = SmartPointerProperty::New(surfaceCreator);
       surfaceCreator->PlaceByGeometryOn();
       GetDataNode()->SetProperty( "surfacegeometry", surfacecreatorprop );
@@ -404,10 +404,10 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
     surfaceCreator->SetInput( input );
 
     // Clip the PlaneGeometry with the reference geometry bounds (if available)
-    if ( input->GetGeometry2D()->HasReferenceGeometry() )
+    if ( input->GetPlaneGeometry()->HasReferenceGeometry() )
     {
       surfaceCreator->SetBoundingBox(
-        input->GetGeometry2D()->GetReferenceGeometry()->GetBoundingBox()
+        input->GetPlaneGeometry()->GetReferenceGeometry()->GetBoundingBox()
       );
     }
 
@@ -439,7 +439,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
   }
 }
 
-void mitk::Geometry2DDataMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoint, mitk::Point2D &innerPoint,
+void mitk::PlaneGeometryDataMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoint, mitk::Point2D &innerPoint,
   const mitk::PlaneGeometry *planeGeometry,
   const mitk::PlaneGeometry *rendererPlaneGeometry,
   const mitk::DisplayGeometry *displayGeometry,
@@ -479,7 +479,7 @@ void mitk::Geometry2DDataMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoi
 }
 
 
-void mitk::Geometry2DDataMapper2D::ApplyAllProperties( BaseRenderer *renderer )
+void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties( BaseRenderer *renderer )
 {
   Superclass::ApplyColorAndOpacityProperties(renderer);
 
@@ -507,7 +507,7 @@ void mitk::Geometry2DDataMapper2D::ApplyAllProperties( BaseRenderer *renderer )
 }
 
 
-void mitk::Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent )
+void mitk::PlaneGeometryDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent )
 {
   if (ds.IsNotNull())
   {
@@ -519,7 +519,7 @@ void mitk::Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::Data
   }
 }
 
-void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
+void mitk::PlaneGeometryDataMapper2D::DrawLine( BaseRenderer* renderer,
                                             ScalarType lengthInDisplayUnits,
                                             Line<ScalarType,2> &line,
                                             std::vector<ScalarType> &gapPositions,
@@ -530,7 +530,7 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
 {
   DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
   const PlaneGeometry *worldPlaneGeometry =
-    dynamic_cast< const PlaneGeometry* >( renderer->GetCurrentWorldGeometry2D() );
+    dynamic_cast< const PlaneGeometry* >( renderer->GetCurrentWorldPlaneGeometry() );
 
   // Apply color and opacity read from the PropertyList.
   this->ApplyAllProperties( renderer );
@@ -624,7 +624,7 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
 
 }
 
-int mitk::Geometry2DDataMapper2D::DetermineThickSliceMode( DataNode * dn, int &thickSlicesNum )
+int mitk::PlaneGeometryDataMapper2D::DetermineThickSliceMode( DataNode * dn, int &thickSlicesNum )
 {
   int thickSlicesMode = 0;
   // determine the state and the extend of the thick-slice mode
@@ -646,7 +646,7 @@ int mitk::Geometry2DDataMapper2D::DetermineThickSliceMode( DataNode * dn, int &t
   return thickSlicesMode;
 }
 
-void mitk::Geometry2DDataMapper2D::DetermineParametricCrossPositions( Line< mitk::ScalarType, 2 > &mainLine,
+void mitk::PlaneGeometryDataMapper2D::DetermineParametricCrossPositions( Line< mitk::ScalarType, 2 > &mainLine,
                                                                      Line< mitk::ScalarType, 2 > &otherLine,
                                                                      std::vector< mitk::ScalarType > &crossPositions )
 {

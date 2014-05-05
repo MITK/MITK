@@ -112,7 +112,7 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
   {
     localStorage->m_LastMTime = mTime;
 
-    const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*>(planarFigure->GetGeometry2D());
+    const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*>(planarFigure->GetPlaneGeometry());
 
     if (planeGeometry == NULL)
       return;

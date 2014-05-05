@@ -159,7 +159,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Inter
   unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image ); // get the timestep of the visible part (time-wise) of the image
 
   // first, we determine, which slice is affected
-  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
 
   return this->GetAffectedImageSliceAs2DImage(planeGeometry, image, timeStep);
 }
@@ -224,7 +224,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEven
 {
   if(!positionEvent) return;
 
-  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
 
   if( planeGeometry && slice)
   {
@@ -319,7 +319,7 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
 unsigned int mitk::SegTool2D::AddContourmarker ( const InteractionPositionEvent* positionEvent )
 {
   const mitk::PlaneGeometry* plane = dynamic_cast<const PlaneGeometry*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
-    positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
+    positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetPlaneGeometry(0));
 
   us::ServiceReference<PlanePositionManagerService> serviceRef =
       us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
@@ -335,7 +335,7 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const InteractionPositionEvent*
   p2[1] -= plane->GetSpacing()[1];
   contourMarker->PlaceFigure( p1 );
   contourMarker->SetCurrentControlPoint( p1 );
-  contourMarker->SetGeometry2D( const_cast<PlaneGeometry*>(plane));
+  contourMarker->SetPlaneGeometry( const_cast<PlaneGeometry*>(plane));
 
   std::stringstream markerStream;
   mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));

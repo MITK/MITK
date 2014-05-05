@@ -21,7 +21,7 @@
 #include "mitkPlaneGeometry.h"
 #include "mitkTimeGeometry.h"
 #include "mitkDisplayGeometry.h"
-#include "mitkGeometry2DData.h"
+#include "mitkPlaneGeometryData.h"
 #include "mitkCameraController.h"
 #include "mitkDisplayPositionEvent.h"
 #include "mitkWheelEvent.h"
@@ -178,21 +178,21 @@ namespace mitk
     //## @brief Set/Get the WorldGeometry (m_WorldGeometry) for 3D and 2D rendering, that describing the
     //## (maximal) area to be rendered.
     //##
-    //## Depending of the type of the passed Geometry3D more or less information can be extracted:
-    //## \li if it is a PlaneGeometry (which is a sub-class of Geometry3D), m_CurrentWorldGeometry2D is
+    //## Depending of the type of the passed BaseGeometry more or less information can be extracted:
+    //## \li if it is a PlaneGeometry (which is a sub-class of BaseGeometry), m_CurrentWorldPlaneGeometry is
     //## also set to point to it. m_WorldTimeGeometry is set to NULL.
     //## \li if it is a TimeGeometry, m_WorldTimeGeometry is also set to point to it.
-    //## If m_WorldTimeGeometry contains instances of SlicedGeometry3D, m_CurrentWorldGeometry2D is set to
+    //## If m_WorldTimeGeometry contains instances of SlicedGeometry3D, m_CurrentWorldPlaneGeometry is set to
     //## one of geometries stored in the SlicedGeometry3D according to the value of m_Slice;  otherwise
-    //## a PlaneGeometry describing the top of the bounding-box of the Geometry3D is set as the
-    //## m_CurrentWorldGeometry2D.
-    //## \li otherwise a PlaneGeometry describing the top of the bounding-box of the Geometry3D
-    //## is set as the m_CurrentWorldGeometry2D. m_WorldTimeGeometry is set to NULL.
-    //## @todo add calculation of PlaneGeometry describing the top of the bounding-box of the Geometry3D
-    //## when the passed Geometry3D is not sliced.
+    //## a PlaneGeometry describing the top of the bounding-box of the BaseGeometry is set as the
+    //## m_CurrentWorldPlaneGeometry.
+    //## \li otherwise a PlaneGeometry describing the top of the bounding-box of the BaseGeometry
+    //## is set as the m_CurrentWorldPlaneGeometry. m_WorldTimeGeometry is set to NULL.
+    //## @todo add calculation of PlaneGeometry describing the top of the bounding-box of the BaseGeometry
+    //## when the passed BaseGeometry is not sliced.
     //## \sa m_WorldGeometry
     //## \sa m_WorldTimeGeometry
-    //## \sa m_CurrentWorldGeometry2D
+    //## \sa m_CurrentWorldPlaneGeometry
     virtual void SetWorldGeometry3D(BaseGeometry* geometry);
     virtual void SetWorldTimeGeometry(mitk::TimeGeometry* geometry);
 
@@ -211,8 +211,8 @@ namespace mitk
     itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry)
 
     //##Documentation
-    //## @brief Get the current 2D-worldgeometry (m_CurrentWorldGeometry2D) used for 2D-rendering
-    itkGetConstObjectMacro(CurrentWorldGeometry2D, PlaneGeometry)
+    //## @brief Get the current 2D-worldgeometry (m_CurrentWorldPlaneGeometry) used for 2D-rendering
+    itkGetConstObjectMacro(CurrentWorldPlaneGeometry, PlaneGeometry)
 
     //##Documentation
     //## Calculates the bounds of the DataStorage (if it contains any valid data),
@@ -230,7 +230,7 @@ namespace mitk
     //##Documentation
     //## @brief Set/Get the DisplayGeometry (for 2D rendering)
     //##
-    //## The DisplayGeometry describes which part of the PlaneGeometry m_CurrentWorldGeometry2D
+    //## The DisplayGeometry describes which part of the PlaneGeometry m_CurrentWorldPlaneGeometry
     //## is displayed.
     virtual void SetDisplayGeometry(DisplayGeometry* geometry2d);
 
@@ -239,7 +239,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Set/Get m_Slice which defines together with m_TimeStep the 2D geometry
-    //## stored in m_WorldTimeGeometry used as m_CurrentWorldGeometry2D
+    //## stored in m_WorldTimeGeometry used as m_CurrentWorldPlaneGeometry
     //##
     //## \sa m_Slice
     virtual void SetSlice(unsigned int slice);
@@ -258,7 +258,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Set/Get m_TimeStep which defines together with m_Slice the 2D geometry
-    //## stored in m_WorldTimeGeometry used as m_CurrentWorldGeometry2D
+    //## stored in m_WorldTimeGeometry used as m_CurrentWorldPlaneGeometry
     //##
     //## \sa m_TimeStep
     virtual void SetTimeStep(unsigned int timeStep);
@@ -302,10 +302,10 @@ namespace mitk
 
     //##Documentation
     //## @brief Get a data object containing the DisplayGeometry (for 2D rendering)
-    itkGetObjectMacro(DisplayGeometryData, Geometry2DData)
+    itkGetObjectMacro(DisplayGeometryData, PlaneGeometryData)
     //##Documentation
     //## @brief Get a data object containing the WorldGeometry (for 2D rendering)
-    itkGetObjectMacro(WorldGeometryData, Geometry2DData)
+    itkGetObjectMacro(WorldGeometryData, PlaneGeometryData)
 
     //##Documentation
     //## @brief Get a DataNode pointing to a data object containing the WorldGeometry (3D and 2D rendering)
@@ -314,24 +314,24 @@ namespace mitk
     //## @brief Get a DataNode pointing to a data object containing the DisplayGeometry (for 2D rendering)
     itkGetObjectMacro(DisplayGeometryNode, DataNode)
     //##Documentation
-    //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldGeometry2D (for 2D rendering)
-    itkGetObjectMacro(CurrentWorldGeometry2DNode, DataNode)
+    //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldPlaneGeometry (for 2D rendering)
+    itkGetObjectMacro(CurrentWorldPlaneGeometryNode, DataNode)
 
     //##Documentation
-    //## @brief Sets timestamp of CurrentWorldGeometry2D and DisplayGeometry and forces so reslicing in that renderwindow
+    //## @brief Sets timestamp of CurrentWorldPlaneGeometry and DisplayGeometry and forces so reslicing in that renderwindow
     void SendUpdateSlice();
 
     //##Documentation
-    //## @brief Get timestamp of last call of SetCurrentWorldGeometry2D
-    unsigned long GetCurrentWorldGeometry2DUpdateTime()
+    //## @brief Get timestamp of last call of SetCurrentWorldPlaneGeometry
+    unsigned long GetCurrentWorldPlaneGeometryUpdateTime()
     {
-      return m_CurrentWorldGeometry2DUpdateTime;
+      return m_CurrentWorldPlaneGeometryUpdateTime;
     }
     //##Documentation
     //## @brief Get timestamp of last call of SetDisplayGeometry
     unsigned long GetDisplayGeometryUpdateTime()
     {
-      return m_CurrentWorldGeometry2DUpdateTime;
+      return m_CurrentWorldPlaneGeometryUpdateTime;
     }
     //##Documentation
     //## @brief Get timestamp of last change of current TimeStep
@@ -506,8 +506,8 @@ namespace mitk
     bool m_Focused;
 
     //##Documentation
-    //## @brief Sets m_CurrentWorldGeometry2D
-    virtual void SetCurrentWorldGeometry2D(PlaneGeometry* geometry2d);
+    //## @brief Sets m_CurrentWorldPlaneGeometry
+    virtual void SetCurrentWorldPlaneGeometry(PlaneGeometry* geometry2d);
 
     //##Documentation
     //## @brief Sets m_CurrentWorldGeometry
@@ -531,12 +531,12 @@ namespace mitk
     itk::SmartPointer<OverlayManager> m_OverlayManager;
 
     //##Documentation
-    //## m_WorldTimeGeometry is set by SetWorldGeometry if the passed Geometry3D is a
+    //## m_WorldTimeGeometry is set by SetWorldGeometry if the passed BaseGeometry is a
     //## TimeGeometry (or a sub-class of it). If it contains instances of SlicedGeometry3D,
     //## m_Slice and m_TimeStep (set via SetSlice and SetTimeStep, respectively) define
     //## which 2D geometry stored in m_WorldTimeGeometry (if available)
-    //## is used as m_CurrentWorldGeometry2D.
-    //## \sa m_CurrentWorldGeometry2D
+    //## is used as m_CurrentWorldPlaneGeometry.
+    //## \sa m_CurrentWorldPlaneGeometry
     TimeGeometry::Pointer m_WorldTimeGeometry;
 
     //##Documentation
@@ -551,7 +551,7 @@ namespace mitk
     //## It is const, since we are not allowed to change it (it may be taken
     //## directly from the geometry of an image-slice and thus it would be
     //## very strange when suddenly the image-slice changes its geometry).
-    PlaneGeometry::Pointer m_CurrentWorldGeometry2D;
+    PlaneGeometry::Pointer m_CurrentWorldPlaneGeometry;
 
     //##Documentation
     //## Pointer to the displaygeometry. The displaygeometry describes the
@@ -562,18 +562,18 @@ namespace mitk
 
     //##Documentation
     //## Defines together with m_Slice which 2D geometry stored in m_WorldTimeGeometry
-    //## is used as m_CurrentWorldGeometry2D: m_WorldTimeGeometry->GetGeometry2D(m_Slice, m_TimeStep).
+    //## is used as m_CurrentWorldPlaneGeometry: m_WorldTimeGeometry->GetPlaneGeometry(m_Slice, m_TimeStep).
     //## \sa m_WorldTimeGeometry
     unsigned int m_Slice;
     //##Documentation
     //## Defines together with m_TimeStep which 2D geometry stored in m_WorldTimeGeometry
-    //## is used as m_CurrentWorldGeometry2D: m_WorldTimeGeometry->GetGeometry2D(m_Slice, m_TimeStep).
+    //## is used as m_CurrentWorldPlaneGeometry: m_WorldTimeGeometry->GetPlaneGeometry(m_Slice, m_TimeStep).
     //## \sa m_WorldTimeGeometry
     unsigned int m_TimeStep;
 
     //##Documentation
     //## @brief timestamp of last call of SetWorldGeometry
-    itk::TimeStamp m_CurrentWorldGeometry2DUpdateTime;
+    itk::TimeStamp m_CurrentWorldPlaneGeometryUpdateTime;
 
     //##Documentation
     //## @brief timestamp of last call of SetDisplayGeometry
@@ -592,13 +592,13 @@ namespace mitk
 
     //##Documentation
     //## Data object containing the m_WorldGeometry defined above.
-    Geometry2DData::Pointer m_WorldGeometryData;
+    PlaneGeometryData::Pointer m_WorldGeometryData;
     //##Documentation
     //## Data object containing the m_DisplayGeometry defined above.
-    Geometry2DData::Pointer m_DisplayGeometryData;
+    PlaneGeometryData::Pointer m_DisplayGeometryData;
     //##Documentation
-    //## Data object containing the m_CurrentWorldGeometry2D defined above.
-    Geometry2DData::Pointer m_CurrentWorldGeometry2DData;
+    //## Data object containing the m_CurrentWorldPlaneGeometry defined above.
+    PlaneGeometryData::Pointer m_CurrentWorldPlaneGeometryData;
 
     //##Documentation
     //## DataNode objects containing the m_WorldGeometryData defined above.
@@ -607,15 +607,15 @@ namespace mitk
     //## DataNode objects containing the m_DisplayGeometryData defined above.
     DataNode::Pointer m_DisplayGeometryNode;
     //##Documentation
-    //## DataNode objects containing the m_CurrentWorldGeometry2DData defined above.
-    DataNode::Pointer m_CurrentWorldGeometry2DNode;
+    //## DataNode objects containing the m_CurrentWorldPlaneGeometryData defined above.
+    DataNode::Pointer m_CurrentWorldPlaneGeometryNode;
 
     //##Documentation
     //## @brief test only
     unsigned long m_DisplayGeometryTransformTime;
     //##Documentation
     //## @brief test only
-    unsigned long m_CurrentWorldGeometry2DTransformTime;
+    unsigned long m_CurrentWorldPlaneGeometryTransformTime;
 
     std::string m_Name;
 

@@ -49,12 +49,12 @@ namespace mitk {
   public:
     mitkClassMacro(AbstractTransformGeometry, PlaneGeometry);
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
-    //##Documentation
-    //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)
-    virtual vtkAbstractTransform* GetVtkAbstractTransform() const;
+      //##Documentation
+      //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)
+      virtual vtkAbstractTransform* GetVtkAbstractTransform() const;
 
     virtual unsigned long GetMTime() const;
 
@@ -123,7 +123,6 @@ namespace mitk {
 
     virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
 
-
     virtual const Transform3D* GetParametricTransform() const;
 
     //##Documentation
@@ -136,7 +135,7 @@ namespace mitk {
     virtual void SetOversampling(mitk::ScalarType oversampling);
 
     //##Documentation
-    //## @brief Calculates the standard part of a Geometry3D
+    //## @brief Calculates the standard part of a BaseGeometry
     //## (IndexToWorldTransform and bounding box) around the
     //## curved geometry. Has to be implemented in subclasses.
     //##
@@ -145,7 +144,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Set the frame geometry which is used as the standard
-    //## part of an Geometry3D (IndexToWorldTransform and bounding box)
+    //## part of an BaseGeometry (IndexToWorldTransform and bounding box)
     //##
     //## Maybe used as a hint within which the interpolation shall occur
     //## by concrete sub-classes.
@@ -153,7 +152,6 @@ namespace mitk {
     virtual void SetFrameGeometry(const mitk::BaseGeometry* frameGeometry);
 
     virtual itk::LightObject::Pointer InternalClone() const;
-
 
     //##Documentation
     //## @brief Get the parametric bounding-box
@@ -205,9 +203,7 @@ namespace mitk {
 
     mitk::BaseGeometry::Pointer m_FrameGeometry;
 
-    virtual void PostInitialize();
-
-        //##Documentation
+    //##Documentation
     //## @brief Set the parametric bounds
     //##
     //## Protected in this class, made public in some sub-classes, e.g.,
@@ -215,6 +211,8 @@ namespace mitk {
     virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
 
     mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
+  private:
+    virtual void PostInitialize();
   };
 } // namespace mitk
 #endif /* MITKVTKABSTRACTTRANSFORMPLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */

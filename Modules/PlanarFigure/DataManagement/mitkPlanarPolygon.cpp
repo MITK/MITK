@@ -116,7 +116,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   double area       = 0.0;
   bool intersection = false;
 
-  if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
+  if ( this->IsClosed() && (this->GetPlaneGeometry() != NULL) )
   {
     // does PlanarPolygon overlap/intersect itself?
     unsigned int numberOfPoints = polyLinePoints.size();

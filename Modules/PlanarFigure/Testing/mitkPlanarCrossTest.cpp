@@ -370,7 +370,7 @@ int mitkPlanarCrossTest(int /* argc */, char* /*argv*/[])
   // **************************************************************************
   // 1. Double-line mode instantiation and basic tests
   mitk::PlanarCross::Pointer planarCross = mitk::PlanarCross::New();
-  planarCross->SetGeometry2D( planeGeometry );
+  planarCross->SetPlaneGeometry( planeGeometry );
 
   // first test: did this work?
   MITK_TEST_CONDITION_REQUIRED( planarCross.IsNotNull(), "Testing instantiation" );
@@ -387,7 +387,7 @@ int mitkPlanarCrossTest(int /* argc */, char* /*argv*/[])
   // 2. Single-line mode instantiation and basic tests
   planarCross = mitk::PlanarCross::New();
   planarCross->SingleLineModeOn();
-  planarCross->SetGeometry2D( planeGeometry );
+  planarCross->SetPlaneGeometry( planeGeometry );
 
   // test: single-line mode?
   MITK_TEST_CONDITION_REQUIRED( planarCross->GetSingleLineMode(), "Testing activation of single-line mode" );
@@ -399,7 +399,7 @@ int mitkPlanarCrossTest(int /* argc */, char* /*argv*/[])
   // **************************************************************************
   // 3. Tests of application of spatial constraints for double-line mode
   planarCross = mitk::PlanarCross::New();
-  planarCross->SetGeometry2D( planeGeometry );
+  planarCross->SetPlaneGeometry( planeGeometry );
 
   // Test placement with various out-of-bounds control points (automatic application of
   // constraints expected)

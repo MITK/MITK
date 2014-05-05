@@ -64,8 +64,8 @@ class ImageStatisticsHolder;
 //##
 //## For ITK v3.8 and older: Converting coordinates from the ITK physical
 //## coordinate system (which does not support rotated images) to the MITK world
-//## coordinate system should be performed via the Geometry3D of the Image, see
-//## Geometry3D::WorldToItkPhysicalPoint.
+//## coordinate system should be performed via the BaseGeometry of the Image, see
+//## BaseGeometry::WorldToItkPhysicalPoint.
 //## @ingroup Data
 class MITK_CORE_EXPORT Image : public SlicedData
 {
@@ -235,13 +235,13 @@ public:
   virtual void Initialize(const mitk::PixelType& type, unsigned int dimension, const unsigned int *dimensions, unsigned int channels = 1);
 
   //##Documentation
-  //## initialize new (or re-initialize) image information by a Geometry3D
+  //## initialize new (or re-initialize) image information by a BaseGeometry
   //##
   //## @param tDim defines the number of time steps for which the Image should be initialized
   virtual void Initialize(const mitk::PixelType& type, const mitk::BaseGeometry& geometry, unsigned int channels = 1, int tDim=1);
 
   /**
-  * initialize new (or re-initialize) image information by a Geometry3D
+  * initialize new (or re-initialize) image information by a TimeGeometry
   *
   * @param tDim defines the number of time steps for which the Image should be initialized
   * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
@@ -417,7 +417,7 @@ public:
     }
 
     // re-initialize PlaneGeometry with origin and direction
-    PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(GetSlicedGeometry(0)->GetGeometry2D(0));
+    PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(GetSlicedGeometry(0)->GetPlaneGeometry(0));
     planeGeometry->SetOrigin(origin);
     planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
 

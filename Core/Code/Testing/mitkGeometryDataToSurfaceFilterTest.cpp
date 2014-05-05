@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkGeometry2DDataToSurfaceFilter.h"
+#include "mitkPlaneGeometryDataToSurfaceFilter.h"
 
 #include "mitkSurface.h"
 #include "mitkPlaneGeometry.h"
-#include "mitkGeometry2DData.h"
+#include "mitkPlaneGeometryData.h"
 
 #include "vtkPolyData.h"
 
@@ -104,7 +104,7 @@ int testSurfaceBoundingBoxConsistency(mitk::Surface* surface, bool expectIdentit
   return EXIT_SUCCESS;
 }
 
-int testGeometryDataToSurfaceFilter(mitk::Geometry2DDataToSurfaceFilter* geometryToSurfaceFilter, mitk::ScalarType expectedIndexBounds[6], mitk::ScalarType expectedAxisParallelBounds[6], bool expectIdentityTransform)
+int testGeometryDataToSurfaceFilter(mitk::PlaneGeometryDataToSurfaceFilter* geometryToSurfaceFilter, mitk::ScalarType expectedIndexBounds[6], mitk::ScalarType expectedAxisParallelBounds[6], bool expectIdentityTransform)
 {
   int result;
 
@@ -156,11 +156,11 @@ int mitkGeometryDataToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
 {
   int result;
 
-  std::cout << "Testing mitk::Geometry2DDataToSurfaceFilter: " << std::endl;
+  std::cout << "Testing mitk::PlaneGeometryDataToSurfaceFilter: " << std::endl;
 
-  mitk::Geometry2DDataToSurfaceFilter::Pointer geometryToSurfaceFilter;
-  std::cout << "Testing Geometry2DDataToSurfaceFilter::New(): ";
-  geometryToSurfaceFilter = mitk::Geometry2DDataToSurfaceFilter::New();
+  mitk::PlaneGeometryDataToSurfaceFilter::Pointer geometryToSurfaceFilter;
+  std::cout << "Testing PlaneGeometryDataToSurfaceFilter::New(): ";
+  geometryToSurfaceFilter = mitk::PlaneGeometryDataToSurfaceFilter::New();
   if (geometryToSurfaceFilter.IsNull()) {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -175,8 +175,8 @@ int mitkGeometryDataToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   mitk::FillVector3D(origin, 1.0, 2.0, 3.0);
   plane->SetOrigin(origin);
 
-  mitk::Geometry2DData::Pointer geometryData = mitk::Geometry2DData::New();
-  geometryData->SetGeometry2D(plane);
+  mitk::PlaneGeometryData::Pointer geometryData = mitk::PlaneGeometryData::New();
+  geometryData->SetPlaneGeometry(plane);
 
   std::cout << "Testing SetInput(): ";
   geometryToSurfaceFilter->SetInput(geometryData);
@@ -192,7 +192,7 @@ int mitkGeometryDataToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   }
 
 
-  std::cout << "Testing default of Geometry2DDataToSurfaceFilter::m_PlaceByGeometry (expected is false): ";
+  std::cout << "Testing default of PlaneGeometryDataToSurfaceFilter::m_PlaceByGeometry (expected is false): ";
   if (geometryToSurfaceFilter->GetPlaceByGeometry() !=  false ) {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -207,7 +207,7 @@ int mitkGeometryDataToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
     return result;
   }
 
-  std::cout << "Testing Geometry2DDataToSurfaceFilter::SetPlaceByGeometry(true): ";
+  std::cout << "Testing PlaneGeometryDataToSurfaceFilter::SetPlaceByGeometry(true): ";
   geometryToSurfaceFilter->SetPlaceByGeometry(true);
   if (geometryToSurfaceFilter->GetPlaceByGeometry() !=  true ) {
     std::cout<<"[FAILED]"<<std::endl;

@@ -127,7 +127,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
     //
     // get the world time
     //
-    const PlaneGeometry* worldGeometry = renderer->GetCurrentWorldGeometry2D();
+    const PlaneGeometry* worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
     assert( worldGeometry != NULL );
     ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
 

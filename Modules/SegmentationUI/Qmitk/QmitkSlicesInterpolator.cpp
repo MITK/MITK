@@ -481,7 +481,7 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
       if (slicedGeometry)
       {
         m_LastSNC = slicer;
-        mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( event.GetPos() ));
+        mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetPlaneGeometry( event.GetPos() ));
         if (plane)
           Interpolate( plane, m_TimeStep[slicer], slicer );
         return true;

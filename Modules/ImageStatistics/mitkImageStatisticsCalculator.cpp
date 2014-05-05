@@ -609,14 +609,14 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
         throw std::runtime_error( "Image geometry invalid!" );
       }
 
-      const PlaneGeometry *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
-      if ( planarFigureGeometry2D == NULL )
+      const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
+      if ( planarFigurePlaneGeometry == NULL )
       {
         throw std::runtime_error( "Planar-Figure not yet initialized!" );
       }
 
       const PlaneGeometry *planarFigureGeometry =
-        dynamic_cast< const PlaneGeometry * >( planarFigureGeometry2D );
+        dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
       if ( planarFigureGeometry == NULL )
       {
         throw std::runtime_error( "Non-planar planar figures not supported!" );
@@ -1089,7 +1089,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
   // These points are used by the vtkLassoStencilSource to create
   // a vtkImageStencil.
-  const mitk::PlaneGeometry *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+  const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
   const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
   const mitk::BaseGeometry *imageGeometry3D = m_Image->GetGeometry( 0 );
   // If there is a second poly line in a closed planar figure, treat it as a hole.
@@ -1134,7 +1134,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
     // Convert 2D point back to the local index coordinates of the selected
     // image
-    planarFigureGeometry2D->Map( it->Point, point3D );
+    planarFigurePlaneGeometry->Map( it->Point, point3D );
 
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil
@@ -1159,7 +1159,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
     for (it = planarFigureHolePolyline.begin(); it != end; ++it)
     {
-      planarFigureGeometry2D->Map(it->Point, point3D);
+      planarFigurePlaneGeometry->Map(it->Point, point3D);
       imageGeometry3D->WorldToIndex(point3D, point3D);
       holePoints->InsertNextPoint(point3D[i0], point3D[i1], 0);
     }

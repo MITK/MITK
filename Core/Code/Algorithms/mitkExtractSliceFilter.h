@@ -40,7 +40,7 @@ namespace mitk
 
   The convinient workflow is:
   1. Set an image as input.
-  2. Set the worldGeometry2D. This defines a grid where the slice is being extracted
+  2. Set the worldPlaneGeometry. This defines a grid where the slice is being extracted
   3. And then start the pipeline.
 
   There are a few more properties that can be set to modify the behavior of the slicing.
@@ -101,7 +101,7 @@ namespace mitk
     /** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]
     * The method uses the input of the filter to calculate the bounds.
     * It is recommended to use
-    * GetClippedPlaneBounds(const Geometry3D*, const PlaneGeometry*, double*)
+    * GetClippedPlaneBounds(const BaseGeometry*, const PlaneGeometry*, double*)
     * if you are not sure about the input.
     */
     bool GetClippedPlaneBounds(double bounds[6]);

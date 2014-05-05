@@ -42,7 +42,7 @@ public:
 
   static void InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry);
 
-  static bool SetGeometry2D(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);
+  static bool SetPlaneGeometry(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);
 };
 
 } // namespace mitk

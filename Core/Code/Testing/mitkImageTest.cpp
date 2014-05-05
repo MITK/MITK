@@ -337,7 +337,7 @@ int mitkImageTest(int argc, char* argv[])
 
   // Test origin
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin), "Testing correctness of changed origin via GetGeometry()->GetOrigin(): ");
-  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(), origin),  "Testing correctness of changed origin via GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(): ");
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetPlaneGeometry(0)->GetOrigin(), origin),  "Testing correctness of changed origin via GetSlicedGeometry()->GetPlaneGeometry(0)->GetOrigin(): ");
 
   //-----------------
   // testing spacing information and methodsunsigned int dim[]={100,100,20};
@@ -346,7 +346,7 @@ int mitkImageTest(int argc, char* argv[])
   mitk::FillVector3D(spacing, 7.0, 0.92, 1.83);
   imgMem->SetSpacing(spacing);
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing), "Testing correctness of changed spacing via GetGeometry()->GetSpacing(): ");
-  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(), spacing), "Testing correctness of changed spacing via GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(): ");
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing(), spacing), "Testing correctness of changed spacing via GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing(): ");
 
   mitk::Image::Pointer vecImg = mitk::Image::New();
   try

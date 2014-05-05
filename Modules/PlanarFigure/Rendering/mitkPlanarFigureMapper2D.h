@@ -153,8 +153,8 @@ protected:
   void RenderLines( PlanarFigureDisplayMode lineDisplayMode,
                     mitk::PlanarFigure * planarFigure,
                     mitk::Point2D &anchorPoint,
-                    mitk::PlaneGeometry * planarFigureGeometry2D,
-                    const mitk::PlaneGeometry * rendererGeometry2D,
+                    mitk::PlaneGeometry * planarFigurePlaneGeometry,
+                    const mitk::PlaneGeometry * rendererPlaneGeometry,
                     mitk::DisplayGeometry * displayGeometry );
 
   /**
@@ -182,8 +182,8 @@ protected:
   */
   void RenderControlPoints( mitk::PlanarFigure * planarFigure,
                             PlanarFigureDisplayMode lineDisplayMode,
-                            mitk::PlaneGeometry * planarFigureGeometry2D,
-                            const mitk::PlaneGeometry * rendererGeometry2D,
+                            mitk::PlaneGeometry * planarFigurePlaneGeometry,
+                            const mitk::PlaneGeometry * rendererPlaneGeometry,
                             mitk::DisplayGeometry * displayGeometry );
 
 
@@ -212,8 +212,8 @@ protected:
   void PaintPolyLine( mitk::PlanarFigure::PolyLineType vertices,
     bool closed,
     Point2D& anchorPoint,
-    const PlaneGeometry* planarFigureGeometry2D,
-    const PlaneGeometry* rendererGeometry2D,
+    const PlaneGeometry* planarFigurePlaneGeometry,
+    const PlaneGeometry* rendererPlaneGeometry,
     const DisplayGeometry* displayGeometry);
 
   /**
@@ -222,8 +222,8 @@ protected:
   */
   void DrawMainLines( mitk::PlanarFigure* figure,
     Point2D& anchorPoint,
-    const PlaneGeometry* planarFigureGeometry2D,
-    const PlaneGeometry* rendererGeometry2D,
+    const PlaneGeometry* planarFigurePlaneGeometry,
+    const PlaneGeometry* rendererPlaneGeometry,
     const DisplayGeometry* displayGeometry) ;
 
   /**
@@ -232,8 +232,8 @@ protected:
   */
   void DrawHelperLines( mitk::PlanarFigure* figure,
     Point2D& anchorPoint,
-    const PlaneGeometry* planarFigureGeometry2D,
-    const PlaneGeometry* rendererGeometry2D,
+    const PlaneGeometry* planarFigurePlaneGeometry,
+    const PlaneGeometry* rendererPlaneGeometry,
     const DisplayGeometry* displayGeometry) ;
 
   void InitializeDefaultPlanarFigureProperties();

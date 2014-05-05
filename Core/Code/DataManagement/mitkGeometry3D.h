@@ -46,21 +46,21 @@ namespace mitk {
 
     itkCloneMacro(Self)
 
-      //##Documentation
-      //## @brief clones the geometry
-      //##
-      //## Overwrite in all sub-classes.
-      //## Normally looks like:
-      //## \code
-      //##  Self::Pointer newGeometry = new Self(*this);
-      //##  newGeometry->UnRegister();
-      //##  return newGeometry.GetPointer();
-      //## \endcode
-      virtual itk::LightObject::Pointer InternalClone() const;
-
   protected:
     Geometry3D();
     Geometry3D(const Geometry3D& other);
+
+    //##Documentation
+    //## @brief clones the geometry
+    //##
+    //## Overwrite in all sub-classes.
+    //## Normally looks like:
+    //## \code
+    //##  Self::Pointer newGeometry = new Self(*this);
+    //##  newGeometry->UnRegister();
+    //##  return newGeometry.GetPointer();
+    //## \endcode
+    virtual itk::LightObject::Pointer InternalClone() const;
 
     virtual ~Geometry3D();
   };

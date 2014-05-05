@@ -472,7 +472,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
     slices = slicedWorldGeometry->GetSlices();
     if ( slicedWorldGeometry->GetEvenlySpaced() )
     {
-      mitk::PlaneGeometry *plane = slicedWorldGeometry->GetGeometry2D( 0 );
+      mitk::PlaneGeometry *plane = slicedWorldGeometry->GetPlaneGeometry( 0 );
 
       const Vector3D &direction = slicedWorldGeometry->GetDirectionVector();
 
@@ -494,7 +494,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
       Point3D projectedPoint;
       for ( s = 0; s < slices; ++s )
       {
-        slicedWorldGeometry->GetGeometry2D( s )->Project( point, projectedPoint );
+        slicedWorldGeometry->GetPlaneGeometry( s )->Project( point, projectedPoint );
         Vector3D distance = projectedPoint - point;
         ScalarType currentDistance = distance.GetSquaredNorm();
 
@@ -570,7 +570,7 @@ SliceNavigationController::GetCurrentPlaneGeometry()
   {
     const mitk::PlaneGeometry *planeGeometry =
       dynamic_cast< mitk::PlaneGeometry * >
-        ( slicedGeometry->GetGeometry2D(this->GetSlice()->GetPos()) );
+        ( slicedGeometry->GetPlaneGeometry(this->GetSlice()->GetPos()) );
     return planeGeometry;
   }
   else

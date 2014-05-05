@@ -29,10 +29,10 @@ namespace mitk {
 //## @brief Data class containing PlaneGeometry objects
 //## @ingroup Geometry
 //##
-class MITK_CORE_EXPORT Geometry2DData : public GeometryData
+class MITK_CORE_EXPORT PlaneGeometryData : public GeometryData
 {
 public:
-  mitkClassMacro(Geometry2DData, GeometryData);
+  mitkClassMacro(PlaneGeometryData, GeometryData);
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -47,11 +47,11 @@ public:
   //##Documentation
   //## @brief Set the reference to the PlaneGeometry that is stored
   //## by the object
-  virtual void SetGeometry2D(mitk::PlaneGeometry* geometry2d);
+  virtual void SetPlaneGeometry(mitk::PlaneGeometry* geometry2d);
   //##Documentation
   //## @brief Get the reference to the PlaneGeometry that is stored
   //## by the object
-  virtual mitk::PlaneGeometry * GetGeometry2D() const
+  virtual mitk::PlaneGeometry * GetPlaneGeometry() const
   {
     return static_cast<mitk::PlaneGeometry *>(GetGeometry());
   };
@@ -69,9 +69,9 @@ public:
   virtual void CopyInformation(const itk::DataObject *data);
 
 protected:
-  Geometry2DData();
+  PlaneGeometryData();
 
-  virtual ~Geometry2DData();
+  virtual ~PlaneGeometryData();
 };
 
 } // namespace mitk

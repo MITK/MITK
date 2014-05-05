@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 #include "mitkVtkMapper.h"
 #include "mitkDataStorage.h"
-#include "mitkGeometry2DDataToSurfaceFilter.h"
+#include "mitkPlaneGeometryDataToSurfaceFilter.h"
 #include "mitkWeakPointer.h"
 
 #include <vtkSystemIncludes.h>
@@ -37,7 +37,7 @@ class vtkHedgeHog;
 
 namespace mitk {
 
-class Geometry2DData;
+class PlaneGeometryData;
 class BaseRenderer;
 class ImageVtkMapper2D;
 class DataStorage;
@@ -46,7 +46,7 @@ class DataStorage;
  *  \brief Vtk-based mapper to display a PlaneGeometry in a 3D window
  *  \ingroup Mapper
  *
- *  Uses a Geometry2DDataToSurfaceFilter object to create a vtkPolyData representation of a given PlaneGeometry instance.
+ *  Uses a PlaneGeometryDataToSurfaceFilter object to create a vtkPolyData representation of a given PlaneGeometry instance.
  *  PlaneGeometry may either contain a common flat plane or a curved plane (ThinPlateSplineCurvedGeometry).
  *
  *  The vtkPolyData object is then decorated by a colored tube on the edges and by image textures if possible
@@ -79,13 +79,13 @@ class DataStorage;
  *  The internal filter pipeline which combines a (sometimes deformed) 2D surface
  *  with a nice frame and image textures is illustrated in the following sketch:
  *
- *  \image html mitkGeometry2DDataVtkMapper3D.png "Internal filter pipeline"
+ *  \image html mitkPlaneGeometryDataVtkMapper3D.png "Internal filter pipeline"
  *
  */
-class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public VtkMapper
+class MITK_CORE_EXPORT PlaneGeometryDataVtkMapper3D : public VtkMapper
 {
 public:
-  mitkClassMacro(Geometry2DDataVtkMapper3D, VtkMapper);
+  mitkClassMacro(PlaneGeometryDataVtkMapper3D, VtkMapper);
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -99,9 +99,9 @@ public:
   virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 
   /**
-   *  \brief Get the Geometry2DData to map
+   *  \brief Get the PlaneGeometryData to map
    */
-  virtual const Geometry2DData *GetInput();
+  virtual const PlaneGeometryData *GetInput();
 
   /**
    * \brief All images found when traversing the (sub-) tree starting at
@@ -116,9 +116,9 @@ protected:
 
   typedef std::multimap< int, vtkActor * > LayerSortedActorList;
 
-  Geometry2DDataVtkMapper3D();
+  PlaneGeometryDataVtkMapper3D();
 
-  virtual ~Geometry2DDataVtkMapper3D();
+  virtual ~PlaneGeometryDataVtkMapper3D();
 
   virtual void GenerateDataForRenderer(BaseRenderer* renderer);
 
@@ -132,7 +132,7 @@ protected:
   /** \brief PropAssembly to hold the planes */
   vtkAssembly *m_ImageAssembly;
 
-  Geometry2DDataToSurfaceFilter::Pointer m_SurfaceCreator;
+  PlaneGeometryDataToSurfaceFilter::Pointer m_SurfaceCreator;
 
   BoundingBox::Pointer m_SurfaceCreatorBoundingBox;
 
@@ -205,7 +205,7 @@ protected:
   ActorList m_ImageActors;
 
   // responsiblity to remove the observer upon its destruction
-  typedef itk::MemberCommand< Geometry2DDataVtkMapper3D > MemberCommandType;
+  typedef itk::MemberCommand< PlaneGeometryDataVtkMapper3D > MemberCommandType;
   MemberCommandType::Pointer m_ImageMapperDeletedCommand;
 };
 } // namespace mitk

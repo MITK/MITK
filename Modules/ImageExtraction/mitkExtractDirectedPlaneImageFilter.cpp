@@ -207,7 +207,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     m_Reslicer->SetResliceTransform(
       inputGeometry->GetVtkTransform()->GetLinearInverse() );
 
-    // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D)
+    // Set background level to TRANSLUCENT (see PlaneGeometryDataVtkMapper3D)
     m_Reslicer->SetBackgroundLevel( -32768 );
 
     // Check if a reference geometry does exist (as would usually be the case for
@@ -263,7 +263,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     m_Reslicer->SetResliceTransform( composedResliceTransform );
 
     // Set background level to BLACK instead of translucent, to avoid
-    // boundary artifacts (see Geometry2DDataVtkMapper3D)
+    // boundary artifacts (see PlaneGeometryDataVtkMapper3D)
     m_Reslicer->SetBackgroundLevel( -1023 );
     composedResliceTransform->Delete();
   }

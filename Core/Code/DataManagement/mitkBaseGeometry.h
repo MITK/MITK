@@ -99,18 +99,6 @@ namespace mitk {
   public:
     mitkClassMacro(BaseGeometry, itk::Object);
 
-    //##Documentation
-    //## @brief clones the geometry
-    //##
-    //## Overwrite in all sub-classes.
-    //## Normally looks like:
-    //## \code
-    //##  Self::Pointer newGeometry = new Self(*this);
-    //##  newGeometry->UnRegister();
-    //##  return newGeometry.GetPointer();
-    //## \endcode
-    virtual itk::LightObject::Pointer InternalClone() const =0;
-
     // ********************************** TypeDef **********************************
 
     typedef itk::ScalableAffineTransform<ScalarType, 3>    TransformType;
@@ -522,7 +510,7 @@ namespace mitk {
     //## the opposite corner of the image: here the corner would appear
     //## outside the image (by half of the voxel diameter). Thus, we have
     //## to correct for this and to be able to do that, we need to know
-    //## that the Geometry3D is referring to an Image.
+    //## that the BaseGeometry is referring to an Image.
     itkSetMacro(ImageGeometry, bool);
     itkBooleanMacro(ImageGeometry);
 
@@ -532,6 +520,18 @@ namespace mitk {
     BaseGeometry();
     BaseGeometry(const BaseGeometry& other);
     virtual ~BaseGeometry();
+
+    //##Documentation
+    //## @brief clones the geometry
+    //##
+    //## Overwrite in all sub-classes.
+    //## Normally looks like:
+    //## \code
+    //##  Self::Pointer newGeometry = new Self(*this);
+    //##  newGeometry->UnRegister();
+    //##  return newGeometry.GetPointer();
+    //## \endcode
+    virtual itk::LightObject::Pointer InternalClone() const =0;
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
@@ -558,6 +558,17 @@ namespace mitk {
 
     static const std::string GetTransformAsString( TransformType* transformType );
 
+    itkGetConstMacro(NDimensions, unsigned int);
+
+    bool IsBoundingBoxNull() const;
+
+    bool IsIndexToWorldTransformNull() const;
+
+    //##Documentation
+    //## @brief Intern functions to assure a consistent behaviour of SetSpacing.
+    void _SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
+
+  private:
     //##Documentation
     //## @brief Pre- and Post-functions are empty in BaseGeometry
     //##
@@ -575,15 +586,7 @@ namespace mitk {
     virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
     virtual void PreSetSpacing(const mitk::Vector3D& aSpacing);
-    void _SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
-    itkGetConstMacro(NDimensions, unsigned int);
-
-    bool IsBoundingBoxNull() const;
-
-    bool IsIndexToWorldTransformNull() const;
-
-  private:
     // ********************************** Variables **********************************
     //##Documentation
     //## @brief Spacing, measurement of the resolution
@@ -628,7 +631,7 @@ namespace mitk {
   //
   /**
   * @brief Equal A function comparing two geometries for beeing identical.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::mitk::Geometry3D& g1, const mitk::Geometry3D& g2) instead.
+  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::mitk::BaseGeometry& g1, const mitk::BaseGeometry& g2) instead.
   *
   * @ingroup MITKTestingAPI
   *
@@ -667,7 +670,7 @@ namespace mitk {
 
   /**
   * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::mitk::Geometry3D::TransformType& t1, const mitk::Geometry3D::TransformType& t2) instead.
+  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::mitk::BaseGeometry::TransformType& t1, const mitk::BaseGeometry::TransformType& t2) instead.
   *
   * @ingroup MITKTestingAPI
   *
@@ -700,7 +703,7 @@ namespace mitk {
 
   /**
   * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::mitk::Geometry3D::BoundingBoxType& b1, const mitk::Geometry3D::BoundingBoxType& b2) instead.
+  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::mitk::BaseGeometry::BoundingBoxType& b1, const mitk::BaseGeometry::BoundingBoxType& b2) instead.
   *
   * @ingroup MITKTestingAPI
   *

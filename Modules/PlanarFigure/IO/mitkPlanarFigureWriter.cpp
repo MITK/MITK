@@ -138,7 +138,7 @@ void mitk::PlanarFigureWriter::GenerateData()
       controlPointsElement->LinkEndChild(vElement);
     }
     TiXmlElement* geoElement = new TiXmlElement("Geometry");
-    const PlaneGeometry* planeGeo = dynamic_cast<const PlaneGeometry*>(pf->GetGeometry2D());
+    const PlaneGeometry* planeGeo = dynamic_cast<const PlaneGeometry*>(pf->GetPlaneGeometry());
     if (planeGeo != NULL)
     {
       // Write parameters of IndexToWorldTransform of the PlaneGeometry

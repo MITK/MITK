@@ -83,11 +83,11 @@ public:
    * describing the slice of the image on which measurements will be
    * performed.
    */
-  virtual void SetGeometry2D( mitk::PlaneGeometry *geometry );
+  virtual void SetPlaneGeometry( mitk::PlaneGeometry *geometry );
 
 
   /** \brief Returns (previously set) 2D geometry of this figure. */
-  virtual const PlaneGeometry *GetGeometry2D() const;
+  virtual const PlaneGeometry *GetPlaneGeometry() const;
 
 
   /** \brief True if the planar figure is closed.
@@ -392,7 +392,7 @@ private:
 
   virtual itk::LightObject::Pointer InternalClone() const = 0;
 
-  PlaneGeometry *m_Geometry2D;
+  PlaneGeometry *m_PlaneGeometry;
 
 
   bool m_PolyLineUpToDate;

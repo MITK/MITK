@@ -299,7 +299,7 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
   if (!posEvent) return false;
 
   BaseRenderer* clickedRenderer = e->GetEvent()->GetSender();
-  const PlaneGeometry* ourViewportGeometry = dynamic_cast<const PlaneGeometry*>( clickedRenderer->GetCurrentWorldGeometry2D() );
+  const PlaneGeometry* ourViewportGeometry = dynamic_cast<const PlaneGeometry*>( clickedRenderer->GetCurrentWorldPlaneGeometry() );
   if (!ourViewportGeometry) return false;
 
   DisplayGeometry* clickedDisplayGeometry = clickedRenderer->GetDisplayGeometry();

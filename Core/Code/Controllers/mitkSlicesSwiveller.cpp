@@ -105,11 +105,11 @@ void SlicesSwiveller::UpdateRelevantSNCs()
 
     if (slicedGeometry->IsValidSlice(0))
     {
-      firstSlice = slicedGeometry->GetGeometry2D(0);
+      firstSlice = slicedGeometry->GetPlaneGeometry(0);
     }
 //    if (slicedGeometry->IsValidSlice(1))
 //    {
-//      secondSlice = slicedGeometry->GetGeometry2D(1);
+//      secondSlice = slicedGeometry->GetPlaneGeometry(1);
 //    }
 
     // If the direction vector of these two slices is the same, then accept

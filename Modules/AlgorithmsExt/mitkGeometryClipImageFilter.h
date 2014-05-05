@@ -128,7 +128,7 @@ public:
   virtual void GenerateData();
 
   template < typename TPixel, unsigned int VImageDimension >
-    friend void _InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* itkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::PlaneGeometry* clippingGeometry2D);
+    friend void _InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* itkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::PlaneGeometry* clippingPlaneGeometry);
 
   mitk::BaseGeometry::ConstPointer m_ClippingGeometry;
   mitk::GeometryData::Pointer m_ClippingGeometryData;

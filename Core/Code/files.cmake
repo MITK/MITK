@@ -57,7 +57,7 @@ set(H_FILES
   DataManagement/mitkImageToItk.h
   DataManagement/mitkShaderProperty.h
   DataManagement/mitkImageToItk.txx
-  DataManagement/mitkTimeSlicedGeometry.h # Deprecated, empty for compatibilty reasons.
+  DataManagement/mitkTimeSlicedGeometry.h # Deprecated, empty for compatibility reasons.
   DataManagement/mitkPropertyListReplacedObserver.cpp
 
   Interactions/mitkEventMapperAddOn.h
@@ -72,6 +72,7 @@ set(H_FILES
 
 
   IO/mitkPixelTypeTraits.h
+
 )
 
 set(CPP_FILES
@@ -79,7 +80,7 @@ set(CPP_FILES
   Algorithms/mitkCompareImageDataFilter.cpp
   Algorithms/mitkMultiComponentImageDataComparisonFilter.cpp
   Algorithms/mitkDataNodeSource.cpp
-  Algorithms/mitkGeometry2DDataToSurfaceFilter.cpp
+  Algorithms/mitkPlaneGeometryDataToSurfaceFilter.cpp
   Algorithms/mitkHistogramGenerator.cpp
   Algorithms/mitkImageChannelSelector.cpp
   Algorithms/mitkImageSliceSelector.cpp
@@ -140,7 +141,7 @@ set(CPP_FILES
 # DataManagement/mitkDataTreeStorage.cpp
   DataManagement/mitkDisplayGeometry.cpp
   DataManagement/mitkEnumerationProperty.cpp
-  DataManagement/mitkGeometry2DData.cpp
+  DataManagement/mitkPlaneGeometryData.cpp
   DataManagement/mitkGeometry3D.cpp
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGroupTagProperty.cpp
@@ -341,8 +342,8 @@ set(CPP_FILES
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkVtkMapper.cpp
   Rendering/mitkRenderWindowFrame.cpp
-  Rendering/mitkGeometry2DDataMapper2D.cpp
-  Rendering/mitkGeometry2DDataVtkMapper3D.cpp
+  Rendering/mitkPlaneGeometryDataMapper2D.cpp
+  Rendering/mitkPlaneGeometryDataVtkMapper3D.cpp
   Rendering/mitkGLMapper.cpp
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkManufacturerLogo.cpp

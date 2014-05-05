@@ -119,7 +119,7 @@ float mitk::SurfaceDeformationInteractor3D
   //  // Get the PlaneGeometry of the window the user interacts with (for 2D point
   //  // projection)
   //  mitk::BaseRenderer *renderer = stateEvent->GetEvent()->GetSender();
-  //  const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldGeometry2D();
+  //  const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
   //  // For reading on the points, Ids etc
   //  //mitk::CurveModel::PointSetType *pointSet = curveModel->GetPointSet( timeStep );

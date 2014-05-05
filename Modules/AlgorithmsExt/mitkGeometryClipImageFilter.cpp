@@ -122,7 +122,7 @@ void mitk::GeometryClipImageFilter::GenerateOutputInformation()
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inputItkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::PlaneGeometry* clippingGeometry2D)
+void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inputItkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::PlaneGeometry* clippingPlaneGeometry)
 {
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
   typedef itk::Image<TPixel, VImageDimension> ItkOutputImageType;
@@ -158,7 +158,7 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
   {
     Point3D leftMostPoint;
     leftMostPoint.Fill( std::numeric_limits<float>::min() / 2.0 );
-    if(clippingGeometry2D->IsAbove(pointInMM) != above)
+    if(clippingPlaneGeometry->IsAbove(pointInMM) != above)
       {
       // invert meaning of above --> left is always the "above" side
       above = !above;
@@ -182,7 +182,7 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
       for(i=0;i<dim;++i)
         indexPt[i]=(mitk::ScalarType)inputIt.GetIndex()[i];
       inputGeometry->IndexToWorld(indexPt, pointInMM);
-      if(clippingGeometry2D->IsAbove(pointInMM) == above)
+      if(clippingPlaneGeometry->IsAbove(pointInMM) == above)
       {
         if ( labelBothSides )
           outputIt.Set( aboveLabel );

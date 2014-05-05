@@ -144,13 +144,13 @@ void mitk::PlanesPerpendicularToLinesFilter::GenerateData()
     PlaneGeometry::Pointer plane = static_cast<PlaneGeometry*>((*planes.rbegin())->Clone().GetPointer());
     itk2vtk(last.GetVnlVector()-right*halfWidthInMM-down*halfHeightInMM, origin);
     plane->SetOrigin(origin);
-    m_CreatedGeometries->SetGeometry2D(plane, planes.size());
+    m_CreatedGeometries->SetPlaneGeometry(plane, planes.size());
 
     //add all planes to sliced-geometry
     int s;
     for(s=0; planes.empty()==false; planes.pop_front(), ++s)
     {
-      m_CreatedGeometries->SetGeometry2D(planes.front(), s);
+      m_CreatedGeometries->SetPlaneGeometry(planes.front(), s);
     }
 
     m_CreatedGeometries->SetEvenlySpaced(false);

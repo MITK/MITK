@@ -96,7 +96,7 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
   if (!positionEvent) return;
 
   // Get Spacing of current Slice
-  //mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing();
+  //mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing();
 
   //
   // Draw a contour in Square according to selected brush size
@@ -450,7 +450,7 @@ bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent*
 
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
-    const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldGeometry2D() ) );
+    const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
 
     if (!workingNode)

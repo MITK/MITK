@@ -83,7 +83,7 @@ public:
   }
 
   /**
-  * @brief Return the Geometry3D of the data.
+  * @brief Return the TimeGeometry of the data.
   *
   * The method does not simply return the value of the m_TimeGeometry
   * member. Before doing this, it makes sure that the TimeGeometry
@@ -93,7 +93,7 @@ public:
   const mitk::TimeGeometry* GetUpdatedTimeGeometry();
 
   /**
-  * @brief Return the Geometry3D of the data.
+  * @brief Return the TimeGeometry of the data.
   *
   * The method does not simply return the value of the m_TimeGeometry
   * member. Before doing this, it makes sure that the TimeGeometry
@@ -117,11 +117,11 @@ public:
   virtual void Expand( unsigned int timeSteps );
 
   /**
-  * \brief Return the Geometry3D of the data at time \a t.
+  * \brief Return the BaseGeometry of the data at time \a t.
   *
   * The method does not simply return
   * m_TimeGeometry->GetGeometry(t).
-  * Before doing this, it makes sure that the Geometry3D is up-to-date
+  * Before doing this, it makes sure that the BaseGeometry is up-to-date
   * (by setting the update extent appropriately and calling
   * UpdateOutputInformation).
   *
@@ -257,9 +257,9 @@ public:
   void ExecuteOperation(Operation* operation);
 
   /**
-  * \brief Set the Geometry3D of the data, which will be referenced (not copied!).
+  * \brief Set the BaseGeometry of the data, which will be referenced (not copied!).
   * Assumes the data object has only 1 time step ( is a 3D object ) and creates a
-  * new TimeGeometry which saves the given Geometry3D. If an TimeGeometry has already
+  * new TimeGeometry which saves the given BaseGeometry. If an TimeGeometry has already
   * been set for the object, it will be replaced after calling this function.
   *
   * @warning This method will normally be called internally by the sub-class of BaseData
@@ -295,7 +295,7 @@ public:
   virtual void SetClonedTimeGeometry (const TimeGeometry* geometry);
 
   //##Documentation
-  //## @brief Set a clone of the provided geometry as Geometry3D of a given time step.
+  //## @brief Set a clone of the provided geometry as BaseGeometry of a given time step.
   //##
   //## \sa SetGeometry
   virtual void SetClonedGeometry(const BaseGeometry* aGeometry3D, unsigned int time);
@@ -324,10 +324,10 @@ public:
 
   //##Documentation
   //## @brief Convenience method for setting the origin of
-  //## the Geometry3D instances of all time steps
+  //## the BaseGeometry instances of all time steps
   //##
-  //## \warning Geometries contained in the Geometry3D will
-  //## \em not be changed, e.g. in case the Geometry3D is a
+  //## \warning Geometries contained in the BaseGeometry will
+  //## \em not be changed, e.g. in case the BaseGeometry is a
   //## SlicedGeometry3D the origin will \em not be propagated
   //## to the contained slices. The sub-class SlicedData
   //## does this for the case that the SlicedGeometry3D is

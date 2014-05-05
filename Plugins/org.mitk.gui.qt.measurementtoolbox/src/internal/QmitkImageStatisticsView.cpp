@@ -681,8 +681,8 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       }
 
       // check whether PlanarFigure is initialized
-      const mitk::PlaneGeometry *planarFigureGeometry2D = m_SelectedPlanarFigure->GetGeometry2D();
-      if ( planarFigureGeometry2D == NULL || outOfBounds)
+      const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_SelectedPlanarFigure->GetPlaneGeometry();
+      if ( planarFigurePlaneGeometry == NULL || outOfBounds)
       {
         // Clear statistics, histogram, and GUI
         this->InvalidateStatisticsTableView();

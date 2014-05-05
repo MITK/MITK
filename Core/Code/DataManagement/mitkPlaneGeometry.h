@@ -14,46 +14,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-  /**
-  * \brief Describes the geometry of a plane object
-  *
-  * Describes a two-dimensional manifold, i.e., to put it simply,
-  * an object that can be described using a 2D coordinate-system.
-  *
-  * PlaneGeometry can map points between 3D world coordinates
-  * (in mm) and the described 2D coordinate-system (in mm) by first projecting
-  * the 3D point onto the 2D manifold and then calculating the 2D-coordinates
-  * (in mm). These 2D-mm-coordinates can be further converted into
-  * 2D-unit-coordinates (e.g., pixels), giving a parameter representation of
-  * the object with parameter values inside a rectangle
-  * (e.g., [0,0]..[width, height]), which is the bounding box (bounding range
-  * in z-direction always [0]..[1]).
-  *
-  * A PlaneGeometry describes the 2D representation within a 3D object and is
-  * therefore itself a Geometry3D (derived from BaseGeometry). For example,
-  * a single CT-image (slice) is 2D in the sense that you can access the
-  * pixels using 2D-coordinates, but is also 3D, as the pixels are really
-  * voxels, thus have an extension (thickness) in the 3rd dimension.
-  *
-  *
-  * Optionally, a reference BaseGeometry can be specified, which usually would
-  * be the geometry associated with the underlying dataset. This is currently
-  * used for calculating the intersection of inclined / rotated planes
-  * (represented as PlaneGeometry) with the bounding box of the associated
-  * BaseGeometry.
-  *
-  * \warning The PlaneGeometry are not necessarily up-to-date and not even
-  * initialized. As described in the previous paragraph, one of the
-  * Generate-/Copy-/UpdateOutputInformation methods have to initialize it.
-  * mitk::BaseData::GetGeometry2D() makes sure, that the PlaneGeometry is
-  * up-to-date before returning it (by setting the update extent appropriately
-  * and calling UpdateOutputInformation).
-  *
-  * Rule: everything is in mm (or ms for temporal information) if not
-  * stated otherwise.
-  * \ingroup Geometry
-  */
+/**
+* \brief Describes the geometry of a plane object
+*
+* Describes a two-dimensional manifold, i.e., to put it simply,
+* an object that can be described using a 2D coordinate-system.
+*
+* PlaneGeometry can map points between 3D world coordinates
+* (in mm) and the described 2D coordinate-system (in mm) by first projecting
+* the 3D point onto the 2D manifold and then calculating the 2D-coordinates
+* (in mm). These 2D-mm-coordinates can be further converted into
+* 2D-unit-coordinates (e.g., pixels), giving a parameter representation of
+* the object with parameter values inside a rectangle
+* (e.g., [0,0]..[width, height]), which is the bounding box (bounding range
+* in z-direction always [0]..[1]).
+*
+* A PlaneGeometry describes the 2D representation within a 3D object (derived from BaseGeometry). For example,
+* a single CT-image (slice) is 2D in the sense that you can access the
+* pixels using 2D-coordinates, but is also 3D, as the pixels are really
+* voxels, thus have an extension (thickness) in the 3rd dimension.
+*
+*
+* Optionally, a reference BaseGeometry can be specified, which usually would
+* be the geometry associated with the underlying dataset. This is currently
+* used for calculating the intersection of inclined / rotated planes
+* (represented as PlaneGeometry) with the bounding box of the associated
+* BaseGeometry.
+*
+* \warning The PlaneGeometry are not necessarily up-to-date and not even
+* initialized. As described in the previous paragraph, one of the
+* Generate-/Copy-/UpdateOutputInformation methods have to initialize it.
+* mitk::BaseData::GetPlaneGeometry() makes sure, that the PlaneGeometry is
+* up-to-date before returning it (by setting the update extent appropriately
+* and calling UpdateOutputInformation).
+*
+* Rule: everything is in mm (or ms for temporal information) if not
+* stated otherwise.
+* \ingroup Geometry
+*/
 
 #ifndef PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 #define PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
@@ -79,12 +77,12 @@ namespace mitk {
     mitkClassMacro(PlaneGeometry,BaseGeometry);
 
     /** Method for creation through the object factory. */
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
-    enum PlaneOrientation
+      enum PlaneOrientation
     {
-    Axial,
+      Axial,
       Sagittal,
       Frontal
     };
@@ -122,7 +120,7 @@ namespace mitk {
     /**
     * \brief Initialize a plane with orientation \a planeorientation
     * (default: axial) with respect to \a BaseGeometry (default: identity).
-    * Spacing also taken from \a geometry3D.
+    * Spacing also taken from \a BaseGeometry.
     *
     * \warning A former version of this method created a geometry with unit
     * spacing. For unit spacing use
@@ -402,7 +400,7 @@ namespace mitk {
     /** Implements operation to re-orient the plane */
     virtual void ExecuteOperation( Operation *operation );
 
-        /**
+    /**
     * \brief Project a 3D point given in mm (\a pt3d_mm) onto the 2D
     * geometry. The result is a 2D point in mm (\a pt2d_mm).
     *
@@ -426,7 +424,7 @@ namespace mitk {
     */
     virtual void Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const;
 
-        /**
+    /**
     * \brief Set the width and height of this 2D-geometry in units by calling
     * SetBounds. This does \a not change the extent in mm!
     *
@@ -501,11 +499,11 @@ namespace mitk {
       return fabs(SignedDistance(pt3d_mm));
     }
 
-        /**
+    /**
     * \brief Set the geometrical frame of reference in which this PlaneGeometry
     * is placed.
     *
-    * This would usually be the Geometry3D of the underlying dataset, but
+    * This would usually be the BaseGeometry of the underlying dataset, but
     * setting it is optional.
     */
     void SetReferenceGeometry( mitk::BaseGeometry *geometry );
@@ -516,7 +514,6 @@ namespace mitk {
     BaseGeometry *GetReferenceGeometry() const;
     bool HasReferenceGeometry() const;
 
-
   protected:
     PlaneGeometry();
 
@@ -525,14 +522,6 @@ namespace mitk {
     virtual ~PlaneGeometry();
 
     virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
-
-    virtual void PreSetBounds( const BoundingBox::BoundsArrayType &bounds );
-
-    virtual void PreSetIndexToWorldTransform( AffineTransform3D *transform);
-
-    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
-
-    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
     /**
     * \brief factor to convert x-coordinates from mm to units and vice versa
@@ -549,6 +538,15 @@ namespace mitk {
     mitk::BaseGeometry *m_ReferenceGeometry;
 
   private:
+
+    virtual void PreSetBounds( const BoundingBox::BoundsArrayType &bounds );
+
+    virtual void PreSetIndexToWorldTransform( AffineTransform3D *transform);
+
+    virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
+
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+
     /**
     * \brief Compares plane with another plane: \a true if IsOnPlane
     * (bounding-box \em not considered)

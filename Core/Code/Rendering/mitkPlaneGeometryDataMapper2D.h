@@ -37,7 +37,7 @@ class BaseRenderer;
  * the orientation of the slices displayed in other 2D windows.
  *
  *
- * Properties that can be set and influence the Geometry2DDataMapper2D are:
+ * Properties that can be set and influence the PlaneGeometryDataMapper2D are:
  *
  *   - \b "PlaneOrientationProperty": (PlaneOrientationProperty)
 
@@ -45,19 +45,19 @@ class BaseRenderer;
  * \todo implement for AbstractTransformGeometry.
  * \ingroup Mapper
  */
-class MITK_CORE_EXPORT Geometry2DDataMapper2D : public GLMapper
+class MITK_CORE_EXPORT PlaneGeometryDataMapper2D : public GLMapper
 {
 
 public:
-  mitkClassMacro(Geometry2DDataMapper2D, GLMapper);
+  mitkClassMacro(PlaneGeometryDataMapper2D, GLMapper);
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
   /**
-    * \brief Get the Geometry2DData to map
+    * \brief Get the PlaneGeometryData to map
     */
-  const Geometry2DData *GetInput();
+  const PlaneGeometryData *GetInput();
 
   virtual void Paint( BaseRenderer *renderer );
 
@@ -69,9 +69,9 @@ public:
   LocalStorageHandler<BaseLocalStorage> m_LSH;
 
 protected:
-  Geometry2DDataMapper2D();
+  PlaneGeometryDataMapper2D();
 
-  virtual ~Geometry2DDataMapper2D();
+  virtual ~PlaneGeometryDataMapper2D();
 
   virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
   /**
@@ -114,7 +114,7 @@ protected:
   DataNode::Pointer m_ParentNode;  ///< parent node that will be used to search for sub nodes
 
   typedef std::vector<DataNode*> NodesVectorType;
-  NodesVectorType m_OtherGeometry2Ds;
+  NodesVectorType m_OtherPlaneGeometries;
 
   bool m_RenderOrientationArrows;
   bool m_ArrowOrientationPositive;

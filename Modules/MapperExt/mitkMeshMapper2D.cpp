@@ -81,7 +81,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     //
     // get the world time
     //
-    const PlaneGeometry* worldGeometry = renderer->GetCurrentWorldGeometry2D();
+    const PlaneGeometry* worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
     assert( worldGeometry != NULL );
     ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
 
@@ -108,7 +108,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
     assert(displayGeometry.IsNotNull());
 
-    const PlaneGeometry* worldplanegeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetCurrentWorldGeometry2D());
+    const PlaneGeometry* worldplanegeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetCurrentWorldPlaneGeometry());
 
     //apply color and opacity read from the PropertyList
     ApplyColorAndOpacityProperties(renderer);

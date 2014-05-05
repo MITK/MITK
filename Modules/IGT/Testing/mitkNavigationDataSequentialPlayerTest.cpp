@@ -1,4 +1,3 @@
-
 /*===================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
@@ -18,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataSequentialPlayer.h>
 #include <mitkStandardFileLocations.h>
 #include "mitkTestingMacros.h"
+#include <mitkTestFixture.h>
+#include "mitkNavigationDataReaderXML.h"
 
 #include <iostream>
 #include <sstream>
@@ -26,200 +27,149 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTException.h"
 #include "mitkIGTIOException.h"
 
-
-const char* XML_STRING =
-  "<?xml version=\"1.0\" ?><Version Ver=\"1\" /><Data ToolCount=\"2\">"
-    "<NavigationData Time=\"1375.79\" Tool=\"0\" X=\"-279.14\" Y=\"40.48\" Z=\"-2023.72\" QX=\"0.0085\" QY=\"-0.0576\" QZ=\"-0.0022\" QR=\"0.9982\" C00=\"0.00168921\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.00168921\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationData Time=\"1375.79\" Tool=\"1\" X=\"-142.54\" Y=\"43.67\" Z=\"-1913.5\" QX=\"0.4478\" QY=\"-0.092\" QZ=\"-0.8824\" QR=\"0.1102\" C00=\"0.104782\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.104782\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationData Time=\"9948.11\" Tool=\"0\" X=\"-336.65\" Y=\"138.5\" Z=\"-2061.07\" QX=\"0.1251\" QY=\"-0.0638\" QZ=\"0.0071\" QR=\"0.99\" C00=\"0.023593\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.023593\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationData Time=\"9948.11\" Tool=\"1\" X=\"-202.09\" Y=\"120.33\" Z=\"-1949.81\" QX=\"0.4683\" QY=\"0.0188\" QZ=\"-0.8805\" QR=\"0.0696\" C00=\"0.0913248\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.0913248\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationData Time=\"104845\" Tool=\"0\" X=\"-134.86\" Y=\"295.49\" Z=\"-2187.63\" QX=\"0.1846\" QY=\"-0.2565\" QZ=\"-0.0829\" QR=\"0.945\" C00=\"0.022082\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.022082\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationData Time=\"104845\" Tool=\"1\" X=\"-56.93\" Y=\"233.79\" Z=\"-2042.6\" QX=\"-0.6264\" QY=\"-0.0197\" QZ=\"0.7772\" QR=\"0.0562\" C00=\"0.0915063\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.0915063\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-  "</Data>";
-
-const char* XML_INVALID_TESTSTRING =
-  "<?version=\"1.0\" ?><Version Ver=\"1\" />< ToolCount=\"2\">"
-    "<NavigationDhgata Time=\"1375.79\" Tool=\"0\" X=\"-279.14\" Y=\"40.48\" Z=\"-2023.72\" QX=\"0.0085\" QY=\"-0.0576\" QZ=\"-0.0022\" QR=\"0.9982\" C00=\"0.00168921\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.00168921\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigatifhgonData Time=\"1375.79\" Tool=\"1\" X=\"-142.54\" Y=\"43.67\" Z=\"-1913.5\" QX=\"0.4478\" QY=\"-0.092\" QZ=\"-0.8824\" QR=\"0.1102\" C00=\"0.104782\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.104782\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigathgfionData Time=\"9948.11\" Tool=\"0\" X=\"-336.65\" Y=\"138.5\" Z=\"-2061.07\" QX=\"0.1251\" QY=\"-0.0638\" QZ=\"0.0071\" QR=\"0.99\" C00=\"0.023593\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.023593\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigatifghonData Time=\"9948.11\" Tool=\"1\" X=\"-202.09\" Y=\"120.33\" Z=\"-1949.81\" QX=\"0.4683\" QY=\"0.0188\" QZ=\"-0.8805\" QR=\"0.0696\" C00=\"0.0913248\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.0913248\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigatgfhionData Time=\"104845\" Tool=\"0\" X=\"-134.86\" Y=\"295.49\" Z=\"-2187.63\" QX=\"0.1846\" QY=\"-0.2565\" QZ=\"-0.0829\" QR=\"0.945\" C00=\"0.022082\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.022082\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-    "<NavigationDatja Time=\"104845\" Tool=\"1\" X=\"-56.93\" Y=\"233.79\" Z=\"-2042.6\" QX=\"-0.6264\" QY=\"-0.0197\" QZ=\"0.7772\" QR=\"0.0562\" C00=\"0.0915063\" C01=\"0\" C02=\"0\" C03=\"0\" C04=\"0\" C05=\"0\" C10=\"0\" C11=\"0.0915063\" C12=\"0\" C13=\"0\" C14=\"0\" C15=\"0\" Valid=\"1\" hO=\"1\" hP=\"1\" />"
-  "</>";
-
-vnl_vector<mitk::ScalarType> tTool0Snapshot1(3);
-vnl_vector<mitk::ScalarType> tTool1Snapshot2(3);
-mitk::Quaternion qTool0Snapshot0;
-mitk::Quaternion qTool1Snapshot1;
-
-mitk::NavigationDataSequentialPlayer::Pointer player(
-   mitk::NavigationDataSequentialPlayer::New());
-
-bool runLoop()
+class mitkNavigationDataSequentialPlayerTestSuite : public mitk::TestFixture
 {
+  CPPUNIT_TEST_SUITE(mitkNavigationDataSequentialPlayerTestSuite);
+  MITK_TEST(TestStandardWorkflow);
+  MITK_TEST(TestRestartWithNewNavigationDataSet);
+  MITK_TEST(TestGoToSnapshotException);
+  MITK_TEST(TestDoubleUpdate);
+  CPPUNIT_TEST_SUITE_END();
 
+private:
+  /** Members used inside the different test methods. All members are initialized via setUp().*/
+  mitk::NavigationDataSet::Pointer NavigationDataSet;
+  mitk::NavigationDataSequentialPlayer::Pointer player;
 
-  bool success = true;
-  mitk::NavigationData::Pointer nd0;
-  mitk::NavigationData::Pointer nd1;
-  for(unsigned int i=0; i<player->GetNumberOfSnapshots();++i)
+public:
+
+  void setUp(){
+    player = mitk::NavigationDataSequentialPlayer::New();
+    std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2ToolsDouble.xml");
+    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    NavigationDataSet =reader->Read(file);
+  }
+
+  void tearDown()
+  {
+  }
+
+  bool runLoop()
   {
     player->Update();
-    nd0 = player->GetOutput();
-    nd1 = player->GetOutput(1);
-
-    // test some values
-    if(nd0.IsNull() || nd1.IsNull()) return false;
-
-    if(i==0)
+    mitk::NavigationData::Pointer nd0;
+    mitk::NavigationData::Pointer nd1;
+    for(unsigned int i=0; i<player->GetNumberOfSnapshots(); ++i)
     {
-      if (!(qTool0Snapshot0.as_vector() == nd0->GetOrientation().as_vector())) {success = false;}
+      nd0 = player->GetOutput(0);
+      nd1 = player->GetOutput(1);
+
+      // test some values
+      if(nd0.IsNull() || nd1.IsNull()) return false;
+
+      //Compare data
+      mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(i,0);
+      mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(i,1);
+      if (!(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector())) {return false;}
+      if (!(ref1->GetOrientation().as_vector() == nd1->GetOrientation().as_vector())) {return false;}
+      if (!(ref0->GetPosition().GetVnlVector() == nd0->GetPosition().GetVnlVector())) {return false;}
+      if (!(ref1->GetPosition().GetVnlVector() == nd1->GetPosition().GetVnlVector())) {return false;}
+
+      // Goto next Snapshot
+      player->GoToNextSnapshot();
     }
-    else if(i==1)
+    return true;
+  }
+
+  void TestStandardWorkflow()
+  {
+    // Set NavigationDatas for player
+    player->SetNavigationDataSet(NavigationDataSet);
+
+    MITK_TEST_CONDITION(player->GetNumberOfSnapshots() == 3,"Testing if player reports correct number of Snapshots");
+    MITK_TEST_CONDITION(player->GetNumberOfIndexedOutputs() == 2,"Testing number of outputs");
+
+    //rest repeat
+    player->SetRepeat(true);
+
+    MITK_TEST_CONDITION(runLoop(),"Testing first run.");
+    MITK_TEST_CONDITION(runLoop(),"Testing second run."); //repeat is on should work a second time
+
+    // now test the go to snapshot function
+    player->GoToSnapshot(2);
+    mitk::NavigationData::Pointer nd1 = player->GetOutput(1);
+    mitk::NavigationData::Pointer ref1 = NavigationDataSet->GetNavigationDataForIndex(2,1);
+    MITK_TEST_CONDITION(ref1->GetPosition().GetVnlVector() == nd1->GetPosition().GetVnlVector(),
+      "Testing GoToSnapshot() [1]");
+
+    //MITK_TEST_OUTPUT( << "Reference:" << ref1->GetPosition().GetVnlVector() << "\tObserved: " << nd1->GetPosition().GetVnlVector());
+
+    player->GoToSnapshot(0);
+    mitk::NavigationData::Pointer nd0 = player->GetOutput();
+    mitk::NavigationData::Pointer ref0 = NavigationDataSet->GetNavigationDataForIndex(0,0);
+    MITK_TEST_CONDITION(ref0->GetOrientation().as_vector() == nd0->GetOrientation().as_vector(),
+      "Testing GoToSnapshot() [2]");
+
+    //MITK_TEST_OUTPUT( << "Reference" << ref0->GetPosition().GetVnlVector() << "\tObserved:" <<nd0->GetOrientation().as_vector() );
+  }
+
+  void TestRestartWithNewNavigationDataSet()
+  {
+    player->SetNavigationDataSet(NavigationDataSet);
+    mitk::NavigationData::PositionType nd1 = player->GetOutput(0)->GetPosition();
+    player->SetNavigationDataSet(NavigationDataSet);
+    mitk::NavigationData::PositionType nd2 = player->GetOutput(0)->GetPosition();
+
+    MITK_TEST_CONDITION(nd1 == nd2, "First output must be the same after setting same navigation data again.");
+
+    // setting new NavigationDataSet with different tool count should result in an exception
+    std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData.xml");
+    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    MITK_TEST_FOR_EXCEPTION(mitk::IGTException, player->SetNavigationDataSet(reader->Read(file)));
+  }
+
+  void TestGoToSnapshotException()
+  {
+    //testing GoToSnapShot for exception
+    mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer2 = mitk::NavigationDataSequentialPlayer::New();
+    std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2Tools.xml");
+    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    myTestPlayer2->SetNavigationDataSet(reader->Read(file));
+
+    bool exceptionThrown2=false;
+    try
     {
-      if (!(tTool0Snapshot1 == nd0->GetPosition().GetVnlVector())) {success = false;}
-      else if (!(qTool1Snapshot1.as_vector() == nd1->GetOrientation().as_vector())) {success = false;}
+      unsigned int invalidSnapshot = 1000;
+      myTestPlayer2->GoToSnapshot(invalidSnapshot);
     }
-    else if(i==2) // should be repeated
+    catch(mitk::IGTException)
     {
-      if (!(tTool1Snapshot2 == nd1->GetPosition().GetVnlVector())) {success = false;}
+      exceptionThrown2=true;
     }
-
+    MITK_TEST_CONDITION(exceptionThrown2, "Testing if exception is thrown when GoToSnapShot method is called with an index that doesn't exist.");
   }
-  return success;
-}
 
-void TestStandardWorkflow()
-{
-  // create test values valid for the xml data above
-  tTool0Snapshot1[0] = -336.65;
-  tTool0Snapshot1[1] = 138.5;
-  tTool0Snapshot1[2]= -2061.07;
-  tTool1Snapshot2[0] = -56.93;
-  tTool1Snapshot2[1] = 233.79;
-  tTool1Snapshot2[2]= -2042.6;
-  vnl_vector_fixed<mitk::ScalarType,4> qVec;
-  qVec[0] = 0.0085;
-  qVec[1] = -0.0576;
-  qVec[2]= -0.0022;
-  qVec[3]= 0.9982;
-  qTool0Snapshot0 = mitk::Quaternion(qVec);
-  qVec[0] = 0.4683;
-  qVec[1] = 0.0188;
-  qVec[2]= -0.8805;
-  qVec[3]= 0.0696;
-  qTool1Snapshot1 = mitk::Quaternion(qVec);
-
-  //test SetXMLString()
-  player->SetXMLString(XML_STRING);
-  MITK_TEST_CONDITION_REQUIRED(player->GetNumberOfSnapshots() == 3,"Testing method SetXMLString with 3 navigation datas.");
-  MITK_TEST_CONDITION_REQUIRED(player->GetNumberOfIndexedOutputs() == 2,"Testing number of outputs");
-
-  //rest repeat
-  player->SetRepeat(true);
-  MITK_TEST_CONDITION_REQUIRED(runLoop(),"Testing first run.");
-  MITK_TEST_CONDITION_REQUIRED(runLoop(),"Testing second run."); //repeat is on should work a second time
-
-  // now test the go to snapshot function
-  player->GoToSnapshot(3);
-  mitk::NavigationData::Pointer nd1 = player->GetOutput(1);
-  MITK_TEST_CONDITION(tTool1Snapshot2 == nd1->GetPosition().GetVnlVector(),
-                      "Testing GoToSnapshot() [1]");
-
-  player->GoToSnapshot(1);
-  mitk::NavigationData::Pointer nd0 = player->GetOutput();
-  MITK_TEST_CONDITION(qTool0Snapshot0.as_vector() == nd0->GetOrientation().as_vector(),
-                      "Testing GoToSnapshot() [2]");
-
-  player->GoToSnapshot(3);
-
-  // and a third time
-  MITK_TEST_CONDITION_REQUIRED(runLoop(),"Tested if repeat works again.");
-
-}
-
-void TestSetFileNameException()
-{ //testing exception if file name hasnt been set
-  mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer = mitk::NavigationDataSequentialPlayer::New();
-  bool exceptionThrown=false;
-  try
+  void TestDoubleUpdate()
   {
-    myTestPlayer->SetFileName("");
+    //std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2Tools.xml");
+
+    //mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+    //player->SetNavigationDataSet(reader->Read(file));
+    player->SetNavigationDataSet(NavigationDataSet);
+
+    player->Update();
+    mitk::Quaternion nd1Orientation = player->GetOutput()->GetOrientation();
+
+    player->Update();
+    mitk::Quaternion nd2Orientation = player->GetOutput()->GetOrientation();
+
+    MITK_TEST_CONDITION(nd1Orientation.as_vector() == nd2Orientation.as_vector(), "Output must be the same no matter if Update() was called between.");
+
+    MITK_TEST_CONDITION(player->GoToNextSnapshot(), "There must be a next snapshot available.");
+    player->Update();
+    mitk::Quaternion nd3Orientation = player->GetOutput()->GetOrientation();
+
+    MITK_TEST_CONDITION(nd1Orientation.as_vector() != nd3Orientation.as_vector(), "Output must be different if GoToNextSnapshot() was called between.");
   }
-  catch(mitk::IGTIOException)
-  {
-   exceptionThrown=true;
-    MITK_TEST_OUTPUT(<<"Tested exception for the case when file version is wrong in SetFileName. Application should not crash.");
-  }
-  MITK_TEST_CONDITION_REQUIRED(exceptionThrown, "Testing SetFileName method if exception (if file name hasnt been set) was thrown.");
-
-  //testing ReInItXML method if data element is not found
-  mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer1 = mitk::NavigationDataSequentialPlayer::New();
-  std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("NavigationDataTestDataInvalidTags.xml", "Modules/IGT/Testing/Data");
-  bool exceptionThrown1=false;
-  try
-  {
-    myTestPlayer1->SetFileName(file);
-  }
-  catch(mitk::IGTException)
-  {
-   exceptionThrown1=true;
-  }
-  MITK_TEST_CONDITION_REQUIRED(exceptionThrown1, "Testing SetFileName method if exception (if data element not found) was thrown.");
-
-}
-
-void TestGoToSnapshotException()
-{
- //testing GoToSnapShot for exception
-  mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer2 = mitk::NavigationDataSequentialPlayer::New();
-  myTestPlayer2->SetXMLString(XML_STRING);
-
-  bool exceptionThrown2=false;
-  try
-  {
-    unsigned int invalidSnapshot = 1000;
-    myTestPlayer2->GoToSnapshot(invalidSnapshot);
-  }
-  catch(mitk::IGTException)
-  {
-    exceptionThrown2=true;
-  }
-  MITK_TEST_CONDITION_REQUIRED(exceptionThrown2, "Testing if exception is thrown when GoToSnapShot method is called with an index that doesn't exist.");
-}
-
-void TestSetXMLStringException()
-{
-  mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer3 = mitk::NavigationDataSequentialPlayer::New();
-
-  bool exceptionThrown3=false;
-
-  //The string above XML_INVALID_TESTSTRING is a wrong string, some element were deleted in above
-  try
-  {
-    myTestPlayer3->SetXMLString(XML_INVALID_TESTSTRING);
-  }
-  catch(mitk::IGTException)
-  {
-    exceptionThrown3=true;
-  }
- MITK_TEST_CONDITION_REQUIRED(exceptionThrown3, "Testing SetXMLString method with an invalid XML string.");
-}
-
-
-
-
-/**Documentation
- *  test for the class "NavigationDataRecorder".
- */
-int mitkNavigationDataSequentialPlayerTest(int /* argc */, char* /*argv*/[])
-{
-  MITK_TEST_BEGIN("NavigationDataSequentialPlayer");
-
-  TestStandardWorkflow();
-  TestSetFileNameException();
-  TestSetXMLStringException();
-  TestGoToSnapshotException();
-
-  MITK_TEST_END();
-}
+};
+MITK_TEST_SUITE_REGISTRATION(mitkNavigationDataSequentialPlayer)

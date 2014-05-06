@@ -566,6 +566,8 @@ if (!this->GetPeristenceService())
 mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
 propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
 propList->Set("AuroraPortWin",m_Controls->m_portSpinBoxAurora->value());
+propList->Set("PortTypePolaris", m_Controls->portTypePolaris->currentIndex());
+propList->Set("PortTypeAurora", m_Controls->portTypeAurora->currentIndex());
 propList->Set("MTCalibrationFile",m_MTCalibrationFile);
 propList->Set("SelectedDevice",m_Controls->m_trackingDeviceChooser->currentIndex());
 }
@@ -579,13 +581,17 @@ if (!this->GetPeristenceService())
   return;
   }
 mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
-int portPolarisWin,portAuroraWin,SelectedDevice;
+int portPolarisWin,portAuroraWin,portTypePolaris,portTypeAurora,SelectedDevice;
 propList->Get("PolarisPortWin",portPolarisWin);
 propList->Get("AuroraPortWin",portAuroraWin);
+propList->Get("PortTypePolaris", portTypePolaris);
+propList->Get("PortTypeAurora", portTypeAurora);
 propList->Get("MTCalibrationFile",m_MTCalibrationFile);
 propList->Get("SelectedDevice",SelectedDevice);
 m_Controls->m_portSpinBoxPolaris->setValue(portPolarisWin);
 m_Controls->m_portSpinBoxAurora->setValue(portAuroraWin);
+m_Controls->portTypePolaris->setCurrentIndex(portTypePolaris);
+m_Controls->portTypeAurora->setCurrentIndex(portTypeAurora);
 m_Controls->m_TrackingSystemWidget->setCurrentIndex(SelectedDevice);
 m_Controls->m_trackingDeviceChooser->setCurrentIndex(SelectedDevice);
 m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(m_MTCalibrationFile.c_str()));

@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
+#include <QSettings>
 #include <qfiledialog.h>
 
 // MITK
@@ -61,6 +62,8 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
 {
+  this->StoreUISettings();
+
   try
   {
     //clean up worker thread
@@ -138,7 +141,6 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     mitk::Color red;
     red.SetRed(1);
     m_TrackingVolumeNode->SetColor(red);
-    GetDataStorage()->Add(m_TrackingVolumeNode);
 
     //initialize buttons
     m_Controls->m_Connect->setEnabled(true);
@@ -177,6 +179,14 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     //tracking device may be changed already by the persistence of the
     //QmitkTrackingDeciveConfigurationWidget
     this->OnTrackingDeviceChanged();
+
+    this->LoadUISettings();
+
+    //add tracking volume node only to data storage if the volume should be shown
+    if ( m_Controls->m_ShowTrackingVolume->isChecked() )
+    {
+      this->GetDataStorage()->Add(m_TrackingVolumeNode);
+    }
   }
 }
 
@@ -226,6 +236,9 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   //update tool preview
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
+
+  //save filename for persistent storage
+  m_ToolStorageFilename = filename;
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnResetTools()
@@ -234,6 +247,8 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
   m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
   QString toolLabel = QString("Loaded Tools: <none>");
   m_Controls->m_toolLabel->setText(toolLabel);
+
+  m_ToolStorageFilename = "";
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnConnect()
@@ -570,7 +585,9 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
       catch(mitk::IGTException)
       {
         std::string errormessage = "Error during serialization. Please check the Zip file.";
-        QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());}
+        QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+      }
+
       return;
     }
     else if (ret == 65536) //no
@@ -848,6 +865,65 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
   m_toolStorage = newStorage;
   m_toolStorage->SetName(newStorageName);
   m_toolStorage->RegisterAsMicroservice("no tracking device");
+}
+
+void QmitkMITKIGTTrackingToolboxView::StoreUISettings()
+{
+  // persistence service does not directly work in plugins for now
+  // -> using QSettings
+  QSettings settings;
+
+  settings.beginGroup(QString::fromStdString(VIEW_ID));
+
+  // set the values of some widgets and attrbutes to the QSettings
+  settings.setValue("ShowTrackingVolume", QVariant(m_Controls->m_ShowTrackingVolume->isChecked()));
+  settings.setValue("toolStorageFilename", QVariant(m_ToolStorageFilename));
+  settings.setValue("VolumeSelectionBox", QVariant(m_Controls->m_VolumeSelectionBox->currentIndex()));
+
+  settings.endGroup();
+}
+
+void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
+{
+  // persistence service does not directly work in plugins for now
+  // -> using QSettings
+  QSettings settings;
+
+  settings.beginGroup(QString::fromStdString(VIEW_ID));
+
+  // set some widgets and attributes by the values from the QSettings
+  m_Controls->m_ShowTrackingVolume->setChecked(settings.value("ShowTrackingVolume", true).toBool());
+  m_Controls->m_VolumeSelectionBox->setCurrentIndex(settings.value("VolumeSelectionBox", 0).toInt());
+  m_ToolStorageFilename = settings.value("toolStorageFilename", QVariant("")).toString();
+
+  settings.endGroup();
+
+
+  // try to deserialize the tool storage from the given tool storage file name
+  if ( ! m_ToolStorageFilename.isEmpty() )
+  {
+    // try-catch block for exceptions
+    try
+    {
+      mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(GetDataStorage());
+      m_toolStorage->UnRegisterMicroservice();
+      m_toolStorage = myDeserializer->Deserialize(m_ToolStorageFilename.toStdString());
+      m_toolStorage->RegisterAsMicroservice("no tracking device");
+
+      //update label
+      Poco::Path myPath = Poco::Path(m_ToolStorageFilename.toStdString()); //use this to seperate filename from path
+      QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
+      m_Controls->m_toolLabel->setText(toolLabel);
+
+      //update tool preview
+      m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
+      m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
+    }
+    catch(mitk::IGTException)
+    {
+      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during deserializing. Problems with file,please check the file?";
+    }
+  }
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::SetWorkerMethod(WorkerMethod w)

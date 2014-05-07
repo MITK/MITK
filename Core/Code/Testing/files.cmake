@@ -47,12 +47,14 @@ set(MODULE_TESTS
   mitkMessageTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
+  mitkPointSetTest.cpp
   mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
-  mitkPointSetTest.cpp
+  mitkPointSetOnEmptyTest.cpp
   mitkPointSetWriterTest.cpp
   mitkPointSetReaderTest.cpp
   mitkPointSetInteractorTest.cpp
+  mitkPointSetPointOperationsTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
   mitkSlicedGeometry3DTest.cpp

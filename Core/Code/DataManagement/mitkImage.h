@@ -66,6 +66,8 @@ class ImageStatisticsHolder;
 //## coordinate system (which does not support rotated images) to the MITK world
 //## coordinate system should be performed via the Geometry3D of the Image, see
 //## Geometry3D::WorldToItkPhysicalPoint.
+//##
+//## For more information, see \ref MitkImagePage .
 //## @ingroup Data
 class MITK_CORE_EXPORT Image : public SlicedData
 {

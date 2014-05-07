@@ -177,61 +177,44 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImagePointer iP) const
     return;
   }
 
-  int datatype;
-
-/*  if ( ( m_PixelType.GetType() == mitkIpPicInt || m_PixelType.GetType() == mitkIpPicUInt ) && m_PixelType.GetBitsPerComponent() == 1 )
+  if ( m_PixelType->GetComponentType() == itk::ImageIOBase::CHAR )
   {
-    datatype = VTK_BIT );
-    scalars = vtkBitArray::New();
-  }
-  else*/ if ( m_PixelType->GetComponentType() == itk::ImageIOBase::CHAR )
-  {
-    datatype = VTK_CHAR;
     scalars = vtkCharArray::New();
   }
   else if (   m_PixelType->GetComponentType() == itk::ImageIOBase::UCHAR)
   {
-    datatype = VTK_UNSIGNED_CHAR;
     scalars = vtkUnsignedCharArray::New();
   }
   else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::SHORT )
   {
-    datatype = VTK_SHORT;
     scalars = vtkShortArray::New();
   }
   else if (   m_PixelType->GetComponentType() == itk::ImageIOBase::USHORT )
   {
-    datatype = VTK_UNSIGNED_SHORT;
     scalars = vtkUnsignedShortArray::New();
   }
   else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::INT )
   {
-    datatype = VTK_INT;
     scalars = vtkIntArray::New();
   }
   else if (   m_PixelType->GetComponentType() == itk::ImageIOBase::UINT )
   {
-    datatype = VTK_UNSIGNED_INT;
     scalars = vtkUnsignedIntArray::New();
   }
   else if ( m_PixelType->GetComponentType() == itk::ImageIOBase::LONG )
   {
-    datatype = VTK_LONG;
     scalars = vtkLongArray::New();
   }
   else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::ULONG )
   {
-    datatype = VTK_UNSIGNED_LONG;
     scalars = vtkUnsignedLongArray::New();
   }
   else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::FLOAT  )
   {
-    datatype = VTK_FLOAT;
     scalars = vtkFloatArray::New();
   }
   else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::DOUBLE  )
   {
-    datatype = VTK_DOUBLE;
     scalars = vtkDoubleArray::New();
   }
   else
@@ -240,15 +223,11 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImagePointer iP) const
     return;
   }
 
-  inData->AllocateScalars(datatype,m_PixelType->GetNumberOfComponents());
-
   m_VtkImageData = inData;
 
-  // allocate the new scalars
-  scalars->SetNumberOfComponents(m_VtkImageData->GetNumberOfScalarComponents());
-
-  scalars->SetVoidArray(m_Data, size * m_VtkImageData->GetNumberOfScalarComponents(), 1);
-
+  // set mitk imageDataItem void array to vtk scalar values
+  scalars->SetNumberOfComponents(m_PixelType->GetNumberOfComponents());
+  scalars->SetVoidArray(m_Data, size * m_PixelType->GetNumberOfComponents(), 1);
   m_VtkImageData->GetPointData()->SetScalars(scalars);
   scalars->Delete();
 

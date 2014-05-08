@@ -239,11 +239,14 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   parser.addArgument("derived", "d", ctkCommandLineParser::String, "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
   parser.addArgument("silent", "s", ctkCommandLineParser::Bool, "No xml progress output.");
   parser.addArgument("resample", "r", ctkCommandLineParser::String, "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
+  parser.addArgument("binary", "b", ctkCommandLineParser::String, "Speficies that derived resource are binary (interpolation using nearest neighbor)",us::Any());
+
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   // Handle special arguments
   bool silent = false;
+  bool isBinary = false;
   {
     if (parsedArgs.size() == 0)
     {
@@ -259,6 +262,9 @@ int BatchedFolderRegistration( int argc, char* argv[] )
 
     if (parsedArgs.count("silent"))
       silent = true;
+
+    if (parsedArgs.count("binary"))
+      isBinary = true;
 
     // Show a help message
     if ( parsedArgs.count("help") || parsedArgs.count("h"))
@@ -416,7 +422,7 @@ int BatchedFolderRegistration( int argc, char* argv[] )
       MITK_INFO << "----Processing derived resource " << derivedResourceFilename << " ...";
       mitk::Image::Pointer derivedMovingResource = mitk::IOUtil::LoadImage(derivedResourceFilename);
       // Apply transformation to derived resource, treat derived resource as binary
-      mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, resampleReference, true);
+      mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, resampleReference,isBinary);
 
       savePathAndFileName = GetSavePath(outputPath, derivedResourceFilename);
       std::string fileType = itksys::SystemTools::GetFilenameExtension(derivedResourceFilename);

@@ -112,17 +112,11 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
             if( surface )
             {
-              QString varName = MITK_SURFACE_VAR_NAME;
-              MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << varName.toStdString();
-
-              if( j > 0 )
-                varName = QString("%1%2").arg(MITK_SURFACE_VAR_NAME).arg(j);
-              MITK_DEBUG("varName") << "varName" << varName.toStdString();
+              MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << node->GetName();
 
               if( m_PythonService->IsVtkPythonWrappingAvailable() )
               {
-                m_PythonService->CopyToPythonAsVtkPolyData( surface, MITK_SURFACE_VAR_NAME.toStdString() );
-                ++j;
+                m_PythonService->CopyToPythonAsVtkPolyData( surface, node->GetName() );
               }
               else
               {

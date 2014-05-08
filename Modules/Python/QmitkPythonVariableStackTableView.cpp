@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <mitkRenderingManager.h>
 #include <mitkSurface.h>
+#include <vtkPolyData.h>
 
 QmitkPythonVariableStackTableView::QmitkPythonVariableStackTableView(QWidget *parent)
     :QTableView(parent)
@@ -90,8 +91,15 @@ void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QMode
     }
 
     std::string nodeName = varName.toStdString();
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetName ( nodeName );
+    mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(nodeName);
+
+    // only create data node if it does not exist
+    if ( node.IsNull() )
+    {
+      node = mitk::DataNode::New();
+      node->SetName ( nodeName );
+      m_DataStorage->Add(node);
+    }
 
     if( mitkImage.IsNotNull() )
     {
@@ -100,8 +108,9 @@ void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QMode
     else if( mitkSurface.IsNotNull() )
     {
       node->SetData( mitkSurface );
+      // init renderwindow geometry
+      mitk::RenderingManager::GetInstance()->InitializeViews(mitkSurface->GetGeometry());
     }
 
-    m_DataStorage->Add(node);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

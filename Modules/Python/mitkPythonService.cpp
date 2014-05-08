@@ -437,7 +437,7 @@ mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const std
   MITK_DEBUG("PythonService") << "run python command to save polydata with vtk to " << fileName.toStdString();
   command = QString (
     "vtkStlWriter = vtk.vtkSTLWriter()\n"
-    "vtkStlWriter.SetInput(%1)\n"
+    "vtkStlWriter.SetInputData(%1)\n"
     "vtkStlWriter.SetFileName(\"%2\")\n"
     "vtkStlWriter.Write()\n").arg(varName).arg(fileName);
 

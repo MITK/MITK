@@ -22,6 +22,10 @@ namespace mitk {
   //##Documentation
   //## @brief ModifiedLock manages the calls of Modified() functions
   //##
+  //## If an object of ModifiedLock is created, the ModifiedLockFlag in class
+  //## BaseGeometry is set to true. Therefore, all following calls of Modified()
+  //## will be collected and only be carried out at the end of the function / section,
+  //## when the deconstructor of the ModifiedLock object is called.
   //##
   class MITK_CORE_EXPORT ModifiedLock
   {

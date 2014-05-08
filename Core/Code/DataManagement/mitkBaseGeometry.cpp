@@ -67,7 +67,7 @@ const mitk::Point3D& mitk::BaseGeometry::GetOrigin() const
 
 void mitk::BaseGeometry::SetOrigin(const Point3D & origin)
 {
-    mitk::ModifiedLock lock(this);
+  mitk::ModifiedLock lock(this);
 
   if(origin!=GetOrigin())
   {
@@ -80,7 +80,7 @@ void mitk::BaseGeometry::SetOrigin(const Point3D & origin)
 
 void mitk::BaseGeometry::TransferItkToVtkTransform()
 {
-    mitk::ModifiedLock lock(this);
+  mitk::ModifiedLock lock(this);
   // copy m_IndexToWorldTransform into m_VtkIndexToWorldTransform
 
   TransferItkTransformToVtkMatrix(m_IndexToWorldTransform.GetPointer(), m_VtkMatrix);
@@ -390,7 +390,7 @@ mitk::ScalarType mitk::BaseGeometry::GetExtentInMM(int direction) const
 
 void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
 {
-    mitk::ModifiedLock lock(this);
+  mitk::ModifiedLock lock(this);
 
   ScalarType len = GetExtentInMM(direction);
   if(fabs(len - extentInMM)>=mitk::eps)
@@ -546,7 +546,7 @@ vtkLinearTransform* mitk::BaseGeometry::GetVtkTransform() const
 
 void mitk::BaseGeometry::SetIdentity()
 {
-    mitk::ModifiedLock lock(this);
+  mitk::ModifiedLock lock(this);
 
   m_IndexToWorldTransform->SetIdentity();
   m_Origin.Fill(0);
@@ -564,7 +564,7 @@ void mitk::BaseGeometry::TransferVtkToItkTransform()
 
 void mitk::BaseGeometry::Compose( const mitk::BaseGeometry::TransformType * other, bool pre )
 {
-    mitk::ModifiedLock lock(this);
+  mitk::ModifiedLock lock(this);
 
   m_IndexToWorldTransform->Compose(other, pre);
   CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
@@ -601,7 +601,7 @@ void mitk::BaseGeometry::IndexToWorld(const mitk::Vector3D &vec_units, mitk::Vec
 #include <vtkTransform.h>
 void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
 {
-    mitk::ModifiedLock lock(this);
+  mitk::ModifiedLock lock(this);
 
   vtkTransform *vtktransform = vtkTransform::New();
   vtktransform->SetMatrix(m_VtkMatrix);
@@ -730,7 +730,7 @@ mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTra
 
 void mitk::BaseGeometry::SetTimeBounds(const TimeBounds& timebounds)
 {
-    mitk::ModifiedLock lock(this);
+  mitk::ModifiedLock lock(this);
 
   if(m_TimeBounds != timebounds)
   {

@@ -148,24 +148,13 @@ namespace mitk {
     itkGetConstMacro(IndexToWorldTransformLastModified, unsigned long);
 
     //##Documentation
-    //## @brief ModifiedLockFlag is used to prohibit the call of Modified()
-    //##
-    //## For the use of this Flag, see class ModifiedLock. This flag should only be set
-    //## by the ModifiedLock class!
-    bool m_ModifiedLockFlag;
-
-    //##Documentation
-    //## @brief ModifiedcalledFlag is used to collect calls of Modified().
-    //##
-    //## For the use of this Flag, see class ModifiedLock. This flag should only be set
-    //## by the Modified() function!
-    mutable bool m_ModifiedCalledFlag;
-
-    //##Documentation
     //## @brief Overload of function Modified() to prohibit several calls of Modified() using the ModifiedLock class.
     //##
     //## For the use of Modified(), see class ModifiedLock.
     void Modified() const;
+
+    friend class ModifiedLock;
+
     //##Documentation
     //## @brief Is this BaseGeometry in a state that is valid?
     //##
@@ -642,6 +631,20 @@ namespace mitk {
     mutable unsigned long m_IndexToWorldTransformLastModified;
 
     bool m_ImageGeometry;
+
+    //##Documentation
+    //## @brief ModifiedLockFlag is used to prohibit the call of Modified()
+    //##
+    //## For the use of this Flag, see class ModifiedLock. This flag should only be set
+    //## by the ModifiedLock class!
+    bool m_ModifiedLockFlag;
+
+    //##Documentation
+    //## @brief ModifiedcalledFlag is used to collect calls of Modified().
+    //##
+    //## For the use of this Flag, see class ModifiedLock. This flag should only be set
+    //## by the Modified() function!
+    mutable bool m_ModifiedCalledFlag;
   };
 
   // ********************************** Equal Functions **********************************

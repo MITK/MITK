@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ModifiedLock::ModifiedLock(BaseGeometry* baseGeo){
   m_baseGeometry = baseGeo;
   m_baseGeometry->m_ModifiedLockFlag = true;
+  m_baseGeometry->m_ModifiedCalledFlag = false;
 }
 
 mitk::ModifiedLock::~ModifiedLock(){

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 // this include hold the old deprecated ways to convert from itk 2 vtk and the likes.
-// th calls to these functions shall be removed in future bugsquashings so that this include can be removed.
+// calls to these functions shall be removed in future bugsquashings so that this include can be removed.
 #include "mitkVectorDeprecated.h"
 
 

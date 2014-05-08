@@ -143,6 +143,7 @@ set(CPP_FILES
   DataManagement/mitkEnumerationProperty.cpp
   DataManagement/mitkPlaneGeometryData.cpp
   DataManagement/mitkGeometry3D.cpp
+  DataManagement/mitkGeometry2D.cpp # Deprecated
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGroupTagProperty.cpp
   DataManagement/mitkImage.cpp
@@ -167,6 +168,7 @@ set(CPP_FILES
   DataManagement/mitkMemoryUtilities.cpp
   DataManagement/mitkModalityProperty.cpp
   DataManagement/mitkModeOperation.cpp
+  DataManagement/mitkModifiedLock.cpp
   DataManagement/mitkNodePredicateAnd.cpp
   DataManagement/mitkNodePredicateBase.cpp
   DataManagement/mitkNodePredicateCompositeBase.cpp

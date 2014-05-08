@@ -27,9 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkApplyTransformMatrixOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
+#include "mitkModifiedLock.h"
 
 mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
-  m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0), m_ImageGeometry(false)
+  m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0), m_ImageGeometry(false), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
 {
   m_VtkMatrix = vtkMatrix4x4::New();
   m_VtkIndexToWorldTransform = vtkMatrixToLinearTransform::New();
@@ -39,7 +40,7 @@ mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
 
 mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), m_TimeBounds(other.m_TimeBounds),
   m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin),
-  m_ImageGeometry(other.m_ImageGeometry)
+  m_ImageGeometry(other.m_ImageGeometry), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
 {
   //  DEPRECATED(m_RotationQuaternion = other.m_RotationQuaternion);
   // AffineGeometryFrame
@@ -66,6 +67,8 @@ const mitk::Point3D& mitk::BaseGeometry::GetOrigin() const
 
 void mitk::BaseGeometry::SetOrigin(const Point3D & origin)
 {
+    mitk::ModifiedLock lock(this);
+
   if(origin!=GetOrigin())
   {
     m_Origin = origin;
@@ -77,6 +80,7 @@ void mitk::BaseGeometry::SetOrigin(const Point3D & origin)
 
 void mitk::BaseGeometry::TransferItkToVtkTransform()
 {
+    mitk::ModifiedLock lock(this);
   // copy m_IndexToWorldTransform into m_VtkIndexToWorldTransform
 
   TransferItkTransformToVtkMatrix(m_IndexToWorldTransform.GetPointer(), m_VtkMatrix);
@@ -166,6 +170,8 @@ void mitk::BaseGeometry::PostInitialize()
 /** Set the bounds */
 void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
 {
+  mitk::ModifiedLock lock(this);
+
   PreSetBounds(bounds);
 
   m_BoundingBox = BoundingBoxType::New();
@@ -194,6 +200,8 @@ void mitk::BaseGeometry::PreSetBounds(const BoundsArrayType& bounds){};
 
 void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
 {
+  mitk::ModifiedLock lock(this);
+
   PreSetIndexToWorldTransform(transform);
   if(m_IndexToWorldTransform.GetPointer() != transform)
   {
@@ -382,6 +390,8 @@ mitk::ScalarType mitk::BaseGeometry::GetExtentInMM(int direction) const
 
 void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
 {
+    mitk::ModifiedLock lock(this);
+
   ScalarType len = GetExtentInMM(direction);
   if(fabs(len - extentInMM)>=mitk::eps)
   {
@@ -536,6 +546,8 @@ vtkLinearTransform* mitk::BaseGeometry::GetVtkTransform() const
 
 void mitk::BaseGeometry::SetIdentity()
 {
+    mitk::ModifiedLock lock(this);
+
   m_IndexToWorldTransform->SetIdentity();
   m_Origin.Fill(0);
   CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
@@ -552,6 +564,8 @@ void mitk::BaseGeometry::TransferVtkToItkTransform()
 
 void mitk::BaseGeometry::Compose( const mitk::BaseGeometry::TransformType * other, bool pre )
 {
+    mitk::ModifiedLock lock(this);
+
   m_IndexToWorldTransform->Compose(other, pre);
   CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
   vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
@@ -587,6 +601,8 @@ void mitk::BaseGeometry::IndexToWorld(const mitk::Vector3D &vec_units, mitk::Vec
 #include <vtkTransform.h>
 void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
 {
+    mitk::ModifiedLock lock(this);
+
   vtkTransform *vtktransform = vtkTransform::New();
   vtktransform->SetMatrix(m_VtkMatrix);
   switch (operation->GetOperationType())
@@ -714,6 +730,8 @@ mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTra
 
 void mitk::BaseGeometry::SetTimeBounds(const TimeBounds& timebounds)
 {
+    mitk::ModifiedLock lock(this);
+
   if(m_TimeBounds != timebounds)
   {
     m_TimeBounds = timebounds;
@@ -923,6 +941,13 @@ void mitk::BaseGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
   os << indent << " ImageGeometry: " << this->GetImageGeometry() << std::endl;
   os << indent << " Spacing: " << this->GetSpacing() << std::endl;
   os << indent << " TimeBounds: " << this->GetTimeBounds() << std::endl;
+}
+
+void mitk::BaseGeometry::Modified() const{
+  if(!m_ModifiedLockFlag)
+    Superclass::Modified();
+  else
+    m_ModifiedCalledFlag = true;
 }
 
 bool mitk::Equal( const mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose )

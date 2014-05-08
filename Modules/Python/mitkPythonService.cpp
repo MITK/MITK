@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDir>
 #include <PythonQt.h>
 #include "PythonPath.h"
+#include <vtkPolyData.h>
 
 const QString mitk::PythonService::m_TmpDataFileName("temp_mitk_data_file");
 
@@ -427,72 +428,64 @@ ctkAbstractPythonManager *mitk::PythonService::GetPythonManager()
 
 mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const std::string& stdvarName )
 {
-  QString varName = QString::fromStdString( stdvarName );
-  mitk::Surface::Pointer newSurface;
-
+  // access python module
+  PyObject *pyMod = PyImport_AddModule((char*)"__main__");
+  // global dictionarry
+  PyObject *pyDict = PyModule_GetDict(pyMod);
+  // python memory address
+  PyObject *pyAddr = NULL;
+  // cpp address
+  size_t addr = 0;
+  mitk::Surface::Pointer surface = mitk::Surface::New();
   QString command;
-  QString fileName = GetTempDataFileName( ".stl" );
-  fileName = QDir::fromNativeSeparators( fileName );
+  QString varName = QString::fromStdString( stdvarName );
 
-  MITK_DEBUG("PythonService") << "run python command to save polydata with vtk to " << fileName.toStdString();
-  command = QString (
-    "vtkStlWriter = vtk.vtkSTLWriter()\n"
-    "vtkStlWriter.SetInputData(%1)\n"
-    "vtkStlWriter.SetFileName(\"%2\")\n"
-    "vtkStlWriter.Write()\n").arg(varName).arg(fileName);
+  command.append( QString("surface_addr_str = %1.GetAddressAsString(\"vtkPolyData\")\n").arg(varName) );
+  // remove 0x from the address
+  command.append( QString("surface_addr = int(surface_addr_str[5:],16)\n") );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-  try
-  {
-    MITK_DEBUG("PythonService") << "Loading temporary file " << fileName.toStdString() << " as MITK Surface";
-    newSurface = mitk::IOUtil::LoadSurface( fileName.toStdString() );
-  }
-  catch(std::exception& e)
-  {
-    MITK_ERROR << e.what();
-  }
+  // get address of the object
+  pyAddr = PyDict_GetItemString(pyDict,"surface_addr");
 
-  QFile file(fileName);
-  if( file.exists() )
-  {
-    MITK_DEBUG("PythonService") << "Removing temporary file " << fileName.toStdString();
-    file.remove();
-  }
+  // convert to long
+  addr = PyInt_AsLong(pyAddr);
 
-  return newSurface;
+  MITK_DEBUG << "Python object address: " << addr;
+
+  // get the object
+  vtkPolyData* poly = (vtkPolyData*)((void*)addr);
+  surface->SetVtkPolyData(poly);
+
+  return surface;
 }
 
 bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, const std::string& stdvarName )
 {
   QString varName = QString::fromStdString( stdvarName );
-  bool convert = false;
-
-  // try to save mitk image
-  QString fileName = this->GetTempDataFileName( ".stl" );
-  fileName = QDir::fromNativeSeparators( fileName );
-  MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
-  if( !mitk::IOUtil::SaveSurface( surface, fileName.toStdString() ) )
-  {
-    MITK_ERROR << "Temporary file " << fileName.toStdString() << " could not be created.";
-    return convert;
-  }
-
+  std::ostringstream oss;
+  std::string addr = "";
   QString command;
+  QString address;
 
-  command.append( QString("vtkStlReader = vtk.vtkSTLReader()\n") );
-  command.append( QString("vtkStlReader.SetFileName(\"%1\")\n").arg( fileName ) );
-  command.append( QString("vtkStlReader.Update()\n") );
-  command.append( QString("%1 = vtkStlReader.GetOutput()\n").arg( varName ) );
+  oss << (void*) ( surface->GetVtkPolyData() );
+
+  // get the address
+  addr = oss.str();
+
+  // remove "0x"
+  addr = addr.substr(2);
+
+  address = QString::fromStdString(addr);
+
+  command.append( QString("%1 = vtk.vtkPolyData(\"%2\")\n").arg(varName).arg(address) );
+
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-  MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
-  QFile file(fileName);
-  file.remove();
-  convert = true;
-  return convert;
+  return true;
 }
 
 bool mitk::PythonService::IsItkPythonWrappingAvailable()

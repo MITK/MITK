@@ -19,10 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "mitkPointOperation.h"
 #include "mitkRenderingManager.h"
-#include <mitkPointSetInteractor.h>
+#include <mitkPointSetDataInteractor.h>
 #include <mitkEvent.h>
 #include <mitkStateEvent.h>
 #include <mitkInteractionConst.h>
+#include <mitkInternalEvent.h>
 
 
 QmitkPointListModel::QmitkPointListModel( mitk::DataNode* pointSetNode, int t, QObject* parent )
@@ -294,13 +295,14 @@ void QmitkPointListModel::RemoveSelectedPoint()
     return;
 
   //get corresponding interactor to PointSet
-  mitk::PointSetInteractor::Pointer interactor = dynamic_cast<mitk::PointSetInteractor*>(m_PointSetNode->GetInteractor());
+  mitk::PointSetDataInteractor::Pointer interactor = dynamic_cast<mitk::PointSetDataInteractor*>(m_PointSetNode->GetDataInteractor().GetPointer());
   if (interactor.IsNull())
   {
     if (m_PointSetNode->GetInteractor()==NULL && m_PointSetNode != NULL) //no Interactor set to node
     {
-      interactor = mitk::PointSetInteractor::New("pointsetinteractor",m_PointSetNode);
-      m_PointSetNode->SetInteractor(interactor);
+      interactor->LoadStateMachine("PointSet.xml");
+      interactor->SetEventConfig("PointSetConfig.xml");
+      m_PointSetNode->SetDataInteractor(interactor.GetPointer());
     }
     else
     {
@@ -308,14 +310,9 @@ void QmitkPointListModel::RemoveSelectedPoint()
       return;
     }
   }
-
-
-  //send a DEL event to pointsetinteractor
-  const mitk::Event* delEvent = new mitk::Event(NULL, mitk::Type_KeyPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_Delete);
-  mitk::StateEvent* delStateEvent = new mitk::StateEvent(mitk::EIDDELETE, delEvent);
-  interactor->HandleEvent(delStateEvent);
-  delete delEvent;
-  delete delStateEvent;
+//  mitk::InternalEvent::Pointer event = mitk::InternalEvent::New(NULL,interactor,"RemovePoint");
+//  interactor->HandleEvent(event.GetPointer(), interactor->GetDataNode());
+//  MITK_INFO << "!!!!!!!!!!!!!!!!!!!!!!! EXECUTED !!!!!!!!!!!!!!!!!!!!";
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in PointSet/Mapper
 }

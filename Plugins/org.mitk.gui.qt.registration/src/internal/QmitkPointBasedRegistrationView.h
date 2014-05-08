@@ -24,9 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include "mitkTestingConfig.h" // IMPORTANT: this defines or undefines BUILD_TESTING !
 
-#include <mitkPointSetInteractor.h>
-#include <mitkGlobalInteraction.h>
-#include <mitkAffineInteractor.h>
 #include <mitkPointSet.h>
 #include <vtkCellArray.h>
 #include <vtkLandmarkTransform.h>

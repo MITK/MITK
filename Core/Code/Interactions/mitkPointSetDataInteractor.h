@@ -50,6 +50,9 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+
+    void DeletePointByIndex(unsigned int index, unsigned int timeStep = 0);
+
   protected:
     PointSetDataInteractor();
     virtual ~PointSetDataInteractor();
@@ -154,7 +157,6 @@ namespace mitk
     /** \brief to calculate a direction vector from last point and actual
      * point
      */
-
     Point3D m_LastPoint;
 
     /** \brief summ-vector for Movement */
@@ -165,7 +167,6 @@ namespace mitk
     // DATA
     PointSet::Pointer m_PointSet;
     int m_MaxNumberOfPoints; // maximum of allowed number of points
-
     float m_SelectionAccuracy; // accuracy that's needed to select a point
 
     // FUNCTIONS

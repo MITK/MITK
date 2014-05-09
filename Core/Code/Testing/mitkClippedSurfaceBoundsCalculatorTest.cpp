@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClippedSurfaceBoundsCalculator.h"
 #include "mitkGeometry3D.h"
 #include "mitkGeometry2D.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 
 static void CheckPlanesInsideBoundingBoxOnlyOnOneSlice(mitk::Geometry3D::Pointer geometry3D)
 {

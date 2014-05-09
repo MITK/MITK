@@ -101,7 +101,7 @@ void mitk::Geometry3D::Initialize()
 
   m_VtkMatrix->Identity();
 
-  m_TimeBounds[0]=ScalarTypeNumericTraits::NonpositiveMin(); m_TimeBounds[1]=ScalarTypeNumericTraits::max();
+  m_TimeBounds[0]=itk::NumericTraits<mitk::ScalarType>::NonpositiveMin(); m_TimeBounds[1]=itk::NumericTraits<mitk::ScalarType>::max();
 
   m_FrameOfReferenceID = 0;
 

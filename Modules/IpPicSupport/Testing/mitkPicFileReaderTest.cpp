@@ -171,8 +171,8 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       if(picheader->dim==4)
       {
         std::cout << "4D dataset: Testing that timebounds are not infinite: ";
-        if((slicedgeometry->GetTimeBounds()[0] == mitk::ScalarTypeNumericTraits::NonpositiveMin()) &&
-           (slicedgeometry->GetTimeBounds()[1] == mitk::ScalarTypeNumericTraits::max())
+        if((slicedgeometry->GetTimeBounds()[0] ==  itk::NumericTraits<mitk::ScalarType>::NonpositiveMin()) &&
+           (slicedgeometry->GetTimeBounds()[1] ==  itk::NumericTraits<mitk::ScalarType>::max())
           )
         {
           std::cout<<"[FAILED]"<<std::endl;

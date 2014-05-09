@@ -91,7 +91,7 @@ void mitk::SphereLandmarkProjector::ProjectLandmarks(
   switch(0)
   {
   case 0/*MIN*/:
-    radius = mitk::ScalarTypeNumericTraits::max();
+    radius =  itk::NumericTraits<mitk::ScalarType>::max();
     for(id=0, pointiterator=start;id<size;++id, ++pointiterator)
     {
       point = pointiterator->Value();

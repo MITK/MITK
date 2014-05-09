@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
-#include <mitkVector.h>
+#include <mitkTypes.h>
 
 #include <ctime>
 #include <cstdlib>
@@ -545,7 +545,7 @@ public:
     ImageType::IndexType testPoint3DInIndex;
     imageInMitk->GetGeometry()->WorldToIndex(testPoint3DInWorld, testPoint3DInIndex);
 
-    mitk::Index3D testPoint2DInIndex;
+    itk::Index<3> testPoint2DInIndex;
 
     /* end define a point in the 3D volume.*/
 
@@ -634,7 +634,7 @@ public:
     MITK_INFO << "\n" << "volume world: " << testPoint3DInWorld << " = " << valueAt3DVolumeByWorld ;
     MITK_INFO << "\n" << "slice idx: " << testPoint2DInIndex << " = " << valueAtSlice ;
 
-    mitk::Index3D curr;
+    itk::Index<3> curr;
     curr[0] = curr[1] = curr[2] = 0;
 
     for( int i = 0; i < 32 ; ++i){

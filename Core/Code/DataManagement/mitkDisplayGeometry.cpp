@@ -114,7 +114,7 @@ void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned i
     currentNewCenterInDisplayUnits[1] = m_SizeInDisplayUnits[1]*0.5;
 
     Vector2D shift;
-    shift=positionOfOldCenterInCurrentDisplayUnits.GetVectorFromOrigin()-currentNewCenterInDisplayUnits;
+    shift=positionOfOldCenterInCurrentDisplayUnits-currentNewCenterInDisplayUnits;
 
     MoveBy(shift);
     Zoom(m_SizeInMM.GetNorm()/oldSizeInMM.GetNorm(), currentNewCenterInDisplayUnits);
@@ -173,7 +173,7 @@ bool mitk::DisplayGeometry::SetScaleFactor(ScalarType mmPerDisplayUnit)
   }
 
   m_ScaleFactorMMPerDisplayUnit = mmPerDisplayUnit;
-  assert(m_ScaleFactorMMPerDisplayUnit < ScalarTypeNumericTraits::infinity());
+  assert(m_ScaleFactorMMPerDisplayUnit < itk::NumericTraits<mitk::ScalarType>::infinity());
 
   DisplayToWorld(m_SizeInDisplayUnits, m_SizeInMM);
 

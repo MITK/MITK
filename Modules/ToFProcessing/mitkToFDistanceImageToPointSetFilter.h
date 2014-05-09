@@ -86,7 +86,7 @@ namespace mitk
     \brief If this subset is defined, the cartesian coordinates are only computed for the contained indizes. Make sure the indizes are contained in the input image
     \param subset index subset specified in index coordinates.
     */
-    void SetSubset( std::vector<Index3D> subset);
+    void SetSubset( std::vector<itk::Index<3> > subset);
 
     /*!
     \brief Sets the subset of indizes used for caluclation of output PointSet as a PointSet.
@@ -130,7 +130,7 @@ namespace mitk
     */
     void CreateOutputsForAllInputs();
 
-    std::vector<Index3D> m_Subset; ///< If this subset is specified only the contained indizes are converted to cartesian coordinates
+    std::vector<itk::Index<3> > m_Subset; ///< If this subset is specified only the contained indizes are converted to cartesian coordinates
     mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< Member holding the intrinsic parameters needed for PointSet calculation
     ToFProcessingCommon::ToFPoint2D m_InterPixelDistance; ///< distance in mm between two adjacent pixels on the ToF camera chip
     bool m_ReconstructionMode; ///< true = Reconstruction without interpixeldistance and with focal lengths in pixel units. false = Reconstruction with interpixeldistance and with focal length in mm.

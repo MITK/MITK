@@ -66,7 +66,7 @@ int mitkToFProcessingCommonTest(int /* argc */, char* /*argv*/[])
   expectedKinectCoordinate[1] = -250.0;
   expectedKinectCoordinate[2] = 1000.0;
 
-  mitk::Index3D index;
+  itk::Index<3> index;
   index[0] = i;
   index[1] = j;
   index[2] = 0;

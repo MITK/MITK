@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkProperties.h"
 #include "mitkStringProperty.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 
 
 mitk::BaseProperty* mitk::PropertyList::GetProperty(const std::string& propertyKey) const

@@ -173,7 +173,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
   int timestep=0;
 
-  if( time > ScalarTypeNumericTraits::NonpositiveMin() )
+  if( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
     timestep = inputTimeGeometry->TimePointToTimeStep( time );
 
  // int timestep = this->GetTimestep();

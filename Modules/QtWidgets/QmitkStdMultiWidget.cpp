@@ -1660,7 +1660,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   mitk::Point3D crosshairPos = this->GetCrossPosition();
   std::string statusText;
   std::stringstream stream;
-  mitk::Index3D p;
+  itk::Index<3> p;
   mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
   unsigned int timestep = baseRenderer->GetTimeStep();
 

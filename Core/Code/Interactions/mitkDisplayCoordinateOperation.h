@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 #include "mitkBaseRenderer.h"
-#include "mitkVector.h"
+#include "mitkTypes.h"
 #include "mitkOperation.h"
 #include <mitkWeakPointer.h>
 

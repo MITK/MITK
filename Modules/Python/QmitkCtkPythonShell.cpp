@@ -77,7 +77,7 @@ bool QmitkCtkPythonShell::canInsertFromMimeData( const QMimeData *source ) const
 void QmitkCtkPythonShell::executeCommand(const QString& command)
 {
   MITK_DEBUG("QmitkCtkPythonShell") << "executing command " << command.toStdString();
-  ctkPythonConsole::executeCommand(command);
+  d->m_PythonService->Execute(command.toStdString(),mitk::IPythonService::MULTI_LINE_COMMAND);
   d->m_PythonService->NotifyObserver(command.toStdString());
 }
 

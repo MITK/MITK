@@ -44,6 +44,8 @@ namespace mitk {
   typedef itk::FixedArray<ScalarType,2>  TimeBounds;
   typedef itk::FixedArray<ScalarType, 3> FixedArrayType;
 
+  typedef itk::AffineGeometryFrame<ScalarType, 3>        AffineGeometryFrame3D;
+
   //##Documentation
   //## @brief BaseGeometry Describes the geometry of a data object
   //##

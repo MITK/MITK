@@ -154,8 +154,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
             p0[0] += newP[0];
             p0[1] += newP[1];
 
-            const mitk::Geometry2D* pfgeometry = figure->GetGeometry2D();
-            const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(pfgeometry);
+            const mitk::PlaneGeometry* planeGeo = figure->GetPlaneGeometry();
 
             mitk::Point3D w, wc;
             planeGeo->Map(p0, w);
@@ -196,8 +195,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
                 newP[1] = m_2DPoints.at(j)[1];
 
                 // calculate normal
-                mitk::Geometry2D* pfgeometry = const_cast<mitk::Geometry2D*>(figure->GetGeometry2D());
-                mitk::PlaneGeometry* planeGeo = dynamic_cast<mitk::PlaneGeometry*>(pfgeometry);
+                mitk::PlaneGeometry* planeGeo = const_cast<mitk::PlaneGeometry*>(figure->GetPlaneGeometry());
                 mitk::Vector3D perp = wc-planeGeo->ProjectPointOntoPlane(wc); perp.Normalize();
                 vnl_vector_fixed< double, 3 > n2 = planeGeo->GetNormalVnl();
                 wc = figure->GetWorldControlPoint(0);

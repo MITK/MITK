@@ -88,6 +88,7 @@ set(external_projects
   SOFA
   MITKData
   Qwt
+  SimpleITK
   )
 
 # Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
@@ -311,6 +312,7 @@ ExternalProject_Add(${proj}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
     ${Qxt_DEPENDS}
+    ${SimpleITK_DEPENDS}
 )
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
@@ -425,6 +427,7 @@ ExternalProject_Add(${proj}
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
     -DQwt_DIR:PATH=${Qwt_DIR}
     -DQxt_DIR:PATH=${Qxt_DIR}
+    -DSimpleITK_DIR:PATH=${SimpleITK_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}

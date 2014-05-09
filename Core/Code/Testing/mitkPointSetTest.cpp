@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkPointSet.h>
-#include <mitkTypes.h>
+#include <mitkNumericTypes.h>
 #include <mitkPointOperation.h>
 #include <mitkInteractionConst.h>
 

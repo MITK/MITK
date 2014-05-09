@@ -262,8 +262,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   mitk::Point3D lastP = point;          // last visited point (predecessor in point set of "point")
   mitk::Vector3D vec;                   // p - lastP
   mitk::Vector3D lastVec;               // lastP - point before lastP
-  vec.Fill(0);
-  lastVec.Fill(0);
+  vec.Fill(0.0);
+  lastVec.Fill(0.0);
 
   mitk::Point3D projected_p = point;     // p projected on viewplane
 

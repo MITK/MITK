@@ -14,10 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkConstants.h"
-#include "vnl/vnl_math.h"
-#include <limits>
 
-const mitk::ScalarType mitk::eps     = vnl_math::eps*100;
-const mitk::ScalarType mitk::sqrteps = vnl_math::sqrteps;
-extern const mitk::ScalarType mitk::large   = std::numeric_limits<mitk::ScalarType>::max();
+#ifndef MITKAFFINETRANSFORM3D_H_
+#define MITKAFFINETRANSFORM3D_H_
+
+
+#include <itkAffineGeometryFrame.h>
+
+namespace mitk
+{
+  typedef itk::AffineGeometryFrame<ScalarType, 3>::TransformType AffineTransform3D;
+}
+
+
+
+#endif /* MITKAFFINETRANSFORM3D_H_ */

@@ -14,20 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkNumericConstants.h"
+#include "vnl/vnl_math.h"
+#include <limits>
 
-#ifndef MITKDATATYPEBASICS_H
-#define MITKDATATYPEBASICS_H
-
-#include <MitkCoreExports.h>
-
-namespace mitk {
-
-typedef double ScalarType;
-
-MITK_CORE_EXPORT extern const ScalarType eps;
-MITK_CORE_EXPORT extern const ScalarType sqrteps;
-MITK_CORE_EXPORT extern const double large;
-
-}
-
-#endif // MITKDATATYPEBASICS_H
+const mitk::ScalarType mitk::eps     = vnl_math::eps*100;
+const mitk::ScalarType mitk::sqrteps = vnl_math::sqrteps;
+extern const mitk::ScalarType mitk::large   = std::numeric_limits<mitk::ScalarType>::max();

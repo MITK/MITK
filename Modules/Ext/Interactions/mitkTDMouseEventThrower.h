@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef TDMouseEventThrower__h__
 #define TDMouseEventThrower__h__
 
-#include <mitkTypes.h>
+#include <mitkNumericTypes.h>
 #include <iostream>
 
 namespace mitk {

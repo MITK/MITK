@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKMOUSEMOVEPOINTSETINTERACTOR_H_HEADER_INCLUDED_C11202FF
 
 #include <MitkCoreExports.h>
-#include "mitkTypes.h"
+#include "mitkNumericTypes.h"
 #include <mitkPointSetInteractor.h>
 
 namespace mitk

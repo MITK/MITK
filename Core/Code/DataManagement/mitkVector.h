@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_vector_fixed.h>
 #include <vnl/vnl_vector.h>
 
-#include "mitkConstants.h"
+#include "mitkNumericConstants.h"
 #include "mitkArray.h"
 #include "mitkEqual.h"
 #include "mitkExceptionMacro.h"
@@ -100,12 +100,11 @@ namespace mitk
      * @param array the array whose values shall be copied. Must overload [] operator.
      */
     template <typename ArrayType >
-    void FromArray(const ArrayType& array)
+    void FillVector(const ArrayType& array)
     {
       itk::FixedArray<TCoordRep, NVectorDimension>* thisP = dynamic_cast<itk::FixedArray<TCoordRep, NVectorDimension>* >(this);
-      mitk::FromArray<ArrayType, TCoordRep, NVectorDimension>(*thisP, array);
+      mitk::FillArray<ArrayType, TCoordRep, NVectorDimension>(*thisP, array);
     }
-
 
     /**
      * Copies the values stored in this vector into the array array.d
@@ -113,7 +112,7 @@ namespace mitk
      * @param array the array which should store the values of this.
      */
     template <typename ArrayType >
-    void ToArray(ArrayType array)
+    void ToArray(ArrayType array) const
     {
       mitk::ToArray<ArrayType, TCoordRep, NVectorDimension>(array, *this);
     }

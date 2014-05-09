@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_vector_fixed_ref.h>
 #include "vnl/vnl_math.h"
 
-#include "mitkConstants.h"
+#include "mitkNumericConstants.h"
 #include "mitkVector.h"
 #include "mitkPoint.h"
 
@@ -55,7 +55,7 @@ class mitkVectorTypeConversionTestSuite : public mitk::TestFixture
   MITK_TEST(Vnl2Mitk_WrongVnlVectorSize);
 
   MITK_TEST(ToArray_DifferentType);
-  MITK_TEST(FromArray_DifferentType);
+  MITK_TEST(Fill_DifferentType);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -88,7 +88,7 @@ private:
   *  @param eps   defines the allowed tolerance when testing for equality.
    */
   template <typename T1, typename T2>
-  void TestForEquality(T1 v1, T2 v2, std::string v1Name, std::string v2Name, ScalarType eps = mitk::eps)
+  void TestForEquality(const T1& v1, const T2& v2, const std::string& v1Name, const std::string& v2Name, const ScalarType& eps = mitk::eps) const
   {
     CPPUNIT_ASSERT_EQUAL_MESSAGE("\nAssigning " + v2Name + " to " + v1Name + ":\n both are equal", true,
         EqualArray(v1, v2, 3, eps));
@@ -235,7 +235,7 @@ public:
   }
 
 
-  void FromArray_DifferentType(void)
+  void Fill_DifferentType(void)
   {
     mitk::Vector3D vector3D = originalValues;
     float podArray[3];
@@ -243,7 +243,7 @@ public:
       podArray[var] = valuesToCopy[var];
     }
 
-    vector3D.FromArray(podArray);
+    vector3D.FillVector(podArray);
 
     TestForEquality(vector3D, podArray, "mitk::Vector3D", "float POD", epsDouble2Float);
   }

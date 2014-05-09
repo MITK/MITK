@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include "MitkExtExports.h"
 #include <mitkOperation.h>
-#include <mitkTypes.h>
+#include <mitkNumericTypes.h>
 #include <mitkImage.h>
 #include <mitkSeedsImage.h>
 

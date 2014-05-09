@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestFixture.h>
 #include "mitkTestingMacros.h"
-#include <mitkTypes.h>
+#include <mitkNumericTypes.h>
 
 #include <iostream>
 #include <vtkColorTransferFunction.h>

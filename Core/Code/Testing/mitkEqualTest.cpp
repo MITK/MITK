@@ -16,7 +16,7 @@
 
 #include "mitkTestingMacros.h"
 #include <mitkTestFixture.h>
-#include <mitkTypes.h>
+#include <mitkNumericTypes.h>
 
 class mitkEqualTestSuite : public mitk::TestFixture
 {

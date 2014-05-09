@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPICHELPER_H_HEADER_INCLUDED_C1F4DAB4
 
 #include <MitkIpPicSupportExports.h>
-#include "mitkTypes.h"
+#include "mitkNumericTypes.h"
 #include <mitkIpPic.h>
 
 namespace mitk {

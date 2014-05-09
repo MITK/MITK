@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKNodeDepententPointSetInteractor_H_HEADER_INCLUDED
 
 #include <MitkCoreExports.h>
-#include "mitkTypes.h"
+#include "mitkNumericTypes.h"
 #include <mitkInteractor.h>
 #include <mitkDataNode.h>
 #include <mitkPointSetInteractor.h>

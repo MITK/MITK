@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkMatrix.h>
 
-#include "mitkConstants.h"
+#include "mitkNumericConstants.h"
 #include "mitkArray.h"
 #include "mitkEqual.h"
 
@@ -37,11 +37,11 @@ namespace mitk
     typedef typename itk::Matrix<T, NRows, NColumns>::InternalMatrixType InternalMatrixType;
 
     /** Default constructor. */
-    Matrix<T, NRows, NColumns>() :
+    explicit Matrix<T, NRows, NColumns>() :
         itk::Matrix<T, NRows, NColumns>() {}
 
     /** Copy constructor. */
-    Matrix<T, NRows, NColumns>(const Matrix & matrix) :
+    explicit Matrix<T, NRows, NColumns>(const Matrix & matrix) :
             itk::Matrix<T, NRows, NColumns>(matrix) {}
 
     /** Copy constructor for itk compatibility */
@@ -69,7 +69,7 @@ namespace mitk
      * @param array the array whose values shall be copied. Must overload [] operator.
      */
     template <typename ArrayType >
-    void FromArray(const ArrayType& array)
+    void FillMatrix(const ArrayType& array)
     {
       for (unsigned i = 0; i < NRows; i++)
       {
@@ -81,16 +81,16 @@ namespace mitk
     };
 
     /**
-     * Warning: Array must have same dimension as Matrix
+     * Warning: matrix must have same dimension as Matrix
      */
-    template <typename ArrayType>
-    void ToArray(ArrayType array) const
+    template <typename MatrixType>
+    void ToArray(MatrixType matrix) const
     {
       for (unsigned i = 0; i < NRows; i++)
       {
         for (unsigned j = 0; j < NColumns; j++)
         {
-          array[i][j] = (*this)[i][j];
+          matrix[i][j] = (*this)[i][j];
         }
       }
     }

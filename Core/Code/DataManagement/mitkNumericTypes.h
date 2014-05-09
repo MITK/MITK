@@ -14,17 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKQUATERNION_H_
-#define MITKQUATERNION_H_
+
+#ifndef MITKNUMERICTYPES_H_
+#define MITKNUMERICTYPES_H_
 
 
-#include <vnl/vnl_quaternion.h>
 #include "mitkNumericConstants.h"
+#include "mitkQuaternion.h"
+#include "mitkAffineTransform3D.h"
+#include "mitkPoint.h"
+#include "mitkVector.h"
+#include "mitkMatrix.h"
+#include "mitkEqual.h"
 
-namespace mitk {
 
-typedef vnl_quaternion<ScalarType> Quaternion;
+// this include hold the old deprecated ways to convert from itk 2 vtk and the likes.
+// calls to these functions shall be removed in future bugsquashings so that this include can be removed.
+#include "mitkVectorDeprecated.h"
 
-}
 
-#endif /* MITKQUATERNION_H_ */
+
+
+
+
+#endif /* MITKNUMERICTYPES_H_ */

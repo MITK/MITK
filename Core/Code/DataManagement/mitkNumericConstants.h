@@ -15,11 +15,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkTDMouseEvent.h"
-#include "mitkInteractionConst.h"
-#include "mitkNumericTypes.h"
+#ifndef MITKNUMERICCONSTANTS_H_
+#define MITKNUMERICCONSTANTS_H_
 
-mitk::TDMouseEvent::TDMouseEvent(int buttonState, const Vector3D& translation, const Vector3D& rotation, const ScalarType& angle)
-: Event(NULL, Type_TDMouseInput, BS_NoButton, buttonState, Key_none), m_Translation(translation), m_Rotation(rotation), m_Angle(angle)
-{
+#include <MitkCoreExports.h>
+
+namespace mitk {
+
+typedef double ScalarType;
+
+MITK_CORE_EXPORT extern const ScalarType eps;
+MITK_CORE_EXPORT extern const ScalarType sqrteps;
+MITK_CORE_EXPORT extern const double large;
+
 }
+
+#endif // MITKNUMERICCONSTANTS_H_

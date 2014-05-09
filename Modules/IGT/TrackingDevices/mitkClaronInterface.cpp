@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <MTC.h>
 #include <math.h>
-#include <mitkTypes.h>
+#include <mitkNumericTypes.h>
 
 mitk::ClaronInterface::ClaronInterface()
 {

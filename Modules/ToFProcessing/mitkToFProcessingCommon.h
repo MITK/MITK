@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkToFProcessingExports.h>
 #include <mitkCameraIntrinsics.h>
-#include "mitkTypes.h"
+#include "mitkNumericTypes.h"
 #include <vnl/vnl_math.h>
 
 namespace mitk

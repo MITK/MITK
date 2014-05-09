@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestFixture.h"
 
 #include "mitkTestingMacros.h"
-#include "mitkConstants.h"
-#include "mitkTypes.h" // for Equal method
+#include "mitkNumericConstants.h"
+#include "mitkNumericTypes.h" // for Equal method
 #include "mitkPoint.h"
 #include "itkPoint.h"
 #include "vtkPoints.h"

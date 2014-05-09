@@ -62,7 +62,7 @@ set(H_FILES
   DataManagement/mitkVectorDeprecated.h
   DataManagement/mitkArray.h
   DataManagement/mitkQuaternion.h
-  DataManagement/mitkTypes.h
+  DataManagement/mitkNumericTypes.h
   DataManagement/mitkVector.h
   DataManagement/mitkPoint.h
   DataManagement/mitkMatrix.h
@@ -209,7 +209,7 @@ set(CPP_FILES
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkVector.cpp
-  DataManagement/mitkConstants.cpp
+  DataManagement/mitkNumericConstants.cpp
   DataManagement/mitkVtkInterpolationProperty.cpp
   DataManagement/mitkVtkRepresentationProperty.cpp
   DataManagement/mitkVtkResliceInterpolationProperty.cpp

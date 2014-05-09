@@ -15,14 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKOLDTYPECONVERSIONS_H_
-#define MITKOLDTYPECONVERSIONS_H_
+#ifndef MITKVECTORDEPRECATED_H_
+#define MITKVECTORDEPRECATED_H_
 
 #include <vnl/vnl_quaternion.h>
 #include <itkIndex.h>
 
 
-#include "mitkConstants.h"
+#include "mitkNumericConstants.h"
 #include "mitkVector.h"
 #include "mitkPoint.h"
 #include "mitkMatrix.h"
@@ -212,6 +212,22 @@ namespace mitk
         out[i][j] = in[i][j];
   }
 
+#define mitkSetConstReferenceMacro(name,type) \
+  virtual void Set##name (const type & _arg) \
+  { \
+    itkDebugMacro("setting " << #name " to " << _arg ); \
+    if (this->m_##name != _arg) \
+      { \
+      this->m_##name = _arg; \
+      this->Modified(); \
+      } \
+  }
+
+#define mitkSetVectorMacro(name,type) \
+  mitkSetConstReferenceMacro(name,type)
+
+#define mitkGetVectorMacro(name,type) \
+  itkGetConstReferenceMacro(name,type)
 
 } // namespace mitk
 
@@ -219,4 +235,4 @@ namespace mitk
 
 
 
-#endif /* MITKOLDTYPECONVERSIONS_H_ */
+#endif /* MITKVECTORDEPRECATED_H_ */

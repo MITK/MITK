@@ -15,13 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKPOINT_H
-#define MITKPOINT_H
+#ifndef MITKPOINT_H_
+#define MITKPOINT_H_
 
 
 #include <itkPoint.h>
 
-#include "mitkConstants.h"
+#include "mitkNumericConstants.h"
 #include "mitkArray.h"
 #include "mitkEqual.h"
 
@@ -44,14 +44,14 @@ namespace mitk {
 
   public:
     /** Default constructor has nothing to do. */
-    Point<TCoordRep, NPointDimension>() : itk::Point<TCoordRep, NPointDimension>() {}
+    explicit Point<TCoordRep, NPointDimension>() : itk::Point<TCoordRep, NPointDimension>() {}
 
     /** Pass-through constructors for the Array base class. */
     template< typename TPointValueType >
-    Point(const Point< TPointValueType, NPointDimension > & r):itk::Point<TCoordRep, NPointDimension>(r) {}
+    explicit Point(const Point< TPointValueType, NPointDimension > & r):itk::Point<TCoordRep, NPointDimension>(r) {}
 
     template< typename TPointValueType >
-    Point(const TPointValueType r[NPointDimension]):itk::Point<TCoordRep, NPointDimension>(r) {}
+    explicit Point(const TPointValueType r[NPointDimension]):itk::Point<TCoordRep, NPointDimension>(r) {}
 
     template< typename TPointValueType >
     Point(const TPointValueType & v):itk::Point<TCoordRep, NPointDimension>(v) {}
@@ -70,10 +70,10 @@ namespace mitk {
      * @param array the array whose values shall be copied. Must overload [] operator.
      */
     template <typename ArrayType >
-    void FromArray(const ArrayType& array)
+    void FillPoint(const ArrayType& array)
     {
       itk::FixedArray<TCoordRep, NPointDimension>* thisP = dynamic_cast<itk::FixedArray<TCoordRep, NPointDimension>* >(this);
-      mitk::FromArray<ArrayType, TCoordRep, NPointDimension>(*thisP, array);
+      mitk::FillArray<ArrayType, TCoordRep, NPointDimension>(*thisP, array);
     }
 
 
@@ -83,7 +83,7 @@ namespace mitk {
      * @param array the array which should store the values of this.
      */
     template <typename ArrayType >
-    void ToArray(ArrayType array)
+    void ToArray(ArrayType array) const
     {
       mitk::ToArray<ArrayType, TCoordRep, NPointDimension>(array, *this);
     }
@@ -132,4 +132,4 @@ namespace mitk {
 } // namespace mitk
 
 
-#endif /* MITKPOINT_H */
+#endif /* MITKPOINT_H_ */

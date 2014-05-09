@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk
 #include <mitkInteractionConst.h>
-#include <mitkTypes.h>
+#include <mitkNumericTypes.h>
 #include <mitkSurface.h>
 #include <mitkRenderingManager.h>
-#include <mitkTypes.h>
+#include <mitkNumericTypes.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkDataStorage.h>
 #include <mitkRenderingManager.h>

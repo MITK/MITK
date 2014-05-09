@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkTypes.h"
+#include "mitkNumericTypes.h"
 #include "itkScalableAffineTransform.h"
 #include "mitkMatrixConvert.h"
 

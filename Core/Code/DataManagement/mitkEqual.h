@@ -10,7 +10,7 @@
 
 #include <iomanip>
 
-#include "mitkConstants.h"
+#include "mitkNumericConstants.h"
 #include "mitkLogMacros.h"
 
 namespace mitk {

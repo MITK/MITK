@@ -1,16 +1,25 @@
-/*
- * mitkArray.h
- *
- *  Created on: Nov 11, 2013
- *      Author: wirkert
- */
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #ifndef MITKARRAY_H_
 #define MITKARRAY_H_
 
 #include <itkFixedArray.h>
 
-#include "mitkConstants.h"
+#include "mitkNumericConstants.h"
 #include "mitkEqual.h"
 
 
@@ -33,10 +42,9 @@ namespace mitk {
    * @attention this method implicitly converts between data types.
    */
   template <typename ArrayType, typename TCoordRep, unsigned int NVectorDimension>
-  void FromArray(itk::FixedArray<TCoordRep, NVectorDimension>& toArray, const ArrayType& array)
+  void FillArray(itk::FixedArray<TCoordRep, NVectorDimension>& toArray, const ArrayType& array)
   {
     itk::FixedArray<TCoordRep, NVectorDimension> vectorOrPoint;
-
     for (unsigned short int var = 0; var < NVectorDimension; ++var)
     {
       toArray[var] =  array[var];
@@ -51,11 +59,11 @@ namespace mitk {
    * @attention this method implicitly converts between data types.
    */
   template <typename ArrayType, typename TCoordRep, unsigned int NVectorDimension>
-  itk::FixedArray<TCoordRep, NVectorDimension> FromArray(const ArrayType& array)
+  itk::FixedArray<TCoordRep, NVectorDimension> FillArray(const ArrayType& array)
   {
     itk::FixedArray<TCoordRep, NVectorDimension> vectorOrPoint;
 
-    mitk::FromArray(vectorOrPoint, array);
+    mitk::FillArray(vectorOrPoint, array);
 
     return vectorOrPoint;
   }

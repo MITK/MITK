@@ -90,7 +90,7 @@ public:
 
   void Pod2Mitk(void)
   {
-    mitkMatrix3D.FromArray(podMatrix3D);
+    mitkMatrix3D.FillMatrix(podMatrix3D);
 
     TestForEquality(podMatrix3D, mitkMatrix3D);
   }

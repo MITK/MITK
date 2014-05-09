@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSurface.h"
 #include "mitkCommon.h"
-#include "mitkTypes.h"
+#include "mitkNumericTypes.h"
 #include "mitkTestingMacros.h"
 
 #include "vtkPolyData.h"

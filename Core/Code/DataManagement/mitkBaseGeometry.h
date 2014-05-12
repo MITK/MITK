@@ -57,9 +57,6 @@ namespace mitk {
   //## world-coordinate system with coordinates in millimeters
   //## and milliseconds (all are floating point values), to
   //## be accessed by GetIndexToWorldTransform()
-  //## \li a life span, i.e. a bounding box in time in ms (with
-  //## start and end time), to be accessed by GetTimeBounds().
-  //## The default is minus infinity to plus infinity.
   //## \li an origin and spacing to define the geometry
   //##
   //## BaseGeometry and its sub-classes allow converting between
@@ -362,7 +359,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Get the time bounds (in ms)
-    itkGetConstReferenceMacro(TimeBounds, TimeBounds);
+    //itkGetConstReferenceMacro(TimeBounds, TimeBounds);
 
     // a bit of a misuse, but we want only doxygen to see the following:
 #ifdef DOXYGEN_SKIP
@@ -404,7 +401,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Set the time bounds (in ms)
-    void SetTimeBounds(const TimeBounds& timebounds);
+    //void SetTimeBounds(const TimeBounds& timebounds);
 
     // ********************************** Geometry **********************************
 
@@ -590,7 +587,7 @@ namespace mitk {
 
     virtual void PostSetExtentInMM(int direction, ScalarType extentInMM);
 
-    virtual void PostSetTimeBounds(const TimeBounds& timebounds);
+    //virtual void PostSetTimeBounds(const TimeBounds& timebounds);
 
     virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
     virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
@@ -619,7 +616,7 @@ namespace mitk {
 
     unsigned int m_FrameOfReferenceID;
 
-    mitk::TimeBounds m_TimeBounds;
+    //mitk::TimeBounds m_TimeBounds;
 
     //##Documentation
     //## @brief Origin, i.e. upper-left corner of the plane

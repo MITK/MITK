@@ -104,7 +104,7 @@ class mitkBaseGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestIndexToWorld);
   MITK_TEST(TestExecuteOperation);
   MITK_TEST(TestCalculateBoundingBoxRelToTransform);
-  MITK_TEST(TestSetTimeBounds);
+  //MITK_TEST(TestSetTimeBounds);
   MITK_TEST(TestIs2DConvertable);
   MITK_TEST(TestGetCornerPoint);
   MITK_TEST(TestExtentInMM);
@@ -883,25 +883,25 @@ public:
     CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
   }
 
-  void TestSetTimeBounds(){
-    mitk::TimeBounds timeBounds;
-    timeBounds[0] = 1;
-    timeBounds[1] = 9;
+  //void TestSetTimeBounds(){
+  //  mitk::TimeBounds timeBounds;
+  //  timeBounds[0] = 1;
+  //  timeBounds[1] = 9;
 
-    DummyTestClass::Pointer dummy = DummyTestClass::New();
-    dummy->SetTimeBounds(timeBounds);
-    mitk::TimeBounds timeBounds2 = dummy->GetTimeBounds();
+  //  DummyTestClass::Pointer dummy = DummyTestClass::New();
+  //  dummy->SetTimeBounds(timeBounds);
+  //  mitk::TimeBounds timeBounds2 = dummy->GetTimeBounds();
 
-    CPPUNIT_ASSERT(timeBounds[0]==timeBounds2[0]);
-    CPPUNIT_ASSERT(timeBounds[1]==timeBounds2[1]);
+  //  CPPUNIT_ASSERT(timeBounds[0]==timeBounds2[0]);
+  //  CPPUNIT_ASSERT(timeBounds[1]==timeBounds2[1]);
 
-    //undo changes, new and changed object need to be the same!
-    timeBounds[0]=mitk::ScalarTypeNumericTraits::NonpositiveMin();
-    timeBounds[1]=mitk::ScalarTypeNumericTraits::max();
+  //  //undo changes, new and changed object need to be the same!
+  //  timeBounds[0]=mitk::ScalarTypeNumericTraits::NonpositiveMin();
+  //  timeBounds[1]=mitk::ScalarTypeNumericTraits::max();
 
-    DummyTestClass::Pointer newDummy = DummyTestClass::New();
-    CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
-  }
+  //  DummyTestClass::Pointer newDummy = DummyTestClass::New();
+  //  CPPUNIT_ASSERT(mitk::Equal(dummy,newDummy,mitk::eps,true));
+  //}
 
   void TestIs2DConvertable(){
     DummyTestClass::Pointer dummy = DummyTestClass::New();
@@ -1168,10 +1168,10 @@ public:
     DummyTestClass::Pointer dummy2 = DummyTestClass::New();
     dummy2->SetOrigin(anotherPoint);
     dummy2->SetBounds(anotherBoundingBox->GetBounds());
-    mitk::TimeBounds timeBounds;
-    timeBounds[0] = 1;
-    timeBounds[1] = 9;
-    dummy2->SetTimeBounds(timeBounds);
+    //mitk::TimeBounds timeBounds;
+    //timeBounds[0] = 1;
+    //timeBounds[1] = 9;
+    //dummy2->SetTimeBounds(timeBounds);
     dummy2->SetIndexToWorldTransform(anotherTransform);
     dummy2->SetSpacing(anotherSpacing);
 

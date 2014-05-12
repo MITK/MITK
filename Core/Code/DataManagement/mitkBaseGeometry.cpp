@@ -38,7 +38,7 @@ mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
   Initialize();
 }
 
-mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), m_TimeBounds(other.m_TimeBounds),
+mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), //m_TimeBounds(other.m_TimeBounds),
   m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin),
   m_ImageGeometry(other.m_ImageGeometry), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
 {
@@ -111,7 +111,7 @@ void mitk::BaseGeometry::Initialize()
 
   m_VtkMatrix->Identity();
 
-  m_TimeBounds[0]=ScalarTypeNumericTraits::NonpositiveMin(); m_TimeBounds[1]=ScalarTypeNumericTraits::max();
+  //m_TimeBounds[0]=ScalarTypeNumericTraits::NonpositiveMin(); m_TimeBounds[1]=ScalarTypeNumericTraits::max();
 
   m_FrameOfReferenceID = 0;
 
@@ -149,7 +149,7 @@ void
 {
   newGeometry->SetBounds(m_BoundingBox->GetBounds());
   // we have to create a new transform!!
-  newGeometry->SetTimeBounds(m_TimeBounds);
+  //newGeometry->SetTimeBounds(m_TimeBounds);
   newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
 
   if(m_IndexToWorldTransform)
@@ -728,20 +728,20 @@ mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTra
   return result;
 }
 
-void mitk::BaseGeometry::SetTimeBounds(const TimeBounds& timebounds)
-{
-  mitk::ModifiedLock lock(this);
-
-  if(m_TimeBounds != timebounds)
-  {
-    m_TimeBounds = timebounds;
-    Modified();
-  }
-  PostSetTimeBounds(timebounds);
-}
-
-void mitk::BaseGeometry::PostSetTimeBounds(const TimeBounds& timebounds)
-{}
+//void mitk::BaseGeometry::SetTimeBounds(const TimeBounds& timebounds)
+//{
+//  mitk::ModifiedLock lock(this);
+//
+//  if(m_TimeBounds != timebounds)
+//  {
+//    m_TimeBounds = timebounds;
+//    Modified();
+//  }
+//  PostSetTimeBounds(timebounds);
+//}
+//
+//void mitk::BaseGeometry::PostSetTimeBounds(const TimeBounds& timebounds)
+//{}
 
 const std::string mitk::BaseGeometry::GetTransformAsString( TransformType* transformType )
 {
@@ -940,7 +940,7 @@ void mitk::BaseGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
   os << indent << " Origin: " << this->GetOrigin() << std::endl;
   os << indent << " ImageGeometry: " << this->GetImageGeometry() << std::endl;
   os << indent << " Spacing: " << this->GetSpacing() << std::endl;
-  os << indent << " TimeBounds: " << this->GetTimeBounds() << std::endl;
+  //os << indent << " TimeBounds: " << this->GetTimeBounds() << std::endl;
 }
 
 void mitk::BaseGeometry::Modified() const{

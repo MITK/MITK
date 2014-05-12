@@ -134,7 +134,7 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
     // Find the diffusion image
     mitk::DiffusionImage<DiffusionPixelType>* diffImage;
     mitk::DataNode::Pointer correctNode;
-    mitk::Geometry3D* geometry;
+    mitk::BaseGeometry* geometry;
 
     if (m_DiffusionImage.IsNotNull())
     {

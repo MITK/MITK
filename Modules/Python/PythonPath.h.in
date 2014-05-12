@@ -14,7 +14,6 @@
 "sys.path.append('@SimpleITK_DIR@/bin')\n"\
 "sys.path.append('@SimpleITK_DIR@/lib')\n"\
 "sys.path.append('@SimpleITK_DIR@/Wrapping')\n"\
-"sys.path.append('@SimpleITK_DIR@/Wrapping/PythonPackage')\n"\
 "sys.path.append('@VTK_LIBRARY_DIRS@')\n"\
 "sys.path.append('@VTK_DIR@/Wrapping/Python')\n"\
 "sys.path.append('@VTK_DIR@/Wrapping/PythonCore')\n"\

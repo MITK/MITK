@@ -201,6 +201,7 @@ env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 env_option(MITK_USE_Poco "Use the Poco library" ON)
 env_option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 env_option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
+env_option(MITK_USE_SimpleITK "Use the SimpleITK library" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
@@ -221,6 +222,7 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 if(MITK_USE_Python)
   FIND_PACKAGE(PythonLibs REQUIRED)
   FIND_PACKAGE(PythonInterp REQUIRED)
+  set(MITK_USE_SimpleITK ON CACHE BOOL "Use the SimpleITK library" FORCE)
 endif()
 
 if(MITK_USE_Boost)
@@ -1025,7 +1027,10 @@ endif(WIN32)
 add_subdirectory(Applications)
 
 #-----------------------------------------------------------------------------
-# MITK Examples
+# MITK Examplesfind_package(SOFA REQUIRED CONFIG)
+list(APPEND ALL_INCLUDE_DIRECTORIES ${SOFA_INCLUDE_DIRS})
+list(APPEND ALL_LIBRARIES ${SOFA_LIBRARIES})
+link_directories(${SOFA_LIBRARY_DIRS})
 #-----------------------------------------------------------------------------
 
 if(MITK_BUILD_EXAMPLES)

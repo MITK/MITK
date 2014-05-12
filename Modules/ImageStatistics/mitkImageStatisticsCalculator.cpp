@@ -1147,7 +1147,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
     // Convert 2D point back to the local index coordinates of the selected
     // image
-    planarFigurePlaneGeometry->Map( it->Point, point3D );
+    planarFigurePlaneGeometry->Map( *it, point3D );
 
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil
@@ -1172,7 +1172,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
     for (it = planarFigureHolePolyline.begin(); it != end; ++it)
     {
-      planarFigurePlaneGeometry->Map(it->Point, point3D);
+      planarFigurePlaneGeometry->Map(*it, point3D);
       imageGeometry3D->WorldToIndex(point3D, point3D);
       holePoints->InsertNextPoint(point3D[i0], point3D[i1], 0);
     }

@@ -182,9 +182,6 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 ))
     return;
 
-  Geometry3D::Pointer worldGeometry = renderer->GetWorldGeometry();
-  PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(worldGeometry.GetPointer());
-
   //apply color and opacity read from the PropertyList
   this->ApplyAllProperties(renderer);
 
@@ -232,11 +229,11 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(timestep);
     Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
     assert( worldGeometry.IsNotNull() );
-    if(worldPlaneGeometry.IsNotNull())
+    if (worldGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
-      point=worldPlaneGeometry->GetOrigin();
-      normal=worldPlaneGeometry->GetNormal(); normal.Normalize();
+      point=worldGeometry->GetOrigin();
+      normal=worldGeometry->GetNormal(); normal.Normalize();
       m_Plane->SetTransform((vtkAbstractTransform*)NULL);
     }
     else

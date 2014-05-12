@@ -86,7 +86,6 @@ void USTelemedScanConverterPlugin::ReleasePlugin()
     // remove this callback from Telemed API plugin
     m_Plugin->SetCallback(NULL,USPC_BUFFER_INTERIM_OUTPUT);
   }
-  SAFE_RELEASE(m_Plugin);
 }
 
 void USTelemedScanConverterPlugin::SetOutputImage(mitk::Image::Pointer outputImage)
@@ -97,15 +96,17 @@ void USTelemedScanConverterPlugin::SetOutputImage(mitk::Image::Pointer outputIma
 STDMETHODIMP USTelemedScanConverterPlugin::SetScanConverterPlugin(IDispatch* plugin)
 {
   // make sure that there is no scan converter plugin registered already
-  ReleasePlugin();
+  this->ReleasePlugin();
 
   HRESULT hr;
 
+  // it is ok to call this method with a NULL plugin to remove
+  // a previous callback
   if (plugin == NULL)
   {
-    MITK_WARN("IUsgfwScanConverterPluginCB")("ScanConverterPlugin")
-      << "Plugin must not be NULL when calling SetScanConverterPlugin.";
-    return S_FALSE;
+    MITK_INFO("IUsgfwScanConverterPluginCB")("ScanConverterPlugin")
+      << "NULL plugin set to the scan converter. The callback for the previous plugin is removed now.";
+    return S_OK;
   }
 
   // get Telemed API plugin from the COM library

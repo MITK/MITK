@@ -185,13 +185,17 @@ Usgfw2Lib::IUsgfw2* mitk::USTelemedDevice::GetUsgMainInterface()
 
 void mitk::USTelemedDevice::SetActiveDataView(Usgfw2Lib::IUsgDataView* usgDataView)
 {
-  // scan converter plugin is conected to IUsgDataView -> a new plugin
-  // must be created when changing IUsgDataView
-  m_UsgDataView = usgDataView;
-  if ( ! m_ImageSource->CreateAndConnectConverterPlugin(m_UsgDataView, Usgfw2Lib::SCAN_MODE_B)) { return; }
+  // do nothing if the usg data view hasn't changed
+  if ( m_UsgDataView != usgDataView )
+  {
+    // scan converter plugin is connected to IUsgDataView -> a new plugin
+    // must be created when changing IUsgDataView
+    m_UsgDataView = usgDataView;
+    if ( ! m_ImageSource->CreateAndConnectConverterPlugin(m_UsgDataView, Usgfw2Lib::SCAN_MODE_B)) { return; }
 
-  // b mode control object must know about active data view
-  m_ControlsBMode->SetUsgDataView(m_UsgDataView);
+    // b mode control object must know about active data view
+    m_ControlsBMode->SetUsgDataView(m_UsgDataView);
+  }
 }
 
 void mitk::USTelemedDevice::ConnectDeviceChangeSink( )

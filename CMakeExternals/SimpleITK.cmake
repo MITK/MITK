@@ -59,6 +59,7 @@ if(MITK_USE_SimpleITK)
          -DBUILD_EXAMPLES:BOOL=OFF
          -DGDCM_DIR:PATH=${GDCM_DIR}
          -DITK_DIR:PATH=${ITK_DIR}
+         -DSWIG_DIR:PATH=${ITK_DIR}/Wrapping/Generators/SwigInterface/swig/share/swig/2.0.4
        DEPENDS ${proj_DEPENDENCIES}
       )
 

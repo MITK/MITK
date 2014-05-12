@@ -84,10 +84,18 @@ public:
    * performed.
    */
   virtual void SetPlaneGeometry( mitk::PlaneGeometry *geometry );
+              /**
+    * \deprecatedSince{2014_06} Please use SetPlaneGeometry
+    */
+    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo){SetPlaneGeometry(geo);};)
 
 
   /** \brief Returns (previously set) 2D geometry of this figure. */
   virtual const PlaneGeometry *GetPlaneGeometry() const;
+        /**
+    * \deprecatedSince{2014_06} Please use GetPlaneGeometry
+    */
+    DEPRECATED(const PlaneGeometry* GetGeometry2D(){return GetPlaneGeometry();};)
 
 
   /** \brief True if the planar figure is closed.

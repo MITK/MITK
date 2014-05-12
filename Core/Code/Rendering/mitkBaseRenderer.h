@@ -1,18 +1,18 @@
 /*===================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
 
- See LICENSE.txt or http://www.mitk.org for details.
+See LICENSE.txt or http://www.mitk.org for details.
 
- ===================================================================*/
+===================================================================*/
 
 #ifndef BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
 #define BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
@@ -55,25 +55,25 @@ namespace mitk
   class BaseLocalStorageHandler;
   class OverlayManager;
 
-//##Documentation
-//## @brief Organizes the rendering process
-//##
-//## Organizes the rendering process. A Renderer contains a reference to a
-//## DataStorage and asks the mappers of the data objects to render
-//## the data into the renderwindow it is associated to.
-//##
-//## \#Render() checks if rendering is currently allowed by calling
-//## RenderWindow::PrepareRendering(). Initialization of a rendering context
-//## can also be performed in this method.
-//##
-//## The actual rendering code has been moved to \#Repaint()
-//## Both \#Repaint() and \#Update() are declared protected now.
-//##
-//## Note: Separation of the Repaint and Update processes (rendering vs
-//## creating a vtk prop tree) still needs to be worked on. The whole
-//## rendering process also should be reworked to use VTK based classes for
-//## both 2D and 3D rendering.
-//## @ingroup Renderer
+  //##Documentation
+  //## @brief Organizes the rendering process
+  //##
+  //## Organizes the rendering process. A Renderer contains a reference to a
+  //## DataStorage and asks the mappers of the data objects to render
+  //## the data into the renderwindow it is associated to.
+  //##
+  //## \#Render() checks if rendering is currently allowed by calling
+  //## RenderWindow::PrepareRendering(). Initialization of a rendering context
+  //## can also be performed in this method.
+  //##
+  //## The actual rendering code has been moved to \#Repaint()
+  //## Both \#Repaint() and \#Update() are declared protected now.
+  //##
+  //## Note: Separation of the Repaint and Update processes (rendering vs
+  //## creating a vtk prop tree) still needs to be worked on. The whole
+  //## rendering process also should be reworked to use VTK based classes for
+  //## both 2D and 3D rendering.
+  //## @ingroup Renderer
   class MITK_CORE_EXPORT BaseRenderer: public itk::Object
   {
   public:
@@ -202,27 +202,31 @@ namespace mitk
     DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry* geometry));
 
     itkGetConstObjectMacro(WorldGeometry, BaseGeometry)
-    itkGetObjectMacro(WorldGeometry, BaseGeometry)
-    itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
-    itkGetObjectMacro(WorldTimeGeometry, TimeGeometry)
+      itkGetObjectMacro(WorldGeometry, BaseGeometry)
+      itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
+      itkGetObjectMacro(WorldTimeGeometry, TimeGeometry)
 
-    //##Documentation
-    //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
-    itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry)
+      //##Documentation
+      //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
+      itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry)
 
-    //##Documentation
-    //## @brief Get the current 2D-worldgeometry (m_CurrentWorldPlaneGeometry) used for 2D-rendering
-    itkGetConstObjectMacro(CurrentWorldPlaneGeometry, PlaneGeometry)
+      //##Documentation
+      //## @brief Get the current 2D-worldgeometry (m_CurrentWorldPlaneGeometry) used for 2D-rendering
+      itkGetConstObjectMacro(CurrentWorldPlaneGeometry, PlaneGeometry)
+      /**
+      * \deprecatedSince{2014_06} Please use GetCurrentWorldPlaneGeometry
+      */
+      DEPRECATED(const PlaneGeometry* GetCurrentWorldGeometry2D(){return GetCurrentWorldPlaneGeometry();};)
 
-    //##Documentation
-    //## Calculates the bounds of the DataStorage (if it contains any valid data),
-    //## creates a geometry from these bounds and sets it as world geometry of the renderer.
-    //##
-    //## Call this method to re-initialize the renderer to the current DataStorage
-    //## (e.g. after loading an additional dataset), to ensure that the view is
-    //## aligned correctly.
-    //## \warn This is not implemented yet.
-    virtual bool SetWorldGeometryToDataStorageBounds()
+      //##Documentation
+      //## Calculates the bounds of the DataStorage (if it contains any valid data),
+      //## creates a geometry from these bounds and sets it as world geometry of the renderer.
+      //##
+      //## Call this method to re-initialize the renderer to the current DataStorage
+      //## (e.g. after loading an additional dataset), to ensure that the view is
+      //## aligned correctly.
+      //## \warn This is not implemented yet.
+      virtual bool SetWorldGeometryToDataStorageBounds()
     {
       return false;
     }
@@ -235,14 +239,14 @@ namespace mitk
     virtual void SetDisplayGeometry(DisplayGeometry* geometry2d);
 
     itkGetConstObjectMacro(DisplayGeometry, DisplayGeometry)
-    itkGetObjectMacro(DisplayGeometry, DisplayGeometry)
+      itkGetObjectMacro(DisplayGeometry, DisplayGeometry)
 
-    //##Documentation
-    //## @brief Set/Get m_Slice which defines together with m_TimeStep the 2D geometry
-    //## stored in m_WorldTimeGeometry used as m_CurrentWorldPlaneGeometry
-    //##
-    //## \sa m_Slice
-    virtual void SetSlice(unsigned int slice);
+      //##Documentation
+      //## @brief Set/Get m_Slice which defines together with m_TimeStep the 2D geometry
+      //## stored in m_WorldTimeGeometry used as m_CurrentWorldPlaneGeometry
+      //##
+      //## \sa m_Slice
+      virtual void SetSlice(unsigned int slice);
 
     //##Documentation
     //## @brief Sets an OverlayManager which is used to add various Overlays to this
@@ -256,23 +260,23 @@ namespace mitk
 
     itkGetConstMacro(Slice, unsigned int)
 
-    //##Documentation
-    //## @brief Set/Get m_TimeStep which defines together with m_Slice the 2D geometry
-    //## stored in m_WorldTimeGeometry used as m_CurrentWorldPlaneGeometry
-    //##
-    //## \sa m_TimeStep
-    virtual void SetTimeStep(unsigned int timeStep);
+      //##Documentation
+      //## @brief Set/Get m_TimeStep which defines together with m_Slice the 2D geometry
+      //## stored in m_WorldTimeGeometry used as m_CurrentWorldPlaneGeometry
+      //##
+      //## \sa m_TimeStep
+      virtual void SetTimeStep(unsigned int timeStep);
 
     itkGetConstMacro(TimeStep, unsigned int)
 
-    //##Documentation
-    //## @brief Get the time-step of a BaseData object which
-    //## exists at the time of the currently displayed content
-    //##
-    //## Returns -1 or mitk::BaseData::m_TimeSteps if there
-    //## is no data at the current time.
-    //## \sa GetTimeStep, m_TimeStep
-    int GetTimeStep(const BaseData* data) const;
+      //##Documentation
+      //## @brief Get the time-step of a BaseData object which
+      //## exists at the time of the currently displayed content
+      //##
+      //## Returns -1 or mitk::BaseData::m_TimeSteps if there
+      //## is no data at the current time.
+      //## \sa GetTimeStep, m_TimeStep
+      int GetTimeStep(const BaseData* data) const;
 
     //##Documentation
     //## @brief Get the time in ms of the currently displayed content
@@ -303,23 +307,27 @@ namespace mitk
     //##Documentation
     //## @brief Get a data object containing the DisplayGeometry (for 2D rendering)
     itkGetObjectMacro(DisplayGeometryData, PlaneGeometryData)
-    //##Documentation
-    //## @brief Get a data object containing the WorldGeometry (for 2D rendering)
-    itkGetObjectMacro(WorldGeometryData, PlaneGeometryData)
+      //##Documentation
+      //## @brief Get a data object containing the WorldGeometry (for 2D rendering)
+      itkGetObjectMacro(WorldGeometryData, PlaneGeometryData)
 
-    //##Documentation
-    //## @brief Get a DataNode pointing to a data object containing the WorldGeometry (3D and 2D rendering)
-    itkGetObjectMacro(WorldGeometryNode, DataNode)
-    //##Documentation
-    //## @brief Get a DataNode pointing to a data object containing the DisplayGeometry (for 2D rendering)
-    itkGetObjectMacro(DisplayGeometryNode, DataNode)
-    //##Documentation
-    //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldPlaneGeometry (for 2D rendering)
-    itkGetObjectMacro(CurrentWorldPlaneGeometryNode, DataNode)
+      //##Documentation
+      //## @brief Get a DataNode pointing to a data object containing the WorldGeometry (3D and 2D rendering)
+      itkGetObjectMacro(WorldGeometryNode, DataNode)
+      //##Documentation
+      //## @brief Get a DataNode pointing to a data object containing the DisplayGeometry (for 2D rendering)
+      itkGetObjectMacro(DisplayGeometryNode, DataNode)
+      //##Documentation
+      //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldPlaneGeometry (for 2D rendering)
+      itkGetObjectMacro(CurrentWorldPlaneGeometryNode, DataNode)
+      /**
+      * \deprecatedSince{2014_06} Please use GetCurrentWorldPlaneGeometryNode
+      */
+      DEPRECATED(DataNode* GetCurrentWorldGeometry2DNode(){return GetCurrentWorldPlaneGeometryNode();};)
 
-    //##Documentation
-    //## @brief Sets timestamp of CurrentWorldPlaneGeometry and DisplayGeometry and forces so reslicing in that renderwindow
-    void SendUpdateSlice();
+      //##Documentation
+      //## @brief Sets timestamp of CurrentWorldPlaneGeometry and DisplayGeometry and forces so reslicing in that renderwindow
+      void SendUpdateSlice();
 
     //##Documentation
     //## @brief Get timestamp of last call of SetCurrentWorldPlaneGeometry
@@ -327,9 +335,14 @@ namespace mitk
     {
       return m_CurrentWorldPlaneGeometryUpdateTime;
     }
-    //##Documentation
-    //## @brief Get timestamp of last call of SetDisplayGeometry
-    unsigned long GetDisplayGeometryUpdateTime()
+    /**
+    * \deprecatedSince{2014_06} Please use GetCurrentWorldPlaneGeometryUpdateTime
+    */
+    DEPRECATED(unsigned long GetCurrentWorldGeometry2DUpdateTime(){return GetCurrentWorldPlaneGeometryUpdateTime();};)
+
+      //##Documentation
+      //## @brief Get timestamp of last call of SetDisplayGeometry
+      unsigned long GetDisplayGeometryUpdateTime()
     {
       return m_CurrentWorldPlaneGeometryUpdateTime;
     }
@@ -350,10 +363,10 @@ namespace mitk
     virtual void PickWorldPoint(const Point2D& diplayPosition, Point3D& worldPosition) const;
 
     /** \brief Determines the object (mitk::DataNode) closest to the current
-     * position by means of picking
-     *
-     * \warning Implementation currently empty for 2D rendering; intended to be
-     * implemented for 3D renderers */
+    * position by means of picking
+    *
+    * \warning Implementation currently empty for 2D rendering; intended to be
+    * implemented for 3D renderers */
     virtual DataNode* PickObject(const Point2D& /*displayPosition*/, Point3D& /*worldPosition*/) const
     {
       return NULL;
@@ -362,34 +375,34 @@ namespace mitk
     //##Documentation
     //## @brief Get the MapperSlotId to use.
     itkGetMacro(MapperID, MapperSlotId)
-    itkGetConstMacro(MapperID, MapperSlotId)
+      itkGetConstMacro(MapperID, MapperSlotId)
 
-    //##Documentation
-    //## @brief Set the MapperSlotId to use.
-    itkSetMacro(MapperID, MapperSlotId)
+      //##Documentation
+      //## @brief Set the MapperSlotId to use.
+      itkSetMacro(MapperID, MapperSlotId)
 
-    //##Documentation
-    //## @brief Has the renderer the focus?
-    itkGetMacro(Focused, bool)
-    //##Documentation
-    //## @brief Tell the renderer that it is focused. The caller is responsible for focus management,
-    //## not the renderer itself.
-    itkSetMacro(Focused, bool)
+      //##Documentation
+      //## @brief Has the renderer the focus?
+      itkGetMacro(Focused, bool)
+      //##Documentation
+      //## @brief Tell the renderer that it is focused. The caller is responsible for focus management,
+      //## not the renderer itself.
+      itkSetMacro(Focused, bool)
 
-    itkGetMacro(Size, int*)
+      itkGetMacro(Size, int*)
 
-    void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
+      void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
     void SetCameraController(CameraController* cameraController);
     itkGetObjectMacro(CameraController, CameraController)
-    itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
-    itkGetObjectMacro(CameraRotationController, CameraRotationController)
+      itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
+      itkGetObjectMacro(CameraRotationController, CameraRotationController)
 
-    itkGetMacro(EmptyWorldGeometry, bool)
+      itkGetMacro(EmptyWorldGeometry, bool)
 
-    //##Documentation
-    //## @brief Mouse event dispatchers
-    //## @note for internal use only. preliminary.
-    virtual void MousePressEvent(MouseEvent*);
+      //##Documentation
+      //## @brief Mouse event dispatchers
+      //## @note for internal use only. preliminary.
+      virtual void MousePressEvent(MouseEvent*);
     //##Documentation
     //## @brief Mouse event dispatchers
     //## @note for internal use only. preliminary.
@@ -437,7 +450,7 @@ namespace mitk
     void ForceImmediateUpdate();
 
     /** Returns number of mappers which are visible and have level-of-detail
-     * rendering enabled */
+    * rendering enabled */
     unsigned int GetNumberOfVisibleLODEnabledMappers() const;
 
     ///**
@@ -446,14 +459,14 @@ namespace mitk
     //void SetRenderingManager( mitk::RenderingManager* );
 
     /**
-     * \brief Getter for the RenderingManager that handles this instance of BaseRenderer
-     */
+    * \brief Getter for the RenderingManager that handles this instance of BaseRenderer
+    */
     virtual mitk::RenderingManager* GetRenderingManager() const;
 
     /**
-     * \brief Provides (1) world coordinates for a given mouse position and (2)
-     * translates mousePosition to Display coordinates
-     */
+    * \brief Provides (1) world coordinates for a given mouse position and (2)
+    * translates mousePosition to Display coordinates
+    */
     virtual Point3D Map2DRendererPositionTo3DWorldPosition(const Point2D& mousePosition) const;
 
     /**
@@ -508,10 +521,14 @@ namespace mitk
     //##Documentation
     //## @brief Sets m_CurrentWorldPlaneGeometry
     virtual void SetCurrentWorldPlaneGeometry(PlaneGeometry* geometry2d);
+    /**
+    * \deprecatedSince{2014_06} Please use SetCurrentWorldPlaneGeometry
+    */
+    DEPRECATED(void SetCurrentWorldGeometry2D(PlaneGeometry* geometry2d){SetCurrentWorldPlaneGeometry(geometry2d);};)
 
-    //##Documentation
-    //## @brief Sets m_CurrentWorldGeometry
-    virtual void SetCurrentWorldGeometry(BaseGeometry* geometry);
+      //##Documentation
+      //## @brief Sets m_CurrentWorldGeometry
+      virtual void SetCurrentWorldGeometry(BaseGeometry* geometry);
 
     //##Documentation
     //## @brief This method is called during the rendering process to update or render the Overlays
@@ -626,7 +643,7 @@ namespace mitk
     typedef std::set<Mapper *> LODEnabledMappersType;
 
     /** Number of mappers which are visible and have level-of-detail
-     * rendering enabled */
+    * rendering enabled */
     unsigned int m_NumberOfVisibleLODEnabledMappers;
 
     // Local Storage Handling for mappers

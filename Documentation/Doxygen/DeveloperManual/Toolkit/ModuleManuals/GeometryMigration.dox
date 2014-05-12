@@ -46,7 +46,22 @@ Here are some guidelines, how to change your code to the new geometry scheme.
 \endcode
 
 \subsection geo2ddata Rename Geometry2D... classes.
-  All Geometry2D... classes and functions are renamed to PlaneGeometry. The classes are Geometry2DData, Geometry2DDataToSurfaceFilter, Geometry2DDataMapper2D, Geometry2DDataVTKMapper. The new names are PlaneGeometryData... . An example for functions is GetGeometry2D, which is now called GetPlaneGeometry.
+  All ...Geometry2D... classes and functions are renamed to ...PlaneGeometry... .  The new names are for example PlaneGeometryData instead of Geometry2DData. An example for functions is GetGeometry2D, which is now called GetPlaneGeometry. A simple search & replace of Geometry2D should work in most cases.\n\n
+  List of all names changed (excluding variables):
+  <ul>
+    <li> Geometry2D
+    <li> Geometry2DData
+    <li> Geometry2DDataToSurfaceFilter
+    <li> Geometry2DDataMapper2D
+    <li> Geometry2DDataVTKMapper
+    <li> GetCurrentWorldGeometry2D
+    <li> GetCurrentWorldGeometry2DNode
+    <li> GetCurrentWorldGeometry2DUpdateTime
+    <li> SetCurrentWorldGeometry2D
+    <li> GetGeometry2DData
+    <li> GetGeometry2D
+    <li> SetGeometry2D
+  </ul>
 
 
 \subsection geo3d In some cases, use BaseGeometry instead of Geometry3D.
@@ -123,7 +138,7 @@ Code of PlaneGeometry:
 \endcode
 
 \subsection parametric Parametric functions are not part of BaseGeometry.
-  In Geometry3D, there were several "Parametric" functions (e.g. GetParametricExtent), which only called the non-parametric function (e.g. GetExtent). These functions are removed, please use the non-parametric implementation instead. However, in the AbstractTransformGeometry (and all subclasses), these parametric functions behave different and are still available.
+  In Geometry3D, there were several "Parametric" functions (e.g. GetParametricExtent, GetParametricTransform), which only called the non-parametric function (e.g. GetExtent, GetIndexToWorldTransform). These functions are removed, please use the non-parametric implementation instead. However, in the AbstractTransformGeometry (and all subclasses), these parametric functions behave different and are still available.
 
 \subsection floatspacing There is no float spacing any more.
   Use GetSpacing instead of GetFloatSpacing.

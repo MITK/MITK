@@ -143,7 +143,6 @@ set(CPP_FILES
   DataManagement/mitkEnumerationProperty.cpp
   DataManagement/mitkPlaneGeometryData.cpp
   DataManagement/mitkGeometry3D.cpp
-  DataManagement/mitkGeometry2D.cpp # Deprecated
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGroupTagProperty.cpp
   DataManagement/mitkImage.cpp

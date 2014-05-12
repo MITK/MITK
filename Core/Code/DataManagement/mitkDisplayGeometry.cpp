@@ -37,15 +37,15 @@ unsigned long mitk::DisplayGeometry::GetMTime() const
   return PlaneGeometry::GetMTime();
 }
 
-const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
-{
-  if(m_WorldGeometry.IsNull())
-  {
-    return this->GetTimeBounds();
-  }
-
-  return m_WorldGeometry->GetTimeBounds();
-}
+//const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
+//{
+//  if(m_WorldGeometry.IsNull())
+//  {
+//    return m_TimeBounds;
+//  }
+//
+//  return m_WorldGeometry->GetTimeBounds();
+//}
 
 // size definition methods
 

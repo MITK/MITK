@@ -102,6 +102,9 @@ public:
       m_TreatAsCircle = active;
   }
 
+  const unsigned int FEATURE_ID_MAJOR_AXIS;
+  const unsigned int FEATURE_ID_MINOR_AXIS;
+
 protected:
   PlanarEllipse();
   virtual ~PlanarEllipse();

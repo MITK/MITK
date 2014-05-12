@@ -772,7 +772,7 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
     for ( VertexContainerType::const_iterator it = polyLine.begin(); it != polyLine.end(); ++it )
     {
       // Get plane coordinates of this point of polyline (if possible)
-      if ( !this->TransformObjectToDisplay( it->Point,
+      if ( !this->TransformObjectToDisplay( *it,
                                             polyLinePoint,
                                             planarFigureGeometry,
                                             rendererGeometry,
@@ -790,7 +790,7 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
       else if ( this->IsPointNearLine( displayPosition, previousPolyLinePoint, polyLinePoint, pointProjectedOntoLine ) )
       {
         // Point is close enough to line segment --> Return index of the segment
-        return it->Index;
+        return std::distance(polyLine.begin(), it);
       }
       previousPolyLinePoint = polyLinePoint;
     }

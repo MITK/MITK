@@ -17,14 +17,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkUSUIActivator_h
 #define __mitkUSUIActivator_h
 
-#include "QmitkUSControlsCustomVideoDeviceWidget.h"
+#include "QmitkUSAbstractCustomWidget.h"
 
 // Microservices
 #include <usModuleContext.h>
 #include <usModuleActivator.h>
 
+class QmitkUSControlsCustomVideoDeviceWidget;
+
 namespace mitk
 {
+  class USUICustomWidgetFactory;
+
   /**
     * \brief Module activator for the USUI module.
     * Registers custom widget for mitk::USVideoDevice as microservice.
@@ -51,7 +55,8 @@ namespace mitk
   protected:
     us::ServiceRegistration<QmitkUSAbstractCustomWidget>  m_ServiceRegistration;
 
-    QmitkUSControlsCustomVideoDeviceWidget                m_CustomVideoDeviceWidget;
+    USUICustomWidgetFactory*                              m_CustomWidgetFactory;
+    QmitkUSControlsCustomVideoDeviceWidget*               m_CustomVideoDeviceWidget;
   };
 } // namespace mitk
 

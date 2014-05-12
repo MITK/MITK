@@ -240,7 +240,8 @@ void
   this->SetPlaneGeometry( geometry2D, 0 );
   this->SetSpacing( spacing ,true);
   this->SetEvenlySpaced();
-  this->SetTimeBounds( geometry2D->GetTimeBounds() );
+
+  //this->SetTimeBounds( geometry2D->GetTimeBounds() );
 
   assert(this->GetIndexToWorldTransform()
     != geometry2D->GetIndexToWorldTransform()); // (**) see above.
@@ -635,18 +636,21 @@ void
   }
 }
 
-void
-  mitk::SlicedGeometry3D::PostSetTimeBounds( const mitk::TimeBounds& timebounds )
-{
-  unsigned int s;
-  for ( s = 0; s < m_Slices; ++s )
-  {
-    if(m_PlaneGeometries[s].IsNotNull())
-    {
-      m_PlaneGeometries[s]->SetTimeBounds( timebounds );
-    }
-  }
-}
+//void
+//mitk::SlicedGeometry3D::SetTimeBounds( const mitk::TimeBounds& timebounds )
+//{
+//  Superclass::SetTimeBounds( timebounds );
+//
+//  unsigned int s;
+//  for ( s = 0; s < m_Slices; ++s )
+//  {
+//    if(m_Geometry2Ds[s].IsNotNull())
+//    {
+//      m_Geometry2Ds[s]->SetTimeBounds( timebounds );
+//    }
+//  }
+//  m_TimeBounds = timebounds;
+//}
 
 itk::LightObject::Pointer
   mitk::SlicedGeometry3D::InternalClone() const

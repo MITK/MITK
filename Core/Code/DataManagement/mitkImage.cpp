@@ -145,7 +145,6 @@ void AccessPixel( const mitk::PixelType ptype, void* data, const unsigned int of
     returnvalue += (((T*) data)[rgboffset + 2]);
     value = returnvalue;
   }
-
 }
 
 double mitk::Image::GetPixelValueByIndex(const mitk::Index3D &position, unsigned int timestep)
@@ -394,7 +393,6 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
     item->SetComplete(true);
     return item;
   }
-
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data, ImportMemoryManagementType importMemoryManagement)
@@ -767,14 +765,6 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
   slicedGeometry->InitializeEvenlySpaced(planegeometry, m_Dimensions[2]);
-
-  if(dimension>=4)
-  {
-    TimeBounds timebounds;
-    timebounds[0] = 0.0;
-    timebounds[1] = 1.0;
-    slicedGeometry->SetTimeBounds(timebounds);
-  }
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
@@ -1190,7 +1180,6 @@ void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
       os << indent << " NumberOfComponents: " << chPixelType.GetNumberOfComponents() << std::endl;
       os << indent << " BitsPerComponent: " << chPixelType.GetBitsPerComponent() << std::endl;
     }
-
   }
   else
   {

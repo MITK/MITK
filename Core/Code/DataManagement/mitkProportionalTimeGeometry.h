@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 
 namespace mitk {
-
   /**
   * \brief Organizes geometries over proportional time steps
   *
@@ -75,9 +74,29 @@ namespace mitk {
     virtual TimePointType    GetMaximumTimePoint () const;
 
     /**
+    * \brief Returns the first time point for which the object is valid.
+    *
+    * Returns the first valid time point for the given TimeStep. The time point
+    * is given in ms.
+    */
+    virtual TimePointType    GetMinimumTimePoint(TimeStepType step) const;
+    /**
+    * \brief Returns the last time point for which the object is valid
+    *
+    * Gives the last time point for the Geometry specified by the given TimeStep. The time point is given in ms.
+    */
+    virtual TimePointType    GetMaximumTimePoint(TimeStepType step) const;
+
+    /**
     * \brief Get the time bounds (in ms)
     */
     virtual TimeBounds GetTimeBounds( ) const;
+
+    /**
+    * \brief Get the time bounds for the given TimeStep (in ms)
+    */
+    virtual TimeBounds GetTimeBounds(TimeStepType step) const;
+
     /**
     * \brief Tests if a given time point is covered by this object
     *
@@ -201,8 +220,6 @@ namespace mitk {
     std::vector<BaseGeometry::Pointer> m_GeometryVector;
     TimePointType m_FirstTimePoint;
     TimePointType m_StepDuration;
-
   }; // end class ProportialTimeGeometry
-
 } // end namespace MITK
 #endif // ProportionalTimeGeometry_h

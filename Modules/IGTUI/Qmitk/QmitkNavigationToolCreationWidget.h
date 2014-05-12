@@ -103,7 +103,23 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
     mitk::NavigationTool::Pointer m_CreatedTool;
 
     //############## private help methods #######################
+    /** Shows a message box with the given message s. */
     void MessageBox(std::string s);
+
+    /** Hold the data nodes which are needed for the landmark widgets. */
+    mitk::DataNode::Pointer m_calLandmarkNode, m_regLandmarkNode;
+
+    /** Set the tool landmark lists in the UI.*/
+    void FillUIToolLandmarkLists(mitk::PointSet::Pointer calLandmarks, mitk::PointSet::Pointer regLandmarks);
+
+    /** Returns the tool landmark lists from the UI.
+      * @param[out] calLandmarks Returns a pointer to the calibration landmarks point set.
+      * @param[out] regLandmarks Returns a pointer to the registration landmarks point set.
+      */
+    void GetUIToolLandmarksLists(mitk::PointSet::Pointer& calLandmarks, mitk::PointSet::Pointer& regLandmarks);
+
+    /** Initializes the tool landmark lists in the UI. */
+    void InitializeUIToolLandmarkLists();
 
 };
 #endif

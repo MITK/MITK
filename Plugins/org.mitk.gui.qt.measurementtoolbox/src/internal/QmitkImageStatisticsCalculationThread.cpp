@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread():QThread(),
   m_StatisticsImage(NULL), m_BinaryMask(NULL), m_PlanarFigureMask(NULL), m_TimeStep(0),
-  m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false)
+  m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false), m_HistogramBinSize(1)
 {
 }
 
@@ -79,6 +79,16 @@ void QmitkImageStatisticsCalculationThread::SetIgnoreZeroValueVoxel(bool _arg)
 bool QmitkImageStatisticsCalculationThread::GetIgnoreZeroValueVoxel()
 {
   return this->m_IgnoreZeros;
+}
+
+void QmitkImageStatisticsCalculationThread::SetHistogramBinSize(unsigned int size)
+{
+  this->m_HistogramBinSize = size;
+}
+
+unsigned int QmitkImageStatisticsCalculationThread::GetHistogramBinSize()
+{
+  return this->m_HistogramBinSize;
 }
 
 std::string QmitkImageStatisticsCalculationThread::GetLastErrorMessage()
@@ -146,6 +156,7 @@ void QmitkImageStatisticsCalculationThread::run()
 
   calculator->SetDoIgnorePixelValue(this->m_IgnoreZeros);
   calculator->SetIgnorePixelValue(0);
+  calculator->SetHistogramBinSize( m_HistogramBinSize );
 
   for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
   {

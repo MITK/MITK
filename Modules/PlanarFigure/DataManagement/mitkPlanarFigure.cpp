@@ -17,11 +17,58 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPlanarFigure.h"
 #include "mitkPlaneGeometry.h"
-#include "mitkProperties.h"
+#include <mitkProperties.h>
 #include <mitkProportionalTimeGeometry.h>
 
-#include "algorithm"
+#include <algorithm>
 
+#ifdef __GNUC__
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif __clang__
+#  pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif _MSC_VER
+#  pragma warning (push)
+#  pragma warning (disable: 4996)
+#endif
+
+mitk::PlanarFigure::PolyLineElement::PolyLineElement(Point2D point, int index)
+  : Point(point),
+    Index(index)
+{
+}
+
+mitk::PlanarFigure::PolyLineElement::PolyLineElement(const Point2D& point)
+  : Point(point),
+    Index(-1)
+{
+}
+
+mitk::PlanarFigure::PolyLineElement::PolyLineElement(const PolyLineElement &other)
+  : Point(other.Point),
+    Index(other.Index)
+{
+}
+
+mitk::PlanarFigure::PolyLineElement& mitk::PlanarFigure::PolyLineElement::operator=(const PolyLineElement &other)
+{
+  if (this != &other)
+  {
+    Point = other.Point;
+    Index = other.Index;
+  }
+
+  return *this;
+}
+
+mitk::PlanarFigure::PolyLineElement::operator mitk::Point2D&()
+{
+  return Point;
+}
+
+mitk::PlanarFigure::PolyLineElement::operator const mitk::Point2D&() const
+{
+  return Point;
+}
 
 mitk::PlanarFigure::PlanarFigure()
 : m_SelectedControlPoint( -1 ),
@@ -33,8 +80,6 @@ mitk::PlanarFigure::PlanarFigure()
   m_FeaturesUpToDate(false),
   m_FeaturesMTime( 0 )
 {
-
-
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
 
   m_DisplaySize.first = 0.0;
@@ -469,7 +514,6 @@ bool mitk::PlanarFigure::VerifyRequestedRegion()
 
 void mitk::PlanarFigure::SetRequestedRegion(const itk::DataObject * /*data*/ )
 {
-
 }
 
 
@@ -562,12 +606,6 @@ void mitk::PlanarFigure::InitializeTimeGeometry( unsigned int timeSteps )
 {
   mitk::PlaneGeometry::Pointer geometry2D = mitk::PlaneGeometry::New();
   geometry2D->Initialize();
-
-  if ( timeSteps > 1 )
-  {
-    mitk::ScalarType timeBounds[] = {0.0, 1.0};
-    geometry2D->SetTimeBounds( timeBounds );
-  }
 
   // The geometry is propagated automatically to all time steps,
   // if EvenlyTimed is true...
@@ -701,12 +739,14 @@ void mitk::PlanarFigure::SetNumberOfHelperPolyLines( unsigned int numberOfHerlpe
   m_HelperPolyLines.resize(numberOfHerlperPolyLines);
 }
 
-
 void mitk::PlanarFigure::AppendPointToPolyLine( unsigned int index, PolyLineElement element )
 {
   if ( index < m_PolyLines.size() )
   {
-    m_PolyLines.at( index ).push_back( element );
+    if(element.Index == -1)
+      element.Index = m_PolyLines[index].size();
+
+    m_PolyLines[index].push_back(element);
     m_PolyLineUpToDate = false;
   }
   else
@@ -719,7 +759,10 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
 {
   if ( index < m_HelperPolyLines.size() )
   {
-    m_HelperPolyLines.at( index ).push_back( element );
+    if(element.Index == -1)
+      element.Index = m_HelperPolyLines[index].size();
+
+    m_HelperPolyLines[index].push_back(element);
     m_HelperLinesUpToDate = false;
   }
   else
@@ -728,3 +771,10 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
   }
 }
 
+#ifdef __GNUC__
+#  pragma GCC diagnostic error "-Wdeprecated-declarations"
+#elif __clang__
+#  pragma clang diagnostic error "-Wdeprecated-declarations"
+#elif _MSC_VER
+#  pragma warning (pop)
+#endif

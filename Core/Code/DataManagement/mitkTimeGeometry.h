@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk {
-
   /**
   * \deprecatedSince{2013_09} GlobalInteraction is deprecated. It is replaced by mitk::Dispatcher.
   *  Please use the new implementation described in \see DataInteractionPage .
@@ -71,6 +70,7 @@ namespace mitk {
     mitkClassMacro(TimeGeometry, itk::Object)
     itkCloneMacro(Self)
     itkCreateAnotherMacro(Self)
+
     /**
     * \brief Returns the number of time steps.
     *
@@ -87,19 +87,38 @@ namespace mitk {
     * time steps available it usually goes from -max to +max. The time point
     * is given in ms.
     */
-    virtual TimePointType    GetMinimumTimePoint () const = 0;
+    virtual TimePointType    GetMinimumTimePoint() const = 0;
     /**
     * \brief Returns the last time point for which the object is valid
     *
     * Gives the last time point for which a valid geometrie is saved in
     * this time geometry. The time point is given in ms.
     */
-    virtual TimePointType    GetMaximumTimePoint () const = 0;
+    virtual TimePointType    GetMaximumTimePoint() const = 0;
+
+    /**
+    * \brief Returns the first time point for which the object is valid.
+    *
+    * Returns the first valid time point for the given TimeStep. The time point
+    * is given in ms.
+    */
+    virtual TimePointType    GetMinimumTimePoint(TimeStepType step) const = 0;
+    /**
+    * \brief Returns the last time point for which the object is valid
+    *
+    * Gives the last time point for the Geometry specified by the given TimeStep. The time point is given in ms.
+    */
+    virtual TimePointType    GetMaximumTimePoint(TimeStepType step) const = 0;
 
     /**
     * \brief Get the time bounds (in ms)
     */
-    virtual TimeBounds GetTimeBounds( ) const = 0;
+    virtual TimeBounds GetTimeBounds() const = 0;
+
+    /**
+    * \brief Get the time bounds for the given TimeStep (in ms)
+    */
+    virtual TimeBounds GetTimeBounds(TimeStepType step) const = 0;
     /**
     * \brief Tests if a given time point is covered by this object
     *
@@ -281,8 +300,6 @@ namespace mitk {
     virtual void ExecuteOperation(Operation *op);
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
-
   }; // end class TimeGeometry
-
 } // end namespace MITK
 #endif // TimeGeometry_h

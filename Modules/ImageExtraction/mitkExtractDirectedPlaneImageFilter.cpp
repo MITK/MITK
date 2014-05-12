@@ -80,16 +80,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   }
 
   // Get the target timestep; if none is set, use the lowest given.
-  unsigned int timestep = 0;
-  if ( ! m_TargetTimestep )
-  {
-    ScalarType time = m_WorldGeometry->GetTimeBounds()[0];
-    if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
-    {
-      timestep = inputTimeGeometry->TimePointToTimeStep( time );
-    }
-  }
-  else timestep = m_TargetTimestep;
+  unsigned int timestep = m_TargetTimestep;
 
   if ( inputTimeGeometry->IsValidTimeStep( timestep ) == false )
   {

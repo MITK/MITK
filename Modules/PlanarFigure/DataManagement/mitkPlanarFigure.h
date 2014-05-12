@@ -60,21 +60,29 @@ public:
   mitkClassMacro( PlanarFigure, BaseData )
   itkCloneMacro( Self )
 
-  struct PolyLineElement
+  /** \brief Treat as Point2D by implicitly using conversion operators.
+    *
+    * \deprecatedSince{2014_06} "struct PolyLineElement {...};" will be changed to "typedef Point2D PolyLineElement;".
+    */
+  struct MitkPlanarFigure_EXPORT PolyLineElement
   {
-    PolyLineElement( Point2D point, int index )
-      : Point( point ), Index( index )
-    {
-    };
+    DEPRECATED(PolyLineElement(Point2D point, int index));
+    PolyLineElement(const Point2D& point);
 
-    Point2D Point;
-    int Index;
+    PolyLineElement(const PolyLineElement &other);
+    PolyLineElement& operator=(const PolyLineElement &other);
+
+    operator Point2D&();
+    operator const Point2D&() const;
+
+    DEPRECATED(Point2D Point);
+    DEPRECATED(int Index);
   };
 
   typedef itk::VectorContainer< unsigned long, bool>  BoolContainerType;
 
   typedef std::deque< Point2D > ControlPointListType;
-  typedef std::list< PolyLineElement > PolyLineType;
+  typedef std::vector< PolyLineElement > PolyLineType;
 
 
   /** \brief Sets the 2D geometry on which this figure will be placed.

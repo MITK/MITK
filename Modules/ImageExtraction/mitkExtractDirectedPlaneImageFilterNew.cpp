@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ExtractDirectedPlaneImageFilterNew::ExtractDirectedPlaneImageFilterNew()
 :m_CurrentWorldPlaneGeometry(NULL),
-m_ActualInputTimestep(-1)
+m_ActualInputTimestep(0)
 {
   MITK_WARN << "Class ExtractDirectedPlaneImageFilterNew is deprecated! Use ExtractSliceFilter instead.";
 }
@@ -33,7 +33,6 @@ mitk::ExtractDirectedPlaneImageFilterNew::~ExtractDirectedPlaneImageFilterNew()
 }
 
 void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
-
     mitk::Image::ConstPointer inputImage = ImageToImageFilter::GetInput(0);
 
     if ( !inputImage )
@@ -47,14 +46,6 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
 
     //If no timestep is set, the lowest given will be selected
     const mitk::TimeGeometry* inputTimeGeometry = this->GetInput()->GetTimeGeometry();
-    if ( m_ActualInputTimestep == -1)
-    {
-        ScalarType time = m_CurrentWorldPlaneGeometry->GetTimeBounds()[0];
-        if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
-        {
-            m_ActualInputTimestep = inputTimeGeometry->TimePointToTimeStep( time );
-        }
-    }
 
     if ( inputImage->GetDimension() > 4 || inputImage->GetDimension() < 2)
     {
@@ -85,7 +76,6 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
     }
 
     AccessFixedDimensionByItk( inputImage, ItkSliceExtraction, 3 );
-
 }//Generate Data
 
 
@@ -222,9 +212,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
 
         if ( m_ImageGeometry->IsIndexInside( inputIndex ))
         {
-
             resultSlice->SetPixel( sliceIterator.GetIndex(), inputImage->GetPixel(inputIndex) );
-
         }
         else
         {

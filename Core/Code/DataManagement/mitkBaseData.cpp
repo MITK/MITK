@@ -51,12 +51,6 @@ void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
   mitk::BaseGeometry::Pointer baseGeo = dynamic_cast<BaseGeometry*>(geo3D.GetPointer());
   baseGeo->Initialize();
 
- if ( timeSteps > 1 )
- {
-    mitk::ScalarType timeBounds[] = {0.0, 1.0};
-    baseGeo->SetTimeBounds( timeBounds );
- }
-
   // The geometry is propagated automatically to the other items,
   // if EvenlyTimed is true...
   //Old timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );

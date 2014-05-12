@@ -77,7 +77,7 @@ namespace mitk
     /// \return this objects modified time.
     virtual unsigned long GetMTime() const;
 
-    virtual const TimeBounds& GetTimeBounds() const;
+    //virtual const TimeBounds& GetTimeBounds() const;
 
     // size definition methods
 

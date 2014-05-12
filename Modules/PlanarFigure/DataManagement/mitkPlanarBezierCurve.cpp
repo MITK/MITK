@@ -34,18 +34,10 @@ mitk::PlanarBezierCurve::~PlanarBezierCurve()
 
 void mitk::PlanarBezierCurve::EvaluateFeaturesInternal()
 {
-  std::vector<Point2D> points;
-  points.reserve(m_NumberOfSegments + 1);
-
-  PolyLineType::const_iterator end = m_PolyLines[0].end();
-
-  for (PolyLineType::const_iterator it = m_PolyLines[0].begin(); it != end; ++it)
-    points.push_back(it->Point);
-
   double length = 0.0;
 
   for (unsigned int i = 0; i < m_NumberOfSegments; ++i)
-    length += points[i].EuclideanDistanceTo(points[i + 1]);
+    length += static_cast<Point2D>(m_PolyLines[0][i]).EuclideanDistanceTo(static_cast<Point2D>(m_PolyLines[0][i + 1]));
 
   this->SetQuantity(FEATURE_ID_LENGTH, length);
 }
@@ -73,7 +65,7 @@ void mitk::PlanarBezierCurve::GenerateHelperPolyLine(double, unsigned int)
   unsigned int numHelperPolyLinePoints = m_ControlPoints.size();
 
   for (unsigned int i = 0; i < numHelperPolyLinePoints; ++i)
-    this->AppendPointToHelperPolyLine(0, PolyLineElement(m_ControlPoints[i], i));
+    this->AppendPointToHelperPolyLine(0, m_ControlPoints[i]);
 }
 
 void mitk::PlanarBezierCurve::GeneratePolyLine()
@@ -83,7 +75,7 @@ void mitk::PlanarBezierCurve::GeneratePolyLine()
   const unsigned int numPolyLinePoints = m_NumberOfSegments + 1;
 
   for (unsigned int i = 0; i < numPolyLinePoints; ++i)
-    this->AppendPointToPolyLine(0, PolyLineElement(this->ComputeDeCasteljauPoint(i / static_cast<ScalarType>(m_NumberOfSegments)), i));
+    this->AppendPointToPolyLine(0, this->ComputeDeCasteljauPoint(i / static_cast<ScalarType>(m_NumberOfSegments)));
 }
 
 mitk::Point2D mitk::PlanarBezierCurve::ComputeDeCasteljauPoint(mitk::ScalarType t)

@@ -167,10 +167,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   //
   // get the world time
   //
-  PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
-  assert( worldGeometry.IsNotNull() );
-
-  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+  ScalarType time =renderer->GetTime();
   int timestep=0;
 
   if( time > ScalarTypeNumericTraits::NonpositiveMin() )
@@ -185,6 +182,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 ))
     return;
 
+  Geometry3D::Pointer worldGeometry = renderer->GetWorldGeometry();
   PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(worldGeometry.GetPointer());
 
   //apply color and opacity read from the PropertyList
@@ -232,6 +230,8 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }
 
     vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(timestep);
+    Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
+    assert( worldGeometry.IsNotNull() );
     if(worldPlaneGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
@@ -526,7 +526,6 @@ void mitk::SurfaceGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 
     node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
     node->GetFloatProperty( "back normal lenth (px)", m_BackNormalLengthInPixels, renderer );
-
   }
   else
   {
@@ -538,7 +537,5 @@ void mitk::SurfaceGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 
     node->GetFloatProperty( "back normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
     node->GetFloatProperty( "front normal lenth (px)", m_BackNormalLengthInPixels, renderer );
-
   }
 }
-

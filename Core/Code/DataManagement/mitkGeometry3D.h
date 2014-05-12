@@ -45,6 +45,9 @@ namespace mitk {
       mitkNewMacro1Param(Self,Self);
 
     itkCloneMacro(Self)
+      //itkGetConstReferenceMacro(TimeBounds, TimeBounds);
+
+      //virtual void SetTimeBounds(const TimeBounds& timebounds);
 
   protected:
     Geometry3D();

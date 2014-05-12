@@ -95,15 +95,15 @@ static void TestPlanarCrossPlacement( mitk::PlanarCross::Pointer planarCross )
   mitk::PlanarFigure::PolyLineType::const_iterator iter1 = polyLine1.begin();
 
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = iter0->Point;
+  const mitk::Point2D& pp0 = *iter0;
   iter0++;
-  const mitk::Point2D& pp1 = iter0->Point;
+  const mitk::Point2D& pp1 = *iter0;
   MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
     || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
 
-  const mitk::Point2D& pp2 = iter1->Point;
+  const mitk::Point2D& pp2 = *iter1;
   iter1++;
-  const mitk::Point2D& pp3 = iter1->Point;
+  const mitk::Point2D& pp3 = *iter1;
   MITK_TEST_CONDITION( ((pp2 == p2) && (pp3 == p3))
     || ((pp2 == p3) && (pp3 == p2)), "Correct polyline 2" );
 
@@ -155,9 +155,9 @@ static void TestPlanarCrossPlacementSingleLine(mitk::PlanarCross::Pointer planar
   MITK_TEST_CONDITION( planarCross->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = iter->Point;
+  const mitk::Point2D& pp0 = *iter;
   iter++;
-  const mitk::Point2D& pp1 = iter->Point;
+  const mitk::Point2D& pp1 = *iter;
   MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
     || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
 

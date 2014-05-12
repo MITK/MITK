@@ -1053,7 +1053,7 @@ namespace mitk
 
       // Convert 2D point back to the local index coordinates of the selected
       // image
-      mitk::Point2D point2D = it->Point;
+      mitk::Point2D point2D = *it;
       planarFigureGeometry2D->WorldToIndex(point2D, point2D);
       point2D[0] -= 0.5/m_UpsamplingFactor;
       point2D[1] -= 0.5/m_UpsamplingFactor;

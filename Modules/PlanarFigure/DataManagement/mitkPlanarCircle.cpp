@@ -135,7 +135,7 @@ void mitk::PlanarCircle::GeneratePolyLine()
 
     // ... and append it to the PolyLine.
     // No extending supported here, so we can set the index of the PolyLineElement to '0'
-    AppendPointToPolyLine( 0, PolyLineElement( polyLinePoint, 0 ) );
+    this->AppendPointToPolyLine(0, polyLinePoint);
   }
 }
 

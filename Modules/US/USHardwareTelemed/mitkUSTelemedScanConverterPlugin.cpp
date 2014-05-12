@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageWriteAccessor.h"
 
 USTelemedScanConverterPlugin::USTelemedScanConverterPlugin( )
-  : m_Plugin(NULL), m_OutputImage(NULL)
+  : m_Plugin(NULL), m_OutputImage(NULL), m_OutputImageMutex(NULL)
 {
 }
 
@@ -62,7 +62,9 @@ STDMETHODIMP USTelemedScanConverterPlugin::InterimOutBufferCB (
   int nOutY2
   )
 {
-  if ( ! m_OutputImage ) { return S_FALSE; };
+  if ( m_OutputImage.IsNull() ) { return S_FALSE; };
+
+  if ( m_OutputImageMutex.IsNotNull() ) { m_OutputImageMutex->Lock(); }
 
   // initialize mitk::Image with given image size on the first time
   if ( ! m_OutputImage->IsInitialized() )
@@ -73,8 +75,9 @@ STDMETHODIMP USTelemedScanConverterPlugin::InterimOutBufferCB (
   }
 
   // lock the image for writing an copy the given buffer into the image then
-  mitk::ImageWriteAccessor imageWriteAccessor(m_OutputImage, m_OutputImage->GetSliceData(0,0,0));
   m_OutputImage->SetSlice(pBufferOut);
+
+  if ( m_OutputImageMutex.IsNotNull() ) { m_OutputImageMutex->Unlock(); }
 
   return S_OK;
 }
@@ -88,9 +91,10 @@ void USTelemedScanConverterPlugin::ReleasePlugin()
   }
 }
 
-void USTelemedScanConverterPlugin::SetOutputImage(mitk::Image::Pointer outputImage)
+void USTelemedScanConverterPlugin::SetOutputImage(mitk::Image::Pointer outputImage, itk::FastMutexLock::Pointer outputImageMutex)
 {
   m_OutputImage = outputImage;
+  m_OutputImageMutex = outputImageMutex;
 }
 
 STDMETHODIMP USTelemedScanConverterPlugin::SetScanConverterPlugin(IDispatch* plugin)

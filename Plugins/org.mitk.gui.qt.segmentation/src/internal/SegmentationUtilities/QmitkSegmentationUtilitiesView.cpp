@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSegmentationUtilitiesView.h"
 #include "BooleanOperations/QmitkBooleanOperationsWidget.h"
+#include "ContourModelToImage/QmitkContourModelToImageWidget.h"
 #include "ImageMasking/QmitkImageMaskingWidget.h"
 #include "MorphologicalOperations/QmitkMorphologicalOperationsWidget.h"
 #include "SurfaceToImage/QmitkSurfaceToImageWidget.h"
@@ -25,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkSegmentationUtilitiesView::QmitkSegmentationUtilitiesView()
   : m_BooleanOperationsWidget(NULL),
+    m_ContourModelToImageWidget(NULL),
     m_ImageMaskingWidget(NULL),
     m_MorphologicalOperationsWidget(NULL),
     m_SurfaceToImageWidget(NULL),
@@ -47,11 +49,13 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
     : NULL;
 
   m_BooleanOperationsWidget = new QmitkBooleanOperationsWidget(timeNavigationController, parent);
+  m_ContourModelToImageWidget = new QmitkContourModelToImageWidget(timeNavigationController, parent);
   m_ImageMaskingWidget = new QmitkImageMaskingWidget(timeNavigationController, parent);
   m_MorphologicalOperationsWidget = new QmitkMorphologicalOperationsWidget(timeNavigationController, parent);
   m_SurfaceToImageWidget = new QmitkSurfaceToImageWidget(timeNavigationController, parent);
 
   this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
+  this->AddUtilityWidget(m_ContourModelToImageWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Contour Model To Image");
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
   this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
   this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/SegmentationUtilities/SurfaceToImage_48x48.png"), "Surface To Image");
@@ -77,6 +81,7 @@ void QmitkSegmentationUtilitiesView::RenderWindowPartActivated(mitk::IRenderWind
   mitk::SliceNavigationController* timeNavigationController = renderWindowPart->GetTimeNavigationController();
 
   m_BooleanOperationsWidget->SetTimeNavigationController(timeNavigationController);
+  m_ContourModelToImageWidget->SetTimeNavigationController(timeNavigationController);
   m_ImageMaskingWidget->SetTimeNavigationController(timeNavigationController);
   m_MorphologicalOperationsWidget->SetTimeNavigationController(timeNavigationController);
   m_SurfaceToImageWidget->SetTimeNavigationController(timeNavigationController);
@@ -89,6 +94,7 @@ void QmitkSegmentationUtilitiesView::RenderWindowPartActivated(mitk::IRenderWind
 void QmitkSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
   m_BooleanOperationsWidget->SetTimeNavigationController(NULL);
+  m_ContourModelToImageWidget->SetTimeNavigationController(NULL);
   m_ImageMaskingWidget->SetTimeNavigationController(NULL);
   m_MorphologicalOperationsWidget->SetTimeNavigationController(NULL);
   m_SurfaceToImageWidget->SetTimeNavigationController(NULL);

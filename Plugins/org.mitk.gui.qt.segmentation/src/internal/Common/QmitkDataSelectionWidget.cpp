@@ -16,11 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDataSelectionWidget.h"
 #include <berryPlatform.h>
+#include <mitkContourModel.h>
+#include <mitkContourModelSet.h>
 #include <mitkIDataStorageService.h>
 #include <mitkImage.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 #include <mitkSurface.h>
@@ -55,7 +58,11 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
       return mitk::NodePredicateAnd::New(
         mitk::TNodePredicateDataType<mitk::Image>::New(),
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
-
+    case QmitkDataSelectionWidget::ContourModelPredicate:
+      return mitk::NodePredicateAnd::New(
+            mitk::NodePredicateOr::New( mitk::TNodePredicateDataType<mitk::ContourModelSet>::New(),
+            mitk::TNodePredicateDataType<mitk::ContourModel>::New()),
+            mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
     default:
       assert(false && "Unknown predefined predicate!");
       return NULL;

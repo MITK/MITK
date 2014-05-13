@@ -118,6 +118,8 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
     MITK_TEST_CONDITION( mitk::Equal(posBefore1, posAfter1) == false, "Testing if tracking is producing new position values in tool 1.");
   }
 
+  // temporarly deactivated the test due to bug 17791
+  /*
   // add tool while tracking is in progress
   tracker->AddTool("while Running");
 
@@ -141,6 +143,7 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   {
     MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == false, "Testing if tracking is producing new position values for 'while running' tool.");
   }
+  */
 
   // always end with this!
   MITK_TEST_END();

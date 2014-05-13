@@ -322,6 +322,17 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
   {
     this->StopViewing();
   }
+
+  if ( m_CurrentDynamicRange != service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE)).toDouble() )
+  {
+    m_CurrentDynamicRange = service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE)).toDouble();
+
+    // update level window for the current dynamic range
+    mitk::LevelWindow levelWindow;
+    m_Node->GetLevelWindow(levelWindow);
+    levelWindow.SetAuto(m_Image, true, true);
+    m_Node->SetLevelWindow(levelWindow);
+  }
 }
 
 UltrasoundSupport::UltrasoundSupport()

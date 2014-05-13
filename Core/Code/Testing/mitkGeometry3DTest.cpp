@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 #include <fstream>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 bool testGetAxisVectorVariants(mitk::Geometry3D* geometry)
 {
@@ -184,7 +184,7 @@ int testIndexAndWorldConsistencyForIndex(mitk::Geometry3D* geometry3d)
    itk::Index<4> itkIndex4, itkIndex4b;
    itk::Index<3> itkIndex3, itkIndex3b;
    itk::Index<2> itkIndex2, itkIndex2b;
-   mitk::Index3D mitkIndex, mitkIndexb;
+   itk::Index<3> mitkIndex, mitkIndexb;
 
    itkIndex4[0] = itkIndex4[1] = itkIndex4[2] = itkIndex4[3] = 4;
    itkIndex3[0] = itkIndex3[1] = itkIndex3[2] = 6;

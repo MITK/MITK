@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVtkAbstractTransform.h"
 #include <vtkAbstractTransform.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 namespace itk {
 
@@ -78,7 +78,7 @@ TransformPoint(const InputPointType &point) const
 
   OutputPointType outputpoint;
   vnl_vector<TScalarType> vnl_vec;
-  double vtkpt[3];
+  mitk::ScalarType vtkpt[3];
   mitk::itk2vtk(point, vtkpt);
   m_VtkAbstractTransform->TransformPoint(vtkpt, vtkpt);
   mitk::vtk2itk(vtkpt, outputpoint);
@@ -96,9 +96,9 @@ TransformVector(const InputVectorType &vect) const
 
   OutputVectorType outputvector;
   vnl_vector<TScalarType> vnl_vec;
-  double vtkpt[3]={0,0,0};
-  double vtkvec[3];
-  mitk::vnl2vtk<TScalarType, double>(vect.GetVnlVector(), vtkvec);
+  mitk::ScalarType vtkpt[3]={0,0,0};
+  mitk::ScalarType vtkvec[3];
+  mitk::vnl2vtk<TScalarType, mitk::ScalarType>(vect.GetVnlVector(), vtkvec);
   m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::vtk2itk(vtkvec, outputvector);
   return outputvector;
@@ -114,9 +114,9 @@ TransformVector(const InputVnlVectorType &vect) const
   assert(m_VtkAbstractTransform!=NULL);
 
   OutputVnlVectorType outputvector;
-  double vtkpt[3]={0,0,0};
-  double vtkvec[3];
-  mitk::vnl2vtk<TScalarType, double>(vect, vtkvec);
+  mitk::ScalarType vtkpt[3]={0,0,0};
+  mitk::ScalarType vtkvec[3];
+  mitk::vnl2vtk<TScalarType, mitk::ScalarType>(vect, vtkvec);
   m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::vtk2itk(vtkvec, outputvector);
   return outputvector;
@@ -133,7 +133,7 @@ TransformCovariantVector(const InputCovariantVectorType &/*vec*/) const
 
 //  for (unsigned int i = 0; i < NDimensions; i++)
 //    {
-//    result[i] = NumericTraits<ScalarType>::Zero;
+//    result[i] = NumericTraits<mitk::ScalarType>::Zero;
 //    for (unsigned int j = 0; j < NDimensions; j++)
 //      {
 //      result[i] += m_Inverse[j][i]*vec[j]; // Inverse transposed
@@ -151,7 +151,7 @@ BackTransform(const OutputPointType &point) const
   assert(m_VtkAbstractTransform!=NULL);
 
   OutputPointType outputpoint;
-  double vtkpt[3];
+  mitk::ScalarType vtkpt[3];
   mitk::itk2vtk(point, vtkpt);
   m_InverseVtkAbstractTransform->TransformPoint(vtkpt, vtkpt);
   mitk::vtk2itk(vtkpt, outputpoint);
@@ -167,8 +167,8 @@ BackTransform(const OutputVectorType &vect ) const
   assert(m_VtkAbstractTransform!=NULL);
 
   OutputVectorType outputvector;
-  double vtkpt[3]={0,0,0};
-  double vtkvec[3];
+  mitk::ScalarType vtkpt[3]={0,0,0};
+  mitk::ScalarType vtkvec[3];
   mitk::itk2vtk(vect, vtkvec);
   m_InverseVtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::vtk2itk(vtkvec, outputvector);
@@ -184,8 +184,8 @@ BackTransform(const OutputVnlVectorType &vect ) const
   assert(m_InverseVtkAbstractTransform!=NULL);
 
   OutputVnlVectorType outputvector;
-  double vtkpt[3]={0,0,0};
-  double vtkvec[3];
+  mitk::ScalarType vtkpt[3]={0,0,0};
+  mitk::ScalarType vtkvec[3];
   mitk::itk2vtk(vect, vtkvec);
   m_InverseVtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::vtk2itk(vtkvec, outputvector);
@@ -201,7 +201,7 @@ BackTransform(const OutputCovariantVectorType &vec) const
   itkExceptionMacro( << "implement before using!" );
 //  for (unsigned int i = 0; i < NDimensions; i++)
 //    {
-//    result[i] = NumericTraits<ScalarType>::Zero;
+//    result[i] = NumericTraits<mitk::ScalarType>::Zero;
 //    for (unsigned int j = 0; j < NDimensions; j++)
 //      {
 //      result[i] += m_Matrix[j][i]*vec[j]; // Direct matrix transposed

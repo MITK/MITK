@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDiffusionFunctionCollection.h"
 #include <math.h>
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 // for Windows
 #ifndef M_PI

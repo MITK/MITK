@@ -444,7 +444,7 @@ mitk::ScalarType mitk::BaseRenderer::GetTime() const
   else
   {
     ScalarType timeInMS = m_WorldTimeGeometry->TimeStepToTimePoint(GetTimeStep());
-    if (timeInMS == ScalarTypeNumericTraits::NonpositiveMin())
+    if (timeInMS == itk::NumericTraits<mitk::ScalarType>::NonpositiveMin())
       return 0;
     else
       return timeInMS;

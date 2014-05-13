@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkGlobalInteraction.h>
 #include <mitkInteractionConst.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 #include <mitkSpaceNavigatorAddOn.h>
 #include <mitkSpaceNavigatorDriver.h>

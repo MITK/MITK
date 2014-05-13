@@ -30,7 +30,7 @@ To use the geometry classes in the right way you have to understand the three di
 		- They can be obtained by calling Geometry3D::WorldToIndex(), where &pt_mm is a point in worldcoordinates.\n 		
 	-# Index coordinate system:
 		- Index coordinates are discrete values that address voxels of a data object explicitly.
-		- Index coordinates are represented by  mitk::Index3D objects.
+		- Index coordinates are represented by  itk::Index<3> objects.
 		- Basically they are continuous index coordinates which are rounded from half integer up.
 		- E.g. (0,0) specifies the very first pixel of a 2D image, (0,1) the pixel of the next column in the same row
 		- If you have world coordinates, they can be converted to discrete index coordinates by calling

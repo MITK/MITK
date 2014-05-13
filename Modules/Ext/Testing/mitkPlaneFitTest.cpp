@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlaneFit.h>
 #include <mitkPointSet.h>
 #include <mitkGeometry2D.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkGeometryData.h>
 #include <fstream>
 

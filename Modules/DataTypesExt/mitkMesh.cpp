@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLineOperation.h"
 #include "mitkLineOperation.h"
 #include "mitkPointOperation.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 #include "mitkLine.h"

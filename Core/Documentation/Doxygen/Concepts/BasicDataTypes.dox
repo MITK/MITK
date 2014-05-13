@@ -1,0 +1,60 @@
+/**
+\page BasicDataTypesPage Numeric MITK data types and their usage.
+
+This page describes how to use very foundational data-tyes in MITK like mitk::Vector, mitk::Point and mitk::Matrix and 
+how they can interact.
+
+\tableofcontents
+
+\section Structure Structure
+
+The previously known, monolythic structure of putting every basic type into mitkVector.h has been broken and 
+mitkVector.h has been split up into several, more atomic files, namely:
+
+-# mitkNumericConstants.h : contains basic constants like mitk::ScalarType or mitk::eps
+-# mitkArray.h : copy itk::FixedArrays (like itk::Point and itk::Vector) from and to types which implement the [] operator (array-types), like e.g. Plain Old Datatypes (POD) or the opencv vector
+-# mitkPoint.h : the mitk::Point class. This is basically the itk::Point with the added ToArray and Fill members to conveniently copy from and to array-types. In MITK, a point is considered a fixed geometric location and thus cannot be summed or multiplied.
+-# mitkVector.h : the mitk::Vector class. This is an itk::Vector, but with the possiblity to implicitly convert to vnl_vector and vnl_vector_fixed. In MITK, vectors denote directions and can be summed or multiplied with scalars. 
+-# mitkMatrix.h : the mitk::Matrix class. This is an itk::Matrix with the added ToArray and Fill members to conveniently copy from and to array-types.
+-# mitkQuaternion.h : a typedef to vnl_quaternion. 
+-# mitkAffineTransform3D.h : a typedef to itk::AffineGeometryFrame<ScalarType, 3>
+-# mitkNumericTypes.h : this file includes all of the above as a convenience header
+
+The Equal methods to compare Points, Vectors, Matrices, ... have been moved into the respective files. 
+E.g., if you want to compare two vectors simply use the Equal method provided by mitkVector.h.
+
+\section Conversion Conversion between the data-types
+
+If you want to convert a mitk::Vector from or to a vnl_vector or a vnl_vector_fixed, simply write
+
+\code
+  mitkVector3D  = vnlVector3D;
+  vnlVector3D_2 = mitkVector3D;
+\endcode
+
+Unfortunately this mechanism couldn't be implemented to every type of conversion. But in any case, the ToArray and FillVector/FillPoint/FillMatrix member
+functions can be used to convert to array-types. E.g.,
+
+\code
+  cv::Vec3d cvVec3D;
+  
+  mitkVector3D.ToArray(cvVec3D);
+  mitkVector3D_2.FillVector(cvVec3D);
+\endcode
+
+No implicit conversion from mitk::Point to mitk::Vector was implemented as this would break with itk's
+concept of separating points and vectors. If you want to convert, use:
+
+\code
+  mitkVector3D  = mitkPoint3D.GetVectorFromOrigin();
+  mitkPoint3D_2 = mitkVector3D;  
+\endcode
+
+more examples of how to convert between data types can be found in the tests:
+
+-# mitkArrayTypeConversionTest.cpp
+-# mitkPointTypeConversionTest.cpp
+-# mitkVectorTypeConversionTest.cpp
+-# mitkMatrixTypeConversionTest.cpp
+
+*/

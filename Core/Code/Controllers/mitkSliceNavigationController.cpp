@@ -789,7 +789,7 @@ SliceNavigationController
                 // get the position and gray value from the image and build up status bar text
                 if(image3D.IsNotNull())
                 {
-                  Index3D p;
+                  itk::Index<3> p;
                   image3D->GetGeometry()->WorldToIndex(worldposition, p);
                   stream.precision(2);
                   stream<<"Position: <" << std::fixed <<worldposition[0] << ", " << std::fixed << worldposition[1] << ", " << std::fixed << worldposition[2] << "> mm";

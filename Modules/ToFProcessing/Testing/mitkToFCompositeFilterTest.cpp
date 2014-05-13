@@ -71,7 +71,7 @@ static bool ApplyTemporalMedianFilter(mitk::Image::Pointer& image, ItkImageType_
 
   //initialize median filtering
   std::vector<ToFScalarType> allDistances;
-  mitk::Index3D curIdx3D;
+  itk::Index<3> curIdx3D;
   ItkImageType_2D::IndexType curIdx2D;
 
   //compute median over time for each (x,y)

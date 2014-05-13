@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace mitk;
 
 template <class T>
-static void ReadPixel(const PixelType&, Image::Pointer image, const Index3D& index, ScalarType* returnValue)
+static void ReadPixel(const PixelType&, Image::Pointer image, const itk::Index<3>& index, ScalarType* returnValue)
 {
   switch (image->GetDimension())
   {
@@ -60,7 +60,7 @@ static IntensityProfile::Pointer ComputeIntensityProfile(Image::Pointer image, i
   IntensityProfile::MeasurementVectorType measurementVector;
   itk::PolyLineParametricPath<3>::OffsetType offset;
   Point3D worldPoint;
-  Index3D index;
+  itk::Index<3> index;
 
   do
   {

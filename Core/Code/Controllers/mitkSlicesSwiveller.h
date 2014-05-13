@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define SLICESSWIVELLER_H_HEADER_INCLUDED
 
 #include <mitkSlicesCoordinator.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>

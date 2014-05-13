@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkInternalTrackingTool.h>
 #include <MitkIGTExports.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <itkFastMutexLock.h>
 #include <mitkItkNonUniformBSpline.h>
 

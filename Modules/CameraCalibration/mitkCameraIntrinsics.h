@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCameraIntrinsics_h
 
 #include <mitkCommon.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <itkDataObject.h>
 #include <itkFastMutexLock.h>
 #include <cv.h>

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include "MitkExtExports.h"
 #include <mitkInteractor.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkImageAccessByItk.h>//needed by QmitkSimplexMeshes (SMDeformation.cpp and LungSegmentation.cpp)
 #include <mitkDataNode.h>
 #include <mitkSeedsImage.h>

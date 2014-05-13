@@ -95,6 +95,10 @@ set(MODULE_TESTS
   mitkInteractionEventTest.cpp
   mitkLookupTableTest.cpp
   mitkSTLFileReaderTest.cpp
+  mitkPointTypeConversionTest.cpp
+  mitkVectorTypeConversionTest.cpp
+  mitkMatrixTypeConversionTest.cpp
+  mitkArrayTypeConversionTest.cpp
   mitkSurfaceToImageFilterTest.cpp
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
@@ -107,6 +111,7 @@ set(MODULE_TESTS
   mitkPointSetDataInteractorTest.cpp
 )
 endif()
+
 
 
 # test with image filename as an extra command line parameter

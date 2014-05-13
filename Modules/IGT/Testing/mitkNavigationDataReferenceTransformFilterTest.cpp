@@ -201,6 +201,7 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
   pointC = quaternionTransform->GetMatrix() * pointC;
 
   // now subtract them from the filter landmarks and compare them to the source pos
+
   pointA = myFilter->GetSourceLandmarks()->GetPoint(0)-pointA;
   pointB = myFilter->GetSourceLandmarks()->GetPoint(1)-pointB;
   pointC = myFilter->GetSourceLandmarks()->GetPoint(2)-pointC;

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDataObject.h>
 #include <MitkIGTExports.h>
 #include <mitkCommon.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 namespace mitk {
 

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkToFTestingCommon.h>
 #include <mitkIOUtil.h>
 

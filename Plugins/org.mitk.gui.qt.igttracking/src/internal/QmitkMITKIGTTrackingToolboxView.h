@@ -213,6 +213,7 @@ public:
 
   public slots:
     void ThreadFunc();
+    void OnTimeOut();
 
   signals:
     void AutoDetectToolsFinished(bool success, QString errorMessage);

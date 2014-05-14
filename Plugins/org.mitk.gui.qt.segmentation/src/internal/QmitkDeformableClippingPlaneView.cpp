@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLookupTableProperty.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
-#include "mitkPlane.h"
 #include "mitkRenderingModeProperty.h"
 #include "mitkRotationOperation.h"
 #include "mitkSurfaceDeformationDataInteractor3D.h"
@@ -37,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkFloatArray.h"
 #include "vtkPointData.h"
 #include "vtkProperty.h"
+#include <vtkPlaneSource.h>
 
 
 const std::string QmitkDeformableClippingPlaneView::VIEW_ID = "org.mitk.views.deformableclippingplane";
@@ -257,11 +257,20 @@ void QmitkDeformableClippingPlaneView::UpdateView()
 
 void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
 {
-
-  mitk::Image::Pointer referenceImage = mitk::Image::New();
-
   //the new clipping plane
-  mitk::Plane::Pointer plane = mitk::Plane::New();
+  mitk::Surface::Pointer plane = mitk::Surface::New();
+  mitk::Image::Pointer referenceImage = mitk::Image::New();
+  vtkSmartPointer<vtkPlaneSource> planeSource = vtkSmartPointer<vtkPlaneSource>::New();
+
+  // default initialization of the clipping plane
+  planeSource->SetOrigin( -32.0, -32.0, 0.0 );
+  planeSource->SetPoint1(  32.0, -32.0, 0.0 );
+  planeSource->SetPoint2( -32.0,  32.0, 0.0 );
+  planeSource->SetResolution( 128, 128 );
+  planeSource->Update();
+
+  plane->SetVtkPolyData(planeSource->GetOutput());
+
 
   double imageDiagonal = 200;
 
@@ -319,8 +328,18 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
   }
 
   //set some properties for the clipping plane
-  plane->SetExtent(imageDiagonal * 0.9, imageDiagonal * 0.9);
-  plane->SetResolution(64, 64);
+  // plane->SetExtent(imageDiagonal * 0.9, imageDiagonal * 0.9);
+  // plane->SetResolution(64, 64);
+
+  // eequivalent to the extent and resolution function of the clipping plane
+  const double x = imageDiagonal * 0.9;
+  planeSource->SetOrigin( -x / 2.0, -x / 2.0, 0.0 );
+  planeSource->SetPoint1(  x / 2.0, -x / 2.0, 0.0 );
+  planeSource->SetPoint2( -x / 2.0,  x / 2.0, 0.0 );
+  planeSource->SetResolution( 64, 64 );
+  planeSource->Update();
+
+  plane->SetVtkPolyData(planeSource->GetOutput());
 
   // Set scalars (for colorization of plane)
   vtkFloatArray *scalars = vtkFloatArray::New();

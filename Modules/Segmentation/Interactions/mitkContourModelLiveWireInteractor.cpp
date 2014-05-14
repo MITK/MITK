@@ -190,6 +190,11 @@ bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const 
 
     newContour->SetClosed(contour->IsClosed(timestep), timestep);
 
+    // instead of leaving a single point, delete all points
+    if (newContour->GetNumberOfVertices(timestep) <= 2){
+      newContour->Clear(timestep);
+    }
+
     m_DataNode->SetData(newContour);
 
     assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
@@ -418,7 +423,7 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
       //if selected vertex is the first element search from end of contour downwards
       itDown = end;
       itDown--;
-      while(!((*itDown)->IsControlPoint)){itDown--;}
+      while(!((*itDown)->IsControlPoint) && itDown != begin){itDown--;}
 
       //move one forward as we don't want the first control point
       it++;

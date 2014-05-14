@@ -249,6 +249,7 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
   m_Controls->m_toolLabel->setText(toolLabel);
 
   m_ToolStorageFilename = "";
+
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnConnect()
@@ -857,9 +858,12 @@ void QmitkMITKIGTTrackingToolboxView::DisableTrackingConfigurationButtons()
 void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::NavigationToolStorage::Pointer newStorage, std::string newStorageName)
 {
   //first: get rid of the old one
-  m_toolStorage->UnLockStorage(); //only to be sure...
-  m_toolStorage->UnRegisterMicroservice();
-  m_toolStorage = NULL;
+  //don't reset if there is no tool storage. BugFix #17793
+  if ( m_toolStorage.IsNotNull() ){
+    m_toolStorage->UnLockStorage(); //only to be sure...
+    m_toolStorage->UnRegisterMicroservice();
+    m_toolStorage = NULL;
+  }
 
   //now: replace by the new one
   m_toolStorage = newStorage;
@@ -897,7 +901,6 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
   m_ToolStorageFilename = settings.value("toolStorageFilename", QVariant("")).toString();
 
   settings.endGroup();
-
 
   // try to deserialize the tool storage from the given tool storage file name
   if ( ! m_ToolStorageFilename.isEmpty() )

@@ -135,11 +135,17 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
 
       // that's our vtkPolyData-Surface
       vtkSmartPointer<vtkPolyData> surface2D = vtkSmartPointer<vtkPolyData>::New();
-
+      if (surface->GetVtkPolyData(timeStep) == NULL)
+      {
+        MITK_WARN << "No surface has been created from contour model. Add more points to fill contour in slice.";
+        return;
+      }
       surface2D->SetPoints(surface->GetVtkPolyData(timeStep)->GetPoints());
       surface2D->SetLines(surface->GetVtkPolyData(timeStep)->GetLines());
       surface2D->Modified();
       //surface2D->Update();
+
+
 
       // prepare the binary image's voxel grid
       vtkSmartPointer<vtkImageData> whiteImage =

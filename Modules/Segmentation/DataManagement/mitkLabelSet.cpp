@@ -182,27 +182,14 @@ void mitk::LabelSet::SetActiveLabel(int pixelValue)
 
 void mitk::LabelSet::RemoveLabel(int pixelValue)
 {
-  m_LabelContainer.erase(m_LabelContainer.find(pixelValue));
+  LabelContainerConstIteratorType it = m_LabelContainer.find(pixelValue);
+  if(it != m_LabelContainer.end())
+    m_LabelContainer.erase(it);
 }
 
 bool mitk::LabelSet::IsSelected(mitk::Label::Pointer label)
 {
   return label->GetSelected();
-}
-
-void mitk::LabelSet::RemoveSelectedLabels()
-{
-  // mitk::LabelSet::LabelContainerIteratorType _begin = m_LabelContainer.begin();
-  // mitk::LabelSet::LabelContainerIteratorType _end = m_LabelContainer.end();
-  // m_LabelContainer.erase(std::remove_if( _begin, _end, &mitk::LabelSet::IsSelected ), _end);
-  // this->m_ActiveLabel = m_LabelContainer.front();
-  // TODO: Adapt for std::map
-}
-
-void mitk::LabelSet::RemoveLabels(int begin, int count)
-{
-  // m_LabelContainer.erase(m_LabelContainer.begin()+begin, m_LabelContainer.begin()+begin+count);
-  // TODO: Adapt for std::map
 }
 
 void mitk::LabelSet::AddLabel(const mitk::Label& label )

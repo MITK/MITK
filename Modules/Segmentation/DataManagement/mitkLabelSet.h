@@ -70,14 +70,6 @@ public:
 
     /** \brief
     */
-    void RemoveSelectedLabels();
-
-    /** \brief
-    */
-    void RemoveLabels(int begin, int count);
-
-    /** \brief
-    */
     void AddLabel(const Label& label);
 
     /** \brief

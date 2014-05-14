@@ -34,6 +34,7 @@ namespace mitk
 // @brief LabelSet containing the labels corresponding to a segmentation session.
 // @ingroup Data
 //
+
 class MitkSegmentation_EXPORT LabelSet : public itk::Object
 {
 public:
@@ -41,7 +42,7 @@ public:
     mitkClassMacro( LabelSet, itk::Object );
     itkNewMacro(Self);
 
-    typedef std::vector <Label::Pointer>          LabelContainerType;
+    typedef std::map <unsigned int, Label::Pointer>             LabelContainerType;
     typedef LabelContainerType::const_iterator    LabelContainerConstIteratorType;
     typedef LabelContainerType::iterator          LabelContainerIteratorType;
 
@@ -105,7 +106,7 @@ public:
 
     /** \brief
     */
-    void SetLabelVisible(int index, bool value);
+    void SetLabelVisible(int pixelValue, bool value);
 
     /** \brief
     */
@@ -113,7 +114,7 @@ public:
 
     /** \brief
     */
-    void SetLabelLocked(int index, bool value);
+    void SetLabelLocked(int pixelValue, bool value);
 
     /** \brief
     */
@@ -121,11 +122,11 @@ public:
 
     /** \brief
     */
-    int GetLabelLayer(int index) const;
+    int GetLabelLayer(unsigned int index) const;
 
     /** \brief
     */
-    void SetLabelSelected(int index, bool value);
+    void SetLabelSelected(int pixelValue, bool value);
 
     /** \brief
     */
@@ -133,23 +134,23 @@ public:
 
     /** \brief
     */
-    void SetLabelOpacity(int index, float value);
+    void SetLabelOpacity(int pixelValue, float value);
 
     /** \brief
     */
-    float GetLabelOpacity(int index);
+    float GetLabelOpacity(int pixelValue);
 
     /** \brief
     */
-    void SetLabelVolume(int index, float value);
+    void SetLabelVolume(int pixelValue, float value);
 
     /** \brief
     */
-    float GetLabelVolume(int index);
+    float GetLabelVolume(int pixelValue);
 
     /** \brief
     */
-    void SetLabelName(int index, const std::string &name);
+    void SetLabelName(int pixelValue, const std::string &name);
 
     /** \brief
     */
@@ -169,7 +170,7 @@ public:
 
     /** \brief
     */
-    Label::ConstPointer GetLabel(int index) const;
+    Label::ConstPointer GetLabel(unsigned int index) const;
 
     /** \brief
     */
@@ -193,7 +194,8 @@ public:
 
     /** \brief
     */
-    const Point3D& GetLabelCenterOfMassCoordinates(int index);
+    const Point3D&
+    GetLabelCenterOfMassCoordinates(int index);
 
     /** \brief
     */

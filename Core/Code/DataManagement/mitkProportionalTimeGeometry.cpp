@@ -144,9 +144,19 @@ void mitk::ProportionalTimeGeometry::ReserveSpaceForGeometries(TimeStepType numb
 void mitk::ProportionalTimeGeometry::Expand(mitk::TimeStepType size)
 {
   m_GeometryVector.reserve(size);
-  while  (m_GeometryVector.size() < size)
+  if (m_GeometryVector.size() == 0)
   {
-    m_GeometryVector.push_back(Geometry3D::New());
+    while  (m_GeometryVector.size() < size)
+    {
+      m_GeometryVector.push_back(Geometry3D::New());
+    }
+  } else
+  {
+    while (m_GeometryVector.size() < size)
+    {
+      Geometry3D::Pointer clone = m_GeometryVector[0]->Clone();
+      m_GeometryVector.push_back(clone);
+    }
   }
 }
 

@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 
 namespace mitk {
-
   /**
   * \brief Organizes geometries over proportional time steps
   *
@@ -154,7 +153,9 @@ namespace mitk {
     /**
     * \brief Expands the time geometry to the given number of time steps.
     *
-    * Initializes the new time steps with empty geometries.
+    * Initializes the new time steps with empty geometries if no timesteps
+    * in the geometry so far. Otherwise fills the new times steps with
+    * clones of the first time step.
     * Shrinking is not supported.
     */
     virtual void Expand(TimeStepType size);
@@ -200,8 +201,6 @@ namespace mitk {
     std::vector<Geometry3D::Pointer> m_GeometryVector;
     TimePointType m_FirstTimePoint;
     TimePointType m_StepDuration;
-
   }; // end class ProportialTimeGeometry
-
 } // end namespace MITK
 #endif // ProportionalTimeGeometry_h

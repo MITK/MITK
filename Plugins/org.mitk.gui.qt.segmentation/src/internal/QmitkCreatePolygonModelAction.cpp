@@ -54,7 +54,6 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
 
   try
   {
-
     // Get preference properties for smoothing and decimation
     IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
     IPreferences::Pointer segPref = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");

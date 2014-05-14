@@ -38,7 +38,7 @@ namespace mitk
   * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
   */
 
-  class DEPRECATED() MITK_CORE_EXPORT MouseMovePointSetInteractor : public PointSetInteractor
+  class MITK_CORE_EXPORT MouseMovePointSetInteractor : public PointSetInteractor
   {
   public:
     mitkClassMacro(MouseMovePointSetInteractor, Interactor);

@@ -427,12 +427,11 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   }
 }
 
-void QmitkLabelSetTableWidget::InsertItem()
+void QmitkLabelSetTableWidget::InsertItem(const mitk::Label * label)
 {
-  int index = this->rowCount();
   //m_LabelStringList.append( QString::fromStdString(label->GetName()) );
 
-  const mitk::Color& color = m_LabelSetImage->GetLabelColor(index);
+  const mitk::Color& color = label->GetColor();
 
   QString styleSheet = "background-color:rgb(";
   styleSheet.append(QString::number(color[0]*255));
@@ -443,9 +442,10 @@ void QmitkLabelSetTableWidget::InsertItem()
   styleSheet.append(")");
 
   int colWidth = (this->columnWidth(NAME_COL) < 180) ? 180 : this->columnWidth(NAME_COL)-2;
-  QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(index).c_str(), Qt::ElideMiddle, colWidth);
+  QString text = fontMetrics().elidedText(label->GetName(), Qt::ElideMiddle, colWidth);
   QTableWidgetItem *nameItem = new QTableWidgetItem(text);
   nameItem->setTextAlignment(Qt::AlignCenter | Qt::AlignLeft);
+  nameItem->setData(Qt::UserRole,QVariant(label->GetPixelValue()));
 
   QPushButton * pbColor = new QPushButton(this);
   pbColor->setFixedSize(24,24);
@@ -468,7 +468,7 @@ void QmitkLabelSetTableWidget::InsertItem()
   pbLocked->setIconSize(QSize(24,24));
   pbLocked->setCheckable(true);
   pbLocked->setToolTip("Lock/unlock label");
-  pbLocked->setChecked(!m_LabelSetImage->GetLabelLocked(index));
+  pbLocked->setChecked(!label->GetLocked());
   //pbLocked->setEnabled(!isBackground);
   connect( pbLocked, SIGNAL(clicked()), this, SLOT(OnLockedButtonClicked()) );
 
@@ -484,7 +484,7 @@ void QmitkLabelSetTableWidget::InsertItem()
   pbVisible->setCheckable(true);
   pbVisible->setToolTip("Show/hide label");
 //  pbVisible->setEnabled(!isBackground);
-  pbVisible->setChecked(!m_LabelSetImage->GetLabelVisible(index));
+  pbVisible->setChecked(!label->GetVisible());
 
   connect( pbVisible, SIGNAL(clicked()), this, SLOT(OnVisibleButtonClicked()) );
 
@@ -497,7 +497,8 @@ void QmitkLabelSetTableWidget::InsertItem()
   this->setCellWidget(row, 2, pbColor);
   this->setCellWidget(row, 3, pbVisible);
   this->selectRow(row);
-  m_LabelSetImage->SetActiveLabel(row);
+
+  m_LabelSetImage->SetActiveLabel(label->GetPixelValue());
   m_ToolManager->WorkingDataModified.Send();
   emit activeLabelChanged(row);
 
@@ -935,11 +936,12 @@ void QmitkLabelSetTableWidget::Reset()
   if (m_LabelSetImage.IsNotNull()) // sometimes Reset() is correctly called without a labelset image
   {
     // add all labels
-    int counter = 0;
-    while (counter != m_LabelSetImage->GetNumberOfLabels())
+    mitk::LabelSet::LabelContainerConstIteratorType it = m_LabelSetImage->GetLabelSet()->IteratorBegin();
+    mitk::LabelSet::LabelContainerConstIteratorType end = m_LabelSetImage->GetLabelSet()->IteratorEnd();
+    while (it != end)
     {
-      this->InsertItem();
-      ++counter;
+      this->InsertItem(it->second);
+      it++;
     }
   }
 }

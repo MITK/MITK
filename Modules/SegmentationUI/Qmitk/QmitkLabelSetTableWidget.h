@@ -133,7 +133,7 @@ class MitkSegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     void SetActiveLabelSetImage(mitk::LabelSetImage* image);
 
     /// \brief Inserts a new label at the end of the table.
-    virtual void InsertItem();
+    virtual void InsertItem(const mitk::Label *label);
 
     void WaitCursorOn();
 

@@ -61,10 +61,10 @@ class MitkSegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     void LabelRemoved();
 
     /// \brief A label was modified in the LabelSet.
-    void LabelModified(int);
+    void LabelModified(int rowIndex);
 
     /// \brief The active label was changed in the LabelSet.
-    void ActiveLabelChanged(int);
+    void ActiveLabelChanged(int rowIndex);
 
     /// \brief All labels were modified in the LabelSet.
     void AllLabelsModified();

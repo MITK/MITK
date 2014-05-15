@@ -263,21 +263,21 @@ void mitk::LabelSet::SetLookupTable( mitk::LookupTable* lut)
 
 void mitk::LabelSet::ResetLabels()
 {
-  LabelContainerType::iterator _end = m_LabelContainer.end();
-  LabelContainerType::iterator _it = m_LabelContainer.begin();
-  int value = 0;
-  double rgba[4];
-  for (; _it!=_end; ++_it, ++value)
-  {
-    _it->second->SetIndex(value);
-    _it->second->SetSelected(false);
-    const mitk::Color& color = _it->second->GetColor();
-    rgba[0] = color.GetRed();
-    rgba[1] = color.GetGreen();
-    rgba[2] = color.GetBlue();
-    rgba[3] = _it->second->GetOpacity();
-    m_LookupTable->SetTableValue(_it->second->GetIndex(),rgba);
-  }
+//  LabelContainerType::iterator _end = m_LabelContainer.end();
+//  LabelContainerType::iterator _it = m_LabelContainer.begin();
+//  int value = 0;
+//  double rgba[4];
+//  for (; _it!=_end; ++_it, ++value)
+//  {
+//    //_it->second->SetPixelValue(value);
+//    _it->second->SetSelected(false);
+//    const mitk::Color& color = _it->second->GetColor();
+//    rgba[0] = color.GetRed();
+//    rgba[1] = color.GetGreen();
+//    rgba[2] = color.GetBlue();
+//    rgba[3] = _it->second->GetOpacity();
+//    m_LookupTable->SetTableValue(_it->second->GetPixelValue(),rgba);
+//  }
 }
 
 int mitk::LabelSet::GetActiveLabelLayer() const

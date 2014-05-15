@@ -253,41 +253,42 @@ void QmitkLabelSetTableWidget::AllLabelsModified( )
     this->LabelModified(i);
 }
 
-void QmitkLabelSetTableWidget::ActiveLabelChanged(int index)
+void QmitkLabelSetTableWidget::ActiveLabelChanged(int rowIndex)
 {
   if (!m_BlockEvents)
   {
-    QTableWidgetItem* nameItem = this->item(index, NAME_COL);
+    QTableWidgetItem* nameItem = this->item(rowIndex, NAME_COL);
     if (!nameItem) return;
     this->clearSelection();
     this->setSelectionMode(QAbstractItemView::SingleSelection);
-    this->selectRow(index);
+    this->selectRow(rowIndex);
     this->scrollToItem(nameItem);
     this->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    emit activeLabelChanged(index);
+    emit activeLabelChanged(rowIndex);
   }
 }
 
-void QmitkLabelSetTableWidget::LabelModified( int index )
+void QmitkLabelSetTableWidget::LabelModified( int rowIndex )
 {
-  QTableWidgetItem* nameItem = this->item(index,NAME_COL);
+  QTableWidgetItem* nameItem = this->item(rowIndex,NAME_COL);
   if (!nameItem) return;
 
+  int pixelValue = nameItem->data(Qt::UserRole).toInt();
   int colWidth = (this->columnWidth(NAME_COL) < 180) ? 180 : this->columnWidth(NAME_COL)-2;
-  QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(index).c_str(), Qt::ElideMiddle, colWidth);
+  QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(pixelValue).c_str(), Qt::ElideMiddle, colWidth);
 //  QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(index).c_str(), Qt::ElideMiddle, this->columnWidth(NAME_COL)-2);
   nameItem->setText(text);
 
   QPushButton* button;
-  button = (QPushButton*) this->cellWidget(index,LOCKED_COL);
+  button = (QPushButton*) this->cellWidget(rowIndex,LOCKED_COL);
   if (!button) return;
 
-  button->setChecked(!m_LabelSetImage->GetLabelLocked(index));
+  button->setChecked(!m_LabelSetImage->GetLabelLocked(pixelValue));
 
-  button = (QPushButton*) this->cellWidget(index,COLOR_COL);
+  button = (QPushButton*) this->cellWidget(rowIndex,COLOR_COL);
   if (!button) return;
 
-  const mitk::Color& color = m_LabelSetImage->GetLabelColor(index);
+  const mitk::Color& color = m_LabelSetImage->GetLabelColor(pixelValue);
   button->setAutoFillBackground(true);
   QColor qcolor(color[0]*255,color[1]*255,color[2]*255);
   QString styleSheet = "background-color:rgb(";
@@ -299,7 +300,7 @@ void QmitkLabelSetTableWidget::LabelModified( int index )
   styleSheet.append(")");
   button->setStyleSheet(styleSheet);
 
-  button = (QPushButton*) this->cellWidget(index,VISIBLE_COL);
+  button = (QPushButton*) this->cellWidget(rowIndex,VISIBLE_COL);
   if (!button) return;
 
   button->setChecked(!m_LabelSetImage->GetLabelVisible(pixelValue));

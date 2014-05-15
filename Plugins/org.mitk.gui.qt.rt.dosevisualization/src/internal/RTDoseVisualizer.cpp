@@ -57,6 +57,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSliceNavigationController.h"
 
+#include "vtkDecimatePro.h"
+
 const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualization";
 
 RTDoseVisualizer::RTDoseVisualizer()
@@ -579,6 +581,9 @@ void RTDoseVisualizer::UpdateStdIsolines()
         ++count;
         vtkSmartPointer<vtkContourFilter> isolineFilter = vtkSmartPointer<vtkContourFilter>::New();
 //        isolineFilter->SetInputData(reslicedImage->GetVtkImageData());
+        isolineFilter->ComputeNormalsOff();
+        isolineFilter->ComputeGradientsOff();
+        isolineFilter->ComputeScalarsOff();
         isolineFilter->SetInputData(image->GetVtkImageData());
         isolineFilter->GenerateValues(1,doseIT->GetDoseValue()*pref,doseIT->GetDoseValue()*pref);
         isolineFilter->Update();
@@ -586,14 +591,21 @@ void RTDoseVisualizer::UpdateStdIsolines()
         polyData=isolineFilter->GetOutput();
 
         mitk::Surface::Pointer surface = mitk::Surface::New();
-        surface->SetVtkPolyData(polyData);
+
+        vtkSmartPointer<vtkDecimatePro> deciFilter = vtkSmartPointer<vtkDecimatePro>::New();
+        deciFilter->SetTargetReduction(0.4);
+        MITK_INFO << "REDUCTION: " << deciFilter->GetTargetReduction() << endl;
+        deciFilter->SetInputData(polyData);
+        deciFilter->Update();
+
+        surface->SetVtkPolyData(deciFilter->GetOutput());
+//        surface->SetVtkPolyData(polyData);
 //        surface->SetGeometry(reslicedImage->GetGeometry()->Clone());
         surface->SetGeometry(image->GetGeometry()->Clone());
         mitk::Vector3D spacing;
         spacing.Fill(1);
         surface->GetGeometry()->SetSpacing(spacing);
 //        surface->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
-
 
         mitk::DataNode::Pointer isoNode = mitk::DataNode::New();
         isoNode->SetData(surface);

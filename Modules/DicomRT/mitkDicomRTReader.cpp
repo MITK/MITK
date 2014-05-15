@@ -322,7 +322,8 @@ namespace mitk
     return resultUid;
   }
 
-  mitk::DataNode::Pointer DicomRTReader::LoadRTDose(DcmDataset* dataset, char* filename)
+  mitk::DataNode::Pointer DicomRTReader::
+      LoadRTDose(DcmDataset* dataset, char* filename)
   {
     std::string name = filename;
     itk::FilenamesContainer file;
@@ -338,7 +339,8 @@ namespace mitk
       return 0;
     }
 
-    mitk::Image::Pointer originalImage = dynamic_cast<mitk::Image*>(originalNode->GetData());
+    mitk::Image::Pointer originalImage
+        = dynamic_cast<mitk::Image*>(originalNode->GetData());
 
     DRTDoseIOD doseObject;
     OFCondition result = doseObject.read(*dataset);
@@ -367,10 +369,13 @@ namespace mitk
   }
 
   template<typename TPixel, unsigned int VImageDimension>
-  void DicomRTReader::MultiplayGridScaling(itk::Image<TPixel,VImageDimension>* image , Float32 gridscale)
+  void DicomRTReader::MultiplayGridScaling(itk::Image<TPixel,
+                                           VImageDimension>* image,
+                                           Float32 gridscale)
   {
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
-    itk::ImageRegionIterator<InputImageType> it( image, image->GetRequestedRegion() );
+    itk::ImageRegionIterator<InputImageType> it(image,
+                                                image->GetRequestedRegion());
     for(it=it.Begin(); !it.IsAtEnd(); ++it)
     {
       it.Set(it.Get()*gridscale);

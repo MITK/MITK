@@ -130,9 +130,13 @@ public:
   void AddLabel(const mitk::Label& label);
 
   /**
+    * \brief    */
+  bool ExistLabel(const int pixelValue, int layer = -1);
+
+  /**
     * \brief
   */
-  void MergeLabels(std::vector<int>& indexes, int index, int layer = -1);
+  void MergeLabels(std::vector<int>& VectorOfLablePixelValues, int index, int layer = -1);
 
   /**
     * \brief
@@ -141,7 +145,7 @@ public:
 
   /**
     * \brief  */
-  void EraseLabel(int index, bool reorder, int layer = -1);
+  void EraseLabel(int pixelValue, int layer = -1);
 
   /**
     * \brief  */
@@ -209,15 +213,15 @@ public:
 
   /**
     * \brief  */
-  void RemoveLabel(int index, int layer = -1);
+  void RemoveLabel(int pixelValue, int layer = -1);
 
   /**
     * \brief  */
-  void RemoveLabels(std::vector<int>& indexes, int layer = -1);
+  void RemoveLabels(std::vector<int>& VectorOfLabelPixelValues, int layer = -1);
 
   /**
     * \brief  */
-  void EraseLabels(std::vector<int>& indexes, int layer = -1);
+  void EraseLabels(std::vector<int>& VectorOfLabelPixelValues, int layer = -1);
 
   /**
     * \brief  */
@@ -237,7 +241,7 @@ public:
 
   /**
     * \brief  */
-  int GetActiveLabelIndex(int layer = -1) const;
+  int GetActiveLabelPixelValue(int layer = -1) const;
 
   /**
     * \brief  */

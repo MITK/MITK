@@ -136,7 +136,7 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(toolManager->GetWorkingData(0)->GetData());
   assert(workingImage);
 
-  int activePixelValue = workingImage->GetActiveLabel()->GetIndex();
+  int activePixelValue = workingImage->GetActiveLabel()->GetPixelValue();
 
   if (activePixelValue == 0) // if exterior is the active label
   {

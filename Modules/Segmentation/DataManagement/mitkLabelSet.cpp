@@ -33,7 +33,7 @@ void mitk::LabelSet::Initialize(const LabelSet* other)
   if (!other)
     mitkThrow() << "Trying to initialize with NULL input.";
   m_LabelContainer = other->m_LabelContainer;
-  m_ActiveLabel = m_LabelContainer[other->GetActiveLabelIndex()];
+  m_ActiveLabel = m_LabelContainer[other->GetActiveLabelPixelValue()];
 }
 
 mitk::LabelSet::~LabelSet()
@@ -159,9 +159,9 @@ void mitk::LabelSet::SetAllLabelsVisible(bool value)
   for(; _it!=_end; ++_it)
   {
     _it->second->SetVisible(value);
-    m_LookupTable->GetTableValue(_it->second->GetIndex(),rgba);
+    m_LookupTable->GetTableValue(_it->second->GetPixelValue(),rgba);
     rgba[3] = value ? _it->second->GetOpacity() : 0.0;
-    m_LookupTable->SetTableValue(_it->second->GetIndex(),rgba);
+    m_LookupTable->SetTableValue(_it->second->GetPixelValue(),rgba);
   }
 }
 
@@ -204,7 +204,11 @@ void mitk::LabelSet::AddLabel(const mitk::Label& label )
   newLabel->SetLocked( label.GetLocked() );
   newLabel->SetOpacity( label.GetOpacity() );
   newLabel->SetVolume( label.GetVolume() );
-  newLabel->SetIndex( m_LabelContainer.size() );
+  if(label.GetPixelValue() == -1)
+    newLabel->SetPixelValue( m_LabelContainer.size() );
+  else
+    newLabel->SetPixelValue( label.GetPixelValue()) ;
+
   newLabel->SetLayer( m_Layer );
 
   const mitk::Color& color = label.GetColor();
@@ -215,7 +219,7 @@ void mitk::LabelSet::AddLabel(const mitk::Label& label )
   rgba[3] = label.GetOpacity();
   m_LookupTable->SetTableValue( m_LabelContainer.size(), rgba );
 
-  m_LabelContainer[newLabel->GetIndex()] = newLabel;
+  m_LabelContainer[newLabel->GetPixelValue()] = newLabel;
   m_ActiveLabel = newLabel;
 }
 
@@ -226,22 +230,7 @@ void mitk::LabelSet::AddLabel(const std::string& name, const mitk::Color& color 
   mitk::Label::Pointer newLabel = mitk::Label::New();
   newLabel->SetName(name);
   newLabel->SetColor(color);
-  newLabel->SetOpacity(0.4);
-  newLabel->SetVolume(0.0);
-  newLabel->SetVisible(true);
-  newLabel->SetLocked(false);
-  newLabel->SetIndex( m_LabelContainer.size());
-  newLabel->SetLayer( m_Layer );
-  m_LabelContainer[newLabel->GetIndex()] = newLabel;
-
-  double rgba[4];
-  rgba[0] = color.GetRed();
-  rgba[1] = color.GetGreen();
-  rgba[2] = color.GetBlue();
-  rgba[3] = newLabel->GetOpacity();
-  m_LookupTable->SetTableValue( newLabel->GetIndex(), rgba );
-
-  m_ActiveLabel = newLabel;
+  AddLabel(*newLabel);
 }
 
 void mitk::LabelSet::RenameLabel(int index, const std::string& name, const mitk::Color& color)
@@ -297,9 +286,9 @@ int mitk::LabelSet::GetLabelLayer(unsigned int pixelValue) const
   return ( it != m_LabelContainer.end() )? it->second->GetLayer() : 0;
 }
 
-int mitk::LabelSet::GetActiveLabelIndex() const
+int mitk::LabelSet::GetActiveLabelPixelValue() const
 {
-  return this->GetActiveLabel()->GetIndex();
+  return this->GetActiveLabel()->GetPixelValue();
 }
 
 mitk::Label::ConstPointer mitk::LabelSet::GetLabel(unsigned int pixelValue) const

@@ -139,7 +139,7 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
   int activeLayer = workingImage->GetActiveLayer();
-  int activePixelValue = workingImage->GetActiveLabel(activeLayer)->GetIndex();
+  int activePixelValue = workingImage->GetActiveLabel(activeLayer)->GetPixelValue();
 
 /*
   unsigned int rowSize = originalPicSlice->n[0];

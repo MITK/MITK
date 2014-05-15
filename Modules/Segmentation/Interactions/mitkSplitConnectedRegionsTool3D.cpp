@@ -133,7 +133,7 @@ void mitk::SplitConnectedRegionsTool3D::Run()
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
   assert(workingImage);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 

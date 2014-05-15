@@ -177,7 +177,7 @@ void LabelSetImageReader::GenerateData()
     label->SetLocked(_locked);
     label->SetVisible(_visible);
     label->SetLayer(_layer);
-    label->SetIndex(_index);
+    label->SetPixelValue(_index);
     if (_index != 0)
       output->AddLabel(*label);
   }

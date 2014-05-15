@@ -86,8 +86,8 @@ public:
     const mitk::Color& GetColor() const
     { return m_Color; };
 
-    itkSetMacro(Index, int);
-    itkGetConstMacro(Index, int);
+    itkSetMacro(PixelValue, int);
+    itkGetConstMacro(PixelValue, int);
 
     itkSetMacro(Layer, int);
     itkGetConstMacro(Layer, int);
@@ -111,7 +111,7 @@ protected:
     std::string m_LatinName;
     float m_Volume;
     std::string m_LastModified;
-    int m_Index;
+    int m_PixelValue;
     int m_Layer;
     mitk::Color m_Color;
     mitk::Point3D m_CenterOfMassIndex;

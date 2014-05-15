@@ -84,7 +84,7 @@ void mitk::FillHolesTool3D::Run()
 
   CurrentlyBusy.Send(true);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
   m_PreviewNode->SetProperty("outline binary", BoolProperty::New(false) );
   m_PreviewNode->SetOpacity(0.3);
 

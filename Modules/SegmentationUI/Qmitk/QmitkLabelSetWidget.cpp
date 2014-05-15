@@ -430,12 +430,12 @@ void QmitkLabelSetWidget::UpdateControls()
   m_Controls.m_lblCaption->setText(captionText.str().c_str());
 }
 
-void QmitkLabelSetWidget::OnActiveLabelChanged(int activeLabel)
+void QmitkLabelSetWidget::OnActiveLabelChanged(int pixelValue)
 {
   mitk::SurfaceBasedInterpolationController* interpolator = mitk::SurfaceBasedInterpolationController::GetInstance();
   if (interpolator)
   {
-    interpolator->SetActiveLabel(activeLabel);
+    interpolator->SetActiveLabel(pixelValue);
   }
 }
 

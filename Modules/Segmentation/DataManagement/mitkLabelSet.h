@@ -166,7 +166,7 @@ public:
 
     /** \brief
     */
-    int GetActiveLabelIndex() const;
+    int GetActiveLabelPixelValue() const;
 
     /** \brief
     */

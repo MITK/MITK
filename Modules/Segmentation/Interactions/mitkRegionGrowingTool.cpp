@@ -165,7 +165,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (StateMachineAction*, InteractionEv
          initialWorkingOffset >= 0 )
     {
       // 3. determine the pixel value under the last click
-      m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+      m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
       const mitk::Color& color = workingImage->GetActiveLabelColor();
       FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
       m_OriginalPicSlice = mitkIpPicNew();

@@ -95,7 +95,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 
   int numberOfLayers = image->GetNumberOfLayers();
   int activeLayer = image->GetActiveLayer();
-  int activeLabel = image->GetActiveLabelIndex();
+  int activeLabel = image->GetActiveLabelPixelValue();
   float opacity = 1.0f;
   node->GetOpacity( opacity, renderer, "opacity" );
 

@@ -74,7 +74,7 @@ void mitk::SegTool3D::AcceptPreview()
   assert(workingImage);
 
   //check if active label has changed in the meanwhile (between Run and AcceptPreview)
-  if (m_PaintingPixelValue != workingImage->GetActiveLabelIndex())
+  if (m_PaintingPixelValue != workingImage->GetActiveLabelPixelValue())
   {
     m_PreviewNode->SetVisibility(false);
     m_PreviewImage = NULL;

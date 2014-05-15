@@ -96,7 +96,7 @@ bool mitk::SubtractContourTool::OnInvertLogic(StateMachineAction*, InteractionEv
     assert(workingNode);
     LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
     assert(workingImage);
-    m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
     const mitk::Color& color = workingImage->GetActiveLabelColor();
     FeedbackContourTool::SetFeedbackContourColor(color.GetRed(), color.GetGreen(), color.GetBlue());
   }

@@ -87,7 +87,7 @@ void mitk::MedianTool3D::Run()
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
 
   CurrentlyBusy.Send(true);
 

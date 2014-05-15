@@ -27,7 +27,7 @@ m_Filled(true),
 m_Exterior(false),
 m_Opacity(0.6),
 m_Volume(0.0),
-m_Index(0),
+m_PixelValue(-1),
 m_Layer(0)
 {
 
@@ -46,7 +46,7 @@ mitk::Label::Label(const Label& other)
   this->m_LatinName = other.GetLatinName();
   this->m_Volume = other.GetVolume();
   this->m_LastModified = other.GetLastModified();
-  this->m_Index = other.GetIndex();
+  this->m_PixelValue = other.GetPixelValue();
   this->m_Layer = other.GetLayer();
   this->m_Color = other.GetColor();
 }

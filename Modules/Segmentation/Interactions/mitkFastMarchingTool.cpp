@@ -259,7 +259,7 @@ void mitk::FastMarchingTool::AcceptPreview()
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
 
   CurrentlyBusy.Send(true);
 

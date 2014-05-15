@@ -87,7 +87,7 @@ private slots:
   void OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges );
 
   // reaction to the button "Change Label"
-  void OnActiveLabelChanged(int);
+  void OnActiveLabelChanged(int pixelValue);
 
   // reaction to the button "Add Layer"
   void OnAddLayer();

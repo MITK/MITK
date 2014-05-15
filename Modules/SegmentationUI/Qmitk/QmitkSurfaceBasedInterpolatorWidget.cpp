@@ -274,7 +274,7 @@ void QmitkSurfaceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
     }
 
     m_SurfaceBasedInterpolatorController->SetWorkingImage(m_WorkingImage);
-    m_SurfaceBasedInterpolatorController->SetActiveLabel(m_WorkingImage->GetActiveLabelIndex());
+    m_SurfaceBasedInterpolatorController->SetActiveLabel(m_WorkingImage->GetActiveLabelPixelValue());
     m_SurfaceBasedInterpolatorController->SetMaxSpacing(maxSpacing);
     m_SurfaceBasedInterpolatorController->SetMinSpacing(minSpacing);
     m_SurfaceBasedInterpolatorController->SetDistanceImageVolume(50000);

@@ -719,21 +719,13 @@ void QmitkLabelSetTableWidget::OnMergeLabels(bool value)
     if ( ranges.isEmpty() )
       return;
 
-    std::vector<int> indexes;
-    for (int i=0; i<ranges.size(); i++)
-    {
-      int begin = ranges.at(i).topRow();
-      for (int j=0; j<ranges.at(i).rowCount(); j++)
-      {
-        if (begin+j != this->currentRow())
-        {
-          indexes.push_back(begin+j);
-        }
-      }
-    }
+    std::vector<int> VectorOfLablePixelValues;
+    foreach (QTableWidgetSelectionRange a, ranges)
+      for(int i = a.topRow(); i <= a.bottomRow(); i++)
+        VectorOfLablePixelValues.push_back(this->item(i,0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    m_LabelSetImage->MergeLabels(indexes,this->currentRow());
+    m_LabelSetImage->MergeLabels(VectorOfLablePixelValues,this->currentRow());
     this->WaitCursorOff();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -752,18 +744,13 @@ void QmitkLabelSetTableWidget::OnRemoveLabels(bool value)
     if ( ranges.isEmpty() )
       return;
 
-    std::vector<int> indexes;
-    for (int i=0; i<ranges.size(); i++)
-    {
-      int begin = ranges.at(i).topRow();
-      for (int j=0; j<ranges.at(i).rowCount(); j++)
-      {
-          indexes.push_back(begin+j);
-      }
-    }
+    std::vector<int> VectorOfLablePixelValues;
+    foreach (QTableWidgetSelectionRange a, ranges)
+      for(int i = a.topRow(); i <= a.bottomRow(); i++)
+        VectorOfLablePixelValues.push_back(this->item(i,0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    m_LabelSetImage->RemoveLabels(indexes);
+    m_LabelSetImage->RemoveLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
   }
 
@@ -783,19 +770,13 @@ void QmitkLabelSetTableWidget::OnEraseLabels(bool value)
     if ( ranges.isEmpty() )
     return;
 
-    std::vector<int> indexes;
-    for (int i=0; i<ranges.size(); i++)
-    {
-      int begin = ranges.at(i).topRow();
-      for (int j=0; j<ranges.at(i).rowCount(); j++)
-      {
-        //m_LabelSetImage->SetLabelSelected(begin+j, true);
-        indexes.push_back(begin+j);
-      }
-    }
+    std::vector<int> VectorOfLablePixelValues;
+    foreach (QTableWidgetSelectionRange a, ranges)
+      for(int i = a.topRow(); i <= a.bottomRow(); i++)
+        VectorOfLablePixelValues.push_back(this->item(i,0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    m_LabelSetImage->EraseLabels(indexes);
+    m_LabelSetImage->EraseLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

@@ -89,7 +89,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   boundingBox->SetPoints(pointscontainer);
   boundingBox->ComputeBoundingBox();
 
-  Geometry3D* geometry3d = GetGeometry(0);
+  BaseGeometry* geometry3d = GetGeometry(0);
   geometry3d->SetIndexToWorldTransform(transform);
   geometry3d->SetBounds(boundingBox->GetBounds());
   /* the objects position is the center of all sub bounding objects */
@@ -179,7 +179,7 @@ bool mitk::BoundingObjectGroup::VerifyRequestedRegion()
   return m_Counter > 0;
 }
 
-mitk::Geometry3D *  mitk::BoundingObjectGroup::GetGeometry (int t) const
+mitk::BaseGeometry *  mitk::BoundingObjectGroup::GetGeometry (int t) const
 {
   //if ( m_BoundingObjects == NULL )
   return Superclass::GetGeometry(t);

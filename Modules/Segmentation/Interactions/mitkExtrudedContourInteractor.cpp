@@ -125,7 +125,7 @@ bool mitk::ExtrudedContourInteractor::ExecuteAction(mitk::Action* action, mitk::
   {
     eventPoint = posEvent->GetWorldPosition();
     mitk::BaseRenderer* sender = (mitk::BaseRenderer*) stateEvent->GetEvent()->GetSender();
-    eventPlaneNormal = sender->GetCurrentWorldGeometry2D()->GetAxisVector(2);
+    eventPlaneNormal = sender->GetCurrentWorldPlaneGeometry()->GetAxisVector(2);
   }
 
 

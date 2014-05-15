@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkDiffusionCoreExports.h>
 
 #include "vtkProgrammableGlyphFilter.h"
-#include "mitkGeometry3D.h"
+#include "mitkBaseGeometry.h"
 
 class vtkMaskPoints;
 /**
@@ -89,9 +89,9 @@ public:
   //void SelectInputNormals(const char *fieldName)
   //  {this->SetInputNormalsSelection(fieldName);}
 
-  void SetGeometry(mitk::Geometry3D::Pointer geo)
+  void SetGeometry(mitk::BaseGeometry::Pointer geo)
   { this->m_Geometry = geo; }
-  mitk::Geometry3D::Pointer GetGeometry()
+  mitk::BaseGeometry::Pointer GetGeometry()
   { return this->m_Geometry; }
 
 protected:
@@ -104,7 +104,7 @@ protected:
   int MaximumNumberOfPoints;
   int UseMaskPoints;
 
-  mitk::Geometry3D::Pointer m_Geometry;
+  mitk::BaseGeometry::Pointer m_Geometry;
 
 private:
   vtkMaskedProgrammableGlyphFilter(const vtkMaskedProgrammableGlyphFilter&);  // Not implemented.

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Base-class for geometric planar (2D) figures, such as
@@ -91,11 +91,19 @@ public:
    * describing the slice of the image on which measurements will be
    * performed.
    */
-  virtual void SetGeometry2D( mitk::Geometry2D *geometry );
+  virtual void SetPlaneGeometry( mitk::PlaneGeometry *geometry );
+              /**
+    * \deprecatedSince{2014_06} Please use SetPlaneGeometry
+    */
+    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo){SetPlaneGeometry(geo);};)
 
 
   /** \brief Returns (previously set) 2D geometry of this figure. */
-  virtual const Geometry2D *GetGeometry2D() const;
+  virtual const PlaneGeometry *GetPlaneGeometry() const;
+        /**
+    * \deprecatedSince{2014_06} Please use GetPlaneGeometry
+    */
+    DEPRECATED(const PlaneGeometry* GetGeometry2D(){return GetPlaneGeometry();};)
 
 
   /** \brief True if the planar figure is closed.
@@ -335,7 +343,7 @@ protected:
   virtual void EvaluateFeaturesInternal() = 0;
 
   /** \brief Initializes the TimeGeometry describing the (time-resolved)
-   * geometry of this figure. Note that each time step holds one Geometry2D.
+   * geometry of this figure. Note that each time step holds one PlaneGeometry.
    */
   virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 );
 
@@ -400,7 +408,7 @@ private:
 
   virtual itk::LightObject::Pointer InternalClone() const = 0;
 
-  Geometry2D *m_Geometry2D;
+  PlaneGeometry *m_PlaneGeometry;
 
 
   bool m_PolyLineUpToDate;

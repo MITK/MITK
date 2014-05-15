@@ -47,11 +47,11 @@ void mitk::PadImageFilter::GenerateData()
   mitk::CastToItkImage( image, itkImage );
 
 
-  mitk::Geometry3D *imageGeometry = image->GetGeometry();
+  mitk::BaseGeometry *imageGeometry = image->GetGeometry();
   mitk::Point3D origin = imageGeometry->GetOrigin();
   mitk::Vector3D spacing = imageGeometry->GetSpacing();
 
-  mitk::Geometry3D *referenceImageGeometry = referenceImage->GetGeometry();
+  mitk::BaseGeometry *referenceImageGeometry = referenceImage->GetGeometry();
   mitk::Point3D referenceOrigin = referenceImageGeometry->GetOrigin();
 
   double outputOrigin[3];

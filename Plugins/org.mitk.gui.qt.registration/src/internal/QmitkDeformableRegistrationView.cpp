@@ -600,7 +600,7 @@ void QmitkDeformableRegistrationView::SetImagesVisible(berry::ISelection::ConstP
     for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
       ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
     {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
+      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::PlaneGeometryData*>(nodeIt->Value()->GetData())==NULL)
       {
         nodeIt->Value()->SetVisibility(true);
       }
@@ -613,7 +613,7 @@ void QmitkDeformableRegistrationView::SetImagesVisible(berry::ISelection::ConstP
     for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
       ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
     {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
+      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::PlaneGeometryData*>(nodeIt->Value()->GetData())==NULL)
       {
         nodeIt->Value()->SetVisibility(false);
       }

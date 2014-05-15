@@ -411,7 +411,7 @@ Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(itk::SmartP
 
   Float4DImageType::Pointer output = Float4DImageType::New();
 
-  mitk::Geometry3D* geo = image->GetGeometry();
+  mitk::BaseGeometry* geo = image->GetGeometry();
   mitk::Vector3D mitkSpacing = geo->GetSpacing();
   mitk::Point3D mitkOrigin = geo->GetOrigin();
 

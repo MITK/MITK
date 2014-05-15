@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkThinPlateSplineCurvedGeometry.h"
 #include <vtkThinPlateSplineTransform.h>
 #include <vtkPoints.h>
@@ -58,7 +57,6 @@ void mitk::ThinPlateSplineCurvedGeometry::SetSigma(double sigma)
 double mitk::ThinPlateSplineCurvedGeometry::GetSigma() const
 {
   return m_ThinPlateSplineTransform->GetSigma();
-
 }
 
 void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
@@ -96,7 +94,7 @@ void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
 
 itk::LightObject::Pointer mitk::ThinPlateSplineCurvedGeometry::InternalClone() const
 {
-  mitk::Geometry3D::Pointer newGeometry = new Self(*this);
+  mitk::BaseGeometry::Pointer newGeometry = new Self(*this);
   newGeometry->UnRegister();
   return newGeometry.GetPointer();
 }

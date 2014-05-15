@@ -86,7 +86,7 @@ bool mitk::MoveBaseDataInteractor::ExecuteAction( Action* action, mitk::StateEve
       /* now we have a worldpoint. check if it is inside our object and select/deselect it accordingly */
 
       std::auto_ptr<StateEvent> newStateEvent;
-      const Geometry3D* geometry = GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep( m_TimeStep );
+      const BaseGeometry* geometry = GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep( m_TimeStep );
       if (geometry->IsInside(worldPoint))
         newStateEvent.reset(new mitk::StateEvent(EIDYES, stateEvent->GetEvent()));
       else
@@ -162,7 +162,7 @@ bool mitk::MoveBaseDataInteractor::ExecuteAction( Action* action, mitk::StateEve
       movementVector.SetElement(1, (float) yP->GetValue());
       movementVector.SetElement(2, (float) zP->GetValue());
 
-      Geometry3D* geometry = m_DataNode->GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep( m_TimeStep );
+      BaseGeometry* geometry = m_DataNode->GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep( m_TimeStep );
       geometry->Translate(movementVector);
 
       // indicate modification of data tree node

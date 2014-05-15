@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkGeometry2DDataVtkMapper3D.h"
+#include "mitkPlaneGeometryDataVtkMapper3D.h"
 
 #include "mitkImageVtkMapper2D.h"
 #include "mitkSmartPointerProperty.h"
@@ -42,14 +42,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
+  PlaneGeometryDataVtkMapper3D::PlaneGeometryDataVtkMapper3D()
     : m_NormalsActorAdded(false),
     m_DataStorage(NULL)
   {
     m_EdgeTuber = vtkTubeFilter::New();
     m_EdgeMapper = vtkPolyDataMapper::New();
 
-    m_SurfaceCreator = Geometry2DDataToSurfaceFilter::New();
+    m_SurfaceCreator = PlaneGeometryDataToSurfaceFilter::New();
     m_SurfaceCreatorBoundingBox = BoundingBox::New();
     m_SurfaceCreatorPointsContainer = BoundingBox::PointsContainer::New();
     m_Edges = vtkFeatureEdges::New();
@@ -125,10 +125,10 @@ namespace mitk
 
     m_ImageMapperDeletedCommand = MemberCommandType::New();
     m_ImageMapperDeletedCommand->SetCallbackFunction(
-        this, &Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback );
+        this, &PlaneGeometryDataVtkMapper3D::ImageMapperDeletedCallback );
   }
 
-  Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
+  PlaneGeometryDataVtkMapper3D::~PlaneGeometryDataVtkMapper3D()
   {
     m_ImageAssembly->Delete();
     m_Prop3DAssembly->Delete();
@@ -154,7 +154,7 @@ namespace mitk
     m_DataStorage = NULL;
   }
 
-  vtkProp* Geometry2DDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
+  vtkProp* PlaneGeometryDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
   {
     if ( (this->GetDataNode() != NULL )
       && (m_ImageAssembly != NULL) )
@@ -168,18 +168,18 @@ namespace mitk
     return m_Prop3DAssembly;
   }
 
-  void Geometry2DDataVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
+  void PlaneGeometryDataVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
   {
     m_ImageAssembly->SetUserTransform(
         this->GetDataNode()->GetVtkTransform(this->GetTimestep()) );
   }
 
-  const Geometry2DData* Geometry2DDataVtkMapper3D::GetInput()
+  const PlaneGeometryData* PlaneGeometryDataVtkMapper3D::GetInput()
   {
-    return static_cast<const Geometry2DData * > ( GetDataNode()->GetData() );
+    return static_cast<const PlaneGeometryData * > ( GetDataNode()->GetData() );
   }
 
-  void Geometry2DDataVtkMapper3D::SetDataStorageForTexture(mitk::DataStorage* storage)
+  void PlaneGeometryDataVtkMapper3D::SetDataStorageForTexture(mitk::DataStorage* storage)
   {
     if(storage != NULL && m_DataStorage != storage )
     {
@@ -188,7 +188,7 @@ namespace mitk
     }
   }
 
-  void Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback(
+  void PlaneGeometryDataVtkMapper3D::ImageMapperDeletedCallback(
       itk::Object *caller, const itk::EventObject& /*event*/ )
   {
     ImageVtkMapper2D *imageMapper = dynamic_cast< ImageVtkMapper2D * >( caller );
@@ -202,7 +202,7 @@ namespace mitk
     }
   }
 
-  void Geometry2DDataVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
+  void PlaneGeometryDataVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
   {
     SetVtkMapperImmediateModeRendering(m_EdgeMapper);
     SetVtkMapperImmediateModeRendering(m_BackgroundMapper);
@@ -238,16 +238,16 @@ namespace mitk
     this->GetDataNode()->GetBoolProperty("draw edges", drawEdges, renderer);
     m_EdgeActor->SetVisibility(drawEdges);
 
-    Geometry2DData::Pointer input = const_cast< Geometry2DData * >(this->GetInput());
+    PlaneGeometryData::Pointer input = const_cast< PlaneGeometryData * >(this->GetInput());
 
-    if (input.IsNotNull() && (input->GetGeometry2D() != NULL))
+    if (input.IsNotNull() && (input->GetPlaneGeometry() != NULL))
     {
       SmartPointerProperty::Pointer surfacecreatorprop;
       surfacecreatorprop = dynamic_cast< SmartPointerProperty * >(GetDataNode()->GetProperty("surfacegeometry", renderer));
 
       if ( (surfacecreatorprop.IsNull())
         || (surfacecreatorprop->GetSmartPointer().IsNull())
-        || ((m_SurfaceCreator = dynamic_cast<Geometry2DDataToSurfaceFilter*>
+        || ((m_SurfaceCreator = dynamic_cast<PlaneGeometryDataToSurfaceFilter*>
              (surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull() ) )
         {
         m_SurfaceCreator->PlaceByGeometryOn();
@@ -269,11 +269,11 @@ namespace mitk
 
       double tubeRadius = 1.0; // Radius of tubular edge surrounding plane
 
-      // Clip the Geometry2D with the reference geometry bounds (if available)
-      if ( input->GetGeometry2D()->HasReferenceGeometry() )
+      // Clip the PlaneGeometry with the reference geometry bounds (if available)
+      if ( input->GetPlaneGeometry()->HasReferenceGeometry() )
       {
-        Geometry3D *referenceGeometry =
-            input->GetGeometry2D()->GetReferenceGeometry();
+        BaseGeometry *referenceGeometry =
+            input->GetPlaneGeometry()->GetReferenceGeometry();
 
         BoundingBox::PointType boundingBoxMin, boundingBoxMax;
         boundingBoxMin = referenceGeometry->GetBoundingBox()->GetMinimum();
@@ -306,7 +306,7 @@ namespace mitk
         tubeRadius = sqrt( m_SurfaceCreator->GetBoundingBox()->GetDiagonalLength2() ) / 450.0;
       }
 
-      // Calculate the surface of the Geometry2D
+      // Calculate the surface of the PlaneGeometry
       m_SurfaceCreator->Update();
       Surface *surface = m_SurfaceCreator->GetOutput();
 
@@ -444,7 +444,7 @@ namespace mitk
       m_BackgroundActor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
   }
 
-  void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* renderer,
+  void PlaneGeometryDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* renderer,
                                                Surface * surface, LayerSortedActorList &layerSortedActors )
   {
     if ( node != NULL )
@@ -560,7 +560,7 @@ namespace mitk
     }
   }
 
-  void Geometry2DDataVtkMapper3D::ActorInfo::Initialize(vtkActor* actor, itk::Object* sender, itk::Command* command)
+  void PlaneGeometryDataVtkMapper3D::ActorInfo::Initialize(vtkActor* actor, itk::Object* sender, itk::Command* command)
   {
     m_Actor = actor;
     m_Sender = sender;
@@ -569,11 +569,11 @@ namespace mitk
     m_ObserverID = sender->AddObserver( itk::DeleteEvent(), command );
   }
 
-  Geometry2DDataVtkMapper3D::ActorInfo::ActorInfo() : m_Actor(NULL), m_Sender(NULL), m_ObserverID(0)
+  PlaneGeometryDataVtkMapper3D::ActorInfo::ActorInfo() : m_Actor(NULL), m_Sender(NULL), m_ObserverID(0)
   {
   }
 
-  Geometry2DDataVtkMapper3D::ActorInfo::~ActorInfo()
+  PlaneGeometryDataVtkMapper3D::ActorInfo::~ActorInfo()
   {
     if(m_Sender != NULL)
     {

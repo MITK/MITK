@@ -29,7 +29,6 @@ set(MODULE_TESTS
   mitkEventTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
-  mitkGeometry2DTest.cpp
   mitkGeometry3DTest.cpp
   mitkGeometry3DEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
@@ -96,6 +95,7 @@ set(MODULE_TESTS
   mitkLookupTableTest.cpp
   mitkSTLFileReaderTest.cpp
   mitkSurfaceToImageFilterTest.cpp
+  mitkBaseGeometryTest.cpp
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
   mitkLineTest.cpp

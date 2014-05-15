@@ -158,7 +158,7 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
       grid->ComputeBounds();
       grid->GetBounds( bounds );
     }
-    mitk::Geometry3D::Pointer g3d = timeGeometry->GetGeometryForTimeStep( i );
+    mitk::BaseGeometry::Pointer g3d = timeGeometry->GetGeometryForTimeStep( i );
     assert( g3d.IsNotNull() );
     g3d->SetFloatBounds( bounds );
   }

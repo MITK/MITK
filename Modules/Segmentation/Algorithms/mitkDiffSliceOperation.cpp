@@ -31,18 +31,19 @@ mitk::DiffSliceOperation::DiffSliceOperation():Operation(1)
 
 mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
                                              vtkImageData* slice,
-                                             Geometry3D* sliceGeometry,
+                                             SlicedGeometry3D* sliceGeometry,
                                              unsigned int timestep,
-                                             Geometry3D* currentWorldGeometry):Operation(1)
+                                             BaseGeometry* currentWorldGeometry):Operation(1)
 
 {
-  m_WorldGeometry = currentWorldGeometry->Clone();
+  itk::LightObject::Pointer lopointer = currentWorldGeometry->Clone();
+  m_WorldGeometry = dynamic_cast<BaseGeometry*>(lopointer.GetPointer());
 
   /*
   Quick fix for bug 12338.
   Guard object - fix this when clone method of PlaneGeometry is cloning the reference geometry (see bug 13392)*/
-  m_GuardReferenceGeometry = mitk::Geometry3D::New();
-  m_GuardReferenceGeometry = dynamic_cast<mitk::Geometry2D*>(m_WorldGeometry.GetPointer())->GetReferenceGeometry();
+  //xxxx m_GuardReferenceGeometry = mitk::BaseGeometry::New();
+  m_GuardReferenceGeometry = dynamic_cast<mitk::PlaneGeometry*>(m_WorldGeometry.GetPointer())->GetReferenceGeometry();
   /*---------------------------------------------------------------------------------------------------*/
 
   m_SliceGeometry = sliceGeometry->Clone();

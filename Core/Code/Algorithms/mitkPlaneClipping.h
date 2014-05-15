@@ -52,7 +52,7 @@ static bool LineIntersectZero( vtkPoints *points, int p1, int p2, double *bounds
 /** \brief Calculate the bounding box of the resliced image. This is necessary for
     arbitrarily rotated planes in an image volume. A rotated plane (e.g. in swivel mode)
     will have a new bounding box, which needs to be calculated. */
-static bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, const PlaneGeometry *planeGeometry, double *bounds )
+static bool CalculateClippedPlaneBounds( const BaseGeometry *boundingGeometry, const PlaneGeometry *planeGeometry, double *bounds )
 {
   // Clip the plane with the bounding geometry. To do so, the corner points
   // of the bounding box are transformed by the inverse transformation
@@ -124,7 +124,7 @@ static bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, con
   {
     // The resulting bounds must be adjusted by the plane spacing, since we
     // we have so far dealt with index coordinates
-    const float *planeSpacing = planeGeometry->GetFloatSpacing();
+    const mitk::Vector3D planeSpacing = planeGeometry->GetSpacing();
     bounds[0] *= planeSpacing[0];
     bounds[1] *= planeSpacing[0];
     bounds[2] *= planeSpacing[1];

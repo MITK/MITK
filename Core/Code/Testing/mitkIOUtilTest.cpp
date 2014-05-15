@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class mitkIOUtilTestSuite : public mitk::TestFixture
 {
-
   CPPUNIT_TEST_SUITE(mitkIOUtilTestSuite);
   MITK_TEST(TestTempMethods);
   MITK_TEST(TestLoadAndSaveImage);
@@ -75,7 +74,7 @@ public:
 
     std::ofstream tmpFile3;
     std::string tmpFilePath3 = mitk::IOUtil::CreateTemporaryFile(tmpFile3, std::ios_base::binary,
-                                                                 "my-XXXXXX.TXT", programPath);
+      "my-XXXXXX.TXT", programPath);
     CPPUNIT_ASSERT(tmpFile3 && tmpFile3.is_open());
     CPPUNIT_ASSERT(tmpFilePath3.size() > programPath.size());
     CPPUNIT_ASSERT(tmpFilePath3.substr(0, programPath.size()) == programPath);
@@ -198,7 +197,6 @@ public:
     //delete the files after the test is done
     std::remove(surfacePath.c_str());
   }
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkIOUtil)

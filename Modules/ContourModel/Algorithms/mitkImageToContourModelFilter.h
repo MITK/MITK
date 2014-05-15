@@ -66,7 +66,7 @@ namespace mitk {
     void Itk2DContourExtraction (itk::Image<TPixel, VImageDimension>* sliceImage);
 
   private:
-    const Geometry3D* m_SliceGeometry;
+    const BaseGeometry* m_SliceGeometry;
 
   };
 

@@ -81,7 +81,7 @@ void TestPictureWriting(mitk::Image* image, const std::string& filename, const s
   {
     mitk::ExtractSliceFilter::Pointer extractFilter = mitk::ExtractSliceFilter::New();
     extractFilter->SetInput( image );
-    extractFilter->SetWorldGeometry( image->GetSlicedGeometry()->GetGeometry2D(0) );
+    extractFilter->SetWorldGeometry( image->GetSlicedGeometry()->GetPlaneGeometry(0) );
 
     extractFilter->Update();
     singleSliceImage = extractFilter->GetOutput();

@@ -110,7 +110,7 @@ bool Assert_ImageMetaData_AreEqual( typename ImageType::Pointer itkImage, mitk::
   return_value &= ptype_compare;
   MITK_TEST_CONDITION( ptype_compare, " - Pixel types equal!")
 
-  mitk::Geometry3D* imageGeometry = mitkImage->GetGeometry();
+  mitk::BaseGeometry* imageGeometry = mitkImage->GetGeometry();
   const mitk::Point3D origin = imageGeometry->GetOrigin();
 
   bool origin_compare = true;

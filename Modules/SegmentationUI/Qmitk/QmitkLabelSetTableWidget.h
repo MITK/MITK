@@ -78,7 +78,7 @@ class MitkSegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// Sets AutoSelectNewItems flag. If set to true new items will be automatically selected. Default is false.
     void SetAutoSelectNewItems(bool value);
 
-    QStringList& GetLabelStringList();
+    QStringList GetLabelStringList();
 
     void OnToolManagerWorkingDataModified();
 
@@ -147,7 +147,7 @@ class MitkSegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 
     mitk::ToolManager* m_ToolManager;
 
-    QStringList m_LabelStringList;
+    //QStringList m_LabelStringList;
 
     mitk::ColorSequenceRainbow* m_ColorSequenceRainbow;
 

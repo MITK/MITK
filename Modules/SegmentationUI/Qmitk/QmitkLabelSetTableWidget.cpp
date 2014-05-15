@@ -134,10 +134,10 @@ void QmitkLabelSetTableWidget::Initialize()
   this->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
-QStringList& QmitkLabelSetTableWidget::GetLabelStringList()
-{
-  return m_LabelStringList;
-}
+//QStringList& QmitkLabelSetTableWidget::GetLabelStringList()
+//{
+//  return m_LabelStringList;
+//}
 
 bool QmitkLabelSetTableWidget::GetAutoSelectNewLabels()
 {
@@ -302,8 +302,8 @@ void QmitkLabelSetTableWidget::LabelModified( int index )
   button = (QPushButton*) this->cellWidget(index,VISIBLE_COL);
   if (!button) return;
 
-  button->setChecked(!m_LabelSetImage->GetLabelVisible(index));
-  m_LabelStringList.replace(index, QString::fromStdString( m_LabelSetImage->GetLabelName(index) ) );
+  button->setChecked(!m_LabelSetImage->GetLabelVisible(pixelValue));
+  //m_LabelStringList.replace(index, QString::fromStdString( m_LabelSetImage->GetLabelName(pixelValue) ) );
 /*
   this->clearSelection();
   this->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -429,7 +429,7 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
 void QmitkLabelSetTableWidget::InsertItem()
 {
   int index = this->rowCount();
-  m_LabelStringList.append( QString::fromStdString(m_LabelSetImage->GetLabelName(index)) );
+  //m_LabelStringList.append( QString::fromStdString(label->GetName()) );
 
   const mitk::Color& color = m_LabelSetImage->GetLabelColor(index);
 
@@ -514,7 +514,7 @@ void QmitkLabelSetTableWidget::InsertItem()
     emit activeLabelChanged(row);
   }
   */
-  emit labelListModified(m_LabelStringList);
+  //emit labelListModified(m_LabelStringList);
 }
 
 void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint & pos )
@@ -929,7 +929,7 @@ void QmitkLabelSetTableWidget::Reset()
   while (this->rowCount())
     this->removeRow( 0 );
 
-  m_LabelStringList.clear();
+  //m_LabelStringList.clear();
 
   if (m_LabelSetImage.IsNotNull()) // sometimes Reset() is correctly called without a labelset image
   {
@@ -941,6 +941,14 @@ void QmitkLabelSetTableWidget::Reset()
       ++counter;
     }
   }
+}
+
+QStringList QmitkLabelSetTableWidget::GetLabelStringList()
+{
+  QStringList list;
+  for(int i = 0 ; i < this->rowCount(); i++)
+    list.append(this->item(i,0)->text());
+  return list;
 }
 
 void QmitkLabelSetTableWidget::WaitCursorOn()

@@ -192,6 +192,11 @@ bool mitk::LabelSet::IsSelected(mitk::Label::Pointer label)
   return label->GetSelected();
 }
 
+bool mitk::LabelSet::ExistLabel(int pixelValue)
+{
+  return m_LabelContainer.count(pixelValue) > 0 ? true : false;
+}
+
 void mitk::LabelSet::AddLabel(const mitk::Label& label )
 {
   if (m_LabelContainer.size() > 255) return;

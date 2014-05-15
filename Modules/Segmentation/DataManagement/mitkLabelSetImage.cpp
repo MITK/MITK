@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRelabelComponentImageFilter.h>
 
 mitk::LabelSetImage::LabelSetImage() : mitk::Image(),
-m_ActiveLayer(0)
+  m_ActiveLayer(0)
 {
   mitk::LabelSet::Pointer ls = this->CreateDefaultLabelSet();
   ls->SetLayer(m_ActiveLayer);
@@ -375,7 +375,7 @@ void mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
   const unsigned int* otherDims = other->GetDimensions();
   const unsigned int* thisDims = this->GetDimensions();
   if ( (otherDims[0] != thisDims[0]) || (otherDims[1] != thisDims[1]) || (otherDims[2] != thisDims[2]) )
-      mitkThrow() << "Dimensions do not match.";
+    mitkThrow() << "Dimensions do not match.";
 
   try
   {
@@ -409,6 +409,12 @@ void mitk::LabelSetImage::ClearBuffer()
   {
     mitkThrow() << e.GetDescription();
   }
+}
+
+bool mitk::LabelSetImage::ExistLabel(const int pixelValue, int layer)
+{
+  if (layer < 0) layer = m_ActiveLayer;
+  return m_LabelSetContainer[layer]->ExistLabel(pixelValue);
 }
 
 void mitk::LabelSetImage::AddLabel(const mitk::Label& label)
@@ -952,28 +958,28 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
   typedef itk::ImageRegionIterator< ImageType1 > TargetIteratorType;
   typedef itk::RelabelComponentImageFilter<ImageType2, ImageType2> FilterType;
 
-  typename FilterType::Pointer relabelFilter = FilterType::New();
-  relabelFilter->SetInput(input);
-  relabelFilter->Update();
-  int numberOfObjects = relabelFilter->GetNumberOfObjects();
+  //  typename FilterType::Pointer relabelFilter = FilterType::New();
+  //  relabelFilter->SetInput(input);
+  //  relabelFilter->Update();
+  //  int numberOfObjects = relabelFilter->GetNumberOfObjects();
 
-  for (int i=0; i<numberOfObjects; ++i)
-  {
-    std::stringstream name;
-    name << "object-" << i+1;
-    mitk::Label::Pointer label = mitk::Label::New();
-    label->SetName( name.str().c_str() );
-    double rgba[4];
-    m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->GetTableValue(i+1, rgba );
-    mitk::Color newColor;
-    newColor.SetRed(rgba[0]);
-    newColor.SetGreen(rgba[1]);
-    newColor.SetBlue(rgba[2]);
-    label->SetColor( newColor );
-    label->SetOpacity( rgba[3] );
+  //  for (int i=0; i<numberOfObjects; ++i)
+  //  {
+  //    std::stringstream name;
+  //    name << "object-" << i+1;
+  //    mitk::Label::Pointer label = mitk::Label::New();
+  //    label->SetName( name.str().c_str() );
+  //    double rgba[4];
+  //    m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->GetTableValue(i+1, rgba );
+  //    mitk::Color newColor;
+  //    newColor.SetRed(rgba[0]);
+  //    newColor.SetGreen(rgba[1]);
+  //    newColor.SetBlue(rgba[2]);
+  //    label->SetColor( newColor );
+  //    label->SetOpacity( rgba[3] );
 
-    this->AddLabel(*label);
-  }
+  //    this->AddLabel(*label);
+  //  }
 
   TargetIteratorType targetIter( output, output->GetLargestPossibleRegion() );
   targetIter.GoToBegin();
@@ -982,10 +988,32 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
   SourceIteratorType sourceIter( input, input->GetLargestPossibleRegion() );
   sourceIter.GoToBegin();
 
+  this->m_LabelSetContainer.empty();
+
   while ( !sourceIter.IsAtEnd() )
   {
     int sourceValue = static_cast<int>(sourceIter.Get());
     targetIter.Set( sourceValue );
+
+    if(!this->ExistLabel(sourceValue))
+    {
+      std::stringstream name;
+      name << "object-" << sourceValue;
+      mitk::Label::Pointer label = mitk::Label::New();
+      label->SetName( name.str().c_str() );
+      double rgba[4];
+      m_LabelSetContainer[m_ActiveLayer]->GetLookupTable()->GetTableValue(sourceValue, rgba );
+      mitk::Color newColor;
+      newColor.SetRed(rgba[0]);
+      newColor.SetGreen(rgba[1]);
+      newColor.SetBlue(rgba[2]);
+      label->SetColor( newColor );
+      label->SetOpacity( rgba[3] );
+      label->SetPixelValue( sourceValue );
+
+      this->AddLabel(*label);
+    }
+
     ++sourceIter;
     ++targetIter;
   }

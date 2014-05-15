@@ -70,6 +70,10 @@ public:
 
     /** \brief
     */
+    bool ExistLabel(int pixelValue);
+
+    /** \brief
+    */
     void AddLabel(const Label& label);
 
     /** \brief

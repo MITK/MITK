@@ -304,8 +304,8 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   {
     mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
     assert(workingImage);
-    hasLabels = workingImage->GetNumberOfLabels() > 1;
-    hasSelection = workingImage->GetActiveLabelIndex() > 0;
+    hasLabels = workingImage->GetNumberOfLabels();
+    hasSelection = workingImage->GetActiveLabel();
   }
 
   //MITK_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();

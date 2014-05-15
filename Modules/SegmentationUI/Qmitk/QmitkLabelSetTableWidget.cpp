@@ -189,39 +189,41 @@ void QmitkLabelSetTableWidget::SetActiveLabelSetImage(mitk::LabelSetImage* _imag
   this->Reset();
 }
 
-void QmitkLabelSetTableWidget::SetActiveLabel(int index)
-{
-  if ( (index >= 0) && (index < this->rowCount()) )
-  {
-    m_LabelSetImage->SetActiveLabel(index);
-    m_ToolManager->WorkingDataModified.Send();
-
-    QTableWidgetItem* nameItem = this->item(index,NAME_COL);
-    if (!nameItem) return;
-    this->clearSelection();
-    this->setSelectionMode(QAbstractItemView::SingleSelection);
-    this->selectRow(index);
-    this->scrollToItem(nameItem);
-    this->setSelectionMode(QAbstractItemView::ExtendedSelection);
-
-    emit activeLabelChanged(index);
-  }
-}
-
 void QmitkLabelSetTableWidget::SetActiveLabel(const std::string& text)
 {
-  int index = m_LabelStringList.indexOf(text.c_str());
-  if (index >= 0 && index < this->rowCount())
-  {
-    this->SetActiveLabel(index);
-    m_ToolManager->WorkingDataModified.Send();
-    this->WaitCursorOn();
-    int activeLabel = m_LabelSetImage->GetActiveLabelIndex();
-    const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(activeLabel, true);
-    this->WaitCursorOff();
-    if (pos.GetVnlVector().max_value() > 0.0)
-        emit goToLabel(pos);
+
+  int pixelValue = -1;
+  int row = -1;
+  for(int i = 0; i < this->rowCount(); i++){
+    if( this->item(i,0)->text().toStdString().compare(text) == 0)
+    {
+      pixelValue = this->item(i,0)->data(Qt::UserRole).toInt();
+      row = i;
+      break;
+    }
   }
+  if(pixelValue == -1) return;
+  m_LabelSetImage->SetActiveLabel(pixelValue);
+
+  QTableWidgetItem* nameItem = this->item(row,NAME_COL);
+  if (!nameItem) return;
+
+  this->clearSelection();
+  this->setSelectionMode(QAbstractItemView::SingleSelection);
+  this->selectRow(row);
+  this->scrollToItem(nameItem);
+  this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+  this->WaitCursorOn();
+  const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(pixelValue, true);
+  this->WaitCursorOff();
+
+  m_ToolManager->WorkingDataModified.Send();
+
+  if (pos.GetVnlVector().max_value() > 0.0) emit goToLabel(pos);
+
+  emit activeLabelChanged(pixelValue);
+
 }
 
 void QmitkLabelSetTableWidget::LabelAdded()
@@ -230,7 +232,7 @@ void QmitkLabelSetTableWidget::LabelAdded()
   if (!m_BlockEvents)
   {
     m_BlockEvents = true;
-    this->InsertItem();
+    this->Reset();
     m_BlockEvents = false;
   }
 }
@@ -896,8 +898,11 @@ void QmitkLabelSetTableWidget::OnSetOnlyActiveLabelVisible(bool value)
 
 void QmitkLabelSetTableWidget::OnRenameLabel(bool value)
 {
-  int index = this->currentRow();
-  emit renameLabel( index, m_LabelSetImage->GetLabelColor(index), m_LabelSetImage->GetLabelName(index) );
+  int rowIndex = this->currentRow();
+  int pixelValue = this->item(rowIndex,0)->data(Qt::UserRole).toInt();
+  emit renameLabel( pixelValue,
+                    m_LabelSetImage->GetLabelColor(pixelValue),
+                    m_LabelSetImage->GetLabelName(pixelValue) );
 }
 
 void QmitkLabelSetTableWidget::OnRandomColor(bool value)

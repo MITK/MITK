@@ -267,6 +267,10 @@ bool mitk::USDevice::Activate()
 
     this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE, true);
     this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL, this->GetServicePropertyLabel());
+
+    // initialize the b mode control properties of the micro service
+    mitk::USControlInterfaceBMode::Pointer bmodeControls = this->GetControlInterfaceBMode();
+    if ( bmodeControls.IsNotNull() ) { bmodeControls->Initialize(); }
   }
 
   return m_DeviceState == State_Activated;

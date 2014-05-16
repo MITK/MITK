@@ -260,7 +260,8 @@ class USControlInterfaceDoppler;
     std::string GetDeviceModel();
     std::string GetDeviceComment();
 
-    itkGetMacro(DeviceState, DeviceStates);
+    itkGetMacro(DeviceState, DeviceStates)
+    itkGetMacro(ServiceProperties, us::ServiceProperties)
 
     void GrabImage();
 

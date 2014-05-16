@@ -442,24 +442,24 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
 
 std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
 {
-  us::ServiceProperties::const_iterator probeIt =
-      m_UltrasoundDevice->GetServiceProperties().find(
+  us::ServiceProperties usdeviceProperties = m_UltrasoundDevice->GetServiceProperties();
+
+  us::ServiceProperties::const_iterator probeIt = usdeviceProperties.find(
         mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED);
 
   // get probe identifier from control interface for probes
   std::string probeName = "default";
-  if (probeIt != m_ServiceProperties.end())
+  if (probeIt != usdeviceProperties.end())
   {
     probeName = (probeIt->second).ToString();
   }
 
   // get string for depth value from the micro service properties
   std::string depth;
-  us::ServiceProperties::iterator depthIterator =
-      m_UltrasoundDevice->GetServiceProperties().find(
+  us::ServiceProperties::iterator depthIterator = usdeviceProperties.find(
         mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH);
 
-  if (depthIterator != m_ServiceProperties.end())
+  if (depthIterator != usdeviceProperties.end())
   {
     depth = depthIterator->second.ToString();
   }

@@ -24,8 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usgscanb.h>
 
 #include "mitkUSTelemedSDKHeader.h"
-
 #include "mitkImage.h"
+
+#include "itkFastMutexLock.h"
 
 /**
   * \brief Telemed API plugin for getting images from scan lines.
@@ -57,8 +58,10 @@ public:
     * image buffer from the Telemed API will be stored at every
     * API callback. This function must be called before image data
     * can be got from this class.
+    * A pointer to a mutex can be set in addition. This mutex will
+    * be locked on every writing to the given image.
     */
-  void SetOutputImage(mitk::Image::Pointer outputImage);
+  void SetOutputImage(mitk::Image::Pointer outputImage, itk::FastMutexLock::Pointer outputImageMutex = 0);
 
   // receives pointers to input and output media samples
   STDMETHOD(SampleCB) (
@@ -153,6 +156,12 @@ protected:
     * from the Telemed API will be stored at every API callback.
     */
   mitk::Image::Pointer        m_OutputImage;
+
+  /**
+    * Mutex for the output image. Has to be set together with the
+    * output image via SetOutputImage().
+    */
+  itk::FastMutexLock::Pointer m_OutputImageMutex;
 
 private:
   long m_cRef ;

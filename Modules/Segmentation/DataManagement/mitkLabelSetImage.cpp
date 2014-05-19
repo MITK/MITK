@@ -519,6 +519,7 @@ void mitk::LabelSetImage::RemoveLabel(int pixelValue, int layer)
   this->EraseLabel(pixelValue);
   m_LabelSetContainer[layer]->RemoveLabel(pixelValue);
   //this->ResetLabels(layer);
+  ActiveLabelEvent(GetActiveLabelPixelValue());
   RemoveLabelEvent.Send();
 }
 
@@ -715,7 +716,7 @@ void mitk::LabelSetImage::SetLabelSelected(int index, bool value, int layer)
 void mitk::LabelSetImage::RemoveAllLabels(int layer)
 {
   if (layer < 0) layer = m_ActiveLayer;
-  m_LabelSetContainer[layer]->RemoveAllLabels();
+  m_LabelSetContainer[layer] = CreateDefaultLabelSet();
   this->ClearBuffer();
   this->Modified();
   RemoveLabelEvent.Send();

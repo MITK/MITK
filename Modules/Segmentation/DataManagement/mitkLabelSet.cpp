@@ -53,7 +53,6 @@ mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorBegin()
 
 void mitk::LabelSet::RemoveAllLabels()
 {
-  //LabelContainerType::iterator _end = m_LabelContainer.end();
   m_LabelContainer.clear();
 }
 
@@ -182,9 +181,16 @@ void mitk::LabelSet::SetActiveLabel(int pixelValue)
 
 void mitk::LabelSet::RemoveLabel(int pixelValue)
 {
-  LabelContainerConstIteratorType it = m_LabelContainer.find(pixelValue);
-  if(it != m_LabelContainer.end())
+  LabelContainerConstIteratorType it;
+
+  it= m_LabelContainer.find(pixelValue);
+  if(it != m_LabelContainer.end()){
     m_LabelContainer.erase(it);
+  }
+
+  it = m_LabelContainer.begin();
+  if(it != m_LabelContainer.end())
+    m_ActiveLabel = it->second;
 }
 
 bool mitk::LabelSet::IsSelected(mitk::Label::Pointer label)
@@ -209,9 +215,13 @@ void mitk::LabelSet::AddLabel(const mitk::Label& label )
   newLabel->SetLocked( label.GetLocked() );
   newLabel->SetOpacity( label.GetOpacity() );
   newLabel->SetVolume( label.GetVolume() );
-  if(label.GetPixelValue() == -1)
-    newLabel->SetPixelValue( m_LabelContainer.size() );
-  else
+  if(label.GetPixelValue() == -1){
+    //find next free
+    int i = 1;
+    while(m_LabelContainer.empty() == false && m_LabelContainer.find(i) != m_LabelContainer.end() )
+      i++;
+    newLabel->SetPixelValue( i );
+  }else
     newLabel->SetPixelValue( label.GetPixelValue()) ;
 
   newLabel->SetLayer( m_Layer );

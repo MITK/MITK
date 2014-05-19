@@ -402,10 +402,11 @@ void QmitkLabelSetTableWidget::OnItemClicked(QTableWidgetItem *item)
   int row = item->row();
   if (row >= 0 && row < this->rowCount())
   {
+    int pixelValue = item->data(Qt::UserRole).toInt();
     m_BlockEvents = true;
-    m_LabelSetImage->SetActiveLabel(row);
+    m_LabelSetImage->SetActiveLabel(pixelValue);
     m_ToolManager->WorkingDataModified.Send();
-    emit activeLabelChanged(row);
+    emit activeLabelChanged(pixelValue);
     m_BlockEvents = false;
   }
 
@@ -418,11 +419,12 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   int row = item->row();
   if (row >= 0 && row < this->rowCount())
   {
-    m_LabelSetImage->SetActiveLabel(row);
+    int pixelValue = this->item(row,0)->data(Qt::UserRole).toInt();
+    m_LabelSetImage->SetActiveLabel(pixelValue);
     m_ToolManager->WorkingDataModified.Send();
-    emit activeLabelChanged(row);
+    emit activeLabelChanged(pixelValue);
     this->WaitCursorOn();
-    const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(row, true);
+    const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(pixelValue, true);
     this->WaitCursorOff();
     if (pos.GetVnlVector().max_value() > 0.0)
         emit goToLabel(pos);
@@ -509,23 +511,13 @@ void QmitkLabelSetTableWidget::InsertItem(const mitk::Label * label)
     this->hideRow(row); // hide exterior label
     return;
   }
-
-  /*
-  if (m_AutoSelectNewLabels)
-  {
-    this->selectRow(row);
-    m_LabelSetImage->SetActiveLabel(row);
-    emit activeLabelChanged(row);
-  }
-  */
-  //emit labelListModified(m_LabelStringList);
 }
 
 void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint & pos )
 {
   QTableWidgetItem *itemAt = this->itemAt(pos);
   if (!itemAt) return;
-  int row = itemAt->row();
+  int pixelValue = itemAt->data(Qt::UserRole).toInt();
   QMenu* menu = new QMenu(this);
 
   if (this->selectedItems().size()>1)
@@ -664,7 +656,7 @@ void QmitkLabelSetTableWidget::NodeTableViewContextMenuRequested( const QPoint &
     m_OpacityAction = new QWidgetAction(this);
     m_OpacityAction->setDefaultWidget(_OpacityWidget);
   //  QObject::connect( m_OpacityAction, SIGNAL( changed() ), this, SLOT( OpacityActionChanged() ) );
-    m_OpacitySlider->setValue(static_cast<int>(m_LabelSetImage->GetLabelOpacity(row)*100));
+    m_OpacitySlider->setValue(static_cast<int>(m_LabelSetImage->GetLabelOpacity(pixelValue)*100));
 
     menu->addAction(m_OpacityAction);
   }

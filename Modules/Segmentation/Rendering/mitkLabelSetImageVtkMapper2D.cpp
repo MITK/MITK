@@ -95,7 +95,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 
   int numberOfLayers = image->GetNumberOfLayers();
   int activeLayer = image->GetActiveLayer();
-  int activeLabel = image->GetActiveLabelPixelValue();
+
   float opacity = 1.0f;
   node->GetOpacity( opacity, renderer, "opacity" );
 
@@ -207,8 +207,9 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 
     if (lidx == activeLayer)
     {
-      if (activeLabel)
+      if (image->GetActiveLabel())
       {
+        int activeLabel = image->GetActiveLabelPixelValue();
         //generate contours/outlines
         localStorage->m_OutlinePolyData = this->CreateOutlinePolyData( renderer, localStorage->m_ReslicedImageVector[lidx], activeLabel );
         localStorage->m_OutlineActor->SetVisibility(true);
@@ -220,7 +221,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
         localStorage->m_OutlineShadowActor->SetVisibility(false);
       }
     }
-/*
+    /*
       bool contourAll = false;
       node->GetBoolProperty( "labelset.contour.all", contourAll, renderer );
 
@@ -301,9 +302,12 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
   localStorage->m_OutlineActor->GetProperty()->SetOpacity(opacity);
   localStorage->m_OutlineShadowActor->GetProperty()->SetOpacity(opacity);
 
-  const mitk::Color& color = image->GetActiveLabelColor();
-  localStorage->m_OutlineActor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
-  localStorage->m_OutlineShadowActor->GetProperty()->SetColor(0,0,0);
+  if(image->GetActiveLabel())
+  {
+    const mitk::Color& color = image->GetActiveLabelColor();
+    localStorage->m_OutlineActor->GetProperty()->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
+    localStorage->m_OutlineShadowActor->GetProperty()->SetColor(0,0,0);
+  }
 }
 
 bool mitk::LabelSetImageVtkMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
@@ -519,11 +523,11 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   // Calculate time step of the image data for the specified renderer (integer value)
   this->CalculateTimeStep( renderer );
 
-   // Check if time step is valid
+  // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = image->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
-    || ( dataTimeGeometry->CountTimeSteps() == 0 )
-    || ( !dataTimeGeometry->IsValidTimeStep( this->GetTimestep() ) ) )
+       || ( dataTimeGeometry->CountTimeSteps() == 0 )
+       || ( !dataTimeGeometry->IsValidTimeStep( this->GetTimestep() ) ) )
   {
     return;
   }
@@ -533,18 +537,18 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 
   //check if something important has changed and we need to re-render
 
-//(localStorage->m_LastDataUpdateTime < node->GetMTime()) // this one is too generic
+  //(localStorage->m_LastDataUpdateTime < node->GetMTime()) // this one is too generic
   if ( (localStorage->m_LastDataUpdateTime < image->GetMTime()) //was the data modified?
        || (localStorage->m_LastDataUpdateTime < image->GetPipelineMTime())
        || (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
        || (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
-      )
+       )
   {
     this->GenerateDataForRenderer( renderer );
     localStorage->m_LastDataUpdateTime.Modified();
   }
   else if ( (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
-       || (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
+            || (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {
     int activeLayer = image->GetActiveLayer();
     const mitk::Color& color = image->GetActiveLabelColor(activeLayer);

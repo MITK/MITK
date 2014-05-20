@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="/SegmentationUtilities">
      <file>BooleanOperations_48x48.png</file>
+     <file>ContourModelSetToImage_48x48.png</file>
      <file>ImageMasking_48x48.png</file>
      <file>MorphologicalOperations_48x48.png</file>
      <file>SurfaceToImage_48x48.png</file>

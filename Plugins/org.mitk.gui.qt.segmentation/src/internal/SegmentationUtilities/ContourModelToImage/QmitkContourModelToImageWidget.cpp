@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkContourModelUtils.h>
 #include <mitkContourModelSet.h>
+#include <mitkContourModelSetToImageFilter.h>
 #include <mitkException.h>
 #include <mitkExceptionMacro.h>
 #include <mitkExtractSliceFilter.h>
@@ -30,14 +31,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <qmessagebox.h>
 
-static const char* const HelpText = "Select a binary image and a contour(set)";
+static const char* const HelpText = "Select a image and a contour(set)";
 
 QmitkContourModelToImageWidget::QmitkContourModelToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::SegmentationPredicate);
+  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
   m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ContourModelPredicate);
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 
@@ -68,6 +69,7 @@ void QmitkContourModelToImageWidget::OnSelectionChanged(unsigned int index, cons
   if (node0.IsNull() || node1.IsNull() )
   {
     this->EnableButtons(false);
+    dataSelectionWidget->SetHelpText(HelpText);
   }
   else
   {
@@ -79,8 +81,6 @@ void QmitkContourModelToImageWidget::SelectionControl(unsigned int index, const 
 {
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(index);
-
-  //TODO check if contours are inside the image!
 
   dataSelectionWidget->SetHelpText("");
   this->EnableButtons();
@@ -95,29 +95,29 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
 {
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
 
-  mitk::DataNode::Pointer segmentationNode = dataSelectionWidget->GetSelection(0);
+  mitk::DataNode::Pointer imageNode = dataSelectionWidget->GetSelection(0);
+  mitk::DataNode::Pointer contourNode = dataSelectionWidget->GetSelection(1);
 
-  if (segmentationNode.IsNull())
+  if(imageNode.IsNull() || contourNode.IsNull() )
   {
-    MITK_ERROR<<"Error writing contours into binary image! No image selected!";
+    MITK_ERROR << "Selection does not contain valid data";
+    QMessageBox::information( this, "Contour To Image",
+                              "Selection does not contain valid data, please select a binary image and a contour(set)", QMessageBox::Ok );
+    m_Controls.btnProcess->setEnabled(false);
     return;
   }
 
-  mitk::Image::Pointer segmentationImage = static_cast<mitk::Image*>(segmentationNode->GetData());
+  mitk::Image::Pointer image = static_cast<mitk::Image*>(imageNode->GetData());
 
-  if (segmentationImage.IsNull())
+  if (image.IsNull())
   {
-    MITK_ERROR<<"Error writing contours into binary image! Invalid image data selected!";
+    MITK_ERROR<<"Error writing contours into image! Invalid image data selected!";
     return;
   }
 
   unsigned int timeStep = this->GetTimeNavigationController()->GetTime()->GetPos();
 
-  m_SegmentationImage = segmentationImage;
-  m_SegmentationImageGeometry = segmentationImage->GetTimeGeometry()->GetGeometryForTimeStep(timeStep);
-
   mitk::ContourModelSet::Pointer contourSet;
-  mitk::DataNode::Pointer contourNode = dataSelectionWidget->GetSelection(1);
   mitk::ContourModel::Pointer contour = dynamic_cast<mitk::ContourModel*>(contourNode->GetData());
   if (contour.IsNotNull())
   {
@@ -140,138 +140,33 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
   mitk::ProgressBar::GetInstance()->AddStepsToDo(num_contours);
   mitk::ProgressBar::GetInstance()->Progress();
 
-  // Do actual filling
-  mitk::ContourModel::Pointer projectedContour;
-  mitk::ContourModelSet::ContourModelSetIterator it = contourSet->Begin();
-  mitk::ContourModelSet::ContourModelSetIterator end = contourSet->End();
-  while (it != end)
+  // Use mitk::ContourModelSetToImageFilter to fill the ContourModelSet into the image
+  mitk::ContourModelSetToImageFilter::Pointer contourFiller = mitk::ContourModelSetToImageFilter::New();
+  contourFiller->SetTimeStep(timeStep);
+  contourFiller->SetImage(image);
+  contourFiller->SetInput(contourSet);
+  contourFiller->MakeOutputBinaryOn();
+  contourFiller->Update();
+
+  // Add result to data storage
+  mitk::Image::Pointer result = contourFiller->GetOutput();
+  if (result.IsNull())
   {
-    mitk::ContourModel* contour = it->GetPointer();
-
-    //Check Controls
-
-    // 1. Get corresponding image slice
-    mitk::Image::Pointer slice = this->GetSliceForContour(contour, timeStep);
-
-    // 2. Fill contour into slice
-    projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice(slice, contour, true, false);
-    mitk::ContourModelUtils::FillContourInSlice(projectedContour, slice);
-//    mitk::DataNode::Pointer filled = mitk::DataNode::New();
-//    filled->SetName("FILLED");
-//    filled->SetData(slice);
-//    dataSelectionWidget->GetDataStorage()->Add(filled);
-
-    // 3. Write slice back into image volume
-    if (slice.IsNotNull())
-    {
-      this->WriteBackSlice(slice, timeStep);
-    }
-    else
-    {
-      MITK_ERROR<<"Contour to image failed!";
-    }
-    mitk::ProgressBar::GetInstance()->Progress();
-    ++it;
-  }
-
-  if(segmentationNode.IsNull() || contourNode.IsNull() )
-  {
-    MITK_ERROR << "Selection does not contain valid data";
-    QMessageBox::information( this, "Contour To Image",
-                              "Selection does not contain valid data, please select a binary image and a contour(set)", QMessageBox::Ok );
-    m_Controls.btnProcess->setEnabled(false);
+    MITK_ERROR<<"Could not write the selected contours into the image!";
     return;
   }
+
+  result->DisconnectPipeline();
+  mitk::DataNode::Pointer filled = mitk::DataNode::New();
+  std::stringstream stream;
+  stream << imageNode->GetName();
+  stream << "_";
+  stream << contourNode->GetName();
+  filled->SetName(stream.str());
+  filled->SetData(result);
+  dataSelectionWidget->GetDataStorage()->Add(filled, imageNode);
+
   this->EnableButtons();
-}
 
-mitk::Image::Pointer QmitkContourModelToImageWidget::GetSliceForContour(mitk::ContourModel::Pointer contour, unsigned int timestep)
-{
-  mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
-  mitk::Point3D point3D, tempPoint;
-  mitk::Vector3D normal;
-
-  mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New();
-  mitk::Image::Pointer slice;
-
-  int sliceIndex;
-  bool isFrontside = true;
-  bool isRotated = false;
-
-  point3D = contour->GetVertexAt(0)->Coordinates;
-  tempPoint = contour->GetVertexAt(contour->GetNumberOfVertices()*0.5)->Coordinates;
-  mitk::Vector3D vec = point3D - tempPoint;
-  vec.Normalize();
-//  MITK_INFO<<setprecision(20)<<"VEC: ["<<vec[0]<<","<<vec[1]<<","<<vec[2]<<"] MATRIX: "<<m_SegmentationImageGeometry->GetIndexToWorldTransform()->GetMatrix();
-  m_SegmentationImageGeometry->WorldToIndex(point3D, point3D);
-  mitk::PlaneGeometry::PlaneOrientation orientation;
-  if (mitk::Equal(vec[0], 0))
-  {
-    orientation = mitk::PlaneGeometry::Sagittal;
-    sliceIndex = point3D[0];
-  }
-  else if (mitk::Equal(vec[1], 0))
-  {
-    orientation = mitk::PlaneGeometry::Frontal;
-    sliceIndex = point3D[1];
-  }
-  else if (mitk::Equal(vec[2], 0))
-  {
-    orientation = mitk::PlaneGeometry::Axial;
-    sliceIndex = point3D[2];
-  }
-  else
-  {
-    // Maybe rotate geometry to extract slice?
-    MITK_ERROR<<"Cannot detect correct slice number! Only axial, sagittal and frontal oriented contours are supported!";
-    return 0;
-  }
-
-  plane->InitializeStandardPlane(m_SegmentationImageGeometry, orientation, sliceIndex, isFrontside, isRotated);
-  point3D = plane->GetOrigin();
-  normal = plane->GetNormal();
-  normal.Normalize();
-  point3D += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
-  plane->SetOrigin(point3D);
-
-  m_CurrentPlane = plane;
-
-  // 2. fill into it
-  extractor->SetInput( m_SegmentationImage );
-//    extractor->SetTimeStep( timeStep );
-  extractor->SetWorldGeometry( plane );
-  extractor->SetVtkOutputRequest(false);
-  extractor->SetResliceTransformByGeometry( m_SegmentationImageGeometry );
-
-  extractor->Modified();
-  extractor->Update();
-
-  slice = extractor->GetOutput();
-  return slice;
-}
-
-void QmitkContourModelToImageWidget::WriteBackSlice(mitk::Image::Pointer slice, unsigned int timestep)
-{
-  //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
-  vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
-
-  //Set the slice as 'input'
-  reslice->SetInputSlice(slice->GetVtkImageData());
-
-  //set overwrite mode to true to write back to the image volume
-  reslice->SetOverwriteMode(true);
-  reslice->Modified();
-
-  mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslice);
-  extractor->SetInput( m_SegmentationImage );
-  extractor->SetTimeStep( timestep );
-  extractor->SetWorldGeometry( m_CurrentPlane );
-  extractor->SetVtkOutputRequest(true);
-  extractor->SetResliceTransformByGeometry( m_SegmentationImage->GetGeometry( timestep ) );
-
-  extractor->Modified();
-  extractor->Update();
-
-  m_SegmentationImage->Modified();
-  m_SegmentationImage->GetVtkImageData()->Modified();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

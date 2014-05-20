@@ -53,12 +53,6 @@ private slots:
   /** @brief This slot is called if the selection in the workbench is changed. */
   void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);
 
-//  /** @brief This slot is called if user activates the radio button for masking an image with a binary image mask. */
-//  void OnContourModelToImageToggled(bool);
-
-//  /** @brief This slot is called if user activates the radio button for masking an image with a surface. */
-//  void OnSurfaceMaskingToggled(bool);
-
   /** @brief This slot is called if user activates the button to mask an image. */
   void OnProcessPressed();
 
@@ -70,12 +64,6 @@ private:
   /** @brief Enable buttons if data selction is valid. */
   void EnableButtons(bool enable = true);
 
-  /** @brief Extracts the slice which correspond to the position of the contour*/
-  itk::SmartPointer<mitk::Image> GetSliceForContour(itk::SmartPointer<mitk::ContourModel> contour, unsigned int timestep);
-
-  /** @brief Extracts the slice which correspond to the position of the contour*/
-  void WriteBackSlice (itk::SmartPointer<mitk::Image> slice, unsigned int timestep);
-
   /** @brief Fills a mitk::ContourModel into a given segmentation image */
   itk::SmartPointer<mitk::Image> ContourModelToImage(itk::SmartPointer<mitk::Image> segmenationImage, itk::SmartPointer<mitk::ContourModel> contour );
 
@@ -83,10 +71,6 @@ private:
   itk::SmartPointer<mitk::Image> ContourModelSetToImage( itk::SmartPointer<mitk::Image> segmenationImage, itk::SmartPointer<mitk::ContourModelSet> contourSet );
 
   Ui::QmitkContourModelToImageWidgetControls m_Controls;
-
-  itk::SmartPointer<mitk::Image> m_SegmentationImage;
-  mitk::Geometry3D::Pointer m_SegmentationImageGeometry;
-  itk::SmartPointer<mitk::PlaneGeometry> m_CurrentPlane;
 };
 
 #endif

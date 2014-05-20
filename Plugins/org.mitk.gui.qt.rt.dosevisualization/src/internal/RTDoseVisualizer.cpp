@@ -425,7 +425,7 @@ void RTDoseVisualizer::OnGlobalVisIsoLineToggled(bool showIsoLines)
 
 void RTDoseVisualizer::OnConvertButtonClicked()
 {
-//  this->InitScrolling();
+  this->InitScrolling();
 
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
 
@@ -548,8 +548,8 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
 
   mitk::DataNode::Pointer isolineNode = mitk::DataNode::New();
   isolineNode->SetData(isoline);
-//  mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
-//  isolineNode->SetMapper(1, mapper);
+  mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
+  isolineNode->SetMapper(1, mapper);
   isolineNode->SetName("Isoline1");
   isolineNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
   isolineNode->SetProperty( "line width", mitk::IntProperty::New(1));
@@ -580,11 +580,7 @@ void RTDoseVisualizer::UpdateStdIsolines()
       if(doseIT->GetVisibleIsoLine()){
         ++count;
         vtkSmartPointer<vtkContourFilter> isolineFilter = vtkSmartPointer<vtkContourFilter>::New();
-//        isolineFilter->SetInputData(reslicedImage->GetVtkImageData());
-        isolineFilter->ComputeNormalsOff();
-        isolineFilter->ComputeGradientsOff();
-        isolineFilter->ComputeScalarsOff();
-        isolineFilter->SetInputData(image->GetVtkImageData());
+        isolineFilter->SetInputData(reslicedImage->GetVtkImageData());
         isolineFilter->GenerateValues(1,doseIT->GetDoseValue()*pref,doseIT->GetDoseValue()*pref);
         isolineFilter->Update();
         vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
@@ -592,16 +588,8 @@ void RTDoseVisualizer::UpdateStdIsolines()
 
         mitk::Surface::Pointer surface = mitk::Surface::New();
 
-        vtkSmartPointer<vtkDecimatePro> deciFilter = vtkSmartPointer<vtkDecimatePro>::New();
-        deciFilter->SetTargetReduction(0.4);
-        MITK_INFO << "REDUCTION: " << deciFilter->GetTargetReduction() << endl;
-        deciFilter->SetInputData(polyData);
-        deciFilter->Update();
-
-        surface->SetVtkPolyData(deciFilter->GetOutput());
-//        surface->SetVtkPolyData(polyData);
-//        surface->SetGeometry(reslicedImage->GetGeometry()->Clone());
-        surface->SetGeometry(image->GetGeometry()->Clone());
+        surface->SetVtkPolyData(polyData);
+        surface->SetGeometry(reslicedImage->GetGeometry()->Clone());
         mitk::Vector3D spacing;
         spacing.Fill(1);
         surface->GetGeometry()->SetSpacing(spacing);
@@ -609,10 +597,10 @@ void RTDoseVisualizer::UpdateStdIsolines()
 
         mitk::DataNode::Pointer isoNode = mitk::DataNode::New();
         isoNode->SetData(surface);
-//        mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
+        mitk::SurfaceVtkMapper3D::Pointer mapper = mitk::SurfaceVtkMapper3D::New();
         mitk::Color color;
         color[0]=doseIT->GetColor()[0];color[1]=doseIT->GetColor()[1];color[2]=doseIT->GetColor()[2];
-//        isoNode->SetMapper(1,mapper);
+        isoNode->SetMapper(1,mapper);
         isoNode->SetColor(color);
         isoNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
         isoNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false) );

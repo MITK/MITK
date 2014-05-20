@@ -96,32 +96,56 @@ void RTDoseVisualizer::SetFocus(){}
 
 void RTDoseVisualizer::OnSliceChanged(itk::Object *sender, const itk::EventObject &e)
 {
-  bool isDoseNode = false;
-  if(m_selectedNode && m_selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),isDoseNode) && isDoseNode)
+  for(int i=0; i<m_StdIsoLines.size();++i)
   {
-    for(int i=0; i<m_StdIsoLines.size();++i)
+    GetDataStorage()->Remove(m_StdIsoLines.at(i));
+  }
+  m_StdIsoLines.clear();
+  this->UpdateStdIsolines();
+
+  if(m_FreeIsoAdded)
+  {
+    float pref;
+    //get the iso dose node
+    mitk::DataNode::Pointer isoNode = this->GetIsoDoseNode();
+    isoNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(isoNode->GetData());
+    mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
+
+    m_Filters.at(0)->SetInputData(slicedImage->GetVtkImageData());
+    m_Filters.at(0)->GenerateValues(1,m_FreeIsoValue->GetDoseValue()*pref,m_FreeIsoValue->GetDoseValue()*pref);
+    m_Filters.at(0)->Update();
+
+    m_FreeIsoline->GetData()->GetGeometry()->SetOrigin(slicedImage->GetGeometry()->GetOrigin());
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+mitk::DataNode::Pointer RTDoseVisualizer::GetIsoDoseNode()
+{
+  //holt zuerst alle isonodes prüft dann auf visibility und nimmt zuletzt den mit dem höchsten layer
+  mitk::NodePredicateProperty::Pointer isDosePredicate = mitk::NodePredicateProperty::New(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),mitk::BoolProperty::New(true));
+  mitk::DataStorage::SetOfObjects::ConstPointer allIsoDoseNodes = this->GetDataStorage()->GetSubset(isDosePredicate);
+  int tmp = -1;
+  int layer = -1;
+  mitk::DataNode::Pointer isoNode = mitk::DataNode::New();
+  for(mitk::DataStorage::SetOfObjects::ConstIterator itIsoDose = allIsoDoseNodes->Begin(); itIsoDose != allIsoDoseNodes->End(); ++itIsoDose)
+  {
+    bool isVisible(false);
+    itIsoDose.Value()->GetBoolProperty("visible",isVisible);
+    if(isVisible)
     {
-      GetDataStorage()->Remove(m_StdIsoLines.at(i));
-    }
-    m_StdIsoLines.clear();
-    this->UpdateStdIsolines();
-
-    if(m_FreeIsoAdded)
-    {
-      float pref;
-      m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
-      mitk::Image::Pointer slicedImage = this->GetExtractedSlice(image);
-
-      m_Filters.at(0)->SetInputData(slicedImage->GetVtkImageData());
-      m_Filters.at(0)->GenerateValues(1,m_FreeIsoValue->GetDoseValue()*pref,m_FreeIsoValue->GetDoseValue()*pref);
-      m_Filters.at(0)->Update();
-
-      m_FreeIsoline->GetData()->GetGeometry()->SetOrigin(slicedImage->GetGeometry()->GetOrigin());
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      if(itIsoDose.Value()->GetIntProperty("layer",tmp) && tmp > layer)
+      {
+        isoNode = itIsoDose.Value();
+      }
     }
   }
+  if(isoNode.IsNotNull())
+    return isoNode;
+  else
+    return NULL;
 }
 
 void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
@@ -564,15 +588,16 @@ void RTDoseVisualizer::UpdateStdIsolines()
 {
   bool isDoseNode = false;
   mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = this->m_Presets[this->m_selectedPresetName];
-  if(m_selectedNode && m_selectedNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),isDoseNode) && isDoseNode)
+  mitk::DataNode::Pointer isoDataNode = this->GetIsoDoseNode();
+  if(isoDataNode && isoDataNode->GetBoolProperty(mitk::rt::Constants::DOSE_PROPERTY_NAME.c_str(),isDoseNode) && isDoseNode)
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_selectedNode->GetData());
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(isoDataNode->GetData());
     mitk::Image::Pointer reslicedImage = this->GetExtractedSlice(image);
 
     reslicedImage->SetSpacing(image->GetGeometry()->GetSpacing());
 
     float pref;
-    m_selectedNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+    isoDataNode->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
 
     unsigned int count (0);
     for(mitk::IsoDoseLevelSet::ConstIterator doseIT = isoDoseLevelSet->Begin(); doseIT!=isoDoseLevelSet->End();++doseIT)
@@ -611,7 +636,7 @@ void RTDoseVisualizer::UpdateStdIsolines()
         isoNode->SetName(strstr.str());
         isoNode->SetBoolProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),true);
         m_StdIsoLines.push_back(isoNode);
-        this->GetDataStorage()->Add(isoNode, m_selectedNode);
+        this->GetDataStorage()->Add(isoNode, isoDataNode);
       }
     }
   }

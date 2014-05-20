@@ -150,6 +150,8 @@ protected:
    */
   mitk::DataNode::Pointer UpdatePolyData(int num, double min, double max);
 
+  mitk::DataNode::Pointer GetIsoDoseNode();
+
   /**
    * @brief Calculates the isolines for the dose image
    * Number, value and color depends on the selected preset

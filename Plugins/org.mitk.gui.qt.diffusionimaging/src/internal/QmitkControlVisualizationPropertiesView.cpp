@@ -264,9 +264,15 @@ struct CvpSelListener : ISelectionListener
 
             float range;
             node->GetFloatProperty("Fiber2DSliceThickness",range);
-            label = "Range %1";
-            label = label.arg(range*0.1);
-            m_View->m_Controls->label_range->setText(label);
+            mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+            mitk::Geometry3D::Pointer geo = fib->GetGeometry();
+            mitk::ScalarType max = geo->GetExtentInMM(0);
+            max = std::max(max, geo->GetExtentInMM(1));
+            max = std::max(max, geo->GetExtentInMM(2));
+
+            m_View->m_Controls->m_FiberThicknessSlider->setMaximum(max * 10);
+
+            m_View->m_Controls->m_FiberThicknessSlider->setValue(range * 10);
 
           }
 
@@ -1467,10 +1473,10 @@ void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
 
 void QmitkControlVisualizationPropertiesView::FiberSlicingUpdateLabel(int value)
 {
-  QString label = "Range %1";
+  QString label = "Range %1 mm";
   label = label.arg(value * 0.1);
   m_Controls->label_range->setText(label);
-
+  this->FiberSlicingThickness2D();
 }
 
 void QmitkControlVisualizationPropertiesView::BundleRepresentationWire()

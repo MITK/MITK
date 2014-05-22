@@ -502,7 +502,7 @@
       </palette>
      </property>
      <property name="text">
-      <string>Convert nod to dose node (for testing only!)</string>
+      <string>Convert node to dose node (for testing only!)</string>
      </property>
     </widget>
    </item>

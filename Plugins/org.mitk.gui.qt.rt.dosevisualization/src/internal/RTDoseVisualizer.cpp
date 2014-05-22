@@ -526,6 +526,8 @@ void RTDoseVisualizer::OnConvertButtonClicked()
 //    this->RequestRenderWindowUpdate();
 
 //    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+    mitk::TimeGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+    mitk::RenderingManager::GetInstance()->InitializeViews( geo );
   }
 }
 

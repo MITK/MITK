@@ -52,12 +52,12 @@ mitk::FeedbackContourTool::~FeedbackContourTool()
 
 void mitk::FeedbackContourTool::SetFeedbackContourColor( float r, float g, float b )
 {
-  m_FeedbackContourNode->SetProperty("contour.color", ColorProperty::New(r, g, b));
+  m_FeedbackContourNode->SetProperty("color", ColorProperty::New(r, g, b));
 }
 
 void mitk::FeedbackContourTool::SetFeedbackContourColorDefault()
 {
-  m_FeedbackContourNode->SetProperty("contour.color", ColorProperty::New(0.0/255.0, 255.0/255.0, 0.0/255.0));
+  m_FeedbackContourNode->SetProperty("color", ColorProperty::New(0.0/255.0, 255.0/255.0, 0.0/255.0));
 }
 
 mitk::ContourModel* mitk::FeedbackContourTool::GetFeedbackContour()

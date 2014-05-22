@@ -267,7 +267,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
   m_LiveWireContourNode->SetProperty( "layer", IntProperty::New(101));
   m_LiveWireContourNode->AddProperty( "fixedLayer", BoolProperty::New(true));
   m_LiveWireContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
-  m_LiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
+  m_LiveWireContourNode->SetProperty( "color", ColorProperty::New(0.1, 1.0, 0.1));
   m_LiveWireContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
 
   m_EditingContour = mitk::ContourModel::New();
@@ -278,7 +278,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
   m_EditingContourNode->SetProperty( "layer", IntProperty::New(102));
   m_EditingContourNode->AddProperty( "fixedLayer", BoolProperty::New(true));
   m_EditingContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
-  m_EditingContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
+  m_EditingContourNode->SetProperty( "color", ColorProperty::New(0.1, 1.0, 0.1));
   m_EditingContourNode->AddProperty( "contour.points.color", ColorProperty::New(0.0, 0.0, 1.0), NULL, true );
   m_EditingContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
 

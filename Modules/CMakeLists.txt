@@ -50,6 +50,8 @@ set(module_dirs
     Python
     Persistence
     VtkShaders
+    DicomRT
+    RTUI
 )
 
 if(MITK_ENABLE_PIC_READER)

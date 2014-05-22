@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
 #include <vtkProperty.h>
+#include <mitkCoreServices.h>
+#include <mitkPropertyAliases.h>
 
 mitk::ContourModelMapper3D::ContourModelMapper3D()
 {
@@ -63,13 +65,11 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
   float lineWidth(1.0);
   if (this->GetDataNode()->GetFloatProperty( "contour.3D.width", lineWidth, renderer ))
   {
-    localStorage->m_TubeFilter->SetRadius(lineWidth);
+    localStorage->m_TubeFilter->SetWidth(lineWidth);
   }else
   {
-    localStorage->m_TubeFilter->SetRadius(0.5);
+    localStorage->m_TubeFilter->SetWidth(0.5);
   }
-  localStorage->m_TubeFilter->CappingOn();
-  localStorage->m_TubeFilter->SetNumberOfSides(10);
   localStorage->m_TubeFilter->Update();
   localStorage->m_Mapper->SetInputConnection(localStorage->m_TubeFilter->GetOutputPort());
 
@@ -200,17 +200,10 @@ void mitk::ContourModelMapper3D::ApplyContourProperties(mitk::BaseRenderer* rend
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
+  float color[3];
+  this->GetDataNode()->GetColor(color, renderer);
 
-  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-        ("contour.color", renderer));
-  if(colorprop)
-  {
-    //set the color of the contour
-    double red = colorprop->GetColor().GetRed();
-    double green = colorprop->GetColor().GetGreen();
-    double blue = colorprop->GetColor().GetBlue();
-    localStorage->m_Actor->GetProperty()->SetColor(red, green, blue);
-  }
+  localStorage->m_Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
 }
 
 
@@ -227,7 +220,7 @@ mitk::ContourModelMapper3D::LocalStorage::LocalStorage()
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
-  m_TubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
+  m_TubeFilter = vtkSmartPointer<vtkRibbonFilter>::New();
 
   //set the mapper for the actor
   m_Actor->SetMapper(m_Mapper);
@@ -238,6 +231,12 @@ void mitk::ContourModelMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk
 {
   node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
   node->AddProperty( "contour.3D.width", mitk::FloatProperty::New( 0.5 ), renderer, overwrite );
+
+  IPropertyAliases* aliases = CoreServices::GetPropertyAliases();
+  if(aliases != NULL)
+  {
+    aliases->AddAlias("color", "contour.color", "ContourModel");
+  }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

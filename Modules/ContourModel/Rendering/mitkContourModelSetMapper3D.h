@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkAssembly.h>
 #include <vtkProp.h>
 #include <vtkPolyData.h>
-#include <vtkTubeFilter.h>
+#include <vtkRibbonFilter.h>
 
 
 namespace mitk {
@@ -101,7 +101,7 @@ namespace mitk {
 
     virtual vtkSmartPointer<vtkPolyData> CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour,mitk::BaseRenderer* renderer);
 
-    virtual void ApplyContourProperties(mitk::BaseRenderer* renderer);
+    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor = NULL);
   };
 }
 #endif

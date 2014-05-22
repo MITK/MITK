@@ -515,17 +515,6 @@ void RTDoseVisualizer::OnConvertButtonClicked()
 
     UpdateBySelectedNode();
 
-//    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-//    if ( renderWindow != NULL && selectedNode->GetData()->GetTimeGeometry()->IsValid() )
-//    {
-//         renderWindow->GetRenderingManager()->InitializeViews(
-//             selectedNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-//         renderWindow->GetRenderingManager()->RequestUpdateAll();
-//    }
-
-//    this->RequestRenderWindowUpdate();
-
-//    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     mitk::TimeGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
     mitk::RenderingManager::GetInstance()->InitializeViews( geo );
   }
@@ -564,13 +553,10 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
 
   mitk::Surface::Pointer isoline = mitk::Surface::New();
   isoline->SetVtkPolyData(polyData);
-//  isoline->SetGeometry(const_cast<mitk::Geometry2D*>(this->GetGeometry2D("axial")->Clone().GetPointer()));
   isoline->SetGeometry(reslicedImage->GetGeometry()->Clone());
   mitk::Vector3D spacing;
   spacing.Fill(1);
   isoline->GetGeometry()->SetSpacing(spacing);
-//  isoline->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing());
-//  isoline->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
 
   mitk::DataNode::Pointer isolineNode = mitk::DataNode::New();
   isolineNode->SetData(isoline);
@@ -620,7 +606,6 @@ void RTDoseVisualizer::UpdateStdIsolines()
         mitk::Vector3D spacing;
         spacing.Fill(1);
         surface->GetGeometry()->SetSpacing(spacing);
-//        surface->SetOrigin(reslicedImage->GetGeometry()->GetOrigin());
 
         mitk::DataNode::Pointer isoNode = mitk::DataNode::New();
         isoNode->SetData(surface);

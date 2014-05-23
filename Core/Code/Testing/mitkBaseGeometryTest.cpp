@@ -448,6 +448,7 @@ public:
   void Equal_InputIsNull_ReturnsFalse()
   {
     DummyTestClass::Pointer geometryNull = NULL;
+    MITK_INFO<<"Test, if a Null pointer throws an error. The next line needs to display an error.";
     CPPUNIT_ASSERT( mitk::Equal(geometryNull, anotherDummyGeometry, mitk::eps,false)==false);
   }
 
@@ -1040,7 +1041,7 @@ public:
     CPPUNIT_ASSERT(refCorner==corner);
 
     //Wrong Corner needs to fail
-    CPPUNIT_ASSERT_THROW(dummy->GetCornerPoint(-1),itk::ExceptionObject);
+    CPPUNIT_ASSERT_THROW(dummy->GetCornerPoint(20),itk::ExceptionObject);
 
     //dummy geometry must not have changed!
     DummyTestClass::Pointer newDummy = DummyTestClass::New();

@@ -7,7 +7,7 @@
 
 #include "mitkDataStorage.h"
 
-#include "QmlMitkCoreExports.h"
+#include "MitkQmlItemsExports.h"
 
 /**
   \brief QML replacement for QmitkStdMultiWidget.
@@ -17,7 +17,7 @@
 
   \warning Subject to change.
 */
-class QmlMitk_EXPORT QmlMitkFourRenderWindowWidget : public QQuickItem
+class MitkQmlItems_EXPORT QmlMitkFourRenderWindowWidget : public QQuickItem
 {
     Q_OBJECT
 

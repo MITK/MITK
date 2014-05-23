@@ -56,7 +56,7 @@ public:
 
   mitkClassMacro(DummyTestClass, mitk::BaseGeometry);
   itkNewMacro(Self);
-  mitkNewMacro1Param(Self,Self);
+  mitkNewMacro1Param(Self, const Self&);
 
   itk::LightObject::Pointer InternalClone() const
   {
@@ -413,7 +413,7 @@ public:
     dummy2->SetSpacing(anotherSpacing);
 
     DummyTestClass::Pointer dummy3;
-    dummy3 = DummyTestClass::New(*dummy2);
+    dummy3 = new DummyTestClass(*dummy2);
     CPPUNIT_ASSERT(mitk::Equal(dummy3,dummy2,mitk::eps,true));
   }
 
@@ -584,7 +584,7 @@ public:
   }
 
   // a part of the test requires axis-parallel coordinates
-  int testIndexAndWorldConsistency(DummyTestClass* dummyGeometry)
+  int testIndexAndWorldConsistency(DummyTestClass::Pointer dummyGeometry)
   {
     //Testing consistency of index and world coordinate systems
     mitk::Point3D origin = dummyGeometry->GetOrigin();

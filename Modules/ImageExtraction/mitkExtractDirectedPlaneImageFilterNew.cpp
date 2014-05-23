@@ -45,7 +45,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
     m_ImageGeometry = inputImage->GetGeometry();
 
     //If no timestep is set, the lowest given will be selected
-    const mitk::TimeGeometry* inputTimeGeometry = this->GetInput()->GetTimeGeometry();
+    //const mitk::TimeGeometry* inputTimeGeometry = this->GetInput()->GetTimeGeometry();
 
     if ( inputImage->GetDimension() > 4 || inputImage->GetDimension() < 2)
     {

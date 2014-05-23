@@ -98,11 +98,8 @@ namespace mitk {
     */
     DEPRECATED(const PlaneGeometry* GetGeometry2D(int s){return GetPlaneGeometry(s);};)
 
+
     /**
-    * \brief Set PlaneGeometry of slice \a s.
-    */
-    virtual bool SetPlaneGeometry( mitk::PlaneGeometry *geometry2D, int s );
-                /**
     * \deprecatedSince{2014_06} Please use SetPlaneGeometry
     */
     DEPRECATED(void SetGeometry2D(PlaneGeometry* geo, int s){SetPlaneGeometry(geo, s);};)
@@ -118,6 +115,12 @@ namespace mitk {
     * \brief Get the number of slices
     */
     itkGetConstMacro( Slices, unsigned int );
+
+    /**
+    * \brief Set PlaneGeometry of slice \a s.
+    */
+    virtual bool SetPlaneGeometry( mitk::PlaneGeometry *geometry2D, int s );
+
 
     /**
     * \brief Check whether a slice exists

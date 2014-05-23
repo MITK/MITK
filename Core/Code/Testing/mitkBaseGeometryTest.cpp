@@ -21,10 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseGeometry.h>
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
-#include "mitkoperationactor.h"
+#include "mitkOperationActor.h"
 
 #include <itkBoundingBox.h>
-#include "mitkvector.h"
+#include "mitkVector.h"
 #include <itkAffineGeometryFrame.h>
 #include <itkQuaternionRigidTransform.h>
 #include "itkScalableAffineTransform.h"
@@ -58,7 +58,7 @@ public:
   itkNewMacro(Self);
   mitkNewMacro1Param(Self,Self);
 
-  itk::LightObject::Pointer DummyTestClass::InternalClone() const
+  itk::LightObject::Pointer InternalClone() const
   {
     Self::Pointer newGeometry = new Self(*this);
     newGeometry->UnRegister();
@@ -851,7 +851,10 @@ public:
     expectedVoxelStepIndex.Fill(1);
     CPPUNIT_ASSERT(mitk::Equal(voxelStepIndex,expectedVoxelStepIndex));
 
-    delete opR, opN, opS, opP;
+    delete opR;
+    delete opN;
+    delete opS;
+    delete opP;
   }
 
   void TestCalculateBoundingBoxRelToTransform(){

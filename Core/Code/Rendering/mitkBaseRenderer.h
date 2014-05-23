@@ -524,7 +524,7 @@ namespace mitk
     /**
     * \deprecatedSince{2014_06} Please use SetCurrentWorldPlaneGeometry
     */
-    DEPRECATED(void SetCurrentWorldGeometry2D(PlaneGeometry* geometry2d){SetCurrentWorldPlaneGeometry(geometry2d);};)
+    DEPRECATED(void SetCurrentWorldGeometry2D(PlaneGeometry* geometry2d)){SetCurrentWorldPlaneGeometry(geometry2d);};
 
       //##Documentation
       //## @brief Sets m_CurrentWorldGeometry

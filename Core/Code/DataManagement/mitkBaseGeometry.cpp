@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iomanip>
 
 #include "mitkBaseGeometry.h"
-#include "mitkvector.h"
+#include "mitkVector.h"
 #include "mitkMatrixConvert.h"
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>

@@ -189,7 +189,7 @@ void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Vector2D &vec_mm,
   m_Plane->WorldToIndex(vec_mm, vec_units);
 }
 
-bool mitk::AbstractTransformGeometry::IsAbove(const mitk::Point3D& pt3d_mm) const
+bool mitk::AbstractTransformGeometry::IsAbove(const mitk::Point3D& pt3d_mm, bool considerBoundingBox) const
 {
   assert((m_ItkVtkAbstractTransform.IsNotNull()) && (m_Plane.IsNotNull()));
 

@@ -95,7 +95,7 @@ public:
               /**
     * \deprecatedSince{2014_06} Please use SetPlaneGeometry
     */
-    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo){SetPlaneGeometry(geo);};)
+    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo)){SetPlaneGeometry(geo);};
 
 
   /** \brief Returns (previously set) 2D geometry of this figure. */
@@ -103,7 +103,7 @@ public:
         /**
     * \deprecatedSince{2014_06} Please use GetPlaneGeometry
     */
-    DEPRECATED(const PlaneGeometry* GetGeometry2D(){return GetPlaneGeometry();};)
+    DEPRECATED(const PlaneGeometry* GetGeometry2D()){return GetPlaneGeometry();};
 
 
   /** \brief True if the planar figure is closed.

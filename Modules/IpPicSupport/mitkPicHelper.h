@@ -44,10 +44,11 @@ public:
   static void InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry);
 
   static bool SetPlaneGeometry(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);
-      /**
-    * \deprecatedSince{2014_06} Please use SetPlaneGeometry
-    */
-    DEPRECATED(static bool SetGeometry2D(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry){return SetPlaneGeometry(pic,s,slicedgeometry);};)
+
+  /**
+  * \deprecatedSince{2014_06} Please use SetPlaneGeometry
+  */
+  DEPRECATED(static bool SetGeometry2D(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry)){return SetPlaneGeometry(pic,s,slicedgeometry);};
 };
 
 } // namespace mitk

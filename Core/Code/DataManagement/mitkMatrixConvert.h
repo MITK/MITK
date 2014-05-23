@@ -118,7 +118,7 @@ namespace mitk
     typename TTransformType::MatrixType rotationMatrix;
     GetRotation(geometry, rotationMatrix);
 
-    const typename mitk::Geometry3D::TransformType::OffsetType& geometryOffset =
+    const typename mitk::BaseGeometry::TransformType::OffsetType& geometryOffset =
       geometry->GetIndexToWorldTransform()->GetOffset();
 
     vnl_vector<typename TTransformType::MatrixType::ValueType> vnlOffset(3);

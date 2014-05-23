@@ -119,7 +119,7 @@ namespace mitk {
     //## For further information about coordinates types, please see the Geometry documentation
     virtual void WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
-    virtual bool IsAbove(const Point3D& pt3d_mm) const;
+    virtual bool IsAbove(const Point3D& pt3d_mm, bool considerBoundingBox=false) const;
 
     virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
 

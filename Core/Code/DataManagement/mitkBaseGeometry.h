@@ -19,10 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
-#include "mitkoperationactor.h"
+#include "mitkOperationActor.h"
 
 #include <itkBoundingBox.h>
-#include "mitkvector.h"
+#include "mitkVector.h"
 #include <itkAffineGeometryFrame.h>
 #include <itkQuaternionRigidTransform.h>
 #include "itkScalableAffineTransform.h"
@@ -618,16 +618,16 @@ namespace mitk {
 
     //mitk::TimeBounds m_TimeBounds;
 
-    //##Documentation
-    //## @brief Origin, i.e. upper-left corner of the plane
-    //##
-    Point3D m_Origin;
-
     static const unsigned int m_NDimensions = 3;
 
     mutable TransformType::Pointer m_InvertedTransform;
 
     mutable unsigned long m_IndexToWorldTransformLastModified;
+
+    //##Documentation
+    //## @brief Origin, i.e. upper-left corner of the plane
+    //##
+    Point3D m_Origin;
 
     bool m_ImageGeometry;
 

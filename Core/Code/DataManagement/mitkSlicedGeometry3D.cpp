@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkApplyTransformMatrixOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkSliceNavigationController.h"
+#include <itkSpatialOrientationAdapter.h>
+#include <itkMatrix.h>
 
 const mitk::ScalarType PI = 3.14159265359;
 
@@ -204,41 +206,61 @@ mitk::SlicedGeometry3D::InitializeEvenlySpaced(
   directionVector.Normalize();
   directionVector *= zSpacing;
 
-  if ( flipped == false )
-  {
-    // Normally we should use the following four lines to create a copy of
-    // the transform contrained in geometry2D, because it may not be changed
-    // by us. But we know that SetSpacing creates a new transform without
-    // changing the old (coming from geometry2D), so we can use the fifth
-    // line instead. We check this at (**).
-    //
-    // AffineTransform3D::Pointer transform = AffineTransform3D::New();
-    // transform->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
-    // transform->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
-    // SetIndexToWorldTransform(transform);
-
-    m_IndexToWorldTransform = const_cast< AffineTransform3D * >(
-      geometry2D->GetIndexToWorldTransform() );
-  }
-  else
-  {
-    directionVector *= -1.0;
-    m_IndexToWorldTransform = AffineTransform3D::New();
-    m_IndexToWorldTransform->SetMatrix(
-      geometry2D->GetIndexToWorldTransform()->GetMatrix() );
-
-    AffineTransform3D::OutputVectorType scaleVector;
-    FillVector3D(scaleVector, 1.0, 1.0, -1.0);
-    m_IndexToWorldTransform->Scale(scaleVector, true);
-    m_IndexToWorldTransform->SetOffset(
-      geometry2D->GetIndexToWorldTransform()->GetOffset() );
-  }
-
   mitk::Vector3D spacing;
   FillVector3D( spacing,
     geometry2D->GetExtentInMM(0) / bounds[1],
     geometry2D->GetExtentInMM(1) / bounds[3],
     zSpacing );
+
+  AffineTransform3D::MatrixType affineTransformMatrix = geometry2D->GetIndexToWorldTransform()->GetMatrix();
+  AffineTransform3D::MatrixType::InternalMatrixType inverseTransformMatrix = affineTransformMatrix.GetInverse();
+
+  // Axes in world: LR (sagittal), AP (coronal/frontal), SI (axial)
+  int dominantAxes[3];
+  dominantAxes[0] = itk::Function::Max3(inverseTransformMatrix[0][0], inverseTransformMatrix[1][0], inverseTransformMatrix[2][0]);
+  dominantAxes[1] = itk::Function::Max3(inverseTransformMatrix[0][1], inverseTransformMatrix[1][1], inverseTransformMatrix[2][1]);
+  dominantAxes[2] = itk::Function::Max3(inverseTransformMatrix[0][2], inverseTransformMatrix[1][2], inverseTransformMatrix[2][2]);
+
+  // Axes in renderer: x (horizontal), y (vertical), z (depth)
+  int permutedAxes[3];
+  for (int i = 0; i < 3; ++i)
+  {
+   permutedAxes[dominantAxes[i]] = i;
+  }
+
+  bool inputIsImageGeometry = geometry2D->GetImageGeometry();
+
+  if ( flipped == false )
+  {
+    m_IndexToWorldTransform = AffineTransform3D::New();
+    m_IndexToWorldTransform->SetMatrix(affineTransformMatrix);
+
+    AffineTransform3D::OutputVectorType scaleVector;
+    FillVector3D(scaleVector, spacing[0], spacing[1], spacing[2]);
+    m_IndexToWorldTransform->Scale(scaleVector, true);
+    AffineTransform3D::OutputVectorType offset = geometry2D->GetIndexToWorldTransform()->GetOffset();
+    if (!inputIsImageGeometry)
+    {
+      offset[permutedAxes[2]] -= 0.5 * zSpacing;
+    }
+    m_IndexToWorldTransform->SetOffset(offset);
+  }
+  else
+  {
+    directionVector *= -1.0;
+    m_IndexToWorldTransform = AffineTransform3D::New();
+    m_IndexToWorldTransform->SetMatrix(affineTransformMatrix);
+
+    AffineTransform3D::OutputVectorType scaleVector;
+    FillVector3D(scaleVector, spacing[0], spacing[1], -spacing[2]);
+    m_IndexToWorldTransform->Scale(scaleVector, true);
+    AffineTransform3D::OutputVectorType offset = geometry2D->GetIndexToWorldTransform()->GetOffset();
+    if (!inputIsImageGeometry)
+    {
+      offset[permutedAxes[2]] -= 0.5 * zSpacing;
+    }
+    m_IndexToWorldTransform->SetOffset(offset);
+  }
 
   // Ensure that spacing differs from m_Spacing to make SetSpacing change the
   // matrix.
@@ -840,7 +862,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       if (std::abs(rotationAngle-180) < mitk::eps )
       {
          // current Normal and desired normal are not linear independent!!(e.g 1,0,0 and -1,0,0).
-         // Rotation Axis should be ANY vector that is 90� to current Normal
+         // Rotation Axis should be ANY vector that is 90 degrees to current Normal
          mitk::Vector3D helpNormal;
          helpNormal = currentNormal;
          helpNormal[0] += 1;
@@ -899,7 +921,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
          if (std::abs(rotationAngle-180) < mitk::eps )
          {
             // current axisVec and desired axisVec are not linear independent!!(e.g 1,0,0 and -1,0,0).
-            // Rotation Axis can be just plane Normal. (have to rotate by 180�)
+            // Rotation Axis can be just plane Normal. (have to rotate by 180 degrees)
             rotationAxis = newNormal;
          }
 

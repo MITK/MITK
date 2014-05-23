@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmlMitkRenderingManager_h
 #define QmlMitkRenderingManager_h
 
-#include <QmlMitkExports.h>
+#include <MitkQmlItemsExports.h>
 
 #include "mitkRenderingManager.h"
 
@@ -36,7 +36,7 @@ class QmlMitkRenderingManagerFactory;
  * receive it back in the GUI thread where we are allowed to do rendering.
  *
  */
-class QmlMitk_EXPORT QmlMitkRenderingManager : public QObject, public mitk::RenderingManager
+class MitkQmlItems_EXPORT QmlMitkRenderingManager : public QObject, public mitk::RenderingManager
 {
   Q_OBJECT
 

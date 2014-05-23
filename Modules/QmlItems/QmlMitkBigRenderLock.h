@@ -3,7 +3,7 @@
 
 #include <QtCore>
 
-#include "QmlMitkExports.h"
+#include "MitkQmlItemsExports.h"
 
 /**
   \brief Workaround lock around MITK rendering.
@@ -17,7 +17,7 @@
   in rendering thread safe. This solution is much more
   work though, so it will come later.
 */
-class QmlMitk_EXPORT QmlMitkBigRenderLock : public QObject
+class MitkQmlItems_EXPORT QmlMitkBigRenderLock : public QObject
 {
   Q_OBJECT
   public:

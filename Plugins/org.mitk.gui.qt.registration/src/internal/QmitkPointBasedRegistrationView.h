@@ -274,10 +274,10 @@ protected:
   mitk::DataNode::Pointer m_FixedPointSetNode;
   mitk::DataNode::Pointer m_MovingNode;
   mitk::DataNode::Pointer m_FixedNode;
-  std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
-  std::list<mitk::Geometry3D::Pointer> m_UndoPointsGeometryList;
-  std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;
-  std::list<mitk::Geometry3D::Pointer> m_RedoPointsGeometryList;
+  std::list<mitk::BaseGeometry::Pointer> m_UndoGeometryList;
+  std::list<mitk::BaseGeometry::Pointer> m_UndoPointsGeometryList;
+  std::list<mitk::BaseGeometry::Pointer> m_RedoGeometryList;
+  std::list<mitk::BaseGeometry::Pointer> m_RedoPointsGeometryList;
   bool m_ShowRedGreen;
   float m_Opacity;
   float m_OriginalOpacity;

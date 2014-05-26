@@ -91,7 +91,7 @@ void QmitkFieldmapGeneratorView::PlaceFieldSource()
 
     mitk::Point3D index;
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_Controls->m_SelectedImageBox->GetSelectedNode()->GetData());
-    mitk::Geometry3D* geom = img->GetGeometry();
+    mitk::BaseGeometry* geom = img->GetGeometry();
 
     if ( geom->IsInside(m_WorldPoint) )
     {
@@ -130,7 +130,7 @@ void QmitkFieldmapGeneratorView::GenerateFieldmap()
         return;
 
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_Controls->m_SelectedImageBox->GetSelectedNode()->GetData());
-    mitk::Geometry3D* geom = img->GetGeometry();
+    mitk::BaseGeometry* geom = img->GetGeometry();
 
     typedef itk::Image< double, 3 > FieldMapType;
     itk::Vector<double>                 spacing;              ///< output image spacing

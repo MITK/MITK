@@ -52,8 +52,8 @@ int CopyGeometry(int argc, char* argv[])
         infile = BaseDataIO::LoadBaseDataFromFile( imageName, s1, s2, false );
         Image::Pointer target = dynamic_cast<Image*>(infile.at(0).GetPointer());
 
-        mitk::Geometry3D* s_geom = source->GetGeometry();
-        mitk::Geometry3D* t_geom = target->GetGeometry();
+        mitk::BaseGeometry* s_geom = source->GetGeometry();
+        mitk::BaseGeometry* t_geom = target->GetGeometry();
 
         t_geom->SetIndexToWorldTransform(s_geom->GetIndexToWorldTransform());
         target->SetGeometry(t_geom);

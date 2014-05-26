@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <tinyxml.h>
 #include "itksys/SystemTools.hxx"
 #include <vtkMatrix4x4.h>
+#include "mitkGeometry3D.h"
 
 void mitk::ConnectomicsNetworkReader::GenerateData()
 {

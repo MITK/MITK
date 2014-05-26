@@ -38,7 +38,6 @@ mitk::CoordinateSupplier::CoordinateSupplier(const char * type, mitk::OperationA
 
 mitk::CoordinateSupplier::~CoordinateSupplier()
 {
-
 }
 
 bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
@@ -53,9 +52,7 @@ bool mitk::CoordinateSupplier::ExecuteAction(Action* action, mitk::StateEvent co
       ScalarType timeInMS = 0;
       if(stateEvent->GetEvent()->GetSender()!=NULL)
       {
-        const Geometry2D* worldGeometry = stateEvent->GetEvent()->GetSender()->GetCurrentWorldGeometry2D();
-        assert( worldGeometry != NULL );
-        timeInMS = worldGeometry->GetTimeBounds()[ 0 ];
+        timeInMS = stateEvent->GetEvent()->GetSender()->GetTime();
       }
       else
       {

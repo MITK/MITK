@@ -180,7 +180,7 @@ int mitkPlanarSubdivisionPolygonTest(int /* argc */, char* /*argv*/[])
   // **************************************************************************
   // 1. Instantiation and basic tests, including feature evaluation
   mitk::PlanarSubdivisionPolygon::Pointer planarSubdivisionPolygon = mitk::PlanarSubdivisionPolygon::New();
-  planarSubdivisionPolygon->SetGeometry2D( planeGeometry );
+  planarSubdivisionPolygon->SetPlaneGeometry( planeGeometry );
 
   // first test: did this work?
   MITK_TEST_CONDITION_REQUIRED( planarSubdivisionPolygon.IsNotNull(), "Testing instantiation" );

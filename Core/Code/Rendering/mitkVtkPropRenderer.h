@@ -236,7 +236,7 @@ private:
   PickingMode               m_PickingMode;
 
   // Explicit use of SmartPointer to avoid circular #includes
-  itk::SmartPointer< mitk::Mapper > m_CurrentWorldGeometry2DMapper;
+  itk::SmartPointer< mitk::Mapper > m_CurrentWorldPlaneGeometryMapper;
 
   vtkLightKit* m_LightKit;
 

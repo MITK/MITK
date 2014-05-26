@@ -73,8 +73,8 @@ public:
 
   //##Documentation
   //## @brief Optional geometry for clipping the extruded contour
-  itkGetConstObjectMacro(ClippingGeometry, mitk::Geometry3D);
-  itkSetObjectMacro(ClippingGeometry, mitk::Geometry3D);
+  itkGetConstObjectMacro(ClippingGeometry, mitk::BaseGeometry);
+  itkSetObjectMacro(ClippingGeometry, mitk::BaseGeometry);
 
   virtual unsigned long GetMTime() const;
 protected:
@@ -87,7 +87,7 @@ protected:
   mitk::Contour::Pointer m_Contour;
   mitk::Vector3D m_Vector;
   mitk::Vector3D m_RightVector;
-  mitk::Geometry3D::Pointer m_ClippingGeometry;
+  mitk::BaseGeometry::Pointer m_ClippingGeometry;
 
   bool m_AutomaticVectorGeneration;
 

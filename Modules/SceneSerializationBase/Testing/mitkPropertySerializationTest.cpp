@@ -193,7 +193,7 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
   RenderWindowFrame
   mitk::DiffusionImage< TPixelType >
   GeometryData
-  mitk::Geometry2DData
+  mitk::PlaneGeometryData
   GradientBackground
   ItkBaseDataAdapter
   ManufacturerLogo

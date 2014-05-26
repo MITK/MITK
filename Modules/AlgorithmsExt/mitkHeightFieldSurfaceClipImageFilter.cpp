@@ -405,7 +405,7 @@ namespace mitk
       MITK_INFO<<"Plane: "<<i;
       MITK_INFO << "Clipping: Start\n";
 
-      //const Geometry2D *clippingGeometryOfCurrentTimeStep = NULL;
+      //const PlaneGeometry *clippingGeometryOfCurrentTimeStep = NULL;
 
       int t;
       for( t = tstart; t < tmax; ++t )

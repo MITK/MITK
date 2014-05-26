@@ -14,22 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <mitkModifiedLock.h>
 
-#include "mitkLandmarkBasedCurvedGeometry.h"
-#include <vtkAbstractTransform.h>
-
-mitk::LandmarkBasedCurvedGeometry::LandmarkBasedCurvedGeometry()
-  : m_TargetLandmarks(NULL)
-{
+mitk::ModifiedLock::ModifiedLock(BaseGeometry* baseGeo){
+  m_baseGeometry = baseGeo;
+  m_baseGeometry->m_ModifiedLockFlag = true;
+  m_baseGeometry->m_ModifiedCalledFlag = false;
 }
 
-mitk::LandmarkBasedCurvedGeometry::LandmarkBasedCurvedGeometry(const LandmarkBasedCurvedGeometry& other)
-  : Superclass(other)
-{
-  SetTargetLandmarks(other.m_TargetLandmarks);
-}
+mitk::ModifiedLock::~ModifiedLock(){
+  m_baseGeometry->m_ModifiedLockFlag = false;
 
-mitk::LandmarkBasedCurvedGeometry::~LandmarkBasedCurvedGeometry()
-{
+  if(m_baseGeometry->m_ModifiedCalledFlag)
+    m_baseGeometry->Modified();
 
+  m_baseGeometry->m_ModifiedCalledFlag = false;
 }

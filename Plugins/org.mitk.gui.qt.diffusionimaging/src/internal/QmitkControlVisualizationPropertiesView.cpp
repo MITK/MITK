@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGlobalInteraction.h"
 #include "usModuleRegistry.h"
 
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 #include "berryIWorkbenchWindow.h"
 #include "berryIWorkbenchPage.h"
@@ -97,7 +97,7 @@ static bool DetermineAffectedImageSlice( const mitk::Image* image, const mitk::P
   }
 
   // determine slice number in image
-  mitk::Geometry3D* imageGeometry = image->GetGeometry(0);
+  mitk::BaseGeometry* imageGeometry = image->GetGeometry(0);
   mitk::Point3D testPoint = imageGeometry->GetCenter();
   mitk::Point3D projectedPoint;
   plane->Project( testPoint, projectedPoint );
@@ -265,7 +265,7 @@ struct CvpSelListener : ISelectionListener
             float range;
             node->GetFloatProperty("Fiber2DSliceThickness",range);
             mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
-            mitk::Geometry3D::Pointer geo = fib->GetGeometry();
+            mitk::BaseGeometry::Pointer geo = fib->GetGeometry();
             mitk::ScalarType max = geo->GetExtentInMM(0);
             max = std::max(max, geo->GetExtentInMM(1));
             max = std::max(max, geo->GetExtentInMM(2));

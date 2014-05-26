@@ -96,8 +96,8 @@ void BoundingObjectCutter::GenerateOutputInformation()
   if((m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeGeometry()->CountTimeSteps() == 0))
     return;
 
-  mitk::Geometry3D* boGeometry =  m_BoundingObject->GetGeometry();
-  mitk::Geometry3D* inputImageGeometry = input->GetSlicedGeometry();
+  mitk::BaseGeometry* boGeometry =  m_BoundingObject->GetGeometry();
+  mitk::BaseGeometry* inputImageGeometry = input->GetSlicedGeometry();
   // calculate bounding box of bounding-object relative to the geometry
   // of the input image. The result is in pixel coordinates of the input
   // image (because the m_IndexToWorldTransform includes the spacing).

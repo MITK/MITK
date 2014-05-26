@@ -153,7 +153,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     mitk::FiberBundleX* m_Fib;
 
-    mitk::Geometry3D* m_CurrentGeometry;
+    mitk::BaseGeometry* m_CurrentGeometry;
 
     // A table model for saving group information in a name,number pair.
     QmitkTbssTableModel* m_GroupModel;

@@ -236,13 +236,13 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
   }
 }
 
-//const mitk::Geometry2D* mitk::SlicedData::GetGeometry2D(int s, int t) const
+//const mitk::PlaneGeometry* mitk::SlicedData::GetPlaneGeometry(int s, int t) const
 //{
 //  const_cast<SlicedData*>(this)->SetRequestedRegionToLargestPossibleRegion();
 //
 //  const_cast<SlicedData*>(this)->UpdateOutputInformation();
 //
-//  return GetSlicedGeometry(t)->GetGeometry2D(s);
+//  return GetSlicedGeometry(t)->GetPlaneGeometry(s);
 //}
 //
 mitk::SlicedGeometry3D* mitk::SlicedData::GetSlicedGeometry(unsigned int t) const
@@ -261,7 +261,7 @@ const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry(unsigne
   return GetSlicedGeometry(t);
 }
 
-void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
+void mitk::SlicedData::SetGeometry(BaseGeometry* aGeometry3D)
 {
   if(aGeometry3D!=NULL)
   {
@@ -269,10 +269,10 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
     SlicedGeometry3D::Pointer slicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
     if(slicedGeometry.IsNull())
     {
-      Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(aGeometry3D);
+      PlaneGeometry* geometry2d = dynamic_cast<PlaneGeometry*>(aGeometry3D);
       if(geometry2d!=NULL)
       {
-        if((GetSlicedGeometry()->GetGeometry2D(0)==geometry2d) && (GetSlicedGeometry()->GetSlices()==1))
+        if((GetSlicedGeometry()->GetPlaneGeometry(0)==geometry2d) && (GetSlicedGeometry()->GetSlices()==1))
           return;
         slicedGeometry = SlicedGeometry3D::New();
         slicedGeometry->InitializeEvenlySpaced(geometry2d, 1);
@@ -321,7 +321,7 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
       slicedGeometry->SetOrigin(origin);
       if(slicedGeometry->GetEvenlySpaced())
       {
-        mitk::Geometry2D* geometry2D = slicedGeometry->GetGeometry2D(0);
+        mitk::PlaneGeometry* geometry2D = slicedGeometry->GetPlaneGeometry(0);
         geometry2D->SetOrigin(origin);
         slicedGeometry->InitializeEvenlySpaced(geometry2D, slicedGeometry->GetSlices());
       }

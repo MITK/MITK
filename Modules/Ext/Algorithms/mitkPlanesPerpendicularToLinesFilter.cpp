@@ -144,13 +144,13 @@ void mitk::PlanesPerpendicularToLinesFilter::GenerateData()
     PlaneGeometry::Pointer plane = static_cast<PlaneGeometry*>((*planes.rbegin())->Clone().GetPointer());
     itk2vtk(last.GetVnlVector()-right*halfWidthInMM-down*halfHeightInMM, origin);
     plane->SetOrigin(origin);
-    m_CreatedGeometries->SetGeometry2D(plane, planes.size());
+    m_CreatedGeometries->SetPlaneGeometry(plane, planes.size());
 
     //add all planes to sliced-geometry
     int s;
     for(s=0; planes.empty()==false; planes.pop_front(), ++s)
     {
-      m_CreatedGeometries->SetGeometry2D(planes.front(), s);
+      m_CreatedGeometries->SetPlaneGeometry(planes.front(), s);
     }
 
     m_CreatedGeometries->SetEvenlySpaced(false);
@@ -199,11 +199,11 @@ void mitk::PlanesPerpendicularToLinesFilter::SetInput(const mitk::Mesh *input)
     const_cast< mitk::Mesh * >( input ) );
 }
 
-void mitk::PlanesPerpendicularToLinesFilter::SetFrameGeometry(const mitk::Geometry3D* frameGeometry)
+void mitk::PlanesPerpendicularToLinesFilter::SetFrameGeometry(const mitk::BaseGeometry* frameGeometry)
 {
   if((frameGeometry != NULL) && (frameGeometry->IsValid()))
   {
-    m_FrameGeometry = static_cast<mitk::Geometry3D*>(frameGeometry->Clone().GetPointer());
+    m_FrameGeometry = static_cast<mitk::BaseGeometry*>(frameGeometry->Clone().GetPointer());
   }
   else
   {

@@ -54,7 +54,7 @@ namespace mitk
     //itkFactorylessNewMacro(Self)
     //itkCloneMacro(Self)
 
-    //mitkNewMacro4Param(DiffSliceOperation,mitk::Image,mitk::Image,unsigned int, mitk::Geometry2D);
+    //mitkNewMacro4Param(DiffSliceOperation,mitk::Image,mitk::Image,unsigned int, mitk::PlaneGeometry);
 
     /** \brief Creates an empty instance.
       Note that it is not valid yet. The properties of the object have to be set.
@@ -62,13 +62,13 @@ namespace mitk
     DiffSliceOperation();
 
     /** \brief */
-    DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, Geometry3D* sliceGeometry, unsigned int timestep, Geometry3D* currentWorldGeometry);
+    DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, SlicedGeometry3D* sliceGeometry, unsigned int timestep, BaseGeometry* currentWorldGeometry);
 
     /** \brief
     *
     * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
     */
-    DEPRECATED(DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, TimeSlicedGeometry* sliceGeometry, unsigned int timestep, Geometry3D* currentWorldGeometry));
+    DEPRECATED(DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, TimeSlicedGeometry* sliceGeometry, unsigned int timestep, BaseGeometry* currentWorldGeometry));
 
     /** \brief Check if it is a valid operation.*/
     bool IsValid();
@@ -89,9 +89,9 @@ namespace mitk
     unsigned int GetTimeStep(){return this->m_TimeStep;}
 
     /** \brief Set the axis where the slice has to be applied in the volume.*/
-    void SetSliceGeometry(Geometry3D* sliceGeometry){this->m_SliceGeometry = sliceGeometry;}
+    void SetSliceGeometry(SlicedGeometry3D* sliceGeometry){this->m_SliceGeometry = sliceGeometry;}
     /** \brief Get the axis where the slice has to be applied in the volume.*/
-    Geometry3D* GetSliceGeometry(){return this->m_SliceGeometry;}
+    SlicedGeometry3D* GetSliceGeometry(){return this->m_SliceGeometry;}
 
 
     /** \brief Set the axis where the slice has to be applied in the volume.
@@ -100,9 +100,9 @@ namespace mitk
     void SetSliceGeometry(TimeSlicedGeometry* sliceGeometry);
 
     /** \brief Set the axis where the slice has to be applied in the volume.*/
-    void SetCurrentWorldGeometry(Geometry3D* worldGeometry){this->m_WorldGeometry = worldGeometry;}
+    void SetCurrentWorldGeometry(BaseGeometry* worldGeometry){this->m_WorldGeometry = worldGeometry;}
     /** \brief Get the axis where the slice has to be applied in the volume.*/
-    Geometry3D* GetWorldGeometry(){return this->m_WorldGeometry;}
+    BaseGeometry* GetWorldGeometry(){return this->m_WorldGeometry;}
 
 
     /** \brief Set the axis where the slice has to be applied in the volume.
@@ -123,17 +123,17 @@ namespace mitk
 
     vtkSmartPointer<vtkImageData> m_Slice;
 
-    Geometry3D::Pointer m_SliceGeometry;
+    SlicedGeometry3D::Pointer m_SliceGeometry;
 
     unsigned int m_TimeStep;
 
-    Geometry3D::Pointer m_WorldGeometry;
+    BaseGeometry::Pointer m_WorldGeometry;
 
     bool m_ImageIsValid;
 
     unsigned long m_DeleteObserverTag;
 
-    mitk::Geometry3D::Pointer m_GuardReferenceGeometry;
+    mitk::BaseGeometry::Pointer m_GuardReferenceGeometry;
 
   };
 }

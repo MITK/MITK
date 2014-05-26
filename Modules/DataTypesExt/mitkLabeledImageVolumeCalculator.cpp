@@ -93,7 +93,7 @@ template < typename TPixel, unsigned int VImageDimension >
 void LabeledImageVolumeCalculator::_InternalCalculateVolumes(
   itk::Image< TPixel, VImageDimension > *image,
   LabeledImageVolumeCalculator* /*volumeCalculator*/,
-  Geometry3D *geometry )
+  BaseGeometry *geometry )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef typename ImageType::IndexType IndexType;

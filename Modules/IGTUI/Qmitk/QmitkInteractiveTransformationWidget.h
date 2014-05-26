@@ -48,9 +48,9 @@ class MitkIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
      *  provided by the second variable. These values will be applied to the geometry
      *  in the beginning and the UI will also hold these values.
      */
-    void SetGeometry(mitk::Geometry3D::Pointer geometry, mitk::Geometry3D::Pointer defaultValues = NULL);
+    void SetGeometry(mitk::BaseGeometry::Pointer geometry, mitk::BaseGeometry::Pointer defaultValues = NULL);
 
-    mitk::Geometry3D::Pointer GetGeometry();
+    mitk::BaseGeometry::Pointer GetGeometry();
 
   protected slots:
     void OnZTranslationValueChanged( int v );
@@ -86,8 +86,8 @@ signals:
     // Member variables
     Ui::QmitkInteractiveTransformationWidgetControls* m_Controls;
 
-    mitk::Geometry3D::Pointer m_Geometry;         ///< \brief Initial geometry that is manipulated
-    mitk::Geometry3D::Pointer m_ResetGeometry;    ///< \brief Lifeline to reset to the initial geometry
+    mitk::BaseGeometry::Pointer m_Geometry;         ///< \brief Initial geometry that is manipulated
+    mitk::BaseGeometry::Pointer m_ResetGeometry;    ///< \brief Lifeline to reset to the initial geometry
     mitk::Vector3D m_TranslationVector;           ///< \brief Accumulated translation vector
     mitk::Vector3D m_RotateSliderPos;             ///< \brief Accumulated rotation vector (holds degree around x,y,z direction)
 };

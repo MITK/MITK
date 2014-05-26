@@ -1046,10 +1046,10 @@ void QmitkSegmentationView::RenderingManagerReinitialized()
    * For further information see Bug 16063
    */
    mitk::DataNode* workingNode = m_Controls->segImageSelector->GetSelectedNode();
-   const mitk::Geometry3D* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
+   const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
    if (workingNode && worldGeo)
    {
-      const mitk::Geometry3D* workingNodeGeo = workingNode->GetData()->GetGeometry();
+      const mitk::BaseGeometry* workingNodeGeo = workingNode->GetData()->GetGeometry();
       if (mitk::Equal(workingNodeGeo->GetBoundingBox(), worldGeo->GetBoundingBox(), mitk::eps, true))
       {
          this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
@@ -1073,8 +1073,8 @@ bool QmitkSegmentationView::CheckForSameGeometry(const mitk::DataNode *node1, co
    mitk::Image* image2 = dynamic_cast<mitk::Image*>(node2->GetData());
    if (image1 && image2)
    {
-      mitk::Geometry3D* geo1 = image1->GetGeometry();
-      mitk::Geometry3D* geo2 = image2->GetGeometry();
+      mitk::BaseGeometry* geo1 = image1->GetGeometry();
+      mitk::BaseGeometry* geo2 = image2->GetGeometry();
 
       isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetOrigin(), geo2->GetOrigin());
       isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(0), geo2->GetExtent(0));

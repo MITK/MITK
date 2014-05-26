@@ -308,6 +308,116 @@ int TestProjectPointOntoPlane()
     }
 }
 
+mitk::PlaneGeometry::Pointer  createPlaneGeometry()
+{
+   mitk::Vector3D mySpacing;
+   mySpacing[0] = 31;
+   mySpacing[1] = 0.1;
+   mySpacing[2] = 5.4;
+   mitk::Point3D myOrigin;
+   myOrigin[0] = 8;
+   myOrigin[1] = 9;
+   myOrigin[2] = 10;
+   mitk::AffineTransform3D::Pointer myTransform = mitk::AffineTransform3D::New();
+   itk::Matrix<mitk::ScalarType, 3,3> transMatrix;
+   transMatrix.Fill(0);
+   transMatrix[0][0] = 1;
+   transMatrix[1][1] = 2;
+   transMatrix[2][2] = 4;
+
+   myTransform->SetMatrix(transMatrix);
+
+   mitk::PlaneGeometry::Pointer geometry2D = mitk::PlaneGeometry::New();
+   geometry2D->SetIndexToWorldTransform(myTransform);
+   geometry2D->SetSpacing(mySpacing);
+   geometry2D->SetOrigin(myOrigin);
+   return geometry2D;
+}
+
+int testPlaneGeometryCloning()
+{
+  mitk::PlaneGeometry::Pointer geometry2D = createPlaneGeometry();
+
+  try
+  {
+    mitk::PlaneGeometry::Pointer clone = geometry2D->Clone();
+    itk::Matrix<mitk::ScalarType,3,3> matrix = clone->GetIndexToWorldTransform()->GetMatrix();
+    MITK_TEST_CONDITION(matrix[0][0] == 31, "Test if matrix element exists...");
+
+    double origin = geometry2D->GetOrigin()[0];
+    MITK_TEST_CONDITION(mitk::Equal(origin, 8),"First Point of origin as expected...");
+
+    double spacing = geometry2D->GetSpacing()[0];
+    MITK_TEST_CONDITION(mitk::Equal(spacing, 31),"First Point of spacing as expected...");
+  }
+  catch (...)
+  {
+    MITK_TEST_CONDITION(false, "Error during access on a member of cloned geometry");
+  }
+   // direction [row] [coloum]
+   MITK_TEST_OUTPUT( << "Casting a rotated 2D ITK Image to a MITK Image and check if Geometry is still same" );
+
+  return EXIT_SUCCESS;
+}
+
+bool compareMatrix(itk::Matrix<mitk::ScalarType, 3,3> left, itk::Matrix<mitk::ScalarType, 3,3> right)
+{
+  bool equal = true;
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 3; ++j)
+      equal &= mitk::Equal(left[i][j], right[i][j]);
+  return equal;
+}
+
+int testPlaneGeometryInitializeOrder()
+{
+   mitk::Vector3D mySpacing;
+   mySpacing[0] = 31;
+   mySpacing[1] = 0.1;
+   mySpacing[2] = 5.4;
+   mitk::Point3D myOrigin;
+   myOrigin[0] = 8;
+   myOrigin[1] = 9;
+   myOrigin[2] = 10;
+   mitk::AffineTransform3D::Pointer myTransform = mitk::AffineTransform3D::New();
+   itk::Matrix<mitk::ScalarType, 3,3> transMatrix;
+   transMatrix.Fill(0);
+   transMatrix[0][0] = 1;
+   transMatrix[1][1] = 2;
+   transMatrix[2][2] = 4;
+
+   myTransform->SetMatrix(transMatrix);
+
+   mitk::PlaneGeometry::Pointer geometry2D1 = mitk::PlaneGeometry::New();
+   geometry2D1->SetIndexToWorldTransform(myTransform);
+   geometry2D1->SetSpacing(mySpacing);
+   geometry2D1->SetOrigin(myOrigin);
+
+   mitk::PlaneGeometry::Pointer geometry2D2 = mitk::PlaneGeometry::New();
+   geometry2D2->SetSpacing(mySpacing);
+   geometry2D2->SetOrigin(myOrigin);
+   geometry2D2->SetIndexToWorldTransform(myTransform);
+
+   mitk::PlaneGeometry::Pointer geometry2D3 = mitk::PlaneGeometry::New();
+   geometry2D3->SetIndexToWorldTransform(myTransform);
+   geometry2D3->SetSpacing(mySpacing);
+   geometry2D3->SetOrigin(myOrigin);
+   geometry2D3->SetIndexToWorldTransform(myTransform);
+
+   MITK_TEST_CONDITION(mitk::Equal(geometry2D1->GetOrigin(), geometry2D2->GetOrigin()),"Origin of Geometry 1 match those of Geometry 2.");
+   MITK_TEST_CONDITION(mitk::Equal(geometry2D1->GetOrigin(), geometry2D3->GetOrigin()),"Origin of Geometry 1 match those of Geometry 3.");
+   MITK_TEST_CONDITION(mitk::Equal(geometry2D2->GetOrigin(), geometry2D3->GetOrigin()),"Origin of Geometry 2 match those of Geometry 3.");
+
+   MITK_TEST_CONDITION(mitk::Equal(geometry2D1->GetSpacing(), geometry2D2->GetSpacing()),"Spacing of Geometry 1 match those of Geometry 2.");
+   MITK_TEST_CONDITION(mitk::Equal(geometry2D1->GetSpacing(), geometry2D3->GetSpacing()),"Spacing of Geometry 1 match those of Geometry 3.");
+   MITK_TEST_CONDITION(mitk::Equal(geometry2D2->GetSpacing(), geometry2D3->GetSpacing()),"Spacing of Geometry 2 match those of Geometry 3.");
+
+   MITK_TEST_CONDITION(compareMatrix(geometry2D1->GetIndexToWorldTransform()->GetMatrix(), geometry2D2->GetIndexToWorldTransform()->GetMatrix()),"Transformation of Geometry 1 match those of Geometry 2.");
+   MITK_TEST_CONDITION(compareMatrix(geometry2D1->GetIndexToWorldTransform()->GetMatrix(), geometry2D3->GetIndexToWorldTransform()->GetMatrix()),"Transformation of Geometry 1 match those of Geometry 3.");
+   MITK_TEST_CONDITION(compareMatrix(geometry2D2->GetIndexToWorldTransform()->GetMatrix(), geometry2D3->GetIndexToWorldTransform()->GetMatrix()),"Transformation of Geometry 2 match those of Geometry 3.");
+   return EXIT_SUCCESS;
+}
+
 int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
 {
   int result;
@@ -1018,6 +1128,12 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
 
   std::cout<<"[PASSED]"<<std::endl<<std::endl;
 
+   int result2;
+
+  MITK_TEST_CONDITION_REQUIRED ( (result2 = testPlaneGeometryCloning()) == EXIT_SUCCESS, "");
+
+  // See bug 15990
+  // MITK_TEST_CONDITION_REQUIRED ( (result = testPlaneGeometryInitializeOrder()) == EXIT_SUCCESS, "");
 
 
   std::cout<<"[TEST DONE]"<<std::endl;

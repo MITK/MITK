@@ -549,7 +549,7 @@ void QmitkPreprocessingView::DoShowGradientDirections()
   BValueMap bValMap =  m_DiffusionImage->GetBValueMap();
 
   GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();
-  mitk::Geometry3D::Pointer geometry = m_DiffusionImage->GetGeometry();
+  mitk::BaseGeometry::Pointer geometry = m_DiffusionImage->GetGeometry();
   int shellCount = 1;
   for(BValueMapIterator it = bValMap.begin(); it!=bValMap.end(); ++it)
   {

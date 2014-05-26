@@ -213,12 +213,13 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     }
 
     // Initial moving image geometry
-    m_ImageGeometry = m_MovingNode->GetData()->GetGeometry()->Clone();
+    itk::LightObject::Pointer lopointer = m_MovingNode->GetData()->GetGeometry()->Clone();
+    m_ImageGeometry = dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer());
     std::cout << "Moving Image Geometry (IndexToWorldTransform)"  << std::endl;
     std::cout << m_ImageGeometry->GetIndexToWorldTransform()->GetMatrix();
-    mitk::Geometry3D::TransformType::InputPointType center = m_ImageGeometry->GetIndexToWorldTransform()->GetCenter();
+    mitk::BaseGeometry::TransformType::InputPointType center = m_ImageGeometry->GetIndexToWorldTransform()->GetCenter();
     std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-    mitk::Geometry3D::TransformType::OutputVectorType offset = m_ImageGeometry->GetIndexToWorldTransform()->GetOffset();
+    mitk::BaseGeometry::TransformType::OutputVectorType offset = m_ImageGeometry->GetIndexToWorldTransform()->GetOffset();
     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
     std::cout << std::endl;
 
@@ -238,8 +239,9 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     // container that holds all derived moving data, that needs to be transformed with the transformation found by registration
     if(m_MovingMaskNode.IsNotNull())
     {
-      m_ChildNodes.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()));
-      m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()->Clone()));
+      m_ChildNodes.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry*>(m_MovingMaskNode, m_MovingMaskNode->GetData()->GetGeometry()));
+      itk::LightObject::Pointer lopointer = m_MovingMaskNode->GetData()->GetGeometry()->Clone();
+      m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry::Pointer>(m_MovingMaskNode, dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer())));
     }
 
     if(m_MovingNodeChildren.IsNotNull())
@@ -249,12 +251,13 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       mitk::DataNode::Pointer childNode;
       for (unsigned long i = 0; i < size; ++i)
       {
-        m_ChildNodes.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()));
-        m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()->Clone()));
+        m_ChildNodes.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry*>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()));
+         itk::LightObject::Pointer lopointer = m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()->Clone();
+         m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::BaseGeometry::Pointer>(m_MovingNodeChildren->GetElement(i), dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer())));
       }
     }
 
-    m_GeometryWorldToItkPhysicalTransform = mitk::Geometry3D::TransformType::New();
+    m_GeometryWorldToItkPhysicalTransform = mitk::BaseGeometry::TransformType::New();
     GetWorldToItkPhysicalTransform(m_MovingGeometry, m_GeometryWorldToItkPhysicalTransform.GetPointer());
 
     //     std::cout << "Moving Image: World to ITK-physical transform" << std::endl;
@@ -266,8 +269,8 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     //     std::cout << std::endl;
 
     // Calculate the ITK-Physical to World transform for the fixed image
-    m_GeometryItkPhysicalToWorldTransform = mitk::Geometry3D::TransformType::New();
-    mitk::Geometry3D::TransformType::Pointer fixedWorld2Phys = mitk::Geometry3D::TransformType::New();
+    m_GeometryItkPhysicalToWorldTransform = mitk::BaseGeometry::TransformType::New();
+    mitk::BaseGeometry::TransformType::Pointer fixedWorld2Phys = mitk::BaseGeometry::TransformType::New();
     GetWorldToItkPhysicalTransform(m_FixedNode->GetData()->GetGeometry(), fixedWorld2Phys.GetPointer());
     fixedWorld2Phys->GetInverse(m_GeometryItkPhysicalToWorldTransform);
 
@@ -429,16 +432,16 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl << std::endl;*/
 
     // now adapt all children geometries accordingly if children exist
-    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*>::iterator iter;
-    std::map<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>::iterator iter2;
+    std::map<mitk::DataNode::Pointer, mitk::BaseGeometry*>::iterator iter;
+    std::map<mitk::DataNode::Pointer, mitk::BaseGeometry::Pointer>::iterator iter2;
     mitk::DataNode::Pointer childNode;
     for( iter = m_ChildNodes.begin(); iter != m_ChildNodes.end(); iter++ )
     {
       childNode = (*iter).first;
       if (childNode.IsNotNull())
       {
-        mitk::Geometry3D* childGeometry;
-        mitk::Geometry3D::Pointer childImageGeometry;
+        mitk::BaseGeometry* childGeometry;
+        mitk::BaseGeometry::Pointer childImageGeometry;
         // Calculate the World to ITK-Physical transform for the moving mask
         childGeometry = (*iter).second;
         iter2 = m_ChildNodes2.find(childNode);

@@ -38,7 +38,7 @@ mitk::ScalarType mitk::BoundingObject::GetVolume()
   return 0.0;
 }
 
-void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
+void mitk::BoundingObject::FitGeometry(mitk::BaseGeometry* aGeometry3D)
 {
 
   // Adjusted this function to fix

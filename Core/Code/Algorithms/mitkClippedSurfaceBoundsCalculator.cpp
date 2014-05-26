@@ -31,7 +31,7 @@ mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
 }
 
 mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
-    const mitk::Geometry3D* geometry,
+    const mitk::BaseGeometry* geometry,
     mitk::Image::Pointer image)
 : m_PlaneGeometry(NULL)
 , m_Geometry3D(NULL)
@@ -84,7 +84,7 @@ mitk::ClippedSurfaceBoundsCalculator::SetInput(
 
 void
 mitk::ClippedSurfaceBoundsCalculator::SetInput(
-    const mitk::Geometry3D* geometry,
+    const mitk::BaseGeometry* geometry,
     mitk::Image* image)
 {
   if(geometry && image)
@@ -142,8 +142,8 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
     // go through all slices of the image, ...
     const mitk::SlicedGeometry3D* slicedGeometry3D = dynamic_cast<const mitk::SlicedGeometry3D*>( m_Geometry3D.GetPointer() );
     int allSlices = slicedGeometry3D->GetSlices();
-    this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry3D->GetGeometry2D(0)));
-    this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry3D->GetGeometry2D(allSlices-1)));
+    this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry3D->GetPlaneGeometry(0)));
+    this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry3D->GetPlaneGeometry(allSlices-1)));
   }
   else if( !m_ObjectPointsInWorldCoordinates.empty() )
   {

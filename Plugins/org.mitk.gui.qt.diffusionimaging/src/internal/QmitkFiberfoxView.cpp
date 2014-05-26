@@ -1391,7 +1391,7 @@ void QmitkFiberfoxView::AlignOnGrid()
                     if ( pImgNode.IsNotNull() && dynamic_cast<mitk::Image*>(pImgNode->GetData()) )
                     {
                         mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(pImgNode->GetData());
-                        mitk::Geometry3D::Pointer geom = img->GetGeometry();
+                        mitk::BaseGeometry::Pointer geom = img->GetGeometry();
                         itk::Index<3> idx;
                         geom->WorldToIndex(wc0, idx);
 
@@ -1430,7 +1430,7 @@ void QmitkFiberfoxView::AlignOnGrid()
                         mitk::Point3D wc0 = pe->GetWorldControlPoint(0);
 
                         mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(imgNode->GetData());
-                        mitk::Geometry3D::Pointer geom = img->GetGeometry();
+                        mitk::BaseGeometry::Pointer geom = img->GetGeometry();
                         itk::Index<3> idx;
                         geom->WorldToIndex(wc0, idx);
                         mitk::Point3D cIdx; cIdx[0]=idx[0]; cIdx[1]=idx[1]; cIdx[2]=idx[2];
@@ -1466,7 +1466,7 @@ void QmitkFiberfoxView::AlignOnGrid()
                         mitk::PlanarEllipse::Pointer pe = dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData());
                         mitk::Point3D wc0 = pe->GetWorldControlPoint(0);
 
-                        mitk::Geometry3D::Pointer geom = img->GetGeometry();
+                        mitk::BaseGeometry::Pointer geom = img->GetGeometry();
                         itk::Index<3> idx;
                         geom->WorldToIndex(wc0, idx);
                         mitk::Point3D cIdx; cIdx[0]=idx[0]; cIdx[1]=idx[1]; cIdx[2]=idx[2];
@@ -1871,7 +1871,7 @@ void QmitkFiberfoxView::ApplyTransform()
                     if ( fiducialNode.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData()) )
                     {
                         mitk::PlanarEllipse* pe = dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData());
-                        mitk::Geometry3D* geom = pe->GetGeometry();
+                        mitk::BaseGeometry* geom = pe->GetGeometry();
 
                         // translate
                         mitk::Vector3D world;
@@ -1933,7 +1933,7 @@ void QmitkFiberfoxView::ApplyTransform()
         for (unsigned int i=0; i<m_SelectedFiducials.size(); i++)
         {
             mitk::PlanarEllipse* pe = dynamic_cast<mitk::PlanarEllipse*>(m_SelectedFiducials.at(i)->GetData());
-            mitk::Geometry3D* geom = pe->GetGeometry();
+            mitk::BaseGeometry* geom = pe->GetGeometry();
 
             // translate
             mitk::Vector3D world;

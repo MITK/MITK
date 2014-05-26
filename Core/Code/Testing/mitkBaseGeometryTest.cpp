@@ -412,8 +412,7 @@ public:
     dummy2->SetIndexToWorldTransform(anotherTransform);
     dummy2->SetSpacing(anotherSpacing);
 
-    DummyTestClass::Pointer dummy3;
-    dummy3 = new DummyTestClass(*dummy2);
+    DummyTestClass::Pointer dummy3 = DummyTestClass::New(*dummy2);
     CPPUNIT_ASSERT(mitk::Equal(dummy3,dummy2,mitk::eps,true));
   }
 
@@ -657,7 +656,7 @@ public:
     return EXIT_SUCCESS;
   }
 
-  int testIndexAndWorldConsistencyForVectors(DummyTestClass* dummyGeometry)
+  int testIndexAndWorldConsistencyForVectors(DummyTestClass::Pointer dummyGeometry)
   {
     //Testing consistency of index and world coordinate systems for vectors
     mitk::Vector3D xAxisMM = dummyGeometry->GetAxisVector(0);
@@ -713,7 +712,7 @@ public:
     return EXIT_SUCCESS;
   }
 
-  int testIndexAndWorldConsistencyForIndex(DummyTestClass* dummyGeometry)
+  int testIndexAndWorldConsistencyForIndex(DummyTestClass::Pointer dummyGeometry)
   {
     //Testing consistency of index and world coordinate systems
 

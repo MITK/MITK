@@ -42,7 +42,7 @@ namespace mitk {
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
-      mitkNewMacro1Param(Self,Self);
+    mitkNewMacro1Param(Self, const Self&);
 
     itkCloneMacro(Self)
       //itkGetConstReferenceMacro(TimeBounds, TimeBounds);

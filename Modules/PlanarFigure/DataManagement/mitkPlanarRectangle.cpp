@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 
 #include "mitkPlanarRectangle.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 
 mitk::PlanarRectangle::PlanarRectangle()
@@ -114,7 +114,7 @@ void mitk::PlanarRectangle::EvaluateFeaturesInternal()
 
   // Calculate rectangle area (well, done a bit clumsy...)
   double area = 0.0;
-  if ( this->GetGeometry2D() != NULL )
+  if ( this->GetPlaneGeometry() != NULL )
   {
     for ( i = 0; i < this->GetNumberOfControlPoints(); ++i )
     {

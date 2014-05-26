@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //MITK
 #include <mitkTimeGeometry.h>
+#include <mitkGeometry3D.h>
 #include <mitkCommon.h>
 #include <MitkCoreExports.h>
 
 namespace mitk {
-
   /**
   * \brief Organizes geometries over proportional time steps
   *
@@ -74,9 +74,29 @@ namespace mitk {
     virtual TimePointType    GetMaximumTimePoint () const;
 
     /**
+    * \brief Returns the first time point for which the object is valid.
+    *
+    * Returns the first valid time point for the given TimeStep. The time point
+    * is given in ms.
+    */
+    virtual TimePointType    GetMinimumTimePoint(TimeStepType step) const;
+    /**
+    * \brief Returns the last time point for which the object is valid
+    *
+    * Gives the last time point for the Geometry specified by the given TimeStep. The time point is given in ms.
+    */
+    virtual TimePointType    GetMaximumTimePoint(TimeStepType step) const;
+
+    /**
     * \brief Get the time bounds (in ms)
     */
     virtual TimeBounds GetTimeBounds( ) const;
+
+    /**
+    * \brief Get the time bounds for the given TimeStep (in ms)
+    */
+    virtual TimeBounds GetTimeBounds(TimeStepType step) const;
+
     /**
     * \brief Tests if a given time point is covered by this object
     *
@@ -118,7 +138,7 @@ namespace mitk {
     * Returns a clone of the geometry which defines the given time step. If
     * the given time step is invalid an null-pointer is returned.
     */
-    virtual Geometry3D::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const;
+    virtual BaseGeometry::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const;
 
     /**
     * \brief Returns the geometry which corresponds to the given time point
@@ -129,7 +149,7 @@ namespace mitk {
     * If the returned geometry is changed this will affect the saved
     * geometry.
     */
-    virtual Geometry3D::Pointer GetGeometryForTimePoint ( TimePointType timePoint) const;
+    virtual BaseGeometry::Pointer GetGeometryForTimePoint ( TimePointType timePoint) const;
     /**
     * \brief Returns the geometry which corresponds to the given time step
     *
@@ -139,7 +159,7 @@ namespace mitk {
     * If the returned geometry is changed this will affect the saved
     * geometry.
     */
-    virtual Geometry3D::Pointer GetGeometryForTimeStep  ( TimeStepType timeStep) const;
+    virtual BaseGeometry::Pointer GetGeometryForTimeStep  ( TimeStepType timeStep) const;
 
     /**
     * \brief Tests if all necessary informations are set and the object is valid
@@ -164,7 +184,7 @@ namespace mitk {
     * This method does not afflict other time steps, since the geometry for
     * each time step is saved individually.
     */
-    virtual void SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep);
+    virtual void SetTimeStepGeometry(BaseGeometry* geometry, TimeStepType timeStep);
 
     /**
     * \brief Makes a deep copy of the current object
@@ -186,9 +206,9 @@ namespace mitk {
     *
     * Saves a copy for each time step.
     */
-    void Initialize (Geometry3D* geometry, TimeStepType timeSteps);
+    void Initialize (BaseGeometry* geometry, TimeStepType timeSteps);
     /**
-    * \brief Initialize the TimeGeometry with empty Geometry3D
+    * \brief Initialize the TimeGeometry with empty BaseGeometry
     */
     void Initialize (TimeStepType timeSteps);
 
@@ -197,11 +217,9 @@ namespace mitk {
   protected:
     virtual ~ProportionalTimeGeometry();
 
-    std::vector<Geometry3D::Pointer> m_GeometryVector;
+    std::vector<BaseGeometry::Pointer> m_GeometryVector;
     TimePointType m_FirstTimePoint;
     TimePointType m_StepDuration;
-
   }; // end class ProportialTimeGeometry
-
 } // end namespace MITK
 #endif // ProportionalTimeGeometry_h

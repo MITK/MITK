@@ -15,10 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkGeometry2DDataToSurfaceFilter.h"
+#include "mitkPlaneGeometryDataToSurfaceFilter.h"
 #include "mitkSurface.h"
 #include "mitkGeometry3D.h"
-#include "mitkGeometry2DData.h"
+#include "mitkPlaneGeometryData.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkAbstractTransformGeometry.h"
 
@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTextureMapToPlane.h>
 
 
-mitk::Geometry2DDataToSurfaceFilter::Geometry2DDataToSurfaceFilter()
+mitk::PlaneGeometryDataToSurfaceFilter::PlaneGeometryDataToSurfaceFilter()
 : m_UseGeometryParametricBounds( true ), m_XResolution( 10 ),
   m_YResolution( 10 ), m_PlaceByGeometry( false ), m_UseBoundingBox( false )
 {
@@ -66,7 +66,7 @@ mitk::Geometry2DDataToSurfaceFilter::Geometry2DDataToSurfaceFilter()
 }
 
 
-mitk::Geometry2DDataToSurfaceFilter::~Geometry2DDataToSurfaceFilter()
+mitk::PlaneGeometryDataToSurfaceFilter::~PlaneGeometryDataToSurfaceFilter()
 {
   m_PlaneSource->Delete();
   m_Transform->Delete();
@@ -89,13 +89,13 @@ mitk::Geometry2DDataToSurfaceFilter::~Geometry2DDataToSurfaceFilter()
 }
 
 
-void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
+void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
 {
-  mitk::Geometry2DData::ConstPointer input = this->GetInput();
+  mitk::PlaneGeometryData::ConstPointer input = this->GetInput();
   mitk::Surface::Pointer output = this->GetOutput();
 
-  if ( input.IsNull() || (input->GetGeometry2D() == NULL)
-    || (input->GetGeometry2D()->IsValid() == false)
+  if ( input.IsNull() || (input->GetPlaneGeometry() == NULL)
+    || (input->GetPlaneGeometry()->IsValid() == false)
     || (m_UseBoundingBox && (m_BoundingBox.IsNull() || (m_BoundingBox->GetDiagonalLength2() < mitk::eps))) )
   {
     return;
@@ -107,11 +107,11 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
   vtkPolyData *planeSurface = NULL;
 
 
-  // Does the Geometry2DData contain a PlaneGeometry?
-  if ( dynamic_cast< PlaneGeometry * >( input->GetGeometry2D() ) != NULL )
+  // Does the PlaneGeometryData contain a PlaneGeometry?
+  if ( dynamic_cast< PlaneGeometry * >( input->GetPlaneGeometry() ) != NULL )
   {
     mitk::PlaneGeometry *planeGeometry =
-      dynamic_cast< PlaneGeometry * >( input->GetGeometry2D() );
+      dynamic_cast< PlaneGeometry * >( input->GetPlaneGeometry() );
 
     if ( m_PlaceByGeometry )
     {
@@ -121,7 +121,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
         planeGeometry->GetIndexToWorldTransform();
 
       TimeGeometry *timeGeometry = output->GetTimeGeometry();
-      Geometry3D *geometrie3d = timeGeometry->GetGeometryForTimeStep( 0 );
+      BaseGeometry *geometrie3d = timeGeometry->GetGeometryForTimeStep( 0 );
       geometrie3d->SetIndexToWorldTransform( affineTransform );
     }
 
@@ -190,7 +190,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
         planeGeometry->GetVtkTransform()->GetLinearInverse()
       );
 
-      Geometry3D *referenceGeometry = planeGeometry->GetReferenceGeometry();
+      BaseGeometry *referenceGeometry = planeGeometry->GetReferenceGeometry();
       if ( referenceGeometry )
       {
         m_Transform->Concatenate(
@@ -264,9 +264,9 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     }
   }
 
-  // Does the Geometry2DData contain an AbstractTransformGeometry?
+  // Does the PlaneGeometryData contain an AbstractTransformGeometry?
   else if ( mitk::AbstractTransformGeometry *abstractGeometry =
-    dynamic_cast< AbstractTransformGeometry * >( input->GetGeometry2D() ) )
+    dynamic_cast< AbstractTransformGeometry * >( input->GetPlaneGeometry() ) )
   {
     // In the case of an AbstractTransformGeometry (which holds a possibly
     // non-rigid transform), we proceed slightly differently: since the
@@ -307,7 +307,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
         abstractGeometry->GetIndexToWorldTransform();
 
       TimeGeometry *timeGeometry = output->GetTimeGeometry();
-      Geometry3D *g3d = timeGeometry->GetGeometryForTimeStep( 0 );
+      BaseGeometry *g3d = timeGeometry->GetGeometryForTimeStep( 0 );
       g3d->SetIndexToWorldTransform( affineTransform );
 
       vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
@@ -347,7 +347,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     }
 
     m_Transform->Identity();
-    m_Transform->Concatenate( input->GetGeometry2D()->GetVtkTransform() );
+    m_Transform->Concatenate( input->GetPlaneGeometry()->GetVtkTransform() );
     m_Transform->PreMultiply();
 
     m_Box->SetTransform( m_Transform );
@@ -373,7 +373,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 }
 
 
-void mitk::Geometry2DDataToSurfaceFilter::GenerateData()
+void mitk::PlaneGeometryDataToSurfaceFilter::GenerateData()
 {
   mitk::Surface::Pointer output = this->GetOutput();
 
@@ -383,41 +383,41 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateData()
 //  output->GetVtkPolyData()->Update(); //VTK6_TODO vtk pipeline
 }
 
-const mitk::Geometry2DData *mitk::Geometry2DDataToSurfaceFilter::GetInput()
+const mitk::PlaneGeometryData *mitk::PlaneGeometryDataToSurfaceFilter::GetInput()
 {
   if (this->GetNumberOfInputs() < 1)
   {
     return 0;
   }
 
-  return static_cast<const mitk::Geometry2DData * >
+  return static_cast<const mitk::PlaneGeometryData * >
     ( this->ProcessObject::GetInput(0) );
 }
 
 
-const mitk::Geometry2DData *
-mitk::Geometry2DDataToSurfaceFilter
+const mitk::PlaneGeometryData *
+mitk::PlaneGeometryDataToSurfaceFilter
 ::GetInput(unsigned int idx)
 {
-  return static_cast< const mitk::Geometry2DData * >
+  return static_cast< const mitk::PlaneGeometryData * >
     ( this->ProcessObject::GetInput(idx) );
 }
 
 
 void
-mitk::Geometry2DDataToSurfaceFilter
-::SetInput(const mitk::Geometry2DData *input)
+mitk::PlaneGeometryDataToSurfaceFilter
+::SetInput(const mitk::PlaneGeometryData *input)
 {
   // Process object is not const-correct so the const_cast is required here
   this->ProcessObject::SetNthInput( 0,
-  const_cast< mitk::Geometry2DData * >( input )
+  const_cast< mitk::PlaneGeometryData * >( input )
   );
 }
 
 
 void
-mitk::Geometry2DDataToSurfaceFilter
-::SetInput(unsigned int index, const mitk::Geometry2DData *input)
+mitk::PlaneGeometryDataToSurfaceFilter
+::SetInput(unsigned int index, const mitk::PlaneGeometryData *input)
 {
   if( index+1 > this->GetNumberOfInputs() )
   {
@@ -425,13 +425,13 @@ mitk::Geometry2DDataToSurfaceFilter
   }
   // Process object is not const-correct so the const_cast is required here
   this->ProcessObject::SetNthInput(index,
-    const_cast< mitk::Geometry2DData *>( input )
+    const_cast< mitk::PlaneGeometryData *>( input )
   );
 }
 
 
 void
-mitk::Geometry2DDataToSurfaceFilter
+mitk::PlaneGeometryDataToSurfaceFilter
 ::SetBoundingBox( const mitk::BoundingBox *boundingBox )
 {
   m_BoundingBox = boundingBox;
@@ -440,7 +440,7 @@ mitk::Geometry2DDataToSurfaceFilter
 
 
 const mitk::BoundingBox *
-mitk::Geometry2DDataToSurfaceFilter
+mitk::PlaneGeometryDataToSurfaceFilter
 ::GetBoundingBox() const
 {
   return m_BoundingBox.GetPointer();

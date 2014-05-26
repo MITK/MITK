@@ -136,7 +136,7 @@ int mitkPlanarPolygonTest(int /* argc */, char* /*argv*/[])
   // **************************************************************************
   // 1. Instantiation and basic tests, including feature evaluation
   mitk::PlanarPolygon::Pointer planarPolygon = mitk::PlanarPolygon::New();
-  planarPolygon->SetGeometry2D( planeGeometry );
+  planarPolygon->SetPlaneGeometry( planeGeometry );
 
   // first test: did this work?
   MITK_TEST_CONDITION_REQUIRED( planarPolygon.IsNotNull(), "Testing instantiation" );

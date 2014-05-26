@@ -50,7 +50,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 namespace mitk {
-
 SliceNavigationController::SliceNavigationController( const char *type )
 : BaseController( type ),
   m_InputWorldGeometry3D( NULL ),
@@ -98,7 +97,7 @@ SliceNavigationController::~SliceNavigationController()
 
 
 void
-SliceNavigationController::SetInputWorldGeometry3D( const Geometry3D *geometry )
+SliceNavigationController::SetInputWorldGeometry3D( const BaseGeometry *geometry )
 {
   if ( geometry != NULL )
   {
@@ -242,7 +241,7 @@ SliceNavigationController::Update(
 
     // initialize the viewplane
     SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
-    Geometry3D::ConstPointer currentGeometry = NULL;
+    BaseGeometry::ConstPointer currentGeometry = NULL;
     if (m_InputWorldTimeGeometry.IsNotNull())
       if (m_InputWorldTimeGeometry->IsValidTimeStep(GetTime()->GetPos()))
         currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(GetTime()->GetPos());
@@ -338,12 +337,14 @@ SliceNavigationController::Update(
 
       assert( worldTimeGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() ).IsNotNull() );
 
-      slicedWorldGeometry->SetTimeBounds(
-        worldTimeGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() )->GetTimeBounds() );
+      TimePointType minimumTimePoint = worldTimeGeometry->TimeStepToTimePoint(this->GetTime()->GetPos());
+      TimePointType stepDuration = worldTimeGeometry->TimeStepToTimePoint(this->GetTime()->GetPos()+1)-worldTimeGeometry->TimeStepToTimePoint(this->GetTime()->GetPos());
 
       //@todo implement for non-evenly-timed geometry!
       m_CreatedWorldGeometry = ProportionalTimeGeometry::New();
       dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())->Initialize(slicedWorldGeometry, worldTimeGeometry->CountTimeSteps());
+      dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())->GetMinimumTimePoint(minimumTimePoint);
+      dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())->SetStepDuration(stepDuration);
     }
   }
 
@@ -473,7 +474,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
     slices = slicedWorldGeometry->GetSlices();
     if ( slicedWorldGeometry->GetEvenlySpaced() )
     {
-      mitk::Geometry2D *plane = slicedWorldGeometry->GetGeometry2D( 0 );
+      mitk::PlaneGeometry *plane = slicedWorldGeometry->GetPlaneGeometry( 0 );
 
       const Vector3D &direction = slicedWorldGeometry->GetDirectionVector();
 
@@ -495,7 +496,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
       Point3D projectedPoint;
       for ( s = 0; s < slices; ++s )
       {
-        slicedWorldGeometry->GetGeometry2D( s )->Project( point, projectedPoint );
+        slicedWorldGeometry->GetPlaneGeometry( s )->Project( point, projectedPoint );
         Vector3D distance = projectedPoint - point;
         ScalarType currentDistance = distance.GetSquaredNorm();
 
@@ -546,7 +547,7 @@ SliceNavigationController::GetCreatedWorldGeometry()
   return m_CreatedWorldGeometry;
 }
 
-const mitk::Geometry3D *
+const mitk::BaseGeometry *
 SliceNavigationController::GetCurrentGeometry3D()
 {
   if ( m_CreatedWorldGeometry.IsNotNull() )
@@ -571,7 +572,7 @@ SliceNavigationController::GetCurrentPlaneGeometry()
   {
     const mitk::PlaneGeometry *planeGeometry =
       dynamic_cast< mitk::PlaneGeometry * >
-        ( slicedGeometry->GetGeometry2D(this->GetSlice()->GetPos()) );
+        ( slicedGeometry->GetPlaneGeometry(this->GetSlice()->GetPos()) );
     return planeGeometry;
   }
   else
@@ -623,7 +624,6 @@ SliceNavigationController::AdjustSliceStepperRange()
   {
     m_Slice->InvalidateRange();
   }
-
 }
 
 
@@ -811,9 +811,7 @@ SliceNavigationController
 
                 statusText = stream.str();
                 mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
-
               }
-
             }
             ok = true;
             break;
@@ -836,6 +834,4 @@ SliceNavigationController
 
   return false;
 }
-
 } // namespace
-

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLookupTableProperty.h>
 #include <vtkSmartPointer.h>
 #include <mitkPlaneGeometry.h>
-#include <mitkGeometry2D.h>
 
 QmitkODFRenderWidget::QmitkODFRenderWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
 {

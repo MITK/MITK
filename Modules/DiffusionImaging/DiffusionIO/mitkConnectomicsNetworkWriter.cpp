@@ -52,7 +52,7 @@ void mitk::ConnectomicsNetworkWriter::GenerateData()
   if (ext == ".cnf")
   {
     // Get geometry of the network
-    mitk::Geometry3D* geometry = input->GetGeometry();
+    mitk::BaseGeometry* geometry = input->GetGeometry();
 
     // Create XML document
     TiXmlDocument documentXML;

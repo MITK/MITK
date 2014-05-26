@@ -208,7 +208,7 @@ void mitk::Surface::CalculateBoundingBox()
       polyData->GetBounds(bounds);
     }
 
-    Geometry3D::Pointer geometry = timeGeometry->GetGeometryForTimeStep(i);
+    BaseGeometry::Pointer geometry = timeGeometry->GetGeometryForTimeStep(i);
 
     if (geometry.IsNull())
       mitkThrow() << "Time-sliced geometry is invalid (equals NULL).";

@@ -145,7 +145,7 @@ bool mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
         MITK_DEBUG << "OnMousePressed: got working slice" << std::endl;
 
         // 2. Determine if the user clicked inside or outside of the segmentation
-          const Geometry3D* workingSliceGeometry = m_WorkingSlice->GetGeometry();
+          const BaseGeometry* workingSliceGeometry = m_WorkingSlice->GetGeometry();
           Point3D mprojectedPointIn2D;
           workingSliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), mprojectedPointIn2D);
           itk::Index<2> projectedPointInWorkingSlice2D;
@@ -295,7 +295,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside( StateMachineAction*, Intera
   // 3.2 If we have a reference image, then perform an initial region growing, considering the reference image's level window
 
   // if click was outside the image, don't continue
-  const Geometry3D* sliceGeometry = m_ReferenceSlice->GetGeometry();
+  const BaseGeometry* sliceGeometry = m_ReferenceSlice->GetGeometry();
   Point3D mprojectedPointIn2D;
   sliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), mprojectedPointIn2D );
   itk::Index<2> projectedPointIn2D;
@@ -418,7 +418,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionE
             {
               FeedbackContourTool::FillContourInSlice( projectedContour, timestep, m_WorkingSlice, m_PaintingPixelValue );
 
-              const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+              const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
 
               //MITK_DEBUG << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
 

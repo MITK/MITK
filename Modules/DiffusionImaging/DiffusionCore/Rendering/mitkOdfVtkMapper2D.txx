@@ -289,8 +289,7 @@ template<class T, int N>
 typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry mitk::OdfVtkMapper2D<T,N>
 ::MeasureDisplayedGeometry(mitk::BaseRenderer* renderer)
 {
-    Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
-    PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
+    PlaneGeometry::ConstPointer worldPlaneGeometry = renderer->GetCurrentWorldPlaneGeometry();
 
     // set up the cutter orientation according to the current geometry of
     // the renderers plane
@@ -832,10 +831,8 @@ template <class T, int N>
 bool mitk::OdfVtkMapper2D<T,N>
 ::IsPlaneRotated(mitk::BaseRenderer* renderer)
 {
-    Geometry2D::ConstPointer worldGeometry =
-            renderer->GetCurrentWorldGeometry2D();
     PlaneGeometry::ConstPointer worldPlaneGeometry =
-            dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
+            renderer->GetCurrentWorldPlaneGeometry();
 
     double vnormal[ 3 ];
     Vector3D normal = worldPlaneGeometry->GetNormal(); normal.Normalize();

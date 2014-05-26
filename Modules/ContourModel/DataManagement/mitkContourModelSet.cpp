@@ -203,7 +203,7 @@ void mitk::ContourModelSet::UpdateOutputInformation()
         mitkBounds[5] = tmp[5];
 
         //set boundingBox at current timestep
-        Geometry3D* geometry3d = this->GetGeometry(currenTimeStep);
+        BaseGeometry* geometry3d = this->GetGeometry(currenTimeStep);
         geometry3d->SetBounds(mitkBounds);
       }
     }

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarFigure.h"
-#include <mitkGeometry2D.h>
+#include "mitkPlaneGeometry.h"
 #include <mitkProperties.h>
 #include <mitkProportionalTimeGeometry.h>
 
@@ -74,14 +74,12 @@ mitk::PlanarFigure::PlanarFigure()
 : m_SelectedControlPoint( -1 ),
   m_PreviewControlPointVisible( false ),
   m_FigurePlaced( false ),
-  m_Geometry2D( NULL ),
+  m_PlaneGeometry( NULL ),
   m_PolyLineUpToDate(false),
   m_HelperLinesUpToDate(false),
   m_FeaturesUpToDate(false),
   m_FeaturesMTime( 0 )
 {
-
-
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
 
   m_DisplaySize.first = 0.0;
@@ -110,7 +108,7 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
     m_PreviewControlPoint(other.m_PreviewControlPoint),
     m_PreviewControlPointVisible(other.m_PreviewControlPointVisible),
     m_FigurePlaced(other.m_FigurePlaced),
-    m_Geometry2D(other.m_Geometry2D), // do not clone since SetGeometry2D() doesn't clone either
+    m_PlaneGeometry(other.m_PlaneGeometry), // do not clone since SetPlaneGeometry() doesn't clone either
     m_PolyLineUpToDate(other.m_PolyLineUpToDate),
     m_HelperLinesUpToDate(other.m_HelperLinesUpToDate),
     m_FeaturesUpToDate(other.m_FeaturesUpToDate),
@@ -121,16 +119,16 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
 }
 
 
-void mitk::PlanarFigure::SetGeometry2D( mitk::Geometry2D *geometry )
+void mitk::PlanarFigure::SetPlaneGeometry( mitk::PlaneGeometry *geometry )
 {
   this->SetGeometry( geometry );
-  m_Geometry2D = dynamic_cast<Geometry2D *>(GetGeometry(0));//geometry;
+  m_PlaneGeometry = dynamic_cast<PlaneGeometry *>(GetGeometry(0));//geometry;
 }
 
 
-const mitk::Geometry2D *mitk::PlanarFigure::GetGeometry2D() const
+const mitk::PlaneGeometry *mitk::PlanarFigure::GetPlaneGeometry() const
 {
-  return m_Geometry2D;
+  return m_PlaneGeometry;
 }
 
 
@@ -319,9 +317,9 @@ mitk::Point2D mitk::PlanarFigure::GetControlPoint( unsigned int index ) const
 mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint( unsigned int index ) const
 {
   Point3D point3D;
-  if ( (m_Geometry2D != NULL) && (index < m_NumberOfControlPoints) )
+  if ( (m_PlaneGeometry != NULL) && (index < m_NumberOfControlPoints) )
   {
-    m_Geometry2D->Map( m_ControlPoints.at( index ), point3D );
+    m_PlaneGeometry->Map( m_ControlPoints.at( index ), point3D );
     return point3D;
   }
 
@@ -490,7 +488,7 @@ void mitk::PlanarFigure::EvaluateFeatures()
 
 void mitk::PlanarFigure::UpdateOutputInformation()
 {
-  // Bounds are NOT calculated here, since the Geometry2D defines a fixed
+  // Bounds are NOT calculated here, since the PlaneGeometry defines a fixed
   // frame (= bounds) for the planar figure.
   Superclass::UpdateOutputInformation();
   this->GetTimeGeometry()->Update();
@@ -516,7 +514,6 @@ bool mitk::PlanarFigure::VerifyRequestedRegion()
 
 void mitk::PlanarFigure::SetRequestedRegion(const itk::DataObject * /*data*/ )
 {
-
 }
 
 
@@ -529,22 +526,22 @@ void mitk::PlanarFigure::ResetNumberOfControlPoints( int numberOfControlPoints )
 
 mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints( unsigned int /*index*/, const Point2D& point )
 {
-  if ( m_Geometry2D ==  NULL )
+  if ( m_PlaneGeometry ==  NULL )
   {
     return point;
   }
 
   Point2D indexPoint;
-  m_Geometry2D->WorldToIndex( point, indexPoint );
+  m_PlaneGeometry->WorldToIndex( point, indexPoint );
 
-  BoundingBox::BoundsArrayType bounds = m_Geometry2D->GetBounds();
+  BoundingBox::BoundsArrayType bounds = m_PlaneGeometry->GetBounds();
   if ( indexPoint[0] < bounds[0] ) { indexPoint[0] = bounds[0]; }
   if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
   if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
   if ( indexPoint[1] > bounds[3] ) { indexPoint[1] = bounds[3]; }
 
   Point2D constrainedPoint;
-  m_Geometry2D->IndexToWorld( indexPoint, constrainedPoint );
+  m_PlaneGeometry->IndexToWorld( indexPoint, constrainedPoint );
 
   return constrainedPoint;
 }
@@ -607,14 +604,8 @@ void mitk::PlanarFigure::DeactivateFeature( unsigned int index )
 
 void mitk::PlanarFigure::InitializeTimeGeometry( unsigned int timeSteps )
 {
-  mitk::Geometry2D::Pointer geometry2D = mitk::Geometry2D::New();
+  mitk::PlaneGeometry::Pointer geometry2D = mitk::PlaneGeometry::New();
   geometry2D->Initialize();
-
-  if ( timeSteps > 1 )
-  {
-    mitk::ScalarType timeBounds[] = {0.0, 1.0};
-    geometry2D->SetTimeBounds( timeBounds );
-  }
 
   // The geometry is propagated automatically to all time steps,
   // if EvenlyTimed is true...
@@ -644,7 +635,7 @@ void mitk::PlanarFigure::PrintSelf( std::ostream& os, itk::Indent indent) const
     os << indent.GetNextIndent() << i << ": " << m_ControlPoints.at( i ) << std::endl;
   }
   os << indent << "Geometry:\n";
-  this->GetGeometry2D()->Print(os, indent.GetNextIndent());
+  this->GetPlaneGeometry()->Print(os, indent.GetNextIndent());
 }
 
 
@@ -726,8 +717,8 @@ void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
   m_NumberOfControlPoints       = oldFigure->m_NumberOfControlPoints;
 
   //copy geometry 2D of planar figure
-  Geometry2D::Pointer affineGeometry = oldFigure->m_Geometry2D->Clone();
-  SetGeometry2D(affineGeometry.GetPointer());
+  PlaneGeometry::Pointer affineGeometry = oldFigure->m_PlaneGeometry->Clone();
+  SetPlaneGeometry(affineGeometry.GetPointer());
 
   for(unsigned long index=0; index < oldFigure->GetNumberOfControlPoints(); index++)
   {

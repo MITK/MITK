@@ -33,15 +33,12 @@ int mitkPicFileReaderTest(int argc, char* argv[])
   {
     if(itksys::SystemTools::FileLength(argv[1]) == 0)
     {
-
       mitk::PicFileReader::Pointer emptyFileReader = mitk::PicFileReader::New();
       emptyFileReader->SetFileName(argv[1]);
       MITK_TEST_FOR_EXCEPTION(itk::ImageFileReaderException,emptyFileReader->Update());
     }
     else
     {
-
-
       //independently read header of pic file
       mitkIpPicDescriptor *picheader=NULL;
       if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
@@ -114,7 +111,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       std::cout<<"[PASSED]"<<std::endl;
 
       std::cout << "Testing availability of first geometry contained in the SlicedGeometry3D: ";
-      mitk::Geometry2D* geometry2d = slicedgeometry->GetGeometry2D(0);
+      mitk::PlaneGeometry* geometry2d = slicedgeometry->GetPlaneGeometry(0);
       if(geometry2d==NULL)
       {
         std::cout<<"[FAILED]"<<std::endl;
@@ -171,8 +168,8 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       if(picheader->dim==4)
       {
         std::cout << "4D dataset: Testing that timebounds are not infinite: ";
-        if((slicedgeometry->GetTimeBounds()[0] == mitk::ScalarTypeNumericTraits::NonpositiveMin()) &&
-           (slicedgeometry->GetTimeBounds()[1] == mitk::ScalarTypeNumericTraits::max())
+        if((timeGeometry->GetTimeBounds(0)[0] == mitk::ScalarTypeNumericTraits::NonpositiveMin()) &&
+           (timeGeometry->GetTimeBounds(0)[1] == mitk::ScalarTypeNumericTraits::max())
           )
         {
           std::cout<<"[FAILED]"<<std::endl;

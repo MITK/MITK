@@ -177,7 +177,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
 
     output->GetSlicedGeometry()->SetSpacing(spacing);
 
-    //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), dimensions).GetPointer(), 0);
+    //output->GetSlicedGeometry()->SetPlaneGeometry(mitk::Image::BuildStandardPlanePlaneGeometry(output->GetSlicedGeometry(), dimensions).GetPointer(), 0);
     output->GetSlicedGeometry()->SetEvenlySpaced();
   }
 

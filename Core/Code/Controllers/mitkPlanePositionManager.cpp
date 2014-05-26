@@ -26,7 +26,7 @@ mitk::PlanePositionManagerService::~PlanePositionManagerService()
     delete m_PositionList[i];
 }
 
-unsigned int mitk::PlanePositionManagerService::AddNewPlanePosition ( const Geometry2D* plane, unsigned int sliceIndex )
+unsigned int mitk::PlanePositionManagerService::AddNewPlanePosition ( const PlaneGeometry* plane, unsigned int sliceIndex )
 {
     for (unsigned int i = 0; i < m_PositionList.size(); ++i)
     {

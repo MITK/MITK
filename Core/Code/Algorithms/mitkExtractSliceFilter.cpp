@@ -198,7 +198,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
       m_Reslicer->SetResliceTransform(m_ResliceTransform->GetVtkTransform()->GetLinearInverse());
 
 
-    // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D),
+    // Set background level to TRANSLUCENT (see PlaneGeometryDataVtkMapper3D),
     // else the background of the image turns out gray
     m_Reslicer->SetBackgroundLevel( -32768 );
 
@@ -247,7 +247,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
       m_Reslicer->SetResliceTransform( composedResliceTransform );
 
       // Set background level to BLACK instead of translucent, to avoid
-      // boundary artifacts (see Geometry2DDataVtkMapper3D)
+      // boundary artifacts (see PlaneGeometryDataVtkMapper3D)
       m_Reslicer->SetBackgroundLevel( -1023 );
     }
     else
@@ -413,8 +413,8 @@ void mitk::ExtractSliceFilter::GenerateData(){
     //the originalGeometry is the Geometry of the result slice
 
 //    mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
-//    Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
-    Geometry2D::Pointer originalGeometry = m_WorldGeometry->Clone();
+//    PlaneGeometry::Pointer originalGeometry = dynamic_cast<PlaneGeometry*>( originalGeometryAGF.GetPointer() );
+    PlaneGeometry::Pointer originalGeometry = m_WorldGeometry->Clone();
 
     originalGeometry->GetIndexToWorldTransform()->SetMatrix(m_WorldGeometry->GetIndexToWorldTransform()->GetMatrix());
 
@@ -477,7 +477,7 @@ bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(double bounds[6]){
 }
 
 
-bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const Geometry3D *boundingGeometry,
+bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const BaseGeometry *boundingGeometry,
                                                      const PlaneGeometry *planeGeometry, double *bounds )
 {
   bool b =  mitk::PlaneClipping::CalculateClippedPlaneBounds(boundingGeometry, planeGeometry, bounds);

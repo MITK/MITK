@@ -64,7 +64,7 @@ mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 
 mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 {
-  //The 3D RW Mapper (Geometry2DDataVtkMapper3D) is listening to this event,
+  //The 3D RW Mapper (PlaneGeometryDataVtkMapper3D) is listening to this event,
   //in order to delete the images from the 3D RW.
   this->InvokeEvent( itk::DeleteEvent() );
 }
@@ -129,7 +129,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   }
 
   //check if there is a valid worldGeometry
-  const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
   if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->HasReferenceGeometry() ))
   {
     return;
@@ -209,7 +209,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // Thick slices parameters
   if( input->GetPixelType().GetNumberOfComponents() == 1 ) // for now only single component are allowed
   {
-    DataNode *dn=renderer->GetCurrentWorldGeometry2DNode();
+    DataNode *dn=renderer->GetCurrentWorldPlaneGeometryNode();
     if(dn)
     {
       ResliceMethodProperty *resliceMethodEnumProperty=0;
@@ -653,8 +653,8 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
        || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
-       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
+       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
+       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime())
        || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
        || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {
@@ -991,7 +991,7 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)
   }
 }
 
-bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
+bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage( const PlaneGeometry* renderingGeometry, SlicedGeometry3D* imageGeometry )
 {
   // if either one of the two geometries is NULL we return true
   // for safety reasons

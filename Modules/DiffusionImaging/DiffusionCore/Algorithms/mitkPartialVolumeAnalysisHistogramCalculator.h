@@ -271,7 +271,7 @@ namespace mitk
 
     template < typename TPixel, unsigned int VImageDimension >
         void InternalReorientImagePlane(
-            const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* imggeo, mitk::Geometry3D* planegeo3D, int additionalIndex );
+          const itk::Image< TPixel, VImageDimension > *image, mitk::BaseGeometry* imggeo, mitk::BaseGeometry* planegeo3D, int additionalIndex );
 
     template < typename TPixel, unsigned int VImageDimension >
         void InternalResampleImageFromMask(

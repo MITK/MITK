@@ -318,7 +318,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
 
   assert(input->GetTimeGeometry());
 
-  const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
+  const BaseGeometry* worldgeometry = renderer->GetCurrentWorldGeometry();
   if(worldgeometry==NULL)
   {
     GetDataNode()->SetProperty("volumerendering",mitk::BoolProperty::New(false));

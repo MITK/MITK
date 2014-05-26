@@ -62,7 +62,7 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   mitkIpPicDescriptor* ipPicResult = ipMITKSegmentationInterpolate( lowerPICSlice, upperPICSlice, ratio ); // magic
   if (!ipPicResult) return NULL;
 
-  Geometry3D::Pointer originalGeometry = resultImage->GetGeometry();
+  BaseGeometry::Pointer originalGeometry = resultImage->GetGeometry();
   resultImage->Initialize( CastToImageDescriptor( ipPicResult ) );
   // FIXME resultImage->SetPicSlice( ipPicResult );
   resultImage->SetSlice( ipPicResult->data );

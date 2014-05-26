@@ -895,7 +895,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
     }
     else
     {
-        mitk::Geometry2D::ConstPointer pfgeometry = pf->GetGeometry2D();
+      mitk::PlaneGeometry::ConstPointer pfgeometry = pf->GetPlaneGeometry();
         const mitk::PlaneGeometry* planeGeometry = dynamic_cast<const mitk::PlaneGeometry*> (pfgeometry.GetPointer());
         Vector3D planeNormal = planeGeometry->GetNormal();
         planeNormal.Normalize();
@@ -1295,7 +1295,7 @@ itk::Point<float, 3> mitk::FiberBundleX::TransformPoint(vnl_vector_fixed< double
 
     vnl_matrix_fixed< double, 3, 3 > rot = rotZ*rotY*rotX;
 
-    mitk::Geometry3D::Pointer geom = this->GetGeometry();
+    mitk::BaseGeometry::Pointer geom = this->GetGeometry();
     mitk::Point3D center = geom->GetCenter();
 
     point[0] -= center[0];
@@ -1335,7 +1335,7 @@ void mitk::FiberBundleX::TransformFibers(double rx, double ry, double rz, double
 
     vnl_matrix_fixed< double, 3, 3 > rot = rotZ*rotY*rotX;
 
-    mitk::Geometry3D::Pointer geom = this->GetGeometry();
+    mitk::BaseGeometry::Pointer geom = this->GetGeometry();
     mitk::Point3D center = geom->GetCenter();
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -1396,7 +1396,7 @@ void mitk::FiberBundleX::RotateAroundAxis(double x, double y, double z)
     rotZ[0][1] = -sin(z);
     rotZ[1][0] = -rotZ[0][1];
 
-    mitk::Geometry3D::Pointer geom = this->GetGeometry();
+    mitk::BaseGeometry::Pointer geom = this->GetGeometry();
     mitk::Point3D center = geom->GetCenter();
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -1438,7 +1438,7 @@ void mitk::FiberBundleX::ScaleFibers(double x, double y, double z)
     MITK_INFO << "Scaling fibers";
     boost::progress_display disp(m_NumFibers);
 
-    mitk::Geometry3D* geom = this->GetGeometry();
+    mitk::BaseGeometry* geom = this->GetGeometry();
     mitk::Point3D c = geom->GetCenter();
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();

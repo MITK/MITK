@@ -21,9 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkColorProperty.h"
 #include "mitkDataNode.h"
 #include "mitkEnumerationProperty.h"
-#include "mitkGeometry2DData.h"
-#include "mitkGeometry2DDataMapper2D.h"
-#include "mitkGeometry2DDataVtkMapper3D.h"
+#include "mitkPlaneGeometryData.h"
+#include "mitkPlaneGeometryDataMapper2D.h"
+#include "mitkPlaneGeometryDataVtkMapper3D.h"
 #include "mitkGeometry3D.h"
 #include "mitkGeometryData.h"
 #include "mitkImage.h"
@@ -199,9 +199,9 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
         newMapper = mitk::ImageVtkMapper2D::New();
         newMapper->SetDataNode(node);
       }
-      else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
+      else if((dynamic_cast<PlaneGeometryData*>(data)!=NULL))
       {
-        newMapper = mitk::Geometry2DDataMapper2D::New();
+        newMapper = mitk::PlaneGeometryDataMapper2D::New();
         newMapper->SetDataNode(node);
       }
       else if((dynamic_cast<Surface*>(data)!=NULL))
@@ -224,9 +224,9 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
         newMapper = mitk::VolumeDataVtkMapper3D::New();
         newMapper->SetDataNode(node);
       }
-      else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
+      else if((dynamic_cast<PlaneGeometryData*>(data)!=NULL))
       {
-        newMapper = mitk::Geometry2DDataVtkMapper3D::New();
+        newMapper = mitk::PlaneGeometryDataVtkMapper3D::New();
         newMapper->SetDataNode(node);
       }
       else if((dynamic_cast<Surface*>(data)!=NULL))

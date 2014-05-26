@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarPolygon.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
 // stl related includes
@@ -106,7 +106,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   double area       = 0.0;
   bool intersection = false;
 
-  if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
+  if ( this->IsClosed() && (this->GetPlaneGeometry() != NULL) )
   {
     // does PlanarPolygon overlap/intersect itself?
     unsigned int numberOfPoints = polyLine.size();

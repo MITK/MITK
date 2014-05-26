@@ -265,7 +265,7 @@ struct CvpSelListener : ISelectionListener
             float range;
             node->GetFloatProperty("Fiber2DSliceThickness",range);
             mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
-            mitk::Geometry3D::Pointer geo = fib->GetGeometry();
+            mitk::BaseGeometry::Pointer geo = fib->GetGeometry();
             mitk::ScalarType max = geo->GetExtentInMM(0);
             max = std::max(max, geo->GetExtentInMM(1));
             max = std::max(max, geo->GetExtentInMM(2));

@@ -1,29 +1,52 @@
-
-cmake_minimum_required(VERSION 2.8.4)
+if(DESIRED_QT_VERSION MATCHES 5)
+  cmake_minimum_required(VERSION 2.8.12)
+else()
+  cmake_minimum_required(VERSION 2.8.4)
+endif()
 
 project(Qxt)
 
 set(${PROJECT_NAME}_MAJOR_VERSION 0)
 set(${PROJECT_NAME}_MINOR_VERSION 6)
-set(${PROJECT_NAME}_PATCH_VERSION 2)
+set(${PROJECT_NAME}_PATCH_VERSION 99)
 set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
 
-macro(QT4_GENERATE_MOCS)
+macro(_qt_generate_mocs)
   foreach(file ${ARGN})
     get_filename_component(source_path ${file} PATH)
     get_filename_component(source_name ${file} NAME_WE)
     get_filename_component(source_ext ${file} EXT)
 
     set(moc_file ${CMAKE_CURRENT_BINARY_DIR}/${source_path}/moc_${source_name}.cpp)
-    QT4_GENERATE_MOC(${file} ${moc_file})
+    if(DESIRED_QT_VERSION MATCHES "4")
+      QT4_GENERATE_MOC(${file} ${moc_file})
+    else()
+      qt5_generate_moc(${file} ${moc_file})
+    endif()
     set_property(SOURCE ${source_path}/${source_name}.cpp APPEND PROPERTY
                  OBJECT_DEPENDS ${moc_file})
   endforeach()
 endmacro()
 
+macro(_qt_wrap_cpp)
+  if(DESIRED_QT_VERSION MATCHES "4")
+    qt4_wrap_cpp(${ARGN})
+  else()
+    qt5_wrap_cpp(${ARGN})
+  endif()
+endmacro()
+
+macro(_qt_add_resources)
+  if(DESIRED_QT_VERSION MATCHES "4")
+    qt4_add_resources(${ARGN})
+  else()
+    qt5_add_resources(${ARGN})
+  endif()
+endmacro()
+
 set(${PROJECT_NAME}_LIBRARIES
   QxtCore
-  QxtGui
+  QxtWidgets
   QxtNetwork
   QxtWeb
 )
@@ -117,8 +140,8 @@ set(QXT_GUI_MOC_HEADERS
   qxtlookuplineedit.h
 
   # !qws:!symbian
-  qxtapplication.h
-  qxtglobalshortcut.h
+  #qxtapplication.h
+  #qxtglobalshortcut.h
 )
 
 set(QXT_NETWORK_MOC_HEADERS
@@ -237,8 +260,8 @@ set(QXT_GUI_SOURCES
   qxtlookuplineedit.cpp
 
   # !qws:!symbian
-  qxtapplication.cpp
-  qxtglobalshortcut.cpp
+  #qxtapplication.cpp
+  #qxtglobalshortcut.cpp
 )
 
 set(QXT_NETWORK_SOURCES
@@ -270,28 +293,42 @@ set(QXT_WEB_SOURCES
 )
 
 if(UNIX)
-  list(APPEND QXT_CORE_MOC_HEADERS qxtserialdevice.h qxtserialdevice_p.h)
+  list(APPEND QXT_CORE_MOC_HEADERS unix/qxtserialdevice.h unix/qxtserialdevice_p.h)
   list(APPEND QXT_CORE_SOURCES
-       qxtfilelock_unix.cpp qxtserialdevice.cpp qxtserialdevice_unix.cpp)
+       unix/qxtfilelock_unix.cpp unix/qxtserialdevice.cpp unix/qxtserialdevice_unix.cpp)
   if(APPLE)
     list(APPEND QXT_GUI_SOURCES
-         qxtapplication_mac.cpp qxtglobalshortcut_mac.cpp)
+         #mac/qxtapplication_mac.cpp
+         #mac/qxtglobalshortcut_mac.cpp
+        )
   else()
+    if(DESIRED_QT_VERSION MATCHES "5")
+      find_package(Qt5X11Extras REQUIRED)
+    endif()
     list(APPEND QXT_GUI_SOURCES
-         qxtapplication_x11.cpp qxtglobalshortcut_x11.cpp
-         qxtscreen_x11.cpp qxtwindowsystem_x11.cpp)
+         #x11/qxtapplication_x11.cpp
+         #x11/qxtglobalshortcut_x11.cpp
+         x11/qxtscreen_x11.cpp
+         #x11/qxtwindowsystem_x11.cpp
+        )
   endif()
 endif()
 
 if(NOT APPLE)
-  list(APPEND QXT_GUI_SOURCES qxtscreen.cpp qxtwindowsystem.cpp)
+  list(APPEND QXT_GUI_SOURCES
+       qxtscreen.cpp
+       #qxtwindowsystem.cpp
+      )
 endif()
 
 if(WIN32)
-  list(APPEND QXT_CORE_SOURCES qxtfilelock_win.cpp)
+  list(APPEND QXT_CORE_SOURCES win/qxtfilelock_win.cpp)
   list(APPEND QXT_GUI_SOURCES
-       qxtapplication_win.cpp qxtglobalshortcut_win.cpp
-       qxtscreen_win.cpp qxtwindowsystem_win.cpp)
+       #win/qxtapplication_win.cpp
+       #win/qxtglobalshortcut_win.cpp
+       win/qxtscreen_win.cpp
+       #win/qxtwindowsystem_win.cpp
+      )
 endif()
 
 set(_qxt_core_moc_headers )
@@ -301,7 +338,7 @@ endforeach()
 
 set(_qxt_gui_moc_headers )
 foreach(_header ${QXT_GUI_MOC_HEADERS})
-  list(APPEND _qxt_gui_moc_headers src/gui/${_header})
+  list(APPEND _qxt_gui_moc_headers src/widgets/${_header})
 endforeach()
 
 set(_qxt_network_moc_headers )
@@ -326,7 +363,7 @@ endforeach()
 
 set(_qxt_gui_sources )
 foreach(_source ${QXT_GUI_SOURCES})
-  list(APPEND _qxt_gui_sources src/gui/${_source})
+  list(APPEND _qxt_gui_sources src/widgets/${_source})
 endforeach()
 
 set(_qxt_network_sources )
@@ -339,13 +376,13 @@ foreach(_source ${QXT_WEB_SOURCES})
   list(APPEND _qxt_web_sources src/web/${_source})
 endforeach()
 
-set(_qxt_gui_resources src/gui/resources.qrc)
+set(_qxt_gui_resources src/widgets/resources.qrc)
 
 set(${PROJECT_NAME}_INCLUDE_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/core
   ${CMAKE_CURRENT_SOURCE_DIR}/include/QxtCore
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/gui
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/QxtGui
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/QxtWidgets
   ${CMAKE_CURRENT_SOURCE_DIR}/src/network
   ${CMAKE_CURRENT_SOURCE_DIR}/include/QxtNetwork
   ${CMAKE_CURRENT_SOURCE_DIR}/src/web
@@ -354,55 +391,76 @@ set(${PROJECT_NAME}_INCLUDE_DIRS
 
 include_directories(${${PROJECT_NAME}_INCLUDE_DIRS})
 
-find_package(Qt4 REQUIRED)
-
-set(QT_USE_QTNETWORK 1)
-set(QT_USE_QTDESIGNER 1)
-include(${QT_USE_FILE})
+if(DESIRED_QT_VERSION MATCHES "4")
+  find_package(Qt4 REQUIRED)
+  set(QT_USE_QTNETWORK 1)
+  set(QT_USE_QTDESIGNER 1)
+  include(${QT_USE_FILE})
+else()
+  if (WIN32)
+    cmake_policy(SET CMP0020 NEW) # Automatically link Qt executables to qtmain target on Windows
+  endif()
+  find_package(Qt5 COMPONENTS Network Designer Widgets REQUIRED)
+endif()
 
 # Build the QxtCore library
-qt4_wrap_cpp(_qxt_core_sources ${_qxt_core_moc_headers})
+_qt_wrap_cpp(_qxt_core_sources ${_qxt_core_moc_headers})
 
 add_library(QxtCore SHARED ${_qxt_core_sources})
-target_link_libraries(QxtCore ${QT_LIBRARIES})
+if(DESIRED_QT_VERSION MATCHES "4")
+  target_link_libraries(QxtCore ${QT_LIBRARIES})
+else()
+  target_link_libraries(QxtCore Qt5::Core)
+endif()
 
 set_target_properties(QxtCore PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}
                       COMPILE_DEFINITIONS "BUILD_QXT_CORE")
 
-# Build the QxtGui library
-qt4_wrap_cpp(_qxt_gui_sources ${_qxt_gui_moc_headers})
-qt4_add_resources(_qxt_gui_sources ${_qxt_gui_resources})
+# Build the QxtWidgets (formerly QxtGui) library
+_qt_wrap_cpp(_qxt_gui_sources ${_qxt_gui_moc_headers})
+_qt_add_resources(_qxt_gui_sources ${_qxt_gui_resources})
 
-set(QxtGui_link_libraries ${QT_LIBRARIES})
+if(DESIRED_QT_VERSION MATCHES "4")
+  set(QxtGui_link_libraries ${QT_LIBRARIES})
+else()
+  set(QxtGui_link_libraries Qt5::Widgets)
+  if(UNIX AND NOT APPLE)
+    list(APPEND QxtGui_link_libraries Qt5::X11Extras)
+  endif()
+endif()
 if(APPLE)
   find_library(CARBON_FW NAMES Carbon)
   list(APPEND QxtGui_link_libraries ${CARBON_FW})
 endif()
-add_library(QxtGui SHARED ${_qxt_gui_sources})
-target_link_libraries(QxtGui QxtCore ${QxtGui_link_libraries})
+add_library(QxtWidgets SHARED ${_qxt_gui_sources})
+target_link_libraries(QxtWidgets QxtCore ${QxtGui_link_libraries})
 
-set_target_properties(QxtGui PROPERTIES
+set_target_properties(QxtWidgets PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}
                       COMPILE_DEFINITIONS "BUILD_QXT_GUI")
 
 # Build the QxtNetwork library
-qt4_wrap_cpp(_qxt_network_sources ${_qxt_network_moc_headers})
-qt4_add_resources(_qxt_network_sources ${_qxt_network_resources})
+_qt_wrap_cpp(_qxt_network_sources ${_qxt_network_moc_headers})
+_qt_add_resources(_qxt_network_sources ${_qxt_network_resources})
 
 # The generate moc_* sources are included directly in .cpp files
-QT4_GENERATE_MOCS(${_qxt_network_manual_moc_headers})
+_qt_generate_mocs(${_qxt_network_manual_moc_headers})
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/network)
 
 add_library(QxtNetwork SHARED ${_qxt_network_sources})
-target_link_libraries(QxtNetwork QxtCore ${QT_LIBRARIES})
+if(DESIRED_QT_VERSION MATCHES "4")
+  target_link_libraries(QxtNetwork QxtCore ${QT_LIBRARIES})
+else()
+  target_link_libraries(QxtNetwork Qt5::Network)
+endif()
 
 set_target_properties(QxtNetwork PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}
                       COMPILE_DEFINITIONS "BUILD_QXT_NETWORK")
 
 # Build the QxtWeb library
-qt4_wrap_cpp(_qxt_web_sources ${_qxt_web_moc_headers})
+_qt_wrap_cpp(_qxt_web_sources ${_qxt_web_moc_headers})
 
 add_library(QxtWeb SHARED ${_qxt_web_sources})
 target_link_libraries(QxtWeb QxtCore QxtNetwork ${QT_LIBRARIES})
@@ -436,7 +494,12 @@ set(_qxt_designer_sources
   src/designer/qxttreewidgetplugin.cpp
 )
 
-qt4_wrap_cpp(_qxt_designer_sources
+set(wrap_cpp_options )
+if(DESIRED_QT_VERSION MATCHES "5")
+  list(APPEND wrap_cpp_options TARGET QxtDesignerPlugins)
+endif()
+
+_qt_wrap_cpp(_qxt_designer_sources
   src/designer/qxtbasespinboxplugin.h
   src/designer/qxtcheckcomboboxplugin.h
   src/designer/qxtcountrycomboboxplugin.h
@@ -455,12 +518,16 @@ qt4_wrap_cpp(_qxt_designer_sources
   src/designer/qxtstringspinboxplugin.h
   src/designer/qxttablewidgetplugin.h
   src/designer/qxttreewidgetplugin.h
-
+  ${wrap_cpp_options}
 )
 
-qt4_add_resources(_qxt_designer_sources src/designer/resources.qrc)
+_qt_add_resources(_qxt_designer_sources src/designer/resources.qrc)
 add_library(QxtDesignerPlugins SHARED ${_qxt_designer_sources})
-target_link_libraries(QxtDesignerPlugins QxtGui QxtCore ${QT_LIBRARIES})
+if(DESIRED_QT_VERSION MATCHES "4")
+  target_link_libraries(QxtDesignerPlugins QxtWidgets QxtCore ${QT_LIBRARIES})
+else()
+  target_link_libraries(QxtDesignerPlugins QxtWidgets QxtCore Qt5::Designer)
+endif()
 
 set_target_properties(QxtDesignerPlugins PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}

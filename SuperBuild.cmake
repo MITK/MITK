@@ -72,9 +72,9 @@ set(external_projects
   )
 
 # Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
-if(MITK_USE_Qt4)
+#if(MITK_USE_Qt4)
   list(APPEND external_projects Qxt)
-endif()
+#endif()
 
 # These are "hard" dependencies and always set to ON
 set(MITK_USE_tinyxml 1)
@@ -87,10 +87,10 @@ set(MITK_USE_VTK 1)
 # Semi-hard dependencies, enabled by user-controlled variables
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 if(MITK_USE_QT)
-  if(MITK_USE_Qt4)
-    set(MITK_USE_Qwt 1)
+  set(MITK_USE_Qwt 1)
+  #if(MITK_USE_Qt4)
     set(MITK_USE_Qxt 1) #TODO: Check how Qxt builds with Qt 5
-  endif()
+  #endif()
 endif()
 
 if(MITK_USE_SOFA)

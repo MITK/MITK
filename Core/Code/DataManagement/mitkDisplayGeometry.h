@@ -188,7 +188,7 @@ namespace mitk
 
     virtual bool IsValid() const;
 
-    virtual bool IsAbove( const Point3D &pt3d_mm , bool considerBoundingBox=false) const { return Superclass::IsAbove(pt3d_mm, true);};
+    virtual bool IsAbove( const Point3D &pt3d_mm , bool /*considerBoundingBox=false*/) const { return Superclass::IsAbove(pt3d_mm, true);};
 
   protected:
 

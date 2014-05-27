@@ -311,7 +311,7 @@ namespace mitk {
     mitk::SliceNavigationController *m_SliceNavigationController;
   private:
 
-    virtual void PreSetBounds(const BoundsArrayType& bounds){};
+    virtual void PreSetBounds(const BoundsArrayType& /*bounds*/){};
 
         /**
     * \brief Set the spacing (m_Spacing), in direction of the plane normal.

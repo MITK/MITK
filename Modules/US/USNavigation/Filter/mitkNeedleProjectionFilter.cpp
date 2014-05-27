@@ -81,7 +81,7 @@ void mitk::NeedleProjectionFilter::GenerateData()
   // 3b) else, calculate intersection with plane
   mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
   plane->SetIndexToWorldTransform(m_TargetPlane);
-  plane->TransferItkToVtkTransform();
+  //plane->TransferItkToVtkTransform(); //included in SetIndexToWorldTransform
 
   double t;
   double x[3];
@@ -144,7 +144,7 @@ mitk::Geometry3D::Pointer mitk::NeedleProjectionFilter::TransformToGeometry(mitk
   mitk::ScalarType scale[] = {1.0, 1.0, 1.0};
   g3d->SetSpacing(scale);
   g3d->SetIndexToWorldTransform(transform);
-  g3d->TransferItkToVtkTransform(); // update VTK Transform for rendering too
+  //g3d->TransferItkToVtkTransform(); // update VTK Transform for rendering too //included in SetIndexToWorldTransform
   g3d->Modified();
   return g3d;
 }

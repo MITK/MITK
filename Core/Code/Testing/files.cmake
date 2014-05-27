@@ -96,6 +96,7 @@ set(MODULE_TESTS
   mitkSurfaceToImageFilterTest.cpp
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
+  mitkArbitraryTimeGeometryTest
 )
 
 if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow

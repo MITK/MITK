@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmlMitkRenderingManagerFactory_h
 #define QmlMitkRenderingManagerFactory_h
 
-#include <QmlMitkExports.h>
+#include <MitkQmlItemsExports.h>
 
 #include "mitkRenderingManagerFactory.h"
 
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * CreateRenderingManager().
  *
  */
-class QmlMitk_EXPORT QmlMitkRenderingManagerFactory : public mitk::RenderingManagerFactory
+class MitkQmlItems_EXPORT QmlMitkRenderingManagerFactory : public mitk::RenderingManagerFactory
 {
 public:
 

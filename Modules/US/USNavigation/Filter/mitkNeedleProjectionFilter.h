@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataPassThroughFilter.h>
 #include <mitkNavigationData.h>
 #include <mitkPointSet.h>
+#include <mitkGeometry3D.h>
 
 namespace mitk {
   /**

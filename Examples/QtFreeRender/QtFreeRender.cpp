@@ -24,7 +24,7 @@
 #include <mitkRenderingManager.h>
 #include <mitkGlobalInteraction.h>
 #include "mitkProperties.h"
-#include "mitkGeometry2DDataMapper2D.h"
+#include "mitkPlaneGeometryDataMapper2D.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkDisplayInteractor.h"
 #include "mitkPositionEvent.h"
@@ -139,11 +139,11 @@ void AddDisplayPlaneSubTree()
 
   float white[3] =
   { 1.0f, 1.0f, 1.0f };
-  mitk::Geometry2DDataMapper2D::Pointer mapper;
+  mitk::PlaneGeometryDataMapper2D::Pointer mapper;
   mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1000);
 
   // ... of widget 1
-  m_PlaneNode1 = (mitk::BaseRenderer::GetInstance(mitkWidget1->GetVtkRenderWindow()))->GetCurrentWorldGeometry2DNode();
+  m_PlaneNode1 = (mitk::BaseRenderer::GetInstance(mitkWidget1->GetVtkRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode1->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
   m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(true));
   m_PlaneNode1->SetProperty("name", mitk::StringProperty::New("widget1Plane"));
@@ -151,11 +151,11 @@ void AddDisplayPlaneSubTree()
   m_PlaneNode1->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_PlaneNode1->SetProperty("layer", layer);
   m_PlaneNode1->SetColor(1.0, 0.0, 0.0);
-  mapper = mitk::Geometry2DDataMapper2D::New();
+  mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode1->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
   // ... of widget 2
-  m_PlaneNode2 = (mitk::BaseRenderer::GetInstance(mitkWidget2->GetVtkRenderWindow()))->GetCurrentWorldGeometry2DNode();
+  m_PlaneNode2 = (mitk::BaseRenderer::GetInstance(mitkWidget2->GetVtkRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode2->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
   m_PlaneNode2->SetProperty("visible", mitk::BoolProperty::New(true));
   m_PlaneNode2->SetProperty("name", mitk::StringProperty::New("widget2Plane"));
@@ -163,11 +163,11 @@ void AddDisplayPlaneSubTree()
   m_PlaneNode2->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_PlaneNode2->SetProperty("layer", layer);
   m_PlaneNode2->SetColor(0.0, 1.0, 0.0);
-  mapper = mitk::Geometry2DDataMapper2D::New();
+  mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode2->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
   // ... of widget 3
-  m_PlaneNode3 = (mitk::BaseRenderer::GetInstance(mitkWidget3->GetVtkRenderWindow()))->GetCurrentWorldGeometry2DNode();
+  m_PlaneNode3 = (mitk::BaseRenderer::GetInstance(mitkWidget3->GetVtkRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode3->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
   m_PlaneNode3->SetProperty("visible", mitk::BoolProperty::New(true));
   m_PlaneNode3->SetProperty("name", mitk::StringProperty::New("widget3Plane"));
@@ -175,7 +175,7 @@ void AddDisplayPlaneSubTree()
   m_PlaneNode3->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_PlaneNode3->SetProperty("layer", layer);
   m_PlaneNode3->SetColor(0.0, 0.0, 1.0);
-  mapper = mitk::Geometry2DDataMapper2D::New();
+  mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode3->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
   m_Node = mitk::DataNode::New();
@@ -191,11 +191,11 @@ void AddDisplayPlaneSubTree()
       m_DataStorage->Add(m_PlaneNode1, m_Node);
       m_DataStorage->Add(m_PlaneNode2, m_Node);
       m_DataStorage->Add(m_PlaneNode3, m_Node);
-      static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode1->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
+      static_cast<mitk::PlaneGeometryDataMapper2D*>(m_PlaneNode1->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
           m_DataStorage, m_Node);
-      static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode2->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
+      static_cast<mitk::PlaneGeometryDataMapper2D*>(m_PlaneNode2->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
           m_DataStorage, m_Node);
-      static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode3->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
+      static_cast<mitk::PlaneGeometryDataMapper2D*>(m_PlaneNode3->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
           m_DataStorage, m_Node);
     }
   }

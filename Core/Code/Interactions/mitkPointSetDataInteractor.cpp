@@ -72,7 +72,7 @@ bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
     end = m_PointSet->End();
     while( it != end )
     {
-      if (!m_PointSet->IndexExists(lastPosition))
+      if (!m_PointSet->IndexExists(lastPosition,timeStep))
         break;
       ++it;
       ++lastPosition;
@@ -140,12 +140,12 @@ bool mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
       //undoable deselect of all points in the DataList
       this->UnselectAll( timeStep, timeInMs);
 
-      PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT, point, index);
+      PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT,timeInMs, point, index);
 
       //Undo
       if (m_UndoEnabled)
       {
-        PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT,point, index);
+        PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT,timeInMs,point, index);
         OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp);
         m_UndoController->SetOperationEvent(operationEvent);
       }
@@ -258,7 +258,7 @@ bool mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction*, Interact
 bool mitk::PointSetDataInteractor::MovePoint(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-
+  ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
@@ -292,12 +292,12 @@ bool mitk::PointSetDataInteractor::MovePoint(StateMachineAction* stateMachineAct
         sumVec[1] = pt[1];
         sumVec[2] = pt[2];
         resultPoint = sumVec + dirVector;
-        PointOperation doOp(OpMOVE, resultPoint, position);
-
+        PointOperation* doOp = new mitk::PointOperation(OpMOVE,timeInMs, resultPoint, position);
         //execute the Operation
         //here no undo is stored, because the movement-steps aren't interesting.
         // only the start and the end is interisting to store for undo.
-        m_PointSet->ExecuteOperation(&doOp);
+        m_PointSet->ExecuteOperation(doOp);
+        delete doOp;
       }
       ++it;
     }

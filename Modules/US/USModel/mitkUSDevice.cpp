@@ -44,6 +44,8 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
+  m_Manufacturer(manufacturer),
+  m_Name(model),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
   m_SpawnAcquireThread(true),
@@ -52,11 +54,6 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   m_ThreadID(-1),
   m_UnregisteringStarted(false)
 {
-  // Initialize Members
-  m_Metadata = mitk::USImageMetadata::New();
-  m_Metadata->SetDeviceManufacturer(manufacturer);
-  m_Metadata->SetDeviceModel(model);
-
   USImageCropArea empty;
   empty.cropBottom = 0;
   empty.cropTop = 0;
@@ -82,7 +79,9 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   m_ThreadID(-1),
   m_UnregisteringStarted(false)
 {
-  m_Metadata = metadata;
+  m_Manufacturer = metadata->GetDeviceManufacturer();
+  m_Name = metadata->GetDeviceModel();
+  m_Comment = metadata->GetDeviceComment();
 
   USImageCropArea empty;
   empty.cropBottom = 0;
@@ -158,12 +157,9 @@ us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
   }
 
   props[ propertyKeys.US_PROPKEY_CLASS ] = GetDeviceClass();
-  props[ mitk::USImageMetadata::PROP_DEV_MANUFACTURER ] = m_Metadata->GetDeviceManufacturer();
-  props[ mitk::USImageMetadata::PROP_DEV_MODEL ] = m_Metadata->GetDeviceModel();
-  props[ mitk::USImageMetadata::PROP_DEV_COMMENT ] = m_Metadata->GetDeviceComment();
-  props[ mitk::USImageMetadata::PROP_PROBE_NAME ] = m_Metadata->GetProbeName();
-  props[ mitk::USImageMetadata::PROP_PROBE_FREQUENCY ] = m_Metadata->GetProbeFrequency();
-  props[ mitk::USImageMetadata::PROP_ZOOM ] = m_Metadata->GetZoom();
+  props[ propertyKeys.US_PROPKEY_MANUFACTURER ] = m_Manufacturer;
+  props[ propertyKeys.US_PROPKEY_NAME ] = m_Name;
+  props[ propertyKeys.US_PROPKEY_COMMENT ] = m_Comment;
 
   m_ServiceProperties = props;
 
@@ -453,15 +449,15 @@ bool mitk::USDevice::GetIsConnected()
 }
 
 std::string mitk::USDevice::GetDeviceManufacturer(){
-  return this->m_Metadata->GetDeviceManufacturer();
+  return m_Manufacturer;
 }
 
 std::string mitk::USDevice::GetDeviceModel(){
-  return this->m_Metadata->GetDeviceModel();
+  return m_Name;
 }
 
 std::string mitk::USDevice::GetDeviceComment(){
-  return this->m_Metadata->GetDeviceComment();
+  return m_Comment;
 }
 
 void mitk::USDevice::GenerateData()
@@ -490,7 +486,7 @@ std::string mitk::USDevice::GetServicePropertyLabel()
   if (this->GetIsActive()) { isActive = " (Active)"; }
   else { isActive = " (Inactive)"; }
   // e.g.: Zonare MyLab5 (Active)
-  return m_Metadata->GetDeviceManufacturer() + " " + m_Metadata->GetDeviceModel() + isActive;
+  return m_Manufacturer + " " + m_Name + isActive;
 }
 
 ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)

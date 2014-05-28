@@ -49,8 +49,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(NodeDepententPointSetInteractor, PointSetInteractor);
-    mitkNewMacro4Param(Self, const char*, DataNode*, DataNode*, int);
-    mitkNewMacro3Param(Self, const char*, DataNode*, DataNode*);
+    DEPRECATED() mitkNewMacro4Param(Self, const char*, DataNode*, DataNode*, int);
+    DEPRECATED() mitkNewMacro3Param(Self, const char*, DataNode*, DataNode*);
 
     /**
      * \brief Checks visibility of the specified node (e.g. image),

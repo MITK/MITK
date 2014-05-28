@@ -42,8 +42,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(MouseMovePointSetInteractor, Interactor);
-    mitkNewMacro3Param(Self, const char*, DataNode*, int);
-    mitkNewMacro2Param(Self, const char*, DataNode*);
+    DEPRECATED() mitkNewMacro3Param(Self, const char*, DataNode*, int);
+    DEPRECATED() mitkNewMacro2Param(Self, const char*, DataNode*);
 
 
     /**

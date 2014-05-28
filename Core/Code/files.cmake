@@ -262,6 +262,7 @@ set(CPP_FILES
   Interactions/mitkPointSetInteractor.cpp
   Interactions/mitkPositionEvent.cpp
   Interactions/mitkPositionTracker.cpp
+  Interactions/mitkSinglePointDataInteractor.cpp
   Interactions/mitkStateMachineAction.cpp
   Interactions/mitkStateMachineCondition.cpp
   Interactions/mitkStateMachineState.cpp

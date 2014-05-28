@@ -53,6 +53,19 @@ namespace mitk
 
     void DeletePointByIndex(unsigned int index, unsigned int timeStep = 0);
 
+    /**
+     * Sets the maximum distance that is accepted when looking for a point at a certain position using the GetPointIndexByPosition function.
+     */
+    void SetAccuracy(float accuracy);
+
+
+    /**
+     * @brief SetMaxPoints Sets the maximal number of points for the pointset
+     * Default ist zero, which result in infinite number of allowed points
+     * @param maxNumber
+     */
+    void SetMaxPoints(unsigned int maxNumber = 0);
+
   protected:
     PointSetDataInteractor();
     virtual ~PointSetDataInteractor();
@@ -69,20 +82,6 @@ namespace mitk
      * and added to the DataNode.
      */
     virtual void DataNodeChanged();
-
-
-    /**
-     * Sets the maximum distance that is accepted when looking for a point at a certain position using the GetPointIndexByPosition function.
-     */
-    void SetAccuracy(float accuracy);
-
-
-    /**
-     * @brief SetMaxPoints Sets the maximal number of points for the pointset
-     * Default ist zero, which result in infinite number of allowed points
-     * @param maxNumber
-     */
-    void SetMaxPoints(unsigned int maxNumber = 0);
 
     /**
      * \brief Return index in PointSet of the point that is within given accuracy to the provided position.
@@ -162,8 +161,6 @@ namespace mitk
     /** \brief summ-vector for Movement */
     Vector3D m_SumVec;
 
-
-  private:
     // DATA
     PointSet::Pointer m_PointSet;
     int m_MaxNumberOfPoints; // maximum of allowed number of points

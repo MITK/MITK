@@ -26,6 +26,8 @@ namespace mitk {
   /**Documentation
   * \brief This class encapsulates all necessary metadata to describe a US Image.
   * \ingroup US
+  *
+  * \deprecated Deprecated since 2014-06
   */
   class MitkUS_EXPORT USImageMetadata : public itk::Object
   {

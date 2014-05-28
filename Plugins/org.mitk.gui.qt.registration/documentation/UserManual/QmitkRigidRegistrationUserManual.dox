@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_rigidregistration The Rigid Registration View
 
-\image html QmitkRegistration_RigidRegistrationIcon.png "Icon of the View"
+\imageMacro{QmitkRegistration_RigidRegistrationIcon.png,"Icon of the View",2.00}
 
 Available sections:
   - \ref QmitkRigidRegistrationUserManualOverview 
@@ -15,7 +15,7 @@ This view allows you to register 2D as well as 3D images in a rigid manner. If t
 Register means to align two images, so that they become as similar as possible. Therefore you can select from different transforms, metrics and optimizers. Registration results will 
 directly be applied to the Moving Image. Also binary images as image masks can be used to restrict the metric evaluation only to the masked area.
 
-\image html QmitkRegistration_RigidRegistration_small.png "MITK with the QmitkRigidRegistration view"
+\imageMacro{QmitkRegistration_RigidRegistration_small.png,"MITK with the QmitkRigidRegistration view",16.00}
 
 This document will tell you how to use this view, but it is assumed that you already know how to navigate through the slices of an image using the
 multi-widget.
@@ -30,7 +30,7 @@ on a gradient image and uncheck the checkbox for "Compute Gradient".
 First of all you have to open the data sets which you want to register and select them in the Data Manager. You have to select exactly 2 images for registration. The image which was selected 
 first will become the fixed image, the other one the moving image. The two selected images will remain for registration until exactly two images were selected in the Data Manager again. 
 
-\image html QmitkRegistration_ImageArea.png "The Image area"
+\imageMacro{QmitkRegistration_ImageArea.png,"The Image area",7.34}
 
 While there aren't two images for registration a message is viewed on top of the view saying that registration needs two images. If two images are selected the message disappears and the 
 interaction areas for the fixed and moving data appears. If both selected images have a binary image as childnode a selection box appears which allows, when checked, to use the binary images as 
@@ -45,7 +45,7 @@ With the "Moving Image Opacity:" slider you can change the opacity of the moving
 the fixed dataset will be displayed in red-values and the moving dataset in green-values to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, 
 both datasets will be displayed in grey-values.
 
-\image html QmitkRegistration_RegistrationArea.png "The Registration area"
+\imageMacro{QmitkRegistration_RegistrationArea.png,"The Registration area",7.49}
 
 In the "Register" area you can start the registration by clicking the "Calculate Transform" button. The optimizer value for every iteration step is diplayed as LCD number next to the 
 "Optimizer Value:" label. Many of the registration methods can be canceled during their iteration steps by clicking the "Stop Optimization" button. During the calculation, a progress bar 
@@ -57,12 +57,12 @@ visualization of the registration as well as the optimizer value provides the us
 The "Undo Transformation" button becomes enabled when you have performed an transformation and you can undo the performed transformations. The "Redo Transformation" button becomes enabled when 
 you have performed an undo to redo the transformation without to recalculate it.
 
-\image html QmitkRegistration_ManualRegistrationArea.png "The Manual Registration area"
+\imageMacro{QmitkRegistration_ManualRegistrationArea.png,"The Manual Registration area",5.95}
 
 In the "Manual Registration" area, shown by checking the checkbox Manual Registration, you can manually allign the images by moving sliders for translation and scaling in x-, y- and z-axis as 
 well as for rotation around the x-, y- and z-Axis. Additionally you can automatically allign the image centers with the button "Automatic Allign Image Centers".
 
-\image html QmitkRegistration_Tab2.png "The Advanced Mode tab"
+\imageMacro{QmitkRegistration_Tab2.png,"The Advanced Mode tab",7.54}
 
 In the "Advanced Mode" tab you can choose a transform, a metric, an optimizer and an interpolator and you have to set the corresponding parameters to specify the registration 
 method you want to perform. With the topmost button you can also load testpresets. These presets contain all parametersets which were saved using the "Save as Testpreset" button. The "Save as 

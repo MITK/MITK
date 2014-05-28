@@ -85,7 +85,7 @@ segmentation algorithms. These can also be compiled into a tool extension shared
 Summing up the last section, an example tool extension could comprise the following files:
 \verbatim
 mitkExternalTool.h      \
-mitkExternalTool.xpm     >--- implementing mitk::ExternalTool (header, icon, implementation)
+mitkExternalTool.png     >--- implementing mitk::ExternalTool (header, icon, implementation)
 mitkExternalTool.cpp    /
 
 QmitkExternalToolGUI.h    ,-- implementing a GUI for mitk::ExternalTool

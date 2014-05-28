@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_eventrecorder Eventrecorder
 
-\image html icon.xpm "Icon of Eventrecorder"
+\imageMacro{icon.png,"Icon of Eventrecorder",2.00}
 
 Available sections:
   - \ref org_mitk_gui_qt_eventrecorderOverview

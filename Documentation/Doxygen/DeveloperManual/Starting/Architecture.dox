@@ -16,7 +16,7 @@ of MITK can decide if he simply wants to add a new plug-in to the existing appli
 own application and wants to use MITK as a software library. Depending on the type of use MITK uses different software libraries, which is
 shown in the next figure for overview.
 
-\image html MitkOverview.png "Overview of MITK"
+\imageMacro{MitkOverview.png,"Overview of MITK",16}
 
 Like shown above, MITK uses the following libraries.
 <ul>

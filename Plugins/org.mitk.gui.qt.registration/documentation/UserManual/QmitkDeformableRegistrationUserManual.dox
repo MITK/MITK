@@ -10,7 +10,7 @@ Available sections:
 This view allows you to register 2D as well as 3D images in a deformable manner. Register means to align two images, so that they become as similar as
 possible. Registration results will directly be applied to the Moving Image.
 
-\image html QmitkRegistration_DeformableRegistration_small.png "MITK with the DeformableRegistration view"
+\imageMacro{QmitkRegistration_DeformableRegistration_small.png,"MITK with the DeformableRegistration view",16.00}
 
 This document will tell you how to use this view, but it is assumed that you already know how to navigate through the slices of an image using the
 multi-widget.
@@ -23,14 +23,14 @@ there aren't two images for registration a message is viewed on top of the view 
 areas for the fixed and moving data appears. On default only the fixed and moving image are shown in the render windows. If you want to have other images visible you have to set the visibility 
 via the Data Manager. Also if you want to perform a reinit on a specific node or a global reinit for all nodes you have to use the Data Manager.
 
-\image html QmitkRegistration_ImageSelectionDeformable.png "The Image area"
+\imageMacro{QmitkRegistration_ImageSelectionDeformable.png,"The Image area",7.56}
 
 The upper area is the "Image" area, where the selected images are shown. It is used for changing the colour of the images between grey values and red/green as well as for changing the opacity of the moving image.
 To do so, just use the "Moving Image Opacity:" slider. In the "Show Images Red/Green" you can switch the color from both datasets. If you check the box, the fixed dataset will be displayed in redvalues and the
 moving dataset in greenvalues to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, 
 both datasets will be displayed in greyvalues.
 
-\image html QmitkRegistration_RegistrationDeformable.png "The Registration area for Demons based registration"
+\imageMacro{QmitkRegistration_RegistrationDeformable.png,"The Registration area for Demons based registration",7.56}
 
 In the "Registration" area you have the choice between different Demonsbased deformable registration algorithms. There are available:
 

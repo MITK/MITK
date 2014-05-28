@@ -9,11 +9,11 @@
 
 \subsection OldClasses Old class diagram
 Until now, all geometry classes inherited from Geometry3D. This inheritance didn't make sense. For example, there is no reason, why we need a Geometry2D and a PlaneGeometry as both describe the same thing. Also, why does a two-dimensional class need to inherit from a three-dimensional class?
-\image html oldClasses.png "Old class diagram."
+\imageMacro{oldClasses.png,"Old class diagram.",12.70}
 
 \subsection NewClasses New class diagram
 Therefore, we inserted an abstract BaseGeometry class, from which all other geometry classes should inherit. The classes Geometry2D and PlaneGeometry are combined in the new PlaneGeometry class. Also, the LandmarkBasedCurvedGeometry is included in LandmarkProjectorBasedCurvedGeometry.
-\image html currentClasses.png "New class diagram."
+\imageMacro{currentClasses.png,"New class diagram.",15.32}
 
 
 \section Howto How to adapt your code

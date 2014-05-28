@@ -12,7 +12,7 @@ device "tool1" and "tool2" are just added to the object by method AddTool(name).
 
 \section sec2 In Navigation Layer
 
-\image html IGTTutorialStep1.png
+\imageMacro{IGTTutorialStep1.png,"",15.90}
 
 Secondly, a new source of the type  mitk::TrackingDeviceSource has to be created with outputs for each single tool of a tracker.
 The source sets the following tracking device by using method SetTrackingDevice as shown below
@@ -34,7 +34,7 @@ Part IV explains how the recoded file can be played for further use. After the o
 is created, the required file has to be set to the player and playing has to be started.  Here, there exists a new pipeline which functions by reading
 the recorded file from the harddisc and plays it by using the player as source. During the play, the for-loop makes the file update as in part III.
 
-\image html IGTTutorialStep1-2.png
+\imageMacro{IGTTutorialStep1-2.png,"",9.53}
 
 The full code of small navigation pipeline is shown below and can be found in MITK-Source/Modules/IGT/Tutorial/mitkIGTTutorialStep1.cpp.
 This tutorial is an extra target which can be build separately.

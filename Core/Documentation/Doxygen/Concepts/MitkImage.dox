@@ -7,7 +7,7 @@
 
 The MITK Image obviously is a very central class to MITK and one of those you are most likely to work with. This section will get you up and running with the basics. Consider this document a prerequisite for the Pipelining Introduction and the \ref GeometryOverviewPage.
 
-\image html mitkimagehierarchy.png
+\imageMacro{mitkimagehierarchy.png,"",16}
 
 Image is a direct descendant of SlicedData which itself inherits from BaseData. In MITK, BaseData is the common DataType from which all other Datatypes stem. SlicedData specifies this class to contain image slices, a typical example being a CT scan, and introduces properties and methods necessary to give the data a well defined geometry. Image further specializes the concept to allow for multiple channels, volumes and slices as well as additional information like image properties.
 
@@ -31,7 +31,7 @@ Objects of the class Image store the actual image data. It is important to disce
 
 There is also the pointer m_CompleteData that references all of the data (i.e. all volumes) as a singular array. This member is helpful, when one wants to copy image data from one image to another.
 
-\image html mitkimagememory.png
+\imageMacro{mitkimagememory.png,"",16}
 
 \subsection MitkImagePage_Properties Image Properties
 
@@ -58,7 +58,7 @@ The existing instantiable image accessor classes are: mitk::ImageReadAccessor, m
 They all inherit from mitk::ImageAccessorBase, which mainly contains the lock functionality and a representation of the specified image area.
 The classes mitk::ImageReadAccessor and mitk::ImageWriteAccessor provide access to an mitk::Image or mitk::ImageDataItem and supply a (const) void* pointer, while mitk::ImageVtkAccessor supports Vtk image access in a legacy mode (you should not instantiate it).
 
-\image html mitkimageaccessorhierarchy.png
+\imageMacro{mitkimageaccessorhierarchy.png,"",16}
 
 \subsection MitkImagePage_HowToGetAccess How to get access
 Although the concept of image accessors is extensive, the use of image accessors is simple. 

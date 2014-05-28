@@ -96,13 +96,13 @@ namespace mitk {
         /**
     * \deprecatedSince{2014_06} Please use GetPlaneGeometry
     */
-    DEPRECATED(const PlaneGeometry* GetGeometry2D(int s){return GetPlaneGeometry(s);};)
+    DEPRECATED(const PlaneGeometry* GetGeometry2D(int s)){return GetPlaneGeometry(s);};
 
 
     /**
     * \deprecatedSince{2014_06} Please use SetPlaneGeometry
     */
-    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo, int s){SetPlaneGeometry(geo, s);};)
+    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo, int s)){SetPlaneGeometry(geo, s);};
 
     //##Documentation
     //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSimulation.h"
 #include <sofa/simulation/tree/TreeSimulation.h>
+#include "mitkGeometry3D.h"
 
 static sofa::simulation::Simulation::SPtr CreateSimulation()
 {
@@ -134,7 +135,7 @@ void mitk::Simulation::UpdateOutputInformation()
       bounds.Fill(0.0f);
     }
 
-    mitk::Geometry3D::Pointer geometry = this->GetGeometry();
+    mitk::BaseGeometry::Pointer geometry = this->GetGeometry();
 
     if (geometry.IsNull())
     {

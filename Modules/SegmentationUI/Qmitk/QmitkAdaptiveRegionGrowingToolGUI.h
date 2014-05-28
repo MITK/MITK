@@ -50,6 +50,9 @@ class MitkSegmentationUI_EXPORT QmitkAdaptiveRegionGrowingToolGUI : public Qmitk
   Q_OBJECT
 
 public:
+  /**
+   * @brief mitkClassMacro
+   */
   mitkClassMacro(QmitkAdaptiveRegionGrowingToolGUI, QmitkToolGUI);
 
   itkFactorylessNewMacro(Self)
@@ -64,12 +67,32 @@ public:
   ///** \brief Method to set the default data storage.*/
   virtual void SetDataStorage(mitk::DataStorage* dataStorage);
 
+  /**
+   * @brief Method to set the used multiwidget.
+   * @param multiWidget
+   */
   void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
 
+  /**
+   * @brief Method to set the name of a data node.
+   * @param labledSegmentation Name of the labeled segmentation
+   * @param binaryImage Name of the binary image
+   * @param surface Name of the surface
+   */
   void SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, /*std::string vesselTree,*/ std::string surface);
 
+  /**
+   * @brief Method to enable/disable controls for region growing
+   *
+   * This method checks if a seed point is set and a segmentation exists.
+   * @param enable/disable controls
+   */
   void EnableControls(bool enable);
 
+  /**
+   * @brief Method to set the input image node
+   * @param data node
+   */
   void SetInputImageNode(mitk::DataNode* node);
 
   void Deactivated();
@@ -83,25 +106,70 @@ public:
 
 protected slots:
 
-    void RunSegmentation();
+  /**
+   * @brief Method to start the segmentation
+   *
+   * This method is called, when the "Start Segmentation" button is clicked.
+   */
+  void RunSegmentation();
 
-    void ChangeLevelWindow(double newValue);//called, when the Level Window is changed via the slider in the ControlWidget
+  /**
+   * @brief Method to change the level window
+   *
+   * This method is called, when the level window slider is changed via the slider in the control widget
+   * @param new value
+   */
+  void ChangeLevelWindow(double newValue);
 
-    //****called, when the slider-position is modified via the +/- buttons
-    void IncreaseSlider();
+  /**
+   * @brief Method to increase the preview slider
+   *
+   * This method is called, when the + button is clicked and increases the value by 1
+   */
+  void IncreaseSlider();
 
-    void DecreaseSlider();
-    //***
+  /**
+   * @brief Method to decrease the preview slider
+   *
+   * This method is called, when the - button is clicked and decreases the value by 1
+   */
+  void DecreaseSlider();
 
-    void ConfirmSegmentation();
+  /**
+   * @brief Method to confirm the preview segmentation
+   *
+   * This method is called, when the "Confirm Segmentation" button is clicked.
+   */
+  void ConfirmSegmentation();
 
-    void UseVolumeRendering(bool on);
+  /**
+   * @brief Method to switch the volume rendering on/off
+   * @param on/off
+   */
+  void UseVolumeRendering(bool on);
 
-    void SetLowerThresholdValue(double lowerThreshold);
+  /**
+   * @brief Method to set the lower threshold
+   *
+   * This method is called, when the minimum threshold slider has changed
+   * @param lower threshold
+   */
+  void SetLowerThresholdValue(double lowerThreshold);
 
-    void SetUpperThresholdValue(double upperThreshold);
+  /**
+   * @brief Method to set upper threshold
+   *
+   * This Method is called, when the maximum threshold slider has changed
+   * @param upper threshold
+   */
+  void SetUpperThresholdValue(double upperThreshold);
 
-    void OnNewToolAssociated(mitk::Tool*);
+  /**
+   * @brief Method to determine which tool to activate
+   *
+   * This method listens to the tool manager and activates this tool if requested otherwise disables this view
+   */
+  void OnNewToolAssociated(mitk::Tool*);
 
 protected:
 
@@ -117,6 +185,9 @@ protected:
 
   mitk::DataNode::Pointer m_InputImageNode;
 
+  /**
+   * @brief Method to calculate parameter settings, when a seed point is set
+   */
   void OnPointAdded();
 
 private:

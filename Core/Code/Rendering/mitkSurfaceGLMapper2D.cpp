@@ -227,7 +227,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }
 
     vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(timestep);
-    Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
+    PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
     assert( worldGeometry.IsNotNull() );
     if (worldGeometry.IsNotNull())
     {

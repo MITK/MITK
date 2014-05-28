@@ -17,7 +17,7 @@ documentation\doxygen\
   modules.dox......................... Doxygen file for documenting your plug-in
 
 resources\
-  icon.xpm............................ The icon of your plug-in. GIMP or other programs (including your text editor)
+  icon.png............................ The icon of your plug-in. GIMP or other programs (including your text editor)
                                        can be used to change this
 
 src\internal\

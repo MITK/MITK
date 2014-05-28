@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_navigationdataplayer NavigationData Player
 
-\image html QmitkIGTTracking_IconNavigationDataPlayer.png "Icon of NavigationData Player"
+\imageMacro{QmitkIGTTracking_IconNavigationDataPlayer.png,"Icon of NavigationData Player",2.00}
 
 Available sections:
   - \ref NavigationDataPlayerOverview
@@ -12,7 +12,7 @@ Press the button "start" for starting the player and the visualization. If "Sequ
 
 You can use the resolution field to define which part of the samples you want to use. E.g. 1 = every sample; 2 = every second sample; 3 = every third sample, ...
 
-\image html QmitkIGTTracking_ScreenshotNavigationDataPlayer.png "Screenshot of the NavigationData Player"
+\imageMacro{QmitkIGTTracking_ScreenshotNavigationDataPlayer.png,"Screenshot of the NavigationData Player",16.00}
 
 */
 

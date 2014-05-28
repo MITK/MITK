@@ -18,7 +18,7 @@ Contains the code of step 4a + b.
  
 \section Step4aSection Step 4a - Create axial and sagittal view
 
-\image html step4a_result.png 
+\imageMacro{step4a_result.png,"",11.01}
 
 \dontinclude Step4.cpp
 
@@ -48,7 +48,7 @@ The toplevelWidget is now the new main widget:
 
 \section Step4bSection Step 4b - Display slice positions
 
-\image html step4b_result.png 
+\imageMacro{step4b_result.png,"",11.01}
 
 We now want to see the position of the slice in 2D and the slice itself in 3D.
 Therefore it has to be added to the tree:

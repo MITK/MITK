@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_cmdlinemodules The Command Line Modules View
 
-\image html cmdlinemodules_Icon.png "Icon of the Command Line Modules View"
+\imageMacro{cmdlinemodules_Icon.png,"Icon of the Command Line Modules View",2.00}
 
 \tableofcontents
 
@@ -44,7 +44,7 @@ as utility programs to resample an image, and calculate a Jacobian image. These 
 The first time that the Command Line Modules View is launched, it is advisable to set the user preferences for the view. Please refer
 to Figure 1.
 
-\image html cmdlinemodules_Preferences.png "Figure 1. The Command Line Modules Preferences Page"
+\imageMacro{cmdlinemodules_Preferences.png,"Figure 1. The Command Line Modules Preferences Page",16.00}
 
 Each of these preferences is now explained in some detail.
 
@@ -78,8 +78,8 @@ a selection box that enables the user to specify custom directories to scan, and
 box that enables the user to select specific modules. Picking specific directories, and specific executables
 will most likely make the application quicker to launch.
 
-\image html cmdlinemodules_PreferencesAdditionalDirectories.png "Figure 2. The User can specify specific directories to scan".
-\image html cmdlinemodules_PreferencesAdditionalModules.png "Figure 3. The User can specify specific command line programs to load".
+\imageMacro{cmdlinemodules_PreferencesAdditionalDirectories.png,"Figure 2. The User can specify specific directories to scan".",7.90}
+\imageMacro{cmdlinemodules_PreferencesAdditionalModules.png,"Figure 3. The User can specify specific command line programs to load".",7.92}
 
 These directory and file selection boxes enable directories or files to be added, removed and updated in a similar fashion.
 
@@ -97,7 +97,7 @@ of temporary workspace.
 
 When the view is launched, a simple interface is presented, as shown in Figure 4.
 
-\image html cmdlinemodules_Initial.png "Figure 4. The initial interface, with no command line programs available."
+\imageMacro{cmdlinemodules_Initial.png,"Figure 4. The initial interface\, with no command line programs available.",8.66}
 
 In this example, all the above check-box preferences were off, and the "additional module directories"
 was empty, and the "additional modules" list was empty so no command line applications were found.
@@ -106,12 +106,12 @@ The "Search" box displays zero entries, and there is nothing to search.
 If the available search paths contain programs that are compatible (i.e. runnable) with this view,
 the name of the programs are displayed in the "Search" box in a nested menu, shown in Figure 5.
 
-\image html cmdlinemodules_WithPrograms.png "Figure 5. When valid paths are set, and programs are discovered, the menu is recalculated to show available programs."
+\imageMacro{cmdlinemodules_WithPrograms.png,"Figure 5. When valid paths are set\, and programs are discovered\, the menu is recalculated to show available programs.",10.54}
 
 When a program is selected, the relevant interface is displayed, by default as collapsed group boxes to save space.
 Each section can be individually expanded if necessary to see the parameters.
 
-\image html cmdlinemodules_NiftyReg.png "Figure 6. An example program, showing parameters for NiftyReg's program RegAladin."
+\imageMacro{cmdlinemodules_NiftyReg.png,"Figure 6. An example program\, showing parameters for NiftyReg's program RegAladin.",10.24}
 
 In this example, the parameters are displayed for <a href="http://www0.cs.ucl.ac.uk/staff/m.modat/Marcs_Page/Software.html">NiftyReg</a>
 produced at <a href="http://www.ucl.ac.uk">UCL</a>, and more specifically for the affine registration program called
@@ -122,7 +122,7 @@ selected from the combo box.
 At this stage, multiple tabs can be opened, with one tab for each command line program. Figure 7 shows 2 tabs,
 for the RegAladin and RegF3D programs.
 
-\image html cmdlinemodules_F3D.png "Figure 7. Multiple tabs can be opened, one for each command line program."
+\imageMacro{cmdlinemodules_F3D.png,"Figure 7. Multiple tabs can be opened\, one for each command line program.",10.24}
 
 The main view provides some simple controls:
 
@@ -132,7 +132,7 @@ The main view provides some simple controls:
 At this stage, nothing has been launched.  When the user hits the green arrow button, a job is launched.
 Each running job is shown as a new progress reporting widget under the main tabbed widget, as shown in Figure 8.
 
-\image html cmdlinemodules_NiftyRegRunning2.png "Figure 8. Multiple programs can be run, each with individual controls and console output."
+\imageMacro{cmdlinemodules_NiftyRegRunning2.png,"Figure 8. Multiple programs can be run\, each with individual controls and console output.",10.24}
 
 The controls for each running job are:
 

@@ -8,7 +8,7 @@ Available sections:
   - \ref StrTrackUserManualParameters
   - \ref StrTrackUserManualReferences
 
-\image html streamlinetrackingview.png Streamline Tracking View
+\imageMacro{streamlinetrackingview.png,"Streamline Tracking View",10.41}
 
 \section StrTrackUserManualInputData Input Data
 

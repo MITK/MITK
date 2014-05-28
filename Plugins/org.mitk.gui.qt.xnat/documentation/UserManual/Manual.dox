@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_xnat XNAT Plugin
 
-\image html icon.xpm "Icon of XNAT Plugin"
+\imageMacro{icon.png,"Icon of XNAT Plugin",2.00}
 
 Available sections:
   - \ref org_mitk_gui_qt_xnatOverview

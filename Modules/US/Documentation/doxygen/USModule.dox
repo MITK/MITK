@@ -28,7 +28,7 @@ Its functionality is made available to the User via the \link org_mitk_gui_qt_ul
 
 Ultrasound Devices are managed in a simple hierarchy:
 
-\image html USHierarchy.png
+\imageMacro{USHierarchy.png,"",14.92}
 
 <ul>
   <li> mitk::USDevice: The common superclass for all ultrasound devices. Deriving from this class will make sure that US-specific GUI-Components will be able to interact with your class.
@@ -53,20 +53,20 @@ Matching functions mitk::USDevice::Disconnect(), mitk::USDevice::OnDisconnect, m
 
 The following diagram illustrates the situation:
 
-\image html USLifecycle.png
+\imageMacro{USLifecycle.png,"",16.00}
 
 The blue message symbols indicate that the corresponding method of the subclass is called to react to the event.
 
 \section USControlInterfaces Control Interfaces for API Devices
 Capabilities of API-based ultrasound devices are available through control interfaces which are shown below: 
 
-\image html USControlInterfaces.png
+\imageMacro{USControlInterfaces.png,"",16.00}
 
 The control interfaces mitk::USControlInterfaceProbes and mitk::USControlInterfaceBMode are available, while mitk::USControlInteraceDoppler is empty at the moment. Every sublcass of mitk::USDevice can use an implementation of each of these interfaces, but this is not necessary. The mitk::USVideoDevice for examples uses a custom control interface only, which is a subclass of mitk::USAbstractControlInterface.
 
 Each custom control interface needs its own Widget (subclassed of QmitkUSAbstractCustomWidget). For mitk::USControlInterfaceProbes, mitk::USControlInterfaceBMode and mitk::USControlInterfaceDoppler there are Widgets available in the USUI module (QmitkUSControlsProbesWidget, QmitkUSControlsBModeWidget, QmitkUSControlsDopplerWidget) which can be used by plugins. Each Widget must get an object of the corresponding control interface on its constructor call. A class diagram showing how the Widgets are connected to the control interfaces can be seen below:
 
-\image html USControlWidgets.png
+\imageMacro{USControlWidgets.png,"",16.00}
 
 A plugin can use the Widgets by creating a new object of the Widget and setting the corresponding interface object of the mitk::USDevice which should be controlled. How to use custom widgets is described in the class documentation of QmitkUSConcreteCustomWidget.
 

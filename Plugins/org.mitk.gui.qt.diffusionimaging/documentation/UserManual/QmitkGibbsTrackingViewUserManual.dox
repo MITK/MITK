@@ -5,7 +5,7 @@ This view provides the user interface for the Gibbs Tracking algorithm, a global
 
 \tableofcontents
 
-\image html gibbstrackingview.png The Gibbs Tracking View
+\imageMacro{gibbstrackingview.png,"The Gibbs Tracking View",10.12}
 
 \section QmitkGibbsTrackingUserManualInputData Input Data
 
@@ -25,7 +25,7 @@ Optional Input:
 
 The automatic selection of parameters for the particle length/width and weight are determined directly from the input image using information about the image spacing and GFA.
 
-\image html gibbstrackingviewadvanced.png Advanced Tracking Parameters
+\imageMacro{gibbstrackingviewadvanced.png,"Advanced Tracking Parameters",10.08}
 
 \section QmitkGibbsTrackingUserManualTrackingSurveillance Surveilance of the tracking process
 

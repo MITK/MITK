@@ -40,7 +40,7 @@ Parameters:
 
 \li Joint information: if checked the whole DWI is seen as a vector image, weighting each voxels complete vector, instead of weighting each channel seperate. (This might be a bit faster, but is less accurate)
 
-\image html NLM.png Fig. 1: a) View using the Non-local means filter  b) 2D illustration of the Non-local means principle [1]
+\imageMacro{NLM.png,"Fig. 1: a) View using the Non-local means filter  b) 2D illustration of the Non-local means principle [1]",16.00}
 
 \section DwiDenoisingUserManualDiscreteGaussian Discrete gaussian filter
 
@@ -50,7 +50,7 @@ Parameters:
 
 \li Variance: defines the varinance of the gaussian distribution to denoise the image.
 
-\image html GaussianFilter.png Fig. 2: View using the discrete gaussian filter
+\imageMacro{GaussianFilter.png,"Fig. 2: View using the discrete gaussian filter",8.04}
 
 
 \section DwiDenoisingUserManualReferences References

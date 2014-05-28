@@ -24,17 +24,17 @@ BlueBerry makes use of the Eclipse UI guidlines which state some concepts on how
 \section Workbench Workbench
 \li root object of the platform UI
 \li collection of \ref WorkbenchWindow "windows"
-\image html workbench.jpg "The Workbech"
+\imageMacro{workbench.jpg,"The Workbech",11.64}
 
 \section WorkbenchWindow WorkbenchWindow
 \li has one \ref Workbench-Page "page"
-\image html workbench-window.jpg "Worbench Windows"
+\imageMacro{workbench-window.jpg,"Worbench Windows",8.47}
 
 \section WorkbenchPage Workbench Page
 \li denotes to the inner part of the \ref WorkbenchWindow "window", that is: everything except the title bar
 \li may have one menu bar, one toolbar, one shortcut bar, and one statusbar
 \li has one or more \ref Perspective "perspectives"
-\image html workbench-page.jpg "Workbench Page"
+\imageMacro{workbench-page.jpg,"Workbench Page",8.47}
 
 \section Perspective Perspective
 <UL>
@@ -46,7 +46,7 @@ BlueBerry makes use of the Eclipse UI guidlines which state some concepts on how
     <LI> There are several perspectives inside a \ref Workbench-Page "page" </LI>
     </UL>
 </UL>
-\image html workbench-window-perspective.png "A Perspective"
+\imageMacro{workbench-window-perspective.png,"A Perspective",11.79}
 
 \section Part Part
 \li every \ref Views "View" or \ref Editors "Editor" is called \b Part
@@ -58,7 +58,7 @@ BlueBerry makes use of the Eclipse UI guidlines which state some concepts on how
 \li primary position in the UI
 \li contributes commands to the workbench's main menu bar and toolbar
 \li shared in other perspectives
-\image html workbench-window-editor-area.png "Editor Area"
+\imageMacro{workbench-window-editor-area.png,"Editor Area",11.79}
 
 \subsection Views Views
 <UL>
@@ -71,9 +71,9 @@ BlueBerry makes use of the Eclipse UI guidlines which state some concepts on how
 <LI> The views exist wholly within the perspective (not shared, one instance at a time) </LI>
 <LI> Every functionality is a view- it supports medical image processing </LI>
 </UL>
-\image html workbench-window-views.png "Views"
+\imageMacro{workbench-window-views.png,"Views",11.79}
 
 \section ClassDiagram Summary as class diagram
-\image html workbench-class-diagram.jpg "class diagram"
+\imageMacro{workbench-class-diagram.jpg,"class diagram",13.74}
 
 */

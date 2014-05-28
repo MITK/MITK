@@ -31,7 +31,7 @@ The following sequence diagram gives an exemplary overview of the process from c
 This diagram assumes the usage of the Qt framework, but also shows that the interaction concept itself is implemented independent of any specific
 graphical user interface toolkit.
 
-\image html event_handling.png
+\imageMacro{event_handling.png,"",16}
 <ol>
   <li>a user event is triggered and send to MITK
   <li>this layer serves as an adapter from the GUI toolkit (here Qt) events to MITK internal events (later referred to as \link mitk::InteractionEvent InteractionEvents\endlink).

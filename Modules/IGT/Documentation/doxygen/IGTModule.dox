@@ -23,7 +23,7 @@ on the IGT tutorial, which can be found here:
 
 There are also a few ready-to-use sample applications available as MITK-Plugins:
 
-  \li \subpage org_mitk_gui_qt_igtexample
-  \li \subpage org_mitk_gui_qt_igttracking
+  \li \ref org_mitk_gui_qt_igtexample
+  \li \ref org_mitk_gui_qt_igttracking
   
 */

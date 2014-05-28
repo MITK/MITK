@@ -122,7 +122,7 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     * For example, this Initialization will filter for all USDevices that are set to active. The USDevice's model will be used to display it in the list:
     * \verbatim
         std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(IsActive=true))";
-        m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USImageMetadata::PROP_DEV_MODEL ,filter);
+        m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USDevice::GetPropertyKeys().US_PROPKEY_NAME ,filter);
     * \endverbatim
     */
     template <class T>

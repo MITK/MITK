@@ -149,6 +149,8 @@ set(QXT_NETWORK_MOC_HEADERS
   qxtsmtp.h
   qxtrpcpeer.h
   qxtsmtp_p.h
+  qxtsslserver.h
+  qxtsslconnectionmanager.h
   qxttcpconnectionmanager.h
   qxttcpconnectionmanager_p.h
   qxtxmlrpcclient.h
@@ -271,6 +273,8 @@ set(QXT_NETWORK_SOURCES
   qxtmailmessage.cpp
   qxtrpcpeer.cpp
   qxtsmtp.cpp
+  qxtsslserver.cpp
+  qxtsslconnectionmanager.cpp
   qxttcpconnectionmanager.cpp
   qxtxmlrpccall.cpp
   qxtxmlrpcclient.cpp

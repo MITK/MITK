@@ -275,6 +275,10 @@ class USControlInterfaceDoppler;
     itkGetMacro(Name, std::string);
     itkGetMacro(Comment, std::string);
 
+    void SetManufacturer(std::string manufacturer);
+    void SetName(std::string name);
+    void SetComment(std::string comment);
+
     itkGetMacro(DeviceState, DeviceStates);
 
     void GrabImage();

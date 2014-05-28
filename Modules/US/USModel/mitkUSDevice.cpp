@@ -134,6 +134,33 @@ mitk::USControlInterfaceDoppler::Pointer mitk::USDevice::GetControlInterfaceDopp
   return 0;
 }
 
+void mitk::USDevice::SetManufacturer(std::string manufacturer)
+{
+  m_Manufacturer = manufacturer;
+  if ( m_DeviceState >= State_Initialized )
+  {
+    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_MANUFACTURER, manufacturer);
+  }
+}
+
+void mitk::USDevice::SetName(std::string name)
+{
+  m_Name = name;
+  if ( m_DeviceState >= State_Initialized )
+  {
+    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_NAME, name);
+  }
+}
+
+void mitk::USDevice::SetComment(std::string comment)
+{
+  m_Comment = comment;
+  if ( m_DeviceState >= State_Initialized )
+  {
+    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_COMMENT, comment);
+  }
+}
+
 us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 {
   mitk::USDevice::PropertyKeys propertyKeys = mitk::USDevice::GetPropertyKeys();

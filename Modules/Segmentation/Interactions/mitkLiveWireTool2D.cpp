@@ -225,8 +225,7 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
     ++itWorkingContours;
   }
 
-  this->ReleaseHelperObjects();
-  this->ReleaseInteractors();
+  this->ClearSegmentation();
 }
 
 void mitk::LiveWireTool2D::ClearSegmentation()

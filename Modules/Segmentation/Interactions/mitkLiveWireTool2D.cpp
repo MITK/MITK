@@ -237,6 +237,9 @@ void mitk::LiveWireTool2D::ClearSegmentation()
 
 bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+    return false;
+
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
 
   if (!positionEvent) return false;
@@ -334,6 +337,9 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
 
 bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+    return false;
+
   //complete LiveWire interaction for last segment
   //add current LiveWire contour to the finished contour and reset
   //to start new segment and computation
@@ -387,6 +393,9 @@ bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
 
 bool mitk::LiveWireTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+    return false;
+
   //compute LiveWire segment from last control point to current mouse position
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
@@ -454,6 +463,9 @@ bool mitk::LiveWireTool2D::OnCheckPoint( const InteractionEvent* interactionEven
 
 bool mitk::LiveWireTool2D::OnFinish( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+    return false;
+
   // finish livewire tool interaction
 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );

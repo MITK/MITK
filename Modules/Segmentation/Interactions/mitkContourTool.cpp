@@ -61,14 +61,15 @@ void mitk::ContourTool::Deactivated()
 */
 bool mitk::ContourTool::OnMousePressed( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+      return false;
+
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(interactionEvent->GetEvent());
   if (!positionEvent) return false;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
-
-//  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
@@ -95,7 +96,8 @@ bool mitk::ContourTool::OnMousePressed( StateMachineAction*, InteractionEvent* i
 */
 bool mitk::ContourTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  //if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+      return false;
 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());

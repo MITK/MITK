@@ -311,8 +311,8 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 
   ctkServiceReference service = event.getServiceReference();
 
-  if ( m_Device->GetDeviceManufacturer() != service.getProperty(mitk::USImageMetadata::PROP_DEV_MANUFACTURER).toString().toStdString()
-    && m_Device->GetDeviceModel() != service.getProperty(mitk::USImageMetadata::PROP_DEV_MODEL).toString().toStdString() )
+  if ( m_Device->GetManufacturer() != service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_MANUFACTURER)).toString().toStdString()
+    && m_Device->GetName() != service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_NAME)).toString().toStdString() )
   {
     return;
   }

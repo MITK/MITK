@@ -32,6 +32,13 @@
       <string>Metadata:</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Comment</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QLabel" name="label_6">
         <property name="font">
@@ -54,7 +61,11 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="m_Manufacturer"/>
+       <widget class="QLineEdit" name="m_Manufacturer">
+        <property name="text">
+         <string>Unknown Manufacturer</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_2">
@@ -64,49 +75,18 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLineEdit" name="m_Model"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_5">
+       <widget class="QLineEdit" name="m_Model">
         <property name="text">
-         <string>Comment</string>
+         <string>Unknown Model</string>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLineEdit" name="m_Comment"/>
-      </item>
-      <item row="4" column="1">
-       <widget class="QLabel" name="probe_label">
-        <property name="font">
-         <font>
-          <underline>true</underline>
-         </font>
-        </property>
+       <widget class="QLineEdit" name="m_Comment">
         <property name="text">
-         <string>Probe Information:</string>
+         <string>None</string>
         </property>
        </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="probe_label2">
-        <property name="text">
-         <string>Probe</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QLineEdit" name="m_Probe"/>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="zoom_label">
-        <property name="text">
-         <string>Zoom</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QLineEdit" name="m_Zoom"/>
       </item>
      </layout>
     </widget>
@@ -312,12 +292,9 @@
   <tabstop>m_Manufacturer</tabstop>
   <tabstop>m_Model</tabstop>
   <tabstop>m_Comment</tabstop>
-  <tabstop>m_Probe</tabstop>
-  <tabstop>m_Zoom</tabstop>
   <tabstop>m_RadioDeviceSource</tabstop>
   <tabstop>m_DeviceSelector</tabstop>
   <tabstop>m_RadioFileSource</tabstop>
-  <tabstop>m_FilePathSelector</tabstop>
   <tabstop>m_CheckResolutionOverride</tabstop>
  </tabstops>
  <resources>

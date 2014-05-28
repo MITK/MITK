@@ -68,7 +68,7 @@ namespace mitk {
     /**
     * \deprecatedSince{2014_06} Please use SetCurrentWorldPlaneGeometry
     */
-    DEPRECATED(void SetCurrentWorldGeometry2D(BaseGeometry* geo){SetCurrentWorldPlaneGeometry(geo);};)
+    DEPRECATED(void SetCurrentWorldGeometry2D(BaseGeometry* geo)){SetCurrentWorldPlaneGeometry(geo);};
 
       itkSetMacro(ImageGeometry, BaseGeometry* );
 

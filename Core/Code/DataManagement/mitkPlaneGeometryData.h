@@ -52,7 +52,7 @@ namespace mitk {
     /**
     * \deprecatedSince{2014_06} Please use SetPlaneGeometry
     */
-    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo){SetPlaneGeometry(geo);});
+    DEPRECATED(void SetGeometry2D(PlaneGeometry* geo)){SetPlaneGeometry(geo);};
 
       //##Documentation
       //## @brief Get the reference to the PlaneGeometry that is stored
@@ -64,7 +64,7 @@ namespace mitk {
     /**
     * \deprecatedSince{2014_06} Please use GetPlaneGeometry
     */
-    DEPRECATED(const PlaneGeometry* GetGeometry2D(){return GetPlaneGeometry();});
+    DEPRECATED(const PlaneGeometry* GetGeometry2D()){return GetPlaneGeometry();};
 
       virtual void UpdateOutputInformation();
 

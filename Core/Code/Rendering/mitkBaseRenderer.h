@@ -216,7 +216,7 @@ namespace mitk
       /**
       * \deprecatedSince{2014_06} Please use GetCurrentWorldPlaneGeometry
       */
-      DEPRECATED(const PlaneGeometry* GetCurrentWorldGeometry2D(){return GetCurrentWorldPlaneGeometry();};)
+      DEPRECATED(const PlaneGeometry* GetCurrentWorldGeometry2D()){return GetCurrentWorldPlaneGeometry();};
 
       //##Documentation
       //## Calculates the bounds of the DataStorage (if it contains any valid data),
@@ -323,7 +323,7 @@ namespace mitk
       /**
       * \deprecatedSince{2014_06} Please use GetCurrentWorldPlaneGeometryNode
       */
-      DEPRECATED(DataNode* GetCurrentWorldGeometry2DNode(){return GetCurrentWorldPlaneGeometryNode();};)
+      DEPRECATED(DataNode* GetCurrentWorldGeometry2DNode()){return GetCurrentWorldPlaneGeometryNode();};
 
       //##Documentation
       //## @brief Sets timestamp of CurrentWorldPlaneGeometry and DisplayGeometry and forces so reslicing in that renderwindow
@@ -338,7 +338,7 @@ namespace mitk
     /**
     * \deprecatedSince{2014_06} Please use GetCurrentWorldPlaneGeometryUpdateTime
     */
-    DEPRECATED(unsigned long GetCurrentWorldGeometry2DUpdateTime(){return GetCurrentWorldPlaneGeometryUpdateTime();};)
+    DEPRECATED(unsigned long GetCurrentWorldGeometry2DUpdateTime()){return GetCurrentWorldPlaneGeometryUpdateTime();};
 
       //##Documentation
       //## @brief Get timestamp of last call of SetDisplayGeometry

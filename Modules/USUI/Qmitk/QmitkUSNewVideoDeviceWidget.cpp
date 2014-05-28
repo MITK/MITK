@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkUSNewVideoDeviceWidget.h>
 
 //QT headers
+#include <QFileDialog>
 
 //mitk headers
 
@@ -56,6 +57,7 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
     connect( m_Controls->m_BtnCancel, SIGNAL(clicked()), this, SLOT(OnClickedCancel()) );
     connect( m_Controls->m_RadioDeviceSource, SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
     connect( m_Controls->m_RadioFileSource,   SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
+    connect( m_Controls->m_OpenFileButton, SIGNAL(clicked()), this, SLOT(OnOpenFileButtonClicked()) );
   }
 }
 
@@ -119,6 +121,17 @@ void QmitkUSNewVideoDeviceWidget::OnClickedCancel(){
 void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection(){
   m_Controls->m_FilePathSelector->setEnabled(m_Controls->m_RadioFileSource->isChecked());
   m_Controls->m_DeviceSelector->setEnabled(m_Controls->m_RadioDeviceSource->isChecked());
+}
+
+void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()
+{
+  QString fileName = QFileDialog::getOpenFileName(NULL, "Open Video File");
+  if ( fileName.isNull() ) { return; } // user pressed cancel
+
+  m_Controls->m_FilePathSelector->setText(fileName);
+
+  m_Controls->m_RadioFileSource->setChecked(true);
+  this->OnDeviceTypeSelection();
 }
 
 ///////////////// Methods & Slots Handling Logic //////////////////////////

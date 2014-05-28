@@ -8,7 +8,7 @@ This view provides the user interface for Fiberfox [1,2,3], an interactive simul
   - \ref QmitkFiberfoxViewUserManualSignalGeneration
   - \ref QmitkFiberfoxViewUserManualKnownIssues
   - \ref QmitkFiberfoxViewUserManualReferences
-\image html Fiberfox.png "Fig. 1: Screenshot of the Fiberfox framework. The four render windows display an axial (top left), sagittal (top right) and coronal (bottom left) 2D cut as well as a 3D view of a synthetic fiber helix and the fiducials used to define its shape. In the 2D views the helix is superimposing the baseline volume of the corresponding diffusion weighted image. The sagittal render window shows a close-up view on one of the circular fiducials."
+\imageMacro{Fiberfox.png, "Fig. 1: Screenshot of the Fiberfox framework. The four render windows display an axial (top left)\, sagittal (top right) and coronal (bottom left) 2D cut as well as a 3D view of a synthetic fiber helix and the fiducials used to define its shape. In the 2D views the helix is superimposing the baseline volume of the corresponding diffusion weighted image. The sagittal render window shows a close-up view on one of the circular fiducials.",16}
 
 \section QmitkFiberfoxViewUserManualFiberDefinition Fiber Definition
 
@@ -21,7 +21,7 @@ Fiber strands are defined simply by placing markers in a 3D image volume. The fi
 \li In some cases the fibers are entangled in a way that can't be resolved by introducing an additional fiber twist. Fiberfox tries to avoid these situations, which arise from different normal orientations of succeeding fiducials, automatically. In rare cases this is not successful. Use the double-arrow button to flip the fiber positions of the selected fiducial in one dimension. Either the problem is resolved now or you can resolve it manually by adjusting the twist-control point.
 \li To create non elliptical fiber profile shapes switch to the Fiber Extraction View. This view provides tools to extract subesets of fibers from fiber bundles and enables to cut out arbitrary polygonal fiber shapes from existing bundles.
 
-\image html Fiberfox-Fiducial.png "Fig. 2: Control points defining the actual shape of the fiducial. A specifies the fiducials position in space, B and C the two ellipse radii and D the twisting angle between two successive fiducials."
+\imageMacro{Fiberfox-Fiducial.png, "Fig. 2: Control points defining the actual shape of the fiducial. A specifies the fiducials position in space\, B and C the two ellipse radii and D the twisting angle between two successive fiducials.",16}
 
 <b>Fiber Options:</b>
 \li <b>Real Time Fibers</b>: If checked, each parameter adjustment (fiducial position, number of fibers, ...) will be directly applied to the selected fiber bundle. If unchecked, the fibers will only be generated if the corresponding button "Generate Fibers" is clicked.
@@ -44,7 +44,7 @@ Fiber strands are defined simply by placing markers in a 3D image volume. The fi
 \li <b>Join Bundles</b>: Add new bundle to the datamanager that contains all fibers from the selected bundles.
 \li <b>Include Fiducials</b>: If checked, the specified transformation is also applied to the fiducials belonging to the selected fiber bundle and the fiducials are also copied.
 
-\image html FiberfoxExamples.png "Fig. 3: Examples of artificial crossing (a,b), fanning (c,d), highly curved (e,f), kissing (g,h) and twisting (i,j) fibers as well as of the corresponding tensor images generated with Fiberfox."
+\imageMacro{FiberfoxExamples.png, "Fig. 3: Examples of artificial crossing (a\,b)\, fanning (c\,d)\, highly curved (e\,f)\, kissing (g\,h) and twisting (i\,j) fibers as well as of the corresponding tensor images generated with Fiberfox.",16}
 
 
 \section QmitkFiberfoxViewUserManualSignalGeneration Signal Generation

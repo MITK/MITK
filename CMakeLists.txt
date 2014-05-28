@@ -1,3 +1,4 @@
+set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 if(DESIRED_QT_VERSION MATCHES "4")
   cmake_minimum_required(VERSION 2.8.9)
 else()
@@ -162,7 +163,6 @@ endmacro()
 # Qt version related variables
 
 env_option(MITK_USE_QT "Use Nokia's Qt library" ON)
-set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 set(MITK_DESIRED_QT_VERSION ${DESIRED_QT_VERSION})
 
 if(MITK_USE_QT)

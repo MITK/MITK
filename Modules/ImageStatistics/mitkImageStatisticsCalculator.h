@@ -149,6 +149,12 @@ public:
   /** \brief Get wether a pixel value will be ignored in the statistics */
   bool GetDoIgnorePixelValue();
 
+  /** \brief Set bin size for histogram resolution.*/
+  void SetHistogramBinSize( unsigned int size);
+
+  /** \brief Get bin size for histogram resolution.*/
+  unsigned int GetHistogramBinSize();
+
   /** \brief Compute statistics (together with histogram) for the current
    * masking mode.
    *
@@ -207,7 +213,7 @@ protected:
   /** \brief If the passed vector matches any of the three principal axes
    * of the passed geometry, the ínteger value corresponding to the axis
    * is set and true is returned. */
-  bool GetPrincipalAxis( const Geometry3D *geometry, Vector3D vector,
+  bool GetPrincipalAxis( const BaseGeometry *geometry, Vector3D vector,
     unsigned int &axis );
 
   template < typename TPixel, unsigned int VImageDimension >
@@ -326,6 +332,8 @@ protected:
   unsigned int m_PlanarFigureSlice;   // Slice which contains PlanarFigure
   int m_PlanarFigureCoordinate0;      // First plane-axis for PlanarFigure
   int m_PlanarFigureCoordinate1;      // Second plane-axis for PlanarFigure
+
+  unsigned int m_HistogramBinSize;    ///Bin size for histogram resoluion.
 
 };
 

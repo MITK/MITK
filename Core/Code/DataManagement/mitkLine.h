@@ -76,11 +76,10 @@ public:
   //## @brief Set/change start point of the line
   void SetPoint( const itk::Point<TCoordRep,NPointDimension>& point1 )
   {
-    itk::Vector<TCoordRep,NPointDimension> point2;
+    itk::Point<TCoordRep,NPointDimension> point2;
     point2 = m_Point + m_Direction;
-
     m_Point = point1;
-    m_Direction = point2 - point1;
+    m_Direction = point2.GetVectorFromOrigin() - point1.GetVectorFromOrigin();
   }
 
   //##Documentation

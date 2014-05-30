@@ -13,21 +13,21 @@ This module provides means to diffusion weighted image reconstruction, visualiza
 
 The preprocessing view gives an overview over the important features of a diffusion weighted image like the number of gradient directions, b-value and the measurement frame. Additionally it allows the extraction of the B0 image, reduction of gradient directions and the generation of a binary brain mask. The image volume can be modified by applying a new mesurement frame, which is useful if the measurement frame is not set correctly in the image header, or by averaging redundant gradient directions.
 
-\image html prepro1.png Preprocessing
+\imageMacro{prepro1.png,"Preprocessing",9.97}
 
 \section QmitkDiffusionImagingUserManualTensorReconstruction Tensor Reconstruction
 
 The tensor reconstruction view allows ITK based tensor reconstruction [3]. The advanced settings for ITK reconstruction let you configure a manual threshold on the non-diffusion weighted image. All voxels below this threshold will not be reconstructed and left blank. It is also possible to check for negative eigenvalues. The according voxels are also left blank.
 
-\image html tensor1.png ITK tensor reconstruction
+\imageMacro{tensor1.png,"ITK tensor reconstruction",9.97}
 
 A few seconds (depending on the image size) after the reconstruction button is hit, a colored image should appear in the main window.
 
-\image html tensor4.png Tensor image after reconstruction
+\imageMacro{tensor4.png,"Tensor image after reconstruction",16.00}
 
 To assess the quality of the tensor fit it has been proposed to calculate the model residual [9]. This calculates the residual between the measured signal and the signal predicted by the model. Large residuals indicate an inadequacy of the model or the presence of artefacts in the signal intensity (noise, head motion, etc.). To use this option: Select a DWI dataset, estimate a tensor, select both the DWI node and the tensor node in the datamanager and press Residual Image Calculation. MITK-Diffusion can show the residual for every voxel averaged over all volumes or (in the plot widget) summarized per volume or for every slice in every volume. Clicking in the widget where the residual is shown per slice will automatically let the cross-hair jump to that position in the DWI dataset. If Percentage of outliers is checked, the per volume plot will show the percentage of outliers per volume. Otherwise it will show the mean together with the first and third quantile of residuals. See [9] for more information.
 
-\image html residuals.png The residual widget
+\imageMacro{residuals.png,"The residual widget",16.00}
 
 The view also allows the generation of artificial diffusion weighted or Q-Ball images from the selected tensor image. The ODFs of the Q-Ball image are directly initialized from the tensor values and afterwards normalized. The diffusion weighted image is estimated using the l2-norm image of the tensor image as B0. The gradient images are afterwards generated using the standard tensor equation.
 
@@ -40,15 +40,15 @@ The q-ball reonstruction view implements a variety of reconstruction methods. Th
 \li <b>ADC-profile only:</b> The ADC-profile reconstructed with spherical harmonic basis functions
 \li <b>Raw signal only:</b> The raw signal reconstructed with spherical harmonic basis functions
 
-\image html qballs1.png The q-ball resonstruction view
+\imageMacro{qballs1.png,"The q-ball resonstruction view",9.99}
 
 B0 threshold works the same as in tensor reconstruction. The maximum l-level configures the size of the spherical harmonics basis. Larger l-values (e.g. l=8) allow higher levels of detail, lower levels are more stable against noise (e.g. l=4). Lambda is a regularisation parameter. Set it to 0 for no regularisation. lambda = 0.006 has proven to be a stable choice under various settings.
 
-\image html qballs2.png Advanced q-ball reconstruction settings
+\imageMacro{qballs2.png,"Advanced q-ball reconstruction settings",8.00}
 
 This is how a q-ball image should initially look after reconstruction. Standard q-balls feature a relatively low GFA and thus appear rather dark. Adjust the level-window to solve this.
 
-\image html qballs3.png q-ball image after reconstruction
+\imageMacro{qballs3.png,"q-ball image after reconstruction",16.00}
 
 \section QmitkDiffusionImagingUserManualDicomImport Dicom Import
 
@@ -58,7 +58,7 @@ In case your dicom images are readable by MITK-DI, select one or more input dico
 
 In case many imports are performed at once, it is recommended to set the the optional output folder argument. This prevents the images from being kept in memory.
 
-\image html dicom1.png Dicom import
+\imageMacro{dicom1.png,"Dicom import",9.59}
 
 The option "Average duplicate gradients" accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "blur radius" > 0 is configured.
 
@@ -68,13 +68,13 @@ FSL diffusion data can be imported with MITK Diffusion. FSL diffusion datasets c
 
 MITK can also save diffusion weighted images in FSL format. To do this the extension of the new file should be changed to .fsl or .fslgz upon saving the file.
 
-\image html fslsave.png Save a dwi dataset as fsl
+\imageMacro{fslsave.png,"Save a dwi dataset as fsl",16.00}
 
 \section QmitkDiffusionImagingUserManualQuantification Quantification
 
 The quantification view allows the derivation of different scalar anisotropy measures for the reconstructed tensors (Fractional Anisotropy, Relative Anisotropy, Axial Diffusivity, Radial Diffusivity) or q-balls (Generalized Fractional Anisotropy).
 
-\image html quantification.png Anisotropy quantification
+\imageMacro{quantification.png,"Anisotropy quantification",9.17}
 
 \section QmitkDiffusionImagingUserManualVisualizationSettings ODF Visualization Setting
 
@@ -86,7 +86,7 @@ In diffusion images, a slider lets you choose the desired image channel from the
 
 This is how a visualization with activated glyphs should look like:
 
-\image html visualization3.png Q-ball image with ODF glyph visibility toggled ON
+\imageMacro{visualization3.png,"Q-ball image with ODF glyph visibility toggled ON",16.00}
 
 \section QmitkDiffusionImagingUserManualReferences References
 
@@ -129,4 +129,5 @@ The MITK Diffusion tools consist of further components, which have their own doc
   \li \subpage org_mitk_views_streamlinetracking
   \li \subpage org_mitk_views_fiberfoxview
   \li \subpage org_mitk_views_fieldmapgenerator
+  \li \subpage org_mitk_views_denoisingview
 */

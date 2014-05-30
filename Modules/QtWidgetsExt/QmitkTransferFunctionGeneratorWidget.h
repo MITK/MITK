@@ -85,4 +85,6 @@ class MitkQtWidgetsExt_EXPORT QmitkTransferFunctionGeneratorWidget : public QWid
     double ScaleDelta(int d) const;
 
 };
+
 #endif
+

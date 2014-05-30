@@ -14,20 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKNavigationDataPlayerBase_H_HEADER_INCLUDED_
 #define MITKNavigationDataPlayerBase_H_HEADER_INCLUDED_
 
-#include <mitkNavigationDataSource.h>
-#include "tinyxml.h"
-
+#include "mitkNavigationDataSource.h"
+#include "mitkNavigationDataSet.h"
 
 namespace mitk{
-
-  /**Documentation
-  * \brief This class is a slightly changed reimplementation of the
-  * NavigationDataPlayer which does not care about timestamps and just
-  * outputs the navigationdatas in their sequential order
+  /**
+  * \brief Base class for using mitk::NavigationData as a filter source.
+  * Subclasses can play objects of mitk::NavigationDataSet.
+  *
+  * Each subclass has to check the state of m_Repeat and do or do not repeat
+  * the playing accordingly.
   *
   * \ingroup IGT
   */
@@ -35,43 +34,84 @@ namespace mitk{
     : public NavigationDataSource
   {
   public:
-    mitkClassMacro(NavigationDataPlayerBase, NavigationDataSource);
+    mitkClassMacro(NavigationDataPlayerBase, NavigationDataSource)
 
     /**
-    * \brief Used for pipeline update just to tell the pipeline that we always have to update
+    * \brief Set to true if the data player should repeat the outputs.
+    */
+    itkSetMacro(Repeat, bool)
+
+    /**
+    * \return Returns if the data player should repeat the outputs.
+    */
+    itkGetMacro(Repeat, bool)
+
+    /**
+    * \brief Used for pipeline update just to tell the pipeline that we always have to update.
     */
     virtual void UpdateOutputInformation();
 
-    /** @return Returns an error message if there was one (e.g. if the stream is invalid).
-     *          Returns an empty string if there was no error in the current stream.
-     */
-    itkGetStringMacro(ErrorMessage);
+    itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer)
 
-    /** @return Retruns if the current stream is valid or not. */
-    itkGetMacro(StreamValid,bool);
+    /**
+    * \brief Set mitk::NavigationDataSet for playing.
+    * Player is initialized by call to mitk::NavigationDataPlayerBase::InitPlayer()
+    * inside this method. Method must be called before this object can be used as
+    * a filter source.
+    *
+    * @param navigationDataSet mitk::NavigationDataSet which will be played by this player.
+    */
+    void SetNavigationDataSet(NavigationDataSet::Pointer navigationDataSet);
 
-   /**
+    /**
+    * \brief Getter for the size of the mitk::NavigationDataSet used in this object.
+    *
+    * @return Returns the number of navigation data snapshots available in the player.
+    */
+    unsigned int GetNumberOfSnapshots();
+
+    unsigned int GetCurrentSnapshotNumber();
+
+    /**
     * \brief This method checks if player arrived at end of file.
     *
-    *\warning This method is not tested yet. It is not save to use!
+    * @return true if last mitk::NavigationData object is in the outputs, false otherwise
     */
     bool IsAtEnd();
 
   protected:
     NavigationDataPlayerBase();
     virtual ~NavigationDataPlayerBase();
-    virtual void GenerateData() = 0;
-
 
     /**
-    * \brief Creates NavigationData from XML element and returns it
-    * @throw mitk::Exception Throws an exception if elem is NULL.
+    * \brief Every subclass hast to implement this method. See ITK filter documentation for details.
     */
-    mitk::NavigationData::Pointer ReadNavigationData(TiXmlElement* elem);
+    virtual void GenerateData() = 0;
 
-    bool m_StreamValid;                       ///< stores if the input stream is valid or not
-    std::string m_ErrorMessage;               ///< stores the error message if the stream is invalid
+    /**
+    * \brief Initializes the outputs of this NavigationDataSource.
+    * Aftwer calling this method, the first Navigationdata from the loaded Navigationdataset is loaded into the outputs.
+    */
+    void InitPlayer();
 
+    /**
+    * \brief Convenience method for subclasses.
+    * When there are no further mitk::NavigationData objects available, this
+    * method can be called in the implementation of mitk::NavigationDataPlayerBase::GenerateData().
+    */
+    void GraftEmptyOutput();
+
+    /**
+    * \brief If the player should repeat outputs. Default is false.
+    */
+    bool m_Repeat;
+
+    NavigationDataSet::Pointer m_NavigationDataSet;
+
+    /**
+    * \brief Iterator always points to the NavigationData object which is in the outputs at the moment.
+    */
+    mitk::NavigationDataSet::NavigationDataSetIterator m_NavigationDataSetIterator;
   };
 } // namespace mitk
 

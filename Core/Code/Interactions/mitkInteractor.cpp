@@ -289,7 +289,7 @@ bool mitk::Interactor::HandleEvent(StateEvent const* stateEvent)
       mitk::BaseRenderer* sender = event->GetSender();
       if (sender != NULL)
       {
-        //Get the TimeStep according to CurrentWorldGeometry2D
+        //Get the TimeStep according to CurrentWorldPlaneGeometry
         unsigned int currentTimeStep = sender->GetTimeStep();
         if (currentTimeStep != m_TimeStep)
           this->UpdateTimeStep(currentTimeStep);

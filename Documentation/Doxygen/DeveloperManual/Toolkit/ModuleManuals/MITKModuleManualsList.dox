@@ -22,4 +22,5 @@ The modules are shared libraries that provide functionality that can be used by 
 \section MITKMigrationGuides Migration Guides
 
   \li \subpage InteractionMigration
+  \li \subpage GeometryMigration
 */

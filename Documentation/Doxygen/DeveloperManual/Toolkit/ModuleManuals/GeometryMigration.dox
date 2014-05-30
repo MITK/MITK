@@ -1,0 +1,148 @@
+/**
+
+\page GeometryMigration Migration Guide to new Geometry Concept
+
+\tableofcontents
+
+
+\section GeneralChanges General Changes
+
+\subsection OldClasses Old class diagram
+Until now, all geometry classes inherited from Geometry3D. This inheritance didn't make sense. For example, there is no reason, why we need a Geometry2D and a PlaneGeometry as both describe the same thing. Also, why does a two-dimensional class need to inherit from a three-dimensional class?
+\imageMacro{oldClasses.png,"Old class diagram.",12.70}
+
+\subsection NewClasses New class diagram
+Therefore, we inserted an abstract BaseGeometry class, from which all other geometry classes should inherit. The classes Geometry2D and PlaneGeometry are combined in the new PlaneGeometry class. Also, the LandmarkBasedCurvedGeometry is included in LandmarkProjectorBasedCurvedGeometry.
+\imageMacro{currentClasses.png,"New class diagram.",15.32}
+
+
+\section Howto How to adapt your code
+Most content of the BaseGeometry class consists of functions and variables of the former Geometry3D.
+Here are some guidelines, how to change your code to the new geometry scheme.
+
+\subsection privateVariables Variables are private.
+  All variables of BaseGeometry (former in Geometry3D) are private now. Hence, use the Set and Get methods to access the variables.
+
+\subsection geo2d Always use PlaneGeometry instead of Geometry2D.
+  The class Geometry2D does not exist any more. In most cases, you can just replace the Geometry2D by PlaneGeometry. Please pay attention if you use the function "IsAbove(Point3D point)". There were two different implementations in Geometry2D and PlaneGeometry. The default behavior is implemented according to the former function of PlaneGeometry. If you want to use the implementation of the former Geometry2D, please call "IsAbove(point,true)".\n
+
+  Here are the different implementations:
+\code
+    bool PlaneGeometry::IsAbove( const Point3D &pt3d_mm , bool considerBoundingBox = false) const
+    {
+      if(considerBoundingBox)
+      {
+        //This is the implementation of former Geometry2D
+        Point3D pt3d_units;
+        BaseGeometry::WorldToIndex(pt3d_mm, pt3d_units);
+        return (pt3d_units[2] > this->GetBoundingBox()->GetBounds()[4]);
+      }
+      else
+      {
+        //This is the implementation of former PlaneGeometry and the default behavior.
+        return SignedDistanceFromPlane(pt3d_mm) > 0;
+      }
+    }
+\endcode
+
+\subsection geo2ddata Rename Geometry2D... classes.
+  All ...Geometry2D... classes and functions are renamed to ...PlaneGeometry... .  The new names are for example PlaneGeometryData instead of Geometry2DData. An example for functions is GetGeometry2D, which is now called GetPlaneGeometry. A simple search & replace of Geometry2D should work in most cases.\n\n
+  List of all names changed (excluding variables):
+  <ul>
+    <li> Geometry2D
+    <li> Geometry2DData
+    <li> Geometry2DDataToSurfaceFilter
+    <li> Geometry2DDataMapper2D
+    <li> Geometry2DDataVTKMapper
+    <li> GetCurrentWorldGeometry2D
+    <li> GetCurrentWorldGeometry2DNode
+    <li> GetCurrentWorldGeometry2DUpdateTime
+    <li> SetCurrentWorldGeometry2D
+    <li> GetGeometry2DData
+    <li> GetGeometry2D
+    <li> SetGeometry2D
+  </ul>
+
+
+\subsection geo3d In some cases, use BaseGeometry instead of Geometry3D.
+  As there are no classes any more, which inherit from Geometry3D, you cannot insert other classes (i.e. SlicedGeometry3D) for a Geometry3D.
+  If you have trouble, e.g. calling a function which expects a Geometry3D parameter, try one of the following steps:
+  <ul>
+    <li> Do you really need a Geometry3D? Maybe you always use e.g. a PlaneGeometry. Change your function to PlaneGeometry.
+    <li> If your function/object needs to be flexible for all geometry classes, change the Geometry3D to BaseGeometry.
+    <li> Try dynamic type casts to BaseGeometry.
+  </ul>
+
+\subsection clone Clones of BaseGeometry.
+  The BaseGeometry class is an abstract class. You cannot create an object of BaseGeometry. If you need a clone of BaseGeometry to call a function, use the following code:
+  \code
+    itk::LightObject::Pointer lopointer = geometry.Clone();
+    Initialize(dynamic_cast<BaseGeometry*>(lopointer.GetPointer()));
+  \endcode
+
+  instead of:
+  \code
+    Geometry3D::Pointer geometry3D = geometry.Clone();
+    Initialize(geometry3D.GetPointer());
+  \endcode
+
+\subsection object Create an object of BaseGeometry.
+  Again, you cannot create an object of BaseGeometry. However, there are cases, where we need a flexible Variable which can contain objects of any other geometry class later on. This might be the case for member variables, etc. In this case, try:
+  \code
+    mitk::Geometry3D::Pointer geo3D = Geometry3D::New();
+    mitk::BaseGeometry::Pointer m_geometry = dynamic_cast<BaseGeometry*>(geo3D.GetPointer());
+  \endcode
+
+  instead of
+
+  \code
+    mitk::Geometry3D::Pointer m_geometry = mitk::Geometry3D::New();
+  \endcode
+
+\subsection virtual Virtual functions.
+  To ensure a reliable behavior of functions, most functions are not virtual any more. However, if a function needs a different behavior in subclasses, there are virtual Pre- and Post- functions, which allow for additional code. The pre-functions are called at the very beginning of a function, the post-functions at the end. In the BaseGeometry, all pre- and post-functions are empty.\n
+  An example:\n
+  The function "SetIndexToWorldTransform" is not virtual any more.
+  For a PlaneGeometry, we need a perpendicular normal before the transformation is set. Afterwards, we need to apply the transformation to the scaling factors.\n
+  Code of the BaseGeometry class:
+
+\code
+  void SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
+  {
+    PreSetIndexToWorldTransform(transform);
+    if(m_IndexToWorldTransform.GetPointer() != transform)
+    {
+    m_IndexToWorldTransform = transform;
+    CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
+    vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
+    TransferItkToVtkTransform();
+    Modified();
+    }
+    PostSetIndexToWorldTransform(transform);
+  }
+    virtual void PreSetIndexToWorldTransform(mitk::AffineTransform3D* transform){};
+    virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform){};
+\endcode
+
+Code of PlaneGeometry:
+\code
+    void PlaneGeometry::PreSetIndexToWorldTransform(mitk::AffineTransform3D *transform)
+  {
+    EnsurePerpendicularNormal(transform);
+  }
+    void  PlaneGeometry::PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform)
+  {
+    m_ScaleFactorMMPerUnitX=GetExtentInMM(0)/GetExtent(0);
+    m_ScaleFactorMMPerUnitY=GetExtentInMM(1)/GetExtent(1);
+  }
+\endcode
+
+\subsection parametric Parametric functions are not part of BaseGeometry.
+  In Geometry3D, there were several "Parametric" functions (e.g. GetParametricExtent, GetParametricTransform), which only called the non-parametric function (e.g. GetExtent, GetIndexToWorldTransform). These functions are removed, please use the non-parametric implementation instead. However, in the AbstractTransformGeometry (and all subclasses), these parametric functions behave different and are still available.
+
+\subsection floatspacing There is no float spacing any more.
+  Use GetSpacing instead of GetFloatSpacing.
+
+\subsection LandmarkBased Always use LandmarkProjectorBasedCurvedGeometry instead of LandmarkBasedCurvedGeometry.
+  The class LandmarkBasedCurvedGeometry does not exist any more. Please use LandmarkProjectorBasedCurvedGeometry.
+*/

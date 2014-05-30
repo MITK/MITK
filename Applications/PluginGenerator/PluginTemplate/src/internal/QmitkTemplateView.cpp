@@ -10,6 +10,8 @@ $(license)
 // Qt
 #include <QMessageBox>
 
+//mitk image
+#include <mitkImage.h>
 
 const std::string $(view-class-name)::VIEW_ID = "$(view-id)";
 

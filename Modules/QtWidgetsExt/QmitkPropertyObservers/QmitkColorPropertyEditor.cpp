@@ -34,8 +34,6 @@ QmitkPopupColorChooser::QmitkPopupColorChooser(QWidget* parent, unsigned int ste
   setLineWidth(2);
   setMouseTracking ( TRUE );
 
-  //setMargin(0);
-  //setAutoMask( FALSE );
   setFrameStyle ( QFrame::Panel | QFrame::Raised );
   setLineWidth( 1 );
   ensurePolished();
@@ -71,8 +69,7 @@ void QmitkPopupColorChooser::mouseMoveEvent (QMouseEvent* e)
 
   if ( x >= 0.0 )
   {
-    //x = (int)(x / (1.0/m_Steps)) * (1.0/m_Steps); // div stepsize * stepsize
-    x = (int)(x * (float)(m_Steps-1)) / (float)(m_Steps-1); // same as above
+    x = (int)(x * (float)(m_Steps-1)) / (float)(m_Steps-1);
     if (x > 1.0) x = 1.0;
     if (x < 0.0) x = 0.0;
   }

@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsHolder.h"
 #include "mitkToolCommand.h"
 #include "mitkProgressBar.h"
+#include "mitkImage.h"
 
 #include <usModule.h>
 #include <usModuleResource.h>

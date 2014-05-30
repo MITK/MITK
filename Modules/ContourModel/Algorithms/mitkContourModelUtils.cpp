@@ -52,7 +52,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(Ima
   ContourModel::Pointer projectedContour = ContourModel::New();
   projectedContour->Initialize(*contourIn3D);
 
-  const Geometry3D* sliceGeometry = slice->GetGeometry();
+  const BaseGeometry* sliceGeometry = slice->GetGeometry();
 
   int numberOfTimesteps = contourIn3D->GetTimeGeometry()->CountTimeSteps();
 
@@ -85,7 +85,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(Ima
 
 
 
-mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
+mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, ContourModel* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
 {
   if ( !sliceGeometry || !contourIn2D ) return NULL;
 
@@ -135,11 +135,17 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
 
       // that's our vtkPolyData-Surface
       vtkSmartPointer<vtkPolyData> surface2D = vtkSmartPointer<vtkPolyData>::New();
-
+      if (surface->GetVtkPolyData(timeStep) == NULL)
+      {
+        MITK_WARN << "No surface has been created from contour model. Add more points to fill contour in slice.";
+        return;
+      }
       surface2D->SetPoints(surface->GetVtkPolyData(timeStep)->GetPoints());
       surface2D->SetLines(surface->GetVtkPolyData(timeStep)->GetLines());
       surface2D->Modified();
       //surface2D->Update();
+
+
 
       // prepare the binary image's voxel grid
       vtkSmartPointer<vtkImageData> whiteImage =

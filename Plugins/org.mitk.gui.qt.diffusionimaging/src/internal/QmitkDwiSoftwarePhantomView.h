@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkFunctionality.h>
 #include "ui_QmitkDwiSoftwarePhantomViewControls.h"
+#include <itkImage.h>
 
 /*!
 \brief View for diffusion software phantom generation using binary ROIs.

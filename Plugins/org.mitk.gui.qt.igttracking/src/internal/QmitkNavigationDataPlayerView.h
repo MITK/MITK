@@ -17,34 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkNavigationDataPlayerView_h
 #define QmitkNavigationDataPlayerView_h
 
-#include <berryISelectionListener.h>
-
 //Qmitk
-#include <QmitkFunctionality.h>
-#include <QmitkIGTPlayerWidget.h>
-
-#include <mitkSplineVtkMapper3D.h>
+#include <QmitkAbstractView.h>
 
 // ui
 #include "ui_QmitkNavigationDataPlayerViewControls.h"
 
 //mitk
-#include <mitkColorSequenceCycleH.h>
 #include <mitkNavigationDataObjectVisualizationFilter.h>
-
-
-
-
+#include <mitkNavigationToolStorage.h>
 
 /*!
 \brief QmitkNavigationDataPlayerView
 
 \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
-\sa QmitkFunctionality
-\ingroup Functionalities
 */
-class QmitkNavigationDataPlayerView : public QmitkFunctionality
+class QmitkNavigationDataPlayerView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -58,120 +47,78 @@ public:
   virtual ~QmitkNavigationDataPlayerView();
 
   virtual void CreateQtPartControl(QWidget *parent);
+  void SetFocus();
 
   /**
   \brief This method creates this bundle's SIGNAL and SLOT connections
   */
-  virtual void CreateConnections();
+  void CreateConnections();
 
-
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
-
-
-  protected slots:
+protected slots:
 
     /*!
-    \brief Creates DataNodes for all available playback objects
+    \brief loads a file and triggers creation of players and the pipeline
     */
-    void OnCreatePlaybackVisualization();
-    /*!
-    \brief Assigns position changings from the player widget to the visualization objects
-    */
-    void OnPerformPlaybackVisualization();
-    /*!
-    \brief Reinits this player. Cleans all timers and trajectory data
-    */
-    void OnReinit();
-    /*!
-    \brief Shows trajectory of tool with index
-    */
-    void OnShowTrajectory(int index);
-    /*!
-    \brief Cleans trajectory data before playing is started
-    */
-    void OnPlayingStarted();
-    /*!
-    \brief Enables or disables trajectory visualization with splines
-    */
-    void OnEnableSplineTrajectoryMapper(bool enable);
+    void OnOpenFile();
 
+    /*!
+    \brief Creates the correct player and displays the according widget
+    */
+    void OnSelectPlayer();
+
+    /*!
+    \brief Changes the repeat mode of the selected player
+    */
+    void OnSetRepeat(int);
+
+    /*!
+    \brief Registers or unregisters a virtual tracking device for the player.
+    */
+    void OnSetMicroservice();
+
+    /*!
+    \brief Triggers the creation and destruction of the rendering pipeline
+    */
+    void OnSetDisplay();
+
+    /*!
+    \brief Updates the visualization
+    */
+    void OnUpdate();
 
 protected:
 
-  enum TrajectoryStyle {
-    Points = 1,
-    Splines = 2
-  };
-
-  void CreateBundleWidgets(QWidget* parent);
-
-   /**
-    \brief Refreshes the visualization of the playback object DataNodes.
-    */
-  void RenderScene();
+  /**
+  * \brief configures the player according to the checkboxes set in the GUI
+  */
+  void ConfigurePlayer();
 
   /**
-    \brief Creates representation DataNode with given name and color
+  * \brief Creates the Rendering Pipeline necessary to Render the images
   */
-  mitk::DataNode::Pointer CreateRepresentationObject( const std::string& name , const mitk::Color color );
-  /**
-    \brief Adds representation DataNode to the DataStorage
-  */
-  void AddRepresentationObject(mitk::DataStorage* ds, mitk::DataNode::Pointer reprObject);
-  /**
-    \brief Removes representation DataNode from the DataStorage
-  */
-  void RemoveRepresentationObject(mitk::DataStorage* ds, mitk::DataNode::Pointer reprObject);
+  void CreatePipeline();
 
   /**
-    \brief Adds trajectory DataNode to the DataStorage
+  * \brief Destroys the Rendering Pipeline (but not the player)
   */
-  void AddTrajectory(mitk::DataStorage* ds, mitk::DataNode::Pointer trajectoryNode);
+  void DestroyPipeline();
 
   /**
-    \brief Creates a trajectory DataNode from given PointSet with given name and color
+  * \brief Makes player component active or inactive.
+  *
+  * Used to activate all components once data is loaded
   */
-  mitk::DataNode::Pointer CreateTrajectory( mitk::PointSet::Pointer points, const std::string& name, const mitk::Color color );
-
-
-
+  void SetInteractionComponentsEnabledState(bool isActive);
 
   Ui::QmitkNavigationDataPlayerViewControls* m_Controls;
 
-  QmitkStdMultiWidget* m_MultiWidget;
-  QmitkIGTPlayerWidget* m_PlayerWidget; ///< this bundle's playback widget
-
-  mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< this filter visualizes the navigation data
-
-  std::vector<mitk::DataNode::Pointer> m_RepresentationObjects; ///< vector for current visualization objects
-
-  mitk::DataNode::Pointer m_Trajectory; ///< main trajectory visualization DataNode
-  mitk::PointSet::Pointer m_TrajectoryPointSet; ///< PointSet with all points for trajectory
-  int m_TrajectoryIndex;  ///< trajectory tool index
-
-  bool m_ReloadData;  ///< flag needed for refresh of visualization if needed
-  bool m_ShowTrajectory;  ///< flag needed for trajectory visualization
-
-  mitk::SplineVtkMapper3D::Pointer m_SplineMapper; ///< spline trajectory mapper
-  mitk::PointSetVtkMapper3D::Pointer m_PointSetMapper; ///< standard trajectroy mapper
-
-
-
+  mitk::NavigationDataObjectVisualizationFilter::Pointer m_VisFilter;
+  std::vector<mitk::DataNode::Pointer> m_RenderingNodes;
+  mitk::NavigationDataPlayerBase::Pointer m_Player;
+  mitk::NavigationDataSet::Pointer m_Data;
+  mitk::NavigationToolStorage::Pointer m_ToolStorage;
 
 private:
-  /**
-    \brief Returns color from colorcycle with given index
-  */
-  mitk::Color GetColorCircleColor(int index);
-  /**
-    \brief Returns the trajectory mapper for the given style if stýle is not Points or Splines NULL will be returned.
-  */
-  mitk::PointSetVtkMapper3D::Pointer GetTrajectoryMapper(TrajectoryStyle style);
-
 };
 
-
-
 #endif // _QMITKNAVIGATIONDATAPLAYERVIEW_H_INCLUDED
-

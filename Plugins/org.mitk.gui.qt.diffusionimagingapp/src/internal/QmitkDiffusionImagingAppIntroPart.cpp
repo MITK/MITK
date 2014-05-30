@@ -35,10 +35,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 #include <QMessageBox>
 #include <QtCore/qconfig.h>
-#ifdef QT_WEBKIT
+
 #include <QWebView>
 #include <QWebPage>
-#endif
 #include <QString>
 #include <QStringList>
 #include <QRegExp>
@@ -83,7 +82,8 @@ QmitkDiffusionImagingAppIntroPart::~QmitkDiffusionImagingAppIntroPart()
 
   // if workbench is not closing (Just welcome screen closing), open last used perspective
   if (this->GetIntroSite()->GetPage()->GetPerspective()->GetId()
-    == "org.mitk.diffusionimagingapp.perspectives.welcome" && !this->GetIntroSite()->GetPage()->GetWorkbenchWindow()->GetWorkbench()->IsClosing())
+    == "org.mitk.diffusionimagingapp.perspectives.welcome"
+      && !this->GetIntroSite()->GetPage()->GetWorkbenchWindow()->GetWorkbench()->IsClosing())
     {
     berry::IPerspectiveDescriptor::Pointer perspective = this->GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->GetPerspectiveRegistry()->FindPerspectiveWithId("org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp");
     if (perspective)
@@ -102,7 +102,6 @@ void QmitkDiffusionImagingAppIntroPart::CreateQtPartControl(QWidget* parent)
     // create GUI widgets
     m_Controls = new Ui::QmitkWelcomeScreenViewControls;
     m_Controls->setupUi(parent);
-#ifdef QT_WEBKIT
 
     // create a QWebView as well as a QWebPage and QWebFrame within the QWebview
     m_view = new QWebView(parent);
@@ -114,13 +113,9 @@ void QmitkDiffusionImagingAppIntroPart::CreateQtPartControl(QWidget* parent)
     // adds the webview as a widget
     parent->layout()->addWidget(m_view);
     this->CreateConnections();
-#else
-    parent->layout()->addWidget(new QLabel("<h1><center>Please install Qt with the WebKit option to see cool pictures!</center></h1>"));
-#endif
   }
 }
 
-#ifdef QT_WEBKIT
 void QmitkDiffusionImagingAppIntroPart::CreateConnections()
 {
   if ( m_Controls )
@@ -196,8 +191,6 @@ void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
   }
 
 }
-
-#endif
 
 void QmitkDiffusionImagingAppIntroPart::StandbyStateChanged(bool)
 {

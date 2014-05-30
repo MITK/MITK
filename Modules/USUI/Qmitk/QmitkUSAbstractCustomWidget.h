@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace us {
-  class PrototypeServiceFactory;
+  struct PrototypeServiceFactory;
   class ModuleContext;
 }
 
@@ -106,17 +106,19 @@ public:
   virtual QmitkUSAbstractCustomWidget* Clone(QWidget* parent = 0) const = 0;
 
   /**
+    * \brief Method for initializing the Qt stuff of the widget (setupUI, connect).
+    * This method will be called in CloneForQt() and has to be implemented by concrete
+    * subclasses.
+    * \warning All Qt initialization stuff belongs into this method rather than in the constructor.
+    */
+  virtual void Initialize() = 0;
+
+  /**
     * \brief Return pointer to copy of the object.
     * Internally use of QmitkUSAbstractCustomWidget::Clone() with additionaly
     * setting an internal flag that the object was really cloned.
     */
   QmitkUSAbstractCustomWidget* CloneForQt(QWidget* parent = 0) const;
-
-  /**
-    * \brief Register object as micro service.
-    * The object will be registered using an us::PrototypeServiceFactory.
-    */
-  us::ServiceRegistration<QmitkUSAbstractCustomWidget> RegisterService(us::ModuleContext* context);
 
   /**
     * \brief Returns the properties of the micro service.

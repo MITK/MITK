@@ -160,6 +160,7 @@ set(CACHED_RESOURCE_FILES
   resources/odf.png
   resources/refresh.xpm
   resources/diffusionregistration.png
+  resources/denoisingicon.png
  )
 
 set(QRC_FILES

@@ -38,7 +38,7 @@ namespace mitk
  * - PLANE_DECORATION_POSITIVE_ORIENTATION (arrows pointing upwards)
  * - PLANE_DECORATION_NEGATIVE_ORIENTATION (arrows pointing downwards)
  *
- * See also mitk::Geometry2DDataMapper2D::DrawOrientationArrow()
+ * See also mitk::PlaneGeometryDataMapper2D::DrawOrientationArrow()
  */
 class MITK_CORE_EXPORT PlaneOrientationProperty : public EnumerationProperty
 {

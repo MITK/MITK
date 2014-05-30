@@ -35,8 +35,8 @@ static mitk::Point2D GetCenterPoint(const mitk::PlanarFigure::PolyLineType& poly
 
   for (mitk::PlanarFigure::PolyLineType::const_iterator polyLineIter = polyLine.begin(); polyLineIter != polyLineEnd; ++polyLineIter)
   {
-    centerPoint[0] += polyLineIter->Point[0];
-    centerPoint[1] += polyLineIter->Point[1];
+    centerPoint[0] += static_cast<mitk::Point2D>(*polyLineIter)[0];
+    centerPoint[1] += static_cast<mitk::Point2D>(*polyLineIter)[1];
   }
 
   size_t numPoints = polyLine.size();
@@ -131,7 +131,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
   if (numPolyLines == 0)
     mitkThrow() << "Primary input does not contain any poly lines!";
 
-  const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*>(input->GetGeometry2D());
+  const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*>(input->GetPlaneGeometry());
 
   if (planeGeometry == NULL)
     mitkThrow() << "Could not get plane geometry from primary input!";
@@ -173,7 +173,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
     for (PolyLineConstIter polyLineIter = polyLine.begin(); polyLineIter != polyLineEnd; ++polyLineIter)
     {
       Point3D point;
-      planeGeometry->Map(polyLineIter->Point, point);
+      planeGeometry->Map(*polyLineIter, point);
       crossSection.push_back(point);
     }
 

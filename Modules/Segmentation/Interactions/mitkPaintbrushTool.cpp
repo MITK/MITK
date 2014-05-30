@@ -96,7 +96,7 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
   if (!positionEvent) return;
 
   // Get Spacing of current Slice
-  //mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing();
+  //mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing();
 
   //
   // Draw a contour in Square according to selected brush size
@@ -282,6 +282,9 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
   */
 bool mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+      return false;
+
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -309,6 +312,9 @@ bool mitk::PaintbrushTool::OnPrimaryButtonPressedMoved( StateMachineAction*, Int
   */
 bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, bool leftMouseButtonPressed)
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+      return false;
+
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
 
@@ -418,6 +424,9 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
 
 bool mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
+  if ( SegTool2D::CanHandleEvent(interactionEvent) < 1.0 )
+      return false;
+
     //When mouse is released write segmentationresult back into image
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
@@ -450,7 +459,7 @@ bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent*
 
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
-    const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldGeometry2D() ) );
+    const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
 
     if (!workingNode)

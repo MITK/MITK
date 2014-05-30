@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkPointSet.h"
+#include "mitkPlaneGeometry.h"
 
 //vtk includes
 #include <vtkActor.h>
@@ -273,7 +274,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   mitk::Point2D preLastPt2d = pt2d ;     // projected_p in display coordinates before lastPt2
 
   mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
-  const mitk::Geometry2D* geo2D = renderer->GetCurrentWorldGeometry2D();
+  const mitk::PlaneGeometry* geo2D = renderer->GetCurrentWorldPlaneGeometry();
 
   vtkLinearTransform* dataNodeTransform = input->GetGeometry()->GetVtkTransform();
 

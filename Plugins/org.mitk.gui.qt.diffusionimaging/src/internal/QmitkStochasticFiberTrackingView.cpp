@@ -216,7 +216,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
 
     itk::ImageRegionConstIterator< BinaryImageType > it(binaryImageToItk1->GetOutput(), binaryImageToItk1->GetOutput()->GetRequestedRegion());
     it.GoToBegin();
-    mitk::Geometry3D* geom = m_DiffusionImage->GetGeometry();
+    mitk::BaseGeometry* geom = m_DiffusionImage->GetGeometry();
 
     while(!it.IsAtEnd())
     {

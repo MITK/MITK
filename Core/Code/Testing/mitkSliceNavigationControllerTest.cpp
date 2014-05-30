@@ -68,7 +68,7 @@ int compareGeometry(const mitk::TimeGeometry & timeGeometry,
 {
    //Probleme durch umstellung von Time-SlicedGeometry auf  TimeGeometry?
    //Eventuell gibt es keine Entsprechung mehr.
-   const mitk::Geometry3D::Pointer geometry= timeGeometry.GetGeometryForTimeStep(0);
+   const mitk::BaseGeometry::Pointer geometry= timeGeometry.GetGeometryForTimeStep(0);
    std::cout << "Testing width, height and thickness (in units): ";
    if((mitk::Equal(geometry->GetExtent(0),width)==false) ||
       (mitk::Equal(geometry->GetExtent(1),height)==false) ||
@@ -253,7 +253,7 @@ int testReorientPlanes ()
       mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
       geo2d->Initialize();
       geo2d->SetReferenceGeometry(geometry);
-      slicedgeometry1->SetGeometry2D(geo2d,i);
+      slicedgeometry1->SetPlaneGeometry(geo2d,i);
    }
 
    for (int i=0; i < (int)numSlices; i++)
@@ -261,7 +261,7 @@ int testReorientPlanes ()
       mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
       geo2d->Initialize();
       geo2d->SetReferenceGeometry(geometry);
-      slicedgeometry2->SetGeometry2D(geo2d,i);
+      slicedgeometry2->SetPlaneGeometry(geo2d,i);
    }
 
    slicedgeometry1->SetReferenceGeometry(geometry);
@@ -412,7 +412,7 @@ int testRestorePlanePostionOperation ()
       mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
       geo2d->Initialize();
       geo2d->SetReferenceGeometry(geometry);
-      slicedgeometry1->SetGeometry2D(geo2d,i);
+      slicedgeometry1->SetPlaneGeometry(geo2d,i);
    }
 
    for (int i=0; i < (int)numSlices; i++)
@@ -420,7 +420,7 @@ int testRestorePlanePostionOperation ()
       mitk::PlaneGeometry::Pointer geo2d = mitk::PlaneGeometry::New();
       geo2d->Initialize();
       geo2d->SetReferenceGeometry(geometry);
-      slicedgeometry2->SetGeometry2D(geo2d,i);
+      slicedgeometry2->SetPlaneGeometry(geo2d,i);
    }
 
    slicedgeometry1->SetReferenceGeometry(geometry);
@@ -449,11 +449,11 @@ int testRestorePlanePostionOperation ()
    us::ServiceReference<mitk::PlanePositionManagerService> serviceRef =
       us::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
    mitk::PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
-   service->AddNewPlanePosition(slicedgeometry2->GetGeometry2D(0), 178);
+   service->AddNewPlanePosition(slicedgeometry2->GetPlaneGeometry(0), 178);
    sliceCtrl1->ExecuteOperation(service->GetPlanePosition(0));
    sliceCtrl1->Update();
-   mitk::Geometry2D* planeRotated = slicedgeometry2->GetGeometry2D(178);
-   mitk::Geometry2D* planeRestored = dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetGeometry2D(178);
+   mitk::PlaneGeometry* planeRotated = slicedgeometry2->GetPlaneGeometry(178);
+   mitk::PlaneGeometry* planeRestored = dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetPlaneGeometry(178);
 
    try{
       MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(planeRotated->GetIndexToWorldTransform()->GetMatrix(), planeRestored->GetIndexToWorldTransform()->GetMatrix()),"Testing for IndexToWorld");

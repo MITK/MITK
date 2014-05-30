@@ -12,7 +12,7 @@ The Geometry3D class holds (see figure)
 \li a transform to convert intrinsic coordinates into a world-coordinate system with coordinates in millimeters and milliseconds (floating point values), to be accessed by Geometry3D::GetIndexToWorldTransform()
 \li a life span, i.e. a bounding box in time in ms (with start and end time), to be accessed by Geometry3D::GetTimeBounds(). The default is minus infinity to plus infinity.
 
-\image html ModuleGeometryFig1.png "Geometry: Bounding box and transform"
+\imageMacro{ModuleGeometryFig1.png,"Geometry: Bounding box and transform",14.82}
 
 Geometry3D and its sub-classes allow converting between intrinsic coordinates (called index or unit coordinates) and word-coordinates (called world or mm coordinates), e.g. Geometry3D::WorldToIndex.
 

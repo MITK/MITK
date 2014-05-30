@@ -549,7 +549,7 @@ void QmitkPreprocessingView::DoShowGradientDirections()
   BValueMap bValMap =  m_DiffusionImage->GetBValueMap();
 
   GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();
-  mitk::Geometry3D::Pointer geometry = m_DiffusionImage->GetGeometry();
+  mitk::BaseGeometry::Pointer geometry = m_DiffusionImage->GetGeometry();
   int shellCount = 1;
   for(BValueMapIterator it = bValMap.begin(); it!=bValMap.end(); ++it)
   {
@@ -824,8 +824,15 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
 
     GetDefaultDataStorage()->Add(node);
 
+    /*A reinitialization is needed to access the time channels via the ImageNavigationController
+    The Global-Geometry can not recognize the time channel without a re-init.
+    (for a new selection in datamanger a automatically updated of the Global-Geometry should be done - if it contains the time channel)*/
+    mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeGeometry(),mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+
     ++itemiter;
   }
+
+
 
 }
 

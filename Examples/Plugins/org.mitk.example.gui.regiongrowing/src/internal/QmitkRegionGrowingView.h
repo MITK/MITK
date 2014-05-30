@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //! [includes]
 #include "mitkPointSet.h"
 #include "mitkIRenderWindowPartListener.h"
+#include <itkImage.h>
 
 class QmitkPointListWidget;
 //! [includes]
@@ -82,7 +83,7 @@ class QmitkRegionGrowingView : public QmitkAbstractView, public mitk::IRenderWin
       a given MITK image and calls this function for further processing (in our case region growing)
     */
     template < typename TPixel, unsigned int VImageDimension >
-    void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry );
+    void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BaseGeometry* imageGeometry );
     //! [itkimageprocessing]
 
     //! [members]

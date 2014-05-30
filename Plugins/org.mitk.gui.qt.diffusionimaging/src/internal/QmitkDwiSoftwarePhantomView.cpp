@@ -320,7 +320,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
 
     if (m_Controls->m_OutputVectorFieldBox->isChecked())
     {
-        mitk::Geometry3D::Pointer geometry = image->GetGeometry();
+        mitk::BaseGeometry::Pointer geometry = image->GetGeometry();
         mitk::Vector3D outImageSpacing = geometry->GetSpacing();
         float minSpacing = 1;
         if(outImageSpacing[0]<outImageSpacing[1] && outImageSpacing[0]<outImageSpacing[2])

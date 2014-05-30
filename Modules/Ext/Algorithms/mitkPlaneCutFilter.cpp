@@ -56,7 +56,7 @@ mitk::PlaneCutFilter::~PlaneCutFilter()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::PlaneCutFilter::_computeIntersection(itk::Image<TPixel, VImageDimension> *image, const PlaneGeometry *plane, const Geometry3D *geometry)
+void mitk::PlaneCutFilter::_computeIntersection(itk::Image<TPixel, VImageDimension> *image, const PlaneGeometry *plane, const BaseGeometry *geometry)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
 

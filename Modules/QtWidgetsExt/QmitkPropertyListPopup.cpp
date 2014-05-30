@@ -30,59 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qpainter.h>
 #include <QWidgetAction>
 
-/*!
-   Auxiliary class to provide fancy menu items with different fonts.
-
-   Copied from the Qt example program menu/menu.cpp:
-   "This example program may be used, distributed and modified without limitation."
- */
-//!mm,deleted: Qt4 no longer supports QCustomMenuItem
-//!instead you have QAction with a lot of possibilities for fancy menu items
-/*
-class QFontMenuItem : public QCustomMenuItem
-{
-  public:
-    QFontMenuItem( const QString& s, const QFont& f )
-      : string( s ), font( f ), color ( Qt::black ) {};
-    QFontMenuItem( const QString& s, const QFont& f, const QColor& c )
-      : string( s ), font( f ), color( c ) {};
-    ~QFontMenuItem(){}
-
-    void paint( QPainter* p, const QColorGroup& cg, bool act, bool enabled, int x, int y, int w, int h )
-    {
-      p->setBackgroundMode ( Qt::OpaqueMode );
-      int ha,es,vau;
-      color.getHsv(ha,es,vau);
-      if ( es < 60 && vau > 200 )
-        p->setBackgroundColor ( Qt::black );
-      else
-        p->setBackgroundColor ( Qt::white );
-      p->setPen ( color );
-      p->setFont ( font );
-      p->drawText( x, y, w, h, AlignLeft | AlignVCenter | DontClip | ShowPrefix, string );
-    }
-
-    QSize sizeHint()
-    {
-      return QFontMetrics( font ).size( AlignLeft | AlignVCenter | ShowPrefix | DontClip,  string );
-    }
-  private:
-    QString string;
-    QFont font;
-    QColor color;
-};
-*/
-//!
-
 QmitkPropertyListPopup::QmitkPropertyListPopup( mitk::PropertyList* list, QObject* parent, bool disableBoolProperties, bool fillMenuImmediatelty, const char* name )
 :QObject(parent, name),
-//!mm
-//m_PopupMenu( new Q3PopupMenu( dynamic_cast<QWidget*>(parent), name ) ),
 m_PopupMenu( new QMenu( name, dynamic_cast<QWidget*>(parent) ) ),
-//!
 m_PropertyList(list),
 m_MaterialEditor(NULL),
-//!mm,init QAction ptrs with 0
 m_NameMenuAction(0),
 m_VisibleMenuAction(0),
 m_ColorMenuAction(0),
@@ -90,7 +42,6 @@ m_MaterialMenuAction(0),
 m_OpacityMenuAction(0),
 m_AcceptOnHide(false),
 m_DisableBoolProperties(disableBoolProperties)
-//!
 {
   if (!parent)
   {
@@ -103,13 +54,9 @@ m_DisableBoolProperties(disableBoolProperties)
   }
 
   connect( m_PopupMenu, SIGNAL(aboutToHide()), this, SLOT(popupAboutToHide()) );
-  //!mm
-  //connect( m_PopupMenu, SIGNAL(highlighted(int)), this, SLOT(popupMenuItemHighlighted(int)) );
   connect( m_PopupMenu, SIGNAL(hovered(int)), this, SLOT(popupMenuItemHovered(int)) );
-  //!
 }
 
-//!mm
 QIcon QmitkPropertyListPopup::createColorIcon(QColor color)
 {
   QPixmap pixmap(20, 20);
@@ -119,16 +66,11 @@ QIcon QmitkPropertyListPopup::createColorIcon(QColor color)
 
   return QIcon(pixmap);
 }
-//!
 
 void QmitkPropertyListPopup::fillPopup()
 {
   if (m_PropertyList.IsNotNull())
   {
-    //!mm
-    //m_PopupMenu->setCheckable(true); // in general, there could are some checkable items in this menu
-    //!
-
     // color
     mitk::ColorProperty* colorProperty = dynamic_cast<mitk::ColorProperty*>( m_PropertyList->GetProperty("color"));
     if (colorProperty)
@@ -138,37 +80,24 @@ void QmitkPropertyListPopup::fillPopup()
 
       QFont normalFont;
       normalFont.setBold(true);
-      //!mm
-      //m_ColorMenuID = m_PopupMenu->insertItem( new QFontMenuItem("Color...", normalFont, currentColor ) );
-      //m_PopupMenu->connectItem( m_ColorMenuID, this, SLOT(onColorClicked()) );
-      //m_PopupMenu->setItemEnabled( m_ColorMenuID, true );
       m_ColorMenuAction = new QAction(this->createColorIcon(currentColor), QString("Color..."), this);
       m_ColorMenuAction->setFont(normalFont);
       m_PopupMenu->addAction(m_ColorMenuAction);
       m_ColorMenuAction->setEnabled(true);
       connect( m_ColorMenuAction, SIGNAL(triggered()), this, SLOT(onColorClicked()) );
-      //!
     }
     else
     {
-      //!mm
-      //m_ColorMenuAction = m_PopupMenu->insertItem( "Color..." );
-      //m_PopupMenu->setItemEnabled( m_ColorMenuAction, false );
       m_ColorMenuAction = new QAction(QString("Color..."), this);
       m_PopupMenu->addAction(m_ColorMenuAction);
       m_ColorMenuAction->setEnabled(true);
-      //!
     }
 
     if ( !AddMaterialPopup() )
     {
-      //!mm
-      //m_MaterialMenuAction = m_PopupMenu->insertItem("Material");
-      //m_PopupMenu->setItemEnabled( m_MaterialMenuAction, false );
       m_MaterialMenuAction = new QAction(QString("Material"), this);
       m_PopupMenu->addAction(m_MaterialMenuAction);
       m_MaterialMenuAction->setEnabled(false);
-      //!
     }
 
 
@@ -176,47 +105,26 @@ void QmitkPropertyListPopup::fillPopup()
     if ( mitk::FloatProperty* opacityProperty = dynamic_cast<mitk::FloatProperty*>( m_PropertyList->GetProperty("opacity")))
     {
       m_OriginalOpacity = mitk::FloatProperty::New( opacityProperty->GetValue() );
-      //!mm
-      //Q3PopupMenu* opacityPopup = new Q3PopupMenu( m_PopupMenu );
       QMenu* opacityPopup = m_PopupMenu->addMenu("Opacity");
-      //!
 
       QmitkNumberPropertySlider* npe = new QmitkNumberPropertySlider( opacityProperty, opacityPopup );
       npe->setShowPercent(true);
       npe->setMinValue(0);
       npe->setMaxValue(1);
-      //!mm
-      //opacityPopup->insertItem( npe );
 
-      //m_OpacityMenuAction = m_PopupMenu->insertItem("Opacity", opacityPopup);
-      //m_PopupMenu->setItemEnabled( m_OpacityMenuAction, true );
       QWidgetAction* opacityMenuAction = new QWidgetAction(opacityPopup);
       opacityMenuAction->setDefaultWidget(npe);
       m_OpacityMenuAction = opacityMenuAction;
       opacityPopup->addAction(m_OpacityMenuAction);
       m_OpacityMenuAction->setEnabled(true);
-      //!
     }
     else
     {
-      //!mm
-      //m_OpacityMenuAction = m_PopupMenu->insertItem("Opacity");
-      //m_PopupMenu->setItemEnabled( m_OpacityMenuAction, false );
       m_OpacityMenuAction = new QAction(QString("Opacity"), this);
       m_PopupMenu->addAction(m_OpacityMenuAction);
       m_OpacityMenuAction->setEnabled(true);
-      //!
     }
 
-    // Build up a "name" entry. On click, call onNameChangeClicked.
-    //!mm
-    //m_NameMenuAction = m_PopupMenu->insertItem("Name...");
-    //mitk::StringProperty* nameProperty = dynamic_cast<mitk::StringProperty*>( m_PropertyList->GetProperty("name"));
-    //m_PopupMenu->setItemEnabled( m_NameMenuAction, nameProperty != NULL );
-    //if (nameProperty)
-    //{
-      //m_PopupMenu->connectItem( m_NameMenuAction, this, SLOT(onNameClicked()) );
-    //}
     m_NameMenuAction = new QAction(QString("Name..."), this);
     m_PopupMenu->addAction(m_NameMenuAction);
     mitk::StringProperty* nameProperty = dynamic_cast<mitk::StringProperty*>( m_PropertyList->GetProperty("name"));
@@ -225,19 +133,7 @@ void QmitkPropertyListPopup::fillPopup()
     {
       connect( m_NameMenuAction, SIGNAL(triggered()), this, SLOT(onNameClicked()) );
     }
-    //!
 
-
-    // Build up a checkable "visible" entry. On click, call onVisibleChanged.
-    //!m
-    //m_VisibleMenuAction = m_PopupMenu->insertItem("Visibility");
-    //mitk::BoolProperty* visibleProperty = dynamic_cast<mitk::BoolProperty*>( m_PropertyList->GetProperty("visible"));
-    //m_PopupMenu->setItemEnabled( m_VisibleMenuAction, visibleProperty != NULL );
-    //if (visibleProperty)
-    //{
-      //m_PopupMenu->setItemChecked( m_VisibleMenuAction, visibleProperty->GetValue() );
-      //m_PopupMenu->connectItem( m_VisibleMenuAction, this, SLOT(onVisibleClicked()) );
-    //}
     m_VisibleMenuAction = new QAction(QString("Visibility"), this);
     m_VisibleMenuAction->setCheckable(true);
     m_PopupMenu->addAction(m_VisibleMenuAction);
@@ -248,24 +144,14 @@ void QmitkPropertyListPopup::fillPopup()
       m_VisibleMenuAction->setChecked( visibleProperty->GetValue() );
       connect( m_VisibleMenuAction, SIGNAL(triggered()), this, SLOT(onVisibleClicked()) );
     }
-    //!
 
     // other properties, "information"
     const mitk::PropertyList::PropertyMap* map = m_PropertyList->GetMap();
     if (map)
     {
-      // build a sub-menu with all properties shown
-      //!mm
-      //m_InfoPopup = new Q3PopupMenu( m_PopupMenu );
-      //m_InfoPopup->setCheckable(true); // bool properties are checked
-      //m_PopupMenu->insertItem("Information", m_InfoPopup);
-
-      //m_PopupMenu->insertSeparator();
       m_InfoPopup = m_PopupMenu->addMenu("Information");
-      //m_InfoPopup->setCheckable(true); // bool properties are checked
 
       m_PopupMenu->addSeparator();
-      //!
 
       QFont boldFont = m_PopupMenu->font();
       boldFont.setBold( true );
@@ -324,30 +210,20 @@ bool QmitkPropertyListPopup::AddMaterialPopup()
   if ( mitk::MaterialProperty* materialProperty = dynamic_cast<mitk::MaterialProperty*>( m_PropertyList->GetProperty("material"))) // normal "material"
   {
     m_OriginalMaterial = mitk::MaterialProperty::New( *materialProperty );
-    //!mm
-    //Q3PopupMenu* materialPopup = new Q3PopupMenu( m_PopupMenu );
     QMenu* materialPopup = new QMenu( m_PopupMenu );
-    //!
 
     m_MaterialEditor = new QmitkMaterialEditor( m_PopupMenu );
     m_MaterialEditor->setInline(true); // important to call this first :(
     m_MaterialEditor->Initialize( materialProperty );
-    //!mm
-    //materialPopup->insertItem( m_MaterialEditor );
     // setting QDialog as menu item with Qt4 QWidgetAction
     QWidgetAction* materialEditorMenuItem = new QWidgetAction(materialPopup);
     materialEditorMenuItem->setDefaultWidget(m_MaterialEditor);
     materialPopup->addAction(materialEditorMenuItem);
-    //!
     connect( m_MaterialEditor, SIGNAL(ChangesAccepted(QmitkMaterialEditor*)), this, SLOT(MaterialEditorChangesAccepted(QmitkMaterialEditor*)) );
 
-    //!mm
-    //m_MaterialMenuAction = m_PopupMenu->insertItem("Material", materialPopup);
-    //m_PopupMenu->setItemEnabled( m_MaterialMenuAction, true );
     m_MaterialMenuAction = new QAction(QString("Material"), materialPopup);
     materialPopup->addAction(m_OpacityMenuAction);
     m_OpacityMenuAction->setEnabled(true);
-    //!
 
     return true;
   }
@@ -360,16 +236,10 @@ QmitkPropertyListPopup::~QmitkPropertyListPopup()
   delete m_MaterialEditor;
 }
 
-//!mm
-//void QmitkPropertyListPopup::popup( const QPoint& pos, int indexAtPoint )
-//{
-//  m_PopupMenu->exec(pos, indexAtPoint);
-//}
-void QmitkPropertyListPopup::popup( const QPoint& pos, QAction* action /*= 0 */ )
+void QmitkPropertyListPopup::popup( const QPoint& pos, QAction* action)
 {
   m_PopupMenu->exec(pos, action);
 }
-//!
 
 void QmitkPropertyListPopup::onNameClicked()
 {
@@ -411,17 +281,11 @@ void QmitkPropertyListPopup::onNameClicked()
 
 void QmitkPropertyListPopup::onVisibleClicked()
 {
-  //!mm
-  //m_PopupMenu->setItemChecked( m_VisibleMenuAction, !m_PopupMenu->isItemChecked(m_VisibleMenuAction) );
   m_VisibleMenuAction->setChecked(m_VisibleMenuAction->isChecked());
-  //!
   mitk::BoolProperty* visibleProperty = dynamic_cast<mitk::BoolProperty*>( m_PropertyList->GetProperty("visible"));
   if (visibleProperty)
   {
-    //!mm
-    //visibleProperty->SetValue( m_PopupMenu->isItemChecked( m_VisibleMenuAction ) );
     visibleProperty->SetValue( m_VisibleMenuAction->isChecked() );
-    //!
     visibleProperty->Modified(); // quite stupid that this is not done in SetValue() to inform observers
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     emit propertyListChangesDone();
@@ -473,7 +337,7 @@ void QmitkPropertyListPopup::onBoolPropertyClicked(int param)
   }
 }
 
-void QmitkPropertyListPopup::MaterialEditorChangesAccepted(QmitkMaterialEditor* /*ed*/)
+void QmitkPropertyListPopup::MaterialEditorChangesAccepted(QmitkMaterialEditor*)
 {
 }
 
@@ -500,8 +364,6 @@ void QmitkPropertyListPopup::popupAboutToHide()
   }
 }
 
-//!mm
-//void QmitkPropertyListPopup::popupMenuItemHighlighted(int id)
 void QmitkPropertyListPopup::popupMenuItemHovered( QAction* action )
 {
   if ( action == m_OpacityMenuAction || action == m_MaterialMenuAction )

@@ -28,7 +28,7 @@ namespace mitk
 class MitkPlanarFigure_EXPORT PlanarFigureSerializer : public BaseDataSerializer
 {
   public:
-    mitkClassMacro( PlanarFigureSerializer, BaseDataSerializer );
+    mitkClassMacro( PlanarFigureSerializer, BaseDataSerializer )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     virtual std::string Serialize();

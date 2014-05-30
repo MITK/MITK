@@ -153,8 +153,8 @@ protected:
   void RenderLines( PlanarFigureDisplayMode lineDisplayMode,
                     mitk::PlanarFigure * planarFigure,
                     mitk::Point2D &anchorPoint,
-                    mitk::Geometry2D * planarFigureGeometry2D,
-                    const mitk::Geometry2D * rendererGeometry2D,
+                    mitk::PlaneGeometry * planarFigurePlaneGeometry,
+                    const mitk::PlaneGeometry * rendererPlaneGeometry,
                     mitk::DisplayGeometry * displayGeometry );
 
   /**
@@ -182,16 +182,16 @@ protected:
   */
   void RenderControlPoints( mitk::PlanarFigure * planarFigure,
                             PlanarFigureDisplayMode lineDisplayMode,
-                            mitk::Geometry2D * planarFigureGeometry2D,
-                            const mitk::Geometry2D * rendererGeometry2D,
+                            mitk::PlaneGeometry * planarFigurePlaneGeometry,
+                            const mitk::PlaneGeometry * rendererPlaneGeometry,
                             mitk::DisplayGeometry * displayGeometry );
 
 
   void TransformObjectToDisplay(
     const mitk::Point2D &point2D,
     mitk::Point2D &displayPoint,
-    const mitk::Geometry2D *objectGeometry,
-    const mitk::Geometry2D *rendererGeometry,
+    const mitk::PlaneGeometry *objectGeometry,
+    const mitk::PlaneGeometry *rendererGeometry,
     const mitk::DisplayGeometry *displayGeometry );
 
   void DrawMarker(
@@ -202,8 +202,8 @@ protected:
     float markerOpacity,
     float lineWidth,
     PlanarFigureControlPointStyleProperty::Shape shape,
-    const mitk::Geometry2D *objectGeometry,
-    const mitk::Geometry2D *rendererGeometry,
+    const mitk::PlaneGeometry *objectGeometry,
+    const mitk::PlaneGeometry *rendererGeometry,
     const mitk::DisplayGeometry *displayGeometry );
 
   /**
@@ -212,8 +212,8 @@ protected:
   void PaintPolyLine( mitk::PlanarFigure::PolyLineType vertices,
     bool closed,
     Point2D& anchorPoint,
-    const Geometry2D* planarFigureGeometry2D,
-    const Geometry2D* rendererGeometry2D,
+    const PlaneGeometry* planarFigurePlaneGeometry,
+    const PlaneGeometry* rendererPlaneGeometry,
     const DisplayGeometry* displayGeometry);
 
   /**
@@ -222,8 +222,8 @@ protected:
   */
   void DrawMainLines( mitk::PlanarFigure* figure,
     Point2D& anchorPoint,
-    const Geometry2D* planarFigureGeometry2D,
-    const Geometry2D* rendererGeometry2D,
+    const PlaneGeometry* planarFigurePlaneGeometry,
+    const PlaneGeometry* rendererPlaneGeometry,
     const DisplayGeometry* displayGeometry) ;
 
   /**
@@ -232,8 +232,8 @@ protected:
   */
   void DrawHelperLines( mitk::PlanarFigure* figure,
     Point2D& anchorPoint,
-    const Geometry2D* planarFigureGeometry2D,
-    const Geometry2D* rendererGeometry2D,
+    const PlaneGeometry* planarFigurePlaneGeometry,
+    const PlaneGeometry* rendererPlaneGeometry,
     const DisplayGeometry* displayGeometry) ;
 
   void InitializeDefaultPlanarFigureProperties();
@@ -270,6 +270,7 @@ private:
   bool m_DrawControlPoints;
   bool m_DrawName;
   bool m_DrawDashed;
+  bool m_DrawHelperDashed;
 
   // the width of the shadow is defined as 'm_LineWidth * m_ShadowWidthFactor'
   float m_LineWidth;

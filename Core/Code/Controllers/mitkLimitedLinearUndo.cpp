@@ -86,6 +86,7 @@ bool mitk::LimitedLinearUndo::Undo(int oeid)
 {
   if(m_UndoList.empty()) return false;
 
+  bool rc = true;
   do
   {
     m_UndoList.back()->ReverseAndExecute();
@@ -97,14 +98,15 @@ bool mitk::LimitedLinearUndo::Undo(int oeid)
     if (m_UndoList.empty())
     {
       InvokeEvent( UndoEmptyEvent() );
-      return false;
+      rc = false;
+      break;
     }
   }
   while ( m_UndoList.back()->GetObjectEventId() >= oeid );
 
   //Update. Check Rendering Mechanism where to request updates
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  return true;
+  return rc;
 }
 
 bool mitk::LimitedLinearUndo::Redo(bool)

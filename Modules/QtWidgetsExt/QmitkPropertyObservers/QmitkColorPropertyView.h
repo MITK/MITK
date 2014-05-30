@@ -31,10 +31,6 @@ class MitkQtWidgetsExt_EXPORT QmitkColorPropertyView : public QLabel, public mit
     QmitkColorPropertyView( const mitk::ColorProperty*, QWidget* parent );
     virtual ~QmitkColorPropertyView();
 
-    //virtual void unsetPalette();
-    //virtual void setPalette( const QPalette & );
-    //virtual void setBackgroundMode( QWidget::BackgroundMode );
-    //virtual void setPaletteBackgroundColor( const QColor & );
   protected:
 
     virtual void PropertyChanged();
@@ -45,10 +41,6 @@ class MitkQtWidgetsExt_EXPORT QmitkColorPropertyView : public QLabel, public mit
     const mitk::ColorProperty* m_ColorProperty;
 
     QPalette m_WidgetPalette;
-
-  private:
-
-    //bool m_SelfCall;
 };
 
 #endif

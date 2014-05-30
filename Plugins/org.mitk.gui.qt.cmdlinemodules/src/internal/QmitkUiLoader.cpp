@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDataStorageComboBoxWithSelectNone.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateOr.h"
+#include "mitkImage.h"
 
 //-----------------------------------------------------------------------------
 QmitkUiLoader::QmitkUiLoader(const mitk::DataStorage* dataStorage, QObject *parent)

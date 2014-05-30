@@ -97,14 +97,14 @@ protected:
   int m_MovingDimension;
   bool m_StopOptimization;
   mitk::RigidRegistrationPreset* m_Preset;
-  mitk::Geometry3D::TransformType::Pointer m_GeometryItkPhysicalToWorldTransform;
-  mitk::Geometry3D::TransformType::Pointer m_GeometryWorldToItkPhysicalTransform;
-  mitk::Geometry3D* m_MovingGeometry;
-  mitk::Geometry3D::Pointer m_ImageGeometry;
+  mitk::BaseGeometry::TransformType::Pointer m_GeometryItkPhysicalToWorldTransform;
+  mitk::BaseGeometry::TransformType::Pointer m_GeometryWorldToItkPhysicalTransform;
+  mitk::BaseGeometry* m_MovingGeometry;
+  mitk::BaseGeometry::Pointer m_ImageGeometry;
   mitk::RigidRegistrationObserver::Pointer m_Observer;
   mitk::DataStorage::SetOfObjects::ConstPointer m_MovingNodeChildren;
-  std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> m_ChildNodes;
-  std::map<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer> m_ChildNodes2;
+  std::map<mitk::DataNode::Pointer, mitk::BaseGeometry*> m_ChildNodes;
+  std::map<mitk::DataNode::Pointer, mitk::BaseGeometry::Pointer> m_ChildNodes2;
 };
 
 #endif

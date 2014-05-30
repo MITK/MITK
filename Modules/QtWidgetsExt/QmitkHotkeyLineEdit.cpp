@@ -27,14 +27,12 @@ QmitkHotkeyLineEdit::QmitkHotkeyLineEdit( QWidget* parent )
 : QLineEdit(parent)
 {
   this->Init();
-  //this->setReadOnly(true);
 }
 
 QmitkHotkeyLineEdit::QmitkHotkeyLineEdit( const QKeySequence& _QKeySequence, QWidget* parent)
 : QLineEdit(parent)
 {
   this->Init();
-  //this->setReadOnly(true);
   this->SetKeySequence(_QKeySequence);
 }
 
@@ -42,7 +40,6 @@ QmitkHotkeyLineEdit::QmitkHotkeyLineEdit( const QString& _QKeySequenceAsString, 
 : QLineEdit(parent)
 {
   this->Init();
-  //this->setReadOnly(true);
   this->SetKeySequence(_QKeySequenceAsString);
 }
 
@@ -106,3 +103,4 @@ void QmitkHotkeyLineEdit::LineEditTextChanged(const QString & text)
 {
   m_KeySequence = QKeySequence(text.toUpper());
 }
+

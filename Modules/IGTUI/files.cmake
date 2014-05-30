@@ -18,6 +18,9 @@ set(CPP_FILES
   Qmitk/QmitkNavigationDataSourceSelectionWidget.cpp
   Qmitk/QmitkInteractiveTransformationWidget.cpp
   Qmitk/QmitkNavigationToolStorageSelectionWidget.cpp
+
+  Qmitk/QmitkNavigationDataPlayerControlWidget.cpp
+  Qmitk/QmitkNavigationDataSequentialPlayerControlWidget.cpp
 )
 
 set(UI_FILES
@@ -38,6 +41,9 @@ set(UI_FILES
   Qmitk/QmitkNavigationDataSourceSelectionWidgetControls.ui
   Qmitk/QmitkInteractiveTransformationWidgetControls.ui
   Qmitk/QmitkNavigationToolStorageSelectionWidgetControls.ui
+
+  Qmitk/QmitkNavigationDataPlayerControlWidget.ui
+  Qmitk/QmitkNavigationDataSequentialPlayerControlWidget.ui
 )
 
 set(MOC_H_FILES
@@ -60,6 +66,9 @@ set(MOC_H_FILES
   Qmitk/QmitkNavigationDataSourceSelectionWidget.h
   Qmitk/QmitkInteractiveTransformationWidget.h
   Qmitk/QmitkNavigationToolStorageSelectionWidget.h
+
+  Qmitk/QmitkNavigationDataPlayerControlWidget.h
+  Qmitk/QmitkNavigationDataSequentialPlayerControlWidget.h
 )
 
 set(QRC_FILES

@@ -14,6 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef QmitkPropertyViewFactory_h
+#define QmitkPropertyViewFactory_h
+
 #include <mitkProperties.h>
 #include "MitkQtWidgetsExtExports.h"
 
@@ -37,8 +40,7 @@ class MitkQtWidgetsExt_EXPORT QmitkPropertyViewFactory
 
     QmitkPropertyViewFactory();   // hidden, access through GetInstance()
     ~QmitkPropertyViewFactory();
-
-  private:
-
 };
+
+#endif
 

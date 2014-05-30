@@ -44,7 +44,7 @@ namespace mitk
     PlanarDoubleEllipse();
     virtual ~PlanarDoubleEllipse();
 
-    mitkCloneMacro(Self);
+    mitkCloneMacro(Self)
 
     virtual mitk::Point2D ApplyControlPointConstraints(unsigned int index, const Point2D& point);
     virtual void EvaluateFeaturesInternal();

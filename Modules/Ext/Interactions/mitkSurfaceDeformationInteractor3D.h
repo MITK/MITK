@@ -102,7 +102,7 @@ private:
 
   Vector3D m_ObjectNormal;
 
-  Geometry3D::Pointer m_Geometry;
+  BaseGeometry::Pointer m_Geometry;
 
   Surface *m_Surface;
   vtkPolyData *m_PolyData;

@@ -18,7 +18,7 @@ configuration. If it is, the matching variant name is returned. Then the state m
 in its current state that is triggered by this event variant. If this is the case all actions that are associated with this transition
 are queried and executed. The actions themselves are implemented on mitk::DataInteractor level. The following diagram illustrates the process:
 
-\image html sm_and_config.png
+\imageMacro{sm_and_config.png,"",16}
 
 
 Each mitk::BaseRenderer creates a mitk::BindDispatcherInteractor object which encapsulates the connection between the mitk::DataStorage and

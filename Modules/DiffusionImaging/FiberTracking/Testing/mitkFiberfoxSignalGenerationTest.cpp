@@ -74,15 +74,11 @@ void StartSimulation(FiberfoxParameters<double> parameters, FiberBundleX::Pointe
         bool cond = CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage());
         if (!cond)
         {
-            mitk::IOUtil::SaveBaseData(testImage, "/tmp/testImage.dwi");
-            mitk::IOUtil::SaveBaseData(refImage, "/tmp/refImage.dwi");
+            MITK_INFO << "Saving test and rference image to " << mitk::IOUtil::GetTempPath();
+            mitk::IOUtil::SaveBaseData(testImage, mitk::IOUtil::GetTempPath()+"testImage.dwi");
+            mitk::IOUtil::SaveBaseData(refImage, mitk::IOUtil::GetTempPath()+"refImage.dwi");
         }
         MITK_TEST_CONDITION_REQUIRED(cond, message);
-    }
-    else
-    {
-        MITK_INFO << "Saving test image to " << message;
-        mitk::IOUtil::SaveBaseData(testImage, message);
     }
 }
 

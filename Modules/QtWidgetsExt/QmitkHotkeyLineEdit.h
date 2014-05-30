@@ -49,4 +49,5 @@ protected:
 
 };
 
-#endif /* QMITKHOTKEYLINEEDIT_H_ */
+#endif
+

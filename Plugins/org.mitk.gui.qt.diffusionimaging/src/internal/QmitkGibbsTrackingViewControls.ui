@@ -120,8 +120,8 @@
          <string>Start Tractography</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../Modules/QmitkExt/resources/QmitkResources.qrc">
-          <normaloff>:/qmitk/play.xpm</normaloff>:/qmitk/play.xpm</iconset>
+         <iconset resource="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc">
+          <normaloff>:/QtWidgetsExt/play.xpm</normaloff>:/QtWidgetsExt/play.xpm</iconset>
         </property>
        </widget>
       </item>
@@ -140,8 +140,8 @@
          <string>Stop Tractography</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../Modules/QmitkExt/resources/QmitkResources.qrc">
-          <normaloff>:/qmitk/stop.xpm</normaloff>:/qmitk/stop.xpm</iconset>
+         <iconset resource="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc">
+          <normaloff>:/QtWidgetsExt/stop.xpm</normaloff>:/QtWidgetsExt/stop.xpm</iconset>
         </property>
        </widget>
       </item>
@@ -859,8 +859,8 @@
          <string>Save Parameters</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../Modules/QmitkExt/resources/QmitkResources.qrc">
-          <normaloff>:/qmitk/btnMoveDown.png</normaloff>:/qmitk/btnMoveDown.png</iconset>
+         <iconset resource="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc">
+          <normaloff>:/QtWidgetsExt/btnMoveDown.png</normaloff>:/QtWidgetsExt/btnMoveDown.png</iconset>
         </property>
        </widget>
       </item>
@@ -879,8 +879,8 @@
          <string>Load Parameters</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../Modules/QmitkExt/resources/QmitkResources.qrc">
-          <normaloff>:/qmitk/btnMoveUp.png</normaloff>:/qmitk/btnMoveUp.png</iconset>
+         <iconset resource="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc">
+          <normaloff>:/QtWidgetsExt/btnMoveUp.png</normaloff>:/QtWidgetsExt/btnMoveUp.png</iconset>
         </property>
        </widget>
       </item>
@@ -1109,7 +1109,7 @@
  <layoutdefault spacing="6" margin="11"/>
  <resources>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>
-  <include location="../../../../Modules/QmitkExt/resources/QmitkResources.qrc"/>
+  <include location="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc"/>
  </resources>
  <connections/>
 </ui>

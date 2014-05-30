@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkNavigationDataPlayerControlWidget</class>
+ <widget class="QWidget" name="QmitkNavigationDataPlayerControlWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>364</width>
+    <height>95</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="6">
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLabel" name="secLabel">
+       <property name="text">
+        <string>sec</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="QLabel" name="msecLabel">
+       <property name="text">
+        <string>msec</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLCDNumber" name="secLCDNumber">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(250, 250, 250);</string>
+       </property>
+       <property name="numDigits">
+        <number>2</number>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+       <property name="intValue" stdset="0">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="minLabel">
+       <property name="text">
+        <string>min</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLCDNumber" name="minLCDNumber">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(250, 250, 250);</string>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="numDigits">
+        <number>3</number>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+       <property name="intValue" stdset="0">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QLCDNumber" name="msecLCDNumber">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(60, 60, 60);
+color: rgb(250, 250, 250);</string>
+       </property>
+       <property name="numDigits">
+        <number>3</number>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Flat</enum>
+       </property>
+       <property name="intValue" stdset="0">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QSlider" name="samplePositionHorizontalSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="m_PlayerButtonsLayout">
+     <item>
+      <widget class="QPushButton" name="restartPushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Restart from beginning</string>
+       </property>
+       <property name="text">
+        <string>Restart</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/IGTUI.qrc">
+         <normaloff>:/IGTUI/firstframe.png</normaloff>:/IGTUI/firstframe.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="playPushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Play at normal speed</string>
+       </property>
+       <property name="text">
+        <string>Play</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/IGTUI.qrc">
+         <normaloff>:/IGTUI/play.png</normaloff>
+         <activeon>:/IGTUI/pause.png</activeon>:/IGTUI/play.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stopPushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Stop playing</string>
+       </property>
+       <property name="text">
+        <string>Stop</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/IGTUI.qrc">
+         <normaloff>:/IGTUI/stop.png</normaloff>:/IGTUI/stop.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>playPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkNavigationDataPlayerControlWidget</receiver>
+   <slot>OnPlayPause()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>181</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>181</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>restartPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkNavigationDataPlayerControlWidget</receiver>
+   <slot>OnRestart()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>62</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>181</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stopPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkNavigationDataPlayerControlWidget</receiver>
+   <slot>OnStop()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>301</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>181</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>OnStop()</slot>
+  <slot>OnRestart()</slot>
+  <slot>OnPlayPause()</slot>
+ </slots>
+</ui>

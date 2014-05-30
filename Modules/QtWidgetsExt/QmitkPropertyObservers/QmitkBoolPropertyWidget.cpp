@@ -109,4 +109,3 @@ void QmitkBoolPropertyWidget::onToggle(bool on)
   }
 }
 
-

@@ -182,7 +182,7 @@
     <view id="org.mitk.views.denoisingview"
           name="DWI Denoising"
           class="QmitkDenoisingView"
-          icon="resources/diffusionregistration.png" />
+          icon="resources/denoisingicon.png" />
   </extension>
 
 </plugin>

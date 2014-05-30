@@ -74,8 +74,9 @@ public:
     return m_PiecewiseFunction->GetSize();
   }
 
-  void DoubleClickOnHandle(int /*handle*/)
-  {}
+  void DoubleClickOnHandle(int)
+  {
+  }
 
   void MoveFunctionPoint(int index, std::pair<double,double> pos);
 
@@ -124,5 +125,6 @@ protected:
   QString m_Title;
 
 };
+
 #endif
 

@@ -5,6 +5,7 @@ set(CPP_FILES
   Algorithms/mitkPlanarFigureSource.cpp
   Algorithms/mitkPlanarFigureToPlanarFigureFilter.cpp
   DataManagement/mitkPlanarAngle.cpp
+  DataManagement/mitkPlanarBezierCurve.cpp
   DataManagement/mitkPlanarCircle.cpp
   DataManagement/mitkPlanarDoubleEllipse.cpp
   DataManagement/mitkPlanarEllipse.cpp

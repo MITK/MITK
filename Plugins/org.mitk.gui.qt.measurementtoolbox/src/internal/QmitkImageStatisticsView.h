@@ -75,10 +75,14 @@ public:
   void OnSelectionChanged( berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes );
 
   static const std::string VIEW_ID;
+  static const int STAT_TABLE_BASE_HEIGHT;
 
   public slots:
     /** \brief  Called when the statistics update is finished, sets the results to GUI.*/
     void OnThreadedStatisticsCalculationEnds();
+
+    /** \brief Update bin size for histogram resolution. */
+    void OnHistogramBinSizeSliderValueChanged(int);
 
     protected slots:
       /** \brief  Saves the histogram to the clipboard */
@@ -98,7 +102,7 @@ signals:
 
 protected:
   /** \brief  Writes the calculated statistics to the GUI */
-  void FillStatisticsTableView( const mitk::ImageStatisticsCalculator::Statistics &s,
+  void FillStatisticsTableView( const std::vector<mitk::ImageStatisticsCalculator::Statistics> &s,
     const mitk::Image *image );
   /** \brief  Removes statistics from the GUI */
   void InvalidateStatisticsTableView();
@@ -172,7 +176,7 @@ protected:
   bool m_DataNodeSelectionChanged;
   bool m_Visible;
 
-  mitk::Point3D     m_WorldMin;
-  mitk::Point3D     m_WorldMax;
+  std::vector<mitk::Point3D>     m_WorldMinList;
+  std::vector<mitk::Point3D>     m_WorldMaxList;
 };
 #endif // QmitkImageStatisticsView_H__INCLUDED

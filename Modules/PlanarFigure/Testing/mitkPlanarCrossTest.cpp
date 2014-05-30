@@ -95,15 +95,15 @@ static void TestPlanarCrossPlacement( mitk::PlanarCross::Pointer planarCross )
   mitk::PlanarFigure::PolyLineType::const_iterator iter1 = polyLine1.begin();
 
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = iter0->Point;
+  const mitk::Point2D& pp0 = *iter0;
   iter0++;
-  const mitk::Point2D& pp1 = iter0->Point;
+  const mitk::Point2D& pp1 = *iter0;
   MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
     || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
 
-  const mitk::Point2D& pp2 = iter1->Point;
+  const mitk::Point2D& pp2 = *iter1;
   iter1++;
-  const mitk::Point2D& pp3 = iter1->Point;
+  const mitk::Point2D& pp3 = *iter1;
   MITK_TEST_CONDITION( ((pp2 == p2) && (pp3 == p3))
     || ((pp2 == p3) && (pp3 == p2)), "Correct polyline 2" );
 
@@ -155,9 +155,9 @@ static void TestPlanarCrossPlacementSingleLine(mitk::PlanarCross::Pointer planar
   MITK_TEST_CONDITION( planarCross->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = iter->Point;
+  const mitk::Point2D& pp0 = *iter;
   iter++;
-  const mitk::Point2D& pp1 = iter->Point;
+  const mitk::Point2D& pp1 = *iter;
   MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
     || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
 
@@ -370,7 +370,7 @@ int mitkPlanarCrossTest(int /* argc */, char* /*argv*/[])
   // **************************************************************************
   // 1. Double-line mode instantiation and basic tests
   mitk::PlanarCross::Pointer planarCross = mitk::PlanarCross::New();
-  planarCross->SetGeometry2D( planeGeometry );
+  planarCross->SetPlaneGeometry( planeGeometry );
 
   // first test: did this work?
   MITK_TEST_CONDITION_REQUIRED( planarCross.IsNotNull(), "Testing instantiation" );
@@ -387,7 +387,7 @@ int mitkPlanarCrossTest(int /* argc */, char* /*argv*/[])
   // 2. Single-line mode instantiation and basic tests
   planarCross = mitk::PlanarCross::New();
   planarCross->SingleLineModeOn();
-  planarCross->SetGeometry2D( planeGeometry );
+  planarCross->SetPlaneGeometry( planeGeometry );
 
   // test: single-line mode?
   MITK_TEST_CONDITION_REQUIRED( planarCross->GetSingleLineMode(), "Testing activation of single-line mode" );
@@ -399,7 +399,7 @@ int mitkPlanarCrossTest(int /* argc */, char* /*argv*/[])
   // **************************************************************************
   // 3. Tests of application of spatial constraints for double-line mode
   planarCross = mitk::PlanarCross::New();
-  planarCross->SetGeometry2D( planeGeometry );
+  planarCross->SetPlaneGeometry( planeGeometry );
 
   // Test placement with various out-of-bounds control points (automatic application of
   // constraints expected)

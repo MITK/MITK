@@ -65,26 +65,6 @@ else \
   }
 
 ///
-/// an assert macro for throwing exceptions from an assert
-///
-#define endoAssert(a) if(!(a)) { \
-std::ostringstream s; \
-s << mitk::EndoDebug::GetInstance().GetFilenameWithoutExtension(__FILE__) << ", " \
-  << __LINE__ << ", failed: " << #a; \
-throw std::invalid_argument(s.str()); }
-
-///
-/// same as above but with an output error stream
-/// use it like this: endoAssertMsg( file.read() == true, file << "could not be read" );
-///
-#define endoAssertMsg(a, msg) if(!(a)) { \
-  std::ostringstream s; \
-  s << mitk::EndoDebug::GetInstance().GetFilenameWithoutExtension(__FILE__) << ", " \
-    << __LINE__ << ": " << msg; \
-  throw std::invalid_argument(s.str()); \
-  }
-
-///
 /// definition of the corresponding directory separator
 ///
 #ifdef WIN32
@@ -92,5 +72,29 @@ throw std::invalid_argument(s.str()); }
 #else
   static const std::string DIR_SEPARATOR = "/";
 #endif
+
+#define endoSetInput(name, type) \
+public: \
+    virtual void Set##name (const type _arg) \
+    { \
+        if ( this->m_##name != _arg ) \
+        { \
+            this->m_##name = _arg; \
+        } \
+    } \
+protected: \
+    const type m_##name;
+
+#define endoSetOutput(name, type) \
+public: \
+    virtual void Set##name (type _arg) \
+    { \
+        if ( this->m_##name != _arg ) \
+        { \
+            this->m_##name = _arg; \
+        } \
+    } \
+protected: \
+    type m_##name;
 
 #endif // mitkEndoMacros_h

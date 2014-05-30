@@ -1,4 +1,9 @@
-cmake_minimum_required(VERSION 2.8.9)
+set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
+if(DESIRED_QT_VERSION MATCHES "4")
+  cmake_minimum_required(VERSION 2.8.9)
+else()
+  cmake_minimum_required(VERSION 2.8.12)
+endif()
 
 #-----------------------------------------------------------------------------
 # Include ctest launchers for dashboard in case of makefile generator
@@ -158,7 +163,6 @@ endmacro()
 # Qt version related variables
 
 env_option(MITK_USE_QT "Use Nokia's Qt library" ON)
-set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 set(MITK_DESIRED_QT_VERSION ${DESIRED_QT_VERSION})
 
 if(MITK_USE_QT)
@@ -168,12 +172,15 @@ if(MITK_USE_QT)
     find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
     set(MITK_USE_Qt4 TRUE)
     set(MITK_USE_Qt5 FALSE)
-  endif(DESIRED_QT_VERSION MATCHES 4)
+  endif()
   if(DESIRED_QT_VERSION MATCHES 5)
     set(MITK_QT5_MINIMUM_VERSION 5.0.0)
     set(MITK_USE_Qt4 FALSE)
     set(MITK_USE_Qt5 TRUE)
-  endif(DESIRED_QT_VERSION MATCHES 5)
+    set(QT5_INSTALL_PREFIX "" CACHE PATH "The install location of Qt5")
+    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${QT5_INSTALL_PREFIX})
+    find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+  endif()
 else()
   set(MITK_USE_Qt4 FALSE)
   set(MITK_USE_Qt5 FALSE)

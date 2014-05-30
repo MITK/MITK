@@ -55,3 +55,4 @@ void QmitkCrossWidget::mouseMoveEvent(QMouseEvent * )
 void QmitkCrossWidget::mouseReleaseEvent(QMouseEvent*)
 {
 }
+

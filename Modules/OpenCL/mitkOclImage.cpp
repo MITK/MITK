@@ -321,7 +321,7 @@ float mitk::OclImage::GetSpacing(int idx)
 {
   if (this->m_dim > idx)
   {
-    const float* imSpacing = m_Image->GetSlicedGeometry()->GetFloatSpacing();
+    const mitk::Vector3D imSpacing = m_Image->GetSlicedGeometry()->GetSpacing();
 
     return imSpacing[idx];
   }

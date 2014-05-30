@@ -476,13 +476,13 @@ namespace mitk
           throw std::runtime_error( "Masking not possible for non-closed figures" );
         }
 
-        const Geometry3D *imageGeometry = timeSliceImage->GetUpdatedGeometry();
+        const BaseGeometry *imageGeometry = timeSliceImage->GetUpdatedGeometry();
         if ( imageGeometry == NULL )
         {
           throw std::runtime_error( "Image geometry invalid!" );
         }
 
-        const Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+        const PlaneGeometry *planarFigureGeometry2D = m_PlanarFigure->GetPlaneGeometry();
         if ( planarFigureGeometry2D == NULL )
         {
           throw std::runtime_error( "Planar-Figure not yet initialized!" );
@@ -592,7 +592,7 @@ namespace mitk
   template < typename TPixel, unsigned int VImageDimension >
       void PartialVolumeAnalysisHistogramCalculator::InternalReorientImagePlane(
           const itk::Image< TPixel, VImageDimension > *image,
-          mitk::Geometry3D* , mitk::Geometry3D* planegeo3D, int additionalIndex )
+          mitk::BaseGeometry* , mitk::BaseGeometry* planegeo3D, int additionalIndex )
   {
 
     MITK_DEBUG << "InternalReorientImagePlane() start";
@@ -621,8 +621,8 @@ namespace mitk
 
     // Size
     typename ResamplerType::SizeType size;
-    size[0] = planegeo->GetParametricExtentInMM(0) / spacing[0];
-    size[1] = planegeo->GetParametricExtentInMM(1) / spacing[1];
+    size[0] = planegeo->GetExtentInMM(0) / spacing[0];
+    size[1] = planegeo->GetExtentInMM(1) / spacing[1];
     size[2] = 1+2*m_PlanarFigureThickness; // klaus add +2*m_PlanarFigureThickness
     MITK_DEBUG << "setting size2:="<<size[2] << " (before " << 1 << ")";
     resampler->SetSize( size );
@@ -1013,9 +1013,9 @@ namespace mitk
     // (The polyline points are shifted by -0.5 in z-direction to make sure
     // that the extrusion filter, which afterwards elevates all points by +0.5
     // in z-direction, creates a 3D object which is cut by the the plane z=0)
-    const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+    const mitk::PlaneGeometry *planarFigureGeometry2D = m_PlanarFigure->GetPlaneGeometry();
     const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
-    const mitk::Geometry3D *imageGeometry3D = m_InternalImage->GetGeometry( 0 );
+    const mitk::BaseGeometry *imageGeometry3D = m_InternalImage->GetGeometry( 0 );
 
     vtkPolyData *polyline = vtkPolyData::New();
     polyline->Allocate( 1, 1 );
@@ -1053,7 +1053,7 @@ namespace mitk
 
       // Convert 2D point back to the local index coordinates of the selected
       // image
-      mitk::Point2D point2D = it->Point;
+      mitk::Point2D point2D = *it;
       planarFigureGeometry2D->WorldToIndex(point2D, point2D);
       point2D[0] -= 0.5/m_UpsamplingFactor;
       point2D[1] -= 0.5/m_UpsamplingFactor;

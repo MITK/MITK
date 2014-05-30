@@ -52,7 +52,8 @@ AffineInteractor3D
   m_Precision( 6.5 ),
   m_InteractionMode( INTERACTION_MODE_TRANSLATION )
 {
-  m_OriginalGeometry = Geometry3D::New();
+  Geometry3D::Pointer geo3D = Geometry3D::New();
+  m_OriginalGeometry = dynamic_cast<BaseGeometry*>(geo3D.GetPointer());
 
   // Initialize vector arithmetic
   m_ObjectNormal[0] = 0.0;
@@ -140,10 +141,10 @@ float AffineInteractor3D
 
   //if ( curveModel != NULL )
   //{
-  //  // Get the Geometry2D of the window the user interacts with (for 2D point
+  //  // Get the PlaneGeometry of the window the user interacts with (for 2D point
   //  // projection)
   //  BaseRenderer *renderer = stateEvent->GetEvent()->GetSender();
-  //  const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
+  //  const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
   //  // For reading on the points, Ids etc
   //  //CurveModel::PointSetType *pointSet = curveModel->GetPointSet( timeStep );
@@ -355,7 +356,7 @@ bool AffineInteractor3D
 
       // Make deep copy of current Geometry3D of the plane
       data->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
-      m_OriginalGeometry = static_cast< Geometry3D * >(
+      m_OriginalGeometry = static_cast< BaseGeometry * >(
         data->GetGeometry( timeStep )->Clone().GetPointer() );
 
       ok = true;
@@ -431,7 +432,7 @@ bool AffineInteractor3D
           // Reset current Geometry3D to original state (pre-interaction) and
           // apply rotation
           RotationOperation op( OpROTATE, rotationCenter, rotationAxis, rotationAngle );
-          Geometry3D::Pointer newGeometry = static_cast< Geometry3D * >(
+          BaseGeometry::Pointer newGeometry = static_cast< BaseGeometry * >(
             m_OriginalGeometry->Clone().GetPointer() );
           newGeometry->ExecuteOperation( &op );
           data->SetClonedGeometry(newGeometry, timeStep);

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSliceNavigationController.h"
 #include "mitkDataStorage.h"
 #include "mitkStandaloneDataStorage.h"
-
+#include "mitkSlicedGeometry3D.h"
 #include <QWidget>
 
 class MitkQtWidgetsExt_EXPORT QmitkSliceWidget : public QWidget, public Ui::QmitkSliceWidgetUi
@@ -71,8 +71,6 @@ public slots:
 
  void SetData( mitk::DataNode::Pointer node  );
 
- // void AddData( mitk::DataNode::Pointer node);
-
   void SetData( mitk::DataNode::Pointer node, mitk::SliceNavigationController::ViewDirection view );
 
   void InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection );
@@ -88,7 +86,6 @@ protected:
 
   QmitkRenderWindow* m_RenderWindow;
   mitk::SliceNavigationController::ViewDirection m_View;
-  //int newVariable;
 
 private:
 
@@ -101,4 +98,5 @@ private:
 
 };
 
-#endif /*QMITKSLICEWIDGET_H_*/
+#endif
+

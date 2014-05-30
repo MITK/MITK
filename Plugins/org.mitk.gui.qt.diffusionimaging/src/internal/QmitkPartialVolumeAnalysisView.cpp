@@ -330,7 +330,7 @@ void QmitkPartialVolumeAnalysisView::ExportClusteringResults()
     if (m_ClusteringResult.IsNull() || m_SelectedImage.IsNull())
         return;
 
-    mitk::Geometry3D* geometry = m_SelectedImage->GetGeometry();
+    mitk::BaseGeometry* geometry = m_SelectedImage->GetGeometry();
 
     itk::Image< short, 3>::Pointer referenceImage = itk::Image< short, 3>::New();
 

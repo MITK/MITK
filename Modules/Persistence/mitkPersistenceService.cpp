@@ -13,7 +13,6 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
 #include "mitkPersistenceService.h"
 #include "mitkStandaloneDataStorage.h"
 #include "mitkUIDGenerator.h"
@@ -23,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usGetModuleContext.h"
 #include <itksys/SystemTools.hxx>
 
+//not used at the moment because of bug 17729 (using the strings directly instead until the bug is fixed)
 const std::string mitk::PersistenceService::PERSISTENCE_PROPERTY_NAME("PersistenceNode");
-
 const std::string mitk::PersistenceService::PERSISTENCE_PROPERTYLIST_NAME("PersistenceService");
 
 
@@ -51,6 +50,8 @@ std::string mitk::PersistenceService::GetDefaultPersistenceFile()
   std::string file = "PersistentData.mitk";
   us::ModuleContext* context = us::GetModuleContext();
   std::string contextDataFile = context->GetDataFile("PersistentData.mitk");
+  itksys::SystemTools::MakeDirectory(context->GetDataFile("").c_str());
+
   if( !contextDataFile.empty() )
   {
       file = contextDataFile;
@@ -176,6 +177,8 @@ bool mitk::PersistenceService::Load(const std::string& fileName, bool enforceRel
   if(theFile.empty())
       theFile = PersistenceService::GetDefaultPersistenceFile();
 
+  MITK_INFO << "Load persistence data from file: " << theFile;
+
   if( !itksys::SystemTools::FileExists(theFile.c_str()) )
       return false;
 
@@ -229,7 +232,8 @@ void mitk::PersistenceService::SetAutoLoadAndSave(bool autoLoadAndSave)
 {
   this->Initialize();
   m_AutoLoadAndSave = autoLoadAndSave;
-  std::string id = PERSISTENCE_PROPERTYLIST_NAME;
+  //std::string id = PERSISTENCE_PROPERTYLIST_NAME; //see bug 17729
+  std::string id = "PersistenceService";
   mitk::PropertyList::Pointer propList = this->GetPropertyList( id );
   propList->Set("m_AutoLoadAndSave", m_AutoLoadAndSave);
   this->Save();
@@ -260,7 +264,8 @@ us::ModuleContext* mitk::PersistenceService::GetModuleContext()
 std::string mitk::PersistenceService::GetPersistenceNodePropertyName()
 {
   this->Initialize();
-  return PERSISTENCE_PROPERTY_NAME;
+  //return PERSISTENCE_PROPERTY_NAME; //see bug 17729
+  return "PersistenceNode";
 }
 mitk::DataStorage::SetOfObjects::Pointer mitk::PersistenceService::GetDataNodes(mitk::DataStorage* ds)
 {
@@ -275,8 +280,11 @@ mitk::DataStorage::SetOfObjects::Pointer mitk::PersistenceService::GetDataNodes(
 
       this->ClonePropertyList( (*it).second, node->GetPropertyList() );
 
-      node->SetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str(), true );
+
       node->SetName( name );
+      MITK_DEBUG << "Persistence Property Name: " <<PERSISTENCE_PROPERTY_NAME.c_str();
+      //node->SetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str() , true ); //see bug 17729
+      node->SetBoolProperty( "PersistenceNode" , true );
 
       ds->Add(node);
       set->push_back( node );
@@ -297,7 +305,8 @@ bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes( cons
   {
       mitk::DataNode* node = *sourceIter;
       bool isPersistenceNode = false;
-      node->GetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str(), isPersistenceNode );
+      //node->GetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str(), isPersistenceNode ); //see bug 17729
+      node->GetBoolProperty( "PersistenceNode", isPersistenceNode );
 
       if( isPersistenceNode )
       {
@@ -368,7 +377,8 @@ void mitk::PersistenceService::Initialize()
 
   // Load Default File in any case
   this->Load();
-  std::string id = mitk::PersistenceService::PERSISTENCE_PROPERTYLIST_NAME;
+  //std::string id = mitk::PersistenceService::PERSISTENCE_PROPERTYLIST_NAME; //see bug 17729
+  std::string id = "PersistenceService";
   mitk::PropertyList::Pointer propList = this->GetPropertyList( id );
   bool autoLoadAndSave = true;
   propList->GetBoolProperty("m_AutoLoadAndSave", autoLoadAndSave);

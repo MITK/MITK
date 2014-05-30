@@ -159,7 +159,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   slicedGeometry->SetOrigin(origin);
 
   // get the PlaneGeometry for the first slice of the original image
-  mitk::PlaneGeometry::Pointer plane = dynamic_cast<mitk::PlaneGeometry*>( inputGeometry->GetGeometry2D( 0 )->Clone().GetPointer() );
+  mitk::PlaneGeometry::Pointer plane = dynamic_cast<mitk::PlaneGeometry*>( inputGeometry->GetPlaneGeometry( 0 )->Clone().GetPointer() );
   assert( plane );
 
   // re-initialize the plane according to the new requirements:

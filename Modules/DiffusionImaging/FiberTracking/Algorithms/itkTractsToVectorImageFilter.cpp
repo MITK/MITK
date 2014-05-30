@@ -68,7 +68,7 @@ itk::Point<float, 3> TractsToVectorImageFilter< PixelType >::GetItkPoint(double 
 template< class PixelType >
 void TractsToVectorImageFilter< PixelType >::GenerateData()
 {
-    mitk::Geometry3D::Pointer geometry = m_FiberBundle->GetGeometry();
+  mitk::BaseGeometry::Pointer geometry = m_FiberBundle->GetGeometry();
 
     // calculate new image parameters
     itk::Vector<double> spacing;
@@ -86,7 +86,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
     {
         spacing = geometry->GetSpacing();
         origin = geometry->GetOrigin();
-        mitk::Geometry3D::BoundsArrayType bounds = geometry->GetBounds();
+        mitk::BaseGeometry::BoundsArrayType bounds = geometry->GetBounds();
         origin[0] += bounds.GetElement(0);
         origin[1] += bounds.GetElement(2);
         origin[2] += bounds.GetElement(4);

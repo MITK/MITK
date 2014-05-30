@@ -116,6 +116,10 @@ public:
     if (! CompareDoubles(offset[2], 2.3234)) identical = false;
 
     MITK_TEST_CONDITION_REQUIRED(identical, "Testing if deserialized calibration is identical to serialized one...");
+
+    // test if invalid strings cause exceptions
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception, modality->DeserializeCalibration("invalid-string"));
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception, modality->DeserializeCalibration("<xml><test></xml>", false));
   }
 
   static void TestFilterPipeline()

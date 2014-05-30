@@ -57,7 +57,7 @@ namespace itk{
       return;
 
     // generate upsampled image
-    mitk::Geometry3D::Pointer geometry = m_FiberBundle->GetGeometry();
+    mitk::BaseGeometry::Pointer geometry = m_FiberBundle->GetGeometry();
     typename OutputImageType::Pointer outImage = this->GetOutput();
 
     // calculate new image parameters

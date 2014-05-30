@@ -30,9 +30,6 @@ See QmitkHistogramWidget for an example of its usage.
 
 class QmitkHistogram: public QwtPlotItem
 {
-
-// Q_OBJECT
-
 public:
     explicit QmitkHistogram(const QString &title = QString::null);
     explicit QmitkHistogram(const QwtText &title);
@@ -64,3 +61,4 @@ private:
 };
 
 #endif
+

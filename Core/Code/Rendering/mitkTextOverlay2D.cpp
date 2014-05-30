@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTextActor.h>
 #include <vtkImageMapper.h>
 #include <vtkTextRenderer.h>
+#include <vtkImageData.h>
 
 mitk::TextOverlay2D::TextOverlay2D()
 {

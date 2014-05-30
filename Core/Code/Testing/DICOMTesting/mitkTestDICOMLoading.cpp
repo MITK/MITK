@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <limits>
 #include "mitkTestDICOMLoading.h"
-
+#include "mitkImage.h"
 #include <stack>
 
 mitk::TestDICOMLoading::TestDICOMLoading()
@@ -58,7 +58,7 @@ void mitk::TestDICOMLoading::ResetUserLocale()
 
 
 
-mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const StringContainer& files, Image::Pointer preLoadedVolume )
+mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const StringContainer& files, itk::SmartPointer<Image> preLoadedVolume )
 {
   for (StringContainer::const_iterator iter = files.begin();
        iter != files.end();
@@ -135,7 +135,6 @@ mitk::TestDICOMLoading::ComponentTypeToString(int type)
 std::string
 mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
 {
-
   std::stringstream result;
 
   if (image == NULL) return result.str();
@@ -154,7 +153,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
 
   // geometry data
   result << "Geometry: \n";
-  Geometry3D* geometry = image->GetGeometry();
+  BaseGeometry* geometry = image->GetGeometry();
   if (geometry)
   {
     AffineTransform3D* transform = geometry->GetIndexToWorldTransform();
@@ -204,12 +203,10 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
       result << "\n";
 
       result << "  " << "TimeBounds: ";
-      const TimeBounds timeBounds = geometry->GetTimeBounds();
+      const TimeBounds timeBounds = image->GetTimeGeometry()->GetTimeBounds(0);
       for (unsigned int i = 0; i < 2; ++i)
           result << timeBounds[i] << " ";
       result << "\n";
-
-
     }
   }
 
@@ -266,7 +263,6 @@ mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference,
                                                   const std::string& test,
                                                   double /*eps*/ )
 {
-
   bool result(true);
 
   // tokenize string, compare each token, if possible by float comparison
@@ -446,4 +442,3 @@ mitk::TestDICOMLoading::ParseDump( const std::string& dump )
 
   return parsedResult;
 }
-

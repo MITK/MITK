@@ -1,0 +1,62 @@
+/**
+\page org_mitk_views_denoisingview DWI Denoising
+
+This view provides the user interface to denoise a diffusion weighted image (DWI) with several methods.
+
+Available sections:
+  - \ref DwiDenoisingUserManualInputData
+  - \ref DwiDenoisingUserManualOutputData
+  - \ref DwiDenoisingUserManualNonLocalMeans
+  - \ref DwiDenoisingUserManualDiscreteGaussian
+  - \ref DwiDenoisingUserManualReferences
+
+\section DwiDenoisingUserManualInputData Input Data
+
+Mandatory Input:
+
+\li Diffusion weigthed image
+
+Optional Input:
+
+\li Binary mask to define a denoising area.
+
+\section DwiDenoisingUserManualOutputData Output Data
+
+\li Denoised DWI: if a mask is set for denoising, all voxel excluding the masked area are set to 0.
+
+\section DwiDenoisingUserManualNonLocalMeans Non-local means filter
+
+Denoise the input DWI using a non local means algorithm. For more details refer to [1] and [2].
+
+Parameters:
+
+\li Searchradius: defines the size of the neighborhood V (Fig. 1 b)) in which the voxels will be weighted to reconstruct the center voxel. The resulting neighborhood size is defined as 2x searchradius + 1 (e.g. a searchradius of 1 generates a neighborhood cube with size 3x3x3).
+
+\li Comparisonradius: defines the size of the compared neighborhoods N (Fig. 1 b)) around each voxel. The resulting neighborhood size is defined as 2x comaprisonradius + 1 (e.g. a comparisonradius of 1 generates a neighborhood cube with size 3x3x3).
+
+\li Noise variance: the variance of the noise need to be set for filtering. An estimation of the noise varinace will be implemented soon.
+
+\li Rician adaption: if checked the non-local means uses an adaption for Rician distributed noise.
+
+\li Joint information: if checked the whole DWI is seen as a vector image, weighting each voxels complete vector, instead of weighting each channel seperate. (This might be a bit faster, but is less accurate)
+
+\imageMacro{NLM.png,"Fig. 1: a) View using the Non-local means filter  b) 2D illustration of the Non-local means principle [1]",16.00}
+
+\section DwiDenoisingUserManualDiscreteGaussian Discrete gaussian filter
+
+Denoise the input DWI using a discrete gaussian filter.
+
+Parameters:
+
+\li Variance: defines the varinance of the gaussian distribution to denoise the image.
+
+\imageMacro{GaussianFilter.png,"Fig. 2: View using the discrete gaussian filter",8.04}
+
+
+\section DwiDenoisingUserManualReferences References
+
+[1] Wiest-Daesslé et al. Non-Local Means Variants for Denoising of Diffusion-Weigthed and Diffusion Tensor MRI. MICCAI 2007, Part II, LNCS 4792, pp- 344-351.
+
+[2] Wiest-Daesslé et al. Rician Noise Removal by Non-Local Means Filtering for Low Signal-to-Noise Ratio MRI: Applications to DT-MRI. MICCAI 2008, Part II, LNCS 5242, pp. 171-179.
+
+*/

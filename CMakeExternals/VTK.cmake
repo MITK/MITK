@@ -48,20 +48,15 @@ if(NOT DEFINED VTK_DIR)
   endif()
 
   if(MITK_USE_QT)
-    if(DESIRED_QT_VERSION MATCHES 4) # current VTK package has a HARD Qt 4 dependency
-      list(APPEND additional_cmake_args
-          -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION}
-          -DVTK_USE_GUISUPPORT:BOOL=ON
-          -DVTK_USE_QVTK_QTOPENGL:BOOL=OFF
-          -DVTK_USE_QT:BOOL=ON
-          -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-          -DModule_vtkGUISupportQt:BOOL=ON
-          -DModule_vtkGUISupportQtWebkit:BOOL=ON
-          -DModule_vtkGUISupportQtSQL:BOOL=ON
-          -DModule_vtkRenderingQt:BOOL=ON
-          -DVTK_Group_Qt:BOOL=ON
-       )
-     endif()
+    list(APPEND additional_cmake_args
+        -DVTK_QT_VERSION:STRING=${DESIRED_QT_VERSION}
+        -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+        -DModule_vtkGUISupportQt:BOOL=ON
+        -DModule_vtkGUISupportQtWebkit:BOOL=ON
+        -DModule_vtkGUISupportQtSQL:BOOL=ON
+        -DModule_vtkRenderingQt:BOOL=ON
+        -DVTK_Group_Qt:BOOL=ON
+     )
   endif()
 
   set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.1.0.tar.gz)

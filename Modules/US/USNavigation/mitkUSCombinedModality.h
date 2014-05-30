@@ -127,6 +127,8 @@ namespace mitk {
     * If the bool flag is true, all prior calibrations will be deleted.
     * If the flag is set to false, prior calibrations will be retained, but overwritten
     * if one of equal name is present.
+    *
+    * \throws mitk::Exception if the given string could not be parsed correctly.
     */
     void DeserializeCalibration(const std::string &xmlString, bool clearPreviousCalibrations = true);
 

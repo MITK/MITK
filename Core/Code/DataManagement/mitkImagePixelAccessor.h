@@ -75,7 +75,7 @@ class Image;
 
     /** \brief Pointer to the used Geometry.
      *  Since Geometry can be different to the Image (if memory was forced to be coherent) it is necessary to store Geometry separately. */
-    Geometry3D::Pointer m_Geometry;
+    BaseGeometry::Pointer m_Geometry;
 
     /** \brief A Subregion defines an arbitrary area within the image.
      *  If no SubRegion is defined, the whole ImageDataItem or Image is regarded.

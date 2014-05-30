@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestDICOMLoading.h"
+#include "mitkImage.h"
 
 std::vector<std::string> LoadDumps(const std::string& fileName)
 {

@@ -27,15 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkPointSetDataInteractor.h>
 
-#include "btnLoad.xpm"
-#include "btnSave.xpm"
-#include "btnClear.xpm"
-#include "btnSetPoints.xpm"
-#include "btnSetPointsManually.xpm"
-#include "btnUp.xpm"
-#include "btnDown.xpm"
-
-
 #include <mitkDataInteractor.h>
 
 
@@ -81,8 +72,6 @@ QmitkPointListWidget::~QmitkPointListWidget()
 
 void QmitkPointListWidget::SetupConnections()
 {
-  //m_PointListView->setModel(m_PointListModel);
-
   connect(this->m_LoadPointsBtn, SIGNAL(clicked()), this, SLOT(OnBtnLoadPoints()));
   connect(this->m_SavePointsBtn, SIGNAL(clicked()), this, SLOT(OnBtnSavePoints()));
   connect(this->m_MovePointUpBtn, SIGNAL(clicked()), this, SLOT(MoveSelectedPointUp()));
@@ -98,46 +87,46 @@ void QmitkPointListWidget::SetupUi()
 {
   //Setup the buttons
 
-  m_ToggleAddPoint = new QPushButton();//iconSetPoints, "", this);
+  m_ToggleAddPoint = new QPushButton();
   m_ToggleAddPoint->setMaximumSize(25,25);
   m_ToggleAddPoint->setCheckable(true);
   m_ToggleAddPoint->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");
-  QIcon iconAdd(btnSetPoints_xpm);
+  QIcon iconAdd(":/QtWidgetsExt/btnSetPoints.xpm");
   m_ToggleAddPoint->setIcon(iconAdd);
 
-  m_AddPoint = new QPushButton();//iconSetPoints, "", this);
+  m_AddPoint = new QPushButton();
   m_AddPoint->setMaximumSize(25,25);
   m_AddPoint->setToolTip("Manually add point");
-  QIcon iconAddManually(btnSetPointsManually_xpm);
+  QIcon iconAddManually(":/QtWidgetsExt/btnSetPointsManually.xpm");
   m_AddPoint->setIcon(iconAddManually);
 
   m_RemovePointBtn = new QPushButton();
   m_RemovePointBtn->setMaximumSize(25, 25);
-  const QIcon iconDel(btnClear_xpm);
+  const QIcon iconDel(":/QtWidgetsExt/btnClear.xpm");
   m_RemovePointBtn->setIcon(iconDel);
   m_RemovePointBtn->setToolTip("Erase one point from list   (Hotkey: DEL)");
 
   m_MovePointUpBtn = new QPushButton();
   m_MovePointUpBtn->setMaximumSize(25, 25);
-  const QIcon iconUp(btnUp_xpm);
+  const QIcon iconUp(":/QtWidgetsExt/btnUp.xpm");
   m_MovePointUpBtn->setIcon(iconUp);
   m_MovePointUpBtn->setToolTip("Swap selected point upwards   (Hotkey: F2)");
 
   m_MovePointDownBtn = new QPushButton();
   m_MovePointDownBtn->setMaximumSize(25, 25);
-  const QIcon iconDown(btnDown_xpm);
+  const QIcon iconDown(":/QtWidgetsExt/btnDown.xpm");
   m_MovePointDownBtn->setIcon(iconDown);
   m_MovePointDownBtn->setToolTip("Swap selected point downwards   (Hotkey: F3)");
 
   m_SavePointsBtn = new QPushButton();
   m_SavePointsBtn->setMaximumSize(25, 25);
-  QIcon iconSave(btnSave_xpm);
+  QIcon iconSave(":/QtWidgetsExt/btnSave.xpm");
   m_SavePointsBtn->setIcon(iconSave);
   m_SavePointsBtn->setToolTip("Save points to file");
 
   m_LoadPointsBtn = new QPushButton();
   m_LoadPointsBtn->setMaximumSize(25, 25);
-  QIcon iconLoad(btnLoad_xpm);
+  QIcon iconLoad(":/QtWidgetsExt/btnLoad.xpm");
   m_LoadPointsBtn->setIcon(iconLoad);
   m_LoadPointsBtn->setToolTip("Load list of points from file (REPLACES current content)");
 
@@ -189,9 +178,6 @@ void QmitkPointListWidget::SetupUi()
   lay2->addWidget(m_SavePointsBtn);
   lay2->addWidget(m_LoadPointsBtn);
 
-
-  //lay2->addSpacing();;
-
   lay1->insertWidget(i,m_PointListView);
   this->setLayout(lay1);
 }
@@ -225,7 +211,7 @@ void QmitkPointListWidget::OnBtnSavePoints()
   // let the user choose a file
   std::string name("");
 
-  QString fileNameProposal = QString("/PointSet.mps");//.arg(m_PointSetNode->GetName().c_str()); //"PointSet.mps";
+  QString fileNameProposal = QString("/PointSet.mps");
   QString aFilename = QFileDialog::getSaveFileName( NULL, "Save point set", QDir::currentPath() + fileNameProposal, "MITK Pointset (*.mps)" );
   if ( aFilename.isEmpty() )
     return;
@@ -268,17 +254,7 @@ void QmitkPointListWidget::OnBtnLoadPoints()
 
     // loading successful
 
-    //      bool interactionOn( m_Interactor.IsNotNull() );
-    //      if (interactionOn)
-    //      {
-    //        OnEditPointSetButtonToggled(false);
-    //      }
-    //
     this->SetPointSet(pointSet);
-    //      if (interactionOn)
-    //      {
-    //        OnEditPointSetButtonToggled(true);
-    //      }
   }
   catch(...)
   {
@@ -384,7 +360,6 @@ void QmitkPointListWidget::OnBtnAddPointManually()
 
 void QmitkPointListWidget::OnListDoubleClick()
 {
-  ;
 }
 
 void QmitkPointListWidget::OnPointSelectionChanged()
@@ -392,12 +367,11 @@ void QmitkPointListWidget::OnPointSelectionChanged()
   emit this->PointSelectionChanged();
 }
 
-void QmitkPointListWidget::DeactivateInteractor(bool /*deactivate*/)
+void QmitkPointListWidget::DeactivateInteractor(bool)
 {
-  ;
 }
 
-void QmitkPointListWidget::EnableEditButton( bool enabled )
+void QmitkPointListWidget::EnableEditButton(bool enabled)
 {
   m_EditAllowed = enabled;
   if (enabled == false)
@@ -408,7 +382,7 @@ void QmitkPointListWidget::EnableEditButton( bool enabled )
 }
 
 
-void QmitkPointListWidget::ObserveNewNode( mitk::DataNode* node )
+void QmitkPointListWidget::ObserveNewNode(mitk::DataNode* node)
 {
   if (m_DataInteractor.IsNotNull())
     m_DataInteractor->SetDataNode(node);
@@ -433,16 +407,11 @@ void QmitkPointListWidget::ObserveNewNode( mitk::DataNode* node )
     itk::ReceptorMemberCommand<QmitkPointListWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkPointListWidget>::New();
     command->SetCallbackFunction( this, &QmitkPointListWidget::OnNodeDeleted );
     m_NodeObserverTag = m_PointSetNode->AddObserver( itk::DeleteEvent(), command );
-
-
-
   }
   else
   {
     m_NodeObserverTag = 0;
   }
-
-
 
   if (m_EditAllowed == true)
     m_ToggleAddPoint->setEnabled( m_PointSetNode );
@@ -455,7 +424,7 @@ void QmitkPointListWidget::ObserveNewNode( mitk::DataNode* node )
   m_AddPoint->setEnabled(m_PointSetNode);
 }
 
-void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject &  /*e*/ )
+void QmitkPointListWidget::OnNodeDeleted(const itk::EventObject&)
 {
   if(m_PointSetNode.IsNotNull() && ! m_NodeObserverTag)
     m_PointSetNode->RemoveObserver( m_NodeObserverTag );
@@ -524,3 +493,4 @@ void QmitkPointListWidget::UnselectEditButton()
 {
   m_ToggleAddPoint->setChecked(false);
 }
+

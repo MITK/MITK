@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkTransferFunctionGeneratorWidget.h"
 
+#include <mitkImageStatisticsHolder.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkTransferFunctionInitializer.h>
@@ -109,54 +110,6 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset( )
     m_InfoPreset->setText( QString( (std::string("saved ")+ fileNameOutput).c_str() ) );
   else
     m_InfoPreset->setText( QString( std::string("saving failed").c_str() ) );
-                                           /*
-  FILE *f=fopen("c:\\temp.txt","w");
-
-
-  // grayvalue -> opacity
-  {
-    mitk::TransferFunction::ControlPoints scalarOpacityPoints = tf->GetScalarOpacityPoints();
-    fprintf(f,"// grayvalue->opacity \n"
-              "{\n"
-              "  vtkPiecewiseFunction *f=tf->GetScalarOpacityFunction();\n"
-              "  f->RemoveAllPoints();\n");
-    for ( mitk::TransferFunction::ControlPoints::iterator iter = scalarOpacityPoints.begin(); iter != scalarOpacityPoints.end(); ++iter )
-    fprintf(f,"  f->AddPoint(%f,%f);\n",iter->first, iter->second);
-    fprintf(f,"  f->Modified();\n"
-              "}\n");
-  }
-
-  // gradient
-  {
-    mitk::TransferFunction::ControlPoints gradientOpacityPoints = tf->GetGradientOpacityPoints();
-    fprintf(f,"// gradient at grayvalue->opacity \n"
-              "{\n"
-              "  vtkPiecewiseFunction *f=tf->GetGradientOpacityFunction();\n"
-              "  f->RemoveAllPoints();\n");
-    for ( mitk::TransferFunction::ControlPoints::iterator iter = gradientOpacityPoints.begin(); iter != gradientOpacityPoints.end(); ++iter )
-    fprintf(f,"  f->AddPoint(%f,%f);\n",iter->first, iter->second);
-    fprintf(f,"  f->Modified();\n"
-              "}\n");
-  }
-
-  // color
-  {
-    mitk::TransferFunction::RGBControlPoints points = tf->GetRGBPoints();
-
-    fprintf(f,"// grayvalue->color \n"
-              "{\n"
-              "  vtkColorTransferFunction *f=tf->GetColorTransferFunction();\n"
-              "  f->RemoveAllPoints();\n");
-    for ( mitk::TransferFunction::RGBControlPoints::iterator iter = points.begin(); iter != points.end(); ++iter )
-    fprintf(f,"  f->AddRGBPoint(%f,%f,%f,%f);\n",iter->first, iter->second[0], iter->second[1], iter->second[2]);
-    fprintf(f,"  f->Modified();\n"
-              "}\n");
-  }
-
-  fclose(f);
-
-  MITK_INFO << "saved under C:\\temp.txt";
-                                             */
 }
 
 
@@ -180,24 +133,11 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
 
   if(tf.IsNotNull())
   {
-    /*
-    if( histoGramm )
-      tf->InitializeByItkHistogram( histoGramm );
-    */
-
     tfpToChange->SetValue( tf );
 
     m_InfoPreset->setText( QString( (std::string("loaded ")+ fileNameOutput).c_str() ) );
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     emit SignalUpdateCanvas();
-
-    /*
-    double* dp = tf->GetScalarOpacityFunction()->GetDataPointer();
-    for (int i = 0; i < tf->GetScalarOpacityFunction()->GetSize(); i++)
-    {
-      MITK_INFO << "x: " << dp[i * 2] << " y: " << dp[i * 2 + 1];
-    }
-    */
   }
 }
 
@@ -238,16 +178,11 @@ static double stepFunctionGlocke ( double x )
 
 double QmitkTransferFunctionGeneratorWidget::ScaleDelta(int d) const
 {
-  //MITK_INFO << "Scaling (int) " << d << "to (double) " << deltaScale*(double)d;
   return deltaScale*(double)d;
 }
 
-void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)      // bell
+void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy) // bell
 {
-  //std::string infoText;
-
-//  m_InfoThreshold->setText( QString( x.c_str() ) );
-
   if(tfpToChange.IsNull())
     return;
 
@@ -301,15 +236,7 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)   
     f->AddPoint( 0, 1.0 );
     f->Modified();
   }
-/*
-  // grayvalue->color
-  {
-    vtkColorTransferFunction *ctf=tf->GetColorTransferFunction();
-    ctf->RemoveAllPoints();
-    ctf->AddRGBPoint( 0, 1.0, 1.0, 1.0 );
-    ctf->Modified();
-  }
-  */
+
   tf->Modified();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -326,7 +253,7 @@ static double stepFunctionThreshold ( double x )
   return x;
 }
 
-void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)   // LEVELWINDOW
+void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy) // LEVELWINDOW
 {
 
   if(tfpToChange.IsNull())
@@ -346,11 +273,6 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)   //
 
   if(thPos > histoMaximum)
     thPos = histoMaximum;
-
-  //MITK_INFO << "threshold pos: " << thPos << " delta: " << thDelta;
-  //MITK_INFO << "histoMinimum: " << histoMinimum << " max: " << histoMaximum;
-
-
 
   std::stringstream ss;
 
@@ -384,15 +306,6 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)   //
     f->AddPoint( 0, 1.0 );
     f->Modified();
   }
-/*
-  // grayvalue->color
-  {
-    vtkColorTransferFunction *ctf=tf->GetColorTransferFunction();
-    ctf->RemoveAllPoints();
-    ctf->AddRGBPoint( 0, 1.0, 1.0, 1.0 );
-    ctf->Modified();
-  }
-  */
 
   tf->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -404,8 +317,6 @@ std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fil
 {
   if (fileNameLong.length()< 40)
     return fileNameLong;
-
-  //MITK_INFO <<" fileName > 20 ";
 
   std::string fileNameShort;
   std::string fileNameRevert;
@@ -423,7 +334,7 @@ std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fil
       break;
     }
   }
-  //MITK_INFO <<" fileNameShort: " << fileNameShort.c_str();
+
   unsigned int len( fileNameLong.length() );
   for(unsigned int i=len-1; i <= len; i--)
   {
@@ -438,7 +349,6 @@ std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fil
     if (i>=fileNameLong.length()-24)
     {
       fileNameRevert= x+ fileNameRevert;
-      //MITK_INFO <<" fileNameRevert: " << fileNameRevert.c_str();
     }
     else
     {
@@ -465,18 +375,15 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode* node)
     tfpToChange = dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction"));
 
     if(!tfpToChange)
-    {
       node->SetProperty("TransferFunction", tfpToChange = mitk::TransferFunctionProperty::New() );
-      dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction"));
-    }
 
     mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
 
     if( mitk::Image* image = dynamic_cast<mitk::Image*>( node->GetData() ) )
     {
-//      tf->InitializeByItkHistogram( histoGramm = image->GetScalarHistogram() );
-      histoMinimum= image->GetScalarValueMin();
-      histoMaximum= image->GetScalarValueMax();
+      mitk::ImageStatisticsHolder* statistics = image->GetStatistics();
+      histoMinimum= statistics->GetScalarValueMin();
+      histoMaximum= statistics->GetScalarValueMax();
     }
     else if (mitk::UnstructuredGrid* grid = dynamic_cast<mitk::UnstructuredGrid*>( node->GetData() ) )
     {
@@ -503,6 +410,4 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode* node)
 
   }
 }
-
-
 

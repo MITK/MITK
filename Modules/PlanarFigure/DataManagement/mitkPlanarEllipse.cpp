@@ -17,13 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 #include "mitkPlanarEllipse.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
 #include <algorithm>
 
 mitk::PlanarEllipse::PlanarEllipse()
-    : m_MinRadius(0),
+    : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
+      FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
+      m_MinRadius(0),
       m_MaxRadius(100),
       m_MinMaxRadiusContraintsActive(false),
       m_TreatAsCircle(true)
@@ -164,16 +166,16 @@ mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int ind
     return point;
 
     Point2D indexPoint;
-    this->GetGeometry2D()->WorldToIndex( point, indexPoint );
+    this->GetPlaneGeometry()->WorldToIndex( point, indexPoint );
 
-    BoundingBox::BoundsArrayType bounds = this->GetGeometry2D()->GetBounds();
+    BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
     if ( indexPoint[0] < bounds[0] ) { indexPoint[0] = bounds[0]; }
     if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
     if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
     if ( indexPoint[1] > bounds[3] ) { indexPoint[1] = bounds[3]; }
 
     Point2D constrainedPoint;
-    this->GetGeometry2D()->IndexToWorld( indexPoint, constrainedPoint );
+    this->GetPlaneGeometry()->IndexToWorld( indexPoint, constrainedPoint );
 
     if(m_MinMaxRadiusContraintsActive)
     {
@@ -251,11 +253,11 @@ void mitk::PlanarEllipse::GeneratePolyLine()
 
         // ... and append it to the PolyLine.
         // No extending supported here, so we can set the index of the PolyLineElement to '0'
-        AppendPointToPolyLine( 0, PolyLineElement( polyLinePoint, 0 ) );
+        this->AppendPointToPolyLine(0, polyLinePoint);
     }
 
-    AppendPointToPolyLine( 1, PolyLineElement( centerPoint, 0 ) );
-    AppendPointToPolyLine( 1, PolyLineElement( GetControlPoint( 3 ), 0 ) );
+    this->AppendPointToPolyLine(1, centerPoint);
+    this->AppendPointToPolyLine(1, this->GetControlPoint(3));
 }
 
 void mitk::PlanarEllipse::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
@@ -265,7 +267,10 @@ void mitk::PlanarEllipse::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, un
 
 void mitk::PlanarEllipse::EvaluateFeaturesInternal()
 {
+  Point2D centerPoint = this->GetControlPoint(0);
 
+  this->SetQuantity(FEATURE_ID_MAJOR_AXIS, 2 * centerPoint.EuclideanDistanceTo(this->GetControlPoint(1)));
+  this->SetQuantity(FEATURE_ID_MINOR_AXIS, 2 * centerPoint.EuclideanDistanceTo(this->GetControlPoint(2)));
 }
 
 

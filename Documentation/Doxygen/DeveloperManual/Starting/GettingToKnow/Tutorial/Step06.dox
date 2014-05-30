@@ -6,7 +6,7 @@ In this step the program is enhanced by the possibility to start a region-grower
 We will see how MITK images can be accessed as ITK images.
 We now load the image file only (bin/CMakeExternals/Source/MITK-Data/Pic3D.nrrd) since the surface will be the result of the region-growing.
 
-\image html step6_result.png 
+\imageMacro{step6_result.png,"",13.55}
 
 The source is now split among several files:
 

@@ -3,7 +3,7 @@
 
 The required input for the "Intra-voxel incoherent motion estimation" (IVIM) is a diffusion weighted image (.dwi or .hdwi) that was acquired with several different b-values.
 
-\image html ivimview.png The IVIM View
+\imageMacro{ivimview.png,"The IVIM View",13.91}
 
 Once an input image is selected in the datamanager, the IVIM view allows for interactive exploration of the dataset (click around in the image and watch the estimated parameters in the figure of the view) as well as generation of f-, D-, and D*-maps (activate the checkmarks and press "Generate Output Images").
 

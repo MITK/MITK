@@ -175,6 +175,18 @@ namespace mitk
     #define endodebugimg(imgVariableName)
     #define endodebugbegin if( false ) {
     #define endodebugend }
+    #define endoAssert(a) \
+    if(!(a)) { \
+        throw std::invalid_argument("FAILED: " #a); \
+    }
+
+    #define endoAssertMsg(a, msg) \
+    if(!(a)) { \
+    throw std::invalid_argument( "FAILED: " #a ); \
+    }
+
+    #define endodebugcode(code)
+    #define endoAssertCode(assertCode)
 #else
   ///
   /// macro for debugging purposes
@@ -262,6 +274,36 @@ namespace mitk
   ///
   #define endodebugend \
     }
+
+  #define endodebugcode(code) \
+    endodebugbegin \
+    code \
+    endodebugend
+
+///
+/// an assert macro for throwing exceptions from an assert
+///
+#define endoAssert(a) \
+if(!(a)) { \
+std::ostringstream s; \
+s << mitk::EndoDebug::GetInstance().GetFilenameWithoutExtension(__FILE__) << ", " \
+  << __LINE__ << ", failed: " << #a; \
+throw std::invalid_argument(s.str()); }
+
+///
+/// same as above but with an output error stream
+/// use it like this: endoAssertMsg( file.read() == true, file << "could not be read" );
+///
+#define endoAssertMsg(a, msg) \
+if(!(a)) { \
+  std::ostringstream s; \
+  s << mitk::EndoDebug::GetInstance().GetFilenameWithoutExtension(__FILE__) << ", " \
+    << __LINE__ << ": " << msg; \
+  throw std::invalid_argument(s.str()); \
+  }
+
+#define endoAssertCode(assertCode) \
+    assertCode
 
 #endif
 

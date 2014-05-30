@@ -34,25 +34,22 @@ namespace mitk
  * rendering mode is applied to images.
  * Valid values are:
  *
- * \li LEVELWINDOW_COLOR: Level window and color will be applied to the image.
- * Our default level-window (sometimes referred to as window-level by other sources) setup for a test image looks like this:
+ * \li LEVELWINDOW_COLOR is DEPRECATED and mapped to LOOKUPTABLE_LEVELWINDOW_COLOR.
+ * \li LOOKUPTABLE_LEVELWINDOW_COLOR: A lookup table, level window and color will be applied to the image.
+ * As lookup table, the table object supplied by the property "LookupTable" will be used. As default,
+ * we apply a GRAYSCALE mitk::LookupTable. Note, if you want to use a former rainbow-like lookup table,
+ * set the mitk::LookupTableProperty to use a LEGACY_RAINBOW_COLOR type mitk::LookupTable.
+ * Our default setup using the GRAYSCALE mitk::LookupTable for a test image looks like this:
  * \image html ExampleLevelWindowColor.png
  * This image can be reproduced with the mitkImageVtkMapper2DColorTest or mitkImageVtkMapper2DLevelWindowTest.
- * If "Image Rendering.Mode" is set to LEVELWINDOW_COLOR inside the mitkWorkbench, the level window slider will change
- * the rendering of the image. That means it will change the values of an internally used default lookup table.
- * Note, the level window slider changes the property "levelwindow" which modifies the range of
- * the internally used default lookup table. There is no way to directly modify the default lookup table.
- * In case you want to create a lookup table, use any LOOKUPTABLE mode as "Image Rendering.Mode".
+ * If "Image Rendering.Mode" is set to LOOKUPTABLE_LEVELWINDOW_COLOR inside the mitkWorkbench, the level window
+ * slider will change the rendering of the image. That means it will change the values of an internally used
+ * default lookup table. Note, the level window slider changes the property "levelwindow" which modifies the range
+ * of the internally used lookup table.
  * This mode will apply the "color" property. The default color is white. If you change the "color"
  * property to yellow, the test image will be rendered like this:
  * \image html ExampleColorYellow.png
  * This image can be reproduced with the mitkImageVtkMapper2DColorTest.
- *
- * \li LOOKUPTABLE_LEVELWINDOW_COLOR: A lookup table, level window and color will be applied to the image.
- * As lookup table, the table object supplied by the property "LookupTable" will be used. If the user does not
- * supply any lookup table, a default rainbow-like lookup table will be used instead. This lookup table
- * will be influenced by the property "levelwindow" and the actor will be colored by the
- * "color" property.
  * Our test image with a lookup table mapping everything from red to blue looks like this:
  * \image html ExampleLookupTable.png
  * This image can be reproduced with the mitkImageVtkMapper2DLookupTableTest. Check this test code for an example how
@@ -107,12 +104,14 @@ public:
   //Never (!) change this without adaptation of mitkLevelWindowManagerTest::VerifyRenderingModes and mitkLevelWindowManagerTest::TestLevelWindowSliderVisibility !
   enum ImageRenderingMode
   {
-    LEVELWINDOW_COLOR = 0,
+    //0 used to be LEVELWINDOW_COLOR which is deprecated now and will be mapped to LOOKUPTABLE_LEVELWINDOW_COLOR.
+    //Our default lookup table property is the GRAYSCALE type which represents the
+    //former LEVELWINDOW_COLOR mode.
     LOOKUPTABLE_LEVELWINDOW_COLOR = 1,
     COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR = 2,
     LOOKUPTABLE_COLOR = 3,
     COLORTRANSFERFUNCTION_COLOR = 4
-  //  Default = LEVELWINDOW_COLOR;
+  //  Default = LOOKUPTABLE_LEVELWINDOW_COLOR;
   };
 
   /**

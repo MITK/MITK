@@ -2,7 +2,7 @@
 
 \page Step01Page MITK Tutorial - Step 1: Displaying an image
 
-\image html step1_result.png 
+\imageMacro{step1_result.png,"",6.22}
 
 
 Open your IDE. All steps can be found among the listed projects.
@@ -11,7 +11,7 @@ The program has to be executed using the image file bin/CMakeExternals/Source/MI
 
 If you are using Visual Studio use the StartVS_release.bat in your bin\\ subdirectory to start it with all required paths set. To set the image file path in Visual Studio, right click on "Step1"-project and go to 'Properties -> Configuration Properties -> Debugging'. Now insert the image file path in the "Command Arguments" text field. Use this also in the following steps.
 
-\image html configureVisualStudioProperties.png
+\imageMacro{configureVisualStudioProperties.png,"",11.85}
 
 The code is divided into parts I through V. First of all a DataTree has to be created. Then data has to be read from a file which afterwards has to be put into the tree. Part IV creates a window and passes the tree to it. The last part deals with some Qt-specific initialization.
 

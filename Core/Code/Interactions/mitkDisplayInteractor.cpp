@@ -116,6 +116,7 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
   {
     distance = m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0];
   }
+
   // set zooming speed
   if (distance < 0.0)
   {
@@ -125,8 +126,13 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
   {
     factor = 1.0 * m_ZoomFactor;
   }
-  sender->GetDisplayGeometry()->ZoomWithFixedWorldCoordinates(factor, m_StartDisplayCoordinate, m_StartCoordinateInMM);
-  sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+
+  if (factor != 1.0)
+  {
+    sender->GetDisplayGeometry()->ZoomWithFixedWorldCoordinates(factor, m_StartDisplayCoordinate, m_StartCoordinateInMM);
+    sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+  }
+
   m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   return true;

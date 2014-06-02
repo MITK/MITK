@@ -459,6 +459,14 @@ mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const std
   vtkPolyData* poly = (vtkPolyData*)((void*)addr);
   surface->SetVtkPolyData(poly);
 
+  // delete helper variables from python stack
+  command = "";
+  command.append( QString("del surface_addr_str\n") );
+  command.append( QString("del surface_addr\n") );
+
+  MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
+
   return surface;
 }
 

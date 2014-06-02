@@ -32,6 +32,7 @@ set(CPP_FILES
   IO/mitkNavigationDataPlayer.cpp
   IO/mitkNavigationDataPlayerBase.cpp
   IO/mitkNavigationDataRecorder.cpp
+  IO/mitkNavigationDataRecorderDeprecated.cpp
   IO/mitkNavigationDataSequentialPlayer.cpp
   IO/mitkNavigationToolReader.cpp
   IO/mitkNavigationToolStorageSerializer.cpp

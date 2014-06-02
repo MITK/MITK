@@ -46,6 +46,8 @@ namespace mitk {
   {
   public:
     static const std::string DeviceClassIdentifier;
+    static const char*       DefaultProbeIdentifier;
+    static const char*       ProbeAndDepthSeperator;
 
     mitkClassMacro(USCombinedModality, USDevice);
     mitkNewMacro4Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, std::string, std::string);

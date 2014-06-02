@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <tinyxml.h>
 
 const std::string mitk::USCombinedModality::DeviceClassIdentifier = "org.mitk.modules.us.USCombinedModality";
+const char* mitk::USCombinedModality::DefaultProbeIdentifier = "default";
+const char* mitk::USCombinedModality::ProbeAndDepthSeperator = "_";
 
 mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer, std::string model)
   : mitk::USDevice(manufacturer, model), m_UltrasoundDevice(usDevice), m_TrackingDevice(trackingDevice),
@@ -446,7 +448,7 @@ std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
         mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED);
 
   // get probe identifier from control interface for probes
-  std::string probeName = "default";
+  std::string probeName = mitk::USCombinedModality::DefaultProbeIdentifier;
   if (probeIt != usdeviceProperties.end())
   {
     probeName = (probeIt->second).ToString();
@@ -466,7 +468,7 @@ std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
     depth = "0";
   }
 
-  return probeName + depth;
+  return probeName + mitk::USCombinedModality::ProbeAndDepthSeperator + depth;
 }
 
 void mitk::USCombinedModality::RebuildFilterPipeline()

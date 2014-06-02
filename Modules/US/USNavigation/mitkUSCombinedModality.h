@@ -65,6 +65,23 @@ namespace mitk {
     AffineTransform3D::Pointer GetCalibration();
 
     /**
+     * \brief Getter for calibration data of the currently active probe and the given depth.
+     *
+     * \param depth depth of the b mode ultrasound image for which the calibration should be returned
+     * \return Transformation for calibration or null if no calibration is available.
+     */
+    AffineTransform3D::Pointer GetCalibration(std::string depth);
+
+    /**
+     * \brief Getter for calibration data of the given probe and depth.
+     *
+     * \param depth depth of the b mode ultrasound image for which the calibration should be returned
+     * \param probe probe of the ultrasound device for which the calibration should be returned
+     * \return Transformation for calibration or null if no calibration is available.
+     */
+    AffineTransform3D::Pointer GetCalibration(std::string depth, std::string probe);
+
+    /**
     * \brief Sets a transformation as calibration data.
     * Calibration data is set for the currently activated probe and their current
     * zoom factor. It also marks the device as calibrated.
@@ -177,6 +194,8 @@ namespace mitk {
     void GenerateData();
 
     std::string GetIdentifierForCurrentCalibration();
+    std::string GetIdentifierForCurrentProbe();
+    std::string GetCurrentDepthValue();
 
     void RebuildFilterPipeline();
 

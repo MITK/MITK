@@ -124,13 +124,17 @@ void mitk::USCombinedModality::UnregisterOnService()
 
 mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration()
 {
-  std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
-  if (calibrationKey.empty())
-  {
-    MITK_WARN("USCombinedModality")("USDevice")
-        << "Could not get a key for the calibration.";
-    return 0;
-  }
+  return this->GetCalibration(this->GetCurrentDepthValue(), this->GetIdentifierForCurrentProbe());
+}
+
+mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration(std::string depth)
+{
+  return this->GetCalibration(depth, this->GetIdentifierForCurrentProbe());
+}
+
+mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration(std::string depth, std::string probe)
+{
+  std::string calibrationKey = probe + mitk::USCombinedModality::ProbeAndDepthSeperator + depth;
 
   // find calibration for combination of probe identifier and depth
   std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
@@ -138,7 +142,7 @@ mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration()
 
   if (calibrationIterator == m_Calibrations.end())
   {
-    MITK_WARN("USCombinedModality")("USDevice")
+    MITK_INFO("USCombinedModality")("USDevice")
         << "No calibration found for selected probe and depth.";
     return 0;
   }
@@ -444,6 +448,13 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
 
 std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
 {
+  return this->GetIdentifierForCurrentProbe()
+    + mitk::USCombinedModality::ProbeAndDepthSeperator
+    + this->GetCurrentDepthValue();
+}
+
+std::string mitk::USCombinedModality::GetIdentifierForCurrentProbe()
+{
   us::ServiceProperties usdeviceProperties = m_UltrasoundDevice->GetServiceProperties();
 
   us::ServiceProperties::const_iterator probeIt = usdeviceProperties.find(
@@ -456,10 +467,17 @@ std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
     probeName = (probeIt->second).ToString();
   }
 
+  return probeName;
+}
+
+std::string mitk::USCombinedModality::GetCurrentDepthValue()
+{
+  us::ServiceProperties usdeviceProperties = m_UltrasoundDevice->GetServiceProperties();
+
   // get string for depth value from the micro service properties
   std::string depth;
   us::ServiceProperties::iterator depthIterator = usdeviceProperties.find(
-        mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH);
+    mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH);
 
   if (depthIterator != usdeviceProperties.end())
   {
@@ -470,7 +488,7 @@ std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
     depth = "0";
   }
 
-  return probeName + mitk::USCombinedModality::ProbeAndDepthSeperator + depth;
+  return depth;
 }
 
 void mitk::USCombinedModality::RebuildFilterPipeline()

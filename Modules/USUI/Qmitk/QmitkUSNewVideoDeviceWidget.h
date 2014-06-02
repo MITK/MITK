@@ -84,7 +84,7 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     */
     void OnDeviceTypeSelection();
 
-
+    void OnOpenFileButtonClicked();
 
 
 

@@ -429,6 +429,7 @@ include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
 include(mitkMacroGetPMDPlatformString)
+include(mitkMacroInstallPython)
 
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
@@ -1034,6 +1035,9 @@ if(MITK_BUILD_EXAMPLES)
   add_subdirectory(Examples)
 endif()
 
+if(MITK_USE_Python)
+  MITK_INSTALL_PYTHON()
+endif()
 #-----------------------------------------------------------------------------
 # Print configuration summary
 #-----------------------------------------------------------------------------

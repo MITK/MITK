@@ -19,4 +19,5 @@ set(CPP_FILES
     ExportShImage.cpp
     NetworkCreation.cpp
     NetworkStatistics.cpp
+    DICOMLoader.cpp
 )

@@ -1,7 +1,7 @@
 
 macro(MITK_INSTALL_PYTHON)
 
-  find_package(VTK REQUIRED)
+find_package(VTK REQUIRED)
 
 foreach(_lib ${VTK_LIBRARIES})
   # exclude system libs
@@ -41,6 +41,13 @@ foreach(_lib ${VTK_LIBRARIES})
     endif()
   endif()
 endforeach()
+
+# install vtk python
+install(DIRECTORY ${VTK_DIR}/Wrapping/Python/vtk
+        DESTINATION bin
+        USE_SOURCE_PERMISSIONS
+        COMPONENT Runtime)
+
 
 endmacro(MITK_INSTALL_PYTHON)
 

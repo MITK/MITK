@@ -23,7 +23,7 @@
             <action name="update"/>
             <action name="removePoint"/>
         </transition>
-        <transition event_class="MousePressEvent" event_variant="AddPointClick" target="MovementInitalized">
+        <transition event_class="MousePressEvent" event_variant="StartMove" target="MovementInitalized">
             <action name="update"/>
             <action name="initMove"/>
         </transition>

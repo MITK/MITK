@@ -19,10 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "mitkPointOperation.h"
 #include "mitkRenderingManager.h"
-#include <mitkPointSetInteractor.h>
+#include <mitkPointSetDataInteractor.h>
 #include <mitkEvent.h>
 #include <mitkStateEvent.h>
 #include <mitkInteractionConst.h>
+#include <mitkInternalEvent.h>
 
 
 QmitkPointListModel::QmitkPointListModel( mitk::DataNode* pointSetNode, int t, QObject* parent )
@@ -293,31 +294,12 @@ void QmitkPointListModel::RemoveSelectedPoint()
   if (pointSet.IsNull())
     return;
 
-  //get corresponding interactor to PointSet
-  mitk::PointSetInteractor::Pointer interactor = dynamic_cast<mitk::PointSetInteractor*>(m_PointSetNode->GetInteractor());
-  if (interactor.IsNull())
-  {
-    if (m_PointSetNode->GetInteractor()==NULL && m_PointSetNode != NULL) //no Interactor set to node
-    {
-      interactor = mitk::PointSetInteractor::New("pointsetinteractor",m_PointSetNode);
-      m_PointSetNode->SetInteractor(interactor);
-    }
-    else
-    {
-      MITK_WARN<<"Unexpected interactor found!\n";
-      return;
-    }
-  }
-
-
-  //send a DEL event to pointsetinteractor
-  const mitk::Event* delEvent = new mitk::Event(NULL, mitk::Type_KeyPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_Delete);
-  mitk::StateEvent* delStateEvent = new mitk::StateEvent(mitk::EIDDELETE, delEvent);
-  interactor->HandleEvent(delStateEvent);
-  delete delEvent;
-  delete delStateEvent;
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in PointSet/Mapper
+  mitk::PointSet::PointIdentifier selectedID;
+  selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
+  mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
+  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+  pointSet->ExecuteOperation(doOp);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
 
 mitk::PointSet* QmitkPointListModel::CheckForPointSetInNode(mitk::DataNode* node) const

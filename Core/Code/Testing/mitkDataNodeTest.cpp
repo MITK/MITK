@@ -47,8 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVolumeDataVtkMapper3D.h>
 
 //Interactors
-#include <mitkAffineInteractor.h>
-#include <mitkPointSetInteractor.h>
+#include <mitkPointSetDataInteractor.h>
 
 //Propertylist Test
 
@@ -167,19 +166,19 @@ static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
 {
 
   //this method tests the SetInteractor() and GetInteractor methods
-  //the Interactor base class calls the DataNode->SetInteractor method
+  //the DataInteractor base class calls the DataNode->SetInteractor method
 
-  mitk::Interactor::Pointer interactor;
+  mitk::DataInteractor::Pointer interactor;
 
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a NULL pointer was set correctly (Interactor)" )
+  MITK_TEST_CONDITION( interactor == dataNode->GetDataInteractor(), "Testing if a NULL pointer was set correctly (DataInteractor)" )
 
-  interactor = mitk::AffineInteractor::New("AffineInteractions click to select", dataNode);
-  dataNode->EnableInteractor();
-  dataNode->DisableInteractor();
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a AffineInteractor was set correctly" )
+  interactor = mitk::PointSetDataInteractor::New();
+  interactor->SetDataNode(dataNode);
+  MITK_TEST_CONDITION( interactor == dataNode->GetDataInteractor(), "Testing if a PointSetDataInteractor was set correctly" )
 
-  interactor = mitk::PointSetInteractor::New("AffineInteractions click to select", dataNode);
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a PointSetInteractor was set correctly" )
+  interactor = mitk::PointSetDataInteractor::New();
+  dataNode->SetDataInteractor(interactor);
+  MITK_TEST_CONDITION( interactor == dataNode->GetDataInteractor(), "Testing if a PointSetDataInteractor was set correctly" )
 }
 static void TestPropertyList(mitk::DataNode::Pointer dataNode)
 {

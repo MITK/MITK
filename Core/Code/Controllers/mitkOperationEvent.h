@@ -39,7 +39,7 @@ namespace mitk {
 //## ExecuteIncrement() does the actual incementation.
 //##
 //## The GroupEventID is intended for logical grouping of several related Operations.
-//## Currently this is used only by PointSetInteractor. How this is done and when to use
+//## Currently this is used only by PointSetDataInteractor. How this is done and when to use
 //## GroupEventIDs is still undocumented.
 //## @ingroup Undo
 class MITK_CORE_EXPORT UndoStackItem

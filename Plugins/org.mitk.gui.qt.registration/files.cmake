@@ -8,7 +8,6 @@ set(INTERNAL_CPP_FILES
   QmitkDeformableRegistrationView.cpp
   # PointBasedRegistration
   QmitkPointBasedRegistrationView.cpp
-  QmitkPointBasedRegistrationTesting.cpp
   mitkLandmarkWarping.cpp
   # RigidRegistration
   QmitkRigidRegistrationView.cpp

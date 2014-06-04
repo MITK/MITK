@@ -144,6 +144,16 @@ add_custom_target(doc ${_doc_in_all}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   )
 
+add_custom_target(doc_usersguide
+                  ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen_users_guide.conf
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                  )
+
+add_custom_target(doc_developersguide
+                  ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen_developers_guide.conf
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                  )
+
 if(MITK_USE_BLUEBERRY)
   # convert the extension points schema files into html
   find_package(Ant)

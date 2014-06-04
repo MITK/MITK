@@ -162,50 +162,6 @@ bool mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
   return false;
 }
 
-void mitk::PointSetDataInteractor::DeletePointByIndex(unsigned int index, unsigned int timeStep)
-{
-  UnselectAll(timeStep,0);
-
-  mitk::Point3D itkPoint;
-  PointSet::PointType pt = m_PointSet->GetPoint(index, timeStep);
-  itkPoint[0] = pt[0];
-  itkPoint[1] = pt[1];
-  itkPoint[2] = pt[2];
-
-  PointOperation* doOp = new mitk::PointOperation(OpREMOVE,0, itkPoint, index);
-  if (m_UndoEnabled)  //write to UndoMechanism
-  {
-    PointOperation* undoOp = new mitk::PointOperation(OpINSERT,0, itkPoint, index);
-    OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Remove point");
-    m_UndoController->SetOperationEvent(operationEvent);
-  }
-  //execute the Operation
-  m_PointSet->ExecuteOperation(doOp);
-
-  if ( !m_UndoEnabled )
-    delete doOp;
-
-  /*now select the point "position-1",
- and if it is the first in list,
- then continue at the last in list*/
-  //only then a select of a point is possible!
-  if (m_PointSet->GetSize( timeStep ) > 0)
-  {
-    if (index>0)//not the first in list
-    {
-      this->SelectPoint( index-1, timeStep,0);
-    }
-    //it was the first point in list, that was removed, so select
-    //the last in list
-    else
-    {
-      index = m_PointSet->GetSize( timeStep ) - 1; //last in list
-      this->SelectPoint( index, timeStep, 0 );
-    }
-  }
-
-}
-
 mitk::PointSetDataInteractor::PointSetDataInteractor() :
   m_MaxNumberOfPoints(0),m_SelectionAccuracy(3.5)
 {

@@ -50,9 +50,6 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-
-    void DeletePointByIndex(unsigned int index, unsigned int timeStep = 0);
-
     /**
      * Sets the maximum distance that is accepted when looking for a point at a certain position using the GetPointIndexByPosition function.
      */

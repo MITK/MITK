@@ -31,7 +31,7 @@ namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)
 {
-  mitk::PersistenceService::LoadModule(); //Workaround for bug in persistence module (see bug 16643 for details)
+  //mitk::PersistenceService::LoadModule(); //Workaround for bug in persistence module (see bug 16643 for details)
                                           //CAN BE REMOVED WHEN THE BUG IS FIXED
 
 

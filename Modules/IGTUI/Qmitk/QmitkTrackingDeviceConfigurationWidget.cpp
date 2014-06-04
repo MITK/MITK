@@ -535,7 +535,7 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
     if (propList.IsNull())
     {MITK_ERROR << "Property list for this UI (" << id <<") is not available, could not load UI settings!"; return;}
-    int portPolarisWin,portAuroraWin,portTypePolaris,portTypeAurora,SelectedDevice;
+    int portPolarisWin=0,portAuroraWin=0,portTypePolaris=0,portTypeAurora=0,SelectedDevice=-1;
     propList->Get("PolarisPortWin",portPolarisWin);
     propList->Get("AuroraPortWin",portAuroraWin);
     propList->Get("PortTypePolaris", portTypePolaris);

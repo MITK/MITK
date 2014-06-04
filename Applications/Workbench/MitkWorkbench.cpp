@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtSingleApplication>
 #include <QtGlobal>
 #include <QTime>
+#include <QDir>
 #include <QDesktopServices>
 
 #include <usModuleSettings.h>
@@ -124,9 +125,9 @@ int main(int argc, char** argv)
     // Append a hash value of the absolute path of the executable to the data location.
     // This allows to start the same application from different build or install trees.
     storageDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + '_';
-    storageDir += QString::number(qHash(QCoreApplication::applicationDirPath())) + "/";
+    storageDir += QString::number(qHash(QCoreApplication::applicationDirPath())) + QDir::separator();
   }
-  us::ModuleSettings::SetStoragePath((storageDir + "us/").toStdString());
+  us::ModuleSettings::SetStoragePath((storageDir + QString("us") + QDir::separator()).toStdString());
 
   // These paths replace the .ini file and are tailored for installation
   // packages created with CPack. If a .ini file is presented, it will

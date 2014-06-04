@@ -52,7 +52,7 @@ PROJECT_LOGO           =
 # If a relative path is entered, it will be relative to the location
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = @MITK_DOXYGEN_OUTPUT_DIR@/Guides/Users_Guide/
+OUTPUT_DIRECTORY       = @MITK_DOXYGEN_OUTPUT_DIR@/Guides/Developers_Guide/
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create
 # 4096 sub-directories (in 2 levels) under the output directory of each output
@@ -202,8 +202,9 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" " \
                          "minimumCMakeVersion=@CMAKE_MINIMUM_REQUIRED_VERSION@" \
                          "minimumQt4Version=@MITK_QT4_MINIMUM_VERSION@" \
-                         "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \                         "developersguidemainpage{1}=\page \1 " \
-                         "usersguidemainpage{1}=\mainpage "
+                         "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
+                         "developersguidemainpage{1}=\mainpage " \
+                         "usersguidemainpage{1}=\page \1"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding
@@ -573,14 +574,14 @@ SHOW_DIRECTORIES       = NO
 # This will remove the Files entry from the Quick Index and from the
 # Folder Tree View (if specified). The default is YES.
 
-SHOW_FILES             = YES
+SHOW_FILES             = NO
 
 # Set the SHOW_NAMESPACES tag to NO to disable the generation of the
 # Namespaces page.
 # This will remove the Namespaces entry from the Quick Index
 # and from the Folder Tree View (if specified). The default is YES.
 
-SHOW_NAMESPACES        = YES
+SHOW_NAMESPACES        = NO
 
 # The FILE_VERSION_FILTER tag can be used to specify a program or script that
 # doxygen should invoke to get the current version for each file (typically from
@@ -672,9 +673,9 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = @MITK_SOURCE_DIR@/Plugins/ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/UserManual/ \
-                         @MITK_SOURCE_DIR@/Examples/Plugins/
+INPUT                  = @MITK_SOURCE_DIR@/Core/Documentation/Doxygen/Concepts/ \
+                         @MITK_SOURCE_DIR@/Documentation/Doxygen/DeveloperManual/ \
+                         @MITK_SOURCE_DIR@/Modules/
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -756,9 +757,9 @@ EXAMPLE_RECURSIVE      = YES
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/UserManual/ \
-                         @MITK_SOURCE_DIR@/Plugins/ \
-                         @MITK_SOURCE_DIR@/Examples/Plugins/
+IMAGE_PATH             = @MITK_SOURCE_DIR@/Core/Documentation/Doxygen/Concepts/ \
+                         @MITK_SOURCE_DIR@/Documentation/Doxygen/DeveloperManual/ \
+                         @MITK_SOURCE_DIR@/Modules/
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -1318,7 +1319,7 @@ LATEX_BATCHMODE        = YES
 # include the index chapters (such as File Index, Compound Index, etc.)
 # in the output.
 
-LATEX_HIDE_INDICES     = NO
+LATEX_HIDE_INDICES     = YES
 
 # If LATEX_SOURCE_CODE is set to YES then doxygen will include
 # source code with syntax highlighting in the LaTeX output.

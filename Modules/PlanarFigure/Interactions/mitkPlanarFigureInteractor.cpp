@@ -108,6 +108,8 @@ bool mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction*, Interac
     return false;
   }
 
+  planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
+
   // check if the control points shall be hidden during interaction
   bool hidecontrolpointsduringinteraction = false;
   GetDataNode()->GetBoolProperty( "planarfigure.hidecontrolpointsduringinteraction", hidecontrolpointsduringinteraction );
@@ -634,9 +636,6 @@ bool mitk::PlanarFigureInteractor::RequestContextMenu(StateMachineAction*, Inter
 bool mitk::PlanarFigureInteractor::CheckResetOnPointSelect( const InteractionEvent* interactionEvent )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
-
-  // Invoke tmpEvent to notify listeners that interaction with this PF starts now
-  planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
 
   // Reset the PlanarFigure if required
   return planarFigure->ResetOnPointSelect();

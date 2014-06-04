@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
 #include "mitkDataStorage.h"
-#include "mitkPointSetInteractor.h"
+#include "mitkSinglePointDataInteractor.h"
 #include "mitkPointSet.h"
 
 namespace us {
@@ -86,7 +86,7 @@ namespace mitk
 
     //seed point
     PointSet::Pointer m_PointSet;
-    PointSetInteractor::Pointer m_SeedPointInteractor;
+    SinglePointDataInteractor::Pointer m_SeedPointInteractor;
     DataNode::Pointer m_PointSetNode;
 
 

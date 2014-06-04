@@ -42,14 +42,8 @@ mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), mitk:
   m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin),
   m_ImageGeometry(other.m_ImageGeometry), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
 {
-  //  DEPRECATED(m_RotationQuaternion = other.m_RotationQuaternion);
-  // AffineGeometryFrame
-  SetBounds(other.GetBounds());
   m_VtkMatrix = vtkMatrix4x4::New();
-  m_VtkMatrix->DeepCopy(other.m_VtkMatrix);
-
   m_VtkIndexToWorldTransform = vtkMatrixToLinearTransform::New();
-  m_VtkIndexToWorldTransform->DeepCopy(other.m_VtkIndexToWorldTransform);
   m_VtkIndexToWorldTransform->SetInput(m_VtkMatrix);
   other.InitializeGeometry(this);
 }
@@ -154,10 +148,7 @@ void
 
   if(m_IndexToWorldTransform)
   {
-    TransformType::Pointer indexToWorldTransform = TransformType::New();
-    indexToWorldTransform->SetCenter( m_IndexToWorldTransform->GetCenter() );
-    indexToWorldTransform->SetMatrix( m_IndexToWorldTransform->GetMatrix() );
-    indexToWorldTransform->SetOffset( m_IndexToWorldTransform->GetOffset() );
+    TransformType::Pointer indexToWorldTransform = m_IndexToWorldTransform->Clone();
     newGeometry->SetIndexToWorldTransform(indexToWorldTransform);
   }
 

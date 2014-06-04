@@ -168,7 +168,7 @@ public:
 
     // Disabled because this test fails on the dashboard. Does not fail on my machine.
     // See Bug 6505
-    //    MITK_TEST_CONDITION(matrixEqual, "Matrix elements of cloned matrix equal original matrix");
+    MITK_TEST_CONDITION(matrixEqual, "Matrix elements of cloned matrix equal original matrix");
 
   }
 };

@@ -120,6 +120,8 @@ if(NOT DEFINED MITK_DOXYGEN_DOT_NUM_THREADS)
   set(MITK_DOXYGEN_DOT_NUM_THREADS 0)
 endif()
 
+file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Users_Guide/)
+
 configure_file(Doxygen/MainPage.dox.in
                ${CMAKE_CURRENT_BINARY_DIR}/Doxygen/MainPage.dox)
 configure_file(doxygen.conf.in

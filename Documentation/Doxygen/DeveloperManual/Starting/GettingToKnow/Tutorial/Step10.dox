@@ -313,6 +313,33 @@ void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 }
 \endcode
 
+\subsection ConditionSection Conditions
+Conditions can be added to transitions and represent functions in the mitk::DataInteractor that are executed on taking a transition.
+A condition is used to determine if a following action should be executed or not.
+\code
+<statemachine>
+    <state name="start" startstate="true">
+        <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="start">
+            <condition name="checkPoint"/>
+            <action name="addPoint"/>
+            <action name="countClicks"/>
+        </transition>
+    </state>
+</statemachine>
+\endcode
+
+In order to tell the mitk::DataInteractor which function to execute these conditions are made known to the mitk::DataInteractor using
+the CONNECT_CONDITION macro. The ConnectActionsAndFunctions() method has to be augmented accordingly:
+
+\code
+void mitk::ExampleInteractor::ConnectActionsAndFunctions()
+{
+  CONNECT_CONDITION("checkPoint", CheckPoint);
+  CONNECT_FUNCTION("addPoint", AddPoint);
+  CONNECT_FUNCTION("countClicks", CountClicks);
+}
+\endcode
+
 \section ReferenceToIncludeFiles Integration of the pattern and configuration files
 
 See \ref IncludeFiles for a description.
@@ -321,15 +348,22 @@ See \ref IncludeFiles for a description.
 \section HowToDataInteractor Implementation of a new mitk::DataInteractor
 
 DataInteractors are to inherit from mitk::DataInteractor. Their functionality is implemented in functions that follow this interface:
+For Actions:
 \code
 bool SomeFunctionality(StateMachineAction* , InteractionEvent*);
 \endcode
 
-Your functions are connected with actions by implementing the function ConnectActionsAndFunctions(), e.g.
+For Conditions:
+\code
+bool SomeFunctionality(const InteractionEvent*);
+\endcode
+
+Your functions are connected with actions and conditions by implementing the function ConnectActionsAndFunctions(), e.g.
 
 \code
 void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 {
+ CONNECT_CONDITION("checkPoint", CheckPoint);
  CONNECT_FUNCTION("addPoint", AddPoint);
  CONNECT_FUNCTION("enoughPoints", EnoughPoints);
 }
@@ -337,30 +371,11 @@ void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 
 Now all that is left is to write a state machine pattern and a config file as is described in the tutorials.
 
-\subsection ExampleInternalEvent PointSetDataInteractor
 To provide a useful example the mitk::PointSetDataInteractor is annotated with comments that describe the important parts for an implementation
 of a mitk::DataInteractor.
 
 This step assumes knowledge of the Interaction concept described in \ref DataInteractionPage and some background of the implementation which is described in
 \ref DataInteractionPageTechnical. Please refer to these pages before proceeding.
-
-
-
-
-DataInteractor are to inherit from mitk::DataInteractor. Their functionality is implemented in functions that follow this interface:
-\code
-bool SomeFunctionality(StateMachineAction* , InteractionEvent*);
-\endcode
-
-Your functions are connected with actions by implementing the function ConnectActionsAndFunctions(), e.g.
-
-\code
-void mitk::ExampleInteractor::ConnectActionsAndFunctions()
-{
- CONNECT_FUNCTION("addPoint", AddPoint);
- CONNECT_FUNCTION("enoughPoints", EnoughPoints);
-}
-\endcode
 
 Now all that is left it to write a state machine pattern and a config file as is described in the tutorials.
 
@@ -376,6 +391,7 @@ have been added.
 <statemachine>
     <state name="start" startstate="true" >
         <transition event_class="MousePressEvent" event_variant="AddPointClick" target="start">
+            <condition name="checkPoint"/>
             <action name="addPoint"/>
         </transition>
         <transition event_class="InternalEvent" event_variant="enoughPointsAdded" target="final">
@@ -430,16 +446,12 @@ allowed points:
 \skipline void mitk::ExampleInteractor::ConfigurationChang
 \until }
 
-Next the actual functionality of the DataInteractor is implemented, by providing one function per action, following this prototype:
-
-\code
-bool FUNCTION_NAME (StateMachineAction* , InteractionEvent*);
-\endcode
+Next the actual functionality of the DataInteractor is implemented, by providing one function per action, following this prototype described before.
 
 \dontinclude Step10.h
 
 \skipline private:
-\until bool EnoughPoints(StateMac
+\until bool CheckPoint(cons
 
 Each function has to return a boolean value. True if the action has been executed, and false if the action has not been executed.
 
@@ -448,6 +460,13 @@ Each function has to return a boolean value. True if the action has been execute
 
 \skipline bool mitk::ExampleInteractor::AddPoint(StateM
 \until //-
+
+If the conditions returns false the following actions in the same transition will not be executed.
+
+\dontinclude Step10.cpp
+
+\skipline bool mitk::ExampleInteractor::CheckPoint(
+\until // end CheckPoint
 
 Here we see an internal event used to signal that the point set reached the maximal number of allowed points.
 The event is created and added to the Dispatchers event queue.

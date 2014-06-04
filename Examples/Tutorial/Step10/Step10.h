@@ -47,6 +47,7 @@ namespace mitk
   private:
     bool AddPoint(StateMachineAction* , InteractionEvent*); // function to add new points
     bool EnoughPoints(StateMachineAction* , InteractionEvent*); // function changes color of pointset to indicate, it is full
+    bool CheckPoint(const InteractionEvent* interactionEvent); // function checks if the clicked point is valid
 
     PointSet::Pointer m_PointSet;
     int m_NumberOfPoints;

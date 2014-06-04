@@ -37,7 +37,7 @@ void
 AccessItkOtsuFilter(itk::Image<TPixel, VImageDimension>* itkImage, paramContainer params)
 {
   typedef itk::Image<TPixel, VImageDimension> itkInputImageType;
-  typedef itk::Image< mitk::OtsuSegmentationFilter::OutputPixelType, 3 > itkOutputImageType;
+  typedef itk::Image< mitk::OtsuSegmentationFilter::OutputPixelType, VImageDimension > itkOutputImageType;
   typedef itk::OtsuMultipleThresholdsImageFilter< itkInputImageType, itkOutputImageType > OtsuFilterType;
 
   typename OtsuFilterType::Pointer filter = OtsuFilterType::New();

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLookupTableProperty.h>
 #include "mitkOtsuSegmentationFilter.h"
 #include "mitkImage.h"
+#include "mitkImageAccessByItk.h"
 
 // ITK
 #include <itkOtsuMultipleThresholdsImageFilter.h>
@@ -173,24 +174,27 @@ void mitk::OtsuTool3D::ConfirmSegmentation()
 void mitk::OtsuTool3D::UpdateBinaryPreview(std::vector<int> regionIDs)
 {
   m_MultiLabelResultNode->SetVisibility(false);
-  //pixel with regionID -> binary image
-  const unsigned short dim = 3;
-  typedef unsigned char PixelType;
+  mitk::Image::Pointer multiLabelSegmentation = dynamic_cast<mitk::Image*>(m_MultiLabelResultNode->GetData());
+  AccessByItk_1( multiLabelSegmentation, CalculatePreview, regionIDs);
+}
 
-  typedef itk::Image< PixelType, dim > InputImageType;
-  typedef itk::Image< PixelType, dim > OutputImageType;
+template< typename TPixel, unsigned int VImageDimension>
+void mitk::OtsuTool3D::CalculatePreview(itk::Image< TPixel, VImageDimension>* itkImage, std::vector<int> regionIDs)
+{
+  typedef itk::Image< TPixel, VImageDimension > InputImageType;
+  typedef itk::Image< unsigned char, VImageDimension > OutputImageType;
 
   typedef itk::BinaryThresholdImageFilter< InputImageType, OutputImageType > FilterType;
 
   FilterType::Pointer filter = FilterType::New();
 
-  InputImageType::Pointer itkImage;
+  //InputImageType::Pointer itkImage;
   OutputImageType::Pointer itkBinaryTempImage1;
   OutputImageType::Pointer itkBinaryTempImage2;
   OutputImageType::Pointer itkBinaryResultImage;
 
-  mitk::Image::Pointer multiLabelSegmentation = dynamic_cast<mitk::Image*>(m_MultiLabelResultNode->GetData());
-  mitk::CastToItkImage(multiLabelSegmentation, itkImage);
+  //mitk::Image::Pointer multiLabelSegmentation = dynamic_cast<mitk::Image*>(m_MultiLabelResultNode->GetData());
+  //mitk::CastToItkImage(multiLabelSegmentation, itkImage);
 
   filter->SetInput(itkImage);
   filter->SetLowerThreshold(regionIDs[0]);

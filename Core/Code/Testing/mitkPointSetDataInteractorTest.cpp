@@ -50,12 +50,12 @@ public:
     m_DataInteractor->LoadStateMachine("PointSet.xml");
     // Set the configuration file that defines the triggers for the transitions
     m_DataInteractor->SetEventConfig("PointSetConfig.xml");
-    // set the DataNode (which already is added to the DataStorage)
-    m_DataInteractor->SetDataNode(m_TestPointSetNode);
 
     //Create new PointSet which will receive the interaction input
     m_TestPointSet = mitk::PointSet::New();
     m_TestPointSetNode->SetData(m_TestPointSet);
+    // set the DataNode (which already is added to the DataStorage)
+    m_DataInteractor->SetDataNode(m_TestPointSetNode);
   }
 
   void tearDown()

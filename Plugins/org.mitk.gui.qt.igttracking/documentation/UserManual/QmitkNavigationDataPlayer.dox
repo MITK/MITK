@@ -7,10 +7,22 @@ Available sections:
   - \ref NavigationDataPlayerOverview
 
 \section NavigationDataPlayerOverview
-The navigation data player plays recorded or artificial navigation data of one ore more tracking tools and visualizes their trajectory. For that purpose select an input file (*.xml only) and select which tracking tool's trajectory should be visualized. If you additionally activate the checkbox "Splines" the trajectory curve will be smoothed via spline interpolation.
-Press the button "start" for starting the player and the visualization. If "Sequential Mode" is checked, the navigation data are played sequentially without regarding the recorded time steps.
+The navigation data player plays recorded or artificial navigation data of one ore more tracking tools and visualizes their trajectory.
+It can also make the data available als a NavigationDataSource to Plugins that require a stream of tracking data, without having to create a tracking device.
 
-You can use the resolution field to define which part of the samples you want to use. E.g. 1 = every sample; 2 = every second sample; 3 = every third sample, ...
+\imageMacro{QmitkIGTTracking_NavigationDataPlayer.png, "The Navigation Data Player", 7}
+
+To use it, select a set of recorded navigation data using the "Open File" button.
+The Player will show the number of tools and the number of frames in the file.
+Select the sequential player if you want to play the data with a specified tempo (set the update Interval accordingly).
+Use the Time-based player to play the data in the speed they were originally acquired in.
+
+<ul>
+<li>Check "Repeat" to repeat the data as a loop indefinitely.
+<li>Check "Register as Microservice" to make the data available as a microservice TrackingDataSource. Other Filters can then be connected to it from other plugins. This is useful for development purposes or to replay previously recorded Situations.
+<li> Check "Display" to render the data in the render Window.
+</ul>
+
 
 \imageMacro{QmitkIGTTracking_ScreenshotNavigationDataPlayer.png,"Screenshot of the NavigationData Player",16.00}
 

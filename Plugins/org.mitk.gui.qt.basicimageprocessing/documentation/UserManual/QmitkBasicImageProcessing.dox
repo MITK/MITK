@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_basicimageprocessing The Basic Image Processing Plugin
 
-\imageMacro{QmitkBasicImageProcessing_ImageProcessing_48.png,"Icon of the Plugin",2.00}
+\imageMacro{QmitkBasicImageProcessing_ImageProcessing_48.png,"Icon of the Basic Image Processing Plugin",2.00}
 
 \tableofcontents
 

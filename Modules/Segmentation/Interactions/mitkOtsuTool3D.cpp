@@ -204,7 +204,7 @@ void mitk::OtsuTool3D::CalculatePreview(itk::Image< TPixel, VImageDimension>* it
   filter->Update();
   itkBinaryTempImage2 = filter->GetOutput();
 
-  itk::OrImageFilter<OutputImageType, OutputImageType>::Pointer orFilter = itk::OrImageFilter<OutputImageType, OutputImageType>::New();
+  typename itk::OrImageFilter<OutputImageType, OutputImageType>::Pointer orFilter = itk::OrImageFilter<OutputImageType, OutputImageType>::New();
 
   // if more than one region id is used compute the union of all given binary regions
   for (std::vector<int>::iterator it = regionIDs.begin() ; it != regionIDs.end(); ++it)

@@ -294,27 +294,12 @@ void QmitkPointListModel::RemoveSelectedPoint()
   if (pointSet.IsNull())
     return;
 
-  //get corresponding interactor to PointSet
-  mitk::PointSetDataInteractor::Pointer interactor = dynamic_cast<mitk::PointSetDataInteractor*>(m_PointSetNode->GetDataInteractor().GetPointer());
-  if (interactor.IsNull())
-  {
-    if (m_PointSetNode->GetInteractor()==NULL && m_PointSetNode != NULL) //no Interactor set to node
-    {
-      interactor->LoadStateMachine("PointSet.xml");
-      interactor->SetEventConfig("PointSetConfig.xml");
-      m_PointSetNode->SetDataInteractor(interactor.GetPointer());
-    }
-    else
-    {
-      MITK_WARN<<"Unexpected interactor found!\n";
-      return;
-    }
-  }
-//  mitk::InternalEvent::Pointer event = mitk::InternalEvent::New(NULL,interactor,"RemovePoint");
-//  interactor->HandleEvent(event.GetPointer(), interactor->GetDataNode());
-//  MITK_INFO << "!!!!!!!!!!!!!!!!!!!!!!! EXECUTED !!!!!!!!!!!!!!!!!!!!";
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in PointSet/Mapper
+  mitk::PointSet::PointIdentifier selectedID;
+  selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
+  mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
+  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+  pointSet->ExecuteOperation(doOp);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
 
 mitk::PointSet* QmitkPointListModel::CheckForPointSetInNode(mitk::DataNode* node) const

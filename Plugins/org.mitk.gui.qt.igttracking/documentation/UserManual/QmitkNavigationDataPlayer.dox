@@ -23,8 +23,4 @@ Use the Time-based player to play the data in the speed they were originally acq
 <li> Check "Display" to render the data in the render Window.
 </ul>
 
-
-\imageMacro{QmitkIGTTracking_ScreenshotNavigationDataPlayer.png,"Screenshot of the NavigationData Player",16.00}
-
 */
-

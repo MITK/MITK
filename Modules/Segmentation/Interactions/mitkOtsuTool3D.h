@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
+#include "itkImage.h"
 
 namespace us {
 class ModuleResource;
@@ -52,6 +53,9 @@ namespace mitk{
     protected:
       OtsuTool3D();
       virtual ~OtsuTool3D();
+
+      template< typename TPixel, unsigned int VImageDimension>
+      void CalculatePreview( itk::Image< TPixel, VImageDimension>* itkImage, std::vector<int> regionIDs);
 
       itk::SmartPointer<Image> m_OriginalImage;
       //holds the user selected binary segmentation

@@ -2,7 +2,7 @@
 
 \page org_mitk_views_datamanager The DataManager
 
-\imageMacro{QmitkDatamanager_Icon.png,"Icon of the Module",2.00}
+\imageMacro{QmitkDatamanager_Icon.png,"Icon of the Data Manager",2.00}
 
 \tableofcontents
 

@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_pointsetinteraction The Point Set Interaction View
 
-\imageMacro{QmitkPointSetInteraction_Icon.png,"Icon of the View",2.00}
+\imageMacro{QmitkPointSetInteraction_Icon.png,"Icon of the Point Set Interaction View",2.00}
 
 Available sections:
   - \ref QmitkPointSetInteractionUserManualOverview

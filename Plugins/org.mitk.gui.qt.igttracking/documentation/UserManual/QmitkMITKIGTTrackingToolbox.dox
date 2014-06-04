@@ -2,7 +2,7 @@
 
 \page org_mitk_views_igttrackingtoolbox The MITK-IGT Tracking Toolbox
 
-\imageMacro{QmitkIGTTracking_IconTrackingToolbox.png,"Icon of the module",2.12}
+\imageMacro{QmitkIGTTracking_IconTrackingToolbox.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
 
 Available sections:
   - \ref QmitkMITKIGTTrackingToolboxIntroduction

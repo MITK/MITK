@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_volumevisualization The Volume Visualization Plugin
 
-\imageMacro{QmitkVolumeVisualization_Icon.png,"Icon of the Plugin",2.00}
+\imageMacro{QmitkVolumeVisualization_Icon.png,"Icon of the Volume Visualization Plugin",2.00}
 
 \tableofcontents
 

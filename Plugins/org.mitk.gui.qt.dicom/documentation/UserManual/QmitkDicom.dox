@@ -1,9 +1,9 @@
 /**
 \page org_mitk_gui_qt_dicom The Dicom Plugin
 
-\imageMacro{QmitkDicom_Icon.png,"Icon of Dicom",2.00}
+\imageMacro{QmitkDicom_Icon.png,"Icon of the DICOM Plugin",2.00}
 
-\note This article requires a basic knowledge of DICOM.
+\note This article requires a basic knowledge of the DICOM Standard.
 
 \tableofcontents
 

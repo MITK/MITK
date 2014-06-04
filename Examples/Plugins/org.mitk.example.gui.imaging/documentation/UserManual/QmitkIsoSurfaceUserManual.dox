@@ -2,7 +2,7 @@
 
 \page org_mitk_views_isosurface The Iso Surface Module
 
-\imageMacro{IsoSurfaceIcon.png,"Icon of the Module",2.00}
+\imageMacro{IsoSurfaceIcon.png,"Icon of the Iso Surface Module",2.00}
 
 Available sections:
   - \ref QmitkIsoSurfaceUserManualOverview 

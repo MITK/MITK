@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_segmentation The Segmentation Plugin
 
-\imageMacro{QmitkSegmentation_Icon.png,"Icon of the Plugin",2.00}
+\imageMacro{QmitkSegmentation_Icon.png,"Icon of the Segmentation Plugin",2.00}
 
 <i>Some of the features described below are closed source additions to the open source toolkit MITK and are not  available in every application.</i>
 

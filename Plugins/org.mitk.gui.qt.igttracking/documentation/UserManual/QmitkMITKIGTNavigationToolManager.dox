@@ -2,7 +2,7 @@
 
 \page org_mitk_views_igtnavigationtoolmanager The MITK-IGT Navigation Tool Manager
 
-\imageMacro{QmitkIGTTracking_IconNavigationToolManager.png,"Icon of the Module",2.12}
+\imageMacro{QmitkIGTTracking_IconNavigationToolManager.png,"Icon of the Navigation Tool Manager",2.00}
 
 \section QmitkMITKIGTNavigationToolManager Introduction
 

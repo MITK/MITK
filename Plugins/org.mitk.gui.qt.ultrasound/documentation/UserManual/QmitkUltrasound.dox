@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_ultrasound The Ultrasound Plugin
 
-\imageMacro{QmitkUltrasound_Icon.png,"Icon of Ultrasound",2.12}
+\imageMacro{QmitkUltrasound_Icon.png,"Icon of the Ultrasound Plugin",2.12}
 
 \tableofcontents
 

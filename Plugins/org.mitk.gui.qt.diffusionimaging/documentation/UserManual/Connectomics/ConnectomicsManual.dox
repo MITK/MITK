@@ -1,7 +1,7 @@
 /**
 \page org_mitk_diffusionimagingapp_perspectives_connectomics The Connectomics Perspective
 
-\imageMacro{connectomics_perspective.png,"Icon of the Perspective",2.00}
+\imageMacro{connectomics_perspective.png,"Icon of the Connectomics Perspective",2.00}
 
 The connectomics perspective is a collection of views which provide functionality for the work with brain connectivity networks. Currently there exist the following views:
 
@@ -38,7 +38,7 @@ See http://www.mitk.org/wiki/Mailinglist on how to do this.
 /**
 \page org_mitk_views_connectomicsdata The Connectomics Network Data View
 
-\imageMacro{QmitkConnectomicsDataViewIcon_48.png,"Icon of the View",2.00}
+\imageMacro{QmitkConnectomicsDataViewIcon_48.png,"Icon of the Connectomics Network Data View",2.00}
 
 This view can be used to create a network from a parcellation and a fiber image as well as to create synthetic networks.
 
@@ -63,7 +63,7 @@ Additionally you have the option to create artificial networks, for testing purp
 /**
 \page org_mitk_views_connectomicsnetworkoperations The Connectomics Network Operations View
 
-\imageMacro{QmitkConnectomicsNetworkOperationsViewIcon_48.png,"Icon of the View",2.00}
+\imageMacro{QmitkConnectomicsNetworkOperationsViewIcon_48.png,"Icon of the Connectomics Network Operations View",2.00}
 
 This view can be used modify networks and related data.
 
@@ -79,7 +79,7 @@ Select a network and press "Create Connectivity Matrix Image" to create a 2D ima
 /**
 \page org_mitk_views_connectomicsstatistics The Connectomics Statistics View
 
-\imageMacro{QmitkConnectomicsStatisticsViewIcon_48.png,"Icon of the View",2.00}
+\imageMacro{QmitkConnectomicsStatisticsViewIcon_48.png,"Icon of the Connectomics Statistics View",2.00}
 
 This view can be used to show statistical analysis of a network.
 

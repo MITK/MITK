@@ -5,7 +5,7 @@ This view provides the user interface for the Gibbs Tracking algorithm, a global
 
 \tableofcontents
 
-\imageMacro{gibbstrackingview.png,"The Gibbs Tracking View",10.12}
+\imageMacro{gibbstrackingview.png,"The Gibbs Tracking View",2}
 
 \section QmitkGibbsTrackingUserManualInputData Input Data
 

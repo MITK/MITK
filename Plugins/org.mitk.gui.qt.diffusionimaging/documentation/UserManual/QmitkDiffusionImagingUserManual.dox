@@ -74,7 +74,7 @@ MITK can also save diffusion weighted images in FSL format. To do this the exten
 
 The quantification view allows the derivation of different scalar anisotropy measures for the reconstructed tensors (Fractional Anisotropy, Relative Anisotropy, Axial Diffusivity, Radial Diffusivity) or q-balls (Generalized Fractional Anisotropy).
 
-\imageMacro{quantification.png,"Anisotropy quantification",9.17}
+\imageMacro{quantification.png,"Anisotropy quantification",2}
 
 \section QmitkDiffusionImagingUserManualVisualizationSettings ODF Visualization Setting
 

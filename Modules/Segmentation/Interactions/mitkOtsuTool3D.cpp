@@ -186,12 +186,12 @@ void mitk::OtsuTool3D::CalculatePreview(itk::Image< TPixel, VImageDimension>* it
 
   typedef itk::BinaryThresholdImageFilter< InputImageType, OutputImageType > FilterType;
 
-  FilterType::Pointer filter = FilterType::New();
+  typename FilterType::Pointer filter = FilterType::New();
 
   //InputImageType::Pointer itkImage;
-  OutputImageType::Pointer itkBinaryTempImage1;
-  OutputImageType::Pointer itkBinaryTempImage2;
-  OutputImageType::Pointer itkBinaryResultImage;
+  typename OutputImageType::Pointer itkBinaryTempImage1;
+  typename OutputImageType::Pointer itkBinaryTempImage2;
+  typename OutputImageType::Pointer itkBinaryResultImage;
 
   //mitk::Image::Pointer multiLabelSegmentation = dynamic_cast<mitk::Image*>(m_MultiLabelResultNode->GetData());
   //mitk::CastToItkImage(multiLabelSegmentation, itkImage);

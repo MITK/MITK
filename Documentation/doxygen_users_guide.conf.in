@@ -202,7 +202,8 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" " \
                          "minimumCMakeVersion=@CMAKE_MINIMUM_REQUIRED_VERSION@" \
                          "minimumQt4Version=@MITK_QT4_MINIMUM_VERSION@" \
-                         "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm"
+                         "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \                         "developersguidemainpage{1}=\page \1 " \
+                         "usersguidemainpage{1}=\mainpage "
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding

@@ -123,11 +123,7 @@ KinectController::~KinectController()
       // Camera registration
       if ( d->m_DepthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT) )
       {
-        if (d->m_UseIR)
-        {
-          d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_IRGenerator));
-        }
-        else
+        if (!d->m_UseIR)
         {
           d->m_ConnectionCheck = d->ErrorText(d->m_DepthGenerator.GetAlternativeViewPointCap().SetViewPoint(d->m_ImageGenerator));
         }

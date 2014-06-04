@@ -114,8 +114,8 @@ bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChan
   if(theFile.empty())
       theFile = PersistenceService::GetDefaultPersistenceFile();
 
-  std::string thePath = itksys::SystemTools::GetFilenamePath( theFile );
-  if( !itksys::SystemTools::FileExists(thePath.c_str()) )
+  std::string thePath = itksys::SystemTools::GetFilenamePath( theFile.c_str() );
+  if( !thePath.empty() && !itksys::SystemTools::FileExists( thePath.c_str() ) )
   {
     if( !itksys::SystemTools::MakeDirectory( thePath.c_str() ) )
     {

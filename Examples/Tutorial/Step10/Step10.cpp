@@ -26,10 +26,28 @@
 
 void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 {
-  // connect the action names of the state machine pattern with function within
+  // connect the action and condition names of the state machine pattern with function within
   // this DataInteractor
+  CONNECT_CONDITION("checkPoint", CheckPoint);
   CONNECT_FUNCTION("addPoint", AddPoint);
   CONNECT_FUNCTION("enoughPoints", EnoughPoints);
+}
+
+bool mitk::ExampleInteractor::CheckPoint(const InteractionEvent *interactionEvent)
+{
+  // check if a point close to the clicked position already exists
+  float epsilon = 0.3; // do not accept new points within 3mm range of existing points
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent != NULL)
+  {
+    // query the position of the mouse in the world geometry
+    mitk::Point3D point = positionEvent->GetPositionInWorld();
+    int retVal = m_PointSet->SearchPoint(point, epsilon);
+    if ( retVal == -1 ) // SearchPoint returns -1 if no point was found within given range
+      return true;
+  }
+  return false; // if the positionEvent is NULL or a point was found return false. AddPoint will not be executed
+  //end
 }
 
 bool mitk::ExampleInteractor::AddPoint(StateMachineAction*, InteractionEvent* interactionEvent)

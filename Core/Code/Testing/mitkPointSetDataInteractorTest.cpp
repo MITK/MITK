@@ -50,6 +50,7 @@ public:
     m_DataInteractor->LoadStateMachine("PointSet.xml");
     // Set the configuration file that defines the triggers for the transitions
     m_DataInteractor->SetEventConfig("PointSetConfig.xml");
+
     //Create new PointSet which will receive the interaction input
     m_TestPointSet = mitk::PointSet::New();
     m_TestPointSetNode->SetData(m_TestPointSet);

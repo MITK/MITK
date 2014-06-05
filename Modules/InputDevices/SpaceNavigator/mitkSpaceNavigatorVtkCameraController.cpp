@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "mitkInteractionConst.h"
 #include "mitkStateEvent.h"
 #include "mitkGlobalInteraction.h"

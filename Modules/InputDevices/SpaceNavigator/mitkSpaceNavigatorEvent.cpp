@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSpaceNavigatorEvent.h"
 #include "mitkInteractionConst.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 mitk::SpaceNavigatorEvent::SpaceNavigatorEvent(int buttonState, const Vector3D& translation, const Vector3D& rotation, const ScalarType& angle)
 : Event(NULL, mitk::Type_SpaceNavigatorInput, BS_NoButton, buttonState, Key_none), m_Translation(translation), m_Rotation(rotation), m_Angle(angle)

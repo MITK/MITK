@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 #include <stdlib.h>
 
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include <MitkCoreExports.h>
 #include "mitkBaseProperty.h"
 

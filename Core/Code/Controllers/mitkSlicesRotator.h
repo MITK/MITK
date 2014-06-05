@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
 #pragma GCC visibility pop
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 namespace mitk {
 

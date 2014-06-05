@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHash>
 #include <QtPlugin>
 
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkRenderingManager.h>
 
 #include <org_mitk_gui_common_Export.h>

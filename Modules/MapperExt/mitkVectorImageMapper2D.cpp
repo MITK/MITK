@@ -520,7 +520,7 @@ int mitk::VectorImageMapper2D::GetCurrentTimeStep( mitk::BaseData* data, mitk::B
   // convert the world time to time steps of the input object
   //
   int timestep = 0;
-  if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
+  if ( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
     timestep = dataTimeGeometry->TimePointToTimeStep( time );
   if ( dataTimeGeometry->IsValidTimeStep( timestep ) == false )
   {

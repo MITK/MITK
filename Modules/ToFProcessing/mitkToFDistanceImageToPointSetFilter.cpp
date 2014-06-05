@@ -67,7 +67,7 @@ mitk::Image* mitk::ToFDistanceImageToPointSetFilter::GetInput( unsigned int idx 
   return static_cast< mitk::Image*>(this->ProcessObject::GetInput(idx));
 }
 
-void mitk::ToFDistanceImageToPointSetFilter::SetSubset(std::vector<mitk::Index3D> subset)
+void mitk::ToFDistanceImageToPointSetFilter::SetSubset(std::vector<itk::Index<3> > subset)
 {
   // check if points of PointSet are inside the input image
   mitk::Image::Pointer input = this->GetInput();
@@ -83,7 +83,7 @@ void mitk::ToFDistanceImageToPointSetFilter::SetSubset(std::vector<mitk::Index3D
   bool pointSetValid = true;
   for (unsigned int i=0; i<subset.size(); i++)
   {
-    mitk::Index3D currentIndex = subset.at(i);
+    itk::Index<3> currentIndex = subset.at(i);
     if (currentIndex[0]<0||currentIndex[0]>xDim||currentIndex[1]<0||currentIndex[1]>yDim)
     {
       pointSetValid = false;
@@ -101,11 +101,11 @@ void mitk::ToFDistanceImageToPointSetFilter::SetSubset(std::vector<mitk::Index3D
 
 void mitk::ToFDistanceImageToPointSetFilter::SetSubset( mitk::PointSet::Pointer pointSet)
 {
-  std::vector<mitk::Index3D> subset;
+  std::vector<itk::Index<3> > subset;
   for (int i=0; i<pointSet->GetSize(); i++)
   {
     mitk::Point3D currentPoint = pointSet->GetPoint(i);
-    mitk::Index3D currentIndex;
+    itk::Index<3> currentIndex;
     currentIndex[0] = currentPoint[0];
     currentIndex[1] = currentPoint[1];
     currentIndex[2] = currentPoint[2];
@@ -142,7 +142,7 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
     mitk::ImagePixelReadAccessor<float,2> imageAcces(input, input->GetSliceData(0));
     for (unsigned int i=0; i<m_Subset.size(); i++)
     {
-      mitk::Index3D currentIndex = m_Subset.at(i);
+      itk::Index<3> currentIndex = m_Subset.at(i);
       itk::Index<2> index2D;
       index2D[0] = currentIndex[0];
       index2D[1] = currentIndex[1];

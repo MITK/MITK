@@ -89,9 +89,9 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   temp2[1] = n1[0] * sin(-degrees) + n1[1] * cos(-degrees);
 
   this->AppendPointToHelperPolyLine(0, p1);
-  this->AppendPointToHelperPolyLine(0, p1 - temp * nonScalingLength);
+  this->AppendPointToHelperPolyLine(0, Point2D(p1 - temp * nonScalingLength));
   this->AppendPointToHelperPolyLine(1, p1);
-  this->AppendPointToHelperPolyLine(1, p1 - temp2 * nonScalingLength);
+  this->AppendPointToHelperPolyLine(1, Point2D(p1 - temp2 * nonScalingLength));
 }
 
 

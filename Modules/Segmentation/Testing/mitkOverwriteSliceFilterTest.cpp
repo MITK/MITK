@@ -134,7 +134,7 @@ int mitkOverwriteSliceFilterTest(int argc, char* argv[])
 
   /* ============= check ref == working ============*/
   bool areSame = true;
-  mitk::Index3D id;
+  itk::Index<3> id;
   id[0] = id[1] = id[2] = 0;
   for (int x = 0; x < VolumeSize; ++x){
     id[0]  = x;

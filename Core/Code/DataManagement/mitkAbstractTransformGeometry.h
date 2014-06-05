@@ -123,7 +123,7 @@ namespace mitk {
 
     virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
 
-    virtual const Transform3D* GetParametricTransform() const;
+  virtual const itk::Transform<mitk::ScalarType, 3, 3>* GetParametricTransform() const;
 
     //##Documentation
     //## @brief Change the parametric bounds to @a oversampling times

@@ -118,7 +118,7 @@ void TestRandomPixelAccess( const mitk::PixelType ptype, mitk::Image::Pointer im
       value = static_cast<mitk::ScalarType>(imAccess3.GetPixelByWorldCoordinates(point));
       MITK_TEST_CONDITION( (value >= imageMin && value <= imageMax), "Value returned is between max/min");
     }
-    mitk::Index3D itkIndex;
+    itk::Index<3> itkIndex;
     image->GetGeometry()->WorldToIndex(position, itkIndex);
     MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception);
     imAccess3.GetPixelByIndexSafe(itkIndex);

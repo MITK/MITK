@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_WIIMOTEBUTTONEVENT_H
 
 #include "mitkEvent.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "mitkInteractionConst.h"
 
 #include <MitkWiiMoteExports.h>

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPOINTSETINTERACTOR_H_HEADER_INCLUDED_C11202FF
 
 #include <MitkCoreExports.h>
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include <mitkInteractor.h>
 
 namespace mitk

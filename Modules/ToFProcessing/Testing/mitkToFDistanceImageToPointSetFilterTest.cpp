@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>
 #include <mitkToFTestingCommon.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkImagePixelReadAccessor.h>
 
 #include <itkImage.h>
@@ -57,10 +57,10 @@ mitk::PointSet::Pointer CreateTestPointSet()
   return subSet;
 }
 
-std::vector<mitk::Index3D> CreateVectorPointSet()
+std::vector<itk::Index<3> > CreateVectorPointSet()
 {
-  std::vector<mitk::Index3D> subSet = std::vector<mitk::Index3D>();
-  mitk::Index3D point;
+  std::vector<itk::Index<3> > subSet = std::vector<itk::Index<3> >();
+  itk::Index<3> point;
   point[0] = 10;
   point[1] = 20;
   point[2] = 0;
@@ -331,7 +331,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(mitk::ToFTestingCommon::PointSetsEqual(expectedResult,result),"Testing filter with subset");
 
   // Test case to reproduce and check fix of bug 13933.
-  std::vector<mitk::Index3D> vecSubset = CreateVectorPointSet();
+  std::vector<itk::Index<3> > vecSubset = CreateVectorPointSet();
   filter = mitk::ToFDistanceImageToPointSetFilter::New();
   try
   {

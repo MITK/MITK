@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
 #include <mitkInteractor.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkContour.h>
 #include <mitkDataNode.h>
 

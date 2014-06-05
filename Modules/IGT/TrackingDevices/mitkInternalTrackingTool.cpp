@@ -113,15 +113,13 @@ void mitk::InternalTrackingTool::GetPosition(mitk::Point3D& position) const
 }
 
 
-void mitk::InternalTrackingTool::SetPosition(mitk::Point3D position, mitk::ScalarType eps)
+void mitk::InternalTrackingTool::SetPosition(mitk::Point3D position)
 {
   itkDebugMacro("setting  m_Position to " << position);
-  if (!Equal(m_Position, position, eps))
-  {
-    MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-    m_Position = position;
-    this->Modified();
-  }
+
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
+  m_Position = position;
+  this->Modified();
 }
 
 
@@ -170,15 +168,14 @@ void mitk::InternalTrackingTool::SetToolTip(mitk::Point3D toolTipPosition,
   }
 }
 
-void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation, mitk::ScalarType eps)
+void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation)
 {
   itkDebugMacro("setting  m_Orientation to " << orientation);
-  if (!Equal(m_Orientation, orientation, eps))
-  {
-    MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-    m_Orientation = orientation;
-    this->Modified();
-  }
+
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
+  m_Orientation = orientation;
+  this->Modified();
+
 }
 
 

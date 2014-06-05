@@ -34,14 +34,14 @@ void GenerateTimeInInputRegion(const mitk::TimeGeometry *outputTimeGeometry, con
   // convert the start-index-time of output in start-index-time of input via millisecond-time
   mitk::TimePointType timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3));
   mitk::TimeStepType timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( inputTimeGeometry->IsValidTimeStep( timestep ) ) )
+  if( ( timeInMS > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() ) && ( inputTimeGeometry->IsValidTimeStep( timestep ) ) )
     inputRegion.SetIndex( 3, timestep );
   else
     inputRegion.SetIndex( 3, 0 );
   // convert the end-index-time of output in end-index-time of input via millisecond-time
   timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
   timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTimeStep( timestep ) ) )
+  if( ( timeInMS > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTimeStep( timestep ) ) )
     inputRegion.SetSize( 3, timestep - inputRegion.GetIndex(3) + 1 );
   else
     inputRegion.SetSize( 3, 1 );

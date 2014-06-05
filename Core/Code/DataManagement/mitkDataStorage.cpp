@@ -265,11 +265,11 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
   Point3D point;
 
   Vector3D minSpacing;
-  minSpacing.Fill(ScalarTypeNumericTraits::max());
+  minSpacing.Fill(itk::NumericTraits<mitk::ScalarType>::max());
 
   ScalarType stmin, stmax;
-  stmin= ScalarTypeNumericTraits::NonpositiveMin();
-  stmax= ScalarTypeNumericTraits::max();
+  stmin= itk::NumericTraits<mitk::ScalarType>::NonpositiveMin();
+  stmax= itk::NumericTraits<mitk::ScalarType>::max();
 
   ScalarType minimalIntervallSize = stmax;
   ScalarType minimalTime = stmax;
@@ -457,8 +457,8 @@ mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyK
 
   ScalarType stmin, stmax, cur;
 
-  stmin= ScalarTypeNumericTraits::NonpositiveMin();
-  stmax= ScalarTypeNumericTraits::max();
+  stmin= itk::NumericTraits<mitk::ScalarType>::NonpositiveMin();
+  stmax= itk::NumericTraits<mitk::ScalarType>::max();
 
   timeBounds[0]=stmax; timeBounds[1]=stmin;
 

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkImageRegion.h>
 #include <itkVector.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <itkMatrix.h>
 #include <vector>
 

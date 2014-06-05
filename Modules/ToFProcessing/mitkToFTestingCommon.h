@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkToFTestingCOMMON_H
 
 #include <MitkToFProcessingExports.h>
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include <mitkToFProcessingCommon.h>
 #include <mitkSurface.h>
 #include <mitkPointSet.h>

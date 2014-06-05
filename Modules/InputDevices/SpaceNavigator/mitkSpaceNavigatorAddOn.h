@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKSPACENAVIGATORADDON_H_HEADER_INCLUDED
 #define MITKSPACENAVIGATORADDON_H_HEADER_INCLUDED
 
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkCommon.h>
 
 #include <mitkEventMapperAddOn.h>

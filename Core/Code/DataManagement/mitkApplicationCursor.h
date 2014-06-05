@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_APPLICATION_CURSOR_H_DEFINED_AND_ALL_IS_GOOD
 
 #include <MitkCoreExports.h>
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 namespace mitk
 {

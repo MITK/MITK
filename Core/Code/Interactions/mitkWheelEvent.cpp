@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkWheelEvent.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 mitk::WheelEvent::WheelEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, const mitk::Point2D& displPosition, int delta)
 : DisplayPositionEvent(sender, type, button, buttonState, key, displPosition)

@@ -48,7 +48,8 @@ public:
   typedef PathType::InputType                                   InputType;
   typedef PathType::OutputType                                  OutputType;
   typedef PathType::OffsetType                                  OffsetType;
-  typedef itk::BoundingBox<unsigned long, 3, ScalarType >        BoundingBoxType;
+  typedef itk::BoundingBox<unsigned long, 3, ScalarType,
+    itk::VectorContainer< unsigned long, mitk::Point< ScalarType, 3 > > >        BoundingBoxType;
   typedef BoundingBoxType::PointsContainer                      PointsContainer;
   typedef BoundingBoxType::PointsContainer::Pointer             PointsContainerPointer;
   typedef BoundingBoxType::PointsContainerIterator              PointsContainerIterator;

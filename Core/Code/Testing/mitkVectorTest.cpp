@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkTestingMacros.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 #include <vnl/vnl_vector_fixed.txx>
 
@@ -100,11 +100,13 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
 
   // test scalar equality method
   mitk::ScalarType scalar1 = 0.5689;
-  mitk::ScalarType scalar2 = scalar1 + mitk::eps;
-  mitk::ScalarType scalar3 = scalar1 + mitk::eps*0.95;
+  mitk::ScalarType scalar2 = scalar1 + mitk::eps*1.01;
+  mitk::ScalarType scalar3 = scalar1;
+  mitk::ScalarType scalar4 = scalar1 + mitk::eps*0.95;
   MITK_TEST_CONDITION(mitk::Equal(scalar1,scalar1), "Test scalar equality using the same scalar with mitk::eps");
   MITK_TEST_CONDITION(!mitk::Equal(scalar1,scalar2), "Test scalar equality using the different scalars with a difference greater than mitk::eps");
-  MITK_TEST_CONDITION(mitk::Equal(scalar1,scalar3), "Test scalar equality using the different scalars with a difference less than mitk::eps");
+  MITK_TEST_CONDITION(mitk::Equal(scalar1,scalar3), "Test scalar equality using the different scalars with a difference equal to mitk::eps");
+  MITK_TEST_CONDITION(mitk::Equal(scalar1,scalar4), "Test scalar equality using the different scalars with a difference less than mitk::eps");
 
   // test matrix equality methods
   vnl_matrix_fixed<mitk::ScalarType,3,3> vnlMatrix3x3_1;
@@ -129,7 +131,7 @@ int mitkVectorTest(int /*argc*/, char* /*argv*/[])
   vnlMatrix3x3_2(2,2) = 1.0000009;
 
   mitk::ScalarType epsilon = 0.000001;
-  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_1,0.0),"Test for matrix equality with given epsilon=0.0 and exactly the same matrix elements");
+  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_1,mitk::eps),"Test for matrix equality with given epsilon=mitk::eps and exactly the same matrix elements");
   MITK_TEST_CONDITION(!mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_2,0.0),"Test for matrix equality with given epsilon=0.0 and slightly different matrix elements");
   MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(vnlMatrix3x3_1,vnlMatrix3x3_2,epsilon),"Test for matrix equality with given epsilon and slightly different matrix elements");
   MITK_TEST_CONDITION(!mitk::MatrixEqualRMS(vnlMatrix3x3_1,vnlMatrix3x3_2,0.0),"Test for matrix equality with given epsilon=0.0 and slightly different matrix elements");

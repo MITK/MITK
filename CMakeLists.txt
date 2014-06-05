@@ -1035,9 +1035,6 @@ if(MITK_BUILD_EXAMPLES)
   add_subdirectory(Examples)
 endif()
 
-if(MITK_USE_Python)
-  MITK_INSTALL_PYTHON()
-endif()
 #-----------------------------------------------------------------------------
 # Print configuration summary
 #-----------------------------------------------------------------------------
@@ -1047,3 +1044,7 @@ feature_summary(
   DESCRIPTION "------- FEATURE SUMMARY FOR ${PROJECT_NAME} -------"
   WHAT ALL
 )
+
+if(MITK_USE_Python)
+  MITK_INSTALL_PYTHON()
+endif()

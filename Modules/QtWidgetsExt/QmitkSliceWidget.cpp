@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSliceWidget.h"
 #include "QmitkStepperAdapter.h"
 #include "mitkNodePredicateDataType.h"
-
+#include "mitkImage.h"
 #include <mitkProportionalTimeGeometry.h>
 #include <QMenu>
 #include <QMouseEvent>
@@ -60,7 +60,6 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name,
       "navigation");
 
   SetLevelWindowEnabled(true);
-
 }
 
 mitk::VtkPropRenderer* QmitkSliceWidget::GetRenderer()
@@ -155,8 +154,9 @@ void QmitkSliceWidget::InitWidget(
     return;
   }
 
-  mitk::Geometry3D::Pointer geometry =
-    static_cast<mitk::Geometry3D*> (m_SlicedGeometry->Clone().GetPointer());
+
+  mitk::BaseGeometry::Pointer geometry =
+          static_cast<mitk::BaseGeometry*> (m_SlicedGeometry->Clone().GetPointer());
 
   const mitk::BoundingBox::Pointer boundingbox =
     m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
@@ -167,14 +167,14 @@ void QmitkSliceWidget::InitWidget(
     mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(
         GetRenderer(), NULL);
 
+    mitk::ProportionalTimeGeometry::Pointer timeGeometry = mitk::ProportionalTimeGeometry::New();
+    timeGeometry->Initialize(geometry, 1);
+
     if (timebounds[1] < mitk::ScalarTypeNumericTraits::max())
     {
-      timebounds[1] = timebounds[0] + 1.0f;
-      geometry->SetTimeBounds(timebounds);
+      timeGeometry->SetFirstTimePoint(timebounds[0]);
+      timeGeometry->SetStepDuration(1.0);
     }
-
-    mitk::ProportionalTimeGeometry::Pointer timeGeometry = mitk::ProportionalTimeGeometry::New();
-    timeGeometry->Initialize(geometry,1);
 
     if (const_cast<mitk::BoundingBox*> (timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2()
         >= mitk::eps)
@@ -287,4 +287,3 @@ QmitkSliceWidget::GetController() const
 {
   return m_RenderWindow->GetController();
 }
-

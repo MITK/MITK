@@ -2,7 +2,7 @@
 
 \page org_mitk_views_moviemaker The Movie Maker View
 
-\image html QmitkMovieMaker_Icon.png "Icon of the View"
+\imageMacro{QmitkMovieMaker_Icon.png,"Icon of the Movie Maker View",2.00}
 
 Available sections:
   - \ref QmitkMovieMakerUserManualOverview
@@ -20,7 +20,7 @@ It is also possible to slide through your data, automatically rotate 3D scenes a
 
 \section QmitkMovieMakerUserManualUsage Usage
 
-\image html QmitkMovieMaker_ControlArea.png "A view of the command area of QmitkMovieMaker"
+\imageMacro{QmitkMovieMaker_ControlArea.png,"A view of the command area of QmitkMovieMaker",9.84}
 
 \subsection QmitkMovieMakerUserManualWindowSelection Window selection
 With the first two drop down boxes, you can choose which window you want to step through and which window you want to record in. Left clicking inside a window will set both drop down boxes to that window, but you can choose different windows for stepping and recording.

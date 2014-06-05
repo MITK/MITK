@@ -1,9 +1,9 @@
 /**
 \page org_mitk_views_imagenavigator The Image Navigator
 
-\image html QmtikImageNavigator_Slider.png "Icon of the Module"
+\imageMacro{QmtikImageNavigator_Slider.png,"Icon of the Image Navigator",2.00}
 
-\image html QmtikImageNavigator_ImageNavigator.png "Image Navigator"
+\imageMacro{QmtikImageNavigator_ImageNavigator.png,"Image Navigator",7.47}
 
 Fast movement through the available data can be achieved by using the Image Navigator. 
 By moving the sliders around you can scroll quickly through the slides and timesteps. 

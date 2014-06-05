@@ -60,7 +60,6 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 
   for( int t=tstart; t<tmax; ++t )
   {
-
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
 
     // Median -->smooth 3D
@@ -134,13 +133,30 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       }
       gaussian->Delete();
       vtkimagethreshold->Delete();
-
     }
     ProgressBar::GetInstance()->Progress();
 
     // Create surface for t-Slice
     CreateSurface(t, vtkimage, surface, thresholdExpanded);
     ProgressBar::GetInstance()->Progress();
+  }
+
+  MITK_INFO << "Updating Time Geometry to ensure right timely displaying";
+  // Fixing wrong time geometry
+  TimeGeometry* surfaceTG = surface->GetTimeGeometry();
+  ProportionalTimeGeometry* surfacePTG = dynamic_cast<ProportionalTimeGeometry*>(surfaceTG);
+  TimeGeometry* imageTG = image->GetTimeGeometry();
+  ProportionalTimeGeometry* imagePTG = dynamic_cast<ProportionalTimeGeometry*>(imageTG);
+  // Requires ProportionalTimeGeometries to work. May not be available for all steps.
+  assert(surfacePTG != NULL);
+  assert(imagePTG != NULL);
+  if ((surfacePTG != NULL) && (imagePTG != NULL))
+  {
+    TimePointType firstTime = imagePTG->GetFirstTimePoint();
+    TimePointType duration = imagePTG->GetStepDuration();
+    surfacePTG->SetFirstTimePoint(firstTime);
+    surfacePTG->SetStepDuration(duration);
+    MITK_INFO << "First Time Point: " << firstTime << "  Duration: " << duration;
   }
 };
 
@@ -158,4 +174,3 @@ void mitk::ManualSegmentationToSurfaceFilter::SetInterpolation(vtkDouble x, vtkD
   m_InterpolationY = y;
   m_InterpolationZ = z;
 }
-

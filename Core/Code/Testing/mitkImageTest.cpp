@@ -153,7 +153,7 @@ public:
 
     image->SetClonedGeometry(planegeometry);
 
-    mitk::Geometry3D::Pointer imageGeometry = image->GetGeometry();
+    mitk::BaseGeometry::Pointer imageGeometry = image->GetGeometry();
     itk::ScalableAffineTransform<mitk::ScalarType,3>* frameNew = imageGeometry->GetIndexToWorldTransform();
     itk::ScalableAffineTransform<mitk::ScalarType,3>* frameOld = planegeometry->GetIndexToWorldTransform();
     bool matrixEqual = true;
@@ -301,7 +301,7 @@ int mitkImageTest(int argc, char* argv[])
 
   // Testing Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int slices) with PlaneGeometry and GetData(): ";
   imgMem->Initialize( mitk::MakePixelType<int, int, 1>(), *planegeometry);
-  MITK_TEST_CONDITION_REQUIRED( imgMem->GetGeometry()->GetOrigin() == static_cast<mitk::Geometry3D*>(planegeometry)->GetOrigin(), "Testing correct setting of geometry via initialize!");
+  MITK_TEST_CONDITION_REQUIRED( imgMem->GetGeometry()->GetOrigin() == static_cast<mitk::BaseGeometry*>(planegeometry)->GetOrigin(), "Testing correct setting of geometry via initialize!");
 
   try
   {
@@ -337,7 +337,7 @@ int mitkImageTest(int argc, char* argv[])
 
   // Test origin
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin), "Testing correctness of changed origin via GetGeometry()->GetOrigin(): ");
-  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(), origin),  "Testing correctness of changed origin via GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(): ");
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetPlaneGeometry(0)->GetOrigin(), origin),  "Testing correctness of changed origin via GetSlicedGeometry()->GetPlaneGeometry(0)->GetOrigin(): ");
 
   //-----------------
   // testing spacing information and methodsunsigned int dim[]={100,100,20};
@@ -346,7 +346,7 @@ int mitkImageTest(int argc, char* argv[])
   mitk::FillVector3D(spacing, 7.0, 0.92, 1.83);
   imgMem->SetSpacing(spacing);
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing), "Testing correctness of changed spacing via GetGeometry()->GetSpacing(): ");
-  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(), spacing), "Testing correctness of changed spacing via GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(): ");
+  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing(), spacing), "Testing correctness of changed spacing via GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing(): ");
 
   mitk::Image::Pointer vecImg = mitk::Image::New();
   try
@@ -410,7 +410,7 @@ int mitkImageTest(int argc, char* argv[])
 
   // TODO test the following initializers on channel-incorporation
   //  void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels)
-  //  void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped, unsigned int channels, int tDim )
+  //  void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry2d, bool flipped, unsigned int channels, int tDim )
   //  void mitk::Image::Initialize(const mitk::Image* image)
   //  void mitk::Image::Initialize(const mitkIpPicDescriptor* pic, int channels, int tDim, int sDim)
 

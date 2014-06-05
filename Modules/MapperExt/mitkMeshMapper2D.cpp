@@ -56,7 +56,6 @@ static bool point3DSmaller( const mitk::Point3D& elem1, const mitk::Point3D& ele
 
 void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-
     bool visible = true;
 
     GetDataNode()->GetVisibility(visible, renderer, "visible");
@@ -81,9 +80,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     //
     // get the world time
     //
-    const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
-    assert( worldGeometry != NULL );
-    ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+    ScalarType time = renderer->GetTime();
 
     //
     // convert the world time in time steps of the input object
@@ -108,7 +105,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
     assert(displayGeometry.IsNotNull());
 
-    const PlaneGeometry* worldplanegeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetCurrentWorldGeometry2D());
+    const PlaneGeometry* worldplanegeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetCurrentWorldPlaneGeometry());
 
     //apply color and opacity read from the PropertyList
     ApplyColorAndOpacityProperties(renderer);

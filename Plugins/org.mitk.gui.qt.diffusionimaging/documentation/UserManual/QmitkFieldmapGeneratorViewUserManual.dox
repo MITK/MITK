@@ -11,6 +11,6 @@ This view allows the creation of artificial frequency maps used by Fiberfox to i
 \li To introduce an (additional) linear frequency gradient, specify the gradient below "Add Gradient".
 \li To finally generate the fieldmap, press "Generate Fieldmap".
 
-\image html fieldmapGenerator.png The Fieldmap Generator View. The render window shows a diffusion weighted image of the brain superimposed by a frequency map with two 3D gaussian field inhomogeneities (red).
+\imageMacro{fieldmapGenerator.png,"The Fieldmap Generator View. The render window shows a diffusion weighted image of the brain superimposed by a frequency map with two 3D gaussian field inhomogeneities (red).",16.00}
 
 */

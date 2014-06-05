@@ -66,7 +66,7 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
   VTKWRITER* unstructuredGridWriter = VTKWRITER::New();
   vtkTransformFilter* transformPointSet = vtkTransformFilter::New();
   vtkUnstructuredGrid * unstructuredGrid;
-  Geometry3D* geometry;
+  BaseGeometry* geometry;
 
   if(input->GetTimeGeometry()->CountTimeSteps()>1)
   {
@@ -80,7 +80,7 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
       geometry = input->GetGeometry(t);
       if(input->GetTimeGeometry()->IsValidTimeStep(t))
       {
-        const mitk::TimeBounds& timebounds = geometry->GetTimeBounds();
+        const mitk::TimeBounds& timebounds = input->GetTimeGeometry()->GetTimeBounds(t);
         filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << GetDefaultExtension();
       }
       else
@@ -88,7 +88,6 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
         itkWarningMacro(<<"Error on write: TimeGeometry invalid of unstructured grid " << filename.str() << ".");
         filename <<  m_FileName.c_str() << "_T" << t << GetDefaultExtension();
       }
-      geometry->TransferItkToVtkTransform();
       transformPointSet->SetInputData(input->GetVtkUnstructuredGrid(t));
       transformPointSet->SetTransform(geometry->GetVtkTransform());
       transformPointSet->UpdateWholeExtent();
@@ -103,7 +102,6 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
   else
   {
     geometry = input->GetGeometry();
-    geometry->TransferItkToVtkTransform();
     transformPointSet->SetInputData(input->GetVtkUnstructuredGrid());
     transformPointSet->SetTransform(geometry->GetVtkTransform());
     transformPointSet->UpdateWholeExtent();

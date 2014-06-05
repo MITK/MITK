@@ -184,9 +184,9 @@ void mitk::USImageVideoSource::RemoveRegionOfInterest()
 void mitk::USImageVideoSource::GetNextRawImage( cv::Mat& image )
 {
   // loop video if necessary
-  if (m_VideoCapture->get(CV_CAP_PROP_POS_AVI_RATIO) >= 0.99 )
+  if (m_VideoCapture->get(CV_CAP_PROP_POS_FRAMES) == m_VideoCapture->get(CV_CAP_PROP_FRAME_COUNT))
   {
-    m_VideoCapture->set(CV_CAP_PROP_POS_AVI_RATIO, 0);
+    m_VideoCapture->set(CV_CAP_PROP_POS_FRAMES, 0);
   }
 
   // retrieve image

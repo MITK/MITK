@@ -186,7 +186,7 @@ void mitk::RegionGrow3DTool::RunSegmentation()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::RegionGrow3DTool::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint)
+void mitk::RegionGrow3DTool::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
   typedef typename InputImageType::IndexType IndexType;

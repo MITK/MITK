@@ -23,18 +23,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+class Image;
+
 class MitkDICOMTesting_EXPORT TestDICOMLoading
 {
   public:
 
     typedef DicomSeriesReader::StringContainer StringContainer;
-    typedef std::list<DataNode::Pointer> NodeList;
-    typedef std::list<Image::Pointer> ImageList;
+    typedef std::list< DataNode::Pointer > NodeList;
+    typedef std::list< itk::SmartPointer<Image> > ImageList;
 
     TestDICOMLoading();
 
     ImageList
-    LoadFiles( const StringContainer& files, Image::Pointer preLoadedVolume = NULL );
+    LoadFiles( const StringContainer& files, itk::SmartPointer<Image> preLoadedVolume = NULL );
 
     /**
       \brief Dump relevant image information for later comparison.

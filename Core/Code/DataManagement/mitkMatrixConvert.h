@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD
 
-#include "mitkGeometry3D.h"
+#include "mitkBaseGeometry.h"
 #include "mitkItkMatrixHack.h"
 #include <vtkMatrix4x4.h>
 
@@ -94,11 +94,11 @@ namespace mitk
   }
 
   template <class TMatrixType>
-  void GetRotation(const mitk::Geometry3D * geometry, TMatrixType& itkmatrix)
+  void GetRotation(const mitk::BaseGeometry * geometry, TMatrixType& itkmatrix)
   {
     const mitk::Vector3D& spacing = geometry->GetSpacing();
-    typename mitk::Geometry3D::TransformType::MatrixType::InternalMatrixType& geometryVnlMatrix =
-      const_cast<typename mitk::Geometry3D::TransformType::MatrixType::InternalMatrixType&>(geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix());
+    typename mitk::BaseGeometry::TransformType::MatrixType::InternalMatrixType& geometryVnlMatrix =
+      const_cast<typename mitk::BaseGeometry::TransformType::MatrixType::InternalMatrixType&>(geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix());
 
     typename TMatrixType::InternalMatrixType& outputVnlMatrix =
       const_cast<typename TMatrixType::InternalMatrixType&>(itkmatrix.GetVnlMatrix());
@@ -109,7 +109,7 @@ namespace mitk
   }
 
   template <class TTransformType>
-  void GetWorldToItkPhysicalTransform(const mitk::Geometry3D * geometry, TTransformType* itkTransform)
+  void GetWorldToItkPhysicalTransform(const mitk::BaseGeometry * geometry, TTransformType* itkTransform)
   {
     if(itkTransform==NULL)
       return;
@@ -118,7 +118,7 @@ namespace mitk
     typename TTransformType::MatrixType rotationMatrix;
     GetRotation(geometry, rotationMatrix);
 
-    const typename mitk::Geometry3D::TransformType::OffsetType& geometryOffset =
+    const typename mitk::BaseGeometry::TransformType::OffsetType& geometryOffset =
       geometry->GetIndexToWorldTransform()->GetOffset();
 
     vnl_vector<typename TTransformType::MatrixType::ValueType> vnlOffset(3);

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 #include <mitkIGTException.h>
+#include <QSettings>
 
 #include <itksys/SystemTools.hxx>
 #include <Poco/Path.h>
@@ -46,8 +47,6 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   CreateQtPartControl(this);
   CreateConnections();
   m_MTCalibrationFile = "";
-
-
 
   //reset a few things
   ResetOutput();
@@ -499,42 +498,81 @@ void QmitkTrackingDeviceConfigurationWidget::EnableAdvancedUserControl(bool enab
 
 void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
 {
-std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
-if (!this->GetPeristenceService())
+  std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+  if ( this->GetPeristenceService() )
   {
-  MITK_ERROR << "Persistence service not available, could not store UI settings!";
-  return;
+    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
+    propList->Set("AuroraPortWin",m_Controls->m_portSpinBoxAurora->value());
+    propList->Set("PortTypePolaris", m_Controls->portTypePolaris->currentIndex());
+    propList->Set("PortTypeAurora", m_Controls->portTypeAurora->currentIndex());
+    propList->Set("MTCalibrationFile",m_MTCalibrationFile);
+    propList->Set("SelectedDevice",m_Controls->m_trackingDeviceChooser->currentIndex());
   }
-mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
-propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
-propList->Set("AuroraPortWin",m_Controls->m_portSpinBoxAurora->value());
-propList->Set("MTCalibrationFile",m_MTCalibrationFile);
-propList->Set("SelectedDevice",m_Controls->m_trackingDeviceChooser->currentIndex());
+  else
+  {
+    // QSettings as a fallback if the persistence service is not available
+    QSettings settings;
+
+    settings.beginGroup(QString::fromStdString(id));
+
+    settings.setValue("trackingDeviceChooser", QVariant(m_Controls->m_trackingDeviceChooser->currentIndex()));
+    settings.setValue("portSpinBoxAurora", QVariant(m_Controls->m_portSpinBoxAurora->value()));
+    settings.setValue("portSpinBoxPolaris", QVariant(m_Controls->m_portSpinBoxPolaris->value()));
+    settings.setValue("portTypePolaris", QVariant(m_Controls->portTypePolaris->currentIndex()));
+    settings.setValue("portTypeAurora", QVariant(m_Controls->portTypeAurora->currentIndex()));
+    settings.setValue("mTCalibrationFile", QVariant(QString::fromStdString(m_MTCalibrationFile)));
+
+    settings.endGroup();
+  }
 }
 
 void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
 {
-std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
-if (!this->GetPeristenceService())
-  {MITK_ERROR << "Persistence service not available, could not load UI settings!"; return;}
-mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
-if (propList.IsNull())
-  {MITK_ERROR << "Property list for this UI (" << id <<") is not available, could not load UI settings!"; return;}
-int portPolarisWin,portAuroraWin,SelectedDevice;
-propList->Get("PolarisPortWin",portPolarisWin);
-propList->Get("AuroraPortWin",portAuroraWin);
-propList->Get("MTCalibrationFile",m_MTCalibrationFile);
-propList->Get("SelectedDevice",SelectedDevice);
-if (SelectedDevice<0)
+  std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+  if ( this->GetPeristenceService() )
   {
-  MITK_ERROR << "Loaded data from persistence service is invalid (SelectedDevice:" <<SelectedDevice<<"): aborted to restore data!";
-  return;
+    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    if (propList.IsNull())
+    {MITK_ERROR << "Property list for this UI (" << id <<") is not available, could not load UI settings!"; return;}
+    int portPolarisWin=0,portAuroraWin=0,portTypePolaris=0,portTypeAurora=0,SelectedDevice=-1;
+    propList->Get("PolarisPortWin",portPolarisWin);
+    propList->Get("AuroraPortWin",portAuroraWin);
+    propList->Get("PortTypePolaris", portTypePolaris);
+    propList->Get("PortTypeAurora", portTypeAurora);
+    propList->Get("MTCalibrationFile",m_MTCalibrationFile);
+    propList->Get("SelectedDevice",SelectedDevice);
+    if (SelectedDevice<0)
+    {
+      MITK_ERROR << "Loaded data from persistence service is invalid (SelectedDevice:" <<SelectedDevice<<"): aborted to restore data!";
+      return;
+    }
+    m_Controls->m_portSpinBoxPolaris->setValue(portPolarisWin);
+    m_Controls->m_portSpinBoxAurora->setValue(portAuroraWin);
+    m_Controls->portTypePolaris->setCurrentIndex(portTypePolaris);
+    m_Controls->portTypeAurora->setCurrentIndex(portTypeAurora);
+    m_Controls->m_TrackingSystemWidget->setCurrentIndex(SelectedDevice);
+    m_Controls->m_trackingDeviceChooser->setCurrentIndex(SelectedDevice);
+    MITK_INFO << "Sucessfully restored UI settings";
   }
-m_Controls->m_portSpinBoxPolaris->setValue(portPolarisWin);
-m_Controls->m_portSpinBoxAurora->setValue(portAuroraWin);
-m_Controls->m_TrackingSystemWidget->setCurrentIndex(SelectedDevice);
-m_Controls->m_trackingDeviceChooser->setCurrentIndex(SelectedDevice);
-m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(m_MTCalibrationFile.c_str()));
+  else
+  {
+    // QSettings as a fallback if the persistence service is not available
+    QSettings settings;
+
+    settings.beginGroup(QString::fromStdString(id));
+
+    m_Controls->m_trackingDeviceChooser->setCurrentIndex(settings.value("trackingDeviceChooser", 0).toInt());
+    m_Controls->m_portSpinBoxAurora->setValue(settings.value("portSpinBoxAurora", 0).toInt());
+    m_Controls->m_portSpinBoxPolaris->setValue(settings.value("portSpinBoxPolaris", 0).toInt());
+    m_Controls->portTypePolaris->setCurrentIndex(settings.value("portTypePolaris", 0).toInt());
+    m_Controls->portTypeAurora->setCurrentIndex(settings.value("portTypeAurora", 0).toInt());
+    m_MTCalibrationFile = settings.value("mTCalibrationFile", "").toString().toStdString();
+
+    settings.endGroup();
+  }
+
+  m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString::fromStdString(m_MTCalibrationFile));
 }
 
 void QmitkTrackingDeviceConfigurationWidgetConnectionWorker::TestConnectionThreadFunc()

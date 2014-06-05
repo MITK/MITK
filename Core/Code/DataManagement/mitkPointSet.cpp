@@ -335,7 +335,7 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, PointSpec
   if ( (unsigned int) t < m_PointSetSeries.size() )
   {
     mitk::Point3D indexPoint;
-    mitk::Geometry3D* tempGeometry = this->GetGeometry( t );
+    mitk::BaseGeometry* tempGeometry = this->GetGeometry( t );
     if (tempGeometry == NULL)
     {
       MITK_INFO<< __FILE__ << ", l." << __LINE__ << ": GetGeometry of "<< t <<" returned NULL!" << std::endl;
@@ -524,7 +524,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       pt.CastFrom(pointOp->GetPoint());
 
       //transfer from world to index coordinates
-      mitk::Geometry3D* geometry = this->GetGeometry( timeStep );
+      mitk::BaseGeometry* geometry = this->GetGeometry( timeStep );
       if (geometry == NULL)
       {
         MITK_INFO<<"GetGeometry returned NULL!\n";

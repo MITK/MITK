@@ -56,18 +56,18 @@ void mitk::GeometryClipImageFilter::SetClippingGeometry(const mitk::TimeGeometry
   SetClippingGeometry(timeClippingGeometry->GetGeometryForTimeStep(0));
 }
 
-void mitk::GeometryClipImageFilter::SetClippingGeometry(const mitk::Geometry3D* aClippingGeometry)
+void mitk::GeometryClipImageFilter::SetClippingGeometry(const mitk::BaseGeometry* aClippingGeometry)
 {
   if(aClippingGeometry != m_ClippingGeometry.GetPointer())
   {
     m_ClippingGeometry = aClippingGeometry;
-    m_ClippingGeometryData->SetGeometry(const_cast<mitk::Geometry3D*>(aClippingGeometry));
+    m_ClippingGeometryData->SetGeometry(const_cast<mitk::BaseGeometry*>(aClippingGeometry));
     SetNthInput(1, m_ClippingGeometryData);
     Modified();
   }
 }
 
-const mitk::Geometry3D* mitk::GeometryClipImageFilter::GetClippingGeometry() const
+const mitk::BaseGeometry* mitk::GeometryClipImageFilter::GetClippingGeometry() const
 {
   return m_ClippingGeometry;
 }
@@ -114,7 +114,7 @@ void mitk::GeometryClipImageFilter::GenerateOutputInformation()
 
   delete [] tmpDimensions;
 
-  output->SetGeometry(static_cast<mitk::Geometry3D*>(input->GetGeometry()->Clone().GetPointer()));
+  output->SetGeometry(static_cast<mitk::BaseGeometry*>(input->GetGeometry()->Clone().GetPointer()));
 
   output->SetPropertyList(input->GetPropertyList()->Clone());
 
@@ -122,7 +122,7 @@ void mitk::GeometryClipImageFilter::GenerateOutputInformation()
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inputItkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::Geometry2D* clippingGeometry2D)
+void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inputItkImage, mitk::GeometryClipImageFilter* geometryClipper, const mitk::PlaneGeometry* clippingPlaneGeometry)
 {
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
   typedef itk::Image<TPixel, VImageDimension> ItkOutputImageType;
@@ -146,7 +146,7 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
   else
     outsideValue = (typename ItkOutputImageType::PixelType) geometryClipper->m_OutsideValue;
 
-  mitk::Geometry3D* inputGeometry = geometryClipper->m_InputTimeSelector->GetOutput()->GetGeometry();
+  mitk::BaseGeometry* inputGeometry = geometryClipper->m_InputTimeSelector->GetOutput()->GetGeometry();
   typedef itk::Index<VImageDimension> IndexType;
   Point3D indexPt; indexPt.Fill(0);
   int i, dim=IndexType::GetIndexDimension();
@@ -158,7 +158,7 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
   {
     Point3D leftMostPoint;
     leftMostPoint.Fill( std::numeric_limits<float>::min() / 2.0 );
-    if(clippingGeometry2D->IsAbove(pointInMM) != above)
+    if(clippingPlaneGeometry->IsAbove(pointInMM) != above)
       {
       // invert meaning of above --> left is always the "above" side
       above = !above;
@@ -182,7 +182,7 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
       for(i=0;i<dim;++i)
         indexPt[i]=(mitk::ScalarType)inputIt.GetIndex()[i];
       inputGeometry->IndexToWorld(indexPt, pointInMM);
-      if(clippingGeometry2D->IsAbove(pointInMM) == above)
+      if(clippingPlaneGeometry->IsAbove(pointInMM) == above)
       {
         if ( labelBothSides )
           outputIt.Set( aboveLabel );
@@ -210,15 +210,15 @@ void mitk::GeometryClipImageFilter::GenerateData()
   if((output->IsInitialized()==false) || (m_ClippingGeometry.IsNull()))
     return;
 
-  const Geometry2D * clippingGeometryOfCurrentTimeStep = NULL;
+  const PlaneGeometry * clippingGeometryOfCurrentTimeStep = NULL;
 
   if(m_TimeClippingGeometry.IsNull())
   {
-    clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_ClippingGeometry.GetPointer());
+    clippingGeometryOfCurrentTimeStep = dynamic_cast<const PlaneGeometry*>(m_ClippingGeometry.GetPointer());
   }
   else
   {
-    clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeClippingGeometry->GetGeometryForTimeStep(0).GetPointer());
+    clippingGeometryOfCurrentTimeStep = dynamic_cast<const PlaneGeometry*>(m_TimeClippingGeometry->GetGeometryForTimeStep(0).GetPointer());
   }
 
   if(clippingGeometryOfCurrentTimeStep == NULL)
@@ -253,7 +253,7 @@ void mitk::GeometryClipImageFilter::GenerateData()
       if(m_TimeClippingGeometry->IsValidTimeStep(timestep) == false)
         continue;
 
-      clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeClippingGeometry->GetGeometryForTimeStep(timestep).GetPointer());
+      clippingGeometryOfCurrentTimeStep = dynamic_cast<const PlaneGeometry*>(m_TimeClippingGeometry->GetGeometryForTimeStep(timestep).GetPointer());
     }
 
     AccessByItk_2(m_InputTimeSelector->GetOutput(),_InternalComputeClippedImage,this,clippingGeometryOfCurrentTimeStep);

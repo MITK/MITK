@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 #include "mitkPlanarEllipse.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
 #include <algorithm>
@@ -166,16 +166,16 @@ mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int ind
     return point;
 
     Point2D indexPoint;
-    this->GetGeometry2D()->WorldToIndex( point, indexPoint );
+    this->GetPlaneGeometry()->WorldToIndex( point, indexPoint );
 
-    BoundingBox::BoundsArrayType bounds = this->GetGeometry2D()->GetBounds();
+    BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
     if ( indexPoint[0] < bounds[0] ) { indexPoint[0] = bounds[0]; }
     if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
     if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
     if ( indexPoint[1] > bounds[3] ) { indexPoint[1] = bounds[3]; }
 
     Point2D constrainedPoint;
-    this->GetGeometry2D()->IndexToWorld( indexPoint, constrainedPoint );
+    this->GetPlaneGeometry()->IndexToWorld( indexPoint, constrainedPoint );
 
     if(m_MinMaxRadiusContraintsActive)
     {

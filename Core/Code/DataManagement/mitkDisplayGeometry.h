@@ -14,22 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef mitkDisplayGeometry_h
 #define mitkDisplayGeometry_h
 
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 namespace mitk
 {
-
-/**
+  /**
  \brief Describes the geometry on the display/screen for 2D display.
 
  The main purpose of this class is to convert between display coordinates
  (in display-units) and world coordinates (in mm).
  DisplayGeometry depends on the size of the display area (widget width and
- height, m_SizeInDisplayUnits) and on a Geometry2D (m_WoldGeometry). It
+  height, m_SizeInDisplayUnits) and on a PlaneGeometry (m_WoldGeometry). It
  represents a recangular view on this world-geometry. E.g., you can tell
  the DisplayGeometry to fit the world-geometry in the display area by
  calling Fit(). Provides methods for zooming and panning.
@@ -62,13 +60,12 @@ namespace mitk
  is really the \a certaingeometry.
 
  \ingroup Geometry
-*/
-class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
-{
-
+  */
+  class MITK_CORE_EXPORT DisplayGeometry : public PlaneGeometry
+  {
   public:
 
-    mitkClassMacro(DisplayGeometry,Geometry2D);
+    mitkClassMacro(DisplayGeometry,PlaneGeometry);
 
     /// Method for creation through the object factory.
     itkFactorylessNewMacro(Self)
@@ -77,19 +74,15 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     /// \brief duplicates the geometry, NOT useful for this sub-class
     virtual itk::LightObject::Pointer InternalClone() const;
 
-    virtual bool IsValid() const;
-
     /// \return this objects modified time.
     virtual unsigned long GetMTime() const;
 
-    virtual const TimeBounds& GetTimeBounds() const;
-
-
+    //virtual const TimeBounds& GetTimeBounds() const;
 
     // size definition methods
 
-    virtual void SetWorldGeometry(const Geometry2D* aWorldGeometry);
-    itkGetConstObjectMacro(WorldGeometry, Geometry2D);
+    virtual void SetWorldGeometry(const PlaneGeometry* aWorldGeometry);
+    itkGetConstObjectMacro(WorldGeometry, PlaneGeometry);
 
     /// \return if new origin was within accepted limits
     virtual bool SetOriginInMM(const Vector2D& origin_mm);
@@ -114,9 +107,6 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     virtual Vector2D GetSizeInMM() const;
     unsigned int GetDisplayWidth() const;
     unsigned int GetDisplayHeight() const;
-
-
-
 
     // zooming, panning, restriction of both
 
@@ -154,9 +144,6 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
 
     // \brief align display with world, make world completely visible
     virtual void Fit();
-
-
-
 
     // conversion methods
 
@@ -199,6 +186,10 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     virtual bool Map(const Point3D & atPt3d_mm, const Vector3D &vec3d_mm, Vector2D &vec2d_mm) const;
     virtual void Map(const Point2D & atPt2d_mm, const Vector2D &vec2d_mm, Vector3D &vec3d_mm) const;
 
+    virtual bool IsValid() const;
+
+    virtual bool IsAbove( const Point3D &pt3d_mm , bool /*considerBoundingBox=false*/) const { return Superclass::IsAbove(pt3d_mm, true);};
+
   protected:
 
     DisplayGeometry();
@@ -228,14 +219,12 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     ScalarType m_ScaleFactorMMPerDisplayUnit;
     Vector2D m_SizeInMM;
     Vector2D m_SizeInDisplayUnits;
-    Geometry2D::ConstPointer m_WorldGeometry;
+    PlaneGeometry::ConstPointer m_WorldGeometry;
 
     bool m_ConstrainZoomingAndPanning;
     float m_MaxWorldViewPercentage;
     float m_MinWorldViewPercentage;
-};
-
+  };
 } // namespace
 
 #endif // include guard
-

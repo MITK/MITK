@@ -29,7 +29,6 @@ set(MODULE_TESTS
   mitkEventTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
-  mitkGeometry2DTest.cpp
   mitkGeometry3DTest.cpp
   mitkGeometry3DEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
@@ -47,12 +46,14 @@ set(MODULE_TESTS
   mitkMessageTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
+  mitkPointSetTest.cpp
   mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
-  mitkPointSetTest.cpp
+  mitkPointSetOnEmptyTest.cpp
   mitkPointSetWriterTest.cpp
   mitkPointSetReaderTest.cpp
   mitkPointSetInteractorTest.cpp
+  mitkPointSetPointOperationsTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
   mitkSlicedGeometry3DTest.cpp
@@ -94,8 +95,10 @@ set(MODULE_TESTS
   mitkLookupTableTest.cpp
   mitkSTLFileReaderTest.cpp
   mitkSurfaceToImageFilterTest.cpp
+  mitkBaseGeometryTest.cpp
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
+  mitkLineTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
@@ -173,6 +176,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageToItkTest.cpp
     mitkImageSliceSelectorTest.cpp
     mitkSurfaceDepthPeelingTest.cpp
+    mitkSurfaceDepthSortingTest.cpp
 )
 
 set(MODULE_RESOURCE_FILES

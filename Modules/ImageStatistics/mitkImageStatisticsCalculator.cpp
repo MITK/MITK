@@ -555,12 +555,18 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       {
         if( m_InternalImage->GetDimension() == 3 )
         {
-          CastToItkImage( timeSliceImage, m_InternalImageMask3D );
+          if(itk::ImageIOBase::USHORT != timeSliceImage->GetPixelType().GetComponentType())
+            CastToItkImage( timeSliceImage, m_InternalImageMask3D );
+          else
+            CastToItkImage( timeSliceImage->Clone(), m_InternalImageMask3D  );
           m_InternalImageMask3D->FillBuffer(1);
         }
         if( m_InternalImage->GetDimension() == 2 )
         {
-          CastToItkImage( timeSliceImage, m_InternalImageMask2D );
+          if(itk::ImageIOBase::USHORT != timeSliceImage->GetPixelType().GetComponentType())
+            CastToItkImage( timeSliceImage, m_InternalImageMask2D );
+          else
+            CastToItkImage( timeSliceImage->Clone(), m_InternalImageMask2D );
           m_InternalImageMask2D->FillBuffer(1);
         }
       }
@@ -613,20 +619,20 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
         throw std::runtime_error( "Masking not possible for non-closed figures" );
       }
 
-      const Geometry3D *imageGeometry = timeSliceImage->GetGeometry();
+      const BaseGeometry *imageGeometry = timeSliceImage->GetGeometry();
       if ( imageGeometry == NULL )
       {
         throw std::runtime_error( "Image geometry invalid!" );
       }
 
-      const Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
-      if ( planarFigureGeometry2D == NULL )
+      const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
+      if ( planarFigurePlaneGeometry == NULL )
       {
         throw std::runtime_error( "Planar-Figure not yet initialized!" );
       }
 
       const PlaneGeometry *planarFigureGeometry =
-        dynamic_cast< const PlaneGeometry * >( planarFigureGeometry2D );
+        dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
       if ( planarFigureGeometry == NULL )
       {
         throw std::runtime_error( "Non-planar planar figures not supported!" );
@@ -698,7 +704,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
 
 bool ImageStatisticsCalculator::GetPrincipalAxis(
-  const Geometry3D *geometry, Vector3D vector,
+  const BaseGeometry *geometry, Vector3D vector,
   unsigned int &axis )
 {
   vector.Normalize();
@@ -1102,16 +1108,15 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
   // These points are used by the vtkLassoStencilSource to create
   // a vtkImageStencil.
-  const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+  const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
   const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
-
+  const mitk::BaseGeometry *imageGeometry3D = m_Image->GetGeometry( 0 );
   // If there is a second poly line in a closed planar figure, treat it as a hole.
   PlanarFigure::PolyLineType planarFigureHolePolyline;
 
   if (m_PlanarFigure->GetPolyLinesSize() == 2)
     planarFigureHolePolyline = m_PlanarFigure->GetPolyLine(1);
 
-  const mitk::Geometry3D *imageGeometry3D = m_Image->GetGeometry( 0 );
 
   // Determine x- and y-dimensions depending on principal axis
   int i0, i1;
@@ -1148,7 +1153,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
     // Convert 2D point back to the local index coordinates of the selected
     // image
-    planarFigureGeometry2D->Map( *it, point3D );
+    planarFigurePlaneGeometry->Map( *it, point3D );
 
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil
@@ -1173,7 +1178,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
     for (it = planarFigureHolePolyline.begin(); it != end; ++it)
     {
-      planarFigureGeometry2D->Map(*it, point3D);
+      planarFigurePlaneGeometry->Map(*it, point3D);
       imageGeometry3D->WorldToIndex(point3D, point3D);
       holePoints->InsertNextPoint(point3D[i0], point3D[i1], 0);
     }

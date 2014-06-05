@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestDICOMLoading.h"
 #include "mitkTestingMacros.h"
+#include "mitkImage.h"
 
 bool CheckAllPropertiesAreInOtherList(const mitk::PropertyList* list, const mitk::PropertyList* otherList)
 {

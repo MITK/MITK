@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_volumevisualization The Volume Visualization Plugin
 
-\image html QmitkVolumeVisualization_Icon.png "Icon of the Plugin"
+\imageMacro{QmitkVolumeVisualization_Icon.png,"Icon of the Volume Visualization Plugin",2.00}
 
 \tableofcontents
 
@@ -13,7 +13,7 @@ These functions, that map the gray-value to color and opacity, can be interactiv
 Additionally, there are controls to quickly generate common used transfer function shapes
 like the threshold and bell curve to help identify a range of grey-values.
 
-\image html QmitkVolumeVisualization_Overview.png ""
+\imageMacro{QmitkVolumeVisualization_Overview.png,"",16.00}
 
 \section QVV_EnableVRPage Enable Volume Rendering
 
@@ -37,7 +37,7 @@ Volume Visualization imposes following restrictions on images:
 
 \subsection QVV_EnableVR Enable Volumerendering
 
-\image html QmitkVolumeVisualization_Checkboxen.png ""
+\imageMacro{QmitkVolumeVisualization_Checkboxen.png,"",8.21}
 
 Select an image in datamanager and click on the checkbox left of "Volumerendering".
 Please be patient, while the image is prepared for rendering, which can take up to a half minute.
@@ -63,7 +63,7 @@ A large set of medical data has been tested with that presets, but it may not su
 
 Click on the "Preset" tab for using internal or custom presets.
 
-\image html QmitkVolumeVisualization_InternalPresets.png ""
+\imageMacro{QmitkVolumeVisualization_InternalPresets.png,"",8.30}
 
 <ul>
 <li> "CT Generic" is the default transferfunction that is first applied.
@@ -96,20 +96,25 @@ The second parameter "width" (controlled by vertical movement of the mouse) spec
 \subsection Threshold
 
 Click on the "Threshold" tab to active the threshold function generator.
-\image html QmitkVolumeVisualization_Threshold.png ""
+
+\imageMacro{QmitkVolumeVisualization_Threshold.png,"",8.21}
+
 A threshold shape begins with zero and raises to one across the "center" parameter. Lower widths results in steeper threshold functions.
 
 \subsection Bell
 
 Click on the "Bell" tab to active the threshold function generator.
-\image html QmitkVolumeVisualization_Bell.png ""
+
+\imageMacro{QmitkVolumeVisualization_Bell.png,"",8.23}
+
 A threshold shape begins with zero and raises to one at the "center" parameter and the lowers agains to zero. The "width" parameter correspondens to the width of the bell.
 
 \section QVV_Editing Customize transferfunctions in detail
 
 \subsection QVV_Navigate Choosing grayvalue interval to edit
 
-\image html QmitkVolumeVisualization_Slider.png ""
+\imageMacro{QmitkVolumeVisualization_Slider.png,"",8.23}
+
 To navigate across the grayvalue range or to zoom in some ranges use the "range"-slider.
 
 All three function editors have in common following:
@@ -127,17 +132,20 @@ There are three transferfunctions to customize:
 
 \subsection QVV_GO Grayvalue -> Opacity
 
-\image html QmitkVolumeVisualization_Opacity.png "grayvalues will be mapped to opacity."
+\imageMacro{QmitkVolumeVisualization_Opacity.png,"grayvalues will be mapped to opacity.",8.04}
+
 An opacity of 0 means total transparent, an opacity of 1 means total opaque.
 
 \subsection QVV_GC Grayvalue -> Color
 
-\image html QmitkVolumeVisualization_Color.png "grayvalues will be mapped to color."
+\imageMacro{QmitkVolumeVisualization_Color.png,"grayvalues will be mapped to color.",8.81}
+
 The color transferfunction editor also allows by double-clicking a point to change its color.
 
 \subsection QVV_GGO Grayvalue and Gradient -> Opacity
 
-\image html QmitkVolumeVisualization_Gradient.png ""
+\imageMacro{QmitkVolumeVisualization_Gradient.png,"",8.85}
+
 Here the influence of the gradient is controllable at specific grayvalues.
 
 */

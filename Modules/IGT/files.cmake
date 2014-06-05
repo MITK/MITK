@@ -18,6 +18,7 @@ set(CPP_FILES
   Common/mitkTrackingTypes.cpp
 
   DataManagement/mitkNavigationData.cpp
+  DataManagement/mitkNavigationDataSet.cpp
   DataManagement/mitkNavigationDataSource.cpp
   DataManagement/mitkNavigationTool.cpp
   DataManagement/mitkNavigationToolStorage.cpp
@@ -31,11 +32,17 @@ set(CPP_FILES
   IO/mitkNavigationDataPlayer.cpp
   IO/mitkNavigationDataPlayerBase.cpp
   IO/mitkNavigationDataRecorder.cpp
+  IO/mitkNavigationDataRecorderDeprecated.cpp
   IO/mitkNavigationDataSequentialPlayer.cpp
   IO/mitkNavigationToolReader.cpp
   IO/mitkNavigationToolStorageSerializer.cpp
   IO/mitkNavigationToolStorageDeserializer.cpp
   IO/mitkNavigationToolWriter.cpp
+  IO/mitkNavigationDataReaderInterface.cpp
+  IO/mitkNavigationDataReaderXML.cpp
+  IO/mitkNavigationDataReaderCSV.cpp
+  IO/mitkNavigationDataSetWriterXML.cpp
+  IO/mitkNavigationDataSetWriterCSV.cpp
 
   Rendering/mitkCameraVisualization.cpp
   Rendering/mitkNavigationDataObjectVisualizationFilter.cpp

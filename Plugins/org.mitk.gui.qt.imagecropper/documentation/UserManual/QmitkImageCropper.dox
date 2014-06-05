@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_imagecropper The Image Cropper Plugin
 
-\image html QmitkImageCropper_Icon.png "Icon of the Plugin"
+\imageMacro{QmitkImageCropper_Icon.png,"Icon of the Image Cropper Plugin",2.00}
 
 \tableofcontents
 

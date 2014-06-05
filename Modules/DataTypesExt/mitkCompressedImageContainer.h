@@ -79,7 +79,7 @@ class MitkDataTypesExt_EXPORT CompressedImageContainer : public itk::Object
     /// one for each timestep. first = pointer to compressed data; second = size of buffer in bytes
     std::vector< std::pair<unsigned char*, unsigned long> > m_ByteBuffers;
 
-    Geometry3D::Pointer m_ImageGeometry;
+    BaseGeometry::Pointer m_ImageGeometry;
 };
 
 } // namespace

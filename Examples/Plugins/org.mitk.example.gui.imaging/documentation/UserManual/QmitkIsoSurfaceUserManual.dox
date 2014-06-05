@@ -2,7 +2,7 @@
 
 \page org_mitk_views_isosurface The Iso Surface Module
 
-\image html IsoSurfaceIcon.png "Icon of the Module"
+\imageMacro{IsoSurfaceIcon.png,"Icon of the Iso Surface Module",2.00}
 
 Available sections:
   - \ref QmitkIsoSurfaceUserManualOverview 
@@ -29,7 +29,7 @@ How to create a surface:
 - Press the Button "Create Surface" 
 
 
-\image html IsoSurfaceGUI.png "Graphical User Interface of Iso Surface"
+\imageMacro{IsoSurfaceGUI.png,"Graphical User Interface of Iso Surface",16.00}
 
 \section QmitkIsoSurfaceUserManualTroubleshooting Troubleshooting
 

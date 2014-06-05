@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkLine.h>
 #include <mitkGeometry3D.h>
-#include <mitkGeometry2D.h>
+#include <mitkPlaneGeometry.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkDisplayGeometry.h>
 #include <mitkSlicedGeometry3D.h>
@@ -299,7 +299,7 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
   if (!posEvent) return false;
 
   BaseRenderer* clickedRenderer = e->GetEvent()->GetSender();
-  const PlaneGeometry* ourViewportGeometry = dynamic_cast<const PlaneGeometry*>( clickedRenderer->GetCurrentWorldGeometry2D() );
+  const PlaneGeometry* ourViewportGeometry = dynamic_cast<const PlaneGeometry*>( clickedRenderer->GetCurrentWorldPlaneGeometry() );
   if (!ourViewportGeometry) return false;
 
   DisplayGeometry* clickedDisplayGeometry = clickedRenderer->GetDisplayGeometry();

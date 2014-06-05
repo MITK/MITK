@@ -74,10 +74,11 @@ void QmitkInteractiveTransformationWidget::CreateConnections()
   }
 }
 
-void QmitkInteractiveTransformationWidget::SetGeometry( mitk::Geometry3D::Pointer geometry, mitk::Geometry3D::Pointer defaultValues )
+void QmitkInteractiveTransformationWidget::SetGeometry( mitk::BaseGeometry::Pointer geometry, mitk::BaseGeometry::Pointer defaultValues )
 {
   m_Geometry = geometry;
-  m_ResetGeometry = geometry->Clone();
+  itk::LightObject::Pointer lopointer = geometry->Clone();
+  m_ResetGeometry = dynamic_cast<mitk::BaseGeometry*>(lopointer.GetPointer());
 
   //set default values
   if (defaultValues.IsNotNull())
@@ -110,7 +111,7 @@ void QmitkInteractiveTransformationWidget::SetGeometry( mitk::Geometry3D::Pointe
     }
 }
 
-mitk::Geometry3D::Pointer QmitkInteractiveTransformationWidget::GetGeometry()
+mitk::BaseGeometry::Pointer QmitkInteractiveTransformationWidget::GetGeometry()
 {
   return m_Geometry;
 }
@@ -276,7 +277,6 @@ void QmitkInteractiveTransformationWidget::OnResetGeometry()
   qApp->processEvents();
 
   // reset the input to its initial state.
-  m_ResetGeometry->TransferItkToVtkTransform();
   m_Geometry->SetIdentity();
   m_Geometry->Compose(m_ResetGeometry->GetVtkTransform()->GetMatrix());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

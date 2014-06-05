@@ -20,7 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkFunctionality.h>
 #include "ui_QmitkTbssSkeletonizationViewControls.h"
+#include "itkImage.h"
 
+namespace mitk {
+  class Image;
+}
 
 typedef itk::Image<float, 3> FloatImageType;
 typedef itk::Image<char, 3> CharImageType;
@@ -84,7 +88,7 @@ class QmitkTbssSkeletonizationView : public QmitkFunctionality
 
     void AddToDataStorage(mitk::Image* img, std::string name);
 
-    Float4DImageType::Pointer ConvertToItk(mitk::Image::Pointer image);
+    Float4DImageType::Pointer ConvertToItk(itk::SmartPointer<mitk::Image> image);
 
 
 };

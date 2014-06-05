@@ -74,7 +74,7 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    itkSetMacro( WorldGeometry, Geometry2D* );
+    itkSetMacro( WorldGeometry, PlaneGeometry* );
 
     // The Reslicer is accessible to configure the desired interpolation;
     // (See vtk::ImageReslice class for documentation).
@@ -103,12 +103,12 @@ namespace mitk
     virtual void GenerateData();
     virtual void GenerateOutputInformation();
 
-    bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
+    bool CalculateClippedPlaneBounds( const BaseGeometry *boundingGeometry,
       const PlaneGeometry *planeGeometry, double *bounds );
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,
       double *bounds );
 
-    const Geometry2D*  m_WorldGeometry;
+    const PlaneGeometry*  m_WorldGeometry;
     vtkImageReslice *  m_Reslicer;
 
     unsigned int    m_TargetTimestep;

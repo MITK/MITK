@@ -534,14 +534,14 @@ bool mitk::ContourModel::VerifyRequestedRegion ()
 
 
 
-const mitk::Geometry3D * mitk::ContourModel::GetUpdatedGeometry (int t)
+const mitk::BaseGeometry * mitk::ContourModel::GetUpdatedGeometry (int t)
 {
   return Superclass::GetUpdatedGeometry(t);
 }
 
 
 
-mitk::Geometry3D* mitk::ContourModel::GetGeometry (int t)const
+mitk::BaseGeometry* mitk::ContourModel::GetGeometry (int t)const
 {
   return Superclass::GetGeometry(t);
 }
@@ -692,7 +692,7 @@ void mitk::ContourModel::UpdateOutputInformation()
           mitkBounds[5] = tmp[5];
 
           //set boundingBox at current timestep
-          Geometry3D* geometry3d = this->GetGeometry(currenTimeStep);
+          BaseGeometry* geometry3d = this->GetGeometry(currenTimeStep);
           geometry3d->SetBounds(mitkBounds);
         }
       }

@@ -119,6 +119,7 @@ protected:
   bool m_ImageAlreadySetToNode;
   unsigned int m_CurrentImageWidth;
   unsigned int m_CurrentImageHeight;
+  double m_CurrentDynamicRange;
 };
 
 #endif // UltrasoundSupport_h

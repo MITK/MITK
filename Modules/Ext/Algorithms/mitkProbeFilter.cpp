@@ -26,12 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ProbeFilter::ProbeFilter()
 {
-
 }
 
 mitk::ProbeFilter::~ProbeFilter()
 {
-
 }
 
 const mitk::Surface *mitk::ProbeFilter::GetInput(void)
@@ -72,19 +70,22 @@ void mitk::ProbeFilter::GenerateOutputInformation()
 
   if( (input->GetTimeGeometry()->CountTimeSteps()==1) && (source->GetTimeGeometry()->CountTimeSteps()>1) )
   {
-    Geometry3D::Pointer geometry3D = Geometry3D::New();
+    Geometry3D::Pointer geo3D = Geometry3D::New();
+    BaseGeometry::Pointer geometry3D = dynamic_cast<BaseGeometry*>(geo3D.GetPointer());
     geometry3D->Initialize();
     geometry3D->SetBounds(source->GetTimeGeometry()->GetBoundsInWorld());
-    geometry3D->SetTimeBounds(source->GetTimeGeometry()->GetGeometryForTimeStep(0)->GetTimeBounds());
 
     ProportionalTimeGeometry::Pointer outputTimeGeometry = ProportionalTimeGeometry::New();
     outputTimeGeometry->Initialize(geometry3D, source->GetTimeGeometry()->CountTimeSteps());
+    outputTimeGeometry->SetFirstTimePoint(source->GetTimeGeometry()->GetMinimumTimePoint());
+    TimePointType stepDuration = source->GetTimeGeometry()->GetMaximumTimePoint(0) - source->GetTimeGeometry()->GetMinimumTimePoint(0);
+    outputTimeGeometry->SetStepDuration(stepDuration);
 
     output->Expand(outputTimeGeometry->CountTimeSteps());
     output->SetTimeGeometry( outputTimeGeometry );
   }
   else
-    output->SetGeometry( static_cast<Geometry3D*>(input->GetGeometry()->Clone().GetPointer()) );
+    output->SetGeometry( static_cast<BaseGeometry*>(input->GetGeometry()->Clone().GetPointer()) );
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 }

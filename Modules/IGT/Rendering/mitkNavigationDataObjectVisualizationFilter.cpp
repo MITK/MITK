@@ -169,7 +169,6 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
 
     //set the original spacing to keep scaling of the geometrical object
     data->GetGeometry()->SetSpacing(spacing);
-    data->GetGeometry()->TransferItkToVtkTransform(); // update VTK Transform for rendering too
     data->GetGeometry()->Modified();
     data->Modified();
     output->SetDataValid(true); // operation was successful, therefore data of output is valid.

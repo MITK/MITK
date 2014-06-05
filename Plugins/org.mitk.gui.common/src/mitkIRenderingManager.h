@@ -65,7 +65,7 @@ struct IRenderingManager {
   virtual void ForceImmediateUpdateAll( RenderingManager::RequestType type = RenderingManager::REQUEST_UPDATE_ALL ) = 0;
 
   /** Initializes the windows specified by requestType to the given geometry. */
-  virtual bool InitializeViews( const Geometry3D *geometry,
+  virtual bool InitializeViews( const BaseGeometry *geometry,
                                 RenderingManager::RequestType type = RenderingManager::REQUEST_UPDATE_ALL,
                                 bool preserveRoughOrientationInWorldSpace = false ) = 0;
   virtual bool InitializeViews( const TimeGeometry *geometry,
@@ -83,7 +83,7 @@ struct IRenderingManager {
    * "initializeGlobalTimeSNC" to true in order to use this geometry as
    * global TimeGeometry.
    */
-  virtual bool InitializeView( vtkRenderWindow *renderWindow, const Geometry3D *geometry,
+  virtual bool InitializeView( vtkRenderWindow *renderWindow, const BaseGeometry *geometry,
                                bool initializeGlobalTimeSNC = false) = 0;
 
   /**

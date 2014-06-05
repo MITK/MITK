@@ -98,7 +98,6 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
 
 void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-
   const mitk::DataNode* node=GetDataNode();
   if( node == NULL )
     return;
@@ -127,9 +126,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
     //
     // get the world time
     //
-    const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
-    assert( worldGeometry != NULL );
-    ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+    ScalarType time = renderer->GetTime();
 
     //
     // convert the world time in time steps of the input object

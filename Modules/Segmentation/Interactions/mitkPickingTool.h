@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorage.h"
 #include "mitkSinglePointDataInteractor.h"
 #include "mitkPointSet.h"
+#include "itkImage.h"
 
 namespace us {
 class ModuleResource;
@@ -82,7 +83,7 @@ namespace mitk
 
     //itk regrowing
     template < typename TPixel, unsigned int VImageDimension >
-    void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint );
+    void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint );
 
     //seed point
     PointSet::Pointer m_PointSet;

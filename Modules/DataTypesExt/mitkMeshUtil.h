@@ -47,7 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkProperty.h>
 #include <vtkFloatArray.h>
 
-#include <mitkGeometry3D.h>
+#include <mitkBaseGeometry.h>
 #include <mitkSurface.h>
 
 template <typename MeshType>
@@ -708,7 +708,7 @@ public:
   /*!
   create an itkMesh object from a vtkPolyData
   */
-  static typename MeshType::Pointer MeshFromPolyData(vtkPolyData* poly, mitk::Geometry3D* geometryFrame=NULL, mitk::Geometry3D* polyDataGeometryFrame=NULL)
+  static typename MeshType::Pointer MeshFromPolyData(vtkPolyData* poly, mitk::BaseGeometry* geometryFrame=NULL, mitk::BaseGeometry* polyDataGeometryFrame=NULL)
   {
     // Create a new mesh
     typename MeshType::Pointer output = MeshType::New();
@@ -971,7 +971,7 @@ public:
   /*!
   create an itkMesh object from an mitk::Surface
   */
-  static typename MeshType::Pointer MeshFromSurface(mitk::Surface* surface, mitk::Geometry3D* geometryFrame=NULL)
+  static typename MeshType::Pointer MeshFromSurface(mitk::Surface* surface, mitk::BaseGeometry* geometryFrame=NULL)
   {
     if(surface == NULL)
       return NULL;
@@ -986,7 +986,7 @@ public:
     bool usePointScalarAccessor = false,
     bool useCellScalarAccessor = false,
     unsigned int pointDataType = 0,
-    mitk::Geometry3D* geometryFrame=NULL)
+    mitk::BaseGeometry* geometryFrame=NULL)
   {
     /*!
     default SingleCellArray line cell visitior definition
@@ -1208,7 +1208,7 @@ public:
   /*!
   create a vtkPolyData object from an itkMesh
   */
-  static vtkPolyData* MeshToPolyData(MeshType* mesh, bool onlyTriangles = false, bool useScalarAccessor = false, unsigned int pointDataType = 0, mitk::Geometry3D* geometryFrame=NULL, vtkPolyData* polydata = NULL)
+  static vtkPolyData* MeshToPolyData(MeshType* mesh, bool onlyTriangles = false, bool useScalarAccessor = false, unsigned int pointDataType = 0, mitk::BaseGeometry* geometryFrame=NULL, vtkPolyData* polydata = NULL)
   {
     /*!
     default Distribute line cell visitior definition

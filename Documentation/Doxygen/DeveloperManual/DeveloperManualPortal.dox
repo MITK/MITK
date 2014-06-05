@@ -1,5 +1,5 @@
 /**
-\page DeveloperManualPortal MITK: Developer Manual
+\developersguidemainpage{DeveloperManualPortal} MITK: Developer Manual
 
 Development with MITK can happen under several conditions. Depending on whether you are using the Toolkit or the entire application, different sections may apply to you.
 In case you are unsure about what you need, please refer to \link Architecture The Architecture of MITK text\endlink.

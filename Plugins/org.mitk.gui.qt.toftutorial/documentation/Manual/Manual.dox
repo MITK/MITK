@@ -1,7 +1,7 @@
 /**
 \page org_toftutorial ToFTutorial
 
-\image html icon.png "Icon of ToFTutorial"
+\imageMacro{icon.png,"Icon of ToFTutorial",2}
 
 Available sections:
   - \ref ToFTutorialOverview

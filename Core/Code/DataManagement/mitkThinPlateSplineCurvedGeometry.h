@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKTHINPLATESPLINECURVEDGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 #define MITKTHINPLATESPLINECURVEDGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 
@@ -24,14 +23,13 @@ class vtkPoints;
 class vtkThinPlateSplineTransform;
 
 namespace mitk {
-
-//##Documentation
-//## @brief Thin-plate-spline-based landmark-based curved geometry
-//##
-//## @ingroup Geometry
-class MITK_CORE_EXPORT ThinPlateSplineCurvedGeometry : public LandmarkProjectorBasedCurvedGeometry
-{
-public:
+  //##Documentation
+  //## @brief Thin-plate-spline-based landmark-based curved geometry
+  //##
+  //## @ingroup Geometry
+  class MITK_CORE_EXPORT ThinPlateSplineCurvedGeometry : public LandmarkProjectorBasedCurvedGeometry
+  {
+  public:
   mitkClassMacro(ThinPlateSplineCurvedGeometry, LandmarkProjectorBasedCurvedGeometry);
 
   itkFactorylessNewMacro(Self)
@@ -51,7 +49,7 @@ public:
 
   virtual bool IsValid() const;
 
-protected:
+  protected:
   ThinPlateSplineCurvedGeometry();
   ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other );
 
@@ -61,9 +59,7 @@ protected:
 
   vtkPoints* m_VtkTargetLandmarks;
   vtkPoints* m_VtkProjectedLandmarks;
-
-};
-
+  };
 } // namespace mitk
 
 #endif /* MITKTHINPLATESPLINECURVEDGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */

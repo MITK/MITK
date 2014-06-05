@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkDataNode.h"
 #include "mitkGeometryData.h"
-#include "mitkGeometry2DData.h"
+#include "mitkPlaneGeometryData.h"
 #include "mitkProperties.h"
 #include "itkMesh.h"
 #include "itkPointSet.h"
@@ -31,7 +31,7 @@ mitk::PointSetToCurvedGeometryFilter::PointSetToCurvedGeometryFilter()
   m_PCAPlaneCalculator = mitk::PlaneFit::New();
   m_ImageToBeMapped = NULL;
   m_Sigma = 1000;
-  mitk::Geometry2DData::Pointer output = static_cast<mitk::Geometry2DData*> ( this->MakeOutput ( 0 ).GetPointer() );
+  mitk::PlaneGeometryData::Pointer output = static_cast<mitk::PlaneGeometryData*> ( this->MakeOutput ( 0 ).GetPointer() );
   output->Initialize();
   Superclass::SetNumberOfRequiredOutputs ( 1 );
   Superclass::SetNthOutput ( 0, output.GetPointer() );
@@ -45,7 +45,7 @@ mitk::PointSetToCurvedGeometryFilter::~PointSetToCurvedGeometryFilter()
 void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
 {
   mitk::PointSet::ConstPointer input  = this->GetInput();
-  mitk::Geometry2DData::Pointer output  = dynamic_cast<mitk::Geometry2DData*> ( this->GetOutput() );
+  mitk::PlaneGeometryData::Pointer output  = dynamic_cast<mitk::PlaneGeometryData*> ( this->GetOutput() );
 
   if ( input.IsNull() )
     itkGenericExceptionMacro ( "Input point set is NULL!" );
@@ -60,7 +60,7 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
     itkGenericExceptionMacro ( "Image to be mapped is NULL!" );
 
   bool update = false;
-  if ( output->GetGeometry() == NULL || output->GetGeometry2D() == NULL || output->GetTimeGeometry() == NULL )
+  if ( output->GetGeometry() == NULL || output->GetPlaneGeometry() == NULL || output->GetTimeGeometry() == NULL )
     update = true;
   if ( ( ! update ) && ( output->GetTimeGeometry()->CountTimeSteps() != input->GetTimeGeometry()->CountTimeSteps() ) )
     update = true;
@@ -99,7 +99,7 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateData()
   if ( m_XYPlane.IsNull()  ||  m_XZPlane.IsNull() || m_YZPlane.IsNull() )
   {
     m_ImageToBeMapped->UpdateOutputInformation();
-    const mitk::Geometry3D* imageGeometry = m_ImageToBeMapped->GetUpdatedGeometry();
+    const mitk::BaseGeometry* imageGeometry = m_ImageToBeMapped->GetUpdatedGeometry();
     imageGeometry = m_ImageToBeMapped->GetUpdatedGeometry();
     m_XYPlane = mitk::PlaneGeometry::New();
     m_XZPlane = mitk::PlaneGeometry::New();

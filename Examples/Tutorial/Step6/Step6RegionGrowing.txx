@@ -32,7 +32,7 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 
   typedef float InternalPixelType;
   typedef itk::Image< InternalPixelType, VImageDimension > InternalImageType;
 
-  mitk::Geometry3D* geometry = step6->m_FirstImage->GetGeometry();
+  mitk::BaseGeometry* geometry = step6->m_FirstImage->GetGeometry();
 
   // create itk::CurvatureFlowImageFilter for smoothing and set itkImage as input
   typedef itk::CurvatureFlowImageFilter< ImageType, InternalImageType >

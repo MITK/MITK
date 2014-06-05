@@ -2,7 +2,7 @@
 
 \page org_mitk_views_igtnavigationtoolmanager The MITK-IGT Navigation Tool Manager
 
-\image html QmitkIGTTracking_IconNavigationToolManager.png "Icon of the Module"
+\imageMacro{QmitkIGTTracking_IconNavigationToolManager.png,"Icon of the Navigation Tool Manager",2.00}
 
 \section QmitkMITKIGTNavigationToolManager Introduction
 
@@ -37,7 +37,7 @@ In order to create edit a tool storage container, you can select one of the avai
 
 In the lower part of the UI you always see the list of tools of the tool storage which is currently selected in the upper part. Use the buttons "add", "edit" and "delete" to manage the contained navigation tools. If you click "edit" or "delete" the operation is applied on the currently selected tool, as shown in the screenshot below.
 
-\image html QmitkIGTTracking_NavigationToolManagemantStartScreen.png "Screenshot of the main view of NavigationToolManagent"
+\imageMacro{QmitkIGTTracking_NavigationToolManagemantStartScreen.png,"Screenshot of the main view of NavigationToolManagent",10.90}
 
 \section QmitkMITKIGTNavigationToolManagerAddingEditingNavigationTools Adding / Editing Navigation Tools
 
@@ -50,6 +50,6 @@ The tool type is additional information which is not needed by the tracking devi
 <li> Tool Registration Landmarks: These landmarks are designed for representing defined landmarks on a tools surface. The number of these landmarks might exeed the number of tool calibration landmarks for reasons of redundancy and averaging. They are used for, e.g., manually registering the pose of a tool by visual markers in a CT scan. If you would use these landmarks to do a point based registration from image space to tracking space later, you might overweight the tool because of two many landmarks compared to other markers.
 </ul>
 
-\image html QmitkIGTTracking_NavigationToolManagementAddTool.png "Screenshot of add/edit navigation tool screen"
+\imageMacro{QmitkIGTTracking_NavigationToolManagementAddTool.png,"Screenshot of add/edit navigation tool screen",9.19}
 
 */

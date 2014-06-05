@@ -18,12 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
+#include "itkImage.h"
 
 namespace us {
 class ModuleResource;
 }
 
 namespace mitk{
+
+  class Image;
+
   class MitkSegmentation_EXPORT OtsuTool3D : public AutoSegmentationTool
   {
     public:
@@ -50,7 +54,10 @@ namespace mitk{
       OtsuTool3D();
       virtual ~OtsuTool3D();
 
-      mitk::Image::Pointer m_OriginalImage;
+      template< typename TPixel, unsigned int VImageDimension>
+      void CalculatePreview( itk::Image< TPixel, VImageDimension>* itkImage, std::vector<int> regionIDs);
+
+      itk::SmartPointer<Image> m_OriginalImage;
       //holds the user selected binary segmentation
       mitk::DataNode::Pointer m_BinaryPreviewNode;
       //holds the multilabel result as a preview image

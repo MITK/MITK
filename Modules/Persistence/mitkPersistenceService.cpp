@@ -22,10 +22,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usGetModuleContext.h"
 #include <itksys/SystemTools.hxx>
 
-//not used at the moment because of bug 17729 (using the strings directly instead until the bug is fixed)
-const std::string mitk::PersistenceService::PERSISTENCE_PROPERTY_NAME("PersistenceNode");
-const std::string mitk::PersistenceService::PERSISTENCE_PROPERTYLIST_NAME("PersistenceService");
+std::string mitk::PersistenceService::GetPersistencePropertyName()
+{
+  return "PersistenceNode";
+}
 
+std::string mitk::PersistenceService::GetPersistencePropertyListName()
+{
+  return "PersistenceService";
+}
 
 mitk::PersistenceService::PersistenceService()
 : m_AutoLoadAndSave( true ), m_Initialized(false), m_InInitialized(false)
@@ -47,10 +52,9 @@ mitk::PersistenceService::~PersistenceService()
 std::string mitk::PersistenceService::GetDefaultPersistenceFile()
 {
   this->Initialize();
-  std::string file = "PersistentData.mitk";
+  std::string file = "PersistentData.xml";
   us::ModuleContext* context = us::GetModuleContext();
-  std::string contextDataFile = context->GetDataFile("PersistentData.mitk");
-  itksys::SystemTools::MakeDirectory(context->GetDataFile("").c_str());
+  std::string contextDataFile = context->GetDataFile(file);
 
   if( !contextDataFile.empty() )
   {
@@ -110,6 +114,23 @@ bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChan
   if(theFile.empty())
       theFile = PersistenceService::GetDefaultPersistenceFile();
 
+  std::string thePath = itksys::SystemTools::GetFilenamePath( theFile.c_str() );
+  if( !thePath.empty() && !itksys::SystemTools::FileExists( thePath.c_str() ) )
+  {
+    if( !itksys::SystemTools::MakeDirectory( thePath.c_str() ) )
+    {
+      MITK_ERROR("PersistenceService") << "Could not create " << thePath;
+      return false;
+    }
+  }
+
+  bool createFile = !itksys::SystemTools::FileExists(theFile.c_str());
+  if( !itksys::SystemTools::Touch(theFile.c_str(), createFile) )
+  {
+    MITK_ERROR("PersistenceService") << "Could not create or write to " << theFile;
+    return false;
+  }
+
   bool xmlFile = false;
   if( itksys::SystemTools::GetFilenameLastExtension(theFile.c_str()) == ".xml" )
       xmlFile = true;
@@ -157,6 +178,10 @@ bool mitk::PersistenceService::Save(const std::string& fileName, bool appendChan
   else
   {
       DataStorage::SetOfObjects::Pointer sceneNodes = this->GetDataNodes(tempDs);
+      if(m_SceneIO.IsNull())
+      {
+        m_SceneIO = mitk::SceneIO::New();
+      }
       save = m_SceneIO->SaveScene( sceneNodes.GetPointer(), tempDs, theFile );
   }
   if( save )
@@ -212,6 +237,10 @@ bool mitk::PersistenceService::Load(const std::string& fileName, bool enforceRel
   }
   else
   {
+    if(m_SceneIO.IsNull())
+    {
+      m_SceneIO = mitk::SceneIO::New();
+    }
       DataStorage::Pointer ds = m_SceneIO->LoadScene( theFile );
       load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) && (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
       if( load )
@@ -233,7 +262,7 @@ void mitk::PersistenceService::SetAutoLoadAndSave(bool autoLoadAndSave)
   this->Initialize();
   m_AutoLoadAndSave = autoLoadAndSave;
   //std::string id = PERSISTENCE_PROPERTYLIST_NAME; //see bug 17729
-  std::string id = "PersistenceService";
+  std::string id = GetPersistencePropertyListName();
   mitk::PropertyList::Pointer propList = this->GetPropertyList( id );
   propList->Set("m_AutoLoadAndSave", m_AutoLoadAndSave);
   this->Save();
@@ -265,7 +294,7 @@ std::string mitk::PersistenceService::GetPersistenceNodePropertyName()
 {
   this->Initialize();
   //return PERSISTENCE_PROPERTY_NAME; //see bug 17729
-  return "PersistenceNode";
+  return GetPersistencePropertyName();
 }
 mitk::DataStorage::SetOfObjects::Pointer mitk::PersistenceService::GetDataNodes(mitk::DataStorage* ds)
 {
@@ -282,9 +311,9 @@ mitk::DataStorage::SetOfObjects::Pointer mitk::PersistenceService::GetDataNodes(
 
 
       node->SetName( name );
-      MITK_DEBUG << "Persistence Property Name: " <<PERSISTENCE_PROPERTY_NAME.c_str();
+      MITK_DEBUG << "Persistence Property Name: " << GetPersistencePropertyName().c_str();
       //node->SetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str() , true ); //see bug 17729
-      node->SetBoolProperty( "PersistenceNode" , true );
+      node->SetBoolProperty( GetPersistencePropertyName().c_str() , true );
 
       ds->Add(node);
       set->push_back( node );
@@ -306,7 +335,7 @@ bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes( cons
       mitk::DataNode* node = *sourceIter;
       bool isPersistenceNode = false;
       //node->GetBoolProperty( PERSISTENCE_PROPERTY_NAME.c_str(), isPersistenceNode ); //see bug 17729
-      node->GetBoolProperty( "PersistenceNode", isPersistenceNode );
+      node->GetBoolProperty( GetPersistencePropertyName().c_str(), isPersistenceNode );
 
       if( isPersistenceNode )
       {
@@ -372,13 +401,12 @@ void mitk::PersistenceService::Initialize()
     return;
   m_InInitialized = true;
 
-  m_SceneIO = SceneIO::New();
   m_PropertyListsXmlFileReaderAndWriter = PropertyListsXmlFileReaderAndWriter::New();
 
   // Load Default File in any case
   this->Load();
   //std::string id = mitk::PersistenceService::PERSISTENCE_PROPERTYLIST_NAME; //see bug 17729
-  std::string id = "PersistenceService";
+  std::string id = GetPersistencePropertyListName();
   mitk::PropertyList::Pointer propList = this->GetPropertyList( id );
   bool autoLoadAndSave = true;
   propList->GetBoolProperty("m_AutoLoadAndSave", autoLoadAndSave);

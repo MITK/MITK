@@ -73,7 +73,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 
   vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyData = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   vtkPolyData * polyData;
-  Geometry3D* geometry;
+  BaseGeometry* geometry;
 
   unsigned int t, timesteps = input->GetTimeGeometry()->CountTimeSteps();
 
@@ -89,7 +89,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     {
       if(input->GetTimeGeometry()->IsValidTimeStep(t))
       {
-        const TimeBounds& timebounds = geometry->GetTimeBounds();
+        const TimeBounds& timebounds = input->GetTimeGeometry()->GetTimeBounds(t);
         filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
       }
       else
@@ -102,7 +102,6 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     else
       m_VtkWriter->SetFileName(m_FileName.c_str());
 
-    geometry->TransferItkToVtkTransform();
     transformPolyData->SetInputData(input->GetVtkPolyData(t));
     transformPolyData->SetTransform(geometry->GetVtkTransform());
     transformPolyData->UpdateWholeExtent();

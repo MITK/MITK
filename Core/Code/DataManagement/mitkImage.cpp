@@ -145,7 +145,6 @@ void AccessPixel( const mitk::PixelType ptype, void* data, const unsigned int of
     returnvalue += (((T*) data)[rgboffset + 2]);
     value = returnvalue;
   }
-
 }
 
 double mitk::Image::GetPixelValueByIndex(const mitk::Index3D &position, unsigned int timestep)
@@ -217,8 +216,8 @@ mitk::ImageVtkAccessor* mitk::Image::GetVtkImageData(int t, int n)
     return NULL;
 
   SlicedGeometry3D* geom3d = GetSlicedGeometry(t);
-  float *fspacing = const_cast<float *>(geom3d->GetFloatSpacing());
-  double dspacing[3] = {fspacing[0],fspacing[1],fspacing[2]};
+  const mitk::Vector3D vspacing = (geom3d->GetSpacing());
+  double dspacing[3] = {vspacing[0],vspacing[1],vspacing[2]};
   volume->GetVtkImageData(this)->SetSpacing( dspacing );
 
   return volume->GetVtkImageData(this);
@@ -394,7 +393,6 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
     item->SetComplete(true);
     return item;
   }
-
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data, ImportMemoryManagementType importMemoryManagement)
@@ -768,14 +766,6 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
   slicedGeometry->InitializeEvenlySpaced(planegeometry, m_Dimensions[2]);
 
-  if(dimension>=4)
-  {
-    TimeBounds timebounds;
-    timebounds[0] = 0.0;
-    timebounds[1] = 1.0;
-    slicedGeometry->SetTimeBounds(timebounds);
-  }
-
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
   for (TimeStepType step = 0; step < timeGeometry->CountTimeSteps(); ++step)
@@ -799,11 +789,11 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_Initialized = true;
 }
 
-void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels, int tDim )
+void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::BaseGeometry& geometry, unsigned int channels, int tDim )
 {
   mitk::ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  Geometry3D::Pointer geometry3D = geometry.Clone();
-  timeGeometry->Initialize(geometry3D.GetPointer(), tDim);
+  itk::LightObject::Pointer lopointer = geometry.Clone();
+  timeGeometry->Initialize(dynamic_cast<BaseGeometry*>(lopointer.GetPointer()), tDim);
   this->Initialize(type, *timeGeometry, channels, tDim);
 }
 
@@ -851,10 +841,10 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeomet
   }*/
 }
 
-void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped, unsigned int channels, int tDim )
+void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry2d, bool flipped, unsigned int channels, int tDim )
 {
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-  slicedGeometry->InitializeEvenlySpaced(static_cast<Geometry2D*>(geometry2d.Clone().GetPointer()), sDim, flipped);
+  slicedGeometry->InitializeEvenlySpaced(static_cast<PlaneGeometry*>(geometry2d.Clone().GetPointer()), sDim, flipped);
   Initialize(type, *slicedGeometry, channels, tDim);
 }
 
@@ -971,7 +961,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
   SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
 
   // re-initialize PlaneGeometry with origin and direction
-  PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(slicedGeometry->GetGeometry2D(0));
+  PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>(slicedGeometry->GetPlaneGeometry(0));
   planeGeometry->SetOrigin(origin);
 
   // re-initialize SlicedGeometry3D
@@ -1155,7 +1145,7 @@ void mitk::Image::Clear()
   m_Dimensions = NULL;
 }
 
-void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
+void mitk::Image::SetGeometry(BaseGeometry* aGeometry3D)
 {
   // Please be aware of the 0.5 offset/pixel-center issue! See Geometry documentation for further information
 
@@ -1190,7 +1180,6 @@ void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
       os << indent << " NumberOfComponents: " << chPixelType.GetNumberOfComponents() << std::endl;
       os << indent << " BitsPerComponent: " << chPixelType.GetBitsPerComponent() << std::endl;
     }
-
   }
   else
   {
@@ -1202,7 +1191,7 @@ void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
 
 bool mitk::Image::IsRotated() const
 {
-  const mitk::Geometry3D* geo = this->GetGeometry();
+  const mitk::BaseGeometry* geo = this->GetGeometry();
   bool ret = false;
 
   if(geo)

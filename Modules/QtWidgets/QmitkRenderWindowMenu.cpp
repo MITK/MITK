@@ -832,14 +832,14 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
   {
     if(num==0)
     {
-      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
     }
     else
     {
-      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 1 ) );
-      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( num > 1 ) );
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 1 ) );
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( num > 1 ) );
     }
     m_TSLabel->setText(QString::number(num*2+1));
     m_Renderer->SendUpdateSlice();
@@ -956,14 +956,14 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
     int currentMode = 0;
     {
-      mitk::ResliceMethodProperty::Pointer m = dynamic_cast<mitk::ResliceMethodProperty*>(m_Renderer->GetCurrentWorldGeometry2DNode()->GetProperty( "reslice.thickslices" ));
+      mitk::ResliceMethodProperty::Pointer m = dynamic_cast<mitk::ResliceMethodProperty*>(m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty( "reslice.thickslices" ));
       if( m.IsNotNull() )
         currentMode = m->GetValueAsId();
     }
 
     int currentNum = 1;
     {
-      mitk::IntProperty::Pointer m = dynamic_cast<mitk::IntProperty*>(m_Renderer->GetCurrentWorldGeometry2DNode()->GetProperty( "reslice.thickslices.num" ));
+      mitk::IntProperty::Pointer m = dynamic_cast<mitk::IntProperty*>(m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty( "reslice.thickslices.num" ));
       if( m.IsNotNull() )
       {
         currentNum = m->GetValue();

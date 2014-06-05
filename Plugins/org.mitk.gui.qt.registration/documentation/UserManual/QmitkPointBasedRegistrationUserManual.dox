@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_pointbasedregistration  The Point Based Registration View
 
-\image html QmitkRegistration_PointBasedIcon.png "Icon of the View"
+\imageMacro{QmitkRegistration_PointBasedIcon.png,"Icon of the Point Based Registration View",2.00}
 
 Available sections:
   - \ref PointBasedRegistrationUserManualOverview 
@@ -14,7 +14,7 @@ PointSets. Register means to align two datasets, so that they become as similar 
 Therefore you have to set corresponding points in both datasets, which will be matched. The movement, which has to be 
 performed on the points to align them, will be performed on the moving data as well. The result is shown in the multi-widget. 
 
-\image html QmitkRegistration_PointBasedRegistration_small.png "MITK with the PointBasedRegistration view"
+\imageMacro{QmitkRegistration_PointBasedRegistration_small.png,"MITK with the PointBasedRegistration view",16.00}
 
 This document will tell you how to use this view, but it is assumed that you already know how to navigate through 
 the slices of a dataset using the multi-widget.
@@ -28,7 +28,7 @@ areas for the fixed and moving data appears. The upper area is for interaction w
 moving image with their corresponding pointsets are shown in the render windows. If you want to have other images visible you have to set the visibility via the Data Manager. Also if you want to 
 perform a reinit on a specific node or a global reinit for all nodes you have to use the Data Manager.
 
-\image html QmitkRegistration_FixedDataPointBased.png "The Fixed Data area"
+\imageMacro{QmitkRegistration_FixedDataPointBased.png,"The Fixed Data area",7.43}
 
 The "Fixed Data" area contains a QmitkPointListWidget. Within this widget, all points for the fixed data are listed. The label above this list shows the number of points that are already set. 
 To set points you have to toggle the "Set Points"  button, the leftmost under the QmitkPointListWidget. The views in the QmitkStdMultiWidget were reinitialized to the fixed data. Points can 
@@ -42,7 +42,7 @@ button. With the delete key you can remove the selected landmarks. You can also 
 the "F2" key you can easily move a landmark upwards and bring it further downwards by pressing "F3" or using the "Down-Arrow"-button. Thus the landmark number can be changed. 
 The QmitkStdMultiWidget changes its view to show the position of the landmark.
 
-\image html QmitkRegistration_MovingDataPointBased.png "The Moving Data area"
+\imageMacro{QmitkRegistration_MovingDataPointBased.png,"The Moving Data area",7.45}
 
 The "Moving Data" area contains a QmitkPointListWidget. Within this widget, all points for the moving data are listed. The label above this list shows the number of points that are already set. 
 To set points you have to toggle the "Set Points"  button, the leftmost under the QmitkPointListWidget. The views in the QmitkStdMultiWidget were reinitialized to the moving data. With the 
@@ -57,7 +57,7 @@ release the mouse button. With the delete key you can remove the selected landma
 the "F2" key you can easily move a landmark upwards and bring it further downwards by pressing "F3" or using the "Down-Arrow"-button. Thus the landmark number can be changed.The QmitkStdMultiWidget changes its view to show the position of the 
 landmark.
 
-\image html QmitkRegistration_DisplayOptionsPointBased.png "The Display Options area"
+\imageMacro{QmitkRegistration_DisplayOptionsPointBased.png,"The Display Options area",7.49}
 
 In this area you can find the "Show Images Red/Green" checkbox. Here you can switch the color from both datasets. If you check the box, the fixed dataset will be 
 displayed in redvalues and the moving dataset in greenvalues to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, both datasets will be 
@@ -65,7 +65,7 @@ displayed in greyvalues.
 
 Before you perform your transformation it is useful to see both images again. Therefore detoggle the "Set Points" button for the fixed data as well as for the moving data.
 
-\image html QmitkRegistration_RegistrationPointBased.png "The Registration area"
+\imageMacro{QmitkRegistration_RegistrationPointBased.png,"The Registration area",7.45}
 
 The functions concerning the registration are displayed in the "Registration" area. It not only contains the registration method selection and the registration itself but also offers the possibility
 to save, undo or redo the results. Furthermore a display is implemented, which shows you how good the landmarks correspond.

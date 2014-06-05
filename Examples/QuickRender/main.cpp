@@ -7,6 +7,7 @@
 #include "mitkStandaloneDataStorage.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkGlobalInteraction.h"
+#include "mitkImage.h"
 
 #include "QmlMitkBigRenderLock.h"
 

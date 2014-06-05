@@ -345,7 +345,7 @@ mitk::ScalarType mitk::LabeledImageToSurfaceFilter::GetVolumeForLabel( const mit
 {
   // get the image spacing
   mitk::Image* image =  ( mitk::Image* )GetInput();
-  const float* spacing = image->GetSlicedGeometry()->GetFloatSpacing();
+  const mitk::Vector3D spacing = image->GetSlicedGeometry()->GetSpacing();
 
   // get the number of voxels encountered for the given label,
   // calculate the volume and return it.

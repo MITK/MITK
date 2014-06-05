@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_basicimageprocessing The Basic Image Processing Plugin
 
-\image html QmitkBasicImageProcessing_ImageProcessing_48.png "Icon of the Plugin"
+\imageMacro{QmitkBasicImageProcessing_ImageProcessing_48.png,"Icon of the Basic Image Processing Plugin",2.00}
 
 \tableofcontents
 
@@ -22,7 +22,7 @@ Currently the view can be used with all 3D and 4D image types loadable by MITK.
 2D image support will be added in the future.
 All filters are encapsulated from the Insight Segmentation and Registration Toolkit (ITK, www.itk.org). 
 
-\image html QmitkBasicImageProcessing_BIP_Overview.png "MITK with the Basic Image Processing view"
+\imageMacro{QmitkBasicImageProcessing_BIP_Overview.png,"MITK with the Basic Image Processing view",16.00}
 
 This document will tell you how to use this view, but it is assumed that you already know how to use MITK in general.
 

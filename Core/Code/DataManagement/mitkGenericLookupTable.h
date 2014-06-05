@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkDataObject.h>
 
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include <MitkCoreExports.h>
 
 

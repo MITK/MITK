@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk
 #include "mitkCommon.h"
 #include "mitkCallbackFromGUIThread.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "mitkKalmanFilter.h"
 
 // itk

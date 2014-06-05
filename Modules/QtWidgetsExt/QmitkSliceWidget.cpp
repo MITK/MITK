@@ -170,7 +170,6 @@ void QmitkSliceWidget::InitWidget(
     mitk::ProportionalTimeGeometry::Pointer timeGeometry = mitk::ProportionalTimeGeometry::New();
     timeGeometry->Initialize(geometry, 1);
 
-    if (timebounds[1] < mitk::ScalarTypeNumericTraits::max())
     {
       timeGeometry->SetFirstTimePoint(timebounds[0]);
       timeGeometry->SetStepDuration(1.0);

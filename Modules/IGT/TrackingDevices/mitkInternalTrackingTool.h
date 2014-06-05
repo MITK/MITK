@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTrackingTool.h>
 #include <MitkIGTExports.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <itkFastMutexLock.h>
 
 namespace mitk {
@@ -54,8 +54,8 @@ namespace mitk {
     virtual bool IsTooltipSet() const;                          ///< returns true if a tooltip is set, false if not
     virtual void SetToolName(const std::string _arg);           ///< Sets the name of the tool
     virtual void SetToolName(const char* _arg);                 ///< Sets the name of the tool
-    virtual void SetPosition(Point3D position, ScalarType eps=0.0);           ///< sets the position
-    virtual void SetOrientation(Quaternion orientation, ScalarType eps=0.0);  ///< sets the orientation as a quaternion
+    virtual void SetPosition(Point3D position);           ///< sets the position
+    virtual void SetOrientation(Quaternion orientation);  ///< sets the orientation as a quaternion
     virtual void SetTrackingError(float error);                 ///< sets the tracking error
     virtual void SetDataValid(bool _arg);                       ///< sets if the tracking data (position & Orientation) is valid
     virtual void SetErrorMessage(const char* _arg);             ///< sets the error message

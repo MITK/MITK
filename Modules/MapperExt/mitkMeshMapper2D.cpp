@@ -86,7 +86,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     // convert the world time in time steps of the input object
     //
     int timeStep=0;
-    if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
+    if ( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
       timeStep = inputTimeGeometry->TimePointToTimeStep( time );
     if ( inputTimeGeometry->IsValidTimeStep( timeStep ) == false )
     {

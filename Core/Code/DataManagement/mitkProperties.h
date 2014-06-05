@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPROPERTIES_H_HEADER_INCLUDED
 
 #include "mitkGenericProperty.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "mitkLookupTables.h"
 
 namespace mitk {

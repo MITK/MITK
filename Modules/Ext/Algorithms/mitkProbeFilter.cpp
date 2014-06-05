@@ -175,14 +175,14 @@ void mitk::ProbeFilter::GenerateInputRequestedRegion()
   // convert the start-index-time of output in start-index-time of input via millisecond-time
   timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3));
   timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( inputTimeGeometry->IsValidTimeStep( timestep ) ) )
+  if( ( timeInMS > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() ) && ( inputTimeGeometry->IsValidTimeStep( timestep ) ) )
     inputSurfaceRegion.SetIndex( 3, timestep );
   else
     inputSurfaceRegion.SetIndex( 3, 0 );
   // convert the end-index-time of output in end-index-time of input via millisecond-time
   timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
   timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTimeStep( timestep ) ) )
+  if( ( timeInMS > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTimeStep( timestep ) ) )
     inputSurfaceRegion.SetSize( 3, timestep - inputSurfaceRegion.GetIndex(3) + 1 );
   else
     inputSurfaceRegion.SetSize( 3, 1 );
@@ -195,14 +195,14 @@ void mitk::ProbeFilter::GenerateInputRequestedRegion()
   // convert the start-index-time of output in start-index-time of source via millisecond-time
   timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3));
   timestep = sourceTimeGeometry->TimePointToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( sourceTimeGeometry->IsValidTimeStep( timestep ) ) )
+  if( ( timeInMS > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() ) && ( sourceTimeGeometry->IsValidTimeStep( timestep ) ) )
     sourceImageRegion.SetIndex( 3, timestep );
   else
     sourceImageRegion.SetIndex( 3, 0 );
   // convert the end-index-time of output in end-index-time of source via millisecond-time
   timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
   timestep = sourceTimeGeometry->TimePointToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTimeStep( timestep ) ) )
+  if( ( timeInMS > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTimeStep( timestep ) ) )
     sourceImageRegion.SetSize( 3, timestep - sourceImageRegion.GetIndex(3) + 1 );
   else
     sourceImageRegion.SetSize( 3, 1 );

@@ -48,7 +48,7 @@ int mitkCopyToPythonAsItkImageTest(int /*argc*/, char* argv[])
   mitk::Image::Pointer pythonImage = pythonService->CopyItkImageFromPython(nameOfImageInPython);
 
 
-  mitk::Index3D index;
+  itk::Index<3> index;
   index[0] = 128;
   index[1] = 128;
   index[2] = 24;

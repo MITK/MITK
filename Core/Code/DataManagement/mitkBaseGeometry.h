@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOperationActor.h"
 
 #include <itkBoundingBox.h>
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include <itkAffineGeometryFrame.h>
 #include <itkQuaternionRigidTransform.h>
 #include "itkScalableAffineTransform.h"

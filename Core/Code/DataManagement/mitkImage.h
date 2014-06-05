@@ -131,7 +131,7 @@ public:
 
   The pixel type is always being converted to double.
    \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method can be replaced by a method from ImagePixelWriteAccessor or ImagePixelReadAccessor */
-  DEPRECATED(double GetPixelValueByIndex(const mitk::Index3D& position, unsigned int timestep = 0));
+  DEPRECATED(double GetPixelValueByIndex(const itk::Index<3>& position, unsigned int timestep = 0));
 
   /** @brief Get the pixel value at one specific world position.
 

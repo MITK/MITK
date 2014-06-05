@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkMesh.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkPointOperation.h>
 #include <mitkInteractionConst.h>
 #include <fstream>

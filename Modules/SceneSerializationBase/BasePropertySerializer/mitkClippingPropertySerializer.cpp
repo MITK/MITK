@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBasePropertySerializer.h"
 
 #include "mitkClippingProperty.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 #include <MitkSceneSerializationBaseExports.h>
 

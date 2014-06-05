@@ -16,7 +16,7 @@
 
 #include "mitkTestingMacros.h"
 #include <mitkTestFixture.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 class mitkEqualTestSuite : public mitk::TestFixture
 {
@@ -175,8 +175,8 @@ public:
 
   void Equal_DifferentScalar_ReturnFalse()
   {
-    mitk::ScalarType a = 6;
-    mitk::ScalarType b = 6 + 1.01*mitk::eps;
+    mitk::ScalarType a = 0.6;
+    mitk::ScalarType b = 0.6 + 1.01*mitk::eps;
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Comparison of 2 different scalars. Result should be false", mitk::Equal(a,b), false);
   }
 

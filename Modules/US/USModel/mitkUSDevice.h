@@ -129,6 +129,13 @@ class USControlInterfaceDoppler;
     };
 
     /**
+     * \brief Event for being notified about changes of the micro service properties.
+     * This event can be used if no micro service context is available.
+     */
+    typedef Message2<const std::string&, const std::string&> PropertyEvent;
+    PropertyEvent PropertyChangedEvent;
+
+    /**
      * \return keys for the microservice properties of ultrasound devices
      */
     static mitk::USDevice::PropertyKeys GetPropertyKeys();

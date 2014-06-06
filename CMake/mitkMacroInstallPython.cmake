@@ -19,10 +19,11 @@ macro(MITK_INSTALL_PYTHON)
 
   # all libs with a python loader module
   set(_VTK_PYTHON_TARGETS )
-  # Wrapping tools and dependencies
-  set(_VTK_PYTHON_WRAPPED_MODULES vtkWrappingPythonCore vtkWrappingTools)
-  # additional utilities
-  set(_VTK_UTILITY_DEPS
+
+  # python wrapping and dependencies
+  set(_VTK_PYTHON_DEPS
+    vtkWrappingPythonCore
+    vtkWrappingTools
     verdict
     vtksqlite
     vtkproj4
@@ -35,10 +36,6 @@ macro(MITK_INSTALL_PYTHON)
     vtkexoIIc
     vtkoggtheora )
 
-  foreach(t ${_VTK_UTILITY_DEPS})
-    list(APPEND _VTK_PYTHON_WRAPPED_MODULES ${t})
-  endforeach()
-
   # find all vtk python wrapped targets
   foreach(_lib ${VTK_LIBRARIES})
     # exclude system libs
@@ -46,13 +43,13 @@ macro(MITK_INSTALL_PYTHON)
       # use only python wrapped modules
       if(TARGET ${_lib}PythonD)
         list(APPEND _VTK_PYTHON_TARGETS ${_lib}Python)
-        list(APPEND _VTK_PYTHON_WRAPPED_MODULES ${_lib})
+        list(APPEND _VTK_PYTHON_DEPS ${_lib})
       endif()
     endif()
   endforeach()
 
   # install all targets that are python wrapped
-  foreach(_lib ${_VTK_PYTHON_WRAPPED_MODULES})
+  foreach(_lib ${_VTK_PYTHON_DEPS})
     get_target_property(_target_lib_debug   ${_lib} IMPORTED_LOCATION_DEBUG)
     get_target_property(_target_lib_release ${_lib} IMPORTED_LOCATION_RELEASE)
     get_filename_component(_target_filename_debug   "${_target_lib_debug}" NAME)
@@ -108,7 +105,7 @@ macro(MITK_INSTALL_PYTHON)
 
   # install vtk python
   install(DIRECTORY ${VTK_DIR}/Wrapping/Python/vtk
-          DESTINATION bin
+          DESTINATION bin/Python
           USE_SOURCE_PERMISSIONS
           COMPONENT Runtime)
 

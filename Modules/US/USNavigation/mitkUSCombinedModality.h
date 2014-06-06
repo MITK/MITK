@@ -89,6 +89,29 @@ namespace mitk {
     void SetCalibration(AffineTransform3D::Pointer calibration);
 
     /**
+     * \brief Removes the calibration data of the currently active probe and depth.
+     * \return true on success, false if there was no calibration
+     */
+    bool RemoveCalibration();
+
+    /**
+     * \brief Removes the calibration data of the currently active probe and the given depth.
+     *
+     * \param depth depth of the b mode ultrasound image for which the calibration should be removed
+     * \return true on success, false if there was no calibration
+     */
+    bool RemoveCalibration(std::string depth);
+
+    /**
+     * \brief Removes the calibration data of the given probe and depth.
+     *
+     * \param depth depth of the b mode ultrasound image for which the calibration should be removed
+     * \param probe probe of the ultrasound device for which the calibration should be removed
+     * \return true on success, false if there was no calibration
+     */
+    bool RemoveCalibration(std::string depth, std::string probe);
+
+    /**
     * \brief Returns the Class of the Device.
     */
     virtual std::string GetDeviceClass();

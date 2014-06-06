@@ -181,6 +181,27 @@ void mitk::USCombinedModality::SetCalibration (mitk::AffineTransform3D::Pointer 
   }
 }
 
+bool mitk::USCombinedModality::RemoveCalibration()
+{
+  return this->RemoveCalibration(this->GetCurrentDepthValue(), this->GetIdentifierForCurrentProbe());
+}
+
+bool mitk::USCombinedModality::RemoveCalibration(std::string depth)
+{
+  return this->RemoveCalibration(depth, this->GetIdentifierForCurrentProbe());
+}
+
+bool mitk::USCombinedModality::RemoveCalibration(std::string depth, std::string probe)
+{
+  // make sure that there is no '/' which would cause problems for TinyXML
+  std::replace(probe.begin(), probe.end(), '/', '-');
+
+  // create identifier for calibration from probe and depth
+  std::string calibrationKey = probe + mitk::USCombinedModality::ProbeAndDepthSeperator + depth;
+
+  return m_Calibrations.erase(calibrationKey) > 0;
+}
+
 void mitk::USCombinedModality::SetNumberOfSmoothingValues(unsigned int numberOfSmoothingValues)
 {
   unsigned int oldNumber = m_NumberOfSmoothingValues;

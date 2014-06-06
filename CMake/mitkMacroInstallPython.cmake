@@ -13,7 +13,7 @@ function(MITK_FUNCTION_INSTALL_PYTHON_LIB _target_filename _target_lib _target_c
    endif()
 endfunction()
 
-macro(MITK_INSTALL_PYTHON)
+function(MITK_INSTALL_VTK_PYTHON)
 
   find_package(VTK REQUIRED)
 
@@ -109,6 +109,43 @@ macro(MITK_INSTALL_PYTHON)
           USE_SOURCE_PERMISSIONS
           COMPONENT Runtime)
 
+endfunction()
+
+function(MITK_INSTALL_CV_PYTHON)
+
+  find_package(OpenCV REQUIRED)
+
+  foreach(_lib ${OpenCV_LIBS})
+    get_target_property(_target_lib_debug   ${_lib} IMPORTED_LOCATION_DEBUG)
+    get_target_property(_target_lib_release ${_lib} IMPORTED_LOCATION_RELEASE)
+    get_filename_component(_target_filename_debug   "${_target_lib_debug}" NAME)
+    get_filename_component(_target_filename_release "${_target_lib_release}" NAME)
+
+    if(_target_lib_debug)
+      MITK_FUNCTION_INSTALL_PYTHON_LIB(${_target_filename_debug} ${_target_lib_debug} "Debug")
+    endif()
+
+    if(_target_lib_release)
+      MITK_FUNCTION_INSTALL_PYTHON_LIB(${_target_filename_release} ${_target_lib_release} "Release")
+    endif()
+  endforeach()
+
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    MITK_FUNCTION_INSTALL_PYTHON_LIB("cv2${CMAKE_SHARED_LIBRARY_SUFFIX}" "${OpenCV_DIR}/lib/cv2${CMAKE_SHARED_LIBRARY_SUFFIX}" "Debug" )
+  else()
+    MITK_FUNCTION_INSTALL_PYTHON_LIB("cv2${CMAKE_SHARED_LIBRARY_SUFFIX}" "${OpenCV_DIR}/lib/cv2${CMAKE_SHARED_LIBRARY_SUFFIX}" "Release" )
+  endif()
+
+
+endfunction()
+
+macro(MITK_INSTALL_PYTHON)
+
+  MITK_INSTALL_VTK_PYTHON()
+
+  if(MITK_USE_OpenCV)
+    MITK_INSTALL_CV_PYTHON()
+  endif()
 
 endmacro(MITK_INSTALL_PYTHON)
 

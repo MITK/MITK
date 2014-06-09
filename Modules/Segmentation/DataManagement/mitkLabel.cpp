@@ -23,10 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::Label::Label():
 m_Locked(true),
 m_Visible(true),
-m_Filled(true),
-m_Exterior(false),
+//m_Filled(true),
+//m_Exterior(false),
 m_Opacity(0.6),
-m_Volume(0.0),
+//m_Volume(0.0),
 m_PixelValue(-1),
 m_Layer(0)
 {
@@ -38,17 +38,18 @@ mitk::Label::Label(const Label& other)
 {
   this->m_Locked = other.GetLocked();
   this->m_Visible = other.GetVisible();
-  this->m_Filled = other.GetFilled();
-  this->m_Exterior = other.GetExterior();
+  //this->m_Filled = other.GetFilled();
+  //this->m_Exterior = other.GetExterior();
   this->m_Opacity = other.GetOpacity();
-  this->m_Selected = other.GetSelected();
+  //this->m_Selected = other.GetSelected();
   this->m_Name = other.GetName();
-  this->m_LatinName = other.GetLatinName();
-  this->m_Volume = other.GetVolume();
-  this->m_LastModified = other.GetLastModified();
+  //this->m_LatinName = other.GetLatinName();
+  //this->m_Volume = other.GetVolume();
+  //this->m_LastModified = other.GetLastModified();
   this->m_PixelValue = other.GetPixelValue();
-  this->m_Layer = other.GetLayer();
+  //this->m_Layer = other.GetLayer();
   this->m_Color = other.GetColor();
+  Modified();
 }
 
 mitk::Label::~Label()
@@ -59,6 +60,7 @@ mitk::Label::~Label()
 void mitk::Label::SetColor(const mitk::Color &_color)
 {
   this->m_Color = _color;
+  Modified();
 }
 
 void mitk::Label::PrintSelf(std::ostream &os, itk::Indent indent) const
@@ -69,9 +71,10 @@ void mitk::Label::PrintSelf(std::ostream &os, itk::Indent indent) const
 void mitk::Label::SetCenterOfMassIndex(const mitk::Point3D& center)
 {
   this->m_CenterOfMassIndex = center;
+  Modified();
 }
 
-const mitk::Point3D& mitk::Label::GetCenterOfMassIndex()
+const mitk::Point3D& mitk::Label::GetCenterOfMassIndex() const
 {
   return this->m_CenterOfMassIndex;
 }
@@ -79,9 +82,11 @@ const mitk::Point3D& mitk::Label::GetCenterOfMassIndex()
 void mitk::Label::SetCenterOfMassCoordinates(const mitk::Point3D& center)
 {
   this->m_CenterOfMassCoordinates = center;
+  Modified();
 }
 
-const mitk::Point3D& mitk::Label::GetCenterOfMassCoordinates()
+const mitk::Point3D& mitk::Label::GetCenterOfMassCoordinates() const
 {
   return this->m_CenterOfMassCoordinates;
+
 }

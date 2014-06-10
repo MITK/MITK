@@ -379,8 +379,9 @@ class USControlInterfaceDoppler;
 
     /**
     * \brief Constructs a device with the given Metadata. Make sure the Metadata contains meaningful content!
+    * \deprecated Use USDevice(std::string manufacturer, std::string model) instead.
     */
-    DEPRECATED(USDevice(mitk::USImageMetadata::Pointer metadata));
+    USDevice(mitk::USImageMetadata::Pointer metadata);
 
     virtual ~USDevice();
 

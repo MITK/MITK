@@ -400,6 +400,14 @@ if(DESIRED_QT_VERSION MATCHES "4")
   set(QT_USE_QTNETWORK 1)
   set(QT_USE_QTDESIGNER 1)
   include(${QT_USE_FILE})
+  if("${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}" VERSION_LESS "4.8")
+    # We add the QT_NO_OPENSSL definition in case of Qt < 4.8 because
+    # the Qxt SSL code uses QSsl::TlsV1SslV3 which added in Qt 4.8.
+    # So even if Qt 4.7 was compiled with OpenSSL support, we manually
+    # disable it in Qxt to simplify the build system stuff and to avoid
+    # bumping the minimum required Qt version for MITK
+    add_definitions(-DQT_NO_OPENSSL)
+  endif()
 else()
   if (WIN32)
     cmake_policy(SET CMP0020 NEW) # Automatically link Qt executables to qtmain target on Windows

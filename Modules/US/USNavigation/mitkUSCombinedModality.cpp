@@ -167,13 +167,6 @@ void mitk::USCombinedModality::SetCalibration (mitk::AffineTransform3D::Pointer 
   }
 
   m_Calibrations[calibrationKey] = calibration;
-
-  m_Metadata->SetDeviceIsCalibrated(true);
-
-  if (m_ServiceRegistration != 0)
-  {
-    this->UpdateServiceProperty(mitk::USImageMetadata::PROP_DEV_ISCALIBRATED, true);
-  }
 }
 
 bool mitk::USCombinedModality::RemoveCalibration()

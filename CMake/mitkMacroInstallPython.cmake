@@ -46,11 +46,7 @@ endfunction()
 function(MITK_INSTALL_VTK_PYTHON)
   find_package(VTK REQUIRED)
 
-  # all libs with a python loader module and
-  # wrapping related libraries
-  set(_VTK_PYTHON_TARGETS
-      vtkWrappingPythonCore
-      vtkWrappingTools )
+  set(_VTK_PYTHON_TARGETS )
 
   # find all vtk python wrapped targets
   foreach(_lib ${VTK_LIBRARIES})
@@ -58,7 +54,7 @@ function(MITK_INSTALL_VTK_PYTHON)
     if(${_lib} MATCHES "^vtk.+")
       # use only python wrapped modules
       if(TARGET ${_lib}PythonD)
-        list(APPEND _VTK_PYTHON_TARGETS ${_lib}PythonD)
+        list(APPEND _VTK_PYTHON_TARGETS ${_lib}Python)
       endif()
     endif()
   endforeach()
@@ -66,15 +62,18 @@ function(MITK_INSTALL_VTK_PYTHON)
   # install the python modules and loaders
   foreach(_target ${_VTK_PYTHON_TARGETS})
     # get target properties
-    get_target_property(_target_lib_debug   "${_target}" IMPORTED_LOCATION_DEBUG)
-    get_target_property(_target_lib_release "${_target}" IMPORTED_LOCATION_RELEASE)
+    get_target_property(_target_lib_debug   "${_target}D" IMPORTED_LOCATION_DEBUG)
+    get_filename_component(_filepath_debug "${_target_lib_debug}" PATH)
+    get_target_property(_target_lib_release "${_target}D" IMPORTED_LOCATION_RELEASE)
+    get_filename_component(_filepath_release "${_target_lib_release}" PATH)
 
+    MESSAGE("${_filepath_debug}/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}")
     if(_target_lib_debug)
-      MITK_FUNCTION_INSTALL_PYTHON_MODULE("${_target_lib_debug}" "Debug")
+      MITK_FUNCTION_INSTALL_PYTHON_MODULE("${_filepath_debug}/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}" "Debug")
     endif()
 
     if(_target_lib_release)
-      MITK_FUNCTION_INSTALL_PYTHON_MODULE("${_target_lib_release}" "Release")
+      MITK_FUNCTION_INSTALL_PYTHON_MODULE("${_filepath_release}/$${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}" "Release")
     endif()
   endforeach()
 

@@ -15,7 +15,6 @@
 "sys.path.append('@VTK_DIR@/Wrapping/Python')\n"\
 "sys.path.append('@VTK_DIR@/lib')\n"\
 "sys.path.append('@VTK_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')\n"\
-"sys.path.append('./')\n"\
 "sys.path.append('@OpenCV_DIR@/lib" PYTHON_PATH_BUILD_TYPE "')\n"\
 "sys.path.append('@OpenCV_DIR@/lib')\n"\
 "sys.path.append('@OpenCV_DIR@/bin')\n"\

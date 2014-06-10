@@ -36,7 +36,7 @@ mitk::PythonService::PythonService()
     MITK_DEBUG << "pythonInitialized " << pythonInitialized;
     MITK_DEBUG << "m_PythonManager.isPythonInitialized() " << m_PythonManager.isPythonInitialized();
   }
-
+  MITK_INFO << "PythonPath: " <<  mitk::IOUtil::GetProgramPath();
   // due to strange static var behaviour on windows Py_IsInitialized() returns correct value while
   // m_PythonManager.isPythonInitialized() does not because it has been constructed and destructed again
   if( !m_PythonManager.isPythonInitialized() )
@@ -53,7 +53,14 @@ mitk::PythonService::PythonService()
 
       MITK_DEBUG("PythonService") << "python initalized";
 
+      std::string programPath = mitk::IOUtil::GetProgramPath();
+
       QString pythonCommand(PYTHONPATH_COMMAND);
+      // runtime directory used in installers
+      pythonCommand.append("\n");
+      pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
+      pythonCommand.append( QString("sys.path.append('%1/Python')\n").arg(programPath.c_str()) );
+
       MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
       m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );
 

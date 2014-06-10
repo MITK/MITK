@@ -163,6 +163,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls.m_pbShowLabelTable, SIGNAL(toggled(bool)), this, SLOT( OnShowLabelTable(bool)) );
 
   connect(m_Controls.m_LabelSetWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
+  connect(m_Controls.m_LabelSetWidget, SIGNAL(resetView()), this, SLOT(OnResetView()) );
 
   connect( m_Controls.m_cbInterpolation, SIGNAL( activated (int) ), this, SLOT( OnInterpolationSelectionChanged(int) ) );
 
@@ -381,12 +382,14 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
   color.SetRed(1.0);
   color.SetGreen(0.0);
   color.SetBlue(0.0);
-  workingImage->AddLabel("unnamed", color);
+  workingImage->GetLabelSet()->AddLabel("unnamed", color);
 
   this->WaitCursorOff();
 
   if (!this->GetDataStorage()->Exists(workingNode))
     this->GetDataStorage()->Add(workingNode, referenceNode);
+
+  m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
 }
 
 void QmitkMultiLabelSegmentationView::OnNewLabel()
@@ -407,7 +410,8 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
 
   if ( dialogReturnValue == QDialog::Rejected ) return;
 
-  workingImage->AddLabel(dialog->GetSegmentationName().toStdString(), dialog->GetColor());
+  workingImage->GetActiveLabelSet()->AddLabel(dialog->GetSegmentationName().toStdString(), dialog->GetColor());
+  //m_Controls.m_LabelSetWidget->ResetTableWidget();
 
   m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() > 2);
 }
@@ -516,13 +520,81 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
   }
 
   this->UpdateControls();
+  //m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
+}
+
+void QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection()
+{
+  MITK_INFO << "Connection Established";
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  assert(workingImage);
+
+  workingImage->GetActiveLabelSet()->AddLabelEvent
+      += mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->RemoveLabelEvent
+      += mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ModifyLabelEvent
+      += mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent
+      += mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ActiveLabelEvent
+      += mitk::MessageDelegate1<QmitkLabelSetWidget,int>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::SelectLabelByPixelValue);
+}
+
+
+void QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection()
+{
+  MITK_INFO << "Connection Lost";
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  assert(workingImage);
+
+  // Reset LabelSetWidget Events
+  workingImage->GetActiveLabelSet()->AddLabelEvent
+      -= mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->RemoveLabelEvent
+      -= mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ModifyLabelEvent
+      -= mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent
+      -= mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ActiveLabelEvent
+      -= mitk::MessageDelegate1<QmitkLabelSetWidget,int>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::SelectLabelByPixelValue);
+
 }
 
 void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode *node)
 {
   m_ToolManager->ActivateTool(-1);
 
+  if(m_WorkingNode.IsNotNull())
+  {
+    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+    assert(workingImage);
+
+    //Loose LabelSetConnections
+    OnLooseLabelSetConnection();
+
+    workingImage->BeforeChangeLayerEvent
+        -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
+    workingImage->AfterchangeLayerEvent
+        -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection);
+  }
+
   m_WorkingNode = const_cast<mitk::DataNode*>(node);
+
+  if(m_WorkingNode.IsNotNull())
+  {
+    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+    assert(workingImage);
+
+    //Establish LabelSetConnection
+    OnEstablishLabelSetConnection();
+
+    workingImage->BeforeChangeLayerEvent
+        += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
+    workingImage->AfterchangeLayerEvent
+        += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection);
+  }
 
   m_ToolManager->SetWorkingData(m_WorkingNode);
 
@@ -552,6 +624,11 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
   }
 
   this->UpdateControls();
+
+  if (m_WorkingNode.IsNotNull())
+  {
+    m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
+  }
 }
 
 void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
@@ -598,6 +675,12 @@ void QmitkMultiLabelSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
 {
   if (m_IRenderWindowPart)
     m_IRenderWindowPart->SetSelectedPosition(pos);
+}
+
+void QmitkMultiLabelSegmentationView::OnResetView()
+{
+  if (m_IRenderWindowPart)
+    m_IRenderWindowPart->ForceImmediateUpdate();
 }
 
 QString QmitkMultiLabelSegmentationView::GetLastFileOpenPath()

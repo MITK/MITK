@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkMultiLabelSegmentationControls.h"
 
+
 class QmitkRenderWindow;
 
 /**
@@ -78,7 +79,12 @@ protected slots:
   /// \brief reaction to signal "goToLabel" from labelset widget
   void OnGoToLabel(const mitk::Point3D& pos);
 
+  void OnResetView();
+
 protected:
+
+  void OnEstablishLabelSetConnection();
+  void OnLooseLabelSetConnection();
 
   void SetFocus();
 
@@ -138,6 +144,7 @@ protected:
     * it is needed to unregister the observer on unload.
   */
   us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
+
 
 };
 

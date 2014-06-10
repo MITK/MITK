@@ -44,10 +44,10 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
-  m_Manufacturer(manufacturer),
-  m_Name(model),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
+  m_Manufacturer(manufacturer),
+  m_Name(model),
   m_SpawnAcquireThread(true),
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),

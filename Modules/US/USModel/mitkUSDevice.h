@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkCommon.h>
+#include <mitkMessage.h>
 #include <mitkImageSource.h>
 
 // ITK
@@ -127,6 +128,12 @@ class USControlInterfaceDoppler;
           US_PROPKEY_BMODE_DYNAMIC_RANGE(US_INTERFACE_NAME + ".bmode.dynamicRange")
       {}
     };
+
+    /**
+     * \brief Event for being notified about changes of the micro service properties.
+     * This event can be used if no micro service context is available.
+     */
+    mitkNewMessage2Macro(PropertyChanged, const std::string&, const std::string&)
 
     /**
      * \return keys for the microservice properties of ultrasound devices

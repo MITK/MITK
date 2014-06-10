@@ -264,12 +264,12 @@ class USControlInterfaceDoppler;
     /* @return Returns the area that will be cropped from the US image. Is disabled / [0,0,0,0] by default. */
     mitk::USDevice::USImageCropArea GetCropArea();
 
-    /** \brief Deprecated -> use GetManufacturer() instead */
-    DEPRECATED(std::string GetDeviceManufacturer());
-    /** \brief Deprecated -> use GetName() instead */
-    DEPRECATED(std::string GetDeviceModel());
-    /** \brief Deprecated -> use GetCommend() instead */
-    DEPRECATED(std::string GetDeviceComment());
+    /** \deprecated Deprecated -> use GetManufacturer() instead */
+    std::string GetDeviceManufacturer();
+    /** \deprecated Deprecated -> use GetName() instead */
+    std::string GetDeviceModel();
+    /** \\deprecated Deprecated -> use GetCommend() instead */
+    std::string GetDeviceComment();
 
     itkGetMacro(Manufacturer, std::string);
     itkGetMacro(Name, std::string);

@@ -146,12 +146,7 @@ mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration(std::s
   std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
     = m_Calibrations.find(calibrationKey);
 
-  if (calibrationIterator == m_Calibrations.end())
-  {
-    MITK_INFO("USCombinedModality")("USDevice")
-        << "No calibration found for selected probe and depth.";
-    return 0;
-  }
+  if (calibrationIterator == m_Calibrations.end()) { return 0; }
 
   return calibrationIterator->second;
 }

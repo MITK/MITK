@@ -1,5 +1,6 @@
 
-
+get_filename_component(InstallPython_cmake_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include("${InstallPython_cmake_dir}/GetPrerequisites.cmake")
 
 function(MITK_FUNCTION_INSTALL_PYTHON_LIB _target_filename _target_lib _target_conf)
 
@@ -13,28 +14,42 @@ function(MITK_FUNCTION_INSTALL_PYTHON_LIB _target_filename _target_lib _target_c
    endif()
 endfunction()
 
-function(MITK_INSTALL_VTK_PYTHON)
+function(MITK_FUNCTION_INSTALL_PYTHON_MODULE _lib _conf)
+  #MESSAGE("INSTALL : " ${_lib})
+  get_filename_component(_target_filename ${_lib} NAME)
 
+  MITK_FUNCTION_INSTALL_PYTHON_LIB("${_target_filename}" "${_lib}" "${_conf}")
+
+  # install all dependencies to this python library
+  get_prerequisites(${_lib} prereqs 1 1 bin "${VTK_DIR}/lib")
+
+  foreach(_dep ${prereqs})
+    #MESSAGE("DEPENDENCIE: " ${_dep})
+    get_filename_component(_target_filename "${_dep}" NAME)
+    get_filename_component(_realpath "${_dep}" REALPATH)
+    get_filename_component(_realname "${_realpath}" NAME)
+
+    if(UNIX AND NOT APPLE)
+      # if the realpath is different from the linked dependency
+      # we got a symlink
+      if( NOT("${_dep}" STREQUAL "${_realpath}"))
+        # install symlink
+        install(FILES ${_dep} DESTINATION bin)
+      endif()
+    endif()
+
+    MITK_FUNCTION_INSTALL_PYTHON_LIB("${_realname}" "${_realpath}" "${_conf}")
+  endforeach()
+endfunction()
+
+function(MITK_INSTALL_VTK_PYTHON)
   find_package(VTK REQUIRED)
 
-  # all libs with a python loader module
-  set(_VTK_PYTHON_TARGETS )
-
-  # python wrapping and dependencies
-  set(_VTK_PYTHON_DEPS
-    vtkWrappingPythonCore
-    vtkWrappingTools
-    verdict
-    vtksqlite
-    vtkproj4
-    vtkhdf5
-    vtkhdf5_hl
-    vtklibxml2
-    vtkgl2ps
-    vtkNetCDF_cxx
-    vtkNetCDF
-    vtkexoIIc
-    vtkoggtheora )
+  # all libs with a python loader module and
+  # wrapping related libraries
+  set(_VTK_PYTHON_TARGETS
+      vtkWrappingPythonCore
+      vtkWrappingTools )
 
   # find all vtk python wrapped targets
   foreach(_lib ${VTK_LIBRARIES})
@@ -42,65 +57,24 @@ function(MITK_INSTALL_VTK_PYTHON)
     if(${_lib} MATCHES "^vtk.+")
       # use only python wrapped modules
       if(TARGET ${_lib}PythonD)
-        list(APPEND _VTK_PYTHON_TARGETS ${_lib}Python)
-        list(APPEND _VTK_PYTHON_DEPS ${_lib})
+        list(APPEND _VTK_PYTHON_TARGETS ${_lib}PythonD)
       endif()
-    endif()
-  endforeach()
-
-  # install all targets that are python wrapped
-  foreach(_lib ${_VTK_PYTHON_DEPS})
-    get_target_property(_target_lib_debug   ${_lib} IMPORTED_LOCATION_DEBUG)
-    get_target_property(_target_lib_release ${_lib} IMPORTED_LOCATION_RELEASE)
-    get_filename_component(_target_filename_debug   "${_target_lib_debug}" NAME)
-    get_filename_component(_target_filename_release "${_target_lib_release}" NAME)
-
-    if(_target_lib_debug)
-      MITK_FUNCTION_INSTALL_PYTHON_LIB(${_target_filename_debug} ${_target_lib_debug} "Debug")
-    endif()
-
-    if(_target_lib_release)
-      MITK_FUNCTION_INSTALL_PYTHON_LIB(${_target_filename_release} ${_target_lib_release} "Release")
     endif()
   endforeach()
 
   # install the python modules and loaders
   foreach(_target ${_VTK_PYTHON_TARGETS})
-
-    set(_lib ${_target}D)
-
     # get target properties
-    get_target_property(_target_lib_debug   ${_lib} IMPORTED_LOCATION_DEBUG)
-    get_target_property(_target_lib_release ${_lib} IMPORTED_LOCATION_RELEASE)
-    get_filename_component(_target_filename_debug   "${_target_lib_debug}" NAME)
-    get_filename_component(_target_filename_release "${_target_lib_release}" NAME)
-
-    get_filename_component(_filepath_debug   ${_target_lib_debug} PATH)
-    get_filename_component(_filepath_release ${_target_lib_release} PATH)
-
-    #MESSAGE(${_lib})
-    #MESSAGE(${_filepath_debug})
+    get_target_property(_target_lib_debug   "${_target}" IMPORTED_LOCATION_DEBUG)
+    get_target_property(_target_lib_release "${_target}" IMPORTED_LOCATION_RELEASE)
 
     if(_target_lib_debug)
-      MITK_FUNCTION_INSTALL_PYTHON_LIB(${_target_filename_debug} ${_target_lib_debug} "Debug")
+      MITK_FUNCTION_INSTALL_PYTHON_MODULE("${_target_lib_debug}" "Debug")
     endif()
 
     if(_target_lib_release)
-      MITK_FUNCTION_INSTALL_PYTHON_LIB(${_target_filename_release} ${_target_lib_release} "Release")
+      MITK_FUNCTION_INSTALL_PYTHON_MODULE("${_target_lib_release}" "Release")
     endif()
-
-    # if the target is a wrapped module install the python module loader
-    # and make sure the vtk module is installed
-    if(_filepath_debug)
-      set(_python_mod_file ${_target}${CMAKE_SHARED_LIBRARY_SUFFIX})
-      MITK_FUNCTION_INSTALL_PYTHON_LIB( ${_python_mod_file} "${_filepath_debug}/${_python_mod_file}" "Debug")
-    endif()
-
-    if(_filepath_release)
-      set(_python_mod_file ${_target}${CMAKE_SHARED_LIBRARY_SUFFIX})
-      MITK_FUNCTION_INSTALL_PYTHON_LIB(${_python_mod_file} "${_filepath_release}/${_python_mod_file}" "Release")
-    endif()
-
   endforeach()
 
   # install vtk python
@@ -112,40 +86,22 @@ function(MITK_INSTALL_VTK_PYTHON)
 endfunction()
 
 function(MITK_INSTALL_CV_PYTHON)
-
   find_package(OpenCV REQUIRED)
 
-  foreach(_lib ${OpenCV_LIBS})
-    get_target_property(_target_lib_debug   ${_lib} IMPORTED_LOCATION_DEBUG)
-    get_target_property(_target_lib_release ${_lib} IMPORTED_LOCATION_RELEASE)
-    get_filename_component(_target_filename_debug   "${_target_lib_debug}" NAME)
-    get_filename_component(_target_filename_release "${_target_lib_release}" NAME)
-
-    if(_target_lib_debug)
-      MITK_FUNCTION_INSTALL_PYTHON_LIB(${_target_filename_debug} ${_target_lib_debug} "Debug")
-    endif()
-
-    if(_target_lib_release)
-      MITK_FUNCTION_INSTALL_PYTHON_LIB(${_target_filename_release} ${_target_lib_release} "Release")
-    endif()
-  endforeach()
+  set(_build_type "Release")
 
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    MITK_FUNCTION_INSTALL_PYTHON_LIB("cv2${CMAKE_SHARED_LIBRARY_SUFFIX}" "${OpenCV_DIR}/lib/cv2${CMAKE_SHARED_LIBRARY_SUFFIX}" "Debug" )
-  else()
-    MITK_FUNCTION_INSTALL_PYTHON_LIB("cv2${CMAKE_SHARED_LIBRARY_SUFFIX}" "${OpenCV_DIR}/lib/cv2${CMAKE_SHARED_LIBRARY_SUFFIX}" "Release" )
+    set(_build_type "Debug")
   endif()
 
-
+  MITK_FUNCTION_INSTALL_PYTHON_MODULE("${OpenCV_DIR}/lib/cv2${CMAKE_SHARED_LIBRARY_SUFFIX}" "${_build_type}")
 endfunction()
 
 macro(MITK_INSTALL_PYTHON)
-
   MITK_INSTALL_VTK_PYTHON()
 
   if(MITK_USE_OpenCV)
     MITK_INSTALL_CV_PYTHON()
   endif()
-
 endmacro(MITK_INSTALL_PYTHON)
 

@@ -160,11 +160,6 @@ void mitk::USCombinedModality::SetCalibration (mitk::AffineTransform3D::Pointer 
   }
 
   m_Calibrations[calibrationKey] = calibration;
-
-  if (m_ServiceRegistration != 0)
-  {
-    this->UpdateServiceProperty(mitk::USImageMetadata::PROP_DEV_ISCALIBRATED, true);
-  }
 }
 
 void mitk::USCombinedModality::SetNumberOfSmoothingValues(unsigned int numberOfSmoothingValues)

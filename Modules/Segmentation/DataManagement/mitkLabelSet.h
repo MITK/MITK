@@ -46,6 +46,59 @@ public:
     typedef LabelContainerType::const_iterator    LabelContainerConstIteratorType;
     typedef LabelContainerType::iterator          LabelContainerIteratorType;
 
+    /**
+    * \brief AddLabelEvent is emitted whenever a new label has been added to the LabelSet.
+    *
+    * Observers should register to this event by calling myLabelSet->AddLabelEvent.AddListener(myObject, MyObject::MyMethod).
+    * After registering, myObject->MyMethod() will be called every time a new label has been added to the LabelSet.
+    * Observers should unregister by calling myLabelSet->AddLabelEvent.RemoveListener(myObject, MyObject::MyMethod).
+    *
+    * member variable is not needed to be locked in multi-threaded scenarios since the LabelSetEvent is a typedef for
+    * a Message1 object which is thread safe
+    */
+    Message<> AddLabelEvent;
+
+    /**
+    * \brief RemoveLabelEvent is emitted whenever a new label has been removed from the LabelSet.
+    *
+    * Observers should register to this event by calling myLabelSet->RemoveLabelEvent.AddListener(myObject, MyObject::MyMethod).
+    * After registering, myObject->MyMethod() will be called every time a new label has been removed from the LabelSet.
+    * Observers should unregister by calling myLabelSet->RemoveLabelEvent.RemoveListener(myObject, MyObject::MyMethod).
+    *
+    * member variable is not needed to be locked in multi-threaded scenarios since the LabelSetEvent is a typedef for
+    * a Message object which is thread safe
+    */
+    Message<> RemoveLabelEvent;
+
+    /**
+    * \brief ModifyLabelEvent is emitted whenever a label has been modified from the LabelSet.
+    *
+    * Observers should register to this event by calling myLabelSet->ModifyLabelEvent.AddListener(myObject, MyObject::MyMethod).
+    * After registering, myObject->MyMethod() will be called every time a new label has been removed from the LabelSet.
+    * Observers should unregister by calling myLabelSet->ModifyLabelEvent.RemoveListener(myObject, MyObject::MyMethod).
+    *
+    * member variable is not needed to be locked in multi-threaded scenarios since the LabelSetEvent is a typedef for
+    * a Message object which is thread safe
+    */
+    Message<> ModifyLabelEvent;
+
+    /**
+    * \brief ActiveLabelEvent is emitted whenever a label has been set as active in the LabelSet.
+    */
+    Message1<int> ActiveLabelEvent;
+
+    /**
+    * \brief AllLabelsModifiedEvent is emitted whenever a new label has been removed from the LabelSet.
+    *
+    * Observers should register to this event by calling myLabelSet->AllLabelsModifiedEvent.AddListener(myObject, MyObject::MyMethod).
+    * After registering, myObject->MyMethod() will be called every time a new label has been removed from the LabelSet.
+    * Observers should unregister by calling myLabelSet->AllLabelsModifiedEvent.RemoveListener(myObject, MyObject::MyMethod).
+    *
+    * member variable is not needed to be locked in multi-threaded scenarios since the LabelSetEvent is a typedef for
+    * a Message object which is thread safe
+    */
+    Message<> AllLabelsModifiedEvent;
+
     void Initialize(const LabelSet* other);
 
     /** \brief Returns a const iterator poiting to the begining of the container.
@@ -55,6 +108,12 @@ public:
     /** \brief Returns a const iterator pointing to the end of the container.
     */
     LabelContainerConstIteratorType IteratorEnd();
+
+
+    /** \brief
+     * Recall itk::Object::Modified event from a label and send a ModifyLabelEvent
+    */
+    void OnLabelModified();
 
     /** \brief
     */
@@ -102,100 +161,19 @@ public:
 
     /** \brief
     */
-    void SetLabelVisible(int pixelValue, bool value);
+    Label* GetActiveLabel() { return m_ActiveLabel; }
 
     /** \brief
     */
-    bool GetLabelVisible(int index);
+    const Label* GetActiveLabel() const { return m_ActiveLabel; }
 
     /** \brief
     */
-    void SetLabelLocked(int pixelValue, bool value);
+    Label* GetLabel(int pixelValue) { return m_LabelContainer[pixelValue]; }
 
     /** \brief
     */
-    bool GetLabelLocked(int index);
-
-    /** \brief
-    */
-    int GetLabelLayer(unsigned int index) const;
-
-    /** \brief
-    */
-    void SetLabelSelected(int pixelValue, bool value);
-
-    /** \brief
-    */
-    bool GetLabelSelected(int index);
-
-    /** \brief
-    */
-    void SetLabelOpacity(int pixelValue, float value);
-
-    /** \brief
-    */
-    float GetLabelOpacity(int pixelValue);
-
-    /** \brief
-    */
-    void SetLabelVolume(int pixelValue, float value);
-
-    /** \brief
-    */
-    float GetLabelVolume(int pixelValue);
-
-    /** \brief
-    */
-    void SetLabelName(int pixelValue, const std::string &name);
-
-    /** \brief
-    */
-    std::string GetLabelName(int index);
-
-    /** \brief
-    */
-    void SetLabelColor(int index, const Color &color);
-
-    /** \brief
-    */
-    const Color& GetLabelColor(int index);
-
-    /** \brief
-    */
-    const Label* GetActiveLabel() const { return m_ActiveLabel; };
-
-    /** \brief
-    */
-    Label::ConstPointer GetLabel(unsigned int index) const;
-
-    /** \brief
-    */
-    int GetActiveLabelPixelValue() const;
-
-    /** \brief
-    */
-    int GetActiveLabelLayer() const;
-
-    /** \brief
-    */
-    void SetLabelCenterOfMassIndex(int index, const Point3D& center);
-
-    /** \brief
-    */
-    const Point3D& GetLabelCenterOfMassIndex(int index);
-
-    /** \brief
-    */
-    void SetLabelCenterOfMassCoordinates(int index, const Point3D& center);
-
-    /** \brief
-    */
-    const Point3D&
-    GetLabelCenterOfMassCoordinates(int index);
-
-    /** \brief
-    */
-    void ResetLabels();
+    const Label* GetLabel(int pixelValue) const;
 
     /** \brief
     */
@@ -211,7 +189,7 @@ public:
 
     /** \brief
     */
-    static bool IsSelected( Label::Pointer label );
+    void UpdateLookupTable(int pixelValue);
 
 protected:
 

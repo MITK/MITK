@@ -370,7 +370,7 @@ void mitk::USDevice::UpdateServiceProperty(std::string key, std::string value)
   m_ServiceRegistration.SetProperties(m_ServiceProperties);
 
   // send event to notify listeners about the changed property
-  PropertyChangedEvent.Send(key, value);
+  m_PropertyChangedMessage(key, value);
 }
 
 void mitk::USDevice::UpdateServiceProperty(std::string key, double value)

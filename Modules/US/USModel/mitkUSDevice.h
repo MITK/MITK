@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkCommon.h>
+#include <mitkMessage.h>
 #include <mitkImageSource.h>
 
 // ITK
@@ -124,8 +125,7 @@ class USControlInterfaceDoppler;
      * \brief Event for being notified about changes of the micro service properties.
      * This event can be used if no micro service context is available.
      */
-    typedef Message2<const std::string&, const std::string&> PropertyEvent;
-    PropertyEvent PropertyChangedEvent;
+    mitkNewMessage2Macro(PropertyChanged, const std::string&, const std::string&)
 
     /**
      * \return keys for the microservice properties of ultrasound devices

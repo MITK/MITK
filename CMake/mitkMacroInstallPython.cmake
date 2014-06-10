@@ -16,12 +16,13 @@ endfunction()
 
 function(MITK_FUNCTION_INSTALL_PYTHON_MODULE _lib _conf)
   #MESSAGE("INSTALL : " ${_lib})
-  get_filename_component(_target_filename ${_lib} NAME)
+  get_filename_component(_target_filename "${_lib}" NAME)
+  get_filename_component(_lib_path "${_lib}" PATH)
 
   MITK_FUNCTION_INSTALL_PYTHON_LIB("${_target_filename}" "${_lib}" "${_conf}")
 
   # install all dependencies to this python library
-  get_prerequisites(${_lib} prereqs 1 1 bin "${VTK_DIR}/lib")
+  get_prerequisites(${_lib} prereqs 1 1 bin "${_lib_path}")
 
   foreach(_dep ${prereqs})
     #MESSAGE("DEPENDENCIE: " ${_dep})

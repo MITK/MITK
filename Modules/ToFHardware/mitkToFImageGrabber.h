@@ -171,6 +171,11 @@ namespace mitk
     */
     virtual void AllocateImageArrays();
 
+    /**
+     * @brief InitializeImages Initialze the geometries of the images according to the device properties.
+     */
+    void InitializeImages();
+
     ToFCameraDevice::Pointer m_ToFCameraDevice; ///< Device allowing access to ToF image data
     int m_CaptureWidth; ///< Width of the captured ToF image
     int m_CaptureHeight; ///< Height of the captured ToF image
@@ -186,10 +191,6 @@ namespace mitk
     char* m_SourceDataArray;///< member holding the current source data array
     unsigned char* m_RgbDataArray; ///< member holding the current rgb data array
     unsigned long m_DeviceObserverTag; ///< tag of the observer for the ToFCameraDevice
-    bool m_DistanceImageInitialized; ///< flag indicating whether the distance image is initialized or not
-    bool m_IntensityImageInitialized; ///< flag indicating whether the intensity image is initialized or not
-    bool m_AmplitudeImageInitialized; ///< flag indicating whether the amplitude image is initialized or not
-    bool m_RGBImageInitialized; ///< flag indicating whether the RGB image is initialized or not
     ToFImageGrabber();
 
     ~ToFImageGrabber();

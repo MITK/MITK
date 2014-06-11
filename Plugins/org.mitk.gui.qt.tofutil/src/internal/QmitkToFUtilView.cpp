@@ -206,8 +206,11 @@ void QmitkToFUtilView::OnToFCameraConnected()
     m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
   }
 
-  // initialize measurement widget
-  m_Controls->m_ToFMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
+  if ( this->GetRenderWindowPart() )
+    // initialize measurement widget
+    m_Controls->m_ToFMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
+  else
+    MITK_WARN << "No StdMultiWidget available!!! MeasurementWidget will not work.";
 
   this->m_RealTimeClock = mitk::RealTimeClock::New();
   this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();

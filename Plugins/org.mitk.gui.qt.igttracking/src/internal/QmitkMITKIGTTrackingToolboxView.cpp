@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkProgressBar.h>
 #include <mitkNavigationDataSetWriterXML.h>
+#include <mitkNavigationDataSetWriterCSV.h>
 
 // vtk
 #include <vtkSphereSource.h>
@@ -735,9 +736,18 @@ void QmitkMITKIGTTrackingToolboxView::StopLogging()
     EnableLoggingButtons();
 
     //write the results to a file
-    mitk::NavigationDataSetWriterXML* writer = new mitk::NavigationDataSetWriterXML();
-    writer->Write(this->m_Controls->m_LoggingFileName->text().toStdString(),m_loggingFilter->GetNavigationDataSet());
-    delete writer;
+    if(m_Controls->m_csvFormat->isChecked())
+      {
+      mitk::NavigationDataSetWriterCSV* writer = new mitk::NavigationDataSetWriterCSV();
+      writer->Write(this->m_Controls->m_LoggingFileName->text().toStdString(),m_loggingFilter->GetNavigationDataSet());
+      delete writer;
+      }
+    else if (m_Controls->m_xmlFormat->isChecked())
+      {
+      mitk::NavigationDataSetWriterXML* writer = new mitk::NavigationDataSetWriterXML();
+      writer->Write(this->m_Controls->m_LoggingFileName->text().toStdString(),m_loggingFilter->GetNavigationDataSet());
+      delete writer;
+      }
   }
 }
 

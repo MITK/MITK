@@ -30,6 +30,14 @@ mitk::Label::Label():
   SetOpacity(0.6);
   SetPixelValue(-1);
   SetLayer(0);
+  mitk::Point3D pnt;
+  pnt.SetElement(0,0);
+  pnt.SetElement(1,0);
+  pnt.SetElement(2,0);
+  SetCenterOfMassCoordinates(pnt);
+  SetCenterOfMassIndex(pnt);
+
+  SetName("NoName");
 
   mitk::Color col;
   col.Set(0,0,0);
@@ -38,14 +46,8 @@ mitk::Label::Label():
 
 mitk::Label::Label(const Label& other)
   : PropertyList(other)
+  // copyconstructer of property List handles the coping action
 {
-  SetLocked(other.GetLocked());
-  SetVisible(other.GetVisible());
-  SetOpacity(other.GetOpacity());
-  SetName(other.GetName());
-  SetPixelValue(other.GetPixelValue());
-  SetColor(other.GetColor());
-  Modified();
 }
 
 mitk::Label::~Label()

@@ -18,10 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
 #define MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
 
-namespace mitk {
-  class NavigationDataSetWriterCSV
-  {
+#include <mitkNavigationDataSet.h>
 
+namespace mitk {
+  class MitkIGT_EXPORT NavigationDataSetWriterCSV
+  {
+  public:
+     NavigationDataSetWriterCSV();
+    ~NavigationDataSetWriterCSV();
+
+    virtual void Write (std::string path, mitk::NavigationDataSet::Pointer );
   };
 }
 

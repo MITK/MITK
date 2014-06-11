@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>892</width>
-    <height>1351</height>
+    <height>1355</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -342,7 +342,16 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QFormLayout" name="formLayout_2">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item row="0" column="1">
@@ -424,7 +433,16 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <property name="spacing">
@@ -502,6 +520,25 @@
         </property>
         <property name="text">
          <string>Mirror gradients to half sphere</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_NormalizeImageValuesButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Each image value is normalized with the corresponding basleine signal value.</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Normalize image values</string>
         </property>
        </widget>
       </item>

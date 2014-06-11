@@ -89,6 +89,7 @@ protected slots:
   void UpdateDwiBValueMapRounder(int i);
   void DoLengthCorrection();
   void DoAdcCalculation();
+  void DoDwiNormalization();
 
 protected:
   /** Called by ExtractB0 if check-box activated, extracts all b0 images without averaging */

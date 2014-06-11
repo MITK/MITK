@@ -160,7 +160,8 @@ private:
     INVERSION,
     DOWNSAMPLING,
     FLIPPING,
-    RESAMPLING
+    RESAMPLING,
+    RESCALE
   } m_SelectedAction;
 
   enum OperationType{

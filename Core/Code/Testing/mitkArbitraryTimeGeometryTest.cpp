@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <limits>
 
 static const mitk::ScalarType test_eps = 1E-6; /* some reference values in the test seem
-to have been calculated with float precision. Thus, set this to float precision epsilon.*/
+                                               to have been calculated with float precision. Thus, set this to float precision epsilon.*/
 static const mitk::ScalarType test_eps_square = 1E-3;
 
 class mitkArbitraryTimeGeometryTestClass
@@ -39,7 +39,7 @@ public:
   mitk::ArbitraryTimeGeometry::Pointer m_initTimeGeometry;
   mitk::ArbitraryTimeGeometry::Pointer m_12345TimeGeometry;
   mitk::ArbitraryTimeGeometry::Pointer m_123TimeGeometry;
-  
+
   static mitk::Geometry3D::Pointer GenerateGeometry3D(double lower, double upper)
   {
     mitk::Geometry3D::Pointer spGeo = mitk::Geometry3D::New();

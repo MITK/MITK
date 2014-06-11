@@ -118,7 +118,7 @@ mitk::Geometry3D::Pointer mitk::ProportionalTimeGeometry::GetGeometryForTimePoin
 
 mitk::Geometry3D::Pointer mitk::ProportionalTimeGeometry::GetGeometryCloneForTimeStep( TimeStepType timeStep) const
 {
-  if (timeStep > m_GeometryVector.size())
+  if (timeStep >= m_GeometryVector.size())
     return 0;
   return m_GeometryVector[timeStep]->Clone();
 }

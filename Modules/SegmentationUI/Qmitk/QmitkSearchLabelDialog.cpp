@@ -56,7 +56,7 @@ QmitkSearchLabelDialog::~QmitkSearchLabelDialog()
 {
 }
 
-int QmitkSearchLabelDialog::GetLabelIndex()
+int QmitkSearchLabelDialog::GetLabelSetWidgetTableIndex()
 {
     return m_LabelIndex;
 }

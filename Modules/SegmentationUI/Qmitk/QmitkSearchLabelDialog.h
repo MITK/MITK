@@ -33,7 +33,7 @@ class MitkSegmentationUI_EXPORT QmitkSearchLabelDialog : public QDialog
   QmitkSearchLabelDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
      virtual ~QmitkSearchLabelDialog();
 
-    int GetLabelIndex();
+    int GetLabelSetWidgetTableIndex();
 
     void SetLabelSuggestionList(QStringList stringList);
 

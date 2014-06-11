@@ -52,7 +52,7 @@ You can find the build path by selecting the project in the "Package Explorer" v
 
 Now you should be able to start a Run-time Workbench.
 
-\imageMacro{Runas.png,"\b Fig.6: Start Run-time Workbench",16}
+\imageMacro{Runas.png,"\b Fig.6: Start Run-time Workbench",9}
 
 Therefore you have to press the "Run" button and select "Eclipse Application". Click "OK" (<b>Fig.6: Start Run-time Workbench</b>).
 

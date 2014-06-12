@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGL.h"
 
+static const float GL_RENDERING_OFFSET = (float)0.6f;
+
+
 mitk::ContourModelGLMapper2D::ContourModelGLMapper2D()
 {
 }
@@ -91,6 +94,9 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
     assert(displayGeometry.IsNotNull());
 
+    glEnable( GL_LINE_SMOOTH );
+    glEnable(GL_DEPTH_TEST);
+
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
@@ -102,7 +108,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       double red = colorprop->GetColor().GetRed();
       double green = colorprop->GetColor().GetGreen();
       double blue = colorprop->GetColor().GetBlue();
-      glColor4f(red,green,blue,0.5);
+      glColor4f(red,green,blue,1.0);
     }
 
     mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.points.color", renderer));
@@ -133,11 +139,9 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     mitk::ContourModel::VertexIterator pointsIt = renderingContour->IteratorBegin(timestep);
 
-    Point2D pt2d;       // projected_p in display coordinates
-    Point2D lastPt2d;
+    Point2D pt2d, lastPt2d;       // projected_p in display coordinates
 
     int index = 0;
-
     while ( pointsIt != renderingContour->IteratorEnd(timestep) )
     {
       lastPt2d = pt2d;
@@ -182,8 +186,8 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
             {
               glLineWidth(lineWidth);
               glBegin (GL_LINES);
-              glVertex2f(pt2d[0], pt2d[1]);
-              glVertex2f(lastPt2d[0], lastPt2d[1]);
+              glVertex3f( pt2d[0], pt2d[1], GL_RENDERING_OFFSET );
+              glVertex3f( lastPt2d[0], lastPt2d[1], GL_RENDERING_OFFSET );
               glEnd();
               glLineWidth(1);
             }
@@ -205,21 +209,21 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
               vert[0]=0;
               horz[0]=pointsize;
               vert[1]=pointsize;
-              glColor3f(selectedcolor->GetColor().GetRed(), selectedcolor->GetColor().GetBlue(), selectedcolor->GetColor().GetGreen());
+              glColor3f(selectedcolor->GetColor().GetRed(), selectedcolor->GetColor().GetGreen(), selectedcolor->GetColor().GetBlue());
               glLineWidth(1);
               //a rectangle around the point with the selected color
               glBegin (GL_LINE_LOOP);
-              tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-              tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
-              tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
-              tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+              tmp=pt2d-horz;      glVertex3f(tmp[0],tmp[1],GL_RENDERING_OFFSET);
+              tmp=pt2d+vert;      glVertex3f(tmp[0],tmp[1],GL_RENDERING_OFFSET);
+              tmp=pt2d+horz;      glVertex3f(tmp[0],tmp[1],GL_RENDERING_OFFSET);
+              tmp=pt2d-vert;      glVertex3f(tmp[0],tmp[1],GL_RENDERING_OFFSET);
               glEnd();
               glLineWidth(1);
               //the actual point in the specified color to see the usual color of the point
               glColor3f(colorprop->GetColor().GetRed(),colorprop->GetColor().GetGreen(),colorprop->GetColor().GetBlue());
               glPointSize(1);
               glBegin (GL_POINTS);
-              tmp=pt2d;             glVertex2fv(&tmp[0]);
+              tmp=pt2d;             glVertex3fv(&tmp[0]);
               glEnd ();
             }
         }
@@ -236,22 +240,23 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           horz[1]=0;
           vert[0]=0;
           horz[0]=pointsize;
-          vert[1]=pointsize;
+          vert[0]=0;
+          vert[2]=pointsize;
           glColor3f(0.0, 0.0, 0.0);
           glLineWidth(1);
           //a rectangle around the point with the selected color
           glBegin (GL_LINE_LOOP);
-          tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-          tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
-          tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
-          tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+          tmp=pt2d-horz;      glVertex3f(tmp[0],tmp[1],GL_RENDERING_OFFSET);
+          tmp=pt2d+vert;      glVertex3f(tmp[0],tmp[1],GL_RENDERING_OFFSET);
+          tmp=pt2d+horz;      glVertex3f(tmp[0],tmp[1],GL_RENDERING_OFFSET);
+          tmp=pt2d-vert;      glVertex3f(tmp[0],tmp[1],GL_RENDERING_OFFSET);
           glEnd();
           glLineWidth(1);
           //the actual point in the specified color to see the usual color of the point
           glColor3f(colorprop->GetColor().GetRed(),colorprop->GetColor().GetGreen(),colorprop->GetColor().GetBlue());
           glPointSize(1);
           glBegin (GL_POINTS);
-          tmp=pt2d;             glVertex2fv(&tmp[0]);
+          tmp=pt2d;             glVertex3f(tmp[0],tmp[1],GL_RENDERING_OFFSET);
           glEnd ();
         }
 
@@ -293,6 +298,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       pointsIt++;
     }//end while iterate over controlpoints
 
+
     //close contour if necessary
     if(renderingContour->IsClosed(timestep) && drawit)
     {
@@ -305,10 +311,11 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       displayGeometry->Map(projected_p, pt2d);
       displayGeometry->WorldToDisplay(pt2d, pt2d);
 
+
       glLineWidth(lineWidth);
       glBegin (GL_LINES);
-      glVertex2f(lastPt2d[0], lastPt2d[1]);
-      glVertex2f( pt2d[0], pt2d[1] );
+      glVertex3f( lastPt2d[0], lastPt2d[1], GL_RENDERING_OFFSET );
+      glVertex3f( pt2d[0], pt2d[1], GL_RENDERING_OFFSET );
       glEnd();
       glLineWidth(1);
     }
@@ -343,15 +350,17 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
         //a diamond around the point
         glBegin (GL_LINE_LOOP);
         //begin from upper left corner and paint clockwise
-        tmp[0]=pt2d[0]-pointsize;    tmp[1]=pt2d[1]+pointsize;    glVertex2fv(&tmp[0]);
-        tmp[0]=pt2d[0]+pointsize;    tmp[1]=pt2d[1]+pointsize;    glVertex2fv(&tmp[0]);
-        tmp[0]=pt2d[0]+pointsize;    tmp[1]=pt2d[1]-pointsize;    glVertex2fv(&tmp[0]);
-        tmp[0]=pt2d[0]-pointsize;    tmp[1]=pt2d[1]-pointsize;    glVertex2fv(&tmp[0]);
+        tmp[0]=pt2d[0]-pointsize;    tmp[1]=pt2d[1]+pointsize;    glVertex3fv(&tmp[0]);
+        tmp[0]=pt2d[0]+pointsize;    tmp[1]=pt2d[1]+pointsize;    glVertex3fv(&tmp[0]);
+        tmp[0]=pt2d[0]+pointsize;    tmp[1]=pt2d[1]-pointsize;    glVertex3fv(&tmp[0]);
+        tmp[0]=pt2d[0]-pointsize;    tmp[1]=pt2d[1]-pointsize;    glVertex3fv(&tmp[0]);
         glEnd ();
       }
       //------------------------------------
     }
   }
+  glDisable( GL_LINE_SMOOTH );
+
 }
 
 const mitk::ContourModel* mitk::ContourModelGLMapper2D::GetInput(void)

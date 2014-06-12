@@ -44,7 +44,7 @@ namespace mitk {
 }
 // global declaration for simple call by
 // applications
-void Segmentation_EXPORT RegisterSegmentationObjectFactory();
+//void Segmentation_EXPORT RegisterSegmentationObjectFactory();
 
 #endif
 

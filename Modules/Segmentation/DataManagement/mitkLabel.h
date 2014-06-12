@@ -21,10 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkSegmentationExports.h"
 #include <mitkColorProperty.h>
 #include <mitkVector.h>
-#include <mitkMessage.h>
-
-#include <itkObject.h>
-#include <itkObjectFactory.h>
+#include <mitkPropertyList.h>
 
 namespace mitk
 {
@@ -34,70 +31,39 @@ namespace mitk
 //## @brief A data structure describing a label.
 //## @ingroup Data
 //##
-class MitkSegmentation_EXPORT Label : public itk::Object
+class MitkSegmentation_EXPORT Label : public PropertyList
 {
 public:
-
-  /**
-  * \brief LabelColorPropertyEvent is emitted whenever a label color has been modified.
-  */
-  Message1<mitk::Color> LabelColorPropertyEvent;
-
-  mitkClassMacro( Label, itk::Object );
+  mitkClassMacro( Label, mitk::PropertyList );
 
   itkNewMacro( Self );
 
-  itkSetMacro(Locked, bool);
-  itkGetConstMacro(Locked, bool);
-  itkBooleanMacro(Locked);
+  void SetLocked(bool locked);
+  bool GetLocked() const;
 
-  itkSetMacro(Visible, bool);
-  itkGetConstMacro(Visible, bool);
-  itkBooleanMacro(Visible);
+  void SetVisible(bool visible);
+  bool GetVisible() const;
 
-  //itkSetMacro(Exterior, bool);
-  //itkGetConstMacro(Exterior, bool);
-  //itkBooleanMacro(Exterior);
+  void SetOpacity(float opacity);
+  float GetOpacity() const;
 
-  //itkSetMacro(Filled, bool);
-  //itkGetConstMacro(Filled, bool);
-  //itkBooleanMacro(Filled);
-
-  //itkSetMacro(Selected, bool );
-  //itkGetConstMacro( Selected, bool );
-  //itkBooleanMacro(Selected);
-
-  itkSetMacro(Opacity, float);
-  itkGetConstMacro(Opacity, float);
-
-  //itkSetMacro(Volume, float);
-  //itkGetConstMacro(Volume, float);
-
-  itkSetStringMacro(Name);
-  itkGetStringMacro(Name);
-
-  //itkSetMacro(LatinName, std::string);
-  //itkGetConstMacro(LatinName, std::string);
-
-  //itkSetMacro(LastModified, std::string);
-  //itkGetConstMacro(LastModified, std::string);
+  void SetName(const std::string &name);
+  std::string GetName() const;
 
   void SetCenterOfMassIndex(const mitk::Point3D& center);
-  const mitk::Point3D& GetCenterOfMassIndex() const;
+  mitk::Point3D GetCenterOfMassIndex() const;
 
   void SetCenterOfMassCoordinates(const mitk::Point3D& center);
-  const mitk::Point3D& GetCenterOfMassCoordinates() const;
+  mitk::Point3D GetCenterOfMassCoordinates() const;
 
   void SetColor(const mitk::Color&);
-  const mitk::Color& GetColor() const
-  { return m_Color; };
+  const mitk::Color& GetColor() const;
 
-  itkSetMacro(PixelValue, int);
-  itkGetMacro(PixelValue, int);
-  itkGetConstMacro(PixelValue, int);
+  void SetPixelValue(int pixelValue);
+  int GetPixelValue() const;
 
-  itkSetMacro(Layer, int);
-  itkGetConstMacro(Layer, int);
+  void SetLayer(int layer);
+  int GetLayer() const;
 
   Label();
   virtual ~Label();
@@ -108,21 +74,9 @@ protected:
 
   Label(const Label& other);
 
-  bool m_Locked;
-  bool m_Visible;
-  //bool m_Filled;
-  //bool m_Exterior;
-  float m_Opacity;
-  bool m_Selected;
-  std::string m_Name;
-  //std::string m_LatinName;
-  //float m_Volume;
-  //std::string m_LastModified;
-  int m_PixelValue;
-  int m_Layer;
-  mitk::Color m_Color;
-  mitk::Point3D m_CenterOfMassIndex;
-  mitk::Point3D m_CenterOfMassCoordinates;
+private:
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 } // namespace mitk

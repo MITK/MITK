@@ -916,14 +916,6 @@ mitk::DataNode * QmitkLabelSetWidget::GetWorkingNode()
   return workingNode;
 }
 
-void QmitkLabelSetWidget::OnToolManagerWorkingDataModified()
-{
-  mitk::LabelSetImage* workingImage = GetWorkingImage();
-  assert(workingImage);
-  int pixelValue = workingImage->GetActiveLabel()->GetPixelValue();
-  workingImage->UpdateCenterOfMass(pixelValue);
-}
-
 
 void QmitkLabelSetWidget::UpdateControls()
 {

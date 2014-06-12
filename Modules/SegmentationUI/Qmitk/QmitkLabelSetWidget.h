@@ -70,66 +70,54 @@ public slots:
 
 private slots:
 
+  // Label Set Dependend
   void OnOpacityChanged(int);
-  void OnCreateSmoothedSurface(bool);
-  void OnCreateDetailedSurface(bool);
   void OnUnlockAllLabels(bool);
   void OnLockAllLabels(bool);
   void OnSetAllLabelsVisible(bool);
   void OnSetAllLabelsInvisible(bool);
   void OnSetOnlyActiveLabelVisible(bool);
   void OnRandomColor(bool);
-  void OnEraseLabel(bool);
   void OnRemoveLabel(bool);
-  void OnRenameLabel(bool);
-  void OnCombineAndCreateMask(bool);
-  void OnCreateMasks(bool);
-  void OnCombineAndCreateSurface(bool);
-  void OnEraseLabels(bool);
   void OnRemoveLabels(bool);
-  void OnMergeLabels(bool);
+  void OnRenameLabel(bool);
   void OnLockedButtonClicked();
   void OnVisibleButtonClicked();
   void OnColorButtonClicked();
-
   void OnItemClicked(QTableWidgetItem *item);
   void OnItemDoubleClicked(QTableWidgetItem *item);
   void OnTableViewContextMenuRequested(const QPoint&);
-  //void SelectTableWidgetItem(QTableWidgetItem *item);
   void InsertTableWidgetItem(const mitk::Label * label);
   void UpdateTableWidgetItem(QTableWidgetItem *item);
-
-
   // reaction to "returnPressed" signal from ...
   void OnSearchLabel();
-
-  // reaction to signal "mergeLabel" from QmitkLabelSetTableWidget
-  void OnMergeLabel(bool);
-
-  // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
-  void OnLabelListModified(const QStringList& list);
-
-  // reaction to signal "WorkingDataModified" from ToolManager
-  void OnToolManagerWorkingDataModified();
-
-  // reaction to the signal "toggleOutline" from QmitkLabelSetTableWidget
-  void OnToggleOutline(bool);
-
-  // reaction to the signal "createMask" from QmitkLabelSetTableWidget
-  void OnCreateMask(bool);
-
-  // reaction to the signal "createCroppedMask" from QmitkLabelSetTableWidget
-  void OnCreateCroppedMask(bool);
-
   // reaction to the button "Change Label"
   void OnActiveLabelChanged(int pixelValue);
 
+  //LabelSetImage Dependet
+  void OnCreateDetailedSurface(bool);
+  void OnCreateSmoothedSurface(bool);
+  // reaction to the signal "createMask" from QmitkLabelSetTableWidget
+  void OnCreateMask(bool);
+  void OnCreateMasks(bool);
+  // reaction to the signal "createCroppedMask" from QmitkLabelSetTableWidget
+  void OnCreateCroppedMask(bool);
+  void OnCombineAndCreateMask(bool);
+  void OnCombineAndCreateSurface(bool);
+  void OnEraseLabel(bool);
+  void OnEraseLabels(bool);
+  // reaction to signal "mergeLabel" from QmitkLabelSetTableWidget
+  void OnMergeLabel(bool);
+  void OnMergeLabels(bool);
   // reaction to the button "Import Segmentation"
   void OnImportSegmentation();
-
   // reaction to the button "Import Labeled Image"
   void OnImportLabeledImage();
 
+  // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
+  void OnLabelListModified(const QStringList& list);
+  // reaction to the signal "toggleOutline" from QmitkLabelSetTableWidget
+  void OnToggleOutline(bool);
 
 private:
 

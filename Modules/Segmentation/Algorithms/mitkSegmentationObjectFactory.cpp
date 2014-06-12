@@ -170,13 +170,31 @@ void mitk::SegmentationObjectFactory::RegisterIOFactories()
   CreateFileExtensionsMap();
 }
 
-void RegisterSegmentationObjectFactory()
-{
-  static bool oneSegmentationObjectFactoryRegistered = false;
-  if ( ! oneSegmentationObjectFactoryRegistered )
+// void RegisterSegmentationObjectFactory()
+// {
+//   static bool oneSegmentationObjectFactoryRegistered = false;
+//   if ( ! oneSegmentationObjectFactoryRegistered )
+//   {
+//     MITK_DEBUG << "Registering SegmentationObjectFactory..." << std::endl;
+//     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::SegmentationObjectFactory::New());
+//     oneSegmentationObjectFactoryRegistered = true;
+//   }
+// }
+
+struct RegisterSegmentationObjectFactory{
+  RegisterSegmentationObjectFactory()
+    : m_Factory( mitk::SegmentationObjectFactory::New() )
   {
-    MITK_DEBUG << "Registering SegmentationObjectFactory..." << std::endl;
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::SegmentationObjectFactory::New());
-    oneSegmentationObjectFactoryRegistered = true;
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
   }
-}
+
+  ~RegisterSegmentationObjectFactory()
+  {
+    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
+  }
+
+  mitk::SegmentationObjectFactory::Pointer m_Factory;
+};
+
+
+static RegisterSegmentationObjectFactory registerSegmentationObjectFactory;

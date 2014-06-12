@@ -322,6 +322,11 @@ bool mitk::USCombinedModality::GetIsCalibratedForCurrentStatus()
   return m_Calibrations.find(this->GetIdentifierForCurrentCalibration()) != m_Calibrations.end();
 }
 
+bool mitk::USCombinedModality::GetContainsAtLeastOneCalibration()
+{
+  return ! m_Calibrations.empty();
+}
+
 void mitk::USCombinedModality::GenerateData()
 {
   // update ultrasound image source and get current output then

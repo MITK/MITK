@@ -81,6 +81,27 @@ protected slots:
 
   void OnResetView();
 
+  // reaction to the button "Add Layer"
+  void OnAddLayer();
+
+  // reaction to the button "Delete Layer"
+  void OnDeleteLayer();
+
+  // reaction to the button "Previous Layer"
+  void OnPreviousLayer();
+
+  // reaction to the button "Next Layer"
+  void OnNextLayer();
+
+  // reaction to the combobox change "Change Layer"
+  void OnChangeLayer(int);
+
+  // reaction to the button "Deactive Active Tool"
+  void OnDeactivateActiveTool();
+
+  // reaction to the button "Lock exterior"
+  void OnLockExteriorToggled(bool);
+
 protected:
 
   void OnEstablishLabelSetConnection();

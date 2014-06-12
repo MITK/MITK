@@ -87,7 +87,7 @@ void mitk::MedianTool3D::Run()
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
+  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetPixelValue();
 
   CurrentlyBusy.Send(true);
 
@@ -199,7 +199,7 @@ void mitk::MedianTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   {
     int inputValue = static_cast<int>( inputIter.Get() );
 
-    if ( (inputValue != m_PaintingPixelValue) && workingImage->GetLabelLocked( inputValue ) )
+    if ( (inputValue != m_PaintingPixelValue) && workingImage->GetLabel( inputValue )->GetLocked() )
       resultIter.Set(0);
 
     ++inputIter;

@@ -92,19 +92,19 @@ void mitk::LabelSetImageWriter::GenerateData()
     for (int labelIdx=0; labelIdx<input->GetNumberOfLabels(layerIdx); labelIdx++)
     {
       sprintf( keybuffer, "label_%03d_name", idx );
-      sprintf( valbuffer, "%s", input->GetLabelName(labelIdx,layerIdx).c_str());
+      sprintf( valbuffer, "%s", input->GetLabel(labelIdx,layerIdx)->GetName().c_str());
 
       itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
       sprintf( keybuffer, "label_%03d_props", idx );
       float rgba[4];
-      const mitk::Color& color = input->GetLabelColor(labelIdx, layerIdx);
+      const mitk::Color& color = input->GetLabel(labelIdx, layerIdx)->GetColor();
       rgba[0] = color.GetRed();
       rgba[1] = color.GetGreen();
       rgba[2] = color.GetBlue();
-      rgba[3] = input->GetLabelOpacity(labelIdx, layerIdx);
-      int locked = input->GetLabelLocked(labelIdx, layerIdx);
-      int visible = input->GetLabelVisible(labelIdx, layerIdx);
+      rgba[3] = input->GetLabel(labelIdx, layerIdx)->GetOpacity();
+      int locked = input->GetLabel(labelIdx, layerIdx)->GetLocked();
+      int visible = input->GetLabel(labelIdx, layerIdx)->GetVisible();
       sprintf(valbuffer, "%f %f %f %f %d %d %d %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, layerIdx, labelIdx);
 
       itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));

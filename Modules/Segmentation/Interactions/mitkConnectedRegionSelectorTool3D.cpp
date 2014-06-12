@@ -163,7 +163,7 @@ bool mitk::ConnectedRegionSelectorTool3D::AddRegion( StateMachineAction*, Intera
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
+  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetPixelValue();
 
   int clickedPixelValue = static_cast<int>( workingImage->GetPixelValueByIndex(m_LastSeedIndex, m_CurrentTimeStep) );
 

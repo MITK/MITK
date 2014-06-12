@@ -256,7 +256,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEven
     assert(interpolator);
     mitk::ImageToContourModelSetFilter::Pointer converter = mitk::ImageToContourModelSetFilter::New();
     converter->SetInput(slice);
-    converter->SetContourValue(workingImage->GetActiveLabelPixelValue());
+    converter->SetContourValue(workingImage->GetActiveLabel()->GetPixelValue());
     converter->SetSliceGeometry(slice->GetGeometry());
     converter->Update();
     mitk::ContourModel::Pointer newContour = converter->GetOutput()->GetContourModelAt(0);
@@ -444,7 +444,7 @@ void mitk::SegTool2D::InternalWritePreviewOnWorkingImage( itk::Image<TPixel,VIma
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert (workingImage);
 
-  int activePixelValue = workingImage->GetActiveLabelPixelValue();
+  int activePixelValue = workingImage->GetActiveLabel()->GetPixelValue();
 
   if (activePixelValue == 0) // if exterior is the active label
   {
@@ -465,7 +465,7 @@ void mitk::SegTool2D::InternalWritePreviewOnWorkingImage( itk::Image<TPixel,VIma
       int targetValue = static_cast<int>(outputIterator.Get());
       if ( inputIterator.Get() != 0 )
       {
-        if (!workingImage->GetLabelLocked(targetValue))
+        if (!workingImage->GetLabel(targetValue)->GetLocked())
           outputIterator.Set( overwritevalue );
       }
 

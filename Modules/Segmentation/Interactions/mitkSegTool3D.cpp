@@ -74,7 +74,7 @@ void mitk::SegTool3D::AcceptPreview()
   assert(workingImage);
 
   //check if active label has changed in the meanwhile (between Run and AcceptPreview)
-  if (m_PaintingPixelValue != workingImage->GetActiveLabelPixelValue())
+  if (m_PaintingPixelValue != workingImage->GetActiveLabel()->GetPixelValue())
   {
     m_PreviewNode->SetVisibility(false);
     m_PreviewImage = NULL;
@@ -212,7 +212,7 @@ void mitk::SegTool3D::CreateNewLabel(const std::string& name, const mitk::Color&
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
-  workingImage->AddLabel(name, color);
+  workingImage->GetLabelSet()->AddLabel(name, color);
 
   this->AcceptPreview();
 }

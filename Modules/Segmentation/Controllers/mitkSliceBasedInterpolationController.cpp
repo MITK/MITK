@@ -287,10 +287,10 @@ mitk::Image::Pointer mitk::SliceBasedInterpolationController::Interpolate(unsign
   if ( sliceIndex >= upperLimit - 1 ) return NULL; // can't interpolate first and last slice
   if ( sliceIndex < 1  ) return NULL;
 
-  int activeLabel = m_WorkingImage->GetActiveLabelPixelValue();
+  int pixelValue = m_WorkingImage->GetActiveLabel()->GetPixelValue();
 
   // slice contains a segmentation, won't interpolate anything then
-  if ( m_LabelCountInSlice[timeStep][sliceDimension][sliceIndex][activeLabel] > 0 ) return NULL;
+  if ( m_LabelCountInSlice[timeStep][sliceDimension][sliceIndex][pixelValue] > 0 ) return NULL;
 
   int lowerBound(0);
   int upperBound(0);
@@ -298,7 +298,7 @@ mitk::Image::Pointer mitk::SliceBasedInterpolationController::Interpolate(unsign
 
   for (lowerBound = sliceIndex - 1; /*lowerBound >= 0*/; --lowerBound)
   {
-    if ( m_LabelCountInSlice[timeStep][sliceDimension][lowerBound][activeLabel] > 0 )
+    if ( m_LabelCountInSlice[timeStep][sliceDimension][lowerBound][pixelValue] > 0 )
     {
       bounds = true;
       break;
@@ -312,7 +312,7 @@ mitk::Image::Pointer mitk::SliceBasedInterpolationController::Interpolate(unsign
   bounds = false;
   for (upperBound = sliceIndex + 1 ; upperBound < upperLimit; ++upperBound)
   {
-    if ( m_LabelCountInSlice[timeStep][sliceDimension][upperBound][activeLabel] > 0 )
+    if ( m_LabelCountInSlice[timeStep][sliceDimension][upperBound][pixelValue] > 0 )
     {
       bounds = true;
       break;

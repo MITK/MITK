@@ -84,7 +84,7 @@ void mitk::FillHolesTool3D::Run()
 
   CurrentlyBusy.Send(true);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
+  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetPixelValue();
   m_PreviewNode->SetProperty("outline binary", BoolProperty::New(false) );
   m_PreviewNode->SetOpacity(0.3);
 
@@ -197,7 +197,7 @@ void mitk::FillHolesTool3D::InternalRun( itk::Image< TPixel, VDimension>* input 
   {
     int inputValue = static_cast<int>( inputIter.Get() );
 
-    if ( (inputValue != m_PaintingPixelValue) && workingImage->GetLabelLocked( inputValue ) )
+    if ( (inputValue != m_PaintingPixelValue) && workingImage->GetLabel( inputValue )->GetLocked() )
       resultIter.Set(0);
 
     ++inputIter;

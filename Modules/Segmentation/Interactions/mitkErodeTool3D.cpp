@@ -87,7 +87,7 @@ void mitk::ErodeTool3D::Run()
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
+  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetPixelValue();
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 

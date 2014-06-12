@@ -133,7 +133,7 @@ void mitk::SplitConnectedRegionsTool3D::Run()
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
   assert(workingImage);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelPixelValue();
+  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetPixelValue();
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
@@ -208,13 +208,13 @@ void mitk::SplitConnectedRegionsTool3D::InternalAcceptPreview( ImageType1* targe
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
   assert(workingImage);
 
-  std::string name = workingImage->GetActiveLabelName();
+  std::string name = workingImage->GetActiveLabel()->GetName();
 
   int numberOfObjects = binaryImageToShapeLabelMapFilter->GetOutput()->GetNumberOfLabelObjects();
 
   int maxLabel = workingImage->GetNumberOfLabels();
 
-  std::string originalName = workingImage->GetActiveLabelName();
+  std::string originalName = workingImage->GetActiveLabel()->GetName();
 
   // Loop over all blobs
   for (unsigned int i=0; i<numberOfObjects; i++)
@@ -223,7 +223,7 @@ void mitk::SplitConnectedRegionsTool3D::InternalAcceptPreview( ImageType1* targe
     std::stringstream stream;
     stream << originalName << "-sp-" << i;
     std::string name = stream.str().c_str();
-    workingImage->AddLabel(name, color);
+    workingImage->GetLabelSet()->AddLabel(name, color);
   }
 
   typedef itk::ImageRegionIterator< ImageType1 >      TargetIteratorType;

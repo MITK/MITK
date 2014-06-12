@@ -179,7 +179,7 @@ void LabelSetImageReader::GenerateData()
     label->SetLayer(_layer);
     label->SetPixelValue(_index);
     if (_index != 0)
-      output->AddLabel(*label);
+      output->GetLabelSet()->AddLabel(*label);
   }
 
   // set vector image

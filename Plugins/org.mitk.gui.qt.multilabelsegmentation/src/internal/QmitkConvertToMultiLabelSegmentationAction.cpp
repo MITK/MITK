@@ -57,6 +57,7 @@ void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode
         newNode->SetData(lsImage);
         m_DataStorage->Add(newNode,referenceNode);
       }
+      lsImage->Modified();
     }
   }
 }

@@ -148,7 +148,8 @@ void mitk::FastMarchingTool3D::Activated()
   m_FeedbackImage = mitk::LabelSetImage::New();
   std::string name = "feedback";
   mitk::Color color;
-  m_FeedbackImage->AddLabel(name, color);
+  m_FeedbackImage->GetLabelSet()->AddLabel(name, color);
+  //m_FeedbackImage->AddLabelEvent.Send();
 
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataNode::New();
@@ -368,15 +369,15 @@ void mitk::FastMarchingTool3D::Update()
 
     m_FeedbackImage->InitializeByItk(output.GetPointer());
     m_FeedbackImage->SetChannel(output->GetBufferPointer());
-
     m_FeedbackImage->SetGeometry( m_ReferenceImage->GetGeometry(0)->Clone().GetPointer() );
 
     mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
     assert(workingImage);
 
-    const mitk::Color& color = workingImage->GetActiveLabelColor();
+    const mitk::Color& color = workingImage->GetActiveLabel()->GetColor();
 
-    m_FeedbackImage->SetLabelColor(1, color);
+    m_FeedbackImage->GetLabelSet()->GetLabel(1)->SetColor(color);
+
     m_FeedbackNode->SetData(m_FeedbackImage);
 
     m_NeedUpdate = false;

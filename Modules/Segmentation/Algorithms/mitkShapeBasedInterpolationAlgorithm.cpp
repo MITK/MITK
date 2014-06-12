@@ -141,7 +141,7 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
     int targetValue = static_cast<int>(targetIterator.Get());
     if ( sourceIterator.Get() != 0 )
     {
-      if (!workingImage->GetLabelLocked(targetValue))
+      if (!workingImage->GetLabel(targetValue)->GetLocked());
         targetIterator.Set(1);
     }
     else

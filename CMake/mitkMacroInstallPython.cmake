@@ -32,7 +32,7 @@ function(MITK_FUNCTION_INSTALL_PYTHON_MODULE _lib _conf)
 
     if(UNIX AND NOT APPLE)
       # if the realpath is different from the linked dependency
-      # we got a symlink
+      # we got a symlink on a linux system
       if( NOT("${_dep}" STREQUAL "${_realpath}"))
         # install symlink
         install(FILES ${_dep} DESTINATION bin)
@@ -52,7 +52,7 @@ function(MITK_INSTALL_VTK_PYTHON)
   foreach(_lib ${VTK_LIBRARIES})
     # exclude system libs
     if(${_lib} MATCHES "^vtk.+")
-      # use only python wrapped modules
+      # use only python wrapped modules ( targets end with PythonD )
       if(TARGET ${_lib}PythonD)
         list(APPEND _VTK_PYTHON_TARGETS ${_lib}Python)
       endif()
@@ -61,13 +61,17 @@ function(MITK_INSTALL_VTK_PYTHON)
 
   # install the python modules and loaders
   foreach(_target ${_VTK_PYTHON_TARGETS})
-    # get target properties
+    # get the properties of the python wrapped target
     get_target_property(_target_lib_debug   "${_target}D" IMPORTED_LOCATION_DEBUG)
     get_filename_component(_filepath_debug "${_target_lib_debug}" PATH)
     get_target_property(_target_lib_release "${_target}D" IMPORTED_LOCATION_RELEASE)
     get_filename_component(_filepath_release "${_target_lib_release}" PATH)
 
-    MESSAGE("${_filepath_debug}/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    #MESSAGE("${_filepath_debug}/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+
+    # install the loader library for the python module. The loader library don't got a target but is
+    # linked against the python wrapped target (PythonD). All dependencies of the loader will be packed
+    # into the installer
     if(_target_lib_debug)
       MITK_FUNCTION_INSTALL_PYTHON_MODULE("${_filepath_debug}/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}" "Debug")
     endif()
@@ -77,7 +81,7 @@ function(MITK_INSTALL_VTK_PYTHON)
     endif()
   endforeach()
 
-  # install vtk python
+  # install vtk python. This folder contains all *.py files for VTK module loading.
   install(DIRECTORY ${VTK_DIR}/Wrapping/Python/vtk
           DESTINATION bin/Python
           USE_SOURCE_PERMISSIONS

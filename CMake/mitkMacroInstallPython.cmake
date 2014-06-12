@@ -77,7 +77,7 @@ function(MITK_INSTALL_VTK_PYTHON)
     endif()
 
     if(_target_lib_release)
-      MITK_FUNCTION_INSTALL_PYTHON_MODULE("${_filepath_release}/$${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}" "Release")
+      MITK_FUNCTION_INSTALL_PYTHON_MODULE("${_filepath_release}/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}" "Release")
     endif()
   endforeach()
 

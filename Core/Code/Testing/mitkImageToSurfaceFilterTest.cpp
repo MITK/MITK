@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "mitkTestingMacros.h"
 #include "mitkImageToSurfaceFilter.h"
-#include "mitkItkImageFileReader.h"
 #include "mitkException.h"
 #include "mitkTestFixture.h"
 

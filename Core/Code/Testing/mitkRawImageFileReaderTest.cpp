@@ -15,11 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkRawImageFileReader.h"
 #include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
 #include "mitkIOUtil.h"
-#include "mitkItkImageFileReader.h"
 
 class mitkRawImageFileReaderTestSuite : public mitk::TestFixture
 {
@@ -32,7 +30,7 @@ class mitkRawImageFileReaderTestSuite : public mitk::TestFixture
 private:
 
   /** Members used inside the different test methods. All members are initialized via setUp().*/
-  mitk::RawImageFileReader::Pointer m_FileReader;
+  mitk::IFileReader* m_FileReader;
 
   std::string m_ImagePath;
   std::string m_ImagePathNrrdRef; //corresponding mhd path for comparision

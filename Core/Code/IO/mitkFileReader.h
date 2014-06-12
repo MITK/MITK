@@ -25,6 +25,7 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
+//## @deprecatedSince{2014_03} Use mitk::IFileReader instead.
 class MITK_CORE_EXPORT FileReader
 {
   public:

@@ -27,6 +27,7 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of writers that write data to files
 //## @ingroup Process
+//## @deprecatedSince{2014_03} Use mitk::IFileWriter instead.
 class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
 {
   public:

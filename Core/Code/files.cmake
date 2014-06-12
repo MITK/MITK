@@ -70,6 +70,10 @@ set(H_FILES
   Interactions/mitkEventMapperAddOn.h
 
   Interfaces/mitkIDataNodeReader.h
+  Interfaces/mitkIFileWriter.h
+  Interfaces/mitkIFileWriter.cpp
+  Interfaces/mitkIFileReader.h
+  Interfaces/mitkIFileReader.cpp
 
   Rendering/mitkLocalStorageHandler.h
   Rendering/Colortables/HotIron.h
@@ -77,9 +81,7 @@ set(H_FILES
   Rendering/Colortables/PET20.h
   Rendering/Colortables/PETColor.h
 
-
   IO/mitkPixelTypeTraits.h
-
 )
 
 set(CPP_FILES
@@ -112,7 +114,6 @@ set(CPP_FILES
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp
   Controllers/mitkCameraRotationController.cpp
-  Controllers/mitkCoreActivator.cpp
   Controllers/mitkFocusManager.cpp
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
@@ -144,7 +145,6 @@ set(CPP_FILES
   DataManagement/mitkDataStorage.cpp
 # DataManagement/mitkDataTree.cpp
   DataManagement/mitkDataNode.cpp
-  DataManagement/mitkDataNodeFactory.cpp
 # DataManagement/mitkDataTreeStorage.cpp
   DataManagement/mitkDisplayGeometry.cpp
   DataManagement/mitkEnumerationProperty.cpp
@@ -170,6 +170,7 @@ set(CPP_FILES
   DataManagement/mitkLevelWindowPreset.cpp
   DataManagement/mitkLevelWindowProperty.cpp
   DataManagement/mitkLookupTable.cpp
+  DataManagement/mitkLookupTableProperty.cpp
   DataManagement/mitkLookupTables.cpp # specializations of GenericLookupTable
   DataManagement/mitkMemoryUtilities.cpp
   DataManagement/mitkModalityProperty.cpp
@@ -210,6 +211,7 @@ set(CPP_FILES
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkVector.cpp
+
   DataManagement/mitkNumericConstants.cpp
   DataManagement/mitkVtkInterpolationProperty.cpp
   DataManagement/mitkVtkRepresentationProperty.cpp
@@ -288,6 +290,8 @@ set(CPP_FILES
   Interactions/mitkCrosshairPositionEvent.cpp
   Interactions/mitkXML2EventParser.cpp
 
+  Interfaces/mitkIMimeType.cpp
+  Interfaces/mitkIMimeTypeProvider.cpp
   Interfaces/mitkInteractionEventObserver.cpp
   Interfaces/mitkIShaderRepository.cpp
   Interfaces/mitkIPropertyAliases.cpp
@@ -296,8 +300,8 @@ set(CPP_FILES
   Interfaces/mitkIPropertyFilters.cpp
   Interfaces/mitkIPersistenceService.cpp
 
-  IO/mitkBaseDataIOFactory.cpp
-  IO/mitkCoreDataNodeReader.cpp
+  IO/mitkAbstractFileReader.cpp
+  IO/mitkAbstractFileWriter.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkDicomSR_LoadDICOMScalar.cpp
   IO/mitkDicomSR_LoadDICOMScalar4D.cpp
@@ -308,18 +312,13 @@ set(CPP_FILES
   IO/mitkDicomSR_SliceGroupingResult.cpp
 
   IO/mitkFileReader.cpp
-  IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp
+  IO/mitkFileReaderRegistry.cpp
+  IO/mitkFileWriterRegistry.cpp
 # IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
-  IO/mitkImageWriter.cpp
-  IO/mitkImageWriterFactory.cpp
-  IO/mitkItkImageFileIOFactory.cpp
-  IO/mitkItkImageFileReader.cpp
   IO/mitkItkLoggingAdapter.cpp
-  IO/mitkItkPictureWrite.cpp
   IO/mitkIOUtil.cpp
-  IO/mitkLookupTableProperty.cpp
   IO/mitkOperation.cpp
 # IO/mitkPicFileIOFactory.cpp
 # IO/mitkPicFileReader.cpp
@@ -328,24 +327,9 @@ set(CPP_FILES
 # IO/mitkPicVolumeTimeSeriesIOFactory.cpp
 # IO/mitkPicVolumeTimeSeriesReader.cpp
   IO/mitkPixelType.cpp
-  IO/mitkPointSetIOFactory.cpp
-  IO/mitkPointSetReader.cpp
-  IO/mitkPointSetWriter.cpp
-  IO/mitkPointSetWriterFactory.cpp
-  IO/mitkRawImageFileReader.cpp
+  IO/mitkSimpleMimeType.cpp
   IO/mitkStandardFileLocations.cpp
-  IO/mitkSTLFileIOFactory.cpp
-  IO/mitkSTLFileReader.cpp
-  IO/mitkSurfaceVtkWriter.cpp
-  IO/mitkSurfaceVtkWriterFactory.cpp
   IO/mitkVtkLoggingAdapter.cpp
-  IO/mitkVtiFileIOFactory.cpp
-  IO/mitkVtiFileReader.cpp
-  IO/mitkVtkImageIOFactory.cpp
-  IO/mitkVtkImageReader.cpp
-  IO/mitkVtkSurfaceIOFactory.cpp
-  IO/mitkVtkSurfaceReader.cpp
-  IO/vtkPointSetXMLParser.cpp
   IO/mitkLog.cpp
 
   Rendering/mitkBaseRenderer.cpp
@@ -393,6 +377,14 @@ set(CPP_FILES
   Common/mitkCoreObjectFactoryBase.cpp
   Common/mitkCoreObjectFactory.cpp
   Common/mitkCoreServices.cpp
+
+  Internal/mitkCoreActivator.cpp
+  Internal/mitkItkFileReaderService.cpp
+  Internal/mitkLegacyFileReaderService.cpp
+  #Internal/mitkLegacyFileWriterService.cpp
+  Internal/mitkMimeTypeProvider.cpp
+  Internal/mitkPointSetReaderService.cpp
+  Internal/mitkPointSetWriterService.cpp
 )
 
 set(RESOURCE_FILES

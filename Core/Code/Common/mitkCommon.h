@@ -41,6 +41,7 @@ typedef unsigned int MapperSlotId;
   typedef SuperClassName      Superclass; \
   typedef itk::SmartPointer<Self> Pointer; \
   typedef itk::SmartPointer<const Self>  ConstPointer; \
+  static const char* GetStaticNameOfClass() { return #className; } \
     itkTypeMacro(className,SuperClassName)
 /**
 * Macro for Constructors with one parameter for classes derived from itk::Lightobject

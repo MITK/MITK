@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QFileInfo>
 
+#include <QmitkFileOpenDialog.h>
+#include <QmitkNativeFileOpenDialog.h>
+
 #include <ctkServiceTracker.h>
 
 #include <berryIEditorPart.h>
@@ -109,11 +112,20 @@ QmitkFileOpenAction::~QmitkFileOpenAction()
 
 void QmitkFileOpenAction::Run()
 {
-
   // Ask the user for a list of files to open
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
-                                                        d->getLastFileOpenPath(),
-                                                        mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
+
+  //QmitkFileOpenDialog dialog;
+  //QmitkFileDialog dialog;
+  QmitkNativeFileOpenDialog dialog;
+  //dialog.setFilter(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
+  //dialog.show();
+  dialog.Exec();
+
+  QStringList fileNames  = dialog.GetSelectedFiles();
+
+  //QStringList fileNames =  QmitkFileDialog::getOpenFileNames(NULL, "Open",
+  //d->getLastFileOpenPath(),
+  //  mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
 
   if (fileNames.empty())
     return;

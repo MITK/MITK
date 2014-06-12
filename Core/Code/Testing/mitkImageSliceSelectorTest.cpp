@@ -16,10 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkImage.h>
-#include <mitkDataNodeFactory.h>
-//#include <mitkCylindricToCartesianFilter.h>
+#include <mitkIOUtil.h>
 #include <mitkImageSliceSelector.h>
-#include <itksys/SystemTools.hxx>
 
 #include <fstream>
 int mitkImageSliceSelectorTest(int argc, char* argv[])
@@ -31,27 +29,17 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     std::cout<<"no file specified [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  mitk::Image::Pointer image = NULL;
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
+
+  mitk::Image::Pointer image;
   try
   {
-    std::cout<<argv[1]<<std::endl;
-    factory->SetFileName( argv[1] );
-    factory->Update();
-
-    if(factory->GetNumberOfOutputs()<1)
-    {
-      std::cout<<"file could not be loaded [FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
-    image = dynamic_cast<mitk::Image*>(node->GetData());
-    if(image.IsNull())
-    {
-      std::cout<<"file not an image - test will not be applied [PASSED]"<<std::endl;
-      std::cout<<"[TEST DONE]"<<std::endl;
-      return EXIT_SUCCESS;
-    }
+    image = mitk::IOUtil::LoadImage(argv[1]);
+  }
+  catch ( const mitk::Exception& )
+  {
+    std::cout<<"file not an image - test will not be applied [PASSED]"<<std::endl;
+    std::cout<<"[TEST DONE]"<<std::endl;
+    return EXIT_SUCCESS;
   }
   catch ( itk::ExceptionObject & ex )
   {

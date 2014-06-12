@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkDataNode.h>
-#include <mitkDataNodeFactory.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
@@ -679,7 +678,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   node->AddProperty( "outline shadow width", mitk::FloatProperty::New( 1.5 ), renderer, overwrite );
   if(image->IsRotated()) node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );
   else node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
-  node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
+  node->AddProperty( "texture interpolation", mitk::BoolProperty::New( false ) );
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
 

@@ -53,7 +53,7 @@ void QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string fileN
       //########### None standard data type was found, try to save with extensions.
       // now try the file writers provided by the CoreObjectFactory
 
-      mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+      mitk::CoreObjectFactory::FileWriterList fileWriters; // = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
 
       mitk::CoreObjectFactory::FileWriterList fileWriterCandidates;
       QString fileDialogPattern;

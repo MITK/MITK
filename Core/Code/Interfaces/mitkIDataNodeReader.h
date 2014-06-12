@@ -30,6 +30,8 @@ class DataStorage;
  *
  * This interface provides methods to load data from the local filesystem
  * into a given mitk::DataStorage.
+ *
+ * \deprecatedSince{2014_03} Use mitk::IFileReader instead
  */
 struct IDataNodeReader
 {

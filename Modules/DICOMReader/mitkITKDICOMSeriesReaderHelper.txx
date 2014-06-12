@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <itkLinearInterpolateImageFunction.h>
 //#include <itkTimeProbesCollectorBase.h>
 
-
 template <typename PixelType>
 mitk::Image::Pointer
 mitk::ITKDICOMSeriesReaderHelper
@@ -90,6 +89,13 @@ mitk::ITKDICOMSeriesReaderHelper
 {
   unsigned int numberOfTimeSteps = filenamesForTimeSteps.size();
 
+  MITK_DEBUG << "Start extracting time bounds of time steps";
+  TimeBoundsList timeBoundsList = ExtractTimeBoundsOfTimeSteps(filenamesForTimeSteps);
+  if (numberOfTimeSteps!=timeBoundsList.size())
+  {
+    mitkThrow() << "Error while loading 3D+t. Inconsistent size of generated time bounds list. List size: "<< timeBoundsList.size() << "; number of steps: "<<numberOfTimeSteps;
+  }
+
   mitk::Image::Pointer image = mitk::Image::New();
 
   typedef itk::Image<PixelType, 4> ImageType;
@@ -149,6 +155,9 @@ mitk::ITKDICOMSeriesReaderHelper
                                     << image->GetGeometry()->GetSpacing()[1] << ", "
                                     << image->GetGeometry()->GetSpacing()[2] << "]";
 
+  //construct timegeometry
+  TimeGeometry::Pointer timeGeometry = GenerateTimeGeometry(image->GetGeometry(),timeBoundsList);
+  image->SetTimeGeometry(timeGeometry);
   return image;
 }
 

@@ -89,6 +89,30 @@ function(MITK_INSTALL_VTK_PYTHON)
 
 endfunction()
 
+function(MITK_INSTALL_ITK_PYTHON )
+  find_package(ITK REQUIRED)
+
+  set(_build_type "Release")
+
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(_build_type "Debug")
+  endif()
+
+  file(GLOB _libs RELATIVE "${ITK_DIR}/lib" "${ITK_DIR}/lib/_ITK*" )
+  file(GLOB _py_files RELATIVE "${ITK_DIR}/lib" "${ITK_DIR}/lib/*.py" )
+
+  install(FILES ${_py_files} DESTINATION bin)
+
+  #set(_libs "blabla")
+
+  foreach(_l ${_libs})
+
+    MESSAGE("${ITK_DIR}/lib/${_l}")
+    MITK_FUNCTION_INSTALL_PYTHON_MODULE("${ITK_DIR}/lib/${_l}" "${_build_type}")
+
+  endforeach()
+endfunction()
+
 function(MITK_INSTALL_CV_PYTHON)
   find_package(OpenCV REQUIRED)
 
@@ -102,10 +126,12 @@ function(MITK_INSTALL_CV_PYTHON)
 endfunction()
 
 macro(MITK_INSTALL_PYTHON)
-  MITK_INSTALL_VTK_PYTHON()
 
-  if(MITK_USE_OpenCV)
-    MITK_INSTALL_CV_PYTHON()
-  endif()
+  MITK_INSTALL_ITK_PYTHON()
+  #MITK_INSTALL_VTK_PYTHON()
+
+  #if(MITK_USE_OpenCV)
+  #  MITK_INSTALL_CV_PYTHON()
+  #endif()
 endmacro(MITK_INSTALL_PYTHON)
 

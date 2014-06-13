@@ -137,11 +137,6 @@ if( MITK_BUILD_EXAMPLES )
  set(USERS_GUIDE_PLUGINS "${USERS_GUIDE_PLUGINS}${MITK_SOURCE_DIR}/Examples/Plugins/ \\\n")
 endif()
 
-set(string_length )
-string(LENGTH ${USERS_GUIDE_PLUGINS} string_length)
-math(EXPR string_length "${string_length}-1")
-string(SUBSTRING ${USERS_GUIDE_PLUGINS} 0 ${string_length} USERS_GUIDE_PLUGINS)
-
 # create output directories for the guides
 file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Users_Guide/)
 file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Developers_Guide/)

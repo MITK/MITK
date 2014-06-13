@@ -66,7 +66,8 @@ mitk::PythonService::PythonService()
         pythonCommand.append( QString("import sys\n") );
         pythonCommand.append( QString("sys.path.append('')\n") );
         pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
-        pythonCommand.append( QString("sys.path.append('%1/Python')").arg(programPath.c_str()) );
+        pythonCommand.append( QString("sys.path.append('%1/Python')\n").arg(programPath.c_str()) );
+        pythonCommand.append( QString("sys.path.append('%1/Python/itk')").arg(programPath.c_str()) );
       } else {
          pythonCommand.append(PYTHONPATH_COMMAND);
       }

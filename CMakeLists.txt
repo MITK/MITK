@@ -1045,6 +1045,3 @@ feature_summary(
   WHAT ALL
 )
 
-if(MITK_USE_Python)
-  MITK_INSTALL_PYTHON()
-endif()

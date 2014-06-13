@@ -43,6 +43,12 @@ macro(_fixup_target)
     endif()
   endif()
 
+  set(_python_libs )
+  set(_python_dirs )
+  if(MITK_USE_Python)
+    MITK_INSTALL_PYTHON(_python_libs _python_dirs)
+  endif()
+
   mitkFunctionGetLibrarySearchPaths(_search_paths ${intermediate_dir})
 
   install(CODE "
@@ -149,6 +155,10 @@ macro(_fixup_target)
       list(APPEND PLUGINS \${_plugin_realpath})
     endforeach()
 
+    foreach(_py_lib ${_python_libs})
+      list(APPEND PLUGINS \"\${CMAKE_INSTALL_PREFIX}/bin/\${_py_lib}\")
+    endforeach()
+
     if(PLUGINS)
       list(REMOVE_DUPLICATES PLUGINS)
     endif(PLUGINS)
@@ -166,6 +176,10 @@ macro(_fixup_target)
       get_filename_component(_pluginpath \${_plugin} PATH)
       list(APPEND DIRS \"\${_pluginpath}\")
     endforeach(_plugin)
+
+    foreach(_dir ${_python_dirs})
+      list(APPEND DIRS \"\${_dir}\")
+    endforeach()
 
     list(REMOVE_DUPLICATES DIRS)
 

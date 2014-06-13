@@ -55,11 +55,22 @@ mitk::PythonService::PythonService()
 
       std::string programPath = mitk::IOUtil::GetProgramPath();
 
-      QString pythonCommand(PYTHONPATH_COMMAND);
-      // runtime directory used in installers
-      pythonCommand.append("\n");
-      pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
-      pythonCommand.append( QString("sys.path.append('%1/Python')\n").arg(programPath.c_str()) );
+      QDir programmDir( QString( programPath.c_str() ).append("/Python") );
+
+      QString pythonCommand;
+
+      // Set the pythonpath variable depending if
+      // we have an installer or development environment
+      if ( programmDir.exists() ) {
+        // runtime directory used in installers
+        pythonCommand.append( QString("import sys\n") );
+        pythonCommand.append( QString("sys.path.append('')\n") );
+        pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
+        pythonCommand.append( QString("sys.path.append('%1/Python')").arg(programPath.c_str()) );
+      } else {
+         pythonCommand.append(PYTHONPATH_COMMAND);
+      }
+
 
       MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
       m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );

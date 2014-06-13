@@ -82,7 +82,7 @@ function(MITK_INSTALL_VTK_PYTHON)
   endforeach()
 
   # install vtk python. This folder contains all *.py files for VTK module loading.
-  install(DIRECTORY ${VTK_DIR}/Wrapping/Python/vtk
+  install(DIRECTORY "${VTK_DIR}/Wrapping/Python/vtk"
           DESTINATION bin/Python
           USE_SOURCE_PERMISSIONS
           COMPONENT Runtime)
@@ -98,18 +98,27 @@ function(MITK_INSTALL_ITK_PYTHON )
     set(_build_type "Debug")
   endif()
 
-  file(GLOB _libs RELATIVE "${ITK_DIR}/lib" "${ITK_DIR}/lib/_ITK*" )
-  file(GLOB _py_files RELATIVE "${ITK_DIR}/lib" "${ITK_DIR}/lib/*.py" )
+  file(GLOB _libs "${ITK_DIR}/lib/_ITK*" )
+  file(GLOB _py_files "${ITK_DIR}/lib/*.py" )
+  file(GLOB _py_generators "${ITK_DIR}/Wrapping/Generators/Python/*.py")
 
   install(FILES ${_py_files} DESTINATION bin)
+  install(FILES ${_py_generators} DESTINATION bin)
 
-  #set(_libs "blabla")
+  install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/Configuration"
+          DESTINATION bin
+          USE_SOURCE_PERMISSIONS
+          COMPONENT Runtime)
+
+
+  install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/itkExtras"
+    DESTINATION bin
+    USE_SOURCE_PERMISSIONS
+    COMPONENT Runtime)
 
   foreach(_l ${_libs})
-
-    MESSAGE("${ITK_DIR}/lib/${_l}")
-    MITK_FUNCTION_INSTALL_PYTHON_MODULE("${ITK_DIR}/lib/${_l}" "${_build_type}")
-
+    MESSAGE("${_l}")
+    MITK_FUNCTION_INSTALL_PYTHON_MODULE("${_l}" "${_build_type}")
   endforeach()
 endfunction()
 
@@ -128,10 +137,10 @@ endfunction()
 macro(MITK_INSTALL_PYTHON)
 
   MITK_INSTALL_ITK_PYTHON()
-  #MITK_INSTALL_VTK_PYTHON()
+  MITK_INSTALL_VTK_PYTHON()
 
-  #if(MITK_USE_OpenCV)
-  #  MITK_INSTALL_CV_PYTHON()
-  #endif()
+  if(MITK_USE_OpenCV)
+    MITK_INSTALL_CV_PYTHON()
+  endif()
 endmacro(MITK_INSTALL_PYTHON)
 

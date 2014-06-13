@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Macro
 #include <MitkCoreExports.h>
-#include <mitkCommon.h>
 
 // Microservices
 #include <usServiceInterface.h>
@@ -27,23 +26,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkMessage.h>
 
-// STL
-#include <list>
 
 namespace mitk {
   class BaseData;
 }
 
 namespace mitk {
+
   /**
-  * \brief The common interface of all FileWriters.
-  *
-  * This interface defines the methods necessary for the FileWriterManager
-  * to interact with its FileWriters. To implement a new FileWriter, it is
-  * recommended to derive from FileWriterAbstract instead of directly from this Interface,
-  * as the abstract class already implements most of the methods and also makes sure that your writer
-  * will be managed by the FileWriterManager.
-  */
+   * \brief The common interface of all MITK file writers.
+   *
+   * Implementations of this interface must be registered as a service
+   * to make themselve available via the service registry. If the
+   * implementation is state-full, the service should be registered using
+   * a PrototypeServiceFactory.
+   *
+   * It is recommended to derive new implementations from AbstractFileWriter,
+   * which provides correct service registration semantics.
+   *
+   * \sa AbstractFileWriter
+   * \sa FileWriterRegistry
+   * \sa IFileReader
+   */
   struct MITK_CORE_EXPORT IFileWriter
   {
     virtual ~IFileWriter();
@@ -52,50 +56,63 @@ namespace mitk {
     typedef std::vector<FileServiceOption> OptionList;
     typedef std::vector<std::string> OptionNames;
 
+    typedef mitk::MessageAbstractDelegate1<float> ProgressCallback;
+
     virtual void Write(const BaseData* data, const std::string& path ) = 0;
 
     virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
 
     /**
-    * \brief returns the file extension that this FileWriter is able to handle.
-    *
-    * Please return only the characters after the fullstop, e.g "nrrd" is correct
-    * while "*.nrrd" and ".nrrd" are incorrect.
-    */
-    virtual std::string GetExtension() const = 0;
-
-    /**
-    * \brief returns the itk classname that this FileWriter is able to handle.
-    */
-    virtual std::string GetSupportedBasedataType() const = 0;
-
-    /**
-    * \brief returns a list of the supported Options
-    *
-    * Options are strings that are treated as flags when passed to the write method.
-    */
+     * \brief returns a list of the supported Options
+     *
+     * Options are strings that are treated as flags when passed to the write method.
+     */
     virtual OptionList GetOptions() const = 0;
 
     virtual void SetOptions(const OptionList& options) = 0;
 
     /**
-    * \brief Returns true if this reader can confirm that it can write \c data and false otherwise.
-    */
+     * \brief Returns true if this reader can confirm that it can write \c data and false otherwise.
+     */
     virtual bool CanWrite(const BaseData* data) const = 0;
 
     /**
-    * \brief Returns a value between 0 and 1 depending on the progress of the writing process.
-    * This method need not necessarily be implemented meaningfully, always returning zero is accepted.
-    */
-    virtual float GetProgress() const = 0;
+     * \brief Returns a value between 0 and 1 depending on the progress of the writing process.
+     * This method need not necessarily be implemented meaningfully, always returning zero is accepted.
+     */
+    virtual void AddProgressCallback(const ProgressCallback& callback) = 0;
+
+    virtual void RemoveProgressCallback(const ProgressCallback& callback) = 0;
 
     // Microservice properties
-    static std::string PROP_EXTENSION();
-    static std::string PROP_BASEDATA_TYPE();
-    static std::string PROP_DESCRIPTION();
-    static std::string PROP_IS_LEGACY();
 
-  protected:
+    /**
+     * @brief Service property name for the supported mitk::BaseData sub-class
+     *
+     * The property value must be of type \c std::string.
+     *
+     * @return The property name.
+     */
+    static std::string PROP_BASEDATA_TYPE();
+
+    /**
+     * @brief Service property name for a description.
+     *
+     * The property value must be of type \c std::string.
+     *
+     * @return The property name.
+     */
+    static std::string PROP_DESCRIPTION();
+
+    /**
+     * @brief Service property name for the mime-type associated with this file writer.
+     *
+     * The property value must be of type \c std::string.
+     *
+     * @return The property name.
+     */
+    static std::string PROP_MIMETYPE();
+
   };
 } // namespace mitk
 

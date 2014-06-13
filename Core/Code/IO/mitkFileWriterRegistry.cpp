@@ -18,16 +18,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFileWriterRegistry.h"
 
 // MITK
-#include <mitkCoreObjectFactory.h>
-
-// ITK
-#include <itksys/SystemTools.hxx>
+#include "mitkIMimeTypeProvider.h"
+#include "mitkCoreServices.h"
+#include "mitkBaseData.h"
 
 // Microservices
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usServiceProperties.h>
 #include <usLDAPProp.h>
+
+// ITK
+#include <itksys/SystemTools.hxx>
 
 mitk::FileWriterRegistry::FileWriterRegistry()
 {
@@ -110,13 +112,7 @@ std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(
     const std::string& baseDataType, const std::string& extension,
     const mitk::IFileWriter::OptionNames& options, us::ModuleContext* context)
 {
-  // filter for class and extension
-  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_BASEDATA_TYPE()) == baseDataType &&
-                       us::LDAPProp(mitk::IFileWriter::PROP_EXTENSION()) == extension;
-
-  std::vector <us::ServiceReference<IFileWriter> > refs = context->GetServiceReferences<IFileWriter>(filter);
-  std::sort(refs.begin(), refs.end());
-  std::reverse(refs.begin(), refs.end());
+  std::vector <us::ServiceReference<IFileWriter> > refs = GetRefs(baseDataType, extension, context);
 
   std::vector<mitk::IFileWriter*> result;
   result.reserve(refs.size());
@@ -142,19 +138,19 @@ std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(
 
 //////////////////// GENERIC INFORMATION ////////////////////
 
-std::string mitk::FileWriterRegistry::GetSupportedExtensions(const std::string& extension, us::ModuleContext* context)
-{
-  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_EXTENSION()) == extension;
-  const std::vector <us::ServiceReference<IFileWriter> > refs = context->GetServiceReferences<IFileWriter>(filter);
-  return CreateFileDialogString(refs);
-}
+//std::string mitk::FileWriterRegistry::GetSupportedExtensions(const std::string& extension, us::ModuleContext* context)
+//{
+//  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_EXTENSION()) == extension;
+//  const std::vector <us::ServiceReference<IFileWriter> > refs = context->GetServiceReferences<IFileWriter>(filter);
+//  return CreateFileDialogString(refs);
+//}
 
-std::string mitk::FileWriterRegistry::GetSupportedWriters(const std::string& baseDataType, us::ModuleContext* context)
-{
-  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_BASEDATA_TYPE()) == baseDataType;
-  const std::vector <us::ServiceReference<IFileWriter> > refs = context->GetServiceReferences<IFileWriter>(filter);
-  return CreateFileDialogString(refs);
-}
+//std::string mitk::FileWriterRegistry::GetSupportedWriters(const std::string& baseDataType, us::ModuleContext* context)
+//{
+//  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_BASEDATA_TYPE()) == baseDataType;
+//  const std::vector <us::ServiceReference<IFileWriter> > refs = context->GetServiceReferences<IFileWriter>(filter);
+//  return CreateFileDialogString(refs);
+//}
 
 
 //////////////////// INTERNAL CODE ////////////////////
@@ -182,31 +178,59 @@ bool mitk::FileWriterRegistry::WriterSupportsOptions(mitk::IFileWriter* writer, 
   return true; // if all options have been found, return true
 }
 
-std::string mitk::FileWriterRegistry::CreateFileDialogString(const std::vector<us::ServiceReference<IFileWriter> >& refs)
+//std::string mitk::FileWriterRegistry::CreateFileDialogString(const std::vector<us::ServiceReference<IFileWriter> >& refs)
+//{
+//  std::vector<std::string> entries; // Will contain Description + Extension (Human readable)
+//  entries.reserve(refs.size());
+//  std::string knownExtensions; // Will contain plain list of all known extensions (for the QFileDialog entry "All Known Extensions")
+//  for (std::vector<us::ServiceReference<IFileWriter> >::const_iterator iterator = refs.begin(), end = refs.end();
+//       iterator != end; ++iterator)
+//  {
+//    // Generate List of Extensions
+//    if (iterator == refs.begin()) // First entry without semicolon
+//      knownExtensions += "*" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION()).ToString();
+//    else // Ad semicolon for each following entry
+//      knownExtensions += "; *" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION()).ToString();
+
+//    // Generate List of human readable entries composed of Description + Extension
+//    std::string entry = iterator->GetProperty(mitk::IFileWriter::PROP_DESCRIPTION()).ToString() + "(*" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION()).ToString() + ");;";
+//    entries.push_back(entry);
+//  }
+//  std::sort(entries.begin(), entries.end());
+
+//  std::string result = "Known Extensions (" + knownExtensions + ");;All (*)";
+//  for (std::vector<std::string>::const_iterator iterator = entries.begin(), end = entries.end();
+//       iterator != end; ++iterator)
+//  {
+//    result += ";;" + *iterator;
+//  }
+//  return result;
+//}
+
+std::vector< us::ServiceReference<mitk::IFileWriter> >
+mitk::FileWriterRegistry::GetRefs(const std::string& baseData, const std::string& extension,
+                                  us::ModuleContext* context )
 {
-  std::vector<std::string> entries; // Will contain Description + Extension (Human readable)
-  entries.reserve(refs.size());
-  std::string knownExtensions; // Will contain plain list of all known extensions (for the QFileDialog entry "All Known Extensions")
-  for (std::vector<us::ServiceReference<IFileWriter> >::const_iterator iterator = refs.begin(), end = refs.end();
-       iterator != end; ++iterator)
-  {
-    // Generate List of Extensions
-    if (iterator == refs.begin()) // First entry without semicolon
-      knownExtensions += "*" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION()).ToString();
-    else // Ad semicolon for each following entry
-      knownExtensions += "; *" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION()).ToString();
+  std::vector<us::ServiceReference<IFileWriter> > result;
 
-    // Generate List of human readable entries composed of Description + Extension
-    std::string entry = iterator->GetProperty(mitk::IFileWriter::PROP_DESCRIPTION()).ToString() + "(*" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION()).ToString() + ");;";
-    entries.push_back(entry);
-  }
-  std::sort(entries.begin(), entries.end());
-
-  std::string result = "Known Extensions (" + knownExtensions + ");;All (*)";
-  for (std::vector<std::string>::const_iterator iterator = entries.begin(), end = entries.end();
-       iterator != end; ++iterator)
+  std::string mimeExpr;
+  if (!extension.empty())
   {
-    result += ";;" + *iterator;
+    // filter for mime type
+    mitk::IMimeTypeProvider* mimeTypeProvider = mitk::CoreServices::GetMimeTypeProvider(context);
+    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extension);
+    if (mimeTypes.empty())
+    {
+      MITK_WARN << "No mime-type information for extension " << extension << " available.";
+    }
+    else
+    {
+      mimeExpr = us::LDAPProp(mitk::IFileWriter::PROP_MIMETYPE()) == mimeTypes.front();
+    }
   }
+  std::string filter = us::LDAPProp(mitk::IFileWriter::PROP_BASEDATA_TYPE()) == baseData && us::LDAPPropExpr(mimeExpr);
+  result = context->GetServiceReferences<IFileWriter>(filter);
+  std::sort(result.begin(), result.end());
+  std::reverse(result.begin(), result.end());
   return result;
 }

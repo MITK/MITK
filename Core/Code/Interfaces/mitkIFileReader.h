@@ -38,25 +38,26 @@ namespace itk {
 
 namespace mitk {
   /**
-  * \brief The common interface for all MITK file readers.
-  *
-  * Implementations of this interface must be registered as a service
-  * to make themselve available via the service registry. If the
-  * implementation is state-full, the service should be registered using
-  * a PrototypeServiceFactory.
-  *
-  * The file reader implementation is associated with a mime-type, specified
-  * in the service property PROP_MIMETYPE(). The specified mime-type should
-  * have a corresponding IMimeType service object, registered by the reader
-  * or some other party.
-  *
-  * It is recommended to derive new implementations from AbstractFileReader,
-  * which provides correct service registration semantics.
-  *
-  * \sa AbstractFileReader
-  * \sa IMimeType
-  * \sa FileReaderRegistry
-  */
+   * \brief The common interface for all MITK file readers.
+   *
+   * Implementations of this interface must be registered as a service
+   * to make themselve available via the service registry. If the
+   * implementation is state-full, the service should be registered using
+   * a PrototypeServiceFactory.
+   *
+   * The file reader implementation is associated with a mime-type, specified
+   * in the service property PROP_MIMETYPE(). The specified mime-type should
+   * have a corresponding IMimeType service object, registered by the reader
+   * or some other party.
+   *
+   * It is recommended to derive new implementations from AbstractFileReader,
+   * which provides correct service registration semantics.
+   *
+   * \sa AbstractFileReader
+   * \sa IMimeType
+   * \sa FileReaderRegistry
+   * \sa IFileWriter
+   */
   struct MITK_CORE_EXPORT IFileReader
   {
     virtual ~IFileReader();
@@ -78,42 +79,42 @@ namespace mitk {
     virtual std::vector<itk::SmartPointer<BaseData> > Read(std::istream& stream) = 0;
 
     /**
-    * \brief Reads the specified file and returns its contents.
-    *
-    * When reading a given file, multiple BaseData instances might be produces.
-    * If a DataStorage instance is passed and the reader added a BaseData instance
-    * to it, the second element in the returned pair will be set true.
-    */
+     * \brief Reads the specified file and returns its contents.
+     *
+     * When reading a given file, multiple BaseData instances might be produces.
+     * If a DataStorage instance is passed and the reader added a BaseData instance
+     * to it, the second element in the returned pair will be set true.
+     */
     virtual std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > Read(const std::string& path, mitk::DataStorage& ds) = 0;
 
     /**
-    * \brief Reads the specified input stream and returns its contents.
-    */
+     * \brief Reads the specified input stream and returns its contents.
+     */
     virtual std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > Read(std::istream& stream, mitk::DataStorage& ds) = 0;
 
     /**
-    * \brief returns a list of the supported Options
-    *
-    * Initially, the reader contains a set of standard options. These can be retrieved,
-    * manipulated and set again. To activate or deactivate an option, just set it's bool
-    * value accordingly. All supported options are in the default set, it does not
-    * make sense to add strings artificially after retrieving a reader - the specific
-    * implementation decides which options it wants to support.
-    * If no options are supported, an empty list is returned.
-    */
+     * \brief returns a list of the supported Options
+     *
+     * Initially, the reader contains a set of standard options. These can be retrieved,
+     * manipulated and set again. To activate or deactivate an option, just set it's bool
+     * value accordingly. All supported options are in the default set, it does not
+     * make sense to add strings artificially after retrieving a reader - the specific
+     * implementation decides which options it wants to support.
+     * If no options are supported, an empty list is returned.
+     */
     virtual OptionList GetOptions() const = 0;
 
     /**
-    * \brief Sets the options for this reader
-    *
-    * The best way to use this method is to retireve the options via GetOptions, manipulate the bool values,
-    * and then set the options again.
-    */
+     * \brief Sets the options for this reader
+     *
+     * The best way to use this method is to retireve the options via GetOptions, manipulate the bool values,
+     * and then set the options again.
+     */
     virtual void SetOptions(const OptionList& options) = 0;
 
     /**
-    * \brief Returns true if this writer can confirm that it can read this file and false otherwise.
-    */
+     * \brief Returns true if this writer can confirm that it can read this file and false otherwise.
+     */
     virtual bool CanRead(const std::string& path) const = 0;
 
     /**

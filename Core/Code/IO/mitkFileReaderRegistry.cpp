@@ -225,7 +225,6 @@ std::vector< us::ServiceReference<mitk::IFileReader> > mitk::FileReaderRegistry:
   std::vector<us::ServiceReference<IFileReader> > result;
 
   // filter for mime type
-  std::string filter;
   mitk::IMimeTypeProvider* mimeTypeProvider = mitk::CoreServices::GetMimeTypeProvider(context);
   std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForExtension(extension);
   if (mimeTypes.empty())
@@ -233,7 +232,7 @@ std::vector< us::ServiceReference<mitk::IFileReader> > mitk::FileReaderRegistry:
     MITK_WARN << "No mime-type information for extension " << extension << " available.";
     return result;
   }
-  filter = us::LDAPProp(mitk::IFileReader::PROP_MIMETYPE()) == mimeTypes.front();
+  std::string filter = us::LDAPProp(mitk::IFileReader::PROP_MIMETYPE()) == mimeTypes.front();
   result = context->GetServiceReferences<IFileReader>(filter);
   std::sort(result.begin(), result.end());
   std::reverse(result.begin(), result.end());

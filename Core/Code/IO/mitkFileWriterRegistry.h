@@ -81,15 +81,17 @@ namespace mitk {
 
     // TODO: We should not generate GUI dependent strings here. Maybe just return a pair of extensions
     //       and descriptions.
-    std::string GetSupportedExtensions(const std::string& extension = std::string(), us::ModuleContext* context = us::GetModuleContext());
+    //std::string GetSupportedExtensions(const std::string& extension = std::string(), us::ModuleContext* context = us::GetModuleContext());
 
-    std::string GetSupportedWriters(const std::string& basedataType, us::ModuleContext* context = us::GetModuleContext());
+    //std::string GetSupportedWriters(const std::string& basedataType, us::ModuleContext* context = us::GetModuleContext());
 
   protected:
 
     std::string CreateFileDialogString(const std::vector<us::ServiceReference<IFileWriter> >& refs);
 
     bool WriterSupportsOptions(mitk::IFileWriter* writer, const mitk::IFileWriter::OptionNames& options);
+
+    std::vector<us::ServiceReference<mitk::IFileWriter> > GetRefs(const std::string& baseData, const std::string& extension, us::ModuleContext* context);
 
   private:
 

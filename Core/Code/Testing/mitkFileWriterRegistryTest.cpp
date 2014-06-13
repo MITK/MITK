@@ -46,11 +46,11 @@ public:
   {
   }
 
-  DummyWriter(const std::string& basedataType, const std::string& extension, int priority)
+  DummyWriter(const std::string& basedataType, const std::string& extension, int ranking)
     : mitk::AbstractFileWriter(basedataType, extension, "This is a dummy description")
     , m_Content("Hi there stream")
   {
-    m_Priority = priority;
+    this->SetRanking(ranking);
     m_ServiceReg = this->RegisterService();
   }
 
@@ -91,11 +91,11 @@ public:
   {
   }
 
-  DummyWriter2(const std::string& basedataType, const std::string& extension, int priority)
+  DummyWriter2(const std::string& basedataType, const std::string& extension, int ranking)
     : mitk::AbstractFileWriter(basedataType, extension, "This is a dummy description")
     , m_Content("hi there file path")
   {
-    m_Priority = priority;
+    this->SetRanking(ranking);
     m_ServiceReg = this->RegisterService();
   }
 
@@ -187,10 +187,10 @@ void TestStreamMethods()
 /**
  *  TODO
  */
-int mitkFileWriterRegistryTest(int argc , char* argv[])
+int mitkFileWriterRegistryTest(int /*argc*/ , char* /*argv*/[])
 {
   // always start with this!
-  //MITK_TEST_BEGIN("FileWriterRegistry");
+  MITK_TEST_BEGIN("FileWriterRegistry");
 
   TestStreamMethods();
 
@@ -298,6 +298,5 @@ int mitkFileWriterRegistryTest(int argc , char* argv[])
   delete writerRegistry;
 
   //// always end with this!
-  //MITK_TEST_END()
-  return 0;
+  MITK_TEST_END()
 }

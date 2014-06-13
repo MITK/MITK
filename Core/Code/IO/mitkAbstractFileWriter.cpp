@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileWriter.h>
 #include <mitkBaseData.h>
 #include <mitkIOUtil.h>
+#include <mitkSimpleMimeType.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -26,51 +27,95 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <fstream>
 
-mitk::AbstractFileWriter::AbstractFileWriter()
-  : m_Priority (0)
-  , m_PrototypeFactory(NULL)
+namespace mitk {
+
+class AbstractFileWriter::Impl
+{
+public:
+
+  Impl()
+    : m_Ranking(0)
+    , m_PrototypeFactory(NULL)
+  {}
+
+  Impl(const Impl& other)
+    : m_MimeType(other.m_MimeType)
+    , m_Category(other.m_Category)
+    , m_BaseDataType(other.m_BaseDataType)
+    , m_Extensions(other.m_Extensions)
+    , m_Description(other.m_Description)
+    , m_Ranking(other.m_Ranking)
+    , m_Options(other.m_Options)
+    , m_PrototypeFactory(NULL)
+  {}
+
+  std::string m_MimeType;
+  std::string m_Category;
+  std::string m_BaseDataType;
+  std::vector<std::string> m_Extensions;
+  std::string m_Description;
+  int m_Ranking;
+
+  /**
+   * \brief Options supported by this writer. Set sensible default values!
+   *
+   * Can be left emtpy if no special options are required.
+   */
+  IFileWriter::OptionList m_Options;
+
+
+  us::PrototypeServiceFactory* m_PrototypeFactory;
+
+  Message1<float> m_ProgressMessage;
+
+  SimpleMimeType m_SimpleMimeType;
+  us::ServiceRegistration<IMimeType> m_MimeTypeReg;
+};
+
+
+AbstractFileWriter::AbstractFileWriter()
+  : d(new Impl)
 {
 }
 
-mitk::AbstractFileWriter::~AbstractFileWriter()
+AbstractFileWriter::~AbstractFileWriter()
 {
-  delete m_PrototypeFactory;
+  delete d->m_PrototypeFactory;
+
+  if (d->m_MimeTypeReg)
+  {
+    d->m_MimeTypeReg.Unregister();
+  }
 }
 
-mitk::AbstractFileWriter::AbstractFileWriter(const mitk::AbstractFileWriter& other)
-  : m_Extension(other.m_Extension)
-  , m_BasedataType(other.m_BasedataType)
-  , m_Description(other.m_Description)
-  , m_Priority(other.m_Priority)
-  , m_Options(other.m_Options)
-  , m_PrototypeFactory(NULL)
+AbstractFileWriter::AbstractFileWriter(const AbstractFileWriter& other)
+  : d(new Impl(*other.d.get()))
 {
 }
 
-mitk::AbstractFileWriter::AbstractFileWriter(const std::string& basedataType, const std::string& extension,
-                                             const std::string& description)
-                                             : m_Extension (extension)
-                                             , m_BasedataType(basedataType)
-                                             , m_Description (description)
-                                             , m_Priority (0)
-                                             , m_PrototypeFactory(NULL)
+AbstractFileWriter::AbstractFileWriter(const std::string& baseDataType, const std::string& extension,
+                                       const std::string& description)
+  : d(new Impl)
 {
+  d->m_BaseDataType = baseDataType;
+  d->m_Description = description;
+  d->m_Extensions.push_back(extension);
 }
 
 ////////////////////// Writing /////////////////////////
 
-void mitk::AbstractFileWriter::Write(const BaseData* data, const std::string& path)
+void AbstractFileWriter::Write(const BaseData* data, const std::string& path)
 {
   std::ofstream stream;
   stream.open(path.c_str());
   this->Write(data, stream);
 }
 
-void mitk::AbstractFileWriter::Write(const mitk::BaseData* data, std::ostream& stream)
+void AbstractFileWriter::Write(const BaseData* data, std::ostream& stream)
 {
   // Create a temporary file and write the data to it
   std::ofstream tmpOutputStream;
-  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpOutputStream);
+  std::string tmpFilePath = IOUtil::CreateTemporaryFile(tmpOutputStream);
   this->Write(data, tmpFilePath);
   tmpOutputStream.close();
 
@@ -83,103 +128,139 @@ void mitk::AbstractFileWriter::Write(const mitk::BaseData* data, std::ostream& s
 
 //////////// µS Registration & Properties //////////////
 
-us::ServiceRegistration<mitk::IFileWriter> mitk::AbstractFileWriter::RegisterService(us::ModuleContext* context)
+us::ServiceRegistration<IFileWriter> AbstractFileWriter::RegisterService(us::ModuleContext* context)
 {
-  if (m_PrototypeFactory) return us::ServiceRegistration<mitk::IFileWriter>();
+  if (d->m_PrototypeFactory) return us::ServiceRegistration<IFileWriter>();
 
   struct PrototypeFactory : public us::PrototypeServiceFactory
   {
-    mitk::AbstractFileWriter* const m_Prototype;
+    AbstractFileWriter* const m_Prototype;
 
-    PrototypeFactory(mitk::AbstractFileWriter* prototype)
+    PrototypeFactory(AbstractFileWriter* prototype)
       : m_Prototype(prototype)
     {}
 
     us::InterfaceMap GetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/)
     {
-      return us::MakeInterfaceMap<mitk::IFileWriter>(m_Prototype->Clone());
+      return us::MakeInterfaceMap<IFileWriter>(m_Prototype->Clone());
     }
 
     void UngetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/,
       const us::InterfaceMap& service)
     {
-      delete us::ExtractInterface<mitk::IFileWriter>(service);
+      delete us::ExtractInterface<IFileWriter>(service);
     }
   };
 
-  m_PrototypeFactory = new PrototypeFactory(this);
+  d->m_PrototypeFactory = new PrototypeFactory(this);
   us::ServiceProperties props = this->GetServiceProperties();
-  return context->RegisterService<mitk::IFileWriter>(m_PrototypeFactory, props);
+  return context->RegisterService<IFileWriter>(d->m_PrototypeFactory, props);
 }
 
-us::ServiceProperties mitk::AbstractFileWriter::GetServiceProperties() const
+us::ServiceProperties AbstractFileWriter::GetServiceProperties() const
 {
-  if ( m_Extension.empty() )
+  if ( d->m_Extensions.empty() )
     MITK_WARN << "Registered a Writer with no extension defined (m_Extension is empty). Writer will not be found by calls from WriterManager.)";
-  if ( m_BasedataType.empty() )
+  if ( d->m_BaseDataType.empty() )
     MITK_WARN << "Registered a Writer with no BasedataType defined (m_BasedataType is empty). Writer will not be found by calls from WriterManager.)";
-  if ( m_Description.empty() )
+  if ( d->m_Description.empty() )
     MITK_WARN << "Registered a Writer with no description defined (m_Description is empty). Writer will have no human readable extension information in FileDialogs.)";
 
   us::ServiceProperties result;
-  result[mitk::IFileWriter::PROP_EXTENSION()]    = m_Extension;
-  result[mitk::IFileWriter::PROP_DESCRIPTION()]    = m_Description;
-  result[mitk::IFileWriter::PROP_BASEDATA_TYPE()]    = m_BasedataType;
-  result[us::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
+  //result[IFileWriter::PROP_EXTENSION()] = d->m_Extensions;
+  result[IFileWriter::PROP_DESCRIPTION()] = d->m_Description;
+  result[IFileWriter::PROP_BASEDATA_TYPE()] = d->m_BaseDataType;
+  result[us::ServiceConstants::SERVICE_RANKING()] = d->m_Ranking;
 
-  for (mitk::IFileWriter::OptionList::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it)
+  for (IFileWriter::OptionList::const_iterator it = d->m_Options.begin(); it != d->m_Options.end(); ++it)
   {
     result[it->first] = std::string("true");
   }
   return result;
 }
 
-//////////////////////// Options ///////////////////////
-
-mitk::IFileWriter::OptionList mitk::AbstractFileWriter::GetOptions() const
+void AbstractFileWriter::SetRanking(int ranking)
 {
-  return m_Options;
+  d->m_Ranking = ranking;
 }
 
-void mitk::AbstractFileWriter::SetOptions(const OptionList& options)
+//////////////////////// Options ///////////////////////
+
+IFileWriter::OptionList AbstractFileWriter::GetOptions() const
 {
-  if (options.size() != m_Options.size()) MITK_WARN << "Number of set Options differs from Number of available Options, which is a sign of false usage. Please consult documentation";
-  m_Options = options;
+  return d->m_Options;
+}
+
+void AbstractFileWriter::SetOptions(const OptionList& options)
+{
+  if (options.size() != d->m_Options.size()) MITK_WARN << "Number of set Options differs from Number of available Options, which is a sign of false usage. Please consult documentation";
+  d->m_Options = options;
 }
 
 ////////////////// MISC //////////////////
 
-bool mitk::AbstractFileWriter::CanWrite(const BaseData* data) const
+bool AbstractFileWriter::CanWrite(const BaseData* data) const
 {
   // Default implementation only checks if basedatatype is correct
   std::string externalDataType = data->GetNameOfClass();
-  return (externalDataType == m_BasedataType);
+  return (externalDataType == d->m_BaseDataType);
 }
 
-float mitk::AbstractFileWriter::GetProgress() const
+void AbstractFileWriter::AddProgressCallback(const ProgressCallback& callback)
 {
-  // Default implementation always returns 1 (finished)
-  return 1;
+  d->m_ProgressMessage += callback;
+}
+
+void AbstractFileWriter::RemoveProgressCallback(const ProgressCallback& callback)
+{
+  d->m_ProgressMessage -= callback;
 }
 
 ////////////////// µS related Getters //////////////////
 
-int mitk::AbstractFileWriter::GetPriority() const
+int AbstractFileWriter::GetRanking() const
 {
-  return m_Priority;
+  return d->m_Ranking;
 }
 
-std::string mitk::AbstractFileWriter::GetExtension() const
+std::vector<std::string> AbstractFileWriter::GetExtensions() const
 {
-  return m_Extension;
+  return d->m_Extensions;
 }
 
-std::string mitk::AbstractFileWriter::GetDescription() const
+void AbstractFileWriter::AddExtension(const std::string& extension)
 {
-  return m_Description;
+  d->m_Extensions.push_back(extension);
 }
 
-std::string mitk::AbstractFileWriter::GetSupportedBasedataType() const
+void AbstractFileWriter::SetCategory(const std::string& category)
 {
-  return m_BasedataType;
+  d->m_Category = category;
+}
+
+std::string AbstractFileWriter::GetCategory() const
+{
+  return d->m_Category;
+}
+
+void AbstractFileWriter::SetBaseDataType(const std::string& baseDataType)
+{
+  d->m_BaseDataType = baseDataType;
+}
+
+std::string AbstractFileWriter::GetDescription() const
+{
+  return d->m_Description;
+}
+
+std::string AbstractFileWriter::GetBaseDataType() const
+{
+  return d->m_BaseDataType;
+}
+
+void AbstractFileWriter::SetDescription(const std::string& description)
+{
+  d->m_Description = description;
+}
+
 }

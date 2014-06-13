@@ -145,8 +145,7 @@ protected:
   virtual us::ServiceProperties GetServiceProperties() const;
 
   /**
-   * @brief Returns the mime-type this reader can handle.
-   * @return
+   * @return The mime-type this reader can handle.
    */
   std::string GetMimeType() const;
 

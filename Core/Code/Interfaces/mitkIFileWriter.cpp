@@ -22,26 +22,20 @@ mitk::IFileWriter::~IFileWriter()
 
 }
 
-std::string mitk::IFileWriter::PROP_EXTENSION()
-{
-  static std::string s = "org.mitk.services.FileWriter.Extension";
-  return s;
-}
-
 std::string mitk::IFileWriter::PROP_BASEDATA_TYPE()
 {
-  static std::string s = "org.mitk.services.FileWriter.BasedataType";
+  static std::string s = "org.mitk.IFileWriter.basedatatype";
   return s;
 }
 
 std::string mitk::IFileWriter::PROP_DESCRIPTION()
 {
-  static std::string s = "org.mitk.services.FileWriter.Description";
+  static std::string s = "org.mitk.IFileWriter.description";
   return s;
 }
 
-std::string mitk::IFileWriter::PROP_IS_LEGACY()
+std::string mitk::IFileWriter::PROP_MIMETYPE()
 {
-  static std::string s = "org.mitk.services.FileWriter.IsLegacy";
+  static std::string s = "org.mitk.IFileWriter.mimetype";
   return s;
 }

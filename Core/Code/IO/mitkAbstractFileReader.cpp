@@ -51,7 +51,6 @@ public:
     , m_PrototypeFactory(NULL)
   {}
 
-  // Minimal Service Properties: ALWAYS SET THESE IN CONSTRUCTOR OF DERIVED CLASSES!
   std::string m_MimeType;
   std::string m_Category;
   std::vector<std::string> m_Extensions;
@@ -67,9 +66,9 @@ public:
 
   us::PrototypeServiceFactory* m_PrototypeFactory;
 
-  mitk::Message1<float> m_ProgressMessage;
+  Message1<float> m_ProgressMessage;
 
-  mitk::SimpleMimeType m_SimpleMimeType;
+  SimpleMimeType m_SimpleMimeType;
   us::ServiceRegistration<IMimeType> m_MimeTypeReg;
 };
 

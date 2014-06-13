@@ -112,27 +112,37 @@ void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode* node )
     double dataRange[2] = {0,0};
     double range[2];
 
-    Surface::Pointer input  = const_cast< Surface* >(dynamic_cast<const Surface*>( this->GetDataNode()->GetData() ));
-    if(input.IsNull()) return;
-    const TimeGeometry::Pointer inputTimeGeometry = input->GetTimeGeometry();
-    if(( inputTimeGeometry.IsNull() ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) ) return;
-    for (unsigned int timestep=0; timestep<inputTimeGeometry->CountTimeSteps(); timestep++)
-    {
-      vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
-      if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 )) continue;
-      vtkDataArray *vpointscalars = vtkpolydata->GetPointData()->GetScalars();
-      if (vpointscalars) {
-        vpointscalars->GetRange( range, 0 );
-        if (dataRange[0]==0 && dataRange[1]==0) {
-          dataRange[0] = range[0];
-          dataRange[1] = range[1];
-        }
-        else {
-          if (range[0] < dataRange[0]) dataRange[0] = range[0];
-          if (range[1] > dataRange[1]) dataRange[1] = range[1];
-        }
-      }
-    }
+	Surface::Pointer input  = const_cast< Surface* >(dynamic_cast<const Surface*>( this->GetDataNode()->GetData() ));
+	if(input.IsNull()) return;
+	const TimeGeometry::Pointer inputTimeGeometry = input->GetTimeGeometry();
+	if(( inputTimeGeometry.IsNull() ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) ) return;
+	for (unsigned int timestep=0; timestep<inputTimeGeometry->CountTimeSteps(); timestep++)
+	{
+		vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
+		if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 )) continue;
+		vtkDataArray *vpointscalars = vtkpolydata->GetPointData()->GetScalars();
+		if (vpointscalars) {
+
+			if(vpointscalars->GetLookupTable())
+			{
+				// load vtk lookup table if there is one for the scalar data
+				m_LUT->DeepCopy(vpointscalars->GetLookupTable());
+			}
+			else
+			{
+				vpointscalars->GetRange( range, 0 );
+				if (dataRange[0]==0 && dataRange[1]==0) {
+					dataRange[0] = range[0];
+					dataRange[1] = range[1];
+				}
+				else {
+					if (range[0] < dataRange[0]) dataRange[0] = range[0];
+					if (range[1] > dataRange[1]) dataRange[1] = range[1];
+				}
+			}
+		}
+	}
+
     if (dataRange[1] - dataRange[0] > 0) {
       m_LUT->SetTableRange( dataRange );
       m_LUT->Build();

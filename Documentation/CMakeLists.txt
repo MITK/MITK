@@ -123,24 +123,24 @@ endif()
 # parse which plug-in documentation to activate
 set(USERS_GUIDE_PLUGINS )
 if( MITK_BUILD_ALL_PLUGINS )
- list(APPEND USERS_GUIDE_PLUGINS ${MITK_SOURCE_DIR}/Plugins/xXREPLACEXx )
+ set(USERS_GUIDE_PLUGINS "${USERS_GUIDE_PLUGINS}${MITK_SOURCE_DIR}/Plugins/ \\\n" )
 else()
  foreach(mitk_plugin ${plugin_symbolic_names})
   if( MITK_BUILD_${mitk_plugin} )
    # we want each line to end in " \" and each directory be on a separate line
-   list(APPEND USERS_GUIDE_PLUGINS ${MITK_SOURCE_DIR}/Plugins/${mitk_plugin}/xXREPLACEXx)
+   set(USERS_GUIDE_PLUGINS "${USERS_GUIDE_PLUGINS}${MITK_SOURCE_DIR}/Plugins/${mitk_plugin}/ \\\n")
   endif()
  endforeach()
 endif()
 
 if( MITK_BUILD_EXAMPLES )
- list(APPEND USERS_GUIDE_PLUGINS ${MITK_SOURCE_DIR}/Examples/Plugins/xXREPLACEXx )
+ set(USERS_GUIDE_PLUGINS "${USERS_GUIDE_PLUGINS}${MITK_SOURCE_DIR}/Examples/Plugins/ \\\n")
 endif()
 
-set(temp_plugin_list )
-
-string(REGEX REPLACE ";" " \\n" temp_plugin_list ${USERS_GUIDE_PLUGINS} )
-string(REGEX REPLACE "xXREPLACEXx" " \\\\ " USERS_GUIDE_PLUGINS ${temp_plugin_list} )
+set(string_length )
+string(LENGTH ${USERS_GUIDE_PLUGINS} string_length)
+math(EXPR string_length "${string_length}-1")
+string(SUBSTRING ${USERS_GUIDE_PLUGINS} 0 ${string_length} USERS_GUIDE_PLUGINS)
 
 # create output directories for the guides
 file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Users_Guide/)

@@ -121,26 +121,24 @@ if(NOT DEFINED MITK_DOXYGEN_DOT_NUM_THREADS)
 endif()
 
 # parse which plug-in documentation to activate
-set(USERS_GUIDE_PLUGINS )
-if( MITK_BUILD_ALL_PLUGINS )
- list(APPEND USERS_GUIDE_PLUGINS ${MITK_SOURCE_DIR}/Plugins/xXREPLACEXx )
-else()
- foreach(mitk_plugin ${plugin_symbolic_names})
-  if( MITK_BUILD_${mitk_plugin} )
-   # we want each line to end in " \" and each directory be on a separate line
-   list(APPEND USERS_GUIDE_PLUGINS ${MITK_SOURCE_DIR}/Plugins/${mitk_plugin}/xXREPLACEXx)
+set(USERS_GUIDE_INPUT "${MITK_SOURCE_DIR}/Documentation/Doxygen/UserManual/")
+if(MITK_USE_BLUEBERRY)
+  if(MITK_BUILD_ALL_PLUGINS)
+    set(USERS_GUIDE_INPUT "${USERS_GUIDE_INPUT} \\
+        ${MITK_SOURCE_DIR}/Plugins/")
+  else()
+    foreach(mitk_plugin ${${CMAKE_PROJECT_NAME}_PLUGIN_LIBRARIES})
+      # we want each line to end in " \" and each directory be on a separate line
+      set(USERS_GUIDE_INPUT "${USERS_GUIDE_INPUT} \\
+          ${${mitk_plugin}_SOURCE_DIR}/")
+    endforeach()
   endif()
- endforeach()
+
+  if(MITK_BUILD_EXAMPLES)
+    set(USERS_GUIDE_INPUT "${USERS_GUIDE_INPUT} \\
+        ${MITK_SOURCE_DIR}/Examples/Plugins/")
+  endif()
 endif()
-
-if( MITK_BUILD_EXAMPLES )
- list(APPEND USERS_GUIDE_PLUGINS ${MITK_SOURCE_DIR}/Examples/Plugins/xXREPLACEXx )
-endif()
-
-set(temp_plugin_list )
-
-string(REGEX REPLACE ";" " \\n" temp_plugin_list ${USERS_GUIDE_PLUGINS} )
-string(REGEX REPLACE "xXREPLACEXx" " \\\\ " USERS_GUIDE_PLUGINS ${temp_plugin_list} )
 
 # create output directories for the guides
 file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Users_Guide/)

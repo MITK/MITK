@@ -146,7 +146,7 @@ public:
 
   void TestPointOperationOpSelectPoint()
   {
-    mitk::Point3D point3;
+    mitk::Point3D point3(0.);
     //check OpSELECTPOINT  ExecuteOperation
 
     doOp = new mitk::PointOperation(mitk::OpSELECTPOINT, point3,3);
@@ -171,7 +171,7 @@ public:
   void TestOpDeselectPoint()
   {
     //check OpDESELECTPOINT  ExecuteOperation
-    mitk::Point3D point4;
+    mitk::Point3D point4(0.);
 
     doOp = new mitk::PointOperation(mitk::OpDESELECTPOINT, point4,4);
 
@@ -204,17 +204,15 @@ public:
   void TestOpMovePointUp()
   {
     //check OpMOVEPOINTUP  ExecuteOperation
-    int id = 4;
-    mitk::Point3D point4;
-    mitk::Point3D point;
-    mitk::Point3D tempPoint;
+    const int id = 4;
 
-    point = pointSet->GetPoint(id);
+    mitk::Point3D point = pointSet->GetPoint(id);
 
+    mitk::Point3D point4(0.);
     doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP, point4, id);
 
     pointSet->ExecuteOperation(doOp);
-    tempPoint = pointSet->GetPoint(id-1);
+    mitk::Point3D tempPoint = pointSet->GetPoint(id-1);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("check PointOperation OpMOVEPOINTUP ",
         true, tempPoint == point);
@@ -234,15 +232,13 @@ public:
   {
     //check OpMOVEPOINTDown  ExecuteOperation
 
-    int id = 2;
-    mitk::Point3D point;
-    mitk::Point3D point2;
-    mitk::Point3D tempPoint;
+    const int id = 2;
 
-    point = pointSet->GetPoint(id);
+    mitk::Point3D point = pointSet->GetPoint(id);
+    mitk::Point3D point2(0.);
     doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, point2, id);
     pointSet->ExecuteOperation(doOp);
-    tempPoint = pointSet->GetPoint(id+1);
+    mitk::Point3D tempPoint = pointSet->GetPoint(id+1);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("check PointOperation OpMOVEPOINTDOWN ",
         true, tempPoint == point);

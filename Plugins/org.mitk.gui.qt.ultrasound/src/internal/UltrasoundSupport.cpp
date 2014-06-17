@@ -70,6 +70,8 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(
         mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL ,filter);
 
+  m_Controls.m_ActiveVideoDevices->SetAutomaticallySelectFirstEntry(true);
+
   m_Node = this->GetDataStorage()->GetNamedNode("US Image Stream");
   if (m_Node.IsNull())
   {

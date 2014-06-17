@@ -43,6 +43,8 @@ void QmitkUSDeviceManagerWidget::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkUSDeviceManagerWidgetControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
+
+    m_Controls->m_ConnectedDevices->SetAutomaticallySelectFirstEntry(true);
   }
 
   // Initializations

@@ -1,127 +1,93 @@
 /**
 \page USModulePage The Ultrasound Module
 
+\tableofcontents
+
 \section USModulePageOverview Overview
 
-The Ultrasound Module provides a microservice based API for ultrasound devices.
+The Ultrasound Module provides a <strong>microservice based API for ultrasound devices</strong>.
 The main features are:
 <ul>
-  <li> Microservice-enabled life cycle management, allowing other modules to easily consume USDevice-functionality.
-  <li> Handling and processing of ultrasound image data
-  <li> Metadata for ultrasound images 
-  <li> USVideoDevice class which allows to connect any ultrasound device with a video-out via a Frame grabber
+  <li> Microservice-enabled life cycle management, allowing other modules to easily consume mitk::USDevice-functionality.
+  <li> Handling and processing of ultrasound image data.
   <ul>
-    <li> Fast image preprocessing capabilities (Grey Scale Conversion, Cropping) via OpenCV
-        <li> Advanced image processing functions via mitk filters.
+    <li> Fast image preprocessing capabilities (gray scale conversion, cropping) via OpenCV.
+    <li> Advanced image processing functions via mitk filters.
   </ul>
-  <li> Connection of API-Enabled devices (specifically the Telemed LogicScan 128 is implemented)
+  <li> The mitk::USVideoDevice class allows to connect any ultrasound device with a video-out via a frame grabber.
+  <li> Connection of API-Enabled devices (specifically the Telemed LogicScan 128 is implemented).
   <ul>
-        <li> Control of API-enabled Devices via MITK (Widgets for basic B mode controls and probe selection are available)
+    <li> The submodule USHardwareTelemed provides classes for handling a Telemed API device (mitk::USTelemedDevice).
+    <li> Control of API-enabled Devices via MITK (Widgets for basic B mode controls and probe selection are available).
   </ul>
   <li> Designed to interact with the \link IGTGeneralModulePage IGT Module \endlink for tracking functionality.
 </ul>
 
-This module requires OpenCV to be enabled in the superbuild options via CMAKE.
-Its functionality is made available to the User via the \link org_mitk_gui_qt_ultrasound UltrasoundSupport Plugin \endlink
+This module requires OpenCV to be enabled in the superbuild options via CMake.
+Its functionality is made available to the user via the \link org_mitk_gui_qt_ultrasound UltrasoundSupport plugin \endlink
+
+Documentation on how to use Telemed API devices can be found on \subpage USHardwareTelemedPage.
 
 \section USDeviceHierarchy Ultrasound Device Hierarchy
 
 Ultrasound Devices are managed in a simple hierarchy:
 
-\imageMacro{USHierarchy.png,"",14.92}
+\imageMacro{ClassDiagramUSModuleOverview.png,"",14.92}
 
 <ul>
   <li> mitk::USDevice: The common superclass for all ultrasound devices. Deriving from this class will make sure that US-specific GUI-Components will be able to interact with your class.
-  Especially, the Microservice Life cycle is modeled in this Module.
-  <li> mitk::USVideoDevice: This class can be used for every Ultrasound device that is connected to the PC via a Frame grabber or similar Video input device. It offers image preprocessing functionality via OpenCV. 
-  The \link org_mitk_gui_qt_ultrasound UltrasoundSupport Plugin \endlink enables the user to create USVideoDevice.
-  There also is a reusable Widget for this Task in the USUI Module.
-  <li> mitk::USApiDevice: This is a work-in-progress class that will contain a common superclass for Devices with API support. 
+  Especially, the microservice life cycle is modeled in this class.
+  <li> mitk::USImageSource: Abstract class used by the mitk::USDevice for getting the images from the ultrasound device. The images are filtered by one ore more mitk::AbstractOpenCVImageFilter if they were set to the mitk::USImageSource object.
+  Each concrete subclass of mitk::USDevice has to subclass mitk::USImageSource to handle the actual receiving of images from the ultrasound device.
+  <li> Two devices are implemented in the ultrasound module:
+  <ul>
+    <li> mitk::USVideoDevice: This class can be used for every ultrasound device that is connected to the PC via a frame grabber or a similar video input device.
+    The \link org_mitk_gui_qt_ultrasound UltrasoundSupport plugin \endlink enables the user to create instances of mitk::USVideoDevice.
+    There also is a reusable Widget for this Task in the USUI Module. </li>
+    <li> mitk::USTelemedDevice: This class can be used for API-enabled ultrasound devices of Telemed (e.g. Telemed LogicScan 128). </li>
+    <li> One can add another device by subclassing mitk::USDevice and mitk::USImageSource. Additionally the control interfaces may be implemented (see \link USControlInterfaces). </li>
+  </ul>
+  </li>
 </ul>
 
-\section USDeviceLifeCycle USDevice Life Cycle
+\section USDeviceLifeCycle Ultrasound Device Life Cycle
 
-Once you a USDevice is constructed, it can be connected via call to mitk::USDevice::Connect().
-This will cause the Device to register itself in the Microservice Framework and will make the device available to other Modules, the UltrasoundSupport Plugin and the USDeviceManagerWidget in the USUI Module.
-The Connect() method is not virtual and should never be overwritten.
-Instead, override mitk::USDevice::OnConnect(), which will be called during the connection Process and enables you to react to this event. 
-A connected device is available to other modules, but is not acquiring image data.
-Analogously to Connect, there is a function mitk::USDevice::Activate which will start the image acquisition.
-Again, this method is not virtual, override mitk::USDevice::OnActivate to react to activation.
+Each mitk::USDevice follows a life cycle handling the availabilty as a micro service and the connection to the hardware:
+\imageMacro{MicroServiceLifeCycle.png,"",16.00}
 
-Matching functions mitk::USDevice::Disconnect(), mitk::USDevice::OnDisconnect, mitk::USDevice::Deactivate, mitk::USDevice::OnDeactivate exist as well.
+For changing the states corresponding methods are available in mitk::USDevice: mitk::USDevice::Initialize() for initialization, mitk::USDevice::Connect() for connecting, mitk::USDevice::Disconnect() for disconnecting and so on. For example, once an object of mitk::USDevice is constructed it can be made available as a micro service via a call to mitk::USDevice::Initialize(). The state changes to Initialized then and the device is available to other modules or plugins (\link org_mitk_gui_qt_ultrasound UltrasoundSupport\endlink,  QmitkUSDeviceManagerWidget) through the micro service framework.
 
-The following diagram illustrates the situation:
+The methods for changing the states should not be overwritten by sublcasses. Instead mitk::USDevice::OnInitialization(), mitk::USDevice::OnConnection() and so on can be overwritten for handling everything that has to be done on the corresponding state change.
 
-\imageMacro{USLifecycle.png,"",16.00}
-
-The blue message symbols indicate that the corresponding method of the subclass is called to react to the event.
+When the mitk::USDevice object was created at first it is available just locally. An initialized device is available as a micro service, but not connected to the real hardware. A connected device is connected to the hardware, but no acquiring images. Finally, an activated device is acquiring images from the ultrasound hardware.
 
 \section USControlInterfaces Control Interfaces for API Devices
-Capabilities of API-based ultrasound devices are available through control interfaces which are shown below: 
+Capabilities of API-based ultrasound devices are available through control interfaces which are shown below:
 
 \imageMacro{USControlInterfaces.png,"",16.00}
 
-The control interfaces mitk::USControlInterfaceProbes and mitk::USControlInterfaceBMode are available, while mitk::USControlInteraceDoppler is empty at the moment. Every sublcass of mitk::USDevice can use an implementation of each of these interfaces, but this is not necessary. The mitk::USVideoDevice for examples uses a custom control interface only, which is a subclass of mitk::USAbstractControlInterface.
+The control interfaces mitk::USControlInterfaceProbes and mitk::USControlInterfaceBMode are available, while mitk::USControlInterfaceDoppler is empty at the moment. Every sublcass of mitk::USDevice can use an implementation of each of these interfaces, but this is not necessary. The mitk::USVideoDevice for example uses a custom control interface only (mitk::USVideoDeviceCustomControls), which is a subclass of mitk::USAbstractControlInterface. The mitk::USTelemedDevice uses mitk::USTelemedBModeControls for handling the ultrasound b mode and mitk::USTelemedProbesControls for handling the connected ultrasound probe.
 
-Each custom control interface needs its own Widget (subclassed of QmitkUSAbstractCustomWidget). For mitk::USControlInterfaceProbes, mitk::USControlInterfaceBMode and mitk::USControlInterfaceDoppler there are Widgets available in the USUI module (QmitkUSControlsProbesWidget, QmitkUSControlsBModeWidget, QmitkUSControlsDopplerWidget) which can be used by plugins. Each Widget must get an object of the corresponding control interface on its constructor call. A class diagram showing how the Widgets are connected to the control interfaces can be seen below:
+Each custom control interface needs its own Widget (subclassed of QmitkUSAbstractCustomWidget), if it should be possible to control its functionality by using the \link org_mitk_gui_qt_ultrasound UltrasoundSupport\endlink plugin. For the standard interfaces mitk::USControlInterfaceProbes, mitk::USControlInterfaceBMode and mitk::USControlInterfaceDoppler there are Widgets available in the USUI module (QmitkUSControlsProbesWidget, QmitkUSControlsBModeWidget, QmitkUSControlsDopplerWidget) which can be used by plugins. For each Widget an object of the corresponding control interface must be set on its constructor call. A class diagram showing how the Widgets are connected to the control interfaces can be seen below:
 
 \imageMacro{USControlWidgets.png,"",16.00}
 
-A plugin can use the Widgets by creating a new object of the Widget and setting the corresponding interface object of the mitk::USDevice which should be controlled. How to use custom widgets is described in the class documentation of QmitkUSConcreteCustomWidget.
+A plugin can use the Widgets by creating a new object of the Widget and setting the corresponding interface object of the mitk::USDevice which should be controlled. How to use custom widgets is described in the class documentation of QmitkUSAbstractCustomWidget.
 
 
 \section USDWidgets Available Widgets
 
-There are some Widgets available that can be used for plugin development: a device management Widget, a Widget for creating new mitk::USVideoDevice objects and widgets for the control interfaces of API device.
+There are some Widgets available in the USUI module that can be used for plugin development: a device management Widget, a Widget for creating new mitk::USVideoDevice objects and widgets for the control interfaces of API device.
 The usage of the Widgets is described in more detail in the \link org_mitk_gui_qt_ultrasound UltrasoundSupport Plugin Documentation\endlink.
 
 \subsection USQmitkUSDeviceManagerWidget QmitkUSDeviceManagerWidget
-The QmitkUSDeviceManagerWidget can view every connected mitk::USDevice and allows the user to activate and deactivate devices. Additionally mitk::USVideoDevice can be created using the QmitkNewVideoDeviceWidget and removed by a corresponding button.
+The QmitkUSDeviceManagerWidget can view every connected mitk::USDevice and allows the user to activate and deactivate devices. Additionally mitk::USVideoDevice can be created using the QmitkUSNewVideoDeviceWidget and removed by a corresponding button.
 
-\subsection USQmitkNewVideoDeviceWidget QmitkNewVideoDeviceWidget
-The QmitkNewVideoDeviceWidget allows the user to configure a frame grabber or other video input as a mitk::USVideoDevice. 
- 
+\subsection USQmitkNewVideoDeviceWidget QmitkUSNewVideoDeviceWidget
+The QmitkUSNewVideoDeviceWidget allows the user to configure a frame grabber or other video input as a mitk::USVideoDevice.
+
 \subsection USControlInterfaceWidgets Control Interface Widgets
 
-\section USHardwareTelemed Controlling API Devices of Telemed
-
-The features of ultrasound devices of Telemed can be controlled directly via
-the Ultrasound Module. At the moment, some controls for the b mode are
-implemented. The device used for development was the "Telemed LogicScan 128". A
-graphical user interface is integrated into the Ultrasound Plugin.
-
-\subsection USHardwareTelemedInstall Install the Telemed SDK
-
-The Telemed SDK cannot be shipped with MITK due to legal issues. Instead it can
-be obtained directly from Telemed. MITK was tested with API version 3.9.0
-(2013-02-04).
-The following packages must be installed:
-<ul>
-  <li>Telemed Drivers Package (MITK was tested with version 1.13.7)</li>
-  <li>Usgfw2 SDK Redistributable (usgfwsetup.exe)</li>
-</ul>
-
-For MITK the file "usgfw2.tlh" is needed. This file may be available in one of
-the examples folders of the SDK. If not it can be generated by compiling one of
-the delivered examples (samples_cpp_vs2005).
-
-\subsection USHardwareTelemedEnable Enable the Telemed API
-
-The Telemed API is available for Windows only and does not work with software
-compiled for 64 bit. Therefore, you need a 32 bit build of MITK on Windows.
-
-To use a Telemed device, activate the corresponding CMake flag:
-MITK_USE_US_TELEMED_SDK. After a run of CMake the new CMake variable
-MITK_US_TELEMED_SDK_PATH has to be set to a directory containing the header
-files of the Telemed SKD (from "SDK\include\USGFWSDK\include") and the file
-"usgfw2.tlh" (see previous section). Afterwards MITK can be configured and
-build as usual.
-
-\subsection USHardwareTelemedUse Use a Telemed device
-
-As soon as the ultrasound module is loaded the device will be made available as
-a microservice. It can be got from the service registry then and the Ultrasound
-Plugin shows the device as an available ultrasound device.
+There exists several widgets for controling ultrasound devices: QmitkUSControlsBModeWidget, QmitkUSControlsProbesWidget, QmitkUSControlsCustomVideoDeviceWidget. Own custom control widgets can be added by subclassing the available QmitkUSAbstractCustomWidget.
 
 */

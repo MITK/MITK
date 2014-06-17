@@ -159,6 +159,12 @@ void UltrasoundSupport::OnChangedFramerateLimit(int value)
 
 void UltrasoundSupport::OnClickedFreezeButton()
 {
+  if ( m_Device.IsNull() )
+  {
+    MITK_WARN("UltrasoundSupport") << "Freeze button clicked though no device is selected.";
+    return;
+  }
+
   if ( m_Device->GetIsFreezed() )
   {
     m_Device->SetIsFreezed(false);

@@ -60,6 +60,7 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_FrameRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit(int)) );
   connect( m_Controls.m_FreezeButton, SIGNAL(clicked()), this, SLOT(OnClickedFreezeButton()) );
   connect( m_Timer, SIGNAL(timeout()), this, SLOT(DisplayImage()));
+  connect( m_Controls.m_ActiveVideoDevices, SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnActiveDeviceSelectionChanged(us::ServiceReferenceU)) );
 
   // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
@@ -159,6 +160,12 @@ void UltrasoundSupport::OnChangedFramerateLimit(int value)
 
 void UltrasoundSupport::OnClickedFreezeButton()
 {
+  if ( m_Device.IsNull() )
+  {
+    MITK_WARN("UltrasoundSupport") << "Freeze button clicked though no device is selected.";
+    return;
+  }
+
   if ( m_Device->GetIsFreezed() )
   {
     m_Device->SetIsFreezed(false);
@@ -333,6 +340,11 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
     levelWindow.SetAuto(m_Image, true, true);
     m_Node->SetLevelWindow(levelWindow);
   }
+}
+
+void UltrasoundSupport::OnActiveDeviceSelectionChanged(us::ServiceReferenceU reference)
+{
+  m_Controls.m_BtnView->setEnabled(reference);
 }
 
 UltrasoundSupport::UltrasoundSupport()

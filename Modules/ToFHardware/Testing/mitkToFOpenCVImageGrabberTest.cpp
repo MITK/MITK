@@ -26,14 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 static bool CompareImages(mitk::Image::Pointer mitkImage, cv::Mat openCVImage)
 {
   float equal = true;
-  if ((mitkImage->GetDimension(0)!=openCVImage.cols)||(mitkImage->GetDimension(1)!=openCVImage.rows))
+  if (static_cast<int>((mitkImage->GetDimension(0))!=openCVImage.cols)||(static_cast<int>(mitkImage->GetDimension(1))!=openCVImage.rows))
   {
     equal = false;
   }
   mitk::ImagePixelReadAccessor<float,2> imageAcces(mitkImage, mitkImage->GetSliceData(0));
-  for (unsigned int i=0; i<openCVImage.cols; i++)
+  for(int i=0; i<openCVImage.cols; i++)
   {
-    for (unsigned int j=0; j<openCVImage.rows; j++)
+    for(int j=0; j<openCVImage.rows; j++)
     {
       itk::Index<2> currentIndex;
       currentIndex[0] = i;
@@ -65,26 +65,34 @@ int mitkToFOpenCVImageGrabberTest(int /* argc */, char* /*argv*/[])
   tofImageGrabber->SetProperty("AmplitudeImageFileName",mitk::StringProperty::New(amplitudeFileName));
   std::string intensityFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_IntensityImage.pic";
   tofImageGrabber->SetProperty("IntensityImageFileName",mitk::StringProperty::New(intensityFileName));
+  tofImageGrabber->Update();
 
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(distanceFileName);
 
-  mitk::ToFOpenCVImageGrabber::Pointer tofOpenCVImageGrabber = mitk::ToFOpenCVImageGrabber::New();
-  tofOpenCVImageGrabber->SetToFImageGrabber(tofImageGrabber);
-  MITK_TEST_CONDITION_REQUIRED(tofImageGrabber==tofOpenCVImageGrabber->GetToFImageGrabber(),"Test Set/GetToFImageGrabber()");
-  MITK_TEST_OUTPUT(<<"Call StartCapturing()");
-  tofOpenCVImageGrabber->StartCapturing();
-  cv::Mat cvImage = tofOpenCVImageGrabber->GetImage();
-  MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test distance image");
-  image = mitk::IOUtil::LoadImage(amplitudeFileName);
-  tofOpenCVImageGrabber->SetImageType(1);
-  cvImage = tofOpenCVImageGrabber->GetImage();
-  MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test amplitude image");
-  image = mitk::IOUtil::LoadImage(intensityFileName);
-  tofOpenCVImageGrabber->SetImageType(2);
-  cvImage = tofOpenCVImageGrabber->GetImage();
-  MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test intensity image");
-  MITK_TEST_OUTPUT(<<"Call StopCapturing()");
-  tofOpenCVImageGrabber->StopCapturing();
+  try
+  {
+    mitk::ToFOpenCVImageGrabber::Pointer tofOpenCVImageGrabber = mitk::ToFOpenCVImageGrabber::New();
+    tofOpenCVImageGrabber->SetToFImageGrabber(tofImageGrabber);
+    MITK_TEST_CONDITION_REQUIRED(tofImageGrabber==tofOpenCVImageGrabber->GetToFImageGrabber(),"Test Set/GetToFImageGrabber()");
+    MITK_TEST_OUTPUT(<<"Call StartCapturing()");
+    tofOpenCVImageGrabber->StartCapturing();
+    cv::Mat cvImage = tofOpenCVImageGrabber->GetImage();
+    MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test distance image");
+    image = mitk::IOUtil::LoadImage(amplitudeFileName);
+    tofOpenCVImageGrabber->SetImageType(1);
+    cvImage = tofOpenCVImageGrabber->GetImage();
+    MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test amplitude image");
+    image = mitk::IOUtil::LoadImage(intensityFileName);
+    tofOpenCVImageGrabber->SetImageType(2);
+    cvImage = tofOpenCVImageGrabber->GetImage();
+    MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test intensity image");
+    MITK_TEST_OUTPUT(<<"Call StopCapturing()");
+    tofOpenCVImageGrabber->StopCapturing();
+  }
+  catch(std::exception &e)
+  {
+    MITK_INFO << "Exception is: " << e.what();
+  }
 
   MITK_TEST_END();
 

@@ -26,6 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSetInteractor.h>
 #include "QmitkStdMultiWidget.h"
 
+/**
+* \deprecatedSince{2014_06} mitk::QmitkCorrespondingPointSetsModel is deprecated.
+* Most Functionality is covered by QmitkPointListModel.cpp
+*
+* Alternatively this needs to be updated to the new interaction-framework.
+* Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+*/
+
 class MitkQtWidgetsExt_EXPORT QmitkCorrespondingPointSetsModel : public QAbstractTableModel
 {
   Q_OBJECT

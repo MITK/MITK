@@ -160,7 +160,7 @@ void mitk::BinaryThresholdTool::AcceptPreview()
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetPixelValue();
+  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetValue();
 
   CurrentlyBusy.Send(true);
 
@@ -215,7 +215,7 @@ void mitk::BinaryThresholdTool::InternalAcceptPreview( itk::Image<TPixel1, VDime
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
-  int activePixelValue = workingImage->GetActiveLabel()->GetPixelValue();
+  int activePixelValue = workingImage->GetActiveLabel()->GetValue();
 
   sourceIterator.GoToBegin();
   targetIterator.GoToBegin();

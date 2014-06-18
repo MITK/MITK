@@ -59,8 +59,8 @@ public:
   void SetColor(const mitk::Color&);
   const mitk::Color& GetColor() const;
 
-  void SetPixelValue(int pixelValue);
-  int GetPixelValue() const;
+  void SetValue(int pixelValue);
+  int GetValue() const;
 
   void SetLayer(int layer);
   int GetLayer() const;

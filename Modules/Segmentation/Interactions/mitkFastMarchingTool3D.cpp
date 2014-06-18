@@ -255,7 +255,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
   // combine preview image with current working segmentation
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   int activeLayer = workingImage->GetActiveLayer();
-  int activePixelValue = workingImage->GetActiveLabel(activeLayer)->GetPixelValue();
+  int activePixelValue = workingImage->GetActiveLabel(activeLayer)->GetValue();
   /*
   mitk::Image::Pointer diffImage = mitk::Image::New();
 

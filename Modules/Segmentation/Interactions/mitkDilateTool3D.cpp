@@ -88,7 +88,7 @@ void mitk::DilateTool3D::Run()
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
-  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetPixelValue();
+  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetValue();
 
   CurrentlyBusy.Send(true);
 

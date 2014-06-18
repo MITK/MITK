@@ -225,7 +225,6 @@ void mitk::LabelSetImage::RemoveLayer()
   GetLabelSet(layerToDelete)->RemoveAllObservers();
 
   // set the active layer to one belo, if exists.
-  assert(layerToDelete-1 >= 0);
   SetActiveLayer(layerToDelete-1);
 
   // remove labelset and image data
@@ -312,7 +311,7 @@ mitk::Label::Pointer mitk::LabelSetImage::CreateExteriorLabel()
   //label->SetExterior(true);
   label->SetOpacity(0.0);
   label->SetLocked(false);
-  label->SetPixelValue(0);
+  label->SetValue(0);
   return label;
 }
 
@@ -397,7 +396,7 @@ bool mitk::LabelSetImage::ExistLabel(const int pixelValue, int layer)
 void mitk::LabelSetImage::MergeLabel(int pixelValue, int layer)
 {
   if (layer < 0) layer = GetActiveLayer();
-  int targetPixelValue = GetActiveLabel()->GetPixelValue();
+  int targetPixelValue = GetActiveLabel()->GetValue();
   try
   {
     AccessByItk_2(this, MergeLabelProcessing, targetPixelValue, pixelValue);
@@ -655,7 +654,7 @@ void mitk::LabelSetImage::SurfaceStamp(mitk::Surface* surface, bool forceOverwri
     TargetIteratorType targetIter( itkImage, itkImage->GetLargestPossibleRegion() );
     targetIter.GoToBegin();
 
-    int activeLabel = GetActiveLabel(GetActiveLayer())->GetPixelValue();
+    int activeLabel = GetActiveLabel(GetActiveLayer())->GetValue();
 
     while ( !sourceIter.IsAtEnd() )
     {
@@ -742,7 +741,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
       newColor.SetBlue(rgba[2]);
       label->SetColor( newColor );
       label->SetOpacity( rgba[3] );
-      label->SetPixelValue( sourceValue );
+      label->SetValue( sourceValue );
 
       GetLabelSet()->AddLabel(*label);
     }
@@ -769,7 +768,7 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType* itkImage, mitk::Image* 
   TargetIteratorType targetIter( itkImage, itkImage->GetLargestPossibleRegion() );
   targetIter.GoToBegin();
 
-  int activeLabel = this->GetActiveLabel(GetActiveLayer())->GetPixelValue();
+  int activeLabel = this->GetActiveLabel(GetActiveLayer())->GetValue();
 
   while ( !sourceIter.IsAtEnd() )
   {

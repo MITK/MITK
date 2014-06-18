@@ -92,7 +92,7 @@ bool mitk::EraseRegionTool::OnInvertLogic(StateMachineAction*, InteractionEvent*
   {
     LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_WorkingNode->GetData());
     assert(workingImage);
-    m_PaintingPixelValue = workingImage->GetActiveLabel()->GetPixelValue();
+    m_PaintingPixelValue = workingImage->GetActiveLabel()->GetValue();
     const mitk::Color& color = workingImage->GetActiveLabel()->GetColor();
     FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
   }

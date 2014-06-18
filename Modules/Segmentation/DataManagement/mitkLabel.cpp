@@ -28,7 +28,7 @@ mitk::Label::Label():
   SetLocked(true);
   SetVisible(true);
   SetOpacity(0.6);
-  SetPixelValue(-1);
+  SetValue(-1);
   SetLayer(0);
   mitk::Point3D pnt;
   pnt.SetElement(0,0);
@@ -121,21 +121,21 @@ std::string mitk::Label::GetName() const
   return name;
 }
 
-void mitk::Label::SetPixelValue(int pixelValue)
+void mitk::Label::SetValue(int pixelValue)
 {
-  mitk::IntProperty* property = dynamic_cast<mitk::IntProperty *>(GetProperty("pixelvalue"));
+  mitk::IntProperty* property = dynamic_cast<mitk::IntProperty *>(GetProperty("value"));
   if(property != NULL)
     // Update Property
     property->SetValue(pixelValue);
   else
     // Create new Property
-    SetIntProperty("pixelvalue", pixelValue);
+    SetIntProperty("value", pixelValue);
 }
 
-int mitk::Label::GetPixelValue() const
+int mitk::Label::GetValue() const
 {
   int pixelValue;
-  GetIntProperty("pixelvalue",pixelValue);
+  GetIntProperty("value",pixelValue);
   return pixelValue;
 }
 

@@ -121,7 +121,7 @@ void mitk::OtsuTool3D::RunSegmentation(int regions, bool useValley, int numberOf
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetPixelValue();
+  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetValue();
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 

@@ -260,7 +260,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 
   if (image->GetActiveLabel())
   {
-    int pixelValue = image->GetActiveLabel()->GetPixelValue();
+    int pixelValue = image->GetActiveLabel()->GetValue();
     //MITK_INFO << "pixValue VTK " << pixelValue;
     //generate contours/outlines
     localStorage->m_OutlinePolyData = this->CreateOutlinePolyData( renderer, localStorage->m_ReslicedImageVector[image->GetActiveLayer()], pixelValue );

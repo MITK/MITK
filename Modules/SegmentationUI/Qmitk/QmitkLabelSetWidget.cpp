@@ -343,11 +343,10 @@ void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
   dialog.SetSegmentationName(GetWorkingImage()->GetActiveLabel()->GetName());
 
   if ( dialog.exec() == QDialog::Rejected ) return;
-  int pixelValue = GetWorkingImage()->GetActiveLabel()->GetPixelValue();
+  int pixelValue = GetWorkingImage()->GetActiveLabel()->GetValue();
 
   GetWorkingImage()->GetLabel(pixelValue)->SetColor(dialog.GetColor());
   GetWorkingImage()->GetLabel(pixelValue)->SetName(dialog.GetSegmentationName().toStdString());
-
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
 }
 
@@ -629,7 +628,7 @@ void QmitkLabelSetWidget::InsertTableWidgetItem(const mitk::Label * label)
   nameItem->setTextAlignment(Qt::AlignCenter | Qt::AlignLeft);
   // ---!---
   // IMPORTANT: ADD PIXELVALUE TO TABLEWIDGETITEM.DATA
-  nameItem->setData(Qt::UserRole,QVariant(label->GetPixelValue()));
+  nameItem->setData(Qt::UserRole,QVariant(label->GetValue()));
   // ---!---
 
   QPushButton * pbColor = new QPushButton(tableWidget);

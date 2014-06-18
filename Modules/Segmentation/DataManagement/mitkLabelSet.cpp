@@ -30,7 +30,7 @@ void mitk::LabelSet::Initialize(const LabelSet* other)
   if (!other)
     mitkThrow() << "Trying to initialize with NULL input.";
   m_LabelContainer = other->m_LabelContainer;
-  SetActiveLabel(other->GetActiveLabel()->GetPixelValue());
+  SetActiveLabel(other->GetActiveLabel()->GetValue());
 }
 
 mitk::LabelSet::~LabelSet()
@@ -93,19 +93,19 @@ void mitk::LabelSet::AddLabel(const mitk::Label& label )
   newLabel->SetLayer( m_Layer );
 
   unsigned int pixelValue = -1;
-  if(label.GetPixelValue() == -1){
+  if(label.GetValue() == -1){
     //find next free
     int i = 1;
     while(m_LabelContainer.empty() == false && m_LabelContainer.find(i) != m_LabelContainer.end() )
       i++;
-    newLabel->SetPixelValue( i );
+    newLabel->SetValue( i );
     pixelValue = i;
     MITK_INFO << "Label with corresponding pixelvalue of "  << i << " added to active label set." ;
   }
   else
   {
-    newLabel->SetPixelValue( label.GetPixelValue());
-    pixelValue = label.GetPixelValue();
+    newLabel->SetValue( label.GetValue());
+    pixelValue = label.GetValue();
   }
 
 
@@ -118,7 +118,7 @@ void mitk::LabelSet::AddLabel(const mitk::Label& label )
   newLabel->AddObserver( itk::ModifiedEvent(), command );
   //newLabel->AddObserver(itk::ModifiedEvent(),command);
 
-  SetActiveLabel(newLabel->GetPixelValue());
+  SetActiveLabel(newLabel->GetValue());
   AddLabelEvent.Send();
   Modified();
 }

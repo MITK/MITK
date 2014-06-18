@@ -515,7 +515,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
                 directionImage->SetDirection( direction );
                 directionImage->SetRegions( imageRegion );
                 directionImage->Allocate();
-                Vector< double, 3 > nullVec; nullVec.Fill(0.0);
+                Vector< float, 3 > nullVec; nullVec.Fill(0.0);
                 directionImage->FillBuffer(nullVec);
                 m_DirectionImageContainer->InsertElement(i, directionImage);
             }

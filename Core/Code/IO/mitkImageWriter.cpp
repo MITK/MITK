@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIOFactory.h>
 
 mitk::ImageWriter::ImageWriter()
+: m_UseCompression( true )
 {
    this->SetNumberOfRequiredInputs( 1 );
    m_MimeType = "";
@@ -220,7 +221,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
    }
 
    //use compression if available
-   imageIO->UseCompressionOn();
+   imageIO->SetUseCompression( m_UseCompression );
 
    imageIO->SetIORegion(ioRegion);
    imageIO->SetFileName(fileName);
@@ -487,4 +488,9 @@ void mitk::ImageWriter::DoWrite(BaseData::Pointer data)
       this->SetInput(dynamic_cast<mitk::Image *>(data.GetPointer()));
       this->Update();
    }
+}
+
+void mitk::ImageWriter::SetUseCompression( bool useCompression )
+{
+  m_UseCompression = useCompression;
 }

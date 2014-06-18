@@ -48,6 +48,9 @@ bool KinectDevice::OnConnectCamera()
       this->m_RGBImageHeight = m_CaptureHeight;
       this->m_RGBPixelNumber = this->m_RGBImageWidth * this->m_RGBImageHeight;
 
+      this->SetBoolProperty("HasAmplitudeImage", m_Controller->GetUseIR());
+      this->SetBoolProperty("HasRGBImage", !m_Controller->GetUseIR());
+
       // allocate buffer
       this->m_DistanceArray = new float[this->m_PixelNumber];
       for(int i=0; i<this->m_PixelNumber; i++) {this->m_DistanceArray[i]=0.0;}
@@ -319,16 +322,12 @@ void KinectDevice::SetProperty( const char *propertyKey, BaseProperty* propertyV
     bool rgb = false;
     GetBoolProperty(propertyKey, rgb);
     m_Controller->SetUseIR(!rgb);
-    this->SetBoolProperty("HasAmplitudeImage", false);
-    this->SetBoolProperty("HasRGBImage", true);
   }
   else if (strcmp(propertyKey, "IR") == 0)
   {
     bool ir = false;
     GetBoolProperty(propertyKey, ir);
     m_Controller->SetUseIR(ir);
-    this->SetBoolProperty("HasAmplitudeImage", true);
-    this->SetBoolProperty("HasRGBImage", false);
   }
 }
 

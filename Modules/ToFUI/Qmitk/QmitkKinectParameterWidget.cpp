@@ -71,26 +71,14 @@ void QmitkKinectParameterWidget::OnAcquisitionModeChanged()
 {
   if (m_ToFImageGrabber.IsNotNull())
   {
-    // stop camera if active
-    bool active = m_ToFImageGrabber->IsCameraActive();
-    bool connected = m_ToFImageGrabber->IsCameraConnected();
-    if (connected)
+    if (!m_ToFImageGrabber->IsCameraConnected())
     {
-      if (active)
-      {
-        m_ToFImageGrabber->StopCamera();
-      }
-      m_ToFImageGrabber->DisconnectCamera();
+      this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_RGB->isChecked());
+      this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_IR->isChecked());
     }
-    this->m_ToFImageGrabber->SetBoolProperty("RGB", m_Controls->m_RGB->isChecked());
-    this->m_ToFImageGrabber->SetBoolProperty("IR", m_Controls->m_IR->isChecked());
-    if (connected)
+    else
     {
-      m_ToFImageGrabber->ConnectCamera();
-      if (active)
-      {
-        m_ToFImageGrabber->StartCamera();
-      }
+      MITK_WARN << "Kinect Acquisition mode cannot be changed, if the device is connected. Please disconnect first.";
     }
   }
 }

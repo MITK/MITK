@@ -39,6 +39,26 @@ namespace mitk
    * - select/unselect a point
    *
    * in 2d and 3d render windows.
+   *
+   * \warn If this Interactor is assigned (SetDataNode) an empty mitk::DataNode it creates a point set,
+   * changing the point set of the assigned mitk::DataNode after this assignment will cause the mitk::PointSetDataInteractor
+   * to not work properly. So the usage has follow this general scheme:
+   *
+   * \code
+    // Set up interactor
+    m_CurrentInteractor = mitk::PointSetDataInteractor::New();
+    m_CurrentInteractor->LoadStateMachine("PointSet.xml");
+    m_CurrentInteractor->SetEventConfig("PointSetConfig.xml");
+    //Create new PointSet which will receive the interaction input
+    m_TestPointSet = mitk::PointSet::New();
+    // Add the point set to the mitk::DataNode *before* the DataNode is added to the mitk::PointSetDataInteractor
+    m_TestPointSetNode->SetData(m_TestPointSet);
+    // finally add the mitk::DataNode (which already is added to the mitk::DataStorage) to the mitk::PointSetDataInteractor
+    m_CurrentInteractor->SetDataNode(m_TestPointSetNode);
+
+\endcode
+   *
+   *
    */
 
   // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.

@@ -539,7 +539,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
             // set direction image pixel
             ItkDirectionImageType::Pointer directionImage = m_DirectionImageContainer->GetElement(i);
-            Vector< double, 3 > pixel;
+            Vector< float, 3 > pixel;
             pixel.SetElement(0, dir[0]);
             pixel.SetElement(1, dir[1]);
             pixel.SetElement(2, dir[2]);

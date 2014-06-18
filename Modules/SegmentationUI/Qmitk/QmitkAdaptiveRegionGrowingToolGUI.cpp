@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qmessagebox.h>
 
 #include "mitkNodePredicateDataType.h"
-#include "mitkGlobalInteraction.h"
-#include "mitkPointSetInteractor.h"
 #include "mitkProperties.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageAccessByItk.h"

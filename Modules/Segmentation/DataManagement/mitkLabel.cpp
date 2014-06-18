@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkProcessObject.h"
 #include <mitkProperties.h>
+#include <itkCommand.h>
 
 
 mitk::Label::Label():
@@ -53,6 +54,16 @@ mitk::Label::Label(const Label& other)
 mitk::Label::~Label()
 {
 
+}
+
+void mitk::Label::SetProperty(const std::string &propertyKey, BaseProperty *property)
+{
+
+  itk::SimpleMemberCommand<Label>::Pointer command = itk::SimpleMemberCommand<Label>::New();
+  command->SetCallbackFunction(this, &Label::Modified);
+  property->AddObserver( itk::ModifiedEvent(), command );
+
+  Superclass::SetProperty(propertyKey,property);
 }
 
 void mitk::Label::SetLocked(bool locked)

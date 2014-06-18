@@ -65,6 +65,11 @@ public:
   void SetLayer(int layer);
   int GetLayer() const;
 
+  void SetProperty(const std::string &propertyKey, BaseProperty *property);
+
+  using itk::Object::Modified;
+  void Modified(){Superclass::Modified();}
+
   Label();
   virtual ~Label();
 

@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDataNode.h>
 #include <mitkPointSet.h>
-#include <mitkPointSetInteractor.h>
 #include <mitkDataInteractor.h>
 #include <QmitkStdMultiWidget.h>
 #include <mitkSliceNavigationController.h>

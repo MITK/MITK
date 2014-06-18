@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageCast.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkPointSetInteractor.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageTimeSelector.h"

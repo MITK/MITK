@@ -39,7 +39,6 @@ mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   this->InitializeDefaultPlanarFigureProperties();
 }
 
-
 mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 {
   if ( m_NodeModifiedObserverAdded && GetDataNode() != NULL )
@@ -47,7 +46,6 @@ mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
     GetDataNode()->RemoveObserver( m_NodeModifiedObserverTag );
   }
 }
-
 
 void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
@@ -200,7 +198,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
   {
     mitk::Point2D displayPoint;
     this->TransformObjectToDisplay( vertices.begin()->Point, displayPoint,
-      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+      planarFigurePlaneGeometry, rendererPlaneGeometry, displayGeometry );
 
     pointlist.push_back( displayPoint );
   }

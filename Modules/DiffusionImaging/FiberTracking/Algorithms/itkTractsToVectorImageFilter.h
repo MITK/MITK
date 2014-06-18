@@ -36,10 +36,10 @@ public:
     typedef itk::Image<OutputVectorType, 3>         OutputImageType;
     typedef std::vector< OutputImageType::Pointer > OutputImageContainerType;
 
-    typedef vnl_vector_fixed< double, 3 >                               DirectionType;
+    typedef vnl_vector_fixed< double, 3 >                                         DirectionType;
     typedef VectorContainer< unsigned int, DirectionType >                       DirectionContainerType;
     typedef VectorContainer< unsigned int, DirectionContainerType::Pointer >     ContainerType;
-    typedef Image< Vector< float, 3 >, 3>                               ItkDirectionImageType;
+    typedef Image< Vector< float, 3 >, 3>                                        ItkDirectionImageType;
     typedef VectorContainer< unsigned int, ItkDirectionImageType::Pointer >      DirectionImageContainerType;
 
     typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
@@ -74,7 +74,7 @@ protected:
     vnl_vector_fixed<double, 3> ClusterStep(DirectionContainerType::Pointer dirCont, vnl_vector_fixed<double, 3> currentMean);
 
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
-    itk::Point<float, 3> GetItkPoint(double point[3]);
+    itk::Point<double, 3> GetItkPoint(double point[3]);
 
 
     TractsToVectorImageFilter();
@@ -85,7 +85,7 @@ protected:
     float                               m_Epsilon;                          ///< epsilon for vector equality check
     ItkUcharImgType::Pointer            m_MaskImage;                        ///< only voxels inside the binary mask are processed
     bool                                m_NormalizeVectors;                 ///< normalize vectors to length 1
-    itk::Vector<double>                 m_OutImageSpacing;                  ///< spacing of output image
+    itk::Vector<float>                 m_OutImageSpacing;                  ///< spacing of output image
     ContainerType::Pointer              m_DirectionsContainer;              ///< container for fiber directions
     bool                                m_UseWorkingCopy;                   ///< do not modify input fiber bundle but work on copy
     bool                                m_UseTrilinearInterpolation;        ///< trilinearly interpolate between neighbouring voxels

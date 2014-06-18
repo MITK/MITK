@@ -55,7 +55,7 @@ private:
       for (unsigned j = 0; j < 3; j++)
       {
         std::stringstream ss;
-        ss << "element [" << i << "][" + j << "] equal for mitkMatrix and podMatrix";
+        ss << "element [" << i << "][" << j << "] equal for mitkMatrix and podMatrix";
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE(ss.str(), true,
             (mitkMatrix3D[i][j]==podMatrix3D[i][j]));

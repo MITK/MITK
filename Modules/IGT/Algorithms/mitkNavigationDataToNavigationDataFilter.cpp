@@ -96,11 +96,16 @@ void mitk::NavigationDataToNavigationDataFilter::ConnectTo(mitk::NavigationDataS
 void mitk::NavigationDataToNavigationDataFilter::CreateOutputsForAllInputs()
 {
   this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());  // create outputs for all inputs
-  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
+  bool isModified = false;
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx){
     if (this->GetOutput(idx) == NULL)
     {
       mitk::NavigationData::Pointer newOutput = mitk::NavigationData::New();
       this->SetNthOutput(idx, newOutput);
+      isModified = true;
     }
+  }
+
+  if(isModified)
     this->Modified();
 }

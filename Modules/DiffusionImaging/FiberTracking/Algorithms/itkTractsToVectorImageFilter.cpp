@@ -45,7 +45,7 @@ TractsToVectorImageFilter< PixelType >::~TractsToVectorImageFilter()
 
 
 template< class PixelType >
-vnl_vector_fixed<double, 3> TractsToVectorImageFilter< PixelType >::GetVnlVector(double point[3])
+vnl_vector_fixed<double, 3> TractsToVectorImageFilter< PixelType >::GetVnlVector(double point[])
 {
     vnl_vector_fixed<double, 3> vnlVector;
     vnlVector[0] = point[0];
@@ -56,9 +56,9 @@ vnl_vector_fixed<double, 3> TractsToVectorImageFilter< PixelType >::GetVnlVector
 
 
 template< class PixelType >
-itk::Point<float, 3> TractsToVectorImageFilter< PixelType >::GetItkPoint(double point[3])
+itk::Point<double, 3> TractsToVectorImageFilter< PixelType >::GetItkPoint(double point[])
 {
-    itk::Point<float, 3> itkPoint;
+    itk::Point<double, 3> itkPoint;
     itkPoint[0] = point[0];
     itkPoint[1] = point[1];
     itkPoint[2] = point[2];
@@ -130,7 +130,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
     m_NumDirectionsImage->FillBuffer(0);
 
     // resample fiber bundle
-    float minSpacing = 1;
+    double minSpacing = 1;
     if(m_OutImageSpacing[0]<m_OutImageSpacing[1] && m_OutImageSpacing[0]<m_OutImageSpacing[2])
         minSpacing = m_OutImageSpacing[0];
     else if (m_OutImageSpacing[1] < m_OutImageSpacing[2])
@@ -169,9 +169,9 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
             continue;
 
         itk::Index<3> index; index.Fill(0);
-        itk::ContinuousIndex<float, 3> contIndex;
+        itk::ContinuousIndex<double, 3> contIndex;
         vnl_vector_fixed<double, 3> dir, wDir;
-        itk::Point<float, 3> worldPos;
+        itk::Point<double, 3> worldPos;
         vnl_vector<double> v;
         for( int j=0; j<numPoints-1; j++)
         {
@@ -220,9 +220,9 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
                 continue;
             }
 
-            float frac_x = contIndex[0] - index[0];
-            float frac_y = contIndex[1] - index[1];
-            float frac_z = contIndex[2] - index[2];
+            double frac_x = contIndex[0] - index[0];
+            double frac_y = contIndex[1] - index[1];
+            double frac_z = contIndex[2] - index[2];
 
             if (frac_x<0)
             {
@@ -255,7 +255,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
             DirectionContainerType::Pointer dirCont;
             int idx;
             wDir = dir;
-            float weight = (  frac_x)*(  frac_y)*(  frac_z);
+            double weight = (  frac_x)*(  frac_y)*(  frac_z);
             if (weight>m_Thres)
             {
                 wDir *= weight;
@@ -515,7 +515,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
                 directionImage->SetDirection( direction );
                 directionImage->SetRegions( imageRegion );
                 directionImage->Allocate();
-                Vector< float, 3 > nullVec; nullVec.Fill(0.0);
+                Vector< double, 3 > nullVec; nullVec.Fill(0.0);
                 directionImage->FillBuffer(nullVec);
                 m_DirectionImageContainer->InsertElement(i, directionImage);
             }
@@ -529,30 +529,30 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
         for (unsigned int i=0; i<numDir; i++)
         {
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-            itk::ContinuousIndex<float, 3> center;
+            itk::ContinuousIndex<double, 3> center;
             center[0] = index[0];
             center[1] = index[1];
             center[2] = index[2];
-            itk::Point<float> worldCenter;
+            itk::Point<double> worldCenter;
             m_MaskImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
             DirectionType dir = directions.at(i);
 
             // set direction image pixel
             ItkDirectionImageType::Pointer directionImage = m_DirectionImageContainer->GetElement(i);
-            Vector< float, 3 > pixel;
+            Vector< double, 3 > pixel;
             pixel.SetElement(0, dir[0]);
             pixel.SetElement(1, dir[1]);
             pixel.SetElement(2, dir[2]);
             directionImage->SetPixel(index, pixel);
 
             // add direction to vector field (with spacing compensation)
-            itk::Point<float> worldStart;
+            itk::Point<double> worldStart;
             worldStart[0] = worldCenter[0]-dir[0]/2*minSpacing;
             worldStart[1] = worldCenter[1]-dir[1]/2*minSpacing;
             worldStart[2] = worldCenter[2]-dir[2]/2*minSpacing;
             vtkIdType id = m_VtkPoints->InsertNextPoint(worldStart.GetDataPointer());
             container->GetPointIds()->InsertNextId(id);
-            itk::Point<float> worldEnd;
+            itk::Point<double> worldEnd;
             worldEnd[0] = worldCenter[0]+dir[0]/2*minSpacing;
             worldEnd[1] = worldCenter[1]+dir[1]/2*minSpacing;
             worldEnd[2] = worldCenter[2]+dir[2]/2*minSpacing;
@@ -588,7 +588,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
     }
 
     // initialize
-    float max = 0.0;
+    double max = 0.0;
     touched.resize(inDirs.size(), 0);
     bool free = true;
     currentMean = inDirs[0];  // initialize first seed
@@ -597,7 +597,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
         oldMean.fill(0.0);
 
         // start mean-shift clustering
-        float angle = 0.0;
+        double angle = 0.0;
         int counter = 0;
         while ((currentMean-oldMean).magnitude()>0.0001)
         {
@@ -628,7 +628,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
         if (counter>0)
         {
             currentMean /= counter;
-            float mag = currentMean.magnitude();
+            double mag = currentMean.magnitude();
 
             if (mag>0)
             {
@@ -680,7 +680,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
     }
 
     // initialize
-    float max = 0.0;
+    double max = 0.0;
     touched.resize(inDirs.size(), 0);
     for (std::size_t j=0; j<inDirs.size(); j++)
     {
@@ -688,7 +688,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
         oldMean.fill(0.0);
 
         // start mean-shift clustering
-        float angle = 0.0;
+        double angle = 0.0;
         int counter = 0;
         while ((currentMean-oldMean).magnitude()>0.0001)
         {
@@ -733,7 +733,7 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelTyp
             currentMean /= counter;
             if (add)
             {
-                float mag = currentMean.magnitude();
+                double mag = currentMean.magnitude();
                 if (mag>0)
                 {
                     if (mag>max)
@@ -764,7 +764,7 @@ TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsTo
 {
     DirectionContainerType::Pointer container = DirectionContainerType::New();
 
-    float max = 0;
+    double max = 0;
     for (DirectionContainerType::ConstIterator it = dirCont->Begin(); it!=dirCont->End(); ++it)
     {
         vnl_vector_fixed<double, 3> mean = ClusterStep(dirCont, it.Value());
@@ -776,7 +776,7 @@ TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsTo
         for (DirectionContainerType::ConstIterator it2 = container->Begin(); it2!=container->End(); ++it2)
         {
             vnl_vector_fixed<double, 3> dir = it2.Value();
-            float angle = fabs(dot_product(mean, dir)/(mean.magnitude()*dir.magnitude()));
+            double angle = fabs(dot_product(mean, dir)/(mean.magnitude()*dir.magnitude()));
             if (angle>=m_Epsilon)
             {
                 addMean = false;
@@ -814,7 +814,7 @@ vnl_vector_fixed<double, 3> TractsToVectorImageFilter< PixelType >::ClusterStep(
     for (DirectionContainerType::ConstIterator it = dirCont->Begin(); it!=dirCont->End(); ++it)
     {
         vnl_vector_fixed<double, 3> dir = it.Value();
-        float angle = dot_product(currentMean, dir)/(currentMean.magnitude()*dir.magnitude());
+        double angle = dot_product(currentMean, dir)/(currentMean.magnitude()*dir.magnitude());
         if (angle>=m_AngularThreshold)
             newMean += dir;
         else if (-angle>=m_AngularThreshold)

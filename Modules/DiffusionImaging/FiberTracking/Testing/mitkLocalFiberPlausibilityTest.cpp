@@ -151,7 +151,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
 
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImageIgnore, mitkAngularErrorImageIgnore, 0.01, true), "Check if error images are equal (ignored missing directions).");
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImage, mitkAngularErrorImage, 0.01, true), "Check if error images are equal.");
-        MITK_TEST_CONDITION_REQUIRED(testDirections->Equals(gtTestDirections, 0.5), "Check if vector fields are equal.");
+        MITK_TEST_CONDITION_REQUIRED(testDirections->Equals(gtTestDirections), "Check if vector fields are equal.");
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtNumTestDirImage, mitkNumDirImage, 0.0001, true), "Check if num direction images are equal.");
     }
     catch (itk::ExceptionObject e)

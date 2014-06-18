@@ -36,7 +36,7 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   assert(toolManager);
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(toolManager->GetWorkingData(0)->GetData());
-  int activePixelValue = workingImage->GetActiveLabel()->GetIndex();
+  int activePixelValue = workingImage->GetActiveLabel()->GetValue();
 
   // convert these slices to the ipSegmentation data type (into an ITK image)
   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeLowerITKSlice;
@@ -141,7 +141,7 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
     int targetValue = static_cast<int>(targetIterator.Get());
     if ( sourceIterator.Get() != 0 )
     {
-      if (!workingImage->GetLabelLocked(targetValue))
+      if (!workingImage->GetLabel(targetValue)->GetLocked());
         targetIterator.Set(1);
     }
     else

@@ -48,7 +48,10 @@ bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction*, Intera
 
     int timestep = positionEvent->GetSender()->GetTimeStep();
     int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
-    workingImage->SetActiveLabel(pixelValue); // can be the background
+    workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue); // can be the background
+
+    // Call Events
+    //workingImage->ActiveLabelEvent.Send(pixelValue);
     toolManager->WorkingDataModified.Send();
   }
 

@@ -248,7 +248,7 @@ void QmitkSliceBasedInterpolatorWidget::Interpolate( mitk::PlaneGeometry* plane,
 
   m_PreviewNode->SetData( interpolation );
 
-  const mitk::Color& color = m_WorkingImage->GetActiveLabelColor();
+  const mitk::Color& color = m_WorkingImage->GetActiveLabel()->GetColor();
   m_PreviewNode->SetColor(color);
 
   m_LastSNC = slicer;
@@ -360,7 +360,7 @@ void QmitkSliceBasedInterpolatorWidget::WritePreviewOnWorkingImage( itk::Image<T
   outputIterator.GoToBegin();
   inputIterator.GoToBegin();
 
-  int activePixelValue = m_WorkingImage->GetActiveLabelIndex();
+  int activePixelValue = m_WorkingImage->GetActiveLabel()->GetValue();
 
   if (activePixelValue == 0) // if exterior is the active label
   {
@@ -381,7 +381,7 @@ void QmitkSliceBasedInterpolatorWidget::WritePreviewOnWorkingImage( itk::Image<T
       int targetValue = static_cast<int>(outputIterator.Get());
       if ( inputIterator.Get() != 0 )
       {
-        if (!m_WorkingImage->GetLabelLocked(targetValue))
+        if (!m_WorkingImage->GetLabel(targetValue)->GetLocked())
           outputIterator.Set( overwritevalue );
       }
 
@@ -418,7 +418,7 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
 
     mitk::Image::Pointer previewSlice = dynamic_cast<mitk::Image*>( m_PreviewNode->GetData() );
 
-    AccessFixedDimensionByItk_2( sliceImage, WritePreviewOnWorkingImage, 2, previewSlice, m_WorkingImage->GetActiveLabelIndex() );
+    AccessFixedDimensionByItk_2( sliceImage, WritePreviewOnWorkingImage, 2, previewSlice, m_WorkingImage->GetActiveLabel()->GetValue() );
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
     vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -515,7 +515,7 @@ void QmitkSliceBasedInterpolatorWidget::AcceptAllInterpolations(mitk::SliceNavig
       mitk::Image::Pointer sliceImage = this->GetWorkingSlice(reslicePlane);
       if (sliceImage.IsNull()) return;
 
-      AccessFixedDimensionByItk_2( sliceImage, WritePreviewOnWorkingImage, 2, interpolation, m_WorkingImage->GetActiveLabelIndex() );
+      AccessFixedDimensionByItk_2( sliceImage, WritePreviewOnWorkingImage, 2, interpolation, m_WorkingImage->GetActiveLabel()->GetValue() );
 
       //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
       vtkSmartPointer<mitkVtkImageOverwrite> overwrite = vtkSmartPointer<mitkVtkImageOverwrite>::New();

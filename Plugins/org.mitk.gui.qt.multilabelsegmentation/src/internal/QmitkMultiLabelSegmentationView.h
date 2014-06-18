@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkMultiLabelSegmentationControls.h"
 
+
 class QmitkRenderWindow;
 
 /**
@@ -78,7 +79,33 @@ protected slots:
   /// \brief reaction to signal "goToLabel" from labelset widget
   void OnGoToLabel(const mitk::Point3D& pos);
 
+  void OnResetView();
+
+  // reaction to the button "Add Layer"
+  void OnAddLayer();
+
+  // reaction to the button "Delete Layer"
+  void OnDeleteLayer();
+
+  // reaction to the button "Previous Layer"
+  void OnPreviousLayer();
+
+  // reaction to the button "Next Layer"
+  void OnNextLayer();
+
+  // reaction to the combobox change "Change Layer"
+  void OnChangeLayer(int);
+
+  // reaction to the button "Deactive Active Tool"
+  void OnDeactivateActiveTool();
+
+  // reaction to the button "Lock exterior"
+  void OnLockExteriorToggled(bool);
+
 protected:
+
+  void OnEstablishLabelSetConnection();
+  void OnLooseLabelSetConnection();
 
   void SetFocus();
 
@@ -138,6 +165,7 @@ protected:
     * it is needed to unregister the observer on unload.
   */
   us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
+
 
 };
 

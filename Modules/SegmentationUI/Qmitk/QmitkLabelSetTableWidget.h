@@ -61,10 +61,10 @@ class MitkSegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     void LabelRemoved();
 
     /// \brief A label was modified in the LabelSet.
-    void LabelModified(int);
+    void LabelModified(int rowIndex);
 
     /// \brief The active label was changed in the LabelSet.
-    void ActiveLabelChanged(int);
+    void ActiveLabelChanged(int rowIndex);
 
     /// \brief All labels were modified in the LabelSet.
     void AllLabelsModified();
@@ -78,7 +78,7 @@ class MitkSegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// Sets AutoSelectNewItems flag. If set to true new items will be automatically selected. Default is false.
     void SetAutoSelectNewItems(bool value);
 
-    QStringList& GetLabelStringList();
+    QStringList GetLabelStringList();
 
     void OnToolManagerWorkingDataModified();
 
@@ -133,7 +133,7 @@ class MitkSegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     void SetActiveLabelSetImage(mitk::LabelSetImage* image);
 
     /// \brief Inserts a new label at the end of the table.
-    virtual void InsertItem();
+    virtual void InsertItem(const mitk::Label *label);
 
     void WaitCursorOn();
 
@@ -147,7 +147,7 @@ class MitkSegmentationUI_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 
     mitk::ToolManager* m_ToolManager;
 
-    QStringList m_LabelStringList;
+    //QStringList m_LabelStringList;
 
     mitk::ColorSequenceRainbow* m_ColorSequenceRainbow;
 

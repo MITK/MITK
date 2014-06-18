@@ -130,7 +130,7 @@ void LabelSetImageToSurfaceThreadedFilter::ThreadedUpdateSuccessful()
   node->SetData(m_Result);
   node->SetName(name);
 
-  mitk::Color color = image->GetLabelColor(m_RequestedLabel);
+  mitk::Color color = image->GetLabel(m_RequestedLabel)->GetColor();
   node->SetColor(color);
 
   this->InsertBelowGroupNode(node);

@@ -87,7 +87,7 @@ void mitk::OpenTool3D::Run()
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetValue();
 
   m_CurrentTimeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->GetPos();
 
@@ -198,7 +198,7 @@ void mitk::OpenTool3D::InternalRun( itk::Image< TPixel, VDimension>* input )
   {
     int inputValue = static_cast<int>( inputIter.Get() );
 
-    if ( (inputValue != m_PaintingPixelValue) && workingImage->GetLabelLocked( inputValue ) )
+    if ( (inputValue != m_PaintingPixelValue) && workingImage->GetLabel( inputValue )->GetLocked() )
       resultIter.Set(0);
 
     ++inputIter;

@@ -249,7 +249,8 @@ void mitk::FastMarchingTool::CreateNewLabel(const std::string& name, const mitk:
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
-  workingImage->AddLabel(name,color);
+  workingImage->GetLabelSet()->AddLabel(name,color);
+  //workingImage->AddLabelEvent.Send();
 
   this->AcceptPreview();
 }
@@ -259,7 +260,7 @@ void mitk::FastMarchingTool::AcceptPreview()
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( m_WorkingNode->GetData() );
   assert(workingImage);
 
-  m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+  m_PaintingPixelValue = workingImage->GetActiveLabel()->GetValue();
 
   CurrentlyBusy.Send(true);
 
@@ -471,7 +472,7 @@ void mitk::FastMarchingTool::InternalRun( ImageType* input )
   {
     int inputValue = static_cast<int>( inputIter.Get() );
 
-    if ( (inputValue != m_PaintingPixelValue) && workingImage->GetLabelLocked( inputValue ) )
+    if ( (inputValue != m_PaintingPixelValue) && workingImage->GetLabel( inputValue )->GetLocked() )
       resultIter.Set(0);
 
     ++inputIter;

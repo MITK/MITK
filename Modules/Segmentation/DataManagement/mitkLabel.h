@@ -21,9 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkSegmentationExports.h"
 #include <mitkColorProperty.h>
 #include <mitkVector.h>
-
-#include <itkObject.h>
-#include <itkObjectFactory.h>
+#include <mitkPropertyList.h>
 
 namespace mitk
 {
@@ -33,89 +31,57 @@ namespace mitk
 //## @brief A data structure describing a label.
 //## @ingroup Data
 //##
-class MitkSegmentation_EXPORT Label : public itk::Object
+class MitkSegmentation_EXPORT Label : public PropertyList
 {
 public:
+  mitkClassMacro( Label, mitk::PropertyList );
 
-    mitkClassMacro( Label, itk::Object );
+  itkNewMacro( Self );
 
-    itkNewMacro( Self );
+  void SetLocked(bool locked);
+  bool GetLocked() const;
 
-    itkSetMacro(Locked, bool);
-    itkGetConstMacro(Locked, bool);
-    itkBooleanMacro(Locked);
+  void SetVisible(bool visible);
+  bool GetVisible() const;
 
-    itkSetMacro(Visible, bool);
-    itkGetConstMacro(Visible, bool);
-    itkBooleanMacro(Visible);
+  void SetOpacity(float opacity);
+  float GetOpacity() const;
 
-    itkSetMacro(Exterior, bool);
-    itkGetConstMacro(Exterior, bool);
-    itkBooleanMacro(Exterior);
+  void SetName(const std::string &name);
+  std::string GetName() const;
 
-    itkSetMacro(Filled, bool);
-    itkGetConstMacro(Filled, bool);
-    itkBooleanMacro(Filled);
+  void SetCenterOfMassIndex(const mitk::Point3D& center);
+  mitk::Point3D GetCenterOfMassIndex() const;
 
-    itkSetMacro(Selected, bool );
-    itkGetConstMacro( Selected, bool );
-    itkBooleanMacro(Selected);
+  void SetCenterOfMassCoordinates(const mitk::Point3D& center);
+  mitk::Point3D GetCenterOfMassCoordinates() const;
 
-    itkSetMacro(Opacity, float);
-    itkGetConstMacro(Opacity, float);
+  void SetColor(const mitk::Color&);
+  const mitk::Color& GetColor() const;
 
-    itkSetMacro(Volume, float);
-    itkGetConstMacro(Volume, float);
+  void SetValue(int pixelValue);
+  int GetValue() const;
 
-    itkSetStringMacro(Name);
-    itkGetStringMacro(Name);
+  void SetLayer(int layer);
+  int GetLayer() const;
 
-    itkSetMacro(LatinName, std::string);
-    itkGetConstMacro(LatinName, std::string);
+  void SetProperty(const std::string &propertyKey, BaseProperty *property);
 
-    itkSetMacro(LastModified, std::string);
-    itkGetConstMacro(LastModified, std::string);
+  using itk::Object::Modified;
+  void Modified(){Superclass::Modified();}
 
-    void SetCenterOfMassIndex(const mitk::Point3D& center);
-    const mitk::Point3D& GetCenterOfMassIndex();
-
-    void SetCenterOfMassCoordinates(const mitk::Point3D& center);
-    const mitk::Point3D& GetCenterOfMassCoordinates();
-
-    void SetColor(const mitk::Color&);
-    const mitk::Color& GetColor() const
-    { return m_Color; };
-
-    itkSetMacro(Index, int);
-    itkGetConstMacro(Index, int);
-
-    itkSetMacro(Layer, int);
-    itkGetConstMacro(Layer, int);
-
-    Label();
-    virtual ~Label();
+  Label();
+  virtual ~Label();
 
 protected:
 
-    void PrintSelf(std::ostream &os, itk::Indent indent) const;
+  void PrintSelf(std::ostream &os, itk::Indent indent) const;
 
-    Label(const Label& other);
+  Label(const Label& other);
 
-    bool m_Locked;
-    bool m_Visible;
-    bool m_Filled;
-    bool m_Exterior;
-    float m_Opacity;
-    bool m_Selected;
-    std::string m_Name;
-    std::string m_LatinName;
-    float m_Volume;
-    std::string m_LastModified;
-    int m_Index;
-    int m_Layer;
-    mitk::Color m_Color;
-    mitk::Point3D m_CenterOfMassIndex;
-    mitk::Point3D m_CenterOfMassCoordinates;
+private:
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 } // namespace mitk

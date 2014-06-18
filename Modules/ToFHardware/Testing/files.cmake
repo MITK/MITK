@@ -9,7 +9,7 @@ set(MODULE_TESTS
   #mitkToFImageRecorderFilterTest.cpp
   mitkToFImageWriterTest.cpp
   mitkToFNrrdImageWriterTest.cpp
-  #mitkToFOpenCVImageGrabberTest.cpp
+  mitkToFOpenCVImageGrabberTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

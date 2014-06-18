@@ -134,11 +134,6 @@ namespace mitk
   void ToFOpenCVImageGrabber::SetToFImageGrabber(ToFImageGrabber::Pointer imageGrabber)
   {
     m_ImageGrabber = imageGrabber;
-
-    //initialize OpenCV images
-    m_CurrentOpenCVIntensityImage = cvCreateImage(cvSize(m_ImageGrabber->GetCaptureWidth(), m_ImageGrabber->GetCaptureHeight()), m_ImageDepth, 1);
-    m_CurrentOpenCVAmplitudeImage = cvCreateImage(cvSize(m_ImageGrabber->GetCaptureWidth(), m_ImageGrabber->GetCaptureHeight()), m_ImageDepth, 1);
-    m_CurrentOpenCVDistanceImage = cvCreateImage(cvSize(m_ImageGrabber->GetCaptureWidth(), m_ImageGrabber->GetCaptureHeight()), m_ImageDepth, 1);
   }
 
   ToFImageGrabber::Pointer ToFOpenCVImageGrabber::GetToFImageGrabber()
@@ -151,6 +146,10 @@ namespace mitk
     if (m_ImageGrabber.IsNotNull())
     {
       m_ImageGrabber->ConnectCamera();
+      //Initialize cv Images after the camera is conneceted and we know the resolution
+      m_CurrentOpenCVIntensityImage = cvCreateImage(cvSize(m_ImageGrabber->GetCaptureWidth(), m_ImageGrabber->GetCaptureHeight()), m_ImageDepth, 1);
+      m_CurrentOpenCVAmplitudeImage = cvCreateImage(cvSize(m_ImageGrabber->GetCaptureWidth(), m_ImageGrabber->GetCaptureHeight()), m_ImageDepth, 1);
+      m_CurrentOpenCVDistanceImage = cvCreateImage(cvSize(m_ImageGrabber->GetCaptureWidth(), m_ImageGrabber->GetCaptureHeight()), m_ImageDepth, 1);
       m_ImageGrabber->StartCamera();
     }
   }

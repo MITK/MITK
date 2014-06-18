@@ -186,18 +186,6 @@ ITK_THREAD_RETURN_TYPE KinectDevice::Acquire(void* pInfoStruct)
     bool printStatus = false;
     while (toFCameraDevice->IsCameraActive())
     {
-      //check if to provide IR or RGB image
-      if(toFCameraDevice->GetController()->GetUseIR())
-      {
-        toFCameraDevice->SetBoolProperty("HasAmplitudeImage", true);
-        toFCameraDevice->SetBoolProperty("HasRGBImage", false);
-      }
-      else
-      {
-        toFCameraDevice->SetBoolProperty("HasAmplitudeImage", false);
-        toFCameraDevice->SetBoolProperty("HasRGBImage", true);
-      }
-
       // update the ToF camera
       toFCameraDevice->UpdateCamera();
       // get the image data from the camera and write it at the next free position in the buffer
@@ -331,12 +319,16 @@ void KinectDevice::SetProperty( const char *propertyKey, BaseProperty* propertyV
     bool rgb = false;
     GetBoolProperty(propertyKey, rgb);
     m_Controller->SetUseIR(!rgb);
+    this->SetBoolProperty("HasAmplitudeImage", false);
+    this->SetBoolProperty("HasRGBImage", true);
   }
   else if (strcmp(propertyKey, "IR") == 0)
   {
     bool ir = false;
     GetBoolProperty(propertyKey, ir);
     m_Controller->SetUseIR(ir);
+    this->SetBoolProperty("HasAmplitudeImage", true);
+    this->SetBoolProperty("HasRGBImage", false);
   }
 }
 

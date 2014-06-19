@@ -35,24 +35,26 @@ mitk::MovieGeneratorOpenCV::MovieGeneratorOpenCV()
 
 void mitk::MovieGeneratorOpenCV::SetFileName( const char *fileName )
 {
-
   m_sFile = fileName;
 }
+
 
 void mitk::MovieGeneratorOpenCV::SetFrameRate(int rate)
 {
   m_dwRate = rate;
 }
 
-void mitk::MovieGeneratorOpenCV::SetRemoveColouredFrame(bool RemoveColouredFrame)
+
+void mitk::MovieGeneratorOpenCV::SetRemoveColouredFrame(bool removeColouredFrame)
 {
-  m_RemoveColouredFrame = RemoveColouredFrame;
+  m_RemoveColouredFrame = removeColouredFrame;
 }
 
 void mitk::MovieGeneratorOpenCV::SetFlipVertical(bool flipVertical)
 {
   m_FlipVertical = flipVertical;
 }
+
 
 bool mitk::MovieGeneratorOpenCV::GetFlipVertical() const
 {

@@ -21,14 +21,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::MovieGeneratorOpenCV::MovieGeneratorOpenCV()
+: m_sFile("")
+, m_dwRate(20)
+, m_aviWriter(NULL)
+, m_currentFrame(NULL)
+, m_FourCCCodec(NULL)
+, m_lFrame(0)
+, m_RemoveColouredFrame(true)
+, m_FlipVertical(true)
 {
-  m_initialized = false;
-  m_aviWriter   = NULL;
-  m_dwRate = 20;
-
-  m_FourCCCodec = NULL;
-  m_RemoveColouredFrame = true;
-  m_FlipVertical = true;
 }
 
 

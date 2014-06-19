@@ -201,7 +201,7 @@
          <font/>
         </property>
         <property name="text">
-         <string>Write Movie (MS Windows only) ...</string>
+         <string>Write Movie ...</string>
         </property>
        </widget>
       </item>

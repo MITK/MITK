@@ -28,6 +28,7 @@ mitk::MovieGeneratorOpenCV::MovieGeneratorOpenCV()
 
   m_FourCCCodec = NULL;
   m_RemoveColouredFrame = true;
+  m_FlipVertical = true;
 }
 
 
@@ -45,6 +46,16 @@ void mitk::MovieGeneratorOpenCV::SetFrameRate(int rate)
 void mitk::MovieGeneratorOpenCV::SetRemoveColouredFrame(bool RemoveColouredFrame)
 {
   m_RemoveColouredFrame = RemoveColouredFrame;
+}
+
+void mitk::MovieGeneratorOpenCV::SetFlipVertical(bool flipVertical)
+{
+  m_FlipVertical = flipVertical;
+}
+
+bool mitk::MovieGeneratorOpenCV::GetFlipVertical() const
+{
+  return m_FlipVertical;
 }
 
 bool mitk::MovieGeneratorOpenCV::InitGenerator()
@@ -118,8 +129,24 @@ bool mitk::MovieGeneratorOpenCV::InitGenerator()
 
 bool mitk::MovieGeneratorOpenCV::AddFrame( void *data )
 {
-  //cvSetImageData(m_currentFrame,data,m_width*3);
-  memcpy(m_currentFrame->imageData,data,m_width*m_height*3);
+  if (m_FlipVertical)
+  {
+    // MattClarkson: I tried cvFlip, but it did not appear to work.
+    unsigned char* inputData = static_cast<unsigned char*>(data);
+    unsigned int offsetTop = 0;
+    unsigned int offsetBottom = 0;
+
+    for (int r = 0; r < m_height; r++)
+    {
+      offsetTop = r*m_currentFrame->widthStep;
+      offsetBottom = (m_height - 1 - r)*m_currentFrame->widthStep;
+      memcpy(m_currentFrame->imageData + offsetBottom, inputData + offsetTop, m_currentFrame->widthStep);
+    }
+  }
+  else
+  {
+    memcpy(m_currentFrame->imageData,data,m_width*m_height*3);
+  }
   cvWriteFrame(m_aviWriter,m_currentFrame);
   return true;
 }

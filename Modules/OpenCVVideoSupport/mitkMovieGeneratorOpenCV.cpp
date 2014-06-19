@@ -161,5 +161,9 @@ bool mitk::MovieGeneratorOpenCV::TerminateGenerator()
   {
     cvReleaseVideoWriter(&m_aviWriter);
   }
+  if (m_currentFrame)
+  {
+    cvReleaseImage(&m_currentFrame);
+  }
   return true;
 }

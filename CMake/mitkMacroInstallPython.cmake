@@ -86,8 +86,13 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
   list(APPEND _python_dirs "${VTK_DIR}/lib")
 
   if(NOT MITK_USE_SYSTEM_PYTHON)
-    list(APPEND _python_dirs "${Python_DIR}/lib64")
+    list(APPEND _python_dirs "${Python_DIR}/lib")
     #ToDo: install python stuff
+    install(DIRECTORY "${Python_DIR}/lib/python2.7"
+            DESTINATION bin/Python/lib
+            USE_SOURCE_PERMISSIONS
+            COMPONENT Runtime)
+    install(FILES "${Python_DIR}/include/python2.7/pyconfig.h" DESTINATION bin/Python/include/python2.7)
   endif()
 
   list(REMOVE_DUPLICATES _python_dirs)

@@ -219,8 +219,11 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
                 )
 
 if(MITK_USE_Python)
-  FIND_PACKAGE(PythonLibs REQUIRED)
-  FIND_PACKAGE(PythonInterp REQUIRED)
+  option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" ON)
+  if(MITK_USE_SYSTEM_PYTHON)
+    FIND_PACKAGE(PythonLibs REQUIRED)
+    FIND_PACKAGE(PythonInterp REQUIRED)
+  endif()
 endif()
 
 if(MITK_USE_Boost)
@@ -825,18 +828,7 @@ if(MITK_USE_BLUEBERRY)
     file(REMOVE ${MITK_PLUGIN_USE_FILE})
     set(MITK_PLUGIN_USE_FILE )
   endif()
-
-  # 11.3.13, change, muellerm: activate python bundle if python and blueberry is active
-  if( MITK_USE_Python )
-    set(MITK_BUILD_org.mitk.gui.qt.python ON)
-  endif()
-
 endif()
-
-#-----------------------------------------------------------------------------
-# Python Wrapping
-#-----------------------------------------------------------------------------
-option(MITK_USE_Python "Build Python integration for MITK (requires CableSwig)." OFF)
 
 #-----------------------------------------------------------------------------
 # Documentation

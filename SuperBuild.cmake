@@ -70,6 +70,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(external_projects
+  Python
   tinyxml
   GLUT
   ANN
@@ -348,11 +349,20 @@ endforeach()
 
 # Optional python variables
 if(MITK_USE_Python)
+  list(APPEND mitk_optional_cache_args
+       -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
+       -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
+       -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+       -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
+       -DMITK_USE_SYSTEM_PYTHON:BOOL=${MITK_USE_SYSTEM_PYTHON}
+       -DMITK_BUILD_org.mitk.gui.qt.python:BOOL=ON
+      )
+
+  if( NOT MITK_USE_SYSTEM_PYTHON )
     list(APPEND mitk_optional_cache_args
-         -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
-         -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
-         -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
-         -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2} )
+          -DPython_DIR:PATH=${Python_DIR})
+  endif()
+
 endif()
 
 set(proj MITK-Configure)

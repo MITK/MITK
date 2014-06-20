@@ -28,7 +28,9 @@ if(NOT DEFINED ITK_DIR)
   endif()
 
   if(MITK_USE_Python)
-
+    if(NOT MITK_USE_SYSTEM_PYTHON)
+      list(APPEND proj_DEPENDENCIES Python)
+    endif()
     list(APPEND additional_cmake_args
          -DITK_WRAPPING:BOOL=ON
          -DITK_WRAP_PYTHON:BOOL=ON

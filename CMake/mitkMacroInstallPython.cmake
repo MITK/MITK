@@ -85,6 +85,11 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
 
   list(APPEND _python_dirs "${VTK_DIR}/lib")
 
+  if(NOT MITK_USE_SYSTEM_PYTHON)
+    list(APPEND _python_dirs "${Python_DIR}/lib64")
+    #ToDo: install python stuff
+  endif()
+
   list(REMOVE_DUPLICATES _python_dirs)
 
 endmacro()

@@ -1,5 +1,9 @@
 if( MITK_USE_Python )
 
+  if(NOT MITK_USE_SYSTEM_PYTHON)
+    add_definitions( -DUSE_MITK_BUILTIN_PYTHON )
+  endif()
+
   MITK_CREATE_MODULE(
     DEPENDS MitkCore
     EXPORT_DEFINE MITK_PYTHON_EXPORT

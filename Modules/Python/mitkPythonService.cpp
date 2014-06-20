@@ -36,27 +36,15 @@ mitk::PythonService::PythonService()
     MITK_DEBUG << "pythonInitialized " << pythonInitialized;
     MITK_DEBUG << "m_PythonManager.isPythonInitialized() " << m_PythonManager.isPythonInitialized();
   }
-  MITK_INFO << "PythonPath: " <<  mitk::IOUtil::GetProgramPath();
+
   // due to strange static var behaviour on windows Py_IsInitialized() returns correct value while
   // m_PythonManager.isPythonInitialized() does not because it has been constructed and destructed again
   if( !m_PythonManager.isPythonInitialized() )
   {
     try
     {
-      if( pythonInitialized )
-        m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut|PythonQt::PythonAlreadyInitialized);
-      else
-        m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut);
-
-      MITK_DEBUG("PythonService") << "initalizing python";
-      m_PythonManager.initialize();
-
-      MITK_DEBUG("PythonService") << "python initalized";
-
       std::string programPath = mitk::IOUtil::GetProgramPath();
-
       QDir programmDir( QString( programPath.c_str() ).append("/Python") );
-
       QString pythonCommand;
 
       // Set the pythonpath variable depending if
@@ -68,10 +56,26 @@ mitk::PythonService::PythonService()
         pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
         pythonCommand.append( QString("sys.path.append('%1/Python')\n").arg(programPath.c_str()) );
         pythonCommand.append( QString("sys.path.append('%1/Python/itk')").arg(programPath.c_str()) );
+        // set python home if own runtime is deployed
+#ifdef USE_MITK_BUILTIN_PYTHON
+        Py_SetPythonHome((char*)(QString("sys.path.append('%1/Python')\n").arg(programPath.c_str()).toStdString().c_str()) );
+#endif
       } else {
-         pythonCommand.append(PYTHONPATH_COMMAND);
+        pythonCommand.append(PYTHONPATH_COMMAND);
+#ifdef USE_MITK_BUILTIN_PYTHON
+        Py_SetPythonHome(PYTHONHOME);
+#endif
       }
 
+      if( pythonInitialized )
+        m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut|PythonQt::PythonAlreadyInitialized);
+      else
+        m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut);
+
+      MITK_DEBUG("PythonService") << "initalizing python";
+      m_PythonManager.initialize();
+
+      MITK_DEBUG("PythonService") << "python initalized";
 
       MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
       m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );

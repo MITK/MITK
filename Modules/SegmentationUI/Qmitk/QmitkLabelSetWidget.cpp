@@ -333,8 +333,10 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
   {
     this->WaitCursorOn();
     GetWorkingImage()->GetActiveLabelSet()->RemoveLabel(pixelValue);
+    GetWorkingImage()->EraseLabel(pixelValue);
     this->WaitCursorOff();
   }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)

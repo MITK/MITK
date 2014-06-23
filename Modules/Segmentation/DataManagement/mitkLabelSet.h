@@ -103,12 +103,19 @@ public:
 
     /** \brief Returns a const iterator poiting to the begining of the container.
     */
-    LabelContainerConstIteratorType IteratorBegin();
+    LabelContainerConstIteratorType IteratorConstBegin();
 
     /** \brief Returns a const iterator pointing to the end of the container.
     */
-    LabelContainerConstIteratorType IteratorEnd();
+    LabelContainerConstIteratorType IteratorConstEnd();
 
+    /** \brief Returns a iterator poiting to the begining of the container.
+    */
+    LabelContainerIteratorType IteratorBegin();
+
+    /** \brief Returns a iterator pointing to the end of the container.
+    */
+    LabelContainerIteratorType IteratorEnd();
 
     /** \brief
      * Recall itk::Object::Modified event from a label and send a ModifyLabelEvent

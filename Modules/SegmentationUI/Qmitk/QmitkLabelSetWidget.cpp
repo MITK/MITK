@@ -755,8 +755,8 @@ void QmitkLabelSetWidget::ResetAllTableWidgetItems()
   // add all labels
   m_LabelStringList.clear();
 
-  mitk::LabelSet::LabelContainerConstIteratorType it = workingImage->GetActiveLabelSet()->IteratorBegin();
-  mitk::LabelSet::LabelContainerConstIteratorType end = workingImage->GetActiveLabelSet()->IteratorEnd();
+  mitk::LabelSet::LabelContainerConstIteratorType it = workingImage->GetActiveLabelSet()->IteratorConstBegin();
+  mitk::LabelSet::LabelContainerConstIteratorType end = workingImage->GetActiveLabelSet()->IteratorConstEnd();
 
   int pixelValue =-1;
   while (it != end)

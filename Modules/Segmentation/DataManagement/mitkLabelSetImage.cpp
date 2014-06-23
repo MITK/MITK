@@ -355,8 +355,8 @@ void mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
       this->SetActiveLayer(layer);
       AccessByItk_1(this, ConcatenateProcessing, other);
       mitk::LabelSet * ls = other->GetLabelSet(layer);
-      mitk::LabelSet::LabelContainerConstIteratorType it = ls->IteratorBegin();
-      mitk::LabelSet::LabelContainerConstIteratorType end = ls->IteratorEnd();
+      mitk::LabelSet::LabelContainerConstIteratorType it = ls->IteratorConstBegin();
+      mitk::LabelSet::LabelContainerConstIteratorType end = ls->IteratorConstEnd();
       it++;// skip exterior
       while(it != end)
       {

@@ -44,15 +44,26 @@ void mitk::LabelSet::OnLabelModified()
   Superclass::Modified();
 }
 
-mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorEnd()
+mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstEnd()
 {
   return m_LabelContainer.end();
 }
 
-mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorBegin()
+mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstBegin()
 {
   return m_LabelContainer.begin();
 }
+
+mitk::LabelSet::LabelContainerIteratorType mitk::LabelSet::IteratorEnd()
+{
+  return m_LabelContainer.end();
+}
+
+mitk::LabelSet::LabelContainerIteratorType mitk::LabelSet::IteratorBegin()
+{
+  return m_LabelContainer.begin();
+}
+
 
 int mitk::LabelSet::GetNumberOfLabels() const
 {
@@ -182,8 +193,8 @@ void mitk::LabelSet::RemoveLabel(int pixelValue)
 
 void mitk::LabelSet::RemoveAllLabels()
 {
-  LabelContainerConstIteratorType _it = IteratorBegin();
-  for(;_it!=IteratorEnd();_it++)
+  LabelContainerIteratorType _it = IteratorBegin();
+  for(;_it!=IteratorConstEnd();_it++)
   {
     RemoveLabelEvent.Send();
     m_LabelContainer.erase(_it);

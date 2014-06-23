@@ -416,7 +416,14 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   else if(className == "QmitkCreateSimulationAction")
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
+  }else if(className == "QmitkConvertToMultiLabelSegmentationAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
+  }else if(className == "QmitkCreateMultiLabelSegmentationAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
   }
+
   contextMenuAction->Run( this->GetCurrentSelection() ); // run the action
 }
 

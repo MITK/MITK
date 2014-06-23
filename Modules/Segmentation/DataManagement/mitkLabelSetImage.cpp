@@ -729,7 +729,10 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
     int sourceValue = static_cast<int>(sourceIter.Get());
     targetIter.Set( sourceValue );
 
-    if(!GetActiveLabelSet()->ExistLabel(sourceValue))
+    if(GetActiveLabelSet()->GetNumberOfLabels() > 255)
+      AddLayer();
+
+    if(!ExistLabel(sourceValue))
     {
       std::stringstream name;
       name << "object-" << sourceValue;
@@ -746,6 +749,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
       label->SetValue( sourceValue );
 
       GetLabelSet()->AddLabel(*label);
+      GetLabelSet()->UpdateLookupTable(sourceValue);
     }
 
     ++sourceIter;

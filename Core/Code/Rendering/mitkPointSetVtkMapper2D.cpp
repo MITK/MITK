@@ -217,6 +217,11 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   mitk::PointSet::PointDataContainer::Iterator pointDataIter;
   pointDataIter = itkPointSet->GetPointData()->Begin();
 
+  if (pointDataIter == itkPointSet->GetPointData()->End())
+  {
+    return;
+  }
+
   //check if the list for the PointDataContainer is the same size as the PointsContainer.
   //If not, then the points were inserted manually and can not be visualized according to the PointData (selected/unselected)
   bool pointDataBroken = (itkPointSet->GetPointData()->Size() != itkPointSet->GetPoints()->Size());

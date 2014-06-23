@@ -386,10 +386,12 @@ void mitk::LabelSetImage::ClearBuffer()
   }
 }
 
-bool mitk::LabelSetImage::ExistLabel(const int pixelValue, int layer)
+bool mitk::LabelSetImage::ExistLabel(const int pixelValue)
 {
-  if (layer < 0) layer = GetActiveLayer();
-  return m_LabelSetContainer[layer]->ExistLabel(pixelValue);
+  bool exist = false;
+  for(int lidx = 0 ; lidx < GetNumberOfLayers(); lidx++)
+    exist |= m_LabelSetContainer[lidx]->ExistLabel(pixelValue);
+  return exist;
 }
 
 

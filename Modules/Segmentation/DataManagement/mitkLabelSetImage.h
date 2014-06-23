@@ -130,8 +130,8 @@ public:
   void EraseLabels(std::vector<int>& VectorOfLabelPixelValues, int layer = -1);
 
   /**
-    * \brief    */
-  bool ExistLabel(const int pixelValue, int layer = -1);
+    * \brief  Returns true if the value exists in one of the labelsets*/
+  bool ExistLabel(const int pixelValue);
 
   /**
     * \brief  */

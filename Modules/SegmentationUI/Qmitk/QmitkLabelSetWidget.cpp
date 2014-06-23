@@ -257,12 +257,14 @@ void QmitkLabelSetWidget::OnSetAllLabelsVisible(bool /*value*/)
 {
   GetWorkingImage()->GetLabelSet()->SetAllLabelsVisible(true);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  UpdateAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::OnSetAllLabelsInvisible(bool /*value*/)
 {
   GetWorkingImage()->GetLabelSet()->SetAllLabelsVisible(false);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  UpdateAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::OnSetOnlyActiveLabelVisible(bool /*value*/)
@@ -280,6 +282,8 @@ void QmitkLabelSetWidget::OnSetOnlyActiveLabelVisible(bool /*value*/)
   this->WaitCursorOff();
   if (pos.GetVnlVector().max_value() > 0.0)
     emit goToLabel(pos);
+
+  UpdateAllTableWidgetItems();
 }
 
 

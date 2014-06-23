@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 
 const QString mitk::PythonService::m_TmpDataFileName("temp_mitk_data_file");
+#ifdef USE_MITK_BUILTIN_PYTHON
+  static char* pHome = NULL;
+#endif
 
 mitk::PythonService::PythonService()
   : m_ItkWrappingAvailable( true ), m_OpenCVWrappingAvailable( true ), m_VtkWrappingAvailable( true ), m_ErrorOccured( false )
@@ -46,7 +49,6 @@ mitk::PythonService::PythonService()
       std::string programPath = mitk::IOUtil::GetProgramPath();
       QDir programmDir( QString( programPath.c_str() ).append("/Python") );
       QString pythonCommand;
-
       // Set the pythonpath variable depending if
       // we have an installer or development environment
       if ( programmDir.exists() ) {
@@ -57,14 +59,8 @@ mitk::PythonService::PythonService()
         pythonCommand.append( QString("sys.path.append('%1/Python')\n").arg(programPath.c_str()) );
         pythonCommand.append( QString("sys.path.append('%1/Python/itk')").arg(programPath.c_str()) );
         // set python home if own runtime is deployed
-#ifdef USE_MITK_BUILTIN_PYTHON
-        Py_SetPythonHome((char*)(QString("sys.path.append('%1/Python')\n").arg(programPath.c_str()).toStdString().c_str()) );
-#endif
       } else {
         pythonCommand.append(PYTHONPATH_COMMAND);
-#ifdef USE_MITK_BUILTIN_PYTHON
-        Py_SetPythonHome(PYTHONHOME);
-#endif
       }
 
       if( pythonInitialized )
@@ -72,13 +68,49 @@ mitk::PythonService::PythonService()
       else
         m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut);
 
+// set python home if own runtime is used
+#ifdef USE_MITK_BUILTIN_PYTHON
+      QString pythonHome;
+      if ( programmDir.exists() )
+        pythonHome.append(QString("%1/Python").arg(programPath.c_str()));
+      else
+        pythonHome.append(PYTHONHOME);
+
+      if(pHome) delete[] pHome;
+
+      pHome = new char[pythonHome.toStdString().length() + 1];
+
+      strcpy(pHome,pythonHome.toStdString().c_str());
+      Py_SetPythonHome(pHome);
+      MITK_DEBUG("PythonService") << "PythonHome: " << pHome;
+#endif
+
       MITK_DEBUG("PythonService") << "initalizing python";
       m_PythonManager.initialize();
 
+#ifdef USE_MITK_BUILTIN_PYTHON
+      PyObject* dict = PyDict_New();
+      // Import builtin modules
+      if (PyDict_GetItemString(dict, "__builtins__") == NULL)
+      {
+         PyObject* builtinMod = PyImport_ImportModule("__builtin__");
+         if (builtinMod == NULL ||
+             PyDict_SetItemString(dict, "__builtins__", builtinMod) != 0)
+         {
+           Py_DECREF(dict);
+           Py_XDECREF(dict);
+           return;
+         }
+         Py_DECREF(builtinMod);
+      }
+#endif
+
+      MITK_DEBUG("PythonService")<< "Python Search paths: " << Py_GetPath();
       MITK_DEBUG("PythonService") << "python initalized";
 
       MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
       m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );
+
 
       /*
       //system("export LD_LIBRARY_PATH=/local/muellerm/mitk/bugsquashing/bin-debug/VTK-build/bin:$LD_LIBRARY_PATH");
@@ -149,6 +181,11 @@ mitk::PythonService::~PythonService()
   //m_PythonManager.executeString( "del sys.modules[\"cv2\"]", ctkAbstractPythonManager::SingleInput );
   //m_PythonManager.executeString( "del cv2", ctkAbstractPythonManager::SingleInput );
   MITK_DEBUG("mitk::PythonService") << "destructing PythonService";
+
+#ifdef USE_MITK_BUILTIN_PYTHON
+  if(pHome)
+    delete[] pHome;
+#endif
 }
 
 std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, int commandType)

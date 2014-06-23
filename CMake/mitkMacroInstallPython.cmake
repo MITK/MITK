@@ -85,6 +85,7 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
 
   list(APPEND _python_dirs "${VTK_DIR}/lib")
 
+  # install the python runtime from the superbuild
   if(NOT MITK_USE_SYSTEM_PYTHON)
     list(APPEND _python_dirs "${Python_DIR}/lib")
     #ToDo: install python stuff

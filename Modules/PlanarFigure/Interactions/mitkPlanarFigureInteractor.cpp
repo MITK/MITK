@@ -704,7 +704,7 @@ bool mitk::PlanarFigureInteractor::TransformObjectToDisplay(
   double planeThickness = objectGeometry->GetExtentInMM( 2 );
 
   // TODO: proper handling of distance tolerance
-  if ( displayGeometry->Distance( point3D ) < planeThickness / 3.0 )
+  if ( rendererGeometry->Distance( point3D ) < planeThickness / 3.0 )
   {
     // Project 3D world point onto display geometry
     rendererGeometry->Map( point3D, displayPoint );

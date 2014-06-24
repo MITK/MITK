@@ -51,12 +51,12 @@ bool QmitkXnatObjectEditorInput::operator==(const berry::Object* o) const
   {
     if ( other->GetXnatObject()->parent() )
     {
-      return ( !other->GetName().compare(this->GetName()) ) &&
-        ( !other->GetXnatObject()->parent()->id().toStdString().compare(this->GetXnatObject()->parent()->id().toStdString()) );
+      return (other->GetName() == this->GetName()) &&
+        (other->GetXnatObject()->parent()->id() == this->GetXnatObject()->parent()->id());
     }
     else
     {
-      return ( !other->GetName().compare(this->GetName()) );
+      return (other->GetName() == this->GetName());
     }
   }
   return false;

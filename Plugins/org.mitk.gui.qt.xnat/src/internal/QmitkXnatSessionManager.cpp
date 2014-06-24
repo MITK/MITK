@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkXnatConnectionManager.h"
+#include "QmitkXnatSessionManager.h"
 
 #include "berryPlatform.h"
 #include "berryIPreferences.h"
@@ -25,7 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ctkXnatException.h"
 
-QmitkXnatConnectionManager::QmitkXnatConnectionManager() :
+
+QmitkXnatSessionManager::QmitkXnatSessionManager() :
   m_Session(0)
 {
   m_PreferencesService = berry::Platform::GetServiceRegistry().
@@ -34,9 +35,12 @@ QmitkXnatConnectionManager::QmitkXnatConnectionManager() :
   berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
   berry::IPreferences::Pointer nodeConnectionPref = prefService->GetSystemPreferences()->Node("/XnatConnection");
 
+  QUrl url(QString::fromStdString(nodeConnectionPref->Get("Server Address", "")));
+  url.setPort(QString::fromStdString(nodeConnectionPref->Get("Port", "")).toInt());
+
   ctkXnatLoginProfile profile;
   profile.setName("Default");
-  profile.setServerUrl(QString::fromStdString(nodeConnectionPref->Get("Server Address", "")));
+  profile.setServerUrl(url);
   profile.setUserName(QString::fromStdString(nodeConnectionPref->Get("Username", "")));
   profile.setPassword(QString::fromStdString(nodeConnectionPref->Get("Password", "")));
   profile.setDefault(true);
@@ -44,33 +48,46 @@ QmitkXnatConnectionManager::QmitkXnatConnectionManager() :
   m_Session = new ctkXnatSession(profile);
 }
 
-QmitkXnatConnectionManager::~QmitkXnatConnectionManager()
+QmitkXnatSessionManager::~QmitkXnatSessionManager()
 {
   delete m_Session;
 }
 
-ctkXnatSession* QmitkXnatConnectionManager::GetXnatConnection()
+ctkXnatSession* QmitkXnatSessionManager::GetXnatSession()
 {
+  if(m_Session == NULL) return NULL;
+
   if(!m_Session->isOpen())
   {
-    // Testing the inputs by trying to create a session
-    QString errString;
     try
     {
       m_Session->open();
     }
-    catch(const ctkXnatAuthenticationException& auth)
-    {
-      errString += QString("Test connection failed.\nAuthentication error: Wrong name or password.\n'%1'").arg(auth.message());
-      QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
-      return 0;
-    }
     catch(const ctkException& e)
     {
-      errString += QString("Test connection failed with error code:\n'%1'").arg(e.message());
-      QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
-      return 0;
+      MITK_ERROR << "Just look if your XNAT preferences are ok. Maybe the server is not running.\nTry to use 'Test Connection' funktionality.\n" << e.message().toStdString();
+      return NULL;
     }
   }
   return m_Session;
+}
+
+void QmitkXnatSessionManager::UpdateXnatSession()
+{
+  m_Session->deleteLater();
+
+  berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+  berry::IPreferences::Pointer nodeConnectionPref = prefService->GetSystemPreferences()->Node("/XnatConnection");
+
+  QUrl url(QString::fromStdString(nodeConnectionPref->Get("Server Address", "")));
+  url.setPort(QString::fromStdString(nodeConnectionPref->Get("Port", "")).toInt());
+
+  ctkXnatLoginProfile profile;
+  profile.setName("Default");
+  profile.setServerUrl(url);
+  profile.setUserName(QString::fromStdString(nodeConnectionPref->Get("Username", "")));
+  profile.setPassword(QString::fromStdString(nodeConnectionPref->Get("Password", "")));
+  profile.setDefault(true);
+
+  m_Session = new ctkXnatSession(profile);
 }

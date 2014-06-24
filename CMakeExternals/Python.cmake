@@ -100,27 +100,35 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
   ExternalProject_Add(${proj}
     GIT_REPOSITORY "git://github.com/davidsansome/python-cmake-buildsystem.git"
     GIT_TAG "3c5864f210a8d0ae1196be7c691252e16e459f59"
-    SOURCE_DIR ${proj}-cmake
+    SOURCE_DIR ${proj}-src
+    PREFIX ${proj}-cmake
     BINARY_DIR ${proj}-build
+    INSTALL_DIR ${proj}-install
+    CMAKE_ARGS
+      ${ep_common_args}
+      -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
     CMAKE_CACHE_ARGS
       -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
       -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
-      -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/${proj}-install
       #-DBUILD_TESTING:BOOL=OFF
       -DBUILD_SHARED:BOOL=ON
       -DBUILD_STATIC:BOOL=OFF
       -DUSE_SYSTEM_LIBRARIES:BOOL=ON
       ${additional_cmake_cache_args}
-      ${ep_common_args}
     DEPENDS
       Python-src ${${proj}_DEPENDENCIES}
   )
 
   set(Python_DIR "${CMAKE_BINARY_DIR}/${proj}-install")
-  set(PYTHON_EXECUTABLE "${CMAKE_BINARY_DIR}/${proj}-build/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
-  set(PYTHON_INCLUDE_DIR "${CMAKE_BINARY_DIR}/${proj}-install/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}")
-  set(PYTHON_LIBRARY "${CMAKE_BINARY_DIR}/${proj}-build/lib/${CMAKE_SHARED_LIBRARY_PREFIX}python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-
+  if(UNIX)
+    set(PYTHON_EXECUTABLE "${CMAKE_BINARY_DIR}/${proj}-build/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
+    set(PYTHON_INCLUDE_DIR "${Python_DIR}/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}")
+    set(PYTHON_LIBRARY "${CMAKE_BINARY_DIR}/${proj}-build/lib/${CMAKE_SHARED_LIBRARY_PREFIX}python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  else(WIN32)
+    set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
+    set(PYTHON_INCLUDE_DIR "${Python_DIR}/include")
+    set(PYTHON_LIBRARY "${Python_DIR}/libs/python${PYTHON_MAJOR_VERSION}${PYTHON_MINOR_VERSION}.lib")
+  endif()
  else()
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
  endif()

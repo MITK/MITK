@@ -2,7 +2,7 @@
 # CableSwig
 #-----------------------------------------------------------------------------
 
-if(MITK_USE_Python)
+if(MITK_USE_Python AND UNIX)
 
 # Sanity checks
 if(DEFINED CableSwig_DIR AND NOT EXISTS ${CableSwig_DIR})

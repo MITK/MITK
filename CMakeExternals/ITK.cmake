@@ -9,9 +9,7 @@ endif()
 
 set(proj ITK)
 set(proj_DEPENDENCIES GDCM)
-if(MITK_USE_Python)
-  list(APPEND proj_DEPENDENCIES CableSwig)
-endif()
+
 if(MITK_USE_OpenCV)
   list(APPEND proj_DEPENDENCIES OpenCV)
 endif()
@@ -27,9 +25,9 @@ if(NOT DEFINED ITK_DIR)
         -DCMAKE_USE_PTHREADS:BOOL=OFF)
   endif()
 
-  if(MITK_USE_Python)
+  if(MITK_USE_Python AND UNIX)
     if(NOT MITK_USE_SYSTEM_PYTHON)
-      list(APPEND proj_DEPENDENCIES Python)
+      list(APPEND proj_DEPENDENCIES Python CableSwig)
     endif()
     list(APPEND additional_cmake_args
          -DITK_WRAPPING:BOOL=ON

@@ -1,34 +1,35 @@
 
 macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
+  if(UNIX)
+    # install ITK python wrapping
+    file(GLOB _libs "${ITK_DIR}/lib/_ITK*" )
+    file(GLOB _py_files "${ITK_DIR}/lib/*.py" )
+    file(GLOB _py_generators "${ITK_DIR}/Wrapping/Generators/Python/*.py")
 
-  # install ITK python wrapping
-  file(GLOB _libs "${ITK_DIR}/lib/_ITK*" )
-  file(GLOB _py_files "${ITK_DIR}/lib/*.py" )
-  file(GLOB _py_generators "${ITK_DIR}/Wrapping/Generators/Python/*.py")
-
-  install(FILES ${_libs} DESTINATION bin/Python/itk)
-  install(FILES ${_py_files} DESTINATION bin/bin/Python/itk)
-  install(FILES ${_py_generators} DESTINATION bin/Python/itk)
-  install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/Configuration"
+    install(FILES ${_libs} DESTINATION bin/Python/itk)
+    install(FILES ${_py_files} DESTINATION bin/bin/Python/itk)
+    install(FILES ${_py_generators} DESTINATION bin/Python/itk)
+    install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/Configuration"
           DESTINATION bin/Python/itk
           USE_SOURCE_PERMISSIONS
           COMPONENT Runtime)
-  install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/itkExtras"
+    install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/itkExtras"
           DESTINATION bin/Python/itk
           USE_SOURCE_PERMISSIONS
           COMPONENT Runtime)
 
-  foreach(lib ${_libs})
-    get_filename_component(_libname "${lib}" NAME)
-    list(APPEND _python_libs "Python/itk/${_libname}")
+    foreach(lib ${_libs})
+      get_filename_component(_libname "${lib}" NAME)
+      list(APPEND _python_libs "Python/itk/${_libname}")
 
-    if(UNIX AND NOT APPLE)
-      install(CODE "file(RPATH_REMOVE
+      if(UNIX AND NOT APPLE)
+        install(CODE "file(RPATH_REMOVE
                            FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/itk/${_libname}\")")
-    endif()
-  endforeach()
+      endif()
+    endforeach()
 
-  list(APPEND _python_dirs "${ITK_DIR}/lib")
+    list(APPEND _python_dirs "${ITK_DIR}/lib")
+  endif()
 
   # install OpenCV python wrapping
   if(MITK_USE_OpenCV)
@@ -69,12 +70,19 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
     endif()
     get_filename_component(_filepath "${_target_lib}" PATH)
 
-    install(FILES "${_filepath}/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}" DESTINATION bin)
-
-    install(CODE "file(RPATH_REMOVE
+    if(UNIX)
+      install(FILES "${_filepath}/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}" DESTINATION bin)
+      if( NOT APPLE )
+        install(CODE "file(RPATH_REMOVE
                          FILE \"\${CMAKE_INSTALL_PREFIX}/bin/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}\")")
-
-    list(APPEND _python_libs "${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+      endif()
+      list(APPEND _python_libs "${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    else(WIN32)
+      install(FILES "${_filepath}/${_target}.pyd" DESTINATION bin)
+      install(FILES "${_target_lib}" DESTINATION bin)
+      get_filename_component(_filename "${_target_lib}" NAME)
+      list(APPEND _python_libs "${_filename}")
+    endif()
   endforeach()
 
   # install vtk python. This folder contains all *.py files for VTK module loading.
@@ -87,13 +95,27 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
 
   # install the python runtime from the superbuild
   if(NOT MITK_USE_SYSTEM_PYTHON)
-    list(APPEND _python_dirs "${Python_DIR}/lib")
-    #ToDo: install python stuff
-    install(DIRECTORY "${Python_DIR}/lib/python2.7"
+    if(UNIX)
+      list(APPEND _python_dirs "${Python_DIR}/lib")
+      # install python stuff
+      install(DIRECTORY "${Python_DIR}/lib/python2.7"
             DESTINATION bin/Python/lib
             USE_SOURCE_PERMISSIONS
             COMPONENT Runtime)
-    install(FILES "${Python_DIR}/include/python2.7/pyconfig.h" DESTINATION bin/Python/include/python2.7)
+      install(FILES "${Python_DIR}/include/python2.7/pyconfig.h" DESTINATION bin/Python/include/python2.7)
+    else(WIN32)
+      list(APPEND _python_dirs "${Python_DIR}/libs")
+      list(APPEND _python_dirs "${Python_DIR}/bin")
+
+      install(DIRECTORY "${Python_DIR}/Lib"
+            DESTINATION bin/Python
+            USE_SOURCE_PERMISSIONS
+            COMPONENT Runtime)
+      install(DIRECTORY "${Python_DIR}/include"
+            DESTINATION bin/Python
+            USE_SOURCE_PERMISSIONS
+            COMPONENT Runtime)
+    endif()
   endif()
 
   list(REMOVE_DUPLICATES _python_dirs)

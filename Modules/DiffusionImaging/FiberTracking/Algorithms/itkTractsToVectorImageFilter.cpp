@@ -537,6 +537,9 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
             m_MaskImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
             DirectionType dir = directions.at(i);
 
+            if (dir.magnitude()<0.4)
+                continue;
+
             // set direction image pixel
             ItkDirectionImageType::Pointer directionImage = m_DirectionImageContainer->GetElement(i);
             Vector< float, 3 > pixel;

@@ -154,8 +154,6 @@ public:
     image->SetClonedGeometry(planegeometry);
 
     mitk::BaseGeometry::Pointer imageGeometry = image->GetGeometry();
-    itk::ScalableAffineTransform<mitk::ScalarType,3>* frameNew = imageGeometry->GetIndexToWorldTransform();
-    itk::ScalableAffineTransform<mitk::ScalarType,3>* frameOld = planegeometry->GetIndexToWorldTransform();
 
     bool matrixEqual = mitk::Equal(imageGeometry, planegeometry, mitk::eps, false);
 

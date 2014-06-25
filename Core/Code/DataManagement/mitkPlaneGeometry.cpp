@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   PlaneGeometry::PlaneGeometry()
-    : m_ScaleFactorMMPerUnitX( 1.0 ),
+    : Superclass(), m_ScaleFactorMMPerUnitX( 1.0 ),
     m_ScaleFactorMMPerUnitY( 1.0 ),
     m_ReferenceGeometry( NULL )
   {

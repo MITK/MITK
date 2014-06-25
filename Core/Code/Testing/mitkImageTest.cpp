@@ -156,19 +156,10 @@ public:
     mitk::BaseGeometry::Pointer imageGeometry = image->GetGeometry();
     itk::ScalableAffineTransform<mitk::ScalarType,3>* frameNew = imageGeometry->GetIndexToWorldTransform();
     itk::ScalableAffineTransform<mitk::ScalarType,3>* frameOld = planegeometry->GetIndexToWorldTransform();
-    bool matrixEqual = true;
-    for (int i = 0; i < 16; ++i)
-    {
-      double valueNew = *(frameNew->GetMatrix()[i]);
-      double valueOld = *(frameOld->GetMatrix()[i]);
 
-      //MITK_INFO << "Index: " << i << " Old: " << valueOld << " New: " << valueNew << " Difference:" << valueOld-valueNew<< std::endl;
-      matrixEqual = matrixEqual && mitk::Equal(valueNew, valueOld, mitk::eps);
-    }
+    bool matrixEqual = mitk::Equal(imageGeometry, planegeometry, mitk::eps, false);
 
-    // Disabled because this test fails on the dashboard. Does not fail on my machine.
-    // See Bug 6505
-    //    MITK_TEST_CONDITION(matrixEqual, "Matrix elements of cloned matrix equal original matrix");
+    MITK_TEST_CONDITION(matrixEqual, "Matrix elements of cloned matrix equal original matrix");
 
   }
 };

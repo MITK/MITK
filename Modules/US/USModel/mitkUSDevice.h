@@ -22,12 +22,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MitkUS
 #include "mitkUSProbe.h"
-#include "mitkUSImageMetadata.h"
 #include <MitkUSExports.h>
 #include "mitkUSImageSource.h"
 
 // MITK
 #include <mitkCommon.h>
+#include <mitkMessage.h>
 #include <mitkImageSource.h>
 
 // ITK
@@ -38,6 +38,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceInterface.h>
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
+
+// DEPRECATED
+#include "mitkUSImageMetadata.h"
 
 namespace itk {
 template<class T> class SmartPointer;
@@ -90,6 +93,9 @@ class USControlInterfaceDoppler;
     struct PropertyKeys
     {
       const std::string US_INTERFACE_NAME;       // Common Interface name of all US Devices. Used to refer to this device via Microservices
+      const std::string US_PROPKEY_MANUFACTURER;
+      const std::string US_PROPKEY_NAME;
+      const std::string US_PROPKEY_COMMENT;
       const std::string US_PROPKEY_LABEL;        // Human readable text represntation of this device
       const std::string US_PROPKEY_ISCONNECTED;  // Whether this device is connected or not.
       const std::string US_PROPKEY_ISACTIVE;     // Whether this device is active or not.
@@ -106,7 +112,10 @@ class USControlInterfaceDoppler;
 
       PropertyKeys()
         : US_INTERFACE_NAME("org.mitk.services.UltrasoundDevice"),
+          US_PROPKEY_MANUFACTURER(US_INTERFACE_NAME + ".manufacturer"),
+          US_PROPKEY_NAME(US_INTERFACE_NAME + ".name"),
           US_PROPKEY_LABEL(US_INTERFACE_NAME + ".label"),
+          US_PROPKEY_COMMENT(US_INTERFACE_NAME + ".comment"),
           US_PROPKEY_ISCONNECTED(US_INTERFACE_NAME + ".isConnected"),
           US_PROPKEY_ISACTIVE(US_INTERFACE_NAME + ".isActive"),
           US_PROPKEY_CLASS(US_INTERFACE_NAME + ".class"),
@@ -119,6 +128,12 @@ class USControlInterfaceDoppler;
           US_PROPKEY_BMODE_DYNAMIC_RANGE(US_INTERFACE_NAME + ".bmode.dynamicRange")
       {}
     };
+
+    /**
+     * \brief Event for being notified about changes of the micro service properties.
+     * This event can be used if no micro service context is available.
+     */
+    mitkNewMessage2Macro(PropertyChanged, const std::string&, const std::string&)
 
     /**
      * \return keys for the microservice properties of ultrasound devices
@@ -256,11 +271,23 @@ class USControlInterfaceDoppler;
     /* @return Returns the area that will be cropped from the US image. Is disabled / [0,0,0,0] by default. */
     mitk::USDevice::USImageCropArea GetCropArea();
 
-    std::string GetDeviceManufacturer();
-    std::string GetDeviceModel();
-    std::string GetDeviceComment();
+    /** \brief Deprecated -> use GetManufacturer() instead */
+    DEPRECATED(std::string GetDeviceManufacturer());
+    /** \brief Deprecated -> use GetName() instead */
+    DEPRECATED(std::string GetDeviceModel());
+    /** \brief Deprecated -> use GetCommend() instead */
+    DEPRECATED(std::string GetDeviceComment());
 
-    itkGetMacro(DeviceState, DeviceStates);
+    itkGetMacro(Manufacturer, std::string);
+    itkGetMacro(Name, std::string);
+    itkGetMacro(Comment, std::string);
+
+    void SetManufacturer(std::string manufacturer);
+    void SetName(std::string name);
+    void SetComment(std::string comment);
+
+    itkGetMacro(DeviceState, DeviceStates)
+    itkGetMacro(ServiceProperties, us::ServiceProperties)
 
     void GrabImage();
 
@@ -354,15 +381,6 @@ class USControlInterfaceDoppler;
     virtual void OnFreeze(bool) { }
 
     /**
-    * \brief This metadata set is privately used to imprint USImages with Metadata later.
-    * At instantiation time, it only contains Information about the Device.
-    * At scan time, it integrates this data with the probe information and
-    * imprints it on the produced images. This field is intentionally hidden
-    * from outside interference.
-    */
-    mitk::USImageMetadata::Pointer m_Metadata;
-
-    /**
     * \brief Enforces minimal Metadata to be set.
     */
     USDevice(std::string manufacturer, std::string model);
@@ -370,7 +388,7 @@ class USControlInterfaceDoppler;
     /**
     * \brief Constructs a device with the given Metadata. Make sure the Metadata contains meaningful content!
     */
-    USDevice(mitk::USImageMetadata::Pointer metadata);
+    DEPRECATED(USDevice(mitk::USImageMetadata::Pointer metadata));
 
     virtual ~USDevice();
 
@@ -383,6 +401,10 @@ class USControlInterfaceDoppler;
     std::string GetServicePropertyLabel();
 
   private:
+
+    std::string m_Manufacturer;
+    std::string m_Name;
+    std::string m_Comment;
 
     bool m_SpawnAcquireThread;
 

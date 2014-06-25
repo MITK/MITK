@@ -95,17 +95,18 @@ void UltrasoundSupport::DisplayImage()
   m_Device->Update();
 
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
-  if (! m_ImageAlreadySetToNode && curOutput.IsNotNull() && curOutput->IsInitialized())
-  {
-    m_Node->SetData(curOutput);
-    m_ImageAlreadySetToNode = true;
-  }
 
-  if ( curOutput.GetPointer() != m_Node->GetData() )
+  if ( m_ImageAlreadySetToNode && ( curOutput.GetPointer() != m_Node->GetData() ) )
   {
     MITK_INFO << "Data Node of the ultrasound image stream was changed by another plugin. Stop viewing.";
     this->StopViewing();
     return;
+  }
+
+  if (! m_ImageAlreadySetToNode && curOutput.IsNotNull() && curOutput->IsInitialized())
+  {
+    m_Node->SetData(curOutput);
+    m_ImageAlreadySetToNode = true;
   }
 
   this->RequestRenderWindowUpdate();
@@ -311,8 +312,8 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 
   ctkServiceReference service = event.getServiceReference();
 
-  if ( m_Device->GetDeviceManufacturer() != service.getProperty(mitk::USImageMetadata::PROP_DEV_MANUFACTURER).toString().toStdString()
-    && m_Device->GetDeviceModel() != service.getProperty(mitk::USImageMetadata::PROP_DEV_MODEL).toString().toStdString() )
+  if ( m_Device->GetManufacturer() != service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_MANUFACTURER)).toString().toStdString()
+    && m_Device->GetName() != service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_NAME)).toString().toStdString() )
   {
     return;
   }
@@ -320,6 +321,17 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
   if ( ! m_Device->GetIsActive() && m_Timer->isActive() )
   {
     this->StopViewing();
+  }
+
+  if ( m_CurrentDynamicRange != service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE)).toDouble() )
+  {
+    m_CurrentDynamicRange = service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE)).toDouble();
+
+    // update level window for the current dynamic range
+    mitk::LevelWindow levelWindow;
+    m_Node->GetLevelWindow(levelWindow);
+    levelWindow.SetAuto(m_Image, true, true);
+    m_Node->SetLevelWindow(levelWindow);
   }
 }
 

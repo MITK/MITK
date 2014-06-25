@@ -84,9 +84,9 @@ std::vector<mitk::USDevice::Pointer> mitk::USDevicePersistence::RestoreLastDevic
 
 QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Pointer d)
 {
-  QString manufacturer = d->GetDeviceManufacturer().c_str();
-  QString model = d->GetDeviceModel().c_str();
-  QString comment = d->GetDeviceComment().c_str();
+  QString manufacturer = d->GetManufacturer().c_str();
+  QString model = d->GetName().c_str();
+  QString comment = d->GetComment().c_str();
   int source = d->GetDeviceID();
   std::string file = d->GetFilePath();
   if (file == "") file = "none";
@@ -154,23 +154,17 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
   cropArea.bottomRightX = (QString(data.at(11).c_str())).toInt();
   cropArea.bottomRightY = (QString(data.at(12).c_str())).toInt();
 
-  // Assemble Metadata
-  mitk::USImageMetadata::Pointer metadata = mitk::USImageMetadata::New();
-  metadata->SetDeviceManufacturer(manufacturer);
-  metadata->SetDeviceComment(comment);
-  metadata->SetDeviceModel(model);
-  metadata->SetProbeName("");
-  metadata->SetZoom("");
-
   // Create Device
   mitk::USVideoDevice::Pointer returnValue;
   if (file == "none")
   {
-    returnValue = mitk::USVideoDevice::New(source, metadata);
+    returnValue = mitk::USVideoDevice::New(source, manufacturer, model);
+    returnValue->SetComment(comment);
   }
   else
   {
-    returnValue = mitk::USVideoDevice::New(file, metadata);
+    returnValue = mitk::USVideoDevice::New(file, manufacturer, model);
+    returnValue->SetComment(comment);
   }
 
   mitk::USImageVideoSource::Pointer imageSource =

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkUSNewVideoDeviceWidget.h>
 
 //QT headers
+#include <QFileDialog>
 
 //mitk headers
 
@@ -29,13 +30,6 @@ QmitkUSNewVideoDeviceWidget::QmitkUSNewVideoDeviceWidget(QWidget* parent, Qt::Wi
 {
   m_Controls = NULL;
   CreateQtPartControl(this);
-
-  //disable a few UI components which are not needed at the moment
-  m_Controls->probe_label->setVisible(false);
-  m_Controls->probe_label2->setVisible(false);
-  m_Controls->zoom_label->setVisible(false);
-  m_Controls->m_Probe->setVisible(false);
-  m_Controls->m_Zoom->setVisible(false);
 }
 
 QmitkUSNewVideoDeviceWidget::~QmitkUSNewVideoDeviceWidget()
@@ -63,30 +57,33 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
     connect( m_Controls->m_BtnCancel, SIGNAL(clicked()), this, SLOT(OnClickedCancel()) );
     connect( m_Controls->m_RadioDeviceSource, SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
     connect( m_Controls->m_RadioFileSource,   SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
+    connect( m_Controls->m_OpenFileButton, SIGNAL(clicked()), this, SLOT(OnOpenFileButtonClicked()) );
   }
 }
 
 ///////////// Methods & Slots Handling Direct Interaction /////////////////
 
-void QmitkUSNewVideoDeviceWidget::OnClickedDone(){
+void QmitkUSNewVideoDeviceWidget::OnClickedDone()
+{
   m_Active = false;
-
-  // Assemble Metadata
-  mitk::USImageMetadata::Pointer metadata = mitk::USImageMetadata::New();
-  metadata->SetDeviceComment(m_Controls->m_Comment->text().toStdString());
-  metadata->SetDeviceModel(m_Controls->m_Model->text().toStdString());
-  metadata->SetDeviceManufacturer(m_Controls->m_Manufacturer->text().toStdString());
-  metadata->SetProbeName(m_Controls->m_Probe->text().toStdString());
-  metadata->SetZoom(m_Controls->m_Zoom->text().toStdString());
 
   // Create Device
   mitk::USVideoDevice::Pointer newDevice;
-  if (m_Controls->m_RadioDeviceSource->isChecked()){
-    int deviceID = m_Controls->m_DeviceSelector->value();
-    newDevice = mitk::USVideoDevice::New(deviceID, metadata);
-  } else {
-    std::string filepath = m_Controls->m_FilePathSelector->text().toStdString();
-    newDevice = mitk::USVideoDevice::New(filepath, metadata);
+  if (m_Controls->m_RadioDeviceSource->isChecked())
+  {
+    newDevice = mitk::USVideoDevice::New(
+      m_Controls->m_DeviceSelector->value(),
+      m_Controls->m_Manufacturer->text().toStdString(),
+      m_Controls->m_Model->text().toStdString());
+    newDevice->SetComment(m_Controls->m_Comment->text().toStdString());
+  }
+  else
+  {
+    newDevice = mitk::USVideoDevice::New(
+      m_Controls->m_FilePathSelector->text().toStdString(),
+      m_Controls->m_Manufacturer->text().toStdString(),
+      m_Controls->m_Model->text().toStdString());
+    newDevice->SetComment(m_Controls->m_Comment->text().toStdString());
   }
 
   // get USImageVideoSource from new device
@@ -126,6 +123,17 @@ void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection(){
   m_Controls->m_DeviceSelector->setEnabled(m_Controls->m_RadioDeviceSource->isChecked());
 }
 
+void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()
+{
+  QString fileName = QFileDialog::getOpenFileName(NULL, "Open Video File");
+  if ( fileName.isNull() ) { return; } // user pressed cancel
+
+  m_Controls->m_FilePathSelector->setText(fileName);
+
+  m_Controls->m_RadioFileSource->setChecked(true);
+  this->OnDeviceTypeSelection();
+}
+
 ///////////////// Methods & Slots Handling Logic //////////////////////////
 
 void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
@@ -142,7 +150,6 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
 {
   m_TargetDevice = 0;
-  InitFields(mitk::USImageMetadata::New());
   m_Active = true;
 }
 
@@ -153,12 +160,4 @@ QListWidgetItem* QmitkUSNewVideoDeviceWidget::ConstructItemFromDevice(mitk::USDe
   std::string text = device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
   result->setText(text.c_str());
   return result;
-}
-
-void QmitkUSNewVideoDeviceWidget::InitFields(mitk::USImageMetadata::Pointer metadata){
-  this->m_Controls->m_Manufacturer->setText (metadata->GetDeviceManufacturer().c_str());
-  this->m_Controls->m_Model->setText (metadata->GetDeviceModel().c_str());
-  this->m_Controls->m_Comment->setText (metadata->GetDeviceComment().c_str());
-  this->m_Controls->m_Probe->setText (metadata->GetProbeName().c_str());
-  this->m_Controls->m_Zoom->setText (metadata->GetZoom().c_str());
 }

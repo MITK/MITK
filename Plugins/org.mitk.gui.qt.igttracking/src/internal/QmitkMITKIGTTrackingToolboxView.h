@@ -154,6 +154,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     mitk::DataNode::Pointer m_TrackingVolumeNode;        ///>holds the data node of the tracking volume if volume is visualized
     bool lastTrackingVolumeState;                        ///>temporary holds the state of the tracking volume (activated/not activated) during some methods
 
+    QString m_ToolStorageFilename; ///>stores the filename of the current tool storage
+
     /** @brief Shows a message box with the text given as parameter. */
     void MessageBox(std::string s);
 
@@ -175,6 +177,15 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     */
    void ReplaceCurrentToolStorage(mitk::NavigationToolStorage::Pointer newStorage, std::string newStorageName);
 
+   /**
+    * \brief Stores the properties of some QWidgets (and the tool storage file name) to QSettings.
+    */
+   void StoreUISettings();
+
+   /**
+    * \brief Loads the properties of some QWidgets (and the tool storage file name) from QSettings.
+    */
+   void LoadUISettings();
    //members for worker thread
    QThread* m_WorkerThread;
    QmitkMITKIGTTrackingToolboxViewWorker* m_Worker;

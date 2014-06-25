@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNavigationDataSetWriterCSV.h"
-
+#include <fstream>
 
 void mitk::NavigationDataSetWriterCSV::Write (std::string path, mitk::NavigationDataSet::Pointer data)
 {

@@ -133,6 +133,11 @@ public:
     * \brief  Returns true if the value exists in one of the labelsets*/
   bool ExistLabel(const int pixelValue);
 
+
+  /**
+    * \brief  Returns true if the labelset exists*/
+  bool ExistLabelSet(const int layer);
+
   /**
     * \brief  */
   mitk::Label* GetActiveLabel(int layer = -1);

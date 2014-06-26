@@ -394,6 +394,11 @@ bool mitk::LabelSetImage::ExistLabel(const int pixelValue)
   return exist;
 }
 
+bool mitk::LabelSetImage::ExistLabelSet(const int layer)
+{
+  return layer >= 0 && layer < m_LabelSetContainer.size();
+}
+
 
 void mitk::LabelSetImage::MergeLabel(int pixelValue, int layer)
 {

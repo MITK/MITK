@@ -1,35 +1,5 @@
 
 macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
-  #  if(UNIX)
-  #    # install ITK python wrapping
-  #    file(GLOB _libs "${ITK_DIR}/lib/_ITK*" )
-  #    file(GLOB _py_files "${ITK_DIR}/lib/*.py" )
-  #    file(GLOB _py_generators "${ITK_DIR}/Wrapping/Generators/Python/*.py")
-  #
-  #    install(FILES ${_libs} DESTINATION bin/Python/itk)
-  #    install(FILES ${_py_files} DESTINATION bin/bin/Python/itk)
-  #    install(FILES ${_py_generators} DESTINATION bin/Python/itk)
-  #    install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/Configuration"
-  #          DESTINATION bin/Python/itk
-  #          USE_SOURCE_PERMISSIONS
-  #          COMPONENT Runtime)
-  #    install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/itkExtras"
-  #          DESTINATION bin/Python/itk
-  #          USE_SOURCE_PERMISSIONS
-  #          COMPONENT Runtime)
-  #
-  #    foreach(lib ${_libs})
-  #      get_filename_component(_libname "${lib}" NAME)
-  #      list(APPEND _python_libs "Python/itk/${_libname}")
-  #
-  #      if(UNIX AND NOT APPLE)
-  #        install(CODE "file(RPATH_REMOVE
-  #                           FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/itk/${_libname}\")")
-  #      endif()
-  #    endforeach()
-  #
-  #    list(APPEND _python_dirs "${ITK_DIR}/lib")
-  #  endif()
   if(UNIX)
     set(PYTHON_LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
   else(WIN32)

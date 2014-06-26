@@ -1,0 +1,10 @@
+<?xml version="1.0" standalone=no>
+<DICOMFileReader
+  label="2013 default sorting"
+  description="Sort images by Image Position, then by Acquisition Number, Acq. Time, Trigger time, group tilted images"
+  class="ClassicDICOMSeriesReader"
+  version="1"
+  group3DnT="false"
+  fixTiltByShearing="true"
+  >
+</DICOMFileReader>

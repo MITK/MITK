@@ -20,7 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsCalculator.h"
 #include "mitkPlanarPolygon.h"
 
-#include "mitkDicomSeriesReader.h"
+#include "mitkClassicDICOMSeriesReader.h"
+
+#include "vtkStreamingDemandDrivenPipeline.h"
+
+#include <mitkDataNodeFactory.h>
+#include <mitkStandaloneDataStorage.h>
+
 
 /**
  * \brief Test class for mitkImageStatisticsCalculator
@@ -87,15 +93,18 @@ void mitkImageStatisticsCalculatorTestSuite::setUp()
     MITK_TEST_FAILED_MSG( << "Could not find test file" )
   }
 
-  mitk::DicomSeriesReader::StringContainer file;
-  file.push_back( filename );
+  MITK_TEST_OUTPUT(<< "Loading test image '" << filename << "'")
+  mitk::StringList files;
+  files.push_back( filename );
 
-  mitk::DicomSeriesReader* reader = new mitk::DicomSeriesReader;
+  mitk::ClassicDICOMSeriesReader::Pointer reader = mitk::ClassicDICOMSeriesReader::New();
+  reader->SetInputFiles( files );
+  reader->AnalyzeInputFiles();
+  reader->LoadImages();
+  MITK_TEST_CONDITION_REQUIRED( reader->GetNumberOfOutputs() == 1, "Loaded one result from file" );
 
-  mitk::DataNode::Pointer node = reader->LoadDicomSeries( file, false, false );
-  m_Image = dynamic_cast<mitk::Image*>( node->GetData() );
-
-  MITK_TEST_CONDITION_REQUIRED( m_Image.IsNotNull(), "Loading test image" )
+  m_Image = reader->GetOutput(0).GetMitkImage();
+  MITK_TEST_CONDITION_REQUIRED( m_Image.IsNotNull(), "Loaded an mitk::Image" );
 
   m_Geometry = m_Image->GetSlicedGeometry()->GetPlaneGeometry(0);
   MITK_TEST_CONDITION_REQUIRED( m_Geometry.IsNotNull(), "Getting image geometry" )

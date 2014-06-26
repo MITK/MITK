@@ -5,6 +5,8 @@ set(module_dirs
     AlgorithmsExt
     MapperExt
     IOExt
+    DICOMReader
+    DICOMTesting
     Qt4Qt5TestModule
     SceneSerializationBase
     PlanarFigure

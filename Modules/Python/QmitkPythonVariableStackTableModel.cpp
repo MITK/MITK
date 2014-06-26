@@ -94,9 +94,9 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
             }
             if( !exportAsCvImage )
             {
-              if( m_PythonService->IsItkPythonWrappingAvailable() )
+              if( m_PythonService->IsSimpleItkPythonWrappingAvailable() )
               {
-                m_PythonService->CopyToPythonAsItkImage( mitkImage, MITK_IMAGE_VAR_NAME.toStdString() );
+                m_PythonService->CopyToPythonAsSimpleItkImage( mitkImage, MITK_IMAGE_VAR_NAME.toStdString() );
                 ++i;
               }
               else

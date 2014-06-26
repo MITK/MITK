@@ -305,7 +305,7 @@ QString mitk::PythonService::GetTempDataFileName(const std::string& ext) const
     return fileName;
 }
 
-bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const std::string &stdvarName)
+bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const std::string &stdvarName)
 {
   QString varName = QString::fromStdString( stdvarName );
   // save image
@@ -337,7 +337,7 @@ bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const std::
   return false;
 }
 
-mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const std::string &stdvarName)
+mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std::string &stdvarName)
 {
   QString varName = QString::fromStdString( stdvarName );
     mitk::Image::Pointer mitkImage;
@@ -520,7 +520,7 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
   return true;
 }
 
-bool mitk::PythonService::IsItkPythonWrappingAvailable()
+bool mitk::PythonService::IsSimpleItkPythonWrappingAvailable()
 {
   this->Execute( "import SimpleITK as sitk\n", IPythonService::SINGLE_LINE_COMMAND );
   //this->Execute( "import itk\n", IPythonService::SINGLE_LINE_COMMAND );

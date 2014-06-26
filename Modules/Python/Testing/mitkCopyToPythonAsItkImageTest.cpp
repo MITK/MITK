@@ -37,15 +37,15 @@ int mitkCopyToPythonAsItkImageTest(int /*argc*/, char* argv[])
   //get the service which is generated in the PythonModuleActivator
   us::ServiceReference<mitk::IPythonService> serviceRef = context->GetServiceReference<mitk::IPythonService>();
   mitk::PythonService* pythonService = dynamic_cast<mitk::PythonService*>( context->GetService(serviceRef) );
-  MITK_TEST_CONDITION(pythonService->IsItkPythonWrappingAvailable() == true, "Is Python available?");
+  MITK_TEST_CONDITION(pythonService->IsSimpleItkPythonWrappingAvailable() == true, "Is Python available?");
 
   mitk::Image::Pointer testImage = mitk::IOUtil::LoadImage(std::string(argv[1]));
 
   //give it a name in python
   std::string nameOfImageInPython("mitkImage");
 
-  MITK_TEST_CONDITION( pythonService->CopyToPythonAsItkImage( testImage, nameOfImageInPython) == true, "Valid image copied to python import should return true.");
-  mitk::Image::Pointer pythonImage = pythonService->CopyItkImageFromPython(nameOfImageInPython);
+  MITK_TEST_CONDITION( pythonService->CopyToPythonAsSimpleItkImage( testImage, nameOfImageInPython) == true, "Valid image copied to python import should return true.");
+  mitk::Image::Pointer pythonImage = pythonService->CopySimpleItkImageFromPython(nameOfImageInPython);
 
 
   mitk::Index3D index;

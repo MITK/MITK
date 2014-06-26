@@ -79,7 +79,7 @@ void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QMode
 
     if( type.startsWith("Image") )
     {
-      mitkImage = m_PythonService->CopyItkImageFromPython(varName.toStdString());
+      mitkImage = m_PythonService->CopySimpleItkImageFromPython(varName.toStdString());
     }
     else if( type.startsWith("numpy.ndarray") )
     {

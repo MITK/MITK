@@ -77,7 +77,7 @@ void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QMode
     mitk::Image::Pointer mitkImage;
     mitk::Surface::Pointer mitkSurface;
 
-    if( type.startsWith("itkImage") )
+    if( type.startsWith("Image") )
     {
       mitkImage = m_PythonService->CopyItkImageFromPython(varName.toStdString());
     }

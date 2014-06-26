@@ -79,7 +79,6 @@ set(external_projects
   VTK
   ACVD
   GDCM
-  CableSwig
   OpenCV
   Poco
   ITK
@@ -89,6 +88,8 @@ set(external_projects
   SOFA
   MITKData
   Qwt
+  Swig
+  SimpleITK
   )
 
 # Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
@@ -105,7 +106,6 @@ set(MITK_USE_ITK 1)
 set(MITK_USE_VTK 1)
 
 # Semi-hard dependencies, enabled by user-controlled variables
-set(MITK_USE_CableSwig ${MITK_USE_Python})
 if(MITK_USE_QT)
   if(MITK_USE_Qt4)
     set(MITK_USE_Qwt 1)
@@ -312,6 +312,7 @@ ExternalProject_Add(${proj}
     ${MITK-Data_DEPENDS}
     ${Qwt_DEPENDS}
     ${Qxt_DEPENDS}
+    ${SimpleITK_DEPENDS}
 )
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
@@ -435,6 +436,7 @@ ExternalProject_Add(${proj}
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
     -DQwt_DIR:PATH=${Qwt_DIR}
     -DQxt_DIR:PATH=${Qxt_DIR}
+    -DSimpleITK_DIR:PATH=${SimpleITK_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}

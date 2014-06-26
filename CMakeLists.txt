@@ -201,6 +201,7 @@ env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 env_option(MITK_USE_Poco "Use the Poco library" ON)
 env_option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 env_option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
+env_option(MITK_USE_SimpleITK "Use the SimpleITK library" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 
 option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
@@ -224,6 +225,7 @@ if(MITK_USE_Python)
     FIND_PACKAGE(PythonLibs REQUIRED)
     FIND_PACKAGE(PythonInterp REQUIRED)
   endif()
+  set(MITK_USE_SimpleITK ON CACHE BOOL "Use the SimpleITK library" FORCE)
 endif()
 
 if(MITK_USE_Boost)
@@ -432,7 +434,6 @@ include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
 include(mitkMacroGetPMDPlatformString)
-include(mitkMacroInstallPython)
 
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
@@ -828,6 +829,12 @@ if(MITK_USE_BLUEBERRY)
     file(REMOVE ${MITK_PLUGIN_USE_FILE})
     set(MITK_PLUGIN_USE_FILE )
   endif()
+
+  # 11.3.13, change, muellerm: activate python bundle if python and blueberry is active
+  if( MITK_USE_Python )
+    set(MITK_BUILD_org.mitk.gui.qt.python ON)
+  endif()
+
 endif()
 
 #-----------------------------------------------------------------------------

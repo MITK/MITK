@@ -1,34 +1,56 @@
 
 macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
+  #  if(UNIX)
+  #    # install ITK python wrapping
+  #    file(GLOB _libs "${ITK_DIR}/lib/_ITK*" )
+  #    file(GLOB _py_files "${ITK_DIR}/lib/*.py" )
+  #    file(GLOB _py_generators "${ITK_DIR}/Wrapping/Generators/Python/*.py")
+  #
+  #    install(FILES ${_libs} DESTINATION bin/Python/itk)
+  #    install(FILES ${_py_files} DESTINATION bin/bin/Python/itk)
+  #    install(FILES ${_py_generators} DESTINATION bin/Python/itk)
+  #    install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/Configuration"
+  #          DESTINATION bin/Python/itk
+  #          USE_SOURCE_PERMISSIONS
+  #          COMPONENT Runtime)
+  #    install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/itkExtras"
+  #          DESTINATION bin/Python/itk
+  #          USE_SOURCE_PERMISSIONS
+  #          COMPONENT Runtime)
+  #
+  #    foreach(lib ${_libs})
+  #      get_filename_component(_libname "${lib}" NAME)
+  #      list(APPEND _python_libs "Python/itk/${_libname}")
+  #
+  #      if(UNIX AND NOT APPLE)
+  #        install(CODE "file(RPATH_REMOVE
+  #                           FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/itk/${_libname}\")")
+  #      endif()
+  #    endforeach()
+  #
+  #    list(APPEND _python_dirs "${ITK_DIR}/lib")
+  #  endif()
   if(UNIX)
-    # install ITK python wrapping
-    file(GLOB _libs "${ITK_DIR}/lib/_ITK*" )
-    file(GLOB _py_files "${ITK_DIR}/lib/*.py" )
-    file(GLOB _py_generators "${ITK_DIR}/Wrapping/Generators/Python/*.py")
+    set(PYTHON_LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
+  else(WIN32)
+    set(PYTHON_LIB_SUFFIX .pyd)
+  endif()
 
-    install(FILES ${_libs} DESTINATION bin/Python/itk)
-    install(FILES ${_py_files} DESTINATION bin/bin/Python/itk)
-    install(FILES ${_py_generators} DESTINATION bin/Python/itk)
-    install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/Configuration"
-          DESTINATION bin/Python/itk
-          USE_SOURCE_PERMISSIONS
-          COMPONENT Runtime)
-    install(DIRECTORY "${ITK_DIR}/Wrapping/Generators/Python/itkExtras"
-          DESTINATION bin/Python/itk
-          USE_SOURCE_PERMISSIONS
-          COMPONENT Runtime)
-
-    foreach(lib ${_libs})
-      get_filename_component(_libname "${lib}" NAME)
-      list(APPEND _python_libs "Python/itk/${_libname}")
-
-      if(UNIX AND NOT APPLE)
+  # SimpleITK
+  if(MITK_USE_SimpleITK)
+    install(FILES "${SimpleITK_DIR}/Wrapping/SimpleITK.py"
+                  DESTINATION bin/Python/SimpleITK )
+    install(FILES "${SimpleITK_DIR}/Wrapping/__init__.py"
+                  DESTINATION bin/Python/SimpleITK )
+    install(FILES "${SimpleITK_DIR}/Wrapping/_SimpleITK${PYTHON_LIB_SUFFIX}"
+                  DESTINATION bin/Python/SimpleITK )
+    if(UNIX AND NOT APPLE)
         install(CODE "file(RPATH_REMOVE
-                           FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/itk/${_libname}\")")
-      endif()
-    endforeach()
+                    FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/SimpleITK/_SimpleITK${PYTHON_LIB_SUFFIX}\")")
+    endif()
 
-    list(APPEND _python_dirs "${ITK_DIR}/lib")
+    list(APPEND _python_libs "Python/SimpleITK/_SimpleITK${PYTHON_LIB_SUFFIX}")
+    list(APPEND _python_dirs "${SimpleITK_DIR}/../SimpleITK-install/lib")
   endif()
 
   # install OpenCV python wrapping
@@ -70,19 +92,13 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
     endif()
     get_filename_component(_filepath "${_target_lib}" PATH)
 
-    if(UNIX)
-      install(FILES "${_filepath}/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}" DESTINATION bin)
-      if( NOT APPLE )
-        install(CODE "file(RPATH_REMOVE
-                         FILE \"\${CMAKE_INSTALL_PREFIX}/bin/${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}\")")
-      endif()
-      list(APPEND _python_libs "${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    else(WIN32)
-      install(FILES "${_filepath}/${_target}.pyd" DESTINATION bin)
-      install(FILES "${_target_lib}" DESTINATION bin)
-      get_filename_component(_filename "${_target_lib}" NAME)
-      list(APPEND _python_libs "${_filename}")
+    install(FILES "${_filepath}/${_target}${PYTHON_LIB_SUFFIX}" DESTINATION bin)
+
+    if(UNIX AND NOT APPLE )
+      install(CODE "file(RPATH_REMOVE
+                    FILE \"\${CMAKE_INSTALL_PREFIX}/bin/${_target}${PYTHON_LIB_SUFFIX}\")")
     endif()
+    list(APPEND _python_libs "${_target}${PYTHON_LIB_SUFFIX}")
   endforeach()
 
   # install vtk python. This folder contains all *.py files for VTK module loading.

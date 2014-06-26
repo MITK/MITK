@@ -46,6 +46,7 @@ macro(_fixup_target)
   set(_python_libs )
   set(_python_dirs )
   if(MITK_USE_Python)
+    include(mitkMacroInstallPython)
     MITK_INSTALL_PYTHON(_python_libs _python_dirs)
   endif()
 

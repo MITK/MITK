@@ -57,7 +57,7 @@ mitk::PythonService::PythonService()
         pythonCommand.append( QString("sys.path.append('')\n") );
         pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
         pythonCommand.append( QString("sys.path.append('%1/Python')\n").arg(programPath.c_str()) );
-        pythonCommand.append( QString("sys.path.append('%1/Python/itk')").arg(programPath.c_str()) );
+        pythonCommand.append( QString("sys.path.append('%1/Python/SimpleITK')").arg(programPath.c_str()) );
         // set python home if own runtime is deployed
       } else {
         pythonCommand.append(PYTHONPATH_COMMAND);
@@ -319,48 +319,12 @@ bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const std::
   }
   else
   {
-    // TODO CORRECT TYPE SETUP, MAKE MITK_DEBUG("PythonService") MITK_DEBUG("PythonService")
-    int dim = image->GetDimension();
-    mitk::PixelType pixelType = image->GetPixelType();
-    itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelType();
-
-    // default pixeltype: unsigned short
-    QString type = "US";
-    if( ioPixelType == itk::ImageIOBase::SCALAR )
-    {
-      if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE )
-        type = "D";
-      else if( pixelType.GetComponentType() == itk::ImageIOBase::FLOAT )
-        type = "F";
-      else if( pixelType.GetComponentType() == itk::ImageIOBase::SHORT)
-        type = "SS";
-      else if( pixelType.GetComponentType() == itk::ImageIOBase::CHAR )
-        type = "SC";
-      else if( pixelType.GetComponentType() == itk::ImageIOBase::INT )
-        type = "SI";
-      else if( pixelType.GetComponentType() == itk::ImageIOBase::LONG )
-        type = "SL";
-      else if( pixelType.GetComponentType() == itk::ImageIOBase::UCHAR )
-        type = "UC";
-      else if( pixelType.GetComponentType() == itk::ImageIOBase::UINT )
-        type = "UI";
-      else if( pixelType.GetComponentType() == itk::ImageIOBase::ULONG )
-        type = "UL";
-      else if( pixelType.GetComponentType() == itk::ImageIOBase::USHORT )
-        type = "US";
-    }
-
-    MITK_DEBUG("PythonService") << "Got mitk image with type " << type.toStdString() << " and dim " << dim;
-
     QString command;
 
-    command.append( QString("imageType = itk.Image[itk.%1, %2]\n") .arg( type ).arg( dim ) );
-
-    command.append( QString("readerType = itk.ImageFileReader[imageType]\n") );
-    command.append( QString("reader = readerType.New()\n") );
-    command.append( QString("reader.SetFileName( \"%1\" )\n") .arg(fileName) );
-    command.append( QString("reader.Update()\n") );
-    command.append( QString("%1 = reader.GetOutput()\n").arg( varName ) );
+    command.append( QString("reader = sitk.ImageFileReader()\n") );
+    command.append( QString("reader.SetFileName(\"%1\")\n").arg(fileName) );
+    command.append( QString("%1 = reader.Execute()\n").arg(varName) );
+    command.append( QString("del reader") );
 
     MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
     MITK_INFO << this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
@@ -383,10 +347,10 @@ mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const std::stri
 
     MITK_DEBUG("PythonService") << "Saving temporary file with python itk code " << fileName.toStdString();
 
-    command.append( QString( "writer = itk.ImageFileWriter[ %1 ].New()\n").arg( varName ) );
-    command.append( QString( "writer.SetFileName( \"%1\" )\n").arg(fileName) );
-    command.append( QString( "writer.SetInput( %1 )\n").arg(varName) );
-    command.append( QString( "writer.Update()\n" ) );
+    command.append( QString("writer = sitk.ImageFileWriter()\n") );
+    command.append( QString("writer.SetFileName(\"%1\")\n").arg(fileName) );
+    command.append( QString("writer.Execute(%1)\n").arg(varName) );
+    command.append( QString("del writer") );
 
     MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
     this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
@@ -544,9 +508,9 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
   addr = oss.str();
 
   // remove "0x"
-  addr = addr.substr(2);
+  //addr = addr.substr(2);
 
-  address = QString::fromStdString(addr);
+  address = QString::fromStdString(addr.substr(2));
 
   command.append( QString("%1 = vtk.vtkPolyData(\"%2\")\n").arg(varName).arg(address) );
 
@@ -558,8 +522,9 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
 
 bool mitk::PythonService::IsItkPythonWrappingAvailable()
 {
-  this->Execute( "import itk\n", IPythonService::SINGLE_LINE_COMMAND );
-  this->Execute( "print \"Using ITK version \" + itk.Version.GetITKVersion()\n", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "import SimpleITK as sitk\n", IPythonService::SINGLE_LINE_COMMAND );
+  //this->Execute( "import itk\n", IPythonService::SINGLE_LINE_COMMAND );
+  //this->Execute( "print \"Using ITK version \" + itk.Version.GetITKVersion()\n", IPythonService::SINGLE_LINE_COMMAND );
 
   m_ItkWrappingAvailable = !this->PythonErrorOccured();
 

@@ -895,7 +895,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
     }
     else
     {
-      mitk::PlaneGeometry::ConstPointer pfgeometry = pf->GetPlaneGeometry();
+        mitk::PlaneGeometry::ConstPointer pfgeometry = pf->GetPlaneGeometry();
         const mitk::PlaneGeometry* planeGeometry = dynamic_cast<const mitk::PlaneGeometry*> (pfgeometry.GetPointer());
         Vector3D planeNormal = planeGeometry->GetNormal();
         planeNormal.Normalize();
@@ -924,8 +924,8 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
         MITK_DEBUG << "end clipping";
 
         MITK_DEBUG << "init and update clipperoutput";
-//        clipperout->GetPointData()->Initialize();
-//        clipperout->Update(); //VTK6_TODO
+        //        clipperout->GetPointData()->Initialize();
+        //        clipperout->Update(); //VTK6_TODO
         MITK_DEBUG << "init and update clipperoutput completed";
 
         MITK_DEBUG << "STEP 1: find all points which have distance 0 to the given plane";
@@ -1793,6 +1793,128 @@ void mitk::FiberBundleX::DoFiberSmoothing(float pointDistance, double tension, d
 void mitk::FiberBundleX::DoFiberSmoothing(float pointDistance)
 {
     DoFiberSmoothing(pointDistance, 0, 0, 0 );
+}
+
+unsigned long mitk::FiberBundleX::GetNumberOfPoints()
+{
+    unsigned long points = 0;
+    for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+    {
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        points += cell->GetNumberOfPoints();
+    }
+    return points;
+}
+
+void mitk::FiberBundleX::CompressFibers(float error)
+{
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
+
+    MITK_INFO << "Compressing fibers";
+    unsigned long numRemovedPoints = 0;
+    boost::progress_display disp(m_FiberPolyData->GetNumberOfCells());
+    for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+    {
+        ++disp ;
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
+        // calculate curvatures
+        std::vector< int > removedPoints; removedPoints.resize(numPoints, 0);
+        removedPoints[0]=-1; removedPoints[numPoints-1]=-1;
+
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+
+        bool pointFound = true;
+        while (pointFound)
+        {
+            pointFound = false;
+            double minError = error;
+            int removeIndex = -1;
+
+            for (int j=0; j<numPoints; j++)
+            {
+                if (removedPoints[j]==0)
+                {
+                    double cand[3];
+                    points->GetPoint(j, cand);
+                    vnl_vector_fixed< double, 3 > candV;
+                    candV[0]=cand[0]; candV[1]=cand[1]; candV[2]=cand[2];
+
+                    int validP = -1;
+                    vnl_vector_fixed< double, 3 > pred;
+                    for (int k=j-1; k>=0; k--)
+                        if (removedPoints[k]<=0)
+                        {
+                            double ref[3];
+                            points->GetPoint(k, ref);
+                            pred[0]=ref[0]; pred[1]=ref[1]; pred[2]=ref[2];
+                            validP = k;
+                            break;
+                        }
+                    int validS = -1;
+                    vnl_vector_fixed< double, 3 > succ;
+                    for (int k=j+1; k<numPoints; k++)
+                        if (removedPoints[k]<=0)
+                        {
+                            double ref[3];
+                            points->GetPoint(k, ref);
+                            succ[0]=ref[0]; succ[1]=ref[1]; succ[2]=ref[2];
+                            validS = k;
+                            break;
+                        }
+
+                    if (validP>=0 && validS>=0)
+                    {
+                        double a = (candV-pred).magnitude();
+                        double b = (candV-succ).magnitude();
+                        double c = (pred-succ).magnitude();
+                        double s=0.5*(a+b+c);
+                        double hc=(2.0/c)*sqrt(fabs(s*(s-a)*(s-b)*(s-c)));
+
+                        if (hc<minError)
+                        {
+                            removeIndex = j;
+                            minError = hc;
+                            pointFound = true;
+                        }
+                    }
+                }
+            }
+
+            if (pointFound)
+            {
+                removedPoints[removeIndex] = 1;
+                numRemovedPoints++;
+            }
+        }
+
+        for (int j=0; j<numPoints; j++)
+        {
+            if (removedPoints[j]<=0)
+            {
+                double cand[3];
+                points->GetPoint(j, cand);
+                vtkIdType id = vtkNewPoints->InsertNextPoint(cand);
+                container->GetPointIds()->InsertNextId(id);
+            }
+        }
+
+        vtkNewCells->InsertNextCell(container);
+    }
+
+    if (vtkNewCells->GetNumberOfCells()>0)
+    {
+        MITK_INFO << "Removed points: " << numRemovedPoints;
+        m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+        m_FiberPolyData->SetPoints(vtkNewPoints);
+        m_FiberPolyData->SetLines(vtkNewCells);
+
+        UpdateColorCoding();
+        UpdateFiberGeometry();
+    }
 }
 
 // Resample fiber to get equidistant points

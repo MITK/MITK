@@ -86,6 +86,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_PruneFibersButton, SIGNAL(clicked()), this, SLOT(PruneBundle()) );
         connect( m_Controls->m_CurvatureThresholdButton, SIGNAL(clicked()), this, SLOT(ApplyCurvatureThreshold()) );
         connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
+        connect( m_Controls->m_CompressFibersButton, SIGNAL(clicked()), this, SLOT(CompressSelectedBundles()) );
     }
 }
 
@@ -105,6 +106,7 @@ void QmitkFiberProcessingView::UpdateGui()
     // are fiber bundles selected?
     if ( m_SelectedFB.empty() )
     {
+        m_Controls->m_CompressFibersButton->setEnabled(false);
         m_Controls->m_ProcessFiberBundleButton->setEnabled(false);
         m_Controls->m_ResampleFibersButton->setEnabled(false);
         m_Controls->m_FaColorFibersButton->setEnabled(false);
@@ -118,6 +120,7 @@ void QmitkFiberProcessingView::UpdateGui()
     }
     else
     {
+        m_Controls->m_CompressFibersButton->setEnabled(true);
         m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
         m_Controls->m_ResampleFibersButton->setEnabled(true);
         m_Controls->m_PruneFibersButton->setEnabled(true);
@@ -206,6 +209,7 @@ void QmitkFiberProcessingView::GenerateStats()
             stats += QString(node->GetName().c_str()) + "\n";
             mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
             stats += "Number of fibers: "+ QString::number(fib->GetNumFibers()) + "\n";
+            stats += "Number of points: "+ QString::number(fib->GetNumberOfPoints()) + "\n";
             stats += "Min. length:         "+ QString::number(fib->GetMinFiberLength(),'f',1) + " mm\n";
             stats += "Max. length:         "+ QString::number(fib->GetMaxFiberLength(),'f',1) + " mm\n";
             stats += "Mean length:         "+ QString::number(fib->GetMeanFiberLength(),'f',1) + " mm\n";
@@ -414,6 +418,18 @@ void QmitkFiberProcessingView::ResampleSelectedBundles()
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
         fib->DoFiberSmoothing(factor);
+    }
+    GenerateStats();
+    RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkFiberProcessingView::CompressSelectedBundles()
+{
+    double factor = this->m_Controls->m_FiberErrorSpinBox->value();
+    for (int i=0; i<m_SelectedFB.size(); i++)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        fib->CompressFibers(factor);
     }
     GenerateStats();
     RenderingManager::GetInstance()->RequestUpdateAll();

@@ -728,14 +728,10 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
   SourceIteratorType sourceIter( input, input->GetLargestPossibleRegion() );
   sourceIter.GoToBegin();
 
-
   while ( !sourceIter.IsAtEnd() )
   {
     int sourceValue = static_cast<int>(sourceIter.Get());
     targetIter.Set( sourceValue );
-
-    if(GetActiveLabelSet()->GetNumberOfLabels() > 255)
-      AddLayer();
 
     if(!ExistLabel(sourceValue))
     {
@@ -754,7 +750,13 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
       label->SetValue( sourceValue );
 
       GetLabelSet()->AddLabel(*label);
-      GetLabelSet()->UpdateLookupTable(sourceValue);
+
+      MITK_INFO << GetActiveLabelSet()->GetNumberOfLabels();
+      if(GetActiveLabelSet()->GetNumberOfLabels() >= 255 || sourceValue >= 255)
+      {
+        AddLayer();
+      }
+
     }
 
     ++sourceIter;

@@ -665,9 +665,9 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         if(m_OutputFolderNameSet) logfile << "Initializing Diffusion Image\n";
         typedef mitk::DiffusionImage<PixelValueType> DiffVolumesType;
         DiffVolumesType::Pointer diffImage = DiffVolumesType::New();
-        diffImage->SetDirections(directions);
         diffImage->SetVectorImage(vecImage);
         diffImage->SetReferenceBValue(maxb);
+        diffImage->SetDirections(directions);
         diffImage->InitializeFromVectorImage();
         Status(QString("Diffusion Image initialized"));
         if(m_OutputFolderNameSet) logfile << "Diffusion Image initialized\n";

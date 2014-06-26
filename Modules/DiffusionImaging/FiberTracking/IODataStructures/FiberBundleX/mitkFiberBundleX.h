@@ -73,6 +73,7 @@ public:
     void ResetFiberOpacity();
 
     // fiber smoothing/resampling
+    void CompressFibers(float error = 0.0);
     void ResampleFibers(float pointDistance = 1);
     void DoFiberSmoothing(float pointDistance);
     void DoFiberSmoothing(float pointDistance, double tension, double continuity, double bias );
@@ -112,6 +113,7 @@ public:
     itkGetMacro( MeanFiberLength, float )
     itkGetMacro( MedianFiberLength, float )
     itkGetMacro( LengthStDev, float )
+    unsigned long GetNumberOfPoints();
 
     std::vector<int> GetPointsRoi()
     {

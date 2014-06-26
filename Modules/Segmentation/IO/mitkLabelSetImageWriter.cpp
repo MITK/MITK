@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkLabelSetImageWriter__cpp
 
 #include "mitkLabelSetImageWriter.h"
+#include "mitkPropertyListSerializer.h"
 
 // itk
 #include "itkMetaDataDictionary.h"
@@ -28,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 #include <fstream>
+
+#include "tinyxml.h"
 
 mitk::LabelSetImageWriter::LabelSetImageWriter()
   : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
@@ -77,11 +80,17 @@ void mitk::LabelSetImageWriter::GenerateData()
   sprintf( valbuffer, "LSET");
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("modality"), std::string(valbuffer));
 
+  MITK_INFO << "modality" << valbuffer;
+
   sprintf( valbuffer, input->GetName().c_str() );
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("name"), std::string(valbuffer));
 
+  MITK_INFO << "name" << valbuffer;
+
   sprintf( valbuffer, input->GetLastModificationTime().c_str() );
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("last modification time"), std::string(valbuffer));
+
+  MITK_INFO << "last modification time" << valbuffer;
 
   sprintf( valbuffer, "%1d", input->GetTotalNumberOfLabels());
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("number of labels"), std::string(valbuffer));
@@ -91,23 +100,36 @@ void mitk::LabelSetImageWriter::GenerateData()
   {
     for (int labelIdx=0; labelIdx<input->GetNumberOfLabels(layerIdx); labelIdx++)
     {
+
+      mitk::PropertyListSerializer::Pointer serializer = mitk::PropertyListSerializer::New();
+      serializer->SetPropertyList(input->GetLabel(labelIdx,layerIdx));
+      TiXmlDocument labelAsXml = serializer->SerializeAsTiXmlDocument();
+      std::string text = labelAsXml.Value();
+      MITK_INFO << text;
+
+
+
       sprintf( keybuffer, "label_%03d_name", idx );
       sprintf( valbuffer, "%s", input->GetLabel(labelIdx,layerIdx)->GetName().c_str());
 
-      itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
+      // TODO: Replace by PropertyListSerializer
+      // Only 1 key value pair!
+      {
+        itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
-      sprintf( keybuffer, "label_%03d_props", idx );
-      float rgba[4];
-      const mitk::Color& color = input->GetLabel(labelIdx, layerIdx)->GetColor();
-      rgba[0] = color.GetRed();
-      rgba[1] = color.GetGreen();
-      rgba[2] = color.GetBlue();
-      rgba[3] = input->GetLabel(labelIdx, layerIdx)->GetOpacity();
-      int locked = input->GetLabel(labelIdx, layerIdx)->GetLocked();
-      int visible = input->GetLabel(labelIdx, layerIdx)->GetVisible();
-      sprintf(valbuffer, "%f %f %f %f %d %d %d %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, layerIdx, labelIdx);
+        sprintf( keybuffer, "label_%03d_props", idx );
+        float rgba[4];
+        const mitk::Color& color = input->GetLabel(labelIdx, layerIdx)->GetColor();
+        rgba[0] = color.GetRed();
+        rgba[1] = color.GetGreen();
+        rgba[2] = color.GetBlue();
+        rgba[3] = input->GetLabel(labelIdx, layerIdx)->GetOpacity();
+        int locked = input->GetLabel(labelIdx, layerIdx)->GetLocked();
+        int visible = input->GetLabel(labelIdx, layerIdx)->GetVisible();
+        sprintf(valbuffer, "%f %f %f %f %d %d %d %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, layerIdx, labelIdx);
 
-      itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
+        itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
+      }
       ++idx;
     }
   }

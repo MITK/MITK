@@ -95,6 +95,9 @@ void mitk::LabelSetImageWriter::GenerateData()
   sprintf( valbuffer, "%1d", input->GetTotalNumberOfLabels());
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("number of labels"), std::string(valbuffer));
 
+  TiXmlDocument labelAsXml;
+  TiXmlPrinter printer;
+
   int idx = 0;
   for (int layerIdx=0; layerIdx<input->GetNumberOfLayers(); layerIdx++)
   {
@@ -103,33 +106,14 @@ void mitk::LabelSetImageWriter::GenerateData()
 
       mitk::PropertyListSerializer::Pointer serializer = mitk::PropertyListSerializer::New();
       serializer->SetPropertyList(input->GetLabel(labelIdx,layerIdx));
-      TiXmlDocument labelAsXml = serializer->SerializeAsTiXmlDocument();
-      std::string text = labelAsXml.Value();
-      MITK_INFO << text;
-
-
+      labelAsXml = serializer->SerializeAsTiXmlDocument();
+      printer.SetIndent("");
+      printer.SetLineBreak("");
+      labelAsXml.Accept(&printer);
 
       sprintf( keybuffer, "label_%03d_name", idx );
-      sprintf( valbuffer, "%s", input->GetLabel(labelIdx,layerIdx)->GetName().c_str());
+      itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), printer.Str());
 
-      // TODO: Replace by PropertyListSerializer
-      // Only 1 key value pair!
-      {
-        itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
-
-        sprintf( keybuffer, "label_%03d_props", idx );
-        float rgba[4];
-        const mitk::Color& color = input->GetLabel(labelIdx, layerIdx)->GetColor();
-        rgba[0] = color.GetRed();
-        rgba[1] = color.GetGreen();
-        rgba[2] = color.GetBlue();
-        rgba[3] = input->GetLabel(labelIdx, layerIdx)->GetOpacity();
-        int locked = input->GetLabel(labelIdx, layerIdx)->GetLocked();
-        int visible = input->GetLabel(labelIdx, layerIdx)->GetVisible();
-        sprintf(valbuffer, "%f %f %f %f %d %d %d %d", rgba[0], rgba[1], rgba[2], rgba[3], locked, visible, layerIdx, labelIdx);
-
-        itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
-      }
       ++idx;
     }
   }

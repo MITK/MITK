@@ -115,7 +115,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   mitk::NavigationData::Pointer mitk::NodeDisplacementFilter::GetRawDisplacementNavigationData(unsigned int i)
   {
     mitk::NavigationData::Pointer returnValue = mitk::NavigationData::New();
-    if(m_Nodes.at(i).IsNotNull())
+    if((m_Nodes.size()>i) && (m_Nodes.at(i).IsNotNull()))
       {
       try
         {

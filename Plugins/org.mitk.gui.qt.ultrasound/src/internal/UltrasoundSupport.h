@@ -81,7 +81,7 @@ public:
 protected:
 
   void StartViewing();
-  void StopViewing();
+  void StopViewing(bool RenderWindowUpdate = true);
 
   void CreateControlWidgets();
   void RemoveControlWidgets();

@@ -947,6 +947,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
   }
 }
 
+
 void QmitkMITKIGTTrackingToolboxViewWorker::SetWorkerMethod(WorkerMethod w)
 {
   m_WorkerMethod = w;

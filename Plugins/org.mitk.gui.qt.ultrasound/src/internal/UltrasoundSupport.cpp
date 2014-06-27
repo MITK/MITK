@@ -99,7 +99,7 @@ void UltrasoundSupport::DisplayImage()
   if ( m_ImageAlreadySetToNode && ( curOutput.GetPointer() != m_Node->GetData() ) )
   {
     MITK_INFO << "Data Node of the ultrasound image stream was changed by another plugin. Stop viewing.";
-    this->StopViewing();
+    this->StopViewing(false);
     return;
   }
 
@@ -205,7 +205,7 @@ void UltrasoundSupport::StartViewing()
   this->CreateControlWidgets();
 }
 
-void UltrasoundSupport::StopViewing()
+void UltrasoundSupport::StopViewing(bool RenderWindowUpdate)
 {
   m_Controls.tabWidget->setTabEnabled(1, false);
 
@@ -214,7 +214,7 @@ void UltrasoundSupport::StopViewing()
   //stop timer & release data
   m_Timer->stop();
   m_Node->ReleaseData();
-  this->RequestRenderWindowUpdate();
+  if (RenderWindowUpdate) {this->RequestRenderWindowUpdate();}
 
   //change UI elements
   m_Controls.m_BtnView->setText("Start Viewing");
@@ -320,7 +320,7 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 
   if ( ! m_Device->GetIsActive() && m_Timer->isActive() )
   {
-    this->StopViewing();
+    this->StopViewing(false);
   }
 
   if ( m_CurrentDynamicRange != service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE)).toDouble() )

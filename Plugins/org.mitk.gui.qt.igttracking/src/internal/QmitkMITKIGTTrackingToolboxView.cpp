@@ -872,6 +872,7 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
     m_toolStorage->RegisterAsMicroservice("no tracking device");
 }
 
+
 void QmitkMITKIGTTrackingToolboxViewWorker::SetWorkerMethod(WorkerMethod w)
 {
   m_WorkerMethod = w;

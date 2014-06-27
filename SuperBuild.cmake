@@ -440,6 +440,7 @@ ExternalProject_Add(${proj}
     -DQwt_DIR:PATH=${Qwt_DIR}
     -DQxt_DIR:PATH=${Qxt_DIR}
     -DSimpleITK_DIR:PATH=${SimpleITK_DIR}
+    -DNumpy_DIR:PATH=${Numpy_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}

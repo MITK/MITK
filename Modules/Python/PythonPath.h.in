@@ -5,10 +5,10 @@
 #endif
 
 #define PYTHONPATH_COMMAND "import sys\n"\
+"sys.path.append('@Numpy_DIR@')\n"\
 "sys.path.append('@SimpleITK_DIR@/bin')\n"\
 "sys.path.append('@SimpleITK_DIR@/lib')\n"\
 "sys.path.append('@SimpleITK_DIR@/Wrapping')\n"\
-"sys.path.append('@VTK_LIBRARY_DIRS@')\n"\
 "sys.path.append('@VTK_DIR@/Wrapping/Python')\n"\
 "sys.path.append('@VTK_DIR@/lib')\n"\
 "sys.path.append('@VTK_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')\n"\

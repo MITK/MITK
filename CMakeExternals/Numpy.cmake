@@ -14,15 +14,16 @@ if( MITK_USE_Python )
       SOURCE_DIR ${proj}-src
       PREFIX ${proj}-cmake
       BUILD_IN_SOURCE 1
+      INSTALL_DIR ${CMAKE_BINARY_DIR}/${proj}-install
       CONFIGURE_COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_BINARY_DIR}/${proj}-src/setup.py config
       BUILD_COMMAND   ${PYTHON_EXECUTABLE} ${CMAKE_BINARY_DIR}/${proj}-src/setup.py build
-      INSTALL_COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_BINARY_DIR}/${proj}-src/setup.py install
+      INSTALL_COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_BINARY_DIR}/${proj}-src/setup.py install --prefix=${CMAKE_BINARY_DIR}/${proj}-install
 
       DEPENDS
         ${${proj}_DEPENDENCIES}
     )
 
-    set(Numpy_DIR ${Python_Dir}/lib/python2.7/site-packages/numpy)
+   set(Numpy_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib/python2.7/site-packages)
 
    else()
      mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")

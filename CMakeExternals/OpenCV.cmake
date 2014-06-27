@@ -24,10 +24,6 @@ if(MITK_USE_OpenCV)
       #message(STATUS "PYTHON_DEBUG_LIBRARY: ${PYTHON_DEBUG_LIBRARY}")
       #message(STATUS "PYTHON_INCLUDE_DIR: ${PYTHON_INCLUDE_DIR}")
       #message(STATUS "PYTHON_LIBRARY: ${PYTHON_LIBRARY}")
-
-      if( NOT MITK_USE_Python)
-        list(APPEND proj_DEPENDENCIES Python_DEPENDS)
-      endif()
       list(APPEND additional_cmake_args
          -DBUILD_opencv_python:BOOL=ON
          -DBUILD_NEW_PYTHON_SUPPORT:BOOL=ON
@@ -41,8 +37,10 @@ if(MITK_USE_OpenCV)
           )
         if(NOT MITK_USE_SYSTEM_PYTHON)
           list(APPEND proj_DEPENDENCIES Python Numpy)
+
+          set(env{PYTHONPATH} ${Numpy_DIR})
           list(APPEND additional_cmake_args
-               -DPYTHON_NUMPY_INCLUDE_DIR:PATH=${Python_DIR}/core/include
+            -DPYTHON_NUMPY_INCLUDE_DIR:PATH=${Numpy_DIR}/numpy/core/include/numpy
               )
         endif()
     else()

@@ -71,6 +71,7 @@ endif()
 
 set(external_projects
   Python
+  Numpy
   tinyxml
   GLUT
   ANN
@@ -313,6 +314,7 @@ ExternalProject_Add(${proj}
     ${Qwt_DEPENDS}
     ${Qxt_DEPENDS}
     ${SimpleITK_DEPENDS}
+    ${Numpy_DEPENDS}
 )
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
@@ -356,6 +358,7 @@ if(MITK_USE_Python)
        -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
        -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
        -DMITK_USE_SYSTEM_PYTHON:BOOL=${MITK_USE_SYSTEM_PYTHON}
+       -DPYTHON_LIBRARY_NAME:STRING=${PYTHON_LIBRARY_NAME}
        -DMITK_BUILD_org.mitk.gui.qt.python:BOOL=ON
       )
 

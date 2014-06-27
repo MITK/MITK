@@ -4,10 +4,15 @@ if( MITK_USE_Python )
     add_definitions( -DUSE_MITK_BUILTIN_PYTHON )
   endif()
 
+  set(OpenCV_DEP )
+  if(MITK_USE_OpenCV)
+    set(OpenCV_DEP OpenCV)
+  endif()
+
   MITK_CREATE_MODULE(
     DEPENDS MitkCore
     EXPORT_DEFINE MITK_PYTHON_EXPORT
-    PACKAGE_DEPENDS Qt4|QtGui CTK PythonLibs SimpleITK VTK|vtkPython+vtkWrappingPythonCore
+    PACKAGE_DEPENDS Qt4|QtGui CTK PythonLibs SimpleITK VTK|vtkPython+vtkWrappingPythonCore ${OpenCV_DEP}
   )
   configure_file(PythonPath.h.in
     "${CMAKE_CURRENT_BINARY_DIR}/PythonPath.h" @ONLY)

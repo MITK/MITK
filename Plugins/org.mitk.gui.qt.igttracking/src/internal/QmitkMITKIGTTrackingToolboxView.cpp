@@ -942,7 +942,8 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
     }
     catch(mitk::IGTException)
     {
-      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during deserializing. Problems with file,please check the file?";
+      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during restoring tools. Problems with file ("<<m_ToolStorageFilename.toStdString()<<"), please check the file?";
+      this->OnResetTools(); //if there where errors reset the tool storage to avoid problems later on
     }
   }
 }

@@ -32,13 +32,14 @@ if(MITK_USE_OpenCV)
          -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
          -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
          -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+
          #-DPYTHON_LIBRARIES=${PYTHON_LIBRARY}
          #-DPYTHON_DEBUG_LIBRARIES=${PYTHON_DEBUG_LIBRARIES}
           )
         if(NOT MITK_USE_SYSTEM_PYTHON)
           list(APPEND proj_DEPENDENCIES Python Numpy)
 
-          set(env{PYTHONPATH} ${Numpy_DIR})
+          #set(env{PYTHONPATH} ${Numpy_DIR})
           list(APPEND additional_cmake_args
             -DPYTHON_NUMPY_INCLUDE_DIR:PATH=${Numpy_DIR}/numpy/core/include/numpy
               )

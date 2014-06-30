@@ -1,6 +1,12 @@
 
 if( MITK_USE_Python )
-  if( NOT Numpy_DIR )
+
+  # Sanity checks
+  if(DEFINED Numpy_DIR AND NOT EXISTS ${Numpy_DIR})
+    message(FATAL_ERROR "Numpy_DIR variable is defined but corresponds to non-existing directory")
+  endif()
+
+  if( NOT DEFINED Numpy_DIR )
     set(proj Numpy)
     set(proj_DEPENDENCIES )
     set(Numpy_DEPENDS ${proj})
@@ -9,8 +15,10 @@ if( MITK_USE_Python )
       list(APPEND proj_DEPENDENCIES Python)
     endif()
 
+    set(Numpy_URL "https://dl.dropboxusercontent.com/u/8367205/numpy-1.6.1.tar.gz")
+
     ExternalProject_Add(${proj}
-      URL "http://svn.slicer.org/Slicer3-lib-mirrors/trunk/numpy-1.4.1.tar.gz"
+      URL ${Numpy_URL}
       SOURCE_DIR ${proj}-src
       PREFIX ${proj}-cmake
       BUILD_IN_SOURCE 1

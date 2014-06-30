@@ -4,10 +4,10 @@
 
 if(MITK_USE_SimpleITK)
 
-  # Sanity checks
-  if(DEFINED SimpleITK_DIR AND NOT EXISTS ${SimpleITK_DIR})
-    message(FATAL_ERROR "SimpleITK_DIR variable is defined but corresponds to non-existing directory")
-  endif()
+ # Sanity checks
+ if(DEFINED SimpleITK_DIR AND NOT EXISTS ${SimpleITK_DIR})
+   message(FATAL_ERROR "SimpleITK_DIR variable is defined but corresponds to non-existing directory")
+ endif()
 
   set(proj SimpleITK)
   set(proj_DEPENDENCIES ITK GDCM Swig)

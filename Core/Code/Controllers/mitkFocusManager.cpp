@@ -43,27 +43,20 @@ bool mitk::FocusManager::AddElement(FocusElement* element)
 
 bool mitk::FocusManager::RemoveElement(FocusElement* element)
 {
-  // Try find
-  mitk::FocusManager::FocusListIterator position = std::find(m_FocusList.begin(),m_FocusList.end(),element);
+  if (element == m_FocElement)
+  {
+    this->GoToNext();
+  }
+
+  // Try to find
+  mitk::FocusManager::FocusListIterator position = std::find(m_FocusList.begin(), m_FocusList.end(), element);
   if (position == m_FocusList.end())
+  {
     return false;
-  position = m_FocusList.erase(position);
-  // first delete the one on the position, and store the one afterewards into position
-  if ( m_FocusList.size() == 0 )
-  {
-    // no more FocusElements available
-    m_FocElement = NULL;
   }
-  else if ( position == m_FocusList.end() )
-  {
-    // deleted was the last in row, then take the one before
-    m_FocElement = m_FocusList.back();
-  }
-  else
-  {
-    // m_FocElement is equal to the next one in row
-    m_FocElement = *position;
-  }
+
+  m_FocusList.erase(position);
+
   return true;
 }
 

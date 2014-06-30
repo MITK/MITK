@@ -101,26 +101,31 @@ const mitk::FocusManager::FocusElement* mitk::FocusManager::GetLast() const
 bool mitk::FocusManager::GoToNext()
 {
   //find the m_FocElement
-  FocusListIterator position = std::find(m_FocusList.begin(),m_FocusList.end(),m_FocElement);
-  if (position == m_FocusList.end())//not found
-    return false;
-  else if (*position == m_FocusList.back())//last in row
+  FocusListIterator position = std::find(m_FocusList.begin(), m_FocusList.end(), m_FocElement);
+  if (position == m_FocusList.end())
   {
-    if (m_Loop)
+    return false;
+  }
+
+  for (FocusListIterator nextPosition = position + 1; nextPosition != position; ++nextPosition)
+  {
+    if (nextPosition == m_FocusList.end())
     {
-      m_FocElement = *(m_FocusList.begin());
+      if (!m_Loop)
+      {
+        return false;
+      }
+      nextPosition = m_FocusList.begin();
+    }
+
+    FocusElement* focusElement = *nextPosition;
+    if (focusElement->GetSizeX() > 0 && focusElement->GetSizeY() > 0)
+    {
+      m_FocElement = focusElement;
       return true;
     }
-    else
-    {
-      return false;//last in row and loop == false, so GoToNext == false
-    }
   }
-  else //not last in row
-  {
-    m_FocElement = *(++position);//increase position and set m_FocElement
-    return true;
-  }
+
   return false;
 }
 

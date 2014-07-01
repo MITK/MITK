@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkISimulationService.h"
 #include "mitkSimulation.h"
 #include "mitkSimulationReader.h"
+#include <mitkStringProperty.h>
 #include <sofa/helper/system/SetDirectory.h>
 #include <algorithm>
 
@@ -71,6 +72,10 @@ void mitk::SimulationReader::GenerateData()
   }
 
   simulation->SetRootNode(rootNode);
+
+  std::ifstream scnFile(m_FileName.c_str());
+  simulation->SetProperty("Scene File", StringProperty::New(std::string((std::istreambuf_iterator<char>(scnFile)), std::istreambuf_iterator<char>())));
+  scnFile.close();
 
   sofaSimulation->init(rootNode.get());
   sofaSimulation->reset(rootNode.get());

@@ -8,8 +8,11 @@ set(CPP_FILES
   mitkSimulationIOFactory.cpp
   mitkSimulationObjectFactory.cpp
   mitkSimulationReader.cpp
+  mitkSimulationSerializer.cpp
   mitkSimulationService.cpp
   mitkSimulationVtkMapper3D.cpp
+  mitkSimulationWriter.cpp
+  mitkSimulationWriterFactory.cpp
   mitkVtkModel.cpp
   mitkVtkSimulationPolyDataMapper.cpp
 )

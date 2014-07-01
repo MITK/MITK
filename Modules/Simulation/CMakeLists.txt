@@ -1,6 +1,6 @@
 if(MITK_USE_SOFA)
   MITK_CREATE_MODULE(
-    DEPENDS MitkCore
+    DEPENDS MitkSceneSerializationBase
     PACKAGE_DEPENDS Boost GLUT GLEW SOFA
   )
 

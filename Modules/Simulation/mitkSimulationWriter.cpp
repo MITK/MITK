@@ -41,8 +41,12 @@ void mitk::SimulationWriter::GenerateData()
   if (simulation == NULL)
     mitkThrow() << "Invalid input!";
 
+  std::string originalPath = "<!-- ORIGINAL_PATH = ";
+  originalPath += simulation->GetProperty("Path")->GetValueAsString();
+  originalPath += "\n     This comment is parsed by MITK. -->\n";
+
   std::ofstream scnFile(m_FileName.c_str());
-  scnFile << simulation->GetProperty("Scene File")->GetValueAsString();
+  scnFile << originalPath << simulation->GetProperty("Scene File")->GetValueAsString();
 }
 
 mitk::Simulation* mitk::SimulationWriter::GetInput()

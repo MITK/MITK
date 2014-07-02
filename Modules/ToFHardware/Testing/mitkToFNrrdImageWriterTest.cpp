@@ -14,136 +14,216 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <mitkImage.h>
 #include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 #include <mitkToFNrrdImageWriter.h>
+#include <mitkToFConfig.h>
+#include <mitkIOUtil.h>
 #include <mitkImageGenerator.h>
-#include <mitkImageSliceSelector.h>
-#include "mitkItkImageFileReader.h"
-#include "mitkImageReadAccessor.h"
+#include <mitkImageReadAccessor.h>
 
-/**Documentation
- *  test for the class "ToFImageWriter".
- */
-int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
+class mitkToFNrrdImageWriterTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("ToFNrrdImageWriter");
 
-  mitk::ToFNrrdImageWriter::Pointer tofNrrdWriter = mitk::ToFNrrdImageWriter::New();
-  // testing correct initialization
-  MITK_TEST_CONDITION_REQUIRED(tofNrrdWriter.GetPointer(), "Testing initialization of test object!");
-  MITK_TEST_CONDITION_REQUIRED(tofNrrdWriter->GetExtension() == ".nrrd", "testing initialization of extension member variable!");
+  CPPUNIT_TEST_SUITE(mitkToFNrrdImageWriterTestSuite);
+  MITK_TEST(GetExtension_DefaultValueIsNrrd);
+  MITK_TEST(Add_WriteDistanceImage_OutputImageIsEqualToInput);
+  //Work in progress:
+//  MITK_TEST(Add_WriteDistanceAndAmplitudeImage_OutputImagesAreEqualToInput);
+//  MITK_TEST(Add_WriteDistanceAndIntensityImage_OutputImagesAreEqualToInput);
+//  MITK_TEST(Add_WriteDistanceAndIntensityAndAmplitudeImage_OutputImagesAreEqualToInput);
+  CPPUNIT_TEST_SUITE_END();
 
-  //GENERATE TEST DATA
-  ////run the test with some unusual parameters
-  unsigned int dimX = 255;
-  unsigned int dimY = 178;
-  unsigned int pixelNumber = dimX*dimY;
-  unsigned int numOfFrames = 23; //or numberOfSlices
-  ////create 3 images filled with random values
-  mitk::Image::Pointer distanceImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,1.0, 1.0f, 1.0f);
-  mitk::Image::Pointer amplitudeImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,1.0, 1.0f, 2000.0f);
-  mitk::Image::Pointer intensityImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, numOfFrames,1.0, 1.0f, 100000.0f);
+private:
 
-  //SET NEEDED PARAMETER
-  //file names on the disc
-  std::string distanceImageFileName("distImg.nrrd");
-  std::string amplitudeImageFileName("amplImg.nrrd");
-  std::string intensityImageFileName("intImg.nrrd");
+  /** Members used inside the different (sub-)tests. All members are initialized via setUp().
+    * Every recorder needs a device. Here we use a player device.
+    * The player device needs data to load. The ground truth is loaded via IOUtil.
+    */
+  mitk::ToFNrrdImageWriter::Pointer m_ToFNrrdImageWriter;
+  std::string m_DistanceImageName;
+  std::string m_AmplitudeImageName;
+  std::string m_IntensityImageName;
 
-  // set file name methods
-  tofNrrdWriter->SetDistanceImageFileName(distanceImageFileName);
-  tofNrrdWriter->SetAmplitudeImageFileName(amplitudeImageFileName);
-  tofNrrdWriter->SetIntensityImageFileName(intensityImageFileName);
-  tofNrrdWriter->SetToFCaptureWidth(dimX);
-  tofNrrdWriter->SetToFCaptureHeight(dimY);
-  tofNrrdWriter->SetToFImageType(mitk::ToFNrrdImageWriter::ToFImageType3D);
-  tofNrrdWriter->SetRGBImageSelected(false);
+  mitk::Image::Pointer m_GroundTruthDepthImage;
+  mitk::Image::Pointer m_GroundTruthIntensityImage;
+  mitk::Image::Pointer m_GroundTruthAmplitudeImage;
 
-  //buffer for each slice
-  float* distanceArray;
-  float* amplitudeArray;
-  float* intensityArray;
+  unsigned int m_NumberOfFrames;
 
-  float* distanceArrayRead;
-  float* amplitudeArrayRead;
-  float* intensityArrayRead;
+public:
 
-  tofNrrdWriter->Open(); //open file/stream
-
-  for(unsigned int i = 0; i < numOfFrames ; i++)
+  /**
+    * @brief Setup a recorder including a device. Here, we use a player, because in an automatic test
+    * hardware is not useful.
+    */
+  void setUp()
   {
-    mitk::ImageReadAccessor distAcc(distanceImage, distanceImage->GetSliceData(i, 0, 0));
-    mitk::ImageReadAccessor amplAcc(amplitudeImage, amplitudeImage->GetSliceData(i, 0, 0));
-    mitk::ImageReadAccessor intenAcc(intensityImage, intensityImage->GetSliceData(i, 0, 0));
-    distanceArray = (float*)distAcc.GetData();
-    amplitudeArray = (float*)amplAcc.GetData();
-    intensityArray = (float*)intenAcc.GetData();
+    m_ToFNrrdImageWriter = mitk::ToFNrrdImageWriter::New();
+    m_ToFNrrdImageWriter->SetToFImageType(mitk::ToFNrrdImageWriter::ToFImageType3D); //we test the ToFImageType3D since 3D is deprecated?
 
-    //write (or add) the three slices to the file
-    tofNrrdWriter->Add(distanceArray, amplitudeArray, intensityArray);
+    //Generate some random test data
+    unsigned int dimX = 255;
+    unsigned int dimY = 178;
+    m_NumberOfFrames = 23;
+    m_GroundTruthDepthImage= mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, m_NumberOfFrames,1.0, 1.0f, 1.0f);
+    m_GroundTruthAmplitudeImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, m_NumberOfFrames,1.0, 1.0f, 2000.0f);
+    m_GroundTruthIntensityImage = mitk::ImageGenerator::GenerateRandomImage<float>(dimX, dimY, m_NumberOfFrames,1.0, 1.0f, 100000.0f);
+
+    m_ToFNrrdImageWriter->SetToFCaptureWidth(dimX);
+    m_ToFNrrdImageWriter->SetToFCaptureHeight(dimY);
+
+    m_DistanceImageName = "test_DistanceImage.nrrd";
+    m_AmplitudeImageName = "test_AmplitudeImage.nrrd";
+    m_IntensityImageName = "test_IntensityImage.nrrd";
   }
 
-  tofNrrdWriter->Close(); //close file
-
-
-  //read in the three images from disc
-  mitk::ItkImageFileReader::Pointer fileReader = mitk::ItkImageFileReader::New();
-  fileReader->SetFileName(distanceImageFileName);
-  fileReader->Update();
-  mitk::Image::Pointer distanceImageRead = fileReader->GetOutput();
-
-  fileReader = mitk::ItkImageFileReader::New();
-  fileReader->SetFileName(amplitudeImageFileName);
-  fileReader->Update();
-  mitk::Image::Pointer amplitudeImageRead = fileReader->GetOutput();
-
-  fileReader = mitk::ItkImageFileReader::New();
-  fileReader->SetFileName(intensityImageFileName);
-  fileReader->Update();
-  mitk::Image::Pointer intensityImageRead = fileReader->GetOutput();
-
-  bool readingCorrect = true;
-  //  for all frames...
-  for(unsigned int j=0; j < numOfFrames; j++)
+  void tearDown()
   {
-    //get one slice of each image and compare it
-    //original data
-    mitk::ImageReadAccessor distAcc(distanceImage, distanceImage->GetSliceData(j, 0, 0));
-    mitk::ImageReadAccessor amplAcc(amplitudeImage, amplitudeImage->GetSliceData(j, 0, 0));
-    mitk::ImageReadAccessor intenAcc(intensityImage, intensityImage->GetSliceData(j, 0, 0));
+  }
 
-    distanceArray = (float*)distAcc.GetData();
-    amplitudeArray = (float*)amplAcc.GetData();
-    intensityArray = (float*)intenAcc.GetData();
+  void GetExtension_DefaultValueIsNrrd()
+  {
+    MITK_TEST_CONDITION_REQUIRED(m_ToFNrrdImageWriter->GetExtension() == ".nrrd", "Is .nrrd the default extension?");
+  }
 
-    //data read from disc
-    mitk::ImageReadAccessor distReadAcc(distanceImageRead, distanceImageRead->GetSliceData(j, 0, 0));
-    mitk::ImageReadAccessor amplReadAcc(amplitudeImageRead, amplitudeImageRead->GetSliceData(j, 0, 0));
-    mitk::ImageReadAccessor intenReadAcc(intensityImageRead, intensityImageRead->GetSliceData(j, 0, 0));
+  void Add_WriteDistanceImage_OutputImageIsEqualToInput()
+  {
+    m_ToFNrrdImageWriter->SetDistanceImageFileName(m_DistanceImageName);
 
-    distanceArrayRead = (float*)distReadAcc.GetData();
-    amplitudeArrayRead = (float*)amplReadAcc.GetData();
-    intensityArrayRead = (float*)intenReadAcc.GetData();
+    //buffer for each slice
+    float* distanceArray;
 
-    //for all pixels
-    for(unsigned int i=0; i<pixelNumber; i++)
+    m_ToFNrrdImageWriter->Open(); //open file/stream
+    for(unsigned int i = 0; i < m_NumberOfFrames ; ++i)
     {
-      //compare if input == output
-      if(!mitk::Equal(distanceArrayRead[i], distanceArray[i]) ||
-         !mitk::Equal(amplitudeArrayRead[i], amplitudeArray[i]) ||
-         !mitk::Equal(intensityArrayRead[i], intensityArray[i]))
-      {
-        readingCorrect = false;
-      }
+      mitk::ImageReadAccessor distAcc(m_GroundTruthDepthImage, m_GroundTruthDepthImage->GetSliceData(i, 0, 0));
+      distanceArray = (float*)distAcc.GetData();
+
+      //write (or add) the three slices to the file
+      m_ToFNrrdImageWriter->Add(distanceArray, NULL, NULL);
     }
+    m_ToFNrrdImageWriter->Close(); //close file
+
+    mitk::Image::Pointer writtenImage = mitk::IOUtil::LoadImage( m_DistanceImageName );
+    MITK_ASSERT_EQUAL( m_GroundTruthDepthImage, writtenImage, "Written image should be equal to the test data.");
+
+    //clean up tmp written image
+    remove( m_DistanceImageName.c_str() );
   }
 
-  remove( distanceImageFileName.c_str() );
-  remove( amplitudeImageFileName.c_str() );
-  remove( intensityImageFileName.c_str() );
-  MITK_TEST_CONDITION_REQUIRED(readingCorrect, "Testing if the output values are correct.");
+  void Add_WriteDistanceAndAmplitudeImage_OutputImagesAreEqualToInput()
+  {
+    m_ToFNrrdImageWriter->SetDistanceImageFileName(m_DistanceImageName);
+    m_ToFNrrdImageWriter->SetAmplitudeImageFileName(m_AmplitudeImageName);
+    m_ToFNrrdImageWriter->SetAmplitudeImageSelected(true);
 
-  //delete created image files
 
-  MITK_TEST_END();
-}
+    //buffer for each slice
+    float* distanceArray;
+    float* amplitudeArray;
+
+    m_ToFNrrdImageWriter->Open(); //open file/stream
+    for(unsigned int i = 0; i < m_NumberOfFrames ; ++i)
+    {
+      mitk::ImageReadAccessor distAcc(m_GroundTruthDepthImage, m_GroundTruthDepthImage->GetSliceData(i, 0, 0));
+      mitk::ImageReadAccessor amplAcc(m_GroundTruthAmplitudeImage, m_GroundTruthAmplitudeImage->GetSliceData(i, 0, 0));
+      distanceArray = (float*)distAcc.GetData();
+      amplitudeArray = (float*)amplAcc.GetData();
+
+      //write (or add) the three slices to the file
+      m_ToFNrrdImageWriter->Add(distanceArray, amplitudeArray, NULL);
+    }
+    m_ToFNrrdImageWriter->Close(); //close file
+
+    mitk::Image::Pointer writtenDepthImage = mitk::IOUtil::LoadImage( m_DistanceImageName );
+    mitk::Image::Pointer writtenAmplitudeImage = mitk::IOUtil::LoadImage( m_AmplitudeImageName );
+
+    MITK_ASSERT_EQUAL( m_GroundTruthDepthImage, writtenDepthImage, "Written depth image should be equal to the test data.");
+    MITK_ASSERT_EQUAL( m_GroundTruthAmplitudeImage, writtenAmplitudeImage, "Written amplitude image should be equal to the test data.");
+
+    //clean up tmp written image
+    remove( m_DistanceImageName.c_str() );
+    remove( m_AmplitudeImageName.c_str() );
+  }
+
+  void Add_WriteDistanceAndIntensityImage_OutputImagesAreEqualToInput()
+  {
+    m_ToFNrrdImageWriter->SetDistanceImageFileName(m_DistanceImageName);
+    m_ToFNrrdImageWriter->SetIntensityImageFileName(m_IntensityImageName);
+    m_ToFNrrdImageWriter->SetIntensityImageSelected(true);
+
+    //buffer for each slice
+    float* distanceArray;
+    float* intensityArray;
+
+    m_ToFNrrdImageWriter->Open(); //open file/stream
+    for(unsigned int i = 0; i < m_NumberOfFrames ; ++i)
+    {
+      mitk::ImageReadAccessor distAcc(m_GroundTruthDepthImage, m_GroundTruthDepthImage->GetSliceData(i, 0, 0));
+      mitk::ImageReadAccessor intensityAcc(m_GroundTruthIntensityImage, m_GroundTruthIntensityImage->GetSliceData(i, 0, 0));
+      distanceArray = (float*)distAcc.GetData();
+      intensityArray = (float*)intensityAcc.GetData();
+
+      //write (or add) the three slices to the file
+      m_ToFNrrdImageWriter->Add(distanceArray, NULL, intensityArray);
+    }
+    m_ToFNrrdImageWriter->Close(); //close file
+
+    mitk::Image::Pointer writtenDepthImage = mitk::IOUtil::LoadImage( m_DistanceImageName );
+    mitk::Image::Pointer writtenIntensityImage = mitk::IOUtil::LoadImage( m_IntensityImageName );
+
+    MITK_ASSERT_EQUAL( m_GroundTruthDepthImage, writtenDepthImage, "Written depth image should be equal to the test data.");
+    MITK_ASSERT_EQUAL( m_GroundTruthIntensityImage, writtenIntensityImage, "Written amplitude image should be equal to the test data.");
+
+    //clean up tmp written image
+    remove( m_DistanceImageName.c_str() );
+    remove( m_IntensityImageName.c_str() );
+  }
+
+  void Add_WriteDistanceAndIntensityAndAmplitudeImage_OutputImagesAreEqualToInput()
+  {
+    m_ToFNrrdImageWriter->SetDistanceImageFileName(m_DistanceImageName);
+    m_ToFNrrdImageWriter->SetIntensityImageFileName(m_IntensityImageName);
+    m_ToFNrrdImageWriter->SetIntensityImageSelected(true);
+    m_ToFNrrdImageWriter->SetAmplitudeImageFileName(m_AmplitudeImageName);
+    m_ToFNrrdImageWriter->SetAmplitudeImageSelected(true);
+
+    //buffer for each slice
+    float* distanceArray;
+    float* intensityArray;
+    float* amplitudeArray;
+
+    m_ToFNrrdImageWriter->Open(); //open file/stream
+    for(unsigned int i = 0; i < m_NumberOfFrames ; ++i)
+    {
+      mitk::ImageReadAccessor distAcc(m_GroundTruthDepthImage, m_GroundTruthDepthImage->GetSliceData(i, 0, 0));
+      mitk::ImageReadAccessor intensityAcc(m_GroundTruthIntensityImage, m_GroundTruthIntensityImage->GetSliceData(i, 0, 0));
+      mitk::ImageReadAccessor amplAcc(m_GroundTruthAmplitudeImage, m_GroundTruthAmplitudeImage->GetSliceData(i, 0, 0));
+
+      distanceArray = (float*)distAcc.GetData();
+      intensityArray = (float*)intensityAcc.GetData();
+      amplitudeArray = (float*)amplAcc.GetData();
+
+      //write (or add) the three slices to the file
+      m_ToFNrrdImageWriter->Add(distanceArray, amplitudeArray, intensityArray);
+    }
+    m_ToFNrrdImageWriter->Close(); //close file
+
+    mitk::Image::Pointer writtenDepthImage = mitk::IOUtil::LoadImage( m_DistanceImageName );
+    mitk::Image::Pointer writtenIntensityImage = mitk::IOUtil::LoadImage( m_IntensityImageName );
+    mitk::Image::Pointer writtenAmplitudeImage = mitk::IOUtil::LoadImage( m_AmplitudeImageName );
+
+    MITK_ASSERT_EQUAL( m_GroundTruthDepthImage, writtenDepthImage, "Written depth image should be equal to the test data.");
+    MITK_ASSERT_EQUAL( m_GroundTruthAmplitudeImage, writtenAmplitudeImage, "Written amplitude image should be equal to the test data.");
+    MITK_ASSERT_EQUAL( m_GroundTruthIntensityImage, writtenIntensityImage, "Written amplitude image should be equal to the test data.");
+
+    //clean up tmp written image
+    remove( m_DistanceImageName.c_str() );
+    remove( m_IntensityImageName.c_str() );
+    remove( m_AmplitudeImageName.c_str() );
+  }
+};
+
+MITK_TEST_SUITE_REGISTRATION(mitkToFNrrdImageWriter)

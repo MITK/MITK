@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkIRenderingManager.h>
+#include <mitkImageGenerator.h>
 
 // Qmitk
 #include "UltrasoundSupport.h"
@@ -55,6 +56,7 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 
   connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
   connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
+  //connect( m_Controls.m_DeviceManagerWidget, SIGNAL(DeviceActivated()), this, SLOT(OnChangedActiveDevice()) );
   connect( m_Controls.m_ActiveVideoDevices, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnChangedActiveDevice()) );
   connect( m_Controls.m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()) );
   connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
@@ -69,12 +71,15 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
       + mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE + "=true))";
   m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(
         mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL ,filter);
+  m_Controls.m_ActiveVideoDevices->SetAutomaticallySelectFirstEntry(true);
 
   // Create Node for US Stream
   if (m_Node.IsNull())
   {
     m_Node = mitk::DataNode::New();
     m_Node->SetName("US Support Viewing Stream");
+    mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255,0);
+    m_Node->SetData(dummyImage);
   }
 
   m_Controls.tabWidget->setTabEnabled(1, false);
@@ -94,23 +99,8 @@ void UltrasoundSupport::DisplayImage()
   m_Device->Update();
 
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
-
-  /*
-  if ( m_ImageAlreadySetToNode && ( curOutput.GetPointer() != m_Node->GetData() ) )
-  {
-    MITK_INFO << "Data Node of the ultrasound image stream was changed by another plugin. Stop viewing.";
-    this->StopViewing(false);
-    return;
-  }
-  */
-
- /* if (! m_ImageAlreadySetToNode && curOutput.IsNotNull() && curOutput->IsInitialized())
-  {
-    m_Node->SetData(curOutput);
-    m_ImageAlreadySetToNode = true;
-  }*/
-
   m_Node->SetData(curOutput);
+
   this->RequestRenderWindowUpdate();
 
   if ( curOutput->GetDimension() > 1
@@ -180,8 +170,6 @@ m_Timer->stop();
 this->RemoveControlWidgets();
 this->GetDataStorage()->Remove(m_Node);
 m_Node->ReleaseData();
-m_Node = mitk::DataNode::New();
-m_Node->SetName("US Support Viewing Stream");
 
 //get current device, abort if it is invalid
 m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
@@ -200,13 +188,10 @@ m_Controls.tabWidget->setTabEnabled(1, true);
 if(m_Controls.m_ShowImageStream->isChecked())
   {this->GetDataStorage()->Add(m_Node);}
 
-
 //start timer
 int interval = (1000 / m_Controls.m_FrameRate->value());
 m_Timer->setInterval(interval);
 m_Timer->start();
-
-this->RequestRenderWindowUpdate();
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()
@@ -345,6 +330,7 @@ void UltrasoundSupport::RemoveControlWidgets()
     }
   }
 }
+
 
 void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 {

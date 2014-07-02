@@ -69,6 +69,8 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   csvWriter->SetDistanceImageFileName(distanceImageFileName);
   csvWriter->SetAmplitudeImageFileName(amplitudeImageFileName);
   csvWriter->SetIntensityImageFileName(intensityImageFileName);
+  csvWriter->SetAmplitudeImageSelected(true);
+  csvWriter->SetIntensityImageSelected(true);
 
   csvWriter->SetToFCaptureWidth(dimX);
   csvWriter->SetToFCaptureHeight(dimY);

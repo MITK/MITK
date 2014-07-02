@@ -592,7 +592,7 @@ public:
     //Testing index->world->index conversion consistency
     dummyGeometry->WorldToIndex(origin, dummyPoint);
     dummyGeometry->IndexToWorld(dummyPoint, dummyPoint);
-    CPPUNIT_ASSERT(dummyPoint == origin);
+    CPPUNIT_ASSERT(mitk::EqualArray(dummyPoint, origin, 3, mitk::eps, true));
 
     //Testing WorldToIndex(origin, mitk::Point3D)==(0,0,0)
     mitk::Point3D globalOrigin;
@@ -600,34 +600,34 @@ public:
 
     mitk::Point3D originContinuousIndex;
     dummyGeometry->WorldToIndex(origin, originContinuousIndex);
-    CPPUNIT_ASSERT(originContinuousIndex == globalOrigin);
+    CPPUNIT_ASSERT(mitk::EqualArray(originContinuousIndex, globalOrigin, 3, mitk::eps, true));
 
     //Testing WorldToIndex(origin, itk::Index)==(0,0,0)
     itk::Index<3> itkindex;
     dummyGeometry->WorldToIndex(origin, itkindex);
     itk::Index<3> globalOriginIndex;
     mitk::vtk2itk(globalOrigin, globalOriginIndex);
-    CPPUNIT_ASSERT(itkindex == globalOriginIndex);
+    CPPUNIT_ASSERT(mitk::EqualArray(itkindex, globalOriginIndex, 3, mitk::eps, true));
 
     //Testing WorldToIndex(origin-0.5*spacing, itk::Index)==(0,0,0)
     mitk::Vector3D halfSpacingStep = dummyGeometry->GetSpacing()*0.5;
     mitk::Matrix3D rotation;
     mitk::Point3D originOffCenter = origin-halfSpacingStep;
     dummyGeometry->WorldToIndex(originOffCenter, itkindex);
-    CPPUNIT_ASSERT(itkindex == globalOriginIndex);
+    CPPUNIT_ASSERT(mitk::EqualArray(itkindex, globalOriginIndex, 3, mitk::eps, true));
 
     //Testing WorldToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)
     originOffCenter = origin+halfSpacingStep;
     originOffCenter -= 0.0001;
     dummyGeometry->WorldToIndex( originOffCenter, itkindex);
-    CPPUNIT_ASSERT(itkindex == globalOriginIndex);
+    CPPUNIT_ASSERT(mitk::EqualArray(itkindex, globalOriginIndex, 3, mitk::eps, true));
 
     //Testing WorldToIndex(origin+0.5*spacing, itk::Index)==(1,1,1)");
     originOffCenter = origin+halfSpacingStep;
     itk::Index<3> global111;
     mitk::FillVector3D(global111, 1,1,1);
     dummyGeometry->WorldToIndex( originOffCenter, itkindex);
-    CPPUNIT_ASSERT(itkindex == global111);
+    CPPUNIT_ASSERT(mitk::EqualArray(itkindex, global111, 3, mitk::eps, true));
 
     //Testing WorldToIndex(GetCenter())==BoundingBox.GetCenter
     mitk::Point3D center = dummyGeometry->GetCenter();
@@ -651,7 +651,7 @@ public:
     //Testing index->world->index conversion consistency
     dummyGeometry->WorldToIndex(point, dummyPoint);
     dummyGeometry->IndexToWorld(dummyPoint, dummyPoint);
-    CPPUNIT_ASSERT(dummyPoint == point);
+    CPPUNIT_ASSERT(mitk::EqualArray(dummyPoint, point, 3, mitk::eps, true));
 
     return EXIT_SUCCESS;
   }
@@ -1113,8 +1113,8 @@ public:
     //3-1=2, 8-5=3, 11.5-7.5=4; 2^2+3^2+4^2 = 29
     double expectedLength = sqrt(29.);
 
-    CPPUNIT_ASSERT(expectedLength==dummy->GetDiagonalLength());
-    CPPUNIT_ASSERT(29==dummy->GetDiagonalLength2());
+    CPPUNIT_ASSERT(mitk::Equal(expectedLength, dummy->GetDiagonalLength(), mitk::eps, true));
+    CPPUNIT_ASSERT(mitk::Equal(29., dummy->GetDiagonalLength2(), mitk::eps, true));
 
     //dummy must not have changed
     DummyTestClass::Pointer newDummy = DummyTestClass::New();

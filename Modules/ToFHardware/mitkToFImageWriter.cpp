@@ -23,8 +23,8 @@ namespace mitk
 {
   ToFImageWriter::ToFImageWriter():m_Extension(".nrrd"),
     m_DistanceImageFileName(), m_AmplitudeImageFileName(), m_IntensityImageFileName(), m_RGBImageFileName(),
-    m_NumOfFrames(0), m_DistanceImageSelected(true), m_AmplitudeImageSelected(true),
-    m_IntensityImageSelected(true), m_RGBImageSelected(true), m_ToFCaptureWidth(200),m_ToFCaptureHeight(200),
+    m_NumOfFrames(0), m_DistanceImageSelected(true), m_AmplitudeImageSelected(false),
+    m_IntensityImageSelected(false), m_RGBImageSelected(false), m_ToFCaptureWidth(200),m_ToFCaptureHeight(200),
     m_RGBCaptureWidth(200),m_RGBCaptureHeight(200),
     m_ToFPixelNumber(0), m_ToFImageSizeInBytes(0),
     m_RGBPixelNumber(0), m_RGBImageSizeInBytes(0),

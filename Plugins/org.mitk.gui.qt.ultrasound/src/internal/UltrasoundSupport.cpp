@@ -56,7 +56,6 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 
   connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
   connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
-  //connect( m_Controls.m_DeviceManagerWidget, SIGNAL(DeviceActivated()), this, SLOT(OnChangedActiveDevice()) );
   connect( m_Controls.m_ActiveVideoDevices, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnChangedActiveDevice()) );
   connect( m_Controls.m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()) );
   connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
@@ -78,6 +77,7 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   {
     m_Node = mitk::DataNode::New();
     m_Node->SetName("US Support Viewing Stream");
+    //create a dummy image (gray values 0..255) for correct initialization of level window, etc.
     mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255,0);
     m_Node->SetData(dummyImage);
   }
@@ -95,31 +95,37 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 
 void UltrasoundSupport::DisplayImage()
 {
+  //Update device
   m_Device->Modified();
   m_Device->Update();
 
+  //Update data node
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
   m_Node->SetData(curOutput);
 
-  this->RequestRenderWindowUpdate();
-
-  if ( curOutput->GetDimension() > 1
-    && (curOutput->GetDimension(0) != m_CurrentImageWidth
-    || curOutput->GetDimension(1) != m_CurrentImageHeight) )
+  //Only update the view if the image is shown
+  if(m_Controls.m_ShowImageStream->isChecked())
   {
-    // make a reinit on the ultrasound image
-    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-    if ( renderWindow != NULL && curOutput->GetTimeGeometry()->IsValid() )
+    this->RequestRenderWindowUpdate();
+    if ( curOutput->GetDimension() > 1
+      && (curOutput->GetDimension(0) != m_CurrentImageWidth
+      || curOutput->GetDimension(1) != m_CurrentImageHeight) )
     {
-      renderWindow->GetRenderingManager()->InitializeViews(
-        curOutput->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-      renderWindow->GetRenderingManager()->RequestUpdateAll();
-    }
+      // make a reinit on the ultrasound image
+      mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+      if ( renderWindow != NULL && curOutput->GetTimeGeometry()->IsValid() )
+      {
+        renderWindow->GetRenderingManager()->InitializeViews(
+          curOutput->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        renderWindow->GetRenderingManager()->RequestUpdateAll();
+      }
 
-    m_CurrentImageWidth = curOutput->GetDimension(0);
-    m_CurrentImageHeight = curOutput->GetDimension(1);
+      m_CurrentImageWidth = curOutput->GetDimension(0);
+      m_CurrentImageHeight = curOutput->GetDimension(1);
+    }
   }
 
+  //Update frame counter
   m_FrameCounter ++;
   if (m_FrameCounter == 10)
   {
@@ -127,20 +133,6 @@ void UltrasoundSupport::DisplayImage()
     int fps = 10000.0f / (nMilliseconds );
     m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(fps) +" FPS");
     m_FrameCounter = 0;
-  }
-}
-
-void UltrasoundSupport::OnClickedViewDevice()
-{
-  m_FrameCounter = 0;
-  // We use the activity state of the timer to determine whether we are currently viewing images
-  if ( ! m_Timer->isActive() ) // Activate Imaging
-  {
-    this->StartViewing();
-  }
-  else //deactivate imaging
-  {
-    this->StopViewing();
   }
 }
 
@@ -200,47 +192,6 @@ void UltrasoundSupport::OnNewDeviceWidgetDone()
   m_Controls.m_DeviceManagerWidget->setVisible(true);
   m_Controls.m_Headline->setText("Ultrasound Devices:");
   m_Controls.m_WidgetActiveDevices->setVisible(true);
-}
-
-void UltrasoundSupport::StartViewing()
-{
-  m_ImageAlreadySetToNode = false;
-
-  m_Controls.tabWidget->setTabEnabled(1, true);
-  m_Controls.tabWidget->setCurrentIndex(1);
-
-  //get device & set data node
-  m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
-  if (m_Device.IsNull())
-  {
-    m_Timer->stop();
-    return;
-  }
-
-  //start timer
-  int interval = (1000 / m_Controls.m_FrameRate->value());
-  m_Timer->setInterval(interval);
-  m_Timer->start();
-
-  //change UI elements
-  //m_Controls.m_BtnView->setText("Stop Viewing");
-
-  this->CreateControlWidgets();
-}
-
-void UltrasoundSupport::StopViewing(bool RenderWindowUpdate)
-{
-  m_Controls.tabWidget->setTabEnabled(1, false);
-
-  this->RemoveControlWidgets();
-
-  //stop timer & release data
-  m_Timer->stop();
-  m_Node->ReleaseData();
-  if (RenderWindowUpdate) {this->RequestRenderWindowUpdate();}
-
-  //change UI elements
-  //m_Controls.m_BtnView->setText("Start Viewing");
 }
 
 void UltrasoundSupport::CreateControlWidgets()
@@ -346,7 +297,7 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 
   if ( ! m_Device->GetIsActive() && m_Timer->isActive() )
   {
-    this->StopViewing(false);
+    m_Timer->stop();
   }
 
   if ( m_CurrentDynamicRange != service.getProperty(QString::fromStdString(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DYNAMIC_RANGE)).toDouble() )

@@ -65,8 +65,6 @@ public:
 
       void OnClickedAddNewDevice();
 
-      void OnClickedViewDevice();
-
       void OnChangedFramerateLimit(int);
 
       void OnChangedActiveDevice();
@@ -81,9 +79,6 @@ public:
       void DisplayImage();
 
 protected:
-
-  void StartViewing();
-  void StopViewing(bool RenderWindowUpdate = true);
 
   void CreateControlWidgets();
   void RemoveControlWidgets();

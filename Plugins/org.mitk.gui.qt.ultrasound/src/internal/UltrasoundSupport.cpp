@@ -55,8 +55,9 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 
   connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
   connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
+  connect( m_Controls.m_ActiveVideoDevices, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnChangedActiveDevice()) );
+  connect( m_Controls.m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()) );
   connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
-  connect( m_Controls.m_BtnView, SIGNAL(clicked()), this, SLOT(OnClickedViewDevice()) );
   connect( m_Controls.m_FrameRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit(int)) );
   connect( m_Controls.m_FreezeButton, SIGNAL(clicked()), this, SLOT(OnClickedFreezeButton()) );
   connect( m_Timer, SIGNAL(timeout()), this, SLOT(DisplayImage()));
@@ -69,13 +70,11 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(
         mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL ,filter);
 
-  m_Node = this->GetDataStorage()->GetNamedNode("US Image Stream");
+  // Create Node for US Stream
   if (m_Node.IsNull())
   {
-    // Create Node for US Stream
     m_Node = mitk::DataNode::New();
-    m_Node->SetName("US Image Stream");
-    this->GetDataStorage()->Add(m_Node);
+    m_Node->SetName("US Support Viewing Stream");
   }
 
   m_Controls.tabWidget->setTabEnabled(1, false);
@@ -96,19 +95,22 @@ void UltrasoundSupport::DisplayImage()
 
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
 
+  /*
   if ( m_ImageAlreadySetToNode && ( curOutput.GetPointer() != m_Node->GetData() ) )
   {
     MITK_INFO << "Data Node of the ultrasound image stream was changed by another plugin. Stop viewing.";
     this->StopViewing(false);
     return;
   }
+  */
 
-  if (! m_ImageAlreadySetToNode && curOutput.IsNotNull() && curOutput->IsInitialized())
+ /* if (! m_ImageAlreadySetToNode && curOutput.IsNotNull() && curOutput->IsInitialized())
   {
     m_Node->SetData(curOutput);
     m_ImageAlreadySetToNode = true;
-  }
+  }*/
 
+  m_Node->SetData(curOutput);
   this->RequestRenderWindowUpdate();
 
   if ( curOutput->GetDimension() > 1
@@ -171,6 +173,42 @@ void UltrasoundSupport::OnClickedFreezeButton()
   }
 }
 
+void UltrasoundSupport::OnChangedActiveDevice()
+{
+//clean up and stop timer
+m_Timer->stop();
+this->RemoveControlWidgets();
+this->GetDataStorage()->Remove(m_Node);
+m_Node->ReleaseData();
+m_Node = mitk::DataNode::New();
+m_Node->SetName("US Support Viewing Stream");
+
+//get current device, abort if it is invalid
+m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
+if (m_Device.IsNull())
+  {
+    MITK_WARN << "Selected device is not valid, aborting";
+    m_Controls.tabWidget->setTabEnabled(1, false);
+    return;
+  }
+
+//create the widgets for this device and enable the widget tab
+this->CreateControlWidgets();
+m_Controls.tabWidget->setTabEnabled(1, true);
+
+//show node if the option is enabled
+if(m_Controls.m_ShowImageStream->isChecked())
+  {this->GetDataStorage()->Add(m_Node);}
+
+
+//start timer
+int interval = (1000 / m_Controls.m_FrameRate->value());
+m_Timer->setInterval(interval);
+m_Timer->start();
+
+this->RequestRenderWindowUpdate();
+}
+
 void UltrasoundSupport::OnNewDeviceWidgetDone()
 {
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
@@ -200,7 +238,7 @@ void UltrasoundSupport::StartViewing()
   m_Timer->start();
 
   //change UI elements
-  m_Controls.m_BtnView->setText("Stop Viewing");
+  //m_Controls.m_BtnView->setText("Stop Viewing");
 
   this->CreateControlWidgets();
 }
@@ -217,7 +255,7 @@ void UltrasoundSupport::StopViewing(bool RenderWindowUpdate)
   if (RenderWindowUpdate) {this->RequestRenderWindowUpdate();}
 
   //change UI elements
-  m_Controls.m_BtnView->setText("Start Viewing");
+  //m_Controls.m_BtnView->setText("Start Viewing");
 }
 
 void UltrasoundSupport::CreateControlWidgets()
@@ -276,6 +314,8 @@ void UltrasoundSupport::CreateControlWidgets()
 
 void UltrasoundSupport::RemoveControlWidgets()
 {
+  if(!m_ControlProbesWidget) {return;} //widgets do not exist... nothing to do
+
   // remove all control widgets from the tool box widget
   while (m_Controls.m_ToolBoxControlWidgets->count() > 0)
   {

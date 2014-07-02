@@ -69,6 +69,8 @@ public:
 
       void OnChangedFramerateLimit(int);
 
+      void OnChangedActiveDevice();
+
       void OnClickedFreezeButton();
 
       void OnDeciveServiceEvent(const ctkServiceEvent event);

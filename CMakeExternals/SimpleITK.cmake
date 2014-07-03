@@ -48,12 +48,12 @@ if(MITK_USE_SimpleITK)
     set(SimpleITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSimpleITK.cmake)
 
     ExternalProject_Add(${proj}
+       URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/SimpleITK.tar.gz"
+       URL_MD5 "7cfa5d0ff79a540f4bcfaf992abe44d2"
+       #GIT_TAG "493f15f5cfc620413d0aa7bb705ffe6d038a41b5"
        SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
        BINARY_DIR ${proj}-build
        PREFIX ${proj}-cmake
-       GIT_REPOSITORY "http://itk.org/SimpleITK.git"
-       GIT_TAG "493f15f5cfc620413d0aa7bb705ffe6d038a41b5"
-       #INSTALL_COMMAND ""
        INSTALL_DIR ${proj}-install
        PATCH_COMMAND ${SimpleITK_PATCH_COMMAND}
        CMAKE_ARGS

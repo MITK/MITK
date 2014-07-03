@@ -364,9 +364,11 @@ if(MITK_USE_Python)
 
   if( NOT MITK_USE_SYSTEM_PYTHON )
     list(APPEND mitk_optional_cache_args
-          -DPython_DIR:PATH=${Python_DIR})
+          -DPython_DIR:PATH=${Python_DIR}
+          -DPYTHON_MAJOR_VERSION:STRING=${PYTHON_MAJOR_VERSION}
+          -DPYTHON_MINOR_VERSION:STRING=${PYTHON_MINOR_VERSION}
+        )
   endif()
-
 endif()
 
 set(proj MITK-Configure)

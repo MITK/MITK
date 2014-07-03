@@ -15,14 +15,20 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     set(PYTHON_PATCH_VERSION 3)
 
     set(PYTHON_SOURCE_PACKAGE Python-${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}.${PYTHON_PATCH_VERSION})
+    set(PYTHON_SOURCE_DIR  "${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}")
+    # patch the VS compiler config
+
+    if(WIN32)
+      set(PYTHON_PATCH_COMMAND PATCH_COMMAND ${CMAKE_COMMAND} -DPYTHON_SOURCE_DIR:PATH=${PYTHON_SOURCE_DIR} -P ${CMAKE_CURRENT_LIST_DIR}/Patch${proj}.cmake)
+    endif()
 
     # download the source code
     ExternalProject_Add(Python-src
-      URL "https://www.python.org/ftp/python/${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}.${PYTHON_PATCH_VERSION}/${PYTHON_SOURCE_PACKAGE}.tgz"
-      #URL_MD5 "d41d8cd98f00b204e9800998ecf8427e"
-      #DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
+      URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/${PYTHON_SOURCE_PACKAGE}.tgz"
+      URL_MD5  "2cf641732ac23b18d139be077bd906cd"
       PREFIX   ${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}-cmake
-      SOURCE_DIR  "${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}"
+      SOURCE_DIR  "${PYTHON_SOURCE_DIR}"
+      ${PYTHON_PATCH_COMMAND}
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND ""
@@ -107,8 +113,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
 
     # CMake build environment for python
     ExternalProject_Add(${proj}
-      GIT_REPOSITORY "git://github.com/davidsansome/python-cmake-buildsystem.git"
-      GIT_TAG "3c5864f210a8d0ae1196be7c691252e16e459f59"
+      URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/python-cmake-buildsystem.tar.gz"
+      URL_MD5 "171090922892acdaf1a155e22765d72d"
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       PREFIX ${proj}-cmake
       BINARY_DIR ${proj}-build

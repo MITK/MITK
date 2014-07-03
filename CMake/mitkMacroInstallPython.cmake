@@ -84,12 +84,12 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
     if(UNIX)
       list(APPEND _python_dirs "${Python_DIR}/lib")
       # install python stuff
-      install(DIRECTORY "${Python_DIR}/lib/python2.7"
+      install(DIRECTORY "${Python_DIR}/lib/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}"
             DESTINATION bin/Python/lib
             USE_SOURCE_PERMISSIONS
             COMPONENT Runtime)
-      install(FILES "${Python_DIR}/include/python2.7/pyconfig.h" DESTINATION bin/Python/include/python2.7)
-    else(WIN32)
+      install(FILES "${Python_DIR}/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}/pyconfig.h" DESTINATION bin/Python/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION})
+    else()
       list(APPEND _python_dirs "${Python_DIR}/libs")
       list(APPEND _python_dirs "${Python_DIR}/bin")
 

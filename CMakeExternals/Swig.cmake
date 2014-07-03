@@ -5,24 +5,19 @@ if(DEFINED Swig_DIR AND NOT EXISTS ${Swig_DIR})
 endif()
 
 if(NOT SWIG_DIR)
-
   set(SWIG_TARGET_VERSION 3.0.2)
-  set(SWIG_DOWNLOAD_SOURCE_HASH "62f9b0d010cef36a13a010dc530d0d41")
-  set(SWIG_DOWNLOAD_WIN_HASH "3f18de4fc09ab9abb0d3be37c11fbc8f")
   set(proj Swig)
   set(Swig_DEPENDENCIES )
   set(Swig_DEPENDS )
 
-
+  # binary SWIG for windows
   if(WIN32)
-    # binary SWIG for windows
-    #------------------------------------------------------------------------------
     set(swig_source_dir ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION})
 
     # swig.exe available as pre-built binary on Windows:
     ExternalProject_Add(Swig
-      URL http://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=${SWIG_DOWNLOAD_WIN_HASH}&name=swigwin-${SWIG_TARGET_VERSION}.zip
-      URL_MD5 ${SWIG_DOWNLOAD_WIN_HASH}
+      URL https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/swigwin-${SWIG_TARGET_VERSION}.zip
+      URL_MD5 "3f18de4fc09ab9abb0d3be37c11fbc8f"
       SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION}
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
@@ -33,8 +28,6 @@ if(NOT SWIG_DIR)
     set(SWIG_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION}/swig.exe)
 
   else()
-    # compiled SWIG for others
-    #------------------------------------------------------------------------------
 
     # swig uses bison find it by cmake and pass it down
     find_package(BISON)
@@ -55,8 +48,8 @@ if(NOT SWIG_DIR)
     set(swig_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/swig_configure_step.cmake)
 
     ExternalProject_add(Swig
-      URL http://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=${SWIG_DOWNLOAD_SOURCE_HASH}&name=swig-${SWIG_TARGET_VERSION}.tar.gz
-      URL_MD5 ${SWIG_DOWNLOAD_SOURCE_HASH}
+      URL https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/swig-${SWIG_TARGET_VERSION}.tar.gz
+      URL_MD5 "62f9b0d010cef36a13a010dc530d0d41"
       SOURCE_DIR ${swig_source_dir}
       INSTALL_DIR ${swig_install_dir}
       PREFIX ${proj}-cmake

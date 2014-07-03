@@ -18,13 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSimulation_h
 
 #include <mitkBaseData.h>
+#include <mitkSchedulableProcess.h>
 #include <sofa/core/visual/DrawToolGL.h>
 #include <sofa/simulation/common/Simulation.h>
 #include <MitkSimulationExports.h>
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT Simulation : public BaseData
+  class MitkSimulation_EXPORT Simulation : public BaseData, public SchedulableProcess
   {
   public:
     mitkClassMacro(Simulation, BaseData);

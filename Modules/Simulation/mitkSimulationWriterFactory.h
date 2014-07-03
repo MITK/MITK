@@ -35,9 +35,6 @@ namespace mitk
   protected:
     SimulationWriterFactory();
     ~SimulationWriterFactory();
-
-  private:
-    // static itk::ObjectFactoryBase::Pointer GetInstance();
   };
 }
 

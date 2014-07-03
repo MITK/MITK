@@ -53,12 +53,12 @@ mitk::SimulationReader::~SimulationReader()
 void mitk::SimulationReader::GenerateData()
 {
   Simulation::Pointer simulation = static_cast<mitk::Simulation*>(this->GetOutput());
-  sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
+  sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSOFASimulation();
 
   ISimulationService* simulationService = GetSimulationService();
-  Simulation::Pointer currentSimulation = simulationService->GetSimulation();
+  Simulation::Pointer lastActiveSimulation = simulationService->GetActiveSimulation();
 
-  simulationService->SetSimulation(simulation);
+  simulationService->SetActiveSimulation(simulation);
 
   std::ifstream scnFile(m_FileName.c_str());
   std::string content = std::string((std::istreambuf_iterator<char>(scnFile)), std::istreambuf_iterator<char>());
@@ -109,7 +109,7 @@ void mitk::SimulationReader::GenerateData()
 
   simulation->SetProperty("Scene File", StringProperty::New(content));
 
-  simulationService->SetSimulation(currentSimulation);
+  simulationService->SetActiveSimulation(lastActiveSimulation);
 }
 
 void mitk::SimulationReader::GenerateOutputInformation()

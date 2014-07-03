@@ -1,5 +1,6 @@
 set(CPP_FILES
   mitkGetSimulationService.cpp
+  mitkExportMitkVisitor.cpp
   mitkIndexROI.cpp
   mitkISimulationService.cpp
   mitkSetVtkRendererVisitor.cpp

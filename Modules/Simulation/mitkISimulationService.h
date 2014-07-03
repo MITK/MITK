@@ -26,8 +26,8 @@ namespace mitk
   class MitkSimulation_EXPORT ISimulationService
   {
   public:
-    virtual Simulation::Pointer GetSimulation() const = 0;
-    virtual void SetSimulation(Simulation::Pointer simulation) = 0;
+    virtual Simulation::Pointer GetActiveSimulation() const = 0;
+    virtual void SetActiveSimulation(Simulation::Pointer activeSimulation) = 0;
 
   protected:
     ISimulationService();

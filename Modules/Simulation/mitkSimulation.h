@@ -34,7 +34,7 @@ namespace mitk
     void Animate();
     sofa::core::visual::DrawTool* GetDrawTool();
     sofa::simulation::Node::SPtr GetRootNode() const;
-    sofa::simulation::Simulation::SPtr GetSimulation() const;
+    sofa::simulation::Simulation::SPtr GetSOFASimulation() const;
     void Reset();
     void SetAnimationFlag(bool animate);
     void SetDt(double dt);
@@ -50,7 +50,7 @@ namespace mitk
     Simulation();
     ~Simulation();
 
-    sofa::simulation::Simulation::SPtr m_Simulation;
+    sofa::simulation::Simulation::SPtr m_SOFASimulation;
     sofa::simulation::Node::SPtr m_RootNode;
     sofa::core::visual::DrawToolGL m_DrawTool;
   };

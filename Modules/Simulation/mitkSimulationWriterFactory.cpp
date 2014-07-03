@@ -68,9 +68,3 @@ const char* mitk::SimulationWriterFactory::GetDescription() const
 {
   return "SimulationWriterFactory";
 }
-
-/*itk::ObjectFactoryBase::Pointer mitk::SimulationWriterFactory::GetInstance()
-{
-  static SimulationWriterFactory::Pointer factory = SimulationWriterFactory::New();
-  return factory.GetPointer();
-}*/

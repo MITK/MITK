@@ -155,7 +155,7 @@ void QmitkSimulationView::OnSelectedSceneChanged(const mitk::DataNode* node)
     m_Selection = m_Controls.sceneComboBox->GetSelectedNode();
     mitk::Simulation* simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
 
-    m_SimulationService->SetSimulation(simulation);
+    m_SimulationService->SetActiveSimulation(simulation);
 
     m_Controls.sceneGroupBox->setEnabled(true);
     m_Controls.snapshotButton->setEnabled(true);
@@ -165,7 +165,7 @@ void QmitkSimulationView::OnSelectedSceneChanged(const mitk::DataNode* node)
   {
     m_Selection = NULL;
 
-    m_SimulationService->SetSimulation(NULL);
+    m_SimulationService->SetActiveSimulation(NULL);
 
     m_Controls.sceneGroupBox->setEnabled(false);
     m_Controls.snapshotButton->setEnabled(false);
@@ -179,7 +179,7 @@ void QmitkSimulationView::OnSnapshotButtonClicked()
     return;
 
   mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
-  mitk::ExportMitkVisitor exportVisitor;
+  mitk::ExportMitkVisitor exportVisitor(this->GetDataStorage());
 
   simulation->GetRootNode()->executeVisitor(&exportVisitor);
 }
@@ -211,7 +211,7 @@ bool QmitkSimulationView::SetSelectionAsCurrentSimulation() const
 {
   if (m_Selection.IsNotNull())
   {
-    m_SimulationService->SetSimulation(static_cast<mitk::Simulation*>(m_Selection->GetData()));
+    m_SimulationService->SetActiveSimulation(static_cast<mitk::Simulation*>(m_Selection->GetData()));
     return true;
   }
 

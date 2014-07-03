@@ -27,11 +27,11 @@ namespace mitk
     SimulationService();
     ~SimulationService();
 
-    Simulation::Pointer GetSimulation() const;
-    void SetSimulation(Simulation::Pointer simulation);
+    Simulation::Pointer GetActiveSimulation() const;
+    void SetActiveSimulation(Simulation::Pointer activeSimulation);
 
   private:
-    Simulation::Pointer m_Simulation;
+    Simulation::Pointer m_ActiveSimulation;
   };
 }
 

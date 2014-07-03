@@ -17,16 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkExportMitkVisitor_h
 #define mitkExportMitkVisitor_h
 
+#include <mitkDataStorage.h>
 #include <sofa/simulation/common/Visitor.h>
-#include <org_mitk_simulation_Export.h>
+#include <MitkSimulationExports.h>
 
 namespace mitk
 {
-  class SIMULATION_INIT_EXPORT ExportMitkVisitor : public sofa::simulation::Visitor
+  class MitkSimulation_EXPORT ExportMitkVisitor : public sofa::simulation::Visitor
   {
   public:
-    explicit ExportMitkVisitor(const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
-    explicit ExportMitkVisitor(const std::string& visualModelName, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
+    explicit ExportMitkVisitor(DataStorage::Pointer dataStorage, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
+    ExportMitkVisitor(DataStorage::Pointer dataStorage, const std::string& visualModelName, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
     ~ExportMitkVisitor();
 
     Result processNodeTopDown(sofa::simulation::Node* node);
@@ -37,6 +38,7 @@ namespace mitk
 
     void processVisualModel(sofa::simulation::Node* node, sofa::core::visual::VisualModel* visualModel);
 
+    DataStorage::Pointer m_DataStorage;
     std::string m_VisualModelName;
   };
 }

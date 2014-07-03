@@ -29,7 +29,7 @@ static sofa::simulation::Simulation::SPtr CreateSimulation()
 }
 
 mitk::Simulation::Simulation()
-  : m_Simulation(CreateSimulation())
+  : m_SOFASimulation(CreateSimulation())
 {
 }
 
@@ -37,17 +37,17 @@ mitk::Simulation::~Simulation()
 {
   if (m_RootNode)
   {
-    if (m_Simulation)
-      m_Simulation->unload(m_RootNode);
+    if (m_SOFASimulation)
+      m_SOFASimulation->unload(m_RootNode);
   }
 }
 
 void mitk::Simulation::Animate()
 {
-  if (!m_RootNode || !m_Simulation)
+  if (!m_RootNode || !m_SOFASimulation)
     return;
 
-  m_Simulation->animate(m_RootNode.get(), m_RootNode->getDt());
+  m_SOFASimulation->animate(m_RootNode.get(), m_RootNode->getDt());
 }
 
 sofa::core::visual::DrawTool* mitk::Simulation::GetDrawTool()
@@ -60,19 +60,19 @@ sofa::simulation::Node::SPtr mitk::Simulation::GetRootNode() const
   return m_RootNode;
 }
 
-sofa::simulation::Simulation::SPtr mitk::Simulation::GetSimulation() const
+sofa::simulation::Simulation::SPtr mitk::Simulation::GetSOFASimulation() const
 {
-  return m_Simulation;
+  return m_SOFASimulation;
 }
 
 void mitk::Simulation::Reset()
 {
-  if (!m_RootNode || !m_Simulation)
+  if (!m_RootNode || !m_SOFASimulation)
     return;
 
-  m_Simulation->reset(m_RootNode.get());
+  m_SOFASimulation->reset(m_RootNode.get());
   m_RootNode->setTime(0.0);
-  m_Simulation->updateContext(m_RootNode.get());
+  m_SOFASimulation->updateContext(m_RootNode.get());
 }
 
 void mitk::Simulation::SetAnimationFlag(bool animate)

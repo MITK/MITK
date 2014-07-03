@@ -46,10 +46,10 @@ void mitk::vtkSimulationPolyDataMapper::Render(vtkRenderer* renderer, vtkActor* 
 
   renderer->GetRenderWindow()->MakeCurrent();
 
-  m_SimulationService->SetSimulation(m_Simulation);
+  m_SimulationService->SetActiveSimulation(m_Simulation);
 
   sofa::core::visual::VisualParams* vParams = sofa::core::visual::VisualParams::defaultInstance();
-  sofa::simulation::Simulation::SPtr sofaSimulation = m_Simulation->GetSimulation();
+  sofa::simulation::Simulation::SPtr sofaSimulation = m_Simulation->GetSOFASimulation();
   sofa::simulation::Node::SPtr rootNode = m_Simulation->GetRootNode();
 
   sofaSimulation->updateVisual(rootNode.get());

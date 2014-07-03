@@ -50,6 +50,13 @@ void mitk::MovieGeneratorOpenCV::SetRemoveColouredFrame(bool removeColouredFrame
   m_RemoveColouredFrame = removeColouredFrame;
 }
 
+
+bool mitk::MovieGeneratorOpenCV::GetRemoveColouredFrame() const
+{
+  return m_RemoveColouredFrame;
+}
+
+
 void mitk::MovieGeneratorOpenCV::SetFlipVertical(bool flipVertical)
 {
   m_FlipVertical = flipVertical;
@@ -60,6 +67,7 @@ bool mitk::MovieGeneratorOpenCV::GetFlipVertical() const
 {
   return m_FlipVertical;
 }
+
 
 bool mitk::MovieGeneratorOpenCV::InitGenerator()
 {

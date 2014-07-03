@@ -54,6 +54,7 @@ public:
   /// default: true
   ///
   void SetRemoveColouredFrame(bool);
+  bool GetRemoveColouredFrame() const;
 
   ///
   /// \brief If true (the default for the class), will flip the image in the

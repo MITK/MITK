@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLayoutItem>
 #include <QWidgetItem>
 #include <QMessageBox>
+#include <QtConcurrentMap>
 
 // CTK
 #include <ctkCmdLineModuleManager.h>
@@ -47,6 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleDescription.h>
 #include <ctkCmdLineModuleParameter.h>
 #include <ctkCmdLineModuleUtils.h>
+#include <ctkCmdLineModuleConcurrentHelpers.h>
 
 //-----------------------------------------------------------------------------
 CommandLineModulesView::CommandLineModulesView()
@@ -140,6 +142,8 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreButtonPressed()));
     connect(this->m_Controls->m_ComboBox, SIGNAL(actionChanged(QAction*)), this, SLOT(OnActionChanged(QAction*)));
     connect(this->m_Controls->m_TabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(OnTabCloseRequested(int)));
+    connect(this->m_Controls->m_ClearXMLCache, SIGNAL(pressed()), this, SLOT(OnClearCache()));
+    connect(this->m_Controls->m_ReloadModules, SIGNAL(pressed()), this, SLOT(OnReloadModules()));
 
     this->UpdateRunButtonEnabledStatus();
   }
@@ -489,3 +493,61 @@ void CommandLineModulesView::OnDirectoryWatcherErrorsDetected(const QString& err
 {
   ctkCmdLineModuleUtils::messageBoxForModuleRegistration(errorMsg);
 }
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnClearCache()
+{
+  if (this->m_DebugOutput)
+  {
+    qDebug() << "CommandLineModulesView::OnClearCache(): starting";
+  }
+
+  m_ModuleManager->clearCache();
+
+  if (this->m_DebugOutput)
+  {
+    qDebug() << "CommandLineModulesView::OnClearCache(): finishing";
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnReloadModules()
+{
+  QList<QUrl> urls;
+
+  QList<ctkCmdLineModuleReference> moduleRefs = m_ModuleManager->moduleReferences();
+  foreach (ctkCmdLineModuleReference ref, moduleRefs)
+  {
+    urls.push_back(ref.location());
+  }
+
+  if (this->m_DebugOutput)
+  {
+    qDebug() << "CommandLineModulesView::OnReloadModules(): unloading:" << urls;
+  }
+
+  foreach (ctkCmdLineModuleReference ref, moduleRefs)
+  {
+    m_ModuleManager->unregisterModule(ref);
+  }
+
+  if (this->m_DebugOutput)
+  {
+    qDebug() << "CommandLineModulesView::OnReloadModules(): reloading.";
+  }
+
+  QList<ctkCmdLineModuleReferenceResult> refResults = QtConcurrent::blockingMapped(urls,
+                                                                                   ctkCmdLineModuleConcurrentRegister(m_ModuleManager, m_DebugOutput));
+
+  if (this->m_DebugOutput)
+  {
+    qDebug() << "CommandLineModulesView::OnReloadModules(): finished.";
+  }
+
+  QString errorMessages = ctkCmdLineModuleUtils::errorMessagesFromModuleRegistration(refResults,
+                                                                                     m_ModuleManager->validationMode());
+  ctkCmdLineModuleUtils::messageBoxForModuleRegistration(errorMessages);
+}
+

@@ -115,6 +115,16 @@ private slots:
    */
   void OnJobFinished();
 
+  /**
+   * \brief Called when the user hits the 'clear XML cache' button.
+   */
+  void OnClearCache();
+
+  /**
+   * \brief Called when the user hits the 'reload modules' button.
+   */
+  void OnReloadModules();
+
 private:
 
   /**

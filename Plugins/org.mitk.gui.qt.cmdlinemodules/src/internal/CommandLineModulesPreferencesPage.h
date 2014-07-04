@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_cmdlinemodules_Export.h>
 
 class QWidget;
+class QGridLayout;
 class QCheckBox;
 class QComboBox;
 class QSpinBox;
@@ -86,6 +87,7 @@ protected:
   ctkDirectoryButton       *m_TemporaryDirectory;
   QmitkDirectoryListWidget *m_ModulesDirectories;
   QmitkFileListWidget      *m_ModulesFiles;
+  QGridLayout              *m_GridLayoutForLoadCheckboxes;
   QCheckBox                *m_LoadFromHomeDir;
   QCheckBox                *m_LoadFromHomeDirCliModules;
   QCheckBox                *m_LoadFromCurrentDir;

@@ -141,9 +141,13 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_MaximumNumberProcesses = new QSpinBox(m_MainControl);
   m_MaximumNumberProcesses->setMinimum(1);
   m_MaximumNumberProcesses->setMaximum(1000000);
+  m_XmlTimeoutInSeconds = new QSpinBox(m_MainControl);
+  m_XmlTimeoutInSeconds->setMinimum(1);
+  m_XmlTimeoutInSeconds->setMaximum(3600);
 
   QFormLayout *formLayout = new QFormLayout;
   formLayout->addRow("show debug output:", m_DebugOutput);
+  formLayout->addRow("XML time-out (secs):", m_XmlTimeoutInSeconds);
   formLayout->addRow("XML validation mode:", m_ValidationMode);
   formLayout->addRow("max. concurrent processes:", m_MaximumNumberProcesses);
   formLayout->addRow("scan:", m_GridLayoutForLoadCheckboxes);
@@ -206,6 +210,7 @@ bool CommandLineModulesPreferencesPage::PerformOk()
   }
 
   m_CLIPreferencesNode->PutInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, m_ValidationMode->currentIndex());
+  m_CLIPreferencesNode->PutInt(CommandLineModulesViewConstants::XML_TIMEOUT_SECS, m_XmlTimeoutInSeconds->value());
   m_CLIPreferencesNode->PutInt(CommandLineModulesViewConstants::MAX_CONCURRENT, m_MaximumNumberProcesses->value());
   return true;
 }
@@ -244,5 +249,6 @@ void CommandLineModulesPreferencesPage::Update()
   m_ModulesFiles->setFiles(fileList);
 
   m_ValidationMode->setCurrentIndex(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0));
+  m_XmlTimeoutInSeconds->setValue(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_TIMEOUT_SECS, 30)); // 30 secs = QProcess default timeout
   m_MaximumNumberProcesses->setValue(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4));
 }

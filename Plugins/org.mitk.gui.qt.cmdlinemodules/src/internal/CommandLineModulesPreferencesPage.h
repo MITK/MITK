@@ -97,6 +97,7 @@ protected:
   QCheckBox                *m_LoadFromAutoLoadPathDir;
 
   QComboBox                *m_ValidationMode;
+  QSpinBox                 *m_XmlTimeoutInSeconds;
   QSpinBox                 *m_MaximumNumberProcesses;
 
   berry::IPreferences::Pointer m_CLIPreferencesNode;

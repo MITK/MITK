@@ -53,6 +53,11 @@ struct CommandLineModulesViewConstants
   static const std::string DEBUG_OUTPUT_NODE_NAME;
 
   /**
+   * \brief The name of the preferences node containing whether we are displaying advanced widgets.
+   */
+  static const std::string SHOW_ADVANCED_WIDGETS_NAME;
+
+  /**
    * \brief The name of the preferences node containing a boolean describing whether
    * we are loading modules from the application directory.
    */

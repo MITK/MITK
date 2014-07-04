@@ -72,10 +72,17 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
   endforeach()
 
   # install vtk python. This folder contains all *.py files for VTK module loading.
-  install(DIRECTORY "${VTK_DIR}/Wrapping/Python/vtk"
-          DESTINATION bin/Python
-          USE_SOURCE_PERMISSIONS
-          COMPONENT Runtime)
+  #install(DIRECTORY "${VTK_DIR}/Wrapping/Python/vtk"
+  #        DESTINATION bin/Python
+  #        USE_SOURCE_PERMISSIONS
+  #        COMPONENT Runtime)
+
+  # glob through all files, NSIS can't use directories
+  file(GLOB_RECURSE item RELATIVE "${VTK_DIR}/Wrapping/Python/vtk" "${VTK_DIR}/Wrapping/Python/vtk/*.py")
+  foreach(f ${item})
+    get_filename_component(_filepath "${f}" PATH)
+    install(FILES "${VTK_DIR}/Wrapping/Python/vtk/${f}" DESTINATION bin/Python/vtk/${_filepath})
+  endforeach()
 
   list(APPEND _python_dirs "${VTK_DIR}/lib")
 
@@ -105,10 +112,16 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
   endif()
 
   if(Numpy_DIR)
-    install(DIRECTORY "${Numpy_DIR}/numpy"
-            DESTINATION bin/Python
-            USE_SOURCE_PERMISSIONS
-            COMPONENT Runtime)
+    #install(DIRECTORY "${Numpy_DIR}/numpy"
+    #        DESTINATION bin/Python
+    #        USE_SOURCE_PERMISSIONS
+    #        COMPONENT Runtime)
+    ## glob through all files, NSIS can't use directories
+    #file(GLOB_RECURSE item RELATIVE "${Numpy_DIR}/numpy" "${Numpy_DIR}/numpy/*")
+    foreach(f ${item})
+      get_filename_component(_filepath "${f}" PATH)
+      install(FILES "${Numpy_DIR}/numpy/${f}" DESTINATION bin/Python/numpy/${_filepath})
+    endforeach()
   endif()
 
   list(REMOVE_DUPLICATES _python_dirs)

@@ -48,10 +48,10 @@ if( MITK_USE_Python )
           function(MITK_PYTHON_BUILD_STEP proj step)
              set(_command \${ARGN})
 
-             message(\"Running \${proj} \${step}: \${_command}\")
+             message(\"Running \${proj} \${step}:${PYTHON_EXECUTABLE} \${_command}\")
 
              execute_process(
-                COMMAND ${PYTHON_EXECUTABLE} setup.py config
+                COMMAND ${PYTHON_EXECUTABLE} \${_command}
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/\${proj}-src
                 RESULT_VARIABLE result
                 OUTPUT_VARIABLE output
@@ -72,7 +72,7 @@ if( MITK_USE_Python )
       set(_configure_step ${CMAKE_BINARY_DIR}/${proj}_configure_step.cmake)
       file(WRITE ${_configure_step}
          "include(\"${_external_python_project}\")
-          file(WRITE \"${CMAKE_BINARY_DIR}/${proj}/site.cfg\" \"\")
+          file(WRITE \"${CMAKE_BINARY_DIR}/${proj}-src/site.cfg\" \"\")
           MITK_PYTHON_BUILD_STEP(${proj} configure setup.py config)
          ")
 
@@ -80,19 +80,24 @@ if( MITK_USE_Python )
       set(_build_step ${CMAKE_BINARY_DIR}/${proj}_build_step.cmake)
       file(WRITE ${_build_step}
          "include(\"${_external_python_project}\")
-          MITK_PYTHON_BUILD_STEP(${proj} configure setup.py build --fcompiler=none)
+          MITK_PYTHON_BUILD_STEP(${proj} build setup.py build --fcompiler=none)
+         ")
+
+      # install step
+      set(_install_dir "${CMAKE_BINARY_DIR}/${proj}-install")
+      if(WIN32)
+        STRING(REPLACE "/" "\\\\" _install_dir "${CMAKE_BINARY_DIR}/${proj}-install")
+      endif()
+      set(_install_step ${CMAKE_BINARY_DIR}/${proj}_install_step.cmake)
+      file(WRITE ${_install_step}
+         "include(\"${_external_python_project}\")
+          MITK_PYTHON_BUILD_STEP(${proj} install setup.py install --prefix=${_install_dir})
          ")
 
       #set(Numpy_URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/numpy-1.6.1.tar.gz")
       #set(Numpy_MD5 "2bce18c08fc4fce461656f0f4dd9103e")
       set(Numpy_URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/numpy-1.4.1.tar.gz")
       set(Numpy_MD5 "5c7b5349dc3161763f7f366ceb96516b")
-
-      set(_install_dir "${CMAKE_BINARY_DIR}/${proj}-install")
-
-      if(WIN32)
-        STRING(REPLACE "/" "\\" _install_dir "${CMAKE_BINARY_DIR}/${proj}-install")
-      endif()
 
       ExternalProject_Add(${proj}
         URL ${Numpy_URL}
@@ -103,7 +108,7 @@ if( MITK_USE_Python )
         INSTALL_DIR ${CMAKE_BINARY_DIR}/${proj}-install
         CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${_configure_step}
         BUILD_COMMAND   ${CMAKE_COMMAND} -P ${_build_step}
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_BINARY_DIR}/${proj}-src/setup.py install --prefix=${_install_dir}
+        INSTALL_COMMAND ${CMAKE_COMMAND} -P ${_install_step}
 
         DEPENDS
           ${${proj}_DEPENDENCIES}

@@ -70,7 +70,7 @@ if( MITK_USE_Python )
           ")
       # configure step
       set(_configure_step ${CMAKE_BINARY_DIR}/${proj}_configure_step.cmake)
-      file(WRITE ${_configure_script}
+      file(WRITE ${_configure_step}
          "include(\"${_external_python_project}\")
           file(WRITE \"${CMAKE_BINARY_DIR}/${proj}/site.cfg\" \"\")
           MITK_PYTHON_BUILD_STEP(${proj} configure setup.py config)
@@ -78,7 +78,7 @@ if( MITK_USE_Python )
 
       # build step
       set(_build_step ${CMAKE_BINARY_DIR}/${proj}_build_step.cmake)
-      file(WRITE ${_build_script}
+      file(WRITE ${_build_step}
          "include(\"${_external_python_project}\")
           MITK_PYTHON_BUILD_STEP(${proj} configure setup.py build --fcompiler=none)
          ")

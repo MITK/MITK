@@ -202,6 +202,16 @@ private:
   QString m_OutputDirectoryName;
 
   /**
+   * \brief Cache the list of directory paths locally to avoid repeatedly trying to update Directory Watcher.
+   */
+  QStringList m_DirectoryPaths;
+
+  /**
+   * \brief Cache the list of module/executable paths locally to avoid repeatedly trying to update Directory Watcher.
+   */
+  QStringList m_ModulePaths;
+
+  /**
    * \brief We store the validation mode, accessisble via user preferences.
    */
   ctkCmdLineModuleManager::ValidationMode m_ValidationMode;

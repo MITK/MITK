@@ -129,6 +129,7 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     // Set the main object, the ctkCmdLineModuleManager onto all the objects that need it.
     m_Controls->m_ComboBox->SetManager(m_ModuleManager);
     m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
+    connect(this->m_DirectoryWatcher, SIGNAL(errorDetected(QString)), this, SLOT(OnDirectoryWatcherErrorsDetected(QString)));
     m_ModuleManager->registerBackend(m_ModuleBackend);
 
     // Setup the remaining preferences.
@@ -139,7 +140,6 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreButtonPressed()));
     connect(this->m_Controls->m_ComboBox, SIGNAL(actionChanged(QAction*)), this, SLOT(OnActionChanged(QAction*)));
     connect(this->m_Controls->m_TabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(OnTabCloseRequested(int)));
-    connect(this->m_DirectoryWatcher, SIGNAL(errorDetected(QString)), this, SLOT(OnDirectoryWatcherErrorsDetected(QString)));
 
     this->UpdateRunButtonEnabledStatus();
   }
@@ -253,12 +253,14 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
 
   // OnPreferencesChanged can be called for each preference in a dialog box, so
   // when you hit "OK", it is called repeatedly, whereas we want to only call these only once.
-  if (this->m_DirectoryWatcher->directories() != totalPaths)
+  if (m_DirectoryPaths != totalPaths)
   {
+    m_DirectoryPaths = totalPaths;
     m_DirectoryWatcher->setDirectories(totalPaths);
   }
-  if (this->m_DirectoryWatcher->additionalModules() != additionalModules)
+  if (m_ModulePaths != additionalModules)
   {
+    m_ModulePaths = additionalModules;
     m_DirectoryWatcher->setAdditionalModules(additionalModules);
   }
 }

@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkScheduler_h
 #define mitkScheduler_h
 
-#include <vector>
 #include <MitkSimulationExports.h>
 
 namespace mitk
@@ -29,7 +28,8 @@ namespace mitk
   {
     enum Enum
     {
-      RoundRobin
+      RoundRobin,
+      WeightedRoundRobin
     };
   }
 
@@ -41,14 +41,16 @@ namespace mitk
 
     void AddProcess(SchedulableProcess* process);
     void RemoveProcess(SchedulableProcess* process);
+    bool IsEmpty() const;
+    SchedulableProcess* GetCurrentProcess();
     SchedulableProcess* GetNextProcess();
 
   private:
     Scheduler(const Scheduler&);
     Scheduler& operator=(const Scheduler&);
 
-    std::vector<SchedulableProcess*> m_ProcessQueue;
-    SchedulingAlgorithmBase* m_Algorithm;
+    struct Impl;
+    Impl* m_Impl;
   };
 }
 

@@ -14,13 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkSchedulableProcess.h"
+#ifndef mitkWeightedRoundRobinSchedulingAlgorithm_h
+#define mitkWeightedRoundRobinSchedulingAlgorithm_h
+
 #include "mitkSchedulingAlgorithmBase.h"
 
-mitk::SchedulingAlgorithmBase::SchedulingAlgorithmBase()
+namespace mitk
 {
+  class WeightedRoundRobinSchedulingAlgorithm : public SchedulingAlgorithmBase
+  {
+  public:
+    WeightedRoundRobinSchedulingAlgorithm();
+    ~WeightedRoundRobinSchedulingAlgorithm();
+
+    SchedulableProcess* GetNextProcess(std::vector<SchedulableProcess*>& processQueue);
+  };
 }
 
-mitk::SchedulingAlgorithmBase::~SchedulingAlgorithmBase()
-{
-}
+#endif

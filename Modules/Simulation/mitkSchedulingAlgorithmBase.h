@@ -26,13 +26,10 @@ namespace mitk
   class SchedulingAlgorithmBase
   {
   public:
-    explicit SchedulingAlgorithmBase(std::vector<SchedulableProcess*>* processQueue);
+    SchedulingAlgorithmBase();
     virtual ~SchedulingAlgorithmBase();
 
-    virtual SchedulableProcess* GetNextProcess() = 0;
-
-  protected:
-    std::vector<SchedulableProcess*>* m_ProcessQueue;
+    virtual SchedulableProcess* GetNextProcess(std::vector<SchedulableProcess*>& processQueue) = 0;
 
   private:
     SchedulingAlgorithmBase(const SchedulingAlgorithmBase&);

@@ -17,8 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSchedulableProcess.h"
 #include "mitkRoundRobinSchedulingAlgorithm.h"
 
-mitk::RoundRobinSchedulingAlgorithm::RoundRobinSchedulingAlgorithm(std::vector<SchedulableProcess*>* processQueue)
-  : SchedulingAlgorithmBase(processQueue)
+mitk::RoundRobinSchedulingAlgorithm::RoundRobinSchedulingAlgorithm()
 {
 }
 
@@ -26,10 +25,20 @@ mitk::RoundRobinSchedulingAlgorithm::~RoundRobinSchedulingAlgorithm()
 {
 }
 
-mitk::SchedulableProcess* mitk::RoundRobinSchedulingAlgorithm::GetNextProcess()
+mitk::SchedulableProcess* mitk::RoundRobinSchedulingAlgorithm::GetNextProcess(std::vector<SchedulableProcess*>& processQueue)
 {
-  if (m_ProcessQueue->size() > 1)
-    std::swap(m_ProcessQueue->front(), m_ProcessQueue->back());
+  size_t numProcesses = processQueue.size();
 
-  return m_ProcessQueue->back();
+  if (numProcesses == 0)
+    return NULL;
+
+  mitk::SchedulableProcess* process = processQueue[0];
+
+  if (numProcesses > 1)
+  {
+    processQueue.erase(processQueue.begin());
+    processQueue.push_back(process);
+  }
+
+  return process;
 }

@@ -1,5 +1,5 @@
 <RCC>
   <qresource prefix="/Simulation">
-    <file>SOFAIcon.png</file>
+    <file alias="SOFAIcon">SOFAIcon.png</file>
   </qresource>
 </RCC>

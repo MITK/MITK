@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSchedulableProcess_h
 #define mitkSchedulableProcess_h
 
+#include <boost/chrono.hpp>
 #include <MitkSimulationExports.h>
 
 namespace mitk
@@ -28,15 +29,18 @@ namespace mitk
     virtual ~SchedulableProcess();
 
     int GetPriority() const;
-    int GetLastTimeSliceInMSec() const;
-    void SetLastTimeSliceInMSec(int timeSliceInMSec);
+    boost::chrono::nanoseconds GetTotalElapsedTime() const;
+    void ResetTotalElapsedTime(boost::chrono::nanoseconds carryover = boost::chrono::nanoseconds::zero());
+    boost::chrono::nanoseconds GetElapsedTime() const;
+    void SetElapsedTime(boost::chrono::nanoseconds elapsedTime);
 
   private:
     SchedulableProcess(const SchedulableProcess&);
     SchedulableProcess& operator=(const SchedulableProcess&);
 
     int m_Priority;
-    int m_LastTimeSliceInMSec;
+    boost::chrono::nanoseconds m_TotalElapsedTime;
+    boost::chrono::nanoseconds m_ElapsedTime;
   };
 }
 

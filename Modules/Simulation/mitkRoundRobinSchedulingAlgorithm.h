@@ -24,14 +24,10 @@ namespace mitk
   class RoundRobinSchedulingAlgorithm : public SchedulingAlgorithmBase
   {
   public:
-    explicit RoundRobinSchedulingAlgorithm(std::vector<SchedulableProcess*>* processQueue);
+    RoundRobinSchedulingAlgorithm();
     ~RoundRobinSchedulingAlgorithm();
 
-    SchedulableProcess* GetNextProcess();
-
-  private:
-    RoundRobinSchedulingAlgorithm(const RoundRobinSchedulingAlgorithm&);
-    RoundRobinSchedulingAlgorithm& operator=(const RoundRobinSchedulingAlgorithm&);
+    SchedulableProcess* GetNextProcess(std::vector<SchedulableProcess*>& processQueue);
   };
 }
 

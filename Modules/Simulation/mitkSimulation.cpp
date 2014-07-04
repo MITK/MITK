@@ -75,6 +75,13 @@ void mitk::Simulation::Reset()
   m_SOFASimulation->updateContext(m_RootNode.get());
 }
 
+bool mitk::Simulation::GetAnimationFlag() const
+{
+  return m_RootNode
+    ? m_RootNode->getContext()->getAnimate()
+    : false;
+}
+
 void mitk::Simulation::SetAnimationFlag(bool animate)
 {
   if (m_RootNode)

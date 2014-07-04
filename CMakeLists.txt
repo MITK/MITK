@@ -289,6 +289,12 @@ if(MITK_USE_SOFA)
     message("Adding 'thread' to MITK_USE_Boost_LIBRARIES.")
     list(APPEND MITK_USE_Boost_LIBRARIES thread)
   endif()
+  # Simulation plugin requires boost chrono library
+  list(FIND MITK_USE_Boost_LIBRARIES chrono _result)
+  if(_result LESS 0)
+    message("Adding 'chrono' to MITK_USE_Boost_LIBRARIES.")
+    list(APPEND MITK_USE_Boost_LIBRARIES chrono)
+  endif()
   set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "" FORCE)
   # Allow setting external SOFA plugins directory and SOFA plugins
   set(MITK_USE_SOFA_PLUGINS_DIR ${MITK_USE_SOFA_PLUGINS_DIR} CACHE PATH "External SOFA plugins directory" FORCE)

@@ -20,4 +20,5 @@ set(CPP_FILES
   mitkSimulationWriterFactory.cpp
   mitkVtkModel.cpp
   mitkVtkSimulationPolyDataMapper.cpp
+  mitkWeightedRoundRobinSchedulingAlgorithm.cpp
 )

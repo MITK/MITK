@@ -37,6 +37,7 @@ namespace mitk
     sofa::simulation::Node::SPtr GetRootNode() const;
     sofa::simulation::Simulation::SPtr GetSOFASimulation() const;
     void Reset();
+    bool GetAnimationFlag() const;
     void SetAnimationFlag(bool animate);
     void SetDt(double dt);
     void SetRootNode(sofa::simulation::Node::SPtr rootNode);

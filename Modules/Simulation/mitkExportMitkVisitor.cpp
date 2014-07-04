@@ -57,7 +57,7 @@ static void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::lo
   dataNode->SetFloatProperty("material.specularPower", shininess);
 }
 
-mitk::DataNode::Pointer GetSimulationDataNode(mitk::DataStorage::Pointer dataStorage, sofa::core::objectmodel::BaseNode::SPtr rootNode)
+static mitk::DataNode::Pointer GetSimulationDataNode(mitk::DataStorage::Pointer dataStorage, sofa::core::objectmodel::BaseNode::SPtr rootNode)
 {
   if (dataStorage.IsNull())
     return NULL;

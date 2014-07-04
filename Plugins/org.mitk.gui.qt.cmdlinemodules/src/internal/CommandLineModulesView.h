@@ -85,6 +85,11 @@ protected Q_SLOTS:
    */
   void OnRunButtonPressed();
 
+  /**
+   * \brief Alerts the user of any errors comming out of the directory watcher.
+   */
+  void OnDirectoryWatcherErrorsDetected(const QString&);
+
 protected:
 
   /**
@@ -215,6 +220,11 @@ private:
    * \brief Member variable, taken from preference page.
    */
   bool m_DebugOutput;
+
+  /**
+   * \brief Member variable, taken from preferences page.
+   */
+  int m_XmlTimeoutSeconds;
 
   /**
    * \brief We keep a list of front ends to match the m_TabWidget.

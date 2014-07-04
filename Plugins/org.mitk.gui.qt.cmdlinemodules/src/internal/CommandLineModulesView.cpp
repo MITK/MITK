@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleDescription.h>
 #include <ctkCmdLineModuleParameter.h>
+#include <ctkCmdLineModuleUtils.h>
 
 //-----------------------------------------------------------------------------
 CommandLineModulesView::CommandLineModulesView()
@@ -59,6 +60,7 @@ CommandLineModulesView::CommandLineModulesView()
 , m_MaximumConcurrentProcesses(4)
 , m_CurrentlyRunningProcesses(0)
 , m_DebugOutput(false)
+, m_XmlTimeoutSeconds(30) // 30 seconds = QProcess default timeout.
 {
 }
 
@@ -137,6 +139,7 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreButtonPressed()));
     connect(this->m_Controls->m_ComboBox, SIGNAL(actionChanged(QAction*)), this, SLOT(OnActionChanged(QAction*)));
     connect(this->m_Controls->m_TabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(OnTabCloseRequested(int)));
+    connect(this->m_DirectoryWatcher, SIGNAL(errorDetected(QString)), this, SLOT(OnDirectoryWatcherErrorsDetected(QString)));
 
     this->UpdateRunButtonEnabledStatus();
   }
@@ -205,6 +208,9 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
       prefs->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackHomeDir.toStdString()));
 
   m_MaximumConcurrentProcesses = prefs->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4);
+
+  m_XmlTimeoutSeconds = prefs->GetInt(CommandLineModulesViewConstants::XML_TIMEOUT_SECS, 30);
+  m_ModuleManager->setTimeOutForXMLRetrieval(m_XmlTimeoutSeconds * 1000); // preference is in seconds, underlying CTK library in milliseconds.
 
   // Get the flag for debug output, useful when parsing all the XML.
   m_DebugOutput = prefs->GetBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, false);
@@ -470,4 +476,11 @@ void CommandLineModulesView::OnJobFinished()
 {
   m_CurrentlyRunningProcesses--;
   this->UpdateRunButtonEnabledStatus();
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnDirectoryWatcherErrorsDetected(const QString& errorMsg)
+{
+  ctkCmdLineModuleUtils::messageBoxForModuleRegistration(errorMsg);
 }

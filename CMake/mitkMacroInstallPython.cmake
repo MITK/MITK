@@ -105,8 +105,8 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
   endif()
 
   if(Numpy_DIR)
-    install(DIRECTORY "${Numpy_DIR}"
-            DESTINATION bin/Python/numpy
+    install(DIRECTORY "${Numpy_DIR}/numpy"
+            DESTINATION bin/Python
             USE_SOURCE_PERMISSIONS
             COMPONENT Runtime)
   endif()

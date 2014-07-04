@@ -90,7 +90,9 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_ModulesDirectories->m_Label->setText("Select directories to scan:");
   m_ModulesFiles = new QmitkFileListWidget(m_MainControl);
   m_ModulesFiles->m_Label->setText("Select additional executables:");
+
   m_DebugOutput = new QCheckBox(m_MainControl);
+  m_DebugOutput->setToolTip("Output debugging information to the console.");
 
   m_LoadFromAutoLoadPathDir = new QCheckBox(m_MainControl);
   m_LoadFromAutoLoadPathDir->setText("CTK_MODULE_LOAD_PATH");

@@ -216,6 +216,9 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   m_DebugOutput = prefs->GetBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, false);
   m_DirectoryWatcher->setDebug(m_DebugOutput);
 
+  // Show/Hide the advanced widgets
+  this->m_Controls->SetAdvancedWidgetsVisible(prefs->GetBool(CommandLineModulesViewConstants::SHOW_ADVANCED_WIDGETS_NAME, false));
+
   bool loadApplicationDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, false);
   bool loadApplicationDirCliModules = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR_CLI_MODULES, true);
   bool loadHomeDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR, false);

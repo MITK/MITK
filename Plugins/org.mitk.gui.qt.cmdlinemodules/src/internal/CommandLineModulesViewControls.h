@@ -36,6 +36,8 @@ public:
   CommandLineModulesViewControls(QWidget *parent = 0);
   virtual ~CommandLineModulesViewControls();
 
+  void SetAdvancedWidgetsVisible(const bool& isVisible);
+
 protected:
 
 private:

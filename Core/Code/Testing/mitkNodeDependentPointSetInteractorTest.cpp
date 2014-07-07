@@ -60,13 +60,11 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
   {
     //file 1
     const std::string filename1 = argv[1];
-    node1 = mitk::IOUtil::LoadDataNode(filename1);
-    ds->Add(node1);
+    node1 = mitk::IOUtil::Load(filename1, *ds)->GetElement(0);
 
     //file 2
     const std::string filename2 = argv[2];
-    node2 = mitk::IOUtil::LoadDataNode(filename2);
-    ds->Add(node2);
+    node2 = mitk::IOUtil::Load(filename2, *ds)->GetElement(0);
   }
   catch(...) {
     MITK_TEST_FAILED_MSG(<< "Could not read file for testing");

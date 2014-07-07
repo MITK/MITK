@@ -14,369 +14,176 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPointSetWriterService.h"
 #include <iostream>
 #include <fstream>
 #include <locale>
 
-
 //
 // Initialization of the xml tags.
 //
-
-const char* mitk::PointSetWriterService::XML_POINT_SET_FILE = "point_set_file" ;
-
-const char* mitk::PointSetWriterService::XML_FILE_VERSION = "file_version" ;
-
-const char* mitk::PointSetWriterService::XML_POINT_SET = "point_set" ;
-
-const char* mitk::PointSetWriterService::XML_TIME_SERIES = "time_series";
-
-const char* mitk::PointSetWriterService::XML_TIME_SERIES_ID = "time_series_id";
-
-const char* mitk::PointSetWriterService::XML_POINT = "point" ;
-
-const char* mitk::PointSetWriterService::XML_ID = "id" ;
-
-const char* mitk::PointSetWriterService::XML_SPEC = "specification" ;
-
-const char* mitk::PointSetWriterService::XML_X = "x" ;
-
-const char* mitk::PointSetWriterService::XML_Y = "y" ;
-
-const char* mitk::PointSetWriterService::XML_Z = "z" ;
-
-const char* mitk::PointSetWriterService::VERSION_STRING = "0.1" ;
-
-
+const std::string mitk::PointSetWriterService::XML_POINT_SET_FILE = "point_set_file" ;
+const std::string mitk::PointSetWriterService::XML_FILE_VERSION = "file_version" ;
+const std::string mitk::PointSetWriterService::XML_POINT_SET = "point_set" ;
+const std::string mitk::PointSetWriterService::XML_TIME_SERIES = "time_series";
+const std::string mitk::PointSetWriterService::XML_TIME_SERIES_ID = "time_series_id";
+const std::string mitk::PointSetWriterService::XML_POINT = "point" ;
+const std::string mitk::PointSetWriterService::XML_ID = "id" ;
+const std::string mitk::PointSetWriterService::XML_SPEC = "specification" ;
+const std::string mitk::PointSetWriterService::XML_X = "x" ;
+const std::string mitk::PointSetWriterService::XML_Y = "y" ;
+const std::string mitk::PointSetWriterService::XML_Z = "z" ;
+const std::string mitk::PointSetWriterService::VERSION_STRING = "0.1" ;
 
 
 mitk::PointSetWriterService::PointSetWriterService()
-    : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
+  : AbstractFileWriter(PointSet::GetStaticNameOfClass(), MimeType("application/vnd.mitk.pointset"), "MITK Point Set Writer")
+  , m_IndentDepth(0)
+  , m_Indent(2)
 {
-    this->SetNumberOfRequiredInputs( 1 );
-    this->SetNumberOfIndexedOutputs( 1 );
-    this->SetNthOutput( 0, mitk::PointSet::New().GetPointer() );
-    m_Indent = 2;
-    m_IndentDepth = 0;
-    m_Success = false;
+  this->AddExtension("mps");
+  RegisterService();
 }
 
-
-
+mitk::PointSetWriterService::PointSetWriterService(const mitk::PointSetWriterService& other)
+  : AbstractFileWriter(other)
+  , m_IndentDepth(other.m_IndentDepth)
+  , m_Indent(other.m_Indent)
+{
+}
 
 mitk::PointSetWriterService::~PointSetWriterService()
 {}
 
-
-
-
-void mitk::PointSetWriterService::GenerateData()
+void mitk::PointSetWriterService::Write( const BaseData* baseData, std::ostream& out )
 {
-    m_Success = false;
-    m_IndentDepth = 0;
+  if ( !out.good() )
+  {
+    mitkThrow() << "Stream not good.";
+  }
 
-    //
-    // Opening the file to write to
-    //
-    if ( m_FileName == "" )
-    {
-        itkWarningMacro( << "Sorry, filename has not been set!" );
-        return ;
-    }
-    std::ofstream out( m_FileName.c_str() );
-    if ( !out.good() )
-    {
-      itkExceptionMacro(<< "File " << m_FileName << " could not be opened!");
-      itkWarningMacro( << "Sorry, file " << m_FileName << " could not be opened!" );
-      out.close();
-        return ;
-    }
+  std::locale previousLocale(out.getloc());
+  std::locale I("C");
+  out.imbue(I);
 
-    std::locale previousLocale(out.getloc());
-    std::locale I("C");
-    out.imbue(I);
+  //
+  // Here the actual xml writing begins
+  //
+  WriteXMLHeader( out );
+  WriteStartElement( XML_POINT_SET_FILE, out );
+  WriteStartElement( XML_FILE_VERSION, out );
+  out << VERSION_STRING;
+  WriteEndElement( XML_FILE_VERSION, out, false );
 
-    //
-    // Here the actual xml writing begins
-    //
-    WriteXMLHeader( out );
-    WriteStartElement( XML_POINT_SET_FILE, out );
-    WriteStartElement( XML_FILE_VERSION, out );
-    WriteCharacterData( VERSION_STRING, out );
-    WriteEndElement( XML_FILE_VERSION, out, false );
+  WriteXML( static_cast<const PointSet*>(baseData), out );
 
-    //
-    // for each input object write its xml representation to
-    // the stream
-    //
-    for ( unsigned int i = 0 ; i < this->GetNumberOfInputs(); ++i )
-    {
-        InputType::Pointer pointSet = this->GetInput( i );
-        assert( pointSet.IsNotNull() );
-        WriteXML( pointSet.GetPointer(), out );
-    }
+  WriteEndElement( XML_POINT_SET_FILE, out );
 
-   WriteEndElement( XML_POINT_SET_FILE, out );
-   out.imbue(previousLocale);
-    if ( !out.good() ) // some error during output
-    {
-      out.close();
-      throw std::ios_base::failure("Some error during point set writing.");
-    }
-
-    out.close();
-    m_Success = true;
-    m_MimeType = "application/MITK.PointSet";
+  out.imbue(previousLocale);
+  if ( !out.good() ) // some error during output
+  {
+    mitkThrow() << "Some error during point set writing.";
+  }
 }
 
-
-
-
-void mitk::PointSetWriterService::WriteXML( mitk::PointSet* pointSet, std::ofstream& out )
+mitk::PointSetWriterService*mitk::PointSetWriterService::Clone() const
 {
-    WriteStartElement( XML_POINT_SET, out );
-    unsigned int timecount = pointSet->GetTimeSteps();
+  return new PointSetWriterService(*this);
+}
 
-    for(unsigned int i=0; i< timecount; i++)
+void mitk::PointSetWriterService::WriteXML( const mitk::PointSet* pointSet, std::ostream& out )
+{
+  WriteStartElement( XML_POINT_SET, out );
+  unsigned int timecount = pointSet->GetTimeSteps();
+
+  for(unsigned int i=0; i< timecount; i++)
+  {
+    WriteStartElement( XML_TIME_SERIES, out );
+
+    WriteStartElement( XML_TIME_SERIES_ID, out );
+    out << ConvertToString( i );
+    WriteEndElement( XML_TIME_SERIES_ID, out, false );
+
+    mitk::PointSet::PointsContainer* pointsContainer = pointSet->GetPointSet(i)->GetPoints();
+    mitk::PointSet::PointsContainer::Iterator it;
+
+    for ( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it )
     {
-      WriteStartElement( XML_TIME_SERIES, out );
+      WriteStartElement( XML_POINT, out );
 
-      WriteStartElement( XML_TIME_SERIES_ID, out );
-      WriteCharacterData( ConvertToString( i ).c_str() , out );
-      WriteEndElement( XML_TIME_SERIES_ID, out, false );
+      WriteStartElement( XML_ID, out );
+      out << ConvertToString( it->Index() );
+      WriteEndElement( XML_ID, out, false );
 
-      mitk::PointSet::PointsContainer* pointsContainer = pointSet->GetPointSet(i)->GetPoints();
-      mitk::PointSet::PointsContainer::Iterator it;
+      mitk::PointSet::PointType point = it->Value();
 
-      for ( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it )
-      {
-          WriteStartElement( XML_POINT, out );
+      WriteStartElement( XML_SPEC, out );
+      out << ConvertToString( pointSet->GetSpecificationTypeInfo(it->Index(), i) );
+      WriteEndElement( XML_SPEC, out, false );
 
-          WriteStartElement( XML_ID, out );
-          WriteCharacterData( ConvertToString( it->Index() ).c_str() , out );
-          WriteEndElement( XML_ID, out, false );
+      WriteStartElement( XML_X, out );
+      out << ConvertToString( point[ 0 ] );
+      WriteEndElement( XML_X, out, false );
 
-          mitk::PointSet::PointType point = it->Value();
+      WriteStartElement( XML_Y, out );
+      out << ConvertToString( point[ 1 ] );
+      WriteEndElement( XML_Y, out, false );
 
-          WriteStartElement( XML_SPEC, out );
-          WriteCharacterData( ConvertToString( pointSet->GetSpecificationTypeInfo(it->Index(), i) ).c_str() , out );
-          WriteEndElement( XML_SPEC, out, false );
+      WriteStartElement( XML_Z, out );
+      out << ConvertToString( point[ 2 ] );
+      WriteEndElement( XML_Z, out, false );
 
-          WriteStartElement( XML_X, out );
-          WriteCharacterData( ConvertToString( point[ 0 ] ).c_str(), out );
-          WriteEndElement( XML_X, out, false );
-
-          WriteStartElement( XML_Y, out );
-          WriteCharacterData( ConvertToString( point[ 1 ] ).c_str(), out );
-          WriteEndElement( XML_Y, out, false );
-
-          WriteStartElement( XML_Z, out );
-          WriteCharacterData( ConvertToString( point[ 2 ] ).c_str(), out );
-          WriteEndElement( XML_Z, out, false );
-
-          WriteEndElement( XML_POINT, out );
-      }
+      WriteEndElement( XML_POINT, out );
+    }
     WriteEndElement( XML_TIME_SERIES, out );
-    }
+  }
 
-    WriteEndElement( XML_POINT_SET, out );
+  WriteEndElement( XML_POINT_SET, out );
 }
-
-
-
-
-
-void mitk::PointSetWriterService::ResizeInputs( const unsigned int& num )
-{
-    unsigned int prevNum = this->GetNumberOfInputs();
-    this->SetNumberOfIndexedInputs( num );
-    for ( unsigned int i = prevNum; i < num; ++i )
-    {
-        this->SetNthInput( i, mitk::PointSet::New().GetPointer() );
-    }
-}
-
-
-
-
-void mitk::PointSetWriterService::SetInput( InputType* pointSet )
-{
-    this->ProcessObject::SetNthInput( 0, pointSet );
-}
-
-
-
-
-void mitk::PointSetWriterService::SetInput( const unsigned int& id, InputType* pointSet )
-{
-    if ( id >= this->GetNumberOfInputs() )
-        this->ResizeInputs( id + 1 );
-    this->ProcessObject::SetNthInput( id, pointSet );
-}
-
-
-
-mitk::PointSet* mitk::PointSetWriterService::GetInput()
-{
-    if ( this->GetNumberOfInputs() < 1 )
-    {
-        return 0;
-    }
-    else
-    {
-        return dynamic_cast<InputType*> ( this->GetInput( 0 ) );
-    }
-}
-
-
-
-
-mitk::PointSet* mitk::PointSetWriterService::GetInput( const unsigned int& num )
-{
-    return dynamic_cast<InputType*> ( this->ProcessObject::GetInput( num ) );
-}
-
-
-
-
 
 template < typename T>
 std::string mitk::PointSetWriterService::ConvertToString( T value )
 {
-    std::ostringstream o;
-    std::locale I("C");
-    o.imbue(I);
+  std::ostringstream o;
+  std::locale I("C");
+  o.imbue(I);
 
-    if ( o << value )
-    {
-        return o.str();
-     }
-    else
-        return "conversion error";
+  if ( o << value )
+  {
+    return o.str();
+  }
+  else
+  {
+    return "conversion error";
+  }
 }
 
-
-
-void mitk::PointSetWriterService::WriteXMLHeader( std::ofstream &file )
+void mitk::PointSetWriterService::WriteXMLHeader( std::ostream &file )
 {
-    file << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
+  file << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
 }
 
-
-
-
-void mitk::PointSetWriterService::WriteStartElement( const char *const tag, std::ofstream &file )
+void mitk::PointSetWriterService::WriteStartElement( const std::string& tag, std::ostream &file )
 {
+  file << std::endl;
+  WriteIndent( file );
+  file << '<' << tag << '>';
+  m_IndentDepth++;
+}
+
+void mitk::PointSetWriterService::WriteEndElement( const std::string& tag, std::ostream &file, const bool& indent )
+{
+  m_IndentDepth--;
+  if ( indent )
+  {
     file << std::endl;
     WriteIndent( file );
-    file << '<' << tag << '>';
-    m_IndentDepth++;
-}
-
-
-
-
-void mitk::PointSetWriterService::WriteEndElement( const char *const tag, std::ofstream &file, const bool& indent )
-{
-    m_IndentDepth--;
-    if ( indent )
-    {
-        file << std::endl;
-        WriteIndent( file );
-    }
-    file << '<' << '/' << tag << '>';
-}
-
-
-
-
-void mitk::PointSetWriterService::WriteCharacterData( const char *const data, std::ofstream &file )
-{
-    file << data;
-}
-
-
-
-
-void mitk::PointSetWriterService::WriteStartElement( std::string &tag, std::ofstream &file )
-{
-    WriteStartElement( tag.c_str(), file );
-}
-
-
-
-
-void mitk::PointSetWriterService::WriteEndElement( std::string &tag, std::ofstream &file, const bool& indent )
-{
-    WriteEndElement( tag.c_str(), file, indent );
-}
-
-
-
-
-void mitk::PointSetWriterService::WriteCharacterData( std::string &data, std::ofstream &file )
-{
-    WriteCharacterData( data.c_str(), file );
-}
-
-
-
-
-void mitk::PointSetWriterService::WriteIndent( std::ofstream& file )
-{
-    std::string spaces( m_IndentDepth * m_Indent, ' ' );
-    file << spaces.c_str();
-}
-
-
-
-bool mitk::PointSetWriterService::GetSuccess() const
-{
-    return m_Success;
-}
-
-
-
-bool mitk::PointSetWriterService::CanWriteDataType( DataNode* input )
-{
-  if ( input )
-  {
-    mitk::BaseData* data = input->GetData();
-    if ( data )
-    {
-       mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>( data );
-       if( pointSet.IsNotNull() )
-       {
-         //this writer has no "SetDefaultExtension()" - function
-         m_Extension = ".mps";
-         return true;
-       }
-    }
   }
-  return false;
+  file << '<' << '/' << tag << '>';
 }
 
-void mitk::PointSetWriterService::SetInput( DataNode* input )
+void mitk::PointSetWriterService::WriteIndent( std::ostream& file )
 {
-  if( input && CanWriteDataType( input ) )
-    this->ProcessObject::SetNthInput( 0, dynamic_cast<mitk::PointSet*>( input->GetData() ) );
-}
-
-std::string mitk::PointSetWriterService::GetWritenMIMEType()
-{
-  return m_MimeType;
-}
-
-std::vector<std::string> mitk::PointSetWriterService::GetPossibleFileExtensions()
-{
-  std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".mps");
-  return possibleFileExtensions;
-}
-
-std::string mitk::PointSetWriterService::GetFileExtension()
-{
-  return m_Extension;
+  std::string spaces( m_IndentDepth * m_Indent, ' ' );
+  file << spaces;
 }

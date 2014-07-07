@@ -68,6 +68,7 @@ ${MODULE_TEST_EXTRA_DRIVER_INIT};"
     if(ALL_META_DEPENDENCIES)
       add_dependencies(${TESTDRIVER} ${ALL_META_DEPENDENCIES})
     endif()
+    add_dependencies(${TESTDRIVER} MitkLegacyIO)
 
     #
     # Now tell CMake which tests should be run. This is done automatically

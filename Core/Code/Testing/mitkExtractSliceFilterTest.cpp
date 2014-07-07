@@ -883,7 +883,7 @@ double mitkExtractSliceFilterTestClass::TestFailureDeviation = 0.0;
 
 
 /*================ #BEGIN test main ================*/
-int mitkExtractSliceFilterTest(int argc, char* argv[])
+int mitkExtractSliceFilterTest(int /*argc*/, char* /*argv*/[])
 {
 
   MITK_TEST_BEGIN("mitkExtractSliceFilterTest")

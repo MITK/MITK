@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkIFileWriter.h>
+#include <mitkIMimeType.h>
 
 // Microservices
 #include <usServiceRegistration.h>
@@ -36,136 +37,141 @@ namespace us {
 
 namespace mitk {
 
+/**
+ * @brief Base class for writing mitk::BaseData objects to files or streams.
+ *
+ * In general, all file writers should derive from this class, this way it is
+ * made sure that the new implementation is
+ * exposed to the Microservice-Framework and that is automatically available troughout MITK.
+ * The default implementation only requires one Write()
+ * method and the Clone() method to be implemented.
+ *
+ * @ingroup Process
+ */
+class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
+{
+public:
+
   /**
-   * @brief This abstract class gives a meaningful default implementations to most methods of mitkIFileWriter.h.
-   *
-   * In general, all FileWriters should derive from this class, this way it is made sure that the new implementation is
-   * exposed to the Microservice-Framework and that is automatically available troughout MITK.
-   * The default implementation only requires the two write
-   * methods and the Clone() method to be implemented. Be sure to set all important members in the constructor. These are:
-   * <ul>
-   *  <li> m_Extension: To define which file extension can be written.
-   *  <li> m_Description: To give a human readable name for this writer to be displayed in FileDialogs.
-   *  <li> m_BasedataType: To define which type of Basedata this fileWriter can handle.
-   *  <li> (Optional) m_Priority: To make this writer rank higher when choosing writers automatically
-   *  <li> (Optional) m_SupportedOptions: To define which options this writer can handle. Options can modify writing behaviour (e.g. set a compression)
-   * </ul>
-   * You can also use the protected constructor for this.
-   *
-   * @ingroup Process
+   * \brief Write the data in <code>data</code> to the the location specified in <code>path</code>
    */
-  class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
+  virtual void Write(const BaseData* data, const std::string& path);
+
+  /**
+   * \brief Write the data in <code>data</code> to the the stream specified in <code>stream</code>
+   */
+  virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
+
+  virtual Options GetOptions() const;
+  virtual us::Any GetOption(const std::string &name) const;
+
+  virtual void SetOptions(const Options& options);
+  virtual void SetOption(const std::string& name, const us::Any& value);
+
+  virtual void AddProgressCallback(const ProgressCallback& callback);
+
+  virtual void RemoveProgressCallback(const ProgressCallback& callback);
+
+  us::ServiceRegistration<IFileWriter> RegisterService(us::ModuleContext* context = us::GetModuleContext());
+
+protected:
+
+  class MITK_CORE_EXPORT MimeType : public std::string
   {
   public:
-
-    /**
-     * \brief Write the data in <code>data</code> to the the location specified in <code>path</code>
-     */
-    virtual void Write(const BaseData* data, const std::string& path);
-
-    /**
-     * \brief Write the data in <code>data</code> to the the stream specified in <code>stream</code>
-     */
-    virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
-
-    /**
-     * \brief returns a list of the supported Options
-     *
-     * Options are strings that are treated as flags when passed to the read method.
-     */
-    virtual OptionList GetOptions() const;
-
-    virtual void SetOptions(const OptionList& options);
-
-    /**
-     * \brief Return true if this writer can confirm that it can read this file and false otherwise.
-     *
-     * The default implementation of AbstractFileWriter checks if the supplied filename is of the same extension as m_extension.
-     * Overwrite this method if you require more specific behaviour
-     */
-    virtual bool CanWrite(const BaseData* data) const;
-
-    virtual void AddProgressCallback(const ProgressCallback& callback);
-
-    virtual void RemoveProgressCallback(const ProgressCallback& callback);
-
-    us::ServiceRegistration<IFileWriter> RegisterService(us::ModuleContext* context = us::GetModuleContext());
-
-  protected:
-    AbstractFileWriter();
-    ~AbstractFileWriter();
-
-    AbstractFileWriter(const AbstractFileWriter& other);
-
-    AbstractFileWriter(const std::string& basedataType, const std::string& extension, const std::string& description);
-
-    virtual us::ServiceProperties GetServiceProperties() const;
-
-    /**
-     * @return The mime-type this writer supports.
-     */
-    std::string GetMimeType() const;
-
-    void SetMimeType(const std::string& mimeType);
-
-    /**
-     * \brief Returns the priority which defined how 'good' the FileWriter can handle it's file format.
-     *
-     * Default is zero and should only be chosen differently for a reason.
-     * The priority is intended to be used by the MicroserviceFramework to determine
-     * which reader to use if several equivalent readers have been found.
-     * It may be used to replace a default reader from MITK in your own project.
-     * E.g. if you want to use your own writer for *.nrrd files instead of the default,
-     * implement it and give it a higher priority than zero.
-     *
-     * This method has a default implementation and need not be reimplemented, simply set m_Priority in the constructor.
-     */
-    void SetRanking(int ranking);
-    int GetRanking() const;
-
-    /**
-     * \brief returns the file extension that this FileWriter is able to handle.
-     *
-     * Please enter only the characters after the fullstop, e.g "nrrd" is correct
-     * while "*.nrrd" and ".nrrd" are incorrect.
-     *
-     * This method has a default implementation and need not be reimplemented, simply set m_Extension in the constructor.
-     */
-    std::vector<std::string> GetExtensions() const;
-    void AddExtension(const std::string& extension);
-
-    void SetCategory(const std::string& category);
-    std::string GetCategory() const;
-
-    /**
-     * \brief returns the name of the itk Basedata that this FileWriter is able to handle.
-     *
-     * The correct value is the one given as the first parameter in the mitkNewMacro of that Basedata derivate.
-     * You can also retrieve it by calling <code>GetNameOfClass()</code> on an instance of said data.
-     *
-     * This method has a default implementation and need not be reimplemented, simply set m_BaseDataType in the constructor.
-     */
-    void SetBaseDataType(const std::string& baseDataType);
-    virtual std::string GetBaseDataType() const;
-
-    /**
-     * \brief Returns a human readable description of the file format.
-     *
-     * This will be used in FileDialogs for example.
-     * This method has a default implementation and need not be reimplemented, simply set m_BaseDataType in the constructor.
-     */
-    void SetDescription(const std::string& description);
-    std::string GetDescription() const;
+    MimeType(const std::string& mimeType);
 
   private:
+    MimeType();
 
-    AbstractFileWriter& operator=(const AbstractFileWriter& other);
-
-    virtual mitk::IFileWriter* Clone() const = 0;
-
-    class Impl;
-    std::auto_ptr<Impl> d;
+    friend class AbstractFileReader;
   };
+
+  AbstractFileWriter();
+  ~AbstractFileWriter();
+
+  AbstractFileWriter(const AbstractFileWriter& other);
+
+  AbstractFileWriter(const std::string& basedataType, const MimeType& mimeType, const std::string& description);
+
+  AbstractFileWriter(const std::string& basedataType, const std::string& extension, const std::string& description);
+
+  virtual us::ServiceProperties GetServiceProperties() const;
+
+  /**
+   * Registers a new IMimeType service object.
+   *
+   * This method is called from RegisterService and the default implementation
+   * registers a new IMimeType service object if all of the following conditions
+   * are true:
+   *
+   *  - The writer
+   *
+   * @param context
+   * @return
+   * @throws std::invalid_argument if \c context is NULL.
+   */
+  virtual us::ServiceRegistration<IMimeType> RegisterMimeType(us::ModuleContext* context);
+
+  void SetMimeType(const std::string& mimeType);
+
+  /**
+   * @return Get the mime-type this writer can handle.
+   */
+  std::string GetMimeType() const;
+
+  void SetCategory(const std::string& category);
+  std::string GetCategory() const;
+
+  /**
+   * \brief Get file extension that this writer is able to handle.
+   */
+  std::vector<std::string> GetExtensions() const;
+  void AddExtension(const std::string& extension);
+
+  /**
+   * \brief Sets a human readable description of this writer.
+   *
+   * This will be used in file dialogs for example.
+   */
+  void SetDescription(const std::string& description);
+  std::string GetDescription() const;
+
+  void SetDefaultOptions(const Options& defaultOptions);
+  Options GetDefaultOptions() const;
+
+  /**
+   * \brief Set the service ranking for this file writer.
+   *
+   * Default is zero and should only be chosen differently for a reason.
+   * The ranking is used to determine which writer to use if several
+   * equivalent writers have been found.
+   * It may be used to replace a default writer from MITK in your own project.
+   * E.g. if you want to use your own writer for nrrd files instead of the default,
+   * implement it and give it a higher ranking than zero.
+   */
+  void SetRanking(int ranking);
+  int GetRanking() const;
+
+  /**
+   * \brief Sets the name of the mitk::Basedata that this writer is able to handle.
+   *
+   * The correct value is the one given as the first parameter in the mitkNewMacro of that BaseData derivate.
+   * You can also retrieve it by calling <code>GetNameOfClass()</code> on an instance of said data.
+   */
+  void SetBaseDataType(const std::string& baseDataType);
+  virtual std::string GetBaseDataType() const;
+
+private:
+
+  AbstractFileWriter& operator=(const AbstractFileWriter& other);
+
+  virtual mitk::IFileWriter* Clone() const = 0;
+
+  class Impl;
+  std::auto_ptr<Impl> d;
+};
+
 } // namespace mitk
 
 #endif /* AbstractFileWriter_H_HEADER_INCLUDED_C1E7E521 */

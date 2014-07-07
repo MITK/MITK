@@ -16,15 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include "mitkPointSetReaderService.h"
-#include <mitkPointSet.h>
 
 // STL
 #include <iostream>
 #include <fstream>
 #include <locale>
 
+#include <tinyxml.h>
+
 mitk::PointSetReaderService::PointSetReaderService()
-  : AbstractFileReader(MimeType("application/vnd.mitk.pointset"), "Great Reader of Point Sets")
+  : AbstractFileReader(MimeType("application/vnd.mitk.pointset"), "MITK Point Set Reader")
 {
   this->AddExtension("mps");
   RegisterService();
@@ -39,61 +40,40 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::PointSetReaderService::Re
 
   std::vector< itk::SmartPointer<mitk::BaseData> > result;
 
-
-  stream.seekg(0, std::ios_base::end);
-  long int length = stream.tellg();
-  stream.seekg(0, std::ios_base::beg);
-
-  if (length <= 0)
+  TiXmlDocument doc;
+  stream >> doc;
+  if (!doc.Error())
   {
-    MITK_WARN << "Could not read point set, no data.";
-    return result;
-  }
-
-  char* data = new char[length+1];
-  stream.read(data, length);
-  data[length] = 0;
-
-  try{
-    TiXmlDocument doc("pointset.xml");
-    if (doc.Parse(data))
+    TiXmlHandle docHandle( &doc );
+    //unsigned int pointSetCounter(0);
+    for( TiXmlElement* currentPointSetElement = docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
+         currentPointSetElement != NULL; currentPointSetElement = currentPointSetElement->NextSiblingElement())
     {
-      TiXmlHandle docHandle( &doc );
-      //unsigned int pointSetCounter(0);
-      for( TiXmlElement* currentPointSetElement = docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
-        currentPointSetElement != NULL; currentPointSetElement = currentPointSetElement->NextSiblingElement())
+      mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
+      if(currentPointSetElement->FirstChildElement("time_series") != NULL)
       {
-        mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
-        if(currentPointSetElement->FirstChildElement("time_series") != NULL)
+        for( TiXmlElement* currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
+             currentTimeSeries != NULL; currentTimeSeries = currentTimeSeries->NextSiblingElement())
         {
-          for( TiXmlElement* currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
-            currentTimeSeries != NULL; currentTimeSeries = currentTimeSeries->NextSiblingElement())
-          {
-            unsigned int currentTimeStep(0);
-            TiXmlElement* currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
+          unsigned int currentTimeStep(0);
+          TiXmlElement* currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
 
-            currentTimeStep = atoi(currentTimeSeriesID->GetText());
+          currentTimeStep = atoi(currentTimeSeriesID->GetText());
 
-            newPointSet = this->ReadPoint(newPointSet, currentTimeSeries, currentTimeStep);
-          }
+          newPointSet = this->ReadPoint(newPointSet, currentTimeSeries, currentTimeStep);
         }
-        else
-        {
-          newPointSet = this->ReadPoint(newPointSet, currentPointSetElement, 0);
-        }
-        result.push_back( newPointSet.GetPointer() );
       }
+      else
+      {
+        newPointSet = this->ReadPoint(newPointSet, currentPointSetElement, 0);
+      }
+      result.push_back( newPointSet.GetPointer() );
     }
-    else
-    {
-      MITK_WARN << "XML parser error in mitkPointSetReaderService! Aborting...";
-    }
-  }catch(...)
-  {
-    MITK_ERROR  << "Error while reading point set. Aborting...";
   }
-
-  delete data;
+  else
+  {
+    mitkThrow() << "Parsing error at line " << doc.ErrorRow() << ", col " << doc.ErrorCol() << ": " << doc.ErrorDesc();
+  }
 
   return result;
 }
@@ -141,7 +121,7 @@ mitk::PointSetReaderService::PointSetReaderService(const mitk::PointSetReaderSer
 {
 }
 
-mitk::IFileReader* mitk::PointSetReaderService::Clone() const
+mitk::PointSetReaderService* mitk::PointSetReaderService::Clone() const
 {
   return new mitk::PointSetReaderService(*this);
 }

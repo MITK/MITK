@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceInterface.h>
+#include <usAny.h>
 
 // MITK
 #include <mitkMessage.h>
@@ -41,10 +42,17 @@ namespace mitk {
    * implementation is state-full, the service should be registered using
    * a PrototypeServiceFactory.
    *
+   * The file writer implementation is associated with a mime-type, specified
+   * in the service property PROP_MIMETYPE() and a mitk::BaseData sub-class
+   * as specified in the PROP_BASEDATA_TYPE() service property.
+   * The specified mime-type should have a corresponding IMimeType service
+   * object, registered by the reader or some other party.
+   *
    * It is recommended to derive new implementations from AbstractFileWriter,
    * which provides correct service registration semantics.
    *
    * \sa AbstractFileWriter
+   * \sa IMimeType
    * \sa FileWriterRegistry
    * \sa IFileReader
    */
@@ -52,9 +60,7 @@ namespace mitk {
   {
     virtual ~IFileWriter();
 
-    typedef std::pair<std::string, bool> FileServiceOption;
-    typedef std::vector<FileServiceOption> OptionList;
-    typedef std::vector<std::string> OptionNames;
+    typedef std::map<std::string, us::Any> Options;
 
     typedef mitk::MessageAbstractDelegate1<float> ProgressCallback;
 
@@ -67,14 +73,13 @@ namespace mitk {
      *
      * Options are strings that are treated as flags when passed to the write method.
      */
-    virtual OptionList GetOptions() const = 0;
+    virtual Options GetOptions() const = 0;
 
-    virtual void SetOptions(const OptionList& options) = 0;
+    virtual us::Any GetOption(const std::string& name) const = 0;
 
-    /**
-     * \brief Returns true if this reader can confirm that it can write \c data and false otherwise.
-     */
-    virtual bool CanWrite(const BaseData* data) const = 0;
+    virtual void SetOptions(const Options& options) = 0;
+
+    virtual void SetOption(const std::string& name, const us::Any& value) = 0;
 
     /**
      * \brief Returns a value between 0 and 1 depending on the progress of the writing process.
@@ -116,7 +121,6 @@ namespace mitk {
   };
 } // namespace mitk
 
-// This is the microservice declaration. Do not meddle!
 US_DECLARE_SERVICE_INTERFACE(mitk::IFileWriter, "org.mitk.IFileWriter")
 
 #endif /* IFileWriter_H_HEADER_INCLUDED_C1E7E521 */

@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
-#include "mitkFileWriterRegistry.h"
+#include "mitkIOUtil.h"
 #include "mitkSurface.h"
 
 #include <vtkPolyDataReader.h>
@@ -51,10 +51,10 @@ int mitkSurfaceVtkWriterTest(int /*argc*/ , char* argv[])
     try
     {
       // test for exception handling
-      mitk::FileWriterRegistry::Write(surface, "/usr/bin");
+      mitk::IOUtil::Save(surface, "/usr/bin");
       MITK_TEST_FAILED_MSG( << "itk::ExceptionObject expected" )
     }
-    catch (const itk::ExceptionObject&) { /* this is expected */ }
+    catch (const mitk::Exception&) { /* this is expected */ }
     catch(...)
     {
       //this means that a wrong exception (i.e. no itk:Exception) has been thrown

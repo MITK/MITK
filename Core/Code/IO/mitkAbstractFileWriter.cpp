@@ -15,9 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkAbstractFileWriter.h>
+
 #include <mitkBaseData.h>
 #include <mitkIOUtil.h>
-#include <mitkSimpleMimeType.h>
+
+#include <Internal/mitkFileReaderWriterBase.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -29,47 +31,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class AbstractFileWriter::Impl
+class AbstractFileWriter::Impl : public FileReaderWriterBase
 {
 public:
 
   Impl()
-    : m_Ranking(0)
+    : FileReaderWriterBase()
     , m_PrototypeFactory(NULL)
   {}
 
   Impl(const Impl& other)
-    : m_MimeType(other.m_MimeType)
-    , m_Category(other.m_Category)
+    : FileReaderWriterBase(other)
     , m_BaseDataType(other.m_BaseDataType)
-    , m_Extensions(other.m_Extensions)
-    , m_Description(other.m_Description)
-    , m_Ranking(other.m_Ranking)
-    , m_Options(other.m_Options)
     , m_PrototypeFactory(NULL)
   {}
 
-  std::string m_MimeType;
-  std::string m_Category;
   std::string m_BaseDataType;
-  std::vector<std::string> m_Extensions;
-  std::string m_Description;
-  int m_Ranking;
-
-  /**
-   * \brief Options supported by this writer. Set sensible default values!
-   *
-   * Can be left emtpy if no special options are required.
-   */
-  IFileWriter::OptionList m_Options;
-
 
   us::PrototypeServiceFactory* m_PrototypeFactory;
 
-  Message1<float> m_ProgressMessage;
-
-  SimpleMimeType m_SimpleMimeType;
-  us::ServiceRegistration<IMimeType> m_MimeTypeReg;
 };
 
 
@@ -82,10 +62,7 @@ AbstractFileWriter::~AbstractFileWriter()
 {
   delete d->m_PrototypeFactory;
 
-  if (d->m_MimeTypeReg)
-  {
-    d->m_MimeTypeReg.Unregister();
-  }
+  d->UnregisterMimeType();
 }
 
 AbstractFileWriter::AbstractFileWriter(const AbstractFileWriter& other)
@@ -93,13 +70,22 @@ AbstractFileWriter::AbstractFileWriter(const AbstractFileWriter& other)
 {
 }
 
+AbstractFileWriter::AbstractFileWriter(const std::string& baseDataType, const MimeType& mimeType,
+                                       const std::string& description)
+  : d(new Impl)
+{
+  d->m_BaseDataType = baseDataType;
+  d->SetMimeType(mimeType);
+  d->SetDescription(description);
+}
+
 AbstractFileWriter::AbstractFileWriter(const std::string& baseDataType, const std::string& extension,
                                        const std::string& description)
   : d(new Impl)
 {
   d->m_BaseDataType = baseDataType;
-  d->m_Description = description;
-  d->m_Extensions.push_back(extension);
+  d->SetDescription(description);
+  d->AddExtension(extension);
 }
 
 ////////////////////// Writing /////////////////////////
@@ -108,7 +94,18 @@ void AbstractFileWriter::Write(const BaseData* data, const std::string& path)
 {
   std::ofstream stream;
   stream.open(path.c_str());
-  this->Write(data, stream);
+  try
+  {
+    this->Write(data, stream);
+  }
+  catch(mitk::Exception& e)
+  {
+    mitkReThrow(e) << "Error writing file '" << path << "'";
+  }
+  catch(const std::exception& e)
+  {
+    mitkThrow() << "Error writing file '" << path << "': " << e.what();
+  }
 }
 
 void AbstractFileWriter::Write(const BaseData* data, std::ostream& stream)
@@ -131,6 +128,19 @@ void AbstractFileWriter::Write(const BaseData* data, std::ostream& stream)
 us::ServiceRegistration<IFileWriter> AbstractFileWriter::RegisterService(us::ModuleContext* context)
 {
   if (d->m_PrototypeFactory) return us::ServiceRegistration<IFileWriter>();
+
+  if(context == NULL)
+  {
+    context = us::GetModuleContext();
+  }
+
+  d->RegisterMimeType(context);
+
+  if (this->GetMimeType().empty())
+  {
+    MITK_WARN << "Not registering writer " << typeid(this).name() << " due to empty MIME type.";
+    return us::ServiceRegistration<IFileWriter>();
+  }
 
   struct PrototypeFactory : public us::PrototypeServiceFactory
   {
@@ -159,88 +169,99 @@ us::ServiceRegistration<IFileWriter> AbstractFileWriter::RegisterService(us::Mod
 
 us::ServiceProperties AbstractFileWriter::GetServiceProperties() const
 {
-  if ( d->m_Extensions.empty() )
-    MITK_WARN << "Registered a Writer with no extension defined (m_Extension is empty). Writer will not be found by calls from WriterManager.)";
-  if ( d->m_BaseDataType.empty() )
-    MITK_WARN << "Registered a Writer with no BasedataType defined (m_BasedataType is empty). Writer will not be found by calls from WriterManager.)";
-  if ( d->m_Description.empty() )
-    MITK_WARN << "Registered a Writer with no description defined (m_Description is empty). Writer will have no human readable extension information in FileDialogs.)";
-
   us::ServiceProperties result;
-  //result[IFileWriter::PROP_EXTENSION()] = d->m_Extensions;
-  result[IFileWriter::PROP_DESCRIPTION()] = d->m_Description;
+  result[IFileWriter::PROP_DESCRIPTION()] = this->GetDescription();
+  result[IFileWriter::PROP_MIMETYPE()] = this->GetMimeType();
   result[IFileWriter::PROP_BASEDATA_TYPE()] = d->m_BaseDataType;
-  result[us::ServiceConstants::SERVICE_RANKING()] = d->m_Ranking;
+  result[us::ServiceConstants::SERVICE_RANKING()] = this->GetRanking();
 
-  for (IFileWriter::OptionList::const_iterator it = d->m_Options.begin(); it != d->m_Options.end(); ++it)
-  {
-    result[it->first] = std::string("true");
-  }
+//  for (IFileWriter::OptionList::const_iterator it = d->m_Options.begin(); it != d->m_Options.end(); ++it)
+//  {
+//    result[it->first] = std::string("true");
+//  }
   return result;
+}
+
+std::string AbstractFileWriter::GetMimeType() const
+{
+  return d->GetMimeType();
+}
+
+us::ServiceRegistration<IMimeType> AbstractFileWriter::RegisterMimeType(us::ModuleContext* context)
+{
+  return d->RegisterMimeType(context);
+}
+
+void AbstractFileWriter::SetMimeType(const std::string& mimeType)
+{
+  d->SetMimeType(mimeType);
 }
 
 void AbstractFileWriter::SetRanking(int ranking)
 {
-  d->m_Ranking = ranking;
+  d->SetRanking(ranking);
 }
 
 //////////////////////// Options ///////////////////////
 
-IFileWriter::OptionList AbstractFileWriter::GetOptions() const
+IFileWriter::Options AbstractFileWriter::GetOptions() const
 {
-  return d->m_Options;
+  return d->GetOptions();
 }
 
-void AbstractFileWriter::SetOptions(const OptionList& options)
+us::Any AbstractFileWriter::GetOption(const std::string& name) const
 {
-  if (options.size() != d->m_Options.size()) MITK_WARN << "Number of set Options differs from Number of available Options, which is a sign of false usage. Please consult documentation";
-  d->m_Options = options;
+  return d->GetOption(name);
+}
+
+void AbstractFileWriter::SetOption(const std::string& name, const us::Any& value)
+{
+  d->SetOption(name, value);
+}
+
+void AbstractFileWriter::SetOptions(const Options& options)
+{
+  d->SetOptions(options);
 }
 
 ////////////////// MISC //////////////////
 
-bool AbstractFileWriter::CanWrite(const BaseData* data) const
-{
-  // Default implementation only checks if basedatatype is correct
-  std::string externalDataType = data->GetNameOfClass();
-  return (externalDataType == d->m_BaseDataType);
-}
 
 void AbstractFileWriter::AddProgressCallback(const ProgressCallback& callback)
 {
-  d->m_ProgressMessage += callback;
+  d->AddProgressCallback(callback);
 }
 
 void AbstractFileWriter::RemoveProgressCallback(const ProgressCallback& callback)
 {
-  d->m_ProgressMessage -= callback;
+  d->RemoveProgressCallback(callback);
 }
 
 ////////////////// µS related Getters //////////////////
 
 int AbstractFileWriter::GetRanking() const
 {
-  return d->m_Ranking;
+  return d->GetRanking();
 }
 
 std::vector<std::string> AbstractFileWriter::GetExtensions() const
 {
-  return d->m_Extensions;
+  return d->GetExtensions();
 }
 
 void AbstractFileWriter::AddExtension(const std::string& extension)
 {
-  d->m_Extensions.push_back(extension);
+  d->AddExtension(extension);
 }
 
 void AbstractFileWriter::SetCategory(const std::string& category)
 {
-  d->m_Category = category;
+  d->SetCategory(category);
 }
 
 std::string AbstractFileWriter::GetCategory() const
 {
-  return d->m_Category;
+  return d->GetCategory();
 }
 
 void AbstractFileWriter::SetBaseDataType(const std::string& baseDataType)
@@ -250,7 +271,7 @@ void AbstractFileWriter::SetBaseDataType(const std::string& baseDataType)
 
 std::string AbstractFileWriter::GetDescription() const
 {
-  return d->m_Description;
+  return d->GetDescription();
 }
 
 std::string AbstractFileWriter::GetBaseDataType() const
@@ -260,7 +281,20 @@ std::string AbstractFileWriter::GetBaseDataType() const
 
 void AbstractFileWriter::SetDescription(const std::string& description)
 {
-  d->m_Description = description;
+  d->SetDescription(description);
+}
+
+AbstractFileWriter::MimeType::MimeType(const std::string& mimeType)
+  : std::string(mimeType)
+{
+  if (this->empty())
+  {
+    throw std::invalid_argument("MIME type must not be empty.");
+  }
+}
+
+AbstractFileWriter::MimeType::MimeType()
+{
 }
 
 }

@@ -35,7 +35,7 @@ int mitkPointSetReaderTest(int argc , char* argv[])
   mitk::FileReaderRegistry readerRegistry;
 
   // Get PointSet reader(s)
-  std::vector<mitk::IFileReader*> readers = readerRegistry.GetReaders(".mps");
+  std::vector<mitk::IFileReader*> readers = readerRegistry.GetReaders("mps");
   MITK_TEST_CONDITION_REQUIRED(!readers.empty(), "Testing for registered readers")
 
   for (std::vector<mitk::IFileReader*>::const_iterator iter = readers.begin(), end = readers.end();
@@ -45,13 +45,12 @@ int mitkPointSetReaderTest(int argc , char* argv[])
     mitk::IFileReader* reader = *iter;
     // testing file reading with invalid data
     MITK_TEST_CONDITION_REQUIRED( !reader->CanRead(testName), "Testing CanRead() method with invalid input file name!");
-    std::vector<mitk::BaseData::Pointer> data = reader->Read(testName);
-    MITK_TEST_CONDITION_REQUIRED(data.empty(), "Testing GetSuccess() with invalid input file name!");
+    CPPUNIT_ASSERT_THROW(reader->Read(testName), mitk::Exception);
 
     // testing file reading with valid data
     std::string filePath = argv[1];
     MITK_TEST_CONDITION_REQUIRED( reader->CanRead(filePath), "Testing CanReadFile() method with valid input file name!");
-    data = reader->Read(filePath);
+    std::vector<mitk::BaseData::Pointer> data = reader->Read(filePath);
     MITK_TEST_CONDITION_REQUIRED( !data.empty(), "Testing non-empty data with valid input file name!");
 
     // evaluate if the read point set is correct

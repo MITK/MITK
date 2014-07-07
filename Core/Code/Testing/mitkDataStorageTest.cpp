@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkReferenceCountWatcher.h"
 
 #include "mitkDataStorage.h"
-#include "mitkFileReaderRegistry.h"
+#include "mitkIOUtil.h"
 #include "mitkStandaloneDataStorage.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
@@ -185,7 +185,7 @@ void TestDataStorage( mitk::DataStorage* ds, std::string filename )
 
   // Take the ItkImageFile Reader for the .nrrd data format.
   // (was previously pic which is now deprecated format)
-  mitk::Image::Pointer image = mitk::FileReaderRegistry::Read<mitk::Image>(filename.c_str());
+  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename);
 
   // create some DataNodes to fill the ds
   mitk::DataNode::Pointer n1 = mitk::DataNode::New();   // node with image and name property

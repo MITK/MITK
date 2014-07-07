@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkIOUtil.h"
+
 #include <mitkIOUtil.h>
 #include <mitkImageWriter.h>
 #include <mitkCoreObjectFactory.h>
@@ -22,268 +23,142 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIMimeTypeProvider.h"
 #include "mitkFileReaderRegistry.h"
 
+#include "QmitkFileReaderOptionsDialog.h"
+
 // QT
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QMap>
-#include <QDebug>
+#include <QSet>
 
 //ITK
 #include <itksys/SystemTools.hxx>
 
-QList<mitk::BaseData::Pointer> QmitkIOUtil::LoadFiles(const QStringList& files, mitk::DataStorage* ds)
+struct QmitkIOUtil::Impl
 {
-  QList<mitk::BaseData::Pointer> result;
+  struct OptionsDialogFunctor : public OptionsFunctorBase
+  {
+
+    virtual bool operator()(const std::string& path, const std::vector<std::string>& readerLabels,
+                            const std::vector<mitk::IFileReader*>& readers, mitk::IFileReader*& selectedReader)
+    {
+      QStringList qLabels;
+      for (std::vector<std::string>::const_iterator iter = readerLabels.begin(), iterEnd = readerLabels.end();
+           iter != iterEnd; ++iter)
+      {
+        qLabels.push_back(QString::fromStdString(*iter));
+      }
+      QList<mitk::IFileReader*> qReaders;
+      for (std::vector<mitk::IFileReader*>::const_iterator iter = readers.begin(), iterEnd = readers.end();
+           iter != iterEnd; ++iter)
+      {
+        qReaders.push_back(*iter);
+      }
+
+      QmitkFileReaderOptionsDialog dialog(QString::fromStdString(path), qLabels, qReaders);
+      if (dialog.exec() == QDialog::Accepted)
+      {
+        selectedReader = dialog.GetReader();
+        return !dialog.ReuseOptions();
+      }
+      else
+      {
+        selectedReader = NULL;
+        return true;
+      }
+    }
+  };
+
+};
+
+QString QmitkIOUtil::GetFilterString()
+{
+  QString filters;
+
   mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
-
-  QString errMsg;
-
-  // group the selected files by mime-type
-  QMap<QString, QStringList> filesWithMultipleMimeTypes;
-  QMap<QString, QStringList> mimeTypeToFiles;
-  QString noMimeTypeError;
-  foreach(const QString& selectedFile, files)
+  std::vector<std::string> categories = mimeTypeProvider->GetCategories();
+  std::sort(categories.begin(), categories.end());
+  for (std::vector<std::string>::iterator cat = categories.begin(); cat != categories.end(); ++cat)
   {
-    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForFile(QFile::encodeName(selectedFile).data());
-    // if a file is related to multiple mime-types (e.g. the same extension
-    // is used for different mime types), we need to handle them differently.
-    if (mimeTypes.size() > 1)
+    QSet<QString> filterExtensions;
+    std::vector<std::string> mimeTypes = mimeTypeProvider->GetMimeTypesForCategory(*cat);
+    for (std::vector<std::string>::iterator mt = mimeTypes.begin(); mt != mimeTypes.end(); ++mt)
     {
-      QStringList qmimeTypes;
-      for (std::vector<std::string>::iterator mimeType = mimeTypes.begin(); mimeType != mimeTypes.end(); ++mimeType)
+      std::vector<std::string> extensions = mimeTypeProvider->GetExtensions(*mt);
+      for (std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ++ext)
       {
-        qmimeTypes << QString::fromStdString(*mimeType);
+        filterExtensions << QString::fromStdString(*ext);
       }
-      filesWithMultipleMimeTypes[selectedFile] = qmimeTypes;
     }
-    else if (!mimeTypes.empty())
+
+    QString filter = QString::fromStdString(*cat) + " (";
+    foreach(const QString& extension, filterExtensions)
     {
-      mimeTypeToFiles[QString::fromStdString(mimeTypes.front())] << selectedFile;
+      filter += "*." + extension + " ";
     }
-    else
-    {
-      noMimeTypeError += "  * " + selectedFile + "\n";
-    }
+    filter = filter.replace(filter.size()-1, 1, ')');
+    filters += ";;" + filter;
   }
-
-  if (!noMimeTypeError.isEmpty())
-  {
-    errMsg += "Unknown file format for\n\n" + noMimeTypeError + "\n\n";
-  }
-
-  mitk::FileReaderRegistry readerRegistry;
-
-  // Handle the special case of loading only one (set) of file(s) with
-  // the same set of multiple available mime-types first.
-  if (mimeTypeToFiles.isEmpty() && !filesWithMultipleMimeTypes.isEmpty())
-  {
-    // check if the the set of mime-types is equal
-    QMapIterator<QString, QStringList> iter(filesWithMultipleMimeTypes);
-    iter.next();
-    QStringList multiMimeFiles;
-    multiMimeFiles << iter.key();
-    QStringList mimeTypes = iter.value();
-    bool equalMimeTypes = true;
-    while(iter.hasNext())
-    {
-      iter.next();
-      if (mimeTypes != iter.value())
-      {
-        equalMimeTypes = false;
-        break;
-      }
-      else
-      {
-        multiMimeFiles << iter.key();
-      }
-    }
-
-    if (equalMimeTypes)
-    {
-      std::vector<mitk::FileReaderRegistry::ReaderReference> finalReaderRefs;
-      bool optionsAvailable = false;
-      foreach(const QString& mimeType, mimeTypes)
-      {
-        // Get all IFileReader references for the given mime-type
-        std::vector<mitk::FileReaderRegistry::ReaderReference> readerRefs = readerRegistry.GetReaderReferences(mimeType.toStdString());
-        // Sort according to priority (ascending)
-        std::sort(readerRefs.begin(), readerRefs.end());
-
-        // Loop over all readers, starting at the highest priority, and check if it
-        // really can read the file (well, the first in the list).
-        for (std::vector<mitk::FileReaderRegistry::ReaderReference>::reverse_iterator readerRef = readerRefs.rbegin();
-             readerRef != readerRefs.rend(); ++readerRef)
-        {
-          mitk::IFileReader* reader = readerRegistry.GetReader(*readerRef);
-          if (reader->CanRead(QFile::encodeName(multiMimeFiles.front()).data()))
-          {
-            finalReaderRefs.push_back(*readerRef);
-            if (!reader->GetOptions().empty())
-            {
-              optionsAvailable = true;
-            }
-          }
-          readerRegistry.UngetReader(reader);
-        }
-      }
-
-      if (finalReaderRefs.empty())
-      {
-        errMsg += "No reader available for files\n\n";
-        foreach(const QString& file, multiMimeFiles)
-        {
-          errMsg += "  * " + file + "\n";
-        }
-      }
-      else
-      {
-        mitk::FileReaderRegistry::ReaderReference finalReaderRef = finalReaderRefs.front();
-        if (optionsAvailable || finalReaderRefs.size() > 1)
-        {
-          // TODO Show a dialog for choosing the reader (if there is more
-          //      than one) and setting the options
-          std::string currMimeType = finalReaderRef.GetProperty(mitk::IFileReader::PROP_MIMETYPE()).ToString();
-          MITK_WARN << "Trying to load file(s) with ambiguous mime-type, choosing best reader for mime-type " << currMimeType;
-        }
-
-        mitk::IFileReader* reader = readerRegistry.GetReader(finalReaderRef);
-        // set possible options
-        // reader->SetOptions(...)
-
-        // TODO check if the reader can read a series of files and if yes,
-        //      pass the complete file list to one "Read" call.
-
-        foreach(const QString& file, multiMimeFiles)
-        {
-          // Do the actual reading
-          errMsg += ReadFile(reader, file, ds, result);
-        }
-      }
-    }
-  }
-  else if (!filesWithMultipleMimeTypes.empty())
-  {
-    // We have a wild mix of selected files and different mime-types
-    // Just arbitrarily choose one mime-type for now...
-    QMapIterator<QString, QStringList> iter(filesWithMultipleMimeTypes);
-    while (iter.hasNext())
-    {
-      iter.next();
-      MITK_WARN << "Trying to load file " << iter.key().toStdString() << " which has an ambiguous mime-type. Choosing arbitrarily "
-                << iter.value().front().toStdString();
-      mimeTypeToFiles[iter.value().front()] << iter.key();
-    }
-  }
-
-  // Now handle the easy case with only one mime-type per file for
-  // the remaining set of files
-  QMapIterator<QString, QStringList> iter(mimeTypeToFiles);
-  while(iter.hasNext())
-  {
-    iter.next();
-
-    // Get all IFileReader references for the given mime-type
-    std::vector<mitk::FileReaderRegistry::ReaderReference> readerRefs = readerRegistry.GetReaderReferences(iter.key().toStdString());
-    // Sort according to priority (ascending)
-    std::sort(readerRefs.begin(), readerRefs.end());
-    if (readerRefs.empty())
-    {
-      errMsg += "No reader available for files\n\n";
-      foreach(const QString& file, iter.value())
-      {
-        errMsg += "  * " + file + "\n";
-      }
-      errMsg += "with mime-type " + iter.key() + ".\n\n";
-      continue;
-    }
-
-    foreach(const QString& file, iter.value())
-    {
-      // Loop over all readers, starting at the highest priority, and check if it
-      // really can read the file.
-      mitk::IFileReader* reader = NULL;
-      for (std::vector<mitk::FileReaderRegistry::ReaderReference>::reverse_iterator readerRef = readerRefs.rbegin();
-           readerRef != readerRefs.rend(); ++readerRef)
-      {
-        reader = readerRegistry.GetReader(*readerRef);
-        if (!reader->CanRead(QFile::encodeName(file).data()))
-        {
-          readerRegistry.UngetReader(reader);
-          reader = NULL;
-          continue;
-        }
-      }
-
-      if (reader == NULL)
-      {
-        errMsg += "No suitable reader for file " + file + " found.\n\n";
-        continue;
-      }
-
-      mitk::IFileReader::OptionList readerOptions = reader->GetOptions();
-      if (!readerOptions.empty())
-      {
-        // TODO show the reader options. Maybe remember the service id of the
-        //      reader and re-use the options set by the user if that reader
-        //      is used again in this loop.
-      }
-
-      // TODO check if the reader can read a series of files and if yes,
-      //      pass the complete file list to one "Read" call.
-
-      errMsg += ReadFile(reader, file, ds, result);
-    }
-  }
-
-  if (!errMsg.isEmpty())
-  {
-    QMessageBox::warning(NULL, "Error reading files", errMsg);
-  }
-
-  return result;
+  filters.prepend("All (*.*)");
+  return filters;
 }
 
-QString QmitkIOUtil::ReadFile(mitk::IFileReader* reader, const QString& file, mitk::DataStorage* ds, QList<mitk::BaseData::Pointer>& result)
+QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QStringList& paths)
 {
-  QString errMsg;
-  try
+  std::vector<std::string> qPaths;
+  foreach(const QString& file, paths)
   {
-    // Correct conversion for File names.(BUG 12252)
-    std::string stdFile(QFile::encodeName(file));
-    std::string stdFileBaseName(QFile::encodeName(QFileInfo(file).baseName()));
+    qPaths.push_back(file.toStdString());
+  }
 
-    // Now do the actual reading
-    if (ds != NULL)
-    {
-      std::vector<std::pair<mitk::BaseData::Pointer,bool> > baseData = reader->Read(stdFile, *ds);
-      for (std::vector<std::pair<mitk::BaseData::Pointer,bool> >::iterator iter = baseData.begin();
-           iter != baseData.end(); ++iter)
-      {
-        mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New(stdFileBaseName);
-        iter->first->SetProperty("path", pathProp);
-        if (iter->second == false)
-        {
-          result.push_back(iter->first);
-        }
-      }
-    }
-    else
-    {
-      std::vector<mitk::BaseData::Pointer> baseData = reader->Read(stdFile);
-      for (std::vector<mitk::BaseData::Pointer>::iterator iter = baseData.begin();
-           iter != baseData.end(); ++iter)
-      {
-        mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New(stdFileBaseName);
-        (*iter)->SetProperty("path", pathProp);
-        result.push_back(*iter);
-      }
-    }
-  }
-  catch (const std::exception& e)
+  std::vector<mitk::BaseData::Pointer> result;
+  Impl::OptionsDialogFunctor optionsCallback;
+  std::string errMsg = Load(qPaths, &result, NULL, NULL, &optionsCallback);
+  if (!errMsg.empty())
   {
-    errMsg += "Exception occured when reading file " + file + ":\n" + QString(e.what()) + "\n\n";
+    QMessageBox::warning(NULL, "Error reading files", QString::fromStdString(errMsg));
+    mitkThrow() << errMsg;
   }
-  return errMsg;
+
+  QList<mitk::BaseData::Pointer> qResult;
+  for(std::vector<mitk::BaseData::Pointer>::const_iterator iter = result.begin(),
+      iterEnd = result.end(); iter != iterEnd; ++iter)
+  {
+    qResult << *iter;
+  }
+  return qResult;
+}
+
+mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QStringList& paths, mitk::DataStorage& storage)
+{
+  std::vector<std::string> qPaths;
+  foreach(const QString& file, paths)
+  {
+    qPaths.push_back(file.toStdString());
+  }
+
+  mitk::DataStorage::SetOfObjects::Pointer nodeResult = mitk::DataStorage::SetOfObjects::New();
+  Impl::OptionsDialogFunctor optionsCallback;
+  std::string errMsg = Load(qPaths, NULL, nodeResult, &storage, &optionsCallback);
+  if (!errMsg.empty())
+  {
+    QMessageBox::warning(NULL, "Error reading files", QString::fromStdString(errMsg));
+    mitkThrow() << errMsg;
+  }
+  return nodeResult;
+}
+
+QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QString& path)
+{
+  QStringList paths;
+  paths << path;
+  return Load(paths);
+}
+
+mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QString& path, mitk::DataStorage& storage)
+{
+  QStringList paths;
+  paths << path;
+  return Load(paths, storage);
 }
 
 void QmitkIOUtil::SaveBaseDataWithDialog(mitk::BaseData* data, std::string fileName, QWidget* parent)

@@ -83,4 +83,4 @@ private:
 
 };
 
-US_EXPORT_MODULE_ACTIVATOR(LegacyIO, Activator)
+US_EXPORT_MODULE_ACTIVATOR(MitkLegacyIO, Activator)

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImagePixelWriteAccessor.h"
 #include "mitkImageWriteAccessor.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkFileReaderRegistry.h"
+#include "mitkIOUtil.h"
 #include <itksys/SystemTools.hxx>
 #include "itkBarrier.h"
 #include <itkMultiThreader.h>
@@ -185,7 +185,7 @@ int mitkImageAccessorTest(int argc, char* argv[])
    mitk::Image::Pointer image = NULL;
    try
    {
-     image = mitk::FileReaderRegistry::Read<mitk::Image>(std::string(argv[1]));
+     image = mitk::IOUtil::LoadImage(std::string(argv[1]));
 
       if(image.IsNull())
       {

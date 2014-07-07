@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPointSet.h"
 #include "mitkTestingMacros.h"
-#include "mitkFileReaderRegistry.h"
 #include "mitkFileWriterRegistry.h"
 #include "mitkIOUtil.h"
 
@@ -109,7 +108,7 @@ public:
 
       std::ofstream tmpStream;
       m_FilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream);
-      mitk::FileWriterRegistry::Write(CreateTestPointSet(), tmpStream);
+      mitk::IOUtil::Save(CreateTestPointSet(), m_FilePath);
     }
     catch (std::exception& /*e*/)
     {
@@ -123,7 +122,7 @@ public:
   {
     try
     {
-      mitk::PointSet::Pointer pointSet = mitk::FileReaderRegistry::Read<mitk::PointSet>(m_FilePath);
+      mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(m_FilePath);
       MITK_TEST_CONDITION(pointSet.IsNotNull(), "Testing if the loaded Data are NULL" );
 
       bool identical(true);

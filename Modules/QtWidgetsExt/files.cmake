@@ -1,6 +1,5 @@
 set(CPP_FILES
   QmitkAboutDialog/QmitkAboutDialog.cpp
-  QmitkApplicationBase/QmitkIOUtil.cpp
   QmitkPropertyObservers/QmitkBasePropertyView.cpp
   QmitkPropertyObservers/QmitkBoolPropertyWidget.cpp
   QmitkPropertyObservers/QmitkColorPropertyEditor.cpp

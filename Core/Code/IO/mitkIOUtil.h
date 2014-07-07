@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkImage.h>
 
+#include <mitkIFileReader.h>
+#include <mitkIFileWriter.h>
+
 #include <fstream>
 
 namespace mitk {
@@ -156,33 +159,78 @@ public:
   static std::string CreateTemporaryDirectory(const std::string& templateName = "XXXXXX", std::string path = std::string());
 
   /**
+   * @brief Load a file into the given DataStorage.
+   *
+   * This method calls Load(const std::vector<std::string>&, DataStorage&) with a
+   * one-element vector.
+   *
+   * @param path The absolute file name including the file extension.
+   * @param storage A DataStorage object to which the loaded data will be added.
+   * @return The set of added DataNode objects.
+   * @throws mitk::Exception if \c path could not be loaded.
+   *
+   * @sa Load(const std::vector<std::string>&, DataStorage&)
+   */
+  static DataStorage::SetOfObjects::Pointer Load(const std::string& path, DataStorage& storage);
+
+  static DataStorage::SetOfObjects::Pointer Load(const std::string& path,
+                                                 const IFileReader::Options& options,
+                                                 DataStorage& storage);
+
+  static std::vector<BaseData::Pointer> Load(const std::string& path);
+
+  static std::vector<BaseData::Pointer> Load(const std::string& path,
+                                             const IFileReader::Options& options);
+
+  /**
+   * @brief Loads a list of file paths into the given DataStorage.
+   *
+   * If an entry in \c paths cannot be loaded, this method will continue to load
+   * the remaining entries into \c storage and throw an exception afterwards.
+   *
+   * @param paths A list of absolute file names including the file extension.
+   * @param storage A DataStorage object to which the loaded data will be added.
+   * @return The set of added DataNode objects.
+   * @throws mitk::Exception if an entry in \c paths could not be loaded.
+   */
+  static DataStorage::SetOfObjects::Pointer Load(const std::vector<std::string>& paths, DataStorage& storage);
+
+  static std::vector<BaseData::Pointer> Load(const std::vector<std::string>& paths);
+
+  /**
    * Load a files in <code>fileNames</code> and add the constructed mitk::DataNode instances
    * to the mitk::DataStorage <code>storage</code>
    *
-   * \param fileNames A list (vector) of absolute file name paths.
-   * \param storage The data storage to which the constructed data nodes are added.
-   * \return The number of added mitk::DataNode instances.
+   * @param fileNames A list (vector) of absolute file name paths.
+   * @param storage The data storage to which the constructed data nodes are added.
+   * @return The number of added mitk::DataNode instances.
+   *
+   * @deprecatedSince{2014_03} Use Load() instead
    */
-  static int LoadFiles(const std::vector<std::string>&fileNames, DataStorage& storage);
+  DEPRECATED(static int LoadFiles(const std::vector<std::string>&fileNames, DataStorage& storage));
 
   /**
    * This method will create a new mitk::DataStorage instance and pass it to
    * LoadFiles(std::vector<std::string>,DataStorage).
    *
-   * \param fileNames A list (vector) of absolute file name paths.
-   * \return The new mitk::DataStorage containing the constructed data nodes.
+   * @param fileNames A list (vector) of absolute file name paths.
+   * @return The new mitk::DataStorage containing the constructed data nodes.
    *
-   * \see LoadFiles(std::vector<std::string>,DataStorage)
+   * @see LoadFiles(std::vector<std::string>,DataStorage)
+   *
+   * @deprecatedSince{2014_03} Use Load() instead
    */
-  static DataStorage::Pointer LoadFiles(const std::vector<std::string>& fileNames);
+  DEPRECATED(static DataStorage::Pointer LoadFiles(const std::vector<std::string>& fileNames));
 
   /**
    * @brief Create a BaseData object from the given file.
    * @param path The path to the file including file name and file extension.
    * @throws mitk::Exception In case of an error when reading the file.
    * @return Returns the created BaseData object.
+   *
+   * @deprecatedSince{2014_03} Use Load() or FileReaderRegistry::Read() instead.
    */
-  static mitk::BaseData::Pointer LoadBaseData(const std::string& path);
+  DEPRECATED(static mitk::BaseData::Pointer LoadBaseData(const std::string& path));
 
   /**
    * @brief LoadDataNode Method to load an arbitrary DataNode.
@@ -190,8 +238,10 @@ public:
    * @throws mitk::Exception This exception is thrown when the DataNodeFactory is not able to read/find the file
    * or the DataNode is NULL.
    * @return Returns the DataNode.
+   *
+   * @deprecatedSince{2014_03} Use Load() instead.
    */
-  static mitk::DataNode::Pointer LoadDataNode(const std::string& path);
+  DEPRECATED(static mitk::DataNode::Pointer LoadDataNode(const std::string& path));
 
   /**
    * @brief LoadImage Convenience method to load an arbitrary mitkImage.
@@ -217,52 +267,96 @@ public:
    */
   static mitk::PointSet::Pointer LoadPointSet(const std::string& path);
 
+
+  /**
+   * @brief Convenience method to save mitk::BaseData instances.
+   * @param path The path to the image including file name and file extension.
+   *        If no extention is set, the default extension is used.
+   * @param data The data to save.
+   * @throws mitk::Exception if no writer for \c data is available or the writer
+   *         is not able to write the image.
+   */
+  static void Save(mitk::BaseData* data, const std::string& path);
+
+  /**
+   * @brief Convenience method to save mitk::BaseData instances.
+   * @param path The path to the image including file name and file extension.
+   *        If no extention is set, the default extension is used.
+   * @param data The data to save.
+   * @parma options Configuration data for the used IFileWriter instance.
+   * @throws mitk::Exception if no writer for \c data is available or the writer
+   *         is not able to write the image.
+   */
+  static void Save(mitk::BaseData* data, const std::string& path, const mitk::IFileWriter::Options& options);
+
   /**
    * @brief SaveImage Convenience method to save an arbitrary mitkImage.
    * @param path The path to the image including file name and file extension.
-   * If not extention is set, the default value (defined in DEFAULTIMAGEEXTENSION) is used.
+   *        If no extention is set, the default value (defined in DEFAULTIMAGEEXTENSION) is used.
    * @param image The image to save.
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the image.
    * @return Returns true for success else false.
+   *
+   * @deprecatedSince{2014_03} Use Save() instead.
    */
-  static bool SaveImage(mitk::Image::Pointer image, const std::string& path);
+  DEPRECATED(static bool SaveImage(mitk::Image::Pointer image, const std::string& path));
 
   /**
    * @brief SaveBaseData Convenience method to save arbitrary baseData.
    * @param path The path to the image including file name and file extension.
-   * If not extention is set, the default value (defined in DEFAULTIMAGEEXTENSION) is used.
+   *        If no extention is set, the default extension is used.
    * @param data The data to save.
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the image.
    * @return Returns true for success else false.
+   *
+   * @deprecatedSince{2014_03} Use Save() instead.
    */
-  static bool SaveBaseData(mitk::BaseData* data, const std::string& path);
+  DEPRECATED(static bool SaveBaseData(mitk::BaseData* data, const std::string& path));
 
   /**
    * @brief SaveSurface Convenience method to save an arbitrary mitkSurface.
    * @param path The path to the surface including file name and file extension.
-   * If not extention is set, the default value (defined in DEFAULTSURFACEEXTENSION) is used.
+   *        If no extention is set, the default extension is used.
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the surface.
    * or if the fileextension is not suitable for writing.
    * @return Returns true for success else false.
+   *
+   * @deprecatedSince{2014_03} Use Save() instead.
    */
-  static bool SaveSurface(mitk::Surface::Pointer surface, const std::string& path);
+  DEPRECATED(static bool SaveSurface(mitk::Surface::Pointer surface, const std::string& path));
 
   /**
    * @brief SavePointSet Convenience method to save an mitkPointSet.
-   * @param path The path to the pointset including file name and file extension (currently, only .mps is supported).
-   * If not extention is set, the default value (defined in DEFAULTPOINTSETEXTENSION) is used.
+   * @param path The path to the pointset including file name and file extension.
+   *        If no extention is set, the default extension is used.
    * @throws mitk::Exception This exception is thrown when the writer is not able to write the pointset.
    * @return Returns true for success else false.
+   *
+   * @deprecatedSince{2014_03} Use Save() instead.
    */
-  static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string& path);
+  DEPRECATED(static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string& path));
 
-  static const std::string DEFAULTIMAGEEXTENSION;
-  static const std::string DEFAULTSURFACEEXTENSION;
-  static const std::string DEFAULTPOINTSETEXTENSION;
+  /** @deprecatedSince{2014_03} Use GetDefaultWriteExtension() instead */
+  DEPRECATED(static const std::string DEFAULTIMAGEEXTENSION);
+  /** @deprecatedSince{2014_03} Use GetDefaultWriteExtension() instead */
+  DEPRECATED(static const std::string DEFAULTSURFACEEXTENSION);
+  /** @deprecatedSince{2014_03} Use GetDefaultWriteExtension() instead */
+  DEPRECATED(static const std::string DEFAULTPOINTSETEXTENSION);
+
+protected:
+
+  struct OptionsFunctorBase
+  {
+    virtual bool operator()(const std::string& path, const std::vector<std::string>& readerLabels,
+                            const std::vector<IFileReader*>& readers, IFileReader*& selectedReader) = 0;
+  };
+
+  static std::string Load(const std::vector<std::string>& paths, std::vector<BaseData::Pointer>* result,
+                          DataStorage::SetOfObjects* nodeResult, DataStorage* ds, OptionsFunctorBase* optionsCallback);
 
 private:
 
-  static void SetDefaultDataNodeProperties(mitk::DataNode* node, const std::string& filePath = std::string());
+  struct Impl;
 
 };
 

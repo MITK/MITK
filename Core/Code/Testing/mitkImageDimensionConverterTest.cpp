@@ -24,8 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
 #include <mitkPlaneOperation.h>
-#include <mitkFileWriterRegistry.h>
-#include <mitkFileReaderRegistry.h>
+#include <mitkIOUtil.h>
 #include "mitkTestingConfig.h"
 
 // itk includes
@@ -38,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // vtk includes
 #include <vtkImageData.h>
 
-int mitkImageDimensionConverterTest(int argc, char* argv[])
+int mitkImageDimensionConverterTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN(mitkImageDimensionConverterTest);
 
@@ -106,9 +105,9 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   // Save it without conversion and load it again. It should have an identitiy matrix
   sstream.clear();
   sstream << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage2D.nrrd";
-  mitk::FileWriterRegistry::Write(mitkImage2D, sstream.str());
+  mitk::IOUtil::Save(mitkImage2D, sstream.str());
 
-  mitk::Image::Pointer imageLoaded2D = mitk::FileReaderRegistry::Read<mitk::Image>(sstream.str());
+  mitk::Image::Pointer imageLoaded2D = mitk::IOUtil::LoadImage(sstream.str());
 
   // check if image can be loaded
   MITK_TEST_CONDITION_REQUIRED( imageLoaded2D.IsNotNull() , "Loading saved 2D Image");
@@ -220,8 +219,8 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
 
      std::stringstream sstream2;
      sstream2 << MITK_TEST_OUTPUT_DIR << "" << "/rotatedImage.nrrd";
-     mitk::FileWriterRegistry::Write(mitkImage3D, sstream2.str());
-     mitk::Image::Pointer imageLoaded = mitk::FileReaderRegistry::Read<mitk::Image>(sstream2.str());
+     mitk::IOUtil::Save(mitkImage3D, sstream2.str());
+     mitk::Image::Pointer imageLoaded = mitk::IOUtil::LoadImage(sstream2.str());
 
      // check if image can be loaded
      MITK_TEST_CONDITION_REQUIRED( imageLoaded.IsNotNull() , "Loading saved Image");

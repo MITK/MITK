@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkNumericTraits.h"
 
-int mitkMultiComponentImageDataComparisonFilterTest(int argc, char* argv[])
+int mitkMultiComponentImageDataComparisonFilterTest(int /*argc*/, char* argv[])
 {
   MITK_TEST_BEGIN("MultiComponentImageDataComparisonFilter");
 

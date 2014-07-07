@@ -15,9 +15,13 @@ if(BUILD_TESTING)
   set(US_BUILD_TESTING ON)
 endif()
 
-add_subdirectory(CppMicroServices)
-set(CppMicroServices_DIR ${CMAKE_CURRENT_BINARY_DIR}/CppMicroServices CACHE PATH "Path to the CppMicroServices library")
+set(CppMicroServices_DIR_default "${CMAKE_CURRENT_BINARY_DIR}/CppMicroServices")
+set(CppMicroServices_DIR ${CppMicroServices_DIR_default} CACHE PATH "Path to the CppMicroServices library")
 mark_as_advanced(CppMicroServices_DIR)
+
+if ("${CppMicroServices_DIR}" STREQUAL "${CppMicroServices_DIR_default}")
+  add_subdirectory(CppMicroServices)
+endif()
 
 # create a custom module conf file for CppMicroServices
 function(_generate_cppmicroservices_conf)
@@ -27,6 +31,7 @@ function(_generate_cppmicroservices_conf)
   set(MODULE_TARGET ${MODULE_NAME})
   set(MODULE_EXTRA_CMAKE_CODE "find_package(CppMicroServices NO_MODULE REQUIRED)")
   set(MODULE_INCLUDE_DIRS "\${CppMicroServices_INCLUDE_DIRS}")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "\${US_RUNTIME_LIBRARY_DIRS}")
 
   set(CppMicroServices_CONFIG_FILE "${CMAKE_BINARY_DIR}/${MODULES_CONF_DIRNAME}/CppMicroServicesConfig.cmake" CACHE INTERNAL "Path to module config" FORCE)
   configure_file(${MITK_SOURCE_DIR}/CMake/moduleConf.cmake.in ${CppMicroServices_CONFIG_FILE} @ONLY)

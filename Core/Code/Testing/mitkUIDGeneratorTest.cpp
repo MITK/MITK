@@ -37,7 +37,7 @@ void newGeneratorInstancesHeapTest()
 
 }
 
-void multipleUIDsFromSameGeneratorTest(int UIDlength)
+void multipleUIDsFromSameGeneratorTest(int /*UIDlength*/)
 {
     mitk::UIDGenerator* uidGen = new mitk::UIDGenerator("UID_",8);
     std::string uid1, uid2;

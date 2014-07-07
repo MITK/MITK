@@ -19,22 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "internal/org_mitk_gui_qt_application_Activator.h"
 
 #include <mitkWorkbenchUtil.h>
-#include <mitkCoreObjectFactory.h>
+
+#include <QmitkIOUtil.h>
 
 #include <QFileDialog>
-#include <QFileInfo>
-
-#include <QmitkFileOpenDialog.h>
-#include <QmitkNativeFileOpenDialog.h>
-
-#include <ctkServiceTracker.h>
-
-#include <berryIEditorPart.h>
-#include <berryIWorkbenchPage.h>
-#include <berryIWorkbench.h>
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
-#include <berryUIException.h>
 
 class QmitkFileOpenActionPrivate
 {
@@ -113,19 +101,9 @@ QmitkFileOpenAction::~QmitkFileOpenAction()
 void QmitkFileOpenAction::Run()
 {
   // Ask the user for a list of files to open
-
-  //QmitkFileOpenDialog dialog;
-  //QmitkFileDialog dialog;
-  QmitkNativeFileOpenDialog dialog;
-  //dialog.setFilter(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
-  //dialog.show();
-  dialog.Exec();
-
-  QStringList fileNames  = dialog.GetSelectedFiles();
-
-  //QStringList fileNames =  QmitkFileDialog::getOpenFileNames(NULL, "Open",
-  //d->getLastFileOpenPath(),
-  //  mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
+  QStringList fileNames =  QFileDialog::getOpenFileNames(NULL, "Open",
+                                                         d->getLastFileOpenPath(),
+                                                         QmitkIOUtil::GetFilterString());
 
   if (fileNames.empty())
     return;

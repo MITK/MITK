@@ -26,85 +26,72 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIFileWriter.h"
 
-// Temporarily disable warning until PIMPL pattern is implemented here
-#ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4251)
-#endif
-
 namespace mitk {
   class BaseData;
 }
 
 namespace mitk {
+
+/**
+ * @ingroup Process
+ *
+ * Provides convenient access to mitk::IFileWriter instances and writing
+ * files from mitk::BaseData types.
+ *
+ * \note The life-time of all mitk::IFileWriter objects returned by an
+ * instance of this class ends with the destruction of that instance.
+ */
+class MITK_CORE_EXPORT FileWriterRegistry
+{
+
+public:
+
+  typedef us::ServiceReference<IFileWriter> WriterReference;
+
+  FileWriterRegistry();
+  ~FileWriterRegistry();
+
   /**
-  * @ingroup Process
-  *
-  * Provides convenient access to mitk::IFileWriter instances and writing
-  * files from mitk::BaseData types.
-  *
-  * \note The life-time of all mitk::IFileWriter objects returned by an
-  * instance of this class ends with the destruction of that instance.
-  */
-  class MITK_CORE_EXPORT FileWriterRegistry
-  {
-  public:
+   * @brief Get the default file name extension for writing.
+   *
+   * The default extension is computed by retrieving the highest ranked
+   * mitk::IMimeType instance for the given mitk::IFileWriter reference
+   * and using the first extension from the mime types extension list.
+   *
+   * @param ref The IFileWriter service reference
+   * @param context The us::ModuleContext to look up IMimeType services
+   * @return The default extension without a leading period for the given
+   *         \c ref. Returns an empty string if there is no registered
+   *         mime type with this file writer reference.
+   */
+  static std::string GetDefaultExtension(const WriterReference& ref, us::ModuleContext* context = us::GetModuleContext());
 
-    FileWriterRegistry();
-    ~FileWriterRegistry();
+  static WriterReference GetReference(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
+  static WriterReference GetReference(const std::string& baseDataType, us::ModuleContext* context = us::GetModuleContext());
 
-    static void Write(const mitk::BaseData* data, const std::string& path, us::ModuleContext* context = us::GetModuleContext());
+  static std::vector<WriterReference> GetReferences(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
+  static std::vector<WriterReference> GetReferences(const std::string& baseDataType, us::ModuleContext* context = us::GetModuleContext());
 
-    static void Write(const mitk::BaseData* data, std::ostream& os, us::ModuleContext* context = us::GetModuleContext());
+  IFileWriter* GetWriter(const WriterReference& ref, us::ModuleContext* context = us::GetModuleContext());
 
-    /**
-    * Returns a compatible Writer to the given file extension
-    */
-    mitk::IFileWriter* GetWriter(const std::string& baseDataType, const std::string& extension = std::string(),
-                                 const mitk::IFileWriter::OptionNames& options = mitk::IFileWriter::OptionNames(),
-                                 us::ModuleContext* context = us::GetModuleContext() );
+  IFileWriter* GetWriter(const std::string& baseDataType, us::ModuleContext* context = us::GetModuleContext());
+  IFileWriter* GetWriter(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
 
-    mitk::IFileWriter* GetWriter(const mitk::BaseData* baseData, const std::string& extension = std::string(),
-                                 const mitk::IFileWriter::OptionNames& options = mitk::IFileWriter::OptionNames(),
-                                 us::ModuleContext* context = us::GetModuleContext() );
+  std::vector<IFileWriter*> GetWriters(const std::string& baseDataType, us::ModuleContext* context = us::GetModuleContext());
+  std::vector<IFileWriter*> GetWriters(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
 
-    std::vector<mitk::IFileWriter*> GetWriters(const std::string& baseDataType, const std::string& extension = std::string(),
-                                               const mitk::IFileWriter::OptionNames& options = mitk::IFileWriter::OptionNames(),
-                                               us::ModuleContext* context = us::GetModuleContext() );
+  void UngetWriter(IFileWriter* writer);
+  void UngetWriters(const std::vector<IFileWriter*>& writers);
 
-    std::vector<mitk::IFileWriter*> GetWriters(const mitk::BaseData* baseData, const std::string& extension = std::string(),
-                                               const mitk::IFileWriter::OptionNames& options = mitk::IFileWriter::OptionNames(),
-                                               us::ModuleContext* context = us::GetModuleContext() );
+private:
 
-    void UngetWriter(mitk::IFileWriter* writer);
-    void UngetWriters(const std::vector<mitk::IFileWriter*>& writers);
+  // purposely not implemented
+  FileWriterRegistry(const FileWriterRegistry&);
+  FileWriterRegistry& operator=(const FileWriterRegistry&);
 
-    // TODO: We should not generate GUI dependent strings here. Maybe just return a pair of extensions
-    //       and descriptions.
-    //std::string GetSupportedExtensions(const std::string& extension = std::string(), us::ModuleContext* context = us::GetModuleContext());
+  std::map<IFileWriter*, us::ServiceObjects<IFileWriter> > m_ServiceObjects;
+};
 
-    //std::string GetSupportedWriters(const std::string& basedataType, us::ModuleContext* context = us::GetModuleContext());
-
-  protected:
-
-    std::string CreateFileDialogString(const std::vector<us::ServiceReference<IFileWriter> >& refs);
-
-    bool WriterSupportsOptions(mitk::IFileWriter* writer, const mitk::IFileWriter::OptionNames& options);
-
-    std::vector<us::ServiceReference<mitk::IFileWriter> > GetRefs(const std::string& baseData, const std::string& extension, us::ModuleContext* context);
-
-  private:
-
-    // purposely not implemented
-    FileWriterRegistry(const FileWriterRegistry&);
-    FileWriterRegistry& operator=(const FileWriterRegistry&);
-
-    std::map<mitk::IFileWriter*, us::ServiceObjects<mitk::IFileWriter> > m_ServiceObjects;
-  };
 } // namespace mitk
-
-#ifdef _MSC_VER
-# pragma warning(pop)
-#endif
 
 #endif /* FileWriterRegistry_H_HEADER_INCLUDED_C1E7E521 */

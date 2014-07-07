@@ -115,6 +115,11 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::LegacyFileReaderService::R
     }
   }
 
+  if (result.empty())
+  {
+    mitkThrow() << "Could not read file '" << path << "'";
+  }
+
   return result;
 }
 

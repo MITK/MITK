@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkException.h"
 #include "mitkPixelTypeMultiplex.h"
 #include "mitkImagePixelReadAccessor.h"
-#include "mitkFileReaderRegistry.h"
 #include "mitkIOUtil.h"
 
 #include "mitkImageSliceSelector.h"
@@ -46,7 +45,7 @@ bool ImageVtkDataReferenceCheck(const char* fname) {
   const std::string filename = std::string(fname);
   try
   {
-    mitk::Image::Pointer image = mitk::FileReaderRegistry::Read<mitk::Image>(filename);
+    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename);
     MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Non-NULL image")
 
     vtkImageData* vtk = image->GetVtkImageData();
@@ -64,7 +63,7 @@ bool ImageVtkDataReferenceCheck(const char* fname) {
 }
 
 template <class T>
-void TestRandomPixelAccess( const mitk::PixelType ptype, mitk::Image::Pointer image, mitk::Point3D & point, mitk::ScalarType & value )
+void TestRandomPixelAccess( const mitk::PixelType /*ptype*/, mitk::Image::Pointer image, mitk::Point3D & point, mitk::ScalarType & value )
 {
   // generate a random point in world coordinates
   mitk::Point3D xMax, yMax, zMax, xMaxIndex, yMaxIndex, zMaxIndex;

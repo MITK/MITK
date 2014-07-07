@@ -131,7 +131,7 @@ itkImage = 0;
 
 try
 {
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(testImage,mitkImageAfterCast,mitk::eps,true),"Testing if both images are equal.");
+  MITK_ASSERT_EQUAL(testImage, mitkImageAfterCast, "Testing if both images are equal.");
 }
 catch( const itk::ExceptionObject &e)
 {

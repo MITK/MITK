@@ -48,7 +48,7 @@ private:
    * @param m2    The matrix m2 of the assignment m1 = m2
    */
   template <typename T1, typename T2>
-  void TestForEquality(T1 m1, T2 m2)
+  void TestForEquality(const T1& m1, const T2& m2)
   {
     for (unsigned i = 0; i < 3; i++)
     {
@@ -58,7 +58,7 @@ private:
         ss << "element [" << i << "][" + j << "] equal for mitkMatrix and podMatrix";
 
         CPPUNIT_ASSERT_EQUAL_MESSAGE(ss.str(), true,
-            (mitkMatrix3D[i][j]==podMatrix3D[i][j]));
+            (m1[i][j]==m2[i][j]));
       }
     }
   }

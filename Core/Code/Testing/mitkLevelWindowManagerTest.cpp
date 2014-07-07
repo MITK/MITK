@@ -174,18 +174,16 @@ public:
     mitk::Image::Pointer image1 = mitk::IOUtil::LoadImage(testImageFile);
     mitk::DataNode::Pointer node1 = mitk::DataNode::New();
     node1->SetData(image1);
+    ds->Add(node1);
+
     //mitk::DataNode::Pointer node1 = mitk::IOUtil::LoadDataNode( testImageFile );
-    mitk::DataNode::Pointer node2 = mitk::IOUtil::LoadDataNode( testImageFile );
-    mitk::DataNode::Pointer node3 = mitk::IOUtil::LoadDataNode( testImageFile );
+    mitk::DataNode::Pointer node2 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
+    mitk::DataNode::Pointer node3 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
     std::vector< mitk::DataNode::Pointer > nodeVec;
     //nodeVec.resize( 3 );
     nodeVec.push_back( node1 );
     nodeVec.push_back( node2 );
     nodeVec.push_back( node3 );
-
-    ds->Add(node1);
-    ds->Add(node2);
-    ds->Add(node3);
 
     typedef itk::Statistics::MersenneTwisterRandomVariateGenerator RandomGeneratorType;
     RandomGeneratorType::Pointer rnd = RandomGeneratorType::New();

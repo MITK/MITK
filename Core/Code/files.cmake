@@ -317,8 +317,9 @@ set(CPP_FILES
   IO/mitkFileWriterRegistry.cpp
 # IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
-  IO/mitkItkLoggingAdapter.cpp
+  IO/mitkIOConstants.cpp
   IO/mitkIOUtil.cpp
+  IO/mitkItkLoggingAdapter.cpp
   IO/mitkOperation.cpp
 # IO/mitkPicFileIOFactory.cpp
 # IO/mitkPicFileReader.cpp
@@ -379,12 +380,14 @@ set(CPP_FILES
   Common/mitkCoreServices.cpp
 
   Internal/mitkCoreActivator.cpp
+  Internal/mitkFileReaderWriterBase.cpp
   Internal/mitkItkFileReaderService.cpp
   Internal/mitkLegacyFileReaderService.cpp
   #Internal/mitkLegacyFileWriterService.cpp
   Internal/mitkMimeTypeProvider.cpp
   Internal/mitkPointSetReaderService.cpp
   Internal/mitkPointSetWriterService.cpp
+  Internal/mitkRawImageFileReader.cpp
 )
 
 set(RESOURCE_FILES

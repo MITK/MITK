@@ -22,14 +22,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceInterface.h>
+#include <usAny.h>
 
 // MITK
 #include <mitkMessage.h>
+#include <mitkDataStorage.h>
 
 
 namespace mitk {
   class BaseData;
-  class DataStorage;
 }
 
 namespace itk {
@@ -62,9 +63,7 @@ namespace mitk {
   {
     virtual ~IFileReader();
 
-    typedef std::pair<std::string, bool> Option;
-    typedef std::vector<std::string> OptionNames;
-    typedef std::vector<Option> OptionList;
+    typedef std::map<std::string, us::Any> Options;
 
     typedef mitk::MessageAbstractDelegate1<float> ProgressCallback;
 
@@ -79,18 +78,18 @@ namespace mitk {
     virtual std::vector<itk::SmartPointer<BaseData> > Read(std::istream& stream) = 0;
 
     /**
-     * \brief Reads the specified file and returns its contents.
+     * \brief Reads the specified file, loading its contents into the provided DataStorage.
      *
-     * When reading a given file, multiple BaseData instances might be produces.
-     * If a DataStorage instance is passed and the reader added a BaseData instance
-     * to it, the second element in the returned pair will be set true.
+     * \param path The absolute file path include the file name extension.
+     * \param ds The DataStorage to which the data is added.
+     * \return The set of add DataNodes to \c ds.
      */
-    virtual std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > Read(const std::string& path, mitk::DataStorage& ds) = 0;
+    virtual DataStorage::SetOfObjects::Pointer Read(const std::string& path, mitk::DataStorage& ds) = 0;
 
     /**
      * \brief Reads the specified input stream and returns its contents.
      */
-    virtual std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > Read(std::istream& stream, mitk::DataStorage& ds) = 0;
+    virtual DataStorage::SetOfObjects::Pointer Read(std::istream& stream, mitk::DataStorage& ds) = 0;
 
     /**
      * \brief returns a list of the supported Options
@@ -102,7 +101,9 @@ namespace mitk {
      * implementation decides which options it wants to support.
      * If no options are supported, an empty list is returned.
      */
-    virtual OptionList GetOptions() const = 0;
+    virtual Options GetOptions() const = 0;
+
+    virtual us::Any GetOption(const std::string& name) const = 0;
 
     /**
      * \brief Sets the options for this reader
@@ -110,7 +111,9 @@ namespace mitk {
      * The best way to use this method is to retireve the options via GetOptions, manipulate the bool values,
      * and then set the options again.
      */
-    virtual void SetOptions(const OptionList& options) = 0;
+    virtual void SetOptions(const Options& options) = 0;
+
+    virtual void SetOption(const std::string& name, const us::Any& value) = 0;
 
     /**
      * \brief Returns true if this writer can confirm that it can read this file and false otherwise.
@@ -151,7 +154,6 @@ namespace mitk {
 
 } // namespace mitk
 
-// This is the microservice declaration. Do not meddle!
 US_DECLARE_SERVICE_INTERFACE(mitk::IFileReader, "org.mitk.IFileReader")
 
 #endif /* IFileReader_H_HEADER_INCLUDED_C1E7E521 */

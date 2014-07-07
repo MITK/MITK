@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Internal/mitkItkFileReaderService.h>
 #include <Internal/mitkMimeTypeProvider.h>
 #include <Internal/mitkPointSetReaderService.h>
+#include <Internal/mitkPointSetWriterService.h>
+#include <Internal/mitkRawImageFileReader.h>
 
 // Micro Services
 #include <usGetModuleContext.h>
@@ -265,16 +267,14 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
   this->RegisterMimeTypes();
   this->RegisterItkReaderWriter();
 
+  // Add custom Reader / Writer Services
+  m_FileReaders.push_back(new mitk::PointSetReaderService());
+  m_FileWriters.push_back(new mitk::PointSetWriterService());
+  m_FileReaders.push_back(new mitk::RawImageFileReader());
+
   // Explicitly load the LegacyIO module
   us::SharedLibrary legacyIOLib(programPath, "MitkLegacyIO");
   legacyIOLib.Load();
-
-  // Add Reader / Writer Services
-
-  mitk::IFileReader* reader;
-  //    mitk::IFileWriter* writer;
-  reader = new mitk::PointSetReaderService();
-  m_FileReaders.push_back(reader);
 
   m_ShaderRepositoryTracker->Open();
 
@@ -324,7 +324,7 @@ void MitkCoreActivator::RegisterMimeTypes()
   RegisterMimeType("application/vnd.mitk.pic+gz", "Images", "DKFZ Compressed PIC Format", "pic.gz");
 
   // REMOVE: Test multiple mime types for same extension
-  RegisterMimeType("application/vnd.fancy", "Images", "Fancy Compressed PIC Format", "pic.gz");
+  //RegisterMimeType("application/vnd.fancy", "Images", "Fancy Compressed PIC Format", "pic.gz");
 
   // 2D Images
   RegisterMimeType("image/bmp", "2D Images", "Bitmap Image", "bmp");

@@ -134,21 +134,8 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
       int lastCrtReportType = _CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_DEBUG );
   #endif
 
-  unsigned int oldSize = dataStorage->GetAll()->Size();
-  QList<mitk::BaseData::Pointer> data = QmitkIOUtil::LoadFiles(fileNames, dataStorage.GetPointer());
-  foreach(mitk::BaseData::Pointer baseData, data)
-  {
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(baseData);
-    mitk::StringProperty::Pointer pathProp = dynamic_cast<mitk::StringProperty*>(baseData->GetProperty("path").GetPointer());
-    if (pathProp.IsNotNull())
-    {
-      node->SetName(pathProp->GetValue());
-    }
-    mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(node);
-    dataStorage->Add(node);
-  }
-  const bool dsmodified = !data.empty() || oldSize < dataStorage->GetAll()->Size();
+  DataStorage::SetOfObjects::Pointer data = QmitkIOUtil::Load(fileNames, *dataStorage);
+  const bool dsmodified = !data->empty();
 
   // Set ASSERT status back to previous status.
   #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)

@@ -15,8 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPointSet.h"
-#include "mitkFileReaderRegistry.h"
-#include "mitkFileWriterRegistry.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkIOUtil.h"
 #include "mitkTestingMacros.h"
@@ -50,7 +48,7 @@ void ReaderLocaleTest(mitk::Point3D & refPoint, std::string filename)
 {
   MITK_TEST_OUTPUT(<< "---- Reader Test ---- ");
 
-  mitk::PointSet::Pointer pointSet = mitk::FileReaderRegistry::Read<mitk::PointSet>(filename);
+  mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(filename);
 
   mitk::Point3D point;
   if (pointSet->GetPointIfExists(0, &point))
@@ -79,7 +77,7 @@ void WriterLocaleTest(mitk::Point3D & refPoint, std::string filename)
   std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream);
 
   // write point set
-  mitk::FileWriterRegistry::Write(refPointSet, tmpStream);
+  mitk::IOUtil::Save(refPointSet, tmpFilePath);
   tmpStream.close();
 
   std::ifstream stream(tmpFilePath.c_str());

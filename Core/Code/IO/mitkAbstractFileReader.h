@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkIFileReader.h>
 #include <mitkBaseData.h>
-#include <mitkSimpleMimeType.h>
+#include <mitkIMimeType.h>
 
 // Microservices
 #include <usServiceRegistration.h>
@@ -37,7 +37,7 @@ namespace us {
 namespace mitk {
 
 /**
- * @brief Interface class of readers that read from files
+ * @brief Base class for creating mitk::BaseData objects from files or streams.
  * @ingroup Process
  */
 class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
@@ -45,17 +45,28 @@ class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
 
 public:
 
+  /**
+   * @brief Reads the given \c path and creates a list BaseData objects.
+   *
+   * The default implementation opens a std::ifstream in binary mode for reading
+   * and passed the stream to Read(std::istream&).
+   *
+   * @param path The absolute path to a file include the file name extension.
+   * @return
+   */
   virtual std::vector<itk::SmartPointer<BaseData> > Read(const std::string& path);
 
   virtual std::vector<itk::SmartPointer<BaseData> > Read(std::istream& stream) = 0;
 
-  virtual std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > Read(const std::string& path, mitk::DataStorage& ds);
+  virtual DataStorage::SetOfObjects::Pointer Read(const std::string& path, mitk::DataStorage& ds);
 
-  virtual std::vector<std::pair<itk::SmartPointer<BaseData>,bool> > Read(std::istream& stream, mitk::DataStorage& ds);
+  virtual DataStorage::SetOfObjects::Pointer Read(std::istream& stream, mitk::DataStorage& ds);
 
-  virtual OptionList GetOptions() const;
+  virtual Options GetOptions() const;
+  virtual us::Any GetOption(const std::string &name) const;
 
-  virtual void SetOptions(const OptionList& options);
+  virtual void SetOptions(const Options& options);
+  virtual void SetOption(const std::string& name, const us::Any& value);
 
   /**
    * @brief Checks if the specified path can be read.
@@ -145,11 +156,6 @@ protected:
   virtual us::ServiceProperties GetServiceProperties() const;
 
   /**
-   * @return The mime-type this reader can handle.
-   */
-  std::string GetMimeType() const;
-
-  /**
    * Registers a new IMimeType service object.
    *
    * This method is called from RegisterService and the default implementation
@@ -165,9 +171,23 @@ protected:
   virtual us::ServiceRegistration<IMimeType> RegisterMimeType(us::ModuleContext* context);
 
   void SetMimeType(const std::string& mimeType);
+
+  /**
+   * @return The mime-type this reader can handle.
+   */
+  std::string GetMimeType() const;
+
   void SetCategory(const std::string& category);
+  std::string GetCategory() const;
+
+  std::vector<std::string> GetExtensions() const;
   void AddExtension(const std::string& extension);
+
   void SetDescription(const std::string& description);
+  std::string GetDescription() const;
+
+  void SetDefaultOptions(const Options& defaultOptions);
+  Options GetDefaultOptions() const;
 
   /**
    * \brief Set the service ranking for this file reader.
@@ -182,9 +202,7 @@ protected:
   void SetRanking(int ranking);
   int GetRanking() const;
 
-  std::string GetCategory() const;
-  std::vector<std::string> GetExtensions() const;
-  std::string GetDescription() const;
+  virtual void SetDefaultDataNodeProperties(DataNode* node, const std::string& filePath);
 
 private:
 

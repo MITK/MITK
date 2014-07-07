@@ -28,7 +28,7 @@ set(MODULE_TESTS
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
   mitkFileReaderRegistryTest.cpp
-  mitkFileWriterRegistryTest.cpp
+  #mitkFileWriterRegistryTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
@@ -92,7 +92,7 @@ set(MODULE_TESTS
   mitkPropertyExtensionsTest.cpp
   mitkPropertyFiltersTest.cpp
   mitkTinyXMLTest.cpp
-  #mitkRawImageFileReaderTest.cpp
+  mitkRawImageFileReaderTest.cpp
   mitkInteractionEventTest.cpp
   mitkLookupTableTest.cpp
   #mitkSTLFileReaderTest.cpp
@@ -150,7 +150,7 @@ set(MODULE_CUSTOM_TESTS
     mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp
-    mitkImageWriterTest.cpp
+    #mitkImageWriterTest.cpp
     mitkImageVtkMapper2DTest.cpp
     mitkImageVtkMapper2DLevelWindowTest.cpp
     mitkImageVtkMapper2DOpacityTest.cpp

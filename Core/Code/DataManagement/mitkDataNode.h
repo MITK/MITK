@@ -274,6 +274,12 @@ public:
   bool GetFloatProperty(const char* propertyKey, float &floatValue, mitk::BaseRenderer* renderer = NULL) const;
 
   //##Documentation
+  //## @brief Convenience access method for double properties (instances of
+  //## DoubleProperty)
+  //## @return @a true property was found
+  bool GetDoubleProperty(const char* propertyKey, double &doubleValue, mitk::BaseRenderer* renderer = NULL) const;
+
+  //##Documentation
   //## @brief Convenience access method for string properties (instances of
   //## StringProperty)
   //## @return @a true property was found

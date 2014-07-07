@@ -276,6 +276,10 @@ public:
   //##Documentation
   //## @brief Convenience access method for double properties (instances of
   //## DoubleProperty)
+  //##
+  //## If there is no DoubleProperty for the given \c propertyKey argument, the method
+  //## looks for a corresponding FloatProperty instance.
+  //##
   //## @return @a true property was found
   bool GetDoubleProperty(const char* propertyKey, double &doubleValue, mitk::BaseRenderer* renderer = NULL) const;
 

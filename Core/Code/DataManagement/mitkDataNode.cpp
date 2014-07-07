@@ -316,7 +316,16 @@ bool mitk::DataNode::GetDoubleProperty(const char* propertyKey, double &doubleVa
 {
   mitk::DoubleProperty::Pointer doubleprop = dynamic_cast<mitk::DoubleProperty*>(GetProperty(propertyKey, renderer));
   if(doubleprop.IsNull())
+  {
+    // try float instead
+    float floatValue = 0;
+    if (this->GetFloatProperty(propertyKey, floatValue, renderer))
+    {
+      doubleValue = floatValue;
+      return true;
+    }
     return false;
+  }
 
   doubleValue = doubleprop->GetValue();
   return true;

@@ -307,13 +307,11 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
       this->GetDataNode()->GetBoolProperty("color mode", colorMode);
       ls->m_VtkPolyDataMapper->SetColorMode( (colorMode ? 1 : 0) );
 
-      float scalarsMin = 0;
-      if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum")) != NULL)
-        scalarsMin = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
+      double scalarsMin = 0;
+      this->GetDataNode()->GetDoubleProperty("ScalarsRangeMinimum", scalarsMin, renderer);
 
-      float scalarsMax = 1.0;
-      if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
-        scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
+      double scalarsMax = 1.0;
+      this->GetDataNode()->GetDoubleProperty("ScalarsRangeMaximum", scalarsMax, renderer);
 
       ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
     }

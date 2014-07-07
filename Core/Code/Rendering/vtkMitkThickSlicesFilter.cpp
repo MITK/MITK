@@ -321,7 +321,7 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
         for (idxX = 0; idxX <= maxX; idxX++)
         {
           T sum = 0;
-          for(int z = _minZ+1; z<= _maxZ;z++)
+          for(int z = _minZ; z <= _maxZ;z++)
           {
             T value = inPtr[z*inIncs[2]];
             sum += value;

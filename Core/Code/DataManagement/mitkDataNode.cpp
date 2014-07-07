@@ -312,6 +312,25 @@ bool mitk::DataNode::GetFloatProperty(const char* propertyKey, float &floatValue
   return true;
 }
 
+bool mitk::DataNode::GetDoubleProperty(const char* propertyKey, double &doubleValue, mitk::BaseRenderer* renderer) const
+{
+  mitk::DoubleProperty::Pointer doubleprop = dynamic_cast<mitk::DoubleProperty*>(GetProperty(propertyKey, renderer));
+  if(doubleprop.IsNull())
+  {
+    // try float instead
+    float floatValue = 0;
+    if (this->GetFloatProperty(propertyKey, floatValue, renderer))
+    {
+      doubleValue = floatValue;
+      return true;
+    }
+    return false;
+  }
+
+  doubleValue = doubleprop->GetValue();
+  return true;
+}
+
 bool mitk::DataNode::GetStringProperty(const char* propertyKey, std::string& string, mitk::BaseRenderer* renderer) const
 {
   mitk::StringProperty::Pointer stringProp = dynamic_cast<mitk::StringProperty*>(GetProperty(propertyKey, renderer));
@@ -412,7 +431,20 @@ void mitk::DataNode::SetBoolProperty( const char* propertyKey, bool boolValue, m
 
 void mitk::DataNode::SetFloatProperty( const char* propertyKey, float floatValue, mitk::BaseRenderer* renderer/*=NULL*/ )
 {
+  if (dynamic_cast<DoubleProperty*>(this->GetProperty(propertyKey, renderer)) != NULL)
+  {
+    MITK_WARN << "Setting float property " << propertyKey << " although a double property with the same name already exists";
+  }
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::FloatProperty::New(floatValue));
+}
+
+void mitk::DataNode::SetDoubleProperty(const char *propertyKey, float doubleValue, mitk::BaseRenderer *renderer)
+{
+  if (dynamic_cast<FloatProperty*>(this->GetProperty(propertyKey, renderer)) != NULL)
+  {
+    MITK_WARN << "Setting double property " << propertyKey << " although a float property with the same name already exists";
+  }
+  GetPropertyList(renderer)->SetProperty(propertyKey, mitk::DoubleProperty::New(doubleValue));
 }
 
 void mitk::DataNode::SetStringProperty( const char* propertyKey, const char* stringValue, mitk::BaseRenderer* renderer/*=NULL*/ )

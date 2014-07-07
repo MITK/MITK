@@ -150,7 +150,7 @@ static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
 int mitkDataNodeExtTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("DataNode")
+  MITK_TEST_BEGIN("DataNodeExt")
 
   // Global interaction must(!) be initialized
   mitk::GlobalInteraction::GetInstance()->Initialize("global");

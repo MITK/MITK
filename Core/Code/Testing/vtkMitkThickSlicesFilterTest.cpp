@@ -89,7 +89,7 @@ int vtkMitkThickSlicesFilterTest(int argc, char** const argv)
   // 111111111
   // 222222222
   mitk::Image::Pointer testImage1 = vtkMitkThickSlicesFilterTestHelper::CreateTestImage( 0, 2 );
-  thickSliceFilter->SetInput( testImage1->GetVtkImageData() );
+  thickSliceFilter->SetInputData( testImage1->GetVtkImageData() );
 
 
   // MaxIP
@@ -134,7 +134,7 @@ int vtkMitkThickSlicesFilterTest(int argc, char** const argv)
   // 888888888
 
   mitk::Image::Pointer testImage2 = vtkMitkThickSlicesFilterTestHelper::CreateTestImage( 3, 8 );
-  thickSliceFilter->SetInput( testImage2->GetVtkImageData() );
+  thickSliceFilter->SetInputData( testImage2->GetVtkImageData() );
 
 
   // MaxIP

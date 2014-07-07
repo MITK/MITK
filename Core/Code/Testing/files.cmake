@@ -22,6 +22,7 @@ set(MODULE_TESTS
   ################# RUNNING TESTS ###################################################
   mitkAccessByItkTest.cpp
   mitkCoreObjectFactoryTest.cpp
+  mitkDataNodeTest.cpp
   mitkMaterialTest.cpp
   mitkActionTest.cpp
   mitkDispatcherTest.cpp
@@ -136,7 +137,6 @@ set(MODULE_TESTSURFACES
 
 set(MODULE_CUSTOM_TESTS
     mitkDataStorageTest.cpp
-    mitkDataNodeTest.cpp
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
     mitkEventMapperTest.cpp

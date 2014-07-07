@@ -497,6 +497,12 @@ public:
   void SetFloatProperty(const char* propertyKey, float floatValue, mitk::BaseRenderer* renderer=NULL);
 
   /**
+   * \brief Convenience method for setting double properties (instances of
+   * DoubleProperty)
+   */
+  void SetDoubleProperty(const char* propertyKey, float doubleValue, mitk::BaseRenderer* renderer=NULL);
+
+  /**
    * \brief Convenience method for setting string properties (instances of
    * StringProperty)
    */

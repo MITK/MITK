@@ -35,12 +35,14 @@ mitk::Scheduler::Scheduler(SchedulingAlgorithm::Enum algorithm)
   {
   case mitk::SchedulingAlgorithm::RoundRobin:
     m_Impl->algorithm = new mitk::RoundRobinSchedulingAlgorithm;
+    break;
 
   case mitk::SchedulingAlgorithm::WeightedRoundRobin:
     m_Impl->algorithm = new mitk::WeightedRoundRobinSchedulingAlgorithm;
+    break;
 
   default:
-    assert(false);
+    assert(false && "Unknown scheduling algorithm!");
   }
 }
 

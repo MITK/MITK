@@ -191,7 +191,7 @@ int NetworkStatistics(int argc, char* argv[])
       << "NormalizedLaplacianNumberOf1s "
       << "NormalizedLaplacianNumberOf0s "
       << "NormalizedLaplacianLowerSlope "
-      << "NormalizedLaplacianUpperSlope"
+      << "NormalizedLaplacianUpperSlope "
       << "SmallWorldness"
       << std::endl;
 
@@ -207,7 +207,7 @@ int NetworkStatistics(int argc, char* argv[])
     std::string regionalOutName = outName + "_regional.txt";
 
     // iterate over all three possible methods
-    for(unsigned int method( 1 ); method < 3; method++)
+    for(unsigned int method( 0 ); method < 3; method++)
     {
       // 0 - Random removal threshold
       // 1 - Largest density below threshold

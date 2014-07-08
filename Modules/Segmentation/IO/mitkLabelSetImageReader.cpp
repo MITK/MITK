@@ -23,11 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileReader.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
+#include "mitkPropertyListsXmlFileReaderAndWriter.h"
 
 #include <iostream>
 #include <fstream>
 
 #include "itksys/SystemTools.hxx"
+
+#include "tinyxml.h"
 
 namespace mitk
 {
@@ -96,7 +99,7 @@ void LabelSetImageReader::GenerateData()
   if (vectorImage.IsNull())
     mitkThrow() << "Could not retrieve the vector image.";
 
-  LabelSetImage::Pointer output = static_cast<OutputType*>(this->GetOutput());
+  LabelSetImage * output = static_cast<OutputType*>(this->GetOutput());
 
   ImageType::Pointer auxImg = ImageType::New();
   auxImg->SetSpacing( vectorImage->GetSpacing() );
@@ -140,44 +143,32 @@ void LabelSetImageReader::GenerateData()
 
   output->SetName(name);
   output->SetLastModificationTime(lastmodified);
+  output->AddLayer();
+
+  char str[32786];
+  std::string _xmlStr;
+  mitk::Label::Pointer label;
+  TiXmlDocument doc;
+  mitk::PropertyListsXmlFileReaderAndWriter::Pointer docReader = mitk::PropertyListsXmlFileReaderAndWriter::New();
 
   for (int idx=0; idx<numberOfLabels; idx++)
   {
     itKey = imgMetaKeys.begin();
-    mitk::Color _color;
-    std::string _name;
-    float _opacity;
-    int _locked, _visible, _layer, _index;
     for (; itKey != imgMetaKeys.end(); itKey ++)
     {
       itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
       sprintf( keybuffer, "label_%03d_name", idx );
       if (itKey->find(keybuffer) != std::string::npos)
       {
-        char str[512];
         sscanf(metaString.c_str(), "%[^\n]s", &str);
-        _name = str;
-      }
-      sprintf( keybuffer, "label_%03d_props", idx );
-      if (itKey->find(keybuffer) != std::string::npos)
-      {
-        float rgba[4];
-        sscanf(metaString.c_str(), "%f %f %f %f %d %d %d %d", &rgba[0], &rgba[1], &rgba[2], &rgba[3], &_locked, &_visible, &_layer, &_index);
-        _color.SetRed(rgba[0]);
-        _color.SetGreen(rgba[1]);
-        _color.SetBlue(rgba[2]);
-        _opacity = rgba[3];
+        _xmlStr = str;
+        doc.Parse(_xmlStr.c_str());
       }
     }
 
-    mitk::Label::Pointer label = mitk::Label::New();
-    label->SetName(_name);
-    label->SetOpacity(_opacity);
-    label->SetColor(_color);
-    label->SetLocked(_locked);
-    label->SetVisible(_visible);
-    label->SetLayer(_layer);
-    label->SetValue(_index);
+    label = mitk::Label::New();
+    docReader->ReadLists(doc,label);
+
     if (_index != 0)
       output->GetLabelSet()->AddLabel(*label);
   }

@@ -173,6 +173,7 @@ static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
   MITK_TEST_CONDITION( interactor == dataNode->GetDataInteractor(), "Testing if a NULL pointer was set correctly (DataInteractor)" )
 
   interactor = mitk::PointSetDataInteractor::New();
+  interactor->SetEventConfig("PointSetConfig.xml");
   interactor->SetDataNode(dataNode);
   MITK_TEST_CONDITION( interactor == dataNode->GetDataInteractor(), "Testing if a PointSetDataInteractor was set correctly" )
 

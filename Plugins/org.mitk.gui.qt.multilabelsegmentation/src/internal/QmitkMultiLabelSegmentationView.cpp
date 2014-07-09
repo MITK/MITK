@@ -139,7 +139,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
   m_Controls.m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls.m_ManualToolGUIContainer2D );
   //m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups();
-  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Fill Erase 'Region Growing' FastMarching2D");// todo: "Correction Paint Wipe 'Live Wire'"
+  m_Controls.m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Fill Erase Paint 'Region Growing' FastMarching2D");// todo: "Correction Paint Wipe 'Live Wire'"
   m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
   connect( m_Controls.m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
 
@@ -216,7 +216,6 @@ void QmitkMultiLabelSegmentationView::InitializeListeners()
 
 void QmitkMultiLabelSegmentationView::SetFocus ()
 {
-
 }
 
 bool QmitkMultiLabelSegmentationView::CheckForSameGeometry(const mitk::Image *image1, const mitk::Image *image2) const

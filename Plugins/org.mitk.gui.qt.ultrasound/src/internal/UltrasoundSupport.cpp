@@ -319,11 +319,6 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
   }
 }
 
-void UltrasoundSupport::OnActiveDeviceSelectionChanged(us::ServiceReferenceU reference)
-{
-  m_Controls.m_BtnView->setEnabled(reference);
-}
-
 UltrasoundSupport::UltrasoundSupport()
 : m_ControlCustomWidget(0), m_ControlBModeWidget(0),
   m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),

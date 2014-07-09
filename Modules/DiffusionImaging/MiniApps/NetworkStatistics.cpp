@@ -206,6 +206,7 @@ int NetworkStatistics(int argc, char* argv[])
     std::string localOutName = outName + "_local.txt";
     std::string regionalOutName = outName + "_regional.txt";
 
+    bool firstRun( true );
     // iterate over all three possible methods
     for(unsigned int method( 0 ); method < 3; method++)
     {
@@ -238,10 +239,7 @@ int NetworkStatistics(int argc, char* argv[])
         thresholder->SetNetwork( network );
         thresholder->SetTargetThreshold( targetValue );
         thresholder->SetTargetDensity( targetValue );
-        // TEST
-        thresholder->SetThresholdingScheme( static_cast<mitk::ConnectomicsNetworkThresholder::ThresholdingSchemes>(1) );
-        // ENDTEST
-        //thresholder->SetThresholdingScheme( static_cast<mitk::ConnectomicsNetworkThresholder::ThresholdingSchemes>(method) );
+        thresholder->SetThresholdingScheme( static_cast<mitk::ConnectomicsNetworkThresholder::ThresholdingSchemes>(method) );
         mitk::ConnectomicsNetwork::Pointer thresholdedNetwork = thresholder->GetThresholdedNetwork();
 
         mitk::ConnectomicsStatisticsCalculator::Pointer statisticsCalculator = mitk::ConnectomicsStatisticsCalculator::New();
@@ -353,7 +351,7 @@ int NetworkStatistics(int argc, char* argv[])
 
         {
           // only add to header for the first step of the first method
-          if(step == 0 && method == 0)
+          if( firstRun )
           {
             localHeaderStream << "Th_method " << "Th_target " << "density";
           }
@@ -369,7 +367,7 @@ int NetworkStatistics(int argc, char* argv[])
           {
             if( network->CheckForLabel(localLabels.at( loop )) )
             {
-              if(step == 0 && method == 0)
+              if( firstRun )
               {
                 localHeaderStream  << " "
                   << localLabels.at( loop ) << "_Degree "
@@ -392,7 +390,7 @@ int NetworkStatistics(int argc, char* argv[])
 
         {
           // only add to header for the first step of the first method
-          if(step == 0 && method == 0)
+          if( firstRun )
           {
             regionalHeaderStream << "Th_method " << "Th_target " << "density";
           }
@@ -430,7 +428,7 @@ int NetworkStatistics(int argc, char* argv[])
             }
 
             // only add to header for the first step of the first method
-            if(step == 0 && method == 0)
+            if( firstRun )
             {
               regionalHeaderStream  << " " << regionName << "_LocalAverageDegree "
                 << regionName << "_LocalAverageCC "
@@ -444,6 +442,8 @@ int NetworkStatistics(int argc, char* argv[])
               << " " << count;
           }
         }
+
+        firstRun = false;
       }
 
     }// end calculate local averages

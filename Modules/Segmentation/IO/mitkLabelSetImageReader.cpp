@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileReader.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
-#include "mitkPropertyListsXmlFileReaderAndWriter.h"
 
 #include <iostream>
 #include <fstream>

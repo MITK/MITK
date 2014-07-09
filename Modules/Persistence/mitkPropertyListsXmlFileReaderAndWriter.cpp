@@ -103,7 +103,6 @@ bool PropertyListsXmlFileReaderAndWriter::PropertyFromXmlElem(std::string& name,
     return readOp;
 
 }
-\
 bool PropertyListsXmlFileReaderAndWriter::PropertyToXmlElem(const std::string& name, const mitk::BaseProperty* prop, TiXmlElement* elem)  const
 {
     if(!prop || !elem)
@@ -197,58 +196,51 @@ bool PropertyListsXmlFileReaderAndWriter::WriteLists( const std::string& fileNam
 
     return ( allPropsConverted && doc.SaveFile( fileName.c_str() ) );
 }
-
 bool PropertyListsXmlFileReaderAndWriter::ReadLists( const std::string& fileName, std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists )  const
 {
     // reread
     TiXmlDocument doc( fileName );
     doc.LoadFile();
 
-    return ReadLists(doc, _PropertyLists);
-}
+    TiXmlHandle docHandle( &doc );
+    TiXmlElement* elem = docHandle.FirstChildElement( "PropertyLists" ).FirstChildElement( "PropertyList" ).ToElement();
 
-bool PropertyListsXmlFileReaderAndWriter::ReadLists( TiXmlDocument doc, std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists ) const
-{
-  // reread
-  TiXmlHandle docHandle( &doc );
-  TiXmlElement* elem = docHandle.FirstChildElement( "PropertyLists" ).FirstChildElement( "PropertyList" ).ToElement();
+    if(!elem)
+    {
+        MITK_WARN("PropertyListFromXml") << "Cannot find a PropertyList element (inside a PropertyLists element)";
+        return false;
+    }
 
-  if(!elem)
-  {
-      MITK_WARN("PropertyListFromXml") << "Cannot find a PropertyList element (inside a PropertyLists element)";
-      return false;
-  }
+    bool opRead = false;
+    while(elem)
+    {
+        std::string propListId;
+        opRead = elem->QueryStringAttribute( PROPERTY_LIST_ID_ELEMENT_NAME.c_str(), &propListId ) == TIXML_SUCCESS;
+        if( !opRead )
+            break;
 
-  bool opRead = false;
-  while(elem)
-  {
-      std::string propListId;
-      opRead = elem->QueryStringAttribute( PROPERTY_LIST_ID_ELEMENT_NAME.c_str(), &propListId ) == TIXML_SUCCESS;
-      if( !opRead )
-          break;
+        mitk::PropertyList::Pointer propList = mitk::PropertyList::New();
 
-      mitk::PropertyList::Pointer propList = mitk::PropertyList::New();
+        TiXmlElement* propElem = elem->FirstChildElement("Property");
 
-      TiXmlElement* propElem = elem->FirstChildElement("Property");
+        while(propElem)
+        {
+            std::string name;
+            mitk::BaseProperty::Pointer prop;
+            opRead = this->PropertyFromXmlElem( name, prop, propElem );
+            if(!opRead)
+                break;
+            propList->SetProperty( name, prop );
+            propElem = propElem->NextSiblingElement( "Property" );
+        }
 
-      while(propElem)
-      {
-          std::string name;
-          mitk::BaseProperty::Pointer prop;
-          opRead = this->PropertyFromXmlElem( name, prop, propElem );
-          if(!opRead)
-              break;
-          propList->SetProperty( name, prop );
-          propElem = propElem->NextSiblingElement( "Property" );
-      }
+        if( !opRead )
+            break;
+        _PropertyLists[propListId] = propList;
+        elem = elem->NextSiblingElement( "PropertyList" );
+    }
 
-      if( !opRead )
-          break;
-      _PropertyLists[propListId] = propList;
-      elem = elem->NextSiblingElement( "PropertyList" );
-  }
-
-  return opRead;
+    return opRead;
 }
 
 PropertyListsXmlFileReaderAndWriter::PropertyListsXmlFileReaderAndWriter()

@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactoryBase.h>
 
 class TiXmlElement;
-class TiXmlDocument;
 
 namespace mitk
 {
@@ -53,12 +52,6 @@ class MitkSceneSerializationBase_EXPORT PropertyListSerializer : public itk::Obj
       \return the filename of the newly created file.
       */
     virtual std::string Serialize();
-
-    /**
-      \brief Serializes given PropertyList object.
-      \return the xml string of the propertyList.
-      */
-    virtual TiXmlDocument SerializeAsTiXmlDocument();
 
     PropertyList* GetFailedProperties();
 

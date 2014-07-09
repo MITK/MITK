@@ -18,7 +18,6 @@ set(module_dirs
     GraphAlgorithms
     ContourModel
     SurfaceInterpolation
-    Persistence
     Segmentation
     PlanarFigureSegmentation
     OpenViewCore
@@ -48,6 +47,7 @@ set(module_dirs
     Simulation
     Remeshing
     Python
+    Persistence
     IGTUI
     VtkShaders
 )

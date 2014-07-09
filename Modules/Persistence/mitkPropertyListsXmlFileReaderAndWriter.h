@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataStorage.h"
 
-class TiXmlDocument;
 class TiXmlElement;
 
 namespace mitk
@@ -37,7 +36,6 @@ class PropertyListsXmlFileReaderAndWriter : public itk::Object
 
     bool WriteLists( const std::string& fileName, const std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists ) const;
     bool ReadLists( const std::string& fileName, std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists ) const;
-    bool ReadLists( TiXmlDocument xmlDoc, std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists ) const;
 
   protected:
 

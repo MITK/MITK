@@ -35,52 +35,6 @@ mitk::PropertyListSerializer::~PropertyListSerializer()
 
 std::string mitk::PropertyListSerializer::Serialize()
 {
-
-  std::string fullname(m_WorkingDirectory);
-  std::string filename;
-
-  {// tmpname
-    static unsigned long count = 1;
-    unsigned long n = count++;
-    std::ostringstream name;
-    for (int i = 0; i < 6; ++i)
-    {
-      name << char('a' + (n % 26));
-      n /= 26;
-    }
-
-    filename.append(name.str());
-
-    fullname += "/";
-    fullname += filename;
-    fullname = itksys::SystemTools::ConvertToOutputPath(fullname.c_str());
-
-    // Trim quotes
-    std::string::size_type length = fullname.length();
-
-    if (length >= 2 && fullname[0] == '"' && fullname[length - 1] == '"')
-      fullname = fullname.substr(1, length - 2);
-  }
-
-
-  // serialize propertylist
-  TiXmlDocument document = SerializeAsTiXmlDocument();
-
-
-  {// save XML file
-    if ( !document.SaveFile( fullname ) )
-    {
-      MITK_ERROR << "Could not write PropertyList to " << fullname << "\nTinyXML reports '" << document.ErrorDesc() << "'";
-      return "";
-    }
-  }
-
-  return filename;
-}
-
-
-TiXmlDocument mitk::PropertyListSerializer::SerializeAsTiXmlDocument()
-{
   m_FailedProperties = PropertyList::New();
 
   if ( m_PropertyList.IsNull() || m_PropertyList->IsEmpty() )
@@ -88,6 +42,29 @@ TiXmlDocument mitk::PropertyListSerializer::SerializeAsTiXmlDocument()
     MITK_ERROR << "Not serializing NULL or empty PropertyList";
     return "";
   }
+
+  // tmpname
+  static unsigned long count = 1;
+  unsigned long n = count++;
+  std::ostringstream name;
+  for (int i = 0; i < 6; ++i)
+  {
+    name << char('a' + (n % 26));
+    n /= 26;
+  }
+  std::string filename;
+  filename.append(name.str());
+
+  std::string fullname(m_WorkingDirectory);
+  fullname += "/";
+  fullname += filename;
+  fullname = itksys::SystemTools::ConvertToOutputPath(fullname.c_str());
+
+  // Trim quotes
+  std::string::size_type length = fullname.length();
+
+  if (length >= 2 && fullname[0] == '"' && fullname[length - 1] == '"')
+    fullname = fullname.substr(1, length - 2);
 
   TiXmlDocument document;
   TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
@@ -119,9 +96,15 @@ TiXmlDocument mitk::PropertyListSerializer::SerializeAsTiXmlDocument()
     }
   }
 
-  return document;
-}
+  // save XML file
+  if ( !document.SaveFile( fullname ) )
+  {
+    MITK_ERROR << "Could not write PropertyList to " << fullname << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+    return "";
+  }
 
+  return filename;
+}
 
 TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::string& key, const BaseProperty* property )
 {

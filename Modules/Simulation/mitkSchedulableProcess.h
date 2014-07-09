@@ -32,6 +32,8 @@ namespace mitk
     boost::chrono::nanoseconds GetTotalElapsedTime() const;
     void ResetTotalElapsedTime(boost::chrono::nanoseconds carryover = boost::chrono::nanoseconds::zero());
     boost::chrono::nanoseconds GetElapsedTime() const;
+
+  protected:
     void SetElapsedTime(boost::chrono::nanoseconds elapsedTime);
 
   private:

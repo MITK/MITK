@@ -37,6 +37,7 @@ static void SwitchSimuluationContext(mitk::Simulation::Pointer activeSimulation)
 }
 
 mitk::SimulationService::SimulationService()
+  : m_Scheduler(SchedulingAlgorithm::WeightedRoundRobin)
 {
 }
 
@@ -53,4 +54,9 @@ void mitk::SimulationService::SetActiveSimulation(Simulation::Pointer activeSimu
 {
   SwitchSimuluationContext(activeSimulation);
   m_ActiveSimulation = activeSimulation;
+}
+
+mitk::Scheduler* mitk::SimulationService::GetScheduler()
+{
+  return &m_Scheduler;
 }

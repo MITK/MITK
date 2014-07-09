@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSimulationView.h"
 #include <mitkISimulationService.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkScheduler.h>
 #include <mitkSimulation.h>
 
 template <class T>
@@ -37,7 +38,6 @@ static T* GetService()
 
 QmitkSimulationView::QmitkSimulationView()
   : m_SimulationService(GetService<mitk::ISimulationService>()),
-    m_Scheduler(mitk::SchedulingAlgorithm::WeightedRoundRobin),
     m_Timer(this)
 {
   this->GetDataStorage()->RemoveNodeEvent.AddListener(
@@ -72,23 +72,24 @@ void QmitkSimulationView::CreateQtPartControl(QWidget* parent)
 void QmitkSimulationView::OnAnimateButtonToggled(bool toggled)
 {
   mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
+  mitk::Scheduler* scheduler = m_SimulationService->GetScheduler();
 
   if (toggled)
   {
     simulation->SetAnimationFlag(true);
-    m_Scheduler.AddProcess(simulation);
+    scheduler->AddProcess(simulation);
 
     m_Controls.stepButton->setEnabled(false);
   }
   else
   {
-    m_Scheduler.RemoveProcess(simulation);
+    scheduler->RemoveProcess(simulation);
     simulation->SetAnimationFlag(false);
 
     m_Controls.stepButton->setEnabled(true);
   }
 
-  if (!m_Scheduler.IsEmpty())
+  if (!scheduler->IsEmpty())
   {
     if (!m_Timer.isActive())
       m_Timer.start(0);
@@ -108,12 +109,13 @@ void QmitkSimulationView::OnDtChanged(double dt)
 void QmitkSimulationView::OnNodeRemovedFromDataStorage(const mitk::DataNode* node)
 {
   mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(node->GetData());
+  mitk::Scheduler* scheduler = m_SimulationService->GetScheduler();
 
   if (simulation.IsNotNull())
   {
-    m_Scheduler.RemoveProcess(simulation);
+    scheduler->RemoveProcess(simulation);
 
-    if (m_Scheduler.IsEmpty() && m_Timer.isActive())
+    if (scheduler->IsEmpty() && m_Timer.isActive())
       m_Timer.stop();
   }
 }
@@ -150,16 +152,13 @@ void QmitkSimulationView::OnSelectedSimulationChanged(const mitk::DataNode* node
 
 void QmitkSimulationView::OnStep(bool renderWindowUpdate)
 {
-  mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(m_Scheduler.GetNextProcess());
+  mitk::Scheduler* scheduler = m_SimulationService->GetScheduler();
+  mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(scheduler->GetNextProcess());
 
   m_SimulationService->SetActiveSimulation(simulation);
 
   if (simulation.IsNotNull())
-  {
-    boost::chrono::high_resolution_clock::time_point t0 = boost::chrono::high_resolution_clock::now();
     simulation->Animate();
-    simulation->SetElapsedTime(boost::chrono::high_resolution_clock::now() - t0);
-  }
 
   if (renderWindowUpdate)
     this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);

@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSimulationView_h
 #define QmitkSimulationView_h
 
-#include <mitkScheduler.h>
 #include <QmitkAbstractView.h>
 #include <QTime>
 #include <QTimer>
@@ -56,7 +55,6 @@ private:
   Ui::QmitkSimulationViewControls m_Controls;
   mitk::ISimulationService* m_SimulationService;
   mitk::DataNode::Pointer m_Selection;
-  mitk::Scheduler m_Scheduler;
   QTimer m_Timer;
   QTime m_NextRenderWindowUpdate;
 };

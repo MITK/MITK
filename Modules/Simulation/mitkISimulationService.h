@@ -23,11 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  class Scheduler;
+
   class MitkSimulation_EXPORT ISimulationService
   {
   public:
     virtual Simulation::Pointer GetActiveSimulation() const = 0;
     virtual void SetActiveSimulation(Simulation::Pointer activeSimulation) = 0;
+    virtual Scheduler* GetScheduler() = 0;
 
   protected:
     ISimulationService();

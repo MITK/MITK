@@ -104,6 +104,8 @@ protected:
 
   mitk::Image::Pointer m_Image;
 
+  mitk::Geometry3D::Pointer m_OldGeometry;
+
   Ui::UltrasoundSupportControls m_Controls;
 
   QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;

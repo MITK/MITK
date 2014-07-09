@@ -535,7 +535,7 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
     if (propList.IsNull())
     {MITK_ERROR << "Property list for this UI (" << id <<") is not available, could not load UI settings!"; return;}
-    int portPolarisWin=0,portAuroraWin=0,portTypePolaris=0,portTypeAurora=0,SelectedDevice=-1;
+    int portPolarisWin,portAuroraWin,portTypePolaris,portTypeAurora,SelectedDevice;
     propList->Get("PolarisPortWin",portPolarisWin);
     propList->Get("AuroraPortWin",portAuroraWin);
     propList->Get("PortTypePolaris", portTypePolaris);
@@ -559,7 +559,6 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
   {
     // QSettings as a fallback if the persistence service is not available
     QSettings settings;
-
     settings.beginGroup(QString::fromStdString(id));
 
     m_Controls->m_trackingDeviceChooser->setCurrentIndex(settings.value("trackingDeviceChooser", 0).toInt());
@@ -574,7 +573,6 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
 
   m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString::fromStdString(m_MTCalibrationFile));
 }
-
 void QmitkTrackingDeviceConfigurationWidgetConnectionWorker::TestConnectionThreadFunc()
 {
 MITK_INFO << "Testing Connection!";

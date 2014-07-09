@@ -53,8 +53,8 @@ namespace mitk {
     mitkNewMacro4Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, std::string, std::string);
 
     itkGetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
-
     itkSetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
+    itkGetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
     itkSetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
 
     /**

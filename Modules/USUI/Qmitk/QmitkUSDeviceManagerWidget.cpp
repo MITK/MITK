@@ -88,6 +88,10 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
     {
       QMessageBox::warning(this, "Activation failed", "Could not activate device. Check logging for details.");
     }
+    else
+    {
+      emit DeviceActivated();
+    }
   }
 
   // Manually reevaluate Button logic

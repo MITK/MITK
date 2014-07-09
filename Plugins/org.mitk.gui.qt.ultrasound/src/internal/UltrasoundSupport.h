@@ -65,9 +65,9 @@ public:
 
       void OnClickedAddNewDevice();
 
-      void OnClickedViewDevice();
-
       void OnChangedFramerateLimit(int);
+
+      void OnChangedActiveDevice();
 
       void OnClickedFreezeButton();
 
@@ -84,9 +84,6 @@ public:
       void DisplayImage();
 
 protected:
-
-  void StartViewing();
-  void StopViewing();
 
   void CreateControlWidgets();
   void RemoveControlWidgets();

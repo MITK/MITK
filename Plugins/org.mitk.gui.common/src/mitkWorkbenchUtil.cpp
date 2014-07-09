@@ -134,7 +134,16 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
       int lastCrtReportType = _CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_DEBUG );
   #endif
 
-  DataStorage::SetOfObjects::Pointer data = QmitkIOUtil::Load(fileNames, *dataStorage);
+  DataStorage::SetOfObjects::Pointer data;
+  try
+  {
+    data = QmitkIOUtil::Load(fileNames, *dataStorage);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_INFO << e;
+    return;
+  }
   const bool dsmodified = !data->empty();
 
   // Set ASSERT status back to previous status.

@@ -44,6 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkIOUtil.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkCustomVariants.h>
+#include <QmitkFileSaveAction.h>
 #include "src/internal/QmitkNodeTableViewKeyFilter.h"
 #include "src/internal/QmitkInfoDialog.h"
 #include "src/internal/QmitkDataManagerItemDelegate.h"
@@ -196,9 +197,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(globalReinitAction);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, globalReinitAction));
 
-  QAction* saveAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"), "Save...", this);
-  QObject::connect( saveAction, SIGNAL( triggered(bool) )
-    , this, SLOT( SaveSelectedNodes(bool) ) );
+  QAction* saveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"),
+                                                this->GetSite()->GetWorkbenchWindow());
   unknownDataNodeDescriptor->AddAction(saveAction);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,saveAction));
 
@@ -699,41 +699,6 @@ void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ 
 
 }
 
-void QmitkDataManagerView::SaveSelectedNodes( bool )
-{
-  QModelIndexList indexesOfSelectedRows = m_NodeTreeView->selectionModel()->selectedRows();
-
-  mitk::DataNode* node = 0;
-  unsigned int indexesOfSelectedRowsSize = indexesOfSelectedRows.size();
-  for (unsigned int i = 0; i<indexesOfSelectedRowsSize; ++i)
-  {
-    node = m_NodeTreeModel->GetNode(indexesOfSelectedRows.at(i));
-    // if node is not defined or if the node contains geometry data do not remove it
-    if ( node != 0 )
-    {
-      mitk::BaseData::Pointer data = node->GetData();
-      if (data.IsNotNull())
-      {
-        QString error;
-        try
-        {
-           QmitkIOUtil::SaveBaseDataWithDialog( data.GetPointer(), node->GetName().c_str(), m_Parent );
-        }
-        catch(std::exception& e)
-        {
-          error = e.what();
-        }
-        catch(...)
-        {
-          error = "Unknown error occured";
-        }
-        if( !error.isEmpty() )
-          QMessageBox::critical( m_Parent, "Error saving...", error );
-      }
-    }
-  }
-}
-
 void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
@@ -845,48 +810,6 @@ void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool )
 
   QmitkInfoDialog _QmitkInfoDialog(selectedNodes, this->m_Parent);
   _QmitkInfoDialog.exec();
-}
-
-void QmitkDataManagerView::Load( bool )
-{
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Load data", "", mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
-  for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
-  {
-    FileOpen((*it).toAscii(), 0);
-  }
-}
-
-void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataNode* parentNode )
-{
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
-
-  try
-  {
-    factory->SetFileName( fileName );
-
-    QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
-
-    factory->Update();
-
-    for ( unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i )
-    {
-      mitk::DataNode::Pointer node = factory->GetOutput( i );
-      if ( ( node.IsNotNull() ) && ( node->GetData() != NULL ) )
-      {
-        this->GetDataStorage()->Add(node, parentNode);
-        mitk::BaseData::Pointer basedata = node->GetData();
-        mitk::RenderingManager::GetInstance()->InitializeViews(
-          basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-        //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      }
-    }
-  }
-  catch ( itk::ExceptionObject & ex )
-  {
-    itkGenericOutputMacro( << "Exception during file open: " << ex );
-  }
-
-  QApplication::restoreOverrideCursor();
 }
 
 QItemSelectionModel *QmitkDataManagerView::GetDataNodeSelectionModel() const

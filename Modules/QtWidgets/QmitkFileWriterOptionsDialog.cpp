@@ -14,28 +14,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkFileReaderOptionsDialog.h"
-#include "ui_QmitkFileReaderOptionsDialog.h"
+#include "QmitkFileWriterOptionsDialog.h"
+#include "ui_QmitkFileWriterOptionsDialog.h"
 
 #include "QmitkFileReaderWriterOptionsWidget.h"
-#include "mitkIFileReader.h"
+#include "mitkIFileWriter.h"
 
-QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(const QString& filePath,
+QmitkFileWriterOptionsDialog::QmitkFileWriterOptionsDialog(const QString& filePath,
                                                            const QStringList& labels,
-                                                           const QList<mitk::IFileReader*>& readers,
+                                                           const QList<mitk::IFileWriter*>& writers,
                                                            QWidget *parent)
   : QDialog(parent)
-  , ui(new Ui::QmitkFileReaderOptionsDialog)
-  , m_Readers(readers)
+  , ui(new Ui::QmitkFileWriterOptionsDialog)
+  , m_Writers(writers)
 {
   ui->setupUi(this);
 
-  const int count = qMin(labels.size(), readers.size());
+  const int count = qMin(labels.size(), writers.size());
   bool hasOptions = false;
   for (int i = 0; i < count; ++i)
   {
-    ui->m_ReaderComboBox->addItem(labels[i]);
-    mitk::IFileReader::Options options = readers[i]->GetOptions();
+    ui->m_WriterComboBox->addItem(labels[i]);
+    mitk::IFileWriter::Options options = writers[i]->GetOptions();
     if (!options.empty())
     {
       hasOptions = true;
@@ -50,8 +50,8 @@ QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(const QString& filePa
 
   if (count < 2)
   {
-    ui->m_ReaderLabel->setVisible(false);
-    ui->m_ReaderComboBox->setVisible(false);
+    ui->m_WriterLabel->setVisible(false);
+    ui->m_WriterComboBox->setVisible(false);
     ui->m_FilePathLabel->setText(QString("File: %1").arg(filePath));
   }
   else
@@ -59,28 +59,28 @@ QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(const QString& filePa
     ui->m_FilePathLabel->setText(QString("for %1").arg(filePath));
   }
 
-  this->setWindowTitle("File reading options");
+  this->setWindowTitle("File writing options");
 }
 
-QmitkFileReaderOptionsDialog::~QmitkFileReaderOptionsDialog()
+QmitkFileWriterOptionsDialog::~QmitkFileWriterOptionsDialog()
 {
   delete ui;
 }
 
-mitk::IFileReader* QmitkFileReaderOptionsDialog::GetReader() const
+mitk::IFileWriter* QmitkFileWriterOptionsDialog::GetWriter() const
 {
-  return m_Readers[ui->m_ReaderComboBox->currentIndex()];
+  return m_Writers[ui->m_WriterComboBox->currentIndex()];
 }
 
-bool QmitkFileReaderOptionsDialog::ReuseOptions() const
+bool QmitkFileWriterOptionsDialog::ReuseOptions() const
 {
   return ui->m_ReuseOptionsCheckBox->isChecked();
 }
 
-void QmitkFileReaderOptionsDialog::accept()
+void QmitkFileWriterOptionsDialog::accept()
 {
-  const int index = ui->m_ReaderComboBox->currentIndex();
-  m_Readers[index]->SetOptions(
+  const int index = ui->m_WriterComboBox->currentIndex();
+  m_Writers[index]->SetOptions(
         qobject_cast<QmitkFileReaderWriterOptionsWidget*>(ui->m_StackedOptionsWidget->widget(index))->GetOptions());
   QDialog::accept();
 }

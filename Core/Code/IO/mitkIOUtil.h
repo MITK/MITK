@@ -55,6 +55,15 @@ class MITK_CORE_EXPORT IOUtil
 
 public:
 
+  struct SaveInfo
+  {
+    SaveInfo(const BaseData* baseData, const std::string& mimeType, const std::string& path);
+
+    const BaseData* m_BaseData;
+    std::string m_MimeType;
+    std::string m_Path;
+  };
+
   /**
    * Get the file system path where the running executable is located.
    *
@@ -276,18 +285,25 @@ public:
    * @throws mitk::Exception if no writer for \c data is available or the writer
    *         is not able to write the image.
    */
-  static void Save(mitk::BaseData* data, const std::string& path);
+  static void Save(const mitk::BaseData* data, const std::string& path);
+
+  static void Save(const mitk::BaseData* data, const std::string& path, const IFileWriter::Options& options);
+
+  static void Save(const mitk::BaseData* data, const std::string& mimeType, const std::string& path);
 
   /**
    * @brief Convenience method to save mitk::BaseData instances.
    * @param path The path to the image including file name and file extension.
    *        If no extention is set, the default extension is used.
    * @param data The data to save.
+   * @param mimeType The mime-type to use for the written file
    * @parma options Configuration data for the used IFileWriter instance.
    * @throws mitk::Exception if no writer for \c data is available or the writer
    *         is not able to write the image.
    */
-  static void Save(mitk::BaseData* data, const std::string& path, const mitk::IFileWriter::Options& options);
+  static void Save(const mitk::BaseData* data, const std::string& mimeType, const std::string& path, const mitk::IFileWriter::Options& options);
+
+  static void Save(const std::vector<SaveInfo>& saveInfos);
 
   /**
    * @brief SaveImage Convenience method to save an arbitrary mitkImage.
@@ -345,14 +361,26 @@ public:
 
 protected:
 
-  struct OptionsFunctorBase
+  struct ReaderOptionsFunctorBase
   {
     virtual bool operator()(const std::string& path, const std::vector<std::string>& readerLabels,
                             const std::vector<IFileReader*>& readers, IFileReader*& selectedReader) = 0;
   };
 
+  struct WriterOptionsFunctorBase
+  {
+    virtual bool operator()(const std::string& path, const std::vector<std::string>& writerLabels,
+                            const std::vector<IFileWriter*>& readers, IFileWriter*& selectedWriter) = 0;
+  };
+
   static std::string Load(const std::vector<std::string>& paths, std::vector<BaseData::Pointer>* result,
-                          DataStorage::SetOfObjects* nodeResult, DataStorage* ds, OptionsFunctorBase* optionsCallback);
+                          DataStorage::SetOfObjects* nodeResult, DataStorage* ds, ReaderOptionsFunctorBase* optionsCallback);
+
+  static std::string Save(const BaseData* data, const std::string& mimeType, const std::string& path,
+                          WriterOptionsFunctorBase* optionsCallback);
+
+  static std::string Save(const std::vector<SaveInfo>& saveInfos,
+                          WriterOptionsFunctorBase* optionsCallback);
 
 private:
 

@@ -64,21 +64,31 @@ public:
    *         \c ref. Returns an empty string if there is no registered
    *         mime type with this file writer reference.
    */
-  static std::string GetDefaultExtension(const WriterReference& ref, us::ModuleContext* context = us::GetModuleContext());
+  static std::pair<std::string, std::string> GetDefaultExtension(const WriterReference& ref, us::ModuleContext* context = us::GetModuleContext());
+
+  static std::pair<std::string, std::string> GetDefaultExtension(const BaseData* data, us::ModuleContext* context = us::GetModuleContext());
 
   static WriterReference GetReference(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
+  static WriterReference GetReference(const BaseData* baseData, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
   static WriterReference GetReference(const std::string& baseDataType, us::ModuleContext* context = us::GetModuleContext());
+  static WriterReference GetReference(const std::string& baseDataType, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
   static std::vector<WriterReference> GetReferences(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
+  static std::vector<WriterReference> GetReferences(const BaseData* baseData, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
   static std::vector<WriterReference> GetReferences(const std::string& baseDataType, us::ModuleContext* context = us::GetModuleContext());
+  static std::vector<WriterReference> GetReferences(const std::string& baseDataType, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
   IFileWriter* GetWriter(const WriterReference& ref, us::ModuleContext* context = us::GetModuleContext());
 
   IFileWriter* GetWriter(const std::string& baseDataType, us::ModuleContext* context = us::GetModuleContext());
+  IFileWriter* GetWriter(const std::string& baseDataType, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
   IFileWriter* GetWriter(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
+  IFileWriter* GetWriter(const BaseData* baseData, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
   std::vector<IFileWriter*> GetWriters(const std::string& baseDataType, us::ModuleContext* context = us::GetModuleContext());
+  std::vector<IFileWriter*> GetWriters(const std::string& baseDataType, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
   std::vector<IFileWriter*> GetWriters(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
+  std::vector<IFileWriter*> GetWriters(const BaseData* baseData, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
 
   void UngetWriter(IFileWriter* writer);
   void UngetWriters(const std::vector<IFileWriter*>& writers);

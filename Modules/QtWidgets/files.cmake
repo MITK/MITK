@@ -9,6 +9,7 @@ QmitkDataStorageTreeModel.cpp
 QmitkEventAdapter.cpp
 QmitkFileReaderOptionsDialog.cpp
 QmitkFileReaderWriterOptionsWidget.cpp
+QmitkFileWriterOptionsDialog.cpp
 QmitkIOUtil.cpp
 QmitkLevelWindowPresetDefinitionDialog.cpp
 QmitkLevelWindowRangeChangeDialog.cpp
@@ -38,6 +39,7 @@ QmitkDataStorageComboBox.h
 QmitkDataStorageTableModel.h
 QmitkFileReaderOptionsDialog.h
 QmitkFileReaderWriterOptionsWidget.h
+QmitkFileWriterOptionsDialog.h
 QmitkLevelWindowPresetDefinitionDialog.h
 QmitkLevelWindowRangeChangeDialog.h
 QmitkLevelWindowWidgetContextMenu.h
@@ -60,6 +62,7 @@ QmitkMouseModeSwitcher.h
 
 set(UI_FILES
 QmitkFileReaderOptionsDialog.ui
+QmitkFileWriterOptionsDialog.ui
 QmitkLevelWindowPresetDefinition.ui
 QmitkLevelWindowWidget.ui
 QmitkLevelWindowRangeChange.ui

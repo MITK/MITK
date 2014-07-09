@@ -340,6 +340,39 @@ public:
 
 };
 
+class SaveInfoSorter
+{
+public:
+
+  typedef std::vector<mitk::IOUtil::SaveInfo> SaveInfoVector;
+
+private:
+
+  typedef US_UNORDERED_MAP_TYPE<std::string, SaveInfoVector> HashMapType;
+
+  HashMapType m_SaveInfoMap;
+
+public:
+
+  typedef HashMapType::const_iterator Iterator;
+
+  void AddSaveInfo(const mitk::IOUtil::SaveInfo& info)
+  {
+    std::string key = std::string(info.m_BaseData->GetNameOfClass()) + "+" + info.m_MimeType;
+    m_SaveInfoMap[key].push_back(info);
+  }
+
+  Iterator Begin() const
+  {
+    return m_SaveInfoMap.begin();
+  }
+
+  Iterator End() const
+  {
+    return m_SaveInfoMap.end();
+  }
+};
+
 }
 
 //**************************************************************
@@ -353,9 +386,9 @@ const std::string IOUtil::DEFAULTPOINTSETEXTENSION = ".mps";
 
 struct IOUtil::Impl
 {
-  struct FixedOptionsFunctor : public OptionsFunctorBase
+  struct FixedReaderOptionsFunctor : public ReaderOptionsFunctorBase
   {
-    FixedOptionsFunctor(const IFileReader::Options& options)
+    FixedReaderOptionsFunctor(const IFileReader::Options& options)
       : m_Options(options)
     {}
 
@@ -369,6 +402,24 @@ struct IOUtil::Impl
 
   private:
     const IFileReader::Options& m_Options;
+  };
+
+  struct FixedWriterOptionsFunctor : public WriterOptionsFunctorBase
+  {
+    FixedWriterOptionsFunctor(const IFileReader::Options& options)
+      : m_Options(options)
+    {}
+
+    virtual bool operator()(const std::string& /*path*/, const std::vector<std::string>& /*writerLabels*/,
+                            const std::vector<IFileWriter*>& writers, IFileWriter*& selectedWriter)
+    {
+      selectedWriter = writers.front();
+      selectedWriter->SetOptions(m_Options);
+      return false;
+    }
+
+  private:
+    const IFileWriter::Options& m_Options;
   };
 
   static BaseData::Pointer LoadBaseDataFromFile(const std::string& path);
@@ -536,7 +587,7 @@ DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::string& path,
   std::vector<std::string> paths;
   paths.push_back(path);
   DataStorage::SetOfObjects::Pointer nodeResult = DataStorage::SetOfObjects::New();
-  Impl::FixedOptionsFunctor optionsCallback(options);
+  Impl::FixedReaderOptionsFunctor optionsCallback(options);
   std::string errMsg = Load(paths, NULL, nodeResult, &storage, &optionsCallback);
   if (!errMsg.empty())
   {
@@ -557,7 +608,7 @@ std::vector<BaseData::Pointer> IOUtil::Load(const std::string& path, const IFile
   std::vector<std::string> paths;
   paths.push_back(path);
   std::vector<BaseData::Pointer> result;
-  Impl::FixedOptionsFunctor optionsCallback(options);
+  Impl::FixedReaderOptionsFunctor optionsCallback(options);
   std::string errMsg = Load(paths, &result, NULL, NULL, &optionsCallback);
   if (!errMsg.empty())
   {
@@ -660,14 +711,15 @@ PointSet::Pointer IOUtil::LoadPointSet(const std::string& path)
 
 std::string IOUtil::Load(const std::vector<std::string>& paths, std::vector<BaseData::Pointer>* result,
                          DataStorage::SetOfObjects* nodeResult, DataStorage* ds,
-                         OptionsFunctorBase* optionsCallback)
+                         ReaderOptionsFunctorBase* optionsCallback)
 {
   if (paths.empty())
   {
     return "No input files given";
   }
 
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(2*paths.size());
+  int filesToRead = paths.size();
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(2*filesToRead);
 
   CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider());
 
@@ -749,7 +801,7 @@ std::string IOUtil::Load(const std::vector<std::string>& paths, std::vector<Base
 
       bool callOptionsCallback = finalReaders.size() > 1 || !finalReaders.front()->GetOptions().empty();
       mitk::IFileReader* selectedReader = finalReaders.front();
-      MITK_INFO << "******* USING READER " << typeid(*selectedReader).name() << "*********";
+
       for(FileSorter::FileVector::const_iterator fileIter = currentFiles.begin(),
           fileIterEnd = currentFiles.end(); fileIter != fileIterEnd; ++fileIter)
       {
@@ -762,6 +814,8 @@ std::string IOUtil::Load(const std::vector<std::string>& paths, std::vector<Base
           errMsg += "Reading operation(s) cancelled.";
           break;
         }
+
+        MITK_INFO << "******* USING READER " << typeid(*selectedReader).name() << "*********";
 
         // Do the actual reading
         try
@@ -824,6 +878,14 @@ std::string IOUtil::Load(const std::vector<std::string>& paths, std::vector<Base
           errMsg += "Exception occured when reading file " + *fileIter + ":\n" + e.what() + "\n\n";
         }
         mitk::ProgressBar::GetInstance()->Progress(2);
+        --filesToRead;
+      }
+
+      if (selectedReader == NULL)
+      {
+        // reading was cancelled within the optionsCallback,
+        // break outer loop as well
+        break;
       }
     }
 
@@ -839,59 +901,52 @@ std::string IOUtil::Load(const std::vector<std::string>& paths, std::vector<Base
     MITK_ERROR << errMsg;
   }
 
+  mitk::ProgressBar::GetInstance()->Progress(2*filesToRead);
+
   return errMsg;
 }
 
-void IOUtil::Save(BaseData* data, const std::string& path)
+void IOUtil::Save(const BaseData* data, const std::string& path)
 {
   Save(data, path, IFileWriter::Options());
 }
 
-void IOUtil::Save(BaseData* data, const std::string& path, const IFileWriter::Options& options)
+void IOUtil::Save(const BaseData* data, const std::string& path, const IFileWriter::Options& options)
 {
-  if (data == NULL)
+  Save(data, std::string(), path, options);
+}
+
+void IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::string& path)
+{
+  Save(data, mimeType, path, IFileWriter::Options());
+}
+
+void IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::string& path,
+                  const IFileWriter::Options& options)
+{
+  std::string errMsg;
+  if (options.empty())
   {
-    mitkThrow() << "Cannot write a NULL" << data->GetNameOfClass() << " object.";
+    errMsg = Save(data, mimeType, path, NULL);
   }
-  if (path.empty())
+  else
   {
-    mitkThrow() << "Cannot write a " << data->GetNameOfClass() << " object to an empty path.";
+    Impl::FixedWriterOptionsFunctor optionsCallback(options);
+    errMsg = Save(data, mimeType, path, &optionsCallback);
   }
 
-  FileWriterRegistry writerRegistry;
-  us::ServiceReference<IFileWriter> writerRef = writerRegistry.GetReference(data);
-  // Throw exception if no compatible Writer was found
-  if (!writerRef)
+  if (!errMsg.empty())
   {
-    mitkThrow() << "No writer for " << data->GetNameOfClass() << " available.";
+    mitkThrow() << errMsg;
   }
+}
 
-//  std::string extension = itksys::SystemTools::GetFilenameExtension( path );
-//  if(extension.empty())
-//  {
-//    std::string defaultExtension = writerRegistry.GetDefaultExtension(writerRef);
-//    MITK_WARN << "Using default extension '" << defaultExtension << "' for writing to " << path;
-//    extension = "." + defaultExtension;
-//  }
-
-  IFileWriter* writer = writerRegistry.GetWriter(writerRef);
-  if (writer == NULL)
+void IOUtil::Save(const std::vector<IOUtil::SaveInfo>& saveInfos)
+{
+  std::string errMsg = Save(saveInfos, NULL);
+  if (!errMsg.empty())
   {
-    mitkThrow() << "Got a NULL IFileWriter service for writing " << data->GetNameOfClass();
-  }
-
-  try
-  {
-    if (!options.empty())
-    {
-      writer->SetOptions(options);
-    }
-    writer->Write(data, path);
-  }
-  catch(const std::exception& e)
-  {
-    mitkThrow() << " Writing a " << data->GetNameOfClass() << " to " << path << " failed: "
-                << e.what();
+    mitkThrow() << errMsg;
   }
 }
 
@@ -919,6 +974,149 @@ bool IOUtil::SaveBaseData( mitk::BaseData* data, const std::string& path)
   return true;
 }
 
+std::string IOUtil::Save(const BaseData* data, const std::string& mimeType, const std::string& path,
+                         WriterOptionsFunctorBase* optionsCallback)
+{
+  if (path.empty())
+  {
+    return "No output filename given";
+  }
+
+  std::vector<SaveInfo> infos;
+  infos.push_back(SaveInfo(data, mimeType, path));
+  return Save(infos, optionsCallback);
+}
+
+std::string IOUtil::Save(const std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorBase* optionsCallback)
+{
+  if (saveInfos.empty())
+  {
+    return "No data for saving available";
+  }
+
+  int filesToWrite = saveInfos.size();
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(2*filesToWrite);
+
+  std::string errMsg;
+
+  // Group the SaveInfo objects by base data type and mime-type
+  SaveInfoSorter infoSorter;
+  std::string infoError;
+  for (std::vector<SaveInfo>::const_iterator iter = saveInfos.begin(), iterEnd = saveInfos.end();
+       iter != iterEnd; ++iter)
+  {
+    if (iter->m_BaseData == NULL)
+    {
+      infoError += "Cannot save NULL data to path " + (iter->m_Path.empty() ? "(NULL)" : iter->m_Path) + "\n";
+      continue;
+    }
+    if (iter->m_Path.empty())
+    {
+      infoError += std::string("Cannot save ") + (iter->m_BaseData == NULL ? "(NULL)" : iter->m_BaseData->GetNameOfClass()) +
+                   " data to unknown file path.\n";
+      continue;
+    }
+    infoSorter.AddSaveInfo(*iter);
+  }
+
+  if(!infoError.empty())
+  {
+    errMsg += "Invalid information:\n\n" + infoError + "\n\n";
+  }
+
+  FileWriterRegistry writerRegistry;
+
+  for (SaveInfoSorter::Iterator iter = infoSorter.Begin(), endIter = infoSorter.End();
+       iter != endIter; ++iter)
+  {
+    const SaveInfoSorter::SaveInfoVector& currentInfos = iter->second;
+
+    const std::string baseDataType = currentInfos.front().m_BaseData->GetNameOfClass();
+    const std::string mimeType = currentInfos.front().m_MimeType;
+
+    // Get all IFileWriter references for the base data and mime type
+    std::vector<FileWriterRegistry::WriterReference> writerRefs =
+        writerRegistry.GetReferences(baseDataType, mimeType);
+    std::sort(writerRefs.begin(), writerRefs.end());
+    std::reverse(writerRefs.begin(), writerRefs.end());
+
+    std::vector<IFileWriter*> writers;
+    std::vector<std::string> writerLabels;
+    for (std::vector<FileWriterRegistry::WriterReference>::const_iterator iter = writerRefs.begin(),
+         iterEnd = writerRefs.end(); iter != iterEnd; ++iter)
+    {
+      IFileWriter* writer = writerRegistry.GetWriter(*iter);
+      if (writer)
+      {
+        writers.push_back(writer);
+        writerLabels.push_back(iter->GetProperty(IFileWriter::PROP_DESCRIPTION()).ToString());
+      }
+    }
+
+    // Error out if no compatible Writer was found
+    if (writers.empty())
+    {
+      errMsg += std::string("No writer available for ") + baseDataType + " data.\n";
+    }
+    else
+    {
+      bool callOptionsCallback = writers.size() > 1 || !writers.front()->GetOptions().empty();
+      mitk::IFileWriter* selectedWriter = writers.front();
+
+      for (SaveInfoSorter::SaveInfoVector::const_iterator infoIter = currentInfos.begin(),
+           infoIterEnd = currentInfos.end(); infoIter != infoIterEnd; ++infoIter)
+      {
+        if (callOptionsCallback && optionsCallback)
+        {
+          callOptionsCallback = (*optionsCallback)(infoIter->m_Path, writerLabels, writers, selectedWriter);
+        }
+        if (selectedWriter == NULL)
+        {
+          errMsg += "Writing operation(s) cancelled.";
+          break;
+        }
+
+        MITK_INFO << "******* USING WRITER " << typeid(*selectedWriter).name() << "*********";
+
+        // Do the actual writing
+        try
+        {
+          selectedWriter->Write(infoIter->m_BaseData, infoIter->m_Path);
+        }
+        catch(const std::exception& e)
+        {
+          errMsg += std::string("Exception occurred when writing to ") + infoIter->m_Path + ":\n" + e.what() + "\n";
+        }
+        mitk::ProgressBar::GetInstance()->Progress(2);
+        --filesToWrite;
+      }
+
+      if (selectedWriter == NULL)
+      {
+        // writing was cancelled within the optionsCallback,
+        // break outer loop as well
+        break;
+      }
+    }
+
+    for(std::vector<mitk::IFileWriter*>::const_iterator writerIter = writers.begin(),
+        writerIterEnd = writers.end(); writerIter != writerIterEnd; ++writerIter)
+    {
+      writerRegistry.UngetWriter(*writerIter);
+    }
+  }
+
+  if (!errMsg.empty())
+  {
+    MITK_ERROR << errMsg;
+  }
+
+  mitk::ProgressBar::GetInstance()->Progress(2*filesToWrite);
+
+  return errMsg;
+}
+
+// This method can be removed after the deprecated LoadDataNode() method was removed
 void IOUtil::Impl::SetDefaultDataNodeProperties(DataNode* node, const std::string& filePath)
 {
   // path
@@ -950,6 +1148,13 @@ void IOUtil::Impl::SetDefaultDataNodeProperties(DataNode* node, const std::strin
   {
     node->SetVisibility(true);
   }
+}
+
+IOUtil::SaveInfo::SaveInfo(const BaseData* baseData, const std::string& mimeType, const std::string& path)
+  : m_BaseData(baseData)
+  , m_MimeType(mimeType)
+  , m_Path(path)
+{
 }
 
 }

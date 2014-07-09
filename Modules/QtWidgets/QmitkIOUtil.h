@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //Qt
 #include <QList>
+#include <QPair>
 
 class QWidget;
 class QString;
@@ -53,11 +54,43 @@ class QMITK_EXPORT QmitkIOUtil : public mitk::IOUtil
 
 public:
 
+  class QMITK_EXPORT SaveFilter
+  {
+  public:
+
+    static std::string ALL_MIMETYPE;
+
+    SaveFilter(const SaveFilter& other);
+
+    SaveFilter(const std::string& baseDataType);
+    SaveFilter(const mitk::BaseData* baseData);
+
+    SaveFilter& operator=(const SaveFilter& other);
+
+    QString GetFilterForMimeType(const std::string& mimeType) const;
+    std::string GetMimeTypeForFilter(const QString& filter) const;
+    QString GetDefaultFilter() const;
+    std::string GetDefaultMimeType() const;
+    QString ToString() const;
+    int Size() const;
+    bool IsEmpty() const;
+
+    bool ContainsMimeType(const std::string& mimeType);
+
+  private:
+
+    struct Impl;
+    QScopedPointer<Impl> d;
+  };
+
   /**
    * @brief GetFilterString
    * @return
    */
-  static QString GetFilterString();
+  static QString GetFileOpenFilterString();
+
+  static SaveFilter GetFileSaveFilter(const mitk::BaseData* baseData);
+  static SaveFilter GetFileSaveFilter(const std::string& baseDataType);
 
   /**
    * @brief Loads the specified files
@@ -72,69 +105,61 @@ public:
    * @param ds An optional data storage passed to IFileReader instances
    * @return A list of BaseData instances which have not already been added to the data storage.
    */
-  static QList<mitk::BaseData::Pointer> Load(const QStringList& paths);
+  static QList<mitk::BaseData::Pointer> Load(const QStringList& paths, QWidget* parent = NULL);
 
-  static mitk::DataStorage::SetOfObjects::Pointer Load(const QStringList& paths, mitk::DataStorage& storage);
+  static mitk::DataStorage::SetOfObjects::Pointer Load(const QStringList& paths, mitk::DataStorage& storage,
+                                                       QWidget* parent = NULL);
 
-  static QList<mitk::BaseData::Pointer> Load(const QString& path);
+  static QList<mitk::BaseData::Pointer> Load(const QString& path, QWidget* parent = NULL);
 
-  static mitk::DataStorage::SetOfObjects::Pointer Load(const QString& path, mitk::DataStorage& storage);
+  static mitk::DataStorage::SetOfObjects::Pointer Load(const QString& path, mitk::DataStorage& storage,
+                                                       QWidget* parent = NULL);
 
   using mitk::IOUtil::Load;
+
+  static QString Save(const mitk::BaseData* data, const QString& defaultBaseName,
+                      const QString& defaultPath = QString(), QWidget* parent = NULL);
+
+  static QStringList Save(const std::vector<const mitk::BaseData*>& data, const QStringList& defaultBaseNames,
+                          const QString& defaultPath = QString(), QWidget* parent = NULL);
+
+  using mitk::IOUtil::Save;
 
   /**
    * @brief SaveBaseDataWithDialog Convenience method to save any data with a Qt dialog.
    * @param data BaseData holding the data you wish to save.
    * @param fileName The file name where to save the data (including path and extension).
    * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the screen.
+   * @deprecatedSince{2014_03} Use Save() instead.
    */
-  static void SaveBaseDataWithDialog(mitk::BaseData *data, std::string fileName, QWidget* parent = NULL);
+  DEPRECATED(static void SaveBaseDataWithDialog(mitk::BaseData *data, std::string fileName, QWidget* parent = NULL));
 
   /**
    * @brief SaveSurfaceWithDialog Convenience method to save a surface with a Qt dialog.
    * @param surface The surface to save.
    * @param fileName The file name where to save the data (including path and extension).
    * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the screen.
+   * @deprecatedSince{2014_03} Use Save() instead.
    */
-  static void SaveSurfaceWithDialog(mitk::Surface::Pointer surface, std::string fileName = "", QWidget* parent = NULL);
+  DEPRECATED(static void SaveSurfaceWithDialog(mitk::Surface::Pointer surface, std::string fileName = "", QWidget* parent = NULL));
 
   /**
    * @brief SaveImageWithDialog Convenience method to save an image with a Qt dialog.
    * @param image The image to save.
    * @param fileName The file name where to save the data (including path and extension).
    * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the screen.
+   * @deprecatedSince{2014_03} Use Save() instead.
    */
-  static void SaveImageWithDialog(mitk::Image::Pointer image, std::string fileName = "", QWidget* parent = NULL);
+  DEPRECATED(static void SaveImageWithDialog(mitk::Image::Pointer image, std::string fileName = "", QWidget* parent = NULL));
 
   /**
    * @brief SavePointSetWithDialog Convenience method to save a pointset with a Qt dialog.
    * @param pointset The pointset to save.
    * @param fileName The file name where to save the data (including path and extension).
    * @param parent An optional QWidget as parent. If no parent is supplied, the QFileDialog can occur anywhere on the screen.
+   * @deprecatedSince{2014_03} Use Save() instead.
    */
-  static void SavePointSetWithDialog(mitk::PointSet::Pointer pointset, std::string fileName = "", QWidget* parent = NULL);
-
-protected:
-
-  /**
-   * @brief GetFileNameWithQDialog Opens a QDialog and returns the filename.
-   * @param caption Caption for the QDialog.
-   * @param defaultFilename Default filename (e.g. "NewImage.nrrd" for images).
-   * @param filter Filters the data according to data types (e.g. *.nrrd; *.png; etc. for images).
-   * @param selectedFilter Default selected filter for the data.
-   * @return The file name as QString.
-   */
-  static QString GetFileNameWithQDialog(QString caption, QString defaultFilename, QString filter, QString* selectedFilter = 0, QWidget* parent = NULL);
-
-  /**
-   * @brief SaveToFileWriter Internal helper method to save data with writer's which have been supplied by extensions (e.g. TensorImage etc.).
-   * @param fileWriter The writer supplied by an extension.
-   * @param data The data to save in a specific format.
-   * @param aFileName The filename.
-   * @param propFileName Proposed file name?
-   * @return false if writing attempt  failed, true otherwise
-   */
-  static bool SaveToFileWriter(mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const std::string fileName);
+  DEPRECATED(static void SavePointSetWithDialog(mitk::PointSet::Pointer pointset, std::string fileName = "", QWidget* parent = NULL));
 
 private:
 

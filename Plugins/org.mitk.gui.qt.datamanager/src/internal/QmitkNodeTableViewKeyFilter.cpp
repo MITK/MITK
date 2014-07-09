@@ -40,8 +40,6 @@ bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
     QKeySequence _DeleteSelectedNodes = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Delete selected nodes", "Del")));
     QKeySequence _Reinit = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Reinit selected nodes", "R")));
     QKeySequence _GlobalReinit = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Global Reinit", "Ctrl+, R")));
-    QKeySequence _Save = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Save selected nodes", "Ctrl+, S")));
-    QKeySequence _Load = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Load", "Ctrl+, L")));
     QKeySequence _ShowInfo = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Show Node Information", "Ctrl+, I")));
 
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
@@ -80,16 +78,6 @@ bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
     else if(_KeySequence == _GlobalReinit)
     {
       _DataManagerView->GlobalReinit(true);
-      return true;
-    }
-    else if(_KeySequence == _Save)
-    {
-      _DataManagerView->SaveSelectedNodes(true);
-      return true;
-    }
-    else if(_KeySequence == _Load)
-    {
-      _DataManagerView->Load(true);
       return true;
     }
     else if(_KeySequence == _ShowInfo)

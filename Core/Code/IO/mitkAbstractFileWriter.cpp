@@ -204,6 +204,16 @@ void AbstractFileWriter::SetRanking(int ranking)
 
 //////////////////////// Options ///////////////////////
 
+void AbstractFileWriter::SetDefaultOptions(const IFileWriter::Options& defaultOptions)
+{
+  d->SetDefaultOptions(defaultOptions);
+}
+
+IFileWriter::Options AbstractFileWriter::GetDefaultOptions() const
+{
+  return d->GetDefaultOptions();
+}
+
 IFileWriter::Options AbstractFileWriter::GetOptions() const
 {
   return d->GetOptions();

@@ -40,4 +40,11 @@ void mitk::Exception::GetRethrowData(int rethrowNumber, std::string &file, int &
     file = m_RethrowData.at(rethrowNumber).RethrowClassname;
     line = m_RethrowData.at(rethrowNumber).RethrowLine;
     message = m_RethrowData.at(rethrowNumber).RethrowMessage;
-    }
+}
+
+
+std::ostream& operator<<(std::ostream& os, const mitk::Exception& e)
+{
+  os << e.GetDescription();
+  return os;
+}

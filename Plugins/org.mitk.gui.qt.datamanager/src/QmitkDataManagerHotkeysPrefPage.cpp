@@ -58,10 +58,6 @@ void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
 
   m_HotkeyEditors["Global Reinit"] = new QmitkHotkeyLineEdit("Ctrl+, R");
 
-  m_HotkeyEditors["Save selected nodes"] = new QmitkHotkeyLineEdit("Ctrl+, S");
-
-  m_HotkeyEditors["Load"] = new QmitkHotkeyLineEdit("Ctrl+, L");
-
   m_HotkeyEditors["Show Node Information"] = new QmitkHotkeyLineEdit("Ctrl+, I");
 
   m_MainControl = new QWidget(parent);

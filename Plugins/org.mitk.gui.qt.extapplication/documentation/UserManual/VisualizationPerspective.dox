@@ -1,0 +1,13 @@
+/**
+\page org_mitk_gui_qt_extapplication_perspectives_visualizations The Visualization Perspective
+
+\imageMacro{resources/perspectives/eye.png,"The icon of the visualization perspective",1}
+
+This perspective bundles some views which can be used to generate expressive images for presentations or publications. 
+
+Using \ref org_mitk_views_volumevisualization you can display the image data as a 3D volume, where each voxel is colored depending on its value. This enables you to easily generate understandable 3D representations of your data.
+
+With \ref org_mitk_views_screenshotmaker you can generate high quality screenshots of the different display windows.
+
+With \ref org_mitk_views_moviemaker you can capture videos of your data and automatically step through slices or rotate it in the 3D window.
+*/

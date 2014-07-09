@@ -23,7 +23,11 @@ mitk::USTelemedImageSource::USTelemedImageSource(  )
   : m_Image(mitk::Image::New()),
     m_ImageMutex(itk::FastMutexLock::New()),
     m_Plugin(0),
-    m_PluginCallback(0)
+    m_PluginCallback(0),
+    m_UsgDataView(0),
+    m_ImageProperties(0),
+    m_DepthProperties(0),
+    m_upDateCounter(0)
 {
 }
 
@@ -49,17 +53,23 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 
     m_ImageMutex->Unlock();
   }
-  //if depth changed: update geometry
-  if (m_OldDepth != m_DepthProperties->GetCurrent()) {UpdateImageGeometry();}
+  //if depth changed: update geometry, but 15 frames after the change because it takes this time until geometry adapts
+  if (m_OldDepth != m_DepthProperties->Current)
+    {
+    m_upDateCounter=0;
+    m_OldDepth =  m_DepthProperties->GetCurrent();
+    }
+  if (m_upDateCounter==15) {UpdateImageGeometry();}
+  if (m_upDateCounter<=15) m_upDateCounter++;
 }
 
 void mitk::USTelemedImageSource::UpdateImageGeometry()
 {
+  MITK_INFO << "UpdateImageGeometry called!";
+
   Usgfw2Lib::tagImageResolution currentResolution;
   m_ImageProperties->GetResolution(&currentResolution,0);
-  m_OldDepth =  m_DepthProperties->GetCurrent();
 
-  MITK_INFO << "UpdateImageGeometry called!";
   MITK_INFO << "depth: " << m_DepthProperties->GetCurrent();
   MITK_INFO << "res X: " << currentResolution.nXPelsPerUnit;
   MITK_INFO << "res Y: " << currentResolution.nYPelsPerUnit;

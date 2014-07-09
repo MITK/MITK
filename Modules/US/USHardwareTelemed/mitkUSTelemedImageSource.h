@@ -72,6 +72,8 @@ protected:
   Usgfw2Lib::IUsgImageProperties* m_ImageProperties;
   Usgfw2Lib::IUsgDepth* m_DepthProperties;
   double m_OldDepth;
+  int m_upDateCounter;
+
 
   mitk::Image::Pointer                        m_Image;
   itk::FastMutexLock::Pointer                 m_ImageMutex;

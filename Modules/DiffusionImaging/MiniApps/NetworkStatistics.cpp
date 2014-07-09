@@ -369,13 +369,17 @@ int NetworkStatistics(int argc, char* argv[])
           {
             if( network->CheckForLabel(localLabels.at( loop )) )
             {
-          localHeaderStream  << " " << localLabels.at( loop ) << "_Degree "
-            << localLabels.at( loop ) << "_CC "
-            << localLabels.at( loop ) << "_BC";
+              if(step == 0 && method == 0)
+              {
+                localHeaderStream  << " "
+                  << localLabels.at( loop ) << "_Degree "
+                  << localLabels.at( loop ) << "_CC "
+                  << localLabels.at( loop ) << "_BC";
+              }
 
-          localDataStream  << degreeVector.at( labelToIdMap.find( localLabels.at( loop ) )->second ) << " "
-            << ccVector.at( labelToIdMap.find( localLabels.at( loop ) )->second ) << " "
-            << bcVector.at( labelToIdMap.find( localLabels.at( loop ) )->second ) << " ";
+          localDataStream  << " " << degreeVector.at( labelToIdMap.find( localLabels.at( loop ) )->second )
+            << " " << ccVector.at( labelToIdMap.find( localLabels.at( loop ) )->second )
+            << " " << bcVector.at( labelToIdMap.find( localLabels.at( loop ) )->second );
             }
             else
             {
@@ -434,10 +438,10 @@ int NetworkStatistics(int argc, char* argv[])
                 << regionName << "_NumberOfNodes";
             }
 
-            regionalDataStream  << " " << sumDegree / count << " "
-              << sumCC / count << " "
-              << sumBC / count << " "
-              << count;
+            regionalDataStream  << " " << sumDegree / count
+              << " " << sumCC / count
+              << " " << sumBC / count
+              << " " << count;
           }
         }
       }

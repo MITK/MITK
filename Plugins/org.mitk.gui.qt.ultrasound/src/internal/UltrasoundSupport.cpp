@@ -62,7 +62,6 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_FrameRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit(int)) );
   connect( m_Controls.m_FreezeButton, SIGNAL(clicked()), this, SLOT(OnClickedFreezeButton()) );
   connect( m_Timer, SIGNAL(timeout()), this, SLOT(DisplayImage()));
-  connect( m_Controls.m_ActiveVideoDevices, SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnActiveDeviceSelectionChanged(us::ServiceReferenceU)) );
 
   // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);

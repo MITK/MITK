@@ -178,10 +178,20 @@ void mitk::ProportionalTimeGeometry::ReserveSpaceForGeometries(TimeStepType numb
 void mitk::ProportionalTimeGeometry::Expand(mitk::TimeStepType size)
 {
   m_GeometryVector.reserve(size);
-  while  (m_GeometryVector.size() < size)
+  if (m_GeometryVector.size() == 0)
   {
-    Geometry3D::Pointer geo3D = Geometry3D::New();
-    m_GeometryVector.push_back(dynamic_cast<BaseGeometry*>(geo3D.GetPointer()));
+    while  (m_GeometryVector.size() < size)
+    {
+      Geometry3D::Pointer geo3D = Geometry3D::New();
+      m_GeometryVector.push_back(dynamic_cast<BaseGeometry*>(geo3D.GetPointer()));
+    }
+  } else
+  {
+    while (m_GeometryVector.size() < size)
+    {
+      BaseGeometry::Pointer clone = dynamic_cast<BaseGeometry*>(m_GeometryVector[0]->Clone().GetPointer());
+      m_GeometryVector.push_back(clone);
+    }
   }
 }
 

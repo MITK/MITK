@@ -21,8 +21,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataReaderInterface.h"
 
 namespace mitk {
+  /** This class reads csv logged navigation datas from the hard disc and returns
+   *  the navigation data set.
+   *
+   *  Caution: at the moment only one navigation data is supported which means that only
+   *  the data of the first navigation tool in the file is read!
+   */
   class MitkIGT_EXPORT NavigationDataReaderCSV : public NavigationDataReaderInterface
   {
+  public:
+
+    mitkClassMacro(NavigationDataReaderCSV, NavigationDataReaderInterface);
+    itkNewMacro(Self);
+
+    /** @return Returns the NavigationDataSet of the first tool in the given file.
+     *          Returns an empty NavigationDataSet if the file could not be read.
+     */
+    virtual mitk::NavigationDataSet::Pointer Read(std::string fileName);
+
+  protected:
+    NavigationDataReaderCSV();
+    virtual ~NavigationDataReaderCSV();
+
+    std::vector<std::string> GetFileContentLineByLine(std::string filename);
+    mitk::NavigationData::Pointer GetNavigationDataOutOfOneLine(std::string line);
+    mitk::NavigationData::Pointer GetEmptyNavigationData();
 
   };
 }

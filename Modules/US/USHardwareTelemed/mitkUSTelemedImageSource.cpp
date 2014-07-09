@@ -42,6 +42,21 @@ mitk::USTelemedImageSource::~USTelemedImageSource( )
 void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
   if ( image.IsNull() ) { image = mitk::Image::New(); }
+
+  //if depth changed: update geometry, but 20 frames after the change because it takes this time until geometry adapts
+  if (m_upDateCounter==20 && m_Image->IsInitialized())
+    {
+    UpdateImageGeometry();
+    m_upDateCounter++;
+    }
+  if (m_OldDepth != m_DepthProperties->Current)
+    {
+    m_upDateCounter=0;
+    m_OldDepth =  m_DepthProperties->GetCurrent();
+    }
+  if (m_upDateCounter<20) m_upDateCounter++;
+
+  //now update image
   if ( m_Image->IsInitialized() )
   {
     m_ImageMutex->Lock();
@@ -50,30 +65,37 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
     mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
     image->SetSlice(inputReadAccessor.GetData());
+    image->SetGeometry(m_Image->GetGeometry());
 
     m_ImageMutex->Unlock();
   }
-  //if depth changed: update geometry, but 15 frames after the change because it takes this time until geometry adapts
-  if (m_OldDepth != m_DepthProperties->Current)
-    {
-    m_upDateCounter=0;
-    m_OldDepth =  m_DepthProperties->GetCurrent();
-    }
-  if (m_upDateCounter==15) {UpdateImageGeometry();}
-  if (m_upDateCounter<=15) m_upDateCounter++;
+
 }
 
 void mitk::USTelemedImageSource::UpdateImageGeometry()
 {
-  MITK_INFO << "UpdateImageGeometry called!";
+  Usgfw2Lib::tagPixelsOrigin origin = Usgfw2Lib::tagPixelsOrigin();
+  Usgfw2Lib::tagImageResolution resolutionInMeters;
+  m_ImageProperties->GetResolution(&resolutionInMeters,0);
 
-  Usgfw2Lib::tagImageResolution currentResolution;
-  m_ImageProperties->GetResolution(&currentResolution,0);
+  mitk::Vector3D spacing;
+  spacing[0] = ((double)1 / resolutionInMeters.nXPelsPerUnit) * 1000; //conversion: meters to millimeters
+  spacing[1] = ((double)1 / resolutionInMeters.nXPelsPerUnit) * 1000; //conversion: meters to millimeters
+  spacing[2] = 1;
 
-  MITK_INFO << "depth: " << m_DepthProperties->GetCurrent();
-  MITK_INFO << "res X: " << currentResolution.nXPelsPerUnit;
-  MITK_INFO << "res Y: " << currentResolution.nYPelsPerUnit;
+  m_ImageMutex->Lock();
+  if(m_Image.IsNotNull() && (m_Image->GetGeometry()!=NULL))
+    {
+    m_Image->GetGeometry()->SetSpacing(spacing);
+    m_Image->GetGeometry()->Modified();
+    }
+  else
+    {MITK_WARN << "image or geometry was NULL, can't adapt geometry";}
+  m_ImageMutex->Unlock();
 
+  MITK_DEBUG << "UpdateImageGeometry called!";
+  MITK_DEBUG << "depth: " << m_DepthProperties->GetCurrent();
+  MITK_DEBUG << "new spacing: " << spacing;
 }
 
 bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(Usgfw2Lib::IUsgDataView* usgDataView, Usgfw2Lib::tagScanMode scanMode)

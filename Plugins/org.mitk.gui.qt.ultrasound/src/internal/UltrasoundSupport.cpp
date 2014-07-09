@@ -102,6 +102,7 @@ void UltrasoundSupport::DisplayImage()
   //Update data node
   mitk::Image::Pointer curOutput = m_Device->GetOutput();
   m_Node->SetData(curOutput);
+  curOutput->Modified();
 
   //Only update the view if the image is shown
   if(m_Controls.m_ShowImageStream->isChecked())

@@ -67,16 +67,14 @@ public:
 
       void OnChangedFramerateLimit(int);
 
+      /*
+       *\brief Called, when the selection in the list of the active devices changes.
+       */
       void OnChangedActiveDevice();
 
       void OnClickedFreezeButton();
 
       void OnDeciveServiceEvent(const ctkServiceEvent event);
-
-      /*
-       *\brief Called, when the selection in the list of the active devices changes.
-       */
-      void OnActiveDeviceSelectionChanged(us::ServiceReferenceU reference);
 
       /*
       * \brief This is the main imaging loop that is called regularily during the imaging process

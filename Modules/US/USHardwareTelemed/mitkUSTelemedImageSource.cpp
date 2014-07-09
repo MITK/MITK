@@ -31,6 +31,8 @@ mitk::USTelemedImageSource::~USTelemedImageSource( )
 {
   SAFE_RELEASE(m_PluginCallback);
   SAFE_RELEASE(m_Plugin);
+  SAFE_RELEASE(m_ImageProperties);
+  SAFE_RELEASE(m_DepthProperties);
 }
 
 void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
@@ -47,6 +49,21 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 
     m_ImageMutex->Unlock();
   }
+  //if depth changed: update geometry
+  if (m_OldDepth != m_DepthProperties->GetCurrent()) {UpdateImageGeometry();}
+}
+
+void mitk::USTelemedImageSource::UpdateImageGeometry()
+{
+  Usgfw2Lib::tagImageResolution currentResolution;
+  m_ImageProperties->GetResolution(&currentResolution,0);
+  m_OldDepth =  m_DepthProperties->GetCurrent();
+
+  MITK_INFO << "UpdateImageGeometry called!";
+  MITK_INFO << "depth: " << m_DepthProperties->GetCurrent();
+  MITK_INFO << "res X: " << currentResolution.nXPelsPerUnit;
+  MITK_INFO << "res Y: " << currentResolution.nYPelsPerUnit;
+
 }
 
 bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(Usgfw2Lib::IUsgDataView* usgDataView, Usgfw2Lib::tagScanMode scanMode)
@@ -80,6 +97,13 @@ bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(Usgfw2Lib::IUsg
   SAFE_RELEASE(m_Plugin);
   m_Plugin = (Usgfw2Lib::IUsgScanConverterPlugin*)tmp_obj;
   m_PluginCallback->SetScanConverterPlugin(m_Plugin);
+
+  //last: create some connections which are needed inside this class for communication with the telemed device
+  m_UsgDataView = usgDataView;
+
+  // create telemed controls
+  if (!m_DepthProperties) {CREATE_TelemedControl(m_DepthProperties, m_UsgDataView, Usgfw2Lib::IID_IUsgDepth, Usgfw2Lib::IUsgDepth, Usgfw2Lib::SCAN_MODE_B);}
+  if (!m_ImageProperties) {CREATE_TelemedControl(m_ImageProperties, m_UsgDataView, Usgfw2Lib::IID_IUsgImageProperties, Usgfw2Lib::IUsgImageProperties, Usgfw2Lib::SCAN_MODE_B);}
 
   return true;
 }

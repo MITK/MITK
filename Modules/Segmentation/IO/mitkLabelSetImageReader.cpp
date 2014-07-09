@@ -149,7 +149,6 @@ void LabelSetImageReader::GenerateData()
   std::string _xmlStr;
   mitk::Label::Pointer label;
   TiXmlDocument doc;
-  mitk::PropertyListsXmlFileReaderAndWriter::Pointer docReader = mitk::PropertyListsXmlFileReaderAndWriter::New();
 
   for (int idx=0; idx<numberOfLabels; idx++)
   {
@@ -157,19 +156,21 @@ void LabelSetImageReader::GenerateData()
     for (; itKey != imgMetaKeys.end(); itKey ++)
     {
       itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-      sprintf( keybuffer, "label_%03d_name", idx );
+      sprintf( keybuffer, "label_%03d", idx );
       if (itKey->find(keybuffer) != std::string::npos)
       {
         sscanf(metaString.c_str(), "%[^\n]s", &str);
         _xmlStr = str;
         doc.Parse(_xmlStr.c_str());
+
+        MITK_INFO << _xmlStr;
       }
     }
 
     label = mitk::Label::New();
-    docReader->ReadLists(doc,label);
+    label->DeserializeLabel(&doc);
 
-    if (_index != 0)
+    if (label->GetValue() != 0)
       output->GetLabelSet()->AddLabel(*label);
   }
 

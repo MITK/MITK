@@ -80,40 +80,28 @@ void mitk::LabelSetImageWriter::GenerateData()
   sprintf( valbuffer, "LSET");
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("modality"), std::string(valbuffer));
 
-  MITK_INFO << "modality" << valbuffer;
-
   sprintf( valbuffer, input->GetName().c_str() );
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("name"), std::string(valbuffer));
-
-  MITK_INFO << "name" << valbuffer;
 
   sprintf( valbuffer, input->GetLastModificationTime().c_str() );
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("last modification time"), std::string(valbuffer));
 
-  MITK_INFO << "last modification time" << valbuffer;
-
   sprintf( valbuffer, "%1d", input->GetTotalNumberOfLabels());
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("number of labels"), std::string(valbuffer));
-
-  TiXmlDocument labelAsXml;
-  TiXmlPrinter printer;
 
   int idx = 0;
   for (int layerIdx=0; layerIdx<input->GetNumberOfLayers(); layerIdx++)
   {
     for (int labelIdx=0; labelIdx<input->GetNumberOfLabels(layerIdx); labelIdx++)
     {
-
-      mitk::PropertyListSerializer::Pointer serializer = mitk::PropertyListSerializer::New();
-      serializer->SetPropertyList(input->GetLabel(labelIdx,layerIdx));
-      labelAsXml = serializer->SerializeAsTiXmlDocument();
+      TiXmlDocument labelAsXml = input->GetLabel(labelIdx,layerIdx)->SerializeLabel();
+      TiXmlPrinter printer;
       printer.SetIndent("");
       printer.SetLineBreak("");
       labelAsXml.Accept(&printer);
 
-      sprintf( keybuffer, "label_%03d_name", idx );
+      sprintf( keybuffer, "label_%03d", idx );
       itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), printer.Str());
-
       ++idx;
     }
   }

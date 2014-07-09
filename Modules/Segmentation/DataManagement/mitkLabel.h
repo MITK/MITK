@@ -23,6 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVector.h>
 #include <mitkPropertyList.h>
 
+class TiXmlDocument;
+class TiXmlElement;
+
 namespace mitk
 {
 
@@ -73,6 +76,9 @@ public:
   Label();
   virtual ~Label();
 
+  TiXmlDocument SerializeLabel() const;
+  bool DeserializeLabel(TiXmlDocument *doc);
+
 protected:
 
   void PrintSelf(std::ostream &os, itk::Indent indent) const;
@@ -82,6 +88,10 @@ protected:
 private:
 
   virtual itk::LightObject::Pointer InternalClone() const;
+
+  TiXmlElement* PropertyToXmlElem( const std::string& key, const BaseProperty* property ) const;
+  bool PropertyFromXmlElem(std::string& name, mitk::BaseProperty::Pointer& prop, TiXmlElement* elem) const;
+
 };
 
 } // namespace mitk

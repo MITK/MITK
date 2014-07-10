@@ -231,7 +231,7 @@ void mitk::LabelSetImage::SetVectorImage( VectorImageType::Pointer vectorImage )
       newLayerImage->Initialize(this);
       newLayerImage->SetVolume(auxImg->GetBufferPointer());
 
-      m_LayerContainer.push_back(newLayerImage);
+      m_LayerContainer[lidx] = newLayerImage;
     }
 
     // reset active layer

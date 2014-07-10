@@ -53,7 +53,7 @@ void mitk::LabelSetImage::OnLabelSetModified()
 
 void mitk::LabelSetImage::SetExteriorLabel(mitk::Label * label)
 {
-  m_ExteriorLabel(label);
+  m_ExteriorLabel = label;
 }
 
 mitk::Label* mitk::LabelSetImage::GetExteriorLabel()

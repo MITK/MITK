@@ -47,6 +47,13 @@ public:
   virtual void GetNextRawImage( mitk::Image::Pointer& );
 
   /**
+    * Updates the geometry of the current image from the API.
+    * Is used internally when a new image is initialized, but
+    * also needs to be called if, e.g., the zoom factor is changed.
+    */
+  void UpdateImageGeometry();
+
+  /**
     * \brief Connect this object to the Telemed API.
     * This method is for being used by mitk::USTelemedDevice.
     */
@@ -58,6 +65,15 @@ protected:
 
   Usgfw2Lib::IUsgScanConverterPlugin*         m_Plugin;
   USTelemedScanConverterPlugin*               m_PluginCallback;
+
+  Usgfw2Lib::IUsgDataView* m_UsgDataView;  // main SDK object for comminucating with the Telemed API
+
+  //API objects for communication, used to get the right geometry
+  Usgfw2Lib::IUsgImageProperties* m_ImageProperties;
+  Usgfw2Lib::IUsgDepth* m_DepthProperties;
+  double m_OldDepth;
+  int m_upDateCounter;
+
 
   mitk::Image::Pointer                        m_Image;
   itk::FastMutexLock::Pointer                 m_ImageMutex;

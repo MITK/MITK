@@ -463,6 +463,8 @@ void mitk::USDevice::GrabImage()
   m_ImageMutex->Lock();
   this->SetImage(image);
   m_ImageMutex->Unlock();
+  //if (image.IsNotNull() && (image->GetGeometry()!=NULL)){
+  //  MITK_INFO << "Spacing: " << image->GetGeometry()->GetSpacing();}
 }
 
 //########### GETTER & SETTER ##################//
@@ -510,7 +512,7 @@ void mitk::USDevice::GenerateData()
 
   mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
   output->SetSlice(inputReadAccessor.GetData());
-
+  output->SetGeometry(m_Image->GetGeometry());
   m_ImageMutex->Unlock();
 };
 

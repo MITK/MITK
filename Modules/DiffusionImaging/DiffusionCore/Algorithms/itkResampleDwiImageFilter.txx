@@ -70,9 +70,18 @@ ResampleDwiImageFilter<TScalarType>
 //    region.SetSize(1, region.GetSize(1)*m_SamplingFactor[1]);
 //    region.SetSize(2, region.GetSize(2)*m_SamplingFactor[2]);
 
+    itk::Point<double,3> origin = this->GetInput()->GetOrigin();
+    origin[0] -= this->GetInput()->GetSpacing()[0]/2;
+    origin[1] -= this->GetInput()->GetSpacing()[1]/2;
+    origin[2] -= this->GetInput()->GetSpacing()[2]/2;
+
+    origin[0] += m_NewSpacing[0]/2;
+    origin[1] += m_NewSpacing[1]/2;
+    origin[2] += m_NewSpacing[2]/2;
+
     typename DwiImageType::Pointer outImage = DwiImageType::New();
     outImage->SetSpacing( m_NewSpacing );
-    outImage->SetOrigin( this->GetInput()->GetOrigin() );
+    outImage->SetOrigin( origin );
     outImage->SetDirection( this->GetInput()->GetDirection() );
     outImage->SetLargestPossibleRegion( m_NewImageRegion );
     outImage->SetBufferedRegion( m_NewImageRegion );

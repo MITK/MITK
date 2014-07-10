@@ -204,7 +204,8 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "minimumQt4Version=@MITK_QT4_MINIMUM_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
                          "developersguidemainpage{1}=\page \1 " \
-                         "usersguidemainpage{1}=\page \1 "
+                         "usersguidemainpage{1}=\page \1 " \
+                         "nondependentPluginLink{3}= \ref \1 \"\3\" "
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding

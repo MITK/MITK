@@ -49,6 +49,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QDateTime>
 
+#include "tinyxml.h"
+
 #include <itksys/SystemTools.hxx>
 
 const std::string QmitkMultiLabelSegmentationView::VIEW_ID = "org.mitk.views.multilabelsegmentation";
@@ -351,7 +353,7 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   referenceNode->GetIntProperty("layer", layer);
   workingNode->SetIntProperty("layer", layer+1);
 
-  m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() > 1);
+  m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() >= 1);
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }
@@ -395,20 +397,20 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
     return;
   }
 
+  this->WaitCursorOff();
+
   mitk::DataNode::Pointer workingNode = mitk::DataNode::New();
   workingNode->SetData(workingImage);
   workingNode->SetName(newName.toStdString());
-  workingImage->SetName(newName.toStdString());
-  mitk::Color color;
-  color.SetRed(1.0);
-  color.SetGreen(0.0);
-  color.SetBlue(0.0);
-  workingImage->GetLabelSet()->AddLabel("unnamed", color);
-
-  this->WaitCursorOff();
+  workingImage->GetExteriorLabel()->SetProperty("name.parent",mitk::StringProperty::New(referenceNode->GetName().c_str()));
+  workingImage->GetExteriorLabel()->SetProperty("name.image",mitk::StringProperty::New(newName.toStdString().c_str()));
 
   if (!this->GetDataStorage()->Exists(workingNode))
     this->GetDataStorage()->Add(workingNode, referenceNode);
+
+  m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
+
+  OnNewLabel();
 
   m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
 }
@@ -433,8 +435,7 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
 
   workingImage->GetActiveLabelSet()->AddLabel(dialog->GetSegmentationName().toStdString(), dialog->GetColor());
   //m_Controls.m_LabelSetWidget->ResetTableWidget();
-
-  m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() > 2);
+  UpdateControls();
 }
 
 void QmitkMultiLabelSegmentationView::OnShowLabelTable(bool value)

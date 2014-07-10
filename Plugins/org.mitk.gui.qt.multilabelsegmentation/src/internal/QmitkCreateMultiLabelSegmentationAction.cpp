@@ -42,12 +42,14 @@ void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::P
       try
       {
         lsImage->Initialize(referenceImage);
+
       }
       catch (mitk::Exception &e)
       {
         MITK_ERROR << "Exception caught: " << e.GetDescription();
         return;
       }
+
       if (m_DataStorage.IsNotNull())
       {
         mitk::DataNode::Pointer newNode = mitk::DataNode::New();
@@ -55,6 +57,8 @@ void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::P
         newName += "-labels";
         newNode->SetName(newName);
         newNode->SetData(lsImage);
+        lsImage->GetExteriorLabel()->SetProperty("name.parent",mitk::StringProperty::New(referenceNode->GetName().c_str()));
+        lsImage->GetExteriorLabel()->SetProperty("name.image",mitk::StringProperty::New(newName.c_str()));
         m_DataStorage->Add(newNode, referenceNode);
       }
     }

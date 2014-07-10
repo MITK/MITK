@@ -373,7 +373,8 @@ void mitk::USCombinedModality::GenerateData()
   if ( ! output->IsInitialized() ) { output->Initialize(image); }
 
   mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0,0,0));
-  output->SetSlice(inputReadAccessor.GetData());
+  output->SetSlice(inputReadAccessor.GetData()); //copy image data
+  output->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing()); //copy spacing because this might also change
 
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
   if ( ! calibrationKey.empty() )

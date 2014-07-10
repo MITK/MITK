@@ -95,22 +95,6 @@ public:
 
   /**
     * \brief  */
-  void SetLastModificationTime(const std::string& date);
-
-  /**
-    * \brief  */
-  const std::string& GetLastModificationTime();
-
-  /**
-    * \brief  */
-  void SetName(const std::string& date);
-
-  /**
-    * \brief  */
-  const std::string& GetName();
-
-  /**
-    * \brief  */
   void UpdateCenterOfMass(int pixelValue, int layer = -1);
 
   /**
@@ -222,9 +206,6 @@ protected:
   template < typename ImageType1, typename ImageType2 >
   void ChangeLayerProcessing( ImageType1* source, ImageType2* target );
 
-//  template < typename ImageType >
-//  void AddLayerProcessing( ImageType* input);
-
   template < typename ImageType >
   void LayerContainerToImageProcessing( ImageType* source, int layer);
 
@@ -263,9 +244,6 @@ protected:
 
   int m_ActiveLayer;
 
-  std::string m_LastModificationTime;
-
-  std::string m_Name;
 
 };
 

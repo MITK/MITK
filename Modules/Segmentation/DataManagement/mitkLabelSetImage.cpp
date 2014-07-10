@@ -297,48 +297,6 @@ void mitk::LabelSetImage::SetActiveLayer(int layer)
   this->Modified();
 }
 
-mitk::Label::Pointer mitk::LabelSetImage::CreateExteriorLabel()
-{
-  mitk::Color color;
-  color[0] = 0.0;
-  color[1] = 0.0;
-  color[2] = 0.0;
-  color[3] = 0.0;
-
-  mitk::Label::Pointer label = mitk::Label::New();
-  label->SetColor(color);
-  label->SetName("Exterior");
-  //label->SetExterior(true);
-  label->SetOpacity(0.0);
-  label->SetLocked(false);
-  label->SetValue(0);
-  return label;
-}
-
-void mitk::LabelSetImage::SetLastModificationTime(const std::string& name)
-{
-  m_LastModificationTime = name;
-}
-
-const std::string& mitk::LabelSetImage::GetLastModificationTime()
-{
-  return m_LastModificationTime;
-}
-
-void mitk::LabelSetImage::SetName(const std::string& name)
-{
-  m_Name = name;
-}
-
-const std::string& mitk::LabelSetImage::GetName()
-{
-  return m_Name;
-}
-
-//void mitk::LabelSetImage::CalculateLabelVolume(int index, int layer)
-//{
-//  // todo
-//}
 
 void mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
 {

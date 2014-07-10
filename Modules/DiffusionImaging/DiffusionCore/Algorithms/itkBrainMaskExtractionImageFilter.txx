@@ -40,6 +40,7 @@ namespace itk {
   template< class TOutputImagePixelType >
     BrainMaskExtractionImageFilter< TOutputImagePixelType >
     ::BrainMaskExtractionImageFilter()
+        : m_MaxNumIterations(itk::NumericTraits<int>::max())
   {
     // At least 1 inputs is necessary for a vector image.
     // For images added one at a time we need at least six
@@ -202,7 +203,7 @@ namespace itk {
       }
       #endif*/
 
-    } while( !CompareImages( Mn, Mnplus1) );
+    } while( !CompareImages( Mn, Mnplus1) && iter < m_MaxNumIterations );
 
     std::cout << "Done." << std::endl;
 

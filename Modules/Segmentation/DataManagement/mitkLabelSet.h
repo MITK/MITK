@@ -176,7 +176,7 @@ public:
 
     /** \brief
     */
-    Label* GetLabel(int pixelValue) { return m_LabelContainer[pixelValue]; }
+    Label* GetLabel(int pixelValue);
 
     /** \brief
     */
@@ -201,6 +201,7 @@ public:
 protected:
 
     LabelSet();
+
     virtual ~LabelSet();
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const;

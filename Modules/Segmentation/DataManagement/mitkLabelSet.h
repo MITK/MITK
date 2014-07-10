@@ -140,7 +140,7 @@ public:
 
     /** \brief
     */
-    void AddLabel(const Label& label);
+    void AddLabel(mitk::Label * label);
 
     /** \brief
     */

@@ -90,21 +90,21 @@ bool mitk::LabelSet::ExistLabel(int pixelValue)
 }
 
 
-void mitk::LabelSet::AddLabel(const mitk::Label& label )
+void mitk::LabelSet::AddLabel(mitk::Label * label)
 {
   if (m_LabelContainer.size() > 255) return;
 
-  mitk::Label::Pointer newLabel = mitk::Label::New();
+  mitk::Label::Pointer newLabel(label);
 
-  newLabel->SetColor( label.GetColor() );
-  newLabel->SetName( label.GetName() );
-  newLabel->SetVisible( label.GetVisible() );
-  newLabel->SetLocked( label.GetLocked() );
-  newLabel->SetOpacity( label.GetOpacity() );
+//  newLabel->SetColor( label.GetColor() );
+//  newLabel->SetName( label.GetName() );
+//  newLabel->SetVisible( label.GetVisible() );
+//  newLabel->SetLocked( label.GetLocked() );
+//  newLabel->SetOpacity( label.GetOpacity() );
   newLabel->SetLayer( m_Layer );
 
   unsigned int pixelValue = -1;
-  if(label.GetValue() == -1){
+  if(newLabel->GetValue() == -1){
     //find next free
     int i = 1;
     while(m_LabelContainer.empty() == false && m_LabelContainer.find(i) != m_LabelContainer.end() )
@@ -115,10 +115,8 @@ void mitk::LabelSet::AddLabel(const mitk::Label& label )
   }
   else
   {
-    newLabel->SetValue( label.GetValue());
-    pixelValue = label.GetValue();
+    pixelValue = newLabel->GetValue();
   }
-
 
   // new map entry
   m_LabelContainer[pixelValue] = newLabel;
@@ -141,7 +139,7 @@ void mitk::LabelSet::AddLabel(const std::string& name, const mitk::Color& color 
   mitk::Label::Pointer newLabel = mitk::Label::New();
   newLabel->SetName(name);
   newLabel->SetColor(color);
-  AddLabel(*newLabel);
+  AddLabel(newLabel);
 }
 
 void mitk::LabelSet::RenameLabel(int pixelValue, const std::string& name, const mitk::Color& color)

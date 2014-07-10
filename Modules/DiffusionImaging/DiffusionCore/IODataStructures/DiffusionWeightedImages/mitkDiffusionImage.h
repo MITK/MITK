@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "itkVectorImage.h"
 #include "itkVectorImageToImageAdaptor.h"
+#include <itkImageDuplicator.h>
 
 namespace mitk
 {
@@ -40,6 +41,8 @@ public:
   typedef GradientDirectionContainerType::Pointer                     GradientDirectionContainerTypePointer;
   typedef vnl_matrix_fixed< double, 3, 3 >                            MeasurementFrameType;
   typedef std::vector< unsigned int >                                 IndicesVector;
+  typedef itk::VectorImage< TPixelType, 3 >                           ItkDwiType;
+  typedef itk::ImageDuplicator< ItkDwiType >                          DwiDuplicatorType;
 
   /**
    * \brief The BValueMap contains seperated IndicesVectors for each b value (index for GradientDirectionContainer)
@@ -149,6 +152,10 @@ public:
   void SetDisplayIndexForRendering(int displayIndex);
 
 
+  /**
+  * \brief Return deep copy of this image
+  */
+  mitk::DiffusionImage< TPixelType >::Pointer GetDeepCopy();
 
 protected:
   mitkCloneMacro(Self);

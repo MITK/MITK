@@ -92,6 +92,8 @@ void DwiNormilzationFilter< TInPixelType>::ThreadedGenerateData(const OutputImag
     while( !git.IsAtEnd() )
     {
         typename InputImageType::PixelType pix = git.Get();
+        typename OutputImageType::PixelType outPix;
+        outPix.SetSize(inputImagePointer->GetVectorLength());
 
         double S0 = pix[m_B0Index];
         if (m_UseGlobalMax)
@@ -110,9 +112,9 @@ void DwiNormilzationFilter< TInPixelType>::ThreadedGenerateData(const OutputImag
                     val /= S0;
                     val *= (double)m_NewMax;
                 }
-                pix[i] = (TInPixelType)val;
+                outPix[i] = (TInPixelType)val;
             }
-            oit.Set(pix);
+            oit.Set(outPix);
         }
         else
             oit.Set(nullPix);

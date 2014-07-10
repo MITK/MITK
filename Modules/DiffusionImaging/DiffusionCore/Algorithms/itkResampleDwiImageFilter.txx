@@ -41,6 +41,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkResampleImageFilter.h>
 #include <itkBSplineInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkLinearInterpolateImageFunction.h>
+#include <itkWindowedSincInterpolateImageFunction.h>
 
 namespace itk
 {
@@ -48,6 +50,7 @@ namespace itk
 template <class TScalarType>
 ResampleDwiImageFilter<TScalarType>
 ::ResampleDwiImageFilter()
+    : m_Interpolation(Interpolate_Linear)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
@@ -57,34 +60,72 @@ void
 ResampleDwiImageFilter<TScalarType>
 ::GenerateData()
 {
-    // initialize output image
-    itk::Vector< double, 3 > spacing = this->GetInput()->GetSpacing();
-    spacing[0] /= m_SamplingFactor[0];
-    spacing[1] /= m_SamplingFactor[1];
-    spacing[2] /= m_SamplingFactor[2];
-    ImageRegion<3> region = this->GetInput()->GetLargestPossibleRegion();
-    region.SetSize(0, region.GetSize(0)*m_SamplingFactor[0]);
-    region.SetSize(1, region.GetSize(1)*m_SamplingFactor[1]);
-    region.SetSize(2, region.GetSize(2)*m_SamplingFactor[2]);
+//    // initialize output image
+//    itk::Vector< double, 3 > spacing = this->GetInput()->GetSpacing();
+//    spacing[0] /= m_SamplingFactor[0];
+//    spacing[1] /= m_SamplingFactor[1];
+//    spacing[2] /= m_SamplingFactor[2];
+//    ImageRegion<3> region = this->GetInput()->GetLargestPossibleRegion();
+//    region.SetSize(0, region.GetSize(0)*m_SamplingFactor[0]);
+//    region.SetSize(1, region.GetSize(1)*m_SamplingFactor[1]);
+//    region.SetSize(2, region.GetSize(2)*m_SamplingFactor[2]);
+
+    itk::Point<double,3> origin = this->GetInput()->GetOrigin();
+    origin[0] -= this->GetInput()->GetSpacing()[0]/2;
+    origin[1] -= this->GetInput()->GetSpacing()[1]/2;
+    origin[2] -= this->GetInput()->GetSpacing()[2]/2;
+
+    origin[0] += m_NewSpacing[0]/2;
+    origin[1] += m_NewSpacing[1]/2;
+    origin[2] += m_NewSpacing[2]/2;
 
     typename DwiImageType::Pointer outImage = DwiImageType::New();
-    outImage->SetSpacing( spacing );
-    outImage->SetOrigin( this->GetInput()->GetOrigin() );
+    outImage->SetSpacing( m_NewSpacing );
+    outImage->SetOrigin( origin );
     outImage->SetDirection( this->GetInput()->GetDirection() );
-    outImage->SetLargestPossibleRegion( region );
-    outImage->SetBufferedRegion( region );
-    outImage->SetRequestedRegion( region );
+    outImage->SetLargestPossibleRegion( m_NewImageRegion );
+    outImage->SetBufferedRegion( m_NewImageRegion );
+    outImage->SetRequestedRegion( m_NewImageRegion );
     outImage->SetVectorLength( this->GetInput()->GetVectorLength() );
     outImage->Allocate();
 
-    typename itk::NearestNeighborInterpolateImageFunction<DwiChannelType>::Pointer interp = itk::NearestNeighborInterpolateImageFunction<DwiChannelType>::New();
-//    typename itk::BSplineInterpolateImageFunction<DwiChannelType>::Pointer interp = itk::BSplineInterpolateImageFunction<DwiChannelType>::New();
-
     typename itk::ResampleImageFilter<DwiChannelType, DwiChannelType>::Pointer resampler = itk::ResampleImageFilter<DwiChannelType, DwiChannelType>::New();
     resampler->SetOutputParametersFromImage(outImage);
-    resampler->SetInterpolator(interp);
 
-    for (int i=0; i<this->GetInput()->GetVectorLength(); i++)
+    switch (m_Interpolation)
+    {
+    case Interpolate_NearestNeighbour:
+    {
+        typename itk::NearestNeighborInterpolateImageFunction<DwiChannelType>::Pointer interp = itk::NearestNeighborInterpolateImageFunction<DwiChannelType>::New();
+        resampler->SetInterpolator(interp);
+        break;
+    }
+    case Interpolate_Linear:
+    {
+        typename itk::LinearInterpolateImageFunction<DwiChannelType>::Pointer interp = itk::LinearInterpolateImageFunction<DwiChannelType>::New();
+        resampler->SetInterpolator(interp);
+        break;
+    }
+    case Interpolate_BSpline:
+    {
+        typename itk::BSplineInterpolateImageFunction<DwiChannelType>::Pointer interp = itk::BSplineInterpolateImageFunction<DwiChannelType>::New();
+        resampler->SetInterpolator(interp);
+        break;
+    }
+    case Interpolate_WindowedSinc:
+    {
+        typename itk::WindowedSincInterpolateImageFunction<DwiChannelType, 3>::Pointer interp = itk::WindowedSincInterpolateImageFunction<DwiChannelType, 3>::New();
+        resampler->SetInterpolator(interp);
+        break;
+    }
+    default:
+    {
+        typename itk::LinearInterpolateImageFunction<DwiChannelType>::Pointer interp = itk::LinearInterpolateImageFunction<DwiChannelType>::New();
+        resampler->SetInterpolator(interp);
+    }
+    }
+
+    for (unsigned int i=0; i<this->GetInput()->GetVectorLength(); i++)
     {
         typename DwiChannelType::Pointer channel = DwiChannelType::New();
         channel->SetSpacing( this->GetInput()->GetSpacing() );

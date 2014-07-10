@@ -147,6 +147,11 @@ MITK_USE_QT:BOOL=${MITK_USE_QT}
 ${ADDITIONAL_CMAKECACHE_OPTION}
 ")
 
+if(MITK_USE_QT)
+  set(INITIAL_CMAKECACHE_OPTIONS "${INITIAL_CMAKECACHE_OPTIONS}
+QT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}")
+endif()
+
 # Write a cache file for populating the MITK initial cache (not the superbuild cache).
 # This can be used to provide variables which are not passed through the
 # superbuild process to the MITK configure step)

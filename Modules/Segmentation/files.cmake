@@ -1,4 +1,5 @@
 set(CPP_FILES
+
   Algorithms/mitkCalculateSegmentationVolume.cpp
   #Algorithms/mitkContourModelSource.cpp
   #Algorithms/mitkContourModelSubDivisionFilter.cpp
@@ -93,6 +94,7 @@ set(CPP_FILES
   IO/mitkLabelSetImageWriter.cpp
   IO/mitkLabelSetImageSource.cpp
   IO/mitkLabelSetImageSerializer.cpp
+  IO/mitkSegmentationDataNodeReader.cpp
   Rendering/mitkContourMapper2D.cpp
   #Rendering/mitkContourModelGLMapper2D.cpp
   #Rendering/mitkContourModelMapper2D.cpp

@@ -111,67 +111,37 @@ void LabelSetImageReader::GenerateData()
   output->InitializeByItk<ImageType>( auxImg.GetPointer() );
 
   itk::MetaDataDictionary imgMetaDictionary = vectorImage->GetMetaDataDictionary();
-  std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-  std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-  std::string metaString;
 
   char keybuffer[256];
 
-  int numberOfLabels(0);
-  std::string name, lastmodified;
-  for (; itKey != imgMetaKeys.end(); itKey ++)
-  {
-    itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-    if (itKey->find("name") != std::string::npos)
-    {
-      name = metaString;
-    }
-
-    itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-    if (itKey->find("last modification time") != std::string::npos)
-    {
-      lastmodified = metaString;
-    }
-
-    itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-    if (itKey->find("number of labels") != std::string::npos)
-    {
-      numberOfLabels = atoi(metaString.c_str());
-    }
-  }
-
-  output->SetName(name);
-  output->SetLastModificationTime(lastmodified);
-  output->AddLayer();
-
-  char str[32786];
+  int numberOfLayers = GetIntByKey(imgMetaDictionary,"layers");
   std::string _xmlStr;
   mitk::Label::Pointer label;
   TiXmlDocument doc;
 
-  for (int idx=0; idx<numberOfLabels; idx++)
+
+  for( int layerIdx=0; layerIdx < numberOfLayers; layerIdx++)
   {
-    itKey = imgMetaKeys.begin();
-    for (; itKey != imgMetaKeys.end(); itKey ++)
+    sprintf( keybuffer, "layer_%03d", layerIdx );
+    int numberOfLabels = GetIntByKey(imgMetaDictionary,keybuffer);
+
+    output->AddLayer();
+
+    for(int labelIdx=0; labelIdx < numberOfLabels; labelIdx++)
     {
-      itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-      sprintf( keybuffer, "label_%03d", idx );
-      if (itKey->find(keybuffer) != std::string::npos)
-      {
-        sscanf(metaString.c_str(), "%[^\n]s", &str);
-        _xmlStr = str;
-        doc.Parse(_xmlStr.c_str());
+      sprintf( keybuffer, "label_%03d_%03d", layerIdx, labelIdx );
+      _xmlStr = GetStringByKey(imgMetaDictionary,keybuffer);
+      doc.Parse(_xmlStr.c_str());
 
-        MITK_INFO << _xmlStr;
-      }
+      label = mitk::Label::New();
+      label->LoadFromTiXmlDocument(&doc);
+
+      if(label->GetValue() == 0) // set exterior label is needed to hold exterior information
+        output->SetExteriorLabel(label);
+      output->GetLabelSet()->AddLabel(label);
     }
-
-    label = mitk::Label::New();
-    label->DeserializeLabel(&doc);
-
-    if (label->GetValue() != 0)
-      output->GetLabelSet()->AddLabel(*label);
   }
+
 
   // set vector image
   output->SetVectorImage(vectorImage);
@@ -184,6 +154,38 @@ void LabelSetImageReader::GenerateData()
   {
     mitkThrow() << "Could not reset locale!";
   }
+}
+
+int LabelSetImageReader::GetIntByKey(const itk::MetaDataDictionary & dic,const std::string & str)
+{
+  std::vector<std::string> imgMetaKeys = dic.GetKeys();
+  std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+  std::string metaString("");
+  for (; itKey != imgMetaKeys.end(); itKey ++)
+  {
+    itk::ExposeMetaData<std::string> (dic, *itKey, metaString);
+    if (itKey->find(str.c_str()) != std::string::npos)
+    {
+      return atoi(metaString.c_str());
+    }
+  }
+  return 0;
+}
+
+std::string LabelSetImageReader::GetStringByKey(const itk::MetaDataDictionary & dic,const std::string & str)
+{
+  std::vector<std::string> imgMetaKeys = dic.GetKeys();
+  std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+  std::string metaString("");
+  for (; itKey != imgMetaKeys.end(); itKey ++)
+  {
+    itk::ExposeMetaData<std::string> (dic, *itKey, metaString);
+    if (itKey->find(str.c_str()) != std::string::npos)
+    {
+      return metaString;
+    }
+  }
+  return metaString;
 }
 
 void LabelSetImageReader::GenerateOutputInformation()

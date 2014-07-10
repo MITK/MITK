@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "tinyxml.h"
 
+
 mitk::LabelSetImageWriter::LabelSetImageWriter()
   : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
@@ -77,32 +78,31 @@ void mitk::LabelSetImageWriter::GenerateData()
   char keybuffer[512];
   char valbuffer[512];
 
+  sprintf( keybuffer, "modality");
   sprintf( valbuffer, "LSET");
-  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("modality"), std::string(valbuffer));
+  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
-  sprintf( valbuffer, input->GetName().c_str() );
-  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("name"), std::string(valbuffer));
+  sprintf( keybuffer, "layers");
+  sprintf( valbuffer, "%1d", input->GetNumberOfLayers());
+  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
 
-  sprintf( valbuffer, input->GetLastModificationTime().c_str() );
-  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("last modification time"), std::string(valbuffer));
-
-  sprintf( valbuffer, "%1d", input->GetTotalNumberOfLabels());
-  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string("number of labels"), std::string(valbuffer));
-
-  int idx = 0;
   for (int layerIdx=0; layerIdx<input->GetNumberOfLayers(); layerIdx++)
   {
+    sprintf( keybuffer, "layer_%03d", layerIdx ); // layer idx
+    sprintf( valbuffer, "%1d", input->GetTotalNumberOfLabels()); // number of labels for the layer
+    itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
+
     for (int labelIdx=0; labelIdx<input->GetNumberOfLabels(layerIdx); labelIdx++)
     {
-      TiXmlDocument labelAsXml = input->GetLabel(labelIdx,layerIdx)->SerializeLabel();
+      TiXmlDocument labelAsXml = input->GetLabel(labelIdx,layerIdx)->GetAsTiXmlDocument();
       TiXmlPrinter printer;
       printer.SetIndent("");
       printer.SetLineBreak("");
+
       labelAsXml.Accept(&printer);
 
-      sprintf( keybuffer, "label_%03d", idx );
+      sprintf( keybuffer, "label_%03d_%03d", layerIdx, labelIdx );
       itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), printer.Str());
-      ++idx;
     }
   }
 

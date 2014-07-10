@@ -51,6 +51,8 @@ class MitkSegmentation_EXPORT LabelSetImageReader : public LabelSetImageSource, 
 
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
+    int GetIntByKey(const itk::MetaDataDictionary & dic,const std::string & str);
+    std::string GetStringByKey(const itk::MetaDataDictionary & dic,const std::string & str);
   protected:
 
     virtual void GenerateData();

@@ -8,26 +8,36 @@ list(APPEND CTEST_NOTES_FILES "${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
 set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin...
 site_name(CTEST_SITE)
 
-if(QT_BINARY_DIR)
-  set(QT_QMAKE_EXECUTABLE "${QT_BINARY_DIR}/qmake")
-else()
-  set(QT_QMAKE_EXECUTABLE "qmake")
+if(NOT DEFINED MITK_USE_QT)
+  set(MITK_USE_QT 1)
 endif()
 
-execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} --version
-                OUTPUT_VARIABLE MY_QT_VERSION
-                RESULT_VARIABLE qmake_error)
-if(qmake_error)
-  message(FATAL_ERROR "Error when executing ${QT_QMAKE_EXECUTABLE} --version\n${qmake_error}")
-endif()
+if(MITK_USE_QT)
+  if(QT_BINARY_DIR)
+    set(QT_QMAKE_EXECUTABLE "${QT_BINARY_DIR}/qmake")
+  else()
+    set(QT_QMAKE_EXECUTABLE "qmake")
+  endif()
 
-string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
+  execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} --version
+                  OUTPUT_VARIABLE MY_QT_VERSION
+                  RESULT_VARIABLE qmake_error)
+  if(qmake_error)
+    message(FATAL_ERROR "Error when executing ${QT_QMAKE_EXECUTABLE} --version\n${qmake_error}")
+  endif()
+
+  string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
+endif()
 
 #
 # Project specific properties
 #
 if(NOT CTEST_BUILD_NAME)
-  set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-Qt-${MY_QT_VERSION}-${CTEST_BUILD_CONFIGURATION}")
+  if(MITK_USE_QT)
+     set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-Qt-${MY_QT_VERSION}-${CTEST_BUILD_CONFIGURATION}")
+  else()
+    set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-${CTEST_BUILD_CONFIGURATION}")
+  endif()
 endif()
 set(PROJECT_BUILD_DIR "MITK-build")
 
@@ -133,6 +143,7 @@ MITK_USE_Boost:BOOL=${MITK_USE_Boost}
 MITK_USE_OpenCV:BOOL=${MITK_USE_OpenCV}
 MITK_USE_Poco:BOOL=${MITK_USE_Poco}
 MITK_USE_SOFA:BOOL=${MITK_USE_SOFA}
+MITK_USE_QT:BOOL=${MITK_USE_QT}
 ${ADDITIONAL_CMAKECACHE_OPTION}
 ")
 

@@ -61,7 +61,7 @@ mitk::Label::~Label()
 
 }
 
-TiXmlDocument mitk::Label::SerializeLabel() const
+TiXmlDocument mitk::Label::GetAsTiXmlDocument() const
 {
   TiXmlDocument document;
   TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
@@ -129,7 +129,7 @@ TiXmlElement* mitk::Label::PropertyToXmlElem( const std::string& key, const Base
   return keyelement;
 }
 
-bool mitk::Label::DeserializeLabel(TiXmlDocument * doc)
+bool mitk::Label::LoadFromTiXmlDocument(TiXmlDocument * doc)
 {
   // reread
   TiXmlHandle docHandle( doc );
@@ -157,7 +157,7 @@ bool mitk::Label::PropertyFromXmlElem(std::string& key, mitk::BaseProperty::Poin
   elem->QueryStringAttribute("type", &type);
   elem->QueryStringAttribute("key", &key);
 
-  MITK_INFO << "Query \""<< type <<"\" : " << key;
+  //MITK_INFO << "Query \""<< type <<"\" : " << key;
 
   // construct name of serializer class
   std::string serializername(type);

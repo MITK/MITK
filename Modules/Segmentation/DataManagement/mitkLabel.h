@@ -76,8 +76,8 @@ public:
   Label();
   virtual ~Label();
 
-  TiXmlDocument SerializeLabel() const;
-  bool DeserializeLabel(TiXmlDocument *doc);
+  TiXmlDocument GetAsTiXmlDocument() const;
+  bool LoadFromTiXmlDocument(TiXmlDocument *doc);
 
 protected:
 

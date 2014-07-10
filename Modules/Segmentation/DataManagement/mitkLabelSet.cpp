@@ -244,6 +244,10 @@ void mitk::LabelSet::UpdateLookupTable(int pixelValue)
   m_LookupTable->SetTableValue(pixelValue,rgba);
 }
 
+mitk::Label* mitk::LabelSet::GetLabel(int pixelValue)
+{
+  return m_LabelContainer[pixelValue];
+}
 
 const mitk::Label * mitk::LabelSet::GetLabel(int pixelValue) const
 {

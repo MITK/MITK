@@ -54,7 +54,9 @@ class QmitkPreprocessingView : public QmitkFunctionality
 
   typedef vnl_vector_fixed< double, 3 > GradientDirectionType;
   typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
+  typedef mitk::DiffusionImage<short> MitkDwiType;
   typedef itk::VectorImage< short, 3 > ItkDwiType;
+  typedef itk::ImageDuplicator< ItkDwiType > DwiDuplicatorType;
 
   QmitkPreprocessingView();
   virtual ~QmitkPreprocessingView();
@@ -128,7 +130,7 @@ protected:
   mitk::DiffusionImage<DiffusionPixelType>::Pointer m_DiffusionImage;
   std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;
 
-  void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::DiffusionImage<DiffusionPixelType>::Pointer ImPtr, QString imageName);
+  void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::DiffusionImage<DiffusionPixelType>::Pointer ImPtr, QString imageName, mitk::DataNode* parent);
 };
 
 

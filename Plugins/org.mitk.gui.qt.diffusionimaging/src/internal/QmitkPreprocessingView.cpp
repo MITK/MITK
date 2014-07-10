@@ -328,7 +328,7 @@ void QmitkPreprocessingView::DoResampleImage()
         QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
 
         imageNode->SetName((name+"_resampled_"+outAdd).toStdString().c_str());
-        GetDefaultDataStorage()->Add(imageNode);
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
     }
     else if (m_SelectedImage.IsNotNull())
     {
@@ -469,13 +469,14 @@ void QmitkPreprocessingView::TemplatedResampleImage( itk::Image<TPixel, VImageDi
     QString name = m_SelectedImageNode->GetName().c_str();
 
     imageNode->SetName((name+"_resampled_"+outAdd).toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode);
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
 }
 
 void QmitkPreprocessingView::DoApplyDirectionMatrix()
 {
     if (m_DiffusionImage.IsNotNull())
     {
+        MitkDwiType::Pointer newDwi = m_DiffusionImage->GetDeepCopy();
         ItkDwiType::DirectionType newDirection;
         for (int r=0; r<3; r++)
             for (int c=0; c<3; c++)
@@ -486,7 +487,7 @@ void QmitkPreprocessingView::DoApplyDirectionMatrix()
                 newDirection[r][c] = item->text().toDouble();
             }
 
-        ItkDwiType::Pointer itkDwi = m_DiffusionImage->GetVectorImage();
+        ItkDwiType::Pointer itkDwi = newDwi->GetVectorImage();
 
         typedef mitk::DiffusionImage<DiffusionPixelType>  MitkDwiType;
         vnl_matrix_fixed< double,3,3 > oldInverseDirection = itkDwi->GetDirection().GetInverse();
@@ -503,11 +504,17 @@ void QmitkPreprocessingView::DoApplyDirectionMatrix()
             newGradients->InsertElement(i, newG*mag);
         }
 
-        m_DiffusionImage->SetDirections(newGradients);
+        newDwi->SetDirections(newGradients);
         itkDwi->SetDirection(newDirection);
-        m_DiffusionImage->InitializeFromVectorImage();
+        newDwi->InitializeFromVectorImage();
 
-        mitk::RenderingManager::GetInstance()->InitializeViews( m_SelectedDiffusionNodes.back()->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( newDwi );
+        QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+        imageNode->SetName((name+"_newdirection").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+
+        mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
     else if (m_SelectedImage.IsNotNull())
@@ -547,8 +554,15 @@ void QmitkPreprocessingView::TemplatedApplyRotation( itk::Image<TPixel, VImageDi
         ++it;
     }
 
-    m_SelectedImage->InitializeByItk(newImage.GetPointer());
-    m_SelectedImage->SetVolume(newImage->GetBufferPointer());
+    mitk::Image::Pointer newMitkImage = mitk::Image::New();
+    newMitkImage->InitializeByItk(newImage.GetPointer());
+    newMitkImage->SetVolume(newImage->GetBufferPointer());
+
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( newMitkImage );
+    QString name = m_SelectedImageNode->GetName().c_str();
+    imageNode->SetName((name+"_newdirection").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
 
     mitk::RenderingManager::GetInstance()->InitializeViews( m_SelectedImageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -598,7 +612,7 @@ void QmitkPreprocessingView::DoDwiNormalization()
     QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
 
     imageNode->SetName((name+"_normalized").toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode);
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
 }
 
 void QmitkPreprocessingView::DoLengthCorrection()
@@ -623,10 +637,10 @@ void QmitkPreprocessingView::DoLengthCorrection()
 
     mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
     imageNode->SetData( image );
-    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
 
     imageNode->SetName((name+"_rounded").toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode);
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
 }
 
 void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
@@ -637,7 +651,7 @@ void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
     UpdateBValueTableWidget(i);
 }
 
-void QmitkPreprocessingView::CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::DiffusionImage<DiffusionPixelType>::Pointer ImPtr, QString imageName)
+void QmitkPreprocessingView::CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::DiffusionImage<DiffusionPixelType>::Pointer ImPtr, QString imageName, mitk::DataNode* parent)
 {
     typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
 
@@ -675,7 +689,7 @@ void QmitkPreprocessingView::CallMultishellToSingleShellFilter(itk::DWIVoxelFunc
     imageNode = mitk::DataNode::New();
     imageNode->SetData( outImage );
     imageNode->SetName(imageName.toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode);
+    GetDefaultDataStorage()->Add(imageNode, parent);
 
     //  if(m_Controls->m_OutputRMSErrorImage->isChecked()){
     //    // create new Error image
@@ -712,7 +726,7 @@ void QmitkPreprocessingView::DoBiExpFit()
         const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
         functor->setListOfBValues(bValueList);
         functor->setTargetBValue(targetBValue);
-        CallMultishellToSingleShellFilter(functor,inImage,name + "_BiExp");
+        CallMultishellToSingleShellFilter(functor,inImage,name + "_BiExp", m_SelectedDiffusionNodes.at(i));
     }
 }
 
@@ -737,7 +751,7 @@ void QmitkPreprocessingView::DoAKCFit()
         const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
         functor->setListOfBValues(bValueList);
         functor->setTargetBValue(targetBValue);
-        CallMultishellToSingleShellFilter(functor,inImage,name + "_AKC");
+        CallMultishellToSingleShellFilter(functor,inImage,name + "_AKC", m_SelectedDiffusionNodes.at(i));
     }
 }
 
@@ -767,7 +781,7 @@ void QmitkPreprocessingView::DoADCAverage()
         const double targetBValue = m_Controls->m_targetBValueSpinBox->value();
         functor->setListOfBValues(bValueList);
         functor->setTargetBValue(targetBValue);
-        CallMultishellToSingleShellFilter(functor,inImage,name + "_ADC");
+        CallMultishellToSingleShellFilter(functor,inImage,name + "_ADC", m_SelectedDiffusionNodes.at(i));
     }
 }
 
@@ -797,7 +811,7 @@ void QmitkPreprocessingView::DoAdcCalculation()
         QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
 
         imageNode->SetName((name+"_ADC").toStdString().c_str());
-        GetDefaultDataStorage()->Add(imageNode);
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.at(i));
     }
 }
 
@@ -1001,12 +1015,20 @@ void QmitkPreprocessingView::Deactivated()
 
 void QmitkPreprocessingView::DoHalfSphereGradientDirections()
 {
-    GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();
+    MitkDwiType::Pointer newDwi = m_DiffusionImage->GetDeepCopy();
+    GradientDirectionContainerType::Pointer gradientContainer = newDwi->GetDirections();
 
     for (unsigned int j=0; j<gradientContainer->Size(); j++)
         if (gradientContainer->at(j)[0]<0)
             gradientContainer->at(j) = -gradientContainer->at(j);
-    m_DiffusionImage->SetDirections(gradientContainer);
+
+    newDwi->SetDirections(gradientContainer);
+
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( newDwi );
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    imageNode->SetName((name+"_halfsphere").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
 }
 
 void QmitkPreprocessingView::DoApplyMesurementFrame()
@@ -1023,7 +1045,15 @@ void QmitkPreprocessingView::DoApplyMesurementFrame()
                 return;
             mf[r][c] = item->text().toDouble();
         }
-    m_DiffusionImage->SetMeasurementFrame(mf);
+
+    MitkDwiType::Pointer newDwi = m_DiffusionImage->GetDeepCopy();
+    newDwi->SetMeasurementFrame(mf);
+
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( newDwi );
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    imageNode->SetName((name+"_new-MF").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
 }
 
 void QmitkPreprocessingView::DoShowGradientDirections()
@@ -1163,7 +1193,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
     imageNode->SetData( image );
 
     imageNode->SetName(name.toStdString().c_str());
-    GetDefaultDataStorage()->Add(imageNode);
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
 }
 
 void QmitkPreprocessingView::MergeDwis()
@@ -1266,7 +1296,7 @@ void QmitkPreprocessingView::ExtractB0()
         node->SetData( mitkImage );
         node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0"));
 
-        GetDefaultDataStorage()->Add(node);
+        GetDefaultDataStorage()->Add(node, (*itemiter));
 
         ++itemiter;
     }
@@ -1309,7 +1339,7 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
         node->SetData( mitkImage );
         node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0_ALL"));
 
-        GetDefaultDataStorage()->Add(node);
+        GetDefaultDataStorage()->Add(node, (*itemiter));
 
         /*A reinitialization is needed to access the time channels via the ImageNavigationController
     The Global-Geometry can not recognize the time channel without a re-init.
@@ -1331,15 +1361,20 @@ void QmitkPreprocessingView::AverageGradients()
     mitk::DataStorage::SetOfObjects::const_iterator itemiter( m_SelectedDiffusionNodes.begin() );
     mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_SelectedDiffusionNodes.end() );
 
-    std::vector<mitk::DataNode::Pointer> nodes;
     while ( itemiter != itemiterend ) // for all items
     {
-
-        mitk::DiffusionImage<DiffusionPixelType>* vols =
+        mitk::DiffusionImage<DiffusionPixelType>* mitkDwi =
                 static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
                     (*itemiter)->GetData());
 
-        vols->AverageRedundantGradients(m_Controls->m_Blur->value());
+        MitkDwiType::Pointer newDwi = mitkDwi->GetDeepCopy();
+        newDwi->AverageRedundantGradients(m_Controls->m_Blur->value());
+
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( newDwi );
+        QString name = (*itemiter)->GetName().c_str();
+        imageNode->SetName((name+"_averaged").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, (*itemiter));
 
         ++itemiter;
     }

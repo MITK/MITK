@@ -68,7 +68,6 @@ public:
   */
   Message<> AfterchangeLayerEvent;
 
-
   /**
     * \brief  */
   virtual void Initialize(const mitk::Image* image);
@@ -196,12 +195,14 @@ public:
 
   void OnLabelSetModified();
 
+  void SetExteriorLabel(mitk::Label * label);
+
+  mitk::Label* GetExteriorLabel();
+
 protected:
   LabelSetImage();
   LabelSetImage(mitk::LabelSetImage*);
   virtual ~LabelSetImage();
-
-  Label::Pointer CreateExteriorLabel();
 
   template < typename ImageType1, typename ImageType2 >
   void ChangeLayerProcessing( ImageType1* source, ImageType2* target );
@@ -244,6 +245,7 @@ protected:
 
   int m_ActiveLayer;
 
+  mitk::Label::Pointer m_ExteriorLabel;
 
 };
 

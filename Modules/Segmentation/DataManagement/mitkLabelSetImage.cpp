@@ -35,16 +35,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkCommand.h>
 
-mitk::LabelSetImage::LabelSetImage() : mitk::Image(),
-  m_ActiveLayer(0)
+mitk::LabelSetImage::LabelSetImage() :
+  mitk::Image(),
+  m_ActiveLayer(0),
+  m_ExteriorLabel(NULL)
 {
-
+  // Iniitlaize Background Label
+  // If you want to store more information,
+  // please add it to the exterior label via SetProperty command.
+  m_ExteriorLabel = GetExteriorLabel();
 }
 
 void mitk::LabelSetImage::OnLabelSetModified()
 {
   Superclass::Modified();
 }
+
+void mitk::LabelSetImage::SetExteriorLabel(mitk::Label * label)
+{
+  m_ExteriorLabel(label);
+}
+
+mitk::Label* mitk::LabelSetImage::GetExteriorLabel()
+{
+    if(m_ExteriorLabel.IsNull())
+    {
+      mitk::Color color;
+      color[0] = 0.0;
+      color[1] = 0.0;
+      color[2] = 0.0;
+      color[3] = 0.0;
+      m_ExteriorLabel = mitk::Label::New();
+      m_ExteriorLabel->SetColor(color);
+      m_ExteriorLabel->SetName("Exterior");
+      m_ExteriorLabel->SetOpacity(0.0);
+      m_ExteriorLabel->SetLocked(false);
+      m_ExteriorLabel->SetValue(0);
+    }
+    return m_ExteriorLabel;
+  }
 
 mitk::LabelSetImage::LabelSetImage(mitk::LabelSetImage* other) : mitk::Image(), m_ActiveLayer(0)
 {
@@ -154,7 +183,6 @@ mitk::LabelSetImage::VectorImageType::Pointer mitk::LabelSetImage::GetVectorImag
         ++targetIter;
       }
     }
-
     return newVectorImage;
   }
   catch(itk::ExceptionObject& e)
@@ -251,8 +279,8 @@ int mitk::LabelSetImage::AddLayer()
   ls->SetLayer(newLabelSetId);
 
   // Add exterior Label to label set
-  mitk::Label::Pointer exteriorLabel = CreateExteriorLabel();
-  ls->AddLabel(*exteriorLabel);
+  //mitk::Label::Pointer exteriorLabel = CreateExteriorLabel();
+  ls->AddLabel(GetExteriorLabel());
   ls->SetActiveLabel(0 /*Exterior Label*/);
 
   // push a new working image for the new layer
@@ -318,7 +346,7 @@ void mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
       it++;// skip exterior
       while(it != end)
       {
-        GetLabelSet()->AddLabel(*(it->second));
+        GetLabelSet()->AddLabel((it->second));
         //AddLabelEvent.Send();
         it++;
       }
@@ -707,7 +735,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
       label->SetOpacity( rgba[3] );
       label->SetValue( sourceValue );
 
-      GetLabelSet()->AddLabel(*label);
+      GetLabelSet()->AddLabel(label);
 
       MITK_INFO << GetActiveLabelSet()->GetNumberOfLabels();
       if(GetActiveLabelSet()->GetNumberOfLabels() >= 255 || sourceValue >= 255)

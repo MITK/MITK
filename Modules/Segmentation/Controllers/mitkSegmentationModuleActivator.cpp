@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModule.h>
 
 #include "mitkToolManagerProvider.h"
-
+#include "mitkSegmentationDataNodeReader.h"
 namespace mitk
 {
   /**
@@ -35,6 +35,9 @@ namespace mitk
       /*register ToolManager provider service*/
       m_ToolManagerProvider = mitk::ToolManagerProvider::New();
       context->RegisterService<mitk::ToolManagerProvider>(m_ToolManagerProvider);
+
+      m_SegmentationDataNodeReader.reset(new mitk::SegmentationDataNodeReader);
+      context->RegisterService(m_SegmentationDataNodeReader.get());
     }
 
     void Unload(us::ModuleContext*)
@@ -42,6 +45,9 @@ namespace mitk
     }
 
   private:
+
+
+    std::auto_ptr<IDataNodeReader> m_SegmentationDataNodeReader;
     mitk::ToolManagerProvider::Pointer m_ToolManagerProvider;
   };
 }

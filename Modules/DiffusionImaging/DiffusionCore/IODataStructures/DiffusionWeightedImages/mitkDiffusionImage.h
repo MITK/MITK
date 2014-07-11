@@ -155,7 +155,7 @@ public:
   /**
   * \brief Return deep copy of this image
   */
-  mitk::DiffusionImage< TPixelType >::Pointer GetDeepCopy();
+  mitk::DiffusionImage< TPixelType >* GetDeepCopy();
 
 protected:
   mitkCloneMacro(Self);

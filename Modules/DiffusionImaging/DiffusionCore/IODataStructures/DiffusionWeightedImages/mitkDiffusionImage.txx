@@ -152,7 +152,7 @@ void mitk::DiffusionImage<TPixelType>
 
 
 template<typename TPixelType>
-typename mitk::DiffusionImage< TPixelType >::Pointer mitk::DiffusionImage<TPixelType>::GetDeepCopy()
+typename mitk::DiffusionImage< TPixelType >* mitk::DiffusionImage<TPixelType>::GetDeepCopy()
 {
     typename DwiDuplicatorType::Pointer duplicator = DwiDuplicatorType::New();
     duplicator->SetInputImage(this->GetVectorImage());

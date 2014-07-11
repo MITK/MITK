@@ -150,30 +150,6 @@ void mitk::DiffusionImage<TPixelType>
   MITK_INFO << "Diffusion-Image successfully initialized.";
 }
 
-
-template<typename TPixelType>
-typename mitk::DiffusionImage< TPixelType >* mitk::DiffusionImage<TPixelType>::GetDeepCopy()
-{
-    typename DwiDuplicatorType::Pointer duplicator = DwiDuplicatorType::New();
-    duplicator->SetInputImage(this->GetVectorImage());
-    duplicator->Update();
-
-    mitk::DiffusionImage< TPixelType >::Pointer newDwi = mitk::DiffusionImage< TPixelType >::New();
-    newDwi->SetVectorImage( duplicator->GetOutput() );
-    newDwi->SetReferenceBValue(this->GetReferenceBValue());
-
-    GradientDirectionContainerType::Pointer newDirectionContainer = GradientDirectionContainerType::New();
-    for (unsigned int i=0; i<this->GetDirectionsWithoutMeasurementFrame()->Size(); i++)
-    {
-        newDirectionContainer->InsertElement(i, this->GetDirectionsWithoutMeasurementFrame()->GetElement(i));
-    }
-    newDwi->SetDirections(newDirectionContainer);
-    newDwi->SetMeasurementFrame(this->GetMeasurementFrame());
-    newDwi->InitializeFromVectorImage();
-
-    return newDwi;
-}
-
 template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>
 ::SetDisplayIndexForRendering(int displayIndex)

@@ -151,12 +151,6 @@ public:
   void AverageRedundantGradients(double precision);
   void SetDisplayIndexForRendering(int displayIndex);
 
-
-  /**
-  * \brief Return deep copy of this image
-  */
-  mitk::DiffusionImage< TPixelType >* GetDeepCopy();
-
 protected:
   mitkCloneMacro(Self);
 

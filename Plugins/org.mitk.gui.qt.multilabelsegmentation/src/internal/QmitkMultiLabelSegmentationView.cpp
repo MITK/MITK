@@ -131,7 +131,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualToolSelectionBox3D->SetToolManager(*m_ToolManager);
 
   m_Controls.m_LabelSetWidget->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_LabelSetWidget->SetOrganColors(this->GetDefaultOrganColorString());
+  m_Controls.m_LabelSetWidget->SetOrganColors(mitk::OrganNamesHandling::GetDefaultOrganColorString());
   m_Controls.m_LabelSetWidget->hide();
 
   m_Controls.m_SurfaceBasedInterpolatorWidget->SetDataStorage( *(this->GetDataStorage()) );
@@ -426,7 +426,7 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
   assert(workingImage);
 
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent );
-  dialog->SetSuggestionList( this->GetDefaultOrganColorString() );
+  dialog->SetSuggestionList( mitk::OrganNamesHandling::GetDefaultOrganColorString() );
   dialog->setWindowTitle("New Label");
 
   int dialogReturnValue = dialog->exec();

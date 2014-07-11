@@ -484,7 +484,7 @@ void QmitkPreprocessingView::DoApplyDirectionMatrix()
 {
     if (m_DiffusionImage.IsNotNull())
     {
-        MitkDwiType::Pointer newDwi = m_DiffusionImage->GetDeepCopy();
+        MitkDwiType::Pointer newDwi = m_DiffusionImage->Clone();
         ItkDwiType::DirectionType newDirection;
         for (int r=0; r<3; r++)
             for (int c=0; c<3; c++)
@@ -1023,7 +1023,8 @@ void QmitkPreprocessingView::Deactivated()
 
 void QmitkPreprocessingView::DoHalfSphereGradientDirections()
 {
-    MitkDwiType::Pointer newDwi = m_DiffusionImage->GetDeepCopy();
+
+    MitkDwiType::Pointer newDwi = m_DiffusionImage->Clone();
     GradientDirectionContainerType::Pointer gradientContainer = newDwi->GetDirections();
 
     for (unsigned int j=0; j<gradientContainer->Size(); j++)
@@ -1054,7 +1055,7 @@ void QmitkPreprocessingView::DoApplyMesurementFrame()
             mf[r][c] = item->text().toDouble();
         }
 
-    MitkDwiType::Pointer newDwi = m_DiffusionImage->GetDeepCopy();
+    MitkDwiType::Pointer newDwi = m_DiffusionImage->Clone();
     newDwi->SetMeasurementFrame(mf);
 
     mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
@@ -1375,7 +1376,7 @@ void QmitkPreprocessingView::AverageGradients()
                 static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
                     (*itemiter)->GetData());
 
-        MitkDwiType::Pointer newDwi = mitkDwi->GetDeepCopy();
+        MitkDwiType::Pointer newDwi = mitkDwi->Clone();
         newDwi->AverageRedundantGradients(m_Controls->m_Blur->value());
 
         mitk::DataNode::Pointer imageNode = mitk::DataNode::New();

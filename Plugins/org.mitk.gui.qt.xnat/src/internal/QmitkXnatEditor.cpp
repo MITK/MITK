@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // CTK XNAT Core
 #include "ctkXnatObject.h"
 #include "ctkXnatDataModel.h"
-#include "ctkXnatScanResource.h"
+#include "ctkXnatResource.h"
 #include "ctkXnatFile.h"
 
 // CTK XNAT Widgets
@@ -257,7 +257,7 @@ void QmitkXnatEditor::DownloadResource()
   QVariant variant = m_ListModel->data(index, Qt::UserRole);
   if ( variant.isValid() )
   {
-    ctkXnatScanResource* resource = dynamic_cast<ctkXnatScanResource*>(variant.value<ctkXnatObject*>());
+    ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(variant.value<ctkXnatObject*>());
     if (resource != NULL)
     {
       MITK_INFO << "Download started ...";

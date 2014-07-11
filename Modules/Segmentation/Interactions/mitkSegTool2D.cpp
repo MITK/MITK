@@ -207,10 +207,10 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionP
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const InteractionPositionEvent* positionEvent)
 {
   DataNode* referenceNode( m_ToolManager->GetReferenceData(0) );
-  assert(referenceNode);
+  if(referenceNode == NULL) return NULL;
 
   Image* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
-  assert(referenceImage);
+  if(referenceImage == NULL) return NULL;
 
   return GetAffectedImageSliceAs2DImage( positionEvent, referenceImage );
 }

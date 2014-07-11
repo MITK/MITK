@@ -340,6 +340,9 @@ bool mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction* action, Interacti
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
 
+  if( m_ReferenceSlice.IsNull()) return false;
+  if( m_WorkingSlice.IsNull()) return false;
+
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
   ApplicationCursor* cursor = ApplicationCursor::GetInstance();

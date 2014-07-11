@@ -314,46 +314,66 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
   bool hasReferenceNode = referenceNode != NULL;
 
-  m_Controls.m_pbNewSegmentationSession->setEnabled(hasReferenceNode);
-
-  if(!hasReferenceNode) return;
-
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   bool hasWorkingNode = workingNode != NULL;
 
-  m_Controls.m_LabelSetWidget->setEnabled(hasWorkingNode);
-  m_Controls.m_pbNewLabel->setEnabled(hasWorkingNode);
-  m_Controls.m_gbInterpolation->setEnabled(hasWorkingNode);
-  m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(hasWorkingNode);
-  m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(hasWorkingNode);
-  m_Controls.m_btDeactivateTool->setEnabled(hasWorkingNode);
-  m_Controls.m_btAddLayer->setEnabled(hasWorkingNode);
-
+  m_Controls.m_pbNewSegmentationSession->setEnabled(false);
+  m_Controls.m_pbNewLabel->setEnabled(false);
+  m_Controls.m_gbInterpolation->setEnabled(false);
+  m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(false);
+  m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(false);
+  m_Controls.m_btDeactivateTool->setEnabled(false);
+  m_Controls.m_LabelSetWidget->setEnabled(false);
+  m_Controls.m_btAddLayer->setEnabled(false);
   m_Controls.m_btDeleteLayer->setEnabled(false);
+  m_Controls.m_cbActiveLayer->setEnabled(false);
+  m_Controls.m_cbActiveLayer->setCurrentIndex(false);
   m_Controls.m_btPreviousLayer->setEnabled(false);
   m_Controls.m_btNextLayer->setEnabled(false);
-  m_Controls.m_cbActiveLayer->setEnabled(false);
-  m_Controls.m_btLockExterior->setEnabled(false);
+  m_Controls.m_btLockExterior->setChecked(false);
+  m_Controls.m_pbShowLabelTable->setChecked(false);
 
-  if (!hasWorkingNode) return;
+  m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
+  m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
 
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  if(hasReferenceNode)
+  {
+    m_Controls.m_pbNewSegmentationSession->setEnabled(true);
+  }
 
-  int activeLayer = workingImage->GetActiveLayer();
-  int numberOfLayers = workingImage->GetNumberOfLayers();
+  if(hasWorkingNode)
+  {
+    m_Controls.m_pbNewLabel->setEnabled(true);
+    m_Controls.m_gbInterpolation->setEnabled(true);
+    m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(true);
+    m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(true);
+    m_Controls.m_btDeactivateTool->setEnabled(true);
+    m_Controls.m_LabelSetWidget->setEnabled(true);
+    m_Controls.m_btAddLayer->setEnabled(true);
 
-  m_Controls.m_btDeleteLayer->setEnabled(numberOfLayers>1);
-  m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers>1);
-  m_Controls.m_cbActiveLayer->setCurrentIndex(activeLayer);
-  m_Controls.m_btPreviousLayer->setEnabled(activeLayer>0);
-  m_Controls.m_btNextLayer->setEnabled(activeLayer!=numberOfLayers-1);
-  m_Controls.m_btLockExterior->setChecked(workingImage->GetLabel(0)->GetLocked());
+    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
 
-  int layer = -1;
-  referenceNode->GetIntProperty("layer", layer);
-  workingNode->SetIntProperty("layer", layer+1);
+    int activeLayer = workingImage->GetActiveLayer();
+    int numberOfLayers = workingImage->GetNumberOfLayers();
 
-  m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() >= 1);
+    m_Controls.m_btDeleteLayer->setEnabled(numberOfLayers>1);
+    m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers>1);
+    m_Controls.m_cbActiveLayer->setCurrentIndex(activeLayer);
+    m_Controls.m_btPreviousLayer->setEnabled(activeLayer>0);
+    m_Controls.m_btNextLayer->setEnabled(activeLayer!=numberOfLayers-1);
+    m_Controls.m_btLockExterior->setChecked(workingImage->GetLabel(0)->GetLocked());
+
+    m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() > 1 /*1st is exterior*/);
+
+    m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithWorkingDataVisible);
+  }
+
+  if(hasWorkingNode && hasReferenceNode)
+  {
+    int layer = -1;
+    referenceNode->GetIntProperty("layer", layer);
+    workingNode->SetIntProperty("layer", layer+1);
+  }
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }

@@ -49,6 +49,8 @@ private slots:
 
 private:
   void OnNodeRemovedFromDataStorage(const mitk::DataNode* node);
+  void ResetSimulationSceneTreeWidget();
+  void SetSimulationControlsEnabled(bool enabled);
 
   static const int MSecsPerFrame = 17;
 

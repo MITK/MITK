@@ -66,23 +66,32 @@ void QmitkSimulationView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.dtSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnDtChanged(double)));
 
   if (m_Controls.simulationComboBox->GetSelectedNode().IsNotNull())
+  {
     this->OnSelectedSimulationChanged(m_Controls.simulationComboBox->GetSelectedNode());
+  }
+  else
+  {
+    this->SetSimulationControlsEnabled(false);
+  }
 }
 
 void QmitkSimulationView::OnAnimateButtonToggled(bool toggled)
 {
-  mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
   mitk::Scheduler* scheduler = m_SimulationService->GetScheduler();
 
   if (toggled)
   {
+    mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
+
     simulation->SetAnimationFlag(true);
     scheduler->AddProcess(simulation);
 
     m_Controls.stepButton->setEnabled(false);
   }
-  else
+  else if (m_Selection.IsNotNull())
   {
+    mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
+
     scheduler->RemoveProcess(simulation);
     simulation->SetAnimationFlag(false);
 
@@ -102,6 +111,9 @@ void QmitkSimulationView::OnAnimateButtonToggled(bool toggled)
 
 void QmitkSimulationView::OnDtChanged(double dt)
 {
+  if (m_Selection.IsNull())
+    return;
+
   mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
   simulation->SetDt(std::max(0.0, dt));
 }
@@ -109,14 +121,18 @@ void QmitkSimulationView::OnDtChanged(double dt)
 void QmitkSimulationView::OnNodeRemovedFromDataStorage(const mitk::DataNode* node)
 {
   mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(node->GetData());
-  mitk::Scheduler* scheduler = m_SimulationService->GetScheduler();
 
   if (simulation.IsNotNull())
   {
+    mitk::Scheduler* scheduler = m_SimulationService->GetScheduler();
+
     scheduler->RemoveProcess(simulation);
 
     if (scheduler->IsEmpty() && m_Timer.isActive())
       m_Timer.stop();
+
+    if (m_SimulationService->GetActiveSimulation() == simulation)
+      m_SimulationService->SetActiveSimulation(NULL);
   }
 }
 
@@ -140,14 +156,18 @@ void QmitkSimulationView::OnSelectedSimulationChanged(const mitk::DataNode* node
 
     m_Controls.animateButton->setChecked(simulation->GetAnimationFlag());
     m_Controls.dtSpinBox->setValue(simulation->GetRootNode()->getDt());
-    m_Controls.simulationGroupBox->setEnabled(true);
+    this->SetSimulationControlsEnabled(true);
   }
   else
   {
-    m_Controls.simulationGroupBox->setEnabled(false);
+    m_Selection = NULL;
+
+    this->SetSimulationControlsEnabled(false);
     m_Controls.animateButton->setChecked(false);
     m_Controls.dtSpinBox->setValue(0.0);
   }
+
+  this->ResetSimulationSceneTreeWidget();
 }
 
 void QmitkSimulationView::OnStep(bool renderWindowUpdate)
@@ -166,6 +186,9 @@ void QmitkSimulationView::OnStep(bool renderWindowUpdate)
 
 void QmitkSimulationView::OnStepButtonClicked()
 {
+  if (m_Selection.IsNull())
+    return;
+
   mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
 
   m_SimulationService->SetActiveSimulation(simulation);
@@ -187,6 +210,28 @@ void QmitkSimulationView::OnTimeout()
     m_NextRenderWindowUpdate = currentTime.addMSecs(MSecsPerFrame);
     this->OnStep(true);
   }
+}
+
+void QmitkSimulationView::ResetSimulationSceneTreeWidget()
+{
+  m_Controls.simulationSceneTreeWidget->clear();
+
+  if (m_Selection.IsNull())
+    return;
+
+  mitk::Simulation::Pointer simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
+
+  m_Controls.simulationSceneTreeWidget->addChild(NULL, simulation->GetRootNode().get());
+  m_Controls.simulationSceneTreeWidget->expandItem(m_Controls.simulationSceneTreeWidget->topLevelItem(0));
+}
+
+void QmitkSimulationView::SetSimulationControlsEnabled(bool enabled)
+{
+  m_Controls.animateButton->setEnabled(enabled);
+  m_Controls.stepButton->setEnabled(enabled);
+  m_Controls.resetButton->setEnabled(enabled);
+  m_Controls.dtLabel->setEnabled(enabled);
+  m_Controls.dtSpinBox->setEnabled(enabled);
 }
 
 void QmitkSimulationView::SetFocus()

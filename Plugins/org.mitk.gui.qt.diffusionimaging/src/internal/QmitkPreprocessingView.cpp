@@ -241,7 +241,7 @@ void QmitkPreprocessingView::DoResampleImage()
     if (m_DiffusionImage.IsNotNull())
     {
         typedef itk::ResampleDwiImageFilter< short > ResampleFilter;
-        typename ResampleFilter::Pointer resampler = ResampleFilter::New();
+        ResampleFilter::Pointer resampler = ResampleFilter::New();
         resampler->SetInput(m_DiffusionImage->GetVectorImage());
 
         switch (m_Controls->m_ResampleTypeBox->currentIndex())

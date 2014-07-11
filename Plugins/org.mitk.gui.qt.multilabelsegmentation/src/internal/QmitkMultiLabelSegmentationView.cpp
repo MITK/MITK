@@ -453,8 +453,10 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
 
   if ( dialogReturnValue == QDialog::Rejected ) return;
 
-  workingImage->GetActiveLabelSet()->AddLabel(dialog->GetSegmentationName().toStdString(), dialog->GetColor());
-  //m_Controls.m_LabelSetWidget->ResetTableWidget();
+  QString segName = dialog->GetSegmentationName();
+  if(segName.isEmpty()) segName = "Unnamed";
+  workingImage->GetActiveLabelSet()->AddLabel(segName.toStdString(), dialog->GetColor());
+
   UpdateControls();
 }
 

@@ -327,7 +327,6 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   m_Controls.m_btAddLayer->setEnabled(false);
   m_Controls.m_btDeleteLayer->setEnabled(false);
   m_Controls.m_cbActiveLayer->setEnabled(false);
-  m_Controls.m_cbActiveLayer->setCurrentIndex(false);
   m_Controls.m_btPreviousLayer->setEnabled(false);
   m_Controls.m_btNextLayer->setEnabled(false);
   m_Controls.m_btLockExterior->setChecked(false);

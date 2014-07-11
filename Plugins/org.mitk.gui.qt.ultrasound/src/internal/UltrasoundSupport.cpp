@@ -108,7 +108,7 @@ m_Node->SetData(curOutput);
 if(!mitk::Equal(m_OldGeometry.GetPointer(),curOutput->GetGeometry(),0.0001,false))
 {
 mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-if ( renderWindow != NULL && curOutput->GetTimeGeometry()->IsValid() )
+if ( (renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()) )
 {
 renderWindow->GetRenderingManager()->InitializeViews(
 curOutput->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );

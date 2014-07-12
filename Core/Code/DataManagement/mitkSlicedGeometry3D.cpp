@@ -797,7 +797,7 @@ void
       //
       // 1st Step: Reorient Normal Vector of first plane
       //
-      Point3D center = planeOp->GetPoint(); //m_ReferenceGeometry->GetCenter();
+      Point3D center = m_ReferenceGeometry->GetCenter();
       mitk::Vector3D currentNormal = planeGeometry->GetNormal();
       mitk::Vector3D newNormal;
       if (planeOp->AreAxisDefined())

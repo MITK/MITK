@@ -50,6 +50,7 @@ set(module_dirs
     Persistence
     IGTUI
     VtkShaders
+    DicomRT
 )
 
 if(MITK_ENABLE_PIC_READER)

@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkVtkInteractorStyle.h"
+#include "mitkAbstractTransformGeometry.h"
 
 // VTK
 #include <vtkRenderer.h>
@@ -904,7 +905,9 @@ void mitk::VtkPropRenderer::AdjustCameraToScene(){
     }
 
     const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( this->GetCurrentWorldPlaneGeometry() );
-    if ( planeGeometry != NULL )
+    const AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< const AbstractTransformGeometry * >( planeGeometry );
+
+    if ( planeGeometry != NULL && !abstractTransformGeometry)
     {
       //Transform the camera to the current position (transveral, coronal and saggital plane).
       //This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.

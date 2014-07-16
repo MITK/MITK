@@ -63,6 +63,7 @@ set(H_FILES
   SignalModels/mitkDotModel.h
   SignalModels/mitkAstroStickModel.h
   SignalModels/mitkStickModel.h
+  SignalModels/mitkRawShModel.h
   SignalModels/mitkDiffusionNoiseModel.h
   SignalModels/mitkRicianNoiseModel.h
   SignalModels/mitkChiSquareNoiseModel.h

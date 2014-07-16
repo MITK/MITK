@@ -130,7 +130,9 @@ public:
   {
     if (m_GrabbedHandle != -1)
     {
+      float y = GetFunctionY(m_GrabbedHandle);
       this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair(x,GetFunctionY(m_GrabbedHandle))));
+      m_GrabbedHandle = GetNearHandle(x,y);
       update();
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -140,7 +142,9 @@ public:
   {
     if (m_GrabbedHandle != -1)
     {
+      float x = GetFunctionX(m_GrabbedHandle);
       this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair(GetFunctionX(m_GrabbedHandle),y)));
+      m_GrabbedHandle = GetNearHandle(x,y);
       update();
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }

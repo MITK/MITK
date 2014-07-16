@@ -34,7 +34,7 @@ namespace mitk
   RTDoseReader::~RTDoseReader(){}
 
   mitk::DataNode::Pointer RTDoseReader::
-      LoadRTDose(DcmDataset* dataset, char* filename)
+      LoadRTDose(DcmDataset* dataset, const char* filename)
   {
     std::string name = filename;
     itk::FilenamesContainer file;

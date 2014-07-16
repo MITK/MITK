@@ -14,15 +14,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestingMacros.h"
-#include "mitkRTDoseReader.h"
-#include <iostream>
+#include <mitkTestingMacros.h>
+#include <mitkTestFixture.h>
 
+#include <mitkRTDoseReader.h>
+#include <mitkIOUtil.h>
 
-int mitkRTDoseReaderTest(int  argc , char* argv[])
+class mitkRTDoseReaderTestSuite : public mitk::TestFixture
 {
-  // always start with this!
-  MITK_TEST_BEGIN("DicomRTReader")
+  CPPUNIT_TEST_SUITE(mitkRTDoseReaderTestSuite);
+  MITK_TEST(TestDoseImage);
+  CPPUNIT_TEST_SUITE_END();
 
-  MITK_TEST_END()
-}
+private:
+
+  mitk::RTDoseReader::Pointer m_rtDoseReader;
+
+public:
+
+  void setUp()
+  {
+    m_rtDoseReader = mitk::RTDoseReader::New();
+    CPPUNIT_ASSERT_MESSAGE("Failed to initialize RTDoseReader", m_rtDoseReader.IsNotNull());
+  }
+
+  void TestDoseImage()
+  {
+    mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("RT/Dose/RT_Dose.nrrd"));
+
+    DcmFileFormat file;
+    file.loadFile(GetTestDataFilePath("RT/Dose/Dose.dcm").c_str(), EXS_Unknown);
+    DcmDataset *dataset = file.getDataset();
+
+    mitk::DataNode::Pointer node = m_rtDoseReader->LoadRTDose(dataset,GetTestDataFilePath("RT/Dose/Dose.dcm").c_str());
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+
+    MITK_ASSERT_EQUAL(refImage, image, "referece-Image and image should be equal");
+
+  }
+
+};
+
+MITK_TEST_SUITE_REGISTRATION(mitkRTDoseReader)

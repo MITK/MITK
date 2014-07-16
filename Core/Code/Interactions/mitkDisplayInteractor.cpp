@@ -300,8 +300,8 @@ bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, Interaction
     directionModifier = -1;
   }
 
-  ScalarType levelModifier = std::max( (ScalarType)0.01, level/100 );
-  ScalarType windowModifier = std::max( (ScalarType)0.01, window/100 );
+  ScalarType levelModifier = std::max( (ScalarType)0.01, fabs(level/1000) );
+  ScalarType windowModifier = std::max( (ScalarType)0.01, fabs(window/1000) );
 
   ScalarType levelChange = m_CurrentDisplayCoordinate[levelIndex] - m_LastDisplayCoordinate[levelIndex];
   ScalarType windowChange = m_CurrentDisplayCoordinate[windowIndex] - m_LastDisplayCoordinate[windowIndex];

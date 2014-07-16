@@ -571,7 +571,6 @@ SliceNavigationController::GetCurrentPlaneGeometry()
   if ( slicedGeometry )
   {
     const mitk::PlaneGeometry *planeGeometry =
-      dynamic_cast< mitk::PlaneGeometry * >
         ( slicedGeometry->GetPlaneGeometry(this->GetSlice()->GetPos()) );
     return planeGeometry;
   }

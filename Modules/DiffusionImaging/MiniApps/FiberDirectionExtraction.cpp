@@ -87,7 +87,7 @@ int FiberDirectionExtraction(int argc, char* argv[])
         fOdfFilter->SetFiberBundle(inputTractogram);
         fOdfFilter->SetMaskImage(itkMaskImage);
         fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
-        fOdfFilter->SetNormalizeVectors(true);
+        fOdfFilter->SetNormalizeVectors(false);
         fOdfFilter->SetUseWorkingCopy(false);
         fOdfFilter->Update();
         ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();

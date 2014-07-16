@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cmath>
 #include <mitkFiberfoxParameters.h>
 #include <itkTimeProbe.h>
+#include <mitkRawShModel.h>
+#include <mitkDiffusionImage.h>
+#include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
 
 namespace itk
 {
@@ -59,6 +62,7 @@ public:
     /** Input */
     itkSetMacro( FiberBundle, FiberBundleType )             ///< Input fiber bundle
     itkSetMacro( UseConstantRandSeed, bool )                ///< Seed for random generator.
+    itkSetMacro( InputDwi, mitk::DiffusionImage<short>::Pointer )
     void SetParameters( FiberfoxParameters<double> param )  ///< Simulation parameters.
     { m_Parameters = param; }
 
@@ -95,6 +99,8 @@ protected:
     std::string                                 m_StatusText;
     itk::TimeProbe                              m_TimeProbe;
     bool                                        m_UseConstantRandSeed;
+    mitk::DiffusionImage<short>::Pointer        m_InputDwi;
+    bool                                        m_NoAcquisitionSimulation;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };
 }

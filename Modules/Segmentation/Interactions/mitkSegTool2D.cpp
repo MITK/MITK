@@ -47,6 +47,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOperationEvent.h"
 #include "mitkUndoController.h"
 
+#include "mitkAbstractTransformGeometry.h"
+
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
 mitk::SegTool2D::SegTool2D(const char* type)
@@ -225,8 +227,9 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEven
   if(!positionEvent) return;
 
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+  const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
 
-  if( planeGeometry && slice)
+  if( planeGeometry && slice && !abstractTransformGeometry)
   {
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
     Image* image = dynamic_cast<Image*>(workingNode->GetData());

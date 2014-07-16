@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
+#include "mitkAbstractTransformGeometry.h"
 
 #include "ipSegmentation.h"
 
@@ -277,8 +278,9 @@ bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
   if (!workingNode) return false;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
+  const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-  if ( !image || !planeGeometry ) return false;
+  if ( !image || !planeGeometry || abstractTransformGeometry ) return false;
 
   Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
 

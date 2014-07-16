@@ -40,7 +40,10 @@ int FiberDirectionExtraction(int argc, char* argv[])
     parser.addArgument("out", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
     parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
     parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
+    parser.addArgument("peakthresh", "t", ctkCommandLineParser::Float, "peak size threshold relative to largest peak in voxel", 0.2, true);
     parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "output optional and intermediate calculation results");
+    parser.addArgument("numdirs", "d", ctkCommandLineParser::Int, "maximum number of fibers per voxel", 3, true);
+    parser.addArgument("normalize", "n", ctkCommandLineParser::Bool, "normalize vectors");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -52,6 +55,10 @@ int FiberDirectionExtraction(int argc, char* argv[])
     if (parsedArgs.count("mask"))
         maskImage = us::any_cast<string>(parsedArgs["mask"]);
 
+    float peakThreshold = 0.2;
+    if (parsedArgs.count("peakthresh"))
+        peakThreshold = us::any_cast<float>(parsedArgs["peakthresh"]);
+
     float angularThreshold = 25;
     if (parsedArgs.count("athresh"))
         angularThreshold = us::any_cast<float>(parsedArgs["athresh"]);
@@ -62,6 +69,13 @@ int FiberDirectionExtraction(int argc, char* argv[])
     if (parsedArgs.count("verbose"))
         verbose = us::any_cast<bool>(parsedArgs["verbose"]);
 
+    int maxNumDirs = 3;
+    if (parsedArgs.count("numdirs"))
+        maxNumDirs = us::any_cast<int>(parsedArgs["numdirs"]);
+
+    bool normalize = false;
+    if (parsedArgs.count("normalize"))
+        normalize = us::any_cast<bool>(parsedArgs["normalize"]);
 
     try
     {
@@ -87,28 +101,30 @@ int FiberDirectionExtraction(int argc, char* argv[])
         fOdfFilter->SetFiberBundle(inputTractogram);
         fOdfFilter->SetMaskImage(itkMaskImage);
         fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
-        fOdfFilter->SetNormalizeVectors(false);
+        fOdfFilter->SetNormalizeVectors(normalize);
         fOdfFilter->SetUseWorkingCopy(false);
+        fOdfFilter->SetSizeThreshold(peakThreshold);
+        fOdfFilter->SetMaxNumDirections(maxNumDirs);
         fOdfFilter->Update();
         ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
 
         // write direction images
-        for (unsigned int i=0; i<directionImageContainer->Size(); i++)
-        {
-            itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
-            typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;
-            WriterType::Pointer writer = WriterType::New();
+//        for (unsigned int i=0; i<directionImageContainer->Size(); i++)
+//        {
+//            itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
+//            typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;
+//            WriterType::Pointer writer = WriterType::New();
 
-            string outfilename = outRoot;
-            outfilename.append("_DIRECTION_");
-            outfilename.append(boost::lexical_cast<string>(i));
-            outfilename.append(".nrrd");
+//            string outfilename = outRoot;
+//            outfilename.append("_DIRECTION_");
+//            outfilename.append(boost::lexical_cast<string>(i));
+//            outfilename.append(".nrrd");
 
-            MITK_INFO << "writing " << outfilename;
-            writer->SetFileName(outfilename.c_str());
-            writer->SetInput(itkImg);
-            writer->Update();
-        }
+//            MITK_INFO << "writing " << outfilename;
+//            writer->SetFileName(outfilename.c_str());
+//            writer->SetInput(itkImg);
+//            writer->Update();
+//        }
 
         if (verbose)
         {

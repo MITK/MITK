@@ -154,9 +154,9 @@ void mitk::ContourUtils::ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDi
   {
     while ( !outputIterator.IsAtEnd() )
     {
-      int targetValue = static_cast<int>(outputIterator.Get());
       if ( inputIterator.Get() != 0 )
       {
+        int targetValue = static_cast<int>(outputIterator.Get());
         if (!workingImage->GetLabelLocked(targetValue))
           outputIterator.Set(overwritevalue);
       }

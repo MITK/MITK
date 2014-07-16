@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageReadAccessor.h"
 
 #include "mitkCorrectorTool2D.xpm"
+#include "mitkLabelSetImage.h"
 
 // us
 #include <usModule.h>
@@ -108,6 +109,14 @@ bool mitk::CorrectorTool2D::OnMousePressed ( StateMachineAction*, InteractionEve
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
 
+  m_PaintingPixelValue = 1;
+  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+  if (workingImage)
+  {
+    m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+  }
+  MITK_INFO << "Painting Pixel Value = " << m_PaintingPixelValue;
+
   return true;
 }
 
@@ -182,4 +191,3 @@ bool mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
 
   return true;
 }
-

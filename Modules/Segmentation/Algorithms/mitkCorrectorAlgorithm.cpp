@@ -88,7 +88,6 @@ void mitk::CorrectorAlgorithm::GenerateData()
   TobiasHeimannCorrectionAlgorithm( temporarySlicePic );
 
   temporarySlice->SetTimeGeometry(originalGeometry);
-
 }
 
 void mitk::CorrectorAlgorithm::TobiasHeimannCorrectionAlgorithm(mitkIpPicDescriptor* pic)
@@ -223,7 +222,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
         TSegData thisSegData;
         thisSegData.lineStart = lineStart;
         thisSegData.lineEnd = lineEnd;
-        thisSegData.modified = modifySegment( lineStart, lineEnd, state, pic, _ofsArray );
+        thisSegData.modified = modifySegment( lineStart, lineEnd, ((state==0)?0:2), pic, _ofsArray );
         segData.push_back( thisSegData );
         numSegments++;
       }
@@ -237,7 +236,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     {
       for (int i=segData[segNr].lineStart+1; i<segData[segNr].lineEnd; i++)
       {
-        *(picdata + _ofsArray[i]) = 1;
+        *(picdata + _ofsArray[i]) = 2; // Replace Value
       }
     }
   }
@@ -264,7 +263,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
         p[2 * i + 1] = (mitkIpInt4_t) _points [2 * i + 1];
       }
 
-      if (state == 0) ipMITKSegmentationCombineRegion (pic, p, num, 0, IPSEGMENTATION_OR,  1);
+      if (state == 0) ipMITKSegmentationCombineRegion (pic, p, num, 0, IPSEGMENTATION_OR,  2); //Replace Value
       else            ipMITKSegmentationCombineRegion (pic, p, num, 0, IPSEGMENTATION_AND, 0);
 
       delete[] p;
@@ -283,7 +282,6 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
 
   if (contourPoints)
   {
-
     // copy point from float* to mitk::Contour
     ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Initialize();
@@ -427,7 +425,7 @@ bool mitk::CorrectorAlgorithm::modifySegment( int lineStart, int lineEnd, ipMITK
     // decision is safe enough:
     ipMITKSegmentationTYPE *end = picdata + (pic->n[0]*pic->n[1]);
     for (current = picdata; current<end; current++) {
-      if (*segSrc == newState) *current = newState;
+      if (*segSrc == newState) *current = newState; // Replace Value
       segSrc++;
     }
     modified = true;
@@ -500,4 +498,3 @@ void mitk::CorrectorAlgorithm::ItkCalculateDifferenceImage( itk::Image<TPixel, V
     ++diffIterator;
   }
 }
-

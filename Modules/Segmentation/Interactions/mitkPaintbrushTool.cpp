@@ -91,7 +91,6 @@ mitk::Point2D mitk::PaintbrushTool::upperLeft(mitk::Point2D p)
 
 void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positionEvent)
 {
-  return;
   //MITK_INFO<<"Update...";
   // examine stateEvent and create a contour that matches the pixel mask that we are going to draw
   //mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
@@ -291,12 +290,14 @@ bool mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEven
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   m_MasterContour->SetClosed(true);
-
-  m_PaintingPixelValue = 1;
-  LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
-  if (workingImage)
+  if (m_PaintingPixelValue > 0)
   {
-    m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    m_PaintingPixelValue = 1;
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+    if (workingImage)
+    {
+      m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    }
   }
 
   return this->MouseMoved(interactionEvent, true);
@@ -442,7 +443,7 @@ bool mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEven
 bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
 {
     // Inversion only for 0 and 1 as painting values
-    if (m_PaintingPixelValue == 1)
+    if (m_PaintingPixelValue > 0)
     {
       m_PaintingPixelValue = 0;
       FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
@@ -450,6 +451,11 @@ bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent*
     else if (m_PaintingPixelValue == 0)
     {
       m_PaintingPixelValue = 1;
+      LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+      if (workingImage)
+      {
+        m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+      }
       FeedbackContourTool::SetFeedbackContourColorDefault();
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -465,15 +471,10 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
 
     if(m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
     {
-      MITK_INFO << "2";
       m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
-      MITK_INFO << "3";
       m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
-      MITK_INFO << "4";
       //m_WorkingNode->ReplaceProperty( "color", m_WorkingNode->GetProperty("color") );
-      MITK_INFO << "5";
       m_WorkingNode->SetData(m_WorkingSlice);
-      MITK_INFO << "6";
     }
     else
     {

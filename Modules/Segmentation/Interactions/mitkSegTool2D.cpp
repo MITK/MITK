@@ -226,7 +226,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEven
 
   unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( workingImage );
 
-  if (true)
+  if (m_2DInterpolationEnabled)
   {
     int clickedSliceDimension(-1);
     int clickedSliceIndex(-1);

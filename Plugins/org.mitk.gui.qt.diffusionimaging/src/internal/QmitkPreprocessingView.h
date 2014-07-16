@@ -52,11 +52,11 @@ class QmitkPreprocessingView : public QmitkFunctionality
 
   static const std::string VIEW_ID;
 
-  typedef vnl_vector_fixed< double, 3 > GradientDirectionType;
-  typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
-  typedef mitk::DiffusionImage<short> MitkDwiType;
-  typedef itk::VectorImage< short, 3 > ItkDwiType;
-  typedef itk::ImageDuplicator< ItkDwiType > DwiDuplicatorType;
+  typedef vnl_vector_fixed< double, 3 >                                 GradientDirectionType;
+  typedef itk::VectorContainer< unsigned int, GradientDirectionType >   GradientDirectionContainerType;
+  typedef mitk::DiffusionImage<short>                                   MitkDwiType;
+  typedef itk::VectorImage< short, 3 >                                  ItkDwiType;
+  typedef itk::Image< unsigned char, 3 >                                UcharImageType;
 
   QmitkPreprocessingView();
   virtual ~QmitkPreprocessingView();
@@ -81,6 +81,8 @@ protected slots:
   void AverageGradients();
   void ExtractB0();
   void MergeDwis();
+  void DoApplySpacing();
+  void DoApplyOrigin();
   void DoApplyDirectionMatrix();
   void DoApplyMesurementFrame();
   void DoReduceGradientDirections();
@@ -93,6 +95,7 @@ protected slots:
   void DoProjectSignal();
   void DoExtractBrainMask();
   void DoResampleImage();
+  void DoCropImage();
   void DoUpdateInterpolationGui(int i);
 
 protected:
@@ -103,6 +106,9 @@ protected:
   void DoADCAverage();
 
   template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedCropImage( itk::Image<TPixel, VImageDimension>* itkImage);
+
+  template < typename TPixel, unsigned int VImageDimension >
   void TemplatedApplyRotation( itk::Image<TPixel, VImageDimension>* itkImage);
 
   template < typename TPixel, unsigned int VImageDimension >
@@ -110,6 +116,12 @@ protected:
 
   template < typename TPixel, unsigned int VImageDimension >
   void TemplatedResampleImage( itk::Image<TPixel, VImageDimension>* itkImage);
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedSetImageSpacing( itk::Image<TPixel, VImageDimension>* itkImage);
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedSetImageOrigin( itk::Image<TPixel, VImageDimension>* itkImage);
 
   /** Called by ExtractB0 if check-box activated, extracts all b0 images without averaging */
   void DoExtractBOWithoutAveraging();

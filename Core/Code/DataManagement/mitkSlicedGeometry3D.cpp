@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkApplyTransformMatrixOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkSliceNavigationController.h"
+#include "mitkAbstractTransformGeometry.h"
 
 const mitk::ScalarType PI = 3.14159265359;
 
@@ -96,7 +97,7 @@ mitk::PlaneGeometry *
       PlaneGeometry *firstSlice = dynamic_cast< PlaneGeometry * > (
         m_PlaneGeometries[0].GetPointer() );
 
-      if ( firstSlice != NULL )
+      if ( firstSlice != NULL && dynamic_cast<AbstractTransformGeometry*>(m_PlaneGeometries[0].GetPointer() )==NULL)
       {
         if ( (m_DirectionVector[0] == 0.0)
           && (m_DirectionVector[1] == 0.0)
@@ -333,7 +334,7 @@ void
     dynamic_cast< PlaneGeometry * >( m_PlaneGeometries[0].GetPointer() );
 
   // If plane stack is empty, exit
-  if ( firstPlane == NULL )
+  if ( firstPlane == NULL || dynamic_cast<AbstractTransformGeometry*>( m_PlaneGeometries[0].GetPointer() )!=NULL)
   {
     return;
   }
@@ -545,7 +546,7 @@ void
     const PlaneGeometry *planeGeometry =
       dynamic_cast< const PlaneGeometry * >( firstGeometry.GetPointer() );
 
-    if (planeGeometry != NULL )
+    if (planeGeometry != NULL && dynamic_cast<AbstractTransformGeometry*>( m_PlaneGeometries[0].GetPointer() )==NULL)
     {
       this->WorldToIndex( planeGeometry->GetOrigin(), origin );
       this->WorldToIndex( planeGeometry->GetAxisVector(0), rightDV );
@@ -785,7 +786,7 @@ void
 
       // Need a PlaneGeometry, a PlaneOperation and a reference frame to
       // carry out the re-orientation. If not all avaialble, stop here
-      if ( !m_ReferenceGeometry || !planeGeometry || !planeOp )
+      if ( !m_ReferenceGeometry || (!planeGeometry || dynamic_cast<AbstractTransformGeometry*>( m_PlaneGeometries[0].GetPointer() )!=NULL) || !planeOp )
       {
         break;
       }
@@ -926,7 +927,7 @@ void
 
       // Need a PlaneGeometry, a PlaneOperation and a reference frame to
       // carry out the re-orientation
-      if ( m_ReferenceGeometry && planeGeometry && restorePlaneOp )
+      if ( m_ReferenceGeometry && (planeGeometry && dynamic_cast<AbstractTransformGeometry*>( m_PlaneGeometries[0].GetPointer() )==NULL) && restorePlaneOp )
       {
         // Clear all generated geometries and then rotate only the first slice.
         // The other slices will be re-generated on demand

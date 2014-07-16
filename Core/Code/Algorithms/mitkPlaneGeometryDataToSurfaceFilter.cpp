@@ -107,8 +107,107 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
   vtkPolyData *planeSurface = NULL;
 
 
-  // Does the PlaneGeometryData contain a PlaneGeometry?
-  if ( dynamic_cast< PlaneGeometry * >( input->GetPlaneGeometry() ) != NULL )
+
+
+  // Does the PlaneGeometryData contain an AbstractTransformGeometry?
+  if ( mitk::AbstractTransformGeometry *abstractGeometry =
+    dynamic_cast< AbstractTransformGeometry * >( input->GetPlaneGeometry() ) )
+  {
+    // In the case of an AbstractTransformGeometry (which holds a possibly
+    // non-rigid transform), we proceed slightly differently: since the
+    // plane can be arbitrarily deformed, we need to transform it by the
+    // abstract transform before clipping it. The setup for this is partially
+    // done in the constructor.
+    origin = abstractGeometry->GetPlane()->GetOrigin();
+    right = origin + abstractGeometry->GetPlane()->GetAxisVector( 0 );
+    bottom = origin + abstractGeometry->GetPlane()->GetAxisVector( 1 );
+
+    // Define the plane
+    m_PlaneSource->SetOrigin( origin[0], origin[1], origin[2] );
+    m_PlaneSource->SetPoint1( right[0], right[1], right[2] );
+    m_PlaneSource->SetPoint2( bottom[0], bottom[1], bottom[2] );
+
+    // Set the plane's resolution (unlike for non-deformable planes, the plane
+    // grid needs to have a certain resolution so that the deformation has the
+    // desired effect).
+    if ( m_UseGeometryParametricBounds )
+    {
+      m_PlaneSource->SetXResolution(
+        (int)abstractGeometry->GetParametricExtent(0)
+      );
+      m_PlaneSource->SetYResolution(
+        (int)abstractGeometry->GetParametricExtent(1)
+      );
+    }
+    else
+    {
+      m_PlaneSource->SetXResolution( m_XResolution );
+      m_PlaneSource->SetYResolution( m_YResolution );
+    }
+    if ( m_PlaceByGeometry )
+    {
+      // Let the output use the input geometry to appropriately transform the
+      // coordinate system.
+      mitk::Geometry3D::TransformType *affineTransform =
+        abstractGeometry->GetIndexToWorldTransform();
+
+      TimeGeometry *timeGeometry = output->GetTimeGeometry();
+      BaseGeometry *g3d = timeGeometry->GetGeometryForTimeStep( 0 );
+      g3d->SetIndexToWorldTransform( affineTransform );
+
+      vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
+      composedResliceTransform->Identity();
+      composedResliceTransform->Concatenate(
+        abstractGeometry->GetVtkTransform()->GetLinearInverse() );
+      composedResliceTransform->Concatenate(
+        abstractGeometry->GetVtkAbstractTransform()
+        );
+      // Use the non-rigid transform for transforming the plane.
+      m_VtkTransformPlaneFilter->SetTransform(
+        composedResliceTransform
+      );
+    }
+    else
+    {
+      // Use the non-rigid transform for transforming the plane.
+      m_VtkTransformPlaneFilter->SetTransform(
+        abstractGeometry->GetVtkAbstractTransform()
+      );
+    }
+
+    if ( m_UseBoundingBox )
+    {
+      mitk::BoundingBox::PointType boundingBoxMin = m_BoundingBox->GetMinimum();
+      mitk::BoundingBox::PointType boundingBoxMax = m_BoundingBox->GetMaximum();
+      //mitk::BoundingBox::PointType boundingBoxCenter = m_BoundingBox->GetCenter();
+
+      m_Box->SetXMin( boundingBoxMin[0], boundingBoxMin[1], boundingBoxMin[2] );
+      m_Box->SetXMax( boundingBoxMax[0], boundingBoxMax[1], boundingBoxMax[2] );
+    }
+    else
+    {
+      // Plane will not be clipped
+      m_Box->SetXMin( -10000.0, -10000.0, -10000.0 );
+      m_Box->SetXMax( 10000.0, 10000.0, 10000.0 );
+    }
+
+    m_Transform->Identity();
+    m_Transform->Concatenate( input->GetPlaneGeometry()->GetVtkTransform() );
+    m_Transform->PreMultiply();
+
+    m_Box->SetTransform( m_Transform );
+
+    m_PlaneClipper->SetInputConnection(m_VtkTransformPlaneFilter->GetOutputPort() );
+    m_PlaneClipper->SetClipFunction( m_Box );
+    m_PlaneClipper->GenerateClippedOutputOff(); // important to NOT generate normals data for clipped part
+    m_PlaneClipper->InsideOutOn();
+    m_PlaneClipper->SetValue( 0.0 );
+    m_PlaneClipper->Update();
+
+    planeSurface = m_PlaneClipper->GetOutput();
+  }
+    // Does the PlaneGeometryData contain a PlaneGeometry?
+  else if ( dynamic_cast< PlaneGeometry * >( input->GetPlaneGeometry() ) != NULL )
   {
     mitk::PlaneGeometry *planeGeometry =
       dynamic_cast< PlaneGeometry * >( input->GetPlaneGeometry() );
@@ -262,104 +361,6 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
         m_TextureMapToPlane->GetOutput()
       );
     }
-  }
-
-  // Does the PlaneGeometryData contain an AbstractTransformGeometry?
-  else if ( mitk::AbstractTransformGeometry *abstractGeometry =
-    dynamic_cast< AbstractTransformGeometry * >( input->GetPlaneGeometry() ) )
-  {
-    // In the case of an AbstractTransformGeometry (which holds a possibly
-    // non-rigid transform), we proceed slightly differently: since the
-    // plane can be arbitrarily deformed, we need to transform it by the
-    // abstract transform before clipping it. The setup for this is partially
-    // done in the constructor.
-    origin = abstractGeometry->GetPlane()->GetOrigin();
-    right = origin + abstractGeometry->GetPlane()->GetAxisVector( 0 );
-    bottom = origin + abstractGeometry->GetPlane()->GetAxisVector( 1 );
-
-    // Define the plane
-    m_PlaneSource->SetOrigin( origin[0], origin[1], origin[2] );
-    m_PlaneSource->SetPoint1( right[0], right[1], right[2] );
-    m_PlaneSource->SetPoint2( bottom[0], bottom[1], bottom[2] );
-
-    // Set the plane's resolution (unlike for non-deformable planes, the plane
-    // grid needs to have a certain resolution so that the deformation has the
-    // desired effect).
-    if ( m_UseGeometryParametricBounds )
-    {
-      m_PlaneSource->SetXResolution(
-        (int)abstractGeometry->GetParametricExtent(0)
-      );
-      m_PlaneSource->SetYResolution(
-        (int)abstractGeometry->GetParametricExtent(1)
-      );
-    }
-    else
-    {
-      m_PlaneSource->SetXResolution( m_XResolution );
-      m_PlaneSource->SetYResolution( m_YResolution );
-    }
-    if ( m_PlaceByGeometry )
-    {
-      // Let the output use the input geometry to appropriately transform the
-      // coordinate system.
-      mitk::Geometry3D::TransformType *affineTransform =
-        abstractGeometry->GetIndexToWorldTransform();
-
-      TimeGeometry *timeGeometry = output->GetTimeGeometry();
-      BaseGeometry *g3d = timeGeometry->GetGeometryForTimeStep( 0 );
-      g3d->SetIndexToWorldTransform( affineTransform );
-
-      vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
-      composedResliceTransform->Identity();
-      composedResliceTransform->Concatenate(
-        abstractGeometry->GetVtkTransform()->GetLinearInverse() );
-      composedResliceTransform->Concatenate(
-        abstractGeometry->GetVtkAbstractTransform()
-        );
-      // Use the non-rigid transform for transforming the plane.
-      m_VtkTransformPlaneFilter->SetTransform(
-        composedResliceTransform
-      );
-    }
-    else
-    {
-      // Use the non-rigid transform for transforming the plane.
-      m_VtkTransformPlaneFilter->SetTransform(
-        abstractGeometry->GetVtkAbstractTransform()
-      );
-    }
-
-    if ( m_UseBoundingBox )
-    {
-      mitk::BoundingBox::PointType boundingBoxMin = m_BoundingBox->GetMinimum();
-      mitk::BoundingBox::PointType boundingBoxMax = m_BoundingBox->GetMaximum();
-      //mitk::BoundingBox::PointType boundingBoxCenter = m_BoundingBox->GetCenter();
-
-      m_Box->SetXMin( boundingBoxMin[0], boundingBoxMin[1], boundingBoxMin[2] );
-      m_Box->SetXMax( boundingBoxMax[0], boundingBoxMax[1], boundingBoxMax[2] );
-    }
-    else
-    {
-      // Plane will not be clipped
-      m_Box->SetXMin( -10000.0, -10000.0, -10000.0 );
-      m_Box->SetXMax( 10000.0, 10000.0, 10000.0 );
-    }
-
-    m_Transform->Identity();
-    m_Transform->Concatenate( input->GetPlaneGeometry()->GetVtkTransform() );
-    m_Transform->PreMultiply();
-
-    m_Box->SetTransform( m_Transform );
-
-    m_PlaneClipper->SetInputConnection(m_VtkTransformPlaneFilter->GetOutputPort() );
-    m_PlaneClipper->SetClipFunction( m_Box );
-    m_PlaneClipper->GenerateClippedOutputOff(); // important to NOT generate normals data for clipped part
-    m_PlaneClipper->InsideOutOn();
-    m_PlaneClipper->SetValue( 0.0 );
-    m_PlaneClipper->Update();
-
-    planeSurface = m_PlaneClipper->GetOutput();
   }
 
   m_NormalsUpdater->SetInputData( planeSurface );

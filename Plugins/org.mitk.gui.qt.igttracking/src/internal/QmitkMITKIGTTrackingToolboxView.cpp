@@ -603,10 +603,22 @@ void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
 
 void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   {
+  //update filter
   m_ToolVisualizationFilter->Update();
   MITK_DEBUG << "Number of outputs ToolVisualizationFilter: " << m_ToolVisualizationFilter->GetNumberOfIndexedOutputs();
   MITK_DEBUG << "Number of inputs ToolVisualizationFilter: " << m_ToolVisualizationFilter->GetNumberOfIndexedInputs();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  //update tool colors to show tool status
+  for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
+    {
+    mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
+    if(currentTool->IsDataValid())
+      {this->m_toolStorage->GetTool(i)->GetDataNode()->SetColor(mitk::IGTColor_VALID);}
+    else
+      {this->m_toolStorage->GetTool(i)->GetDataNode()->SetColor(mitk::IGTColor_WARNING);}
+    }
+
+  //update logging
   if (m_logging)
     {
     this->m_loggingFilter->Update();
@@ -615,6 +627,9 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
     //check if logging stopped automatically
     if((m_loggedFrames>1)&&(!m_loggingFilter->GetRecording())){StopLogging();}
     }
+
+  //refresh view and status widget
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   m_Controls->m_TrackingToolsStatusWidget->Refresh();
   }
 
@@ -1149,11 +1164,26 @@ void QmitkMITKIGTTrackingToolboxViewWorker::StartTracking()
     emit StartTrackingFinished(false,errorMessage);
     return;
     }
+  //remember the original colors of the tools
+  m_OriginalColors = std::map<mitk::DataNode::Pointer,mitk::Color>();
+  for(int i=0; i<this->m_NavigationToolStorage->GetToolCount(); i++)
+    {
+    mitk::DataNode::Pointer currentToolNode = m_NavigationToolStorage->GetTool(i)->GetDataNode();
+    float c[3];
+    currentToolNode->GetColor(c);
+    mitk::Color color;
+    color.SetRed(c[0]);
+    color.SetGreen(c[1]);
+    color.SetBlue(c[2]);
+    m_OriginalColors[currentToolNode] = color;
+    }
+
   emit StartTrackingFinished(true,errorMessage);
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
 {
+  //stop tracking
   try
   {
   m_TrackingDeviceSource->StopTracking();
@@ -1162,8 +1192,19 @@ void QmitkMITKIGTTrackingToolboxViewWorker::StopTracking()
   {
     emit StopTrackingFinished(false, e.GetDescription());
   }
-  emit StopTrackingFinished(true, "");
 
+  //restore the original colors of the tools
+  for(int i=0; i<this->m_NavigationToolStorage->GetToolCount(); i++)
+  {
+    mitk::DataNode::Pointer currentToolNode = m_NavigationToolStorage->GetTool(i)->GetDataNode();
+    if (m_OriginalColors.find(currentToolNode) == m_OriginalColors.end())
+      {MITK_WARN << "Cannot restore original color of tool " << m_NavigationToolStorage->GetTool(i)->GetToolName();}
+    else
+      {currentToolNode->SetColor(m_OriginalColors[currentToolNode]);}
+  }
+
+  //emit signal
+  emit StopTrackingFinished(true, "");
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::DisconnectDevice()

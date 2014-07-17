@@ -630,7 +630,7 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
     this->m_Controls->m_LoggedFramesLabel->setText("Logged Frames: "+QString::number(m_loggedFrames));
     //check if logging stopped automatically
     if((m_loggedFrames>1)&&(!m_loggingFilter->GetRecording())){StopLogging();}
-    }
+  }
 
   //refresh view and status widget
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -658,8 +658,6 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
       lastTimeStamp = m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
       }
     }
-  }
-  m_Controls->m_TrackingToolsStatusWidget->Refresh();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()

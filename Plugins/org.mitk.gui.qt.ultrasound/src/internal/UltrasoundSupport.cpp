@@ -71,6 +71,7 @@ std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "="
 m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(
 mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL ,filter);
 m_Controls.m_ActiveVideoDevices->SetAutomaticallySelectFirstEntry(true);
+m_FrameCounter = 0;
 
 // Create Node for US Stream
 if (m_Node.IsNull())
@@ -100,59 +101,50 @@ void UltrasoundSupport::DisplayImage()
 m_Device->Modified();
 m_Device->Update();
 
-//Update data node
-mitk::Image::Pointer curOutput = m_Device->GetOutput();
-m_Node->SetData(curOutput);
-
-// if the geometry changed: make a reinit on the ultrasound image
-if(!mitk::Equal(m_OldGeometry.GetPointer(),curOutput->GetGeometry(),0.0001,false))
-{
-mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-if ( (renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()) )
-{
-renderWindow->GetRenderingManager()->InitializeViews(
-curOutput->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-renderWindow->GetRenderingManager()->RequestUpdateAll();
-}
-m_OldGeometry = dynamic_cast<mitk::Geometry3D*>(curOutput->GetGeometry());
-}
-
 //Only update the view if the image is shown
 if(m_Controls.m_ShowImageStream->isChecked())
 {
-this->RequestRenderWindowUpdate();
-if ( curOutput->GetDimension() > 1
-&& (curOutput->GetDimension(0) != m_CurrentImageWidth
-|| curOutput->GetDimension(1) != m_CurrentImageHeight) )
-{
-// make a reinit on the ultrasound image
-mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-if ( renderWindow != NULL && curOutput->GetTimeGeometry()->IsValid() )
-{
-renderWindow->GetRenderingManager()->InitializeViews(
-curOutput->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-renderWindow->GetRenderingManager()->RequestUpdateAll();
-}
+  //Update data node
+  mitk::Image::Pointer curOutput = m_Device->GetOutput();
+  m_Node->SetData(curOutput);
 
-m_CurrentImageWidth = curOutput->GetDimension(0);
-m_CurrentImageHeight = curOutput->GetDimension(1);
-}
+  // if the geometry changed: reinitialize the ultrasound image
+  if(!mitk::Equal(m_OldGeometry.GetPointer(),curOutput->GetGeometry(),0.0001,false))
+  {
+    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+    if ( (renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()) )
+    {
+      renderWindow->GetRenderingManager()->InitializeViews(
+      curOutput->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+      renderWindow->GetRenderingManager()->RequestUpdateAll();
+    }
+    m_CurrentImageWidth = curOutput->GetDimension(0);
+    m_CurrentImageHeight = curOutput->GetDimension(1);
+    m_OldGeometry = dynamic_cast<mitk::Geometry3D*>(curOutput->GetGeometry());
+  }
+  //if not: only update the view
+  else
+  {
+    this->RequestRenderWindowUpdate();
+  }
 }
 
 //Update frame counter
 m_FrameCounter ++;
-if (m_FrameCounter == 10)
-{
-int nMilliseconds = m_Clock.restart();
-int fps = 10000.0f / (nMilliseconds );
-m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(fps) +" FPS");
-m_FrameCounter = 0;
-}
+if (m_FrameCounter >= 10)
+  {
+  int nMilliseconds = m_Clock.restart();
+  int fps = 10000.0f / (nMilliseconds );
+  m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(fps) +" FPS");
+  m_FrameCounter = 0;
+  }
 }
 
 void UltrasoundSupport::OnChangedFramerateLimit(int value)
 {
+m_Timer->stop();
 m_Timer->setInterval(1000 / value);
+m_Timer->start();
 }
 
 void UltrasoundSupport::OnClickedFreezeButton()

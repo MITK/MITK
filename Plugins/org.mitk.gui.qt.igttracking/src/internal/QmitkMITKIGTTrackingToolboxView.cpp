@@ -139,7 +139,6 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     //initialize tracking volume node
     m_TrackingVolumeNode = mitk::DataNode::New();
     m_TrackingVolumeNode->SetName("TrackingVolume");
-    m_TrackingVolumeNode->SetOpacity(0.25);
     m_TrackingVolumeNode->SetBoolProperty("Backface Culling",true);
     mitk::Color red;
     red.SetRed(1);
@@ -174,11 +173,10 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
     this->LoadUISettings();
 
-    //add tracking volume node only to data storage if the volume should be shown
-    if ( m_Controls->m_ShowTrackingVolume->isChecked() )
-    {
-      this->GetDataStorage()->Add(m_TrackingVolumeNode);
-    }
+    //add tracking volume node only to data storage
+    this->GetDataStorage()->Add(m_TrackingVolumeNode);
+    if (!m_Controls->m_ShowTrackingVolume->isChecked()) m_TrackingVolumeNode->SetOpacity(0.0);
+    else m_TrackingVolumeNode->SetOpacity(0.25);
   }
 }
 
@@ -472,24 +470,25 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
 {
   if (qstr.isNull()) return;
   if (qstr.isEmpty()) return;
-  if (m_Controls->m_ShowTrackingVolume->isChecked())
-  {
-    mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
 
-    std::string str = qstr.toStdString();
+  mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
 
-    mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
-    m_TrackingDeviceData = data;
+  std::string str = qstr.toStdString();
 
-    volumeGenerator->SetTrackingDeviceData(data);
-    volumeGenerator->Update();
+  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
+  m_TrackingDeviceData = data;
 
-    mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
+  volumeGenerator->SetTrackingDeviceData(data);
+  volumeGenerator->Update();
 
-    m_TrackingVolumeNode->SetData(volumeSurface);
+  mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
 
-    GlobalReinit();
-  }
+  m_TrackingVolumeNode->SetData(volumeSurface);
+
+  if (!m_Controls->m_ShowTrackingVolume->isChecked()) m_TrackingVolumeNode->SetOpacity(0.0);
+  else m_TrackingVolumeNode->SetOpacity(0.25);
+
+  GlobalReinit();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnShowTrackingVolumeChanged()
@@ -497,12 +496,11 @@ void QmitkMITKIGTTrackingToolboxView::OnShowTrackingVolumeChanged()
   if (m_Controls->m_ShowTrackingVolume->isChecked())
     {
     OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
-    GetDataStorage()->Add(m_TrackingVolumeNode);
+    m_TrackingVolumeNode->SetOpacity(0.25);
     }
   else
     {
-    GetDataStorage()->Remove(m_TrackingVolumeNode);
-    GlobalReinit();
+    m_TrackingVolumeNode->SetOpacity(0.0);
     }
 }
 

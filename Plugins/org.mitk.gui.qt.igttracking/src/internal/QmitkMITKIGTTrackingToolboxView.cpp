@@ -639,15 +639,15 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   if(i>20)
     {
     i = 0;
-    if (mitk::Equal(lastPositionTool1,m_ToolVisualizationFilter->GetOutput(0)->GetPosition(),0.000000001,false))
-      {
-      MITK_WARN << "Seems as tracking (of at least tool 1) is frozen which means that bug 17713 occurred. Restart tracking might help.";
-      //display further information to find the bug
-      MITK_WARN << "Timestamp of current navigation data: " << m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
-      MITK_WARN << "Timestamp of last navigation data (which holds the same values): " << lastTimeStamp;
-      }
     if (m_ToolVisualizationFilter->GetOutput(0)->IsDataValid())
       {
+      if (mitk::Equal(lastPositionTool1,m_ToolVisualizationFilter->GetOutput(0)->GetPosition(),0.000000001,false))
+        {
+        MITK_WARN << "Seems as tracking (of at least tool 1) is frozen which means that bug 17713 occurred. Restart tracking might help.";
+        //display further information to find the bug
+        MITK_WARN << "Timestamp of current navigation data: " << m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
+        MITK_WARN << "Timestamp of last navigation data (which holds the same values): " << lastTimeStamp;
+        }
       lastPositionTool1 = m_ToolVisualizationFilter->GetOutput(0)->GetPosition();
       lastTimeStamp = m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
       }

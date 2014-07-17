@@ -151,7 +151,7 @@ mitk::LabelSetImage::VectorImageType::Pointer mitk::LabelSetImage::GetVectorImag
 
     // fill inside
     VariableVectorType defaultValue;
-    defaultValue.SetSize( m_LayerContainer.size() - 1);
+    defaultValue.SetSize( m_LayerContainer.size());
     defaultValue.Fill(0);
     newVectorImage->FillBuffer(defaultValue);
 
@@ -159,8 +159,9 @@ mitk::LabelSetImage::VectorImageType::Pointer mitk::LabelSetImage::GetVectorImag
     targetAdaptor->SetImage( newVectorImage );
 
     // transfer layers to a vector image.
-    for (int lidx = 0; lidx < m_LayerContainer.size(); ++lidx)
+    for (unsigned int lidx = 0; lidx < m_LayerContainer.size(); ++lidx)
     {
+      MITK_INFO << lidx ;
       LabelSetImageType::Pointer itkImageLayer;
       mitk::CastToItkImage(m_LayerContainer[lidx],itkImageLayer);
 
@@ -192,11 +193,14 @@ mitk::LabelSetImage::VectorImageType::Pointer mitk::LabelSetImage::GetVectorImag
   }
 }
 
-void mitk::LabelSetImage::SetVectorImage( VectorImageType::Pointer vectorImage )
+void mitk::LabelSetImage::SetVectorImage(VectorImageType::Pointer vectorImage )
 {
   try
   {
     int numberOfLayers = vectorImage->GetNumberOfComponentsPerPixel();
+
+    MITK_INFO << numberOfLayers;
+
     ImageAdaptorType::Pointer vectorAdaptor = ImageAdaptorType::New();
     vectorAdaptor->SetImage( vectorImage );
 
@@ -230,13 +234,12 @@ void mitk::LabelSetImage::SetVectorImage( VectorImageType::Pointer vectorImage )
       mitk::Image::Pointer newLayerImage = mitk::Image::New();
       newLayerImage->Initialize(this);
       newLayerImage->SetVolume(auxImg->GetBufferPointer());
-
       m_LayerContainer[lidx] = newLayerImage;
+      AccessByItk_1(this, LayerContainerToImageProcessing, lidx);
     }
-
     // reset active layer
     SetActiveLayer(0);
-    AccessByItk_1(this, LayerContainerToImageProcessing, GetActiveLayer());
+
   }
   catch(itk::ExceptionObject& e)
   {
@@ -887,17 +890,17 @@ void mitk::LabelSetImage::ConcatenateProcessing(ImageType* itkTarget, mitk::Labe
 }
 
 template < typename ImageType >
-void mitk::LabelSetImage::LayerContainerToImageProcessing( ImageType* source, int layer)
+void mitk::LabelSetImage::LayerContainerToImageProcessing( ImageType* target, int layer)
 {
   typename ImageType::Pointer itkSource;
-  mitk::CastToItkImage(m_LayerContainer[GetActiveLayer()], itkSource);
+  mitk::CastToItkImage(m_LayerContainer[layer], itkSource);
   typedef itk::ImageRegionConstIterator< ImageType >  SourceIteratorType;
   typedef itk::ImageRegionIterator< ImageType >       TargetIteratorType;
 
   SourceIteratorType sourceIter( itkSource, itkSource->GetLargestPossibleRegion() );
   sourceIter.GoToBegin();
 
-  TargetIteratorType targetIter( source, source->GetLargestPossibleRegion() );
+  TargetIteratorType targetIter( target, target->GetLargestPossibleRegion() );
   targetIter.GoToBegin();
 
   while(!sourceIter.IsAtEnd())
@@ -912,7 +915,7 @@ template < typename ImageType >
 void mitk::LabelSetImage::ImageToLayerContainerProcessing( ImageType* source, int layer)
 {
   typename ImageType::Pointer itkTarget;
-  mitk::CastToItkImage(m_LayerContainer[GetActiveLayer()], itkTarget);
+  mitk::CastToItkImage(m_LayerContainer[layer], itkTarget);
 
   typedef itk::ImageRegionConstIterator< ImageType >   SourceIteratorType;
   typedef itk::ImageRegionIterator< ImageType >        TargetIteratorType;

@@ -65,9 +65,9 @@ public:
 
       void OnClickedAddNewDevice();
 
-      void OnClickedViewDevice();
-
       void OnChangedFramerateLimit(int);
+
+      void OnChangedActiveDevice();
 
       void OnClickedFreezeButton();
 
@@ -79,9 +79,6 @@ public:
       void DisplayImage();
 
 protected:
-
-  void StartViewing();
-  void StopViewing(bool RenderWindowUpdate = true);
 
   void CreateControlWidgets();
   void RemoveControlWidgets();
@@ -106,6 +103,8 @@ protected:
   mitk::DataNode::Pointer m_Node;
 
   mitk::Image::Pointer m_Image;
+
+  mitk::Geometry3D::Pointer m_OldGeometry;
 
   Ui::UltrasoundSupportControls m_Controls;
 

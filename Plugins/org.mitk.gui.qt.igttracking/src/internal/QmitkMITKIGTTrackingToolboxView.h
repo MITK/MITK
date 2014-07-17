@@ -246,6 +246,9 @@ public:
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter; ///> holds the tool visualization filter (second filter of the IGT pipeline)
     bool m_InverseMode;
 
+    //stores the original colors of the tracking tools
+    std::map<mitk::DataNode::Pointer,mitk::Color> m_OriginalColors;
+
     void AutoDetectTools();
     void ConnectDevice();
     void StartTracking();

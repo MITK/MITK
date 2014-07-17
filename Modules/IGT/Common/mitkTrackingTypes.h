@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkIGTExports.h>
 
 #include <itkPoint.h>
+#include <mitkColorProperty.h>
 #include <vector>
 
 namespace mitk
@@ -233,5 +234,9 @@ namespace mitk
       PSM  = 5,
       //UIEvents = 6,
     };
+
+    /** definition of a colors for IGT */
+    static mitk::Color IGTColor_WARNING = mitk::ColorProperty::New(1.0f, 0.0f, 0.0f)->GetColor();
+    static mitk::Color IGTColor_VALID = mitk::ColorProperty::New(0.0f, 1.0f, 0.0f)->GetColor();
 } // namespace mitk
 #endif /* MITKTRACKINGTYPES_H_HEADER_INCLUDED_ */

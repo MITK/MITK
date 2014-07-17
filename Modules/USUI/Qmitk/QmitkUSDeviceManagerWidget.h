@@ -58,6 +58,9 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
   signals:
     void NewDeviceButtonClicked();
 
+    /* This signal is emitted if a device is activated. */
+    void DeviceActivated();
+
   public slots:
 
   protected slots:

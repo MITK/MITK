@@ -62,7 +62,6 @@ public:
         out.m_ImageDirection = m_ImageDirection;
         out.SetNumWeightedGradients(m_NumGradients);
         out.m_Bvalue = m_Bvalue;
-        out.m_Repetitions = m_Repetitions;
         out.m_SignalScale = m_SignalScale;
         out.m_tEcho = m_tEcho;
         out.m_tLine = m_tLine;
@@ -106,7 +105,6 @@ public:
     itk::Matrix<double, 3, 3>           m_ImageDirection;           ///< Image rotation matrix.
 
     /** Other acquisitions parameters */
-    unsigned int                        m_Repetitions;              ///< Noise will be summed N times and afterwards averaged.
     double                              m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
     double                              m_tEcho;                    ///< Echo time TE.
     double                              m_tLine;                    ///< k-space line readout time.
@@ -117,6 +115,9 @@ public:
     DiffusionModelListType              m_FiberModelList;           ///< Intra- and inter-axonal compartments.
     DiffusionModelListType              m_NonFiberModelList;        ///< Extra-axonal compartments.
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
+    bool                                m_UsePrototypeSignals;
+    bool                                m_UseRandomDirections;
+    bool                                m_UseMainFiberDirections;
 
     /** Artifacts */
     unsigned int                        m_Spikes;                   ///< Number of spikes randomly appearing in the image

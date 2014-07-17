@@ -100,7 +100,6 @@ protected:
     itk::TimeProbe                              m_TimeProbe;
     bool                                        m_UseConstantRandSeed;
     mitk::DiffusionImage<short>::Pointer        m_InputDwi;
-    bool                                        m_NoAcquisitionSimulation;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };
 }

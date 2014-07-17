@@ -59,6 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QScrollBar>
 #include <itkInvertIntensityImageFilter.h>
 #include <QDialogButtonBox>
+#include <itkAdcImageFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -309,6 +310,13 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_DotWidget1->setVisible(false);
         m_Controls->m_DotWidget2->setVisible(false);
 
+        m_Controls->m_PrototypeWidget1->setVisible(false);
+        m_Controls->m_PrototypeWidget2->setVisible(false);
+        m_Controls->m_PrototypeWidget3->setVisible(false);
+        m_Controls->m_PrototypeWidget4->setVisible(false);
+        m_Controls->m_PrototypeWidget3->SetMinFa(0.0);
+        m_Controls->m_PrototypeWidget3->SetMaxFa(0.15);
+
         m_Controls->m_Comp4FractionFrame->setVisible(false);
         m_Controls->m_DiffusionPropsMessage->setVisible(false);
         m_Controls->m_GeometryMessage->setVisible(false);
@@ -493,7 +501,6 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     parameters.m_tLine = m_Controls->m_LineReadoutTimeBox->value();
     parameters.m_tInhom = m_Controls->m_T2starBox->value();
     parameters.m_tEcho = m_Controls->m_TEbox->value();
-    parameters.m_Repetitions = m_Controls->m_RepetitionsBox->value();
     parameters.m_DoDisablePartialVolume = m_Controls->m_EnforcePureFiberVoxelsBox->isChecked();
     parameters.m_AxonRadius = m_Controls->m_FiberRadius->value();
     parameters.m_SignalScale = m_Controls->m_SignalScaleBox->value();
@@ -877,12 +884,20 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
     }
 
+    if ( m_Controls->m_Compartment1Box->currentIndex()==3 || m_Controls->m_Compartment3Box->currentIndex()==3 )
+    {
+        parameters.m_UsePrototypeSignals = true;
+        parameters.m_UseRandomDirections = true;
+        parameters.m_UseMainFiberDirections = false;
+        parameters.m_NonFiberModelList.clear();
+        parameters.m_FiberModelList.clear();
+    }
+
     parameters.m_ResultNode->AddProperty("Fiberfox.SignalScale", IntProperty::New(parameters.m_SignalScale));
     parameters.m_ResultNode->AddProperty("Fiberfox.FiberRadius", IntProperty::New(parameters.m_AxonRadius));
     parameters.m_ResultNode->AddProperty("Fiberfox.Tinhom", DoubleProperty::New(parameters.m_tInhom));
     parameters.m_ResultNode->AddProperty("Fiberfox.Tline", DoubleProperty::New(parameters.m_tLine));
     parameters.m_ResultNode->AddProperty("Fiberfox.TE", DoubleProperty::New(parameters.m_tEcho));
-    parameters.m_ResultNode->AddProperty("Fiberfox.Repetitions", IntProperty::New(parameters.m_Repetitions));
     parameters.m_ResultNode->AddProperty("Fiberfox.b-value", DoubleProperty::New(parameters.m_Bvalue));
     parameters.m_ResultNode->AddProperty("Fiberfox.NoPartialVolume", BoolProperty::New(parameters.m_DoDisablePartialVolume));
     parameters.m_ResultNode->AddProperty("Fiberfox.Relaxation", BoolProperty::New(parameters.m_DoSimulateRelaxation));
@@ -943,7 +958,6 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.basic.numgradients", ffParamaters.GetNumWeightedVolumes());
     parameters.put("fiberfox.image.basic.bvalue", ffParamaters.m_Bvalue);
     parameters.put("fiberfox.image.showadvanced", m_Controls->m_AdvancedOptionsBox_2->isChecked());
-    parameters.put("fiberfox.image.repetitions", ffParamaters.m_Repetitions);
     parameters.put("fiberfox.image.signalScale", ffParamaters.m_SignalScale);
     parameters.put("fiberfox.image.tEcho", ffParamaters.m_tEcho);
     parameters.put("fiberfox.image.tLine", m_Controls->m_LineReadoutTimeBox->value());
@@ -1081,7 +1095,6 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_NumGradientsBox->setValue(v1.second.get<int>("basic.numgradients"));
             m_Controls->m_BvalueBox->setValue(v1.second.get<int>("basic.bvalue"));
             m_Controls->m_AdvancedOptionsBox_2->setChecked(v1.second.get<bool>("showadvanced"));
-            m_Controls->m_RepetitionsBox->setValue(v1.second.get<int>("repetitions"));
             m_Controls->m_SignalScaleBox->setValue(v1.second.get<int>("signalScale"));
             m_Controls->m_TEbox->setValue(v1.second.get<double>("tEcho"));
             m_Controls->m_LineReadoutTimeBox->setValue(v1.second.get<double>("tLine"));
@@ -1179,6 +1192,13 @@ void QmitkFiberfoxView::Comp1ModelFrameVisibility(int index)
     m_Controls->m_StickWidget1->setVisible(false);
     m_Controls->m_ZeppelinWidget1->setVisible(false);
     m_Controls->m_TensorWidget1->setVisible(false);
+    m_Controls->m_Compartment2Box->setEnabled(true);
+    m_Controls->m_Compartment4Box->setEnabled(true);
+
+    if (m_Controls->m_Compartment3Box->currentIndex()==3 && index!=3)
+        m_Controls->m_Compartment3Box->setCurrentIndex(0);
+
+
 
     switch (index)
     {
@@ -1191,6 +1211,17 @@ void QmitkFiberfoxView::Comp1ModelFrameVisibility(int index)
     case 2:
         m_Controls->m_TensorWidget1->setVisible(true);
         break;
+    case 3:
+    {
+        m_Controls->m_PrototypeWidget1->setVisible(true);
+        if (m_Controls->m_Compartment3Box->currentIndex()!=3)
+            m_Controls->m_Compartment3Box->setCurrentIndex(3);
+        m_Controls->m_Compartment2Box->setCurrentIndex(0);
+        m_Controls->m_Compartment4Box->setCurrentIndex(0);
+        m_Controls->m_Compartment2Box->setEnabled(false);
+        m_Controls->m_Compartment4Box->setEnabled(false);
+        break;
+    }
     }
 }
 
@@ -1221,6 +1252,11 @@ void QmitkFiberfoxView::Comp3ModelFrameVisibility(int index)
     m_Controls->m_BallWidget1->setVisible(false);
     m_Controls->m_AstrosticksWidget1->setVisible(false);
     m_Controls->m_DotWidget1->setVisible(false);
+    m_Controls->m_Compartment2Box->setEnabled(true);
+    m_Controls->m_Compartment4Box->setEnabled(true);
+
+    if (m_Controls->m_Compartment1Box->currentIndex()==3 && index!=3)
+        m_Controls->m_Compartment1Box->setCurrentIndex(0);
 
     switch (index)
     {
@@ -1233,6 +1269,17 @@ void QmitkFiberfoxView::Comp3ModelFrameVisibility(int index)
     case 2:
         m_Controls->m_DotWidget1->setVisible(true);
         break;
+    case 3:
+    {
+        m_Controls->m_PrototypeWidget3->setVisible(true);
+        if (m_Controls->m_Compartment1Box->currentIndex()!=3)
+            m_Controls->m_Compartment1Box->setCurrentIndex(3);
+        m_Controls->m_Compartment2Box->setCurrentIndex(0);
+        m_Controls->m_Compartment4Box->setCurrentIndex(0);
+        m_Controls->m_Compartment2Box->setEnabled(false);
+        m_Controls->m_Compartment4Box->setEnabled(false);
+        break;
+    }
     }
 }
 
@@ -1830,13 +1877,127 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
 
     m_TractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
     parameters.m_ParentNode = fiberNode;
-    m_TractsToDwiFilter->SetParameters(parameters);
-    m_TractsToDwiFilter->SetFiberBundle(fiberBundle);
     if (m_SelectedDWI.IsNotNull())
     {
         mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
         m_TractsToDwiFilter->SetInputDwi(diffImg);
+
+        // sample prototype signals
+        if (parameters.m_UsePrototypeSignals)
+        {
+            const int shOrder = 4;
+            parameters.m_SignalScale = 1;
+
+            typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
+            TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
+            filter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
+            filter->SetBValue(diffImg->GetReferenceBValue());
+            filter->Update();
+            itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = filter->GetOutput();
+
+            const int NumCoeffs = (shOrder*shOrder + shOrder + 2)/2 + shOrder;
+            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
+            typename QballFilterType::Pointer qballfilter = QballFilterType::New();
+            qballfilter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
+            qballfilter->SetBValue(diffImg->GetReferenceBValue());
+            qballfilter->SetLambda(0.006);
+            qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
+            qballfilter->Update();
+            QballFilterType::CoefficientImageType::Pointer itkFeatureImage = qballfilter->GetCoefficientImage();
+
+            itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
+            adcFilter->SetInput(diffImg->GetVectorImage());
+            adcFilter->SetGradientDirections(diffImg->GetDirections());
+            adcFilter->SetB_value(diffImg->GetReferenceBValue());
+            adcFilter->Update();
+            ItkDoubleImgType::Pointer adcImage = adcFilter->GetOutput();
+
+            int b0Index;
+            for (unsigned int i=0; i<diffImg->GetDirectionsWithoutMeasurementFrame()->Size(); i++)
+                if ( diffImg->GetDirectionsWithoutMeasurementFrame()->GetElement(i).magnitude()<0.001 )
+                {
+                    b0Index = i;
+                    break;
+                }
+
+            MITK_INFO << "Sampling signal kernels.";
+            itk::ImageRegionIterator< itk::Image< itk::DiffusionTensor3D< double >, 3 > >  it(tensorImage, tensorImage->GetLargestPossibleRegion());
+            while(!it.IsAtEnd())
+            {
+                bool valid = true;
+                for (int i=0; i<diffImg->GetNumberOfChannels(); i++)
+                {
+                    if (diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i]<=0 || diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i]>diffImg->GetVectorImage()->GetPixel(it.GetIndex())[b0Index])
+                        valid = false;
+                }
+
+                if (valid)
+                {
+                    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+                    randGen->SetSeed();
+                    if (parameters.m_MaskImage.IsNotNull() && parameters.m_MaskImage->GetPixel(it.GetIndex())<=0)
+                    {
+                        ++it;
+                        continue;
+                    }
+                    itk::DiffusionTensor3D< double > tensor = it.Get();
+                    double FA = tensor.GetFractionalAnisotropy();
+                    if (FA>m_Controls->m_PrototypeWidget1->GetMinFa()  && FA<m_Controls->m_PrototypeWidget1->GetMaxFa()  && parameters.m_FiberModelList.size()<m_Controls->m_PrototypeWidget1->GetNumberOfSamples())
+                    {
+                        RawShModel<double>* model = new RawShModel<double>();
+                        model->SetGradientList( parameters.GetGradientDirections() );
+                        itk::Vector< float, NumCoeffs > itkv = itkFeatureImage->GetPixel(it.GetIndex());
+                        vnl_vector_fixed< double, NumCoeffs > coeffs;
+                        for (unsigned int c=0; c<itkv.Size(); c++)
+                            coeffs[c] = itkv[c];
+                        model->SetB0Signal( diffImg->GetVectorImage()->GetPixel(it.GetIndex())[b0Index] );
+                        if (!model->SetShCoefficients( coeffs ))
+                        {
+                            ++it;
+                            continue;
+                        }
+                        parameters.m_FiberModelList.push_back(model);
+                        MITK_INFO << "WM KERNEL: " << it.GetIndex();
+                    }
+                    else if (adcImage->GetPixel(it.GetIndex())<0.001 && FA>m_Controls->m_PrototypeWidget3->GetMinFa()  && FA<m_Controls->m_PrototypeWidget3->GetMaxFa() && parameters.m_NonFiberModelList.size()<m_Controls->m_PrototypeWidget3->GetNumberOfSamples())
+                    {
+                        RawShModel<double>* model = new RawShModel<double>();
+                        model->SetGradientList( parameters.GetGradientDirections() );
+                        itk::Vector< float, NumCoeffs > itkv = itkFeatureImage->GetPixel(it.GetIndex());
+                        vnl_vector_fixed< double, NumCoeffs > coeffs;
+                        for (unsigned int c=0; c<itkv.Size(); c++)
+                            coeffs[c] = itkv[c];
+                        model->SetB0Signal( diffImg->GetVectorImage()->GetPixel(it.GetIndex())[b0Index] );
+                        if (!model->SetShCoefficients( coeffs ))
+                        {
+                            ++it;
+                            continue;
+                        }
+                        itk::Vector<double,3> fib;
+                        fib[0] = randGen->GetVariateWithClosedRange(2)-1.0;
+                        fib[1] = randGen->GetVariateWithClosedRange(2)-1.0;
+                        fib[2] = randGen->GetVariateWithClosedRange(2)-1.0;
+                        fib.Normalize();
+                        model->SetFiberDirection(fib);
+                        parameters.m_NonFiberModelList.push_back(model);
+                        MITK_INFO << "GM/CSF KERNEL: " << it.GetIndex();
+                    }
+
+                    if (parameters.m_FiberModelList.size()>=m_Controls->m_PrototypeWidget1->GetNumberOfSamples() && parameters.m_NonFiberModelList.size()>=m_Controls->m_PrototypeWidget3->GetNumberOfSamples())
+                        break;
+                }
+                ++it;
+            }
+            MITK_INFO << "Using pool of " << parameters.m_FiberModelList.size() << " WM and " << parameters.m_NonFiberModelList.size() << " GM/CSF kernels";
+        }
     }
+    else if (parameters.m_UsePrototypeSignals)
+    {
+        QMessageBox::information( NULL, "Simulation cancelled", "Prototype signal but no diffusion-weighted image selected to sample signal from.");
+        return;
+    }
+    m_TractsToDwiFilter->SetParameters(parameters);
+    m_TractsToDwiFilter->SetFiberBundle(fiberBundle);
     m_Worker.m_FilterType = 0;
     m_Thread.start(QThread::LowestPriority);
 }

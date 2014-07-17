@@ -629,6 +629,29 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   //refresh view and status widget
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   m_Controls->m_TrackingToolsStatusWidget->Refresh();
+
+  //code to better isolate bug 17713, could be removed when bug 17713 is fixed
+  static int i = 0;
+  static mitk::Point3D lastPositionTool1 = m_ToolVisualizationFilter->GetOutput(0)->GetPosition();
+  static itk::TimeStamp lastTimeStamp = m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
+  i++;
+  //every 20 frames: check if tracking is frozen
+  if(i>20)
+    {
+    i = 0;
+    if (mitk::Equal(lastPositionTool1,m_ToolVisualizationFilter->GetOutput(0)->GetPosition(),0.000000001,false))
+      {
+      MITK_WARN << "Seems as tracking (of at least tool 1) is frozen which means that bug 17713 occurred. Restart tracking might help.";
+      //display further information to find the bug
+      MITK_WARN << "Timestamp of current navigation data: " << m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
+      MITK_WARN << "Timestamp of last navigation data (which holds the same values): " << lastTimeStamp;
+      }
+    if (m_ToolVisualizationFilter->GetOutput(0)->IsDataValid())
+      {
+      lastPositionTool1 = m_ToolVisualizationFilter->GetOutput(0)->GetPosition();
+      lastTimeStamp = m_ToolVisualizationFilter->GetOutput(0)->GetTimeStamp();
+      }
+    }
   }
 
 void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()

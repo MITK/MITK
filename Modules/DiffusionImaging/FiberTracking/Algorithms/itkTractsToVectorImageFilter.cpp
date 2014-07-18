@@ -121,18 +121,6 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
     // initialize direction images
     m_DirectionImageContainer = DirectionImageContainerType::New();
-    for (unsigned int i=0; i<m_MaxNumDirections; i++)
-    {
-        ItkDirectionImageType::Pointer directionImage = ItkDirectionImageType::New();
-        directionImage->SetSpacing( spacing );
-        directionImage->SetOrigin( origin );
-        directionImage->SetDirection( direction );
-        directionImage->SetRegions( imageRegion );
-        directionImage->Allocate();
-        Vector< float, 3 > nullVec; nullVec.Fill(0.0);
-        directionImage->FillBuffer(nullVec);
-        m_DirectionImageContainer->InsertElement(i, directionImage);
-    }
 
     // resample fiber bundle
     double minSpacing = 1;
@@ -240,7 +228,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
         std::sort( directions->begin(), directions->end(), CompareVectorLengths );
 
         unsigned int numDir = directions->size();
-        if (numDir>m_MaxNumDirections)
+        if (m_MaxNumDirections>0 && numDir>m_MaxNumDirections)
             numDir = m_MaxNumDirections;
 
         int count = 0;
@@ -261,6 +249,19 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
             if (dir.magnitude()<0.4)
                 continue;
+
+            if (i==m_DirectionImageContainer->size())
+            {
+                ItkDirectionImageType::Pointer directionImage = ItkDirectionImageType::New();
+                directionImage->SetSpacing( spacing );
+                directionImage->SetOrigin( origin );
+                directionImage->SetDirection( direction );
+                directionImage->SetRegions( imageRegion );
+                directionImage->Allocate();
+                Vector< float, 3 > nullVec; nullVec.Fill(0.0);
+                directionImage->FillBuffer(nullVec);
+                m_DirectionImageContainer->InsertElement(i, directionImage);
+            }
 
             // set direction image pixel
             ItkDirectionImageType::Pointer directionImage = m_DirectionImageContainer->GetElement(i);
@@ -310,7 +311,9 @@ typename TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer
     touched.resize(inDirs->size(), 0);
     bool free = true;
     currentMean = inDirs->at(0);  // initialize first seed
+    currentMean.normalize();
     double length = lengths.at(0);
+    touched[0] = 1;
     std::vector< double > newLengths;
     bool meanChanged = false;
 
@@ -321,11 +324,9 @@ typename TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer
 
         // start mean-shift clustering
         double angle = 0;
-        int counter = 0;
 
-        while (dot_product(currentMean, oldMean)<0.99)
+        while (fabs(dot_product(currentMean, oldMean))<0.99)
         {
-            counter = 0;
             oldMean = currentMean;
             currentMean.fill(0.0);
             for (unsigned int i=0; i<inDirs->size(); i++)
@@ -337,7 +338,6 @@ typename TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer
                     if (meanChanged)
                         length += lengths.at(i);
                     touched[i] = 1;
-                    counter++;
                     meanChanged = true;
                 }
                 else if (-angle>=m_AngularThreshold)
@@ -346,22 +346,20 @@ typename TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer
                     if (meanChanged)
                         length += lengths.at(i);
                     touched[i] = 1;
-                    counter++;
                     meanChanged = true;
                 }
             }
-            if (currentMean.magnitude()>0.001)
+            if(!meanChanged)
+                currentMean = oldMean;
+            else
                 currentMean.normalize();
         }
 
         // found stable mean
-        if (counter>0)
-        {
-            outDirs->push_back(currentMean);
-            newLengths.push_back(length);
-            if (length>max)
-                max = length;
-        }
+        outDirs->push_back(currentMean);
+        newLengths.push_back(length);
+        if (length>max)
+            max = length;
 
         // find next unused seed
         free = false;
@@ -372,6 +370,7 @@ typename TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer
                 free = true;
                 meanChanged = false;
                 length = lengths.at(i);
+                touched[i] = 1;
                 break;
             }
     }

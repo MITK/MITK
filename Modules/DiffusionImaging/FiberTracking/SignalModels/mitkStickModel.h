@@ -36,6 +36,7 @@ public:
 
     typedef typename DiffusionSignalModel< ScalarType >::PixelType      PixelType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientType   GradientType;
+    typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
@@ -43,6 +44,9 @@ public:
 
     void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
     void SetDiffusivity(ScalarType diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
+
+    void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
+    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
 
 protected:
 

@@ -40,10 +40,14 @@ public:
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-    void SetMinFa(double minFA){ m_Controls->m_MinFaBox->setValue(minFA); }
-    void SetMaxFa(double maxFA){ m_Controls->m_MaxFaBox->setValue(maxFA); }
+    void SetMinAdc(double min){ m_Controls->m_MinAdcBox->setValue(min); }
+    void SetMaxAdc(double max){ m_Controls->m_MaxAdcBox->setValue(max); }
+    void SetMinFa(double min){ m_Controls->m_MinFaBox->setValue(min); }
+    void SetMaxFa(double max){ m_Controls->m_MaxFaBox->setValue(max); }
     void SetNumberOfSamples(int n){ m_Controls->m_NumSamplesBox->setValue(n); }
 
+    double GetMinAdc(){ return m_Controls->m_MinAdcBox->value(); }
+    double GetMaxAdc(){ return m_Controls->m_MaxAdcBox->value(); }
     double GetMinFa(){ return m_Controls->m_MinFaBox->value(); }
     double GetMaxFa(){ return m_Controls->m_MaxFaBox->value(); }
     double GetNumberOfSamples(){ return m_Controls->m_NumSamplesBox->value(); }

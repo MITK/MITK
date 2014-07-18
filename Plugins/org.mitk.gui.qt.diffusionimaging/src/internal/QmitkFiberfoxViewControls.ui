@@ -2802,6 +2802,11 @@
               <string>Dot Model</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>Prototype Signal</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item row="16" column="0">

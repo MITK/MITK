@@ -53,7 +53,7 @@ public:
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
     typedef itk::Image< double, 2 >                                     SliceType;
     typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType   ComplexSliceType;
-    typedef itk::Vector< double,3>                                      VectorType;
+    typedef itk::Vector< double,3>                                      DoubleVectorType;
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
@@ -62,7 +62,6 @@ public:
     /** Input */
     itkSetMacro( FiberBundle, FiberBundleType )             ///< Input fiber bundle
     itkSetMacro( UseConstantRandSeed, bool )                ///< Seed for random generator.
-    itkSetMacro( InputDwi, mitk::DiffusionImage<short>::Pointer )
     void SetParameters( FiberfoxParameters<double> param )  ///< Simulation parameters.
     { m_Parameters = param; }
 
@@ -99,8 +98,9 @@ protected:
     std::string                                 m_StatusText;
     itk::TimeProbe                              m_TimeProbe;
     bool                                        m_UseConstantRandSeed;
-    mitk::DiffusionImage<short>::Pointer        m_InputDwi;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
+
+    std::vector< DoubleDwiType::Pointer > m_CompartmentImages;
 };
 }
 

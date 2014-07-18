@@ -77,6 +77,7 @@ protected slots:
   void DoImageColorCoding();        ///< color fibers by selected scalar image
   void ApplyCurvatureThreshold();   ///< remove/split fibers with a too high curvature threshold
   void CompressSelectedBundles();   ///< remove points below certain error threshold
+  void CalculateFiberDirections();  ///< Calculate main fiber directions from tractogram
 
 protected:
 

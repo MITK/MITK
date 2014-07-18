@@ -1,4 +1,5 @@
 <config>
+  <!-- Shift + LMB -->
   <event_variant class="MousePressEvent" name="ShiftKeyLeftButtonPressed">
     <attribute name="EventButton" value="LeftMouseButton" />
     <attribute name="Modifiers" value="shift" />
@@ -16,5 +17,24 @@
   </event_variant>
   <event_variant class="MouseReleaseEvent" name="LeftButtonReleased">
     <attribute name="EventButton" value="LeftMouseButton" />
+  </event_variant>
+  <!-- Shift + RMB -->
+  <event_variant class="MousePressEvent" name="ShiftKeyRightButtonPressed">
+    <attribute name="EventButton" value="RightMouseButton" />
+    <attribute name="Modifiers" value="shift" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="ShiftKeyRightButtonMoved">
+    <attribute name="ButtonState" value="RightMouseButton" />
+    <attribute name="Modifiers" value="shift" />
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="RightButtonMoved">
+    <attribute name="ButtonState" value="RightMouseButton" />
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="ShiftKeyRightButtonReleased">
+    <attribute name="EventButton" value="RightMouseButton" />
+    <attribute name="Modifiers" value="shift" />
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="RightButtonReleased">
+    <attribute name="EventButton" value="RightMouseButton" />
   </event_variant>
 </config>

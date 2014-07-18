@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  class InteractionPositionEvent;
+
   class MitkSimulation_EXPORT SimulationInteractor : public DataInteractor
   {
   public:
@@ -37,10 +39,12 @@ namespace mitk
     SimulationInteractor();
     ~SimulationInteractor();
 
-    bool AttachMouseNode(StateMachineAction* action, InteractionEvent* event);
-    bool DetachMouseNode(StateMachineAction* action, InteractionEvent* event);
-    bool MoveMouse(StateMachineAction* action, InteractionEvent* event);
-    bool IsMouseNodeAttached(const InteractionEvent* event);    
+    void StartInteraction(const std::string& type, InteractionPositionEvent* event);
+    bool StartPrimaryInteraction(StateMachineAction* action, InteractionEvent* event);
+    bool StartSecondaryInteraction(StateMachineAction* action, InteractionEvent* event);
+    bool ExecuteInteraction(StateMachineAction* action, InteractionEvent* event);
+    bool StopInteraction(StateMachineAction* action, InteractionEvent* event);
+    bool IsInteractionPerformerNotNull(const InteractionEvent* event);
 
     class Impl;
     std::auto_ptr<Impl> m_Impl;

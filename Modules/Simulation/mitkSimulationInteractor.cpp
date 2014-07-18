@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkInteractionPositionEvent.h>
+#include <sofa/component/collision/AttachBodyPerformer.h>
 #include <sofa/component/collision/ComponentMouseInteraction.h>
 #include <sofa/component/collision/FixParticlePerformer.h>
 #include <sofa/component/collision/RayContact.h>
@@ -28,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulation.h"
 #include "mitkSimulationInteractor.h"
 
+using sofa::component::collision::AttachBodyPerformer;
 using sofa::component::collision::BaseRayContact;
 using sofa::component::collision::BodyPicked;
 using sofa::component::collision::ComponentMouseInteraction;
@@ -66,12 +68,12 @@ namespace mitk
     void Uninitialize();
     void AttachMouseNode();
     void DetachMouseNode();
-    bool IsMouseNodeAttached() const;
-    void UpdatePickRay(const InteractionPositionEvent* event);
+    bool IsInteractionPerformerNotNull() const;
+    void UpdatePickRay(InteractionPositionEvent* event);
     void FindCollision();
     void AttachCompatibleInteraction();
     void DetachInteraction(bool setNull);
-    void StartInteraction();
+    void StartInteraction(const std::string& type);
     void ExecuteInteraction();
     void StopInteraction();
 
@@ -187,12 +189,12 @@ void mitk::SimulationInteractor::Impl::DetachMouseNode()
   }
 }
 
-bool mitk::SimulationInteractor::Impl::IsMouseNodeAttached() const
+bool mitk::SimulationInteractor::Impl::IsInteractionPerformerNotNull() const
 {
-  return m_IsMouseNodeAttached;
+  return m_InteractionPerformer.get() != NULL;
 }
 
-void mitk::SimulationInteractor::Impl::UpdatePickRay(const InteractionPositionEvent* event)
+void mitk::SimulationInteractor::Impl::UpdatePickRay(InteractionPositionEvent* event)
 {
   if (!m_IsMouseNodeAttached)
     return;
@@ -236,18 +238,13 @@ void mitk::SimulationInteractor::Impl::FindCollision()
 
   if (m_UseCollisionPipeline)
   {
-    MITK_INFO << "FindCollisionUsingPipeline()";
     m_LastBodyPicked = this->FindCollisionUsingPipeline();
 
     if (m_LastBodyPicked.body != NULL)
       return;
   }
 
-  MITK_INFO << "FindCollisionUsingBruteForce()";
   m_LastBodyPicked = this->FindCollisionUsingBruteForce();
-
-  if (m_LastBodyPicked.body == NULL && m_LastBodyPicked.mstate == NULL)
-    MITK_WARN << "No body picked!";
 }
 
 BodyPicked mitk::SimulationInteractor::Impl::FindCollisionUsingPipeline()
@@ -260,9 +257,6 @@ BodyPicked mitk::SimulationInteractor::Impl::FindCollisionUsingPipeline()
   const double length = ray.l();
 
   const std::set<BaseRayContact*>& contacts = m_PickRayModel->getContacts();
-
-  if (contacts.empty())
-    MITK_WARN << "No picking contacts!";
 
   for (std::set<BaseRayContact*>::const_iterator contact = contacts.begin(); contact != contacts.end(); ++contact)
   {
@@ -332,10 +326,6 @@ BodyPicked mitk::SimulationInteractor::Impl::FindCollisionUsingBruteForce()
     bodyPicked.dist = 0;
     bodyPicked.rayLength = (bodyPicked.point - origin) * direction;
   }
-  else
-  {
-    MITK_WARN << "No particles picked!";
-  }
 
   return bodyPicked;
 }
@@ -401,13 +391,13 @@ void mitk::SimulationInteractor::Impl::DetachInteraction(bool setNull)
   }
 }
 
-void mitk::SimulationInteractor::Impl::StartInteraction()
+void mitk::SimulationInteractor::Impl::StartInteraction(const std::string& type)
 {
   if (m_Interaction == NULL)
     return;
 
   InteractionPerformer::InteractionPerformerFactory* factory = InteractionPerformer::InteractionPerformerFactory::getInstance();
-  m_InteractionPerformer.reset(factory->createObject("FixParticle", m_Interaction->mouseInteractor.get()));
+  m_InteractionPerformer.reset(factory->createObject(type, m_Interaction->mouseInteractor.get()));
 
   if (m_InteractionPerformer.get() != NULL)
   {
@@ -419,10 +409,20 @@ void mitk::SimulationInteractor::Impl::StartInteraction()
 
 void mitk::SimulationInteractor::Impl::ConfigureInteractionPerformer()
 {
-  FixParticlePerformerConfiguration* configuration = dynamic_cast<FixParticlePerformerConfiguration*>(m_InteractionPerformer.get());
+  AttachBodyPerformer<Vec3Types>* attachBodyPerformer = dynamic_cast<AttachBodyPerformer<Vec3Types>*>(m_InteractionPerformer.get());
 
-  if (configuration != NULL)
-    configuration->setStiffness(10000);
+  if (attachBodyPerformer != NULL)
+  {
+    attachBodyPerformer->setStiffness(1000);
+    attachBodyPerformer->setArrowSize(0);
+    attachBodyPerformer->setShowFactorSize(1);
+    return;
+  }
+
+  FixParticlePerformerConfiguration* fixParticlePerformer = dynamic_cast<FixParticlePerformerConfiguration*>(m_InteractionPerformer.get());
+
+  if (fixParticlePerformer != NULL)
+    fixParticlePerformer->setStiffness(10000);
 }
 
 void mitk::SimulationInteractor::Impl::ExecuteInteraction()
@@ -437,6 +437,11 @@ void mitk::SimulationInteractor::Impl::StopInteraction()
 {
   if (m_InteractionPerformer.get() == NULL)
     return;
+
+  AttachBodyPerformer<Vec3Types>* attachBodyPerformer = dynamic_cast<AttachBodyPerformer<Vec3Types>*>(m_InteractionPerformer.get());
+
+  if (attachBodyPerformer != NULL)
+    attachBodyPerformer->clear();
 
   m_Interaction->mouseInteractor->removeInteractionPerformer(m_InteractionPerformer.get());
   m_InteractionPerformer.release();
@@ -453,10 +458,11 @@ mitk::SimulationInteractor::~SimulationInteractor()
 
 void mitk::SimulationInteractor::ConnectActionsAndFunctions()
 {
-  CONNECT_FUNCTION("attachMouseNode", AttachMouseNode);
-  CONNECT_FUNCTION("detachMouseNode", DetachMouseNode);
-  CONNECT_FUNCTION("moveMouse", MoveMouse);
-  CONNECT_CONDITION("isMouseNodeAttached", IsMouseNodeAttached);
+  CONNECT_FUNCTION("startPrimaryInteraction", StartPrimaryInteraction);
+  CONNECT_FUNCTION("startSecondaryInteraction", StartSecondaryInteraction);
+  CONNECT_FUNCTION("stopInteraction", StopInteraction);
+  CONNECT_FUNCTION("executeInteraction", ExecuteInteraction);
+  CONNECT_CONDITION("isInteractionPerformerNotNull", IsInteractionPerformerNotNull);
 }
 
 void mitk::SimulationInteractor::DataNodeChanged()
@@ -479,32 +485,42 @@ void mitk::SimulationInteractor::DataNodeChanged()
   m_Impl->Uninitialize();
 }
 
-bool mitk::SimulationInteractor::AttachMouseNode(StateMachineAction*, InteractionEvent* event)
+void mitk::SimulationInteractor::StartInteraction(const std::string& type, InteractionPositionEvent* event)
 {
   m_Impl->AttachMouseNode();
-  m_Impl->UpdatePickRay(dynamic_cast<const InteractionPositionEvent*>(event));
+  m_Impl->UpdatePickRay(event);
   m_Impl->FindCollision();
   m_Impl->AttachCompatibleInteraction();
-  m_Impl->StartInteraction();
+  m_Impl->StartInteraction(type);
+}
 
+bool mitk::SimulationInteractor::StartPrimaryInteraction(StateMachineAction*, InteractionEvent* event)
+{
+  this->StartInteraction("AttachBody", dynamic_cast<InteractionPositionEvent*>(event));
   return true;
 }
 
-bool mitk::SimulationInteractor::DetachMouseNode(StateMachineAction*, InteractionEvent*)
+bool mitk::SimulationInteractor::StartSecondaryInteraction(StateMachineAction*, InteractionEvent* event)
+{
+  this->StartInteraction("FixParticle", dynamic_cast<InteractionPositionEvent*>(event));
+  return true;
+}
+
+bool mitk::SimulationInteractor::StopInteraction(StateMachineAction*, InteractionEvent*)
 {
   m_Impl->StopInteraction();
   m_Impl->DetachMouseNode();
   return true;
 }
 
-bool mitk::SimulationInteractor::MoveMouse(StateMachineAction*, InteractionEvent* event)
+bool mitk::SimulationInteractor::ExecuteInteraction(StateMachineAction*, InteractionEvent* event)
 {
-  m_Impl->UpdatePickRay(dynamic_cast<const InteractionPositionEvent*>(event));
+  m_Impl->UpdatePickRay(dynamic_cast<InteractionPositionEvent*>(event));
   m_Impl->ExecuteInteraction();
   return true;
 }
 
-bool mitk::SimulationInteractor::IsMouseNodeAttached(const InteractionEvent*)
+bool mitk::SimulationInteractor::IsInteractionPerformerNotNull(const InteractionEvent*)
 {
-  return m_Impl->IsMouseNodeAttached();
+  return m_Impl->IsInteractionPerformerNotNull();
 }

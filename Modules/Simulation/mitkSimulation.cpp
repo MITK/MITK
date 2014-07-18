@@ -50,6 +50,8 @@ void mitk::Simulation::Animate()
   boost::chrono::high_resolution_clock::time_point t0 = boost::chrono::high_resolution_clock::now();
   m_SOFASimulation->animate(m_RootNode.get(), m_RootNode->getDt());
   this->SetElapsedTime(boost::chrono::high_resolution_clock::now() - t0);
+
+  this->UpdateOutputInformation();
 }
 
 sofa::core::visual::DrawTool* mitk::Simulation::GetDrawTool()

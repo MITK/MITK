@@ -14,49 +14,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkSimulationSceneTreeWidget.h"
+#include "QmitkSceneTreeWidget.h"
 #include <sofa/core/collision/CollisionGroupManager.h>
 #include <sofa/core/collision/ContactManager.h>
 #include <sofa/simulation/common/Colors.h>
 #include <sofa/simulation/common/Node.h>
 
 template <class T>
-static inline T* as(QmitkSimulationSceneTreeWidget::Base* base)
+static inline T* as(QmitkSceneTreeWidget::Base* base)
 {
   return dynamic_cast<T*>(base);
 }
 
 template <class T>
-static inline bool is(QmitkSimulationSceneTreeWidget::Base* base)
+static inline bool is(QmitkSceneTreeWidget::Base* base)
 {
   return dynamic_cast<T*>(base) != NULL;
 }
 
 template <class T1, class T2>
-static inline bool is(QmitkSimulationSceneTreeWidget::Base* base)
+static inline bool is(QmitkSceneTreeWidget::Base* base)
 {
   return is<T1>(base) || is<T2>(base);
 }
 
 template <class T1, class T2, class T3, class T4, class T5>
-static inline bool is(QmitkSimulationSceneTreeWidget::Base* base)
+static inline bool is(QmitkSceneTreeWidget::Base* base)
 {
   return is<T1, T2>(base) || is<T3, T4>(base) || is<T5>(base);
 }
 
-static inline bool isBaseInteractionForceField(QmitkSimulationSceneTreeWidget::Base* base)
+static inline bool isBaseInteractionForceField(QmitkSceneTreeWidget::Base* base)
 {
   sofa::core::behavior::BaseInteractionForceField* iff = dynamic_cast<sofa::core::behavior::BaseInteractionForceField*>(base);
   return iff != NULL && iff->getMechModel1() != iff->getMechModel2();
 }
 
-static inline bool isMechanicalMapping(QmitkSimulationSceneTreeWidget::Base* base)
+static inline bool isMechanicalMapping(QmitkSceneTreeWidget::Base* base)
 {
   sofa::core::BaseMapping* mm = dynamic_cast<sofa::core::BaseMapping*>(base);
   return mm != NULL && mm->isMechanical();
 }
 
-static QRgb GetColor(QmitkSimulationSceneTreeWidget::Base* base)
+static QRgb GetColor(QmitkSceneTreeWidget::Base* base)
 {
   using namespace sofa::core;
   using namespace sofa::core::behavior;
@@ -143,41 +143,41 @@ static QPixmap ReplaceColor(const QPixmap& pixmap, QRgb from, QRgb to)
   return QPixmap::fromImage(image);
 }
 
-static inline QIcon CreateObjectIcon(QmitkSimulationSceneTreeWidget::Base* base)
+static inline QIcon CreateObjectIcon(QmitkSceneTreeWidget::Base* base)
 {
   return QIcon(ReplaceColor(QPixmap(":/Simulation/Object"), 0xff00ff00, GetColor(base)));
 }
 
-static inline QIcon CreateNodeIcon(QmitkSimulationSceneTreeWidget::BaseNode* node)
+static inline QIcon CreateNodeIcon(QmitkSceneTreeWidget::BaseNode* node)
 {
   return QIcon(ReplaceColor(QPixmap(":/Simulation/Node"), 0xff00ff00, GetColor(node)));
 }
 
-static inline QIcon CreateSlaveIcon(QmitkSimulationSceneTreeWidget::Base* base)
+static inline QIcon CreateSlaveIcon(QmitkSceneTreeWidget::Base* base)
 {
   return QIcon(ReplaceColor(QPixmap(":/Simulation/Slave"), 0xff00ff00, GetColor(base)));
 }
 
-static inline QString GetName(QmitkSimulationSceneTreeWidget::Base* base)
+static inline QString GetName(QmitkSceneTreeWidget::Base* base)
 {
   return QString::fromStdString(base->getName());
 }
 
-static inline QString GetClassName(QmitkSimulationSceneTreeWidget::Base* base)
+static inline QString GetClassName(QmitkSceneTreeWidget::Base* base)
 {
   return QString::fromStdString(base->getClassName());
 }
 
-QmitkSimulationSceneTreeWidget::QmitkSimulationSceneTreeWidget(QWidget* parent)
+QmitkSceneTreeWidget::QmitkSceneTreeWidget(QWidget* parent)
   : QTreeWidget(parent)
 {
 }
 
-QmitkSimulationSceneTreeWidget::~QmitkSimulationSceneTreeWidget()
+QmitkSceneTreeWidget::~QmitkSceneTreeWidget()
 {
 }
 
-void QmitkSimulationSceneTreeWidget::clear()
+void QmitkSceneTreeWidget::clear()
 {
   QTreeWidgetItem* rootItem = this->topLevelItem(0);
 
@@ -189,7 +189,7 @@ void QmitkSimulationSceneTreeWidget::clear()
   QTreeWidget::clear();
 }
 
-void QmitkSimulationSceneTreeWidget::addChild(Node* parent, Node* child)
+void QmitkSceneTreeWidget::addChild(Node* parent, Node* child)
 {
   assert(child != NULL && "Child node is NULL!");
   assert(!m_BaseItemMap.contains(child) && "TODO: Support nodes with multiple parents!");
@@ -213,7 +213,7 @@ void QmitkSimulationSceneTreeWidget::addChild(Node* parent, Node* child)
   MutationListener::addChild(parent, child);
 }
 
-void QmitkSimulationSceneTreeWidget::removeChild(Node* parent, Node* child)
+void QmitkSceneTreeWidget::removeChild(Node* parent, Node* child)
 {
   assert(child != NULL && "Child node is NULL!");
   assert(m_BaseItemMap.contains(child) && "Child node has already been removed!");
@@ -233,7 +233,7 @@ void QmitkSimulationSceneTreeWidget::removeChild(Node* parent, Node* child)
   this->RemoveFromMaps(child); 
 }
 
-void QmitkSimulationSceneTreeWidget::moveChild(Node* previous, Node* parent, Node* child)
+void QmitkSceneTreeWidget::moveChild(Node* previous, Node* parent, Node* child)
 {
   if (previous == NULL)
   {
@@ -255,22 +255,25 @@ void QmitkSimulationSceneTreeWidget::moveChild(Node* previous, Node* parent, Nod
   }
 }
 
-void QmitkSimulationSceneTreeWidget::addObject(Node* parent, BaseObject* object)
+void QmitkSceneTreeWidget::addObject(Node* parent, BaseObject* object)
 {
   assert(parent != NULL && "Parent node is NULL!");
   assert(object != NULL && "Object is NULL!");
   assert(m_BaseItemMap.contains(parent) && "Unknown parent node!");
-  assert(!m_BaseItemMap.contains(object) && "Object has already been added!");
+  // assert(!m_BaseItemMap.contains(object) && "Object has already been added!");
 
-  QTreeWidgetItem* item = new QTreeWidgetItem(m_BaseItemMap[parent], QStringList() << GetName(object));
-  item->setToolTip(0, GetClassName(object));
-  item->setIcon(0, CreateObjectIcon(object));
-  this->InsertIntoMaps(object, item);
+  if (!m_BaseItemMap.contains(object))
+  {
+    QTreeWidgetItem* item = new QTreeWidgetItem(m_BaseItemMap[parent], QStringList() << GetName(object));
+    item->setToolTip(0, GetClassName(object));
+    item->setIcon(0, CreateObjectIcon(object));
+    this->InsertIntoMaps(object, item);
+  }
 
   MutationListener::addObject(parent, object);
 }
 
-void QmitkSimulationSceneTreeWidget::removeObject(Node* parent, BaseObject* object)
+void QmitkSceneTreeWidget::removeObject(Node* parent, BaseObject* object)
 {
   assert(parent != NULL && "Parent node is NULL!");
   assert(object != NULL && "Object is NULL!");
@@ -283,7 +286,7 @@ void QmitkSimulationSceneTreeWidget::removeObject(Node* parent, BaseObject* obje
   this->RemoveFromMaps(object);  
 }
 
-void QmitkSimulationSceneTreeWidget::moveObject(Node* previous, Node* parent, BaseObject* object)
+void QmitkSceneTreeWidget::moveObject(Node* previous, Node* parent, BaseObject* object)
 {
   if (previous == NULL)
   {
@@ -305,7 +308,7 @@ void QmitkSimulationSceneTreeWidget::moveObject(Node* previous, Node* parent, Ba
   }
 }
 
-void QmitkSimulationSceneTreeWidget::addSlave(BaseObject* master, BaseObject* slave)
+void QmitkSceneTreeWidget::addSlave(BaseObject* master, BaseObject* slave)
 {
   assert(master != NULL && "Master object is NULL!");
   assert(slave != NULL && "Slave object is NULL!");
@@ -320,7 +323,7 @@ void QmitkSimulationSceneTreeWidget::addSlave(BaseObject* master, BaseObject* sl
   MutationListener::addSlave(master, slave);
 }
 
-void QmitkSimulationSceneTreeWidget::removeSlave(BaseObject* master, BaseObject* slave)
+void QmitkSceneTreeWidget::removeSlave(BaseObject* master, BaseObject* slave)
 {
   assert(master != NULL && "Master object is NULL!");
   assert(slave != NULL && "Slave object is NULL!");
@@ -333,7 +336,7 @@ void QmitkSimulationSceneTreeWidget::removeSlave(BaseObject* master, BaseObject*
   this->RemoveFromMaps(slave);  
 }
 
-void QmitkSimulationSceneTreeWidget::moveSlave(BaseObject* previousMaster, BaseObject* master, BaseObject* slave)
+void QmitkSceneTreeWidget::moveSlave(BaseObject* previousMaster, BaseObject* master, BaseObject* slave)
 {
   if (previousMaster == NULL)
   {
@@ -355,26 +358,26 @@ void QmitkSimulationSceneTreeWidget::moveSlave(BaseObject* previousMaster, BaseO
   }
 }
 
-QmitkSimulationSceneTreeWidget::Base* QmitkSimulationSceneTreeWidget::GetBaseFromItem(QTreeWidgetItem* item) const
+QmitkSceneTreeWidget::Base* QmitkSceneTreeWidget::GetBaseFromItem(QTreeWidgetItem* item) const
 {
   return m_ItemBaseMap.contains(item)
     ? m_ItemBaseMap[item]
     : NULL;
 }
 
-void QmitkSimulationSceneTreeWidget::ClearMaps()
+void QmitkSceneTreeWidget::ClearMaps()
 {
   m_BaseItemMap.clear();
   m_ItemBaseMap.clear();
 }
 
-void QmitkSimulationSceneTreeWidget::InsertIntoMaps(Base* base, QTreeWidgetItem* item)
+void QmitkSceneTreeWidget::InsertIntoMaps(Base* base, QTreeWidgetItem* item)
 {
   m_BaseItemMap.insert(base, item);
   m_ItemBaseMap.insert(item, base);
 }
 
-void QmitkSimulationSceneTreeWidget::RemoveFromMaps(Base* base)
+void QmitkSceneTreeWidget::RemoveFromMaps(Base* base)
 {
   m_ItemBaseMap.remove(m_BaseItemMap[base]);
   m_BaseItemMap.remove(base);

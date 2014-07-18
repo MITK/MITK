@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkSimulationSceneTreeWidget_h
-#define QmitkSimulationSceneTreeWidget_h
+#ifndef QmitkSceneTreeWidget_h
+#define QmitkSceneTreeWidget_h
 
 #include <QMap>
 #include <QTreeWidget>
@@ -39,7 +39,7 @@ namespace sofa
   }
 }
 
-class QmitkSimulationSceneTreeWidget : public QTreeWidget, public sofa::simulation::MutationListener
+class QmitkSceneTreeWidget : public QTreeWidget, public sofa::simulation::MutationListener
 {
   Q_OBJECT
 
@@ -49,16 +49,16 @@ public:
   typedef sofa::core::objectmodel::BaseObject BaseObject;
   typedef sofa::simulation::Node Node;
 
-  explicit QmitkSimulationSceneTreeWidget(QWidget* parent = NULL);
-  ~QmitkSimulationSceneTreeWidget();
+  explicit QmitkSceneTreeWidget(QWidget* parent = NULL);
+  ~QmitkSceneTreeWidget();
 
   Base* GetBaseFromItem(QTreeWidgetItem* item) const;
 
-  // QTreeWidget, QTreeView, and QAbstractItemView Interfaces //////////////////////
+  // QTreeWidget, QTreeView, and QAbstractItemView Interfaces /////////////////
   void clear();
-  //////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
 
-  // MutationListener Interface ////////////////////////////////////////////////////
+  // MutationListener Interface ///////////////////////////////////////////////
   void addChild(Node* parent, Node* child);
   void removeChild(Node* parent, Node* child);
   void moveChild(Node* previous, Node* parent, Node* child);
@@ -68,7 +68,7 @@ public:
   void addSlave(BaseObject* master, BaseObject* slave);
   void removeSlave(BaseObject* master, BaseObject* slave);
   void moveSlave(BaseObject* previousMaster, BaseObject* master, BaseObject* slave);
-  //////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
 
 private:
   void ClearMaps();

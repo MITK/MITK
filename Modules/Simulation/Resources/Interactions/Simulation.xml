@@ -1,0 +1,23 @@
+<statemachine>
+  <state name="start" startstate="true">
+    <transition event_class="MousePressEvent" event_variant="ShiftKeyLeftButtonPressed" target="start">
+      <action name="attachMouseNode" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="ShiftKeyLeftButtonMoved" target="start">
+      <condition name="isMouseNodeAttached" />
+      <action name="moveMouse" />
+    </transition>
+    <transition event_class="MouseMoveEvent" event_variant="LeftButtonMoved" target="start">
+      <condition name="isMouseNodeAttached" />
+      <action name="moveMouse" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="ShiftKeyLeftButtonReleased" target="start">
+      <condition name="isMouseNodeAttached" />
+      <action name="detachMouseNode" />
+    </transition>
+    <transition event_class="MouseReleaseEvent" event_variant="LeftButtonReleased" target="start">
+      <condition name="isMouseNodeAttached" />
+      <action name="detachMouseNode" />
+    </transition>
+  </state>
+</statemachine>

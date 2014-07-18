@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSimulationView_h
 #define QmitkSimulationView_h
 
+#include <mitkSimulationInteractor.h>
 #include <QmitkAbstractView.h>
 #include <QTime>
 #include <QTimer>
@@ -43,13 +44,15 @@ private slots:
   void OnDtChanged(double dt);
   void OnResetButtonClicked();
   void OnSelectedSimulationChanged(const mitk::DataNode* node);
+  void OnSelectedBaseChanged();
   void OnStep(bool renderWindowUpdate);
   void OnStepButtonClicked();
   void OnTimeout();
+  void OnButtonClicked();
 
 private:
   void OnNodeRemovedFromDataStorage(const mitk::DataNode* node);
-  void ResetSimulationSceneTreeWidget();
+  void ResetSceneTreeWidget();
   void SetSimulationControlsEnabled(bool enabled);
 
   static const int MSecsPerFrame = 17;
@@ -57,6 +60,7 @@ private:
   Ui::QmitkSimulationViewControls m_Controls;
   mitk::ISimulationService* m_SimulationService;
   mitk::DataNode::Pointer m_Selection;
+  mitk::SimulationInteractor::Pointer m_Interactor;
   QTimer m_Timer;
   QTime m_NextRenderWindowUpdate;
 };

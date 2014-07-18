@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>274</width>
+    <width>248</width>
     <height>751</height>
    </rect>
   </property>
@@ -109,27 +109,57 @@
     </layout>
    </item>
    <item>
-    <widget class="QmitkSimulationSceneTreeWidget" name="simulationSceneTreeWidget">
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="rootIsDecorated">
-      <bool>false</bool>
-     </property>
-     <property name="columnCount">
-      <number>1</number>
-     </property>
-     <attribute name="headerVisible">
-      <bool>false</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Name</string>
+     <widget class="QmitkSceneTreeWidget" name="sceneTreeWidget">
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
       </property>
-     </column>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <property name="rootIsDecorated">
+       <bool>false</bool>
+      </property>
+      <property name="columnCount">
+       <number>1</number>
+      </property>
+      <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QmitkBaseTreeWidget" name="baseTreeWidget">
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <attribute name="headerDefaultSectionSize">
+       <number>120</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Property</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Value</string>
+       </property>
+      </column>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string/>
+     </property>
     </widget>
    </item>
   </layout>
@@ -141,9 +171,14 @@
    <header>QmitkDataStorageComboBox.h</header>
   </customwidget>
   <customwidget>
-   <class>QmitkSimulationSceneTreeWidget</class>
+   <class>QmitkSceneTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header>QmitkSimulationSceneTreeWidget.h</header>
+   <header>QmitkSceneTreeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkBaseTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>QmitkBaseTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

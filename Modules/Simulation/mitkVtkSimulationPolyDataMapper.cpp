@@ -64,3 +64,23 @@ void mitk::vtkSimulationPolyDataMapper::SetSimulation(Simulation::Pointer simula
 {
   m_Simulation = simulation;
 }
+
+double* mitk::vtkSimulationPolyDataMapper::GetBounds()
+{
+  if (m_Simulation.IsNull())
+    return Superclass::GetBounds();
+
+  sofa::simulation::Node::SPtr rootNode = m_Simulation->GetRootNode();
+  const sofa::defaulttype::BoundingBox& bbox = rootNode->f_bbox.getValue();
+  const sofa::defaulttype::Vector3& min = bbox.minBBox();
+  const sofa::defaulttype::Vector3& max = bbox.maxBBox();
+
+  Bounds[0] = min.x();
+  Bounds[1] = max.x();
+  Bounds[2] = min.y();
+  Bounds[3] = max.y();
+  Bounds[4] = min.z();
+  Bounds[5] = max.z();
+
+  return this->Bounds;
+}

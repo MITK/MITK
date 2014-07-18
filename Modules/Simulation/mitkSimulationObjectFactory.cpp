@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sofa/helper/system/glut.h>
 #include <sofa/component/init.h>
 #include <sofa/core/ObjectFactory.h>
+#include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/common/xml/initXml.h>
 
 static void InitializeSofa()
@@ -33,6 +34,8 @@ static void InitializeSofa()
 
   sofa::component::init();
   sofa::simulation::xml::initXml();
+
+  sofa::core::visual::VisualParams::defaultInstance()->setSupported(sofa::core::visual::API_OpenGL);
 }
 
 static void RegisterSofaClasses()

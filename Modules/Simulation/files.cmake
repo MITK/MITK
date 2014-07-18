@@ -10,6 +10,7 @@ set(CPP_FILES
   mitkSchedulingAlgorithmBase.cpp
   mitkSimulation.cpp
   mitkSimulationActivator.cpp
+  mitkSimulationInteractor.cpp
   mitkSimulationIOFactory.cpp
   mitkSimulationObjectFactory.cpp
   mitkSimulationReader.cpp
@@ -21,4 +22,9 @@ set(CPP_FILES
   mitkVtkModel.cpp
   mitkVtkSimulationPolyDataMapper.cpp
   mitkWeightedRoundRobinSchedulingAlgorithm.cpp
+)
+
+set(RESOURCE_FILES
+  Interactions/Simulation.xml
+  Interactions/SimulationConfig.xml
 )

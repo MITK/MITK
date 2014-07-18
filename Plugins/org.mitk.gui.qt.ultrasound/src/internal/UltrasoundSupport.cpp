@@ -58,6 +58,7 @@ m_Controls.setupUi( parent );
 connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this, SLOT(OnClickedAddNewDevice()) ); // Change Widget Visibilities
 connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
 connect( m_Controls.m_ActiveVideoDevices, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnChangedActiveDevice()) );
+connect( m_Controls.m_RunImageTimer, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()) );
 connect( m_Controls.m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()) );
 connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
 connect( m_Controls.m_FrameRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit(int)) );
@@ -190,9 +191,17 @@ if(m_Controls.m_ShowImageStream->isChecked())
 {this->GetDataStorage()->Add(m_Node);}
 
 //start timer
-int interval = (1000 / m_Controls.m_FrameRate->value());
-m_Timer->setInterval(interval);
-m_Timer->start();
+if(m_Controls.m_RunImageTimer->isChecked())
+  {
+  int interval = (1000 / m_Controls.m_FrameRate->value());
+  m_Timer->setInterval(interval);
+  m_Timer->start();
+  m_Controls.m_TimerWidget->setEnabled(true);
+  }
+else
+  {
+  m_Controls.m_TimerWidget->setEnabled(false);
+  }
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()
@@ -344,6 +353,7 @@ void UltrasoundSupport::StoreUISettings()
   QSettings settings;
   settings.beginGroup(QString::fromStdString(VIEW_ID));
   settings.setValue("DisplayImage", QVariant(m_Controls.m_ShowImageStream->isChecked()));
+  settings.setValue("RunImageTimer", QVariant(m_Controls.m_RunImageTimer->isChecked()));
   settings.endGroup();
 }
 
@@ -352,5 +362,6 @@ void UltrasoundSupport::LoadUISettings()
   QSettings settings;
   settings.beginGroup(QString::fromStdString(VIEW_ID));
   m_Controls.m_ShowImageStream->setChecked(settings.value("DisplayImage", true).toBool());
+  m_Controls.m_RunImageTimer->setChecked(settings.value("RunImageTimer", true).toBool());
   settings.endGroup();
 }

@@ -271,6 +271,9 @@ class USControlInterfaceDoppler;
     /* @return Returns the area that will be cropped from the US image. Is disabled / [0,0,0,0] by default. */
     mitk::USDevice::USImageCropArea GetCropArea();
 
+    /** @return Returns the current image source of this device. */
+    virtual USImageSource::Pointer GetUSImageSource() = 0;
+
     /** \brief Deprecated -> use GetManufacturer() instead */
     DEPRECATED(std::string GetDeviceManufacturer());
     /** \brief Deprecated -> use GetName() instead */
@@ -290,8 +293,6 @@ class USControlInterfaceDoppler;
     itkGetMacro(ServiceProperties, us::ServiceProperties)
 
     void GrabImage();
-
-    virtual USImageSource::Pointer GetUSImageSource() = 0;
 
   protected:
     itkSetMacro(Image, mitk::Image::Pointer);

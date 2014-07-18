@@ -361,20 +361,23 @@ bool mitk::USCombinedModality::GetContainsAtLeastOneCalibration()
 void mitk::USCombinedModality::GenerateData()
 {
   // update ultrasound image source and get current output then
-  m_UltrasoundDevice->Modified();
+  //m_UltrasoundDevice->Modified();
   m_UltrasoundDevice->Update();
   mitk::Image::Pointer image = m_UltrasoundDevice->GetOutput();
   if ( image.IsNull() || ! image->IsInitialized() ) {
     return;
   }
 
+
   // get output and initialize it if it wasn't initialized before
+
   mitk::Image::Pointer output = this->GetOutput();
   if ( ! output->IsInitialized() ) { output->Initialize(image); }
 
   mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0,0,0));
   output->SetSlice(inputReadAccessor.GetData()); //copy image data
   output->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing()); //copy spacing because this might also change
+
 
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
   if ( ! calibrationKey.empty() )
@@ -385,7 +388,7 @@ void mitk::USCombinedModality::GenerateData()
     {
       // transform image according to callibration if one is set
       // for current configuration of probe and depth
-      output->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
+      this->GetOutput()->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
     }
   }
 }

@@ -360,25 +360,25 @@ bool mitk::USCombinedModality::GetContainsAtLeastOneCalibration()
 
 void mitk::USCombinedModality::GenerateData()
 {
-  // update ultrasound image source and get current output then
-  //m_UltrasoundDevice->Modified();
-  m_UltrasoundDevice->Update();
-  mitk::Image::Pointer image = m_UltrasoundDevice->GetOutput();
-  if ( image.IsNull() || ! image->IsInitialized() ) {
+  //get next image from ultrasound image source
+  mitk::Image::Pointer image = m_UltrasoundDevice->GetUSImageSource()->GetNextImage();
+
+  if ( image.IsNull() || ! image->IsInitialized() ) //check the image
+    {
+    MITK_WARN << "Invalid image in USCombinedModality, aborting!";
     return;
-  }
+    }
 
-
-  // get output and initialize it if it wasn't initialized before
-
+  //get output and initialize it if it wasn't initialized before
   mitk::Image::Pointer output = this->GetOutput();
   if ( ! output->IsInitialized() ) { output->Initialize(image); }
 
+  //now update image data
   mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0,0,0));
   output->SetSlice(inputReadAccessor.GetData()); //copy image data
   output->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing()); //copy spacing because this might also change
 
-
+  //and update calibration (= transformation of the image)
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
   if ( ! calibrationKey.empty() )
   {

@@ -360,6 +360,8 @@ bool mitk::USCombinedModality::GetContainsAtLeastOneCalibration()
 
 void mitk::USCombinedModality::GenerateData()
 {
+  if (m_UltrasoundDevice->GetIsFreezed()) {return;} //if the image is freezed: do nothing
+
   //get next image from ultrasound image source
   mitk::Image::Pointer image = m_UltrasoundDevice->GetUSImageSource()->GetNextImage();
 

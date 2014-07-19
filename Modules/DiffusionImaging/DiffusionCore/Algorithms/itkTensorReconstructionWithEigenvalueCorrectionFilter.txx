@@ -745,11 +745,11 @@ namespace itk
                   double tempsum=0;
                   double temp_number=0;
 
-                  for(int i=back_x; i<=forth_x; i++)
+                  for(unsigned int i=back_x; i<=forth_x; i++)
                   {
-                    for (int j=back_y; j<=forth_y; j++)
+                    for (unsigned int j=back_y; j<=forth_y; j++)
                     {
-                      for (int k=back_z; k<=forth_z; k++)
+                      for (unsigned int k=back_z; k<=forth_z; k++)
                       {
                         itk::Index<3> ix = {i,j,k};
 
@@ -815,11 +815,11 @@ namespace itk
                   double tempsum=0;
                   double temp_number=0;
 
-                  for(int i=back_x; i<=forth_x; i++)
+                  for(unsigned int i=back_x; i<=forth_x; i++)
                   {
-                    for (int j=back_y; j<=forth_y; j++)
+                    for (unsigned int j=back_y; j<=forth_y; j++)
                     {
-                      for (int k=back_z; k<=forth_z; k++)
+                      for (unsigned int k=back_z; k<=forth_z; k++)
                       {
                         itk::Index<3> ix = {i,j,k};
 

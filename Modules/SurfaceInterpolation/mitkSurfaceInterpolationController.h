@@ -97,6 +97,12 @@ namespace mitk
      */
     void SetSegmentationImage(Image* workingImage);
 
+    /**
+     * @brief Get the current selected segmentation for which the interpolation is performed
+     * @return the current segmentation image
+     */
+    mitk::Image::Pointer GetCurrentSegmentation();
+
     Surface* GetContoursAsSurface();
 
     void SetDataStorage(DataStorage::Pointer ds);
@@ -104,14 +110,33 @@ namespace mitk
     /**
      * Sets the current list of contourpoints which is used for the surface interpolation
      * @param segmentation The current selected segmentation
+     * \deprecatedSince{2014_03}
      */
-    void SetCurrentSegmentationInterpolationList(mitk::Image* segmentation);
+    DEPRECATED (void SetCurrentSegmentationInterpolationList(mitk::Image::Pointer segmentation));
+
+    /**
+     * Sets the current list of contourpoints which is used for the surface interpolation
+     * @param segmentation The current selected segmentation
+     */
+    void SetCurrentInterpolationSession(mitk::Image::Pointer currentSegmentationImage);
 
     /**
      * Removes the segmentation and all its contours from the list
      * @param segmentation The segmentation to be removed
+     * \deprecatedSince{2014_03}
      */
-    void RemoveSegmentationFromContourList(mitk::Image* segmentation);
+    DEPRECATED (void RemoveSegmentationFromContourList(mitk::Image* segmentation));
+
+    /**
+     * @brief Remove interpolation session
+     * @param segmentationImage the session to be removed
+     */
+    void RemoveInterpolationSession(mitk::Image::Pointer segmentationImage);
+
+    /**
+     * @brief Removes all sessions
+     */
+    void RemoveAllInterpolationSessions();
 
     mitk::Image* GetImage();
 
@@ -120,6 +145,8 @@ namespace mitk
      * \returns The percentage of the real memory which will be used by the interpolation
      */
     double EstimatePortionOfNeededMemory();
+
+    unsigned int GetNumberOfInterpolationSessions();
 
  protected:
 
@@ -139,7 +166,7 @@ namespace mitk
    };
 
     typedef std::vector<ContourPositionPair> ContourPositionPairList;
-    typedef std::map<mitk::Image* , ContourPositionPairList> ContourListMap;
+    typedef std::map<mitk::Image*, ContourPositionPairList> ContourListMap;
 
     ContourPositionPairList::iterator m_Iterator;
 
@@ -153,7 +180,7 @@ namespace mitk
 
     mitk::DataStorage::Pointer m_DataStorage;
 
-    ContourListMap m_MapOfContourLists;
+    ContourListMap m_ListOfInterpolationSessions;
 
     mitk::Surface::Pointer m_InterpolationResult;
 

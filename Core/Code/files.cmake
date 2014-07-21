@@ -302,6 +302,7 @@ set(CPP_FILES
 
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
+  IO/mitkAbstractFileIO.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkDicomSR_LoadDICOMScalar.cpp
   IO/mitkDicomSR_LoadDICOMScalar4D.cpp
@@ -381,7 +382,7 @@ set(CPP_FILES
 
   Internal/mitkCoreActivator.cpp
   Internal/mitkFileReaderWriterBase.cpp
-  Internal/mitkItkFileReaderService.cpp
+  Internal/mitkItkImageIO.cpp
   Internal/mitkLegacyFileReaderService.cpp
   #Internal/mitkLegacyFileWriterService.cpp
   Internal/mitkMimeTypeProvider.cpp

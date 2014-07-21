@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // File IO
 #include <mitkIOUtil.h>
-#include <Internal/mitkItkFileReaderService.h>
+#include <Internal/mitkItkImageIO.h>
 #include <Internal/mitkMimeTypeProvider.h>
 #include <Internal/mitkPointSetReaderService.h>
 #include <Internal/mitkPointSetWriterService.h>
@@ -296,6 +296,18 @@ void MitkCoreActivator::Unload(us::ModuleContext* )
     delete *iter;
   }
 
+  for(std::vector<mitk::IFileWriter*>::iterator iter = m_FileWriters.begin(),
+      endIter = m_FileWriters.end(); iter != endIter; ++iter)
+  {
+    delete *iter;
+  }
+
+  for(std::vector<mitk::AbstractFileIO*>::iterator iter = m_FileIOs.begin(),
+      endIter = m_FileIOs.end(); iter != endIter; ++iter)
+  {
+    delete *iter;
+  }
+
   // The mitk::ModuleContext* argument of the Unload() method
   // will always be 0 for the Mitk library. It makes no sense
   // to use it at this stage anyway, since all libraries which
@@ -332,7 +344,6 @@ void MitkCoreActivator::RegisterMimeTypes()
 
 void MitkCoreActivator::RegisterItkReaderWriter()
 {
-  std::list<itk::ImageIOBase::Pointer> possibleImageIO;
   std::list<itk::LightObject::Pointer> allobjects =
     itk::ObjectFactoryBase::CreateAllInstance("itkImageIOBase");
   for (std::list<itk::LightObject::Pointer >::iterator i = allobjects.begin(),
@@ -341,14 +352,7 @@ void MitkCoreActivator::RegisterItkReaderWriter()
     itk::ImageIOBase* io = dynamic_cast<itk::ImageIOBase*>(i->GetPointer());
     if (io)
     {
-      if(!io->GetSupportedReadExtensions().empty())
-      {
-        possibleImageIO.push_back(io);
-      }
-      else
-      {
-        MITK_INFO << "ImageIO factory " << io->GetNameOfClass() << " does not report its supported read extensions.";
-      }
+      m_FileIOs.push_back(new mitk::ItkImageIO(io));
     }
     else
     {
@@ -356,44 +360,6 @@ void MitkCoreActivator::RegisterItkReaderWriter()
                 << ( *i )->GetNameOfClass();
     }
   }
-  for (std::list<itk::ImageIOBase::Pointer>::iterator k = possibleImageIO.begin(),
-    endIter = possibleImageIO.end(); k != endIter; ++k)
-  {
-    m_FileReaders.push_back(new mitk::ItkFileReaderService((*k)->GetSupportedReadExtensions(), "ITK Image Reader"));
-  }
-
-  // Some ITK ImageIOBase sub-classes do not report supported read extensions.
-  // Registering them manually here.
-  std::vector<std::string> extensions;
-
-  extensions.clear();
-  extensions.push_back("gdcm");
-  m_FileReaders.push_back(new mitk::ItkFileReaderService(extensions, "ITK Image Reader"));
-
-  extensions.clear();
-  extensions.push_back("png");
-  extensions.push_back("PNG");
-  m_FileReaders.push_back(new mitk::ItkFileReaderService(extensions, "ITK Image Reader"));
-
-  extensions.clear();
-  extensions.push_back("spr");
-  m_FileReaders.push_back(new mitk::ItkFileReaderService(extensions, "ITK Image Reader"));
-
-  extensions.clear();
-  extensions.push_back("gipl");
-  extensions.push_back("gipl.gz");
-  m_FileReaders.push_back(new mitk::ItkFileReaderService(extensions, "ITK Image Reader"));
-
-  extensions.clear();
-  extensions.push_back("hdf");
-  extensions.push_back("h4");
-  extensions.push_back("hdf4");
-  extensions.push_back("h5");
-  extensions.push_back("hdf5");
-  extensions.push_back("he4");
-  extensions.push_back("he5");
-  extensions.push_back("hd5");
-  m_FileReaders.push_back(new mitk::ItkFileReaderService(extensions, "ITK Image Reader"));
 }
 
 void MitkCoreActivator::RegisterMimeType(const std::string& id, const std::string& category,

@@ -73,6 +73,7 @@ public:
   virtual void RemoveProgressCallback(const ProgressCallback& callback);
 
   us::ServiceRegistration<IFileWriter> RegisterService(us::ModuleContext* context = us::GetModuleContext());
+  void UnregisterService();
 
 protected:
 

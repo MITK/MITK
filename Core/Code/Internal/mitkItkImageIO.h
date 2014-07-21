@@ -15,25 +15,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKITKFILEREADERSERVICE_H
-#define MITKITKFILEREADERSERVICE_H
+#ifndef MITKITKFILEIO_H
+#define MITKITKFILEIO_H
 
-#include "mitkAbstractFileReader.h"
+#include "mitkAbstractFileIO.h"
+
+#include <itkImageIOBase.h>
 
 namespace mitk {
 
-// This class represents ITK image file reader instances
-// registerred via the ITK object factory system as a micro
-// service.
-class ItkFileReaderService : public AbstractFileReader
+// This class wraps ITK image IO objects registered via the
+// ITK object factory system
+class ItkImageIO : public AbstractFileIO
 {
 
 public:
 
-  ItkFileReaderService(const ItkFileReaderService& other);
+  ItkImageIO(itk::ImageIOBase::Pointer imageIO);
 
-  ItkFileReaderService(const std::vector<std::string>& extensions, const std::string& category);
-  virtual ~ItkFileReaderService();
+  // -------------- AbstractFileReader -------------
 
   using AbstractFileReader::Read;
   virtual std::vector<itk::SmartPointer<BaseData> > Read(const std::string& path);
@@ -43,14 +43,22 @@ public:
   using AbstractFileReader::CanRead;
   virtual bool CanRead(const std::string& path) const;
 
+  // -------------- AbstractFileWriter -------------
+
+  virtual void Write(const BaseData* data, const std::string& path);
+  virtual void Write(const BaseData* data, std::ostream& stream);
+
 private:
 
-  ItkFileReaderService* Clone() const;
+  ItkImageIO(const ItkImageIO& other);
 
-  us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
+  ItkImageIO* Clone() const;
 
+  std::vector<std::string> FixUpImageIOExtensions(const std::string& imageIOName);
+
+  itk::ImageIOBase::Pointer m_ImageIO;
 };
 
 } // namespace mitk
 
-#endif /* MITKITKFILEREADERSERVICE_H */
+#endif /* MITKITKFILEIO_H */

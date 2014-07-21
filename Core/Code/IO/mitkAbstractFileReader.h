@@ -108,6 +108,7 @@ public:
    * @param description A human readable description of this reader.
    */
   us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext* context = us::GetModuleContext());
+  void UnregisterService();
 
 protected:
 

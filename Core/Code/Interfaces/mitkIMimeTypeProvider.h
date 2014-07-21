@@ -60,6 +60,10 @@ struct MITK_CORE_EXPORT IMimeTypeProvider
 
   virtual std::string GetCategory(const std::string& mimeType) const = 0;
 
+  /**
+   * @brief Get a sorted and unique list of mime-type categories.
+   * @return A sorted, unique list of mime-type categories.
+   */
   virtual std::vector<std::string> GetCategories() const = 0;
 };
 

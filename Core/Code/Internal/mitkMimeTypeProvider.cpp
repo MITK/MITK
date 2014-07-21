@@ -166,6 +166,7 @@ std::vector<std::string> MimeTypeProvider::GetCategories() const
       }
     }
   }
+  std::sort(result.begin(), result.end());
   result.erase(std::unique(result.begin(), result.end()), result.end());
   return result;
 }

@@ -45,6 +45,7 @@ public:
   {}
 
   us::PrototypeServiceFactory* m_PrototypeFactory;
+  us::ServiceRegistration<IFileReader> m_Reg;
 
 };
 
@@ -56,6 +57,8 @@ AbstractFileReader::AbstractFileReader()
 
 AbstractFileReader::~AbstractFileReader()
 {
+  UnregisterService();
+
   delete d->m_PrototypeFactory;
 
   d->UnregisterMimeType();
@@ -166,7 +169,7 @@ us::ServiceRegistration<IFileReader> AbstractFileReader::RegisterService(us::Mod
 
   if (this->GetMimeType().empty())
   {
-    MITK_WARN << "Not registering reader " << typeid(this).name() << " due to empty MIME type.";
+    MITK_WARN << "Not registering reader due to empty MIME type.";
     return us::ServiceRegistration<IFileReader>();
   }
 
@@ -192,7 +195,18 @@ us::ServiceRegistration<IFileReader> AbstractFileReader::RegisterService(us::Mod
 
   d->m_PrototypeFactory = new PrototypeFactory(this);
   us::ServiceProperties props = this->GetServiceProperties();
-  return context->RegisterService<IFileReader>(d->m_PrototypeFactory, props);
+  d->m_Reg = context->RegisterService<IFileReader>(d->m_PrototypeFactory, props);
+  return d->m_Reg;
+}
+
+void AbstractFileReader::UnregisterService()
+{
+  try
+  {
+    d->m_Reg.Unregister();
+  }
+  catch (const std::exception&)
+  {}
 }
 
 us::ServiceProperties AbstractFileReader::GetServiceProperties() const

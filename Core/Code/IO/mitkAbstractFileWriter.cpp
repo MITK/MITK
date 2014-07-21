@@ -49,6 +49,7 @@ public:
   std::string m_BaseDataType;
 
   us::PrototypeServiceFactory* m_PrototypeFactory;
+  us::ServiceRegistration<IFileWriter> m_Reg;
 
 };
 
@@ -60,6 +61,8 @@ AbstractFileWriter::AbstractFileWriter()
 
 AbstractFileWriter::~AbstractFileWriter()
 {
+  UnregisterService();
+
   delete d->m_PrototypeFactory;
 
   d->UnregisterMimeType();
@@ -138,7 +141,7 @@ us::ServiceRegistration<IFileWriter> AbstractFileWriter::RegisterService(us::Mod
 
   if (this->GetMimeType().empty())
   {
-    MITK_WARN << "Not registering writer " << typeid(this).name() << " due to empty MIME type.";
+    MITK_WARN << "Not registering writer due to empty MIME type.";
     return us::ServiceRegistration<IFileWriter>();
   }
 
@@ -164,7 +167,18 @@ us::ServiceRegistration<IFileWriter> AbstractFileWriter::RegisterService(us::Mod
 
   d->m_PrototypeFactory = new PrototypeFactory(this);
   us::ServiceProperties props = this->GetServiceProperties();
-  return context->RegisterService<IFileWriter>(d->m_PrototypeFactory, props);
+  d->m_Reg = context->RegisterService<IFileWriter>(d->m_PrototypeFactory, props);
+  return d->m_Reg;
+}
+
+void AbstractFileWriter::UnregisterService()
+{
+  try
+  {
+    d->m_Reg.Unregister();
+  }
+  catch (const std::exception&)
+  {}
 }
 
 us::ServiceProperties AbstractFileWriter::GetServiceProperties() const

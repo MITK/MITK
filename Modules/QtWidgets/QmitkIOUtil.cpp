@@ -111,7 +111,6 @@ QString QmitkIOUtil::GetFileOpenFilterString()
 
   mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
   std::vector<std::string> categories = mimeTypeProvider->GetCategories();
-  std::sort(categories.begin(), categories.end());
   for (std::vector<std::string>::iterator cat = categories.begin(); cat != categories.end(); ++cat)
   {
     QSet<QString> filterExtensions;

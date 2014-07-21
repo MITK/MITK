@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkItkFileReaderService.h"
+#include "mitkItkImageIO.h"
 
 #include <mitkImage.h>
 #include <mitkProportionalTimeGeometry.h>
@@ -24,16 +24,68 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIOFactory.h>
 #include <itkImageFileReader.h>
 #include <itkImageIORegion.h>
+#include <itkMetaDataObject.h>
 
-mitk::ItkFileReaderService::ItkFileReaderService(const mitk::ItkFileReaderService& other)
-  : mitk::AbstractFileReader(other)
+namespace mitk {
+
+ItkImageIO::ItkImageIO(const ItkImageIO& other)
+  : AbstractFileIO(other)
 {
 }
 
-mitk::ItkFileReaderService::ItkFileReaderService(const std::vector<std::string>& extensions,
-                                                 const std::string& category)
-  : AbstractFileReader()
+std::vector<std::string> ItkImageIO::FixUpImageIOExtensions(const std::string& imageIOName)
 {
+  std::vector<std::string> extensions;
+  // Try to fix-up some known ITK image IO classes
+  if (imageIOName == "GiplImageIO")
+  {
+    extensions.push_back("gipl");
+    extensions.push_back("gipl.gz");
+  }
+  else if (imageIOName == "GDCMImageIO")
+  {
+    extensions.push_back("gdcm");
+  }
+  else if (imageIOName == "PNGImageIO")
+  {
+    extensions.push_back("png");
+    extensions.push_back("PNG");
+  }
+  else if (imageIOName == "StimulateImageIO")
+  {
+    extensions.push_back("spr");
+  }
+  else if (imageIOName == "HDF5ImageIO")
+  {
+    extensions.push_back("hdf");
+    extensions.push_back("h4");
+    extensions.push_back("hdf4");
+    extensions.push_back("h5");
+    extensions.push_back("hdf5");
+    extensions.push_back("he4");
+    extensions.push_back("he5");
+    extensions.push_back("hd5");
+  }
+
+  if (!extensions.empty())
+  {
+    MITK_WARN << "Fixing up known extensions for " << imageIOName;
+  }
+
+  return extensions;
+}
+
+ItkImageIO::ItkImageIO(itk::ImageIOBase::Pointer imageIO)
+  : AbstractFileIO()
+  , m_ImageIO(imageIO)
+{
+  std::vector<std::string> extensions = imageIO->GetSupportedReadExtensions();
+  if (extensions.empty())
+  {
+    std::string imageIOName = imageIO->GetNameOfClass();
+    MITK_WARN << "ITK ImageIOBase " << imageIOName << " does not provide read extensions";
+    extensions = FixUpImageIOExtensions(imageIOName);
+  }
   for(std::vector<std::string>::const_iterator iter = extensions.begin(),
       endIter = extensions.end(); iter != endIter; ++iter)
   {
@@ -42,34 +94,44 @@ mitk::ItkFileReaderService::ItkFileReaderService(const std::vector<std::string>&
     {
       extension.assign(extension.begin()+1, extension.end());
     }
-    this->AddExtension(extension);
+    this->AbstractFileReader::AddExtension(extension);
   }
-  this->SetCategory(category);
-  this->SetDescription(category);
 
-  m_ServiceReg = this->RegisterService();
-}
-
-mitk::ItkFileReaderService::~ItkFileReaderService()
-{
-  try
+  extensions = imageIO->GetSupportedWriteExtensions();
+  if (extensions.empty())
   {
-    m_ServiceReg.Unregister();
+    std::string imageIOName = imageIO->GetNameOfClass();
+    MITK_WARN << "ITK ImageIOBase " << imageIOName << " does not provide write extensions";
+    extensions = FixUpImageIOExtensions(imageIOName);
   }
-  catch (const std::exception&)
-  {}
+  for(std::vector<std::string>::const_iterator iter = extensions.begin(),
+      endIter = extensions.end(); iter != endIter; ++iter)
+  {
+    std::string extension = *iter;
+    if (!extension.empty() && extension[0] == '.')
+    {
+      extension.assign(extension.begin()+1, extension.end());
+    }
+    this->AbstractFileWriter::AddExtension(extension);
+  }
+
+  this->SetCategory("Images");
+
+  std::string description = std::string("ITK ") + imageIO->GetNameOfClass();
+  this->SetReaderDescription(description);
+  this->SetWriterDescription(description);
+
+  this->RegisterService();
 }
 
-////////////////////// Reading /////////////////////////
-
-std::vector<mitk::BaseData::Pointer> mitk::ItkFileReaderService::Read(std::istream& stream)
+std::vector<BaseData::Pointer> ItkImageIO::Read(std::istream& stream)
 {
   return mitk::AbstractFileReader::Read(stream);
 }
 
-std::vector<mitk::BaseData::Pointer> mitk::ItkFileReaderService::Read(const std::string& path)
+std::vector<BaseData::Pointer> ItkImageIO::Read(const std::string& path)
 {
-  std::vector<mitk::BaseData::Pointer> result;
+  std::vector<BaseData::Pointer> result;
 
   const std::string& locale = "C";
   const std::string& currLocale = setlocale( LC_ALL, NULL );
@@ -86,7 +148,7 @@ std::vector<mitk::BaseData::Pointer> mitk::ItkFileReaderService::Read(const std:
     }
   }
 
-  mitk::Image::Pointer image = mitk::Image::New();
+  Image::Pointer image = Image::New();
 
   const unsigned int MINDIM = 2;
   const unsigned int MAXDIM = 4;
@@ -96,7 +158,7 @@ std::vector<mitk::BaseData::Pointer> mitk::ItkFileReaderService::Read(const std:
   // Check to see if we can read the file given the name or prefix
   if (path.empty())
   {
-    mitkThrow() << "Empty filename in mitk::ItkFileReaderService ";
+    mitkThrow() << "Empty filename in mitk::ItkImageIO ";
   }
 
   itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO( path.c_str(), itk::ImageIOFactory::ReadMode );
@@ -194,6 +256,18 @@ std::vector<mitk::BaseData::Pointer> mitk::ItkFileReaderService::Read(const std:
   buffer = NULL;
   MITK_INFO << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
 
+  const itk::MetaDataDictionary& dictionary = imageIO->GetMetaDataDictionary();
+  for (itk::MetaDataDictionary::ConstIterator iter = dictionary.Begin(), iterEnd = dictionary.End();
+       iter != iterEnd; ++iter)
+  {
+    std::string key = std::string("meta.") + iter->first;
+    if (iter->second->GetMetaDataObjectTypeInfo() == typeid(std::string))
+    {
+      std::string value = dynamic_cast<itk::MetaDataObject<std::string>*>(iter->second.GetPointer())->GetMetaDataObjectValue();
+      image->SetProperty(key.c_str(), mitk::StringProperty::New(value));
+    }
+  }
+
   MITK_INFO << "...finished!" << std::endl;
 
   try
@@ -210,7 +284,7 @@ std::vector<mitk::BaseData::Pointer> mitk::ItkFileReaderService::Read(const std:
 }
 
 
-bool mitk::ItkFileReaderService::CanRead(const std::string& path) const
+bool mitk::ItkImageIO::CanRead(const std::string& path) const
 {
   if (AbstractFileReader::CanRead(path) == false) return false;
 
@@ -221,7 +295,19 @@ bool mitk::ItkFileReaderService::CanRead(const std::string& path) const
   return imageIO->CanReadFile(path.c_str());
 }
 
-mitk::ItkFileReaderService* mitk::ItkFileReaderService::Clone() const
+void ItkImageIO::Write(const BaseData* data, const std::string& path)
 {
-  return new ItkFileReaderService(*this);
+
+}
+
+void ItkImageIO::Write(const BaseData* data, std::ostream& stream)
+{
+  AbstractFileWriter::Write(data, stream);
+}
+
+ItkImageIO* ItkImageIO::Clone() const
+{
+  return new ItkImageIO(*this);
+}
+
 }

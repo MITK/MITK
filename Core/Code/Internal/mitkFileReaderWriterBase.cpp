@@ -184,7 +184,7 @@ us::ServiceRegistration<IMimeType> FileReaderWriterBase::RegisterMimeType(us::Mo
   props[IMimeType::PROP_ID()] = mimeType;
   props[IMimeType::PROP_CATEGORY()] = this->GetCategory();
   props[IMimeType::PROP_EXTENSIONS()] = extensions;
-  props[IMimeType::PROP_DESCRIPTION()] = std::string("Generated MIME type from mitk::AbstractFileReader");
+  props[IMimeType::PROP_DESCRIPTION()] = std::string("Synthesized MIME type");
   props[us::ServiceConstants::SERVICE_RANKING()]  = this->GetRanking();
 
   // If the mime type is set and the list of extensions is not empty,
@@ -201,7 +201,7 @@ us::ServiceRegistration<IMimeType> FileReaderWriterBase::RegisterMimeType(us::Mo
   {
     if(us::GetModuleContext()->GetServiceReferences<IMimeType>(us::LDAPProp(IMimeType::PROP_ID()) == mimeType).empty())
     {
-      MITK_WARN << "Registering a MITK reader with an unknown MIME type " << mimeType;
+      MITK_WARN << "Registering a MITK reader or writer with an unknown MIME type " << mimeType;
     }
     return us::ServiceRegistration<IMimeType>();
   }
@@ -212,7 +212,7 @@ us::ServiceRegistration<IMimeType> FileReaderWriterBase::RegisterMimeType(us::Mo
 
   if(extensions.empty())
   {
-    MITK_WARN << "Trying to register a MITK reader with an empty mime type and empty extension list.";
+    MITK_WARN << "Trying to register a MITK reader or writer with an empty mime type and empty extension list.";
     return us::ServiceRegistration<IMimeType>();
   }
   else if(extensions.size() == 1)

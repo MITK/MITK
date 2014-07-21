@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // File IO
 #include <mitkIFileReader.h>
 #include <mitkIFileWriter.h>
+#include <mitkAbstractFileIO.h>
 #include <mitkSimpleMimeType.h>
 
 #include <mitkIShaderRepository.h>
@@ -76,6 +77,7 @@ private:
   // File IO
   std::vector<mitk::IFileReader*> m_FileReaders;
   std::vector<mitk::IFileWriter*> m_FileWriters;
+  std::vector<mitk::AbstractFileIO*> m_FileIOs;
 
   us::ServiceRegistration<mitk::IMimeTypeProvider> m_MimeTypeProviderReg;
 

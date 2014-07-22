@@ -76,9 +76,6 @@ public:
   Label();
   virtual ~Label();
 
-  TiXmlDocument GetAsTiXmlDocument() const;
-  bool LoadFromTiXmlDocument(TiXmlDocument *doc);
-
 protected:
 
   void PrintSelf(std::ostream &os, itk::Indent indent) const;
@@ -88,9 +85,6 @@ protected:
 private:
 
   virtual itk::LightObject::Pointer InternalClone() const;
-
-  TiXmlElement* PropertyToXmlElem( const std::string& key, const BaseProperty* property ) const;
-  bool PropertyFromXmlElem(std::string& name, mitk::BaseProperty::Pointer& prop, TiXmlElement* elem) const;
 
 };
 

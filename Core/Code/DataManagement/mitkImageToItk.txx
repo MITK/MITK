@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToItk.h"
 #include "mitkBaseProcess.h"
 #include "itkImportMitkImageContainer.h"
+#include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
 #include "mitkException.h"
 
@@ -93,7 +94,15 @@ template<class TOutputImage>
     noBytes = noBytes * input->GetDimension(i);
   }
 
-  mitk::ImageWriteAccessor* imageAccess = new mitk::ImageWriteAccessor(input);
+  mitk::ImageAccessorBase* imageAccess;
+  if (std::is_const<TOutputImage>::value)
+  {
+    imageAccess = new mitk::ImageReadAccessor(input);
+  }
+  else
+  {
+    imageAccess = new mitk::ImageWriteAccessor(input);
+  }
 
   // hier wird momentan wohl nur der erste Channel verwendet??!!
   if(imageAccess->GetData() == NULL)

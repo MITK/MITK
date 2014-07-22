@@ -60,12 +60,6 @@ public:
     }
   }
 
-  /** \brief Gives const access to the data. */
-  inline const void * GetData()
-  {
-    return m_AddressBegin;
-  }
-
   /** Destructor informs Image to unlock memory. */
   virtual ~ImageReadAccessor()
   {

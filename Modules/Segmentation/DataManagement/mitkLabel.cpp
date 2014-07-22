@@ -29,23 +29,23 @@ mitk::Label::Label():
   PropertyList()
 {
   // initialize basic label properties
-  SetLocked(true);
-  SetVisible(true);
-  SetOpacity(0.6);
-  SetValue(-1);
-  SetLayer(0);
-  mitk::Point3D pnt;
-  pnt.SetElement(0,0);
-  pnt.SetElement(1,0);
-  pnt.SetElement(2,0);
-  SetCenterOfMassCoordinates(pnt);
-  SetCenterOfMassIndex(pnt);
+//  SetLocked(true);
+//  SetVisible(true);
+//  SetOpacity(0.6);
+//  SetValue(-1);
+//  SetLayer(0);
+//  mitk::Point3D pnt;
+//  pnt.SetElement(0,0);
+//  pnt.SetElement(1,0);
+//  pnt.SetElement(2,0);
+//  SetCenterOfMassCoordinates(pnt);
+//  SetCenterOfMassIndex(pnt);
 
-  SetName("NoName");
+//  SetName("NoName");
 
-  mitk::Color col;
-  col.Set(0,0,0);
-  SetColor(col);
+//  mitk::Color col;
+//  col.Set(0,0,0);
+//  SetColor(col);
 }
 
 mitk::Label::Label(const Label& other)
@@ -80,8 +80,10 @@ void mitk::Label::SetLocked(bool locked)
     SetBoolProperty("locked", locked);
 }
 
-bool mitk::Label::GetLocked() const
+bool mitk::Label::GetLocked()
 {
+  if(GetProperty("locked") == NULL) SetLocked(true);
+
   bool locked;
   GetBoolProperty("locked",locked);
   return locked;
@@ -98,8 +100,10 @@ void mitk::Label::SetVisible(bool visible)
     SetBoolProperty("visible", visible);
 }
 
-bool mitk::Label::GetVisible() const
+bool mitk::Label::GetVisible()
 {
+  if(GetProperty("visible") == NULL) SetVisible(true);
+
   bool visible;
   GetBoolProperty("visible",visible);
   return visible;
@@ -116,8 +120,10 @@ void mitk::Label::SetOpacity(float opacity)
     SetFloatProperty("opacity", opacity);
 }
 
-float mitk::Label::GetOpacity() const
+float mitk::Label::GetOpacity()
 {
+  if(GetProperty("opacity") == NULL) SetOpacity(0.6);
+
   float opacity;
   GetFloatProperty("opacity",opacity);
   return opacity;
@@ -128,8 +134,10 @@ void mitk::Label::SetName(const std::string & name)
   SetStringProperty("name", name.c_str());
 }
 
-std::string mitk::Label::GetName() const
+std::string mitk::Label::GetName()
 {
+  if(GetProperty("name") == NULL) SetName("noName!");
+
   std::string name;
   GetStringProperty("name",name);
   return name;
@@ -146,8 +154,10 @@ void mitk::Label::SetValue(int pixelValue)
     SetIntProperty("value", pixelValue);
 }
 
-int mitk::Label::GetValue() const
+int mitk::Label::GetValue()
 {
+  if(GetProperty("value") == NULL) SetValue(-1);
+
   int pixelValue;
   GetIntProperty("value",pixelValue);
   return pixelValue;
@@ -164,15 +174,24 @@ void mitk::Label::SetLayer(int layer)
     SetIntProperty("layer", layer);
 }
 
-int mitk::Label::GetLayer() const
+int mitk::Label::GetLayer()
 {
+  if(GetProperty("layer") == NULL) SetLayer(-1);
+
   int layer;
   GetIntProperty("layer",layer);
   return layer;
 }
 
-const mitk::Color & mitk::Label::GetColor() const
+const mitk::Color & mitk::Label::GetColor()
 {
+  if(GetProperty("color") == NULL)
+  {
+    mitk::Color col;
+    col.Set(0,0,0);
+    SetColor(col);
+  }
+
   mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty *>(GetProperty("color"));
   return colorProp->GetColor();
 }
@@ -199,8 +218,17 @@ void mitk::Label::SetCenterOfMassIndex(const mitk::Point3D& center)
     SetProperty("center.index", mitk::Point3dProperty::New(center));
 }
 
-mitk::Point3D mitk::Label::GetCenterOfMassIndex() const
+mitk::Point3D mitk::Label::GetCenterOfMassIndex()
 {
+  if(GetProperty("center.index") == NULL)
+  {
+    mitk::Point3D pnt;
+    pnt.SetElement(0,0);
+    pnt.SetElement(1,0);
+    pnt.SetElement(2,0);
+    SetCenterOfMassIndex(pnt);
+  }
+
   mitk::Point3dProperty* property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.index"));
   return property->GetValue();
 }
@@ -216,8 +244,17 @@ void mitk::Label::SetCenterOfMassCoordinates(const mitk::Point3D& center)
     SetProperty("center.coordinates", mitk::Point3dProperty::New(center));
 }
 
-mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
+mitk::Point3D mitk::Label::GetCenterOfMassCoordinates()
 {
+  if(GetProperty("center.coordinates") == NULL)
+  {
+    mitk::Point3D pnt;
+    pnt.SetElement(0,0);
+    pnt.SetElement(1,0);
+    pnt.SetElement(2,0);
+    SetCenterOfMassCoordinates(pnt);
+  }
+
   mitk::Point3dProperty* property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.coordinates"));
   return property->GetValue();
 }

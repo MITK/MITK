@@ -123,12 +123,18 @@ public:
   itkGetMacro( CopyMemFlag, bool );
   itkBooleanMacro( CopyMemFlag );
 
+  itkSetMacro( Options, int );
+  itkGetMacro( Options, int );
+
 protected:
   using itk::ProcessObject::SetInput;
   mitk::Image * GetInput(void);
   mitk::Image * GetInput(unsigned int idx);
 
-  ImageToItk(): m_CopyMemFlag(false), m_Channel(0)
+  ImageToItk()
+  : m_CopyMemFlag(false)
+  , m_Channel(0)
+  , m_Options(mitk::ImageAccessorBase::DefaultBehavior)
   {
   }
 
@@ -146,6 +152,7 @@ protected:
 private:
   bool m_CopyMemFlag;
   int m_Channel;
+  int m_Options;
 
   //ImageToItk(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented

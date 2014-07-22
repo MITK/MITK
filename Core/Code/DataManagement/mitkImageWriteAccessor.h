@@ -103,7 +103,7 @@ private:
       {
         ImageAccessorBase* r = *it;
 
-        if(Overlap(r))
+        if((r->m_Options & IgnoreLock) == 0 && Overlap(r))
         {
           // An Overlap was detected.
 

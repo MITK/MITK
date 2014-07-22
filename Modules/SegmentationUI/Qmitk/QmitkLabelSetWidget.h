@@ -87,7 +87,7 @@ private slots:
   void OnItemClicked(QTableWidgetItem *item);
   void OnItemDoubleClicked(QTableWidgetItem *item);
   void OnTableViewContextMenuRequested(const QPoint&);
-  void InsertTableWidgetItem(const mitk::Label * label);
+  void InsertTableWidgetItem(mitk::Label * label);
   void UpdateTableWidgetItem(QTableWidgetItem *item);
   // reaction to "returnPressed" signal from ...
   void OnSearchLabel();

@@ -25,7 +25,7 @@ mitk::LabelSet::LabelSet() :
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
 }
 
-void mitk::LabelSet::Initialize(const LabelSet* other)
+void mitk::LabelSet::Initialize(LabelSet* other)
 {
   if (!other)
     mitkThrow() << "Trying to initialize with NULL input.";

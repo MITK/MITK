@@ -99,7 +99,7 @@ public:
     */
     Message<> AllLabelsModifiedEvent;
 
-    void Initialize(const LabelSet* other);
+    void Initialize(LabelSet *other);
 
     /** \brief Returns a const iterator poiting to the begining of the container.
     */

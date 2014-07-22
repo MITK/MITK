@@ -614,7 +614,7 @@ void QmitkLabelSetWidget::SelectLabelByPixelValue(int pixelValue)
   }
 }
 
-void QmitkLabelSetWidget::InsertTableWidgetItem(const mitk::Label * label)
+void QmitkLabelSetWidget::InsertTableWidgetItem(mitk::Label * label)
 {
   const mitk::Color& color = label->GetColor();
 
@@ -716,7 +716,7 @@ void QmitkLabelSetWidget::UpdateAllTableWidgetItems()
 void QmitkLabelSetWidget::UpdateTableWidgetItem(QTableWidgetItem *item)
 {
   mitk::LabelSetImage * workingImage = GetWorkingImage();
-  const mitk::Label * label = workingImage->GetLabel(item->data(Qt::UserRole).toInt());
+  mitk::Label * label = workingImage->GetLabel(item->data(Qt::UserRole).toInt());
 
   const mitk::Color& color = label->GetColor();
 

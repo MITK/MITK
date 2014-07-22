@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "tinyxml.h"
 
+#include "mitkBasePropertySerializer.h"
+
 namespace mitk
 {
 
@@ -132,8 +134,7 @@ void LabelSetImageReader::GenerateData()
       _xmlStr = GetStringByKey(imgMetaDictionary,keybuffer);
       doc.Parse(_xmlStr.c_str());
 
-      label = mitk::Label::New();
-      label->LoadFromTiXmlDocument(&doc);
+      label = LoadLabelFromTiXmlDocument(&doc);
 
       if(label->GetValue() == 0) // set exterior label is needed to hold exterior information
         output->SetExteriorLabel(label);
@@ -271,6 +272,67 @@ bool LabelSetImageReader::CanReadFile(const std::string filename,
 
   return false;
 }
+
+mitk::Label::Pointer LabelSetImageReader::LoadLabelFromTiXmlDocument(TiXmlDocument * doc)
+{
+  // reread
+  TiXmlHandle docHandle( doc );
+  TiXmlElement * propElem = docHandle.FirstChildElement("Label").FirstChildElement("property").ToElement();
+
+  std::string name;
+  mitk::BaseProperty::Pointer prop;
+
+  mitk::Label::Pointer label = mitk::Label::New();
+  while(propElem)
+  {
+    LabelSetImageReader::PropertyFromXmlElem( name, prop, propElem );
+    label->SetProperty( name, prop );
+    propElem = propElem->NextSiblingElement( "property" );
+  }
+
+  return label.GetPointer();
+}
+
+bool LabelSetImageReader::PropertyFromXmlElem(std::string& key, mitk::BaseProperty::Pointer& prop, TiXmlElement* elem)
+{
+  std::string type;
+  elem->QueryStringAttribute("type", &type);
+  elem->QueryStringAttribute("key", &key);
+
+  // construct name of serializer class
+  std::string serializername(type);
+  serializername += "Serializer";
+
+  std::list<itk::LightObject::Pointer> allSerializers = itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
+  if (allSerializers.size() < 1)
+    MITK_ERROR << "No serializer found for " << type << ". Skipping object";
+
+  if (allSerializers.size() > 1)
+    MITK_WARN << "Multiple deserializers found for " << type << "Using arbitrarily the first one.";
+
+  for ( std::list<itk::LightObject::Pointer>::iterator iter = allSerializers.begin();
+        iter != allSerializers.end();
+        ++iter )
+  {
+    if (BasePropertySerializer* serializer = dynamic_cast<BasePropertySerializer*>( iter->GetPointer() ) )
+    {
+      try
+      {
+        prop = serializer->Deserialize(elem->FirstChildElement());
+      }
+      catch (std::exception& e)
+      {
+        MITK_ERROR << "Deserializer " << serializer->GetNameOfClass() << " failed: " << e.what();
+        return false;
+      }
+      break;
+    }
+  }
+  if(prop.IsNull())
+    return false;
+  return true;
+}
+
 
 } //namespace MITK
 

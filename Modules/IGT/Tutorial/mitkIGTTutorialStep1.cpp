@@ -117,10 +117,10 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //we need the stringstream for building up our filename
   std::stringstream filename;
 
-  //the .xml extension and an counter is added automatically
-  filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output";
+ //the .xml extension and an counter is NOT added automatically anymore -- that was the case in an earlier version
+  filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output-0.xml";
 
-  std::cout << "Record to file: " << filename.str() << "-0.xml ..." << std::endl;
+  std::cout << "Record to file: " << filename.str() << " ..." << std::endl;
 
   mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
 
@@ -155,13 +155,11 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //instead of a TrackingDeviceSource. The input of this player is a NavigationDataSet, which we
   //read with a NavigationDataReader.
 
-  filename << "-0.xml";
   std::cout << "Start playing from file: " << filename.str() << " ..." << std::endl;
 
   mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
 
   mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-  //this is first part of the file name the .xml extension and an counter is added automatically
   mitk::NavigationDataSet::Pointer naviDataSet = reader->Read(filename.str());
   player->SetNavigationDataSet(naviDataSet);
 

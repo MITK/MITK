@@ -25,39 +25,44 @@ namespace mitk {
 int SegmentationDataNodeReader::Read(const std::string &fileName, mitk::DataStorage &storage)
 {
   int n = 0;
-  if (fileName.substr(fileName.size()-5) == ".lset")
-  {
-    int oldSize = storage.GetAll()->Size();
-    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(fileName);
-    mitk::LabelSetImage * lsImage = dynamic_cast<mitk::LabelSetImage *>(image.GetPointer());
-    mitk::Label * extLabel = lsImage->GetExteriorLabel();
-    std::string nameParent("");
-    std::string nameImage("");
-    // if paranet name was set in LabelSetImage
-    if(extLabel->GetMap()->find("name.parent") != extLabel->GetMap()->end())
-      extLabel->GetStringProperty("name.parent",nameParent);
+  /*
+   * The following code could be used to set the segmentation node as child to the original image
+   * The information for this was saved in the exterior label
+   * */
 
-    if(extLabel->GetMap()->find("name.image") != extLabel->GetMap()->end())
-      extLabel->GetStringProperty("name.image",nameImage);
+//  if (fileName.substr(fileName.size()-5) == ".lset")
+//  {
+//    int oldSize = storage.GetAll()->Size();
+//    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(fileName);
+//    mitk::LabelSetImage * lsImage = dynamic_cast<mitk::LabelSetImage *>(image.GetPointer());
+//    mitk::Label * extLabel = lsImage->GetExteriorLabel();
+//    std::string nameParent("");
+//    std::string nameImage("");
+//    // if paranet name was set in LabelSetImage
+//    if(extLabel->GetMap()->find("name.parent") != extLabel->GetMap()->end())
+//      extLabel->GetStringProperty("name.parent",nameParent);
 
-    mitk::DataStorage::SetOfObjects::ConstPointer SoO = storage.GetAll();
-    mitk::DataStorage::SetOfObjects::ConstIterator it = SoO->Begin();
-    mitk::DataStorage::SetOfObjects::ConstIterator end = SoO->End();
+//    if(extLabel->GetMap()->find("name.image") != extLabel->GetMap()->end())
+//      extLabel->GetStringProperty("name.image",nameImage);
 
-    mitk::DataNode::Pointer lsDataNode = mitk::DataNode::New();
-    lsDataNode->SetName(nameImage);
-    mitk::DataNode::Pointer parentDataNode = NULL;
-    lsDataNode->SetData(lsImage);
-    while(it != end)
-    {
-      if(it.Value()->GetName().compare(nameParent) == 0){
-        parentDataNode = it.Value();
-      }
-      ++it;
-    }
-    storage.Add(lsDataNode,parentDataNode.GetPointer());
-    n = storage.GetAll()->Size() - oldSize;
-  }
+//    mitk::DataStorage::SetOfObjects::ConstPointer SoO = storage.GetAll();
+//    mitk::DataStorage::SetOfObjects::ConstIterator it = SoO->Begin();
+//    mitk::DataStorage::SetOfObjects::ConstIterator end = SoO->End();
+
+//    mitk::DataNode::Pointer lsDataNode = mitk::DataNode::New();
+//    lsDataNode->SetName(nameImage);
+//    mitk::DataNode::Pointer parentDataNode = NULL;
+//    lsDataNode->SetData(lsImage);
+//    while(it != end)
+//    {
+//      if(it.Value()->GetName().compare(nameParent) == 0){
+//        parentDataNode = it.Value();
+//      }
+//      ++it;
+//    }
+//    storage.Add(lsDataNode,parentDataNode.GetPointer());
+//    n = storage.GetAll()->Size() - oldSize;
+//  }
   return n;
 }
 

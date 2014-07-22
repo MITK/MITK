@@ -165,15 +165,12 @@ std::vector<std::string> mitk::LabelSetImageWriter::GetPossibleFileExtensions()
 
 TiXmlDocument mitk::LabelSetImageWriter::GetLabelAsTiXmlDocument(mitk::Label * label)
 {
+
   TiXmlDocument document;
   TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
   document.LinkEndChild( decl );
 
-  TiXmlElement* version = new TiXmlElement("Version");
-  version->SetAttribute("Writer",  __FILE__ );
-  version->SetAttribute("Revision",  "$Revision: 17055 $" );
-  version->SetAttribute("FileVersion",  1 );
-  document.LinkEndChild(version);
+  TiXmlElement* labelElem = new TiXmlElement("Label");
 
   // add XML contents
   const PropertyList::PropertyMap* propmap = label->GetMap();
@@ -185,9 +182,10 @@ TiXmlDocument mitk::LabelSetImageWriter::GetLabelAsTiXmlDocument(mitk::Label * l
     const BaseProperty* property = iter->second;
     TiXmlElement* element = PropertyToXmlElem( key, property );
     if (element)
-      document.LinkEndChild( element );
-  }
+     labelElem->LinkEndChild( element );
 
+  }
+  document.LinkEndChild( labelElem );
   return document;
 }
 

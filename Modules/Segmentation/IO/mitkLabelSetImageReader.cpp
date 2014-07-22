@@ -117,8 +117,6 @@ void LabelSetImageReader::GenerateData()
   int numberOfLayers = GetIntByKey(imgMetaDictionary,"layers");
   std::string _xmlStr;
   mitk::Label::Pointer label;
-  TiXmlDocument doc;
-
 
   for( int layerIdx=0; layerIdx < numberOfLayers; layerIdx++)
   {
@@ -129,6 +127,7 @@ void LabelSetImageReader::GenerateData()
 
     for(int labelIdx=0; labelIdx < numberOfLabels; labelIdx++)
     {
+      TiXmlDocument doc;
       sprintf( keybuffer, "label_%03d_%03d", layerIdx, labelIdx );
       _xmlStr = GetStringByKey(imgMetaDictionary,keybuffer);
       doc.Parse(_xmlStr.c_str());

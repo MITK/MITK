@@ -135,8 +135,8 @@ bool mitk::Label::LoadFromTiXmlDocument(TiXmlDocument * doc)
   TiXmlHandle docHandle( doc );
 
   bool opRead = false;
+  TiXmlElement * propElem = docHandle.FirstChildElement("Label").FirstChildElement("property").ToElement();
 
-  TiXmlElement* propElem = docHandle.FirstChildElement("property").ToElement();
   std::string name;
   mitk::BaseProperty::Pointer prop;
   while(propElem)
@@ -156,8 +156,6 @@ bool mitk::Label::PropertyFromXmlElem(std::string& key, mitk::BaseProperty::Poin
   std::string type;
   elem->QueryStringAttribute("type", &type);
   elem->QueryStringAttribute("key", &key);
-
-  //MITK_INFO << "Query \""<< type <<"\" : " << key;
 
   // construct name of serializer class
   std::string serializername(type);

@@ -17,7 +17,7 @@ The source is now split among several files:
 \li \ref Step6RegionGrowing2.cpp "Step6RegionGrowing2.cpp"
 \li \ref Step6main.cpp "Step6main.cpp"
 
-The class Step6 inherits from QMainWindow and provides methods for setting up the widgets. Step6RegionGrowing.cpp contains a method for performing the region-growing. Step6main.cpp contains main.
+The class Step6 inherits from QWidget and provides methods for setting up the widgets. Step6RegionGrowing.cpp contains a method for performing the region-growing. Step6main.cpp contains main.
 Like in ITK and VTK class member names start with m_ followed by the proper member name starting with a capital letter (e.g. m_Tree).
 Function names start with capital letters. To learn more about style conventions in MITK read \ref StyleGuideAndNotesPage "The MITK Style Guide".
 

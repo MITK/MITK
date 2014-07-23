@@ -117,10 +117,12 @@ public:
 
   void SetImmediateUpdate(bool state);
 
-  static std::pair<double,double> ValidateCoord( std::pair<double,double> x )
+  std::pair<double,double> ValidateCoord( std::pair<double,double> x )
   {
-    if( x.first < -2048 ) x.first = -2048;
-    if( x.first >  2048 ) x.first =  2048;
+    double max = m_Histogram->GetMax();
+    double min = m_Histogram->GetMin();
+    if( x.first < min ) x.first = min;
+    if( x.first >  max ) x.first =  max;
     if( x.second < 0 ) x.second = 0;
     if( x.second > 1 ) x.second = 1;
     return x;

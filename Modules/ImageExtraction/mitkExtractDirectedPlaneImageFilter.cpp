@@ -146,7 +146,8 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   Vector2D extent; extent.Fill( 0.0 );
 
   // Do we have a simple PlaneGeometry?
-  if ( dynamic_cast< const PlaneGeometry * >( m_WorldGeometry ) != NULL )
+  if ( dynamic_cast< const PlaneGeometry * >( m_WorldGeometry ) != NULL &&
+       dynamic_cast< const AbstractTransformGeometry * >( m_WorldGeometry ) == NULL)
   {
     const PlaneGeometry *planeGeometry =
       static_cast< const PlaneGeometry * >( m_WorldGeometry );

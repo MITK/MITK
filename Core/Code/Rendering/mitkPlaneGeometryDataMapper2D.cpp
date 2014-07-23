@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateDataType.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkResliceMethodProperty.h"
+#include "mitkAbstractTransformGeometry.h"
 
 
 mitk::PlaneGeometryDataMapper2D::PlaneGeometryDataMapper2D()
@@ -79,7 +80,7 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
       continue;
 
     PlaneGeometry* planegeometry = dynamic_cast<PlaneGeometry*>(geometry2dData->GetPlaneGeometry());
-    if (planegeometry != NULL)
+    if (planegeometry != NULL && dynamic_cast<AbstractTransformGeometry*>(geometry2dData->GetPlaneGeometry())==NULL)
       m_OtherPlaneGeometries.push_back(it->Value());
   }
 }
@@ -109,7 +110,8 @@ void mitk::PlaneGeometryDataMapper2D::Paint(BaseRenderer *renderer)
     dynamic_cast< const PlaneGeometry* >(
     renderer->GetCurrentWorldPlaneGeometry() );
 
-  if ( worldPlaneGeometry && inputPlaneGeometry
+  if ( worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldPlaneGeometry())==NULL
+    && inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(input->GetPlaneGeometry() )==NULL
     && inputPlaneGeometry->GetReferenceGeometry() )
   {
     DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();

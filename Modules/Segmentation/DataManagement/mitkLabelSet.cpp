@@ -44,12 +44,12 @@ void mitk::LabelSet::OnLabelModified()
   Superclass::Modified();
 }
 
-mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstEnd()
+mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstEnd() const
 {
   return m_LabelContainer.end();
 }
 
-mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstBegin()
+mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstBegin() const
 {
   return m_LabelContainer.begin();
 }
@@ -149,11 +149,6 @@ void mitk::LabelSet::RenameLabel(int pixelValue, const std::string& name, const 
   label->SetColor(color);
 }
 
-mitk::LookupTable* mitk::LabelSet::GetLookupTable()
-{
-  return m_LookupTable.GetPointer();
-}
-
 void mitk::LabelSet::SetLookupTable( mitk::LookupTable* lut)
 {
   m_LookupTable = lut;
@@ -251,4 +246,71 @@ const mitk::Label * mitk::LabelSet::GetLabel(int pixelValue) const
 {
   LabelContainerConstIteratorType it = m_LabelContainer.find(pixelValue);
   return ( it != m_LabelContainer.end() )? it->second.GetPointer(): NULL;
+}
+
+bool mitk::Equal( const mitk::LabelSet& leftHandSide, const mitk::LabelSet& rightHandSide, ScalarType eps, bool verbose )
+{
+  bool returnValue = true;
+  // LabelSetmembers
+
+  MITK_INFO(verbose) << "--- LabelSet Equal ---";
+
+  //m_LookupTable;
+  const mitk::LookupTable * lhsLUT = leftHandSide.GetLookupTable();
+  const mitk::LookupTable * rhsLUT = rightHandSide.GetLookupTable();
+
+  returnValue = *lhsLUT == *rhsLUT;
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Lookup tabels not equal.";
+    return returnValue;;
+  }
+
+  //m_ActiveLabel;
+  returnValue = mitk::Equal(*leftHandSide.GetActiveLabel(),*rightHandSide.GetActiveLabel(),eps,verbose);
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Active label not equal.";
+    return returnValue;;
+  }
+
+  //m_Layer;
+  returnValue = leftHandSide.GetLayer() == rightHandSide.GetLayer();
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Layer index not equal.";
+    return returnValue;;
+  }
+
+  // container size;
+  returnValue = leftHandSide.GetNumberOfLabels() == rightHandSide.GetNumberOfLabels();
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Number of labels not equal.";
+    return returnValue;;
+  }
+
+  // Label container (map)
+
+  //m_LabelContainer;
+  mitk::LabelSet::LabelContainerConstIteratorType lhsit = leftHandSide.IteratorConstBegin();
+  mitk::LabelSet::LabelContainerConstIteratorType rhsit = rightHandSide.IteratorConstBegin();
+  for(; lhsit != leftHandSide.IteratorConstEnd(); ++lhsit , ++rhsit)
+  {
+    returnValue = rhsit->first == lhsit->first;
+    if(!returnValue)
+    {
+      MITK_INFO(verbose) << "Label in label container not equal.";
+      return returnValue;;
+    }
+
+    returnValue = mitk::Equal(*(rhsit->second),*(lhsit->second),eps,verbose);
+    if(!returnValue)
+    {
+      MITK_INFO(verbose) << "Label in label container not equal.";
+      return returnValue;;
+    }
+  }
+
+  return returnValue;
 }

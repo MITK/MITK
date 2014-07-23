@@ -103,11 +103,11 @@ public:
 
     /** \brief Returns a const iterator poiting to the begining of the container.
     */
-    LabelContainerConstIteratorType IteratorConstBegin();
+    LabelContainerConstIteratorType IteratorConstBegin() const;
 
     /** \brief Returns a const iterator pointing to the end of the container.
     */
-    LabelContainerConstIteratorType IteratorConstEnd();
+    LabelContainerConstIteratorType IteratorConstEnd() const;
 
     /** \brief Returns a iterator poiting to the begining of the container.
     */
@@ -182,13 +182,9 @@ public:
     */
     const Label* GetLabel(int pixelValue) const;
 
-    /** \brief
-    */
-    int GetLayer() { return m_Layer; }
-
-    /** \brief
-    */
-    LookupTable* GetLookupTable();
+    itkGetMacro(Layer,int)
+    itkGetConstMacro(Layer,int)
+    itkGetModifiableObjectMacro(LookupTable,mitk::LookupTable)
 
     /** \brief
     */
@@ -214,6 +210,24 @@ protected:
 
     int m_Layer;
 };
+
+/**
+* @brief Equal A function comparing two label sets  for beeing equal in data
+*
+* @ingroup MITKTestingAPI
+*
+* Following aspects are tested for equality:
+*  - LabelSetmembers
+*  - Label container (map)
+*
+* @param rightHandSide An image to be compared
+* @param leftHandSide An image to be compared
+* @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+* @param verbose Flag indicating if the user wants detailed console output or not.
+* @return true, if all subsequent comparisons are true, false otherwise
+*/
+MITK_CORE_EXPORT bool Equal( const mitk::LabelSet& leftHandSide, const mitk::LabelSet& rightHandSide, ScalarType eps, bool verbose );
+
 
 } // namespace mitk
 

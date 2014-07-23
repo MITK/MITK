@@ -130,7 +130,7 @@ public:
     point2 = m_Point.GetVectorFromOrigin() + m_Direction;
 
     m_Point = point1;
-    m_Direction = point2 - point1;
+    m_Direction = point2 - point1.GetVectorFromOrigin();
   }
 
   //##Documentation

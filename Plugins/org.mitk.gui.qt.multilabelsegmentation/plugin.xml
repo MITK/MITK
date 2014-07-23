@@ -35,6 +35,8 @@
     <contextMenuAction nodeDescriptorName="Surface" label="Convert to Label" icon="" class="QmitkConvertSurfaceToLabelAction" />
     <contextMenuAction nodeDescriptorName="Image" label="Create Segmentation" icon="" class="QmitkCreateMultiLabelSegmentationAction" />
     <contextMenuAction nodeDescriptorName="Image" label="Convert to Segmentation" icon="" class="QmitkConvertToMultiLabelSegmentationAction" />
+    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Create Preset" icon="" class="QmitkCreateMultiLabelPresetAction" />
+    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Load Preset" icon="" class="QmitkLoadMultiLabelPresetAction" />
   </extension>
 
 </plugin>

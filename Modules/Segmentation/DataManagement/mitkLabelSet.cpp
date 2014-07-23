@@ -111,7 +111,7 @@ void mitk::LabelSet::AddLabel(mitk::Label * label)
       i++;
     newLabel->SetValue( i );
     pixelValue = i;
-    MITK_INFO << "Label with corresponding pixelvalue of "  << i << " added to active label set." ;
+    //MITK_INFO << "Label with corresponding pixelvalue of "  << i << " added to active label set." ;
   }
   else
   {

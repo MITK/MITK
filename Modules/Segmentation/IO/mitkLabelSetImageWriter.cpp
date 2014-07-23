@@ -79,6 +79,8 @@ void mitk::LabelSetImageWriter::GenerateData()
   char keybuffer[512];
   char valbuffer[512];
 
+
+
   sprintf( keybuffer, "modality");
   sprintf( valbuffer, "LSET");
   itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
@@ -95,12 +97,18 @@ void mitk::LabelSetImageWriter::GenerateData()
 
     for (int labelIdx=0; labelIdx<input->GetNumberOfLabels(layerIdx); labelIdx++)
     {
-      TiXmlDocument labelAsXml = GetLabelAsTiXmlDocument(input->GetLabel(labelIdx,layerIdx));
+      std::auto_ptr<TiXmlDocument> document;
+      document.reset(new TiXmlDocument());
+
+      TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
+      document->LinkEndChild( decl );
+      TiXmlElement * labelElem = GetLabelAsTiXmlElement(input->GetLabel(labelIdx,layerIdx));
+      document->LinkEndChild( labelElem );
       TiXmlPrinter printer;
       printer.SetIndent("");
       printer.SetLineBreak("");
 
-      labelAsXml.Accept(&printer);
+      document->Accept(&printer);
 
       sprintf( keybuffer, "label_%03d_%03d", layerIdx, labelIdx );
       itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), printer.Str());
@@ -163,12 +171,8 @@ std::vector<std::string> mitk::LabelSetImageWriter::GetPossibleFileExtensions()
   return possibleFileExtensions;
 }
 
-TiXmlDocument mitk::LabelSetImageWriter::GetLabelAsTiXmlDocument(mitk::Label * label)
+TiXmlElement * mitk::LabelSetImageWriter::GetLabelAsTiXmlElement(mitk::Label * label)
 {
-
-  TiXmlDocument document;
-  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
-  document.LinkEndChild( decl );
 
   TiXmlElement* labelElem = new TiXmlElement("Label");
 
@@ -185,8 +189,7 @@ TiXmlDocument mitk::LabelSetImageWriter::GetLabelAsTiXmlDocument(mitk::Label * l
      labelElem->LinkEndChild( element );
 
   }
-  document.LinkEndChild( labelElem );
-  return document;
+  return labelElem;
 }
 
 TiXmlElement* mitk::LabelSetImageWriter::PropertyToXmlElem( const std::string& key, const BaseProperty* property )

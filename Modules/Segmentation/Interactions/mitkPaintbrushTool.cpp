@@ -297,7 +297,7 @@ bool mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEven
     LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
     if (workingImage)
     {
-      m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+      m_PaintingPixelValue = workingImage->GetActiveLabel()->GetValue();
     }
   }
 
@@ -457,7 +457,7 @@ bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent*
       LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
       if (workingImage)
       {
-        m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+        m_PaintingPixelValue = workingImage->GetActiveLabel()->GetValue();
       }
       FeedbackContourTool::SetFeedbackContourColorDefault();
     }

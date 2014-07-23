@@ -113,7 +113,7 @@ bool mitk::CorrectorTool2D::OnMousePressed ( StateMachineAction*, InteractionEve
   LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
   if (workingImage)
   {
-    m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    m_PaintingPixelValue = workingImage->GetActiveLabel()->GetValue();
   }
   MITK_INFO << "Painting Pixel Value = " << m_PaintingPixelValue;
 

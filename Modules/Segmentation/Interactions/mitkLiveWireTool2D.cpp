@@ -197,7 +197,7 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
   LabelSetImage* lsetImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
   if (lsetImage)
   {
-    m_PaintingPixelValue = lsetImage->GetActiveLabelIndex();
+    m_PaintingPixelValue = lsetImage->GetActiveLabel()->GetValue();
   }
   else
   {

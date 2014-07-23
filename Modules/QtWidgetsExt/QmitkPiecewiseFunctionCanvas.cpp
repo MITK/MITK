@@ -153,6 +153,6 @@ void QmitkPiecewiseFunctionCanvas::MoveFunctionPoint(int index,
     std::pair<double,double> pos)
 {
   RemoveFunctionPoint(GetFunctionX(index));
-  AddFunctionPoint(pos.first, pos.second);
+  m_GrabbedHandle = AddFunctionPoint(pos.first, pos.second);
 }
 

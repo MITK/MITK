@@ -97,7 +97,7 @@ public:
   void PaintHistogram(QPainter &p);
 
   virtual int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) = 0;
-  virtual void AddFunctionPoint(double x,double val) = 0;
+  virtual int AddFunctionPoint(double x,double val) = 0;
   virtual void RemoveFunctionPoint(double x) = 0;
   virtual void MoveFunctionPoint(int index, std::pair<double,double> pos) = 0;
   virtual double GetFunctionX(int index) = 0;
@@ -130,9 +130,7 @@ public:
   {
     if (m_GrabbedHandle != -1)
     {
-      float y = GetFunctionY(m_GrabbedHandle);
       this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair(x,GetFunctionY(m_GrabbedHandle))));
-      m_GrabbedHandle = GetNearHandle(x,y);
       update();
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -142,9 +140,7 @@ public:
   {
     if (m_GrabbedHandle != -1)
     {
-      float x = GetFunctionX(m_GrabbedHandle);
       this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair(GetFunctionX(m_GrabbedHandle),y)));
-      m_GrabbedHandle = GetNearHandle(x,y);
       update();
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }

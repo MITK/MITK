@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLiveWireTool2D.h"
 #include "mitkLiveWireTool2D.xpm"
+#include "mitkLabelSetImage.h"
 
 namespace mitk
 {
@@ -193,6 +194,15 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
   if (!workingImage)
     return;
 
+  LabelSetImage* lsetImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  if (lsetImage)
+  {
+    m_PaintingPixelValue = lsetImage->GetActiveLabelIndex();
+  }
+  else
+  {
+    m_PaintingPixelValue = 1;
+  }
   // for all contours in list (currently created by tool)
   std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itWorkingContours = this->m_WorkingContours.begin();
   while(itWorkingContours != this->m_WorkingContours.end() )
@@ -200,22 +210,19 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
     // if node contains data
     if( itWorkingContours->first->GetData() )
     {
-
       // if this is a contourModel
       mitk::ContourModel* contourModel = dynamic_cast<mitk::ContourModel*>(itWorkingContours->first->GetData());
       if( contourModel )
       {
-
         // for each timestep of this contourModel
         for( TimeStepType currentTimestep = 0; currentTimestep < contourModel->GetTimeGeometry()->CountTimeSteps(); ++currentTimestep)
         {
-
-          //get the segmentation image slice at current timestep
+          double paintingValue = 1;
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(itWorkingContours->second, workingImage, currentTimestep);
 
-          ContourModel::Pointer projectedContour = ContourModel::New();
-          const mitk::Geometry3D* sliceGeometry = workingSlice->GetGeometry();
-          ContourUtils::ProjectContourTo2DSlice( sliceGeometry, contourModel, projectedContour );
+          mitk::ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
+          //mitk::ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, paintingValue);
+          mitk::ContourUtils::FillContourInSlice(projectedContour, workingSlice, m_PaintingPixelValue);
 
           //write back to image volume
           this->WriteBackSegmentationResult(itWorkingContours->second, workingSlice, currentTimestep);
@@ -528,7 +535,6 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( StateMachineAction*, Interaction
   }
   else //remove last segment from contour and reset livewire contour
   {
-
     m_LiveWireContour = mitk::ContourModel::New();
 
     m_LiveWireContourNode->SetData(m_LiveWireContour);
@@ -663,5 +669,4 @@ void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, 
 
     currentIndex[1] = index[1];
   }//end for x
-
 }

@@ -89,7 +89,6 @@ float mitk::SegTool2D::CanHandleEvent( InteractionEvent const *stateEvent) const
 //   {
 //     return 1.0;
 //   }
-
 }
 
 
@@ -277,7 +276,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEven
 
   this->WriteBackSegmentationResult(planeGeometry, slice, timeStep);
   slice->DisconnectPipeline();
-
 }
 
 void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image* slice, unsigned int timeStep)

@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageDataItem.h"
 #include "mitkContourUtils.h"
 #include "ipSegmentation.h"
+#include "mitkLabelSetImage.h"
+#include "mitkContourModelUtils.h"
 
 #include "mitkLevelWindowProperty.h"
 
@@ -59,7 +61,7 @@ void mitk::PaintbrushTool::ConnectActionsAndFunctions()
 void mitk::PaintbrushTool::Activated()
 {
   Superclass::Activated();
-  FeedbackContourTool::SetFeedbackContourVisible(true);
+  FeedbackContourTool::SetFeedbackContourVisible(false);
   SizeChanged.Send(m_Size);
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<mitk::PaintbrushTool>( this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified );
 }
@@ -176,7 +178,6 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
         if (curPoint[1] <= 0)
            break;
      }
-
    }
 
   // QuarterCycle is full! Now copy quarter cycle to other quarters.
@@ -274,7 +275,6 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
   }
 
   m_MasterContour = contourInImageIndexCoordinates;
-
 }
 
 
@@ -291,6 +291,15 @@ bool mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEven
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   m_MasterContour->SetClosed(true);
+  if (m_PaintingPixelValue > 0)
+  {
+    m_PaintingPixelValue = 1;
+    LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+    if (workingImage)
+    {
+      m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+    }
+  }
 
   return this->MouseMoved(interactionEvent, true);
 }
@@ -320,13 +329,14 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
     UpdateContour( positionEvent );
     m_LastContourSize = m_Size;
   }
+  if (!m_WorkingSlice)
+    return true;
 
 //     stateEvent->GetId() == 530
 //     || stateEvent->GetId() == 534
 //     || stateEvent->GetId() == 1
 //     || stateEvent->GetId() == 5
 //     );
-
   Point3D worldCoordinates = positionEvent->GetPositionInWorld();
   Point3D indexCoordinates;
 
@@ -383,18 +393,18 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
     it++;
   }
 
-  /*
   if (leftMouseButtonPressed)
   {
-    ContourUtils::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+    ContourUtils::FillContourInSlice( contour, m_WorkingSlice, m_PaintingPixelValue );
     m_WorkingNode->SetData(m_WorkingSlice);
     m_WorkingNode->Modified();
   }
-  */
 
   // visualize contour
   ContourModel::Pointer displayContour = ContourModel::New();
   displayContour->Initialize();
+  ContourUtils::BackProjectContourFrom2DSlice(m_WorkingSlice->GetGeometry(), contour,displayContour);
+  SetFeedbackContour(*displayContour);
 
   //for (unsigned int index = 0; index < contour->GetNumberOfPoints(); ++index)
   //{
@@ -406,8 +416,8 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   //  }
   //  displayContour->AddVertex( point );
   //}
-
-  //displayContour = ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
+  ////displayContour = ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
+  //MITK_INFO << "2";
   //SetFeedbackContour( *displayContour );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -436,7 +446,7 @@ bool mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEven
 bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
 {
     // Inversion only for 0 and 1 as painting values
-    if (m_PaintingPixelValue == 1)
+    if (m_PaintingPixelValue > 0)
     {
       m_PaintingPixelValue = 0;
       FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
@@ -444,6 +454,11 @@ bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent*
     else if (m_PaintingPixelValue == 0)
     {
       m_PaintingPixelValue = 1;
+      LabelSetImage* workingImage = dynamic_cast<LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
+      if (workingImage)
+      {
+        m_PaintingPixelValue = workingImage->GetActiveLabelIndex();
+      }
       FeedbackContourTool::SetFeedbackContourColorDefault();
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -453,18 +468,16 @@ bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent*
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
     const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldGeometry2D() ) );
-
-    Image::Pointer image = dynamic_cast<Image*>(m_WorkingNode->GetData());
-
+    Image::Pointer image = dynamic_cast<Image*>(m_ToolManager->GetWorkingData(0)->GetData());
     if ( !image || !planeGeometry )
         return;
 
     if(m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
     {
-        m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
-        m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
-        m_WorkingNode->ReplaceProperty( "color", m_WorkingNode->GetProperty("color") );
-        m_WorkingNode->SetData(m_WorkingSlice);
+      m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
+      m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+      //m_WorkingNode->ReplaceProperty( "color", m_WorkingNode->GetProperty("color") );
+      m_WorkingNode->SetData(m_WorkingSlice);
     }
     else
     {
@@ -489,12 +502,10 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
             //So that the paintbrush contour vanished in the previous render window
             RenderingManager::GetInstance()->RequestUpdateAll();
         }
-
     }
 
     if(!m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
     {
-
         m_WorkingNode->SetProperty( "outline binary", mitk::BoolProperty::New(true) );
         m_WorkingNode->SetProperty( "color", m_WorkingNode->GetProperty("color") );
         m_WorkingNode->SetProperty( "name", mitk::StringProperty::New("Paintbrush_Node") );

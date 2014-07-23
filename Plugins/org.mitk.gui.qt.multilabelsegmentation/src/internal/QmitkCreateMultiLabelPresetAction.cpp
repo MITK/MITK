@@ -14,18 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "QmitkCreateMultiLabelPresetAction.h"
-
 #include "mitkLabelSetImage.h"
-#include "mitkRenderingManager.h"
-
-#include "QInputDialog"
 #include "QMessageBox"
-
-#include "QmitkNewSegmentationDialog.h"
-#include "QmitkMultiLabelSegmentationView.h"
-#include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
-//needed for qApp
 #include <qcoreapplication.h>
+#include "QFileDialog"
+#include "mitkLabelSetImageWriter.h"
+#include "tinyxml.h"
 
 QmitkCreateMultiLabelPresetAction::QmitkCreateMultiLabelPresetAction()
 {
@@ -42,52 +36,55 @@ void QmitkCreateMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer
     if (referenceNode.IsNotNull())
     {
 
-      mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
+      mitk::LabelSetImage* referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
       assert(referenceImage);
 
-      QString newName = QString::fromStdString(referenceNode->GetName());
-      newName.append("-labels");
-
-      bool ok = false;
-      newName = QInputDialog::getText(NULL, "New Segmentation Session", "New name:", QLineEdit::Normal, newName, &ok);
-      if(!ok) return;
-
-      mitk::LabelSetImage::Pointer workingImage = mitk::LabelSetImage::New();
-
-      try
+      if(referenceImage->GetNumberOfLabels() <= 1)
       {
-        workingImage->Initialize(referenceImage);
-      }
-      catch ( mitk::Exception& e )
-      {
-        MITK_ERROR << "Exception caught: " << e.GetDescription();
-        QMessageBox::information(NULL, "New Segmentation Session", "Could not create a new segmentation session.\n");
+        QMessageBox::information(NULL, "Create LabelSetImage Preset", "Could not create a LabelSetImage preset.\nNo Labels defined!\n");\
         return;
       }
 
-      mitk::DataNode::Pointer workingNode = mitk::DataNode::New();
-      workingNode->SetData(workingImage);
-      workingNode->SetName(newName.toStdString());
+      std::string sName = referenceNode->GetName();
+      QString qName;
+      qName.sprintf("%s.lsetp",sName.c_str());
+      QString filename = QFileDialog::getSaveFileName( NULL,"save file dialog",QString(),"LabelSet Preset(*.lsetp)");
+      if ( filename.isEmpty() )
+        return;
 
-      // set additional image information
-      workingImage->GetExteriorLabel()->SetProperty("name.parent",mitk::StringProperty::New(referenceNode->GetName().c_str()));
-      workingImage->GetExteriorLabel()->SetProperty("name.image",mitk::StringProperty::New(newName.toStdString().c_str()));
+      std::auto_ptr<TiXmlDocument> presetXmlDoc;
+      presetXmlDoc.reset( new TiXmlDocument());
 
-      if (!m_DataStorage->Exists(workingNode))
-        m_DataStorage->Add(workingNode, referenceNode);
+      TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+      presetXmlDoc->LinkEndChild( decl );
 
-      QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( );
-      dialog->SetSuggestionList( mitk::OrganNamesHandling::GetDefaultOrganColorString());
-      dialog->setWindowTitle("New Label");
+      TiXmlElement * presetElement = new TiXmlElement("LabelSetImagePreset");
+      presetElement->SetAttribute("layers", referenceImage->GetNumberOfLayers());
 
-      int dialogReturnValue = dialog->exec();
+      presetXmlDoc->LinkEndChild(presetElement);
 
-      if ( dialogReturnValue == QDialog::Rejected ) return;
+      for (int layerIdx=0; layerIdx<referenceImage->GetNumberOfLayers(); layerIdx++)
+      {
+        TiXmlElement * layerElement = new TiXmlElement("Layer");
+        layerElement->SetAttribute("index", layerIdx);
+        layerElement->SetAttribute("labels", referenceImage->GetNumberOfLabels(layerIdx));
 
-      QString segName = dialog->GetSegmentationName();
-      if(segName.isEmpty()) segName = "Unnamed";
-      workingImage->GetActiveLabelSet()->AddLabel(segName.toStdString(), dialog->GetColor());
+        presetElement->LinkEndChild(layerElement);
 
+        for (int labelIdx=0; labelIdx<referenceImage->GetNumberOfLabels(layerIdx); labelIdx++)
+        {
+          TiXmlElement * labelAsXml = mitk::LabelSetImageWriter::GetLabelAsTiXmlElement(referenceImage->GetLabel(labelIdx,layerIdx));
+          layerElement->LinkEndChild(labelAsXml);
+        }
+      }
+
+
+      bool wasSaved = presetXmlDoc->SaveFile(filename.toStdString());
+      if(!wasSaved)
+      {
+        QMessageBox::information(NULL, "Create LabelSetImage Preset", "Could not save a LabelSetImage preset as Xml.\n");\
+        return;
+      }
     }
   }
 }

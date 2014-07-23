@@ -58,7 +58,7 @@ public:
     typedef typename mitk::DiffusionImage< TInPixelType >::GradientDirectionType            DirectionType;
     typedef typename mitk::DiffusionImage< TInPixelType >::GradientDirectionContainerType   DirectionContainerType;
 
-    itkSetMacro( ChannelIndices, std::vector< unsigned int > )
+    void SetChannelIndices( std::vector< unsigned int > indices ){ m_ChannelIndices = indices; }
     void SetDirections( typename DirectionContainerType::Pointer directions ){ m_Directions = directions; }
     typename DirectionContainerType::Pointer GetNewDirections(){ return m_NewDirections; }
 

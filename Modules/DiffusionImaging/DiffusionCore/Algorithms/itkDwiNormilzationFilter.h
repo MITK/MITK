@@ -25,6 +25,9 @@ This file is based heavily on a corresponding ITK filter.
 #include "itkImageToImageFilter.h"
 #include "itkVectorImage.h"
 #include <mitkDiffusionImage.h>
+#include <itkLabelStatisticsImageFilter.h>
+#include <itkImageRegionIteratorWithIndex.h>
+#include <itkShiftScaleImageFilter.h>
 
 namespace itk{
 /** \class DwiNormilzationFilter
@@ -50,15 +53,24 @@ public:
     /** Runtime information support. */
     itkTypeMacro(DwiNormilzationFilter, ImageToImageFilter)
 
+    typedef itk::Image< double, 3 > DoubleImageType;
+    typedef itk::Image< unsigned char, 3 > UcharImageType;
+    typedef itk::Image< unsigned short, 3 > BinImageType;
+    typedef itk::Image< TInPixelType, 3 > TInPixelImageType;
     typedef typename Superclass::InputImageType InputImageType;
     typedef typename Superclass::OutputImageType OutputImageType;
     typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
     typedef mitk::DiffusionImage< short >::GradientDirectionType GradientDirectionType;
     typedef mitk::DiffusionImage< short >::GradientDirectionContainerType::Pointer GradientContainerType;
+    typedef itk::LabelStatisticsImageFilter< TInPixelImageType,BinImageType >  StatisticsFilterType;
+    typedef itk::Statistics::Histogram< typename TInPixelImageType::PixelType  > HistogramType;
+    typedef typename HistogramType::MeasurementType MeasurementType;
+    typedef itk::ShiftScaleImageFilter<TInPixelImageType, DoubleImageType>  ShiftScaleImageFilterType;
 
     itkSetMacro( GradientDirections, GradientContainerType )
     itkSetMacro( NewMax, TInPixelType )
     itkSetMacro( UseGlobalMax, bool )
+    itkSetMacro( MaskImage, UcharImageType::Pointer )
 
     protected:
         DwiNormilzationFilter();
@@ -68,11 +80,13 @@ public:
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
 
+    UcharImageType::Pointer m_MaskImage;
     GradientContainerType   m_GradientDirections;
     int                     m_B0Index;
     TInPixelType            m_NewMax;
     bool                    m_UseGlobalMax;
     double                  m_GlobalMax;
+
 };
 
 }

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
 #include "ipSegmentation.h"
+#include "mitkAbstractTransformGeometry.h"
 
 #include "mitkLevelWindowProperty.h"
 
@@ -460,6 +461,7 @@ bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent*
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
     const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+    const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
 
     if (!workingNode)
@@ -467,7 +469,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
 
     Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
 
-    if ( !image || !planeGeometry )
+    if ( !image || !planeGeometry || abstractTransformGeometry )
         return;
 
     if(m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())

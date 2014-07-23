@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkImageReadAccessor.h"
+#include "mitkAbstractTransformGeometry.h"
 
 #include "mitkCorrectorTool2D.xpm"
 
@@ -154,6 +155,9 @@ bool mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
   if ( !image || !planeGeometry ) return false;
+
+  const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+  if ( !image || abstractTransformGeometry ) return false;
 
   // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
   m_WorkingSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );

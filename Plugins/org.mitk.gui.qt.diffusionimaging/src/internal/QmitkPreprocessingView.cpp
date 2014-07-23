@@ -69,6 +69,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <itkResampleDwiImageFilter.h>
 #include <itkResampleImageFilter.h>
+#include <itkImageDuplicator.h>
+#include <itkMaskImageFilter.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateOr.h>
+#include <itkCropImageFilter.h>
 
 const std::string QmitkPreprocessingView::VIEW_ID =
         "org.mitk.views.preprocessing";
@@ -123,6 +130,19 @@ void QmitkPreprocessingView::CreateConnections()
 {
     if ( m_Controls )
     {
+        m_Controls->m_NormalizationMaskBox->SetDataStorage(this->GetDataStorage());
+        mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+        mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
+        mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
+        mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
+        mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
+        isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isQbi);
+        mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
+        mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
+        mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+        finalPredicate = mitk::NodePredicateAnd::New(finalPredicate, isBinaryPredicate);
+        m_Controls->m_NormalizationMaskBox->SetPredicate(finalPredicate);
+
         m_Controls->m_ExtractBrainMask->setVisible(false);
         m_Controls->m_BrainMaskIterationsBox->setVisible(false);
         m_Controls->m_ResampleIntFrame->setVisible(false);
@@ -139,10 +159,199 @@ void QmitkPreprocessingView::CreateConnections()
         connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
         connect( (QObject*)(m_Controls->m_NormalizeImageValuesButton), SIGNAL(clicked()), this, SLOT(DoDwiNormalization()) );
         connect( (QObject*)(m_Controls->m_ModifyDirection), SIGNAL(clicked()), this, SLOT(DoApplyDirectionMatrix()) );
+        connect( (QObject*)(m_Controls->m_ModifySpacingButton), SIGNAL(clicked()), this, SLOT(DoApplySpacing()) );
+        connect( (QObject*)(m_Controls->m_ModifyOriginButton), SIGNAL(clicked()), this, SLOT(DoApplyOrigin()) );
         connect( (QObject*)(m_Controls->m_ResampleImageButton), SIGNAL(clicked()), this, SLOT(DoResampleImage()) );
         connect( (QObject*)(m_Controls->m_ResampleTypeBox), SIGNAL(currentIndexChanged(int)), this, SLOT(DoUpdateInterpolationGui(int)) );
+        connect( (QObject*)(m_Controls->m_CropImageButton), SIGNAL(clicked()), this, SLOT(DoCropImage()) );
+
         //        connect( (QObject*)(m_Controls->m_ExtractBrainMask), SIGNAL(clicked()), this, SLOT(DoExtractBrainMask()) );
     }
+}
+
+void QmitkPreprocessingView::DoCropImage()
+{
+    if (m_DiffusionImage.IsNotNull())
+    {
+        ItkDwiType::SizeType lower;
+        ItkDwiType::SizeType upper;
+        lower[0] = m_Controls->m_XstartBox->value();
+        lower[1] = m_Controls->m_YstartBox->value();
+        lower[2] = m_Controls->m_ZstartBox->value();
+        upper[0] = m_Controls->m_XendBox->value();
+        upper[1] = m_Controls->m_YendBox->value();
+        upper[2] = m_Controls->m_ZendBox->value();
+
+        itk::CropImageFilter< ItkDwiType, ItkDwiType >::Pointer cropper = itk::CropImageFilter< ItkDwiType, ItkDwiType >::New();
+        cropper->SetLowerBoundaryCropSize(lower);
+        cropper->SetUpperBoundaryCropSize(upper);
+        cropper->SetInput(m_DiffusionImage->GetVectorImage());
+        cropper->Update();
+
+        MitkDwiType::Pointer image = MitkDwiType::New();
+        image->SetVectorImage( cropper->GetOutput() );
+        image->SetReferenceBValue( m_DiffusionImage->GetReferenceBValue() );
+        image->SetDirections( m_DiffusionImage->GetDirections() );
+        image->InitializeFromVectorImage();
+
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+        imageNode->SetName((name+"_cropped").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+        mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+        mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    else if(m_SelectedImage.IsNotNull())
+    {
+        AccessFixedDimensionByItk(m_SelectedImage, TemplatedCropImage,3);
+    }
+}
+
+template < typename TPixel, unsigned int VImageDimension >
+void QmitkPreprocessingView::TemplatedCropImage( itk::Image<TPixel, VImageDimension>* itkImage)
+{
+    ItkDwiType::SizeType lower;
+    ItkDwiType::SizeType upper;
+    lower[0] = m_Controls->m_XstartBox->value();
+    lower[1] = m_Controls->m_YstartBox->value();
+    lower[2] = m_Controls->m_ZstartBox->value();
+    upper[0] = m_Controls->m_XendBox->value();
+    upper[1] = m_Controls->m_YendBox->value();
+    upper[2] = m_Controls->m_ZendBox->value();
+
+    typedef itk::Image<TPixel, VImageDimension> ImageType;
+    typename itk::CropImageFilter< ImageType, ImageType >::Pointer cropper = itk::CropImageFilter< ImageType, ImageType >::New();
+    cropper->SetLowerBoundaryCropSize(lower);
+    cropper->SetUpperBoundaryCropSize(upper);
+    cropper->SetInput(itkImage);
+    cropper->Update();
+
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->InitializeByItk( cropper->GetOutput() );
+    image->SetVolume( cropper->GetOutput()->GetBufferPointer() );
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedImageNode->GetName().c_str();
+
+    imageNode->SetName((name+"_cropped").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
+
+    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkPreprocessingView::DoApplySpacing()
+{
+    if (m_DiffusionImage.IsNotNull())
+    {
+        mitk::Vector3D spacing;
+        spacing[0] = m_Controls->m_HeaderSpacingX->value();
+        spacing[1] = m_Controls->m_HeaderSpacingY->value();
+        spacing[2] = m_Controls->m_HeaderSpacingZ->value();
+
+        MitkDwiType::Pointer image = m_DiffusionImage->Clone();
+        image->GetVectorImage()->SetSpacing(spacing);
+        image->InitializeFromVectorImage();
+
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+        imageNode->SetName((name+"_newspacing").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+        mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    else if(m_SelectedImage.IsNotNull())
+    {
+        AccessFixedDimensionByItk(m_SelectedImage, TemplatedSetImageSpacing,3);
+    }
+}
+
+template < typename TPixel, unsigned int VImageDimension >
+void QmitkPreprocessingView::TemplatedSetImageSpacing( itk::Image<TPixel, VImageDimension>* itkImage)
+{
+    mitk::Vector3D spacing;
+    spacing[0] = m_Controls->m_HeaderSpacingX->value();
+    spacing[1] = m_Controls->m_HeaderSpacingY->value();
+    spacing[2] = m_Controls->m_HeaderSpacingZ->value();
+
+    typedef itk::ImageDuplicator< itk::Image<TPixel, VImageDimension> > DuplicateFilterType;
+    typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
+    duplicator->SetInputImage( itkImage );
+    duplicator->Update();
+    typename itk::Image<TPixel, VImageDimension>::Pointer newImage = duplicator->GetOutput();
+    newImage->SetSpacing(spacing);
+
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->InitializeByItk( newImage.GetPointer() );
+    image->SetVolume( newImage->GetBufferPointer() );
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedImageNode->GetName().c_str();
+
+    imageNode->SetName((name+"_newspacing").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
+    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkPreprocessingView::DoApplyOrigin()
+{
+    if (m_DiffusionImage.IsNotNull())
+    {
+        mitk::Vector3D origin;
+        origin[0] = m_Controls->m_HeaderOriginX->value();
+        origin[1] = m_Controls->m_HeaderOriginY->value();
+        origin[2] = m_Controls->m_HeaderOriginZ->value();
+
+        MitkDwiType::Pointer image = m_DiffusionImage->Clone();
+        image->GetVectorImage()->SetOrigin(origin);
+        image->InitializeFromVectorImage();
+
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( image );
+        QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+        imageNode->SetName((name+"_neworigin").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+        mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    else if(m_SelectedImage.IsNotNull())
+    {
+        AccessFixedDimensionByItk(m_SelectedImage, TemplatedSetImageOrigin,3);
+    }
+}
+
+template < typename TPixel, unsigned int VImageDimension >
+void QmitkPreprocessingView::TemplatedSetImageOrigin( itk::Image<TPixel, VImageDimension>* itkImage)
+{
+    mitk::Vector3D origin;
+    origin[0] = m_Controls->m_HeaderOriginX->value();
+    origin[1] = m_Controls->m_HeaderOriginY->value();
+    origin[2] = m_Controls->m_HeaderOriginZ->value();
+
+    typedef itk::ImageDuplicator< itk::Image<TPixel, VImageDimension> > DuplicateFilterType;
+    typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
+    duplicator->SetInputImage( itkImage );
+    duplicator->Update();
+    typename itk::Image<TPixel, VImageDimension>::Pointer newImage = duplicator->GetOutput();
+    newImage->SetOrigin(origin);
+
+    mitk::Image::Pointer image = mitk::Image::New();
+    image->InitializeByItk( newImage.GetPointer() );
+    image->SetVolume( newImage->GetBufferPointer() );
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedImageNode->GetName().c_str();
+
+    imageNode->SetName((name+"_neworigin").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
+    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPreprocessingView::DoUpdateInterpolationGui(int i)
@@ -153,10 +362,6 @@ void QmitkPreprocessingView::DoUpdateInterpolationGui(int i)
     {
         m_Controls->m_ResampleIntFrame->setVisible(false);
         m_Controls->m_ResampleDoubleFrame->setVisible(true);
-
-        m_Controls->m_ResampleDoubleX->setValue(2);
-        m_Controls->m_ResampleDoubleY->setValue(2);
-        m_Controls->m_ResampleDoubleZ->setValue(2);
         break;
     }
     case 1:
@@ -203,9 +408,6 @@ void QmitkPreprocessingView::DoUpdateInterpolationGui(int i)
     }
     default:
     {
-        m_Controls->m_ResampleDoubleX->setValue(2);
-        m_Controls->m_ResampleDoubleY->setValue(2);
-        m_Controls->m_ResampleDoubleZ->setValue(2);
         m_Controls->m_ResampleIntFrame->setVisible(false);
         m_Controls->m_ResampleDoubleFrame->setVisible(true);
     }
@@ -572,7 +774,7 @@ void QmitkPreprocessingView::TemplatedApplyRotation( itk::Image<TPixel, VImageDi
     imageNode->SetName((name+"_newdirection").toStdString().c_str());
     GetDefaultDataStorage()->Add(imageNode, m_SelectedImageNode);
 
-    mitk::RenderingManager::GetInstance()->InitializeViews( m_SelectedImageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -605,8 +807,14 @@ void QmitkPreprocessingView::DoDwiNormalization()
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput(m_DiffusionImage->GetVectorImage());
     filter->SetGradientDirections(m_DiffusionImage->GetDirections());
-    if (m_Controls->m_NormalizationMethodBox->currentIndex()==1)
-        filter->SetUseGlobalMax(true);
+
+    if (m_Controls->m_NormalizationMaskBox->GetSelectedNode().IsNotNull())
+    {
+        UcharImageType::Pointer itkImage = UcharImageType::New();
+        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_NormalizationMaskBox->GetSelectedNode()->GetData()), itkImage);
+        filter->SetMaskImage(itkImage);
+    }
+
     filter->Update();
 
     DiffusionImageType::Pointer image = DiffusionImageType::New();
@@ -929,6 +1137,9 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_ModifyDirection->setEnabled(foundImageVolume);
     m_Controls->m_ExtractBrainMask->setEnabled(foundImageVolume);
     m_Controls->m_ResampleImageButton->setEnabled(foundImageVolume);
+    m_Controls->m_ModifySpacingButton->setEnabled(foundImageVolume);
+    m_Controls->m_ModifyOriginButton->setEnabled(foundImageVolume);
+    m_Controls->m_CropImageButton->setEnabled(foundImageVolume);
 
     // reset sampling frame to 1 and update all ealted components
     m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(1);
@@ -973,6 +1184,18 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
         targetBVal /= (float)bValMap.size()-1;
         m_Controls->m_targetBValueSpinBox->setValue(targetBVal);
 
+        m_Controls->m_HeaderSpacingX->setValue(m_DiffusionImage->GetGeometry()->GetSpacing()[0]);
+        m_Controls->m_HeaderSpacingY->setValue(m_DiffusionImage->GetGeometry()->GetSpacing()[1]);
+        m_Controls->m_HeaderSpacingZ->setValue(m_DiffusionImage->GetGeometry()->GetSpacing()[2]);
+        m_Controls->m_HeaderOriginX->setValue(m_DiffusionImage->GetGeometry()->GetOrigin()[0]);
+        m_Controls->m_HeaderOriginY->setValue(m_DiffusionImage->GetGeometry()->GetOrigin()[1]);
+        m_Controls->m_HeaderOriginZ->setValue(m_DiffusionImage->GetGeometry()->GetOrigin()[2]);
+        m_Controls->m_XstartBox->setMaximum(m_DiffusionImage->GetGeometry()->GetExtent(0)-1);
+        m_Controls->m_YstartBox->setMaximum(m_DiffusionImage->GetGeometry()->GetExtent(1)-1);
+        m_Controls->m_ZstartBox->setMaximum(m_DiffusionImage->GetGeometry()->GetExtent(2)-1);
+        m_Controls->m_XendBox->setMaximum(m_DiffusionImage->GetGeometry()->GetExtent(0)-1);
+        m_Controls->m_YendBox->setMaximum(m_DiffusionImage->GetGeometry()->GetExtent(1)-1);
+        m_Controls->m_ZendBox->setMaximum(m_DiffusionImage->GetGeometry()->GetExtent(2)-1);
     }
     else if (foundImageVolume)
     {
@@ -984,6 +1207,19 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
                 item = new QTableWidgetItem();
                 m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
             }
+
+        m_Controls->m_HeaderSpacingX->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[0]);
+        m_Controls->m_HeaderSpacingY->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[1]);
+        m_Controls->m_HeaderSpacingZ->setValue(m_SelectedImage->GetGeometry()->GetSpacing()[2]);
+        m_Controls->m_HeaderOriginX->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[0]);
+        m_Controls->m_HeaderOriginY->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[1]);
+        m_Controls->m_HeaderOriginZ->setValue(m_SelectedImage->GetGeometry()->GetOrigin()[2]);
+        m_Controls->m_XstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(0)-1);
+        m_Controls->m_YstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(1)-1);
+        m_Controls->m_ZstartBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(2)-1);
+        m_Controls->m_XendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(0)-1);
+        m_Controls->m_YendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(1)-1);
+        m_Controls->m_ZendBox->setMaximum(m_SelectedImage->GetGeometry()->GetExtent(2)-1);
 
         AccessFixedDimensionByItk(m_SelectedImage, TemplatedUpdateGui,3);
     }

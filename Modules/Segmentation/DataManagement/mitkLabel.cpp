@@ -270,3 +270,24 @@ void mitk::Label::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
  // todo
 }
+
+bool mitk::Equal( const mitk::Label& leftHandSide, const mitk::Label& rightHandSide, ScalarType eps, bool verbose )
+{
+  MITK_INFO(verbose) << "--- Label Equal ---";
+
+  bool returnValue = true;
+  // have to be replaced until a PropertyList Equal was implemented :
+  //returnValue = mitk::Equal((const mitk::PropertyList &)leftHandSide,(const mitk::PropertyList &)rightHandSide,eps,verbose);
+
+  const mitk::PropertyList::PropertyMap * lhsmap = leftHandSide.GetMap();
+  const mitk::PropertyList::PropertyMap * rhsmap = rightHandSide.GetMap();
+
+  returnValue = lhsmap->size() == rhsmap->size() && std::equal(lhsmap->begin(), lhsmap->end(), rhsmap->begin());
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Labels in label container are not equal.";
+    return returnValue;
+  }
+
+  return returnValue;
+}

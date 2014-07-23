@@ -88,6 +88,23 @@ private:
 
 };
 
+/**
+* @brief Equal A function comparing two labels for beeing equal in data
+*
+* @ingroup MITKTestingAPI
+*
+* Following aspects are tested for equality:
+*  - Lebel equality via Equal-PropetyList
+*
+* @param rightHandSide An image to be compared
+* @param leftHandSide An image to be compared
+* @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+* @param verbose Flag indicating if the user wants detailed console output or not.
+* @return true, if all subsequent comparisons are true, false otherwise
+*/
+MITK_CORE_EXPORT bool Equal( const mitk::Label& leftHandSide, const mitk::Label& rightHandSide, ScalarType eps, bool verbose );
+
+
 } // namespace mitk
 
 #endif // __mitkLabel_H_

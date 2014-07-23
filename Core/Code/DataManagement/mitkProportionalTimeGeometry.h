@@ -174,7 +174,9 @@ namespace mitk {
     /**
     * \brief Expands the time geometry to the given number of time steps.
     *
-    * Initializes the new time steps with empty geometries.
+    * Initializes the new time steps with empty geometries if no timesteps
+    * in the geometry so far. Otherwise fills the new times steps with
+    * clones of the first time step.
     * Shrinking is not supported.
     */
     virtual void Expand(TimeStepType size);

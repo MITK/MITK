@@ -134,7 +134,20 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateData()
       itkExceptionMacro ( "PCAPlane not yet implemented!" );
       m_PCAPlaneCalculator->SetInput ( input );
       m_PCAPlaneCalculator->Update();
-      m_PlaneLandmarkProjector->SetProjectionPlane ( dynamic_cast<mitk::PlaneGeometry*> ( m_PCAPlaneCalculator->GetOutput() ) );
+
+      const PlaneGeometry *planarFigureGeometry =
+        dynamic_cast< const PlaneGeometry * >( m_PCAPlaneCalculator->GetOutput() );
+      const AbstractTransformGeometry *abstrTransfGeometry =
+        dynamic_cast< const AbstractTransformGeometry * >( m_PCAPlaneCalculator->GetOutput() );
+
+      if ( !planarFigureGeometry || abstrTransfGeometry )
+      {
+        m_PlaneLandmarkProjector->SetProjectionPlane ( NULL );
+      }
+      else
+      {
+        m_PlaneLandmarkProjector->SetProjectionPlane ( planarFigureGeometry );
+      }
     }
     else
       itkExceptionMacro ( "Unknown projection mode" );

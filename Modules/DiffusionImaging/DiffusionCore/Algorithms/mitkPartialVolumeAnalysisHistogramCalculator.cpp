@@ -56,6 +56,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkRegionOfInterestImageFilter.h"
 #include "itkListSample.h"
 
+#include "mitkAbstractTransformGeometry.h"
+
 #include <iostream>
 #include <sstream>
 
@@ -490,10 +492,14 @@ namespace mitk
 
         const PlaneGeometry *planarFigureGeometry =
             dynamic_cast< const PlaneGeometry * >( planarFigureGeometry2D );
-        if ( planarFigureGeometry == NULL )
+        const AbstractTransformGeometry *abstrTransfGeometry =
+            dynamic_cast< const AbstractTransformGeometry * >( planarFigureGeometry2D );
+
+        if ( !planarFigureGeometry || abstrTransfGeometry )
         {
-          throw std::runtime_error( "Non-planar planar figures not supported!" );
+          throw std::runtime_error( "Only PlaneGeometry supported." );
         }
+
 
 //        unsigned int axis = 2;
 //        unsigned int slice = 0;
@@ -604,6 +610,18 @@ namespace mitk
     typename ResamplerType::Pointer resampler = ResamplerType::New();
 
     mitk::PlaneGeometry* planegeo = dynamic_cast<mitk::PlaneGeometry*>(planegeo3D);
+    if ( !planegeo )
+    {
+      throw std::runtime_error( "Unexpected null pointer returned for pointer to PlaneGeometry." );
+    }
+    else
+    {
+      mitk::AbstractTransformGeometry* abstrGeo = dynamic_cast<mitk::AbstractTransformGeometry*>(planegeo3D);
+      if ( abstrGeo )
+      {
+        throw std::runtime_error( "Unexpected pointer to AbstractTransformGeometry returned." );
+      }
+    }
 
     float upsamp = m_UpsamplingFactor;
     float gausssigma = m_GaussianSigma;

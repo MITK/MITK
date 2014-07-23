@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLayoutItem>
 #include <QWidgetItem>
 #include <QMessageBox>
+#include <QtConcurrentMap>
 
 // CTK
 #include <ctkCmdLineModuleManager.h>
@@ -46,6 +47,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleDescription.h>
 #include <ctkCmdLineModuleParameter.h>
+#include <ctkCmdLineModuleUtils.h>
+#include <ctkCmdLineModuleConcurrentHelpers.h>
 
 //-----------------------------------------------------------------------------
 CommandLineModulesView::CommandLineModulesView()
@@ -59,6 +62,7 @@ CommandLineModulesView::CommandLineModulesView()
 , m_MaximumConcurrentProcesses(4)
 , m_CurrentlyRunningProcesses(0)
 , m_DebugOutput(false)
+, m_XmlTimeoutSeconds(30) // 30 seconds = QProcess default timeout.
 {
 }
 
@@ -127,6 +131,7 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     // Set the main object, the ctkCmdLineModuleManager onto all the objects that need it.
     m_Controls->m_ComboBox->SetManager(m_ModuleManager);
     m_DirectoryWatcher = new ctkCmdLineModuleDirectoryWatcher(m_ModuleManager);
+    connect(this->m_DirectoryWatcher, SIGNAL(errorDetected(QString)), this, SLOT(OnDirectoryWatcherErrorsDetected(QString)));
     m_ModuleManager->registerBackend(m_ModuleBackend);
 
     // Setup the remaining preferences.
@@ -137,6 +142,8 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
     connect(this->m_Controls->m_RestoreDefaults, SIGNAL(pressed()), this, SLOT(OnRestoreButtonPressed()));
     connect(this->m_Controls->m_ComboBox, SIGNAL(actionChanged(QAction*)), this, SLOT(OnActionChanged(QAction*)));
     connect(this->m_Controls->m_TabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(OnTabCloseRequested(int)));
+    connect(this->m_Controls->m_ClearXMLCache, SIGNAL(pressed()), this, SLOT(OnClearCache()));
+    connect(this->m_Controls->m_ReloadModules, SIGNAL(pressed()), this, SLOT(OnReloadModules()));
 
     this->UpdateRunButtonEnabledStatus();
   }
@@ -206,9 +213,15 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
 
   m_MaximumConcurrentProcesses = prefs->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4);
 
+  m_XmlTimeoutSeconds = prefs->GetInt(CommandLineModulesViewConstants::XML_TIMEOUT_SECS, 30);
+  m_ModuleManager->setTimeOutForXMLRetrieval(m_XmlTimeoutSeconds * 1000); // preference is in seconds, underlying CTK library in milliseconds.
+
   // Get the flag for debug output, useful when parsing all the XML.
   m_DebugOutput = prefs->GetBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, false);
   m_DirectoryWatcher->setDebug(m_DebugOutput);
+
+  // Show/Hide the advanced widgets
+  this->m_Controls->SetAdvancedWidgetsVisible(prefs->GetBool(CommandLineModulesViewConstants::SHOW_ADVANCED_WIDGETS_NAME, false));
 
   bool loadApplicationDir = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, false);
   bool loadApplicationDirCliModules = prefs->GetBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR_CLI_MODULES, true);
@@ -247,12 +260,14 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
 
   // OnPreferencesChanged can be called for each preference in a dialog box, so
   // when you hit "OK", it is called repeatedly, whereas we want to only call these only once.
-  if (this->m_DirectoryWatcher->directories() != totalPaths)
+  if (m_DirectoryPaths != totalPaths)
   {
+    m_DirectoryPaths = totalPaths;
     m_DirectoryWatcher->setDirectories(totalPaths);
   }
-  if (this->m_DirectoryWatcher->additionalModules() != additionalModules)
+  if (m_ModulePaths != additionalModules)
   {
+    m_ModulePaths = additionalModules;
     m_DirectoryWatcher->setAdditionalModules(additionalModules);
   }
 }
@@ -471,3 +486,68 @@ void CommandLineModulesView::OnJobFinished()
   m_CurrentlyRunningProcesses--;
   this->UpdateRunButtonEnabledStatus();
 }
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnDirectoryWatcherErrorsDetected(const QString& errorMsg)
+{
+  ctkCmdLineModuleUtils::messageBoxForModuleRegistration(errorMsg);
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnClearCache()
+{
+  if (this->m_DebugOutput)
+  {
+    qDebug() << "CommandLineModulesView::OnClearCache(): starting";
+  }
+
+  m_ModuleManager->clearCache();
+
+  if (this->m_DebugOutput)
+  {
+    qDebug() << "CommandLineModulesView::OnClearCache(): finishing";
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+void CommandLineModulesView::OnReloadModules()
+{
+  QList<QUrl> urls;
+
+  QList<ctkCmdLineModuleReference> moduleRefs = m_ModuleManager->moduleReferences();
+  foreach (ctkCmdLineModuleReference ref, moduleRefs)
+  {
+    urls.push_back(ref.location());
+  }
+
+  if (this->m_DebugOutput)
+  {
+    qDebug() << "CommandLineModulesView::OnReloadModules(): unloading:" << urls;
+  }
+
+  foreach (ctkCmdLineModuleReference ref, moduleRefs)
+  {
+    m_ModuleManager->unregisterModule(ref);
+  }
+
+  if (this->m_DebugOutput)
+  {
+    qDebug() << "CommandLineModulesView::OnReloadModules(): reloading.";
+  }
+
+  QList<ctkCmdLineModuleReferenceResult> refResults = QtConcurrent::blockingMapped(urls,
+                                                                                   ctkCmdLineModuleConcurrentRegister(m_ModuleManager, m_DebugOutput));
+
+  if (this->m_DebugOutput)
+  {
+    qDebug() << "CommandLineModulesView::OnReloadModules(): finished.";
+  }
+
+  QString errorMessages = ctkCmdLineModuleUtils::errorMessagesFromModuleRegistration(refResults,
+                                                                                     m_ModuleManager->validationMode());
+  ctkCmdLineModuleUtils::messageBoxForModuleRegistration(errorMessages);
+}
+

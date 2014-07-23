@@ -58,6 +58,9 @@ public:
   typedef typename Superclass::OutputImageRegionType
                                                    OutputImageRegionType;
 
+  itkSetMacro( MaxNumIterations, int )
+  itkGetMacro( MaxNumIterations, int )
+
 protected:
   BrainMaskExtractionImageFilter();
   ~BrainMaskExtractionImageFilter() {};
@@ -67,6 +70,8 @@ protected:
   bool CompareImages( typename OutputImageType::Pointer im1, typename OutputImageType::Pointer im2);
   int ComputeHistogram( typename InputImageType::Pointer image);
   void CopyImage( typename OutputImageType::Pointer target, typename OutputImageType::Pointer source);
+
+  int m_MaxNumIterations;
 };
 
 }

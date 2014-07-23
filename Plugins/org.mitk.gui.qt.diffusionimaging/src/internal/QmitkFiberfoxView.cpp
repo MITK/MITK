@@ -1832,6 +1832,11 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
     parameters.m_ParentNode = fiberNode;
     m_TractsToDwiFilter->SetParameters(parameters);
     m_TractsToDwiFilter->SetFiberBundle(fiberBundle);
+    if (m_SelectedDWI.IsNotNull())
+    {
+        mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
+        m_TractsToDwiFilter->SetInputDwi(diffImg);
+    }
     m_Worker.m_FilterType = 0;
     m_Thread.start(QThread::LowestPriority);
 }

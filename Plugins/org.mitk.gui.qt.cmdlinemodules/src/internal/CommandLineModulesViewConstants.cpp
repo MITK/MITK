@@ -29,4 +29,6 @@ const std::string CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR_CLI
 const std::string CommandLineModulesViewConstants::LOAD_FROM_HOME_DIR_CLI_MODULES = "load from home dir/cli-modules";
 const std::string CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR_CLI_MODULES = "load from current dir/cli-modules";
 const std::string CommandLineModulesViewConstants::XML_VALIDATION_MODE = "xml validation mode";
+const std::string CommandLineModulesViewConstants::XML_TIMEOUT_SECS = "xml time-out";
 const std::string CommandLineModulesViewConstants::MAX_CONCURRENT = "max concurrent processes";
+const std::string CommandLineModulesViewConstants::SHOW_ADVANCED_WIDGETS_NAME = "show advanced widgets";

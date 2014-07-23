@@ -117,12 +117,17 @@ mitk::Image* mitk::LabelSetImage::GetLayerImage(int layer)
   return m_LayerContainer[layer];
 }
 
+const mitk::Image* mitk::LabelSetImage::GetLayerImage(int layer) const
+{
+  return m_LayerContainer[layer];
+}
+
 int mitk::LabelSetImage::GetActiveLayer() const
 {
   return m_ActiveLayer;
 }
 
-int mitk::LabelSetImage::GetNumberOfLayers()
+int mitk::LabelSetImage::GetNumberOfLayers() const
 {
   return m_LabelSetContainer.size();
 }
@@ -466,6 +471,12 @@ mitk::Label *mitk::LabelSetImage::GetLabel(int pixelValue, int layer)
 }
 
 mitk::LabelSet* mitk::LabelSetImage::GetLabelSet(int layer)
+{
+  if (layer < 0) layer = GetActiveLayer();
+  return m_LabelSetContainer[layer].GetPointer();
+}
+
+const mitk::LabelSet* mitk::LabelSetImage::GetLabelSet(int layer) const
 {
   if (layer < 0) layer = GetActiveLayer();
   return m_LabelSetContainer[layer].GetPointer();
@@ -970,4 +981,68 @@ void mitk::LabelSetImage::MergeLabelProcessing(ImageType* itkImage, int pixelVal
     }
     ++iter;
   }
+}
+
+bool mitk::Equal(const mitk::LabelSetImage& leftHandSide, const mitk::LabelSetImage& rightHandSide, ScalarType eps, bool verbose)
+{
+  bool returnValue = true;
+
+  /* LabelSetImage members */
+
+  MITK_INFO(verbose) << "--- LabelSetImage Equal ---";
+
+  // number layers
+  returnValue = leftHandSide.GetNumberOfLayers() == rightHandSide.GetNumberOfLayers();
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Number of layers not equal.";
+    return false;
+  }
+
+  // total number labels
+  returnValue = leftHandSide.GetTotalNumberOfLabels() == rightHandSide.GetTotalNumberOfLabels();
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Total number of labels not equal.";
+    return false;
+  }
+
+  // active layer
+  returnValue = leftHandSide.GetActiveLayer() == rightHandSide.GetActiveLayer();
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Active layer not equal.";
+    return false;
+  }
+
+  // working image data
+  returnValue = mitk::Equal((const mitk::Image&)leftHandSide,(const mitk::Image&)rightHandSide,eps,verbose);
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Working image data not equal.";
+    return false;
+  }
+
+
+  for(int layerIndex = 0 ; layerIndex < leftHandSide.GetNumberOfLayers(); layerIndex++)
+  {
+    // layer image data
+    returnValue = mitk::Equal(*leftHandSide.GetLayerImage(layerIndex),*rightHandSide.GetLayerImage(layerIndex),eps,verbose);
+    if(!returnValue)
+    {
+      MITK_INFO(verbose) << "Layer image data not equal.";
+      return false;
+    }
+    // layer labelset data
+
+    returnValue = mitk::Equal(*leftHandSide.GetLabelSet(layerIndex),*rightHandSide.GetLabelSet(layerIndex),eps,verbose);
+    if(!returnValue)
+    {
+      MITK_INFO(verbose) << "Layer labelset data not equal.";
+      return false;
+    }
+
+  }
+
+  return returnValue;
 }

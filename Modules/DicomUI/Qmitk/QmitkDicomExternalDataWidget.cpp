@@ -51,7 +51,7 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkDicomExternalDataWidgetControls;
         m_Controls->setupUi( parent );
         m_Controls->viewExternalDataButton->setVisible(true);
-        m_Controls->ctkDICOMBrowser->setDynamicTableLayout(true);
+        m_Controls->ctkDICOMBrowser->setTableOrientation(Qt::Vertical);
         m_Controls->ctkDICOMBrowser->setDICOMDatabase(m_ExternalDatabase);
 
         this->SetupImportDialog();

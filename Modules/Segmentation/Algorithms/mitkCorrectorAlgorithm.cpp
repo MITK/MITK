@@ -222,7 +222,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
         TSegData thisSegData;
         thisSegData.lineStart = lineStart;
         thisSegData.lineEnd = lineEnd;
-        thisSegData.modified = modifySegment( lineStart, lineEnd, ((state==0)?0:2), pic, _ofsArray );
+        thisSegData.modified = modifySegment( lineStart, lineEnd, state, pic, _ofsArray );
         segData.push_back( thisSegData );
         numSegments++;
       }
@@ -236,7 +236,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     {
       for (int i=segData[segNr].lineStart+1; i<segData[segNr].lineEnd; i++)
       {
-        *(picdata + _ofsArray[i]) = 2; // Replace Value
+        *(picdata + _ofsArray[i]) = 1; // Replace Value
       }
     }
   }
@@ -263,7 +263,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
         p[2 * i + 1] = (mitkIpInt4_t) _points [2 * i + 1];
       }
 
-      if (state == 0) ipMITKSegmentationCombineRegion (pic, p, num, 0, IPSEGMENTATION_OR,  2); //Replace Value
+      if (state == 0) ipMITKSegmentationCombineRegion (pic, p, num, 0, IPSEGMENTATION_OR,  1); //Replace Value
       else            ipMITKSegmentationCombineRegion (pic, p, num, 0, IPSEGMENTATION_AND, 0);
 
       delete[] p;

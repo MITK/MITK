@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourUtils.h"
 #include "ipSegmentation.h"
 #include "mitkLabelSetImage.h"
+#include "mitkContourModelUtils.h"
 
 #include "mitkLevelWindowProperty.h"
 
@@ -60,7 +61,7 @@ void mitk::PaintbrushTool::ConnectActionsAndFunctions()
 void mitk::PaintbrushTool::Activated()
 {
   Superclass::Activated();
-  FeedbackContourTool::SetFeedbackContourVisible(true);
+  FeedbackContourTool::SetFeedbackContourVisible(false);
   SizeChanged.Send(m_Size);
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<mitk::PaintbrushTool>( this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified );
 }
@@ -402,6 +403,8 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   // visualize contour
   ContourModel::Pointer displayContour = ContourModel::New();
   displayContour->Initialize();
+  ContourUtils::BackProjectContourFrom2DSlice(m_WorkingSlice->GetGeometry(), contour,displayContour);
+  SetFeedbackContour(*displayContour);
 
   //for (unsigned int index = 0; index < contour->GetNumberOfPoints(); ++index)
   //{
@@ -413,8 +416,8 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   //  }
   //  displayContour->AddVertex( point );
   //}
-
-  //displayContour = ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
+  ////displayContour = ContourUtils::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
+  //MITK_INFO << "2";
   //SetFeedbackContour( *displayContour );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );

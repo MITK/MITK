@@ -43,9 +43,9 @@ public:
     update();
   }
 
-  void AddFunctionPoint(double x,double val)
+  int AddFunctionPoint(double x,double val)
   {
-    m_PiecewiseFunction->AddPoint(x,val);
+    return m_PiecewiseFunction->AddPoint(x,val);
   }
 
   void RemoveFunctionPoint(double x)

@@ -42,9 +42,9 @@ public:
     update();
   }
 
-  void AddFunctionPoint(double x, double)
+  int AddFunctionPoint(double x, double)
   {
-    m_ColorTransferFunction->AddRGBPoint(x,m_ColorTransferFunction->GetRedValue(x),m_ColorTransferFunction->GetGreenValue(x),m_ColorTransferFunction->GetBlueValue(x));
+    return m_ColorTransferFunction->AddRGBPoint(x,m_ColorTransferFunction->GetRedValue(x),m_ColorTransferFunction->GetGreenValue(x),m_ColorTransferFunction->GetBlueValue(x));
   }
 
   void RemoveFunctionPoint(double x)

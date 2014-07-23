@@ -23,6 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "PythonPath.h"
 #include <vtkPolyData.h>
 
+#ifndef WIN32
+  #include <dlfcn.h>
+#endif
+
 const QString mitk::PythonService::m_TmpDataFileName("temp_mitk_data_file");
 #ifdef USE_MITK_BUILTIN_PYTHON
   static char* pHome = NULL;
@@ -46,6 +50,10 @@ mitk::PythonService::PythonService()
   {
     try
     {
+#ifndef WIN32
+      dlopen(PYTHON_LIBRARY_NAME, RTLD_NOW | RTLD_NOLOAD | RTLD_GLOBAL);
+#endif
+
       std::string programPath = mitk::IOUtil::GetProgramPath();
       QDir programmDir( QString( programPath.c_str() ).append("/Python") );
       QString pythonCommand;

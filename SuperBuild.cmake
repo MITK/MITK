@@ -71,6 +71,7 @@ endif()
 
 set(external_projects
   Python
+  Numpy
   tinyxml
   GLUT
   ANN
@@ -313,6 +314,7 @@ ExternalProject_Add(${proj}
     ${Qwt_DEPENDS}
     ${Qxt_DEPENDS}
     ${SimpleITK_DEPENDS}
+    ${Numpy_DEPENDS}
 )
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
@@ -356,14 +358,17 @@ if(MITK_USE_Python)
        -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
        -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
        -DMITK_USE_SYSTEM_PYTHON:BOOL=${MITK_USE_SYSTEM_PYTHON}
+       -DPYTHON_LIBRARY_NAME:STRING=${PYTHON_LIBRARY_NAME}
        -DMITK_BUILD_org.mitk.gui.qt.python:BOOL=ON
       )
 
   if( NOT MITK_USE_SYSTEM_PYTHON )
     list(APPEND mitk_optional_cache_args
-          -DPython_DIR:PATH=${Python_DIR})
+          -DPython_DIR:PATH=${Python_DIR}
+          -DPYTHON_MAJOR_VERSION:STRING=${PYTHON_MAJOR_VERSION}
+          -DPYTHON_MINOR_VERSION:STRING=${PYTHON_MINOR_VERSION}
+        )
   endif()
-
 endif()
 
 set(proj MITK-Configure)
@@ -437,6 +442,7 @@ ExternalProject_Add(${proj}
     -DQwt_DIR:PATH=${Qwt_DIR}
     -DQxt_DIR:PATH=${Qxt_DIR}
     -DSimpleITK_DIR:PATH=${SimpleITK_DIR}
+    -DNumpy_DIR:PATH=${Numpy_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}

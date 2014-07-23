@@ -72,10 +72,12 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
   endforeach()
 
   # install vtk python. This folder contains all *.py files for VTK module loading.
-  install(DIRECTORY "${VTK_DIR}/Wrapping/Python/vtk"
-          DESTINATION bin/Python
-          USE_SOURCE_PERMISSIONS
-          COMPONENT Runtime)
+  # glob through all files, NSIS can't use directories
+  file(GLOB_RECURSE item RELATIVE "${VTK_DIR}/Wrapping/Python/vtk" "${VTK_DIR}/Wrapping/Python/vtk/*.py")
+  foreach(f ${item})
+    get_filename_component(_filepath "${f}" PATH)
+    install(FILES "${VTK_DIR}/Wrapping/Python/vtk/${f}" DESTINATION bin/Python/vtk/${_filepath})
+  endforeach()
 
   list(APPEND _python_dirs "${VTK_DIR}/lib")
 
@@ -84,24 +86,36 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
     if(UNIX)
       list(APPEND _python_dirs "${Python_DIR}/lib")
       # install python stuff
-      install(DIRECTORY "${Python_DIR}/lib/python2.7"
+      install(DIRECTORY "${Python_DIR}/lib/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}"
             DESTINATION bin/Python/lib
             USE_SOURCE_PERMISSIONS
             COMPONENT Runtime)
-      install(FILES "${Python_DIR}/include/python2.7/pyconfig.h" DESTINATION bin/Python/include/python2.7)
-    else(WIN32)
+      install(FILES "${Python_DIR}/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}/pyconfig.h"
+              DESTINATION bin/Python/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION})
+    else()
       list(APPEND _python_dirs "${Python_DIR}/libs")
       list(APPEND _python_dirs "${Python_DIR}/bin")
 
-      install(DIRECTORY "${Python_DIR}/Lib"
-            DESTINATION bin/Python
-            USE_SOURCE_PERMISSIONS
-            COMPONENT Runtime)
-      install(DIRECTORY "${Python_DIR}/include"
-            DESTINATION bin/Python
-            USE_SOURCE_PERMISSIONS
-            COMPONENT Runtime)
+      file(GLOB_RECURSE item RELATIVE "${Python_DIR}/Lib" "${Python_DIR}/Lib/*")
+      foreach(f ${item})
+        get_filename_component(_filepath "${f}" PATH)
+        install(FILES "${Python_DIR}/Lib/${f}" DESTINATION bin/Python/Lib/${_filepath})
+      endforeach()
+      file(GLOB_RECURSE item RELATIVE "${Python_DIR}/include" "${Python_DIR}/include/*")
+      foreach(f ${item})
+        get_filename_component(_filepath "${f}" PATH)
+        install(FILES "${Python_DIR}/include/${f}" DESTINATION bin/Python/include/${_filepath})
+      endforeach()
     endif()
+  endif()
+
+  if(Numpy_DIR)
+    # glob through all files, NSIS can't use directories
+    file(GLOB_RECURSE item RELATIVE "${Numpy_DIR}/numpy" "${Numpy_DIR}/numpy/*")
+    foreach(f ${item})
+      get_filename_component(_filepath "${f}" PATH)
+      install(FILES "${Numpy_DIR}/numpy/${f}" DESTINATION bin/Python/numpy/${_filepath})
+    endforeach()
   endif()
 
   list(REMOVE_DUPLICATES _python_dirs)

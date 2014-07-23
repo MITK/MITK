@@ -178,6 +178,7 @@ public:
   double Distance( const Line<TCoordRep,NPointDimension>& line ) const
   {
     MITK_WARN << "Not implemented yet!";
+    return -1;
   }
 
   //##Documentation

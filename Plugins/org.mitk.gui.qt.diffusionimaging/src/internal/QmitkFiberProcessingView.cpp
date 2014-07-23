@@ -48,9 +48,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractDensityImageFilter.h>
 #include <itkImageRegion.h>
 #include <itkTractsToRgbaImageFilter.h>
+#include <itkTractsToVectorImageFilter.h>
 
 #include <math.h>
-
+#include <boost/lexical_cast.hpp>
 
 const std::string QmitkFiberProcessingView::VIEW_ID = "org.mitk.views.fiberprocessing";
 const std::string id_DataManager = "org.mitk.views.datamanager";
@@ -87,6 +88,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_CurvatureThresholdButton, SIGNAL(clicked()), this, SLOT(ApplyCurvatureThreshold()) );
         connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
         connect( m_Controls->m_CompressFibersButton, SIGNAL(clicked()), this, SLOT(CompressSelectedBundles()) );
+        connect( m_Controls->m_ExtractFiberPeaks, SIGNAL(clicked()), this, SLOT(CalculateFiberDirections()) );
     }
 }
 
@@ -101,18 +103,98 @@ void QmitkFiberProcessingView::StdMultiWidgetNotAvailable()
     m_MultiWidget = NULL;
 }
 
+void QmitkFiberProcessingView::CalculateFiberDirections()
+{
+    typedef itk::Image<unsigned char, 3>                                            ItkUcharImgType;
+    typedef itk::Image< itk::Vector< float, 3>, 3 >                                 ItkDirectionImage3DType;
+    typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >  ItkDirectionImageContainerType;
+
+    // load fiber bundle
+    mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.back()->GetData());
+
+    itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
+    // load/create mask image
+    if (m_SelectedImage.IsNotNull())
+    {
+        ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
+        mitk::CastToItkImage<ItkUcharImgType>(m_SelectedImage, itkMaskImage);
+        fOdfFilter->SetMaskImage(itkMaskImage);
+    }
+
+    // extract directions from fiber bundle
+    fOdfFilter->SetFiberBundle(inputTractogram);
+    fOdfFilter->SetAngularThreshold(cos(m_Controls->m_AngularThreshold->value()*M_PI/180));
+    fOdfFilter->SetNormalizeVectors(true);
+    fOdfFilter->SetUseWorkingCopy(true);
+    fOdfFilter->SetSizeThreshold(m_Controls->m_PeakThreshold->value());
+    fOdfFilter->SetMaxNumDirections(m_Controls->m_MaxNumDirections->value());
+    fOdfFilter->Update();
+
+    QString name = m_SelectedFB.back()->GetName().c_str();
+
+    if (m_Controls->m_VectorFieldBox->isChecked())
+    {
+        mitk::FiberBundleX::Pointer directions = fOdfFilter->GetOutputFiberBundle();
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData(directions);
+        node->SetName((name+"_vectorfield").toStdString().c_str());
+
+        node->SetName(name.toStdString().c_str());
+//        node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
+        node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
+        node->SetProperty("color", mitk::ColorProperty::New(1.0f, 1.0f, 1.0f));
+
+        GetDefaultDataStorage()->Add(node, m_SelectedFB.back());
+    }
+
+    if (m_Controls->m_NumDirectionsBox->isChecked())
+    {
+        mitk::Image::Pointer mitkImage = mitk::Image::New();
+        mitkImage->InitializeByItk( fOdfFilter->GetNumDirectionsImage().GetPointer() );
+        mitkImage->SetVolume( fOdfFilter->GetNumDirectionsImage()->GetBufferPointer() );
+
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData(mitkImage);
+        node->SetName((name+"_numdirections").toStdString().c_str());
+        GetDefaultDataStorage()->Add(node, m_SelectedFB.back());
+    }
+
+    if (m_Controls->m_DirectionImagesBox->isChecked())
+    {
+        ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
+        for (unsigned int i=0; i<1; i++)
+        {
+            itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
+
+            if (itkImg.IsNull())
+                return;
+
+            mitk::Image::Pointer mitkImage = mitk::Image::New();
+            mitkImage->InitializeByItk( itkImg.GetPointer() );
+            mitkImage->SetVolume( itkImg->GetBufferPointer() );
+
+            mitk::DataNode::Pointer node = mitk::DataNode::New();
+            node->SetData(mitkImage);
+            node->SetName( (name+"_direction_"+boost::lexical_cast<std::string>(i).c_str()).toStdString().c_str());
+            node->SetVisibility(false);
+            GetDefaultDataStorage()->Add(node, m_SelectedFB.back());
+        }
+    }
+}
+
 void QmitkFiberProcessingView::UpdateGui()
 {
+    m_Controls->m_CompressFibersButton->setEnabled(!m_SelectedFB.empty());
+    m_Controls->m_ProcessFiberBundleButton->setEnabled(!m_SelectedFB.empty());
+    m_Controls->m_ResampleFibersButton->setEnabled(!m_SelectedFB.empty());
+    m_Controls->m_FaColorFibersButton->setEnabled(!m_SelectedFB.empty());
+    m_Controls->m_PruneFibersButton->setEnabled(!m_SelectedFB.empty());
+    m_Controls->m_CurvatureThresholdButton->setEnabled(!m_SelectedFB.empty());
+    m_Controls->m_ExtractFiberPeaks->setEnabled(!m_SelectedFB.empty());
+
     // are fiber bundles selected?
     if ( m_SelectedFB.empty() )
     {
-        m_Controls->m_CompressFibersButton->setEnabled(false);
-        m_Controls->m_ProcessFiberBundleButton->setEnabled(false);
-        m_Controls->m_ResampleFibersButton->setEnabled(false);
-        m_Controls->m_FaColorFibersButton->setEnabled(false);
-        m_Controls->m_PruneFibersButton->setEnabled(false);
-        m_Controls->m_CurvatureThresholdButton->setEnabled(false);
-
         if (m_SelectedSurfaces.size()>0)
             m_Controls->m_MirrorFibersButton->setEnabled(true);
         else
@@ -120,13 +202,6 @@ void QmitkFiberProcessingView::UpdateGui()
     }
     else
     {
-        m_Controls->m_CompressFibersButton->setEnabled(true);
-        m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
-        m_Controls->m_ResampleFibersButton->setEnabled(true);
-        m_Controls->m_PruneFibersButton->setEnabled(true);
-        m_Controls->m_CurvatureThresholdButton->setEnabled(true);
-        m_Controls->m_MirrorFibersButton->setEnabled(true);
-
         if (m_SelectedImage.IsNotNull())
             m_Controls->m_FaColorFibersButton->setEnabled(true);
     }

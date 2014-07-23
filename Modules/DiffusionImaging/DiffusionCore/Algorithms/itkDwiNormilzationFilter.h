@@ -31,7 +31,7 @@ This file is based heavily on a corresponding ITK filter.
 
 namespace itk{
 /** \class DwiNormilzationFilter
- *  \brief Max-Normalizes the data vectors either using the global baseline maximum or the voxelwise baseline value.
+ *  \brief Normalizes the data vectors either using the specified reference value or the voxelwise baseline value.
  */
 
 template< class TInPixelType >
@@ -68,9 +68,10 @@ public:
     typedef itk::ShiftScaleImageFilter<TInPixelImageType, DoubleImageType>  ShiftScaleImageFilterType;
 
     itkSetMacro( GradientDirections, GradientContainerType )
-    itkSetMacro( NewMax, TInPixelType )
-    itkSetMacro( UseGlobalMax, bool )
+    itkSetMacro( ScalingFactor, TInPixelType )
+    itkSetMacro( UseGlobalReference, bool )
     itkSetMacro( MaskImage, UcharImageType::Pointer )
+    itkSetMacro( Reference, double )
 
     protected:
         DwiNormilzationFilter();
@@ -83,9 +84,9 @@ public:
     UcharImageType::Pointer m_MaskImage;
     GradientContainerType   m_GradientDirections;
     int                     m_B0Index;
-    TInPixelType            m_NewMax;
-    bool                    m_UseGlobalMax;
-    double                  m_GlobalMax;
+    TInPixelType            m_ScalingFactor;
+    bool                    m_UseGlobalReference;
+    double                  m_Reference;
 
 };
 

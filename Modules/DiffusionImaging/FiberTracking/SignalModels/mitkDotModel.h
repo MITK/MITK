@@ -36,10 +36,14 @@ public:
 
     typedef typename DiffusionSignalModel< ScalarType >::PixelType      PixelType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientType   GradientType;
+    typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
     ScalarType SimulateMeasurement(unsigned int dir);
+
+    void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
+    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
 
 protected:
 

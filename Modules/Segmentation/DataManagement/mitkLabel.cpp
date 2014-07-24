@@ -255,7 +255,27 @@ bool mitk::Equal( const mitk::Label& leftHandSide, const mitk::Label& rightHandS
   const mitk::PropertyList::PropertyMap * lhsmap = leftHandSide.GetMap();
   const mitk::PropertyList::PropertyMap * rhsmap = rightHandSide.GetMap();
 
-  returnValue = lhsmap->size() == rhsmap->size() && std::equal(lhsmap->begin(), lhsmap->end(), rhsmap->begin());
+  returnValue = lhsmap->size() == rhsmap->size();
+
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Labels in label container are not equal.";
+    return returnValue;
+  }
+
+
+  mitk::PropertyList::PropertyMap::const_iterator lhsmapIt = lhsmap->begin();
+  mitk::PropertyList::PropertyMap::const_iterator lhsmapItEnd = lhsmap->end();
+
+  for(;lhsmapIt != lhsmapItEnd; ++lhsmapIt)
+  {
+    if(rhsmap->find(lhsmapIt->first) == rhsmap->end())
+    {
+      returnValue == false;
+      break;
+    }
+  }
+
   if(!returnValue)
   {
     MITK_INFO(verbose) << "Labels in label container are not equal.";

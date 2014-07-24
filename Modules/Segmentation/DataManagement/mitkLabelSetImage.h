@@ -42,10 +42,8 @@ class MitkSegmentation_EXPORT LabelSetImage : public Image
 
 public:
 
-  mitkClassMacro(LabelSetImage, Image);
-  itkNewMacro(Self);
-
-  mitkNewMacro1Param(Self, LabelSetImage*);
+  mitkClassMacro(LabelSetImage, Image)
+  itkNewMacro(Self)
 
   typedef unsigned char PixelType;
 
@@ -206,8 +204,11 @@ public:
   const mitk::Label* GetExteriorLabel() const;
 
 protected:
+
+  mitkCloneMacro(Self)
+
   LabelSetImage();
-  LabelSetImage(mitk::LabelSetImage*);
+  LabelSetImage(const LabelSetImage & other);
   virtual ~LabelSetImage();
 
   template < typename ImageType1, typename ImageType2 >

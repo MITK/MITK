@@ -51,6 +51,25 @@ mitk::LabelSetImage::LabelSetImage() :
   m_ExteriorLabel->SetValue(0);
 }
 
+mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage & other):
+  Image(other),
+  m_ActiveLayer(other.GetActiveLayer()),
+  m_ExteriorLabel(other.GetExteriorLabel()->Clone())
+{
+  for(int i = 0 ; i < other.GetNumberOfLayers(); i++)
+  {
+    // Clone LabelSet data
+    mitk::LabelSet::Pointer lsClone = other.GetLabelSet(i)->Clone();
+    // add modified event listener to LabelSet (listen to LabelSet changes)
+    itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
+    command->SetCallbackFunction(this,&mitk::LabelSetImage::OnLabelSetModified);
+    lsClone->AddObserver(itk::ModifiedEvent(), command);
+    m_LabelSetContainer.push_back( lsClone );
+
+    // clone layer Image data
+    mitk::Image::Pointer liClone = other.GetLayerImage(i)->Clone();
+    m_LayerContainer.push_back( liClone );
+  }
 }
 
 void mitk::LabelSetImage::OnLabelSetModified()

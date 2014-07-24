@@ -203,6 +203,8 @@ public:
 
   mitk::Label* GetExteriorLabel();
 
+  const mitk::Label* GetExteriorLabel() const;
+
 protected:
   LabelSetImage();
   LabelSetImage(mitk::LabelSetImage*);

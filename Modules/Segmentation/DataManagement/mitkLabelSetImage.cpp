@@ -41,9 +41,16 @@ mitk::LabelSetImage::LabelSetImage() :
   m_ExteriorLabel(NULL)
 {
   // Iniitlaize Background Label
-  // If you want to store more information,
-  // please add it to the exterior label via SetProperty command.
-  m_ExteriorLabel = GetExteriorLabel();
+  mitk::Color color;
+  color.Set(0,0,0);
+  m_ExteriorLabel = mitk::Label::New();
+  m_ExteriorLabel->SetColor(color);
+  m_ExteriorLabel->SetName("Exterior");
+  m_ExteriorLabel->SetOpacity(0.0);
+  m_ExteriorLabel->SetLocked(false);
+  m_ExteriorLabel->SetValue(0);
+}
+
 }
 
 void mitk::LabelSetImage::OnLabelSetModified()
@@ -58,31 +65,12 @@ void mitk::LabelSetImage::SetExteriorLabel(mitk::Label * label)
 
 mitk::Label* mitk::LabelSetImage::GetExteriorLabel()
 {
-    if(m_ExteriorLabel.IsNull())
-    {
-      mitk::Color color;
-      color[0] = 0.0;
-      color[1] = 0.0;
-      color[2] = 0.0;
-      color[3] = 0.0;
-      m_ExteriorLabel = mitk::Label::New();
-      m_ExteriorLabel->SetColor(color);
-      m_ExteriorLabel->SetName("Exterior");
-      m_ExteriorLabel->SetOpacity(0.0);
-      m_ExteriorLabel->SetLocked(false);
-      m_ExteriorLabel->SetValue(0);
-    }
-    return m_ExteriorLabel;
-  }
+  return m_ExteriorLabel;
+}
 
-mitk::LabelSetImage::LabelSetImage(mitk::LabelSetImage* other) : mitk::Image(), m_ActiveLayer(0)
+const mitk::Label* mitk::LabelSetImage::GetExteriorLabel() const
 {
-  this->Initialize(other);
-  int numberOfLayers = other->GetNumberOfLayers();
-  for(int lidx=0; lidx<numberOfLayers; ++lidx)
-  {
-    m_LabelSetContainer.push_back( other->GetLabelSet(lidx) );
-  }
+  return m_ExteriorLabel;
 }
 
 void mitk::LabelSetImage::Initialize(const mitk::Image* other)

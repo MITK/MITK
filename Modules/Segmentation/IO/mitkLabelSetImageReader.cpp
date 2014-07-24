@@ -134,14 +134,13 @@ void LabelSetImageReader::GenerateData()
       _xmlStr = GetStringByKey(imgMetaDictionary,keybuffer);
       doc.Parse(_xmlStr.c_str());
 
-      label = LoadLabelFromTiXmlDocument(&doc);
+      label = LoadLabelFromTiXmlDocument(doc.FirstChildElement("Label"));
 
       if(label->GetValue() == 0) // set exterior label is needed to hold exterior information
         output->SetExteriorLabel(label);
       output->GetLabelSet()->AddLabel(label);
     }
   }
-
 
   // set vector image
   output->SetVectorImage(vectorImage);
@@ -273,11 +272,10 @@ bool LabelSetImageReader::CanReadFile(const std::string filename,
   return false;
 }
 
-mitk::Label::Pointer LabelSetImageReader::LoadLabelFromTiXmlDocument(TiXmlDocument * doc)
+mitk::Label::Pointer LabelSetImageReader::LoadLabelFromTiXmlDocument(TiXmlElement * labelElem)
 {
   // reread
-  TiXmlHandle docHandle( doc );
-  TiXmlElement * propElem = docHandle.FirstChildElement("Label").FirstChildElement("property").ToElement();
+  TiXmlElement * propElem = labelElem->FirstChildElement("property");
 
   std::string name;
   mitk::BaseProperty::Pointer prop;
@@ -287,6 +285,9 @@ mitk::Label::Pointer LabelSetImageReader::LoadLabelFromTiXmlDocument(TiXmlDocume
   {
     LabelSetImageReader::PropertyFromXmlElem( name, prop, propElem );
     label->SetProperty( name, prop );
+    TiXmlPrinter p;
+    propElem->Accept(&p);
+    MITK_INFO << p.CStr();
     propElem = propElem->NextSiblingElement( "property" );
   }
 

@@ -25,6 +25,8 @@
 #include "mitkLevelWindowProperty.h"
 #include "mitkLevelWindow.h"
 
+#include "mitkImageStatisticsHolder.h"
+
 void mitk::DisplayInteractor::Notify(InteractionEvent* interactionEvent, bool isHandled)
 {
   // to use the state machine pattern,
@@ -300,8 +302,14 @@ bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, Interaction
     directionModifier = -1;
   }
 
-  ScalarType levelModifier = std::max( (ScalarType)0.01, (ScalarType) fabs(level/1000) );
-  ScalarType windowModifier = std::max( (ScalarType)0.01, (ScalarType) fabs(window/1000) );
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+
+  ScalarType min = image->GetStatistics()->GetScalarValueMin();
+  ScalarType max = image->GetStatistics()->GetScalarValueMax();
+  ScalarType diff = max - min;
+
+  ScalarType levelModifier = std::max( (ScalarType)0.01, (ScalarType) fabs(diff/1000) );
+  ScalarType windowModifier = std::max( (ScalarType)0.01, (ScalarType) fabs(diff/1000) );
 
   ScalarType levelChange = m_CurrentDisplayCoordinate[levelIndex] - m_LastDisplayCoordinate[levelIndex];
   ScalarType windowChange = m_CurrentDisplayCoordinate[windowIndex] - m_LastDisplayCoordinate[windowIndex];

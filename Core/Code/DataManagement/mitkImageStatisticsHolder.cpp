@@ -221,7 +221,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t)
       AccessByItk_2( image, _ComputeExtremaInItkImage, this, t );
     }
   }
-  else if(pType.GetNumberOfComponents() > 1)
+  else
   {
     m_ScalarMin[t] = 0;
     m_ScalarMax[t] = 255;

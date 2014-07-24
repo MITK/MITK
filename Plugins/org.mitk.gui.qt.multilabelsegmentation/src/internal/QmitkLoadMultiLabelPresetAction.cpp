@@ -20,12 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QInputDialog"
 #include "QMessageBox"
-
-#include "QmitkNewSegmentationDialog.h"
-#include "QmitkMultiLabelSegmentationView.h"
-#include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
-//needed for qApp
-#include <qcoreapplication.h>
+#include "QFileDialog"
+#include "mitkLabelSetImageReader.h"
+#include "tinyxml.h"
 
 QmitkLoadMultiLabelPresetAction::QmitkLoadMultiLabelPresetAction()
 {
@@ -42,52 +39,56 @@ void QmitkLoadMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer> 
     if (referenceNode.IsNotNull())
     {
 
-      mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
+      mitk::LabelSetImage* referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
       assert(referenceImage);
 
-      QString newName = QString::fromStdString(referenceNode->GetName());
-      newName.append("-labels");
+      std::string sName = referenceNode->GetName();
+      QString qName;
+      qName.sprintf("%s.lsetp",sName.c_str());
+      QString filename = QFileDialog::getOpenFileName(NULL,"Load file",QString(),"LabelSet Preset(*.lsetp)");
+      if ( filename.isEmpty() )
+        return;
 
-      bool ok = false;
-      newName = QInputDialog::getText(NULL, "New Segmentation Session", "New name:", QLineEdit::Normal, newName, &ok);
-      if(!ok) return;
+      std::auto_ptr<TiXmlDocument> presetXmlDoc;
+      presetXmlDoc.reset( new TiXmlDocument());
 
-      mitk::LabelSetImage::Pointer workingImage = mitk::LabelSetImage::New();
+      bool ok = presetXmlDoc->LoadFile(filename.toStdString());
+      if ( !ok )
+        return;
 
-      try
+      TiXmlElement * presetElem = presetXmlDoc->FirstChildElement("LabelSetImagePreset");
+      if(!presetElem)
       {
-        workingImage->Initialize(referenceImage);
-      }
-      catch ( mitk::Exception& e )
-      {
-        MITK_ERROR << "Exception caught: " << e.GetDescription();
-        QMessageBox::information(NULL, "New Segmentation Session", "Could not create a new segmentation session.\n");
+        MITK_INFO << "No valid preset XML";
         return;
       }
 
-      mitk::DataNode::Pointer workingNode = mitk::DataNode::New();
-      workingNode->SetData(workingImage);
-      workingNode->SetName(newName.toStdString());
 
-      // set additional image information
-      workingImage->GetExteriorLabel()->SetProperty("name.parent",mitk::StringProperty::New(referenceNode->GetName().c_str()));
-      workingImage->GetExteriorLabel()->SetProperty("name.image",mitk::StringProperty::New(newName.toStdString().c_str()));
+      int numberOfLayers;
+      presetElem->QueryIntAttribute("layers", &numberOfLayers);
 
-      if (!m_DataStorage->Exists(workingNode))
-        m_DataStorage->Add(workingNode, referenceNode);
+      for(int i = 0 ; i < numberOfLayers; i++)
+      {
+        TiXmlElement * layerElem = presetElem->FirstChildElement("Layer");
+        int numberOfLabels;
+        layerElem->QueryIntAttribute("labels", &numberOfLabels);
 
-      QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( );
-      dialog->SetSuggestionList( mitk::OrganNamesHandling::GetDefaultOrganColorString());
-      dialog->setWindowTitle("New Label");
+        if(referenceImage->GetLabelSet(i) == NULL) referenceImage->AddLayer();
 
-      int dialogReturnValue = dialog->exec();
+        TiXmlElement * labelElement = layerElem->FirstChildElement("Label");
 
-      if ( dialogReturnValue == QDialog::Rejected ) return;
+        for(int j = 0 ; j < numberOfLabels; j++)
+        {
+          TiXmlPrinter p;
+          labelElement->Accept(&p);
+          MITK_INFO << p.CStr();
 
-      QString segName = dialog->GetSegmentationName();
-      if(segName.isEmpty()) segName = "Unnamed";
-      workingImage->GetActiveLabelSet()->AddLabel(segName.toStdString(), dialog->GetColor());
+          mitk::Label::Pointer label = mitk::LabelSetImageReader::LoadLabelFromTiXmlDocument(labelElement);
+          referenceImage->GetLabelSet()->AddLabel(label);
 
+          labelElement = labelElement->NextSiblingElement("Label");
+        }
+      }
     }
   }
 }

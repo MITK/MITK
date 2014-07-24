@@ -41,7 +41,7 @@ public:
    * @param transformation - transformation returned from  GetTransformation
    * @param offset - offset  transformation returned from  GetTransformation
    * @param resampleReference - image to which is to be resampled
-   * @param binary
+   * @param binary - resampling will be done using nearest neighbor interpolation
    */
   static void ApplyTransformationToImage(mitk::Image::Pointer img, const RidgidTransformType& transformation, double *offset, mitk::Image* resampleReference = NULL , bool binary = false);
 
@@ -60,9 +60,10 @@ public:
    * @param movingImage
    * @param transformation
    * @param offset - stores offset that has been applied to match origin of both images
+   * @param useSameOrigin -
    * @param mask - optional, provide a mask that is excluded from registration metric
    */
-  static void GetTransformation(Image::Pointer fixedImage , Image::Pointer movingImage, RidgidTransformType transformation, double* offset, mitk::Image* mask = NULL);
+  static void GetTransformation(Image::Pointer fixedImage , Image::Pointer movingImage, RidgidTransformType transformation, double* offset, bool useSameOrigin = true, mitk::Image* mask = NULL);
 };
 
 }

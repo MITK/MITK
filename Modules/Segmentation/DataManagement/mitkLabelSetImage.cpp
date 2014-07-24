@@ -304,7 +304,7 @@ int mitk::LabelSetImage::AddLayer()
   // push a new labelset for the new layer
   m_LabelSetContainer.push_back(ls);
 
-  // add modified event listener
+  // add modified event listener to LabelSet (listen to LabelSet changes)
   itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
   command->SetCallbackFunction(this,&mitk::LabelSetImage::OnLabelSetModified);
   ls->AddObserver(itk::ModifiedEvent(), command);

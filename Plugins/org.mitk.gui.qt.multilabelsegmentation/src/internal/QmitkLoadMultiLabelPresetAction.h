@@ -40,6 +40,8 @@ public:
   virtual void SetSmoothed(bool smoothed);
   virtual void SetDecimated(bool decimated);
 
+  static void LoadDataNodePreset( const QList<mitk::DataNode::Pointer>& selectedNodes );
+
 private:
 
   typedef QList<mitk::DataNode::Pointer> NodeList;

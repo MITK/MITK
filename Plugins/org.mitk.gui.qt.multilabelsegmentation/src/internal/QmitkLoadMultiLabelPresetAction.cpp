@@ -24,15 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImageReader.h"
 #include "tinyxml.h"
 
-QmitkLoadMultiLabelPresetAction::QmitkLoadMultiLabelPresetAction()
-{
-}
-
-QmitkLoadMultiLabelPresetAction::~QmitkLoadMultiLabelPresetAction()
-{
-}
-
-void QmitkLoadMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
+void QmitkLoadMultiLabelPresetAction::LoadDataNodePreset( const QList<mitk::DataNode::Pointer>& selectedNodes )
 {
   foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
   {
@@ -76,21 +68,32 @@ void QmitkLoadMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer> 
         if(referenceImage->GetLabelSet(i) == NULL) referenceImage->AddLayer();
 
         TiXmlElement * labelElement = layerElem->FirstChildElement("Label");
-
+        if(labelElement == NULL) break;
         for(int j = 0 ; j < numberOfLabels; j++)
         {
-          TiXmlPrinter p;
-          labelElement->Accept(&p);
-          MITK_INFO << p.CStr();
 
           mitk::Label::Pointer label = mitk::LabelSetImageReader::LoadLabelFromTiXmlDocument(labelElement);
           referenceImage->GetLabelSet()->AddLabel(label);
 
           labelElement = labelElement->NextSiblingElement("Label");
+          if(labelElement == NULL) break;
         }
       }
     }
   }
+}
+
+QmitkLoadMultiLabelPresetAction::QmitkLoadMultiLabelPresetAction()
+{
+}
+
+QmitkLoadMultiLabelPresetAction::~QmitkLoadMultiLabelPresetAction()
+{
+}
+
+void QmitkLoadMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
+{
+  QmitkLoadMultiLabelPresetAction::LoadDataNodePreset(selectedNodes);
 }
 
 void QmitkLoadMultiLabelPresetAction::SetDataStorage(mitk::DataStorage* dataStorage)

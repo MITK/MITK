@@ -168,11 +168,15 @@ public:
 
     /** \brief
     */
-    Label* GetActiveLabel() { return m_ActiveLabel; }
+    Label* GetActiveLabel() { return m_LabelContainer[m_ActiveLabelValue]; }
 
     /** \brief
     */
-    const Label* GetActiveLabel() const { return m_ActiveLabel; }
+    const Label* GetActiveLabel() const
+    {
+      LabelContainerConstIteratorType it = m_LabelContainer.find(m_ActiveLabelValue);
+      return ( it != m_LabelContainer.end() )? it->second.GetPointer(): NULL;
+    }
 
     /** \brief
     */
@@ -206,7 +210,7 @@ protected:
 
     LookupTable::Pointer m_LookupTable;
 
-    Label* m_ActiveLabel;
+    int m_ActiveLabelValue;
 
     int m_Layer;
 };

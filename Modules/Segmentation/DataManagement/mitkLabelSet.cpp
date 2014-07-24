@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::LabelSet::LabelSet() :
   m_Layer(0),
-  m_ActiveLabel(NULL)
+  m_ActiveLabelValue(0)
 {
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
@@ -78,7 +78,7 @@ void mitk::LabelSet::SetLayer(int layer)
 
 void mitk::LabelSet::SetActiveLabel(int pixelValue)
 {
-  m_ActiveLabel = m_LabelContainer[pixelValue];
+  m_ActiveLabelValue = pixelValue;
   ActiveLabelEvent.Send(pixelValue);
   Modified();
 }

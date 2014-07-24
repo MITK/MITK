@@ -42,31 +42,31 @@ public:
   itkNewMacro( Self );
 
   void SetLocked(bool locked);
-  bool GetLocked();
+  bool GetLocked() const;
 
   void SetVisible(bool visible);
-  bool GetVisible();
+  bool GetVisible() const;
 
   void SetOpacity(float opacity);
-  float GetOpacity();
+  float GetOpacity() const;
 
   void SetName(const std::string &name);
-  std::string GetName();
+  std::string GetName() const;
 
   void SetCenterOfMassIndex(const mitk::Point3D& center);
-  mitk::Point3D GetCenterOfMassIndex();
+  mitk::Point3D GetCenterOfMassIndex() const;
 
   void SetCenterOfMassCoordinates(const mitk::Point3D& center);
-  mitk::Point3D GetCenterOfMassCoordinates();
+  mitk::Point3D GetCenterOfMassCoordinates() const;
 
   void SetColor(const mitk::Color&);
-  const mitk::Color& GetColor();
+  const mitk::Color& GetColor() const;
 
   void SetValue(int pixelValue);
-  int GetValue();
+  int GetValue() const;
 
   void SetLayer(int layer);
-  int GetLayer();
+  int GetLayer() const;
 
   void SetProperty(const std::string &propertyKey, BaseProperty *property);
 

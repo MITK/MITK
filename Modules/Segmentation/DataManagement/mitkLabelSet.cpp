@@ -38,6 +38,25 @@ mitk::LabelSet::~LabelSet()
   m_LabelContainer.clear();
 }
 
+mitk::LabelSet::LabelSet(const LabelSet & other):
+  m_Layer(other.GetLayer()),
+  m_LookupTable(other.GetLookupTable()->Clone()),
+  m_ActiveLabelValue(other.GetActiveLabel()->GetValue())
+{
+
+  // clone Labels
+  LabelContainerConstIteratorType otherIt = other.IteratorConstBegin();
+  for(; otherIt != other.IteratorConstEnd(); ++otherIt)
+  {
+    m_LabelContainer[otherIt->first] = otherIt->second->Clone();
+
+    itk::SimpleMemberCommand<LabelSet>::Pointer command = itk::SimpleMemberCommand<LabelSet>::New();
+    command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
+    m_LabelContainer[otherIt->first]->AddObserver( itk::ModifiedEvent(), command );
+  }
+
+}
+
 void mitk::LabelSet::OnLabelModified()
 {
   ModifyLabelEvent.Send();

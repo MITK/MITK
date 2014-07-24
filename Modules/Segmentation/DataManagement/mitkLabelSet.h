@@ -201,6 +201,9 @@ public:
 protected:
 
     LabelSet();
+    LabelSet(const LabelSet &);
+
+    mitkCloneMacro(Self)
 
     virtual ~LabelSet();
 

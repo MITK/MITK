@@ -16,11 +16,11 @@ if( MITK_USE_Python )
 
     if( NOT DEFINED Numpy_DIR )
       set(proj Numpy)
-      set(proj_DEPENDENCIES )
+      set(${proj}_DEPENDENCIES )
       set(Numpy_DEPENDS ${proj})
 
       if(NOT MITK_USE_SYSTEM_PYTHON)
-        list(APPEND proj_DEPENDENCIES Python)
+        list(APPEND ${proj}_DEPENDENCIES Python)
       endif()
 
       set(_numpy_env

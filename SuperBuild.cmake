@@ -89,6 +89,7 @@ set(external_projects
   SOFA
   MITKData
   Qwt
+  PCRE
   Swig
   SimpleITK
   )

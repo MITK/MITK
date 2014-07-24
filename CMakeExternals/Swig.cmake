@@ -30,6 +30,8 @@ if(MITK_USE_SWIG)
 
     else()
 
+      list(APPEND Swig_DEPENDENCIES PCRE)
+
       # swig uses bison find it by cmake and pass it down
       find_package(BISON)
       set(BISON_FLAGS "" CACHE STRING "Flags used by bison")
@@ -56,6 +58,7 @@ if(MITK_USE_SWIG)
         PREFIX ${proj}-cmake
         BUILD_IN_SOURCE 1
         CONFIGURE_COMMAND ${swig_CONFIGURE_COMMAND}
+        DEPENDS ${Swig_DEPENDENCIES}
         )
 
       set(SWIG_DIR ${swig_install_dir}/share/swig/${SWIG_TARGET_VERSION})

@@ -230,6 +230,7 @@ endif()
 
 if(MITK_USE_SimpleITK)
   set(MITK_USE_SWIG 1)
+  set(MITK_USE_PCRE 1)
 endif()
 
 if(MITK_USE_Boost)

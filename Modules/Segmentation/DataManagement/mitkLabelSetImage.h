@@ -42,10 +42,8 @@ class MitkSegmentation_EXPORT LabelSetImage : public Image
 
 public:
 
-  mitkClassMacro(LabelSetImage, Image);
-  itkNewMacro(Self);
-
-  mitkNewMacro1Param(Self, LabelSetImage*);
+  mitkClassMacro(LabelSetImage, Image)
+  itkNewMacro(Self)
 
   typedef unsigned char PixelType;
 
@@ -137,6 +135,8 @@ public:
     * \brief  */
   mitk::LabelSet * GetLabelSet(int layer = -1);
 
+  const mitk::LabelSet * GetLabelSet(int layer = -1) const;
+
   /**
   * \brief  */
   int GetActiveLayer() const;
@@ -171,7 +171,7 @@ public:
 
   /**
     * \brief  */
-  int GetNumberOfLayers();
+  int GetNumberOfLayers() const;
 
   /**
     * \brief  */
@@ -193,15 +193,22 @@ public:
     * \brief  */
   mitk::Image* GetLayerImage(int layer);
 
+  const mitk::Image* GetLayerImage(int layer) const;
+
   void OnLabelSetModified();
 
   void SetExteriorLabel(mitk::Label * label);
 
   mitk::Label* GetExteriorLabel();
 
+  const mitk::Label* GetExteriorLabel() const;
+
 protected:
+
+  mitkCloneMacro(Self)
+
   LabelSetImage();
-  LabelSetImage(mitk::LabelSetImage*);
+  LabelSetImage(const LabelSetImage & other);
   virtual ~LabelSetImage();
 
   template < typename ImageType1, typename ImageType2 >
@@ -248,6 +255,26 @@ protected:
   mitk::Label::Pointer m_ExteriorLabel;
 
 };
+
+/**
+* @brief Equal A function comparing two label set images for beeing equal in meta- and imagedata
+*
+* @ingroup MITKTestingAPI
+*
+* Following aspects are tested for equality:
+*  - LabelSetImage members
+*  - working image data
+*  - layer image data
+*  - labels in label set
+*
+* @param rightHandSide An image to be compared
+* @param leftHandSide An image to be compared
+* @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+* @param verbose Flag indicating if the user wants detailed console output or not.
+* @return true, if all subsequent comparisons are true, false otherwise
+*/
+MITK_CORE_EXPORT bool Equal( const mitk::LabelSetImage& leftHandSide, const mitk::LabelSetImage& rightHandSide, ScalarType eps, bool verbose );
+
 
 } // namespace mitk
 

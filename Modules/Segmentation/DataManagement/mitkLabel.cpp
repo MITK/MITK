@@ -28,24 +28,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::Label::Label():
   PropertyList()
 {
-  // initialize basic label properties
-//  SetLocked(true);
-//  SetVisible(true);
-//  SetOpacity(0.6);
-//  SetValue(-1);
-//  SetLayer(0);
-//  mitk::Point3D pnt;
-//  pnt.SetElement(0,0);
-//  pnt.SetElement(1,0);
-//  pnt.SetElement(2,0);
-//  SetCenterOfMassCoordinates(pnt);
-//  SetCenterOfMassIndex(pnt);
-
-//  SetName("NoName");
-
-//  mitk::Color col;
-//  col.Set(0,0,0);
-//  SetColor(col);
+  if(GetProperty("locked") == NULL) SetLocked(true);
+  if(GetProperty("visible") == NULL) SetVisible(true);
+  if(GetProperty("opacity") == NULL) SetOpacity(0.6);
+  if(GetProperty("center.coordinates") == NULL)
+  {
+    mitk::Point3D pnt;
+    pnt.SetElement(0,0);
+    pnt.SetElement(1,0);
+    pnt.SetElement(2,0);
+    SetCenterOfMassCoordinates(pnt);
+  }
+  if(GetProperty("center.index") == NULL)
+  {
+    mitk::Point3D pnt;
+    pnt.SetElement(0,0);
+    pnt.SetElement(1,0);
+    pnt.SetElement(2,0);
+    SetCenterOfMassIndex(pnt);
+  }
+  if(GetProperty("color") == NULL)
+  {
+    mitk::Color col;
+    col.Set(0,0,0);
+    SetColor(col);
+  }
+  if(GetProperty("name") == NULL) SetName("noName!");
+  if(GetProperty("value") == NULL) SetValue(-1);
+  if(GetProperty("layer") == NULL) SetLayer(-1);
 }
 
 mitk::Label::Label(const Label& other)
@@ -80,10 +90,8 @@ void mitk::Label::SetLocked(bool locked)
     SetBoolProperty("locked", locked);
 }
 
-bool mitk::Label::GetLocked()
+bool mitk::Label::GetLocked() const
 {
-  if(GetProperty("locked") == NULL) SetLocked(true);
-
   bool locked;
   GetBoolProperty("locked",locked);
   return locked;
@@ -100,10 +108,8 @@ void mitk::Label::SetVisible(bool visible)
     SetBoolProperty("visible", visible);
 }
 
-bool mitk::Label::GetVisible()
+bool mitk::Label::GetVisible() const
 {
-  if(GetProperty("visible") == NULL) SetVisible(true);
-
   bool visible;
   GetBoolProperty("visible",visible);
   return visible;
@@ -120,10 +126,8 @@ void mitk::Label::SetOpacity(float opacity)
     SetFloatProperty("opacity", opacity);
 }
 
-float mitk::Label::GetOpacity()
+float mitk::Label::GetOpacity() const
 {
-  if(GetProperty("opacity") == NULL) SetOpacity(0.6);
-
   float opacity;
   GetFloatProperty("opacity",opacity);
   return opacity;
@@ -134,10 +138,8 @@ void mitk::Label::SetName(const std::string & name)
   SetStringProperty("name", name.c_str());
 }
 
-std::string mitk::Label::GetName()
+std::string mitk::Label::GetName() const
 {
-  if(GetProperty("name") == NULL) SetName("noName!");
-
   std::string name;
   GetStringProperty("name",name);
   return name;
@@ -154,10 +156,8 @@ void mitk::Label::SetValue(int pixelValue)
     SetIntProperty("value", pixelValue);
 }
 
-int mitk::Label::GetValue()
+int mitk::Label::GetValue() const
 {
-  if(GetProperty("value") == NULL) SetValue(-1);
-
   int pixelValue;
   GetIntProperty("value",pixelValue);
   return pixelValue;
@@ -174,25 +174,16 @@ void mitk::Label::SetLayer(int layer)
     SetIntProperty("layer", layer);
 }
 
-int mitk::Label::GetLayer()
+int mitk::Label::GetLayer() const
 {
-  if(GetProperty("layer") == NULL) SetLayer(-1);
-
   int layer;
   GetIntProperty("layer",layer);
   return layer;
 }
 
-const mitk::Color & mitk::Label::GetColor()
+const mitk::Color & mitk::Label::GetColor() const
 {
-  if(GetProperty("color") == NULL)
-  {
-    mitk::Color col;
-    col.Set(0,0,0);
-    SetColor(col);
-  }
-
-  mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty *>(GetProperty("color"));
+   mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty *>(GetProperty("color"));
   return colorProp->GetColor();
 }
 
@@ -218,17 +209,8 @@ void mitk::Label::SetCenterOfMassIndex(const mitk::Point3D& center)
     SetProperty("center.index", mitk::Point3dProperty::New(center));
 }
 
-mitk::Point3D mitk::Label::GetCenterOfMassIndex()
+mitk::Point3D mitk::Label::GetCenterOfMassIndex() const
 {
-  if(GetProperty("center.index") == NULL)
-  {
-    mitk::Point3D pnt;
-    pnt.SetElement(0,0);
-    pnt.SetElement(1,0);
-    pnt.SetElement(2,0);
-    SetCenterOfMassIndex(pnt);
-  }
-
   mitk::Point3dProperty* property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.index"));
   return property->GetValue();
 }
@@ -244,17 +226,8 @@ void mitk::Label::SetCenterOfMassCoordinates(const mitk::Point3D& center)
     SetProperty("center.coordinates", mitk::Point3dProperty::New(center));
 }
 
-mitk::Point3D mitk::Label::GetCenterOfMassCoordinates()
+mitk::Point3D mitk::Label::GetCenterOfMassCoordinates() const
 {
-  if(GetProperty("center.coordinates") == NULL)
-  {
-    mitk::Point3D pnt;
-    pnt.SetElement(0,0);
-    pnt.SetElement(1,0);
-    pnt.SetElement(2,0);
-    SetCenterOfMassCoordinates(pnt);
-  }
-
   mitk::Point3dProperty* property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.coordinates"));
   return property->GetValue();
 }
@@ -269,4 +242,45 @@ itk::LightObject::Pointer mitk::Label::InternalClone() const
 void mitk::Label::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
  // todo
+}
+
+bool mitk::Equal( const mitk::Label& leftHandSide, const mitk::Label& rightHandSide, ScalarType eps, bool verbose )
+{
+  MITK_INFO(verbose) << "--- Label Equal ---";
+
+  bool returnValue = true;
+  // have to be replaced until a PropertyList Equal was implemented :
+  //returnValue = mitk::Equal((const mitk::PropertyList &)leftHandSide,(const mitk::PropertyList &)rightHandSide,eps,verbose);
+
+  const mitk::PropertyList::PropertyMap * lhsmap = leftHandSide.GetMap();
+  const mitk::PropertyList::PropertyMap * rhsmap = rightHandSide.GetMap();
+
+  returnValue = lhsmap->size() == rhsmap->size();
+
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Labels in label container are not equal.";
+    return returnValue;
+  }
+
+
+  mitk::PropertyList::PropertyMap::const_iterator lhsmapIt = lhsmap->begin();
+  mitk::PropertyList::PropertyMap::const_iterator lhsmapItEnd = lhsmap->end();
+
+  for(;lhsmapIt != lhsmapItEnd; ++lhsmapIt)
+  {
+    if(rhsmap->find(lhsmapIt->first) == rhsmap->end())
+    {
+      returnValue == false;
+      break;
+    }
+  }
+
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Labels in label container are not equal.";
+    return returnValue;
+  }
+
+  return returnValue;
 }

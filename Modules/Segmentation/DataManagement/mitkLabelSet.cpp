@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::LabelSet::LabelSet() :
   m_Layer(0),
-  m_ActiveLabel(NULL)
+  m_ActiveLabelValue(0)
 {
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
@@ -38,18 +38,37 @@ mitk::LabelSet::~LabelSet()
   m_LabelContainer.clear();
 }
 
+mitk::LabelSet::LabelSet(const LabelSet & other):
+  m_Layer(other.GetLayer()),
+  m_LookupTable(other.GetLookupTable()->Clone()),
+  m_ActiveLabelValue(other.GetActiveLabel()->GetValue())
+{
+
+  // clone Labels
+  LabelContainerConstIteratorType otherIt = other.IteratorConstBegin();
+  for(; otherIt != other.IteratorConstEnd(); ++otherIt)
+  {
+    m_LabelContainer[otherIt->first] = otherIt->second->Clone();
+
+    itk::SimpleMemberCommand<LabelSet>::Pointer command = itk::SimpleMemberCommand<LabelSet>::New();
+    command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
+    m_LabelContainer[otherIt->first]->AddObserver( itk::ModifiedEvent(), command );
+  }
+
+}
+
 void mitk::LabelSet::OnLabelModified()
 {
   ModifyLabelEvent.Send();
   Superclass::Modified();
 }
 
-mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstEnd()
+mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstEnd() const
 {
   return m_LabelContainer.end();
 }
 
-mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstBegin()
+mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorConstBegin() const
 {
   return m_LabelContainer.begin();
 }
@@ -78,7 +97,7 @@ void mitk::LabelSet::SetLayer(int layer)
 
 void mitk::LabelSet::SetActiveLabel(int pixelValue)
 {
-  m_ActiveLabel = m_LabelContainer[pixelValue];
+  m_ActiveLabelValue = pixelValue;
   ActiveLabelEvent.Send(pixelValue);
   Modified();
 }
@@ -147,11 +166,6 @@ void mitk::LabelSet::RenameLabel(int pixelValue, const std::string& name, const 
   mitk::Label* label = GetLabel(pixelValue);
   label->SetName(name);
   label->SetColor(color);
-}
-
-mitk::LookupTable* mitk::LabelSet::GetLookupTable()
-{
-  return m_LookupTable.GetPointer();
 }
 
 void mitk::LabelSet::SetLookupTable( mitk::LookupTable* lut)
@@ -251,4 +265,71 @@ const mitk::Label * mitk::LabelSet::GetLabel(int pixelValue) const
 {
   LabelContainerConstIteratorType it = m_LabelContainer.find(pixelValue);
   return ( it != m_LabelContainer.end() )? it->second.GetPointer(): NULL;
+}
+
+bool mitk::Equal( const mitk::LabelSet& leftHandSide, const mitk::LabelSet& rightHandSide, ScalarType eps, bool verbose )
+{
+  bool returnValue = true;
+  // LabelSetmembers
+
+  MITK_INFO(verbose) << "--- LabelSet Equal ---";
+
+  //m_LookupTable;
+  const mitk::LookupTable * lhsLUT = leftHandSide.GetLookupTable();
+  const mitk::LookupTable * rhsLUT = rightHandSide.GetLookupTable();
+
+  returnValue = *lhsLUT == *rhsLUT;
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Lookup tabels not equal.";
+    return returnValue;;
+  }
+
+  //m_ActiveLabel;
+  returnValue = mitk::Equal(*leftHandSide.GetActiveLabel(),*rightHandSide.GetActiveLabel(),eps,verbose);
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Active label not equal.";
+    return returnValue;;
+  }
+
+  //m_Layer;
+  returnValue = leftHandSide.GetLayer() == rightHandSide.GetLayer();
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Layer index not equal.";
+    return returnValue;;
+  }
+
+  // container size;
+  returnValue = leftHandSide.GetNumberOfLabels() == rightHandSide.GetNumberOfLabels();
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Number of labels not equal.";
+    return returnValue;;
+  }
+
+  // Label container (map)
+
+  //m_LabelContainer;
+  mitk::LabelSet::LabelContainerConstIteratorType lhsit = leftHandSide.IteratorConstBegin();
+  mitk::LabelSet::LabelContainerConstIteratorType rhsit = rightHandSide.IteratorConstBegin();
+  for(; lhsit != leftHandSide.IteratorConstEnd(); ++lhsit , ++rhsit)
+  {
+    returnValue = rhsit->first == lhsit->first;
+    if(!returnValue)
+    {
+      MITK_INFO(verbose) << "Label in label container not equal.";
+      return returnValue;;
+    }
+
+    returnValue = mitk::Equal(*(rhsit->second),*(lhsit->second),eps,verbose);
+    if(!returnValue)
+    {
+      MITK_INFO(verbose) << "Label in label container not equal.";
+      return returnValue;;
+    }
+  }
+
+  return returnValue;
 }

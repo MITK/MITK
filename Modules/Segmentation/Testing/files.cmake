@@ -3,6 +3,7 @@ set(MODULE_TESTS
   mitkContourTest.cpp
   mitkDataNodeSegmentationTest.cpp
   mitkImageToContourFilterTest.cpp
+  mitkLabelSetImageEqualTest.cpp
 #  mitkSegmentationInterpolationTest.cpp
   mitkOverwriteSliceFilterTest.cpp
   mitkOverwriteSliceFilterObliquePlaneTest.cpp

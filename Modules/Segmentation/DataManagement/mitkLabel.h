@@ -42,31 +42,31 @@ public:
   itkNewMacro( Self );
 
   void SetLocked(bool locked);
-  bool GetLocked();
+  bool GetLocked() const;
 
   void SetVisible(bool visible);
-  bool GetVisible();
+  bool GetVisible() const;
 
   void SetOpacity(float opacity);
-  float GetOpacity();
+  float GetOpacity() const;
 
   void SetName(const std::string &name);
-  std::string GetName();
+  std::string GetName() const;
 
   void SetCenterOfMassIndex(const mitk::Point3D& center);
-  mitk::Point3D GetCenterOfMassIndex();
+  mitk::Point3D GetCenterOfMassIndex() const;
 
   void SetCenterOfMassCoordinates(const mitk::Point3D& center);
-  mitk::Point3D GetCenterOfMassCoordinates();
+  mitk::Point3D GetCenterOfMassCoordinates() const;
 
   void SetColor(const mitk::Color&);
-  const mitk::Color& GetColor();
+  const mitk::Color& GetColor() const;
 
   void SetValue(int pixelValue);
-  int GetValue();
+  int GetValue() const;
 
   void SetLayer(int layer);
-  int GetLayer();
+  int GetLayer() const;
 
   void SetProperty(const std::string &propertyKey, BaseProperty *property);
 
@@ -87,6 +87,23 @@ private:
   virtual itk::LightObject::Pointer InternalClone() const;
 
 };
+
+/**
+* @brief Equal A function comparing two labels for beeing equal in data
+*
+* @ingroup MITKTestingAPI
+*
+* Following aspects are tested for equality:
+*  - Lebel equality via Equal-PropetyList
+*
+* @param rightHandSide An image to be compared
+* @param leftHandSide An image to be compared
+* @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+* @param verbose Flag indicating if the user wants detailed console output or not.
+* @return true, if all subsequent comparisons are true, false otherwise
+*/
+MITK_CORE_EXPORT bool Equal( const mitk::Label& leftHandSide, const mitk::Label& rightHandSide, ScalarType eps, bool verbose );
+
 
 } // namespace mitk
 

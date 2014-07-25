@@ -41,9 +41,35 @@ mitk::LabelSetImage::LabelSetImage() :
   m_ExteriorLabel(NULL)
 {
   // Iniitlaize Background Label
-  // If you want to store more information,
-  // please add it to the exterior label via SetProperty command.
-  m_ExteriorLabel = GetExteriorLabel();
+  mitk::Color color;
+  color.Set(0,0,0);
+  m_ExteriorLabel = mitk::Label::New();
+  m_ExteriorLabel->SetColor(color);
+  m_ExteriorLabel->SetName("Exterior");
+  m_ExteriorLabel->SetOpacity(0.0);
+  m_ExteriorLabel->SetLocked(false);
+  m_ExteriorLabel->SetValue(0);
+}
+
+mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage & other):
+  Image(other),
+  m_ActiveLayer(other.GetActiveLayer()),
+  m_ExteriorLabel(other.GetExteriorLabel()->Clone())
+{
+  for(int i = 0 ; i < other.GetNumberOfLayers(); i++)
+  {
+    // Clone LabelSet data
+    mitk::LabelSet::Pointer lsClone = other.GetLabelSet(i)->Clone();
+    // add modified event listener to LabelSet (listen to LabelSet changes)
+    itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
+    command->SetCallbackFunction(this,&mitk::LabelSetImage::OnLabelSetModified);
+    lsClone->AddObserver(itk::ModifiedEvent(), command);
+    m_LabelSetContainer.push_back( lsClone );
+
+    // clone layer Image data
+    mitk::Image::Pointer liClone = other.GetLayerImage(i)->Clone();
+    m_LayerContainer.push_back( liClone );
+  }
 }
 
 void mitk::LabelSetImage::OnLabelSetModified()
@@ -58,31 +84,12 @@ void mitk::LabelSetImage::SetExteriorLabel(mitk::Label * label)
 
 mitk::Label* mitk::LabelSetImage::GetExteriorLabel()
 {
-    if(m_ExteriorLabel.IsNull())
-    {
-      mitk::Color color;
-      color[0] = 0.0;
-      color[1] = 0.0;
-      color[2] = 0.0;
-      color[3] = 0.0;
-      m_ExteriorLabel = mitk::Label::New();
-      m_ExteriorLabel->SetColor(color);
-      m_ExteriorLabel->SetName("Exterior");
-      m_ExteriorLabel->SetOpacity(0.0);
-      m_ExteriorLabel->SetLocked(false);
-      m_ExteriorLabel->SetValue(0);
-    }
-    return m_ExteriorLabel;
-  }
+  return m_ExteriorLabel;
+}
 
-mitk::LabelSetImage::LabelSetImage(mitk::LabelSetImage* other) : mitk::Image(), m_ActiveLayer(0)
+const mitk::Label* mitk::LabelSetImage::GetExteriorLabel() const
 {
-  this->Initialize(other);
-  int numberOfLayers = other->GetNumberOfLayers();
-  for(int lidx=0; lidx<numberOfLayers; ++lidx)
-  {
-    m_LabelSetContainer.push_back( other->GetLabelSet(lidx) );
-  }
+  return m_ExteriorLabel;
 }
 
 void mitk::LabelSetImage::Initialize(const mitk::Image* other)
@@ -117,12 +124,17 @@ mitk::Image* mitk::LabelSetImage::GetLayerImage(int layer)
   return m_LayerContainer[layer];
 }
 
+const mitk::Image* mitk::LabelSetImage::GetLayerImage(int layer) const
+{
+  return m_LayerContainer[layer];
+}
+
 int mitk::LabelSetImage::GetActiveLayer() const
 {
   return m_ActiveLayer;
 }
 
-int mitk::LabelSetImage::GetNumberOfLayers()
+int mitk::LabelSetImage::GetNumberOfLayers() const
 {
   return m_LabelSetContainer.size();
 }
@@ -292,7 +304,7 @@ int mitk::LabelSetImage::AddLayer()
   // push a new labelset for the new layer
   m_LabelSetContainer.push_back(ls);
 
-  // add modified event listener
+  // add modified event listener to LabelSet (listen to LabelSet changes)
   itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
   command->SetCallbackFunction(this,&mitk::LabelSetImage::OnLabelSetModified);
   ls->AddObserver(itk::ModifiedEvent(), command);
@@ -466,6 +478,12 @@ mitk::Label *mitk::LabelSetImage::GetLabel(int pixelValue, int layer)
 }
 
 mitk::LabelSet* mitk::LabelSetImage::GetLabelSet(int layer)
+{
+  if (layer < 0) layer = GetActiveLayer();
+  return m_LabelSetContainer[layer].GetPointer();
+}
+
+const mitk::LabelSet* mitk::LabelSetImage::GetLabelSet(int layer) const
 {
   if (layer < 0) layer = GetActiveLayer();
   return m_LabelSetContainer[layer].GetPointer();
@@ -970,4 +988,68 @@ void mitk::LabelSetImage::MergeLabelProcessing(ImageType* itkImage, int pixelVal
     }
     ++iter;
   }
+}
+
+bool mitk::Equal(const mitk::LabelSetImage& leftHandSide, const mitk::LabelSetImage& rightHandSide, ScalarType eps, bool verbose)
+{
+  bool returnValue = true;
+
+  /* LabelSetImage members */
+
+  MITK_INFO(verbose) << "--- LabelSetImage Equal ---";
+
+  // number layers
+  returnValue = leftHandSide.GetNumberOfLayers() == rightHandSide.GetNumberOfLayers();
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Number of layers not equal.";
+    return false;
+  }
+
+  // total number labels
+  returnValue = leftHandSide.GetTotalNumberOfLabels() == rightHandSide.GetTotalNumberOfLabels();
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Total number of labels not equal.";
+    return false;
+  }
+
+  // active layer
+  returnValue = leftHandSide.GetActiveLayer() == rightHandSide.GetActiveLayer();
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Active layer not equal.";
+    return false;
+  }
+
+  // working image data
+  returnValue = mitk::Equal((const mitk::Image&)leftHandSide,(const mitk::Image&)rightHandSide,eps,verbose);
+  if(!returnValue)
+  {
+    MITK_INFO(verbose) << "Working image data not equal.";
+    return false;
+  }
+
+
+  for(int layerIndex = 0 ; layerIndex < leftHandSide.GetNumberOfLayers(); layerIndex++)
+  {
+    // layer image data
+    returnValue = mitk::Equal(*leftHandSide.GetLayerImage(layerIndex),*rightHandSide.GetLayerImage(layerIndex),eps,verbose);
+    if(!returnValue)
+    {
+      MITK_INFO(verbose) << "Layer image data not equal.";
+      return false;
+    }
+    // layer labelset data
+
+    returnValue = mitk::Equal(*leftHandSide.GetLabelSet(layerIndex),*rightHandSide.GetLabelSet(layerIndex),eps,verbose);
+    if(!returnValue)
+    {
+      MITK_INFO(verbose) << "Layer labelset data not equal.";
+      return false;
+    }
+
+  }
+
+  return returnValue;
 }

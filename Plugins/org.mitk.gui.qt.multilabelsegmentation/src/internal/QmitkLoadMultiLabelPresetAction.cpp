@@ -24,65 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImageReader.h"
 #include "tinyxml.h"
 
-void QmitkLoadMultiLabelPresetAction::LoadDataNodePreset( const QList<mitk::DataNode::Pointer>& selectedNodes )
-{
-  foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
-  {
-    if (referenceNode.IsNotNull())
-    {
-
-      mitk::LabelSetImage* referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
-      assert(referenceImage);
-
-      std::string sName = referenceNode->GetName();
-      QString qName;
-      qName.sprintf("%s.lsetp",sName.c_str());
-      QString filename = QFileDialog::getOpenFileName(NULL,"Load file",QString(),"LabelSet Preset(*.lsetp)");
-      if ( filename.isEmpty() )
-        return;
-
-      std::auto_ptr<TiXmlDocument> presetXmlDoc;
-      presetXmlDoc.reset( new TiXmlDocument());
-
-      bool ok = presetXmlDoc->LoadFile(filename.toStdString());
-      if ( !ok )
-        return;
-
-      TiXmlElement * presetElem = presetXmlDoc->FirstChildElement("LabelSetImagePreset");
-      if(!presetElem)
-      {
-        MITK_INFO << "No valid preset XML";
-        return;
-      }
-
-
-      int numberOfLayers;
-      presetElem->QueryIntAttribute("layers", &numberOfLayers);
-
-      for(int i = 0 ; i < numberOfLayers; i++)
-      {
-        TiXmlElement * layerElem = presetElem->FirstChildElement("Layer");
-        int numberOfLabels;
-        layerElem->QueryIntAttribute("labels", &numberOfLabels);
-
-        if(referenceImage->GetLabelSet(i) == NULL) referenceImage->AddLayer();
-
-        TiXmlElement * labelElement = layerElem->FirstChildElement("Label");
-        if(labelElement == NULL) break;
-        for(int j = 0 ; j < numberOfLabels; j++)
-        {
-
-          mitk::Label::Pointer label = mitk::LabelSetImageReader::LoadLabelFromTiXmlDocument(labelElement);
-          referenceImage->GetLabelSet()->AddLabel(label);
-
-          labelElement = labelElement->NextSiblingElement("Label");
-          if(labelElement == NULL) break;
-        }
-      }
-    }
-  }
-}
-
 QmitkLoadMultiLabelPresetAction::QmitkLoadMultiLabelPresetAction()
 {
 }
@@ -93,7 +34,23 @@ QmitkLoadMultiLabelPresetAction::~QmitkLoadMultiLabelPresetAction()
 
 void QmitkLoadMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
-  QmitkLoadMultiLabelPresetAction::LoadDataNodePreset(selectedNodes);
+  foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
+  {
+
+    if (referenceNode.IsNull()) return;
+
+    mitk::LabelSetImage::Pointer referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
+    assert(referenceImage);
+
+    std::string sName = referenceNode->GetName();
+    QString qName;
+    qName.sprintf("%s.lsetp",sName.c_str());
+    QString filename = QFileDialog::getOpenFileName(NULL,"Load file",QString(),"LabelSet Preset(*.lsetp)");
+    if ( filename.isEmpty() )
+      return;
+
+    mitk::LabelSetImageReader::LoadLabelSetImagePreset(filename.toStdString(), referenceImage);
+  }
 }
 
 void QmitkLoadMultiLabelPresetAction::SetDataStorage(mitk::DataStorage* dataStorage)

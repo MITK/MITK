@@ -54,7 +54,7 @@ class MitkSegmentation_EXPORT LabelSetImageReader : public LabelSetImageSource, 
     int GetIntByKey(const itk::MetaDataDictionary & dic,const std::string & str);
     std::string GetStringByKey(const itk::MetaDataDictionary & dic,const std::string & str);
 
-    static mitk::Label::Pointer LoadLabelFromTiXmlDocument(TiXmlDocument *doc);
+    static mitk::Label::Pointer LoadLabelFromTiXmlDocument(TiXmlElement *doc);
 
 
   protected:

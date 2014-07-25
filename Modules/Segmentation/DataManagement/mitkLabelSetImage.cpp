@@ -313,7 +313,7 @@ int mitk::LabelSetImage::AddLayer()
   itkImage = NULL;
 
   SetActiveLayer(newLabelSetId);
-  MITK_INFO << GetActiveLayer();
+  //MITK_INFO << GetActiveLayer();
   this->Modified();
   return newLabelSetId;
 }

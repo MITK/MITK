@@ -114,11 +114,11 @@ public:
       }
     }
 
-    static TiXmlDocument GetLabelAsTiXmlDocument(Label *label);
+    static TiXmlElement *GetLabelAsTiXmlElement(Label *label);
 
 protected:
 
-    static TiXmlElement* PropertyToXmlElem( const std::string& key, const BaseProperty* property );
+    static TiXmlElement * PropertyToXmlElem( const std::string& key, const BaseProperty* property );
 
     LabelSetImageWriter();
 

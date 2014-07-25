@@ -36,7 +36,7 @@ void QmitkCreateMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer
     if (referenceNode.IsNotNull())
     {
 
-      mitk::LabelSetImage* referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
+      mitk::LabelSetImage::Pointer referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
       assert(referenceImage);
 
       if(referenceImage->GetNumberOfLabels() <= 1)
@@ -52,34 +52,8 @@ void QmitkCreateMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer
       if ( filename.isEmpty() )
         return;
 
-      std::auto_ptr<TiXmlDocument> presetXmlDoc;
-      presetXmlDoc.reset( new TiXmlDocument());
+      bool wasSaved = mitk::LabelSetImageWriter::SaveLabelSetImagePreset(filename.toStdString(),referenceImage);
 
-      TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
-      presetXmlDoc->LinkEndChild( decl );
-
-      TiXmlElement * presetElement = new TiXmlElement("LabelSetImagePreset");
-      presetElement->SetAttribute("layers", referenceImage->GetNumberOfLayers());
-
-      presetXmlDoc->LinkEndChild(presetElement);
-
-      for (int layerIdx=0; layerIdx<referenceImage->GetNumberOfLayers(); layerIdx++)
-      {
-        TiXmlElement * layerElement = new TiXmlElement("Layer");
-        layerElement->SetAttribute("index", layerIdx);
-        layerElement->SetAttribute("labels", referenceImage->GetNumberOfLabels(layerIdx));
-
-        presetElement->LinkEndChild(layerElement);
-
-        for (int labelIdx=0; labelIdx<referenceImage->GetNumberOfLabels(layerIdx); labelIdx++)
-        {
-          TiXmlElement * labelAsXml = mitk::LabelSetImageWriter::GetLabelAsTiXmlElement(referenceImage->GetLabel(labelIdx,layerIdx));
-          layerElement->LinkEndChild(labelAsXml);
-        }
-      }
-
-
-      bool wasSaved = presetXmlDoc->SaveFile(filename.toStdString());
       if(!wasSaved)
       {
         QMessageBox::information(NULL, "Create LabelSetImage Preset", "Could not save a LabelSetImage preset as Xml.\n");\

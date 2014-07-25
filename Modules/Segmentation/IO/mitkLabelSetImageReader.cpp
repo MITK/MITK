@@ -285,9 +285,6 @@ mitk::Label::Pointer LabelSetImageReader::LoadLabelFromTiXmlDocument(TiXmlElemen
   {
     LabelSetImageReader::PropertyFromXmlElem( name, prop, propElem );
     label->SetProperty( name, prop );
-    TiXmlPrinter p;
-    propElem->Accept(&p);
-    MITK_INFO << p.CStr();
     propElem = propElem->NextSiblingElement( "property" );
   }
 

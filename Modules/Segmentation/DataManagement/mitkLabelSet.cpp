@@ -25,14 +25,6 @@ mitk::LabelSet::LabelSet() :
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
 }
 
-void mitk::LabelSet::Initialize(LabelSet* other)
-{
-  if (!other)
-    mitkThrow() << "Trying to initialize with NULL input.";
-  m_LabelContainer = other->m_LabelContainer;
-  SetActiveLabel(other->GetActiveLabel()->GetValue());
-}
-
 mitk::LabelSet::~LabelSet()
 {
   m_LabelContainer.clear();
@@ -113,13 +105,8 @@ void mitk::LabelSet::AddLabel(mitk::Label * label)
 {
   if (m_LabelContainer.size() > 255) return;
 
-  mitk::Label::Pointer newLabel(label);
+  mitk::Label::Pointer newLabel(label->Clone());
 
-//  newLabel->SetColor( label.GetColor() );
-//  newLabel->SetName( label.GetName() );
-//  newLabel->SetVisible( label.GetVisible() );
-//  newLabel->SetLocked( label.GetLocked() );
-//  newLabel->SetOpacity( label.GetOpacity() );
   newLabel->SetLayer( m_Layer );
 
   unsigned int pixelValue = -1;
@@ -193,12 +180,12 @@ void mitk::LabelSet::RemoveLabel(int pixelValue)
     nextActivePixelValue = it->first;
   }
 
-  RemoveLabelEvent.Send();
-
   if(ExistLabel(nextActivePixelValue))
     SetActiveLabel(nextActivePixelValue);
   else
     SetActiveLabel(m_LabelContainer.rbegin()->first);
+
+  RemoveLabelEvent.Send();
 
   Modified();
 }
@@ -258,13 +245,15 @@ void mitk::LabelSet::UpdateLookupTable(int pixelValue)
 
 mitk::Label* mitk::LabelSet::GetLabel(int pixelValue)
 {
+  if(m_LabelContainer.find(pixelValue) == m_LabelContainer.end()) return NULL;
   return m_LabelContainer[pixelValue];
 }
 
 const mitk::Label * mitk::LabelSet::GetLabel(int pixelValue) const
 {
   LabelContainerConstIteratorType it = m_LabelContainer.find(pixelValue);
-  return ( it != m_LabelContainer.end() )? it->second.GetPointer(): NULL;
+  if(it == m_LabelContainer.end()) return NULL;
+  return it->second.GetPointer();
 }
 
 bool mitk::Equal( const mitk::LabelSet& leftHandSide, const mitk::LabelSet& rightHandSide, ScalarType eps, bool verbose )

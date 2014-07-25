@@ -99,8 +99,6 @@ public:
     */
     Message<> AllLabelsModifiedEvent;
 
-    void Initialize(LabelSet *other);
-
     /** \brief Returns a const iterator poiting to the begining of the container.
     */
     LabelContainerConstIteratorType IteratorConstBegin() const;
@@ -168,15 +166,11 @@ public:
 
     /** \brief
     */
-    Label* GetActiveLabel() { return m_LabelContainer[m_ActiveLabelValue]; }
+    Label* GetActiveLabel() { return GetLabel(m_ActiveLabelValue); }
 
     /** \brief
     */
-    const Label* GetActiveLabel() const
-    {
-      LabelContainerConstIteratorType it = m_LabelContainer.find(m_ActiveLabelValue);
-      return ( it != m_LabelContainer.end() )? it->second.GetPointer(): NULL;
-    }
+    const Label* GetActiveLabel() const { return GetLabel(m_ActiveLabelValue); }
 
     /** \brief
     */

@@ -334,6 +334,47 @@ bool LabelSetImageReader::PropertyFromXmlElem(std::string& key, mitk::BaseProper
   return true;
 }
 
+void LabelSetImageReader::LoadLabelSetImagePreset(const std::string & presetFilename, mitk::LabelSetImage::Pointer& inputImage )
+{
+  std::auto_ptr<TiXmlDocument> presetXmlDoc;
+  presetXmlDoc.reset( new TiXmlDocument());
+
+  bool ok = presetXmlDoc->LoadFile(presetFilename);
+  if ( !ok )
+    return;
+
+  TiXmlElement * presetElem = presetXmlDoc->FirstChildElement("LabelSetImagePreset");
+  if(!presetElem)
+  {
+    MITK_INFO << "No valid preset XML";
+    return;
+  }
+
+  int numberOfLayers;
+  presetElem->QueryIntAttribute("layers", &numberOfLayers);
+
+  for(int i = 0 ; i < numberOfLayers; i++)
+  {
+    TiXmlElement * layerElem = presetElem->FirstChildElement("Layer");
+    int numberOfLabels;
+    layerElem->QueryIntAttribute("labels", &numberOfLabels);
+
+    if(inputImage->GetLabelSet(i) == NULL) inputImage->AddLayer();
+
+    TiXmlElement * labelElement = layerElem->FirstChildElement("Label");
+    if(labelElement == NULL) break;
+    for(int j = 0 ; j < numberOfLabels; j++)
+    {
+
+      mitk::Label::Pointer label = mitk::LabelSetImageReader::LoadLabelFromTiXmlDocument(labelElement);
+      inputImage->GetLabelSet()->AddLabel(label);
+
+      labelElement = labelElement->NextSiblingElement("Label");
+      if(labelElement == NULL) break;
+    }
+  }
+}
+
 
 } //namespace MITK
 

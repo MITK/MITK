@@ -115,6 +115,7 @@ public:
     }
 
     static TiXmlElement *GetLabelAsTiXmlElement(Label *label);
+    static bool SaveLabelSetImagePreset(const std::string & presetFilename, mitk::LabelSetImage::Pointer & inputImage);
 
 protected:
 

@@ -232,4 +232,37 @@ TiXmlElement* mitk::LabelSetImageWriter::PropertyToXmlElem( const std::string& k
   return keyelement;
 }
 
+bool mitk::LabelSetImageWriter::SaveLabelSetImagePreset(const std::string & presetFilename, mitk::LabelSetImage::Pointer & inputImage)
+{
+  TiXmlDocument * presetXmlDoc =  new TiXmlDocument();
+
+  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+  presetXmlDoc->LinkEndChild( decl );
+
+  TiXmlElement * presetElement = new TiXmlElement("LabelSetImagePreset");
+  presetElement->SetAttribute("layers", inputImage->GetNumberOfLayers());
+
+  presetXmlDoc->LinkEndChild(presetElement);
+
+  for (int layerIdx=0; layerIdx<inputImage->GetNumberOfLayers(); layerIdx++)
+  {
+    TiXmlElement * layerElement = new TiXmlElement("Layer");
+    layerElement->SetAttribute("index", layerIdx);
+    layerElement->SetAttribute("labels", inputImage->GetNumberOfLabels(layerIdx));
+
+    presetElement->LinkEndChild(layerElement);
+
+    for (int labelIdx=0; labelIdx<inputImage->GetNumberOfLabels(layerIdx); labelIdx++)
+    {
+      TiXmlElement * labelAsXml = mitk::LabelSetImageWriter::GetLabelAsTiXmlElement(inputImage->GetLabel(labelIdx,layerIdx));
+      layerElement->LinkEndChild(labelAsXml);
+    }
+  }
+
+  bool wasSaved = presetXmlDoc->SaveFile(presetFilename);
+  delete presetXmlDoc;
+
+  return wasSaved;
+}
+
 #endif //__mitkLabelSetImageWriter__cpp

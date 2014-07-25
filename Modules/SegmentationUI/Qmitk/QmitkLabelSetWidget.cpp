@@ -295,7 +295,20 @@ void QmitkLabelSetWidget::OnMergeLabel(bool /*value*/)
   int dialogReturnValue = dialog.exec();
   if ( dialogReturnValue == QDialog::Rejected ) return;
 
-  GetWorkingImage()->MergeLabel(dialog.GetLabelSetWidgetTableIndex());
+  int pixelValue = -1;
+  for(int i = 0 ; i < m_Controls.m_LabelSetTableWidget->columnCount();i++)
+  {
+    if( dialog.GetLabelSetWidgetTableCompleteWord() == QString( m_Controls.m_LabelSetTableWidget->item( i ,0)->text() ) )
+      pixelValue = m_Controls.m_LabelSetTableWidget->item(i ,0)->data(Qt::UserRole).toInt();
+  }
+
+  if(pixelValue == -1 )
+  {
+    MITK_INFO << "unknown label";;
+    return;
+  }
+
+  GetWorkingImage()->MergeLabel(pixelValue);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

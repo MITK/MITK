@@ -61,6 +61,11 @@ int QmitkSearchLabelDialog::GetLabelSetWidgetTableIndex()
     return m_LabelIndex;
 }
 
+QString QmitkSearchLabelDialog::GetLabelSetWidgetTableCompleteWord()
+{
+    return m_CompleteWord;
+}
+
 void QmitkSearchLabelDialog::SetLabelSuggestionList(QStringList stringList)
 {
   m_LabelList = stringList;
@@ -73,6 +78,7 @@ void QmitkSearchLabelDialog::OnLabelCompleterChanged(const QString& completedWor
   if (m_LabelList.contains(completedWord))
   {
     m_LabelIndex = m_LabelList.indexOf(completedWord);
+    m_CompleteWord = completedWord;
 //    emit(goToLabel(m_LabelIndex));
   }
 }

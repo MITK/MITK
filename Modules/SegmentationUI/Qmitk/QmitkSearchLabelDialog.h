@@ -35,6 +35,8 @@ class MitkSegmentationUI_EXPORT QmitkSearchLabelDialog : public QDialog
 
     int GetLabelSetWidgetTableIndex();
 
+    QString GetLabelSetWidgetTableCompleteWord();
+
     void SetLabelSuggestionList(QStringList stringList);
 
 signals:
@@ -56,6 +58,8 @@ signals:
     QStringList m_LabelList;
 
     int m_LabelIndex;
+
+    QString m_CompleteWord;
 
 };
 

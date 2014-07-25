@@ -308,15 +308,18 @@ bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, Interaction
   ScalarType max = image->GetStatistics()->GetScalarValueMax();
   ScalarType diff = max - min;
 
-  ScalarType levelModifier = std::max( (ScalarType)0.01, (ScalarType) fabs(diff/1000) );
-  ScalarType windowModifier = std::max( (ScalarType)0.01, (ScalarType) fabs(diff/1000) );
+  ScalarType levelModifier  = std::max( static_cast<ScalarType>(0.01), static_cast<ScalarType>(fabs(diff/1000)) );
+  ScalarType windowModifier = std::max( static_cast<ScalarType>(0.01), static_cast<ScalarType>(fabs(diff/1000)) );
 
-  ScalarType levelChange = m_CurrentDisplayCoordinate[levelIndex] - m_LastDisplayCoordinate[levelIndex];
+  levelModifier  = std::min( levelModifier, static_cast<ScalarType>(1.0) );
+  windowModifier = std::min( windowModifier, static_cast<ScalarType>(1.0) );
+
+  ScalarType levelChange  = m_CurrentDisplayCoordinate[levelIndex] - m_LastDisplayCoordinate[levelIndex];
   ScalarType windowChange = m_CurrentDisplayCoordinate[windowIndex] - m_LastDisplayCoordinate[windowIndex];
 
   // calculate adjustments from mouse movements
-  level += ((int)( levelModifier * levelChange * static_cast<ScalarType>(2) * directionModifier * 100 )) /100.0;
-  window += ((int)( windowModifier * windowChange * static_cast<ScalarType>(2) * directionModifier *100 )) / 100.0;
+  level  += (static_cast<int>( levelModifier  * levelChange  * directionModifier * 100 )) / 100.0;
+  window += (static_cast<int>( windowModifier * windowChange * directionModifier * 100 )) / 100.0;
 
   lv.SetLevelWindow(level, window);
   dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"))->SetLevelWindow(lv);

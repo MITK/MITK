@@ -440,6 +440,7 @@ void mitk::LabelSetImage::RemoveLabels(std::vector<int>& VectorOfLabelPixelValue
   for (unsigned int idx=0; idx<VectorOfLabelPixelValues.size(); idx++)
   {
     GetLabelSet(layer)->RemoveLabel(VectorOfLabelPixelValues[idx]);
+    EraseLabel(VectorOfLabelPixelValues[idx],layer);
   }
 }
 

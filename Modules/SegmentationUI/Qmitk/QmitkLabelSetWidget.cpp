@@ -459,7 +459,8 @@ void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
         VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i,0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    GetWorkingImage()->MergeLabels(VectorOfLablePixelValues,m_Controls.m_LabelSetTableWidget->currentRow());
+    int pixelValue = m_Controls.m_LabelSetTableWidget->item(m_Controls.m_LabelSetTableWidget->currentRow(),0)->data(Qt::UserRole).toInt();
+    GetWorkingImage()->MergeLabels(VectorOfLablePixelValues,pixelValue);
     this->WaitCursorOff();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

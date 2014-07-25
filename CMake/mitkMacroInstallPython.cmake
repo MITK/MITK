@@ -1,8 +1,10 @@
 
 macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
   if(UNIX)
-    set(PYTHON_LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
+    # apple and linux only supports .so as loadable extension
+    set(PYTHON_LIB_SUFFIX .so)
   else(WIN32)
+    # windows only supports pyd as loadable extension
     set(PYTHON_LIB_SUFFIX .pyd)
   endif()
 

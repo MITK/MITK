@@ -210,10 +210,10 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint& pos)
     createCroppedMaskAction->setEnabled(true);
     QObject::connect( createCroppedMaskAction, SIGNAL( triggered(bool) ), this, SLOT( OnCreateCroppedMask(bool) ) );
 
-    QAction* importAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "Import...", this );
-    importAction->setEnabled(true);
-    QObject::connect( importAction, SIGNAL( triggered(bool) ), this, SLOT( OnImportSegmentationSession(bool) ) );
-    menu->addAction(importAction);
+//    QAction* importAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "Import...", this );
+//    importAction->setEnabled(true);
+//    QObject::connect( importAction, SIGNAL( triggered(bool) ), this, SLOT( OnImportSegmentationSession(bool) ) );
+//    menu->addAction(importAction);
 
     menu->addAction(createCroppedMaskAction);
 

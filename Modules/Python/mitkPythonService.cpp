@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <PythonQt.h>
 #include "PythonPath.h"
 #include <vtkPolyData.h>
+#include <mitkRenderingManager.h>
+#include <mitkImageReadAccessor.h>
+#include </media/Data/Plattformprojekt/bin/MITK-SITK/Numpy-install/lib/python2.7/site-packages/numpy/core/include/numpy/arrayobject.h>
 
 #ifndef WIN32
   #include <dlfcn.h>
@@ -118,76 +121,16 @@ mitk::PythonService::PythonService()
 
       MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
       m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );
-
-
-      /*
-      //system("export LD_LIBRARY_PATH=/local/muellerm/mitk/bugsquashing/bin-debug/VTK-build/bin:$LD_LIBRARY_PATH");
-      //m_PythonManager.executeString( "print sys.path", ctkAbstractPythonManager::SingleInput );
-      //MITK_DEBUG("mitk::PythonService") << "result of 'sys.path': " << result.toString().toStdString();
-
-      //m_PythonManager.executeString( "sys.path.append('/usr/share/pyshared/numpy')", ctkAbstractPythonManager::SingleInput );
-      //m_PythonManager.executeString( "import numpy", ctkAbstractPythonManager::SingleInput );
-
-      MITK_DEBUG("mitk::PythonService") << "Trying to import ITK";
-      m_PythonManager.executeString( "import itk", ctkAbstractPythonManager::SingleInput );
-      m_ItkWrappingAvailable = !m_PythonManager.pythonErrorOccured();
-      MITK_DEBUG("mitk::PythonService") << "m_ItkWrappingAvailable: " << (m_ItkWrappingAvailable? "yes": "no");
-      if( !m_ItkWrappingAvailable )
-      {
-        MITK_WARN << "ITK Python wrapping not available. Please check build settings or PYTHONPATH settings.";
-      }
-
-      {
-        MITK_DEBUG("mitk::PythonService") << "Trying to import OpenCv";
-        PyRun_SimpleString("import cv2\n");
-        if (PyErr_Occurred())
-        {
-          PyErr_Print();
-        }
-        else
-          m_OpenCVWrappingAvailable = true;
-
-        //m_PythonManager.executeString( "import cv2", ctkAbstractPythonManager::SingleInput );
-        MITK_DEBUG("mitk::PythonService") << "Investigate if an error occured while importing cv2";
-        //m_OpenCVWrappingAvailable = !m_PythonManager.pythonErrorOccured();
-        MITK_DEBUG("mitk::PythonService") << "m_OpenCVWrappingAvailable: " << (m_OpenCVWrappingAvailable? "yes": "no");
-        if( !m_OpenCVWrappingAvailable )
-        {
-          MITK_WARN << "OpenCV Python wrapping not available. Please check build settings or PYTHONPATH settings.";
-        }
-      }
-
-      MITK_DEBUG("mitk::PythonService") << "Trying to import VTK";
-      m_PythonManager.executeString( "import vtk", ctkAbstractPythonManager::SingleInput );
-      m_VtkWrappingAvailable = !m_PythonManager.pythonErrorOccured();
-      MITK_DEBUG("mitk::PythonService") << "m_VtkWrappingAvailable: " << (m_VtkWrappingAvailable? "yes": "no");
-      if( !m_VtkWrappingAvailable )
-      {
-        MITK_WARN << "VTK Python wrapping not available. Please check build settings or PYTHONPATH settings.";
-      }
-      */
     }
     catch (...)
     {
       MITK_DEBUG("PythonService") << "exception initalizing python";
     }
-
   }
-
-  //m_PythonManager.executeString( "for path in sys.path:\n  print path\n", ctkAbstractPythonManager::SingleInput );
-  //m_PythonManager.executeString( "for k, v in os.environ.items():\n  print \"%s=%s\" % (k, v)", ctkAbstractPythonManager::SingleInput );
-  //m_PythonManager.executeFile("/local/muellerm/Dropbox/13-02-11-python-wrapping/interpreterInfo.py");
-  //std::string result = m_PythonManager.executeString( "5+5", ctkAbstractPythonManager::EvalInput );
-  //MITK_DEBUG("mitk::PythonService") << "result of '5+5': " << result.toString().toStdString();
 }
 
 mitk::PythonService::~PythonService()
 {
-  //QVariant result = m_PythonManager.executeString( "sys.getrefcount(cv2)", ctkAbstractPythonManager::EvalInput );
-  //MITK_DEBUG("mitk::PythonService") << "sys.getrefcount(cv2): " << result.toString().toStdString();
-
-  //m_PythonManager.executeString( "del sys.modules[\"cv2\"]", ctkAbstractPythonManager::SingleInput );
-  //m_PythonManager.executeString( "del cv2", ctkAbstractPythonManager::SingleInput );
   MITK_DEBUG("mitk::PythonService") << "destructing PythonService";
 
 #ifdef USE_MITK_BUILTIN_PYTHON
@@ -199,31 +142,30 @@ mitk::PythonService::~PythonService()
 std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, int commandType)
 {
   QString pythonCommand = QString::fromStdString(stdpythonCommand);
+  {
+      MITK_DEBUG("mitk::PythonService") << "pythonCommand = " << pythonCommand.toStdString();
+      MITK_DEBUG("mitk::PythonService") << "commandType = " << commandType;
+  }
 
-    {
-        MITK_DEBUG("mitk::PythonService") << "pythonCommand = " << pythonCommand.toStdString();
-        MITK_DEBUG("mitk::PythonService") << "commandType = " << commandType;
-    }
+  QVariant result;
+  bool commandIssued = true;
 
-    QVariant result;
-    bool commandIssued = true;
+  if(commandType == IPythonService::SINGLE_LINE_COMMAND )
+      result = m_PythonManager.executeString(pythonCommand, ctkAbstractPythonManager::SingleInput );
+  else if(commandType == IPythonService::MULTI_LINE_COMMAND )
+      result = m_PythonManager.executeString(pythonCommand, ctkAbstractPythonManager::FileInput );
+  else if(commandType == IPythonService::EVAL_COMMAND )
+      result = m_PythonManager.executeString(pythonCommand, ctkAbstractPythonManager::EvalInput );
+  else
+      commandIssued = false;
 
-    if(commandType == IPythonService::SINGLE_LINE_COMMAND )
-        result = m_PythonManager.executeString(pythonCommand, ctkAbstractPythonManager::SingleInput );
-    else if(commandType == IPythonService::MULTI_LINE_COMMAND )
-        result = m_PythonManager.executeString(pythonCommand, ctkAbstractPythonManager::FileInput );
-    else if(commandType == IPythonService::EVAL_COMMAND )
-        result = m_PythonManager.executeString(pythonCommand, ctkAbstractPythonManager::EvalInput );
-    else
-        commandIssued = false;
+  if(commandIssued)
+  {
+    this->NotifyObserver(pythonCommand.toStdString());
+    m_ErrorOccured = PythonQt::self()->hadError();
+  }
 
-    if(commandIssued)
-    {
-        this->NotifyObserver(pythonCommand.toStdString());
-        m_ErrorOccured = PythonQt::self()->hadError();
-    }
-
-    return result.toString().toStdString();
+  return result.toString().toStdString();
 }
 
 void mitk::PythonService::ExecuteScript( const std::string& pythonScript )
@@ -316,71 +258,126 @@ QString mitk::PythonService::GetTempDataFileName(const std::string& ext) const
 bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const std::string &stdvarName)
 {
   QString varName = QString::fromStdString( stdvarName );
-  // save image
-  QString fileName = this->GetTempDataFileName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
-  fileName = QDir::fromNativeSeparators( fileName );
+  QString command;
+  unsigned int* imgDim = image->GetDimensions();
+  int npy_nd = 1;
+  npy_intp* npy_dims = new npy_intp[1];
+  npy_dims[0] = imgDim[0] * imgDim[1] * imgDim[2];
+  // access python module
+  PyObject *pyMod = PyImport_AddModule((char*)"__main__");
+  // global dictionarry
+  PyObject *pyDict = PyModule_GetDict(pyMod);
+  const mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
+  mitk::PixelType pixelType = image->GetPixelType();
+  itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelType();
+  PyObject* npyArray = NULL;
+  mitk::ImageReadAccessor racc(image);
+  void* array = (void*) racc.GetData();
 
-  MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
-  if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
+  // default pixeltype: unsigned short
+  NPY_TYPES npy_type  = NPY_USHORT;
+  std::string sitk_type = "sitkUInt8";
+  if( ioPixelType == itk::ImageIOBase::SCALAR )
   {
-    MITK_ERROR << "Temporary file could not be created.";
+    if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE ) {
+      npy_type = NPY_DOUBLE;
+      sitk_type = "sitkFloat64";
+    } else if( pixelType.GetComponentType() == itk::ImageIOBase::FLOAT ) {
+      npy_type = NPY_FLOAT;
+      sitk_type = "sitkFloat32";
+    } else if( pixelType.GetComponentType() == itk::ImageIOBase::SHORT) {
+      npy_type = NPY_SHORT;
+      sitk_type = "sitkInt16";
+    } else if( pixelType.GetComponentType() == itk::ImageIOBase::CHAR ) {
+      npy_type = NPY_BYTE;
+      sitk_type = "sitkInt8";
+    } else if( pixelType.GetComponentType() == itk::ImageIOBase::INT ) {
+      npy_type = NPY_INT;
+      sitk_type = "sitkInt32";
+    } else if( pixelType.GetComponentType() == itk::ImageIOBase::LONG ) {
+      npy_type = NPY_LONG;
+      sitk_type = "sitkInt64";
+    } else if( pixelType.GetComponentType() == itk::ImageIOBase::UCHAR ) {
+      npy_type = NPY_UBYTE;
+      sitk_type = "sitkUInt8";
+    } else if( pixelType.GetComponentType() == itk::ImageIOBase::UINT ) {
+      npy_type = NPY_UINT;
+      sitk_type = "sitkUInt32";
+    } else if( pixelType.GetComponentType() == itk::ImageIOBase::ULONG ) {
+      npy_type = NPY_LONG;
+      sitk_type = "sitkUInt64";
+    } else if( pixelType.GetComponentType() == itk::ImageIOBase::USHORT ) {
+      npy_type = NPY_USHORT;
+      sitk_type = "sitkUInt16";
+    }
   }
-  else
-  {
-    QString command;
 
-    command.append( QString("reader = sitk.ImageFileReader()\n") );
-    command.append( QString("reader.SetFileName(\"%1\")\n").arg(fileName) );
-    command.append( QString("%1 = reader.Execute()\n").arg(varName) );
-    command.append( QString("del reader") );
+  // creating numpy array
+  import_array1 (true);
+  npyArray = PyArray_SimpleNewFromData(npy_nd,npy_dims,npy_type,array);
 
-    MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-    MITK_DEBUG << this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
+  // add temp array it to the python dictionary to access it in python code
+  const int status = PyDict_SetItemString(pyDict,"numpy_temp_array",npyArray);
 
-    QFile file( fileName );
-    MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
-    file.remove();
-    return true;
-  }
-  return false;
+  // sanity check
+  if ( status != 0 )
+    return false;
+
+  command.append( QString("%1 = sitk.Image(%2,%3,%4,sitk.%5)\n").arg(varName)
+                  .arg(QString::number(imgDim[0]))
+                  .arg(QString::number(imgDim[1]))
+                  .arg(QString::number(imgDim[2]))
+                  .arg(QString(sitk_type.c_str())) );
+  command.append( QString("%1.SetSpacing([%2,%3,%4])\n").arg(varName)
+                  .arg(QString::number(spacing[0]))
+                  .arg(QString::number(spacing[1]))
+                  .arg(QString::number(spacing[2])) );
+  command.append( QString("sitk._SetImageFromArray(numpy_temp_array,%1)\n").arg(varName) );
+  // cleanup
+  command.append( QString("del numpy_temp_array") );
+
+  MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+  this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
+
+  return true;
 }
 
 mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std::string &stdvarName)
 {
   QString varName = QString::fromStdString( stdvarName );
-    mitk::Image::Pointer mitkImage;
-    QString command;
-    QString fileName = GetTempDataFileName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
-    fileName = QDir::fromNativeSeparators( fileName );
+  mitk::Image::Pointer mitkImage;
+  QString command;
+  QString fileName = GetTempDataFileName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
+  fileName = QDir::fromNativeSeparators( fileName );
 
-    MITK_DEBUG("PythonService") << "Saving temporary file with python itk code " << fileName.toStdString();
+  MITK_DEBUG("PythonService") << "Saving temporary file with python itk code " << fileName.toStdString();
 
-    command.append( QString("writer = sitk.ImageFileWriter()\n") );
-    command.append( QString("writer.SetFileName(\"%1\")\n").arg(fileName) );
-    command.append( QString("writer.Execute(%1)\n").arg(varName) );
-    command.append( QString("del writer") );
+  command.append( QString("writer = sitk.ImageFileWriter()\n") );
+  command.append( QString("writer.SetFileName(\"%1\")\n").arg(fileName) );
+  command.append( QString("writer.Execute(%1)\n").arg(varName) );
+  command.append( QString("del writer") );
 
-    MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-    this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
+  MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-    try
-    {
-        MITK_DEBUG("PythonService") << "Loading temporary file " << fileName.toStdString() << " as MITK image";
-        mitkImage = mitk::IOUtil::LoadImage( fileName.toStdString() );
-    }
-    catch(std::exception& e)
-    {
-      MITK_ERROR << e.what();
-    }
+  try
+  {
+      MITK_DEBUG("PythonService") << "Loading temporary file " << fileName.toStdString() << " as MITK image";
+      mitkImage = mitk::IOUtil::LoadImage( fileName.toStdString() );
+  }
+  catch(std::exception& e)
+  {
+    MITK_ERROR << e.what();
+  }
 
-    QFile file(fileName);
-    if( file.exists() )
-    {
-        MITK_DEBUG("PythonService") << "Removing temporary file " << fileName.toStdString();
-        file.remove();
-    }
+  QFile file(fileName);
+  if( file.exists() )
+  {
+      MITK_DEBUG("PythonService") << "Removing temporary file " << fileName.toStdString();
+      file.remove();
+  }
 
-    return mitkImage;
+  return mitkImage;
 }
 
 bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::string& stdvarName )

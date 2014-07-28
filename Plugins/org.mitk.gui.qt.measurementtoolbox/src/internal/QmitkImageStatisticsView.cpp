@@ -79,7 +79,7 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 
     m_Controls->m_ErrorMessageLabel->hide();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_HistogramBinSizeSlider->setTracking(false);
+//    m_Controls->m_HistogramBinSizeSlider->setTracking(false);
   }
 }
 
@@ -95,7 +95,9 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*) this->m_Controls->m_StatisticsTable, SIGNAL(cellDoubleClicked(int,int)),this, SLOT( JumpToCoordinates(int,int)) );
     connect( (QObject*) (this->m_Controls->m_barRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnBarRadioButtonSelected()));
     connect( (QObject*) (this->m_Controls->m_lineRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnLineRadioButtonSelected()));
-    connect( (QObject*) (this->m_Controls->m_HistogramBinSizeSlider), SIGNAL(valueChanged(int)), this, SLOT(OnHistogramBinSizeSliderValueChanged(int)));
+    connect( (QObject*) (this->m_Controls->m_HistogramBinSizeSpinbox), SIGNAL(editingFinished()), this, SLOT(OnHistogramBinSizeSliderValueChanged()));
+    connect( (QObject*)(this->m_Controls->m_UseDefaultBinSizeBox), SIGNAL(clicked()),(QObject*) this, SLOT(OnDefaultBinSizeBoxChanged()) );
+
   }
 
 }
@@ -216,7 +218,7 @@ void QmitkImageStatisticsView::OnClipboardHistogramButtonClicked()
       it != histogram->End();
       ++it )
     {
-      if( m_Controls->m_HistogramBinSizeSlider->value() == 1)
+      if( m_Controls->m_HistogramBinSizeSpinbox->value() == 1)
       {
         clipboard = clipboard.append( "%L1 \t %L2\n" )
           .arg( it.GetMeasurementVector()[0], 0, 'f', 0 )
@@ -313,9 +315,9 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
     m_Controls->m_JSHistogram->ClearHistogram();
     m_Controls->m_lineRadioButton->setEnabled(true);
     m_Controls->m_barRadioButton->setEnabled(true);
-    m_Controls->m_HistogramBinSizeSlider->setEnabled(true);
+    m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
     m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-    m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
+//    m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
     m_Controls->m_InfoLabel->setText(QString(""));
 
     //   m_Controls->horizontalLayout_3->setEnabled(false);
@@ -337,9 +339,9 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
       m_Controls->m_JSHistogram->ClearHistogram();
       m_Controls->m_lineRadioButton->setEnabled(true);
       m_Controls->m_barRadioButton->setEnabled(true);
-      m_Controls->m_HistogramBinSizeSlider->setEnabled(true);
+      m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-      m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
+//      m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
       m_Controls->m_InfoLabel->setText(QString(""));
     }
     for (int i= 0; i< selectedNodes.size(); ++i)
@@ -519,9 +521,9 @@ void QmitkImageStatisticsView::UpdateStatistics()
       this->m_StatisticsUpdatePending = false;
       m_Controls->m_lineRadioButton->setEnabled(true);
       m_Controls->m_barRadioButton->setEnabled(true);
-      m_Controls->m_HistogramBinSizeSlider->setEnabled(true);
+      m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-      m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
+//      m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
       m_Controls->m_InfoLabel->setText(QString(""));
       return;
     }
@@ -562,7 +564,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     this->m_CalculationThread->SetIgnoreZeroValueVoxel( m_Controls->m_IgnoreZerosCheckbox->isChecked() );
     this->m_CalculationThread->Initialize( m_SelectedImage, m_SelectedImageMask, m_SelectedPlanarFigure );
     this->m_CalculationThread->SetTimeStep( timeStep );
-    this->m_CalculationThread->SetHistogramBinSize(m_Controls->m_HistogramBinSizeSlider->value());
+    this->m_CalculationThread->SetHistogramBinSize(m_Controls->m_HistogramBinSizeSpinbox->value());
     std::stringstream message;
     message << "<font color='red'>Calculating statistics...</font>";
     m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
@@ -571,6 +573,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     try
     {
       // Compute statistics
+      this->m_CalculationThread->SetUseDefaultBinSize(m_Controls->m_UseDefaultBinSizeBox->isChecked());
       this->m_CalculationThread->start();
     }
     catch ( const mitk::Exception& e)
@@ -647,18 +650,18 @@ void QmitkImageStatisticsView::RequestStatisticsUpdate()
     this->GetRenderWindowPart()->RequestUpdate();
 }
 
-void QmitkImageStatisticsView::OnHistogramBinSizeSliderValueChanged(int)
+void QmitkImageStatisticsView::OnHistogramBinSizeSliderValueChanged()
 {
-  m_Controls->m_HistogramBinSizeLabel->setText( QString::number( m_Controls->m_HistogramBinSizeSlider->value()) );
+//  m_Controls->m_HistogramBinSizeLabel->setText( QString::number( m_Controls->m_HistogramBinSizeSlider->value()) );
   this->UpdateStatistics();
 }
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
   m_Controls->m_lineRadioButton->setEnabled(true);
   m_Controls->m_barRadioButton->setEnabled(true);
-  m_Controls->m_HistogramBinSizeSlider->setEnabled(true);
+  m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
   m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-  m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
+//  m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
   m_Controls->m_InfoLabel->setText(QString(""));
 
   if(m_DataNodeSelectionChanged)
@@ -682,6 +685,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_Controls->m_JSHistogram->OnBarRadioButtonSelected();
     }
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
+    m_Controls->m_HistogramBinSizeSpinbox->setValue( this->m_CalculationThread->GetHistogramBinSize() );
     //m_Controls->m_JSHistogram->ComputeHistogram( this->m_CalculationThread->GetTimeStepHistogram(this->m_CalculationThread->GetTimeStep()).GetPointer() );
     this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
   }
@@ -723,9 +727,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         this->m_StatisticsUpdatePending = false;
         m_Controls->m_lineRadioButton->setEnabled(true);
         m_Controls->m_barRadioButton->setEnabled(true);
-        m_Controls->m_HistogramBinSizeSlider->setEnabled(true);
+        m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
         m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-        m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
+//        m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
         if (!outOfBounds)
           m_Controls->m_InfoLabel->setText(QString(""));
         return;
@@ -736,9 +740,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_Controls->m_JSHistogram->ComputeIntensityProfile(timeStep);
       m_Controls->m_lineRadioButton->setEnabled(false);
       m_Controls->m_barRadioButton->setEnabled(false);
-      m_Controls->m_HistogramBinSizeSlider->setEnabled(false);
+      m_Controls->m_HistogramBinSizeSpinbox->setEnabled(false);
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(false);
-      m_Controls->m_HistogramBinSizeLabel->setEnabled(false);
+//      m_Controls->m_HistogramBinSizeLabel->setEnabled(false);
       std::stringstream message;
       message << "<font color='red'>Only linegraph available for an intesityprofile!</font>";
       m_Controls->m_InfoLabel->setText(message.str().c_str());

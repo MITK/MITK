@@ -54,11 +54,9 @@ if(MITK_USE_SimpleITK)
        SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
        BINARY_DIR ${proj}-build
        PREFIX ${proj}-cmake
-       INSTALL_DIR ${proj}-install
        PATCH_COMMAND ${SimpleITK_PATCH_COMMAND}
        CMAKE_ARGS
          ${ep_common_args}
-         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
        CMAKE_CACHE_ARGS
          ${additional_cmake_args}
          -DSimpleITK_BUILD_DISTRIBUTE:BOOL=ON

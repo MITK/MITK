@@ -335,7 +335,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
     command.append( QString("del reader") );
 
     MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-    MITK_INFO << this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
+    MITK_DEBUG << this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
     QFile file( fileName );
     MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();

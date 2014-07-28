@@ -175,40 +175,40 @@ void mitk::PythonService::ExecuteScript( const std::string& pythonScript )
 
 std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
 {
-    std::vector<mitk::PythonVariable> list;
+  std::vector<mitk::PythonVariable> list;
 
-    PyObject* dict = PyImport_GetModuleDict();
-    PyObject* object = PyDict_GetItemString(dict, "__main__");
-    PyObject* dirMain = PyObject_Dir(object);
-    PyObject* tempObject = 0;
-    PyObject* strTempObject = 0;
+  PyObject* dict = PyImport_GetModuleDict();
+  PyObject* object = PyDict_GetItemString(dict, "__main__");
+  PyObject* dirMain = PyObject_Dir(object);
+  PyObject* tempObject = 0;
+  PyObject* strTempObject = 0;
 
-    if(dirMain)
+  if(dirMain)
+  {
+    std::string name, attrValue, attrType;
+
+    for(int i = 0; i<PyList_Size(dirMain); i++)
     {
-      std::string name, attrValue, attrType;
+      tempObject = PyList_GetItem(dirMain, i);
+      name = PyString_AsString(tempObject);
+      tempObject = PyObject_GetAttrString( object, name.c_str() );
+      attrType = tempObject->ob_type->tp_name;
 
-      for(int i = 0; i<PyList_Size(dirMain); i++)
-      {
-        tempObject = PyList_GetItem(dirMain, i);
-        name = PyString_AsString(tempObject);
-        tempObject = PyObject_GetAttrString( object, name.c_str() );
-        attrType = tempObject->ob_type->tp_name;
+      strTempObject = PyObject_Repr(tempObject);
+      if(strTempObject && ( PyUnicode_Check(strTempObject) || PyString_Check(strTempObject) ) )
+        attrValue = PyString_AsString(strTempObject);
+      else
+        attrValue = "";
 
-        strTempObject = PyObject_Repr(tempObject);
-        if(strTempObject && ( PyUnicode_Check(strTempObject) || PyString_Check(strTempObject) ) )
-          attrValue = PyString_AsString(strTempObject);
-        else
-          attrValue = "";
-
-        mitk::PythonVariable var;
-        var.m_Name = name;
-        var.m_Value = attrValue;
-        var.m_Type = attrType;
-        list.push_back(var);
-      }
+      mitk::PythonVariable var;
+      var.m_Name = name;
+      var.m_Value = attrValue;
+      var.m_Type = attrType;
+      list.push_back(var);
     }
+  }
 
-    return list;
+  return list;
 }
 
 bool mitk::PythonService::DoesVariableExist(const std::string& name) const
@@ -216,7 +216,7 @@ bool mitk::PythonService::DoesVariableExist(const std::string& name) const
   bool varExists = false;
 
   std::vector<mitk::PythonVariable> allVars = this->GetVariableStack();
-  for(int i = 0; i< allVars.size(); i++)
+  for(unsigned int i = 0; i< allVars.size(); i++)
   {
     if( allVars.at(i).m_Name == name )
     {
@@ -242,7 +242,7 @@ void mitk::PythonService::RemovePythonCommandObserver(mitk::PythonCommandObserve
 void mitk::PythonService::NotifyObserver(const std::string &command)
 {
   MITK_DEBUG("mitk::PythonService") << "number of observer " << m_Observer.size();
-    for( size_t i=0; i< m_Observer.size(); ++i )
+    for( int i=0; i< m_Observer.size(); ++i )
     {
         m_Observer.at(i)->CommandExecuted(command);
     }
@@ -333,7 +333,6 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
                   .arg(QString::number(spacing[1]))
                   .arg(QString::number(spacing[2])) );
   command.append( QString("sitk._SetImageFromArray(numpy_temp_array,%1)\n").arg(varName) );
-  // cleanup
   command.append( QString("del numpy_temp_array") );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();

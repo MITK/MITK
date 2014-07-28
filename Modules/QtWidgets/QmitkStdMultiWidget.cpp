@@ -1317,30 +1317,33 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   mitk::PlaneGeometryDataMapper2D::Pointer mapper;
 
   // ... of widget 1
-  m_PlaneNode1 = (mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
+  mitk::BaseRenderer* renderer1 = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow());
+  m_PlaneNode1 = renderer1->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode1->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_PlaneNode1->SetProperty("name", mitk::StringProperty::New("widget1Plane"));
+  m_PlaneNode1->SetProperty("name", mitk::StringProperty::New(std::string(renderer1->GetName()) + ".plane"));
   m_PlaneNode1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode1->SetProperty("helper object", mitk::BoolProperty::New(true));
   mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode1->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
   // ... of widget 2
-  m_PlaneNode2 =( mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
+  mitk::BaseRenderer* renderer2 = mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow());
+  m_PlaneNode2 = renderer2->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode2->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   m_PlaneNode2->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_PlaneNode2->SetProperty("name", mitk::StringProperty::New("widget2Plane"));
+  m_PlaneNode2->SetProperty("name", mitk::StringProperty::New(std::string(renderer2->GetName()) + ".plane"));
   m_PlaneNode2->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode2->SetProperty("helper object", mitk::BoolProperty::New(true));
   mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode2->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
   // ... of widget 3
-  m_PlaneNode3 = (mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
+  mitk::BaseRenderer* renderer3 = mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow());
+  m_PlaneNode3 = renderer3->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode3->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
   m_PlaneNode3->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_PlaneNode3->SetProperty("name", mitk::StringProperty::New("widget3Plane"));
+  m_PlaneNode3->SetProperty("name", mitk::StringProperty::New(std::string(renderer3->GetName()) + ".plane"));
   m_PlaneNode3->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode3->SetProperty("helper object", mitk::BoolProperty::New(true));
   mapper = mitk::PlaneGeometryDataMapper2D::New();
@@ -1824,9 +1827,18 @@ void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool 
 
 void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible, mitk::BaseRenderer *renderer)
 {
-  SetWidgetPlaneVisibility("widget1Plane", visible, renderer);
-  SetWidgetPlaneVisibility("widget2Plane", visible, renderer);
-  SetWidgetPlaneVisibility("widget3Plane", visible, renderer);
+  if (m_PlaneNode1.IsNotNull())
+  {
+    m_PlaneNode1->SetVisibility(visible, renderer);
+  }
+  if (m_PlaneNode2.IsNotNull())
+  {
+    m_PlaneNode2->SetVisibility(visible, renderer);
+  }
+  if (m_PlaneNode3.IsNotNull())
+  {
+    m_PlaneNode3->SetVisibility(visible, renderer);
+  }
   m_RenderingManager->RequestUpdateAll();
 }
 

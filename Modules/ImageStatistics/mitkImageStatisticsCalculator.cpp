@@ -1035,7 +1035,10 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       // restrict image to mask area for min/max index calculation
       typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
       typename MaskImageFilterType::Pointer masker = MaskImageFilterType::New();
-      masker->SetOutsideValue( (statistics.Min+statistics.Max)/2 );
+      bool isMinAndMaxSameValue = (statistics.Min == statistics.Max);
+      // bug 17962: following is a workaround for the case when min and max are the same, we can probably find a nicer way here
+      double outsideValue = (isMinAndMaxSameValue ? (statistics.Max/2) : (statistics.Min+statistics.Max)/2);
+      masker->SetOutsideValue( outsideValue );
       masker->SetInput1(adaptedImage);
       masker->SetInput2(adaptedMaskImage);
       masker->Update();
@@ -1052,7 +1055,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
         statistics.MaxIndex.set_size(adaptedImage->GetImageDimension());
 
         typename MinMaxFilterType::IndexType tempMaxIndex = minMaxFilter->GetIndexOfMaximum();
-        typename MinMaxFilterType::IndexType tempMinIndex = minMaxFilter->GetIndexOfMinimum();
+        // bug 17962: following is a workaround for the case when min and max are the same, we can probably find a nicer way here
+        typename MinMaxFilterType::IndexType tempMinIndex =
+          (isMinAndMaxSameValue ? minMaxFilter->GetIndexOfMaximum() : minMaxFilter->GetIndexOfMinimum());
 
 // FIX BUG 14644
         //If a PlanarFigure is used for segmentation the

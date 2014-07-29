@@ -108,11 +108,17 @@ namespace mitk
      */
     virtual bool AdjustLevelWindow(StateMachineAction*, InteractionEvent*);
 
+    mitk::DataNode::Pointer GetDataNodeForLevelWindowInteraction( InteractionEvent* interactionEvent );
+
     /**
     * \brief Method to retrieve bool-value for given property from string-property
     * in given propertylist.
     */
     bool GetBoolProperty( mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue );
+
+    ScalarType m_LevelModifier;
+
+    ScalarType m_WindowModifier;
 
   private:
     /**
@@ -197,6 +203,7 @@ namespace mitk
      * Factor to adjust zooming speed.
      */
     float m_ZoomFactor;
+
   };
 }
 #endif

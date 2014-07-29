@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <mitkRenderingManager.h>
 #include <mitkImageReadAccessor.h>
+#include <mitkImageWriteAccessor.h>
 #include </media/Data/Plattformprojekt/bin/MITK-SITK/Numpy-install/lib/python2.7/site-packages/numpy/core/include/numpy/arrayobject.h>
 
 #ifndef WIN32
@@ -343,38 +344,87 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
 
 mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std::string &stdvarName)
 {
-  QString varName = QString::fromStdString( stdvarName );
-  mitk::Image::Pointer mitkImage;
+  // access python module
+  PyObject *pyMod = PyImport_AddModule((char*)"__main__");
+  // global dictionarry
+  PyObject *pyDict = PyModule_GetDict(pyMod);
+  mitk::Image::Pointer mitkImage = mitk::Image::New();
+  mitk::Vector3D spacing;
   QString command;
-  QString fileName = GetTempDataFileName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
-  fileName = QDir::fromNativeSeparators( fileName );
+  QString varName = QString::fromStdString( stdvarName );
 
-  MITK_DEBUG("PythonService") << "Saving temporary file with python itk code " << fileName.toStdString();
-
-  command.append( QString("writer = sitk.ImageFileWriter()\n") );
-  command.append( QString("writer.SetFileName(\"%1\")\n").arg(fileName) );
-  command.append( QString("writer.Execute(%1)\n").arg(varName) );
-  command.append( QString("del writer") );
+  command.append( QString("import numpy\n") );
+  command.append( QString("numpy_temp_array = sitk.GetArrayFromImage(%1)\n").arg(varName) );
+  command.append( QString("spacing_temp = numpy.asarray(%1.GetSpacing())\n").arg(varName) );
+  command.append( QString("dtype_temp = numpy_temp_array.dtype.name") );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-  try
-  {
-      MITK_DEBUG("PythonService") << "Loading temporary file " << fileName.toStdString() << " as MITK image";
-      mitkImage = mitk::IOUtil::LoadImage( fileName.toStdString() );
-  }
-  catch(std::exception& e)
-  {
-    MITK_ERROR << e.what();
+  PyObject* py_dtype = PyDict_GetItemString(pyDict,"dtype_temp");
+  std::string dtype = PyString_AsString(py_dtype);
+  PyArrayObject* py_data = (PyArrayObject*) PyDict_GetItemString(pyDict,"numpy_temp_array");
+  PyArrayObject* py_spacing = (PyArrayObject*) PyDict_GetItemString(pyDict,"spacing_temp");
+
+  size_t sz = sizeof(short);
+  mitk::PixelType pixelType = MakeScalarPixelType<short>();
+  if( dtype.compare("float64") == 0   ) {
+    pixelType = MakeScalarPixelType<double>();
+    sz = sizeof(double);
+  } else if( dtype.compare("float32") == 0 ) {
+    pixelType = MakeScalarPixelType<float>();
+    sz = sizeof(float);
+  } else if( dtype.compare("int16") == 0) {
+    pixelType = MakeScalarPixelType<short>();
+    sz = sizeof(short);
+  } else if( dtype.compare("int8") == 0 ) {
+    pixelType = MakeScalarPixelType<char>();
+    sz = sizeof(char);
+  } else if( dtype.compare("int32") == 0 ) {
+    pixelType = MakeScalarPixelType<int>();
+    sz = sizeof(int);
+  } else if( dtype.compare("int64") == 0 ) {
+    pixelType = MakeScalarPixelType<long>();
+    sz = sizeof(long);
+  } else if( dtype.compare("uint8") == 0 ) {
+    pixelType = MakeScalarPixelType<unsigned char>();
+    sz = sizeof(unsigned char);
+  } else if( dtype.compare("uint32") == 0 ) {
+    pixelType = MakeScalarPixelType<unsigned int>();
+    sz = sizeof(unsigned int);
+  } else if( dtype.compare("uint64") == 0 ) {
+    pixelType = MakeScalarPixelType<unsigned long>();
+    sz = sizeof(unsigned long);
+  } else if( dtype.compare("uint16") == 0 ) {
+    pixelType = MakeScalarPixelType<unsigned short>();
+    sz = sizeof(unsigned short);
   }
 
-  QFile file(fileName);
-  if( file.exists() )
+  unsigned int* dimensions = new unsigned int[py_data->nd];
+  // fill backwards , nd data saves dimensions in opposite direction
+  for( int i = 0; i < py_data->nd; ++i )
   {
-      MITK_DEBUG("PythonService") << "Removing temporary file " << fileName.toStdString();
-      file.remove();
+    dimensions[i] = py_data->dimensions[py_data->nd - 1 - i];
+    sz *= dimensions[i];
   }
+
+  mitkImage->Initialize(pixelType, py_data->nd, dimensions);
+  memcpy(mitkImage->GetData(), py_data->data, sz);
+
+  double* ds = (double*)py_spacing->data;
+  spacing[0] = ds[0];
+  spacing[1] = ds[1];
+  spacing[2] = ds[2];
+  mitkImage->GetGeometry()->SetSpacing(spacing);
+
+  // cleanup
+  command.clear();
+  command.append( QString("del numpy_temp_array\n") );
+  command.append( QString("del spacing_temp ") );
+  MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
+
+  delete[] dimensions;
 
   return mitkImage;
 }

@@ -15,5 +15,6 @@ Alternatively, you can <a href="http://www.mitk.org/Contact">contact us directly
   <li> \subpage MITKUserManualPage </li>
   <li> \subpage ApplicationsPage </li>  
   <li> \subpage PluginListPage </li>
+  <li> \subpage PerspectiveListPage </li>
 </ul>
 */

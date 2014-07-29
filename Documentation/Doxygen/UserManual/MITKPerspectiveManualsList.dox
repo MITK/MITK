@@ -5,7 +5,7 @@
 
 Perspectives provide a selection of plugins and settings which synergize well in order to solve certain problems. This can include placement of views as well in order to create an environment suited to solve the problem at hand. 
 
-\section PluginListPageEndUserPluginList List of Perspectives
+\section PerspectiveListPagePerspectiveList List of Perspectives
 
   \li \subpage org_mitk_gui_qt_extapplication_perspectives_visualizations
 

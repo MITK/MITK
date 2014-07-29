@@ -515,6 +515,9 @@ mitk::DICOMImageBlockDescriptor
     // nothing, no levelwindow to be predicted...
   }
 
+  std::string modality = this->GetPropertyAsString( "modality" );
+  mitkImage->SetProperty("modality", StringProperty::New( modality ));
+
   mitkImage->SetProperty("dicom.pixel.PhotometricInterpretation", this->GetProperty("photometricInterpretation") );
   mitkImage->SetProperty("dicom.image.imagetype", this->GetProperty("imagetype") );
 

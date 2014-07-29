@@ -17,6 +17,7 @@ set(CPP_FILES
     LocalDirectionalFiberPlausibility.cpp
     #TractogramAngularError.cpp
     FiberDirectionExtraction.cpp
+    ImageResampler.cpp
     PeakExtraction.cpp
     PeaksAngularError.cpp
     MultishellMethods.cpp

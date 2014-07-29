@@ -48,24 +48,15 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
 {
   // Create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  m_Controls.treeView->setModel(m_TreeModel);
   m_Controls.treeView->header()->hide();
 
   m_SelectionProvider = new berry::QtSelectionProvider();
-  m_SelectionProvider->SetItemSelectionModel(m_Controls.treeView->selectionModel());
   this->SetSelectionProvider();
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
 
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)) );
 
-  // Get the XNAT Session from Activator
-  m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
-
-  if(m_Session == 0) return;
-
-  // Fill model and show in the GUI
-  m_TreeModel->addDataModel(m_Session->dataModel());
-  m_Controls.treeView->reset();
+  UpdateSession();
 }
 
 void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
@@ -116,4 +107,26 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 void QmitkXnatTreeBrowserView::SetSelectionProvider()
 {
   GetSite()->SetSelectionProvider(m_SelectionProvider);
+}
+
+void QmitkXnatTreeBrowserView::UpdateSession()
+{
+  delete m_TreeModel;
+  m_TreeModel = new ctkXnatTreeModel();
+  m_Controls.treeView->setModel(m_TreeModel);
+  m_Controls.treeView->reset();
+
+  // Get the XNAT Session from Activator
+  m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
+
+  if(m_Session != NULL)
+  {
+    connect( this->m_Session, SIGNAL(destroyed()), this, SLOT(UpdateSession()) );
+
+    // Fill model and show in the GUI
+    m_Controls.treeView->setModel(m_TreeModel);
+    m_TreeModel->addDataModel(m_Session->dataModel());
+    m_Controls.treeView->reset();
+    m_SelectionProvider->SetItemSelectionModel(m_Controls.treeView->selectionModel());
+  }
 }

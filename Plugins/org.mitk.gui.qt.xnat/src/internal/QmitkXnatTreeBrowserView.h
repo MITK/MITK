@@ -52,12 +52,13 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  berry::QtSelectionProvider::Pointer m_SelectionProvider;
-
   protected slots:
 
     /// \brief Opens or reuses the xnat editor with the activated node as root item.
     void OnActivatedNode(const QModelIndex& index);
+
+    /// \brief Updates the ctkXnatSession and the user interface
+    void UpdateSession();
 
 protected:
 
@@ -67,6 +68,7 @@ protected:
 
 private:
 
+  berry::QtSelectionProvider::Pointer m_SelectionProvider;
   void SetSelectionProvider();
 
   ctkXnatSession* m_Session;

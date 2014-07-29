@@ -60,7 +60,6 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
         QStringList::iterator slIter;
         int i = 0;
-        int j = 0;
         for (slIter = listOfDataNodeAddressPointers.begin();
              slIter != listOfDataNodeAddressPointers.end();
              slIter++)
@@ -70,11 +69,16 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
           MITK_DEBUG("QmitkPythonVariableStackTableModel") << "mitkImage is not null " << (mitkImage != 0? "true": "false");
 
+          QString varName(node->GetName().c_str());
+          varName = varName.replace(QString(" "),QString("_"));
+
           if( mitkImage )
           {
-            QString varName = MITK_IMAGE_VAR_NAME;
+            if ( varName.isEmpty() )
+              varName = MITK_IMAGE_VAR_NAME;
+
             if( i > 0 )
-              varName = QString("%1%2").arg(MITK_IMAGE_VAR_NAME).arg(i);
+              varName = QString("%1%2").arg(varName).arg(i);
             MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << varName.toStdString();
 
             bool exportAsCvImage = mitkImage->GetDimension() == 2 && m_PythonService->IsOpenCvPythonWrappingAvailable();
@@ -88,7 +92,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
               exportAsCvImage = ret == QMessageBox::Yes;
               if(exportAsCvImage)
               {
-                m_PythonService->CopyToPythonAsCvImage( mitkImage, MITK_IMAGE_VAR_NAME.toStdString() );
+                m_PythonService->CopyToPythonAsCvImage( mitkImage, varName.toStdString() );
                 ++i;
               }
             }
@@ -96,7 +100,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
             {
               if( m_PythonService->IsSimpleItkPythonWrappingAvailable() )
               {
-                m_PythonService->CopyToPythonAsSimpleItkImage( mitkImage, MITK_IMAGE_VAR_NAME.toStdString() );
+                m_PythonService->CopyToPythonAsSimpleItkImage( mitkImage, varName.toStdString() );
                 ++i;
               }
               else
@@ -112,11 +116,14 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
             if( surface )
             {
-              MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << node->GetName();
+              if (varName.isEmpty() )
+                varName =  MITK_SURFACE_VAR_NAME;
+
+              MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << varName;
 
               if( m_PythonService->IsVtkPythonWrappingAvailable() )
               {
-                m_PythonService->CopyToPythonAsVtkPolyData( surface, node->GetName() );
+                m_PythonService->CopyToPythonAsVtkPolyData( surface, varName.toStdString() );
               }
               else
               {

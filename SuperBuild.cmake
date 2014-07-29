@@ -370,6 +370,13 @@ if(MITK_USE_Python)
           -DPYTHON_MINOR_VERSION:STRING=${PYTHON_MINOR_VERSION}
         )
   endif()
+
+  if(MITK_USE_NUMPY)
+    list(APPEND mitk_optional_cache_args
+         -DNumpy_DIR:PATH=${Numpy_DIR}
+         -DNUMPY_INCLUDE_DIR:PATH=${NUMPY_INCLUDE_DIR}
+        )
+  endif()
 endif()
 
 set(proj MITK-Configure)

@@ -13,6 +13,7 @@ if( MITK_USE_Python )
     DEPENDS MitkCore
     EXPORT_DEFINE MITK_PYTHON_EXPORT
     PACKAGE_DEPENDS Qt4|QtGui CTK PythonLibs SimpleITK VTK|vtkPython+vtkWrappingPythonCore ${OpenCV_DEP}
+    INCLUDE_DIRS ${NUMPY_INCLUDE_DIR}
   )
   configure_file(PythonPath.h.in
     "${CMAKE_CURRENT_BINARY_DIR}/PythonPath.h" @ONLY)

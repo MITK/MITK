@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
-#include </media/Data/Plattformprojekt/bin/MITK-SITK/Numpy-install/lib/python2.7/site-packages/numpy/core/include/numpy/arrayobject.h>
+#include <numpy/arrayobject.h>
 
 #ifndef WIN32
   #include <dlfcn.h>

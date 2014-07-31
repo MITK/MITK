@@ -62,6 +62,20 @@ mitk::Label::Label(const Label& other)
   : PropertyList(other)
   // copyconstructer of property List handles the coping action
 {
+
+
+  mitk::PropertyList::PropertyMap * map = const_cast<mitk::PropertyList::PropertyMap *>(this->GetMap());
+  mitk::PropertyList::PropertyMap::iterator it = map->begin();
+  mitk::PropertyList::PropertyMap::iterator end = map->end();
+
+  for(; it != end ; ++it)
+  {
+    itk::SimpleMemberCommand<Label>::Pointer command = itk::SimpleMemberCommand<Label>::New();
+    command->SetCallbackFunction(this, &Label::Modified);
+    it->second->AddObserver( itk::ModifiedEvent(), command );
+  }
+
+
 }
 
 mitk::Label::~Label()

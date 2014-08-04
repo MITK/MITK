@@ -39,6 +39,9 @@ int MiniAppManager::RunMiniApp(int argc, char* argv[])
 
         if( argc < 2)
         {
+            std::cout << "Generated XML:" << std::endl;
+            std::cout << this->CreateXML() << std::endl;
+
             std::cout << "Please choose the mini app to execute: " << std::endl;
 
             for(int i=0; it != m_Functions.end(); ++i,++it)
@@ -93,4 +96,22 @@ MiniAppManager::AddFunction(const std::string& name, MiniAppFunction func)
 {
     m_Functions.insert( std::pair<std::string, MiniAppFunction>(name, func) );
     return func;
+}
+
+std::string MiniAppManager::CreateXML() const
+{
+    std::ostringstream output;
+
+    output << "<executables>" << std::endl;
+
+    std::map<std::string, MiniAppFunction>::const_iterator it = m_Functions.begin();
+
+    for (; it != m_Functions.end(); ++it)
+    {
+        output << "  <executable name=\"" << it->first << "\"/>" << std::endl;
+    }
+
+    output << "</executables>" << std::endl;
+
+    return output.str();
 }

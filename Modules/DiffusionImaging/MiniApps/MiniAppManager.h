@@ -24,6 +24,8 @@ public:
     //
     MiniAppFunction AddFunction(const std::string& name, MiniAppFunction func);
 
+    std::string CreateXML() const;
+
 protected:
 
     std::map< std::string, MiniAppFunction >  m_Functions;

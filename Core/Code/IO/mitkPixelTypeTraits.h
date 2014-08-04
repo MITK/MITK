@@ -101,7 +101,7 @@ DEFINE_TYPE_PRIMITIVE(float);
 DEFINE_TYPE_PRIMITIVE(double);
 
 /** \brief Type trait to provide compile-time check for T ?= itk::VectorImage */
-template< class T, typename TValueType >
+template< class T >
 struct isVectorImage
 {
   static const bool value = false;
@@ -110,14 +110,14 @@ struct isVectorImage
 
 /** \brief Partial specification for the isVectorImage trait. */
 template< typename TValueType >
-struct isVectorImage< itk::VariableLengthVector<TValueType>, TValueType>
+struct isVectorImage< itk::VariableLengthVector<TValueType> >
 {
   static const bool value = true;
   static const bool dyn_alloc = false;
 };
 
 template< typename TValueType >
-struct isVectorImage< itk::VectorImage< TValueType>, TValueType>
+struct isVectorImage< itk::VectorImage< TValueType> >
 {
   static const bool value = true;
   static const bool dyn_alloc = true;

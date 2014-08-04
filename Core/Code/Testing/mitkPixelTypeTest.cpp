@@ -104,11 +104,13 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION( obscurePixelType.GetComponentType() == mitk::MapPixelComponentType<MyObscurePixelType::ValueType>::value, "ValueType corresponds."   );
 
   typedef itk::VectorImage< short, 3> VectorImageType;
-  mitk::PixelType vectorPixelType = mitk::MakePixelType< VectorImageType >();
-  vectorPixelType.SetVectorLength( 78 );
+  mitk::PixelType vectorPixelType = mitk::MakePixelType< VectorImageType >( 78 );
+  //vectorPixelType.SetVectorLength( 78 );
 
   typedef itk::Image< itk::Vector< short, 7> > FixedVectorImageType;
   mitk::PixelType fixedVectorPixelType = mitk::MakePixelType< FixedVectorImageType >();
+
+  mitk::PixelType scalarPixelType = mitk::MakeScalarPixelType< float >();
 
 
   // test CastableTo

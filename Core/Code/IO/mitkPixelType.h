@@ -140,6 +140,9 @@ private:
   template< typename ItkImageType >
     friend PixelType MakePixelType();
 
+  template< typename ItkImageType >
+      friend PixelType MakePixelType(size_t);
+
   PixelType( const int componentType,
              const ItkIOPixelType pixelType,
              std::size_t bytesPerComponent,
@@ -191,7 +194,7 @@ PixelType MakePixelType()
   * is propagated to the constructor
   */
 template< typename ItkImageType >
-PixelType MakePixelType()
+PixelType MakePixelType( size_t variable_length )
 {
   // define new type, since the ::PixelType is used to distinguish between simple and compound types
   typedef typename ItkImageType::PixelType ImportPixelType;
@@ -204,9 +207,12 @@ PixelType MakePixelType()
 
   // Get the length of compound type ( initialized to 1 for simple types and variable-length vector images)
   size_t numComp = ComponentsTrait<
-    (isPrimitiveType<PixelT>::value || isVectorImage<PixelT, ComponentT>::value), ItkImageType >::Size;
+    (isPrimitiveType<PixelT>::value || isVectorImage<PixelT>::value), ItkImageType >::Size;
 
-  bool dyn_alloc = isVectorImage<ItkImageType, ComponentT>::dyn_alloc;
+  bool dyn_alloc = isVectorImage<ItkImageType>::dyn_alloc;
+
+  if( dyn_alloc )
+    numComp = variable_length;
 
   // call the constructor
   return PixelType(
@@ -218,6 +224,18 @@ PixelType MakePixelType()
             dyn_alloc
          );
 }
+
+template< typename ItkImageType >
+PixelType MakePixelType()
+{
+  bool dyn_alloc = isVectorImage<ItkImageType>::dyn_alloc;
+  if( dyn_alloc )
+    mitkThrow() << " Variable pixel type given but the length is not specified. Use the parametric MakePixelType( size_t ) method instead.";
+
+  // call the constructor
+  return MakePixelType<ItkImageType>(1);
+}
+
 
 inline PixelType MakePixelType(const itk::ImageIOBase* imageIO)
 {

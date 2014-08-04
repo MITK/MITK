@@ -67,7 +67,7 @@ int MiniAppManager::RunMiniApp(int argc, char* argv[])
             throw std::invalid_argument(s.str().c_str());
         }
 
-        MITK_INFO << "Start " << nameOfMiniApp << " ..";
+//        MITK_INFO << "Start " << nameOfMiniApp << " ..";
         MiniAppFunction func = it->second;
         return func( argc, argv );
     }

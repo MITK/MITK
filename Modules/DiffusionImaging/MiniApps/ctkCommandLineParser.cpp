@@ -53,12 +53,12 @@ public:
     CommandLineParserArgumentDescription(
             const string& longArg, const string& longArgPrefix,
             const string& shortArg, const string& shortArgPrefix,
-            ctkCommandLineParser::Type type, const string& argHelp,
+            ctkCommandLineParser::Type type, const string& argHelp, const string& argLabel,
             const us::Any& defaultValue, bool ignoreRest,
             bool deprecated, bool optional)
         : LongArg(longArg), LongArgPrefix(longArgPrefix),
           ShortArg(shortArg), ShortArgPrefix(shortArgPrefix),
-          ArgHelp(argHelp), IgnoreRest(ignoreRest), NumberOfParametersToProcess(0),
+          ArgHelp(argHelp), ArgLabel(argLabel), IgnoreRest(ignoreRest), NumberOfParametersToProcess(0),
           Deprecated(deprecated), DefaultValue(defaultValue), Value(type), ValueType(type), Optional(optional)
     {
         Value = defaultValue;
@@ -90,6 +90,18 @@ public:
             NumberOfParametersToProcess = 1;
         }
             break;
+
+        case ctkCommandLineParser::Directory:
+        {
+            NumberOfParametersToProcess = 1;
+        }
+            break;
+        case ctkCommandLineParser::File:
+        {
+            NumberOfParametersToProcess = 1;
+        }
+            break;
+
         default:
             MITK_INFO << "Type not supported: " << static_cast<int>(type);
         }
@@ -107,6 +119,7 @@ public:
     string  ShortArg;
     string  ShortArgPrefix;
     string  ArgHelp;
+    string  ArgLabel;
     bool    IgnoreRest;
     int     NumberOfParametersToProcess;
     bool    Deprecated;
@@ -167,6 +180,19 @@ bool CommandLineParserArgumentDescription::addParameter(const string &value)
         Value = f;
     }
         break;
+
+    case ctkCommandLineParser::Directory:
+    {
+      Value = value;
+    }
+      break;
+
+    case ctkCommandLineParser::File:
+    {
+      Value = value;
+    }
+        break;
+
     default:
         return false;
     }
@@ -289,6 +315,10 @@ ctkCommandLineParser::ctkInternal::argumentDescription(const string& argument)
 ctkCommandLineParser::ctkCommandLineParser()
 {
     this->Internal = new ctkInternal();
+    this->Category = string();
+    this->Title = string();
+    this->Contributor = string();
+    this->Description = string();
 }
 
 // --------------------------------------------------------------------------
@@ -315,7 +345,6 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
             desc->Value = desc->DefaultValue;
         }
     }
-
     bool error = false;
     bool ignoreRest = false;
     CommandLineParserArgumentDescription * currentArgDesc = 0;
@@ -323,7 +352,13 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
     for(unsigned int i = 1; i < arguments.size(); ++i)
     {
         string argument = arguments.at(i);
+
         if (this->Internal->Debug) { MITK_DEBUG << "Processing" << argument; }
+        if (!argument.compare("--xml") || !argument.compare("-xml") || !argument.compare("--XML") || !argument.compare("-XML"))
+        {
+          this->GetXML("lala", "lalalalalalalalalalalalalalalla");
+          return map<string, us::Any>();
+        }
 
         // should argument be ignored ?
         if (ignoreRest)
@@ -589,7 +624,7 @@ const ctkCommandLineParser::StringContainerType& ctkCommandLineParser::unparsedA
 void ctkCommandLineParser::addArgument(const string& longarg, const string& shortarg,
                                        Type type, const string& argHelp,
                                        const us::Any& defaultValue, bool optional, bool ignoreRest,
-                                       bool deprecated)
+                                       bool deprecated, const string& argLabel)
 {
     if (longarg.empty() && shortarg.empty()) { return; }
 
@@ -603,7 +638,7 @@ void ctkCommandLineParser::addArgument(const string& longarg, const string& shor
     CommandLineParserArgumentDescription* argDesc =
             new CommandLineParserArgumentDescription(longarg, this->Internal->LongPrefix,
                                                      shortarg, this->Internal->ShortPrefix, type,
-                                                     argHelp, defaultValue, ignoreRest, deprecated, optional);
+                                                     argHelp, argLabel, defaultValue, ignoreRest, deprecated, optional);
 
     int argWidth = 0;
     if (!longarg.empty())
@@ -630,9 +665,9 @@ void ctkCommandLineParser::addArgument(const string& longarg, const string& shor
 
 // --------------------------------------------------------------------------
 void ctkCommandLineParser::addDeprecatedArgument(
-        const string& longarg, const string& shortarg, const string& argHelp)
+        const string& longarg, const string& shortarg, const string& argHelp, const string& argLabel)
 {
-    addArgument(longarg, shortarg, StringList, argHelp, us::Any(), false, true);
+    addArgument(longarg, shortarg, StringList, argHelp, us::Any(), false, true, false, argLabel);
 }
 
 // --------------------------------------------------------------------------
@@ -725,3 +760,86 @@ void ctkCommandLineParser::setStrictModeEnabled(bool strictMode)
     this->Internal->StrictMode = strictMode;
 }
 
+void ctkCommandLineParser::GetXML(std::string title, std::string description)
+{
+  std::stringstream xml;
+
+  xml << "<executable>" << endl;
+  xml << "<category>" << Category << "</category>" << endl;
+  xml << "<title>" << Title <<"</title>" << endl;
+  xml << "<description>" << Description << "</description>" << endl;
+  xml << "<contributor>" << Contributor << "</contributor>" << endl;
+  xml << "<parameters>" << endl;
+
+  //TODO: nicht hard coded!!
+  xml << "<label> Test </label>" << endl;
+  xml << "<description>TestTest</description>" << endl;
+
+
+  std::vector<CommandLineParserArgumentDescription*>::iterator it;
+  for (it = this->Internal->ArgumentDescriptionList.begin(); it != this->Internal->ArgumentDescriptionList.end(); it++)
+  {
+    std::string type;
+    switch ((*it)->ValueType)
+    {
+      case ctkCommandLineParser::String:
+        type = "string";
+        break;
+
+      case ctkCommandLineParser::Bool:
+        type = "boolean";
+        break;
+
+      case ctkCommandLineParser::StringList:
+        type = "string-vector";
+        break;
+
+      case ctkCommandLineParser::Int:
+        type = "integer";
+        break;
+
+      case ctkCommandLineParser::Float:
+        type = "float";
+        break;
+
+      case ctkCommandLineParser::Directory:
+        type = "directory";
+        break;
+
+      case ctkCommandLineParser::File:
+        type = "file";
+        break;
+    }
+
+    xml << "<" << type << ">" << endl;
+    xml << "<label>" << (*it)->ArgLabel << "</label>" << endl;
+    xml << "<description>" << (*it)->ArgHelp << "</description>" << endl;
+    xml << "<longflag>" << (*it)->LongArg << "</longflag>" << endl;
+    xml << "<flag>" << (*it)->ShortArg << "</flag>" << endl;
+    xml << "</" << type << ">" << endl;
+  }
+
+  xml << "</parameters>" << endl;
+  xml << "</executable>" << endl;
+
+  cout << xml.str();
+}
+
+void ctkCommandLineParser::setTitle(string title)
+{
+  Title = title;
+}
+void ctkCommandLineParser::setContributor(string contributor)
+{
+  Contributor = contributor;
+}
+
+void ctkCommandLineParser::setCategory(string category)
+{
+  Category = category;
+}
+
+void ctkCommandLineParser::setDescription(string description)
+{
+  Description = description;
+}

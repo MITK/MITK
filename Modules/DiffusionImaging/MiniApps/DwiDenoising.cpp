@@ -52,13 +52,18 @@ int DwiDenoising(int argc, char* argv[])
 {
   ctkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (DWI)", us::Any(), false);
+  parser.addArgument("input", "i", ctkCommandLineParser::File, "input image (DWI)", us::Any(), false);
   parser.addArgument("variance", "v", ctkCommandLineParser::Float, "noise variance", us::Any(), false);
   parser.addArgument("mask", "m", ctkCommandLineParser::String, "brainmask for input image", us::Any(), true);
   parser.addArgument("search", "s", ctkCommandLineParser::Int, "search radius", us::Any(), true);
   parser.addArgument("compare", "c", ctkCommandLineParser::Int, "compare radius", us::Any(), true);
   parser.addArgument("joint", "j", ctkCommandLineParser::Bool, "use joint information");
   parser.addArgument("rician", "r", ctkCommandLineParser::Bool, "use rician adaption");
+
+  parser.setTitle("DWI Denoising");
+  parser.setCategory("Denoising");
+  parser.setContributor("MBI");
+  parser.setDescription("Denoising for diffusion weighted images.");
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

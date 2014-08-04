@@ -125,7 +125,9 @@ public:
         Bool = 1,
         StringList = 2,
         Int = 3,
-        Float = 4
+        Float = 4,
+        Directory = 5,
+        File = 6
     };
 
     typedef std::vector< std::string > StringContainerType;
@@ -263,7 +265,7 @@ public:
     void addArgument(const string& longarg, const string& shortarg,
                      Type type, const string& argHelp = string(),
                      const us::Any& defaultValue = us::Any(), bool optional=true,
-                     bool ignoreRest = false, bool deprecated = false);
+                     bool ignoreRest = false, bool deprecated = false, const string& argLabel = string());
 
     /**
    * Adds a deprecated command line argument. If a deprecated argument is provided
@@ -278,7 +280,7 @@ public:
    * @param argHelp A help string describing alternatives to the deprecated argument.
    */
     void addDeprecatedArgument(const string& longarg, const string& shortarg,
-                               const string& argHelp);
+                               const string& argHelp, const string& argLabel);
 
     /**
    * Sets a custom regular expression for validating argument parameters. The method
@@ -414,9 +416,21 @@ public:
     */
     void setStrictModeEnabled(bool strictMode);
 
+    void GetXML(std::string title, std::string description);
+
+    void setTitle(std::string title);
+    void setContributor(std::string contributor);
+    void setCategory(std::string category);
+    void setDescription(std::string description);
+
 private:
     class ctkInternal;
     ctkInternal * Internal;
+
+    string Title;
+    string Contributor;
+    string Category;
+    string Description;
 };
 
 #endif

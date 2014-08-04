@@ -24,8 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "ViewBrowserView.h"
-#include <src/internal/mitkQtPerspectiveItem.h>
-#include <src/internal/mitkQtViewItem.h>
 
 // Qt
 #include <QMessageBox>
@@ -47,6 +45,14 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
     connect( m_Controls.m_PluginTreeView, SIGNAL(clicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
 
+    InitTreeView();
+}
+
+void ViewBrowserView::InitTreeView()
+{
+    m_ContextMenu = new QMenu(m_Controls.m_PluginTreeView);
+    m_Controls.m_PluginTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+
     m_TreeModel = new QStandardItemModel();
     QStandardItem *item = m_TreeModel->invisibleRootItem();
 
@@ -57,7 +63,6 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
     std::vector<berry::IViewDescriptor::Pointer> views(viewRegistry->GetViews());
 
-    MITK_INFO << "PERSPECTIVES";
     for (unsigned int i=0; i<perspectives.size(); i++)
     {
         berry::IPerspectiveDescriptor::Pointer p = perspectives.at(i);
@@ -101,19 +106,8 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
         //        mapPerspIdToAction.insert(std::make_pair((*perspIt)->GetId(), perspAction));
     }
 
-
-    //berry::QTOpenPers
-
-
-    // adding a row to the invisible root item produces a root element
-    //item->appendRow(preparedRow);
-
-    //QList<QStandardItem *> secondRow =prepareRow("111", "222", "333");
-    // adding a row to an item starts a subtree
-    //preparedRow.first()->appendRow(secondRow);
-
     m_Controls.m_PluginTreeView->setModel(m_TreeModel);
-//    m_Controls.m_PluginTreeView->expandAll();
+    //    m_Controls.m_PluginTreeView->expandAll();
 }
 
 void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
@@ -135,10 +129,10 @@ void ViewBrowserView::ItemClicked(const QModelIndex &index)
     {
         try
         {
-//            berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
-//            page->CloseAllPerspectives(false, false);
+            //            berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+            //            page->CloseAllPerspectives(false, false);
             mitk::QtPerspectiveItem* pItem = dynamic_cast< mitk::QtPerspectiveItem* >(item);
-//            page->ClosePerspective( pItem->m_Perspective, true, false );
+            //            page->ClosePerspective( pItem->m_Perspective, true, false );
             berry::PlatformUI::GetWorkbench()->ShowPerspective( pItem->m_Perspective->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
         }
         catch (...)
@@ -166,7 +160,31 @@ void ViewBrowserView::ItemClicked(const QModelIndex &index)
 
 }
 
+void ViewBrowserView::MapSignal()
+{
+    if (m_RegisteredPerspective!=NULL)
+    {
+        MITK_INFO << m_RegisteredPerspective->GetId();
+        berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
+        perspRegistry->ClonePerspective(m_RegisteredPerspective->GetId(), "TESTPERSPECTIVE", m_RegisteredPerspective);
+        InitTreeView();
+    }
+}
+
 void ViewBrowserView::CustomMenuRequested(QPoint pos)
 {
-    //    m_ContextMenu->popup(m_Controls.m_PerspectiveTree->viewport()->mapToGlobal(pos));
+
+    QStandardItem* item = m_TreeModel->itemFromIndex(m_Controls.m_PluginTreeView->indexAt(pos));
+
+    if (m_ContextMenu!=NULL && item!=NULL && dynamic_cast< mitk::QtPerspectiveItem* >(item) )
+    {
+        m_ContextMenu->clear();
+        m_RegisteredPerspective = dynamic_cast< mitk::QtPerspectiveItem* >(item)->m_Perspective;
+
+        QAction* action = new QAction("Clone Perspective", this);
+        m_ContextMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), SLOT(MapSignal()));
+
+        m_ContextMenu->popup(m_Controls.m_PluginTreeView->viewport()->mapToGlobal(pos));
+    }
 }

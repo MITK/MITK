@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_ViewBrowserViewControls.h"
 
 #include <QStandardItemModel>
+#include <QMenu>
+#include <src/internal/mitkQtPerspectiveItem.h>
+#include <src/internal/mitkQtViewItem.h>
 
 /**
   \brief ViewBrowserView
@@ -49,6 +52,7 @@ class ViewBrowserView : public QmitkAbstractView
     /// \brief Called when the user clicks the GUI button
     void CustomMenuRequested(QPoint pos);
     void ItemClicked(const QModelIndex &index);
+    void MapSignal();
 
   protected:
 
@@ -56,12 +60,16 @@ class ViewBrowserView : public QmitkAbstractView
 
     virtual void SetFocus();
 
+    void InitTreeView();
+
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes );
 
     Ui::ViewBrowserViewControls m_Controls;
-    QStandardItemModel* m_TreeModel;
+    QStandardItemModel*         m_TreeModel;
+    QMenu*                      m_ContextMenu;
+    berry::IPerspectiveDescriptor::Pointer     m_RegisteredPerspective;
 };
 
 #endif // ViewBrowserView_h

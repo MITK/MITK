@@ -21,9 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
+#include <PluginsTreeViewModel.h>
 
 #include "ui_ViewBrowserViewControls.h"
 
+ #include <QStandardItemModel>
 
 /**
   \brief ViewBrowserView
@@ -59,7 +61,7 @@ class ViewBrowserView : public QmitkAbstractView
                                      const QList<mitk::DataNode::Pointer>& nodes );
 
     Ui::ViewBrowserViewControls m_Controls;
-
+    QStandardItemModel* m_TreeModel;
 };
 
 #endif // ViewBrowserView_h

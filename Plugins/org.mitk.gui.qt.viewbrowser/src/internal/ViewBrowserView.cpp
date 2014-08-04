@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
+ #include <QTreeView>
+ #include <QStandardItemModel>
+ #include <QStandardItem>
 
 //mitk image
 #include <mitkImage.h>
@@ -42,6 +45,9 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
     connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoSomething()) );
+
+    //m_Controls.m_PluginTreeView->setModel(&m_TreeModel);
+    //m_Controls.m_PluginTreeView->show();
 }
 
 void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
@@ -59,17 +65,37 @@ void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 
 void ViewBrowserView::DoSomething()
 {
+    m_TreeModel = new QStandardItemModel ;
+    QStandardItem *item = m_TreeModel->invisibleRootItem();
+
     berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
 //    QActionGroup* perspGroup = new QActionGroup(menuBar);
 
     std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
     bool skip = false;
 
+    berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
+    std::vector<berry::IViewDescriptor::Pointer> views(viewRegistry->GetViews());
+
     MITK_INFO << "PERSPECTIVES";
     for (unsigned int i=0; i<perspectives.size(); i++)
     {
+        //QList<QStandardItem *> preparedRow =prepareRow("first", "second", "third");
         berry::IPerspectiveDescriptor::Pointer p = perspectives.at(i);
         MITK_INFO << p->GetId();
+        QList<QStandardItem *> preparedRow;
+        preparedRow << new QStandardItem(QString::fromStdString(p->GetLabel()));
+        preparedRow << new QStandardItem(QString::fromStdString(p->GetId()));
+        item->appendRow(preparedRow);
+
+        for (unsigned int i=0; i<views.size(); i++)
+        {
+            berry::IViewDescriptor::Pointer w = views.at(i);
+            QList<QStandardItem *> secondRow;
+            secondRow << new QStandardItem(QString::fromStdString(w->GetLabel()));
+            secondRow << new QStandardItem(QString::fromStdString(w->GetId()));
+            preparedRow.first()->appendRow(secondRow);
+        }
         // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
         // should not appear as an menu-entry in the perspective menu
 //        if (perspectiveExcludeList.size() > 0)
@@ -95,11 +121,18 @@ void ViewBrowserView::DoSomething()
     }
 
     MITK_INFO << "VIEWS";
-    berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
-    std::vector<berry::IViewDescriptor::Pointer> views(viewRegistry->GetViews());
-    for (unsigned int i=0; i<views.size(); i++)
-    {
-        berry::IViewDescriptor::Pointer w = views.at(i);
-        MITK_INFO << w->GetId();
-    }
+
+
+    //berry::QTOpenPers
+
+
+     // adding a row to the invisible root item produces a root element
+     //item->appendRow(preparedRow);
+
+     //QList<QStandardItem *> secondRow =prepareRow("111", "222", "333");
+     // adding a row to an item starts a subtree
+     //preparedRow.first()->appendRow(secondRow);
+
+     m_Controls.m_PluginTreeView->setModel(m_TreeModel);
+     m_Controls.m_PluginTreeView->expandAll();
 }

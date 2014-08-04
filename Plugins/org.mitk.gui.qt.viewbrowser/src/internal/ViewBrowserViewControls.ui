@@ -31,6 +31,9 @@
     </widget>
    </item>
    <item>
+    <widget class="QTreeView" name="m_PerspectiveTree"/>
+   </item>
+   <item>
     <spacer name="spacer1">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

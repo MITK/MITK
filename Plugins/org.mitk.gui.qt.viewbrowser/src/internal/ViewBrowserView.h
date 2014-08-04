@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
+#include <QStandardItemModel>
 
 #include "ui_ViewBrowserViewControls.h"
 
@@ -47,6 +48,8 @@ class ViewBrowserView : public QmitkAbstractView
 
     /// \brief Called when the user clicks the GUI button
     void DoSomething();
+    void CustomMenuRequested(QPoint pos);
+    void ItemClicked(const QModelIndex &index);
 
   protected:
 
@@ -59,7 +62,7 @@ class ViewBrowserView : public QmitkAbstractView
                                      const QList<mitk::DataNode::Pointer>& nodes );
 
     Ui::ViewBrowserViewControls m_Controls;
-
+    QStandardItemModel m_Model;
 };
 
 #endif // ViewBrowserView_h

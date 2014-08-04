@@ -20,15 +20,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 #include <berryIPerspectiveRegistry.h>
 #include <berryPlatformUI.h>
+#include <berryQtOpenPerspectiveAction.h>
+#include <berryIWorkbenchPage.h>
 
 // Qmitk
 #include "ViewBrowserView.h"
 
 // Qt
+#include <QActionGroup>
+#include <QStandardItem>
+#include <QMenu>
 #include <QMessageBox>
-
-//mitk image
-#include <mitkImage.h>
 
 const std::string ViewBrowserView::VIEW_ID = "org.mitk.views.viewbrowser";
 
@@ -42,6 +44,8 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
     connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoSomething()) );
+    connect( m_Controls.m_PerspectiveTree, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
+    connect( m_Controls.m_PerspectiveTree, SIGNAL(clicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
 }
 
 void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
@@ -49,49 +53,55 @@ void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
     // iterate all selected objects, adjust warning visibility
     foreach( mitk::DataNode::Pointer node, nodes )
     {
-        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+        if( node.IsNotNull() )
         {
             return;
         }
     }
 }
 
+void ViewBrowserView::ItemClicked(const QModelIndex &index)
+{
+    MITK_INFO << "ROW: " << index.row();
+    try
+    {
+
+        std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry()->GetPerspectives());
+
+        berry::PlatformUI::GetWorkbench()->ShowPerspective( perspectives.at(index.row())->GetId(), berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows().at(0) );
+    }
+    catch (...)
+    {
+        QMessageBox::critical(0, "Opening Perspective Failed", QString("The perspective BLABLA could not be opened.\nSee the log for details."));
+    }
+}
+
+void ViewBrowserView::CustomMenuRequested(QPoint pos)
+{
+    //    m_ContextMenu->popup(m_Controls.m_PerspectiveTree->viewport()->mapToGlobal(pos));
+}
 
 void ViewBrowserView::DoSomething()
 {
-    berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
-//    QActionGroup* perspGroup = new QActionGroup(menuBar);
+    m_Controls.m_PerspectiveTree->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
-    bool skip = false;
+    std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry()->GetPerspectives());
 
     MITK_INFO << "PERSPECTIVES";
     for (unsigned int i=0; i<perspectives.size(); i++)
     {
         berry::IPerspectiveDescriptor::Pointer p = perspectives.at(i);
-        MITK_INFO << p->GetId();
-        // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
-        // should not appear as an menu-entry in the perspective menu
-//        if (perspectiveExcludeList.size() > 0)
-//        {
-//            for (unsigned int i=0; i<perspectiveExcludeList.size(); i++)
-//            {
-//                if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
-//                {
-//                    skip = true;
-//                    break;
-//                }
-//            }
-//            if (skip)
-//            {
-//                skip = false;
-//                continue;
-//            }
-//        }
+        std::string id = p->GetId();
+        MITK_INFO << id;
+        QStandardItem *item = new QStandardItem( QString("%0").arg(id.c_str()) );
 
-//        QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
-//                                                                  *perspIt, perspGroup);
-//        mapPerspIdToAction.insert(std::make_pair((*perspIt)->GetId(), perspAction));
+        //        QAction* perspAction = new berry::QtOpenPerspectiveAction(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows().at(0), p, perspGroup);
+        //        m_Controls.m_PerspectiveTree->addAction(perspAction);
+        m_Model.appendRow(item);
+
+        //        QMenu* menu = new QMenu();
+        //        menu->addAction(perspAction);
+        //        m_PerspectiveContextMenus.push_back(menu);
     }
 
     MITK_INFO << "VIEWS";
@@ -100,6 +110,11 @@ void ViewBrowserView::DoSomething()
     for (unsigned int i=0; i<views.size(); i++)
     {
         berry::IViewDescriptor::Pointer w = views.at(i);
-        MITK_INFO << w->GetId();
+        std::string id = w->GetId();
+        MITK_INFO << id;
+        QStandardItem *item = new QStandardItem( QString("%0").arg(id.c_str()) );
+        //        model->appendRow(item);
     }
+
+    m_Controls.m_PerspectiveTree->setModel(&m_Model);
 }

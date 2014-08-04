@@ -14,6 +14,8 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_viewbrowser_Activator.h
   src/internal/ViewBrowserView.h
+  src/internal/mitkQtPerspectiveItem.h
+  src/internal/mitkQtViewItem.h
 )
 
 # list of resource files which can be used by the plug-in

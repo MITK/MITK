@@ -1,5 +1,5 @@
 set(SRC_CPP_FILES
-
+  PluginsTreeViewModel.cpp
 )
 
 set(INTERNAL_CPP_FILES

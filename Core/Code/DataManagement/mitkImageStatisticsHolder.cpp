@@ -209,7 +209,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t)
       m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max() ) return; // Values already calculated before...
 
   const mitk::PixelType pType = m_Image->GetPixelType(0);
-  if(pType.GetNumberOfComponents() == 1 && (pType.GetPixelType() != itk::ImageIOBase::UNKNOWNPIXELTYPE) )
+  if(pType.GetNumberOfComponents() == 1 && (pType.GetPixelType() != itk::ImageIOBase::UNKNOWNPIXELTYPE) && (pType.GetPixelType() != itk::ImageIOBase::VECTOR) )
   {
     // recompute
     mitk::ImageTimeSelector::Pointer timeSelector = this->GetTimeSelector();

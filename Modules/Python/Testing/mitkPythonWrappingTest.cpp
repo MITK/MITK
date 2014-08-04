@@ -28,8 +28,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPythonService.h>
 #include <mitkIPythonService.h>
 #include <vtkPolyData.h>
-
+#include <QmitkPythonSnippets.h>
+#include <QApplication>
 #include <mitkImagePixelReadAccessor.h>
+
+#include <vtkSmartPointer.h>
+// vtk cone sample snippet
+#include <vtkConeSource.h>
+// vtk decimate pro snippet
+#include <vtkDecimatePro.h>
 
 namespace mitk {
   static bool Equal ( mitk::Image* img1, mitk::Image* img2 );
@@ -108,12 +115,16 @@ class mitkPythonWrappingTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkPythonWrappingTestSuite);
   MITK_TEST(testImageTransfer);
   MITK_TEST(testSurfaceTransfer);
+  MITK_TEST(testVtkCreateConePythonSnippet);
+  MITK_TEST(testVtkDecimateProPythonSnippet);
   CPPUNIT_TEST_SUITE_END();
 
 private:
     mitk::PythonService* m_PythonService;
     mitk::Image::Pointer m_Image;
     mitk::Surface::Pointer m_Surface;
+    QMap<QString, QString> m_Snippets;
+
 public:
 
   void setUp()
@@ -127,6 +138,8 @@ public:
 
     m_Image = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
     m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("binary.stl"));
+
+    QmitkPythonSnippets::LoadStringMap(QmitkPythonSnippets::DEFAULT_SNIPPET_FILE,m_Snippets);
   }
 
   void tearDown()
@@ -153,16 +166,65 @@ public:
   void testSurfaceTransfer()
   {
     std::string varName("mitkSurface");
-    CPPUNIT_ASSERT_MESSAGE ( "Is SimpleITK Python Wrapping available?",
-                      m_PythonService->IsVtkPythonWrappingAvailable() == true );
+    CPPUNIT_ASSERT_MESSAGE ( "Is VTK Python Wrapping available?", m_PythonService->IsVtkPythonWrappingAvailable() == true );
 
     CPPUNIT_ASSERT_MESSAGE( "Valid surface copied to python import should return true.",
           m_PythonService->CopyToPythonAsVtkPolyData( m_Surface, varName) == true );
 
     mitk::Surface::Pointer pythonSurface = m_PythonService->CopyVtkPolyDataFromPython(varName);
 
-    CPPUNIT_ASSERT_MESSAGE( "Compare if surfaces are equal after transfer.",
-                            mitk::Equal(pythonSurface,m_Surface) );
+    CPPUNIT_ASSERT_MESSAGE( "Compare if surfaces are equal after transfer.", mitk::Equal(pythonSurface,m_Surface) );
+  }
+ // 279: [5.790] medianfilter
+ // 279: [5.790] opencv median filter
+  void testVtkCreateConePythonSnippet()
+  {
+    // cone in cpp
+    mitk::Surface::Pointer mitkSurface = mitk::Surface::New();
+    vtkSmartPointer<vtkConeSource> coneSrc = vtkSmartPointer<vtkConeSource>::New();
+    coneSrc->SetResolution(60);
+    coneSrc->SetCenter(-2,0,0);
+    coneSrc->Update();
+    mitkSurface->SetVtkPolyData(coneSrc->GetOutput());
+
+    // run python code
+    CPPUNIT_ASSERT_MESSAGE ( "Is VTK Python Wrapping available?", m_PythonService->IsVtkPythonWrappingAvailable() == true );
+
+    m_PythonService->Execute( m_Snippets["vtk: create cone"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
+
+    mitk::Surface::Pointer pythonSurface = m_PythonService->CopyVtkPolyDataFromPython("cone");
+
+    CPPUNIT_ASSERT_MESSAGE( "Compare if cones are equal.", mitk::Equal(pythonSurface, mitkSurface) );
+
+
+    QMapIterator<QString, QString> i(m_Snippets);
+    while (i.hasNext()) {
+        i.next();
+        MITK_INFO << i.key().toStdString();
+    }
+  }
+
+  void testVtkDecimateProPythonSnippet()
+  {
+    // decimate pro in cpp
+    mitk::Surface::Pointer mitkSurface = mitk::Surface::New();
+    vtkSmartPointer<vtkDecimatePro> deci = vtkSmartPointer<vtkDecimatePro>::New();
+    deci->SetInputData(m_Surface->GetVtkPolyData());
+    deci->SetTargetReduction(0.9);
+    deci->PreserveTopologyOn();
+    deci->Update();
+    mitkSurface->SetVtkPolyData(deci->GetOutput());
+
+    // decimate pro in python
+    CPPUNIT_ASSERT_MESSAGE ( "Is VTK Python Wrapping available?", m_PythonService->IsVtkPythonWrappingAvailable() == true );
+
+    CPPUNIT_ASSERT_MESSAGE( "Valid surface copied to python import should return true.", m_PythonService->CopyToPythonAsVtkPolyData( m_Surface, "mitkSurface") == true );
+
+    m_PythonService->Execute( m_Snippets["vtk.vtkDecimatePro"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
+
+    mitk::Surface::Pointer pythonSurface = m_PythonService->CopyVtkPolyDataFromPython("mitkSurface_new");
+
+    CPPUNIT_ASSERT_MESSAGE( "Compare if surfaces are equal.", mitk::Equal(pythonSurface, mitkSurface) );
   }
 };
 

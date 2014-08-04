@@ -54,9 +54,9 @@ QmitkPythonSnippets::QmitkPythonSnippets( const QString& _AutoSaveFileName, QWid
   d->m_SaveFileName = QDir::currentPath();
   d->m_AutoSaveFileName = _AutoSaveFileName;
 
-  if( !this->LoadStringMap( d->m_AutoSaveFileName, d->m_Snippets ) )
+  if( !QmitkPythonSnippets::LoadStringMap( d->m_AutoSaveFileName, d->m_Snippets ) )
   {
-    this->LoadStringMap( DEFAULT_SNIPPET_FILE, d->m_Snippets );
+    QmitkPythonSnippets::LoadStringMap( DEFAULT_SNIPPET_FILE, d->m_Snippets );
   }
 
   d->m_PasteSnippet = new QAction(this);
@@ -256,7 +256,7 @@ void QmitkPythonSnippets::on_RestoreDefaultSnippets_triggered(bool)
                                       QMessageBox::No );
   if( remove == QMessageBox::Yes || remove == QMessageBox::Ok )
   {
-    this->LoadStringMap( DEFAULT_SNIPPET_FILE, d->m_Snippets );
+    QmitkPythonSnippets::LoadStringMap( DEFAULT_SNIPPET_FILE, d->m_Snippets );
     this->Update();
     this->SaveStringMap( d->m_AutoSaveFileName, d->m_Snippets );
   }
@@ -333,7 +333,7 @@ void QmitkPythonSnippets::SaveStringMap(const QString &filename, const QmitkPyth
 
 }
 
-bool QmitkPythonSnippets::LoadStringMap( const QString& filename, QmitkPythonSnippets::QStringMap& oldMap ) const
+bool QmitkPythonSnippets::LoadStringMap( const QString& filename, QmitkPythonSnippets::QStringMap& oldMap )
 {
   MITK_DEBUG("QmitkPythonSnippets") << "loading from xml file " << filename.toStdString();
   QStringMap map;

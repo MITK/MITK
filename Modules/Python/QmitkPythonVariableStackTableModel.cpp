@@ -69,13 +69,17 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
           MITK_DEBUG("QmitkPythonVariableStackTableModel") << "mitkImage is not null " << (mitkImage != 0? "true": "false");
 
+          QRegExp rx("^\\d");
           QString varName(node->GetName().c_str());
-          varName = varName.replace(QString(" "),QString("_"));
+          // regex replace every character that is not allowed in a python variable
+          varName = varName.replace(QRegExp("[.+-*\\s\\/\\n\\t\\r]"),QString("_"));
 
           if( mitkImage )
           {
             if ( varName.isEmpty() )
               varName = MITK_IMAGE_VAR_NAME;
+            if ( rx.indexIn(varName) == 0)
+              varName.prepend("_").prepend(MITK_IMAGE_VAR_NAME);
 
             if( i > 0 )
               varName = QString("%1%2").arg(varName).arg(i);
@@ -118,6 +122,8 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
             {
               if (varName.isEmpty() )
                 varName =  MITK_SURFACE_VAR_NAME;
+              if ( rx.indexIn(varName) == 0)
+                varName.prepend("_").prepend(MITK_SURFACE_VAR_NAME);
 
               MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << varName;
 

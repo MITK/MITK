@@ -47,7 +47,6 @@ class ViewBrowserView : public QmitkAbstractView
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
-    void DoSomething();
     void CustomMenuRequested(QPoint pos);
     void ItemClicked(const QModelIndex &index);
 

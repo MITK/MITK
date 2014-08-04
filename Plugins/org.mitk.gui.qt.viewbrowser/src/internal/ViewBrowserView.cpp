@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "ViewBrowserView.h"
+#include <src/internal/mitkQtPerspectiveItem.h>
+#include <src/internal/mitkQtViewItem.h>
 
 // Qt
 #include <QMessageBox>
@@ -35,14 +37,13 @@ const std::string ViewBrowserView::VIEW_ID = "org.mitk.views.viewbrowser";
 
 void ViewBrowserView::SetFocus()
 {
-    m_Controls.buttonPerformImageProcessing->setFocus();
+
 }
 
 void ViewBrowserView::CreateQtPartControl( QWidget *parent )
 {
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
-    connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoSomething()) );
     connect( m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
     connect( m_Controls.m_PluginTreeView, SIGNAL(clicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
 
@@ -59,20 +60,21 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     MITK_INFO << "PERSPECTIVES";
     for (unsigned int i=0; i<perspectives.size(); i++)
     {
-        //QList<QStandardItem *> preparedRow =prepareRow("first", "second", "third");
         berry::IPerspectiveDescriptor::Pointer p = perspectives.at(i);
-        MITK_INFO << p->GetId();
-        QList<QStandardItem *> preparedRow;
-        preparedRow << new QStandardItem(QString::fromStdString(p->GetLabel()));
-        preparedRow << new QStandardItem(QString::fromStdString(p->GetId()));
+        QList< QStandardItem*> preparedRow;
+        mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(QString::fromStdString(p->GetLabel()));
+        pItem->m_Perspective = p;
+        preparedRow << pItem;
         item->appendRow(preparedRow);
 
         for (unsigned int i=0; i<views.size(); i++)
         {
-            berry::IViewDescriptor::Pointer w = views.at(i);
+            berry::IViewDescriptor::Pointer v = views.at(i);
             QList<QStandardItem *> secondRow;
-            secondRow << new QStandardItem(QString::fromStdString(w->GetLabel()));
-            secondRow << new QStandardItem(QString::fromStdString(w->GetId()));
+
+            mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(v->GetLabel()));
+            vItem->m_View = v;
+            secondRow << vItem;
             preparedRow.first()->appendRow(secondRow);
         }
         // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
@@ -99,8 +101,6 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
         //        mapPerspIdToAction.insert(std::make_pair((*perspIt)->GetId(), perspAction));
     }
 
-    MITK_INFO << "VIEWS";
-
 
     //berry::QTOpenPers
 
@@ -113,7 +113,7 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     //preparedRow.first()->appendRow(secondRow);
 
     m_Controls.m_PluginTreeView->setModel(m_TreeModel);
-    m_Controls.m_PluginTreeView->expandAll();
+//    m_Controls.m_PluginTreeView->expandAll();
 }
 
 void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
@@ -130,27 +130,43 @@ void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 
 void ViewBrowserView::ItemClicked(const QModelIndex &index)
 {
-    MITK_INFO << index.row() << "-" << index.column();
-//    if (index.column()==0)
-//    {
+    QStandardItem* item = m_TreeModel->itemFromIndex(index);
+    if ( dynamic_cast< mitk::QtPerspectiveItem* >(item) )
+    {
         try
         {
-            std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry()->GetPerspectives());
-            berry::PlatformUI::GetWorkbench()->ShowPerspective( perspectives.at(index.row())->GetId(), berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows().at(0) );
+//            berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+//            page->CloseAllPerspectives(false, false);
+            mitk::QtPerspectiveItem* pItem = dynamic_cast< mitk::QtPerspectiveItem* >(item);
+//            page->ClosePerspective( pItem->m_Perspective, true, false );
+            berry::PlatformUI::GetWorkbench()->ShowPerspective( pItem->m_Perspective->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
         }
         catch (...)
         {
             QMessageBox::critical(0, "Opening Perspective Failed", QString("The requested perspective could not be opened.\nSee the log for details."));
         }
-//    }
+    }
+    else if ( dynamic_cast< mitk::QtViewItem* >(item) )
+    {
+        berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+
+        if (page.IsNotNull())
+        {
+            try
+            {
+                mitk::QtViewItem* vItem = dynamic_cast< mitk::QtViewItem* >(item);
+                page->ShowView(vItem->m_View->GetId());
+            }
+            catch (berry::PartInitException e)
+            {
+                BERRY_ERROR << "Error: " << e.displayText() << std::endl;
+            }
+        }
+    }
+
 }
 
 void ViewBrowserView::CustomMenuRequested(QPoint pos)
 {
     //    m_ContextMenu->popup(m_Controls.m_PerspectiveTree->viewport()->mapToGlobal(pos));
-}
-
-void ViewBrowserView::DoSomething()
-{
-
 }

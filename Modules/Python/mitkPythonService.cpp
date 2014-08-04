@@ -318,7 +318,9 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   npyArray = PyArray_SimpleNewFromData(npy_nd,npy_dims,npy_type,array);
 
   // add temp array it to the python dictionary to access it in python code
-  const int status = PyDict_SetItemString(pyDict,"numpy_temp_array",npyArray);
+  const int status = PyDict_SetItemString( pyDict,QString("%1_numpy_array")
+                                           .arg(varName).toStdString().c_str(),
+                                           npyArray );
 
   // sanity check
   if ( status != 0 )
@@ -333,8 +335,8 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
                   .arg(QString::number(spacing[0]))
                   .arg(QString::number(spacing[1]))
                   .arg(QString::number(spacing[2])) );
-  command.append( QString("sitk._SetImageFromArray(numpy_temp_array,%1)\n").arg(varName) );
-  command.append( QString("del numpy_temp_array") );
+  command.append( QString("sitk._SetImageFromArray(%1_numpy_array,%1)\n").arg(varName) );
+  command.append( QString("del %1_numpy_array").arg(varName) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
@@ -353,18 +355,17 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   QString command;
   QString varName = QString::fromStdString( stdvarName );
 
-  command.append( QString("import numpy\n") );
-  command.append( QString("numpy_temp_array = sitk.GetArrayFromImage(%1)\n").arg(varName) );
-  command.append( QString("spacing_temp = numpy.asarray(%1.GetSpacing())\n").arg(varName) );
-  command.append( QString("dtype_temp = numpy_temp_array.dtype.name") );
+  command.append( QString("%1_numpy_array = sitk.GetArrayFromImage(%1)\n").arg(varName) );
+  command.append( QString("%1_spacing = numpy.asarray(%1.GetSpacing())\n").arg(varName) );
+  command.append( QString("%1_dtype = %1_numpy_array.dtype.name").arg(varName) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-  PyObject* py_dtype = PyDict_GetItemString(pyDict,"dtype_temp");
+  PyObject* py_dtype = PyDict_GetItemString(pyDict,QString("%1_dtype").arg(varName).toStdString().c_str() );
   std::string dtype = PyString_AsString(py_dtype);
-  PyArrayObject* py_data = (PyArrayObject*) PyDict_GetItemString(pyDict,"numpy_temp_array");
-  PyArrayObject* py_spacing = (PyArrayObject*) PyDict_GetItemString(pyDict,"spacing_temp");
+  PyArrayObject* py_data = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_numpy_array").arg(varName).toStdString().c_str() );
+  PyArrayObject* py_spacing = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_spacing").arg(varName).toStdString().c_str() );
 
   size_t sz = sizeof(short);
   mitk::PixelType pixelType = MakeScalarPixelType<short>();
@@ -409,7 +410,10 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   }
 
   mitkImage->Initialize(pixelType, py_data->nd, dimensions);
-  memcpy(mitkImage->GetData(), py_data->data, sz);
+
+  // copy data
+  mitk::ImageWriteAccessor iwa(mitkImage);
+  memcpy( iwa.GetData(), py_data->data, sz);
 
   double* ds = (double*)py_spacing->data;
   spacing[0] = ds[0];
@@ -419,8 +423,9 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 
   // cleanup
   command.clear();
-  command.append( QString("del numpy_temp_array\n") );
-  command.append( QString("del spacing_temp ") );
+  command.append( QString("del %1_numpy_array\n").arg(varName) );
+  command.append( QString("del %1_dtype\n").arg(varName) );
+  command.append( QString("del %1_spacing").arg(varName) );
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
@@ -518,15 +523,15 @@ mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const std
   QString command;
   QString varName = QString::fromStdString( stdvarName );
 
-  command.append( QString("surface_addr_str = %1.GetAddressAsString(\"vtkPolyData\")\n").arg(varName) );
+  command.append( QString("%1_addr_str = %1.GetAddressAsString(\"vtkPolyData\")\n").arg(varName) );
   // remove 0x from the address
-  command.append( QString("surface_addr = int(surface_addr_str[5:],16)\n") );
+  command.append( QString("%1_addr = int(%1_addr_str[5:],16)").arg(varName) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
   // get address of the object
-  pyAddr = PyDict_GetItemString(pyDict,"surface_addr");
+  pyAddr = PyDict_GetItemString(pyDict,QString("%1_addr").arg(varName).toStdString().c_str());
 
   // convert to long
   addr = PyInt_AsLong(pyAddr);
@@ -539,8 +544,8 @@ mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const std
 
   // delete helper variables from python stack
   command = "";
-  command.append( QString("del surface_addr_str\n") );
-  command.append( QString("del surface_addr\n") );
+  command.append( QString("del %1_addr_str\n").arg(varName) );
+  command.append( QString("del %1_addr").arg(varName) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
@@ -562,8 +567,6 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
   addr = oss.str();
 
   // remove "0x"
-  //addr = addr.substr(2);
-
   address = QString::fromStdString(addr.substr(2));
 
   command.append( QString("%1 = vtk.vtkPolyData(\"%2\")\n").arg(varName).arg(address) );
@@ -582,6 +585,14 @@ bool mitk::PythonService::IsSimpleItkPythonWrappingAvailable()
 
   m_ItkWrappingAvailable = !this->PythonErrorOccured();
 
+  // check for numpy
+  this->Execute( "import numpy\n", IPythonService::SINGLE_LINE_COMMAND );
+
+  if ( this->PythonErrorOccured() )
+    MITK_ERROR << "Numpy not found.";
+
+  m_ItkWrappingAvailable = !this->PythonErrorOccured();
+
   return m_ItkWrappingAvailable;
 }
 
@@ -596,7 +607,7 @@ bool mitk::PythonService::IsOpenCvPythonWrappingAvailable()
 bool mitk::PythonService::IsVtkPythonWrappingAvailable()
 {
   this->Execute( "import vtk", IPythonService::SINGLE_LINE_COMMAND );
-  this->Execute( "print \"Using VTK version \" + vtk.vtkVersion.GetVTKVersion()\n", IPythonService::SINGLE_LINE_COMMAND );
+  //this->Execute( "print \"Using VTK version \" + vtk.vtkVersion.GetVTKVersion()\n", IPythonService::SINGLE_LINE_COMMAND );
   m_VtkWrappingAvailable = !this->PythonErrorOccured();
 
   return m_VtkWrappingAvailable;

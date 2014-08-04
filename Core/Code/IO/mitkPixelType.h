@@ -123,6 +123,13 @@ public:
 
   ~PixelType();
 
+  /** Set the vector length <b> once </b>.
+   *
+   *  For PixelTypes derived from itk::VectorImage< CompT > the length is initially set to one however the true length of the vector is a runtime information possibly different to one.
+   * This method allows for setting the length once after the type is created
+  */
+  void SetVectorLength(size_t);
+
 private:
 
   friend PixelType MakePixelType(const itk::ImageIOBase* imageIO);
@@ -156,11 +163,12 @@ private:
 
   std::string m_PixelTypeName;
 
-  std::size_t m_NumberOfComponents;
+  mutable std::size_t m_NumberOfComponents;
 
   std::size_t m_BytesPerComponent;
 
   bool m_VariableLength;
+
 
 };
 

@@ -45,6 +45,15 @@ mitk::PixelType& mitk::PixelType::operator=(const PixelType& other)
   return *this;
 }
 
+void mitk::PixelType::SetVectorLength( size_t Length )
+{
+  if( m_VariableLength )
+  {
+    m_VariableLength = false;
+    this->m_NumberOfComponents = Length;
+  }
+}
+
 itk::ImageIOBase::IOPixelType mitk::PixelType::GetPixelType() const
 {
   return m_PixelType;

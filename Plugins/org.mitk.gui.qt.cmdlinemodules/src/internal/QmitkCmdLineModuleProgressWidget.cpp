@@ -566,7 +566,11 @@ void QmitkCmdLineModuleProgressWidget::Run()
         {
           foreach (QString extension, parameter.fileExtensions())
           {
-            fileName = fileNameBase + "." + extension;
+              if (extension[0]!='.')
+                fileName = fileNameBase + "." + extension;
+              else
+                  fileName = fileNameBase + extension;
+
             try
             {
               if (mitk::IOUtil::SaveBaseData( image, fileName.toStdString() ))

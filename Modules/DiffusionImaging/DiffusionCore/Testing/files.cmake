@@ -8,5 +8,6 @@ set(MODULE_CUSTOM_TESTS
   mitkDWHeadMotionCorrectionTest.cpp
   mitkImageReconstructionTest.cpp
   mitkNonLocalMeansDenoisingTest.cpp
+  mitkDiffusionDICOMFileReaderTest.cpp
 )
 

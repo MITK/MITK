@@ -955,6 +955,17 @@ int mitkLevelWindowTest(int, char* [])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
+  std::cout << "Testing c'tor with x-ray values (formerly did not expand range enough)";
+  mitk::LevelWindow crLevelWindow(16352, 16444);
+  if ( crLevelWindow.GetLevel() != 16352.0 ||
+       crLevelWindow.GetWindow() != 16444.0 )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+
 
   std::cout<<"[PASSED]"<<std::endl;
   std::cout<<"[TEST DONE]"<<std::endl;

@@ -58,6 +58,7 @@ mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
   m_Fixed( false )
 {
   SetDefaultLevelWindow(level, window);
+  SetLevelWindow(level, window, true);
 }
 
 mitk::LevelWindow::LevelWindow(const mitk::LevelWindow& levWin)

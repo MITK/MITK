@@ -53,6 +53,8 @@ namespace mitk
     mitkClassMacro( RTStructureSetReader, itk::Object );
     itkNewMacro( Self );
 
+    ContourModelSetVector ReadStructureSet(DcmDataset* dataset);
+
   protected:
     std::vector<RoiEntry> ROISequenceVector;
 
@@ -61,7 +63,6 @@ namespace mitk
 
     size_t GetNumberOfROIs();
     RoiEntry* FindRoiByNumber(unsigned int roiNum);
-    ContourModelSetVector ReadStructureSet(DcmDataset* dataset);
   };
 }
 

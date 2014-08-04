@@ -25,7 +25,8 @@ mitk::PixelType::PixelType( const mitk::PixelType& other )
     m_ComponentTypeName( other.m_ComponentTypeName ),
     m_PixelTypeName( other.m_PixelTypeName ),
     m_NumberOfComponents( other.m_NumberOfComponents ),
-    m_BytesPerComponent( other.m_BytesPerComponent )
+    m_BytesPerComponent( other.m_BytesPerComponent ),
+    m_VariableLength( other.m_VariableLength )
 {
 }
 
@@ -38,6 +39,8 @@ mitk::PixelType& mitk::PixelType::operator=(const PixelType& other)
   m_PixelTypeName = other.m_PixelTypeName;
   m_NumberOfComponents = other.m_NumberOfComponents;
   m_BytesPerComponent = other.m_BytesPerComponent;
+  // not needed for 'weak' equality
+  //m_VariableLength = other.m_VariableLength;
 
   return *this;
 }
@@ -95,13 +98,15 @@ mitk::PixelType::PixelType( const int componentType,
                             std::size_t bytesPerComponent,
                             std::size_t numberOfComponents,
                             const std::string& componentTypeName,
-                            const std::string& pixelTypeName)
+                            const std::string& pixelTypeName,
+                            bool dynamically_allocated)
   : m_ComponentType( componentType ),
     m_PixelType( pixelType ),
     m_ComponentTypeName(componentTypeName),
     m_PixelTypeName(pixelTypeName),
     m_NumberOfComponents( numberOfComponents ),
-    m_BytesPerComponent( bytesPerComponent )
+    m_BytesPerComponent( bytesPerComponent ),
+    m_VariableLength( dynamically_allocated)
 {
 }
 

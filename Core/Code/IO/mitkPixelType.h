@@ -138,7 +138,8 @@ private:
              std::size_t bytesPerComponent,
              std::size_t numberOfComponents,
              const std::string& componentTypeName,
-             const std::string& pixelTypeName);
+             const std::string& pixelTypeName,
+             bool dynamically_allocated = false);
 
   // default constructor is disabled on purpose
   PixelType(void);
@@ -158,6 +159,8 @@ private:
   std::size_t m_NumberOfComponents;
 
   std::size_t m_BytesPerComponent;
+
+  bool m_VariableLength;
 
 };
 
@@ -195,13 +198,16 @@ PixelType MakePixelType()
   size_t numComp = ComponentsTrait<
     (isPrimitiveType<PixelT>::value || isVectorImage<PixelT, ComponentT>::value), ItkImageType >::Size;
 
+  bool dyn_alloc = isVectorImage<ItkImageType, ComponentT>::dyn_alloc;
+
   // call the constructor
   return PixelType(
             MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOComponentType,
             MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOPixelType,
             sizeof(ComponentT), numComp,
             PixelComponentTypeToString<ComponentT>(),
-            PixelTypeToString<PixelT>()
+            PixelTypeToString<PixelT>(),
+            dyn_alloc
          );
 }
 
@@ -210,7 +216,8 @@ inline PixelType MakePixelType(const itk::ImageIOBase* imageIO)
   return mitk::PixelType(imageIO->GetComponentType(), imageIO->GetPixelType(),
                          imageIO->GetComponentSize(), imageIO->GetNumberOfComponents(),
                          imageIO->GetComponentTypeAsString(imageIO->GetComponentType()),
-                         imageIO->GetPixelTypeAsString(imageIO->GetPixelType()));
+                         imageIO->GetPixelTypeAsString(imageIO->GetPixelType()),
+                         false);
 }
 
 /** \brief An interface to the MakePixelType method for creating scalar pixel types.

@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <mitkLogMacros.h>
 
+#include <itkVectorImage.h>
+
 struct MyObscurePixelType
 {
   typedef float ValueType;
@@ -100,6 +102,12 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION( obscurePixelType.GetPixelType() == itk::ImageIOBase::UNKNOWNPIXELTYPE, "PixelTypeId is 'UNKNOWN' ");
   MITK_TEST_CONDITION( obscurePixelType.GetNumberOfComponents() == MyObscurePixelType::Length, "Lenght was set correctly");
   MITK_TEST_CONDITION( obscurePixelType.GetComponentType() == mitk::MapPixelComponentType<MyObscurePixelType::ValueType>::value, "ValueType corresponds."   );
+
+  typedef itk::VectorImage< short, 3> VectorImageType;
+  mitk::PixelType vectorPixelType = mitk::MakePixelType< VectorImageType >();
+
+  typedef itk::Image< itk::Vector< short, 7> > FixedVectorImageType;
+  mitk::PixelType fixedVectorPixelType = mitk::MakePixelType< FixedVectorImageType >();
 
 
   // test CastableTo

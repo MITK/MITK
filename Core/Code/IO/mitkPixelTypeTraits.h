@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRGBPixel.h>
 #include <itkRGBAPixel.h>
 #include <itkDiffusionTensor3D.h>
+#include <itkVectorImage.h>
 
 /** \file mitkPixelTypeTraits.h
   *
@@ -104,6 +105,7 @@ template< class T, typename TValueType >
 struct isVectorImage
 {
   static const bool value = false;
+  static const bool dyn_alloc = false;
 };
 
 /** \brief Partial specification for the isVectorImage trait. */
@@ -111,6 +113,14 @@ template< typename TValueType >
 struct isVectorImage< itk::VariableLengthVector<TValueType>, TValueType>
 {
   static const bool value = true;
+  static const bool dyn_alloc = false;
+};
+
+template< typename TValueType >
+struct isVectorImage< itk::VectorImage< TValueType>, TValueType>
+{
+  static const bool value = true;
+  static const bool dyn_alloc = true;
 };
 
 /** \brief Compile-time trait for resolving the ValueType from an ItkImageType */
@@ -188,6 +198,12 @@ template< class C>
 struct MapCompositePixelType< itk::DiffusionTensor3D<C> >
 {
   static const itkIOPixelType IOCompositeType = itk::ImageIOBase::DIFFUSIONTENSOR3D;
+};
+
+template< class C>
+struct MapCompositePixelType< itk::VariableLengthVector<C> >
+{
+  static const itkIOPixelType IOCompositeType = itk::ImageIOBase::VECTOR;
 };
 
 //------------------------

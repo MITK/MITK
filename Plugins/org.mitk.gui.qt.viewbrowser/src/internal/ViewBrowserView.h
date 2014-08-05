@@ -60,6 +60,9 @@ class ViewBrowserView : public QmitkAbstractView
     virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes );
 
+    /// \brief Fills the TreeList with the available perspectives and views.
+    void FillTreeList();
+
     Ui::ViewBrowserViewControls m_Controls;
     QStandardItemModel* m_TreeModel;
 };

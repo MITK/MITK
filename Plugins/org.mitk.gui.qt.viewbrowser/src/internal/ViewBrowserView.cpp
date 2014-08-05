@@ -41,119 +41,91 @@ void ViewBrowserView::SetFocus()
 
 void ViewBrowserView::CreateQtPartControl( QWidget *parent )
 {
-    std::map<std::string, berry::IViewDescriptor::Pointer> viewMap;
-
-    berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
-    std::vector<berry::IViewDescriptor::Pointer> views(viewRegistry->GetViews());
-    for (unsigned int i=0; i<views.size(); i++)
-    {
-      viewMap[views[i]->GetId()] = views[i];
-    }
-
-
-
   // create GUI widgets from the Qt Designer's .ui file
-    m_Controls.setupUi( parent );
-    connect( m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
-    connect( m_Controls.m_PluginTreeView, SIGNAL(clicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
+  m_Controls.setupUi( parent );
+  connect( m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
+  connect( m_Controls.m_PluginTreeView, SIGNAL(clicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
 
-    m_TreeModel = new QStandardItemModel();
-    QStandardItem *item = m_TreeModel->invisibleRootItem();
+  // Create a new TreeModel for the data
+  m_TreeModel = new QStandardItemModel();
+  FillTreeList();
 
-    berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
-    std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
-    bool skip = false;
+  m_Controls.m_PluginTreeView->setModel(m_TreeModel);
+}
 
-    berry::IWorkbenchWindow::Pointer curWin = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
-    std::string currentPersp = "";
-    if (curWin.IsNotNull())
+
+void ViewBrowserView::FillTreeList()
+{
+  m_TreeModel->clear();
+  QStandardItem *item = m_TreeModel->invisibleRootItem();
+
+  // Get all available views and create a map of all views
+  std::map<std::string, berry::IViewDescriptor::Pointer> viewMap;
+  berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
+  std::vector<berry::IViewDescriptor::Pointer> views(viewRegistry->GetViews());
+  for (unsigned int i=0; i<views.size(); i++)
+  {
+    viewMap[views[i]->GetId()] = views[i];
+  }
+
+  // Get all available perspectives
+  berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
+  std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
+
+  // Get the current Window and the current active Perspective if possible
+  berry::IWorkbenchWindow::Pointer curWin = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+  std::string currentPersp = "";
+  if (curWin.IsNotNull())
+  {
+    if (curWin->GetActivePage().IsNotNull())
     {
-      if (curWin->GetActivePage().IsNotNull())
-      {
-        berry::IPerspectiveDescriptor::Pointer persps = curWin->GetActivePage()->GetPerspective();
-        currentPersp=persps->GetId();
-      }
+      berry::IPerspectiveDescriptor::Pointer persps = curWin->GetActivePage()->GetPerspective();
+      currentPersp=persps->GetId();
     }
+  }
 
-    for (unsigned int i=0; i<perspectives.size(); i++)
-    {
-        berry::IPerspectiveDescriptor::Pointer p = perspectives.at(i);
-        QList< QStandardItem*> preparedRow;
-        mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(QString::fromStdString(p->GetLabel()));
-        pItem->m_Perspective = p;
-        preparedRow << pItem;
-        item->appendRow(preparedRow);
-        if (currentPersp.compare(p->GetId())==0)
-        {
-          if (curWin.IsNull())
-            continue;
-          berry::IWorkbenchPage::Pointer activePage = curWin->GetActivePage();
-          std::vector< std::string > currentViews = activePage->GetShowViewShortcuts();
-          for (int j = 0; j < currentViews.size(); ++j)
-          {
-            QList<QStandardItem *> secondRow;
-
-            mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(currentViews[j]));
-            vItem->m_View = viewMap[currentViews[j]];
-            secondRow << vItem;
-            preparedRow.first()->appendRow(secondRow);
-          }
-        }
-
-        // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
-        // should not appear as an menu-entry in the perspective menu
-        //        if (perspectiveExcludeList.size() > 0)
-        //        {
-        //            for (unsigned int i=0; i<perspectiveExcludeList.size(); i++)
-        //            {
-        //                if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
-        //                {
-        //                    skip = true;
-        //                    break;
-        //                }
-        //            }
-        //            if (skip)
-        //            {
-        //                skip = false;
-        //                continue;
-        //            }
-        //        }
-
-        //        QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
-        //                                                                  *perspIt, perspGroup);
-        //        mapPerspIdToAction.insert(std::make_pair((*perspIt)->GetId(), perspAction));
-    }
-
-
+  // Fill the TreeModel
+  for (unsigned int i=0; i<perspectives.size(); i++)
+  {
+    berry::IPerspectiveDescriptor::Pointer p = perspectives.at(i);
     QList< QStandardItem*> preparedRow;
-    QStandardItem* pItem = new QStandardItem("All Views");
+    mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(QString::fromStdString(p->GetLabel()));
+    pItem->m_Perspective = p;
     preparedRow << pItem;
     item->appendRow(preparedRow);
-    for (int i = 0; i < views.size(); ++i)
+
+    // If the current perspective is the active perspective add current views
+    if (currentPersp.compare(p->GetId())==0)
     {
-      QList<QStandardItem *> secondRow;
-      mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(views[i]->GetLabel()));
-      vItem->m_View = views[i];
-      secondRow << vItem;
-      preparedRow.first()->appendRow(secondRow);
+      if (curWin.IsNull())
+        continue;
+      berry::IWorkbenchPage::Pointer activePage = curWin->GetActivePage();
+      std::vector< std::string > currentViews = activePage->GetShowViewShortcuts();
+      for (int j = 0; j < currentViews.size(); ++j)
+      {
+        QList<QStandardItem *> secondRow;
+
+        mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(currentViews[j]));
+        vItem->m_View = viewMap[currentViews[j]];
+        secondRow << vItem;
+        preparedRow.first()->appendRow(secondRow);
+      }
     }
+   }
 
-
-    //berry::QTOpenPers
-
-
-    // adding a row to the invisible root item produces a root element
-    //item->appendRow(preparedRow);
-
-    //QList<QStandardItem *> secondRow =prepareRow("111", "222", "333");
-    // adding a row to an item starts a subtree
-    //preparedRow.first()->appendRow(secondRow);
-
-            //QList<QStandardItem *> preparedRow =prepareRow("first", "second", "third");
-
-
-    m_Controls.m_PluginTreeView->setModel(m_TreeModel);
-//    m_Controls.m_PluginTreeView->expandAll();
+  // Add a list with all available views
+  QList< QStandardItem*> preparedRow;
+  QStandardItem* pItem = new QStandardItem("All Views");
+  preparedRow << pItem;
+  item->appendRow(preparedRow);
+  for (int i = 0; i < views.size(); ++i)
+  {
+    QList<QStandardItem *> secondRow;
+    mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(views[i]->GetLabel()));
+    vItem->m_View = views[i];
+    secondRow << vItem;
+    preparedRow.first()->appendRow(secondRow);
+  }
 }
 
 void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )

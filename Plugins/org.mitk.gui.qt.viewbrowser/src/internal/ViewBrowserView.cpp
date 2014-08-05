@@ -56,6 +56,16 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
     std::vector<berry::IViewDescriptor::Pointer> views(viewRegistry->GetViews());
 
+    berry::IWorkbenchWindow::Pointer curWin = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+    std::string currentPersp = "";
+    if (curWin.IsNotNull())
+    {
+      if (curWin->GetActivePage().IsNotNull())
+      {
+        berry::IPerspectiveDescriptor::Pointer persps = curWin->GetActivePage()->GetPerspective();
+        currentPersp=persps->GetId();
+      }
+    }
     MITK_INFO << "PERSPECTIVES";
     for (unsigned int i=0; i<perspectives.size(); i++)
     {
@@ -66,15 +76,23 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
         preparedRow << new QStandardItem(QString::fromStdString(p->GetLabel()));
         preparedRow << new QStandardItem(QString::fromStdString(p->GetId()));
         item->appendRow(preparedRow);
-
-        for (unsigned int i=0; i<views.size(); i++)
+        if (currentPersp.compare(p->GetId())==0)
         {
-            berry::IViewDescriptor::Pointer w = views.at(i);
+          if (curWin.IsNull())
+            continue;
+          berry::IWorkbenchPage::Pointer activePage = curWin->GetActivePage();
+          std::vector< std::string > currentViews = activePage->GetShowViewShortcuts();
+          MITK_INFO << "Views: " << currentViews.size();
+          for (int j = 0; j < currentViews.size(); ++j)
+          {
+            MITK_INFO << currentViews[j];
             QList<QStandardItem *> secondRow;
-            secondRow << new QStandardItem(QString::fromStdString(w->GetLabel()));
-            secondRow << new QStandardItem(QString::fromStdString(w->GetId()));
+            secondRow << new QStandardItem(QString::fromStdString(""));
+            secondRow << new QStandardItem(QString::fromStdString(currentViews[j]));
             preparedRow.first()->appendRow(secondRow);
+          }
         }
+
         // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
         // should not appear as an menu-entry in the perspective menu
         //        if (perspectiveExcludeList.size() > 0)
@@ -112,6 +130,22 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     // adding a row to an item starts a subtree
     //preparedRow.first()->appendRow(secondRow);
 
+            //QList<QStandardItem *> preparedRow =prepareRow("first", "second", "third");
+    QList<QStandardItem *> preparedRow;
+    preparedRow << new QStandardItem(QString::fromStdString("All Views"));
+    preparedRow << new QStandardItem(QString::fromStdString(""));
+    item->appendRow(preparedRow);
+
+    for (unsigned int i=0; i<views.size(); i++)
+    {
+        berry::IViewDescriptor::Pointer w = views.at(i);
+        QList<QStandardItem *> secondRow;
+        secondRow << new QStandardItem(QString::fromStdString(w->GetLabel()));
+        secondRow << new QStandardItem(QString::fromStdString(w->GetId()));
+        preparedRow.first()->appendRow(secondRow);
+    }
+
+
     m_Controls.m_PluginTreeView->setModel(m_TreeModel);
     m_Controls.m_PluginTreeView->expandAll();
 }
@@ -131,6 +165,7 @@ void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 void ViewBrowserView::ItemClicked(const QModelIndex &index)
 {
     MITK_INFO << index.row() << "-" << index.column();
+    MITK_INFO << m_TreeModel->itemFromIndex(index)->text().toStdString();
 //    if (index.column()==0)
 //    {
         try
@@ -152,5 +187,14 @@ void ViewBrowserView::CustomMenuRequested(QPoint pos)
 
 void ViewBrowserView::DoSomething()
 {
-
+    berry::IWorkbenchPage::Pointer activePage = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+    std::vector< std::string > currentViews = activePage->GetShowViewShortcuts();
+    MITK_INFO << "Views: " << currentViews.size();
+    for (int i = 0; i < currentViews.size(); ++i)
+    {
+      MITK_INFO << currentViews[i];
+    }
+    berry::IPerspectiveDescriptor::Pointer persps = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->GetPerspective();
+    MITK_INFO << "Open Perspectives";
+    MITK_INFO <<persps->GetLabel();
 }

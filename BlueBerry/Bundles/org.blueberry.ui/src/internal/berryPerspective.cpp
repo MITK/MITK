@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 const std::string Perspective::VERSION_STRING = "0.016";
 
 Perspective::Perspective(PerspectiveDescriptor::Pointer desc,
@@ -544,6 +543,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
 
   // Is the layout fixed
   fixed = layout->IsFixed();
+  showViewShortcuts = layout->GetShowViewShortcuts();
 
   // Create presentation.
   presentation = new PerspectiveHelper(page, container, Perspective::Pointer(this));
@@ -553,7 +553,6 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   {
     this->HideEditorArea();
   }
-
 }
 
 void Perspective::OnActivate()
@@ -736,7 +735,6 @@ void Perspective::PerformedShowIn(const std::string&  /*partId*/)
 
 bool Perspective::RestoreState(IMemento::Pointer memento)
 {
-
 //  MultiStatus result = new MultiStatus(
 //      PlatformUI.PLUGIN_ID,
 //      IStatus.OK,
@@ -841,7 +839,6 @@ bool Perspective::RestoreState()
     boundsMem->GetInteger(WorkbenchConstants::TAG_WIDTH, r.width);
     //StartupThreading.runWithoutExceptions(new StartupRunnable()
     //    {
-
     //      void runWithException() throws Throwable
     //      {
             if (page->GetWorkbenchWindow()->GetActivePage() == 0)
@@ -850,14 +847,12 @@ bool Perspective::RestoreState()
             }
     //      }
     //    });
-
   }
 
   // Create an empty presentation..
   PerspectiveHelper* pres;
   //StartupThreading.runWithoutExceptions(new StartupRunnable()
   //    {
-
   //      void runWithException() throws Throwable
   //      {
           ViewSashContainer::Pointer mainLayout(new ViewSashContainer(page, this->GetClientComposite()));
@@ -872,7 +867,6 @@ bool Perspective::RestoreState()
 
   //StartupThreading.runWithoutExceptions(new StartupRunnable()
   //    {
-
   //      void runWithException() throws Throwable
   //      {
           // Add the editor workbook. Do not hide it now.
@@ -1226,7 +1220,6 @@ bool Perspective::SaveState(IMemento::Pointer memento)
 bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Pointer p,
     bool saveInnerViewState)
 {
-
 //  MultiStatus result = new MultiStatus(
 //      PlatformUI.PLUGIN_ID,
 //      IStatus.OK,
@@ -1759,5 +1752,4 @@ bool Perspective::UseNewMinMax(Perspective::Pointer activePerspective)
   //bool useNewMinMax = preferenceStore.getbool(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
   return true;
 }
-
 }

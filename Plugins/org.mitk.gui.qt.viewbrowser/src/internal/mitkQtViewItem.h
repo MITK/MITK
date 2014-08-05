@@ -34,7 +34,7 @@ public:
       QStandardItem(icon, string)
     {
     }
-    using QStandardItem::QStandardItem;
+
     berry::IViewDescriptor::Pointer m_View;
 
 private:

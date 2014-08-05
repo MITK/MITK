@@ -31,7 +31,6 @@ public:
     {
     }
 
-    using QStandardItem::QStandardItem;
     berry::IPerspectiveDescriptor::Pointer m_Perspective;
 
 private:

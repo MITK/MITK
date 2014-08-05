@@ -99,6 +99,14 @@ struct BERRY_UI IPerspectiveDescriptor : public Object {
      * @return the label
      */
     virtual std::string GetLabel() const = 0;
+
+    /**
+    * Returns <code>true</code> if this perspective is predefined by an
+    * extension.
+    *
+    * @return boolean whether this perspective is predefined by an extension
+    */
+    virtual bool IsPredefined() const = 0;
 };
 
 }

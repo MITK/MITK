@@ -77,8 +77,8 @@ public:
        * @return a new perspective descriptor or <code>null</code> if the
        *         creation failed.
        */
-      PerspectiveDescriptor::Pointer CreatePerspective(const std::string& label,
-          PerspectiveDescriptor::Pointer originalDescriptor);
+      IPerspectiveDescriptor::Pointer CreatePerspective(const std::string& label,
+          IPerspectiveDescriptor::Pointer originalDescriptor);
 
       /**
        * Reverts a list of perspectives back to the plugin definition

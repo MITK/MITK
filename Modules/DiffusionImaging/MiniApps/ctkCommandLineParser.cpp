@@ -55,11 +55,11 @@ public:
             const string& shortArg, const string& shortArgPrefix,
             ctkCommandLineParser::Type type, const string& argHelp, const string& argLabel,
             const us::Any& defaultValue, bool ignoreRest,
-            bool deprecated, bool optional)
+            bool deprecated, bool optional, string& argGroup, string& groupDescription)
         : LongArg(longArg), LongArgPrefix(longArgPrefix),
           ShortArg(shortArg), ShortArgPrefix(shortArgPrefix),
           ArgHelp(argHelp), ArgLabel(argLabel), IgnoreRest(ignoreRest), NumberOfParametersToProcess(0),
-          Deprecated(deprecated), DefaultValue(defaultValue), Value(type), ValueType(type), Optional(optional)
+          Deprecated(deprecated), DefaultValue(defaultValue), Value(type), ValueType(type), Optional(optional), ArgGroup(argGroup), ArgGroupDescription(groupDescription)
     {
         Value = defaultValue;
 
@@ -91,12 +91,15 @@ public:
         }
             break;
 
-        case ctkCommandLineParser::Directory:
+        case ctkCommandLineParser::OutputDirectory:
+        case ctkCommandLineParser::InputDirectory:
         {
             NumberOfParametersToProcess = 1;
         }
             break;
-        case ctkCommandLineParser::File:
+
+        case ctkCommandLineParser::OutputFile:
+        case ctkCommandLineParser::InputFile:
         {
             NumberOfParametersToProcess = 1;
         }
@@ -120,6 +123,8 @@ public:
     string  ShortArgPrefix;
     string  ArgHelp;
     string  ArgLabel;
+    string  ArgGroup;
+    string  ArgGroupDescription;
     bool    IgnoreRest;
     int     NumberOfParametersToProcess;
     bool    Deprecated;
@@ -181,13 +186,15 @@ bool CommandLineParserArgumentDescription::addParameter(const string &value)
     }
         break;
 
-    case ctkCommandLineParser::Directory:
+    case ctkCommandLineParser::InputDirectory:
+    case ctkCommandLineParser::OutputDirectory:
     {
       Value = value;
     }
       break;
 
-    case ctkCommandLineParser::File:
+    case ctkCommandLineParser::InputFile:
+    case ctkCommandLineParser::OutputFile:
     {
       Value = value;
     }
@@ -319,6 +326,8 @@ ctkCommandLineParser::ctkCommandLineParser()
     this->Title = string();
     this->Contributor = string();
     this->Description = string();
+    this->ParameterGroupName = "Parameters";
+    this->ParameterGroupDescription = "Groupbox containing parameters.";
 }
 
 // --------------------------------------------------------------------------
@@ -356,7 +365,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
         if (this->Internal->Debug) { MITK_DEBUG << "Processing" << argument; }
         if (!argument.compare("--xml") || !argument.compare("-xml") || !argument.compare("--XML") || !argument.compare("-XML"))
         {
-          this->GetXML("lala", "lalalalalalalalalalalalalalalla");
+          this->GetXML();
           return map<string, us::Any>();
         }
 
@@ -638,7 +647,7 @@ void ctkCommandLineParser::addArgument(const string& longarg, const string& shor
     CommandLineParserArgumentDescription* argDesc =
             new CommandLineParserArgumentDescription(longarg, this->Internal->LongPrefix,
                                                      shortarg, this->Internal->ShortPrefix, type,
-                                                     argHelp, argLabel, defaultValue, ignoreRest, deprecated, optional);
+                                                     argHelp, argLabel, defaultValue, ignoreRest, deprecated, optional, ParameterGroupName, ParameterGroupDescription);
 
     int argWidth = 0;
     if (!longarg.empty())
@@ -760,7 +769,7 @@ void ctkCommandLineParser::setStrictModeEnabled(bool strictMode)
     this->Internal->StrictMode = strictMode;
 }
 
-void ctkCommandLineParser::GetXML(std::string title, std::string description)
+void ctkCommandLineParser::GetXML()
 {
   std::stringstream xml;
 
@@ -771,12 +780,9 @@ void ctkCommandLineParser::GetXML(std::string title, std::string description)
   xml << "<contributor>" << Contributor << "</contributor>" << endl;
   xml << "<parameters>" << endl;
 
-  //TODO: nicht hard coded!!
-  xml << "<label> Test </label>" << endl;
-  xml << "<description>TestTest</description>" << endl;
-
-
   std::vector<CommandLineParserArgumentDescription*>::iterator it;
+
+  std::string lastParameterGroup = "";
   for (it = this->Internal->ArgumentDescriptionList.begin(); it != this->Internal->ArgumentDescriptionList.end(); it++)
   {
     std::string type;
@@ -802,20 +808,44 @@ void ctkCommandLineParser::GetXML(std::string title, std::string description)
         type = "float";
         break;
 
-      case ctkCommandLineParser::Directory:
+      case ctkCommandLineParser::OutputDirectory:
+      case ctkCommandLineParser::InputDirectory:
         type = "directory";
         break;
 
-      case ctkCommandLineParser::File:
+      case ctkCommandLineParser::OutputFile:
+      case ctkCommandLineParser::InputFile:
         type = "file";
         break;
     }
 
+    if (lastParameterGroup.compare((*it)->ArgGroup))
+    {
+      if (it != this->Internal->ArgumentDescriptionList.begin())
+      {
+        xml << "</parameters>" << endl;
+        xml << "<parameters>" << endl;
+      }
+      xml << "<label>" << (*it)->ArgGroup << "</label>" << endl;
+      xml << "<description>" << (*it)->ArgGroupDescription << "</description>" << endl;
+      lastParameterGroup = (*it)->ArgGroup;
+    }
+
     xml << "<" << type << ">" << endl;
+    xml << "<name>" << (*it)->LongArg << "</name>" << endl;
     xml << "<label>" << (*it)->ArgLabel << "</label>" << endl;
     xml << "<description>" << (*it)->ArgHelp << "</description>" << endl;
     xml << "<longflag>" << (*it)->LongArg << "</longflag>" << endl;
     xml << "<flag>" << (*it)->ShortArg << "</flag>" << endl;
+
+    if ((*it)->ValueType == ctkCommandLineParser::InputDirectory || (*it)->ValueType == ctkCommandLineParser::InputFile)
+    {
+      xml << "<channel>input</channel>" << endl;
+    }
+    else if ((*it)->ValueType == ctkCommandLineParser::OutputDirectory || (*it)->ValueType == ctkCommandLineParser::OutputFile)
+    {
+      xml << "<channel>output</channel>" << endl;
+    }
     xml << "</" << type << ">" << endl;
   }
 
@@ -842,4 +872,10 @@ void ctkCommandLineParser::setCategory(string category)
 void ctkCommandLineParser::setDescription(string description)
 {
   Description = description;
+}
+
+void ctkCommandLineParser::changeParameterGroup(string name, string description)
+{
+  ParameterGroupName = name;
+  ParameterGroupDescription = description;
 }

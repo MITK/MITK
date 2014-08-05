@@ -106,7 +106,7 @@ int TensorDerivedMapsExtraction(int argc, char* argv[])
   ctkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("help", "h", ctkCommandLineParser::String, "Help", "Show this help text");
-  parser.addArgument("input", "i", ctkCommandLineParser::File, "Input file", "input dwi file", us::Any(),false);
+  parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", "input dwi file", us::Any(),false);
   parser.addArgument("out", "o", ctkCommandLineParser::String, "Output folder", "output folder and base name, e.g. /tmp/outPatient1 ", us::Any(),false);
 
   parser.setCategory("Diffusion Related Measures");

@@ -58,9 +58,9 @@ int StartPeakExtraction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("image", "i", ctkCommandLineParser::File, "Input image", "sh coefficient image", us::Any(), false);
-    parser.addArgument("outroot", "o", ctkCommandLineParser::Directory, "Output directory", "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::File, "Mask", "mask image");
+    parser.addArgument("image", "i", ctkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
+    parser.addArgument("outroot", "o", ctkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask", "mask image");
     parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
     parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
     parser.addArgument("peakthres", "r", ctkCommandLineParser::Float, "Peak threshold", "peak threshold relative to largest peak", 0.4, true);
@@ -339,10 +339,10 @@ int PeakExtraction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("image", "i", ctkCommandLineParser::File, "Input image", "sh coefficient image", us::Any(), false);
+    parser.addArgument("image", "i", ctkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
     parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order");
-    parser.addArgument("outroot", "o", ctkCommandLineParser::Directory, "Output directory", "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::File, "Mask", "mask image");
+    parser.addArgument("outroot", "o", ctkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask", "mask image");
     parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
     parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
     parser.addArgument("peakthres", "r", ctkCommandLineParser::Float, "Peak threshold", "peak threshold relative to largest peak", 0.4, true);

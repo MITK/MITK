@@ -126,8 +126,10 @@ public:
         StringList = 2,
         Int = 3,
         Float = 4,
-        Directory = 5,
-        File = 6
+        InputDirectory = 5,
+        InputFile = 6,
+        OutputDirectory = 7,
+        OutputFile = 8
     };
 
     typedef std::vector< std::string > StringContainerType;
@@ -416,12 +418,13 @@ public:
     */
     void setStrictModeEnabled(bool strictMode);
 
-    void GetXML(std::string title, std::string description);
+    void GetXML();
 
     void setTitle(std::string title);
     void setContributor(std::string contributor);
     void setCategory(std::string category);
     void setDescription(std::string description);
+    void changeParameterGroup(std::string name, std::string description);
 
 private:
     class ctkInternal;
@@ -431,6 +434,8 @@ private:
     string Contributor;
     string Category;
     string Description;
+    string ParameterGroupName;
+    string ParameterGroupDescription;
 };
 
 #endif

@@ -94,11 +94,11 @@ int GibbsTracking(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::File, "Input:", "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
-    parser.addArgument("parameters", "p", ctkCommandLineParser::File, "Parameters:", "parameter file (.gtp)", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::File, "Mask:", "binary mask image");
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+    parser.addArgument("parameters", "p", ctkCommandLineParser::InputFile, "Parameters:", "parameter file (.gtp)", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask:", "binary mask image");
     parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "SH coefficient:", "sh coefficient convention (FSL, MRtrix)", string("FSL"), true);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::File, "Output:", "output fiber bundle (.fib)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output:", "output fiber bundle (.fib)", us::Any(), false);
     parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "No flip:", "do not flip input image to match MITK coordinate convention");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

@@ -35,9 +35,9 @@ int CopyGeometry(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("in", "i", ctkCommandLineParser::File, "Input:", "input image", us::Any(), false);
-    parser.addArgument("ref", "r", ctkCommandLineParser::File, "Reference:", "reference image", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::File, "Output:", "output image", us::Any(), false);
+    parser.addArgument("in", "i", ctkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
+    parser.addArgument("ref", "r", ctkCommandLineParser::InputFile, "Reference:", "reference image", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

@@ -55,8 +55,8 @@ int FiberProcessing(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::File, "Input:", "input fiber bundle (.fib)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::File, "Output:", "output fiber bundle (.fib)", us::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input fiber bundle (.fib)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output:", "output fiber bundle (.fib)", us::Any(), false);
 
     parser.addArgument("resample", "r", ctkCommandLineParser::Float, "Resample:", "Resample fiber with the given point distance (in mm)");
     parser.addArgument("smooth", "s", ctkCommandLineParser::Float, "Smooth:", "Smooth fiber with the given point distance (in mm)");

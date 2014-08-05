@@ -37,8 +37,8 @@ int DicomFolderDump(int argc, char* argv[])
   // Add command line argument names
   parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Help:", "Show this help text");
 //  parser.addArgument("xml", "x",ctkCommandLineParser::Bool, "Print a XML description of this modules command line interface");
-  parser.addArgument("input", "i", ctkCommandLineParser::Directory, "Input folder:", "Input folder",us::Any(),false);
-  parser.addArgument("output", "o", ctkCommandLineParser::Directory, "Output folder:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("input", "i", ctkCommandLineParser::InputDirectory, "Input folder:", "Input folder",us::Any(),false);
+  parser.addArgument("output", "o", ctkCommandLineParser::OutputDirectory, "Output folder:", "Output folder (ending with /)",us::Any(),false);
   parser.addArgument("filename", "f", ctkCommandLineParser::String, "Output name:", "Output filename (incl. .nrrd)",us::Any(),false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

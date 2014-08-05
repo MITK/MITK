@@ -257,8 +257,8 @@ int BatchedFolderRegistration( int argc, char* argv[] )
   // Add command line argument names
   parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Help", "Show this help text");
   //parser.addArgument("usemask", "u", QVariant::Bool, "Use segmentations (derived resources) to exclude areas from registration metrics");
-  parser.addArgument("input", "i", ctkCommandLineParser::Directory, "Input:", "Input folder",us::Any(),false);
-  parser.addArgument("output", "o", ctkCommandLineParser::Directory, "Output:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("input", "i", ctkCommandLineParser::InputDirectory, "Input:", "Input folder",us::Any(),false);
+  parser.addArgument("output", "o", ctkCommandLineParser::OutputDirectory, "Output:", "Output folder (ending with /)",us::Any(),false);
   parser.addArgument("fixed", "f", ctkCommandLineParser::String, "Fixed images:", "Suffix for fixed image (if none is supplied first file matching moving pattern is chosen)",us::Any(),true);
   parser.addArgument("moving", "m", ctkCommandLineParser::String, "Moving images:", "Suffix for moving images",us::Any(),false);
   parser.addArgument("derived", "d", ctkCommandLineParser::String, "Derived resources:", "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);

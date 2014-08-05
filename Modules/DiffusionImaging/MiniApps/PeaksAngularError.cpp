@@ -39,8 +39,8 @@ int PeaksAngularError(int argc, char* argv[])
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("test", "t", ctkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false);
     parser.addArgument("reference", "r", ctkCommandLineParser::StringList, "Reference images", "reference direction images", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::Directory, "Output directory", "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::File, "Mask", "mask image");
+    parser.addArgument("out", "o", ctkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask", "mask image");
     parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "Verbose", "output optional and intermediate calculation results");
     parser.addArgument("ignore", "i", ctkCommandLineParser::Bool, "Ignore", "don't increase error for missing or too many directions");
 

@@ -43,8 +43,8 @@ int StartShConversion(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::File, "Input:", "MITK SH image", us::Any(), false);
-    parser.addArgument("output", "o", ctkCommandLineParser::File, "Output", "MRtrix SH image", us::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "MITK SH image", us::Any(), false);
+    parser.addArgument("output", "o", ctkCommandLineParser::InputFile, "Output", "MRtrix SH image", us::Any(), false);
     parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "SH order:", "spherical harmonics order");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -105,8 +105,8 @@ int ExportShImage(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::File, "Input image", "MITK SH image", us::Any(), false);
-    parser.addArgument("output", "o", ctkCommandLineParser::File, "Output image", "MRtrix SH image", us::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input image", "MITK SH image", us::Any(), false);
+    parser.addArgument("output", "o", ctkCommandLineParser::OutputFile, "Output image", "MRtrix SH image", us::Any(), false);
     parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order");
 
     parser.setCategory("Preprocessing Tools");

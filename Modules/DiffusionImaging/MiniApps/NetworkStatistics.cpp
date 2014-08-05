@@ -43,8 +43,8 @@ int NetworkStatistics(int argc, char* argv[])
 {
   ctkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("inputNetwork", "i", ctkCommandLineParser::File, "Input network", "input connectomics network (.cnf)", us::Any(), false);
-  parser.addArgument("outputFile", "o", ctkCommandLineParser::File, "Output file", "name of output file", us::Any(), false);
+  parser.addArgument("inputNetwork", "i", ctkCommandLineParser::InputFile, "Input network", "input connectomics network (.cnf)", us::Any(), false);
+  parser.addArgument("outputFile", "o", ctkCommandLineParser::OutputFile, "Output file", "name of output file", us::Any(), false);
 
   parser.addArgument("noGlobalStatistics", "g", ctkCommandLineParser::Bool, "No global statistics", "Do not calculate global statistics");
   parser.addArgument("createConnectivityMatriximage", "I", ctkCommandLineParser::Bool, "Write connectivity matrix image", "Write connectivity matrix image");

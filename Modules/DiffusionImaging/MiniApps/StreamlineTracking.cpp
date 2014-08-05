@@ -31,9 +31,9 @@ int StreamlineTracking(int argc, char* argv[])
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", ctkCommandLineParser::StringList, "Input image", "input tensor image (.dti)", us::Any(), false);
-    parser.addArgument("seed", "si", ctkCommandLineParser::File, "Seed image", "binary seed image", us::Any(), true);
-    parser.addArgument("mask", "mi", ctkCommandLineParser::File, "Mask", "binary mask image", us::Any(), true);
-    parser.addArgument("faImage", "fai", ctkCommandLineParser::File, "FA image", "FA image", us::Any(), true);
+    parser.addArgument("seed", "si", ctkCommandLineParser::InputFile, "Seed image", "binary seed image", us::Any(), true);
+    parser.addArgument("mask", "mi", ctkCommandLineParser::InputFile, "Mask", "binary mask image", us::Any(), true);
+    parser.addArgument("faImage", "fai", ctkCommandLineParser::InputFile, "FA image", "FA image", us::Any(), true);
     parser.addArgument("minFA", "fa", ctkCommandLineParser::Float, "Min. FA threshold", "minimum fractional anisotropy threshold", 0.15, true);
     parser.addArgument("minCurv", "c", ctkCommandLineParser::Float, "Min. curvature radius", "minimum curvature radius in mm (default = 0.5*minimum-spacing)");
     parser.addArgument("stepSize", "s", ctkCommandLineParser::Float, "Step size", "step size in mm (default = 0.1*minimum-spacing)");

@@ -34,8 +34,8 @@ int QballReconstruction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::File, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::File, "Output file", "output file", us::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
     parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order", 4, true);
     parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
     parser.addArgument("lambda", "r", ctkCommandLineParser::Float, "Lambda", "ragularization factor lambda", 0.006, true);

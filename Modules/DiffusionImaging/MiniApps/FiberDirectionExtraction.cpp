@@ -42,9 +42,9 @@ int FiberDirectionExtraction(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::File, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::Directory, "Output:", "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::File, "Mask:", "mask image");
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask:", "mask image");
     parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
     parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
 

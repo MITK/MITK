@@ -55,8 +55,8 @@ int MultishellMethods(int argc, char* argv[])
   parser.setContributor("MBI");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("in", "i", ctkCommandLineParser::File, "Input:", "input file", us::Any(), false);
-  parser.addArgument("out", "o", ctkCommandLineParser::File, "Output:", "output file", us::Any(), false);
+  parser.addArgument("in", "i", ctkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
+  parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
   parser.addArgument("adc", "D", ctkCommandLineParser::Bool, "ADC:", "ADC Average", us::Any(), false);
   parser.addArgument("akc", "K", ctkCommandLineParser::Bool, "Kurtosis fit:", "Kurtosis Fit", us::Any(), false);
   parser.addArgument("biexp", "B", ctkCommandLineParser::Bool, "BiExp fit:", "BiExp fit", us::Any(), false);

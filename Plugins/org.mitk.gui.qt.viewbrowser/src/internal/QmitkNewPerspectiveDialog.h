@@ -43,7 +43,7 @@ class QPushButton;
 
   Last contribution by $Author: maleike $.
 */
-class MitkSegmentationUI_EXPORT QmitkNewPerspectiveDialog : public QDialog
+class QmitkNewPerspectiveDialog : public QDialog
 {
     Q_OBJECT
 
@@ -70,4 +70,3 @@ protected:
 };
 
 #endif
-

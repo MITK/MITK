@@ -47,14 +47,12 @@ struct ViewBrowserViewListener : public berry::IPerspectiveListener
   virtual void PerspectiveChanged(berry::SmartPointer<berry::IWorkbenchPage> /*page*/,
       berry::IPerspectiveDescriptor::Pointer /*perspective*/, const std::string& /*changeId*/)
   {
-    MITK_INFO << "Yep i did something...";
     switcher->FillTreeList();
   }
 
   void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
     berry::IPerspectiveDescriptor::Pointer perspective)
   {
-    MITK_INFO << "Yep i did something... and it is not wrong";
     switcher->FillTreeList();
   }
 
@@ -137,7 +135,7 @@ void ViewBrowserView::FillTreeList()
       {
         QList<QStandardItem *> secondRow;
 
-        mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(currentViews[j]));
+        mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(viewMap[currentViews[j]]->GetLabel()));
         vItem->m_View = viewMap[currentViews[j]];
         secondRow << vItem;
         preparedRow.first()->appendRow(secondRow);

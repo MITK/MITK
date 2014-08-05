@@ -37,14 +37,23 @@ const std::string ViewBrowserView::VIEW_ID = "org.mitk.views.viewbrowser";
 
 void ViewBrowserView::SetFocus()
 {
-    m_Controls.buttonPerformImageProcessing->setFocus();
 }
 
 void ViewBrowserView::CreateQtPartControl( QWidget *parent )
 {
-    // create GUI widgets from the Qt Designer's .ui file
+    std::map<std::string, berry::IViewDescriptor::Pointer> viewMap;
+
+    berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
+    std::vector<berry::IViewDescriptor::Pointer> views(viewRegistry->GetViews());
+    for (unsigned int i=0; i<views.size(); i++)
+    {
+      viewMap[views[i]->GetId()] = views[i];
+    }
+
+
+
+  // create GUI widgets from the Qt Designer's .ui file
     m_Controls.setupUi( parent );
-    connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoSomething()) );
     connect( m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
     connect( m_Controls.m_PluginTreeView, SIGNAL(clicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
 
@@ -54,9 +63,6 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
     std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
     bool skip = false;
-
-    berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
-    std::vector<berry::IViewDescriptor::Pointer> views(viewRegistry->GetViews());
 
     berry::IWorkbenchWindow::Pointer curWin = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
     std::string currentPersp = "";
@@ -86,11 +92,10 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
           MITK_INFO << "Views: " << currentViews.size();
           for (int j = 0; j < currentViews.size(); ++j)
           {
-            MITK_INFO << currentViews[j];
             QList<QStandardItem *> secondRow;
 
-            mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(v->GetLabel()));
-            vItem->m_View = v;
+            mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(currentViews[j]));
+            vItem->m_View = viewMap[currentViews[j]];
             secondRow << vItem;
             preparedRow.first()->appendRow(secondRow);
           }
@@ -132,19 +137,6 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     //preparedRow.first()->appendRow(secondRow);
 
             //QList<QStandardItem *> preparedRow =prepareRow("first", "second", "third");
-    QList<QStandardItem *> preparedRow;
-    preparedRow << new QStandardItem(QString::fromStdString("All Views"));
-    preparedRow << new QStandardItem(QString::fromStdString(""));
-    item->appendRow(preparedRow);
-
-    for (unsigned int i=0; i<views.size(); i++)
-    {
-        berry::IViewDescriptor::Pointer w = views.at(i);
-        QList<QStandardItem *> secondRow;
-        secondRow << new QStandardItem(QString::fromStdString(w->GetLabel()));
-        secondRow << new QStandardItem(QString::fromStdString(w->GetId()));
-        preparedRow.first()->appendRow(secondRow);
-    }
 
 
     m_Controls.m_PluginTreeView->setModel(m_TreeModel);
@@ -198,9 +190,7 @@ void ViewBrowserView::ItemClicked(const QModelIndex &index)
             }
         }
     }
-
 }
-    }
 void ViewBrowserView::CustomMenuRequested(QPoint pos)
 {
     //    m_ContextMenu->popup(m_Controls.m_PerspectiveTree->viewport()->mapToGlobal(pos));

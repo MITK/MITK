@@ -26,6 +26,11 @@ namespace mitk
 class QtPerspectiveItem : public QStandardItem
 {
 public:
+    QtPerspectiveItem(QString string) :
+      QStandardItem(string)
+    {
+    }
+
     using QStandardItem::QStandardItem;
     berry::IPerspectiveDescriptor::Pointer m_Perspective;
 

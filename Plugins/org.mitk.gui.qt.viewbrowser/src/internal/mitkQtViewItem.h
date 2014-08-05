@@ -26,6 +26,10 @@ namespace mitk
 class QtViewItem : public QStandardItem
 {
 public:
+    QtViewItem(QString string) :
+      QStandardItem(string)
+    {
+    }
     using QStandardItem::QStandardItem;
     berry::IViewDescriptor::Pointer m_View;
 

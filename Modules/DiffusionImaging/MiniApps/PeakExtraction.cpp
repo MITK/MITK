@@ -339,16 +339,21 @@ int PeakExtraction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("image", "i", ctkCommandLineParser::String, "sh coefficient image", us::Any(), false);
-    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "spherical harmonics order");
-    parser.addArgument("outroot", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
-    parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "0=no norm, 1=max norm, 2=single vec norm", 1, true);
-    parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "maximum number of extracted peaks", 2, true);
-    parser.addArgument("peakthres", "r", ctkCommandLineParser::Float, "peak threshold relative to largest peak", 0.4, true);
-    parser.addArgument("abspeakthres", "a", ctkCommandLineParser::Float, "absolute peak threshold weighted with local GFA value", 0.06, true);
-    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
-    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "do not flip input image to match MITK coordinate convention");
+    parser.addArgument("image", "i", ctkCommandLineParser::File, "Input image", "sh coefficient image", us::Any(), false);
+    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order");
+    parser.addArgument("outroot", "o", ctkCommandLineParser::Directory, "Output directory", "output root", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::File, "Mask", "mask image");
+    parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
+    parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
+    parser.addArgument("peakthres", "r", ctkCommandLineParser::Float, "Peak threshold", "peak threshold relative to largest peak", 0.4, true);
+    parser.addArgument("abspeakthres", "a", ctkCommandLineParser::Float, "Absolute peak threshold", "absolute peak threshold weighted with local GFA value", 0.06, true);
+    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
+    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "No flip", "do not flip input image to match MITK coordinate convention");
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Peak Extraction");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

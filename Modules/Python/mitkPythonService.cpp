@@ -311,6 +311,9 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
       npy_type = NPY_USHORT;
       sitk_type = "sitkUInt16";
     }
+  } else {
+    MITK_WARN << "not a scalar pixeltype";
+    return false;
   }
 
   // creating numpy array

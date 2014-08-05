@@ -105,9 +105,14 @@ int ExportShImage(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "MITK SH image", us::Any(), false);
-    parser.addArgument("output", "o", ctkCommandLineParser::String, "MRtrix SH image", us::Any(), false);
-    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "spherical harmonics order");
+    parser.addArgument("input", "i", ctkCommandLineParser::File, "Input image", "MITK SH image", us::Any(), false);
+    parser.addArgument("output", "o", ctkCommandLineParser::File, "Output image", "MRtrix SH image", us::Any(), false);
+    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order");
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Export SH Image");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

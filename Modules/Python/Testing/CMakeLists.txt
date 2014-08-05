@@ -1,4 +1,1 @@
 MITK_CREATE_MODULE_TESTS()
-
-mitkAddCustomModuleTest(mitkCopyToPythonAsItkImage_CopyPic3DToPythonAndBackToMitk_ImageIsEqual mitkCopyToPythonAsItkImageTest ${MITK_DATA_DIR}/Pic3D.nrrd)
-

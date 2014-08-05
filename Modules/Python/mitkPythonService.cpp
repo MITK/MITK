@@ -269,6 +269,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   // global dictionarry
   PyObject *pyDict = PyModule_GetDict(pyMod);
   const mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
+  const mitk::Point3D origin = image->GetGeometry()->GetOrigin();
   mitk::PixelType pixelType = image->GetPixelType();
   itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelType();
   PyObject* npyArray = NULL;
@@ -311,6 +312,9 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
       npy_type = NPY_USHORT;
       sitk_type = "sitkUInt16";
     }
+  } else {
+    MITK_WARN << "not a scalar pixeltype";
+    return false;
   }
 
   // creating numpy array
@@ -335,6 +339,10 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
                   .arg(QString::number(spacing[0]))
                   .arg(QString::number(spacing[1]))
                   .arg(QString::number(spacing[2])) );
+  command.append( QString("%1.SetOrigin([%2,%3,%4])\n").arg(varName)
+                  .arg(QString::number(origin[0]))
+                  .arg(QString::number(origin[1]))
+                  .arg(QString::number(origin[2])) );
   command.append( QString("sitk._SetImageFromArray(%1_numpy_array,%1)\n").arg(varName) );
   command.append( QString("del %1_numpy_array").arg(varName) );
 
@@ -346,17 +354,20 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
 
 mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std::string &stdvarName)
 {
+  double*ds = NULL;
   // access python module
   PyObject *pyMod = PyImport_AddModule((char*)"__main__");
   // global dictionarry
   PyObject *pyDict = PyModule_GetDict(pyMod);
   mitk::Image::Pointer mitkImage = mitk::Image::New();
   mitk::Vector3D spacing;
+  mitk::Point3D origin;
   QString command;
   QString varName = QString::fromStdString( stdvarName );
 
   command.append( QString("%1_numpy_array = sitk.GetArrayFromImage(%1)\n").arg(varName) );
   command.append( QString("%1_spacing = numpy.asarray(%1.GetSpacing())\n").arg(varName) );
+  command.append( QString("%1_origin = numpy.asarray(%1.GetOrigin())\n").arg(varName) );
   command.append( QString("%1_dtype = %1_numpy_array.dtype.name").arg(varName) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
@@ -366,6 +377,7 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   std::string dtype = PyString_AsString(py_dtype);
   PyArrayObject* py_data = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_numpy_array").arg(varName).toStdString().c_str() );
   PyArrayObject* py_spacing = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_spacing").arg(varName).toStdString().c_str() );
+  PyArrayObject* py_origin = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_origin").arg(varName).toStdString().c_str() );
 
   size_t sz = sizeof(short);
   mitk::PixelType pixelType = MakeScalarPixelType<short>();
@@ -415,17 +427,24 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   mitk::ImageWriteAccessor iwa(mitkImage);
   memcpy( iwa.GetData(), py_data->data, sz);
 
-  double* ds = (double*)py_spacing->data;
+  ds = (double*)py_spacing->data;
   spacing[0] = ds[0];
   spacing[1] = ds[1];
   spacing[2] = ds[2];
   mitkImage->GetGeometry()->SetSpacing(spacing);
 
+  ds = (double*)py_origin->data;
+  origin[0] = ds[0];
+  origin[1] = ds[1];
+  origin[2] = ds[2];
+  mitkImage->GetGeometry()->SetOrigin(origin);
+
   // cleanup
   command.clear();
   command.append( QString("del %1_numpy_array\n").arg(varName) );
   command.append( QString("del %1_dtype\n").arg(varName) );
-  command.append( QString("del %1_spacing").arg(varName) );
+  command.append( QString("del %1_spacing\n").arg(varName) );
+  command.append( QString("del %1_origin").arg(varName) );
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 

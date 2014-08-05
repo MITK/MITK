@@ -43,6 +43,10 @@ class MITK_PYTHON_EXPORT QmitkPythonSnippets: public QWidget
     ///
     /// delete d pointer
     virtual ~QmitkPythonSnippets();
+    ///
+    /// read string map from xml file
+    static bool LoadStringMap( const QString& filename, QStringMap& oldMap );
+
 signals:
     ///
     /// this class whishes to paste sth command
@@ -81,9 +85,6 @@ signals:
     ///
     /// write string map to xml file
     void SaveStringMap( const QString& filename, const QStringMap& map ) const;
-    ///
-    /// read string map from xml file
-    bool LoadStringMap( const QString& filename, QStringMap& oldMap ) const;
     ///
     /// creates a name which does not exist in the list
     QString CreateUniqueName(const QString &name) const;

@@ -74,7 +74,7 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
         currentPersp=persps->GetId();
       }
     }
-    MITK_INFO << "PERSPECTIVES";
+
     for (unsigned int i=0; i<perspectives.size(); i++)
     {
         berry::IPerspectiveDescriptor::Pointer p = perspectives.at(i);
@@ -89,7 +89,6 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
             continue;
           berry::IWorkbenchPage::Pointer activePage = curWin->GetActivePage();
           std::vector< std::string > currentViews = activePage->GetShowViewShortcuts();
-          MITK_INFO << "Views: " << currentViews.size();
           for (int j = 0; j < currentViews.size(); ++j)
           {
             QList<QStandardItem *> secondRow;
@@ -123,6 +122,20 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
         //        QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
         //                                                                  *perspIt, perspGroup);
         //        mapPerspIdToAction.insert(std::make_pair((*perspIt)->GetId(), perspAction));
+    }
+
+
+    QList< QStandardItem*> preparedRow;
+    QStandardItem* pItem = new QStandardItem("All Views");
+    preparedRow << pItem;
+    item->appendRow(preparedRow);
+    for (int i = 0; i < views.size(); ++i)
+    {
+      QList<QStandardItem *> secondRow;
+      mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(views[i]->GetLabel()));
+      vItem->m_View = views[i];
+      secondRow << vItem;
+      preparedRow.first()->appendRow(secondRow);
     }
 
 

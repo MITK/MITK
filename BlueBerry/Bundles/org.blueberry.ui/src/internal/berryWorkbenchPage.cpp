@@ -1529,6 +1529,15 @@ bool WorkbenchPage::CloseEditor(IEditorPart::Pointer editor, bool save)
   return false;
 }
 
+void WorkbenchPage::CloseCurrentPerspective(bool saveParts, bool closePage)
+{
+    Perspective::Pointer persp = this->GetActivePerspective();
+    if (persp != 0)
+    {
+      this->ClosePerspective(persp, saveParts, closePage);
+    }
+}
+
 void WorkbenchPage::ClosePerspective(IPerspectiveDescriptor::Pointer desc,
     bool saveParts, bool closePage)
 {

@@ -52,7 +52,12 @@ class ViewBrowserView : public QmitkAbstractView
     /// \brief Called when the user clicks the GUI button
     void CustomMenuRequested(QPoint pos);
     void ItemClicked(const QModelIndex &index);
-    void MapSignal();
+    void AddPerspective();
+    void ClonePerspective();
+    void ResetPerspective();
+    void DeletePerspective();
+    void ClosePerspectives();
+    void ClosePerspective();
 
   protected:
 
@@ -66,10 +71,11 @@ class ViewBrowserView : public QmitkAbstractView
     virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes );
 
-    Ui::ViewBrowserViewControls m_Controls;
-    QStandardItemModel*         m_TreeModel;
-    QMenu*                      m_ContextMenu;
-    berry::IPerspectiveDescriptor::Pointer     m_RegisteredPerspective;
+    QWidget*                                    m_Parent;
+    Ui::ViewBrowserViewControls                 m_Controls;
+    QStandardItemModel*                         m_TreeModel;
+    QMenu*                                      m_ContextMenu;
+    berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
 };
 
 #endif // ViewBrowserView_h

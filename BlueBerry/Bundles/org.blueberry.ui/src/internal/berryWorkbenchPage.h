@@ -642,6 +642,18 @@ public:
    * @see IWorkbenchPage#closePerspective(IPerspectiveDescriptor, boolean, boolean)
    */
 public:
+
+  void CloseCurrentPerspective(bool saveParts, bool closePage);
+  /**
+   * Closes current perspective. If last perspective, then entire page
+   * is closed.
+   *
+   * @param saveParts
+   *            whether the page's parts should be saved if closed
+   * @param closePage
+   *            whether the page itself should be closed if last perspective
+   */
+
   void ClosePerspective(IPerspectiveDescriptor::Pointer desc, bool saveParts,
       bool closePage);
 

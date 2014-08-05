@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "ViewBrowserView.h"
+#include <src/internal/QmitkNewPerspectiveDialog.h>
 
 // Qt
 #include <QMessageBox>
@@ -41,6 +42,7 @@ void ViewBrowserView::SetFocus()
 void ViewBrowserView::CreateQtPartControl( QWidget *parent )
 {
     // create GUI widgets from the Qt Designer's .ui file
+    m_Parent = parent;
     m_Controls.setupUi( parent );
     connect( m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
     connect( m_Controls.m_PluginTreeView, SIGNAL(clicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
@@ -82,28 +84,6 @@ void ViewBrowserView::InitTreeView()
             secondRow << vItem;
             preparedRow.first()->appendRow(secondRow);
         }
-        // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
-        // should not appear as an menu-entry in the perspective menu
-        //        if (perspectiveExcludeList.size() > 0)
-        //        {
-        //            for (unsigned int i=0; i<perspectiveExcludeList.size(); i++)
-        //            {
-        //                if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
-        //                {
-        //                    skip = true;
-        //                    break;
-        //                }
-        //            }
-        //            if (skip)
-        //            {
-        //                skip = false;
-        //                continue;
-        //            }
-        //        }
-
-        //        QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
-        //                                                                  *perspIt, perspGroup);
-        //        mapPerspIdToAction.insert(std::make_pair((*perspIt)->GetId(), perspAction));
     }
 
     m_Controls.m_PluginTreeView->setModel(m_TreeModel);
@@ -129,8 +109,6 @@ void ViewBrowserView::ItemClicked(const QModelIndex &index)
     {
         try
         {
-            //            berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
-            //            page->CloseAllPerspectives(false, false);
             mitk::QtPerspectiveItem* pItem = dynamic_cast< mitk::QtPerspectiveItem* >(item);
             //            page->ClosePerspective( pItem->m_Perspective, true, false );
             berry::PlatformUI::GetWorkbench()->ShowPerspective( pItem->m_Perspective->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
@@ -160,31 +138,132 @@ void ViewBrowserView::ItemClicked(const QModelIndex &index)
 
 }
 
-void ViewBrowserView::MapSignal()
+void ViewBrowserView::AddPerspective()
 {
-    if (m_RegisteredPerspective!=NULL)
+    QmitkNewPerspectiveDialog* dialog = new QmitkNewPerspectiveDialog( m_Parent );
+
+    int dialogReturnValue = dialog->exec();
+    if ( dialogReturnValue == QDialog::Rejected )
+        return;
+
+    berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
+    try
     {
-        MITK_INFO << m_RegisteredPerspective->GetId();
+        perspRegistry->CreatePerspective(dialog->GetPerspectiveName().toStdString(), perspRegistry->FindPerspectiveWithId(perspRegistry->GetDefaultPerspective()));
+    }
+    catch(...)
+    {
+        QMessageBox::warning(m_Parent, "Error", "Duplication of selected perspective failed. Please make sure the specified perspective name is not already in use!");
+    }
+    InitTreeView();
+}
+
+void ViewBrowserView::ClonePerspective()
+{
+    if (m_RegisteredPerspective.IsNotNull())
+    {
+        QmitkNewPerspectiveDialog* dialog = new QmitkNewPerspectiveDialog( m_Parent );
+        QString defaultName(m_RegisteredPerspective->GetLabel().c_str());
+        defaultName.append(" Copy");
+        dialog->SetPerspectiveName(defaultName);
+
+        int dialogReturnValue = dialog->exec();
+        if ( dialogReturnValue == QDialog::Rejected )
+            return;
+
         berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
-        perspRegistry->ClonePerspective(m_RegisteredPerspective->GetId(), "TESTPERSPECTIVE", m_RegisteredPerspective);
+        try
+        {
+            perspRegistry->ClonePerspective(dialog->GetPerspectiveName().toStdString(), dialog->GetPerspectiveName().toStdString(), m_RegisteredPerspective);
+        }
+        catch(...)
+        {
+            QMessageBox::warning(m_Parent, "Error", "Duplication of selected perspective failed. Please make sure the specified perspective name is not already in use!");
+        }
         InitTreeView();
+    }
+}
+
+void ViewBrowserView::ResetPerspective()
+{
+    if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to reset the curent perspective?", QMessageBox::Yes|QMessageBox::No).exec())
+        berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
+}
+
+void ViewBrowserView::DeletePerspective()
+{
+    if (m_RegisteredPerspective.IsNotNull())
+    {
+        QString question = "Do you really want to remove the perspective '";
+        question.append(m_RegisteredPerspective->GetLabel().c_str());
+        question.append("'?");
+        if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", question, QMessageBox::Yes|QMessageBox::No).exec())
+        {
+            berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
+            perspRegistry->DeletePerspective(m_RegisteredPerspective);
+            InitTreeView();
+        }
+    }
+}
+
+void ViewBrowserView::ClosePerspective()
+{
+    if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to close the curent perspective?", QMessageBox::Yes|QMessageBox::No).exec())
+    {
+        berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+        page->CloseCurrentPerspective(true, true);
+    }
+}
+
+void ViewBrowserView::ClosePerspectives()
+{
+    if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to close all perspectives?", QMessageBox::Yes|QMessageBox::No).exec())
+    {
+        berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+        page->CloseAllPerspectives(true, true);
+
+        berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
+        berry::PlatformUI::GetWorkbench()->ShowPerspective( perspRegistry->GetDefaultPerspective(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
     }
 }
 
 void ViewBrowserView::CustomMenuRequested(QPoint pos)
 {
-
     QStandardItem* item = m_TreeModel->itemFromIndex(m_Controls.m_PluginTreeView->indexAt(pos));
+    m_ContextMenu->clear();
+    m_RegisteredPerspective = NULL;
+
+    QAction* addAction = new QAction("Create new perspective", this);
+    m_ContextMenu->addAction(addAction);
+    connect(addAction, SIGNAL(triggered()), SLOT(AddPerspective()));
 
     if (m_ContextMenu!=NULL && item!=NULL && dynamic_cast< mitk::QtPerspectiveItem* >(item) )
     {
-        m_ContextMenu->clear();
         m_RegisteredPerspective = dynamic_cast< mitk::QtPerspectiveItem* >(item)->m_Perspective;
 
-        QAction* action = new QAction("Clone Perspective", this);
-        m_ContextMenu->addAction(action);
-        connect(action, SIGNAL(triggered()), SLOT(MapSignal()));
+        QAction* cloneAction = new QAction("Duplicate perspective", this);
+        m_ContextMenu->addAction(cloneAction);
+        connect(cloneAction, SIGNAL(triggered()), SLOT(ClonePerspective()));
 
-        m_ContextMenu->popup(m_Controls.m_PluginTreeView->viewport()->mapToGlobal(pos));
+        if (!m_RegisteredPerspective->IsPredefined())
+        {
+            QAction* deleteAction = new QAction("Remove perspective", this);
+            m_ContextMenu->addAction(deleteAction);
+            connect(deleteAction, SIGNAL(triggered()), SLOT(DeletePerspective()));
+        }
     }
+
+    QAction* resetAction = new QAction("Reset current perspective", this);
+    m_ContextMenu->addAction(resetAction);
+    connect(resetAction, SIGNAL(triggered()), SLOT(ResetPerspective()));
+
+    QAction* closeAction = new QAction("Close current perspective", this);
+    m_ContextMenu->addAction(closeAction);
+    connect(closeAction, SIGNAL(triggered()), SLOT(ClosePerspective()));
+
+    QAction* closeAllAction = new QAction("Close all perspectives", this);
+    m_ContextMenu->addAction(closeAllAction);
+    connect(closeAllAction, SIGNAL(triggered()), SLOT(ClosePerspectives()));
+
+    m_ContextMenu->popup(m_Controls.m_PluginTreeView->viewport()->mapToGlobal(pos));
 }

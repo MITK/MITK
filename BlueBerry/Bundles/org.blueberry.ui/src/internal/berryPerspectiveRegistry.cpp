@@ -50,17 +50,17 @@ void PerspectiveRegistry::AddPerspective(PerspectiveDescriptor::Pointer desc)
   this->Add(desc);
 }
 
-PerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const std::string& label,
-    PerspectiveDescriptor::Pointer originalDescriptor)
+IPerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const std::string& label,
+    IPerspectiveDescriptor::Pointer originalDescriptor)
 {
   // Sanity check to avoid invalid or duplicate labels.
   if (!this->ValidateLabel(label))
   {
-    return PerspectiveDescriptor::Pointer(0);
+      throw Poco::InvalidArgumentException();
   }
   if (this->FindPerspectiveWithLabel(label) != 0)
   {
-    return PerspectiveDescriptor::Pointer(0);
+      throw Poco::InvalidArgumentException();
   }
 
   // Calculate ID.
@@ -68,10 +68,18 @@ PerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const std:
   std::replace(id.begin(), id.end(), ' ', '_');
   Poco::trimInPlace(id);
 
+
+  if (this->FindPerspectiveWithId(id) != 0)
+  {
+      throw Poco::InvalidArgumentException();
+  }
+
   // Create descriptor.
-  PerspectiveDescriptor::Pointer desc(
-      new PerspectiveDescriptor(id, label, originalDescriptor));
-  this->Add(desc);
+  IPerspectiveDescriptor::Pointer desc;
+
+  desc = new PerspectiveDescriptor(id, label, originalDescriptor.Cast<PerspectiveDescriptor>());
+
+  this->Add(desc.Cast<PerspectiveDescriptor>());
   return desc;
 }
 
@@ -255,6 +263,11 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::ClonePerspective(const std:
   if (desc != 0)
   {
     throw Poco::InvalidArgumentException();
+  }
+
+  if (this->FindPerspectiveWithLabel(label) != 0)
+  {
+      throw Poco::InvalidArgumentException();
   }
 
   // Create descriptor.

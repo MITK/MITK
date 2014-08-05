@@ -25,4 +25,5 @@ set(CPP_FILES
     NetworkCreation.cpp
     NetworkStatistics.cpp
     DwiDenoising.cpp
+    DICOMLoader.cpp
 )

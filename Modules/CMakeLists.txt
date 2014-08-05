@@ -5,6 +5,8 @@ set(module_dirs
     AlgorithmsExt
     MapperExt
     IOExt
+    DICOMReader
+    DICOMTesting
     Qt4Qt5TestModule
     SceneSerializationBase
     PlanarFigure
@@ -13,7 +15,6 @@ set(module_dirs
     ImageStatistics
     LegacyAdaptors
     IpPicSupport
-    Ext
     SceneSerialization
     GraphAlgorithms
     ContourModel

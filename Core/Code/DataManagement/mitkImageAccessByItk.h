@@ -81,9 +81,9 @@ public:
 //-------------------------------- 0-Arg Versions --------------------------------------
 
 #define _accessByItk(itkImageTypeFunction, pixeltype, dimension)                       \
-  if ( pixelType == mitk::MakePixelType< itk::Image<pixeltype, dimension> >() && constImage->GetDimension() == dimension) \
+  if ( pixelType == mitk::MakePixelType< mitk::ImageTypeTrait<pixeltype, dimension>::ImageType >(pixelType.GetNumberOfComponents()) && constImage->GetDimension() == dimension) \
   {\
-    typedef itk::Image<pixeltype, dimension> ImageType;                                \
+    typedef mitk::ImageTypeTrait<pixeltype, dimension>::ImageType ImageType;           \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
     imagetoitk->SetInput(nonConstImage);                                               \
@@ -109,9 +109,9 @@ public:
 //-------------------------------- n-Arg Versions --------------------------------------
 
 #define _accessByItk_n(itkImageTypeFunction, pixeltype, dimension, args)               \
-  if ( pixelType == mitk::MakePixelType< itk::Image<pixeltype, dimension> >() && constImage->GetDimension() == dimension) \
+  if ( pixelType == mitk::MakePixelType< typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType >(pixelType.GetNumberOfComponents()) && constImage->GetDimension() == dimension) \
   {                                                                                    \
-    typedef itk::Image<pixeltype, dimension> ImageType;                                \
+    typedef typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType ImageType;  \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
     imagetoitk->SetInput(nonConstImage);                                               \
@@ -244,6 +244,9 @@ public:
  */
 #define AccessFloatingPixelTypeByItk(mitkImage, itkImageTypeFunction)                  \
   AccessFixedTypeByItk(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
+
+#define AccessVectorPixelTypeByItk(mitkImage, itkImageTypeFunction) \
+  AccessFixedTypeByItk(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 /**
  * \brief Access a mitk-image with known dimension by an itk-image
@@ -429,6 +432,9 @@ public:
  */
 #define AccessFloatingPixelTypeByItk_n(mitkImage, itkImageTypeFunction, va_tuple)      \
   AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ, va_tuple)
+
+#define AccessVectorPixelTypeByItk_n(mitkImage, itkImageTypeFunction, va_tuple)      \
+  AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ, va_tuple)
 
 /**
  * \brief Access a mitk-image with known dimension by an itk-image with

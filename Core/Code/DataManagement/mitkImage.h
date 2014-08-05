@@ -334,7 +334,7 @@ public:
    // mitk::PixelType importType = ImportItkPixelType( itkimage::PixelType );
 
 
-    Initialize(MakePixelType<itkImageType>(),
+    Initialize(MakePixelType<itkImageType>(itkimage->GetNumberOfComponentsPerPixel()),
       m_Dimension,
       tmpDimensions,
       channels);

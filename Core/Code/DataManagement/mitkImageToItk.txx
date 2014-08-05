@@ -33,7 +33,7 @@ void mitk::ImageToItk<TOutputImage>::SetInput(mitk::Image *input)
     itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
 
 
-  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>()))
+  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>(input->GetPixelType().GetNumberOfComponents())))
     itkExceptionMacro( << "image has wrong pixel type " );
 
   // Process object is not const-correct so the const_cast is required here
@@ -54,7 +54,7 @@ void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, mitk::Image *
     itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
 
 
-  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>() ))
+  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>(input->GetPixelType().GetNumberOfComponents()) ))
     itkExceptionMacro( << "image has wrong pixel type " );
 
   // Process object is not const-correct so the const_cast is required here
@@ -92,6 +92,11 @@ template<class TOutputImage>
   {
     noBytes = noBytes * input->GetDimension(i);
   }
+  const mitk::PixelType pixelType = input->GetPixelType();
+  if (pixelType.GetPixelType() == itk::ImageIOBase::VECTOR)
+  {
+    noBytes *= pixelType.GetNumberOfComponents();
+  }
 
   mitk::ImageWriteAccessor* imageAccess = new mitk::ImageWriteAccessor(input);
 
@@ -111,14 +116,14 @@ template<class TOutputImage>
 
     output->Allocate();
 
-    memcpy( (PixelType *) output->GetBufferPointer(), imageAccess->GetData(), sizeof(PixelType)*noBytes);
+    memcpy(output->GetBufferPointer(), imageAccess->GetData(), sizeof(InternalPixelType)*noBytes);
 
     delete imageAccess;
   }
   else
   {
     itkDebugMacro("do not copyMem ...");
-    typedef itk::ImportMitkImageContainer< unsigned long, PixelType >   ImportContainerType;
+    typedef itk::ImportMitkImageContainer< unsigned long, InternalPixelType >   ImportContainerType;
     typename ImportContainerType::Pointer import;
 
     import = ImportContainerType::New();
@@ -126,9 +131,9 @@ template<class TOutputImage>
 
     itkDebugMacro( << "size of container = " << import->Size() );
     //import->SetImageDataItem(m_ImageDataItem);
-    import->SetImageAccessor(imageAccess,sizeof(PixelType)*noBytes);
+    import->SetImageAccessor(imageAccess,sizeof(InternalPixelType)*noBytes);
 
-     output->SetPixelContainer(import);
+    output->SetPixelContainer(import);
     itkDebugMacro( << "size of container = " << import->Size() );
   }
 }

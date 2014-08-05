@@ -339,6 +339,20 @@ if(NOT MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES)
     CACHE STRING "List of composite pixel types used in AccessByItk and InstantiateAccessFunction macros" FORCE)
 endif()
 
+if(NOT MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES)
+  string(REPLACE "," ";" _integral_types ${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES})
+  string(REPLACE "," ";" _floating_types ${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES})
+  foreach(_scalar_type ${_integral_types} ${_floating_types})
+    set(MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES
+        "${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}itk::VariableLengthVector<${_scalar_type}>,")
+  endforeach()
+  string(LENGTH "${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}" _length)
+  math(EXPR _length "${_length} - 1")
+  string(SUBSTRING "${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}" 0 ${_length} MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES)
+  set(MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES ${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}
+      CACHE STRING "List of vector pixel types used in AccessByItk and InstantiateAccessFunction macros for itk::VectorImage types" FORCE)
+endif()
+
 if(NOT MITK_ACCESSBYITK_DIMENSIONS)
   set(MITK_ACCESSBYITK_DIMENSIONS
       "2,3"

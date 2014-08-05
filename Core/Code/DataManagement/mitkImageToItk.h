@@ -66,6 +66,8 @@ public:
   typedef typename TOutputImage::IndexType        IndexType;
   typedef typename TOutputImage::RegionType       RegionType;
   typedef typename TOutputImage::PixelType        PixelType;
+  typedef typename TOutputImage::InternalPixelType InternalPixelType;
+  typedef typename TOutputImage::PixelContainer PixelContainer;
 
   virtual void SetInput(mitk::Image *input);
   virtual void SetInput(unsigned int index, mitk::Image * image);

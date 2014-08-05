@@ -123,33 +123,25 @@ public:
 
   ~PixelType();
 
-  /** Set the vector length <b> once </b>.
-   *
-   *  For PixelTypes derived from itk::VectorImage< CompT > the length is initially set to one however the true length of the vector is a runtime information possibly different to one.
-   * This method allows for setting the length once after the type is created
-  */
-  void SetVectorLength(size_t);
-
 private:
 
   friend PixelType MakePixelType(const itk::ImageIOBase* imageIO);
 
   template< typename ComponentT, typename PixelT, std::size_t numberOfComponents >
-    friend PixelType MakePixelType();
+  friend PixelType MakePixelType();
 
   template< typename ItkImageType >
-    friend PixelType MakePixelType();
+  friend PixelType MakePixelType();
 
   template< typename ItkImageType >
-      friend PixelType MakePixelType(size_t);
+  friend PixelType MakePixelType(size_t);
 
   PixelType( const int componentType,
              const ItkIOPixelType pixelType,
              std::size_t bytesPerComponent,
              std::size_t numberOfComponents,
              const std::string& componentTypeName,
-             const std::string& pixelTypeName,
-             bool dynamically_allocated = false);
+             const std::string& pixelTypeName);
 
   // default constructor is disabled on purpose
   PixelType(void);
@@ -166,12 +158,9 @@ private:
 
   std::string m_PixelTypeName;
 
-  mutable std::size_t m_NumberOfComponents;
+  std::size_t m_NumberOfComponents;
 
   std::size_t m_BytesPerComponent;
-
-  bool m_VariableLength;
-
 
 };
 
@@ -194,7 +183,7 @@ PixelType MakePixelType()
   * is propagated to the constructor
   */
 template< typename ItkImageType >
-PixelType MakePixelType( size_t variable_length )
+PixelType MakePixelType( std::size_t numOfComponents )
 {
   // define new type, since the ::PixelType is used to distinguish between simple and compound types
   typedef typename ItkImageType::PixelType ImportPixelType;
@@ -205,35 +194,32 @@ PixelType MakePixelType( size_t variable_length )
   // The PixelType is the same as the ComponentT for simple types
   typedef typename ItkImageType::PixelType PixelT;
 
-  // Get the length of compound type ( initialized to 1 for simple types and variable-length vector images)
-  size_t numComp = ComponentsTrait<
-    (isPrimitiveType<PixelT>::value || isVectorImage<PixelT>::value), ItkImageType >::Size;
-
-  bool dyn_alloc = isVectorImage<ItkImageType>::dyn_alloc;
-
-  if( dyn_alloc )
-    numComp = variable_length;
-
   // call the constructor
   return PixelType(
             MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOComponentType,
             MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOPixelType,
-            sizeof(ComponentT), numComp,
+            sizeof(ComponentT), numOfComponents,
             PixelComponentTypeToString<ComponentT>(),
-            PixelTypeToString<PixelT>(),
-            dyn_alloc
+            PixelTypeToString<PixelT>()
          );
 }
 
 template< typename ItkImageType >
 PixelType MakePixelType()
 {
-  bool dyn_alloc = isVectorImage<ItkImageType>::dyn_alloc;
-  if( dyn_alloc )
+  if( ImageTypeTrait<ItkImageType>::IsVectorImage )
+  {
     mitkThrow() << " Variable pixel type given but the length is not specified. Use the parametric MakePixelType( size_t ) method instead.";
+  }
+
+  // Use the InternalPixelType to get "1" for the number of components in case of
+  // a itk::VectorImage
+  typedef typename ItkImageType::InternalPixelType PixelT;
+
+  const std::size_t numComp = ComponentsTrait<isPrimitiveType<PixelT>::value, ItkImageType>::Size;
 
   // call the constructor
-  return MakePixelType<ItkImageType>(1);
+  return MakePixelType<ItkImageType>(numComp);
 }
 
 
@@ -242,8 +228,7 @@ inline PixelType MakePixelType(const itk::ImageIOBase* imageIO)
   return mitk::PixelType(imageIO->GetComponentType(), imageIO->GetPixelType(),
                          imageIO->GetComponentSize(), imageIO->GetNumberOfComponents(),
                          imageIO->GetComponentTypeAsString(imageIO->GetComponentType()),
-                         imageIO->GetPixelTypeAsString(imageIO->GetPixelType()),
-                         false);
+                         imageIO->GetPixelTypeAsString(imageIO->GetPixelType()));
 }
 
 /** \brief An interface to the MakePixelType method for creating scalar pixel types.

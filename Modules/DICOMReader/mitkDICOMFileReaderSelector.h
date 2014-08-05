@@ -43,7 +43,7 @@ namespace mitk
   Two convenience methods load "default" configurations from
   compiled-in resources: LoadBuiltIn3DConfigs() and LoadBuiltIn3DnTConfigs().
 */
-class DICOMReader_EXPORT DICOMFileReaderSelector : public itk::LightObject
+class MitkDICOMReader_EXPORT DICOMFileReaderSelector : public itk::LightObject
 {
   public:
 

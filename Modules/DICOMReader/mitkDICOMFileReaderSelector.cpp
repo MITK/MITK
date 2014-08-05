@@ -118,11 +118,11 @@ mitk::DICOMFileReaderSelector
   //this->AddConfigsFromResources("configurations/3D");
   // in this order of preference...
   this->AddConfigFromResource("configurations/3D/instancenumber.xml");
+  this->AddConfigFromResource("configurations/3D/instancenumber_soft.xml");
   this->AddConfigFromResource("configurations/3D/slicelocation.xml");
   this->AddConfigFromResource("configurations/3D/imageposition.xml");
   this->AddConfigFromResource("configurations/3D/imageposition_byacquisition.xml");
-  //this->AddConfigFromResource("configurations/3D/imagetime.xml"); // no sense in this one? want to see a real-world example first
-  this->AddConfigFromResource("configurations/3D/classicreader.xml"); // currently is 3D+t actually
+  //this->AddConfigFromResource("configurations/3D/classicreader.xml"); // not the best choice in ANY of the images I came across
 }
 
 void

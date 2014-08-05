@@ -34,7 +34,7 @@ namespace mitk
 
   \note This class assumes that the datasets have identical orientations!
 */
-class DICOMReader_EXPORT SortByImagePositionPatient : public DICOMSortCriterion
+class MitkDICOMReader_EXPORT SortByImagePositionPatient : public DICOMSortCriterion
 {
   public:
 

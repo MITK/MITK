@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
 
-#include "DICOMReaderExports.h"
+#include "MitkDICOMReaderExports.h"
 
 #include "mitkDICOMTagCache.h"
 
@@ -53,7 +53,7 @@ namespace mitk
   brings a number of methods that describe its configuration/specifics by
   means of a short label and a (longer) description.
 */
-class DICOMReader_EXPORT DICOMFileReader : public itk::Object
+class MitkDICOMReader_EXPORT DICOMFileReader : public itk::Object
 {
   public:
 

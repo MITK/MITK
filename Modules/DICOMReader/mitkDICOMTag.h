@@ -18,8 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkTag_h
 
 #include "mitkVector.h"
+#include "mitkPoint.h"
 
-#include "DICOMReaderExports.h"
+#include "MitkDICOMReaderExports.h"
 
 namespace mitk
 {
@@ -32,7 +33,7 @@ namespace mitk
   numbers for better readability and make handling tags
   more easy by offering comparison methods.
 */
-class DICOMReader_EXPORT DICOMTag
+class MitkDICOMReader_EXPORT DICOMTag
 {
   public:
 

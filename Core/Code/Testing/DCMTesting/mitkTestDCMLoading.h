@@ -23,9 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class Image;
-
-class MitkDICOMTesting_EXPORT TestDICOMLoading
+class MitkDICOMTesting_EXPORT TestDCMLoading
 {
   public:
 

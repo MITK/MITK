@@ -90,7 +90,8 @@ mitk::DICOMTagBasedSorter::CutDecimalPlaces
 mitk::DICOMTagBasedSorter
 ::DICOMTagBasedSorter()
 :DICOMDatasetSorter()
-,m_StrictSorting(true)
+,m_StrictSorting(false)
+,m_ExpectDistanceOne(false)
 {
 }
 
@@ -111,6 +112,7 @@ mitk::DICOMTagBasedSorter
 ,m_DistinguishingTags( other.m_DistinguishingTags )
 ,m_SortCriterion( other.m_SortCriterion )
 ,m_StrictSorting( other.m_StrictSorting )
+,m_ExpectDistanceOne( other.m_ExpectDistanceOne )
 {
   for(TagValueProcessorMap::const_iterator ti = other.m_TagValueProcessor.begin();
       ti != other.m_TagValueProcessor.end();
@@ -130,6 +132,7 @@ mitk::DICOMTagBasedSorter
     m_DistinguishingTags = other.m_DistinguishingTags;
     m_SortCriterion = other.m_SortCriterion;
     m_StrictSorting = other.m_StrictSorting;
+    m_ExpectDistanceOne = other.m_ExpectDistanceOne;
 
     for(TagValueProcessorMap::const_iterator ti = other.m_TagValueProcessor.begin();
         ti != other.m_TagValueProcessor.end();
@@ -148,6 +151,7 @@ mitk::DICOMTagBasedSorter
   if (const DICOMTagBasedSorter* otherSelf = dynamic_cast<const DICOMTagBasedSorter*>(&other))
   {
     if (this->m_StrictSorting != otherSelf->m_StrictSorting) return false;
+    if (this->m_ExpectDistanceOne != otherSelf->m_ExpectDistanceOne) return false;
 
     bool allTagsPresentAndEqual(true);
     if (this->m_DistinguishingTags.size() != otherSelf->m_DistinguishingTags.size())
@@ -183,7 +187,11 @@ void
 mitk::DICOMTagBasedSorter
 ::PrintConfiguration(std::ostream& os, const std::string& indent) const
 {
-  os << indent << "Tag based sorting:" << std::endl;
+  os << indent << "Tag based sorting "
+     << "(strict=" << (m_StrictSorting?"true":"false")
+     << ", expectDistanceOne=" << (m_ExpectDistanceOne?"true":"false") << "):"
+     << std::endl;
+
   for (DICOMTagList::const_iterator tagIter = m_DistinguishingTags.begin();
        tagIter != m_DistinguishingTags.end();
        ++tagIter)
@@ -216,6 +224,21 @@ mitk::DICOMTagBasedSorter
 {
   return m_StrictSorting;
 }
+
+void
+mitk::DICOMTagBasedSorter
+::SetExpectDistanceOne(bool strict)
+{
+  m_ExpectDistanceOne = strict;
+}
+
+bool
+mitk::DICOMTagBasedSorter
+::GetExpectDistanceOne() const
+{
+  return m_ExpectDistanceOne;
+}
+
 
 mitk::DICOMTagList
 mitk::DICOMTagBasedSorter
@@ -428,17 +451,15 @@ mitk::DICOMTagBasedSorter
             double currentDistance = m_SortCriterion->NumericDistance(previousDS, *dataset);
             if (constantDistanceInitialized)
             {
-              if (fabs(currentDistance - constantDistance) < constantDistance * 0.01) // ok, deviation of up to 1% of distance is tolerated
+              if (fabs(currentDistance - constantDistance) < fabs(constantDistance * 0.01)) // ok, deviation of up to 1% of distance is tolerated
               {
                 // nothing to do, just ok
+                MITK_DEBUG << "Checking currentDistance==" << currentDistance << ": small enough";
               }
-              else if (currentDistance < mitk::eps) // close enough to 0
-              {
-                // no numeric comparison possible?
-                // rare case(?), just accept
-              }
+              //else if (currentDistance < mitk::eps) // close enough to 0
               else
               {
+                MITK_DEBUG << "Split consecutive group at index " << dsIndex << " (current distance " << currentDistance << ", constant distance " << constantDistance << ")";
                 // split! this is done by simply creating a new group (key)
                 groupKey.str(std::string());
                 groupKey.clear();
@@ -454,13 +475,23 @@ mitk::DICOMTagBasedSorter
               //            a missing slice right after the first slice
               //            ==> split off slices
               // in all other cases: second dataset at this position, no need to split already, we are still learning about the images
-              if ((currentDistance - (int)currentDistance == 0.0) && fabs(currentDistance) != 1.0)
-                // exact comparison. An integer should not be expressed as 1.000000000000000000000000001!
+
+              // addition to the above: when sorting by imagepositions, a distance other than 1 between the first two slices is
+              // not unusual, actually expected... then we should not split
+
+              if (m_ExpectDistanceOne)
               {
-                groupKey.str(std::string());
-                groupKey.clear();
-                groupKey << std::setfill('0') << std::setw(6) << groupIndex++;
+                if ((currentDistance - (int)currentDistance == 0.0) && fabs(currentDistance) != 1.0)
+                  // exact comparison. An integer should not be expressed as 1.000000000000000000000000001!
+                {
+                  MITK_DEBUG << "Split consecutive group at index " << dsIndex << " (special case: expected distance 1 exactly)";
+                  groupKey.str(std::string());
+                  groupKey.clear();
+                  groupKey << std::setfill('0') << std::setw(6) << groupIndex++;
+                }
               }
+
+              MITK_DEBUG << "Initialize strict distance to currentDistance=" << currentDistance;
 
               constantDistance = currentDistance;
               constantDistanceInitialized = true;
@@ -518,6 +549,24 @@ mitk::DICOMTagBasedSorter
 
     groups = sortedResultBlocks;
   }
+
+  unsigned int groupIndex(0);
+  for (GroupIDToListType::iterator gIter = groups.begin();
+      gIter != groups.end();
+      ++groupIndex, ++gIter)
+  {
+    DICOMDatasetList& dsList = gIter->second;
+    MITK_DEBUG << "   --------------------------------------------------------------------------------";
+    MITK_DEBUG << "   DICOMTagBasedSorter after sorting group : " << groupIndex;
+    for (DICOMDatasetList::iterator oi = dsList.begin();
+        oi != dsList.end();
+        ++oi)
+    {
+      MITK_DEBUG << "     OUTPUT    : " << (*oi)->GetFilenameIfAvailable();
+    }
+    MITK_DEBUG << "   --------------------------------------------------------------------------------";
+  }
+
 
   return groups;
 }

@@ -130,21 +130,32 @@ mitk::DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vec
   successful = true;
 
   std::istringstream orientationReader(s);
+  std::istringstream converter;
   std::string coordinate;
   unsigned int dim(0);
   while( std::getline( orientationReader, coordinate, '\\' ) && dim < 6 )
   {
+    converter.str(coordinate);
+    converter.clear();
     if (dim<3)
     {
-      right[dim++] = atof(coordinate.c_str());
+      if ( !(converter >> right[dim++] && converter.eof() ))
+      {
+        // conversion error
+        break;
+      }
     }
     else
     {
-      up[dim++ - 3] = atof(coordinate.c_str());
+      if ( !(converter >> up[dim++ - 3] && converter.eof() ))
+      {
+        // conversion error
+        break;
+      }
     }
   }
 
-  if (dim && dim != 6)
+  if (dim != 0 && dim != 6)
   {
     successful = false;
   }
@@ -167,21 +178,29 @@ mitk::DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarTyp
   bool successful = false;
 
   std::istringstream spacingReader(s);
+  std::istringstream converter;
   std::string spacing;
   if ( std::getline( spacingReader, spacing, '\\' ) )
   {
-    spacingY = atof( spacing.c_str() );
-
-    if ( std::getline( spacingReader, spacing, '\\' ) )
+    converter.str(spacing);
+    converter.clear();
+    if (converter >> spacingY && converter.eof())
     {
-      spacingX = atof( spacing.c_str() );
-
-      successful = true;
+      if ( std::getline( spacingReader, spacing, '\\' ) )
+      {
+        converter.str(spacing);
+        converter.clear();
+        if (converter >> spacingX && converter.eof())
+        {
+          successful = true;
+        }
+      }
     }
   }
 
   return successful;
 }
+
 
 mitk::Point3D
 mitk::DICOMStringToPoint3D(const std::string& s, bool& successful)
@@ -190,14 +209,21 @@ mitk::DICOMStringToPoint3D(const std::string& s, bool& successful)
   successful = true;
 
   std::istringstream originReader(s);
+  std::istringstream converter;
   std::string coordinate;
   unsigned int dim(0);
   while( std::getline( originReader, coordinate, '\\' ) && dim < 3)
   {
-    p[dim++]= atof(coordinate.c_str());
+    converter.str(coordinate);
+    converter.clear();
+    if ( ! (converter >> p[dim++] && converter.eof() ) )
+    { // conversion failed
+      successful = false;
+      break;
+    }
   }
 
-  if (dim && dim != 3)
+  if (dim != 0 && dim != 3)
   {
     successful = false;
   }

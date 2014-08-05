@@ -26,11 +26,11 @@ set(H_FILES)
 set(CPP_FILES)
 
 # now create a new module only for testing purposes
-MITK_CREATE_MODULE( mitkDCMTesting
-  DEPENDS Mitk # Mitk.so
+MITK_CREATE_MODULE(
+  DEPENDS MitkCore # Mitk.so
 )
 
-mitk_check_module_dependencies(MODULES mitkDCMTesting MISSING_DEPENDENCIES_VAR _missing_deps)
+mitk_check_module_dependencies(MODULES MitkDCMTesting MISSING_DEPENDENCIES_VAR _missing_deps)
 
 if(_missing_deps)
   message(STATUS "mitkDCMTesting application won't be built. Missing: ${_missing_deps}")
@@ -41,11 +41,11 @@ else(_missing_deps)
 
   # dumps out image information
   add_executable(DumpDCMMitkImage DumpDCMMitkImage.cpp)
-  mitk_use_modules(TARGET DumpDCMMitkImage MODULES mitkDCMTesting)
+  mitk_use_modules(TARGET DumpDCMMitkImage MODULES MitkDCMTesting)
 
   # compares dumped out image information against reference dump
   add_executable(VerifyDCMMitkImageDump VerifyDCMMitkImageDump.cpp)
-  mitk_use_modules(TARGET VerifyDCMMitkImageDump MODULES mitkDCMTesting)
+  mitk_use_modules(TARGET VerifyDCMMitkImageDump MODULES MitkDCMTesting)
 
   add_subdirectory(Testing)
 endif()

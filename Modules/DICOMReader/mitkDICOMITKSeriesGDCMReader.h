@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkITKDICOMSeriesReaderHelper.h"
 
-#include "DICOMReaderExports.h"
+#include "MitkDICOMReaderExports.h"
 
 #include <stack>
 
@@ -194,7 +194,7 @@ namespace mitk
   repeating most of AnalyzeInputFiles().
 
 */
-class DICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
+class MitkDICOMReader_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 {
   public:
 

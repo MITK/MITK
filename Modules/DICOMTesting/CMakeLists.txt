@@ -13,11 +13,11 @@ set(H_FILES)
 set(CPP_FILES)
 
 # now create a new module only for testing purposes
-MITK_CREATE_MODULE( DICOMTesting
-  DEPENDS DICOMReader
+MITK_CREATE_MODULE(
+  DEPENDS MitkDICOMReader
 )
 
-mitk_check_module_dependencies(MODULES DICOMTesting MISSING_DEPENDENCIES_VAR _missing_deps)
+mitk_check_module_dependencies(MODULES MitkDICOMTesting MISSING_DEPENDENCIES_VAR _missing_deps)
 
 if(_missing_deps)
   message(STATUS "mitkDICOMTesting module helper applications won't be built. Missing: ${_missing_deps}")
@@ -25,11 +25,11 @@ else(_missing_deps)
 
   # dumps out image information
   add_executable(DumpDICOMMitkImage DumpDICOMMitkImage.cpp)
-  mitk_use_modules(TARGET DumpDICOMMitkImage MODULES DICOMTesting)
+  mitk_use_modules(TARGET DumpDICOMMitkImage MODULES MitkDICOMTesting)
 
   # compares dumped out image information against reference dump
   add_executable(VerifyDICOMMitkImageDump VerifyDICOMMitkImageDump.cpp)
-  mitk_use_modules(TARGET VerifyDICOMMitkImageDump MODULES DICOMTesting)
+  mitk_use_modules(TARGET VerifyDICOMMitkImageDump MODULES MitkDICOMTesting)
 
   add_subdirectory(Testing)
 endif()

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
 
-#include "DICOMReaderExports.h"
+#include "MitkDICOMReaderExports.h"
 
 namespace mitk
 {
@@ -32,7 +32,7 @@ namespace mitk
     (think of DICOM multi-frame classes) within a DICOM file.
     To be used by DICOMFileReader%s and as part of DICOMImageBlockDescriptor.
   */
-  class DICOMReader_EXPORT DICOMImageFrameInfo : public itk::LightObject
+  class MitkDICOMReader_EXPORT DICOMImageFrameInfo : public itk::LightObject
   {
     public:
 

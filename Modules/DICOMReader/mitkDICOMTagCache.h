@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMTag.h"
 
-#include "DICOMReaderExports.h"
+#include "MitkDICOMReaderExports.h"
 
 namespace mitk
 {
@@ -33,7 +33,7 @@ namespace mitk
     \ingroup DICOMReaderModule
     \brief ...
   */
-  class DICOMReader_EXPORT DICOMTagCache : public itk::Object
+  class MitkDICOMReader_EXPORT DICOMTagCache : public itk::Object
   {
     public:
 

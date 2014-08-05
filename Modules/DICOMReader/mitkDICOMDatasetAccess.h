@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMTag.h"
 
-#include "DICOMReaderExports.h"
+#include "MitkDICOMReaderExports.h"
 
 namespace mitk
 {
@@ -30,7 +30,7 @@ namespace mitk
 
   Minimal interface to hide actual implementation, which might rely on GDCM.
 */
-class DICOMReader_EXPORT DICOMDatasetAccess
+class MitkDICOMReader_EXPORT DICOMDatasetAccess
 {
   public:
 

@@ -435,8 +435,8 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 
   ds = (double*)py_origin->data;
   origin[0] = ds[0];
-  origin[0] = ds[0];
-  origin[0] = ds[0];
+  origin[1] = ds[1];
+  origin[2] = ds[2];
   mitkImage->GetGeometry()->SetOrigin(origin);
 
   // cleanup

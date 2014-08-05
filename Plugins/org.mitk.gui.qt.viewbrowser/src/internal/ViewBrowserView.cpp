@@ -33,6 +33,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStandardItem>
 
 
+struct ViewBrowserViewListener : public berry::IPerspectiveListener
+{
+  ViewBrowserViewListener(ViewBrowserView* switcher)
+  : switcher(switcher)
+  {}
+
+  Events::Types GetPerspectiveEventTypes() const
+  {
+    return Events::ACTIVATED;
+  }
+
+  virtual void PerspectiveChanged(berry::SmartPointer<berry::IWorkbenchPage> /*page*/,
+      berry::IPerspectiveDescriptor::Pointer /*perspective*/, const std::string& /*changeId*/)
+  {
+    MITK_INFO << "Yep i did something...";
+    switcher->FillTreeList();
+  }
+
+  void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
+    berry::IPerspectiveDescriptor::Pointer perspective)
+  {
+    MITK_INFO << "Yep i did something... and it is not wrong";
+    switcher->FillTreeList();
+  }
+
+private:
+  ViewBrowserView* switcher;
+};
+
 const std::string ViewBrowserView::VIEW_ID = "org.mitk.views.viewbrowser";
 
 void ViewBrowserView::SetFocus()
@@ -51,6 +80,9 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
   FillTreeList();
 
   m_Controls.m_PluginTreeView->setModel(m_TreeModel);
+
+  this->perspListener = new ViewBrowserViewListener(this);
+  berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->AddPerspectiveListener(this->perspListener);
 }
 
 

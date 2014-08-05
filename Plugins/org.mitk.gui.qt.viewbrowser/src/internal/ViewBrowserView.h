@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define ViewBrowserView_h
 
 #include <berryISelectionListener.h>
+#include <berryIPerspectiveListener.h>
 
 #include <QmitkAbstractView.h>
 
@@ -26,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QStandardItemModel>
 
+#include <berryIWorkbench.h>
+#include <berryIWorkbenchPage.h>
+#include <berryIPerspectiveDescriptor.h>
 /**
   \brief ViewBrowserView
 
@@ -44,6 +48,11 @@ class ViewBrowserView : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
+
+    /// \brief Fills the TreeList with the available perspectives and views.
+    void FillTreeList();
+
+
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
@@ -60,11 +69,12 @@ class ViewBrowserView : public QmitkAbstractView
     virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes );
 
-    /// \brief Fills the TreeList with the available perspectives and views.
-    void FillTreeList();
 
     Ui::ViewBrowserViewControls m_Controls;
     QStandardItemModel* m_TreeModel;
+    berry::IPerspectiveListener::Pointer perspListener;
+
+    friend struct ViewBrowserViewListener;
 };
 
 #endif // ViewBrowserView_h

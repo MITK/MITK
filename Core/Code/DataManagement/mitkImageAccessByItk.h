@@ -81,7 +81,7 @@ public:
 //-------------------------------- 0-Arg Versions --------------------------------------
 
 #define _accessByItk(itkImageTypeFunction, pixeltype, dimension)                       \
-  if ( pixelType == mitk::MakePixelType< mitk::ImageTypeTrait<pixeltype, dimension>::ImageType >(pixelType.GetNumberOfComponents()) && constImage->GetDimension() == dimension) \
+  if ( pixelType == mitk::MakePixelType<typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType >(pixelType.GetNumberOfComponents()) && constImage->GetDimension() == dimension) \
   {\
     typedef mitk::ImageTypeTrait<pixeltype, dimension>::ImageType ImageType;           \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
@@ -109,7 +109,7 @@ public:
 //-------------------------------- n-Arg Versions --------------------------------------
 
 #define _accessByItk_n(itkImageTypeFunction, pixeltype, dimension, args)               \
-  if ( pixelType == mitk::MakePixelType< typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType >(pixelType.GetNumberOfComponents()) && constImage->GetDimension() == dimension) \
+  if ( pixelType == mitk::MakePixelType<typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType >(pixelType.GetNumberOfComponents()) && constImage->GetDimension() == dimension) \
   {                                                                                    \
     typedef typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType ImageType;  \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \

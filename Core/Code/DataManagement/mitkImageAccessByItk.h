@@ -78,12 +78,18 @@ public:
 
 #define _msvc_expand_bug(macro, arg) MITK_PP_EXPAND(macro arg)
 
+#ifdef _WIN32
+#define _accessByItkImageType(pixeltype, dimension) mitk::ImageTypeTrait<pixeltype, dimension>::ImageType
+#else
+#define _accessByItkImageType(pixeltype, dimension) typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType
+#endif
+
 //-------------------------------- 0-Arg Versions --------------------------------------
 
 #define _accessByItk(itkImageTypeFunction, pixeltype, dimension)                       \
-  if ( pixelType == mitk::MakePixelType<typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType >(pixelType.GetNumberOfComponents()) && constImage->GetDimension() == dimension) \
+  if ( pixelType == mitk::MakePixelType<_accessByItkImageType(pixeltype, dimension)>(pixelType.GetNumberOfComponents()) && constImage->GetDimension() == dimension) \
   {\
-    typedef mitk::ImageTypeTrait<pixeltype, dimension>::ImageType ImageType;           \
+    typedef _accessByItkImageType(pixeltype, dimension) ImageType;                     \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
     imagetoitk->SetInput(nonConstImage);                                               \
@@ -109,9 +115,9 @@ public:
 //-------------------------------- n-Arg Versions --------------------------------------
 
 #define _accessByItk_n(itkImageTypeFunction, pixeltype, dimension, args)               \
-  if ( pixelType == mitk::MakePixelType<typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType >(pixelType.GetNumberOfComponents()) && constImage->GetDimension() == dimension) \
+  if ( pixelType == mitk::MakePixelType<_accessByItkImageType(pixeltype, dimension)>(pixelType.GetNumberOfComponents()) && constImage->GetDimension() == dimension) \
   {                                                                                    \
-    typedef typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType ImageType;  \
+    typedef _accessByItkImageType(pixeltype, dimension) ImageType;                     \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                \
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
     imagetoitk->SetInput(nonConstImage);                                               \

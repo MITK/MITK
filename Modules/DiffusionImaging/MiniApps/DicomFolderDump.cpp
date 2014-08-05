@@ -27,13 +27,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 int DicomFolderDump(int argc, char* argv[])
 {
   ctkCommandLineParser parser;
+
+  parser.setTitle("Dicom Loader");
+  parser.setCategory("Preprocessing Tools");
+  parser.setDescription("");
+  parser.setContributor("MBI");
+
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
-  parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Show this help text");
-  parser.addArgument("xml", "x",ctkCommandLineParser::Bool, "Print a XML description of this modules command line interface");
-  parser.addArgument("input", "i", ctkCommandLineParser::String, "Input folder",us::Any(),false);
-  parser.addArgument("output", "o", ctkCommandLineParser::String, "Output folder (ending with /)",us::Any(),false);
-  parser.addArgument("filename", "f", ctkCommandLineParser::String, "Output filename (incl. .nrrd)",us::Any(),false);
+  parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Help:", "Show this help text");
+//  parser.addArgument("xml", "x",ctkCommandLineParser::Bool, "Print a XML description of this modules command line interface");
+  parser.addArgument("input", "i", ctkCommandLineParser::Directory, "Input folder:", "Input folder",us::Any(),false);
+  parser.addArgument("output", "o", ctkCommandLineParser::Directory, "Output folder:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("filename", "f", ctkCommandLineParser::String, "Output name:", "Output filename (incl. .nrrd)",us::Any(),false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 

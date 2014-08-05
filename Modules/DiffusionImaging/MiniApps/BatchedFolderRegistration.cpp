@@ -248,20 +248,25 @@ int BatchedFolderRegistration( int argc, char* argv[] )
 {
   ctkCommandLineParser parser;
   parser.setArgumentPrefix("--","-");
+
+  parser.setTitle("Batched Folder Registraton");
+  parser.setCategory("Preprocessing Tools");
+  parser.setDescription("");
+  parser.setContributor("MBI");
+
   // Add command line argument names
-  parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Show this help text");
-  parser.addArgument("xml", "x",ctkCommandLineParser::Bool, "Print a XML description of this modules command line interface");
+  parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Help", "Show this help text");
   //parser.addArgument("usemask", "u", QVariant::Bool, "Use segmentations (derived resources) to exclude areas from registration metrics");
-  parser.addArgument("input", "i", ctkCommandLineParser::String, "Input folder",us::Any(),false);
-  parser.addArgument("output", "o", ctkCommandLineParser::String, "Output folder (ending with /)",us::Any(),false);
-  parser.addArgument("fixed", "f", ctkCommandLineParser::String, "Suffix for fixed image (if none is supplied first file matching moving pattern is chosen)",us::Any(),true);
-  parser.addArgument("moving", "m", ctkCommandLineParser::String, "Suffix for moving images",us::Any(),false);
-  parser.addArgument("derived", "d", ctkCommandLineParser::String, "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
-  parser.addArgument("silent", "s", ctkCommandLineParser::Bool, "No xml progress output.");
-  parser.addArgument("resample", "r", ctkCommandLineParser::String, "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
-  parser.addArgument("binary", "b", ctkCommandLineParser::Bool, "Speficies that derived resource are binary (interpolation using nearest neighbor)",us::Any());
-  parser.addArgument("correct-origin", "c", ctkCommandLineParser::Bool, "Correct for large origin displacement. Switch when you reveive:  Joint PDF summed to zero ",us::Any());
-  parser.addArgument("sinc-int", "s", ctkCommandLineParser::Bool, "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
+  parser.addArgument("input", "i", ctkCommandLineParser::Directory, "Input:", "Input folder",us::Any(),false);
+  parser.addArgument("output", "o", ctkCommandLineParser::Directory, "Output:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("fixed", "f", ctkCommandLineParser::String, "Fixed images:", "Suffix for fixed image (if none is supplied first file matching moving pattern is chosen)",us::Any(),true);
+  parser.addArgument("moving", "m", ctkCommandLineParser::String, "Moving images:", "Suffix for moving images",us::Any(),false);
+  parser.addArgument("derived", "d", ctkCommandLineParser::String, "Derived resources:", "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
+  parser.addArgument("silent", "s", ctkCommandLineParser::Bool, "Silent:" "No xml progress output.");
+  parser.addArgument("resample", "r", ctkCommandLineParser::String, "Resample (x,y,z)mm:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
+  parser.addArgument("binary", "b", ctkCommandLineParser::Bool, "Binary:", "Speficies that derived resource are binary (interpolation using nearest neighbor)",us::Any());
+  parser.addArgument("correct-origin", "c", ctkCommandLineParser::Bool, "Origin correction:", "Correct for large origin displacement. Switch when you reveive:  Joint PDF summed to zero ",us::Any());
+  parser.addArgument("sinc-int", "s", ctkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
 
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

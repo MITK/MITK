@@ -87,13 +87,19 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
 int GibbsTracking(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Gibbs Tracking");
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setDescription("");
+    parser.setContributor("MBI");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
-    parser.addArgument("parameters", "p", ctkCommandLineParser::String, "parameter file (.gtp)", us::Any(), false);
-    parser.addArgument("mask", "m", ctkCommandLineParser::String, "binary mask image");
-    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "sh coefficient convention (FSL, MRtrix)", string("FSL"), true);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", us::Any(), false);
-    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "do not flip input image to match MITK coordinate convention");
+    parser.addArgument("input", "i", ctkCommandLineParser::File, "Input:", "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+    parser.addArgument("parameters", "p", ctkCommandLineParser::File, "Parameters:", "parameter file (.gtp)", us::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::File, "Mask:", "binary mask image");
+    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "SH coefficient:", "sh coefficient convention (FSL, MRtrix)", string("FSL"), true);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::File, "Output:", "output fiber bundle (.fib)", us::Any(), false);
+    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "No flip:", "do not flip input image to match MITK coordinate convention");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

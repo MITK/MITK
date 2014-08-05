@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDIFFUSIONHEADERSIEMENSDICOMFILEREADER_H
 #define MITKDIFFUSIONHEADERSIEMENSDICOMFILEREADER_H
 
-#include "DiffusionCoreExports.h"
+#include "MitkDiffusionCoreExports.h"
 
 #include "mitkDiffusionHeaderDICOMFileReader.h"
 #include "mitkDiffusionHeaderSiemensDICOMFileHelper.h"
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class DiffusionCore_EXPORT DiffusionHeaderSiemensDICOMFileReader
+class MitkDiffusionCore_EXPORT DiffusionHeaderSiemensDICOMFileReader
     : public DiffusionHeaderDICOMFileReader
 {
 public:

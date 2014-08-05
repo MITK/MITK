@@ -117,7 +117,7 @@ bool mitk::DiffusionDICOMFileReader
 
   // initialize the output image
   output_image->SetDirections( directions );
-  output_image->SetB_Value( max_bvalue );
+  output_image->SetReferenceBValue( max_bvalue );
   if( is_mosaic_file )
   {
 
@@ -133,7 +133,7 @@ bool mitk::DiffusionDICOMFileReader
     output_image->SetVectorImage( helper.LoadToVector<short, 3>( filenames ) );
   }
   output_image->InitializeFromVectorImage();
-  output_image->UpdateBValueMap();
+  //output_image->UpdateBValueMap();
 
   // reduce the number of outputs to 1 as we will produce a single image
   this->SetNumberOfOutputs(1);

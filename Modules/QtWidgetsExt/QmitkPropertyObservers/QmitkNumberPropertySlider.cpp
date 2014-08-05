@@ -13,7 +13,12 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #include <QmitkNumberPropertySlider.h>
+
+#include <mitkPropertyObserver.h>
+#include <mitkProperties.h>
+
 #include <mitkRenderingManager.h>
 
 #define DT_SHORT   1
@@ -24,62 +29,150 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define ROUND(x)       (((x) > 0) ?   int((x) + 0.5) :   int((x) - 0.5))
 #define ROUND_SHORT(x) (((x) > 0) ? short((x) + 0.5) : short((x) - 0.5))
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::IntProperty* property, QWidget* parent, const char*)
-: QSlider( parent ),
-  PropertyEditor( property ),
-  m_IntProperty(property),
-  m_DataType(DT_INT)
+class QmitkNumberPropertySlider::Impl
 {
-  initialize();
+public:
+
+  Impl(QmitkNumberPropertySlider* q);
+
+  void DisplayNumber();
+  void adjustFactors(short, bool);
+
+  class Editor : public mitk::PropertyEditor
+  {
+  public:
+    Editor(mitk::IntProperty*, Impl* impl);
+    Editor(mitk::FloatProperty*, Impl* impl);
+    Editor(mitk::DoubleProperty*, Impl* impl);
+
+    virtual void PropertyChanged();
+    virtual void PropertyRemoved();
+
+    void BeginModifyProperty()
+    { mitk::PropertyEditor::BeginModifyProperty(); }
+    void EndModifyProperty()
+    { mitk::PropertyEditor::EndModifyProperty(); }
+
+    union {
+      mitk::GenericProperty<int>*     m_IntProperty;
+      mitk::GenericProperty<float>*   m_FloatProperty;
+      mitk::GenericProperty<double>*  m_DoubleProperty;
+    };
+
+    const int m_DataType;
+
+  private:
+    Impl* m_Impl;
+  };
+
+  std::auto_ptr<Editor> m_PropEditor;
+
+  short m_DecimalPlaces;            // how many decimal places are shown
+  double m_FactorPropertyToSlider; // internal conversion factor. neccessary because slider ranges work only with ints
+  double m_FactorSliderToDisplay;  // internal conversion factor. neccessary because slider ranges work only with ints
+  bool m_ShowPercents;              // whether values are given in percent (0.5 -> 50%)
+
+  bool m_SelfChangeLock;
+
+private:
+
+  void initialize();
+
+  QmitkNumberPropertySlider* q;
+};
+
+QmitkNumberPropertySlider::QmitkNumberPropertySlider::Impl::Editor::Editor(mitk::IntProperty* property, Impl* impl)
+  : mitk::PropertyEditor(property)
+  , m_IntProperty(property)
+  , m_DataType(DT_INT)
+  , m_Impl(impl)
+{
 }
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::FloatProperty* property, QWidget* parent, const char*)
-: QSlider( parent ),
-  PropertyEditor( property ),
-  m_FloatProperty(property),
-  m_DataType(DT_FLOAT)
+QmitkNumberPropertySlider::QmitkNumberPropertySlider::Impl::Editor::Editor(mitk::FloatProperty* property, Impl* impl)
+  : mitk::PropertyEditor( property )
+  , m_FloatProperty(property)
+  , m_DataType(DT_FLOAT)
+  , m_Impl(impl)
 {
-  initialize();
 }
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::DoubleProperty* property, QWidget* parent, const char* )
-: QSlider( parent ),
-  PropertyEditor( property ),
-  m_DoubleProperty(property),
-  m_DataType(DT_DOUBLE)
+QmitkNumberPropertySlider::QmitkNumberPropertySlider::Impl::Editor::Editor(mitk::DoubleProperty* property, Impl* impl)
+  : mitk::PropertyEditor( property )
+  , m_DoubleProperty(property)
+  , m_DataType(DT_DOUBLE)
+  , m_Impl(impl)
 {
-  initialize();
 }
 
 QmitkNumberPropertySlider::~QmitkNumberPropertySlider()
 {
 }
 
-void QmitkNumberPropertySlider::initialize()
-{ // only to be called from constructors
-
-  // spinbox settings
-  setOrientation( Qt::Horizontal );
-
-  // protected
-  m_DecimalPlaces = 0;
-  m_FactorPropertyToSlider = 1.0;
-  m_FactorSliderToDisplay = 1.0;
-  m_ShowPercents = false;
-
-  // private
-  m_SelfChangeLock = false;
-
-  connect( this, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)) );
-
-  // display current value of our property
-  DisplayNumber();
+void QmitkNumberPropertySlider::SetProperty(mitk::IntProperty* property)
+{
+  if (property == NULL)
+  {
+    d->m_PropEditor.reset();
+    this->setEnabled(false);
+  }
+  else
+  {
+    d->m_PropEditor.reset(new Impl::Editor(property, d.get()));
+    this->setEnabled(true);
+  }
 }
 
-void QmitkNumberPropertySlider::adjustFactors(short newDecimalPlaces, bool newShowPercents)
+void QmitkNumberPropertySlider::SetProperty(mitk::FloatProperty* property)
 {
-  int oldMax = maxValue();
-  int oldMin = minValue();
+  if (property == NULL)
+  {
+    d->m_PropEditor.reset();
+    this->setEnabled(false);
+  }
+  else
+  {
+    d->m_PropEditor.reset(new Impl::Editor(property, d.get()));
+    this->setEnabled(true);
+  }
+}
+
+void QmitkNumberPropertySlider::SetProperty(mitk::DoubleProperty* property)
+{
+  if (property == NULL)
+  {
+    d->m_PropEditor.reset();
+    this->setEnabled(false);
+  }
+  else
+  {
+    d->m_PropEditor.reset(new Impl::Editor(property, d.get()));
+    this->setEnabled(true);
+  }
+}
+
+QmitkNumberPropertySlider::Impl::Impl(QmitkNumberPropertySlider* q)
+  : m_DecimalPlaces(0)
+  , m_FactorPropertyToSlider(1.0)
+  , m_FactorSliderToDisplay(1.0)
+  , m_ShowPercents(false)
+  , m_SelfChangeLock(false)
+  , q(q)
+{
+}
+
+QmitkNumberPropertySlider::QmitkNumberPropertySlider(QWidget *parent)
+  : QSlider(parent)
+  , d(new Impl(this))
+{
+  connect( this, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)) );
+  this->setEnabled(false);
+}
+
+void QmitkNumberPropertySlider::Impl::adjustFactors(short newDecimalPlaces, bool newShowPercents)
+{
+  int oldMax = q->maxValue();
+  int oldMin = q->minValue();
 
   m_DecimalPlaces = newDecimalPlaces;
   m_ShowPercents = newShowPercents;
@@ -90,90 +183,96 @@ void QmitkNumberPropertySlider::adjustFactors(short newDecimalPlaces, bool newSh
   if ( m_ShowPercents )
     m_FactorPropertyToSlider *= 100.0;
 
-  setMinimum(oldMin);
-  setMaximum(oldMax);
+  q->setMinimum(oldMin);
+  q->setMaximum(oldMax);
 }
 
 short QmitkNumberPropertySlider::getDecimalPlaces() const
 {
-  return m_DecimalPlaces;
+  return d->m_DecimalPlaces;
 }
 
 void QmitkNumberPropertySlider::setDecimalPlaces(short places)
 {
-  switch (m_DataType)
+  if (d->m_PropEditor.get() == NULL) return;
+
+  switch (d->m_PropEditor->m_DataType)
   {
-    case DT_FLOAT:
-    case DT_DOUBLE:
-      {
-        adjustFactors( places, m_ShowPercents );
-        DisplayNumber();
-        break;
-      }
-    default:
-      break;
+  case DT_FLOAT:
+  case DT_DOUBLE:
+  {
+    d->adjustFactors( places, d->m_ShowPercents );
+    d->DisplayNumber();
+    break;
+  }
+  default:
+    break;
   }
 }
 
 bool QmitkNumberPropertySlider::getShowPercent() const
 {
-  return m_ShowPercents;
+  return d->m_ShowPercents;
 }
 
 void QmitkNumberPropertySlider::setShowPercent(bool showPercent)
 {
-  if ( showPercent == m_ShowPercents ) return; // nothing to change
+  if ( showPercent == d->m_ShowPercents ) return; // nothing to change
 
-  switch (m_DataType)
+  if (d->m_PropEditor.get() == NULL) return;
+
+  switch (d->m_PropEditor->m_DataType)
   {
-    case DT_FLOAT:
-    case DT_DOUBLE:
-    {
-      adjustFactors( m_DecimalPlaces, showPercent );
-      break;
-    }
-    default:
-    {
-      break;
-    }
+  case DT_FLOAT:
+  case DT_DOUBLE:
+  {
+    d->adjustFactors(d->m_DecimalPlaces, showPercent);
+    break;
+  }
+  default:
+  {
+    break;
+  }
   }
 
-  DisplayNumber();
+  d->DisplayNumber();
 }
 
 int QmitkNumberPropertySlider::minValue() const
 {
-  return ROUND( QSlider::minimum() / m_FactorPropertyToSlider );
+  return ROUND( QSlider::minimum() / d->m_FactorPropertyToSlider );
 }
 
 void QmitkNumberPropertySlider::setMinValue(int value)
 {
-  QSlider::setMinimum( ROUND(value * m_FactorPropertyToSlider ) );
+  QSlider::setMinimum( ROUND(value * d->m_FactorPropertyToSlider ) );
 }
 
 int QmitkNumberPropertySlider::maxValue() const
 {
-  return ROUND( QSlider::maximum() / m_FactorPropertyToSlider );
+  return ROUND( QSlider::maximum() / d->m_FactorPropertyToSlider );
 }
 
 void QmitkNumberPropertySlider::setMaxValue(int value)
 {
-  QSlider::setMaximum( ROUND( value * m_FactorPropertyToSlider ) );
+  QSlider::setMaximum( ROUND( value * d->m_FactorPropertyToSlider ) );
 }
 
 double QmitkNumberPropertySlider::doubleValue() const
 {
-  return static_cast<double>((QSlider::value()) / m_FactorPropertyToSlider );
+  return static_cast<double>((QSlider::value()) / d->m_FactorPropertyToSlider );
 }
 
 void QmitkNumberPropertySlider::setDoubleValue(double value)
 {
-  QSlider::setValue( ROUND( value * m_FactorPropertyToSlider ) );
+  QSlider::setValue( ROUND( value * d->m_FactorPropertyToSlider ) );
 }
 
 void QmitkNumberPropertySlider::onValueChanged(int value)
 {
-  if (m_SelfChangeLock) return; // valueChanged is even emitted, when this widget initiates a change to its value
+  if (d->m_PropEditor.get() == NULL) return;
+
+  if (d->m_SelfChangeLock) return; // valueChanged is even emitted, when this widget initiates a change to its value
                                 // this may be useful some times, but in this use, it would be wrong:
                                 //   (A) is an editor with 3 decimal places
                                 //   (B) is an editor with 2 decimal places
@@ -183,71 +282,71 @@ void QmitkNumberPropertySlider::onValueChanged(int value)
                                 //   B's onValueChanged gets called and sets the associated Property to 4.00
                                 //   A's onPropertyChanged gets called, sets its display to 4.000
 
-  BeginModifyProperty();
+  d->m_PropEditor->BeginModifyProperty();
 
-  double newValue( value / m_FactorPropertyToSlider );
+  double newValue( value / d->m_FactorPropertyToSlider );
 
-  switch (m_DataType)
+  switch (d->m_PropEditor->m_DataType)
   {
-    case DT_INT:
-      {
-        m_IntProperty->SetValue(ROUND(newValue));
-        break;
-      }
-    case DT_FLOAT:
-      {
-        m_FloatProperty->SetValue(newValue);
-        break;
-      }
-    case DT_DOUBLE:
-      {
-        m_DoubleProperty->SetValue(newValue);
-        break;
-      }
+  case DT_INT:
+  {
+    d->m_PropEditor->m_IntProperty->SetValue(ROUND(newValue));
+    break;
+  }
+  case DT_FLOAT:
+  {
+    d->m_PropEditor->m_FloatProperty->SetValue(newValue);
+    break;
+  }
+  case DT_DOUBLE:
+  {
+    d->m_PropEditor->m_DoubleProperty->SetValue(newValue);
+    break;
+  }
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  EndModifyProperty();
+  d->m_PropEditor->EndModifyProperty();
 }
 
-void QmitkNumberPropertySlider::PropertyChanged()
+void QmitkNumberPropertySlider::Impl::Editor::PropertyChanged()
 {
-  DisplayNumber();
+  m_Impl->DisplayNumber();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkNumberPropertySlider::PropertyRemoved()
+void QmitkNumberPropertySlider::Impl::Editor::PropertyRemoved()
 {
-  m_Property = NULL;
+  this->m_Property = NULL;
 }
 
-void QmitkNumberPropertySlider::DisplayNumber()
+void QmitkNumberPropertySlider::Impl::DisplayNumber()
 {
-  if (! m_Property ) return;
+  if (m_PropEditor.get() == NULL) return;
 
   m_SelfChangeLock = true;
-  switch (m_DataType)
+  switch (m_PropEditor->m_DataType)
   {
-    case DT_INT:
-      {
-        int i = m_IntProperty->GetValue();
-        QSlider::setValue( i );
-        break;
-      }
-    case DT_FLOAT:
-      {
-        float f = m_FloatProperty->GetValue();
-        setDoubleValue( f );
-        break;
-      }
-    case DT_DOUBLE:
-      {
-        double d = m_DoubleProperty->GetValue();
-        setDoubleValue( d );
-        break;
-      }
-    default:
-      break;
+  case DT_INT:
+  {
+    int i = m_PropEditor->m_IntProperty->GetValue();
+    q->setValue( i );
+    break;
+  }
+  case DT_FLOAT:
+  {
+    float f = m_PropEditor->m_FloatProperty->GetValue();
+    q->setDoubleValue( f );
+    break;
+  }
+  case DT_DOUBLE:
+  {
+    double d = m_PropEditor->m_DoubleProperty->GetValue();
+    q->setDoubleValue( d );
+    break;
+  }
+  default:
+    break;
   }
   m_SelfChangeLock = false;
 }

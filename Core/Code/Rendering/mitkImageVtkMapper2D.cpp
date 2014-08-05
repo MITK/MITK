@@ -770,8 +770,11 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       PixelType pixelType = image->GetPixelType();
       size_t numComponents = pixelType.GetNumberOfComponents();
 
-      if ((pixelType.GetPixelTypeAsString() == "vector" && numComponents > 1) || numComponents == 2 || numComponents > 4)
+      if ((pixelType.GetPixelType() == itk::ImageIOBase::VECTOR && numComponents > 1) ||
+          numComponents == 2 || numComponents > 4)
+      {
         node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
+      }
     }
   }
 

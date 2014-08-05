@@ -64,6 +64,13 @@ private:
 
 const std::string ViewBrowserView::VIEW_ID = "org.mitk.views.viewbrowser";
 
+bool compareViews(berry::IViewDescriptor::Pointer a, berry::IViewDescriptor::Pointer b)
+{
+  if (a.IsNull() || b.IsNull())
+    return false;
+  return a->GetLabel().compare(b->GetLabel()) < 0;
+}
+
 void ViewBrowserView::SetFocus()
 {
 }
@@ -99,6 +106,7 @@ void ViewBrowserView::FillTreeList()
   {
     viewMap[views[i]->GetId()] = views[i];
   }
+  std::sort(views.begin(), views.end(), compareViews);
 
   // Get all available perspectives
   berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
@@ -131,14 +139,28 @@ void ViewBrowserView::FillTreeList()
     {
       if (curWin.IsNull())
         continue;
+
       berry::IWorkbenchPage::Pointer activePage = curWin->GetActivePage();
       std::vector< std::string > currentViews = activePage->GetShowViewShortcuts();
+      // Create a vector with all current elements
+      std::vector<berry::IViewDescriptor::Pointer> activeViews;
       for (int j = 0; j < currentViews.size(); ++j)
       {
-        QList<QStandardItem *> secondRow;
+        berry::IViewDescriptor::Pointer view = viewMap[currentViews[j]];
+        if (view.IsNull())
+          continue;
+        activeViews.push_back(view);
+      }
+      std::sort(activeViews.begin(), activeViews.end(), compareViews);
 
-        mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(currentViews[j]));
-        vItem->m_View = viewMap[currentViews[j]];
+
+      for (int j = 0; j < activeViews.size(); ++j)
+      {
+        berry::IViewDescriptor::Pointer view =activeViews[j];
+        QList<QStandardItem *> secondRow;
+        QIcon* icon = static_cast<QIcon*>(view->GetImageDescriptor()->CreateImage());
+        mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon,QString::fromStdString(view->GetLabel()));
+        vItem->m_View = view;
         secondRow << vItem;
         preparedRow.first()->appendRow(secondRow);
       }
@@ -147,13 +169,14 @@ void ViewBrowserView::FillTreeList()
 
   // Add a list with all available views
   QList< QStandardItem*> preparedRow;
-  QStandardItem* pItem = new QStandardItem("All Views");
+  QStandardItem* pItem = new QStandardItem(QIcon(),"All Views");
   preparedRow << pItem;
   item->appendRow(preparedRow);
   for (int i = 0; i < views.size(); ++i)
   {
     QList<QStandardItem *> secondRow;
-    mitk::QtViewItem* vItem = new mitk::QtViewItem(QString::fromStdString(views[i]->GetLabel()));
+    QIcon* icon = static_cast<QIcon*>(views[i]->GetImageDescriptor()->CreateImage());
+    mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon, QString::fromStdString(views[i]->GetLabel()));
     vItem->m_View = views[i];
     secondRow << vItem;
     preparedRow.first()->appendRow(secondRow);

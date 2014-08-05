@@ -30,6 +30,10 @@ public:
       QStandardItem(string)
     {
     }
+    QtViewItem(const QIcon& icon, QString string) :
+      QStandardItem(icon, string)
+    {
+    }
     using QStandardItem::QStandardItem;
     berry::IViewDescriptor::Pointer m_View;
 

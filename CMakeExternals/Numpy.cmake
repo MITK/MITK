@@ -84,10 +84,20 @@ if( MITK_USE_Python )
          ")
 
       # install step
-      set(_install_dir "${CMAKE_BINARY_DIR}/${proj}-install")
-      if(WIN32)
-        STRING(REPLACE "/" "\\\\" _install_dir "${CMAKE_BINARY_DIR}/${proj}-install")
+      set(NUMPY_CMAKE_INSTALL_DIR )
+      if(NOT MITK_USE_SYSTEM_PYTHON)
+        set(_install_dir ${Python_BUILD_DIR})
+        if(WIN32)
+          STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
+        endif()
+      else()
+        set(NUMPY_CMAKE_INSTALL_DIR INSTALL_DIR ${CMAKE_BINARY_DIR}/${proj}-install)
+        set(_install_dir "${CMAKE_BINARY_DIR}/${proj}-install")
+        if(WIN32)
+          STRING(REPLACE "/" "\\\\" _install_dir ${CMAKE_BINARY_DIR}/${proj}-install)
+        endif()
       endif()
+
       set(_install_step ${CMAKE_BINARY_DIR}/${proj}_install_step.cmake)
       file(WRITE ${_install_step}
          "include(\"${_external_python_project}\")
@@ -105,7 +115,7 @@ if( MITK_USE_Python )
         SOURCE_DIR ${proj}-src
         PREFIX ${proj}-cmake
         BUILD_IN_SOURCE 1
-        INSTALL_DIR ${CMAKE_BINARY_DIR}/${proj}-install
+        ${NUMPY_CMAKE_INSTALL_DIR}
         CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${_configure_step}
         BUILD_COMMAND   ${CMAKE_COMMAND} -P ${_build_step}
         INSTALL_COMMAND ${CMAKE_COMMAND} -P ${_install_step}
@@ -115,9 +125,9 @@ if( MITK_USE_Python )
       )
 
       if(WIN32)
-        set(Numpy_DIR ${CMAKE_BINARY_DIR}/${proj}-install/Lib/site-packages)
+        set(Numpy_DIR ${_install_dir}/Lib/site-packages)
       else()
-        set(Numpy_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib/python2.7/site-packages)
+        set(Numpy_DIR ${_install_dir}/lib/python2.7/site-packages)
       endif()
       set(NUMPY_INCLUDE_DIR ${Numpy_DIR}/numpy/core/include)
     else()

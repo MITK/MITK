@@ -39,10 +39,11 @@ if(MITK_USE_OpenCV)
       if(NOT MITK_USE_SYSTEM_PYTHON)
         list(APPEND proj_DEPENDENCIES Python)
       endif()
+      # use the numpy build within mitk
       if(MITK_USE_NUMPY)
         list(APPEND proj_DEPENDENCIES Numpy)
         list(APPEND additional_cmake_args
-          -DPYTHON_NUMPY_INCLUDE_DIR:PATH=${Numpy_DIR}/numpy/core/include/numpy
+          -DPYTHON_NUMPY_INCLUDE_DIR:PATH=${Numpy_DIR}/numpy/core/include
             )
       endif()
     else()

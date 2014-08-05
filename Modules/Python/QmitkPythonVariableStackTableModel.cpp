@@ -72,7 +72,8 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
           QRegExp rx("^\\d");
           QString varName(node->GetName().c_str());
           // regex replace every character that is not allowed in a python variable
-          varName = varName.replace(QRegExp("[.+-*\\s\\/\\n\\t\\r]"),QString("_"));
+          varName = varName.replace(QRegExp("[.\\+\\-*\\s\\/\\n\\t\\r]"),QString("_"));
+          MITK_INFO << "varName: " << varName.toStdString();
 
           if( mitkImage )
           {
@@ -90,12 +91,12 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
             if( exportAsCvImage )
             {
               int ret = QMessageBox::question(NULL, "Export option",
-                "2D image detected. Export as OpenCV image to Python instead of an ITK image?",
+                "2D image detected. Export as OpenCV image to Python instead of an SimpleITK image?",
                                               QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-
               exportAsCvImage = ret == QMessageBox::Yes;
               if(exportAsCvImage)
               {
+                varName = MITK_IMAGE_VAR_NAME;
                 m_PythonService->CopyToPythonAsCvImage( mitkImage, varName.toStdString() );
                 ++i;
               }

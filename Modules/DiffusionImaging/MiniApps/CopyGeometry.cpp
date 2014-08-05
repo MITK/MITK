@@ -28,10 +28,16 @@ using namespace mitk;
 int CopyGeometry(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Copy Geometry");
+    parser.setCategory("Preprocessing Tools");
+    parser.setDescription("");
+    parser.setContributor("MBI");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("in", "i", ctkCommandLineParser::String, "input image", us::Any(), false);
-    parser.addArgument("ref", "r", ctkCommandLineParser::String, "reference image", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output image", us::Any(), false);
+    parser.addArgument("in", "i", ctkCommandLineParser::File, "Input:", "input image", us::Any(), false);
+    parser.addArgument("ref", "r", ctkCommandLineParser::File, "Reference:", "reference image", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::File, "Output:", "output image", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

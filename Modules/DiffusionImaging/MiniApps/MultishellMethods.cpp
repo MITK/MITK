@@ -48,13 +48,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 int MultishellMethods(int argc, char* argv[])
 {
   ctkCommandLineParser parser;
+
+  parser.setTitle("Multishell Methods");
+  parser.setCategory("Fiber Tracking and Processing Methods");
+  parser.setDescription("");
+  parser.setContributor("MBI");
+
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("in", "i", ctkCommandLineParser::String, "input file", us::Any(), false);
-  parser.addArgument("out", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
-  parser.addArgument("adc", "D", ctkCommandLineParser::Bool, "ADC Average", us::Any(), false);
-  parser.addArgument("akc", "K", ctkCommandLineParser::Bool, "Kurtosis Fit", us::Any(), false);
-  parser.addArgument("biexp", "B", ctkCommandLineParser::Bool, "BiExp fit", us::Any(), false);
-  parser.addArgument("targetbvalue", "b", ctkCommandLineParser::String, "target bValue (mean, min, max)", us::Any(), false);
+  parser.addArgument("in", "i", ctkCommandLineParser::File, "Input:", "input file", us::Any(), false);
+  parser.addArgument("out", "o", ctkCommandLineParser::File, "Output:", "output file", us::Any(), false);
+  parser.addArgument("adc", "D", ctkCommandLineParser::Bool, "ADC:", "ADC Average", us::Any(), false);
+  parser.addArgument("akc", "K", ctkCommandLineParser::Bool, "Kurtosis fit:", "Kurtosis Fit", us::Any(), false);
+  parser.addArgument("biexp", "B", ctkCommandLineParser::Bool, "BiExp fit:", "BiExp fit", us::Any(), false);
+  parser.addArgument("targetbvalue", "b", ctkCommandLineParser::String, "b Value:", "target bValue (mean, min, max)", us::Any(), false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

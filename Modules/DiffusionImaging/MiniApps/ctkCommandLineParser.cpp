@@ -622,9 +622,9 @@ const ctkCommandLineParser::StringContainerType& ctkCommandLineParser::unparsedA
 
 // --------------------------------------------------------------------------
 void ctkCommandLineParser::addArgument(const string& longarg, const string& shortarg,
-                                       Type type, const string& argHelp,
+                                       Type type, const string& argLabel, const string& argHelp,
                                        const us::Any& defaultValue, bool optional, bool ignoreRest,
-                                       bool deprecated, const string& argLabel)
+                                       bool deprecated)
 {
     if (longarg.empty() && shortarg.empty()) { return; }
 
@@ -665,9 +665,9 @@ void ctkCommandLineParser::addArgument(const string& longarg, const string& shor
 
 // --------------------------------------------------------------------------
 void ctkCommandLineParser::addDeprecatedArgument(
-        const string& longarg, const string& shortarg, const string& argHelp, const string& argLabel)
+        const string& longarg, const string& shortarg, const string& argLabel, const string& argHelp)
 {
-    addArgument(longarg, shortarg, StringList, argHelp, us::Any(), false, true, false, argLabel);
+    addArgument(longarg, shortarg, StringList, argLabel, argHelp, us::Any(), false, true, false);
 }
 
 // --------------------------------------------------------------------------

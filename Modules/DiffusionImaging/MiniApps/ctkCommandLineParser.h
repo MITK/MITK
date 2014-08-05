@@ -263,9 +263,9 @@ public:
    *         does not match <code>type</code>, a <code>std::logic_error</code> is thrown.
    */
     void addArgument(const string& longarg, const string& shortarg,
-                     Type type, const string& argHelp = string(),
+                     Type type, const string& argLabel, const string& argHelp = string(),
                      const us::Any& defaultValue = us::Any(), bool optional=true,
-                     bool ignoreRest = false, bool deprecated = false, const string& argLabel = string());
+                     bool ignoreRest = false, bool deprecated = false);
 
     /**
    * Adds a deprecated command line argument. If a deprecated argument is provided
@@ -279,8 +279,8 @@ public:
    * @param shortarg The short argument name.
    * @param argHelp A help string describing alternatives to the deprecated argument.
    */
-    void addDeprecatedArgument(const string& longarg, const string& shortarg,
-                               const string& argHelp, const string& argLabel);
+    void addDeprecatedArgument(const string& longarg, const string& shortarg, const string& argLabel,
+                               const string& argHelp);
 
     /**
    * Sets a custom regular expression for validating argument parameters. The method

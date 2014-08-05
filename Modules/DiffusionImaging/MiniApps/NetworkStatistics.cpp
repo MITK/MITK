@@ -43,18 +43,23 @@ int NetworkStatistics(int argc, char* argv[])
 {
   ctkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("inputNetwork", "i", ctkCommandLineParser::String, "input connectomics network (.cnf)", us::Any(), false);
-  parser.addArgument("outputFile", "o", ctkCommandLineParser::String, "name of output file", us::Any(), false);
+  parser.addArgument("inputNetwork", "i", ctkCommandLineParser::File, "Input network", "input connectomics network (.cnf)", us::Any(), false);
+  parser.addArgument("outputFile", "o", ctkCommandLineParser::File, "Output file", "name of output file", us::Any(), false);
 
-  parser.addArgument("noGlobalStatistics", "g", ctkCommandLineParser::Bool, "Do not calculate global statistics");
-  parser.addArgument("createConnectivityMatriximage", "I", ctkCommandLineParser::Bool, "Write connectivity matrix image");
-  parser.addArgument("binaryConnectivity", "b", ctkCommandLineParser::Bool, "Whether to create a binary connectivity matrix");
-  parser.addArgument("rescaleConnectivity", "r", ctkCommandLineParser::Bool, "Whether to rescale the connectivity matrix");
-  parser.addArgument("localStatistics", "L", ctkCommandLineParser::StringList, "Provide a list of node labels for local statistics", us::Any());
-  parser.addArgument("regionList", "R", ctkCommandLineParser::StringList, "A space separated list of regions. Each region has the format\n regionname;label1;label2;...;labelN", us::Any());
-  parser.addArgument("granularity", "gr", ctkCommandLineParser::Int, "How finely to test the density range and how many thresholds to consider");
-  parser.addArgument("startDensity", "d", ctkCommandLineParser::Bool, "Largest density for the range");
-  parser.addArgument("thresholdStepSize", "t", ctkCommandLineParser::Int, "Distance of two adjacent thresholds");
+  parser.addArgument("noGlobalStatistics", "g", ctkCommandLineParser::Bool, "No global statistics", "Do not calculate global statistics");
+  parser.addArgument("createConnectivityMatriximage", "I", ctkCommandLineParser::Bool, "Write connectivity matrix image", "Write connectivity matrix image");
+  parser.addArgument("binaryConnectivity", "b", ctkCommandLineParser::Bool, "Binary connectivity", "Whether to create a binary connectivity matrix");
+  parser.addArgument("rescaleConnectivity", "r", ctkCommandLineParser::Bool, "Rescale connectivity", "Whether to rescale the connectivity matrix");
+  parser.addArgument("localStatistics", "L", ctkCommandLineParser::StringList, "Local statistics", "Provide a list of node labels for local statistics", us::Any());
+  parser.addArgument("regionList", "R", ctkCommandLineParser::StringList, "Region list", "A space separated list of regions. Each region has the format\n regionname;label1;label2;...;labelN", us::Any());
+  parser.addArgument("granularity", "gr", ctkCommandLineParser::Int, "Granularity", "How finely to test the density range and how many thresholds to consider");
+  parser.addArgument("startDensity", "d", ctkCommandLineParser::Bool, "Start Density", "Largest density for the range");
+  parser.addArgument("thresholdStepSize", "t", ctkCommandLineParser::Int, "Step size threshold", "Distance of two adjacent thresholds");
+
+  parser.setCategory("Connectomics");
+  parser.setTitle("Network Statistics");
+  parser.setDescription("");
+  parser.setContributor("MBI");
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

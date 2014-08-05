@@ -34,14 +34,19 @@ int QballReconstruction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
-    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "spherical harmonics order", 4, true);
-    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "baseline image intensity threshold", 0, true);
-    parser.addArgument("lambda", "r", ctkCommandLineParser::Float, "ragularization factor lambda", 0.006, true);
-    parser.addArgument("csa", "csa", ctkCommandLineParser::Bool, "use constant solid angle consideration");
-    parser.addArgument("outputCoeffs", "shc", ctkCommandLineParser::Bool, "output file containing the SH coefficients");
-    parser.addArgument("mrtrix", "mb", ctkCommandLineParser::Bool, "use MRtrix compatible spherical harmonics definition");
+    parser.addArgument("input", "i", ctkCommandLineParser::File, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::File, "Output file", "output file", us::Any(), false);
+    parser.addArgument("shOrder", "sh", ctkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order", 4, true);
+    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
+    parser.addArgument("lambda", "r", ctkCommandLineParser::Float, "Lambda", "ragularization factor lambda", 0.006, true);
+    parser.addArgument("csa", "csa", ctkCommandLineParser::Bool, "Constant solid angle consideration", "use constant solid angle consideration");
+    parser.addArgument("outputCoeffs", "shc", ctkCommandLineParser::Bool, "Output coefficients", "output file containing the SH coefficients");
+    parser.addArgument("mrtrix", "mb", ctkCommandLineParser::Bool, "MRtrix", "use MRtrix compatible spherical harmonics definition");
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Qball Reconstruction");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

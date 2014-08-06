@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_ViewBrowserViewControls.h"
 
 #include <QStandardItemModel>
+#include <QSortFilterProxyModel>
 #include <QMenu>
 #include <src/internal/mitkQtPerspectiveItem.h>
 #include <src/internal/mitkQtViewItem.h>
@@ -42,6 +43,8 @@ See LICENSE.txt or http://www.mitk.org for details.
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
+class ClassFilterProxyModel;
+
 class ViewBrowserView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -55,6 +58,7 @@ class ViewBrowserView : public QmitkAbstractView
 
     /// \brief Fills the TreeList with the available perspectives and views.
     void FillTreeList();
+    void RemoveListener();
 
 
   protected slots:
@@ -69,6 +73,7 @@ class ViewBrowserView : public QmitkAbstractView
     void ClosePerspectives();
     void ClosePerspective();
     void ButtonClicked();
+    void FilterChanged();
 
   protected:
 
@@ -83,9 +88,11 @@ class ViewBrowserView : public QmitkAbstractView
     QWidget*                                    m_Parent;
     Ui::ViewBrowserViewControls                 m_Controls;
     QStandardItemModel*                         m_TreeModel;
+    ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
     berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
     berry::IPerspectiveListener::Pointer        perspListener;
+    berry::IWindowListener::Pointer                perspListener2;
 
     friend struct ViewBrowserViewListener;
 };

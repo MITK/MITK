@@ -32,15 +32,79 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QTreeView>
 #include <QStandardItem>
+#include <qsortfilterproxymodel>
 
-static void OpenAllPerspectives()
+class ClassFilterProxyModel : public QSortFilterProxyModel
 {
-    berry::IWorkbenchWindow::Pointer window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+private :
+  bool hasToBeDisplayed(const QModelIndex index) const;
+  bool displayElement(const QModelIndex index) const;
+public:
+  ClassFilterProxyModel(QObject *parent = NULL);
+  bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+};
+ClassFilterProxyModel::ClassFilterProxyModel(QObject *parent):
+  QSortFilterProxyModel(parent)
+{
+}
 
-    if (window.IsNull())
-        return;
+bool ClassFilterProxyModel::filterAcceptsRow(int sourceRow,
+                                             const QModelIndex &sourceParent) const
+{
+  QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
 
-    berry::IWorkbenchPage::Pointer page = window->GetActivePage();
+  return hasToBeDisplayed(index);
+}
+
+bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
+{
+  bool result;
+  QString type = sourceModel()->data(index, Qt::DisplayRole).toString();
+  if ( ! type.contains(filterRegExp()))
+  {
+    result = false;
+  }
+  else
+  {
+    result = true;
+  }
+  return result;
+}
+
+
+bool ClassFilterProxyModel::hasToBeDisplayed(const QModelIndex index) const
+{
+  bool result = false;
+  // How many child this element have
+  if ( sourceModel()->rowCount(index) > 0 )
+  {
+    for( int ii = 0; ii < sourceModel()->rowCount(index); ii++)
+    {
+      QModelIndex childIndex = sourceModel()->index(ii,0,index);
+      if ( ! childIndex.isValid() )
+        break;
+      result = hasToBeDisplayed(childIndex);
+      result |= displayElement(index);
+      if (result)
+      {
+        // there is atless one element to display
+        break;
+      }
+    }
+  }
+  else
+  {
+    result = displayElement(index);
+  }
+  return result;
+}
+
+static bool OpenAllPerspectives()
+{
+  if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNull())
+  {
+    return false;
+  }
     if (page.IsNull())
     {
         return;
@@ -55,6 +119,7 @@ static void OpenAllPerspectives()
 
     //FillTreeList();
     berry::PlatformUI::GetWorkbench()->ShowPerspective( currentPersp->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
+  return true;
 }
 
 struct ViewBrowserViewListener : public berry::IPerspectiveListener
@@ -93,6 +158,36 @@ private:
     bool m_Running;
 };
 
+struct ViewBrowserWindowListener : public berry::IWindowListener
+{
+    ViewBrowserWindowListener(ViewBrowserView* switcher)
+        : switcher(switcher),
+          m_Running(false)
+    {}
+
+    virtual void WindowOpened(berry::IWorkbenchWindow::Pointer /*window*/)
+    {
+      if (m_Running)
+      {
+        return;
+      }
+      m_Running = true;
+      if (OpenAllPerspectives())
+      {
+          switcher->RemoveListener();
+      }
+      switcher->FillTreeList();
+      m_Running = false;
+    }
+
+private:
+    ViewBrowserView* switcher;
+    bool m_Running;
+};
+
+
+
+
 const std::string ViewBrowserView::VIEW_ID = "org.mitk.views.viewbrowser";
 
 bool compareViews(berry::IViewDescriptor::Pointer a, berry::IViewDescriptor::Pointer b)
@@ -114,17 +209,27 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
     connect( m_Controls.m_PluginTreeView, SIGNAL(doubleClicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
     connect( m_Controls.pushButton, SIGNAL(clicked()), SLOT(ButtonClicked()) );
+    connect( m_Controls.lineEdit, SIGNAL(textChanged(QString)), SLOT(FilterChanged()));
 
     m_ContextMenu = new QMenu(m_Controls.m_PluginTreeView);
     m_Controls.m_PluginTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // Create a new TreeModel for the data
     m_TreeModel = new QStandardItemModel();
-    m_Controls.m_PluginTreeView->setModel(m_TreeModel);
-    OpenAllPerspectives();
-    FillTreeList();
-
-    this->perspListener = new ViewBrowserViewListener(this);
+    m_FilterProxyModel = new ClassFilterProxyModel(this);
+    m_FilterProxyModel->setSourceModel(m_TreeModel);
+    //proxyModel->setFilterFixedString("Diff");
+    m_Controls.m_PluginTreeView->setModel(m_FilterProxyModel);
+    if (OpenAllPerspectives())
+    {
+      FillTreeList();
+    }
+    else
+    {
+      this->perspListener2 = new ViewBrowserWindowListener(this);
+      berry::PlatformUI::GetWorkbench()->AddWindowListener(perspListener2);
+    }
+    //this->perspListener = new ViewBrowserViewListener(this);
     //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->AddPerspectiveListener(this->perspListener);
 }
 
@@ -140,6 +245,11 @@ void ViewBrowserView::ButtonClicked()
 
     FillTreeList();
     berry::PlatformUI::GetWorkbench()->ShowPerspective( currentPersp->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
+}
+
+void ViewBrowserView::RemoveListener()
+{
+  berry::PlatformUI::GetWorkbench()->RemoveWindowListener(perspListener2);
 }
 
 void ViewBrowserView::FillTreeList()
@@ -164,6 +274,8 @@ void ViewBrowserView::FillTreeList()
     // workbench window available?
     if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNull())
         return;
+
+//    berry::PlatformUI::GetWorkbench()->AddWindowListener();
 
     // Fill the TreeModel
     berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
@@ -281,9 +393,21 @@ void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 {
 }
 
+void ViewBrowserView::FilterChanged()
+{
+  QRegExp::PatternSyntax syntax = QRegExp::RegExp;
+
+  Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive;
+  QString strPattern = "^*" + m_Controls.lineEdit->text();
+  QRegExp regExp(strPattern, caseSensitivity);
+
+  m_FilterProxyModel->setFilterRegExp(regExp);
+}
+
 void ViewBrowserView::ItemClicked(const QModelIndex &index)
 {
-    QStandardItem* item = m_TreeModel->itemFromIndex(index);
+    QStandardItem* item = m_TreeModel->itemFromIndex(m_FilterProxyModel->mapToSource(index));
+
     if ( dynamic_cast< mitk::QtPerspectiveItem* >(item) )
     {
         try

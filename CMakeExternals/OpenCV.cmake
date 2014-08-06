@@ -38,13 +38,6 @@ if(MITK_USE_OpenCV)
           )
       if(NOT MITK_USE_SYSTEM_PYTHON)
         list(APPEND proj_DEPENDENCIES Python)
-        # set the python home to the correct python runtime.
-        # Else OpenCV will use default system paths during configuration.
-        if(WIN32)
-          set(ENV{PYTHONHOME} "${Python_BUILD_DIR}")
-        else()
-          set(ENV{PYTHONHOME} "${Python_DIR}")
-        endif()
       endif()
       # use the numpy build within mitk
       if(MITK_USE_NUMPY)

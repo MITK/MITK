@@ -86,7 +86,7 @@ if( MITK_USE_Python )
       # install step
       set(NUMPY_CMAKE_INSTALL_DIR )
       if(NOT MITK_USE_SYSTEM_PYTHON)
-        set(_install_dir ${Python_BUILD_DIR})
+        set(_install_dir ${Python_DIR})
         if(WIN32)
           STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
         endif()
@@ -129,7 +129,12 @@ if( MITK_USE_Python )
       else()
         set(Numpy_DIR ${_install_dir}/lib/python2.7/site-packages)
       endif()
+
       set(NUMPY_INCLUDE_DIR ${Numpy_DIR}/numpy/core/include)
+
+      # add Numpy to the python path
+      set(ENV{PYTHONPATH} "${Numpy_DIR}")
+
     else()
       mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
     endif()

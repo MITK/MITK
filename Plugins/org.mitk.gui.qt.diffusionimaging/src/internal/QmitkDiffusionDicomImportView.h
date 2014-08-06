@@ -72,6 +72,7 @@ protected slots:
   void DicomLoadAddFolderNames();
   void DicomLoadDeleteFolderNames();
   void DicomLoadStartLoad() ;
+  void NewDicomLoadStartLoad() ;
   void AverageClicked();
   void OutputSet();
   void OutputClear();

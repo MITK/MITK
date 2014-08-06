@@ -87,6 +87,8 @@ public:
 
   SmartPointer<IWorkbenchPage> GetActivePage();
 
+  SmartPointer<IWorkbenchPage> GetPage(int i);
+
   /**
    * Sets the active page within the window.
    *

@@ -593,6 +593,22 @@ void WorkbenchWindow::CloseAllPages()
   }
 }
 
+
+IWorkbenchPage::Pointer WorkbenchWindow::GetPage(int i)
+{
+    std::list<IWorkbenchPage::Pointer> pages = pageList.GetPages();
+    std::list<IWorkbenchPage::Pointer>::iterator it;
+    int j=-1;
+    for (it = pages.begin(); it!=pages.end(); it++)
+    {
+        j++;
+        if (j==i)
+            break;
+    }
+    if (j==i)
+        return *it;
+}
+
 IWorkbenchPage::Pointer WorkbenchWindow::GetActivePage()
 {
   return pageList.GetActive();

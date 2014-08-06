@@ -488,6 +488,11 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
   virtual void HideView(IViewReference::Pointer view) = 0;
 
   /**
+   * Returns true if perspective with given id contains view with given id
+   */
+  virtual bool HasView(const std::string& perspectiveId, const std::string& viewId) = 0;
+
+  /**
    * Returns whether the specified part is visible.
    *
    * @param part

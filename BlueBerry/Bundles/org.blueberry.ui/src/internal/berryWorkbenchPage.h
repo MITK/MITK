@@ -351,7 +351,6 @@ private:
      * list.
      */
     void SetActive(SmartPointer<Perspective> perspective);
-
   };
 
   IAdaptable* input;
@@ -382,6 +381,13 @@ private:
   //NavigationHistory navigationHistory = new NavigationHistory(this);
 
   IStickyViewManager::Pointer stickyViewMan;
+
+
+
+  /**
+   * Returns true if perspective with given id contains view with given id
+   */
+  bool HasView(const std::string& perspectiveId, const std::string& viewId);
 
   /**
    * If we're in the process of activating a part, this points to the new part.

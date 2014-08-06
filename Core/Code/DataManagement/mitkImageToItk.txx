@@ -23,6 +23,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageWriteAccessor.h"
 #include "mitkException.h"
 
+template<typename TImageType>
+struct SetLengthHelper
+{
+  SetLengthHelper(TImageType* in)
+  { m_Image = in;}
+
+private:
+  TImageType* m_Image;
+};
+
+template< typename T, unsigned int VDimension>
+struct SetLengthHelper< itk::Image< T, VDimension > >
+{
+  typedef itk::Image< T, VDimension > TImageType;
+
+  SetLengthHelper(TImageType* in)
+  { m_Image = in;}
+
+  void SetVectorLength( size_t ) {}
+
+private:
+  TImageType* m_Image;
+};
+
+template< typename T, unsigned int VDimension>
+struct SetLengthHelper< itk::VectorImage< T, VDimension > >
+{
+  typedef itk::VectorImage< T, VDimension > TImageType;
+
+  SetLengthHelper(TImageType* in)
+  { m_Image = in;}
+
+  void SetVectorLength( size_t len) { m_Image->SetVectorLength( len ); }
+
+private:
+  TImageType* m_Image;
+};
 
 template <class TOutputImage>
 void mitk::ImageToItk<TOutputImage>::SetInput(mitk::Image *input)
@@ -96,6 +133,8 @@ template<class TOutputImage>
   if (pixelType.GetPixelType() == itk::ImageIOBase::VECTOR)
   {
     noBytes *= pixelType.GetNumberOfComponents();
+    SetLengthHelper<typename Superclass::OutputImageType> helper( output.GetPointer() );
+    helper.SetVectorLength( pixelType.GetNumberOfComponents() );
   }
 
   mitk::ImageWriteAccessor* imageAccess = new mitk::ImageWriteAccessor(input);

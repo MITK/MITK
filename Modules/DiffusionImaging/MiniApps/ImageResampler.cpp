@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include "mitkNrrdDiffusionImageWriter.h"
 #include <mitkImageTimeSelector.h>
+#include <mitkNrrdDiffusionImageWriter.h>
+
 // ITK
 #include <itksys/SystemTools.hxx>
 #include <itkDirectory.h>
@@ -34,8 +36,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkWindowedSincInterpolateImageFunction.h"
 #include "itkIdentityTransform.h"
 #include "itkResampleImageFilter.h"
+#include "itkResampleDwiImageFilter.h"
 
 typedef itk::Image<double, 3> InputImageType;
+typedef mitk::DiffusionImage<short> DiffusionImageType;
 
 
 static mitk::Image::Pointer TransformToReference(mitk::Image *reference, mitk::Image *moving, bool sincInterpol = false)
@@ -193,6 +197,31 @@ static void SaveImage(std::string fileName, mitk::Image* image, std::string file
   }
 }
 
+DiffusionImageType::Pointer ResampleDWIbySpacing(DiffusionImageType::Pointer input, float* spacing, bool useLinInt = true)
+{
+
+  itk::Vector<double, 3> spacingVector;
+  spacingVector[0] = spacing[0];
+  spacingVector[1] = spacing[1];
+  spacingVector[2] = spacing[2];
+
+  typedef itk::ResampleDwiImageFilter<short> ResampleFilterType;
+
+  ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+  resampler->SetInput(input->GetVectorImage());
+  resampler->SetInterpolation(ResampleFilterType::Interpolate_Linear);
+  resampler->SetNewSpacing(spacingVector);
+  resampler->Update();
+
+  DiffusionImageType::Pointer output = DiffusionImageType::New();
+  output->SetVectorImage(resampler->GetOutput());
+  output->SetDirections(input->GetDirections());
+  output->SetReferenceBValue(input->GetReferenceBValue());
+  output->InitializeFromVectorImage();
+
+  return output;
+}
+
 int ImageResampler( int argc, char* argv[] )
 {
   ctkCommandLineParser parser;
@@ -268,7 +297,28 @@ int ImageResampler( int argc, char* argv[] )
   if (!useSpacing)
       refImage = mitk::IOUtil::LoadImage(refImageFile);
 
+  DiffusionImageType::Pointer inputDWI = dynamic_cast<DiffusionImageType*>(mitk::IOUtil::LoadBaseData(inputFile).GetPointer());
+  if (inputDWI.IsNotNull())
+  {
+    DiffusionImageType::Pointer outputImage;
 
+    if (useSpacing)
+      outputImage = ResampleDWIbySpacing(inputDWI, spacing);
+    else
+    {
+      MITK_WARN << "Not supported yet, to resample a DWI please set a new spacing.";
+      return EXIT_FAILURE;
+    }
+
+    std::string fileStem = itksys::SystemTools::GetFilenameWithoutExtension(inputFile);
+
+    mitk::NrrdDiffusionImageWriter<short>::Pointer writer = mitk::NrrdDiffusionImageWriter<short>::New();
+    writer->SetInput(outputImage);
+    writer->SetFileName(outputPath + fileStem + "_res.dwi");
+    writer->Update();
+
+    return EXIT_SUCCESS;
+  }
   mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(inputFile);
 
 

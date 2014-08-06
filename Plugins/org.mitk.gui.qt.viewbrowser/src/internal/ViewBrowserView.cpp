@@ -387,7 +387,8 @@ void ViewBrowserView::FillTreeList()
         preparedRow.first()->appendRow(secondRow);
     }
 
-    m_Controls.m_PluginTreeView->setCurrentIndex(currentIndex);
+    QModelIndex correctedIndex = m_FilterProxyModel->mapFromSource(currentIndex);
+    m_Controls.m_PluginTreeView->setCurrentIndex(correctedIndex);
 }
 
 void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
@@ -396,10 +397,15 @@ void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 
 void ViewBrowserView::FilterChanged()
 {
+  QString filterString = m_Controls.lineEdit->text();
+  if (filterString.size() > 0 )
+  {
+    m_Controls.m_PluginTreeView->expandAll();
+  }
   QRegExp::PatternSyntax syntax = QRegExp::RegExp;
 
   Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive;
-  QString strPattern = "^*" + m_Controls.lineEdit->text();
+  QString strPattern = "^*" + filterString;
   QRegExp regExp(strPattern, caseSensitivity);
 
   m_FilterProxyModel->setFilterRegExp(regExp);

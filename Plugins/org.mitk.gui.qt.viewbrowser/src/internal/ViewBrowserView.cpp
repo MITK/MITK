@@ -35,21 +35,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 static void OpenAllPerspectives()
 {
-  berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
-  if (page.IsNull())
-  {
-    return;
-  }
+    berry::IWorkbenchWindow::Pointer window = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
 
-  berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
+    if (window.IsNull())
+        return;
 
-  berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
-  std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
-  for (unsigned int i=0; i<perspectives.size(); i++)
-    berry::PlatformUI::GetWorkbench()->ShowPerspective( perspectives.at(i)->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
+    berry::IWorkbenchPage::Pointer page = window->GetActivePage();
+    if (page.IsNull())
+    {
+        return;
+    }
 
-  //FillTreeList();
-  berry::PlatformUI::GetWorkbench()->ShowPerspective( currentPersp->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
+    berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
+
+    berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
+    std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
+    for (unsigned int i=0; i<perspectives.size(); i++)
+        berry::PlatformUI::GetWorkbench()->ShowPerspective( perspectives.at(i)->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
+
+    //FillTreeList();
+    berry::PlatformUI::GetWorkbench()->ShowPerspective( currentPersp->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
 }
 
 struct ViewBrowserViewListener : public berry::IPerspectiveListener
@@ -68,18 +73,18 @@ struct ViewBrowserViewListener : public berry::IPerspectiveListener
     void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
                               berry::IPerspectiveDescriptor::Pointer perspective)
     {
-      if (m_Running)
-      {
-        return;
-      }
-      m_Running = true;
-      if (!m_FirstRun)
-      {
-        OpenAllPerspectives();
-        m_FirstRun = true;
-      }
-      switcher->FillTreeList();
-      m_Running = false;
+        if (m_Running)
+        {
+            return;
+        }
+        m_Running = true;
+        if (!m_FirstRun)
+        {
+            OpenAllPerspectives();
+            m_FirstRun = true;
+        }
+        switcher->FillTreeList();
+        m_Running = false;
     }
 
 private:
@@ -120,7 +125,7 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     FillTreeList();
 
     this->perspListener = new ViewBrowserViewListener(this);
-    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->AddPerspectiveListener(this->perspListener);
+    //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->AddPerspectiveListener(this->perspListener);
 }
 
 void ViewBrowserView::ButtonClicked()
@@ -133,7 +138,7 @@ void ViewBrowserView::ButtonClicked()
     for (unsigned int i=0; i<perspectives.size(); i++)
         berry::PlatformUI::GetWorkbench()->ShowPerspective( perspectives.at(i)->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
 
-    //FillTreeList();
+    FillTreeList();
     berry::PlatformUI::GetWorkbench()->ShowPerspective( currentPersp->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
 }
 
@@ -164,13 +169,15 @@ void ViewBrowserView::FillTreeList()
     berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
     if (page.IsNull())
     {
-      return;
+        return;
     }
     QModelIndex currentIndex;
     berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
     std::vector<std::string> perspectiveExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetPerspectiveExcludeList();
     std::vector<std::string> viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
 
+    QStandardItem *perspectiveRootItem = new QStandardItem("Perspectives");
+    treeRootItem->appendRow(perspectiveRootItem);
     for (unsigned int i=0; i<perspectives.size(); i++)
     {
         berry::IPerspectiveDescriptor::Pointer p = perspectives.at(i);
@@ -186,10 +193,12 @@ void ViewBrowserView::FillTreeList()
             continue;
 
         QList< QStandardItem*> preparedRow;
-        mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(QString::fromStdString(p->GetLabel()));
+
+        QIcon* pIcon = static_cast<QIcon*>(p->GetImageDescriptor()->CreateImage());
+        mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(*pIcon, QString::fromStdString(p->GetLabel()));
         pItem->m_Perspective = p;
         preparedRow << pItem;
-        treeRootItem->appendRow(preparedRow);
+        perspectiveRootItem->appendRow(preparedRow);
 
         if (currentPersp->GetId()==p->GetId())
             currentIndex = pItem->index();
@@ -208,51 +217,51 @@ void ViewBrowserView::FillTreeList()
 
             if ( page->HasView(p->GetId(), views.at(i)->GetId()) )
             {
-              QList<QStandardItem *> secondRow;
-              QIcon* icon = static_cast<QIcon*>(views[i]->GetImageDescriptor()->CreateImage());
-              mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon, QString::fromStdString(views[i]->GetLabel()));
-              vItem->m_View = views[i];
-              secondRow << vItem;
-              preparedRow.first()->appendRow(secondRow);
+                QList<QStandardItem *> secondRow;
+                QIcon* vIcon = static_cast<QIcon*>(views[i]->GetImageDescriptor()->CreateImage());
+                mitk::QtViewItem* vItem = new mitk::QtViewItem(*vIcon, QString::fromStdString(views[i]->GetLabel()));
+                vItem->m_View = views[i];
+                secondRow << vItem;
+                preparedRow.first()->appendRow(secondRow);
             }
         }
 
-//        // If the current perspective is the active perspective add current views
-//        if (currentPersp.compare(p->GetId())==0)
-//        {
-//            if (curWin.IsNull())
-//                continue;
+        //        // If the current perspective is the active perspective add current views
+        //        if (currentPersp.compare(p->GetId())==0)
+        //        {
+        //            if (curWin.IsNull())
+        //                continue;
 
-//            berry::IWorkbenchPage::Pointer activePage = curWin->GetActivePage();
-//            std::vector< std::string > currentViews = activePage->GetShowViewShortcuts();
-//            // Create a vector with all current elements
-//            std::vector<berry::IViewDescriptor::Pointer> activeViews;
-//            for (int j = 0; j < currentViews.size(); ++j)
-//            {
-//                berry::IViewDescriptor::Pointer view = viewMap[currentViews[j]];
-//                if (view.IsNull())
-//                    continue;
-//                activeViews.push_back(view);
-//            }
-//            std::sort(activeViews.begin(), activeViews.end(), compareViews);
+        //            berry::IWorkbenchPage::Pointer activePage = curWin->GetActivePage();
+        //            std::vector< std::string > currentViews = activePage->GetShowViewShortcuts();
+        //            // Create a vector with all current elements
+        //            std::vector<berry::IViewDescriptor::Pointer> activeViews;
+        //            for (int j = 0; j < currentViews.size(); ++j)
+        //            {
+        //                berry::IViewDescriptor::Pointer view = viewMap[currentViews[j]];
+        //                if (view.IsNull())
+        //                    continue;
+        //                activeViews.push_back(view);
+        //            }
+        //            std::sort(activeViews.begin(), activeViews.end(), compareViews);
 
 
-//            for (int j = 0; j < activeViews.size(); ++j)
-//            {
-//                berry::IViewDescriptor::Pointer view =activeViews[j];
-//                QList<QStandardItem *> secondRow;
-//                QIcon* icon = static_cast<QIcon*>(view->GetImageDescriptor()->CreateImage());
-//                mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon,QString::fromStdString(view->GetLabel()));
-//                vItem->m_View = view;
-//                secondRow << vItem;
-//                preparedRow.first()->appendRow(secondRow);
-//            }
-//        }
+        //            for (int j = 0; j < activeViews.size(); ++j)
+        //            {
+        //                berry::IViewDescriptor::Pointer view =activeViews[j];
+        //                QList<QStandardItem *> secondRow;
+        //                QIcon* icon = static_cast<QIcon*>(view->GetImageDescriptor()->CreateImage());
+        //                mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon,QString::fromStdString(view->GetLabel()));
+        //                vItem->m_View = view;
+        //                secondRow << vItem;
+        //                preparedRow.first()->appendRow(secondRow);
+        //            }
+        //        }
     }
 
     // Add a list with all available views
     QList< QStandardItem*> preparedRow;
-    QStandardItem* pItem = new QStandardItem(QIcon(),"All Views");
+    QStandardItem* pItem = new QStandardItem(QIcon(),"Views");
     preparedRow << pItem;
     treeRootItem->appendRow(preparedRow);
     for (unsigned int i = 0; i < views.size(); ++i)
@@ -404,18 +413,43 @@ void ViewBrowserView::ClosePerspectives()
 void ViewBrowserView::CustomMenuRequested(QPoint pos)
 {
     QStandardItem* item = m_TreeModel->itemFromIndex(m_Controls.m_PluginTreeView->indexAt(pos));
+
+    if (m_ContextMenu==NULL || item==NULL)
+        return;
+
     m_ContextMenu->clear();
     m_RegisteredPerspective = NULL;
 
-    QAction* addAction = new QAction("Create new perspective", this);
-    m_ContextMenu->addAction(addAction);
-    connect(addAction, SIGNAL(triggered()), SLOT(AddPerspective()));
+    bool showMenu = false;
+    if (item->text()=="Perspectives")
+    {
+        QAction* addAction = new QAction("Create new perspective", this);
+        m_ContextMenu->addAction(addAction);
+        connect(addAction, SIGNAL(triggered()), SLOT(AddPerspective()));
 
-    if (m_ContextMenu!=NULL && item!=NULL && dynamic_cast< mitk::QtPerspectiveItem* >(item) )
+        m_ContextMenu->addSeparator();
+
+        QAction* resetAction = new QAction("Reset current perspective", this);
+        m_ContextMenu->addAction(resetAction);
+        connect(resetAction, SIGNAL(triggered()), SLOT(ResetPerspective()));
+
+        QAction* closeAction = new QAction("Close current perspective", this);
+        m_ContextMenu->addAction(closeAction);
+        connect(closeAction, SIGNAL(triggered()), SLOT(ClosePerspective()));
+
+        m_ContextMenu->addSeparator();
+
+        QAction* closeAllAction = new QAction("Close all perspectives", this);
+        m_ContextMenu->addAction(closeAllAction);
+        connect(closeAllAction, SIGNAL(triggered()), SLOT(ClosePerspectives()));
+
+        showMenu = true;
+    }
+    if (dynamic_cast< mitk::QtPerspectiveItem* >(item) )
     {
         m_RegisteredPerspective = dynamic_cast< mitk::QtPerspectiveItem* >(item)->m_Perspective;
 
-        m_ContextMenu->addSeparator();
+        //m_ContextMenu->addSeparator();
 
         QAction* cloneAction = new QAction("Duplicate perspective", this);
         m_ContextMenu->addAction(cloneAction);
@@ -428,22 +462,9 @@ void ViewBrowserView::CustomMenuRequested(QPoint pos)
             connect(deleteAction, SIGNAL(triggered()), SLOT(DeletePerspective()));
         }
 
-        m_ContextMenu->addSeparator();
+        showMenu = true;
     }
 
-    QAction* resetAction = new QAction("Reset current perspective", this);
-    m_ContextMenu->addAction(resetAction);
-    connect(resetAction, SIGNAL(triggered()), SLOT(ResetPerspective()));
-
-    QAction* closeAction = new QAction("Close current perspective", this);
-    m_ContextMenu->addAction(closeAction);
-    connect(closeAction, SIGNAL(triggered()), SLOT(ClosePerspective()));
-
-    m_ContextMenu->addSeparator();
-
-    QAction* closeAllAction = new QAction("Close all perspectives", this);
-    m_ContextMenu->addAction(closeAllAction);
-    connect(closeAllAction, SIGNAL(triggered()), SLOT(ClosePerspectives()));
-
-    m_ContextMenu->popup(m_Controls.m_PluginTreeView->viewport()->mapToGlobal(pos));
+    if (showMenu)
+        m_ContextMenu->popup(m_Controls.m_PluginTreeView->viewport()->mapToGlobal(pos));
 }

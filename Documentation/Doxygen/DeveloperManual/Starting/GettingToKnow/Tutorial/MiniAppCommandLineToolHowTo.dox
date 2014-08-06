@@ -14,6 +14,25 @@ Additionally, a command line tool provides a XML representation of the configure
 
 \section MiniAppCommandLineToolSetUp Setting up a simple command line tool
 
-This section describes the different parts of a command line tool using the example of the \ref TensorReconstruction command line tool.
+This section describes the most important code parts a command line tool consists of using the example of the \ref TensorReconstruction command line tool.
 
+First of all the main function of the command line tool is specified. This function is registered at the MiniAppManager via the macro defined in \ref MiniAppManager.h
+
+\code
+
+int TensorReconstruction(int argc, char* argv[])
+{
+
+}
+
+RegisterDiffusionMiniApp(TensorReconstruction);
+
+\endcode
+
+application logic surrounded by try/catch blocks
+
+
+
+following output will be emitted:
+<xml>
 */

@@ -1,0 +1,19 @@
+/**
+
+\page MiniAppCommandLineToolHowToPage How to create a MiniApp command line tool
+
+\tableofcontents
+
+This page will give you an overview of creating your own command line tool that can be integrated into a MiniApp.
+If you don't know about MiniApps, you can read what MiniApps are at the \ref MiniAppExplainPage page.
+
+\section MinAppCommandLineToolDescription What's a MiniApp command line tool?
+
+A MiniApp command line tool allows for configuration of command line arguments and eases the access to these argument values.
+Additionally, a command line tool provides a XML representation of the configured arguments. This XML representation can be used for automatic user interface generation.
+
+\section MiniAppCommandLineToolSetUp Setting up a simple command line tool
+
+This section describes the different parts of a command line tool using the example of the \ref TensorReconstruction command line tool.
+
+*/

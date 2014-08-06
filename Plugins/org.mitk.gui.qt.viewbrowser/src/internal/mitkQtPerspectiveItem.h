@@ -30,6 +30,10 @@ public:
       QStandardItem(string)
     {
     }
+    QtPerspectiveItem(const QIcon& icon, QString string) :
+      QStandardItem(icon, string)
+    {
+    }
 
     berry::IPerspectiveDescriptor::Pointer m_Perspective;
 

@@ -87,14 +87,8 @@ mitk::DiffusionImage<short>::Pointer ReadInDICOMFiles( mitk::StringList& input_f
 
   mitk::DICOMSortCriterion::ConstPointer sorting =
       mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
-                                 mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012)/*, // aqcuisition number
-                                                            mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
-                                                                                       mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060)//, // trigger time
-                                                                                                                /*  mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
-                                                                                                                                             ).GetPointer()
-                                                                                                                  ).GetPointer()
-                                                                                       ).GetPointer()
-                                                          */  ).GetPointer()
+                                 mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012) //acquisition number
+                                                            ).GetPointer()
                                  ).GetPointer();
   tagSorter->SetSortCriterion( sorting );
 
@@ -244,7 +238,7 @@ int DICOMLoader(int argc, char* argv[])
       {
         imageContainer.push_back((*dwi)->GetVectorImage());
         gradientListContainer.push_back((*dwi)->GetDirections());
-        bValueContainer.push_back((*dwi)->GetB_Value());
+        bValueContainer.push_back((*dwi)->GetReferenceBValue());
       }
 
       typedef itk::MergeDiffusionImagesFilter<short> FilterType;
@@ -257,7 +251,7 @@ int DICOMLoader(int argc, char* argv[])
       vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
 
       image->SetVectorImage( filter->GetOutput() );
-      image->SetB_Value(filter->GetB_Value());
+      image->SetReferenceBValue(filter->GetB_Value());
       image->SetDirections(filter->GetOutputGradients());
       image->SetMeasurementFrame(mf);
       image->InitializeFromVectorImage();

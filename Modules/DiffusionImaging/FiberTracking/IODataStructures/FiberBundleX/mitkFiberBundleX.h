@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <QStringList>
 
 #include <mitkPlanarFigure.h>
+#include <mitkPixelTypeTraits.h>
 
 namespace mitk {
 

@@ -45,7 +45,7 @@ Please select:
 In order to select one of those tools simply append the displayed name to call, e.g. GibbsTracking
 this will provide a listing of the parameters of that tool:
 \code
-$./MitkDiffusionMiniApps  GibbsTracking
+$./MitkDiffusionMiniApps GibbsTracking
 
 [1.081] Start GibbsTracking ..
  -i, --input, input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)
@@ -59,7 +59,7 @@ $./MitkDiffusionMiniApps  GibbsTracking
 To execute the tool with parameters an exemplary call would look like this:
 
 \code
-$./MitkDiffusionMiniApps  GibbsTracking -i test.dti -p param.gtp -o /tmp/fiber.fib
+$./MitkDiffusionMiniApps GibbsTracking -i test.dti -p param.gtp -o /tmp/fiber.fib
 \endcode
 
 

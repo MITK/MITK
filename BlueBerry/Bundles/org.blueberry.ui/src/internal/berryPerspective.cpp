@@ -80,6 +80,13 @@ bool Perspective::ContainsView(IViewPart::Pointer view)
   return (view.Cast<IWorkbenchPart>() == ref->GetPart(false));
 }
 
+bool Perspective::ContainsView(const std::string& viewId)
+{
+    if (mapIDtoViewLayoutRec.find(viewId)!=mapIDtoViewLayoutRec.end())
+        return true;
+    return false;
+}
+
 void Perspective::CreatePresentation(PerspectiveDescriptor::Pointer persp)
 {
   if (persp->HasCustomDefinition())

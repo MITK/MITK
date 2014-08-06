@@ -117,6 +117,7 @@ private:
   berry::IPerspectiveListener::Pointer titlePerspectiveListener;
   berry::IPerspectiveListener::Pointer menuPerspectiveListener;
   berry::IPartListener::Pointer imageNavigatorPartListener;
+  berry::IPartListener::Pointer viewBrowserPartListener;
   berry::IPropertyChangeListener::Pointer editorPropertyListener;
   friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
@@ -160,6 +161,7 @@ private:
   QAction* undoAction;
   QAction* redoAction;
   QAction* imageNavigatorAction;
+  QAction* viewBrowserAction;
   QAction* resetPerspAction;
   QAction* closePerspAction;
   QAction* openDicomEditorAction;

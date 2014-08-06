@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 #include <berryIPerspectiveListener.h>
+#include <berryIWorkbench.h>
+#include <berryIWorkbenchPage.h>
+#include <berryIPerspectiveDescriptor.h>
 
 #include <QmitkAbstractView.h>
 
@@ -30,9 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <src/internal/mitkQtPerspectiveItem.h>
 #include <src/internal/mitkQtViewItem.h>
 
-#include <berryIWorkbench.h>
-#include <berryIWorkbenchPage.h>
-#include <berryIPerspectiveDescriptor.h>
+
 /**
   \brief ViewBrowserView
 
@@ -67,6 +68,7 @@ class ViewBrowserView : public QmitkAbstractView
     void DeletePerspective();
     void ClosePerspectives();
     void ClosePerspective();
+    void ButtonClicked();
 
   protected:
 

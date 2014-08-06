@@ -84,6 +84,8 @@ struct BERRY_UI IWorkbenchWindow : public IPageService, public IServiceLocator, 
    */
   virtual bool Close() = 0;
 
+  virtual SmartPointer<IWorkbenchPage> GetPage(int i) = 0;
+
   /**
    * Returns the currently active page for this workbench window.
    *

@@ -13,8 +13,9 @@ Alternatively, you can <a href="http://www.mitk.org/Contact">contact us directly
 <h2> UserManualPortalTopics List of topics</h2>
 <ul>
   <li> \subpage MITKUserManualPage </li>
-  <li> \subpage ApplicationsPage </li>  
+  <li> \subpage ApplicationsPage </li>
   <li> \subpage PluginListPage </li>
   <li> \subpage PerspectiveListPage </li>
+  <li> \subpage MiniAppExplainPage </li>
 </ul>
 */

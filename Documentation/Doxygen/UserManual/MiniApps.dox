@@ -1,0 +1,70 @@
+/**
+\page MiniAppExplainPage MITK MiniApps
+
+\section MiniAppDescription What are MiniApps
+
+MiniApps are small compilations of command line tools. Each of these tools is designed to fulfill one simple task,
+e.g. resample an image or extract image statistics of a given region of interest (ROI). Several tools that relate to
+a similiar topic or research area are grouped into one MiniApp.
+
+They are intended to provide command line access to a variety of features of MITK, thus facilitating batched processing of data.
+
+\section MiniAppUsage Usage
+
+The MiniApps are built in a self-describing way. When calling a MiniApp without any arguements it will list
+all available sub-tools. When calling e.g. the DiffusionMiniApp it will look similarly to this:
+
+\code
+$./MitkDiffusionMiniApps
+
+Please choose the mini app to execute:
+(0) BatchedFolderRegistration
+(1) CopyGeometry
+(2) DicomFolderDump
+(3) DiffusionIndices
+(4) DwiDenoising
+(5) ExportShImage
+(6) ExtractImageStatistics
+(7) FiberDirectionExtraction
+(8) FiberProcessing
+(9) FileFormatConverter
+(10) GibbsTracking
+(11) LocalDirectionalFiberPlausibility
+(12) MultishellMethods
+(13) NetworkCreation
+(14) NetworkStatistics
+(15) PeakExtraction
+(16) PeaksAngularError
+(17) QballReconstruction
+(18) StreamlineTracking
+(19) TensorDerivedMapsExtraction
+(20) TensorReconstruction
+Please select:
+\endcode
+
+In order to select one of those tools simply append the displayed name to call, e.g. GibbsTracking
+this will provide a listing of the parameters of that tool:
+\code
+$./MitkDiffusionMiniApps  GibbsTracking
+
+[1.081] Start GibbsTracking ..
+ -i, --input, input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)
+ -p, --parameters, parameter file (.gtp)
+ -m, --mask, binary mask image (optional)
+ -s, --shConvention, sh coefficient convention (FSL, MRtrix) (optional), (default: FSL)
+ -o, --outFile, output fiber bundle (.fib)
+ -f, --noFlip, do not flip input image to match MITK coordinate convention (optional)
+\endcode
+
+To execute the tool with parameters an exemplary call would look like this:
+
+\code
+$./MitkDiffusionMiniApps  GibbsTracking -i test.dti -p param.gtp -o /tmp/fiber.fib
+\endcode
+
+
+\section MiniAppAvailableList Available MiniApps
+
+\li \ref DiffusionMiniApps
+
+*/

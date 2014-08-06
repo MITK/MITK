@@ -11,7 +11,7 @@ They are intended to provide command line access to a variety of features of MIT
 
 \section MiniAppUsage Usage
 
-The MiniApps are built in a self-describing way. When calling a MiniApp without any arguements it will list
+The MiniApps are built in a self-describing way. When calling a MiniApp without any arguments it will list
 all available sub-tools. When calling e.g. the DiffusionMiniApp it will look similarly to this:
 
 \code

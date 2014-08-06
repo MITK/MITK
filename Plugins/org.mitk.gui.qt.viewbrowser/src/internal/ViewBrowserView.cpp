@@ -105,20 +105,21 @@ static bool OpenAllPerspectives()
   {
     return false;
   }
-    if (page.IsNull())
-    {
-        return;
-    }
+  berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+  if (page.IsNull())
+  {
+    return false;
+  }
 
-    berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
+  berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
 
-    berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
-    std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
-    for (unsigned int i=0; i<perspectives.size(); i++)
-        berry::PlatformUI::GetWorkbench()->ShowPerspective( perspectives.at(i)->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
+  berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
+  std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
+  for (unsigned int i=0; i<perspectives.size(); i++)
+    berry::PlatformUI::GetWorkbench()->ShowPerspective( perspectives.at(i)->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
 
-    //FillTreeList();
-    berry::PlatformUI::GetWorkbench()->ShowPerspective( currentPersp->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
+  //FillTreeList();
+  berry::PlatformUI::GetWorkbench()->ShowPerspective( currentPersp->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
   return true;
 }
 
@@ -536,7 +537,8 @@ void ViewBrowserView::ClosePerspectives()
 
 void ViewBrowserView::CustomMenuRequested(QPoint pos)
 {
-    QStandardItem* item = m_TreeModel->itemFromIndex(m_Controls.m_PluginTreeView->indexAt(pos));
+  QModelIndex index = m_Controls.m_PluginTreeView->indexAt(pos);
+    QStandardItem* item = m_TreeModel->itemFromIndex(m_FilterProxyModel->mapToSource(index));
 
     if (m_ContextMenu==NULL || item==NULL)
         return;

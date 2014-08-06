@@ -81,7 +81,7 @@ private:
   QmitkNumberPropertySlider* q;
 };
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider::Impl::Editor::Editor(mitk::IntProperty* property, Impl* impl)
+QmitkNumberPropertySlider::Impl::Editor::Editor(mitk::IntProperty* property, Impl* impl)
   : mitk::PropertyEditor(property)
   , m_IntProperty(property)
   , m_DataType(DT_INT)
@@ -89,7 +89,7 @@ QmitkNumberPropertySlider::QmitkNumberPropertySlider::Impl::Editor::Editor(mitk:
 {
 }
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider::Impl::Editor::Editor(mitk::FloatProperty* property, Impl* impl)
+QmitkNumberPropertySlider::Impl::Editor::Editor(mitk::FloatProperty* property, Impl* impl)
   : mitk::PropertyEditor( property )
   , m_FloatProperty(property)
   , m_DataType(DT_FLOAT)
@@ -97,7 +97,7 @@ QmitkNumberPropertySlider::QmitkNumberPropertySlider::Impl::Editor::Editor(mitk:
 {
 }
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider::Impl::Editor::Editor(mitk::DoubleProperty* property, Impl* impl)
+QmitkNumberPropertySlider::Impl::Editor::Editor(mitk::DoubleProperty* property, Impl* impl)
   : mitk::PropertyEditor( property )
   , m_DoubleProperty(property)
   , m_DataType(DT_DOUBLE)

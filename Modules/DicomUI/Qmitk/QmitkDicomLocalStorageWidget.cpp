@@ -64,7 +64,7 @@ void QmitkDicomLocalStorageWidget::CreateQtPartControl( QWidget *parent )
         connect(m_LocalIndexer, SIGNAL(progress(int)), m_ProgressDialog, SLOT(setValue(int)));
         connect(m_ProgressDialog, SIGNAL(canceled()), m_LocalIndexer, SLOT(cancel()));
 
-        m_Controls->ctkDicomBrowser->setDynamicTableLayout(true);
+        m_Controls->ctkDicomBrowser->setTableOrientation(Qt::Vertical);
     }
 }
 

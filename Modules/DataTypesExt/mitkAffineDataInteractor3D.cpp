@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkInteractorObserver.h>
+
 
 mitk::AffineDataInteractor3D::AffineDataInteractor3D()
 {
@@ -65,8 +67,8 @@ bool mitk::AffineDataInteractor3D::CheckOverObject(const InteractionEvent* inter
   if(positionEvent == NULL)
     return false;
 
-  Point3D currentPickedPoint;
-  if(interactionEvent->GetSender()->PickObject(positionEvent->GetPointerPositionOnScreen(), currentPickedPoint) == this->GetDataNode().GetPointer())
+  Point3D currentWorldPoint;
+  if(interactionEvent->GetSender()->PickObject(positionEvent->GetPointerPositionOnScreen(), currentWorldPoint) == this->GetDataNode().GetPointer())
     return true;
 
   return false;
@@ -112,8 +114,14 @@ bool mitk::AffineDataInteractor3D::InitTranslate(StateMachineAction*, Interactio
   if(positionEvent == NULL)
     return false;
 
-  m_InitialPickedPoint = positionEvent->GetPositionInWorld();
   m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+
+  vtkInteractorObserver::ComputeDisplayToWorld(
+    interactionEvent->GetSender()->GetVtkRenderer(),
+    m_InitialPickedDisplayPoint[0],
+    m_InitialPickedDisplayPoint[1],
+    0.0, //m_InitialInteractionPickedPoint[2],
+    m_InitialPickedWorldPoint );
 
   // Get the timestep to also support 3D+t
   int timeStep = 0;
@@ -133,8 +141,14 @@ bool mitk::AffineDataInteractor3D::InitRotate(StateMachineAction*, InteractionEv
   if(positionEvent == NULL)
     return false;
 
-  m_InitialPickedPoint = positionEvent->GetPositionInWorld();
   m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+
+  vtkInteractorObserver::ComputeDisplayToWorld(
+    interactionEvent->GetSender()->GetVtkRenderer(),
+    m_InitialPickedDisplayPoint[0],
+    m_InitialPickedDisplayPoint[1],
+    0.0, //m_InitialInteractionPickedPoint[2],
+    m_InitialPickedWorldPoint );
 
   // Get the timestep to also support 3D+t
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
@@ -152,12 +166,19 @@ bool mitk::AffineDataInteractor3D::TranslateObject (StateMachineAction*, Interac
   if(positionEvent == NULL)
     return false;
 
-  Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
+  double currentWorldPoint[4];
+  mitk::Point2D currentDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+  vtkInteractorObserver::ComputeDisplayToWorld(
+    interactionEvent->GetSender()->GetVtkRenderer(),
+    currentDisplayPoint[0],
+    currentDisplayPoint[1],
+    0.0, //m_InitialInteractionPickedPoint[2],
+    currentWorldPoint);
 
   Vector3D interactionMove;
-  interactionMove[0] = currentPickedPoint[0] - m_InitialPickedPoint[0];
-  interactionMove[1] = currentPickedPoint[1] - m_InitialPickedPoint[1];
-  interactionMove[2] = currentPickedPoint[2] - m_InitialPickedPoint[2];
+  interactionMove[0] = currentWorldPoint[0] - m_InitialPickedWorldPoint[0];
+  interactionMove[1] = currentWorldPoint[1] - m_InitialPickedWorldPoint[1];
+  interactionMove[2] = currentWorldPoint[2] - m_InitialPickedWorldPoint[2];
 
   Point3D origin = m_OriginalGeometry->GetOrigin();
 
@@ -201,8 +222,14 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
   if(positionEvent == NULL)
     return false;
 
+  double currentWorldPoint[4];
   Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
-  Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
+  vtkInteractorObserver::ComputeDisplayToWorld(
+    interactionEvent->GetSender()->GetVtkRenderer(),
+    currentPickedDisplayPoint[0],
+    currentPickedDisplayPoint[1],
+    0.0, //m_InitialInteractionPickedPoint[2],
+    currentWorldPoint);
 
   vtkCamera* camera = NULL;
   vtkRenderer* currentVtkRenderer = NULL;
@@ -232,9 +259,9 @@ bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, Interactio
     viewPlaneNormal[2] = vpn[2];
 
     Vector3D interactionMove;
-    interactionMove[0] = currentPickedPoint[0] - m_InitialPickedPoint[0];
-    interactionMove[1] = currentPickedPoint[1] - m_InitialPickedPoint[1];
-    interactionMove[2] = currentPickedPoint[2] - m_InitialPickedPoint[2];
+    interactionMove[0] = currentWorldPoint[0] - m_InitialPickedWorldPoint[0];
+    interactionMove[1] = currentWorldPoint[1] - m_InitialPickedWorldPoint[1];
+    interactionMove[2] = currentWorldPoint[2] - m_InitialPickedWorldPoint[2];
 
     if (interactionMove[0] == 0 && interactionMove[1] == 0  && interactionMove[2] == 0)
       return true;

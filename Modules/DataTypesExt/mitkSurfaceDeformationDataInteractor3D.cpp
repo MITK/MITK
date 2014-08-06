@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <vtkInteractorObserver.h>
 
 mitk::SurfaceDeformationDataInteractor3D::SurfaceDeformationDataInteractor3D()
   :m_GaussSigma(30.0)
@@ -129,7 +130,15 @@ bool mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineActio
   vtkPolyData* polyData = m_Surface->GetVtkPolyData(timeStep);
 
   // Store current picked point
-  interactionEvent->GetSender()->PickObject(positionEvent->GetPointerPositionOnScreen(), m_InitialPickedPoint);
+  mitk::Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+  interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, m_InitialPickedPoint);
+
+  vtkInteractorObserver::ComputeDisplayToWorld(
+    interactionEvent->GetSender()->GetVtkRenderer(),
+    currentPickedDisplayPoint[0],
+    currentPickedDisplayPoint[1],
+    0.0, //m_InitialInteractionPickedPoint[2],
+    m_InitialPickedWorldPoint);
 
   // Make deep copy of vtkPolyData interacted on
   m_OriginalPolyData->DeepCopy(polyData);
@@ -147,13 +156,20 @@ bool mitk::SurfaceDeformationDataInteractor3D::DeformObject (StateMachineAction*
   vtkPolyData* polyData = m_Surface->GetVtkPolyData(timeStep);
   BaseGeometry::Pointer geometry = this->GetDataNode()->GetData()->GetGeometry(timeStep);
 
-  Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
+  double currentWorldPoint[4];
+  mitk::Point2D currentDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+  vtkInteractorObserver::ComputeDisplayToWorld(
+    interactionEvent->GetSender()->GetVtkRenderer(),
+    currentDisplayPoint[0],
+    currentDisplayPoint[1],
+    0.0, //m_InitialInteractionPickedPoint[2],
+    currentWorldPoint);
 
   // Calculate mouse move in 3D space
   Vector3D interactionMove;
-  interactionMove[0] = currentPickedPoint[0] - m_InitialPickedPoint[0];
-  interactionMove[1] = currentPickedPoint[1] - m_InitialPickedPoint[1];
-  interactionMove[2] = currentPickedPoint[2] - m_InitialPickedPoint[2];
+  interactionMove[0] = currentWorldPoint[0] - m_InitialPickedWorldPoint[0];
+  interactionMove[1] = currentWorldPoint[1] - m_InitialPickedWorldPoint[1];
+  interactionMove[2] = currentWorldPoint[2] - m_InitialPickedWorldPoint[2];
 
   // Transform mouse move into geometry space
   this->GetDataNode()->GetData()->UpdateOutputInformation();// make sure that the Geometry is up-to-date

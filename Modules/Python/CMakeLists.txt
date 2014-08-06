@@ -12,7 +12,7 @@ if( MITK_USE_Python )
   MITK_CREATE_MODULE(
     DEPENDS MitkCore
     EXPORT_DEFINE MITK_PYTHON_EXPORT
-    PACKAGE_DEPENDS Qt4|QtGui CTK PythonLibs SimpleITK VTK|vtkPython+vtkWrappingPythonCore ${OpenCV_DEP}
+    PACKAGE_DEPENDS Qt4|QtGui CTK PythonLibs VTK|vtkPython+vtkWrappingPythonCore ${OpenCV_DEP}
     INCLUDE_DIRS ${NUMPY_INCLUDE_DIR}
   )
   configure_file(PythonPath.h.in

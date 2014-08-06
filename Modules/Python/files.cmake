@@ -2,7 +2,6 @@ SET(CPP_FILES
   mitkIPythonService.cpp
   mitkPythonActivator.cpp
   mitkPythonService.cpp
-  mitkSimpleItkImageImport.cpp
   QmitkCtkPythonShell.cpp
   QmitkPythonVariableStackTableModel.cpp
   QmitkPythonVariableStackTableView.cpp

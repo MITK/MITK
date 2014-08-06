@@ -494,6 +494,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     QMainWindow* mainWindow =
             static_cast<QMainWindow*> (window->GetShell()->GetControl());
 
+    window->SetPerspectiveExcludeList(perspectiveExcludeList);
+    window->SetViewExcludeList(viewExcludeList);
+
     if (!windowIcon.empty())
     {
         mainWindow->setWindowIcon(QIcon(QString::fromStdString(windowIcon)));
@@ -573,7 +576,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
             if (isImageNavigatorVisible)
                 imageNavigatorAction->setChecked(true);
         }
-        imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
+        imageNavigatorAction->setToolTip("Toggle image navigator for navigating through image");
     }
 
     // add view browser
@@ -596,7 +599,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
             if (isviewBrowserVisible)
                 viewBrowserAction->setChecked(true);
         }
-        viewBrowserAction->setToolTip("Open view browser");
+        viewBrowserAction->setToolTip("Toggle view browser");
     }
 
     // toolbar for showing file open, undo, redo and other main actions

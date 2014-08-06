@@ -81,7 +81,7 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     m_Parent = parent;
     m_Controls.setupUi( parent );
     connect( m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
-    connect( m_Controls.m_PluginTreeView, SIGNAL(clicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
+    connect( m_Controls.m_PluginTreeView, SIGNAL(doubleClicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
     connect( m_Controls.pushButton, SIGNAL(clicked()), SLOT(ButtonClicked()) );
 
     m_ContextMenu = new QMenu(m_Controls.m_PluginTreeView);
@@ -137,15 +137,26 @@ void ViewBrowserView::FillTreeList()
     berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
     QModelIndex currentIndex;
     berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
+    std::vector<std::string> perspectiveExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetPerspectiveExcludeList();
+    std::vector<std::string> viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
 
     for (unsigned int i=0; i<perspectives.size(); i++)
     {
         berry::IPerspectiveDescriptor::Pointer p = perspectives.at(i);
+
+        bool skipPerspective = false;
+        for(unsigned int e=0; e<perspectiveExcludeList.size(); e++)
+            if(perspectiveExcludeList.at(e)==p->GetId())
+            {
+                skipPerspective = true;
+                break;
+            }
+        if (skipPerspective)
+            continue;
+
         QList< QStandardItem*> preparedRow;
         mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(QString::fromStdString(p->GetLabel()));
         pItem->m_Perspective = p;
-        //pItem->setCheckable(true);
-        //pItem->setCheckState(Qt::Checked);
         preparedRow << pItem;
         treeRootItem->appendRow(preparedRow);
 
@@ -154,6 +165,16 @@ void ViewBrowserView::FillTreeList()
 
         for (unsigned int i = 0; i < views.size(); ++i)
         {
+            bool skipView = false;
+            for(unsigned int e=0; e<viewExcludeList.size(); e++)
+                if(viewExcludeList.at(e)==views.at(i)->GetId())
+                {
+                    skipView = true;
+                    break;
+                }
+            if (skipView)
+                continue;
+
             if ( page->HasView(p->GetId(), views.at(i)->GetId()) )
             {
               QList<QStandardItem *> secondRow;

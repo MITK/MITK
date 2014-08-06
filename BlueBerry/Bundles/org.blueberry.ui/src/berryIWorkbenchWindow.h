@@ -198,6 +198,11 @@ struct BERRY_UI IWorkbenchWindow : public IPageService, public IServiceLocator, 
    */
   virtual SmartPointer<IWorkbenchPage> OpenPage(IAdaptable* input) = 0;
 
+  virtual void SetPerspectiveExcludeList(std::vector<std::string> v) = 0;
+  virtual std::vector<std::string> GetPerspectiveExcludeList() = 0;
+
+  virtual void SetViewExcludeList(std::vector<std::string> v) = 0;
+  virtual std::vector<std::string> GetViewExcludeList() = 0;
 
   virtual ~IWorkbenchWindow();
 

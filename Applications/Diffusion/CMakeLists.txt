@@ -46,6 +46,7 @@ set(_plugins
   org.mitk.gui.qt.basicimageprocessing
   org.mitk.gui.qt.registration
   org.mitk.gui.qt.properties
+  org.mitk.gui.qt.viewbrowser
 )
 
 # Plug-ins listed below will not be

@@ -593,6 +593,25 @@ void WorkbenchWindow::CloseAllPages()
   }
 }
 
+void WorkbenchWindow::SetPerspectiveExcludeList(std::vector<std::string> v)
+{
+    perspectiveExcludeList = v;
+}
+
+std::vector<std::string> WorkbenchWindow::GetPerspectiveExcludeList()
+{
+    return perspectiveExcludeList;
+}
+
+void WorkbenchWindow::SetViewExcludeList(std::vector<std::string> v)
+{
+    viewExcludeList = v;
+}
+
+std::vector<std::string> WorkbenchWindow::GetViewExcludeList()
+{
+    return viewExcludeList;
+}
 
 IWorkbenchPage::Pointer WorkbenchWindow::GetPage(int i)
 {

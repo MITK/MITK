@@ -89,6 +89,12 @@ public:
 
   SmartPointer<IWorkbenchPage> GetPage(int i);
 
+  void SetPerspectiveExcludeList(std::vector<std::string> v);
+  std::vector<std::string> GetPerspectiveExcludeList();
+
+  void SetViewExcludeList(std::vector<std::string> v);
+  std::vector<std::string> GetViewExcludeList();
+
   /**
    * Sets the active page within the window.
    *
@@ -331,6 +337,9 @@ private:
   IPerspectiveListener::Events perspectiveEvents;
 
   WWinPartService partService;
+
+  std::vector<std::string> perspectiveExcludeList;
+  std::vector<std::string> viewExcludeList;
 
   struct ServiceLocatorOwner: public IDisposable
   {

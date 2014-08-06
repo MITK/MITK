@@ -33,11 +33,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTreeView>
 #include <QStandardItem>
 
+static void OpenAllPerspectives()
+{
+  berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+  if (page.IsNull())
+  {
+    return;
+  }
+
+  berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
+
+  berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
+  std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
+  for (unsigned int i=0; i<perspectives.size(); i++)
+    berry::PlatformUI::GetWorkbench()->ShowPerspective( perspectives.at(i)->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
+
+  //FillTreeList();
+  berry::PlatformUI::GetWorkbench()->ShowPerspective( currentPersp->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
+}
 
 struct ViewBrowserViewListener : public berry::IPerspectiveListener
 {
     ViewBrowserViewListener(ViewBrowserView* switcher)
-        : switcher(switcher)
+        : switcher(switcher),
+          m_FirstRun(false),
+          m_Running(false)
     {}
 
     Events::Types GetPerspectiveEventTypes() const
@@ -45,20 +65,27 @@ struct ViewBrowserViewListener : public berry::IPerspectiveListener
         return Events::ACTIVATED;
     }
 
-    virtual void PerspectiveChanged(berry::SmartPointer<berry::IWorkbenchPage> /*page*/,
-                                    berry::IPerspectiveDescriptor::Pointer /*perspective*/, const std::string& /*changeId*/)
-    {
-        switcher->FillTreeList();
-    }
-
     void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
                               berry::IPerspectiveDescriptor::Pointer perspective)
     {
-        switcher->FillTreeList();
+      if (m_Running)
+      {
+        return;
+      }
+      m_Running = true;
+      if (!m_FirstRun)
+      {
+        OpenAllPerspectives();
+        m_FirstRun = true;
+      }
+      switcher->FillTreeList();
+      m_Running = false;
     }
 
 private:
     ViewBrowserView* switcher;
+    bool m_FirstRun;
+    bool m_Running;
 };
 
 const std::string ViewBrowserView::VIEW_ID = "org.mitk.views.viewbrowser";
@@ -72,7 +99,6 @@ bool compareViews(berry::IViewDescriptor::Pointer a, berry::IViewDescriptor::Poi
 
 void ViewBrowserView::SetFocus()
 {
-
 }
 
 void ViewBrowserView::CreateQtPartControl( QWidget *parent )
@@ -89,11 +115,12 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
 
     // Create a new TreeModel for the data
     m_TreeModel = new QStandardItemModel();
-    FillTreeList();
     m_Controls.m_PluginTreeView->setModel(m_TreeModel);
+    OpenAllPerspectives();
+    FillTreeList();
 
     this->perspListener = new ViewBrowserViewListener(this);
-    //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->AddPerspectiveListener(this->perspListener);
+    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->AddPerspectiveListener(this->perspListener);
 }
 
 void ViewBrowserView::ButtonClicked()
@@ -106,7 +133,7 @@ void ViewBrowserView::ButtonClicked()
     for (unsigned int i=0; i<perspectives.size(); i++)
         berry::PlatformUI::GetWorkbench()->ShowPerspective( perspectives.at(i)->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
 
-    FillTreeList();
+    //FillTreeList();
     berry::PlatformUI::GetWorkbench()->ShowPerspective( currentPersp->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
 }
 
@@ -135,6 +162,10 @@ void ViewBrowserView::FillTreeList()
 
     // Fill the TreeModel
     berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+    if (page.IsNull())
+    {
+      return;
+    }
     QModelIndex currentIndex;
     berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
 
@@ -218,7 +249,6 @@ void ViewBrowserView::FillTreeList()
 
 void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
 {
-
 }
 
 void ViewBrowserView::ItemClicked(const QModelIndex &index)

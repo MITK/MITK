@@ -343,7 +343,8 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
                   .arg(QString::number(origin[0]))
                   .arg(QString::number(origin[1]))
                   .arg(QString::number(origin[2])) );
-  command.append( QString("sitk._SetImageFromArray(%1_numpy_array,%1)\n").arg(varName) );
+  // directly access the cpp api from the lib
+  command.append( QString("_SimpleITK._SetImageFromArray(%1_numpy_array,%1)\n").arg(varName) );
   command.append( QString("del %1_numpy_array").arg(varName) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
@@ -599,9 +600,8 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
 bool mitk::PythonService::IsSimpleItkPythonWrappingAvailable()
 {
   this->Execute( "import SimpleITK as sitk\n", IPythonService::SINGLE_LINE_COMMAND );
-  //this->Execute( "import itk\n", IPythonService::SINGLE_LINE_COMMAND );
-  //this->Execute( "print \"Using ITK version \" + itk.Version.GetITKVersion()\n", IPythonService::SINGLE_LINE_COMMAND );
-
+  // directly access cpp lib
+  this->Execute( "import _SimpleITK\n", IPythonService::SINGLE_LINE_COMMAND );
   m_ItkWrappingAvailable = !this->PythonErrorOccured();
 
   // check for numpy

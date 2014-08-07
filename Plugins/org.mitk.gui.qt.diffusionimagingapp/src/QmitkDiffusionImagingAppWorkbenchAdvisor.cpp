@@ -55,6 +55,11 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   perspExcludeList.push_back("org.blueberry.perspectives.help");
 
   std::vector<std::string> viewExcludeList;
+  viewExcludeList.push_back( std::string("org.mitk.views.controlvisualizationpropertiesview") );
+  viewExcludeList.push_back( std::string("org.mitk.views.imagenavigator") );
+  viewExcludeList.push_back( std::string("org.mitk.views.datamanager") );
+  viewExcludeList.push_back( std::string("org.mitk.views.modules") );
+  viewExcludeList.push_back( std::string("org.blueberry.ui.internal.introview") );
 
   configurer->SetInitialSize(berry::Point(1000,770));
 

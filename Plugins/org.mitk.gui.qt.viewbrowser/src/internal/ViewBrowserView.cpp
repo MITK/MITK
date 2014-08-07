@@ -32,71 +32,71 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QTreeView>
 #include <QStandardItem>
-#include <qsortfilterproxymodel>
+#include <QSortFilterProxyModel>
 
 class ClassFilterProxyModel : public QSortFilterProxyModel
 {
 private :
-  bool hasToBeDisplayed(const QModelIndex index) const;
-  bool displayElement(const QModelIndex index) const;
+    bool hasToBeDisplayed(const QModelIndex index) const;
+    bool displayElement(const QModelIndex index) const;
 public:
-  ClassFilterProxyModel(QObject *parent = NULL);
-  bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    ClassFilterProxyModel(QObject *parent = NULL);
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 };
 ClassFilterProxyModel::ClassFilterProxyModel(QObject *parent):
-  QSortFilterProxyModel(parent)
+    QSortFilterProxyModel(parent)
 {
 }
 
 bool ClassFilterProxyModel::filterAcceptsRow(int sourceRow,
                                              const QModelIndex &sourceParent) const
 {
-  QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
+    QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
 
-  return hasToBeDisplayed(index);
+    return hasToBeDisplayed(index);
 }
 
 bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
 {
-  bool result;
-  QString type = sourceModel()->data(index, Qt::DisplayRole).toString();
-  if ( ! type.contains(filterRegExp()))
-  {
-    result = false;
-  }
-  else
-  {
-    result = true;
-  }
-  return result;
+    bool result;
+    QString type = sourceModel()->data(index, Qt::DisplayRole).toString();
+    if ( ! type.contains(filterRegExp()))
+    {
+        result = false;
+    }
+    else
+    {
+        result = true;
+    }
+    return result;
 }
 
 
 bool ClassFilterProxyModel::hasToBeDisplayed(const QModelIndex index) const
 {
-  bool result = false;
-  // How many child this element have
-  if ( sourceModel()->rowCount(index) > 0 )
-  {
-    for( int ii = 0; ii < sourceModel()->rowCount(index); ii++)
+    bool result = false;
+    // How many child this element have
+    if ( sourceModel()->rowCount(index) > 0 )
     {
-      QModelIndex childIndex = sourceModel()->index(ii,0,index);
-      if ( ! childIndex.isValid() )
-        break;
-      result = hasToBeDisplayed(childIndex);
-      result |= displayElement(index);
-      if (result)
-      {
-        // there is atless one element to display
-        break;
-      }
+        for( int ii = 0; ii < sourceModel()->rowCount(index); ii++)
+        {
+            QModelIndex childIndex = sourceModel()->index(ii,0,index);
+            if ( ! childIndex.isValid() )
+                break;
+            result = hasToBeDisplayed(childIndex);
+            result |= displayElement(index);
+            if (result)
+            {
+                // there is atless one element to display
+                break;
+            }
+        }
     }
-  }
-  else
-  {
-    result = displayElement(index);
-  }
-  return result;
+    else
+    {
+        result = displayElement(index);
+    }
+    return result;
 }
 const std::string ViewBrowserView::VIEW_ID = "org.mitk.views.viewbrowser";
 
@@ -105,6 +105,13 @@ bool compareViews(berry::IViewDescriptor::Pointer a, berry::IViewDescriptor::Poi
     if (a.IsNull() || b.IsNull())
         return false;
     return a->GetLabel().compare(b->GetLabel()) < 0;
+}
+
+bool compareQStandardItems(QStandardItem* a, QStandardItem* b)
+{
+    if (a==NULL || b==NULL)
+        return false;
+    return a->text().compare(b->text()) < 0;
 }
 
 void ViewBrowserView::SetFocus()
@@ -170,7 +177,6 @@ void ViewBrowserView::FillTreeList()
     QModelIndex currentIndex;
     berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
     std::vector<std::string> perspectiveExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetPerspectiveExcludeList();
-    std::vector<std::string> viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
 
     QStandardItem *perspectiveRootItem = new QStandardItem("Perspectives");
     treeRootItem->appendRow(perspectiveRootItem);
@@ -201,19 +207,61 @@ void ViewBrowserView::FillTreeList()
     }
 
     // Add a list with all available views
-    QList< QStandardItem*> preparedRow;
-    QStandardItem* pItem = new QStandardItem(QIcon(),"Views");
-    preparedRow << pItem;
-    treeRootItem->appendRow(preparedRow);
+    std::vector<std::string> viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
+    QStandardItem* viewRootItem = new QStandardItem(QIcon(),"View categories");
+    treeRootItem->appendRow(viewRootItem);
+
+    std::vector< QStandardItem* > categoryItems;
+    QStandardItem* noCategoryItem = new QStandardItem(QIcon(),"Miscellaneous");
+
+
     for (unsigned int i = 0; i < views.size(); ++i)
     {
-        QList<QStandardItem *> secondRow;
-        QIcon* icon = static_cast<QIcon*>(views[i]->GetImageDescriptor()->CreateImage());
-        mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon, QString::fromStdString(views[i]->GetLabel()));
-        vItem->m_View = views[i];
-        secondRow << vItem;
-        preparedRow.first()->appendRow(secondRow);
+        berry::IViewDescriptor::Pointer v = views[i];
+        bool skipView = false;
+        for(unsigned int e=0; e<viewExcludeList.size(); e++)
+            if(viewExcludeList.at(e)==v->GetId())
+            {
+                skipView = true;
+                break;
+            }
+        if (skipView)
+            continue;
+
+        std::vector<std::string> catPath = v->GetCategoryPath();
+
+        QIcon* icon = static_cast<QIcon*>(v->GetImageDescriptor()->CreateImage());
+        mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon, QString::fromStdString(v->GetLabel()));
+        vItem->m_View = v;
+
+        if (catPath.empty())
+            noCategoryItem->appendRow(vItem);
+        else
+        {
+            QStandardItem* categoryItem = NULL;
+
+            for (unsigned int c=0; c<categoryItems.size(); c++)
+                if (categoryItems.at(c)->text().toStdString() == catPath.front())
+                {
+                    categoryItem = categoryItems.at(c);
+                    break;
+                }
+
+            if (categoryItem==NULL)
+            {
+                categoryItem  = new QStandardItem(QIcon(),catPath.front().c_str());
+                categoryItems.push_back(categoryItem);
+            }
+
+            categoryItem->appendRow(vItem);
+        }
     }
+    std::sort(categoryItems.begin(), categoryItems.end(), compareQStandardItems);
+
+    for (unsigned int i=0; i<categoryItems.size(); i++)
+        viewRootItem->appendRow(categoryItems.at(i));
+    if (noCategoryItem->hasChildren())
+        viewRootItem->appendRow(noCategoryItem);
 
     QModelIndex correctedIndex = m_FilterProxyModel->mapFromSource(currentIndex);
     m_Controls.m_PluginTreeView->setCurrentIndex(correctedIndex);
@@ -225,18 +273,18 @@ void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 
 void ViewBrowserView::FilterChanged()
 {
-  QString filterString = m_Controls.lineEdit->text();
-  if (filterString.size() > 0 )
-  {
-    m_Controls.m_PluginTreeView->expandAll();
-  }
-  QRegExp::PatternSyntax syntax = QRegExp::RegExp;
+    QString filterString = m_Controls.lineEdit->text();
+    if (filterString.size() > 0 )
+        m_Controls.m_PluginTreeView->expandAll();
+    else
+        m_Controls.m_PluginTreeView->collapseAll();
+    QRegExp::PatternSyntax syntax = QRegExp::RegExp;
 
-  Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive;
-  QString strPattern = "^*" + filterString;
-  QRegExp regExp(strPattern, caseSensitivity);
+    Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive;
+    QString strPattern = "^*" + filterString;
+    QRegExp regExp(strPattern, caseSensitivity);
 
-  m_FilterProxyModel->setFilterRegExp(regExp);
+    m_FilterProxyModel->setFilterRegExp(regExp);
 }
 
 void ViewBrowserView::ItemClicked(const QModelIndex &index)
@@ -371,7 +419,7 @@ void ViewBrowserView::ClosePerspectives()
 
 void ViewBrowserView::CustomMenuRequested(QPoint pos)
 {
-  QModelIndex index = m_Controls.m_PluginTreeView->indexAt(pos);
+    QModelIndex index = m_Controls.m_PluginTreeView->indexAt(pos);
     QStandardItem* item = m_TreeModel->itemFromIndex(m_FilterProxyModel->mapToSource(index));
 
     if (m_ContextMenu==NULL || item==NULL)

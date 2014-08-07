@@ -5,6 +5,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.qballreconstruction"
           name="Q-Balls"
+          category="Signal modeling"
           icon="resources/qball.png"
           class="QmitkQBallReconstructionView" />
   </extension>
@@ -12,6 +13,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.diffusiondicomimport"
           name="DICOM Import"
+          category="Data handling"
           class="QmitkDiffusionDicomImport"
           icon="resources/dwiimport.png" />
   </extension>
@@ -19,6 +21,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.diffusionpreprocessing"
           name="Preprocessing"
+          category="Preprocessing"
           class="QmitkPreprocessingView"
           icon="resources/dwi2.png" />
   </extension>
@@ -26,6 +29,7 @@
     <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.diffusionquantification"
           name="Scalar Indices"
+          category="Quantification"
           class="QmitkDiffusionQuantificationView"
           icon="resources/quantification.png"/>
   </extension>
@@ -33,6 +37,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.tensorreconstruction"
           name="Tensors"
+          category="Signal modeling"
           icon="resources/tensor.png"
           class="QmitkTensorReconstructionView" />
   </extension>
@@ -47,6 +52,7 @@
    <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.ivim"
           name="IVIM"
+          category="Quantification"
           class="QmitkIVIMView"
           icon="resources/IVIM_48.png" />
   </extension>
@@ -61,6 +67,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.odfdetails"
           name="ODF Details"
+          category="Quantification"
           class="QmitkODFDetailsView"
           icon="resources/OdfDetails.png" />
   </extension>
@@ -68,6 +75,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.gibbstracking"
           name="Gibbs Tracking"
+          category="Fiber tractography"
           class="QmitkGibbsTrackingView"
           icon="resources/GibbsTracking.png" />
   </extension>
@@ -75,6 +83,7 @@
      <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.stochasticfibertracking"
           name="Stochastic Tracking"
+          category="Fiber tractography"
           class="QmitkStochasticFiberTrackingView"
           icon="resources/stochFB.png" />
   </extension>
@@ -82,6 +91,7 @@
      <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.streamlinetracking"
           name="Streamline Tracking"
+          category="Fiber tractography"
           class="QmitkStreamlineTrackingView"
           icon="resources/StreamlineTracking.png" />
   </extension>
@@ -89,6 +99,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.fiberprocessing"
           name="Fiber Processing"
+          category="Fiber processing"
           class="QmitkFiberProcessingView"
           icon="resources/FiberBundleOperations.png" />
   </extension>
@@ -96,20 +107,15 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.fiberextraction"
           name="Fiber Extraction"
+          category="Fiber processing"
           class="QmitkFiberExtractionView"
           icon="resources/FiberBundleOperations.png" />
   </extension>
 
-<!--    <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.fiberbundledeveloper"
-          name="FiberDevTool"
-          class="QmitkFiberBundleDeveloperView"
-          icon="resources/FiberBundleOperations.png" />
-  </extension>-->
-
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.partialvolumeanalysisview"
           name="PV Analysis"
+          category="Quantification"
           class="QmitkPartialVolumeAnalysisView"
           icon="resources/PartialVolumeAnalysis_24.png" />
   </extension>
@@ -117,6 +123,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.tbssskeletonization"
           name="Tbss Skeletonization"
+          category="Quantification"
           class="QmitkTbssSkeletonizationView"
           icon="resources/tbss.png" />
   </extension>
@@ -124,6 +131,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.tractbasedspatialstatistics"
           name="Tract-based spatial statistics"
+          category="Quantification"
           class="QmitkTractbasedSpatialStatisticsView"
           icon="resources/tbss.png" />
   </extension>
@@ -132,6 +140,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.connectomicsnetworkoperations"
           name="Network Operations"
+          category="Connectomics"
           class="QmitkConnectomicsNetworkOperationsView"
           icon="resources/connectomics/QmitkConnectomicsNetworkOperationsViewIcon_48.png" />
   </extension>
@@ -139,6 +148,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.connectomicsdata"
           name="Network Data"
+          category="Connectomics"
           class="QmitkConnectomicsDataView"
           icon="resources/connectomics/QmitkConnectomicsDataViewIcon_48.png" />
   </extension>
@@ -146,6 +156,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.connectomicsstatistics"
           name="Network Statistics"
+          category="Connectomics"
           class="QmitkConnectomicsStatisticsView"
           icon="resources/connectomics/QmitkConnectomicsStatisticsViewIcon_48.png" />
   </extension>
@@ -153,6 +164,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.odfmaximaextraction"
           name="Peak Extraction"
+          category="Signal modeling"
           class="QmitkOdfMaximaExtractionView"
           icon="resources/qball_peaks.png" />
   </extension>
@@ -160,6 +172,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.fiberfoxview"
           name="Fiberfox"
+          category="Simulated data"
           class="QmitkFiberfoxView"
           icon="resources/phantom.png" />
   </extension>
@@ -167,6 +180,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.fieldmapgenerator"
           name="Fieldmap Generator"
+          category="Simulated data"
           class="QmitkFieldmapGeneratorView"
           icon="resources/odf.png" />
   </extension>
@@ -174,6 +188,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.diffusionregistrationview"
           name="DWI Registration"
+          category="Registration"
           class="QmitkDiffusionRegistrationView"
           icon="resources/diffusionregistration.png" />
   </extension>
@@ -181,6 +196,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.denoisingview"
           name="DWI Denoising"
+          category="Preprocessing"
           class="QmitkDenoisingView"
           icon="resources/denoisingicon.png" />
   </extension>

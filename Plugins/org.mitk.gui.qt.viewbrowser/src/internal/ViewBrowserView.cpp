@@ -58,16 +58,26 @@ bool ClassFilterProxyModel::filterAcceptsRow(int sourceRow,
 
 bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
 {
-  bool result;
+  bool result = false;
   QString type = sourceModel()->data(index, Qt::DisplayRole).toString();
-  if ( ! type.contains(filterRegExp()))
+  QStandardItem * item = dynamic_cast<QStandardItemModel*>(sourceModel())->itemFromIndex(index);
+
+  if (type.contains(filterRegExp()))
   {
-    result = false;
+    return true;
   }
-  else
+  mitk::QtViewItem* viewItem = dynamic_cast<mitk::QtViewItem*>(item);
+  if (viewItem)
   {
-    result = true;
+    for (int i = 0; i < viewItem->m_Tags.size(); ++i)
+    {
+      if (viewItem->m_Tags[i].contains(filterRegExp()))
+      {
+        return true;
+      }
+    }
   }
+
   return result;
 }
 
@@ -131,6 +141,12 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     //proxyModel->setFilterFixedString("Diff");
     m_Controls.m_PluginTreeView->setModel(m_FilterProxyModel);
     FillTreeList();
+
+    QList<ViewTagsDescriptor::Pointer> additions = m_Registry.GetViewTags();
+    foreach (const ViewTagsDescriptor::Pointer& var, additions)
+    {
+      MITK_INFO << var->GetID().toStdString();
+    }
 }
 
 void ViewBrowserView::ButtonClicked()
@@ -207,10 +223,12 @@ void ViewBrowserView::FillTreeList()
     treeRootItem->appendRow(preparedRow);
     for (unsigned int i = 0; i < views.size(); ++i)
     {
+        ViewTagsDescriptor::Pointer tags = m_Registry.Find(views[i]->GetId());
         QList<QStandardItem *> secondRow;
         QIcon* icon = static_cast<QIcon*>(views[i]->GetImageDescriptor()->CreateImage());
         mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon, QString::fromStdString(views[i]->GetLabel()));
         vItem->m_View = views[i];
+        vItem->m_Tags = tags->GetTags();
         secondRow << vItem;
         preparedRow.first()->appendRow(secondRow);
     }

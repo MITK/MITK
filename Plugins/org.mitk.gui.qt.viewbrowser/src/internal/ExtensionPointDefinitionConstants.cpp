@@ -14,35 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _ViewItem
-#define _ViewItem
+#include "ExtensionPointDefinitionConstants.h"
 
-#include <QStandardItem>
-#include <QString>
-#include <berryPlatformUI.h>
+#include "ViewTagsRegistry.h"
 
-namespace mitk
-{
-
-class QtViewItem : public QStandardItem
-{
-public:
-    QtViewItem(QString string) :
-      QStandardItem(string)
-    {
-    }
-    QtViewItem(const QIcon& icon, QString string) :
-      QStandardItem(icon, string)
-    {
-    }
-
-    berry::IViewDescriptor::Pointer m_View;
-    std::vector<QString> m_Tags;
-
-private:
-
-};
-
-}
-
-#endif
+const std::string ExtensionPointDefinitionConstants::VIEWTAGS_XP_NAME = "org.mitk.views.viewbrowser.textlists";
+const std::string ExtensionPointDefinitionConstants::VIEWTAGS_CHILD_TAG = "tag";
+const std::string ExtensionPointDefinitionConstants::VIEWTAGS_XMLATTRIBUTE_ID = "id";

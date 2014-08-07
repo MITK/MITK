@@ -130,6 +130,15 @@ struct ViewBrowserWindowListener : public berry::IWindowListener
           m_Running(false)
     {}
 
+    virtual void WindowOpened(berry::IWorkbenchWindow::Pointer /*window*/)
+    {
+        if (m_Running)
+            return;
+        m_Running = true;
+        switcher->FillTreeList();
+        m_Running = false;
+    }
+
     virtual void WindowActivated(berry::IWorkbenchWindow::Pointer /*window*/)
     {
         if (m_Running)
@@ -271,7 +280,6 @@ void ViewBrowserView::FillTreeList()
         for(unsigned int e=0; e<viewExcludeList.size(); e++)
             if(viewExcludeList.at(e)==v->GetId())
             {
-
                 break;
             }
         if (skipView)

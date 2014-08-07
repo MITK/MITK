@@ -278,6 +278,9 @@ public:
 #define AccessFixedDimensionByItk(mitkImage, itkImageTypeFunction, dimension)          \
   AccessFixedTypeByItk(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ, (dimension))
 
+#define AccessVectorFixedDimensionByItk(mitkImage, itkImageTypeFunction, dimension)          \
+  AccessFixedTypeByItk(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, (dimension))
+
 /**
  * \brief Access a mitk-image with known type (pixel type and dimension) by an itk-image.
  *
@@ -468,6 +471,9 @@ public:
  */
 #define AccessFixedDimensionByItk_n(mitkImage, itkImageTypeFunction, dimension, va_tuple) \
   AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ, (dimension), va_tuple)
+
+#define AccessVectorFixedDimensionByItk_n(mitkImage, itkImageTypeFunction, dimension, va_tuple) \
+  AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, (dimension), va_tuple)
 
 /**
  * \brief Access a mitk-image with known type (pixel type and dimension) by an itk-image

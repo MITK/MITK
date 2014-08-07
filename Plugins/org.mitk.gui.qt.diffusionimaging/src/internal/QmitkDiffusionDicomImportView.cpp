@@ -48,6 +48,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "gdcmAttribute.h"
 #include "gdcmVersion.h"
 
+#include <itksys/SystemTools.hxx>
+#include <itksys/Directory.hxx>
+
 #include <QMessageBox>
 
 const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusiondicomimport";
@@ -77,11 +80,14 @@ void QmitkDiffusionDicomImport::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
-    m_Controls->m_DicomLoadRecursiveCheckbox->setChecked(true);
+    m_Controls->m_DicomLoadRecursiveCheckbox->setChecked(false);
     m_Controls->m_DicomLoadAverageDuplicatesCheckbox->setChecked(false);
 
-    m_Controls->m_DicomLoadRecursiveCheckbox->setVisible(false);
+    m_Controls->m_DicomLoadRecursiveCheckbox->setVisible(true);
     m_Controls->m_OverrideOptionCheckbox->setVisible(false);
+    m_Controls->m_SubdirPrefixLineEdit->setVisible(false);
+    m_Controls->m_SetPrefixButton->setVisible(false);
+    m_Controls->m_ResetPrefixButton->setVisible(false);
 
     AverageClicked();
   }
@@ -101,9 +107,40 @@ void QmitkDiffusionDicomImport::CreateConnections()
     connect( m_Controls->m_OutputSetButton, SIGNAL(clicked()), this, SLOT(OutputSet()) );
     connect( m_Controls->m_OutputClearButton, SIGNAL(clicked()), this, SLOT(OutputClear()) );
     connect( m_Controls->m_Remove, SIGNAL(clicked()), this, SLOT(Remove()) );
+    connect( m_Controls->m_SetPrefixButton, SIGNAL(clicked()), this, SLOT(SetPrefixButtonPushed()));
+    connect( m_Controls->m_ResetPrefixButton, SIGNAL(clicked()), this, SLOT(ResetPrefixButtonPushed()));
+    connect( m_Controls->m_DicomLoadRecursiveCheckbox, SIGNAL(clicked()), this, SLOT(RecursiveSettingsChanged()) );
   }
 }
 
+void QmitkDiffusionDicomImport::RecursiveSettingsChanged()
+{
+  m_Controls->m_SubdirPrefixLineEdit->setVisible( m_Controls->m_DicomLoadRecursiveCheckbox->isChecked() );
+  m_Controls->m_SetPrefixButton->setVisible( m_Controls->m_DicomLoadRecursiveCheckbox->isChecked() );
+  m_Controls->m_SubdirPrefixLineEdit->clear();
+  this->m_Controls->m_SubdirPrefixLineEdit->setEnabled(true);
+}
+
+void QmitkDiffusionDicomImport::SetPrefixButtonPushed()
+{
+  m_Prefix = this->m_Controls->m_SubdirPrefixLineEdit->text().toStdString();
+  if( !this->m_Controls->m_ResetPrefixButton->isVisible() )
+    this->m_Controls->m_ResetPrefixButton->setVisible(true);
+
+  this->m_Controls->m_SubdirPrefixLineEdit->setEnabled(false);
+  this->m_Controls->m_ResetPrefixButton->setEnabled(true);
+  this->m_Controls->m_SetPrefixButton->setEnabled(false);
+}
+
+void QmitkDiffusionDicomImport::ResetPrefixButtonPushed()
+{
+  m_Controls->m_SubdirPrefixLineEdit->clear();
+
+  this->m_Controls->m_SubdirPrefixLineEdit->setEnabled(true);
+
+  this->m_Controls->m_ResetPrefixButton->setEnabled(false);
+  this->m_Controls->m_SetPrefixButton->setEnabled(true);
+}
 
 void QmitkDiffusionDicomImport::Remove()
 {
@@ -285,6 +322,8 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
   itk::TimeProbesCollectorBase clock;
   bool imageSuccessfullySaved = true;
 
+  bool has_prefix = true;
+
   try
   {
     const std::string& locale = "C";
@@ -325,16 +364,65 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
       QListWidgetItem * item  = m_Controls->listWidget->takeItem(0);
       QString folderName = item->text();
 
-      gdcm::Directory d;
-      d.Load( folderName.toStdString().c_str(), true ); // recursive !
-      const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
-      const unsigned int ntotalfiles = l1.size();
-      Status(QString(" ... found %1 different files").arg(ntotalfiles));
 
-      for( unsigned int i=0; i< ntotalfiles; i++)
+      if( has_prefix )
       {
-        complete_list.push_back( l1.at(i) );
+
+        std::string subdir_prefix = this->m_Prefix;
+
+        itksys::Directory rootdir;
+        rootdir.Load( folderName.toStdString().c_str() );
+
+        for( unsigned int idx=0; idx<rootdir.GetNumberOfFiles(); idx++)
+        {
+          std::string current_path = rootdir.GetFile(idx);
+          std::string directory_path = std::string(rootdir.GetPath()) + std::string("/") + current_path;
+
+          MITK_INFO("dicom.loader.inputrootdir.test") << "ProbePath:   " << current_path;
+          MITK_INFO("dicom.loader.inputrootdir.test") << "IsDirectory: " << itksys::SystemTools::FileIsDirectory( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ).c_str() )
+                                                      << " StartsWith: " << itksys::SystemTools::StringStartsWith( current_path.c_str(), subdir_prefix.c_str() );
+
+          // test for prefix
+          if(    itksys::SystemTools::FileIsDirectory( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ).c_str() )
+                 && itksys::SystemTools::StringStartsWith( current_path.c_str(), subdir_prefix.c_str() )
+                 )
+          {
+
+            gdcm::Directory d;
+            d.Load( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ) , false);
+
+            MITK_INFO("dicom.load.subdir.attempt") << "In directory " << itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() );
+
+            const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
+            const unsigned int ntotalfiles = l1.size();
+            Status(QString(" ... found %1 different files").arg(ntotalfiles));
+
+            for( unsigned int i=0; i< ntotalfiles; i++)
+            {
+              complete_list.push_back( l1.at(i) );
+            }
+
+
+          }
+
+        }
       }
+      else
+      {
+        gdcm::Directory d;
+        d.Load( folderName.toStdString().c_str(), this->m_Controls->m_DicomLoadRecursiveCheckbox->isChecked() ); // recursive !
+        const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
+        const unsigned int ntotalfiles = l1.size();
+        Status(QString(" ... found %1 different files").arg(ntotalfiles));
+
+        for( unsigned int i=0; i< ntotalfiles; i++)
+        {
+          complete_list.push_back( l1.at(i) );
+        }
+
+      }
+
+
 
     }
 
@@ -373,605 +461,6 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
 
       gdcmReader->AddSortingElement( tagSorter );
       gdcmReader->SetInputFiles( complete_list );
-      gdcmReader->AnalyzeInputFiles();
-
-      gdcmReader->LoadImages();
-
-      mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(0).GetMitkImage();
-      mitk::DiffusionImage<short>::Pointer d_img = static_cast<mitk::DiffusionImage<short>*>( loaded_image.GetPointer() );
-
-      node=mitk::DataNode::New();
-      node->SetData( d_img );
-      GetDefaultDataStorage()->Add(node);
-      SetDwiNodeProperties(node, "ImportedData");
-      //Status(QString("Image %1 added to datastorage").arg(descr));
-
-    }
-
-    Status("Timing information");
-    clock.Report();
-
-    if(!m_OutputFolderNameSet && node.IsNotNull())
-    {
-      mitk::BaseData::Pointer basedata = node->GetData();
-      if (basedata.IsNotNull())
-      {
-        mitk::RenderingManager::GetInstance()->InitializeViews(
-              basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-      }
-    }
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-    try
-    {
-      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
-      setlocale(LC_ALL, currLocale.c_str());
-    }
-    catch(...)
-    {
-      MITK_INFO << "Could not reset locale " << currLocale;
-    }
-  }
-  catch (itk::ExceptionObject &ex)
-  {
-    Error(QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()));
-    return ;
-  }
-
-  if (!imageSuccessfullySaved)
-    QMessageBox::warning(NULL,"WARNING","One or more files could not be saved! The according files where moved to the datastorage.");
-  Status(QString("Finished import with memory:"));
-
-  PrintMemoryUsage();
-}
-
-
-void QmitkDiffusionDicomImport::DicomLoadStartLoad()
-{
-  itk::TimeProbesCollectorBase clock;
-  bool imageSuccessfullySaved = true;
-
-  try
-  {
-    const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, NULL );
-
-    if ( locale.compare(currLocale)!=0 )
-    {
-      try
-      {
-        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
-        setlocale(LC_ALL, locale.c_str());
-      }
-      catch(...)
-      {
-        MITK_INFO << "Could not set locale " << locale;
-      }
-    }
-
-    int nrFolders = m_Controls->listWidget->count();
-
-    if(!nrFolders)
-    {
-      Error(QString("No input folders were selected. ABORTING."));
-      return;
-    }
-
-    Status(QString("GDCM %1 used for DICOM parsing and sorting!").arg(gdcm::Version::GetVersion()));
-
-    PrintMemoryUsage();
-    QString status;
-    mitk::DataNode::Pointer node;
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(2*nrFolders);
-
-
-    std::string folder = m_Controls->m_OutputLabel->text().toStdString();
-
-
-    if(berry::Platform::IsWindows())
-    {
-      folder.append("\\import.log");
-    }
-    else
-    {
-      folder.append("/import.log");
-    }
-
-    ofstream logfile;
-    if(m_OutputFolderNameSet) logfile.open(folder.c_str());
-    /*
-    while(m_Controls->listWidget->count())
-    {
-      // RETREIVE FOLDERNAME
-      QListWidgetItem * item  = m_Controls->listWidget->takeItem(0);
-      QString folderName = item->text();
-
-      if(m_OutputFolderNameSet) logfile << "Reading " << folderName.toStdString() << '\n';
-
-      // PARSING DIRECTORY
-      PrintMemoryUsage();
-      clock.Start(folderName.toAscii());
-      std::vector<std::string> seriesUIDs(0);
-      std::vector<std::vector<std::string> > seriesFilenames(0);
-
-      Status("== Initial Directory Scan ==");
-      if(m_OutputFolderNameSet) logfile << "== Initial Directory Scan ==\n";
-
-      gdcm::Directory d;
-      d.Load( folderName.toStdString().c_str(), true ); // recursive !
-      const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
-      const unsigned int ntotalfiles = l1.size();
-      Status(QString(" ... found %1 different files").arg(ntotalfiles));
-      if(m_OutputFolderNameSet)logfile << "...found " << ntotalfiles << " different files\n";
-
-      Status("Scanning Headers");
-      if(m_OutputFolderNameSet) logfile << "Scanning Headers\n";
-
-      gdcm::Scanner s;
-      const gdcm::Tag t1(0x0020,0x000d); // Study Instance UID
-      const gdcm::Tag t2(0x0020,0x000e); // Series Instance UID
-      const gdcm::Tag t5(0x0028, 0x0010); // number rows
-      const gdcm::Tag t6(0x0028, 0x0011); // number cols
-      s.AddTag( t1 );
-      s.AddTag( t2 );
-      s.AddTag( t5 );
-      s.AddTag( t6 );
-
-      bool b = s.Scan( d.GetFilenames() );
-      if( !b )
-      {
-        Error("Scanner failed");
-        if(m_OutputFolderNameSet )logfile << "ERROR: scanner failed\n";
-        continue;
-      }
-
-      // Only get the DICOM files:
-      gdcm::Directory::FilenamesType l2 = s.GetKeys();
-
-
-
-      gdcm::Directory::FilenamesType::iterator it;
-
-      for (it = l2.begin() ; it != l2.end(); ++it) {
-        MITK_INFO << "-------FN " << *it;
-      }
-
-      const int nfiles = l2.size();
-      if(nfiles < 1)
-      {
-        Error("No DICOM files found");
-        if(m_OutputFolderNameSet)logfile << "ERROR: No DICOM files found\n";
-        continue;
-      }
-      Status(QString(" ... successfully scanned %1 headers.").arg(nfiles));
-      if(m_OutputFolderNameSet) logfile << "...succesfully scanned " << nfiles << " headers\n";
-
-      Status("Sorting");
-      if(m_OutputFolderNameSet) logfile << "Sorting\n";
-
-      const gdcm::Scanner::ValuesType &values1 = s.GetValues(t1);
-
-      int nvalues;
-      if(m_Controls->m_DuplicateID->isChecked())
-      {
-        nvalues = 1;
-      }
-      else
-      {
-        nvalues = values1.size();
-      }
-
-      if(nvalues>1)
-      {
-        Error("Multiple sSeries tudies found. Please limit to 1 study per folder");
-        if(m_OutputFolderNameSet) logfile << "Multiple series found. Limit to one. If you are convinced this is an error use the merge duplicate study IDs option \n";
-        continue;
-      }
-
-      const gdcm::Scanner::ValuesType &values5 = s.GetValues(t5);
-      const gdcm::Scanner::ValuesType &values6 = s.GetValues(t6);
-      if(values5.size()>1 || values6.size()>1)
-      {
-        Error("Folder contains images of unequal dimensions that cannot be combined in one 3d volume. ABORTING.");
-        if(m_OutputFolderNameSet) logfile << "Folder contains images of unequal dimensions that cannot be combined in one 3d volume. ABORTING\n.";
-        continue;
-      }
-
-      const gdcm::Scanner::ValuesType &values2 = s.GetValues(t2);
-
-
-      int nSeries;
-      if(m_Controls->m_DuplicateID->isChecked())
-      {
-        nSeries = 1;
-      }
-      else
-      {
-        nSeries = values2.size();
-      }
-
-      gdcm::Directory::FilenamesType files;
-      if(nSeries > 1)
-      {
-        gdcm::Sorter sorter;
-        sorter.SetSortFunction( SortBySeriesUID );
-        if (sorter.StableSort( l2 ))
-        {
-          files = sorter.GetFilenames();
-        }
-        else
-        {
-          Error("Loading of at least one DICOM file not successfull!");
-          return;
-        }
-      }
-      else
-      {
-        files = l2;
-      }
-
-      unsigned int nTotalAcquis = 0;
-
-      if(nfiles % nSeries != 0)
-      {
-        Error("Number of files in series not equal, ABORTING");
-        if(m_OutputFolderNameSet) logfile << "Number of files in series not equal, Some volumes are probably incomplete. ABORTING \n";
-        continue;
-      }
-
-      int filesPerSeries = nfiles / nSeries;
-
-      gdcm::Scanner::ValuesType::const_iterator it2 = values2.begin();
-      for(int i=0; i<nSeries; i++)
-      {
-
-        gdcm::Directory::FilenamesType sub( files.begin() + i*filesPerSeries, files.begin() + (i+1)*filesPerSeries);
-
-        gdcm::Scanner s;
-        const gdcm::Tag t3(0x0020,0x0012);  // Acquisition ID
-        const gdcm::Tag t4(0x0018,0x0024); // Sequence Name (in case acquisitions are equal for all)
-        //        const gdcm::Tag t5(0x20,0x32) );    // Image Position (Patient)
-        s.AddTag(t3);
-        s.AddTag(t4);
-        //        s.AddTag(t5);
-
-        bool b = s.Scan( sub );
-        if( !b )
-        {
-          Error("Scanner failed");
-          if(m_OutputFolderNameSet) logfile << "Scanner failed\n";
-          continue;
-        }
-
-        gdcm::Sorter subsorter;
-        gdcm::Scanner::ValuesType::const_iterator it;
-
-        const gdcm::Scanner::ValuesType &values3 = s.GetValues(t3);
-        const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);
-        unsigned int nAcquis = values3.size();
-
-        if(nAcquis > 1) // More than one element must have this tag (Not != )
-        {
-          subsorter.SetSortFunction( SortByAcquisitionNumber );
-          it = values3.begin();
-        }
-        else if (values4.size() > 1)
-        {
-          nAcquis = values4.size();
-          subsorter.SetSortFunction( SortBySeqName );
-          it = values4.begin();
-        }
-
-        // Hotfix for Bug 14758, better fix by selecting always availible tags.
-        if( nAcquis == 0 || values4.size() == 0)
-        {
-          std::string err_msg = "Sorting tag (0x0020,0x0012) [Acquisition ID] or (0x0018,0x0024) [Sequence Name] missing, ABORTING";
-          Error(err_msg);
-          if(m_OutputFolderNameSet) logfile << err_msg << "\n";
-          continue;
-        }
-
-        nTotalAcquis += nAcquis;
-        subsorter.Sort( sub );
-
-        if(filesPerSeries % nAcquis != 0)
-        {
-          Error("Number of files per acquisition not equal, ABORTING");
-          if(m_OutputFolderNameSet) logfile << "Number of files per acquisition not equal, ABORTING \n";
-          continue;
-        }
-
-        int filesPerAcqu = filesPerSeries / nAcquis;
-
-        gdcm::Directory::FilenamesType subfiles = subsorter.GetFilenames();
-        for ( unsigned int j = 0 ; j < nAcquis ; ++j )
-        {
-          std::string identifier = "serie_" + *it2 + "_acquis_" + *it++;
-
-          gdcm::IPPSorter ippsorter;
-          gdcm::Directory::FilenamesType ipplist((j)*filesPerAcqu+subfiles.begin(),(j+1)*filesPerAcqu+subfiles.begin());
-          ippsorter.SetComputeZSpacing( true );
-          if( !ippsorter.Sort( ipplist ) )
-          {
-            Error(QString("Failed to sort acquisition %1, ABORTING").arg(identifier.c_str()));
-            if(m_OutputFolderNameSet) logfile << "Failed to sort acquisition " << identifier.c_str() << " , Aborting\n";
-            continue;
-          }
-          const std::vector<std::string> & list = ippsorter.GetFilenames();
-          seriesFilenames.push_back(list);
-          seriesUIDs.push_back(identifier.c_str());
-        }
-        ++it2;
-      }
-
-      // Hot Fix for Bug 14758, checking if no file is acuired.
-      if (nTotalAcquis < 1) // Test if zero, if true than error because no file was selected
-      {
-        Error("Nno files in acquisitions, ABORTING");
-        if(m_OutputFolderNameSet) logfile << "Nno files in acquisitions, ABORTING \n";
-        continue;
-      }
-      if(nfiles % nTotalAcquis != 0)
-      {
-        Error("Number of files per acquisition differs between series, ABORTING");
-        if(m_OutputFolderNameSet) logfile << "Number of files per acquisition differs between series, ABORTING \n";
-        continue;
-      }
-
-      int slices = nfiles/nTotalAcquis;
-      Status(QString("Series is composed of %1 different 3D volumes with %2 slices.").arg(nTotalAcquis).arg(slices));
-      if(m_OutputFolderNameSet) logfile << "Series is composed of " << nTotalAcquis << " different 3D volumes with " << slices << " slices\n";
-
-      // READING HEADER-INFOS
-      PrintMemoryUsage();
-      Status(QString("Reading Headers %1").arg(folderName));
-      if(m_OutputFolderNameSet) logfile << "Reading Headers "<< folderName.toStdString() << "\n";
-
-      mitk::DicomDiffusionImageHeaderReader::Pointer headerReader;
-      typedef short PixelValueType;
-      typedef mitk::DicomDiffusionImageReader< PixelValueType, 3 > VolumesReader;
-      VolumesReader::HeaderContainer inHeaders;
-      unsigned int size2 = seriesUIDs.size();
-      for ( unsigned int i = 0 ; i < size2 ; ++i )
-      {
-        // Hot Fix for Bug 14459, catching if no valid data in datafile.
-        try
-        {
-          Status(QString("Reading header image #%1/%2").arg(i+1).arg(size2));
-          headerReader = mitk::DicomDiffusionImageHeaderReader::New();
-          headerReader->SetSeriesDicomFilenames(seriesFilenames[i]);
-          headerReader->Update();
-          inHeaders.push_back(headerReader->GetOutput());
-        }
-        catch (mitk::Exception e)
-        {
-          Error("Could not read file header, ABORTING");
-          if(m_OutputFolderNameSet) logfile << e;
-          continue;
-        }
-        //Status(std::endl;
-      }
-      mitk::ProgressBar::GetInstance()->Progress();
-
-      //        // GROUP HEADERS
-      //        mitk::GroupDiffusionHeadersFilter::Pointer grouper
-      //            = mitk::GroupDiffusionHeadersFilter::New();
-      //        mitk::GroupDiffusionHeadersFilter::OutputType outHeaders;
-      //        grouper->SetInput(inHeaders);
-      //        grouper->Update();
-      //        outHeaders = grouper->GetOutput();
-
-      // READ VOLUMES
-      PrintMemoryUsage();
-      if(m_OutputFolderNameSet) logfile << "Loading volumes\n";
-      Status(QString("Loading Volumes %1").arg(folderName));
-
-      VolumesReader::Pointer vReader = VolumesReader::New();
-      VolumesReader::HeaderContainer hc = inHeaders;
-
-      //        hc.insert(hc.end(), outHeaders[1].begin(), outHeaders[1].end() );
-      //        hc.insert(hc.end(), outHeaders[2].begin(), outHeaders[2].end() );
-      if(hc.size()>1)
-      {
-        vReader->SetHeaders(hc);
-        vReader->Update();
-        VolumesReader::OutputImageType::Pointer vecImage;
-        vecImage = vReader->GetOutput();
-        Status(QString("Volumes Loaded (%1)").arg(folderName));
-
-        // CONSTRUCT CONTAINER WITH DIRECTIONS
-        typedef vnl_vector_fixed< double, 3 >            GradientDirectionType;
-        typedef itk::VectorContainer< unsigned int,
-        GradientDirectionType >                  GradientDirectionContainerType;
-        GradientDirectionContainerType::Pointer directions =
-            GradientDirectionContainerType::New();
-        std::vector<double> b_vals;
-        double maxb = 0;
-        for(unsigned int i=0; i<hc.size(); i++)
-        {
-          double bv = hc[i]->bValue;
-          if(maxb<bv)
-          {
-            maxb = bv;
-          }
-          b_vals.push_back(bv);
-        }
-
-        for(unsigned int i=0; i<hc.size(); i++)
-        {
-          vnl_vector_fixed<double, 3> vect = hc[i]->DiffusionVector;
-          if (vect.magnitude()<0.0001 && b_vals[i]>0)
-          {
-              vect.fill(0.0);
-              vect[0] = 1;
-          }
-          vect.normalize();
-          vect *= sqrt(b_vals[i]/maxb);
-          directions->push_back(vect);
-        }
-
-        // DWI TO DATATREE
-        PrintMemoryUsage();
-        Status(QString("Initializing Diffusion Image"));
-        if(m_OutputFolderNameSet) logfile << "Initializing Diffusion Image\n";
-        typedef mitk::DiffusionImage<PixelValueType> DiffVolumesType;
-        DiffVolumesType::Pointer diffImage = DiffVolumesType::New();
-        diffImage->SetVectorImage(vecImage);
-        diffImage->SetReferenceBValue(maxb);
-        diffImage->SetDirections(directions);
-        diffImage->InitializeFromVectorImage();
-
-
-        Status(QString("Diffusion Image initialized"));
-        if(m_OutputFolderNameSet) logfile << "Diffusion Image initialized\n";
-
-        if(m_Controls->m_DicomLoadAverageDuplicatesCheckbox->isChecked())
-        {
-          PrintMemoryUsage();
-          Status(QString("Averaging gradient directions"));
-          logfile << "Averaging gradient directions\n";
-          diffImage->AverageRedundantGradients(m_Controls->m_Blur->value());
-        }
-
-        QString descr = QString("%1_%2_%3")
-                        .arg(((inHeaders)[0])->seriesDescription.c_str())
-                        .arg(((inHeaders)[0])->seriesNumber)
-                        .arg(((inHeaders)[0])->patientName.c_str());
-        descr = descr.trimmed();
-        descr = descr.replace(" ", "_");
-
-        if(!m_OutputFolderNameSet)
-        {
-          node=mitk::DataNode::New();
-          node->SetData( diffImage );
-          GetDefaultDataStorage()->Add(node);
-          SetDwiNodeProperties(node, descr.toStdString().c_str());
-          Status(QString("Image %1 added to datastorage").arg(descr));
-        }
-        else
-        {
-          QString fullpath = QString("%1/%2.dwi")
-                             .arg(m_OutputFolderName)
-                             .arg(descr);
-
-          // if the override option is not checked, we need to make sure that the current filepath
-          // does not point to an existing file
-          if( !(m_Controls->m_OverrideOptionCheckbox->isChecked()) )
-          {
-            QFile outputFile( fullpath );
-
-            // generate new filename if file exists
-            int file_counter = 0;
-            while( outputFile.exists() )
-            {
-              // copy base name
-              QString newdescr = descr;
-
-              file_counter++;
-              MITK_WARN << "The file "<< fullpath.toStdString() << " exists already.";
-              QString appendix = QString("_%1").arg( QString::number(file_counter) );
-              newdescr.append(appendix);
-              fullpath = QString("%1/%2.dwi")
-                  .arg(m_OutputFolderName)
-                  .arg(newdescr);
-
-              // set the new generated filename for next check
-              outputFile.setFileName( fullpath );
-            }
-          }
-          try
-          {
-            mitk::IOUtil::SaveBaseData(diffImage, fullpath.toStdString());
-          }
-          catch (itk::ExceptionObject &ex)
-          {
-            imageSuccessfullySaved = false;
-            Error(QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()));
-            logfile << QString("%1\n%2\n%3\n%4\n%5\n%6").arg(ex.GetNameOfClass()).arg(ex.GetFile()).arg(ex.GetLine()).arg(ex.GetLocation()).arg(ex.what()).arg(ex.GetDescription()).toStdString() << "\n";
-
-            node=mitk::DataNode::New();
-            node->SetData( diffImage );
-            GetDefaultDataStorage()->Add(node);
-            SetDwiNodeProperties(node, descr.toStdString().c_str());
-            Status(QString("Image %1 added to datastorage").arg(descr));
-            logfile << "Image " << descr.toStdString() << " added to datastorage\n";
-            continue ;
-          }
-          Status(QString("Image %1 written to disc (%1)").arg(fullpath.toStdString().c_str()));
-          logfile << "Image " << fullpath.toStdString() << "\n";
-        }
-      }
-      else
-      {
-        Status(QString("No diffusion information found (%1)").arg(folderName));
-        if(m_OutputFolderNameSet) logfile << "No diffusion information found  "<< folderName.toStdString();
-      }
-
-      Status(QString("Finished processing %1 with memory:").arg(folderName));
-      if(m_OutputFolderNameSet) logfile << "Finished processing " << folderName.toStdString() << "\n";
-      PrintMemoryUsage();
-      clock.Stop(folderName.toAscii());
-      mitk::ProgressBar::GetInstance()->Progress();
-      int lwidget = m_Controls->listWidget->count();
-      std::cout << lwidget <<std::endl;
-
-      logfile << "\n";
-
-    }
-*/
-    logfile.close();
-
-    while(m_Controls->listWidget->count())
-    {
-      // RETREIVE FOLDERNAME
-      QListWidgetItem * item  = m_Controls->listWidget->takeItem(0);
-      QString folderName = item->text();
-
-      if(m_OutputFolderNameSet) logfile << "Reading " << folderName.toStdString() << '\n';
-
-      gdcm::Directory d;
-      d.Load( folderName.toStdString().c_str(), true ); // recursive !
-      const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
-      const unsigned int ntotalfiles = l1.size();
-      Status(QString(" ... found %1 different files").arg(ntotalfiles));
-      if(m_OutputFolderNameSet)logfile << "...found " << ntotalfiles << " different files\n";
-
-
-      mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New();
-      mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
-
-      // Use tags as in Qmitk
-      // all the things that split by tag in DicomSeriesReader
-      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0010) ); // Number of Rows
-      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0011) ); // Number of Columns
-      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0030) ); // Pixel Spacing
-      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
-      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0037) ); // Image Orientation (Patient) // TODO add tolerance parameter (l. 1572 of original code)
-      // TODO handle as real vectors! cluster with configurable errors!
-      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x000e) ); // Series Instance UID
-      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0018, 0x0050) ); // Slice Thickness
-      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0008) ); // Number of Frames
-      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
-
-      // gdcmReader->AddSortingElement( tagSorter );
-      //mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
-
-      mitk::DICOMSortCriterion::ConstPointer sorting =
-          mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
-             mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), // aqcuisition number
-                mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
-                   mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), // trigger time
-                      mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
-                    ).GetPointer()
-                  ).GetPointer()
-                ).GetPointer()
-             ).GetPointer()
-          ).GetPointer();
-      tagSorter->SetSortCriterion( sorting );
-
-      gdcmReader->AddSortingElement( tagSorter );
-      gdcmReader->SetInputFiles( l1 );
       gdcmReader->AnalyzeInputFiles();
 
       gdcmReader->LoadImages();

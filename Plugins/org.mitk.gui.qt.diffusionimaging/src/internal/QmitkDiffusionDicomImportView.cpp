@@ -48,6 +48,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "gdcmAttribute.h"
 #include "gdcmVersion.h"
 
+#include <itksys/SystemTools.hxx>
+#include <itksys/Directory.hxx>
+
 #include <QMessageBox>
 
 const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusiondicomimport";
@@ -77,11 +80,14 @@ void QmitkDiffusionDicomImport::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
-    m_Controls->m_DicomLoadRecursiveCheckbox->setChecked(true);
+    m_Controls->m_DicomLoadRecursiveCheckbox->setChecked(false);
     m_Controls->m_DicomLoadAverageDuplicatesCheckbox->setChecked(false);
 
-    m_Controls->m_DicomLoadRecursiveCheckbox->setVisible(false);
+    m_Controls->m_DicomLoadRecursiveCheckbox->setVisible(true);
     m_Controls->m_OverrideOptionCheckbox->setVisible(false);
+    m_Controls->m_SubdirPrefixLineEdit->setVisible(false);
+    m_Controls->m_SetPrefixButton->setVisible(false);
+    m_Controls->m_ResetPrefixButton->setVisible(false);
 
     AverageClicked();
   }
@@ -101,9 +107,40 @@ void QmitkDiffusionDicomImport::CreateConnections()
     connect( m_Controls->m_OutputSetButton, SIGNAL(clicked()), this, SLOT(OutputSet()) );
     connect( m_Controls->m_OutputClearButton, SIGNAL(clicked()), this, SLOT(OutputClear()) );
     connect( m_Controls->m_Remove, SIGNAL(clicked()), this, SLOT(Remove()) );
+    connect( m_Controls->m_SetPrefixButton, SIGNAL(clicked()), this, SLOT(SetPrefixButtonPushed()));
+    connect( m_Controls->m_ResetPrefixButton, SIGNAL(clicked()), this, SLOT(ResetPrefixButtonPushed()));
+    connect( m_Controls->m_DicomLoadRecursiveCheckbox, SIGNAL(clicked()), this, SLOT(RecursiveSettingsChanged()) );
   }
 }
 
+void QmitkDiffusionDicomImport::RecursiveSettingsChanged()
+{
+  m_Controls->m_SubdirPrefixLineEdit->setVisible( m_Controls->m_DicomLoadRecursiveCheckbox->isChecked() );
+  m_Controls->m_SetPrefixButton->setVisible( m_Controls->m_DicomLoadRecursiveCheckbox->isChecked() );
+  m_Controls->m_SubdirPrefixLineEdit->clear();
+  this->m_Controls->m_SubdirPrefixLineEdit->setEnabled(true);
+}
+
+void QmitkDiffusionDicomImport::SetPrefixButtonPushed()
+{
+  m_Prefix = this->m_Controls->m_SubdirPrefixLineEdit->text().toStdString();
+  if( !this->m_Controls->m_ResetPrefixButton->isVisible() )
+    this->m_Controls->m_ResetPrefixButton->setVisible(true);
+
+  this->m_Controls->m_SubdirPrefixLineEdit->setEnabled(false);
+  this->m_Controls->m_ResetPrefixButton->setEnabled(true);
+  this->m_Controls->m_SetPrefixButton->setEnabled(false);
+}
+
+void QmitkDiffusionDicomImport::ResetPrefixButtonPushed()
+{
+  m_Controls->m_SubdirPrefixLineEdit->clear();
+
+  this->m_Controls->m_SubdirPrefixLineEdit->setEnabled(true);
+
+  this->m_Controls->m_ResetPrefixButton->setEnabled(false);
+  this->m_Controls->m_SetPrefixButton->setEnabled(true);
+}
 
 void QmitkDiffusionDicomImport::Remove()
 {
@@ -285,6 +322,8 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
   itk::TimeProbesCollectorBase clock;
   bool imageSuccessfullySaved = true;
 
+  bool has_prefix = true;
+
   try
   {
     const std::string& locale = "C";
@@ -325,16 +364,65 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
       QListWidgetItem * item  = m_Controls->listWidget->takeItem(0);
       QString folderName = item->text();
 
-      gdcm::Directory d;
-      d.Load( folderName.toStdString().c_str(), true ); // recursive !
-      const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
-      const unsigned int ntotalfiles = l1.size();
-      Status(QString(" ... found %1 different files").arg(ntotalfiles));
 
-      for( unsigned int i=0; i< ntotalfiles; i++)
+      if( has_prefix )
       {
-        complete_list.push_back( l1.at(i) );
+
+        std::string subdir_prefix = this->m_Prefix;
+
+        itksys::Directory rootdir;
+        rootdir.Load( folderName.toStdString().c_str() );
+
+        for( unsigned int idx=0; idx<rootdir.GetNumberOfFiles(); idx++)
+        {
+          std::string current_path = rootdir.GetFile(idx);
+          std::string directory_path = std::string(rootdir.GetPath()) + std::string("/") + current_path;
+
+          MITK_INFO("dicom.loader.inputrootdir.test") << "ProbePath:   " << current_path;
+          MITK_INFO("dicom.loader.inputrootdir.test") << "IsDirectory: " << itksys::SystemTools::FileIsDirectory( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ).c_str() )
+                                                      << " StartsWith: " << itksys::SystemTools::StringStartsWith( current_path.c_str(), subdir_prefix.c_str() );
+
+          // test for prefix
+          if(    itksys::SystemTools::FileIsDirectory( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ).c_str() )
+                 && itksys::SystemTools::StringStartsWith( current_path.c_str(), subdir_prefix.c_str() )
+                 )
+          {
+
+            gdcm::Directory d;
+            d.Load( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ) , false);
+
+            MITK_INFO("dicom.load.subdir.attempt") << "In directory " << itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() );
+
+            const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
+            const unsigned int ntotalfiles = l1.size();
+            Status(QString(" ... found %1 different files").arg(ntotalfiles));
+
+            for( unsigned int i=0; i< ntotalfiles; i++)
+            {
+              complete_list.push_back( l1.at(i) );
+            }
+
+
+          }
+
+        }
       }
+      else
+      {
+        gdcm::Directory d;
+        d.Load( folderName.toStdString().c_str(), this->m_Controls->m_DicomLoadRecursiveCheckbox->isChecked() ); // recursive !
+        const gdcm::Directory::FilenamesType &l1 = d.GetFilenames();
+        const unsigned int ntotalfiles = l1.size();
+        Status(QString(" ... found %1 different files").arg(ntotalfiles));
+
+        for( unsigned int i=0; i< ntotalfiles; i++)
+        {
+          complete_list.push_back( l1.at(i) );
+        }
+
+      }
+
+
 
     }
 

@@ -12,24 +12,69 @@ If you don't know about MiniApps, you can read what MiniApps are at the \ref Min
 A MiniApp command line tool allows for configuration of command line arguments and eases the access to these argument values.
 Additionally, a command line tool provides a XML representation of the configured arguments. This XML representation can be used for automatic user interface generation.
 
-\section MiniAppCommandLineToolSetUp Setting up a simple command line tool
+\section MiniAppCommandLineToolSetUp Setting up a command line tool
 
 This section describes the most important code parts a command line tool consists of using the example of the \ref TensorReconstruction command line tool.
 
 First of all the main function of the command line tool is specified. This function is registered at the MiniAppManager via the macro defined in \ref MiniAppManager.h
 
 \code
-
 int TensorReconstruction(int argc, char* argv[])
 {
 
 }
 
 RegisterDiffusionMiniApp(TensorReconstruction);
-
 \endcode
 
-application logic surrounded by try/catch blocks
+Within the body of the main function the accepted arguments of the command line tool are specified via the addArgument method of the ctkCommandLineParser located in DiffusionImaging/MiniApps directory.
+The TensorReconstruction command line tool requires an input file, an output file, and optionally accepts a threshold of type integer.
+
+\code
+ctkCommandLineParser parser;
+parser.setArgumentPrefix("--", "-");
+parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
+parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
+parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
+\endcode
+
+After specification of allowed arguments the parser's parseArguments method is called. This method returns a mapping of long argument names and their values.
+
+\code
+map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+if (parsedArgs.size() == 0)
+  return EXIT_FAILURE;
+\endcode
+
+The following code snippet shows how argument values can be accessed and converted:
+
+\code
+std::string inFileName = us::any_cast<string>(parsedArgs["input"]);
+std::string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
+
+int threshold = 0;
+if (parsedArgs.count("b0Threshold"))
+  threshold = us::any_cast<int>(parsedArgs["b0Threshold"]);
+\endcode
+
+From now on the values of the command line arguments are used in the application logic.
+
+Following argument types are available:
+\li String
+\li Bool
+\li StringList
+\li Int
+\li Float
+\li InputDirectory
+\li InputFile
+\li OutputDirectory
+\li OutputFile
+
+The distinction between InputFile/OutputFile and InputDirectory/OutputDirectory respectively ensures that the appropriate UI widget is chosen.
+The label string passed to the addArgument method is the label for the corresponding UI widget.
+
+
+
 
 
 

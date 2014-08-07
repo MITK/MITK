@@ -58,7 +58,6 @@ class ViewBrowserView : public QmitkAbstractView
 
     /// \brief Fills the TreeList with the available perspectives and views.
     void FillTreeList();
-    void RemoveListener();
 
 
   protected slots:
@@ -91,8 +90,6 @@ class ViewBrowserView : public QmitkAbstractView
     ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
     berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
-    berry::IPerspectiveListener::Pointer        perspListener;
-    berry::IWindowListener::Pointer                perspListener2;
 
     friend struct ViewBrowserViewListener;
 };

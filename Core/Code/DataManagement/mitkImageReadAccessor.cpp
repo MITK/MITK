@@ -44,8 +44,8 @@ mitk::ImageReadAccessor::ImageReadAccessor(
   }
 }
 
-mitk::ImageReadAccessor::ImageReadAccessor(const mitk::Image* image)
-  : ImageAccessorBase(image, NULL, ImageAccessorBase::DefaultBehavior)
+mitk::ImageReadAccessor::ImageReadAccessor(const mitk::Image* image, const ImageDataItem* iDI)
+  : ImageAccessorBase(image, iDI, ImageAccessorBase::DefaultBehavior)
   , m_Image(image)
 {
   OrganizeReadAccess();

@@ -59,7 +59,7 @@ public:
       int OptionFlags = ImageAccessorBase::DefaultBehavior
       );
 
-  ImageReadAccessor(const Image* image);
+  ImageReadAccessor(const Image* image, const ImageDataItem* iDI = NULL);
 
   /** Destructor informs Image to unlock memory. */
   virtual ~ImageReadAccessor();

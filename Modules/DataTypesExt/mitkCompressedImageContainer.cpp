@@ -86,7 +86,7 @@ void mitk::CompressedImageContainer::SetImage( Image* image )
                << "Attempting to compress " << m_OneTimeStepImageSizeInBytes << " image bytes into a buffer of size " << bufferSize << std::endl;
     }
 
-    ImageReadAccessor imgAcc(Image::ConstPointer(image), image->GetVolumeData(timestep));
+    ImageReadAccessor imgAcc(image, image->GetVolumeData(timestep));
     ::Bytef* dest(byteBuffer);
     ::uLongf destLen(bufferSize);
     ::Bytef* source( (unsigned char*) imgAcc.GetData() );

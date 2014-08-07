@@ -25,22 +25,6 @@ namespace mitk
 {
 #ifndef DOXYGEN_SKIP
 template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType >
-void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
-{
-  typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
-  if(typeid(ItkInputImageType) == typeid(ItkOutputImageType))
-  {
-    itkOutputImage = reinterpret_cast<ItkOutputImageType*>(itkInputImage);
-    return;
-  }
-  typedef itk::CastImageFilter< ItkInputImageType, ItkOutputImageType > CastImageFilterType;
-  typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
-  castImageFilter->SetInput( itkInputImage );
-  castImageFilter->Update();
-  itkOutputImage = castImageFilter->GetOutput();
-}
-
-template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType >
 void _CastToItkImage2Access(const itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
 {
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
@@ -54,7 +38,6 @@ void _CastToItkImage2Access(const itk::Image<TPixel, VImageDimension>* itkInputI
 
 
 #define InstantiateAccessFunction__CastToItkImage2Access(type1, type2) \
-  template MITK_CORE_EXPORT void _CastToItkImage2Access(itk::Image<MITK_PP_TUPLE_REM(2)type1>*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type2> >&); \
   template MITK_CORE_EXPORT void _CastToItkImage2Access(const itk::Image<MITK_PP_TUPLE_REM(2)type1>*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type2> >&);
 
 #define InstantiateCastToItkImage2Access(r, data, dim) \

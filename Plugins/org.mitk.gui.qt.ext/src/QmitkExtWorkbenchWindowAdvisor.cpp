@@ -190,58 +190,6 @@ private:
 
 };
 
-class PartListenerForViewBrowser: public berry::IPartListener
-{
-public:
-
-    PartListenerForViewBrowser(QAction* act) :
-        viewBrowserAction(act)
-    {
-    }
-
-    Events::Types GetPartEventTypes() const
-    {
-        return Events::OPENED | Events::CLOSED | Events::HIDDEN |
-                Events::VISIBLE;
-    }
-
-    void PartOpened(berry::IWorkbenchPartReference::Pointer ref)
-    {
-        if (ref->GetId()=="org.mitk.views.viewbrowser")
-        {
-            viewBrowserAction->setChecked(true);
-        }
-    }
-
-    void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
-    {
-        if (ref->GetId()=="org.mitk.views.viewbrowser")
-        {
-            viewBrowserAction->setChecked(false);
-        }
-    }
-
-    void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
-    {
-        if (ref->GetId()=="org.mitk.views.viewbrowser")
-        {
-            viewBrowserAction->setChecked(true);
-        }
-    }
-
-    void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
-    {
-        if (ref->GetId()=="org.mitk.views.viewbrowser")
-        {
-            viewBrowserAction->setChecked(false);
-        }
-    }
-
-private:
-    QAction* viewBrowserAction;
-
-};
-
 class PerspectiveListenerForTitle: public berry::IPerspectiveListener
 {
 public:
@@ -411,6 +359,7 @@ QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchA
     showViewMenuItem(true),
     showNewWindowMenuItem(false),
     showClosePerspectiveMenuItem(true),
+    enableViewBrowser(true),
     dropTargetListener(new QmitkDefaultDropTargetListener)
 {
     productName = QCoreApplication::applicationName().toStdString();
@@ -444,6 +393,17 @@ void QmitkExtWorkbenchWindowAdvisor::ShowClosePerspectiveMenuItem(bool show)
 bool QmitkExtWorkbenchWindowAdvisor::GetShowClosePerspectiveMenuItem()
 {
     return showClosePerspectiveMenuItem;
+}
+
+
+void QmitkExtWorkbenchWindowAdvisor::EnableViewBrowser(bool enable)
+{
+    enableViewBrowser = enable;
+}
+
+bool QmitkExtWorkbenchWindowAdvisor::GetEnableViewBrowser()
+{
+    return enableViewBrowser;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowNewWindowMenuItem(bool show)
@@ -484,6 +444,11 @@ void QmitkExtWorkbenchWindowAdvisor::SetProductName(const std::string& product)
 void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
 {
     windowIcon = wndIcon;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::onViewBrowser()
+{
+    viewBrowser->setVisible(viewBrowserAction->isChecked());
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
@@ -581,24 +546,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     // add view browser
     viewBrowserAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&View Browser", NULL);
-    bool viewBrowserFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.viewbrowser");
-    if (viewBrowserFound)
+    if (enableViewBrowser)
     {
-        QObject::connect(viewBrowserAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onViewBrowser()));
+        QObject::connect(viewBrowserAction, SIGNAL(triggered(bool)), SLOT(onViewBrowser()));
         viewBrowserAction->setCheckable(true);
-
-        // add part listener for view browser
-        viewBrowserPartListener = new PartListenerForViewBrowser(viewBrowserAction);
-        window->GetPartService()->AddPartListener(viewBrowserPartListener);
-        berry::IViewPart::Pointer viewBrowser = window->GetActivePage()->FindView("org.mitk.views.viewbrowser");
-
         viewBrowserAction->setChecked(false);
-        if (viewBrowser)
-        {
-            bool isviewBrowserVisible = window->GetActivePage()->IsPartVisible(viewBrowser);
-            if (isviewBrowserVisible)
-                viewBrowserAction->setChecked(true);
-        }
         viewBrowserAction->setToolTip("Toggle view browser");
     }
 
@@ -630,7 +582,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     {
         mainActionsToolBar->addAction(imageNavigatorAction);
     }
-    if (viewBrowserFound)
+    if (enableViewBrowser)
     {
         mainActionsToolBar->addAction(viewBrowserAction);
     }
@@ -814,6 +766,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     // progBar->Progress(1);
 
     mainWindow->setStatusBar(qStatusBar);
+
+    viewBrowser = new QDockWidget("View Browser");
+    viewBrowser->setWidget(new QmitkViewBrowserWidget());
+    viewBrowser->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    viewBrowser->setVisible(false);
+    mainWindow->addDockWidget(Qt::LeftDockWidgetArea, viewBrowser);
 
     QmitkMemoryUsageIndicatorView* memoryIndicator =
             new QmitkMemoryUsageIndicatorView();

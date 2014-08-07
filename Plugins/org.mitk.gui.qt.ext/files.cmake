@@ -4,6 +4,12 @@ set(SRC_CPP_FILES
   QmitkExtFileSaveProjectAction.cpp
   QmitkOpenDicomEditorAction.cpp
   QmitkOpenXnatEditorAction.cpp
+
+  QmitkViewBrowserWidget.cpp
+  QmitkNewPerspectiveDialog.cpp
+  ViewTagsRegistry.cpp
+  ViewTagsDescriptor.cpp
+  ExtensionPointDefinitionConstants.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -17,6 +23,7 @@ set(INTERNAL_CPP_FILES
 set(UI_FILES
   src/internal/QmitkAppInstancesPreferencePage.ui
   src/internal/QmitkExternalProgramsPreferencePage.ui
+  src/QmitkViewBrowserWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -31,6 +38,11 @@ set(MOC_H_FILES
   src/internal/QmitkModuleView.h
   src/QmitkOpenDicomEditorAction.h
   src/QmitkOpenXnatEditorAction.h
+
+  src/QmitkViewBrowserWidget.h
+  src/mitkQtPerspectiveItem.h
+  src/mitkQtViewItem.h
+  src/QmitkNewPerspectiveDialog.h
 )
 
 set(CACHED_RESOURCE_FILES

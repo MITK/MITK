@@ -769,7 +769,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     viewBrowser = new QDockWidget("View Browser");
     viewBrowser->setWidget(new QmitkViewBrowserWidget());
-    viewBrowser->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    viewBrowser->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     viewBrowser->setVisible(false);
     mainWindow->addDockWidget(Qt::LeftDockWidgetArea, viewBrowser);
 

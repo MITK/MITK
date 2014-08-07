@@ -51,38 +51,56 @@ namespace mitk {
 
 bool mitk::Equal ( mitk::Image* img1, mitk::Image* img2 )
 {
+  MITK_INFO << "hallo";
   mitk::ImageReadAccessor ra1(img1);
   mitk::ImageReadAccessor ra2(img2);
   const unsigned int* img1Dims = img1->GetDimensions();
 
   if ( img1->GetDimension() != img2->GetDimension() )
+  {
+    MITK_ERROR << "Dimension do not match";
     return false;
+  }
 
   if( img1Dims[0] != img2->GetDimensions()[0] ||
       img1Dims[1] != img2->GetDimensions()[1] ||
       img1Dims[2] != img2->GetDimensions()[2] )
+  {
+    MITK_ERROR << "Dimensions do not match";
     return false;
+  }
 
   if ( img1->GetPixelType().GetPixelType() != img2->GetPixelType().GetPixelType())
+  {
+    MITK_ERROR << "Pixeltypes do not match";
     return false;
+  }
 
   if ( img1->GetGeometry()->GetSpacing()[0] != img2->GetGeometry()->GetSpacing()[0] ||
        img1->GetGeometry()->GetSpacing()[1] != img2->GetGeometry()->GetSpacing()[1] ||
        img1->GetGeometry()->GetSpacing()[2] != img2->GetGeometry()->GetSpacing()[2] )
+  {
+    MITK_ERROR << "Spacing does not match";
     return false;
+  }
 
   if ( img1->GetGeometry()->GetOrigin()[0] != img2->GetGeometry()->GetOrigin()[0] ||
        img1->GetGeometry()->GetOrigin()[1] != img2->GetGeometry()->GetOrigin()[1] ||
        img1->GetGeometry()->GetOrigin()[2] != img2->GetGeometry()->GetOrigin()[2] )
+  {
+    MITK_ERROR << "Origin does not match";
     return false;
+  }
 
   size_t size = img1Dims[0] * img1Dims[1] * img1Dims[2] * img1->GetPixelType().GetSize();
 
   // bytewise compare the image
   for ( size_t i = 0; i < size; ++i )
   {
-    if ( ((char*)ra1.GetData())[i] != ((char*)ra2.GetData())[i] )
+    if ( ((char*)ra1.GetData())[i] != ((char*)ra2.GetData())[i] ) {
+        MITK_INFO << "Byte does not match";
         return false;
+    }
   }
 
   return true;
@@ -248,16 +266,19 @@ mitk::Image::Pointer mitk::SimpleItkToMitkImage( sitk::Image& sitkImage )
 class mitkPythonWrappingTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPythonWrappingTestSuite);
-  MITK_TEST(testImageTransfer);
+  MITK_TEST(testSimpleItkImageTransfer);
+  MITK_TEST(testCVImageTransfer);
   MITK_TEST(testSurfaceTransfer);
   MITK_TEST(testVtkCreateConePythonSnippet);
   MITK_TEST(testVtkDecimateProPythonSnippet);
   MITK_TEST(testSimpleITKMedianFilterSnippet);
+  MITK_TEST(testOpenCVMedianFilter);
   CPPUNIT_TEST_SUITE_END();
 
 private:
     mitk::PythonService* m_PythonService;
     mitk::Image::Pointer m_Image;
+    mitk::Image::Pointer m_Image2D;
     mitk::Surface::Pointer m_Surface;
     QMap<QString, QString> m_Snippets;
 
@@ -273,6 +294,7 @@ public:
     m_PythonService = dynamic_cast<mitk::PythonService*>( context->GetService(serviceRef) );
 
     m_Image = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    m_Image2D = mitk::IOUtil::LoadImage(GetTestDataFilePath("Png2D-bw.png"));
     m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("binary.stl"));
 
     QmitkPythonSnippets::LoadStringMap(QmitkPythonSnippets::DEFAULT_SNIPPET_FILE,m_Snippets);
@@ -281,10 +303,11 @@ public:
   void tearDown()
   {
     m_Image = NULL;
+    m_Image2D = NULL;
     m_Surface = NULL;
   }
 
-  void testImageTransfer()
+  void testSimpleItkImageTransfer()
   {
     std::string varName("mitkImage");
     CPPUNIT_ASSERT_MESSAGE ( "Is SimpleITK Python Wrapping available?",
@@ -297,6 +320,22 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE( "Compare if images are equal after transfer.",
                             mitk::Equal(pythonImage,m_Image) );
+  }
+
+  void testCVImageTransfer()
+  {
+    std::string varName("mitkImage");
+    CPPUNIT_ASSERT_MESSAGE ( "Is OpenCV Python Wrapping available?",
+          m_PythonService->IsOpenCvPythonWrappingAvailable() == true );
+
+    CPPUNIT_ASSERT_MESSAGE( "Valid image copied to python import should return true.",
+          m_PythonService->CopyToPythonAsCvImage( m_Image2D, varName) == true );
+
+    mitk::Image::Pointer pythonImage = m_PythonService->CopyCvImageFromPython(varName);
+
+    // todo pixeltypes do not match, cv is changing it
+    //CPPUNIT_ASSERT_MESSAGE( "Compare if images are equal after transfer.",
+    //                        mitk::Equal(pythonImage,m_Image2D) );
   }
 
   void testSurfaceTransfer()
@@ -326,6 +365,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE ( "Is VTK Python Wrapping available?", m_PythonService->IsVtkPythonWrappingAvailable() == true );
 
     m_PythonService->Execute( m_Snippets["vtk: create cone"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
+    CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
 
     mitk::Surface::Pointer pythonSurface = m_PythonService->CopyVtkPolyDataFromPython("cone");
 
@@ -349,6 +389,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE( "Valid surface copied to python import should return true.", m_PythonService->CopyToPythonAsVtkPolyData( m_Surface, "mitkSurface") == true );
 
     m_PythonService->Execute( m_Snippets["vtk.vtkDecimatePro"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
+    CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
 
     mitk::Surface::Pointer pythonSurface = m_PythonService->CopyVtkPolyDataFromPython("mitkSurface_new");
 
@@ -369,12 +410,25 @@ public:
     CPPUNIT_ASSERT_MESSAGE( "Valid image copied to python import should return true.", m_PythonService->CopyToPythonAsSimpleItkImage(m_Image, "mitkImage") == true );
 
     m_PythonService->Execute( m_Snippets["medianfilter"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
+    CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
 
     mitk::Image::Pointer pythonImage = m_PythonService->CopySimpleItkImageFromPython("mitkImage_new");
 
     CPPUNIT_ASSERT_MESSAGE( "Compare if images are equal.", mitk::Equal(pythonImage, mitkImage) );
   }
-  //TODO opencv median filter
+
+  //TODO opencv median filter, add cpp test code
+  void testOpenCVMedianFilter()
+  {
+    // simple itk median filter in python
+    CPPUNIT_ASSERT_MESSAGE ( "Is OpenCV Python Wrapping available?", m_PythonService->IsOpenCvPythonWrappingAvailable() == true );
+
+    CPPUNIT_ASSERT_MESSAGE( "Valid image copied to python import should return true.", m_PythonService->CopyToPythonAsCvImage(m_Image2D, "mitkImage") == true );
+
+    m_PythonService->Execute( m_Snippets["opencv median filter"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
+
+    CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
+  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPythonWrapping)

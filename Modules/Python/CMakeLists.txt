@@ -1,5 +1,4 @@
 if( MITK_USE_Python )
-
   if(NOT MITK_USE_SYSTEM_PYTHON)
     add_definitions( -DUSE_MITK_BUILTIN_PYTHON )
   endif()

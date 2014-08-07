@@ -135,25 +135,25 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     )
 
     set(Python_DIR "${CMAKE_BINARY_DIR}/${proj}-install")
+    set(Python_BUILD_DIR "${CMAKE_BINARY_DIR}/${proj}-build")
 
-    set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
-
+    # use the python executable in the build dir for unix systems. The stripped
+    # ones will cause conflicts if system libraries are present during the build/configure process
+    # of opencv, since they will try to lookup the sys path first if no lib is directly
+    # linked with it s path into the executable
     if(UNIX)
-      #set(PYTHON_EXECUTABLE "${Python_BUILD_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
+      set(PYTHON_EXECUTABLE "${Python_BUILD_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}")
-      set(PYTHON_LIBRARY "${Python_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-      #set(ENV{PYTHONHOME} "${Python_BUILD_DIR}")
+      set(PYTHON_LIBRARY "${Python_BUILD_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+      set(ENV{PYTHONHOME} "${Python_BUILD_DIR}")
     else()
-      #set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
+      set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include")
       set(PYTHON_LIBRARY "${Python_DIR}/libs/python${PYTHON_MAJOR_VERSION}${PYTHON_MINOR_VERSION}.lib")
+      set(ENV{PYTHONHOME} "${Python_DIR}")
     endif()
 
-    # export python home
-    set(ENV{PYTHONHOME} "${Python_DIR}")
-
-    # get the name of the library. The name is used for dynamic loading
-    # the library on unix systems in development setups
+    # get the name of the library
     get_filename_component(PYTHON_LIBRARY_NAME "${PYTHON_LIBRARY}" NAME)
 
   else()

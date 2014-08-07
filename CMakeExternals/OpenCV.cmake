@@ -38,6 +38,8 @@ if(MITK_USE_OpenCV)
           )
       if(NOT MITK_USE_SYSTEM_PYTHON)
         list(APPEND proj_DEPENDENCIES Python)
+        # export python home
+        set(ENV{PYTHONHOME} "${Python_DIR}")
       endif()
       # use the numpy build within mitk
       if(MITK_USE_NUMPY)

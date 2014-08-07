@@ -91,6 +91,8 @@ class ViewBrowserView : public QmitkAbstractView
     QMenu*                                      m_ContextMenu;
     berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
 
+    berry::IWindowListener::Pointer             m_WindowListener;
+
     friend struct ViewBrowserViewListener;
 };
 

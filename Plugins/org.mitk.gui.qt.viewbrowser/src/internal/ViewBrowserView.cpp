@@ -71,7 +71,6 @@ bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
     return result;
 }
 
-
 bool ClassFilterProxyModel::hasToBeDisplayed(const QModelIndex index) const
 {
     bool result = false;
@@ -98,6 +97,28 @@ bool ClassFilterProxyModel::hasToBeDisplayed(const QModelIndex index) const
     }
     return result;
 }
+
+struct ViewBrowserWindowListener : public berry::IWindowListener
+{
+    ViewBrowserWindowListener(ViewBrowserView* switcher)
+        : switcher(switcher),
+          m_Running(false)
+    {}
+
+    virtual void WindowActivated(berry::IWorkbenchWindow::Pointer /*window*/)
+    {
+        if (m_Running)
+            return;
+        m_Running = true;
+        switcher->FillTreeList();
+        m_Running = false;
+    }
+
+private:
+    ViewBrowserView* switcher;
+    bool m_Running;
+};
+
 const std::string ViewBrowserView::VIEW_ID = "org.mitk.views.viewbrowser";
 
 bool compareViews(berry::IViewDescriptor::Pointer a, berry::IViewDescriptor::Pointer b)
@@ -121,6 +142,9 @@ void ViewBrowserView::SetFocus()
 void ViewBrowserView::CreateQtPartControl( QWidget *parent )
 {
     // create GUI widgets from the Qt Designer's .ui file
+    m_WindowListener = ViewBrowserWindowListener::Pointer(new ViewBrowserWindowListener(this));
+    berry::PlatformUI::GetWorkbench()->AddWindowListener(m_WindowListener);
+
     m_Parent = parent;
     m_Controls.setupUi( parent );
     connect( m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
@@ -147,33 +171,24 @@ void ViewBrowserView::ButtonClicked()
 
 void ViewBrowserView::FillTreeList()
 {
+    // active workbench window available?
+    if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNull())
+        return;
+    // active page available?
+    berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+    if (page.IsNull())
+        return;
+    // everything is fine and we can remove the window listener
+    berry::PlatformUI::GetWorkbench()->RemoveWindowListener(m_WindowListener);
+
+    // initialize tree model
     m_TreeModel->clear();
     QStandardItem *treeRootItem = m_TreeModel->invisibleRootItem();
 
-    // Get all available views and create a map of all views
-    std::map<std::string, berry::IViewDescriptor::Pointer> viewMap;
-    berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
-    std::vector<berry::IViewDescriptor::Pointer> views(viewRegistry->GetViews());
-    for (unsigned int i=0; i<views.size(); i++)
-    {
-        viewMap[views[i]->GetId()] = views[i];
-    }
-    std::sort(views.begin(), views.end(), compareViews);
-
-    // Get all available perspectives
+    // get all available perspectives
     berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
     std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
 
-    // workbench window available?
-    if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNull())
-        return;
-
-    // Fill the TreeModel
-    berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
-    if (page.IsNull())
-    {
-        return;
-    }
     QModelIndex currentIndex;
     berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
     std::vector<std::string> perspectiveExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetPerspectiveExcludeList();
@@ -194,26 +209,26 @@ void ViewBrowserView::FillTreeList()
         if (skipPerspective)
             continue;
 
-        QList< QStandardItem*> preparedRow;
-
         QIcon* pIcon = static_cast<QIcon*>(p->GetImageDescriptor()->CreateImage());
         mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(*pIcon, QString::fromStdString(p->GetLabel()));
         pItem->m_Perspective = p;
-        preparedRow << pItem;
-        perspectiveRootItem->appendRow(preparedRow);
+        perspectiveRootItem->appendRow(pItem);
 
         if (currentPersp->GetId()==p->GetId())
             currentIndex = pItem->index();
     }
 
-    // Add a list with all available views
+    // get all available views
+    berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
+    std::vector<berry::IViewDescriptor::Pointer> views(viewRegistry->GetViews());
+    std::sort(views.begin(), views.end(), compareViews);
+
     std::vector<std::string> viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
     QStandardItem* viewRootItem = new QStandardItem(QIcon(),"View categories");
     treeRootItem->appendRow(viewRootItem);
 
     std::vector< QStandardItem* > categoryItems;
     QStandardItem* noCategoryItem = new QStandardItem(QIcon(),"Miscellaneous");
-
 
     for (unsigned int i = 0; i < views.size(); ++i)
     {

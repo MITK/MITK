@@ -73,7 +73,6 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
           QString varName(node->GetName().c_str());
           // regex replace every character that is not allowed in a python variable
           varName = varName.replace(QRegExp("[.\\+\\-*\\s\\/\\n\\t\\r]"),QString("_"));
-          MITK_INFO << "varName: " << varName.toStdString();
 
           if( mitkImage )
           {

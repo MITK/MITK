@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_ext_Export.h>
 
 #include <QList>
+#include <QDockWidget>
+#include <QmitkViewBrowserWidget.h>
 
 class QAction;
 class QMenu;
@@ -70,6 +72,10 @@ public:
 
     bool GetShowClosePerspectiveMenuItem();
 
+    void EnableViewBrowser(bool enable);
+
+    bool GetEnableViewBrowser();
+
     //TODO should be removed when product support is here
     void SetProductName(const std::string& product);
     void SetWindowIcon(const std::string& wndIcon);
@@ -86,6 +92,7 @@ protected slots:
     virtual void onHelp();
     virtual void onHelpOpenHelpPerspective();
     virtual void onAbout();
+    void onViewBrowser();
 
 private:
 
@@ -139,6 +146,7 @@ private:
   bool showViewMenuItem;
   bool showNewWindowMenuItem;
   bool showClosePerspectiveMenuItem;
+  bool enableViewBrowser;
   std::string productName;
   std::string windowIcon;
 
@@ -166,6 +174,7 @@ private:
   QAction* closePerspAction;
   QAction* openDicomEditorAction;
   QAction* openXnatEditorAction;
+  QDockWidget* viewBrowser;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ViewBrowserViewControls</class>
- <widget class="QWidget" name="ViewBrowserViewControls">
+ <class>QmitkViewBrowserWidgetControls</class>
+ <widget class="QWidget" name="QmitkViewBrowserWidgetControls">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -35,13 +35,6 @@
      <attribute name="headerVisible">
       <bool>false</bool>
      </attribute>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButton">
-     <property name="text">
-      <string>PushButton</string>
-     </property>
     </widget>
    </item>
   </layout>

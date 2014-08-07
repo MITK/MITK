@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+//Qmitk headers
+#include "QmitkViewBrowserWidget.h"
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -21,12 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPerspectiveRegistry.h>
 #include <berryPlatformUI.h>
 #include <berryIWorkbenchPage.h>
-
-// Qmitk
-#include "ViewBrowserView.h"
-#include <src/internal/mitkQtPerspectiveItem.h>
-#include <src/internal/mitkQtViewItem.h>
-#include <src/internal/QmitkNewPerspectiveDialog.h>
 
 // Qt
 #include <QMessageBox>
@@ -125,7 +121,7 @@ bool ClassFilterProxyModel::hasToBeDisplayed(const QModelIndex index) const
 
 struct ViewBrowserWindowListener : public berry::IWindowListener
 {
-    ViewBrowserWindowListener(ViewBrowserView* switcher)
+    ViewBrowserWindowListener(QmitkViewBrowserWidget* switcher)
         : switcher(switcher),
           m_Running(false)
     {}
@@ -149,11 +145,9 @@ struct ViewBrowserWindowListener : public berry::IWindowListener
     }
 
 private:
-    ViewBrowserView* switcher;
+    QmitkViewBrowserWidget* switcher;
     bool m_Running;
 };
-
-const std::string ViewBrowserView::VIEW_ID = "org.mitk.views.viewbrowser";
 
 bool compareViews(berry::IViewDescriptor::Pointer a, berry::IViewDescriptor::Pointer b)
 {
@@ -169,11 +163,18 @@ bool compareQStandardItems(QStandardItem* a, QStandardItem* b)
     return a->text().compare(b->text()) < 0;
 }
 
-void ViewBrowserView::SetFocus()
+QmitkViewBrowserWidget::QmitkViewBrowserWidget( QWidget * parent, Qt::WindowFlags )
+    : QWidget(parent)
 {
+    this->CreateQtPartControl(this);
 }
 
-void ViewBrowserView::CreateQtPartControl( QWidget *parent )
+QmitkViewBrowserWidget::~QmitkViewBrowserWidget()
+{
+
+}
+
+void QmitkViewBrowserWidget::CreateQtPartControl( QWidget *parent )
 {
     // create GUI widgets from the Qt Designer's .ui file
     m_WindowListener = ViewBrowserWindowListener::Pointer(new ViewBrowserWindowListener(this));
@@ -183,7 +184,6 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     m_Controls.setupUi( parent );
     connect( m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
     connect( m_Controls.m_PluginTreeView, SIGNAL(doubleClicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));
-    connect( m_Controls.pushButton, SIGNAL(clicked()), SLOT(ButtonClicked()) );
     connect( m_Controls.lineEdit, SIGNAL(textChanged(QString)), SLOT(FilterChanged()));
 
     m_ContextMenu = new QMenu(m_Controls.m_PluginTreeView);
@@ -200,16 +200,11 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     QList<ViewTagsDescriptor::Pointer> additions = m_Registry.GetViewTags();
     foreach (const ViewTagsDescriptor::Pointer& var, additions)
     {
-      MITK_INFO << var->GetID().toStdString();
+      std::cout << var->GetID().toStdString() << std::endl;
     }
 }
 
-void ViewBrowserView::ButtonClicked()
-{
-    FillTreeList();
-}
-
-void ViewBrowserView::FillTreeList()
+void QmitkViewBrowserWidget::FillTreeList()
 {
     // active workbench window available?
     if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNull())
@@ -280,6 +275,7 @@ void ViewBrowserView::FillTreeList()
         for(unsigned int e=0; e<viewExcludeList.size(); e++)
             if(viewExcludeList.at(e)==v->GetId())
             {
+                skipView = true;
                 break;
             }
         if (skipView)
@@ -326,11 +322,7 @@ void ViewBrowserView::FillTreeList()
     m_Controls.m_PluginTreeView->setCurrentIndex(correctedIndex);
 }
 
-void ViewBrowserView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes )
-{
-}
-
-void ViewBrowserView::FilterChanged()
+void QmitkViewBrowserWidget::FilterChanged()
 {
     QString filterString = m_Controls.lineEdit->text();
     if (filterString.size() > 0 )
@@ -346,7 +338,7 @@ void ViewBrowserView::FilterChanged()
     m_FilterProxyModel->setFilterRegExp(regExp);
 }
 
-void ViewBrowserView::ItemClicked(const QModelIndex &index)
+void QmitkViewBrowserWidget::ItemClicked(const QModelIndex &index)
 {
     QStandardItem* item = m_TreeModel->itemFromIndex(m_FilterProxyModel->mapToSource(index));
 
@@ -381,7 +373,7 @@ void ViewBrowserView::ItemClicked(const QModelIndex &index)
     }
 }
 
-void ViewBrowserView::AddPerspective()
+void QmitkViewBrowserWidget::AddPerspective()
 {
     QmitkNewPerspectiveDialog* dialog = new QmitkNewPerspectiveDialog( m_Parent );
 
@@ -401,7 +393,7 @@ void ViewBrowserView::AddPerspective()
     FillTreeList();
 }
 
-void ViewBrowserView::ClonePerspective()
+void QmitkViewBrowserWidget::ClonePerspective()
 {
     if (m_RegisteredPerspective.IsNotNull())
     {
@@ -427,13 +419,13 @@ void ViewBrowserView::ClonePerspective()
     }
 }
 
-void ViewBrowserView::ResetPerspective()
+void QmitkViewBrowserWidget::ResetPerspective()
 {
     if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to reset the curent perspective?", QMessageBox::Yes|QMessageBox::No).exec())
         berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
-void ViewBrowserView::DeletePerspective()
+void QmitkViewBrowserWidget::DeletePerspective()
 {
     if (m_RegisteredPerspective.IsNotNull())
     {
@@ -449,7 +441,7 @@ void ViewBrowserView::DeletePerspective()
     }
 }
 
-void ViewBrowserView::ClosePerspective()
+void QmitkViewBrowserWidget::ClosePerspective()
 {
     if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to close the curent perspective?", QMessageBox::Yes|QMessageBox::No).exec())
     {
@@ -464,7 +456,7 @@ void ViewBrowserView::ClosePerspective()
     }
 }
 
-void ViewBrowserView::ClosePerspectives()
+void QmitkViewBrowserWidget::ClosePerspectives()
 {
     if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to close all perspectives?", QMessageBox::Yes|QMessageBox::No).exec())
     {
@@ -476,7 +468,7 @@ void ViewBrowserView::ClosePerspectives()
     }
 }
 
-void ViewBrowserView::CustomMenuRequested(QPoint pos)
+void QmitkViewBrowserWidget::CustomMenuRequested(QPoint pos)
 {
     QModelIndex index = m_Controls.m_PluginTreeView->indexAt(pos);
     QStandardItem* item = m_TreeModel->itemFromIndex(m_FilterProxyModel->mapToSource(index));
@@ -490,12 +482,6 @@ void ViewBrowserView::CustomMenuRequested(QPoint pos)
     bool showMenu = false;
     if (item->text()=="Perspectives")
     {
-        QAction* addAction = new QAction("Create new perspective", this);
-        m_ContextMenu->addAction(addAction);
-        connect(addAction, SIGNAL(triggered()), SLOT(AddPerspective()));
-
-        m_ContextMenu->addSeparator();
-
         QAction* resetAction = new QAction("Reset current perspective", this);
         m_ContextMenu->addAction(resetAction);
         connect(resetAction, SIGNAL(triggered()), SLOT(ResetPerspective()));

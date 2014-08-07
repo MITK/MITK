@@ -13,58 +13,47 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+#ifndef _QMITKViewBrowserWidget_H_INCLUDED
+#define _QMITKViewBrowserWidget_H_INCLUDED
 
-
-#ifndef ViewBrowserView_h
-#define ViewBrowserView_h
+//QT headers
+#include <QWidget>
+#include <QString>
+#include "ui_QmitkViewBrowserWidgetControls.h"
 
 #include <berryISelectionListener.h>
 #include <berryIPerspectiveListener.h>
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIPerspectiveDescriptor.h>
-
-#include <QmitkAbstractView.h>
-
-#include "ui_ViewBrowserViewControls.h"
-
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <QMenu>
-#include <src/internal/mitkQtPerspectiveItem.h>
-#include <src/internal/mitkQtViewItem.h>
+#include <QmitkNewPerspectiveDialog.h>
+#include <mitkQtPerspectiveItem.h>
+#include <mitkQtViewItem.h>
+#include <ViewTagsRegistry.h>
 
-#include "ViewTagsRegistry.h"
-
-
-/**
-  \brief ViewBrowserView
-
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
-
-  \sa QmitkAbstractView
-  \ingroup ${plugin_target}_internal
-*/
 class ClassFilterProxyModel;
 
-class ViewBrowserView : public QmitkAbstractView
+/** @brief
+  */
+class QmitkViewBrowserWidget : public QWidget
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
-  Q_OBJECT
+    //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
+    Q_OBJECT
 
-  public:
+public:
 
-    static const std::string VIEW_ID;
+    QmitkViewBrowserWidget (QWidget* parent = 0, Qt::WindowFlags f = 0);
+    virtual ~QmitkViewBrowserWidget();
 
+    virtual void CreateQtPartControl(QWidget *parent);
 
-    /// \brief Fills the TreeList with the available perspectives and views.
     void FillTreeList();
 
+public slots:
 
-  protected slots:
-
-    /// \brief Called when the user clicks the GUI button
     void CustomMenuRequested(QPoint pos);
     void ItemClicked(const QModelIndex &index);
     void AddPerspective();
@@ -73,31 +62,24 @@ class ViewBrowserView : public QmitkAbstractView
     void DeletePerspective();
     void ClosePerspectives();
     void ClosePerspective();
-    void ButtonClicked();
     void FilterChanged();
 
-  protected:
+protected:
 
-    virtual void CreateQtPartControl(QWidget *parent);
-
-    virtual void SetFocus();
-
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes );
-
+    // member variables
+    Ui::QmitkViewBrowserWidgetControls          m_Controls;
     QWidget*                                    m_Parent;
-    Ui::ViewBrowserViewControls                 m_Controls;
     QStandardItemModel*                         m_TreeModel;
     ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
     berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
-
     berry::IWindowListener::Pointer             m_WindowListener;
-
     friend struct ViewBrowserViewListener;
-
     ViewTagsRegistry m_Registry;
+
+private:
+
 };
 
-#endif // ViewBrowserView_h
+#endif // _QMITKViewBrowserWidget_H_INCLUDED
+

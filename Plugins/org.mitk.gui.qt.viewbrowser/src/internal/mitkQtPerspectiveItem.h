@@ -37,6 +37,7 @@ public:
 
     berry::IPerspectiveDescriptor::Pointer m_Perspective;
 
+    std::vector<QString> m_Tags;
 private:
 
 };

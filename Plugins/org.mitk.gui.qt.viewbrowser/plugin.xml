@@ -7,5 +7,13 @@
           class="ViewBrowserView"
           icon="resources/icon.xpm" />
   </extension>
-
+  <extension-point id="org.mitk.views.viewbrowser.textlists" name="New Change Text of Label" schema="schema/taglist.exsd"/>
+  
+  <extension point="org.mitk.views.viewbrowser.textlists">
+    <taglist id="org.mitk.views.viewbrowser">
+      <tag>Tag A</tag>
+      <tag>Tag B</tag>
+      <tag>Tag V</tag>
+    </taglist>
+  </extension>
 </plugin>

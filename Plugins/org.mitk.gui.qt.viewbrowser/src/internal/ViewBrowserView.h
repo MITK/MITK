@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <src/internal/mitkQtPerspectiveItem.h>
 #include <src/internal/mitkQtViewItem.h>
 
+#include "ViewTagsRegistry.h"
+
 
 /**
   \brief ViewBrowserView
@@ -94,6 +96,8 @@ class ViewBrowserView : public QmitkAbstractView
     berry::IWindowListener::Pointer             m_WindowListener;
 
     friend struct ViewBrowserViewListener;
+
+    ViewTagsRegistry m_Registry;
 };
 
 #endif // ViewBrowserView_h

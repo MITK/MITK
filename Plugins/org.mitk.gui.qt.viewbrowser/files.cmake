@@ -1,11 +1,14 @@
 set(SRC_CPP_FILES
-
 )
 
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_viewbrowser_Activator.cpp
   ViewBrowserView.cpp
   QmitkNewPerspectiveDialog.cpp
+
+  ViewTagsRegistry.cpp
+  ViewTagsDescriptor.cpp
+  ExtensionPointDefinitionConstants.cpp
 )
 
 set(UI_FILES

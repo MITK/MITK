@@ -58,16 +58,41 @@ bool ClassFilterProxyModel::filterAcceptsRow(int sourceRow,
 
 bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
 {
-    bool result;
+  bool result = false;
     QString type = sourceModel()->data(index, Qt::DisplayRole).toString();
-    if ( ! type.contains(filterRegExp()))
+  QStandardItem * item = dynamic_cast<QStandardItemModel*>(sourceModel())->itemFromIndex(index);
+
+  if (type.contains(filterRegExp()))
     {
-        result = false;
+    return true;
     }
-    else
     {
-        result = true;
+    mitk::QtViewItem* viewItem = dynamic_cast<mitk::QtViewItem*>(item);
+    if (viewItem)
+    {
+      for (int i = 0; i < viewItem->m_Tags.size(); ++i)
+      {
+        if (viewItem->m_Tags[i].contains(filterRegExp()))
+        {
+          return true;
+        }
+      }
     }
+  }
+  {
+    mitk::QtPerspectiveItem* viewItem = dynamic_cast<mitk::QtPerspectiveItem*>(item);
+    if (viewItem)
+    {
+      for (int i = 0; i < viewItem->m_Tags.size(); ++i)
+      {
+        if (viewItem->m_Tags[i].contains(filterRegExp()))
+        {
+          return true;
+        }
+      }
+    }
+  }
+
     return result;
 }
 
@@ -162,6 +187,12 @@ void ViewBrowserView::CreateQtPartControl( QWidget *parent )
     //proxyModel->setFilterFixedString("Diff");
     m_Controls.m_PluginTreeView->setModel(m_FilterProxyModel);
     FillTreeList();
+
+    QList<ViewTagsDescriptor::Pointer> additions = m_Registry.GetViewTags();
+    foreach (const ViewTagsDescriptor::Pointer& var, additions)
+    {
+      MITK_INFO << var->GetID().toStdString();
+    }
 }
 
 void ViewBrowserView::ButtonClicked()
@@ -212,6 +243,8 @@ void ViewBrowserView::FillTreeList()
         QIcon* pIcon = static_cast<QIcon*>(p->GetImageDescriptor()->CreateImage());
         mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(*pIcon, QString::fromStdString(p->GetLabel()));
         pItem->m_Perspective = p;
+        ViewTagsDescriptor::Pointer tags = m_Registry.Find(p->GetId());
+        pItem->m_Tags = tags->GetTags();
         perspectiveRootItem->appendRow(pItem);
 
         if (currentPersp->GetId()==p->GetId())
@@ -233,11 +266,12 @@ void ViewBrowserView::FillTreeList()
     for (unsigned int i = 0; i < views.size(); ++i)
     {
         berry::IViewDescriptor::Pointer v = views[i];
+        ViewTagsDescriptor::Pointer tags = m_Registry.Find(views[i]->GetId());
         bool skipView = false;
         for(unsigned int e=0; e<viewExcludeList.size(); e++)
             if(viewExcludeList.at(e)==v->GetId())
             {
-                skipView = true;
+
                 break;
             }
         if (skipView)
@@ -248,6 +282,8 @@ void ViewBrowserView::FillTreeList()
         QIcon* icon = static_cast<QIcon*>(v->GetImageDescriptor()->CreateImage());
         mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon, QString::fromStdString(v->GetLabel()));
         vItem->m_View = v;
+        vItem->m_Tags = tags->GetTags();
+
 
         if (catPath.empty())
             noCategoryItem->appendRow(vItem);

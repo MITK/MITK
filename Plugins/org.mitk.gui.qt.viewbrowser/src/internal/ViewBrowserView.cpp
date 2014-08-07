@@ -417,7 +417,8 @@ void ViewBrowserView::ClonePerspective()
         berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
         try
         {
-            perspRegistry->ClonePerspective(dialog->GetPerspectiveName().toStdString(), dialog->GetPerspectiveName().toStdString(), m_RegisteredPerspective);
+            berry::IPerspectiveDescriptor::Pointer perspDesc = perspRegistry->ClonePerspective(dialog->GetPerspectiveName().toStdString(), dialog->GetPerspectiveName().toStdString(), m_RegisteredPerspective);
+            //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->CreatePerspective(perspDesc.Cast<berry::IPerspectiveDescriptor>());
         }
         catch(...)
         {

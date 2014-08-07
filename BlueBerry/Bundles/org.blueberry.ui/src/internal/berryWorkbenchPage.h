@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 //class PartPane;
 //class PartPane::Sashes;
 class EditorAreaHelper;
@@ -58,7 +57,6 @@ class PartService;
  */
 class BERRY_UI WorkbenchPage: public IWorkbenchPage
 {
-
 public:
   berryObjectMacro(WorkbenchPage);
 
@@ -129,12 +127,10 @@ private:
      */
   private:
     void DeactivateContributions(IWorkbenchPart::Pointer part, bool remove);
-
   };
 
   class ActivationList
   {
-
   public:
 
     //List of parts in the activation order (oldest first)
@@ -235,7 +231,6 @@ private:
      * unless 'includeActiveFastViews' is true;
      */
     SmartPointer<IWorkbenchPartReference> GetActiveReference(PartListIter start, bool editorsOnly, bool skipPartsObscuredByZoom);
-
   };
 
   /**
@@ -244,7 +239,6 @@ private:
    */
   struct PerspectiveList
   {
-
   public:
     typedef std::list<SmartPointer<Perspective> > PerspectiveListType;
     typedef PerspectiveListType::iterator iterator;
@@ -700,6 +694,8 @@ private:
 private:
   SmartPointer<Perspective> CreatePerspective(SmartPointer<PerspectiveDescriptor> desc,
       bool notify);
+  public:
+    virtual void CreatePerspective(SmartPointer<berry::IPerspectiveDescriptor> desc);
 
   /**
    * This is called by child objects after a part has been added to the page.
@@ -1723,7 +1719,6 @@ private:
   // provides sash information for the given pane
   struct SashInfo
   {
-
     SmartPointer<LayoutPartSash> right;
 
     SmartPointer<LayoutPartSash> left;
@@ -1797,8 +1792,6 @@ private:
 
 public:
   bool IsPartVisible(IWorkbenchPartReference::Pointer reference);
-
 };
-
 }
 #endif /*BERRYWORKBENCHPAGE_H_*/

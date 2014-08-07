@@ -602,7 +602,8 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
    */
   virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
       const std::string& editorId, bool activate, int matchFlags) = 0;
-
+  public:
+  virtual void CreatePerspective(SmartPointer<berry::IPerspectiveDescriptor> desc)  = 0;
   /**
    * Removes the property change listener.
    *

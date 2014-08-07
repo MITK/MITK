@@ -66,14 +66,29 @@ bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
   {
     return true;
   }
-  mitk::QtViewItem* viewItem = dynamic_cast<mitk::QtViewItem*>(item);
-  if (viewItem)
   {
-    for (int i = 0; i < viewItem->m_Tags.size(); ++i)
+    mitk::QtViewItem* viewItem = dynamic_cast<mitk::QtViewItem*>(item);
+    if (viewItem)
     {
-      if (viewItem->m_Tags[i].contains(filterRegExp()))
+      for (int i = 0; i < viewItem->m_Tags.size(); ++i)
       {
-        return true;
+        if (viewItem->m_Tags[i].contains(filterRegExp()))
+        {
+          return true;
+        }
+      }
+    }
+  }
+  {
+    mitk::QtPerspectiveItem* viewItem = dynamic_cast<mitk::QtPerspectiveItem*>(item);
+    if (viewItem)
+    {
+      for (int i = 0; i < viewItem->m_Tags.size(); ++i)
+      {
+        if (viewItem->m_Tags[i].contains(filterRegExp()))
+        {
+          return true;
+        }
       }
     }
   }
@@ -209,6 +224,8 @@ void ViewBrowserView::FillTreeList()
         QIcon* pIcon = static_cast<QIcon*>(p->GetImageDescriptor()->CreateImage());
         mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(*pIcon, QString::fromStdString(p->GetLabel()));
         pItem->m_Perspective = p;
+        ViewTagsDescriptor::Pointer tags = m_Registry.Find(p->GetId());
+        pItem->m_Tags = tags->GetTags();
         preparedRow << pItem;
         perspectiveRootItem->appendRow(preparedRow);
 

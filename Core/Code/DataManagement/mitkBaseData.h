@@ -405,7 +405,6 @@ protected:
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
-  bool m_RequestedRegionInitialized;
   bool m_LastRequestedRegionWasOutsideOfTheBufferedRegion;
 
   mutable unsigned int m_SourceOutputIndexDuplicate;

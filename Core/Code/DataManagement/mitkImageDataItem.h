@@ -30,11 +30,10 @@ class vtkImageData;
 namespace mitk {
 
   class PixelType;
-  class ImageVtkAccessor;
+  class ImageVtkReadAccessor;
+  class ImageVtkWriteAccessor;
 
   class Image;
-
-  typedef itk::SmartPointer<mitk::Image> ImagePointer;
 
 
   //##Documentation
@@ -67,15 +66,22 @@ namespace mitk {
 //  friend class ImageToItk;
 
   public:
+
+  typedef itk::SmartPointer<mitk::Image> ImagePointer;
+  typedef itk::SmartPointer<const mitk::Image> ImageConstPointer;
+
     mitkClassMacro(ImageDataItem, itk::LightObject);
 
-    ImageDataItem(const ImageDataItem& aParent, const mitk::ImageDescriptor::Pointer desc, unsigned int dimension, void *data = NULL, bool manageMemory = false, size_t offset = 0);
+    ImageDataItem(const ImageDataItem& aParent, const mitk::ImageDescriptor::Pointer desc,
+                  int timestep, unsigned int dimension, void *data = NULL,
+                  bool manageMemory = false, size_t offset = 0);
 
     ~ImageDataItem();
 
-    ImageDataItem(const mitk::ImageDescriptor::Pointer desc, void *data, bool manageMemory);
+    ImageDataItem(const mitk::ImageDescriptor::Pointer desc, int timestep,
+                  void *data, bool manageMemory);
 
-    ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int* dimensions, void* data, bool manageMemory);
+    ImageDataItem(const mitk::PixelType& type, int timestep, unsigned int dimension, unsigned int* dimensions, void* data, bool manageMemory);
 
     ImageDataItem(const ImageDataItem &other);
 
@@ -127,7 +133,8 @@ namespace mitk {
     }
 
     //## Returns a vtkImageData; if non is present, a new one is constructed.
-    ImageVtkAccessor* GetVtkImageData(ImagePointer) const;
+    ImageVtkReadAccessor* GetVtkImageAccessor(ImageConstPointer) const;
+    ImageVtkWriteAccessor* GetVtkImageAccessor(ImagePointer);
     /*{
       if(m_VtkImageData==NULL)
         ConstructVtkImageData(iP);
@@ -140,7 +147,7 @@ namespace mitk {
       return m_ManageMemory;
     }
 
-    virtual void ConstructVtkImageData(ImagePointer) const;
+    virtual void ConstructVtkImageData(ImageConstPointer) const;
 
     unsigned long GetSize() const
     {
@@ -156,7 +163,9 @@ namespace mitk {
 
     bool m_ManageMemory;
 
-    mutable ImageVtkAccessor* m_VtkImageData;
+    mutable vtkImageData* m_VtkImageData;
+    mutable ImageVtkReadAccessor* m_VtkImageReadAccessor;
+    ImageVtkWriteAccessor* m_VtkImageWriteAccessor;
     int m_Offset;
 
     bool m_IsComplete;
@@ -171,6 +180,8 @@ namespace mitk {
     unsigned int m_Dimension;
 
     unsigned int m_Dimensions[MAX_IMAGE_DIMENSIONS];
+
+    int m_Timestep;
 
   };
 

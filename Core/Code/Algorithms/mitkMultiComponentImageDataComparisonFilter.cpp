@@ -149,8 +149,8 @@ namespace mitk
     for( unsigned int t = 0; t < noOfTimes; ++t)
     {
 
-      ImageReadAccessor readAccTImage(const_cast<Image*>(testImage), const_cast<Image*>(testImage)->GetVolumeData(t));
-      ImageReadAccessor readAccVImage(const_cast<Image*>(validImage), const_cast<Image*>(validImage)->GetVolumeData(t));
+      ImageReadAccessor readAccTImage(testImage, testImage->GetVolumeData(t));
+      ImageReadAccessor readAccVImage(validImage, validImage->GetVolumeData(t));
 
       for( unsigned int p = 0; p < noOfPixels*noOfComponents; ++p )
       {

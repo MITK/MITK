@@ -73,6 +73,8 @@ class MITK_CORE_EXPORT Image : public SlicedData
 
   friend class ImageAccessorBase;
   friend class ImageVtkAccessor;
+  friend class ImageVtkReadAccessor;
+  friend class ImageVtkWriteAccessor;
   friend class ImageReadAccessor;
   friend class ImageWriteAccessor;
 
@@ -139,7 +141,8 @@ public:
 
   //##Documentation
   //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
-  virtual ImageVtkAccessor* GetVtkImageData(int t = 0, int n = 0);
+  virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
+  virtual const vtkImageData* GetVtkImageData(int t = 0, int n = 0) const;
 
   //##Documentation
   //## @brief Get the complete image, i.e., all channels linked together, as a @a mitkIpPicDescriptor.
@@ -435,7 +438,7 @@ public:
     delete [] tmpDimensions;
 
     this->Initialize();
-  };
+  }
 
   //##Documentation
   //## @brief Check whether slice @a s at time @a t in channel @a n is valid, i.e.,
@@ -477,17 +480,17 @@ public:
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   \brief (DEPRECATED) Get the minimum for scalar images
@@ -598,11 +601,11 @@ protected:
 
   virtual void Expand( unsigned int timeSteps );
 
-  virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
-  virtual ImageDataItemPointer AllocateVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer AllocateVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
-  virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
+  virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   Image();
 
@@ -637,11 +640,11 @@ protected:
 private:
 
   /** Stores all existing ImageReadAccessors */
-  std::vector<ImageAccessorBase*> m_Readers;
+  mutable std::vector<ImageAccessorBase*> m_Readers;
   /** Stores all existing ImageWriteAccessors */
-  std::vector<ImageAccessorBase*> m_Writers;
+  mutable std::vector<ImageAccessorBase*> m_Writers;
   /** Stores all existing ImageVtkAccessors */
-  std::vector<ImageAccessorBase*> m_VtkReaders;
+  mutable std::vector<ImageAccessorBase*> m_VtkReaders;
 
   /** A mutex, which needs to be locked to manage m_Readers and m_Writers */
   itk::SimpleFastMutexLock m_ReadWriteLock;

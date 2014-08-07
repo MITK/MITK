@@ -20,7 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProportionalTimeGeometry.h>
 
 
-mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false)
+mitk::SlicedData::SlicedData()
+  : m_RequestedRegionInitialized(false)
+  , m_UseLargestPossibleRegion(false)
 {
   unsigned int i;
   for(i=0;i<4;++i)
@@ -30,11 +32,13 @@ mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false)
   }
 }
 
-mitk::SlicedData::SlicedData( const SlicedData &other ): BaseData(other),
-m_LargestPossibleRegion(other.m_LargestPossibleRegion),
-m_RequestedRegion(other.m_RequestedRegion),
-m_BufferedRegion(other.m_BufferedRegion),
-m_UseLargestPossibleRegion(other.m_UseLargestPossibleRegion)
+mitk::SlicedData::SlicedData( const SlicedData &other )
+  : BaseData(other)
+  , m_LargestPossibleRegion(other.m_LargestPossibleRegion)
+  , m_RequestedRegion(other.m_RequestedRegion)
+  , m_RequestedRegionInitialized(other.m_RequestedRegionInitialized)
+  , m_BufferedRegion(other.m_BufferedRegion)
+  , m_UseLargestPossibleRegion(other.m_UseLargestPossibleRegion)
 {
 
 }

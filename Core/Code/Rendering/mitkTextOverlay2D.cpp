@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageMapper.h>
 #include <vtkTextRendererStringToImage.h>
 #include <vtkTextActor.h>
+#include <vtkImageData.h>
 #include <vtkImageMapper.h>
 #include <vtkTextRenderer.h>
 

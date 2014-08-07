@@ -217,7 +217,9 @@ protected:
   virtual ~SlicedData();
   RegionType m_LargestPossibleRegion;
 
-  RegionType          m_RequestedRegion;
+  mutable RegionType  m_RequestedRegion;
+  mutable bool        m_RequestedRegionInitialized;
+
   RegionType          m_BufferedRegion;
   bool                m_UseLargestPossibleRegion;
 };

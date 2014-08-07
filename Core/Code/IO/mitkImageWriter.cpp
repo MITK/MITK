@@ -225,7 +225,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
    imageIO->SetIORegion(ioRegion);
    imageIO->SetFileName(fileName);
 
-   ImageReadAccessor imageAccess(image);
+   ImageReadAccessor imageAccess(static_cast<const Image*>(image));
    imageIO->Write(imageAccess.GetData());
 }
 

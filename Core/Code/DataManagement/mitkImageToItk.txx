@@ -28,55 +28,55 @@ See LICENSE.txt or http://www.mitk.org for details.
 template <class TOutputImage>
 void mitk::ImageToItk<TOutputImage>::SetInput(mitk::Image *input)
 {
-  if(input == NULL)
-    itkExceptionMacro( << "image is null" );
-  if(input->GetDimension()!=TOutputImage::GetImageDimension())
-    itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
-
-
-  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>()))
-    itkExceptionMacro( << "image has wrong pixel type " );
-
-  // Process object is not const-correct so the const_cast is required here
-  itk::ProcessObject::SetNthInput(0, input);
+  this->SetInput(static_cast<const Image*>(input));
+  m_ConstInput = false;
 }
 
+template <class TOutputImage>
+void mitk::ImageToItk<TOutputImage>::SetInput(const mitk::Image* input)
+{
+  this->CheckInput(input);
+  // Process object is not const-correct so the const_cast is required here
+  itk::ProcessObject::PushFrontInput(input);
+  m_ConstInput = true;
+}
+
+/*
 template<class TOutputImage>
-void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, mitk::Image * input )
+void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, const mitk::Image * input )
 {
   if( index+1 > this->GetNumberOfInputs() )
   {
     this->SetNumberOfRequiredInputs( index + 1 );
   }
 
-  if(input == NULL)
-    itkExceptionMacro( << "image is null" );
-  if(input->GetDimension()!=TOutputImage::GetImageDimension())
-    itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
-
-
-  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>() ))
-    itkExceptionMacro( << "image has wrong pixel type " );
+  this->CheckInput(input);
 
   // Process object is not const-correct so the const_cast is required here
-  itk::ProcessObject::SetNthInput(index,input);
+  itk::ProcessObject::PushFrontInput(dex,input);
 }
+*/
 
 template<class TOutputImage>
-mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(void)
+mitk::Image* mitk::ImageToItk<TOutputImage>::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
   {
     return 0;
   }
 
-  return (mitk::Image*) const_cast<itk::DataObject*>(itk::ProcessObject::GetInput(0));
+  return static_cast<mitk::Image*>(itk::ProcessObject::GetInput(0));
 }
 
 template<class TOutputImage>
-mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(unsigned int idx)
+const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput() const
 {
-  return itk::ProcessObject::GetInput(idx);
+  if (this->GetNumberOfInputs() < 1)
+  {
+    return 0;
+  }
+
+  return static_cast<const mitk::Image*>(itk::ProcessObject::GetInput(0));
 }
 
 template<class TOutputImage>
@@ -95,13 +95,13 @@ template<class TOutputImage>
   }
 
   mitk::ImageAccessorBase* imageAccess;
-  if (is_const<TOutputImage>::value)
+  if (m_ConstInput)
   {
-    imageAccess = new mitk::ImageReadAccessor(input, 0, m_Options);
+    imageAccess = new mitk::ImageReadAccessor(input, static_cast<const ImageDataItem*>(NULL), m_Options);
   }
   else
   {
-    imageAccess = new mitk::ImageWriteAccessor(input, 0, m_Options);
+    imageAccess = new mitk::ImageWriteAccessor(input, static_cast<const ImageDataItem*>(NULL), m_Options);
   }
 
   // hier wird momentan wohl nur der erste Channel verwendet??!!
@@ -254,6 +254,24 @@ template<class TOutputImage>
   output->SetOrigin( origin );
   output->SetSpacing( spacing );
   output->SetDirection( direction );
+  }
+
+template<class TOutputImage>
+void mitk::ImageToItk<TOutputImage>::CheckInput(const mitk::Image* input) const
+{
+  if(input == NULL)
+  {
+    itkExceptionMacro( << "image is null" );
+  }
+  if(input->GetDimension()!=TOutputImage::GetImageDimension())
+  {
+    itkExceptionMacro( << "image has dimension " << input->GetDimension() << " instead of " << TOutputImage::GetImageDimension() );
+  }
+
+  if(!(input->GetPixelType() == mitk::MakePixelType<TOutputImage>()))
+  {
+    itkExceptionMacro( << "image has wrong pixel type " );
+  }
 }
 
 template<class TOutputImage>

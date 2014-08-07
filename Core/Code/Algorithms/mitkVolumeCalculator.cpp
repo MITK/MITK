@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsHolder.h"
 
 template < typename TPixel, unsigned int VImageDimension >
-void mitk::VolumeCalculator::InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage)
+void mitk::VolumeCalculator::InternalCompute(const itk::Image< TPixel, VImageDimension >* itkImage)
 {
   itk::ImageRegionConstIterator<itk::Image < TPixel, VImageDimension > > imageIt(itkImage, itkImage->GetLargestPossibleRegion() );
   unsigned long int count = 0;

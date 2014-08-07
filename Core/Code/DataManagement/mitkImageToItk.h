@@ -18,37 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef IMAGETOITK_H_HEADER_INCLUDED_C1C2FCD2
 #define IMAGETOITK_H_HEADER_INCLUDED_C1C2FCD2
 
-#if(_MSC_VER==1200)
-#include <itkFixedCenterOfRotationAffineTransform.h>
-#endif
-
-#include <itkImage.h>
-#include <itkImageSource.h>
 #include "mitkImage.h"
 #include "mitkImageDataItem.h"
 #include "mitkImageWriteAccessor.h"
 
-
-#if __cplusplus > 199711L || \
-    (__cplusplus == 199711L && defined(_MSC_VER) && _MSC_VER >= 1500)
-
-#include <type_traits>
-
-using std::is_const;
-using std::remove_const;
-
-#else
-
-#include <tr1/type_traits>
-
-using std::tr1::is_const;
-using std::tr1::remove_const;
-
-#endif
+#include <itkImage.h>
+#include <itkImageSource.h>
 
 
 namespace mitk
 {
+
 /**
  * Create itk::ImageSource for mitk::Image
  * \ingroup Adaptor
@@ -57,7 +37,7 @@ namespace mitk
  * \todo Get clear about how to handle directed ITK 2D images in ITK
  */
 template <class TOutputImage>
-class ImageToItk : public itk::ImageSource< typename remove_const<TOutputImage>::type >
+class ImageToItk : public itk::ImageSource<TOutputImage>
 {
 protected:
   mitk::Image::Pointer m_MitkImage;
@@ -65,7 +45,7 @@ protected:
 
 public:
   typedef ImageToItk  Self;
-  typedef itk::ImageSource<typename remove_const<TOutputImage>::type>  Superclass;
+  typedef itk::ImageSource<TOutputImage>  Superclass;
   typedef itk::SmartPointer<Self>  Pointer;
   typedef itk::SmartPointer<const Self>  ConstPointer;
 
@@ -87,7 +67,9 @@ public:
   typedef typename TOutputImage::PixelType        PixelType;
 
   virtual void SetInput(mitk::Image *input);
-  virtual void SetInput(unsigned int index, mitk::Image * image);
+  virtual void SetInput(const mitk::Image* input);
+  //virtual void SetInput(unsigned int index, mitk::Image * image);
+  //virtual void SetInput(unsigned int index, const mitk::Image * image);
 
   virtual void UpdateOutputInformation();
 
@@ -104,7 +86,7 @@ public:
 protected:
   using itk::ProcessObject::SetInput;
   mitk::Image * GetInput(void);
-  mitk::Image * GetInput(unsigned int idx);
+  const mitk::Image* GetInput() const;
 
   ImageToItk()
   : m_CopyMemFlag(false)
@@ -129,11 +111,35 @@ private:
   int m_Channel;
   int m_Options;
 
+  bool m_ConstInput;
+
   //ImageToItk(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
+  void CheckInput(const mitk::Image* image) const;
 };
 
+template<typename TPixel, unsigned int VDimension>
+typename itk::Image<TPixel, VDimension>::Pointer ImageToItkImage(mitk::Image* mitkImage)
+{
+  typedef itk::Image<TPixel, VDimension> ImageType;
+  typedef mitk::ImageToItk<ImageType> ImageToItkType;
+  itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();
+  imagetoitk->SetInput(mitkImage);
+  imagetoitk->Update();
+  return imagetoitk->GetOutput();
+}
+
+template<typename TPixel, unsigned int VDimension>
+typename itk::Image<TPixel, VDimension>::ConstPointer ImageToItkImage(const mitk::Image* mitkImage)
+{
+  typedef itk::Image<TPixel, VDimension> ImageType;
+  typedef mitk::ImageToItk<ImageType> ImageToItkType;
+  itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();
+  imagetoitk->SetInput(mitkImage);
+  imagetoitk->Update();
+  return imagetoitk->GetOutput();
+}
 
 } // end namespace mitk
 

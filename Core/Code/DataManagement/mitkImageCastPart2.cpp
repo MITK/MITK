@@ -30,10 +30,16 @@ namespace mitk
   {
     AccessFixedDimensionByItk_1(mitkImage, _CastToItkImage2Access, ItkOutputImageType::ImageDimension, itkOutputImage);
   }
+
+  template <typename ItkOutputImageType> void CastToItkImage(mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+  {
+    AccessFixedDimensionByItk_1(mitkImage, _CastToItkImage2Access, ItkOutputImageType::ImageDimension, itkOutputImage);
+  }
 #endif //DOXYGEN_SKIP
 
 #define InstantiateAccessFunction_CastToItkImage(pixelType, dim) \
-template MITK_CORE_EXPORT void CastToItkImage(const mitk::Image *, itk::SmartPointer<itk::Image<pixelType,dim> >&);
+template MITK_CORE_EXPORT void CastToItkImage(const mitk::Image *, itk::SmartPointer<itk::Image<pixelType,dim> >&); \
+template MITK_CORE_EXPORT void CastToItkImage(mitk::Image *, itk::SmartPointer<itk::Image<pixelType,dim> >&);
 
 InstantiateAccessFunction(CastToItkImage)
 

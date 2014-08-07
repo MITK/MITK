@@ -44,6 +44,13 @@ mitk::ImageReadAccessor::ImageReadAccessor(
   }
 }
 
+mitk::ImageReadAccessor::ImageReadAccessor(const mitk::Image* image)
+  : ImageAccessorBase(image, NULL, ImageAccessorBase::DefaultBehavior)
+  , m_Image(image)
+{
+  OrganizeReadAccess();
+}
+
 mitk::ImageReadAccessor::~ImageReadAccessor()
 {
   if(!(m_Options & ImageAccessorBase::IgnoreLock))

@@ -39,11 +39,23 @@ void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage,
   castImageFilter->Update();
   itkOutputImage = castImageFilter->GetOutput();
 }
+
+template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType >
+void _CastToItkImage2Access(const itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+{
+  typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
+  typedef itk::CastImageFilter< ItkInputImageType, ItkOutputImageType > CastImageFilterType;
+  typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
+  castImageFilter->SetInput( itkInputImage );
+  castImageFilter->Update();
+  itkOutputImage = castImageFilter->GetOutput();
+}
 #endif //DOXYGEN_SKIP
 
 
 #define InstantiateAccessFunction__CastToItkImage2Access(type1, type2) \
-  template MITK_CORE_EXPORT void _CastToItkImage2Access(itk::Image<MITK_PP_TUPLE_REM(2)type1>*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type2> >&);
+  template MITK_CORE_EXPORT void _CastToItkImage2Access(itk::Image<MITK_PP_TUPLE_REM(2)type1>*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type2> >&); \
+  template MITK_CORE_EXPORT void _CastToItkImage2Access(const itk::Image<MITK_PP_TUPLE_REM(2)type1>*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type2> >&);
 
 #define InstantiateCastToItkImage2Access(r, data, dim) \
   MITK_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl, ((_CastToItkImage2Access))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim)))

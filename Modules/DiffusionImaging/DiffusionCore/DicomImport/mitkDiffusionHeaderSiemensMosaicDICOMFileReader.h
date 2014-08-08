@@ -18,11 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDIFFUSIONHEADERSIEMENSMOSAICDICOMFILEREADER_H
 
 #include "mitkDiffusionHeaderSiemensDICOMFileReader.h"
+#include "mitkDiffusionDICOMFileReaderHelper.h"
 
 namespace mitk
 {
 
-class DiffusionHeaderSiemensMosaicDICOMFileReader
+class MitkDiffusionCore_EXPORT DiffusionHeaderSiemensMosaicDICOMFileReader
     : public DiffusionHeaderSiemensDICOMFileReader
 {
 public:
@@ -32,10 +33,19 @@ public:
 
   virtual bool ReadDiffusionHeader(std::string filename);
 
+  mitk::MosaicDescriptor GetMosaicDescriptor()
+  {
+    return m_MosaicDescriptor;
+  }
+
+  void RetrieveMosaicInformation(std::string filename);
+
 protected:
   DiffusionHeaderSiemensMosaicDICOMFileReader();
 
   virtual ~DiffusionHeaderSiemensMosaicDICOMFileReader();
+
+  mitk::MosaicDescriptor m_MosaicDescriptor;
 };
 
 }

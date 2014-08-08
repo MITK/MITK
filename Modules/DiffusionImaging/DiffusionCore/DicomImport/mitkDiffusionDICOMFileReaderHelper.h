@@ -18,6 +18,7 @@ namespace mitk
 struct MosaicDescriptor
 {
   unsigned int nimages;
+  bool slicenormalup;
 
   itk::ImageBase<3>::SpacingType spacing;
   itk::ImageBase<3>::DirectionType direction;
@@ -160,9 +161,9 @@ public:
     output_image->SetNumberOfComponentsPerPixel( filenames.size() );
     /*
      FIXME!!! The struct currently does not provide the geometry information
-              the loading works as required
+              the loading works as required*/
     output_image->SetSpacing( mosaicInfo.spacing );
-    output_image->SetOrigin( mosaicInfo.origin );
+    /*output_image->SetOrigin( mosaicInfo.origin );
     output_image->SetDirection( mosaicInfo.direction );*/
     output_image->SetLargestPossibleRegion( requestedRegion );
     output_image->SetBufferedRegion( requestedRegion );
@@ -213,12 +214,13 @@ public:
         //
         // the remaining is just computing the correct position in the mosaic, done by
         //                --------- index of (0,0,z) -----        + --- current 2d position ---
-        mosaic_index[0] = (threeD_index[2] % images_per_row) * dx + threeD_index[0];
+        mosaic_index[0] = (threeD_index[2] % images_per_row) * dx + threeD_index[0] + images_per_row;
         mosaic_index[1] = (threeD_index[2] / images_per_row) * dy + threeD_index[1];
 
         typename MosaicImageType::PixelType mosaic_pixel = current_mosaic->GetPixel( mosaic_index );
 
         vector_pixel.SetElement( component, mosaic_pixel );
+
         vecIter.Set( vector_pixel );
 
         ++vecIter;

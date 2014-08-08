@@ -46,6 +46,10 @@ protected:
     virtual ~DiffusionDICOMFileReader();
 
     mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType m_RetrievedHeader;
+
+    mitk::DiffusionHeaderDICOMFileReader::Pointer m_HeaderReader;
+
+    bool m_IsMosaicData;
 };
 
 }

@@ -102,6 +102,7 @@ std::string MiniAppManager::CreateXML() const
 {
     std::ostringstream output;
 
+    output << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
     output << "<executables>" << std::endl;
 
     std::map<std::string, MiniAppFunction>::const_iterator it = m_Functions.begin();
@@ -111,7 +112,7 @@ std::string MiniAppManager::CreateXML() const
         output << "  <executable name=\"" << it->first << "\"/>" << std::endl;
     }
 
-    output << "</executables>" << std::endl;
+    output << "</executables>";
 
     return output.str();
 }

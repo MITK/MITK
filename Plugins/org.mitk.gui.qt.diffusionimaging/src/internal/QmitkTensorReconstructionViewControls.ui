@@ -150,7 +150,7 @@
            </property>
            <item>
             <property name="text">
-             <string>Weighted Linear Least Squares</string>
+             <string>ITK Linear Least Squares</string>
             </property>
            </item>
            <item>

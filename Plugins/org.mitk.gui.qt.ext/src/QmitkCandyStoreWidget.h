@@ -65,6 +65,8 @@ public slots:
     void DeletePerspective();
     void ClosePerspectives();
     void ClosePerspective();
+    void ExpandAll();
+    void CollapseAll();
     void FilterChanged();
 
 protected:

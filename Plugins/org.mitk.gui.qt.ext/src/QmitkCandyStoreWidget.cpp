@@ -588,6 +588,16 @@ void QmitkCandyStoreWidget::ClosePerspectives()
     }
 }
 
+void QmitkCandyStoreWidget::ExpandAll()
+{
+    m_Controls.m_PluginTreeView->expandAll();
+}
+
+void QmitkCandyStoreWidget::CollapseAll()
+{
+    m_Controls.m_PluginTreeView->collapseAll();
+}
+
 void QmitkCandyStoreWidget::CustomMenuRequested(QPoint pos)
 {
     QModelIndex index = m_Controls.m_PluginTreeView->indexAt(pos);
@@ -598,6 +608,16 @@ void QmitkCandyStoreWidget::CustomMenuRequested(QPoint pos)
 
     m_ContextMenu->clear();
     m_RegisteredPerspective = NULL;
+
+    QAction* expandAction = new QAction("Expand tree", this);
+    m_ContextMenu->addAction(expandAction);
+    connect(expandAction, SIGNAL(triggered()), SLOT(ExpandAll()));
+
+    QAction* collapseAction = new QAction("Collapse tree", this);
+    m_ContextMenu->addAction(collapseAction);
+    connect(collapseAction, SIGNAL(triggered()), SLOT(CollapseAll()));
+
+    m_ContextMenu->addSeparator();
 
     if ( item!=NULL && dynamic_cast< mitk::QtPerspectiveItem* >(item) )
     {

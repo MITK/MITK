@@ -23,6 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mbilog{
 
 
+enum MBILOG_DLL_API OutputType{
+  Console = 0,
+  File,
+  Other = 100
+};
   /**
    *  \brief This class is an interface for logging backends that can be registered in the mbi logging mechanism.
    *
@@ -42,6 +47,8 @@ namespace mbilog{
      *
      */
     virtual void ProcessMessage(const mbilog::LogMessage& logMessage)=0;
+
+    virtual OutputType GetOutputType()=0;
   };
 
 }

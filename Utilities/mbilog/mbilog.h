@@ -53,6 +53,11 @@ namespace mbilog {
    *        using the bit shift operator (<<). Should only be used by the macros defined in the file mbilog.h
    *  \ingroup mbilog
    */
+
+  bool MBILOG_DLL_API EnableBackends(OutputType type);
+  bool MBILOG_DLL_API DisableBackends(OutputType type);
+  bool MBILOG_DLL_API IsBackendEnabled(OutputType type);
+
   class MBILOG_DLL_API PseudoStream {
 
     protected:
@@ -220,6 +225,9 @@ namespace mbilog {
 #define MBI_WARN mbilog::PseudoStream(mbilog::Warn,__FILE__,__LINE__,__FUNCTION__)
 #define MBI_ERROR mbilog::PseudoStream(mbilog::Error,__FILE__,__LINE__,__FUNCTION__)
 #define MBI_FATAL mbilog::PseudoStream(mbilog::Fatal,__FILE__,__LINE__,__FUNCTION__)
+
+#define MBILOG_DISABLE_BACKENDS(type) static bool disabled = mbilog::DisableBackends(type);
+#define MBILOG_ENABLE_BACKENDS(type) static bool enabled = mbilog::EnableBackends(type);
 
 /** \brief Macro for the debug messages. The messages are disabled if the cmake variable MBILOG_ENABLE_DEBUG is false. */
 #ifdef MBILOG_ENABLE_DEBUG

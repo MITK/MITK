@@ -46,7 +46,7 @@ static void ExtractMapsAndSave(mitk::TensorImage::Pointer tensorImage, std::stri
   typedef itk::Image< TensorPixelType, 3 > TensorImageType;
 
   TensorImageType::Pointer itkvol = TensorImageType::New();
-  mitk::CastToItkImage<TensorImageType>(image, itkvol);
+  mitk::CastToItkImage(image, itkvol);
 
   typedef itk::TensorDerivedMeasurementsFilter<TTensorPixelType> MeasurementsType;
 

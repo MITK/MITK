@@ -122,7 +122,7 @@ int PeaksAngularError(int argc, char* argv[])
         else
         {
             mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImage)->GetData());
-            mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
+            mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
         }
 
         // evaluate directions

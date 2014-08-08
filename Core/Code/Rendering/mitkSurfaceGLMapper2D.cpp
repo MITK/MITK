@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkGL.h>
-
+ 
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
@@ -198,8 +198,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   if(vtkpolydata!=NULL)
   {
-    Point3D point;
-    Vector3D normal;
+    Point3D points[4];
 
     //Check if Lookup-Table is already given, else use standard one.
     double* scalarLimits = m_LUT->GetTableRange();
@@ -235,8 +234,10 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     if(worldPlaneGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
-      point=worldPlaneGeometry->GetOrigin();
-      normal=worldPlaneGeometry->GetNormal(); normal.Normalize();
+      points[0] = worldPlaneGeometry->GetOrigin();
+      points[1] = points[0] + worldPlaneGeometry->GetAxisVector(0);
+      points[2] = points[0] + worldPlaneGeometry->GetAxisVector(1);
+      points[3] = points[1] + worldPlaneGeometry->GetAxisVector(1);
       m_Plane->SetTransform((vtkAbstractTransform*)NULL);
     }
     else
@@ -255,47 +256,41 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           //@FIXME: does not work correctly. Does m_Plane->SetTransform really transforms a "flat plane" into a "curved plane"?
           return;
           // set up vtkPlane according to worldGeometry
-          point=const_cast<BoundingBox*>(worldAbstractGeometry->GetParametricBoundingBox())->GetMinimum();
-          FillVector3D(normal, 0, 0, 1);
-          m_Plane->SetTransform(worldAbstractGeometry->GetVtkAbstractTransform()->GetInverse());
         }
       }
       else
         return;
     }
 
-    double vp[3], vnormal[3];
-
-    vnl2vtk(point.GetVnlVector(), vp);
-    vnl2vtk(normal.GetVnlVector(), vnormal);
-
     //normally, we would need to transform the surface and cut the transformed surface with the cutter.
     //This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.
     //@todo It probably does not work for scaling operations yet:scaling operations have to be
     //dealed with after the cut is performed by scaling the contour.
     vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
-    inversetransform->TransformPoint(vp, vp);
-    inversetransform->TransformNormalAtPoint(vp, vnormal, vnormal);
+    for (int i = 0; i < 4; ++i) {
+        double vp[3];
+        itk2vtk(points[i], vp);
+        inversetransform->TransformPoint(vp, vp);
+        vtk2itk(vp, points[i]);
+    }
 
-    m_Plane->SetOrigin(vp);
-    m_Plane->SetNormal(vnormal);
+    vtkSmartPointer<vtkPolyData> cutResult = input->CutWithPlane(points, timestep);
 
-    //set data into cutter
-    m_Cutter->SetInputData(vtkpolydata);
-    m_Cutter->Update();
+//     m_Cutter->SetInputData(vtkpolydata);
+//     m_Cutter->Update();
     //    m_Cutter->GenerateCutScalarsOff();
     //    m_Cutter->SetSortByToSortByCell();
 
     if (m_DrawNormals)
     {
-      m_Stripper->SetInputData( m_Cutter->GetOutput() );
+        m_Stripper->SetInputData(cutResult);
       // calculate the cut
       m_Stripper->Update();
       PaintCells(renderer, m_Stripper->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
     }
     else
     {
-      PaintCells(renderer, m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
+        PaintCells(renderer, cutResult, worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
     }
   }
 }

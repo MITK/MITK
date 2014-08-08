@@ -196,6 +196,9 @@ set(CPP_FILES
   DataManagement/mitkStateTransitionOperation.cpp
   DataManagement/mitkStringProperty.cpp
   DataManagement/mitkSurface.cpp
+  DataManagement/mitkSurfaceCutterCGAL.cpp
+  DataManagement/mitkSurfaceCutterVtk.cpp
+  DataManagement/mitkSurfaceCutterFactoryPerformanceSelector.cpp
   DataManagement/mitkSurfaceOperation.cpp
   DataManagement/mitkThinPlateSplineCurvedGeometry.cpp
   DataManagement/mitkTransferFunction.cpp

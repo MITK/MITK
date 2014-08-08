@@ -20,11 +20,12 @@ MITK_CREATE_MODULE(Core
     Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
   INTERNAL_INCLUDE_DIRS
     ${OPENGL_INCLUDE_DIR}
-  DEPENDS mbilog CppMicroServices
+  DEPENDS mbilog CppMicroServices 
   PACKAGE_DEPENDS tinyxml GDCM
                   ITK|ITKTransform+ITKImageGrid+ITKImageFeature+ITKTestKernel+ITKIORAW
                   VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
                   OpenGL
+                  CGAL
   EXPORT_DEFINE MITK_CORE_EXPORT
   WARNINGS_AS_ERRORS
   # Do not automatically create CppMicroServices initialization code.

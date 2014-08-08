@@ -207,9 +207,6 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
 
   ~IWorkbenchPage();
 
-
-  public:
-    virtual void RemovePerspective(IPerspectiveDescriptor::Pointer desc) = 0;
   /**
    * Activates the given part. The part will be brought to the front and given
    * focus. The part must belong to this page.
@@ -502,6 +499,14 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
   virtual bool IsPartVisible(IWorkbenchPart::Pointer part) = 0;
 
   /**
+   * Removes the perspective specified by desc.
+   *
+   * @param desc
+   *            the perspective that will be removed
+   */
+  virtual void RemovePerspective(IPerspectiveDescriptor::Pointer desc) = 0;
+
+  /**
    * Reuses the specified editor by setting its new input.
    *
    * @param editor
@@ -602,8 +607,7 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
    */
   virtual IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
       const std::string& editorId, bool activate, int matchFlags) = 0;
-  public:
-  virtual void CreatePerspective(SmartPointer<berry::IPerspectiveDescriptor> desc)  = 0;
+
   /**
    * Removes the property change listener.
    *

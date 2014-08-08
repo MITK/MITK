@@ -1695,12 +1695,6 @@ void WorkbenchPage::CreateClientComposite()
   //      });
 }
 
-void WorkbenchPage::CreatePerspective(SmartPointer<berry::IPerspectiveDescriptor> desc)
-{
-  this->CreatePerspective(desc.Cast<PerspectiveDescriptor>(), false);
-}
-
-
 Perspective::Pointer WorkbenchPage::CreatePerspective(
     PerspectiveDescriptor::Pointer desc, bool notify)
 {

@@ -535,6 +535,12 @@ private:
 private:
   void BusySetPerspective(IPerspectiveDescriptor::Pointer desc);
 
+  /**
+   * Removes the perspective which match the given description.
+   *
+   * @param desc
+   *            identifies the perspective to be removed.
+   */
   public:
     void RemovePerspective(IPerspectiveDescriptor::Pointer desc);
   /**
@@ -694,8 +700,6 @@ private:
 private:
   SmartPointer<Perspective> CreatePerspective(SmartPointer<PerspectiveDescriptor> desc,
       bool notify);
-  public:
-    virtual void CreatePerspective(SmartPointer<berry::IPerspectiveDescriptor> desc);
 
   /**
    * This is called by child objects after a part has been added to the page.

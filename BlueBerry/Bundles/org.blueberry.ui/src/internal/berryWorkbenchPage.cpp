@@ -1067,6 +1067,15 @@ void WorkbenchPage::BusyResetPerspective()
   //  }
 }
 
+void WorkbenchPage::RemovePerspective(IPerspectiveDescriptor::Pointer desc)
+{
+  Perspective::Pointer newPersp;
+  PerspectiveDescriptor::Pointer realDesc = desc.Cast<PerspectiveDescriptor> ();
+  newPersp = this->FindPerspective(desc);
+  perspList.Remove(newPersp);
+}
+
+
 void WorkbenchPage::BusySetPerspective(IPerspectiveDescriptor::Pointer desc)
 {
   // Create new layout.

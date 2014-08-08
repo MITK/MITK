@@ -90,7 +90,6 @@ private:
      */
   public:
     void UpdateActivePart(IWorkbenchPart::Pointer newPart);
-
     /**
      * Updates the contributions given the new part as the topEditor.
      *
@@ -145,7 +144,6 @@ private:
     WorkbenchPage* page;
 
   public:
-
     ActivationList(WorkbenchPage* page);
 
     /*
@@ -537,6 +535,8 @@ private:
 private:
   void BusySetPerspective(IPerspectiveDescriptor::Pointer desc);
 
+  public:
+    void RemovePerspective(IPerspectiveDescriptor::Pointer desc);
   /**
    * Shows a view.
    *

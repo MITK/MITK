@@ -47,6 +47,20 @@ void mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
       }
    }
 
+  // (0020,0032) DS [-802.51815986633\-801.18644070625\-30.680992126465] #  50, 3 ImagePositionPatient
+  std::string position_patient;
+  if( RevealBinaryTag( gdcm::Tag( 0x0028, 0x0032), dataset, position_patient) )
+  {
+    std::stringstream ppass( inplace_spacing );
+    std::string buffer;
+    unsigned int idx=0;
+    while( std::getline( ppass, buffer, '\\' ) )
+    {
+      std::istringstream substream(buffer);
+      substream >> this->m_MosaicDescriptor.origin[idx++];
+    }
+  }
+
 
 }
 

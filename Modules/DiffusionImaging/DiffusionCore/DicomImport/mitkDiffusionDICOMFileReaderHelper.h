@@ -163,8 +163,8 @@ public:
      FIXME!!! The struct currently does not provide the geometry information
               the loading works as required*/
     output_image->SetSpacing( mosaicInfo.spacing );
-    /*output_image->SetOrigin( mosaicInfo.origin );
-    output_image->SetDirection( mosaicInfo.direction );*/
+    output_image->SetOrigin( mosaicInfo.origin );
+    //output_image->SetDirection( mosaicInfo.direction );*/
     output_image->SetLargestPossibleRegion( requestedRegion );
     output_image->SetBufferedRegion( requestedRegion );
     output_image->Allocate();

@@ -18,6 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ViewTagsRegistry.h"
 
-const std::string ExtensionPointDefinitionConstants::VIEWTAGS_XP_NAME = "org.mitk.views.viewbrowser.textlists";
+const std::string ExtensionPointDefinitionConstants::VIEWTAGS_XP_NAME = "org.blueberry.ui.taglists";
 const std::string ExtensionPointDefinitionConstants::VIEWTAGS_CHILD_TAG = "tag";
 const std::string ExtensionPointDefinitionConstants::VIEWTAGS_XMLATTRIBUTE_ID = "id";

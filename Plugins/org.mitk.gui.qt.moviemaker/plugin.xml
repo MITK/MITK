@@ -15,5 +15,13 @@
           class="QmitkScreenshotMaker"
           icon="resources/screenshot_maker.png" />
   </extension>
-
+  <extension point="org.blueberry.ui.taglists">
+    <taglist id="org.mitk.views.moviemaker">
+      <tag>Moving Images</tag>
+      <tag>Documentation</tag>
+      <tag>Visualisation</tag>
+      <tag>Document</tag>
+      <tag>Screen capture</tag>
+    </taglist>
+  </extension>
 </plugin>

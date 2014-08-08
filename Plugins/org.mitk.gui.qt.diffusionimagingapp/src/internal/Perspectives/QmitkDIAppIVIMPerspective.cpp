@@ -44,9 +44,9 @@ void QmitkDIAppIVIMPerspective::CreateInitialLayout(berry::IPageLayout::Pointer 
 
   left->AddView("org.mitk.views.ivim");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.ivim");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.segmentation");
   lo = layout->GetViewLayout("org.mitk.views.segmentation");
-  lo->SetCloseable(false);
+
 }

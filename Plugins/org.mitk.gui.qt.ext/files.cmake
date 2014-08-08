@@ -5,7 +5,7 @@ set(SRC_CPP_FILES
   QmitkOpenDicomEditorAction.cpp
   QmitkOpenXnatEditorAction.cpp
 
-  QmitkViewBrowserWidget.cpp
+  QmitkCandyStoreWidget.cpp
   QmitkNewPerspectiveDialog.cpp
   ViewTagsRegistry.cpp
   ViewTagsDescriptor.cpp
@@ -23,7 +23,7 @@ set(INTERNAL_CPP_FILES
 set(UI_FILES
   src/internal/QmitkAppInstancesPreferencePage.ui
   src/internal/QmitkExternalProgramsPreferencePage.ui
-  src/QmitkViewBrowserWidgetControls.ui
+  src/QmitkCandyStoreWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -39,7 +39,7 @@ set(MOC_H_FILES
   src/QmitkOpenDicomEditorAction.h
   src/QmitkOpenXnatEditorAction.h
 
-  src/QmitkViewBrowserWidget.h
+  src/QmitkCandyStoreWidget.h
   src/mitkQtPerspectiveItem.h
   src/mitkQtViewItem.h
   src/QmitkNewPerspectiveDialog.h

@@ -44,13 +44,13 @@ void QmitkDIAppImageProcessingPerspective::CreateInitialLayout(berry::IPageLayou
 
   left->AddView("org.mitk.views.segmentation");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.segmentation");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.segmentationutilities");
   lo = layout->GetViewLayout("org.mitk.views.segmentationutilities");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.basicimageprocessing");
   lo = layout->GetViewLayout("org.mitk.views.basicimageprocessing");
-  lo->SetCloseable(false);
+
 }

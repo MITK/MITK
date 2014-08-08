@@ -44,15 +44,15 @@ void QmitkDIAppFiberTractographyPerspective::CreateInitialLayout(berry::IPageLay
 
   left->AddView("org.mitk.views.gibbstracking");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.gibbstracking");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.stochasticfibertracking");
   lo = layout->GetViewLayout("org.mitk.views.stochasticfibertracking");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.streamlinetracking");
   lo = layout->GetViewLayout("org.mitk.views.streamlinetracking");
-  lo->SetCloseable(false);
+
 
   bottomleft->AddView("org.mitk.views.fiberextraction");
   berry::IViewLayout::Pointer lo2 = layout->GetViewLayout("org.mitk.views.fiberextraction");

@@ -44,6 +44,6 @@ void QmitkDIAppDicomImportPerspective::CreateInitialLayout(berry::IPageLayout::P
 
   left->AddView("org.mitk.views.diffusiondicomimport");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.diffusiondicomimport");
-  lo->SetCloseable(false);
+
 
 }

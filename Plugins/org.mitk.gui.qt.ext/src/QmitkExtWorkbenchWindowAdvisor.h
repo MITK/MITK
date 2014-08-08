@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QList>
 #include <QDockWidget>
-#include <QmitkViewBrowserWidget.h>
+#include <QmitkCandyStoreWidget.h>
 
 class QAction;
 class QMenu;
@@ -96,7 +96,7 @@ protected slots:
     virtual void onHelp();
     virtual void onHelpOpenHelpPerspective();
     virtual void onAbout();
-    void onViewBrowser();
+    void onCandyStore();
 
 private:
 
@@ -128,7 +128,7 @@ private:
   berry::IPerspectiveListener::Pointer titlePerspectiveListener;
   berry::IPerspectiveListener::Pointer menuPerspectiveListener;
   berry::IPartListener::Pointer imageNavigatorPartListener;
-  berry::IPartListener::Pointer viewBrowserPartListener;
+  berry::IPartListener::Pointer CandyStorePartListener;
   berry::IPropertyChangeListener::Pointer editorPropertyListener;
   friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
@@ -150,7 +150,7 @@ private:
   bool showViewMenuItem;
   bool showNewWindowMenuItem;
   bool showClosePerspectiveMenuItem;
-  bool enableViewBrowser;
+  bool enableCandyStore;
   bool showMemoryIndicator;
   std::string productName;
   std::string windowIcon;
@@ -174,7 +174,7 @@ private:
   QAction* undoAction;
   QAction* redoAction;
   QAction* imageNavigatorAction;
-  QAction* viewBrowserAction;
+  QAction* candyStoreAction;
   QAction* resetPerspAction;
   QAction* closePerspAction;
   QAction* openDicomEditorAction;

@@ -44,5 +44,5 @@ void QmitkDIAppTrackingEvaluationPerspective::CreateInitialLayout(berry::IPageLa
 
   left->AddView("org.mitk.views.artificialqballevaluation");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.artificialqballevaluation");
-  lo->SetCloseable(false);
+
 }

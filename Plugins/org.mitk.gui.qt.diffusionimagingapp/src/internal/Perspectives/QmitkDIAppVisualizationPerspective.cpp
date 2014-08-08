@@ -44,13 +44,13 @@ void QmitkDIAppVisualizationPerspective::CreateInitialLayout(berry::IPageLayout:
 
   left->AddView("org.mitk.views.volumevisualization");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.volumevisualization");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.screenshotmaker");
   lo = layout->GetViewLayout("org.mitk.views.screenshotmaker");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.moviemaker");
   lo = layout->GetViewLayout("org.mitk.views.moviemaker");
-  lo->SetCloseable(false);
+
 }

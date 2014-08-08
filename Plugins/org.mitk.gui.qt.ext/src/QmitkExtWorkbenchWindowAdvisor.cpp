@@ -359,7 +359,7 @@ QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchA
     showViewMenuItem(true),
     showNewWindowMenuItem(false),
     showClosePerspectiveMenuItem(true),
-    enableViewBrowser(true),
+    enableCandyStore(true),
     showMemoryIndicator(true),
     dropTargetListener(new QmitkDefaultDropTargetListener)
 {
@@ -408,12 +408,12 @@ bool QmitkExtWorkbenchWindowAdvisor::GetShowMemoryIndicator()
 
 void QmitkExtWorkbenchWindowAdvisor::EnableCandyStore(bool enable)
 {
-    enableViewBrowser = enable;
+    enableCandyStore = enable;
 }
 
 bool QmitkExtWorkbenchWindowAdvisor::GetEnableCandyStore()
 {
-    return enableViewBrowser;
+    return enableCandyStore;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowNewWindowMenuItem(bool show)
@@ -456,9 +456,9 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
     windowIcon = wndIcon;
 }
 
-void QmitkExtWorkbenchWindowAdvisor::onViewBrowser()
+void QmitkExtWorkbenchWindowAdvisor::onCandyStore()
 {
-    candyStore->setVisible(viewBrowserAction->isChecked());
+    candyStore->setVisible(candyStoreAction->isChecked());
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
@@ -583,14 +583,14 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
         mainActionsToolBar->addAction(imageNavigatorAction);
     }
 
-    if (enableViewBrowser)
+    if (enableCandyStore)
     {
-        viewBrowserAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Candy_icon.png"), "&Candy Store", NULL);
-        QObject::connect(viewBrowserAction, SIGNAL(triggered(bool)), SLOT(onViewBrowser()));
-        viewBrowserAction->setCheckable(true);
-        viewBrowserAction->setChecked(false);
-        viewBrowserAction->setToolTip("Toggle Candy Store");
-        mainActionsToolBar->addAction(viewBrowserAction);
+        candyStoreAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Candy_icon.png"), "&Candy Store", NULL);
+        QObject::connect(candyStoreAction, SIGNAL(triggered(bool)), SLOT(onCandyStore()));
+        candyStoreAction->setCheckable(true);
+        candyStoreAction->setChecked(false);
+        candyStoreAction->setToolTip("Toggle Candy Store");
+        mainActionsToolBar->addAction(candyStoreAction);
     }
     mainWindow->addToolBar(mainActionsToolBar);
 
@@ -773,11 +773,14 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     mainWindow->setStatusBar(qStatusBar);
 
+//    QLabel* label = new QLabel();
+//    label->setText("<span style=\" font-size:11pt; font-weight:700; color:#000000;\"> Candy Store</span>");
     candyStore = new QDockWidget("Candy Store");
-    candyStore->setWidget(new QmitkViewBrowserWidget());
+    candyStore->setWidget(new QmitkCandyStoreWidget());
     candyStore->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     candyStore->setVisible(false);
-    candyStore->setTitleBarWidget();
+    candyStore->setObjectName("Candy Store");
+//    candyStore->setTitleBarWidget(label);
     mainWindow->addDockWidget(Qt::LeftDockWidgetArea, candyStore);
 
     if (showMemoryIndicator)
@@ -929,23 +932,6 @@ void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
     }
     berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
     //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
-}
-
-void QmitkExtWorkbenchWindowAdvisorHack::onViewBrowser()
-{
-    // get view browser
-    berry::IViewPart::Pointer viewBrowser =
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.viewbrowser");
-    if (viewBrowser)
-    {
-        bool isVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(viewBrowser);
-        if (isVisible)
-        {
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(viewBrowser);
-            return;
-        }
-    }
-    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.viewbrowser");
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()

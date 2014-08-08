@@ -39,9 +39,6 @@ int MiniAppManager::RunMiniApp(int argc, char* argv[])
 
         if( argc < 2)
         {
-            std::cout << "Generated XML:" << std::endl;
-            std::cout << this->CreateXML() << std::endl;
-
             std::cout << "Please choose the mini app to execute: " << std::endl;
 
             for(int i=0; it != m_Functions.end(); ++i,++it)
@@ -59,8 +56,16 @@ int MiniAppManager::RunMiniApp(int argc, char* argv[])
         }
         else
         {
-            nameOfMiniApp = argv[1];
-            //--argc;
+            std::string arg = argv[1];
+
+            if (arg == "--xml")
+            {
+                std::cout << this->CreateXML() << std::endl;
+            }
+            else
+            {
+                nameOfMiniApp = argv[1];
+            }
         }
 
         it = m_Functions.find(nameOfMiniApp);

@@ -108,9 +108,10 @@ namespace mitk {
 
 class SurfaceCutterCGALPrivate {
 public:
-    SurfaceCutterCGALPrivate(vtkPolyData* surface)
+    SurfaceCutterCGALPrivate()
+        : _tree(nullptr)
+        , _triangulatedData(nullptr)
     {
-        setPolyData(surface);
     }
 
     void setPolyData(vtkPolyData* surface)
@@ -138,9 +139,14 @@ public:
             return vtkSmartPointer<vtkPolyData>::New();
         }
 
+        // This constant allows to avoid numerical instabilities in Simple_cartesian kernel
+        // It is used to avoid planes with normals parallel to coordinate axes, which is
+        // often the case for non-rotated slicing directions in MITK
+        static const double OFFSET_EPSILPON = 1e-8;
+
         CGAL_Point points[] = {
-            CGAL_Point(planePoints[0][0], planePoints[0][1], planePoints[0][2]),
-            CGAL_Point(planePoints[1][0], planePoints[1][1], planePoints[1][2]),
+            CGAL_Point(planePoints[0][0] - OFFSET_EPSILPON, planePoints[0][1] - OFFSET_EPSILPON, planePoints[0][2] - OFFSET_EPSILPON),
+            CGAL_Point(planePoints[1][0] + OFFSET_EPSILPON, planePoints[1][1] + OFFSET_EPSILPON, planePoints[1][2] + OFFSET_EPSILPON),
             CGAL_Point(planePoints[2][0], planePoints[2][1], planePoints[2][2]),
             CGAL_Point(planePoints[3][0], planePoints[3][1], planePoints[3][2])
         };
@@ -150,7 +156,10 @@ public:
         std::vector<CGAL_AABBTree::Intersection_and_primitive_id<CGAL_Plane>::Type> segments;
 
         if (_tree->do_intersect(bbox)) {
-            CGAL_Plane query_plane(points[0], points[1], points[2]);
+            mitk::Vector3D normal = itk::CrossProduct(planePoints[1] - planePoints[0], planePoints[2] - planePoints[0]);
+            normal.Normalize();
+            
+            CGAL_Plane query_plane(points[0], CGAL_Vector(normal[0], normal[1], normal[2]));
             _tree->all_intersections(query_plane, std::back_inserter(segments));
         }
 
@@ -162,6 +171,12 @@ public:
 
         for (int i = 0; i < segments.size(); ++i) {
             CGAL_Segment* s = boost::get<CGAL_Segment>(&segments[i].first);
+
+            if (!s) {
+                // Ignore non-segment intersections
+                continue;
+            }
+
             pointsOut->InsertNextPoint(s->start().x(), s->start().y(), s->start().z());
             pointsOut->InsertNextPoint(s->end().x(), s->end().y(), s->end().z());
 

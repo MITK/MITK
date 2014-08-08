@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyDescriptions.h>
 #include <mitkPropertyExtensions.h>
 #include <mitkPropertyFilters.h>
+#include <mitkSurfaceCutterFactoryPerformanceSelector.h>
 #include <mitkIOUtil.h>
 
 #include <usGetModuleContext.h>
@@ -264,6 +265,9 @@ public:
     m_PropertyFilters.reset(new mitk::PropertyFilters);
     context->RegisterService<mitk::IPropertyFilters>(m_PropertyFilters.get());
 
+    m_SurfaceCutterFactory.reset(new mitk::SurfaceCutterFactoryPerformanceSelector);
+    context->RegisterService<mitk::ISurfaceCutterFactory>(m_SurfaceCutterFactory.get());
+
     m_ShaderRepositoryTracker.Open();
 
     /*
@@ -297,6 +301,7 @@ private:
   std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
   std::auto_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
   std::auto_ptr<mitk::PropertyFilters> m_PropertyFilters;
+  std::auto_ptr<mitk::SurfaceCutterFactoryPerformanceSelector> m_SurfaceCutterFactory;
 };
 
 US_EXPORT_MODULE_ACTIVATOR(MitkCore, MitkCoreActivator)

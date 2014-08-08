@@ -25,6 +25,11 @@ namespace mitk {
         // TODO: perform test and choose cutter
     }
 
+    SurfaceCutterFactoryPerformanceSelector::~SurfaceCutterFactoryPerformanceSelector()
+    {
+
+    }
+
     ISurfaceCutter* SurfaceCutterFactoryPerformanceSelector::createSurfaceCutter() const
     {
         return new SurfaceCutterCGAL();

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSurfaceCutterCGAL_h
 #define mitkSurfaceCutterCGAL_h
 
+#include <memory>
 #include "mitkISurfaceCutter.h"
 
 namespace mitk

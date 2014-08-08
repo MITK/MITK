@@ -20,7 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyExtensions.h>
 #include <mitkIPropertyFilters.h>
-#include <mitkIShaderRepository.h>
+#include <mitkIShaderRepository.h>     
+#include <mitkISurfaceCutterFactory.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -77,6 +78,11 @@ IPropertyExtensions* CoreServices::GetPropertyExtensions(us::ModuleContext* cont
 IPropertyFilters* CoreServices::GetPropertyFilters(us::ModuleContext* context)
 {
   return GetCoreService<IPropertyFilters>(context);
+}
+
+ISurfaceCutterFactory* CoreServices::GetSurfaceCutterFactory(us::ModuleContext* context)
+{
+    return GetCoreService<ISurfaceCutterFactory>(context);
 }
 
 bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interfaceId*/, void* service)

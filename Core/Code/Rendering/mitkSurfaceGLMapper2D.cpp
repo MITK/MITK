@@ -43,9 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::SurfaceGLMapper2D::SurfaceGLMapper2D()
-: m_Plane( vtkPlane::New() ),
-  m_Cutter( vtkCutter::New() ),
-  m_LUT( vtkLookupTable::New() ),
+: m_LUT( vtkLookupTable::New() ),
   m_PointLocator( vtkPKdTree::New() ),
   m_Stripper( vtkStripper::New() ),
   m_DrawNormals(false),
@@ -70,9 +68,6 @@ mitk::SurfaceGLMapper2D::SurfaceGLMapper2D()
   m_LineColor[2] = 0.0;
   m_LineColor[3] = 1.0;
 
-  m_Cutter->SetCutFunction(m_Plane);
-  m_Cutter->GenerateValues(1,0,1);
-
   m_LUT->SetTableRange(0,255);
   m_LUT->SetNumberOfColors(255);
   m_LUT->SetRampToLinear();
@@ -81,8 +76,6 @@ mitk::SurfaceGLMapper2D::SurfaceGLMapper2D()
 
 mitk::SurfaceGLMapper2D::~SurfaceGLMapper2D()
 {
-  m_Plane->Delete();
-  m_Cutter->Delete();
   m_LUT->Delete();
   m_PointLocator->Delete();
   m_Stripper->Delete();
@@ -228,10 +221,9 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     {
       // set up vtkPlane according to worldGeometry
       points[0] = worldGeometry->GetOrigin();
-      points[1] = points[0] + worldPlaneGeometry->GetAxisVector(0);
-      points[2] = points[0] + worldPlaneGeometry->GetAxisVector(1);
-      points[3] = points[1] + worldPlaneGeometry->GetAxisVector(1);
-      m_Plane->SetTransform((vtkAbstractTransform*)NULL);
+      points[1] = points[0] + worldGeometry->GetAxisVector(0);
+      points[2] = points[0] + worldGeometry->GetAxisVector(1);
+      points[3] = points[1] + worldGeometry->GetAxisVector(1);
     }
     else
     {
@@ -249,6 +241,8 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           //@FIXME: does not work correctly. Does m_Plane->SetTransform really transforms a "flat plane" into a "curved plane"?
           return;
           // set up vtkPlane according to worldGeometry
+          // point=const_cast<BoundingBox*>(worldAbstractGeometry->GetParametricBoundingBox())->GetMinimum();
+          // FillVector3D(normal, 0, 0, 1);
         }
       }
       else
@@ -268,11 +262,6 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }
 
     vtkSmartPointer<vtkPolyData> cutResult = input->CutWithPlane(points, timestep);
-
-//     m_Cutter->SetInputData(vtkpolydata);
-//     m_Cutter->Update();
-    //    m_Cutter->GenerateCutScalarsOff();
-    //    m_Cutter->SetSortByToSortByCell();
 
     if (m_DrawNormals)
     {

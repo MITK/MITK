@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSurfaceCutterVtk_h
 #define mitkSurfaceCutterVtk_h
 
+#include <memory>
+
 #include "mitkISurfaceCutter.h"
 
 namespace mitk

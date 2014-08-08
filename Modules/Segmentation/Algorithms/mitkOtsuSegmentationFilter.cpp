@@ -32,7 +32,7 @@ struct paramContainer
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-AccessItkOtsuFilter(itk::Image<TPixel, VImageDimension>* itkImage, paramContainer params)
+AccessItkOtsuFilter(const itk::Image<TPixel, VImageDimension>* itkImage, paramContainer params)
 {
   typedef itk::Image<TPixel, VImageDimension> itkInputImageType;
   typedef itk::Image< mitk::OtsuSegmentationFilter::OutputPixelType, 3 > itkOutputImageType;

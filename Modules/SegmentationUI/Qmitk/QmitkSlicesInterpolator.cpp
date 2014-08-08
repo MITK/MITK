@@ -572,7 +572,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 
     // Set slice as input
     mitk::Image::Pointer slice = dynamic_cast<mitk::Image*>(m_FeedbackNode->GetData());
-    reslice->SetInputSlice(slice->GetSliceData()->GetVtkImageData(slice));
+    reslice->SetInputSlice(slice->GetSliceData()->GetVtkImageAccessor(slice)->GetVtkImageData());
     //set overwrite mode to true to write back to the image volume
     reslice->SetOverwriteMode(true);
     reslice->Modified();
@@ -668,7 +668,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
         //set overwrite mode to true to write back to the image volume
-        reslice->SetInputSlice(interpolation->GetSliceData()->GetVtkImageData(interpolation));
+        reslice->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
         reslice->SetOverwriteMode(true);
         reslice->Modified();
 

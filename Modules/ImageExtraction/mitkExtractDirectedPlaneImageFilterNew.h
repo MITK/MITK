@@ -89,7 +89,7 @@ private:
     int m_ActualInputTimestep;
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkSliceExtraction (itk::Image<TPixel, VImageDimension>* inputImage);
+    void ItkSliceExtraction (const itk::Image<TPixel, VImageDimension>* inputImage);
 };
 
 }//namespace

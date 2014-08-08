@@ -63,7 +63,7 @@ void mitk::ImageToContourFilter::GenerateData()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ImageToContourFilter::Itk2DContourExtraction (itk::Image<TPixel, VImageDimension>* sliceImage)
+void mitk::ImageToContourFilter::Itk2DContourExtraction (const itk::Image<TPixel, VImageDimension>* sliceImage)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::ContourExtractor2DImageFilter<ImageType> ContourExtractor;

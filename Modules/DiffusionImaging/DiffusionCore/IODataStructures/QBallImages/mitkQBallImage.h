@@ -52,17 +52,19 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual ImageVtkAccessor* GetNonRgbVtkImageData(int t = 0, int n = 0);
+    virtual const vtkImageData* GetNonRgbVtkImageData(int t = 0, int n = 0) const;
+    virtual vtkImageData* GetNonRgbVtkImageData(int t = 0, int n = 0);
 
-    virtual ImageVtkAccessor* GetVtkImageData(int t = 0, int n = 0);
+    virtual const vtkImageData* GetVtkImageData(int t = 0, int n = 0) const;
+    virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
 
-    virtual void ConstructRgbImage();
+    virtual void ConstructRgbImage() const;
 
   protected:
     QBallImage();
     virtual ~QBallImage();
 
-    mitk::Image::Pointer m_RgbImage;
+    mutable mitk::Image::Pointer m_RgbImage;
 
   };
 

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRealTimeClock.h"
 
 #include <iostream>
+#include <fstream>
 #include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 

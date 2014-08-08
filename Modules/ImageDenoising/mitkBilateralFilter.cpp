@@ -57,7 +57,7 @@ void mitk::BilateralFilter::GenerateData()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::BilateralFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage )
+void mitk::BilateralFilter::ItkImageProcessing( const itk::Image<TPixel,VImageDimension>* itkImage )
 {
   //ITK Image type given from the input image
   typedef itk::Image< TPixel, VImageDimension >   ItkImageType;

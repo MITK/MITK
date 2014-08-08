@@ -30,14 +30,21 @@ mitk::QBallImage::~QBallImage()
 
 }
 
-mitk::ImageVtkAccessor* mitk::QBallImage::GetVtkImageData(int t, int n)
+const vtkImageData* mitk::QBallImage::GetVtkImageData(int t, int n) const
 {
   if(m_RgbImage.IsNull())
     ConstructRgbImage();
   return m_RgbImage->GetVtkImageData(t,n);
 }
 
-void mitk::QBallImage::ConstructRgbImage()
+vtkImageData*mitk::QBallImage::GetVtkImageData(int t, int n)
+{
+  if(m_RgbImage.IsNull())
+    ConstructRgbImage();
+  return m_RgbImage->GetVtkImageData(t,n);
+}
+
+void mitk::QBallImage::ConstructRgbImage() const
 {
   typedef itk::Image<itk::Vector<float,QBALL_ODFSIZE>,3> ImageType;
   typedef itk::QBallToRgbImageFilter<ImageType> FilterType;
@@ -53,7 +60,12 @@ void mitk::QBallImage::ConstructRgbImage()
   m_RgbImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
 }
 
-mitk::ImageVtkAccessor* mitk::QBallImage::GetNonRgbVtkImageData(int t, int n)
+const vtkImageData* mitk::QBallImage::GetNonRgbVtkImageData(int t, int n) const
+{
+  return Superclass::GetVtkImageData(t,n);
+}
+
+vtkImageData* mitk::QBallImage::GetNonRgbVtkImageData(int t, int n)
 {
   return Superclass::GetVtkImageData(t,n);
 }

@@ -109,7 +109,7 @@ namespace mitk
     * \brief Template class to perform the symmetric forces demons registration with any kind of image. Called by GenerateData().
     */
     template < typename TPixel, unsigned int VImageDimension >
-      void GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1);
+      void GenerateData2( const itk::Image<TPixel, VImageDimension>* itkImage1);
 
     int m_Iterations;
     float m_StandardDeviation;

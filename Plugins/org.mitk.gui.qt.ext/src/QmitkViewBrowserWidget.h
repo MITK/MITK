@@ -32,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkNewPerspectiveDialog.h>
 #include <mitkQtPerspectiveItem.h>
 #include <mitkQtViewItem.h>
-#include <ViewTagsRegistry.h>
 
 class ClassFilterProxyModel;
 
@@ -75,7 +74,6 @@ protected:
     berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
     berry::IWindowListener::Pointer             m_WindowListener;
     friend struct ViewBrowserViewListener;
-    ViewTagsRegistry m_Registry;
 
 private:
 

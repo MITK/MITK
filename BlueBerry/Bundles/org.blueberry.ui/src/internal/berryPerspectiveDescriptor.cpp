@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
     const std::string& label, PerspectiveDescriptor::Pointer originalDescriptor)
  : singleton(false), fixed(false)
@@ -147,6 +146,27 @@ bool PerspectiveDescriptor::GetFixed() const
   return val;
 }
 
+std::vector< std::string> PerspectiveDescriptor::GetKeywordReferences() const
+{
+  std::vector<std::string> result;
+  if (configElement.IsNull())
+  {
+    return result;
+  }
+
+  std::string keywordRefId;
+  std::vector<berry::IConfigurationElement::Pointer> keywordRefs;
+  berry::IConfigurationElement::vector::iterator keywordRefsIt;
+  keywordRefs = configElement->GetChildren("keywordReference");
+  for (keywordRefsIt = keywordRefs.begin()
+          ; keywordRefsIt != keywordRefs.end(); ++keywordRefsIt) // iterate over all refs
+  {
+    (*keywordRefsIt)->GetAttribute("id", keywordRefId);
+    result.push_back(keywordRefId);
+  }
+  return result;
+}
+
 std::string PerspectiveDescriptor::GetId() const
 {
   return id;
@@ -171,7 +191,6 @@ ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
       imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
           configElement->GetContributor(), icon);
     }
-
   }
 
   if (!imageDescriptor)
@@ -302,5 +321,4 @@ std::string PerspectiveDescriptor::GetFactoryClassName() const
   return configElement == 0 ? className : RegistryReader::GetClassValue(
       configElement, WorkbenchRegistryConstants::ATT_CLASS);
 }
-
 }

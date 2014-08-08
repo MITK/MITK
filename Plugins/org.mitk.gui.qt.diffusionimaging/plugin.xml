@@ -63,6 +63,7 @@
                  class="QmitkDiffusionImagingPublicPerspective"
                  icon="resources/reconodf.png">
       <description>This is a short information about this perspective</description>
+      <keywordReference id="org.mitk.views.screenshotmaker.Keyword"/>
     </perspective>
   </extension>
 

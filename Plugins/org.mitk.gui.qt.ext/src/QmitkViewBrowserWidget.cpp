@@ -24,11 +24,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <berryIWorkbenchPage.h>
 
+#include <berryIExtensionPointService.h>
+
 // Qt
 #include <QMessageBox>
 #include <QTreeView>
 #include <QStandardItem>
 #include <QSortFilterProxyModel>
+
+class KeywordRegistry
+{
+public:
+  KeywordRegistry()
+  {
+    berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
+    berry::IConfigurationElement::vector keywordExts(extensionPointService->GetConfigurationElementsFor("org.blueberry.ui.keywords"));
+
+    std::string keywordId;
+    std::string keywordLabels;
+    berry::IConfigurationElement::vector::iterator keywordExtsIt;
+    for (keywordExtsIt = keywordExts.begin(); keywordExtsIt != keywordExts.end(); ++keywordExtsIt)
+    {
+      (*keywordExtsIt)->GetAttribute("id", keywordId);
+      (*keywordExtsIt)->GetAttribute("label", keywordLabels);
+
+      if (m_Keywords.find(keywordId) == m_Keywords.end())
+      {
+        m_Keywords[keywordId] = std::vector<QString>();
+      }
+      m_Keywords[keywordId].push_back(QString::fromStdString(keywordLabels));
+    }
+  }
+
+  std::vector<QString> GetKeywords(std::string id)
+  {
+    return m_Keywords[id];
+  }
+
+  std::vector<QString> GetKeywords(std::vector<std::string> ids)
+  {
+    std::vector<QString> result;
+    for (int i = 0; i < ids.size(); ++i)
+    {
+      std::vector< QString > tmpResult;
+      tmpResult = this->GetKeywords(ids[i]);
+      result.insert(result.end(), tmpResult.begin(), tmpResult.end());
+    }
+    return result;
+  }
+
+private:
+  std::map<std::string, std::vector<QString> > m_Keywords;
+};
+
 
 class ClassFilterProxyModel : public QSortFilterProxyModel
 {
@@ -202,12 +250,6 @@ void QmitkViewBrowserWidget::CreateQtPartControl( QWidget *parent )
     //proxyModel->setFilterFixedString("Diff");
     m_Controls.m_PluginTreeView->setModel(m_FilterProxyModel);
     FillTreeList();
-
-    QList<ViewTagsDescriptor::Pointer> additions = m_Registry.GetViewTags();
-    foreach (const ViewTagsDescriptor::Pointer& var, additions)
-    {
-      std::cout << var->GetID().toStdString() << std::endl;
-    }
 }
 
 void QmitkViewBrowserWidget::FillTreeList()
@@ -229,6 +271,9 @@ void QmitkViewBrowserWidget::FillTreeList()
     // get all available perspectives
     berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
     std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
+
+    // get all Keywords
+    KeywordRegistry keywordRegistry;
 
     QModelIndex currentIndex;
     berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
@@ -253,9 +298,9 @@ void QmitkViewBrowserWidget::FillTreeList()
         QIcon* pIcon = static_cast<QIcon*>(p->GetImageDescriptor()->CreateImage());
         mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(*pIcon, QString::fromStdString(p->GetLabel()));
         pItem->m_Perspective = p;
-        ViewTagsDescriptor::Pointer tags = m_Registry.Find(p->GetId());
         pItem->m_Description = QString::fromStdString(p->GetDescription());
-        pItem->m_Tags = tags->GetTags();
+        std::vector<std::string> keylist = p->GetKeywordReferences();
+        pItem->m_Tags = keywordRegistry.GetKeywords(keylist);
         perspectiveRootItem->appendRow(pItem);
 
         if (currentPersp)
@@ -281,7 +326,6 @@ void QmitkViewBrowserWidget::FillTreeList()
     {
         berry::IViewDescriptor::Pointer v = views[i];
 
-        ViewTagsDescriptor::Pointer tags = m_Registry.Find(views[i]->GetId());
         bool skipView = false;
         for(unsigned int e=0; e<viewExcludeList.size(); e++)
             if(viewExcludeList.at(e)==v->GetId())
@@ -298,8 +342,9 @@ void QmitkViewBrowserWidget::FillTreeList()
         mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon, QString::fromStdString(v->GetLabel()));
         vItem->m_View = v;
         vItem->m_Description = QString::fromStdString(v->GetDescription());
-        vItem->m_Tags = tags->GetTags();
 
+        std::vector<std::string> keylist = v->GetKeywordReferences();
+        vItem->m_Tags = keywordRegistry.GetKeywords(keylist);
 
         if (catPath.empty())
             noCategoryItem->appendRow(vItem);

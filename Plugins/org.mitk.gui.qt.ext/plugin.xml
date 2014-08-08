@@ -13,7 +13,6 @@
           class="QmitkExternalProgramsPreferencePage" >
     </page>
   </extension>
-  <extension-point id="org.blueberry.ui.taglists" name="New Change Text of Label" schema="schema/taglist.exsd"/>
 
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="3D mouse"/>

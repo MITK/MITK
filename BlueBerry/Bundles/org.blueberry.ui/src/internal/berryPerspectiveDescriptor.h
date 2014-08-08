@@ -116,6 +116,7 @@ private:
    */
   public: std::string GetDescription() const;
 public: void SetDescription(std::string desc) {description = desc; }
+  std::vector< std::string> GetKeywordReferences() const;
 
   /**
    * Returns whether or not this perspective is fixed.

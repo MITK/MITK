@@ -7,9 +7,6 @@ set(SRC_CPP_FILES
 
   QmitkViewBrowserWidget.cpp
   QmitkNewPerspectiveDialog.cpp
-  ViewTagsRegistry.cpp
-  ViewTagsDescriptor.cpp
-  ExtensionPointDefinitionConstants.cpp
 )
 
 set(INTERNAL_CPP_FILES

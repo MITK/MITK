@@ -15,15 +15,13 @@
           class="QmitkScreenshotMaker"
           icon="resources/screenshot_maker.png" >
       <description>This is a short information about this perspective</description>
+      <keywordReference id="org.mitk.views.screenshotmaker.Keyword"/>
     </view>
   </extension>
-  <extension point="org.blueberry.ui.taglists">
-    <taglist id="org.mitk.views.moviemaker">
-      <tag>Moving Images</tag>
-      <tag>Documentation</tag>
-      <tag>Visualisation</tag>
-      <tag>Document</tag>
-      <tag>Screen capture</tag>
-    </taglist>
-  </extension>
+  <extension
+   point="org.blueberry.ui.keywords">
+  <keyword
+          label="presentation tab themes"
+          id="org.mitk.views.screenshotmaker.Keyword"/>
+ </extension>    
 </plugin>

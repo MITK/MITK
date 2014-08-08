@@ -72,9 +72,13 @@ public:
 
     bool GetShowClosePerspectiveMenuItem();
 
-    void EnableViewBrowser(bool enable);
+    void EnableCandyStore(bool enable);
 
-    bool GetEnableViewBrowser();
+    bool GetEnableCandyStore();
+
+    void ShowMemoryIndicator(bool show);
+
+    bool GetShowMemoryIndicator();
 
     //TODO should be removed when product support is here
     void SetProductName(const std::string& product);
@@ -147,6 +151,7 @@ private:
   bool showNewWindowMenuItem;
   bool showClosePerspectiveMenuItem;
   bool enableViewBrowser;
+  bool showMemoryIndicator;
   std::string productName;
   std::string windowIcon;
 
@@ -174,7 +179,7 @@ private:
   QAction* closePerspAction;
   QAction* openDicomEditorAction;
   QAction* openXnatEditorAction;
-  QDockWidget* viewBrowser;
+  QDockWidget* candyStore;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

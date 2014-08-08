@@ -54,40 +54,40 @@ bool ClassFilterProxyModel::filterAcceptsRow(int sourceRow,
 
 bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
 {
-  bool result = false;
+    bool result = false;
     QString type = sourceModel()->data(index, Qt::DisplayRole).toString();
-  QStandardItem * item = dynamic_cast<QStandardItemModel*>(sourceModel())->itemFromIndex(index);
+    QStandardItem * item = dynamic_cast<QStandardItemModel*>(sourceModel())->itemFromIndex(index);
 
-  if (type.contains(filterRegExp()))
+    if (type.contains(filterRegExp()))
     {
-    return true;
+        return true;
     }
     {
-    mitk::QtViewItem* viewItem = dynamic_cast<mitk::QtViewItem*>(item);
-    if (viewItem)
-    {
-      for (int i = 0; i < viewItem->m_Tags.size(); ++i)
-      {
-        if (viewItem->m_Tags[i].contains(filterRegExp()))
+        mitk::QtViewItem* viewItem = dynamic_cast<mitk::QtViewItem*>(item);
+        if (viewItem)
         {
-          return true;
+            for (int i = 0; i < viewItem->m_Tags.size(); ++i)
+            {
+                if (viewItem->m_Tags[i].contains(filterRegExp()))
+                {
+                    return true;
+                }
+            }
         }
-      }
     }
-  }
-  {
-    mitk::QtPerspectiveItem* viewItem = dynamic_cast<mitk::QtPerspectiveItem*>(item);
-    if (viewItem)
     {
-      for (int i = 0; i < viewItem->m_Tags.size(); ++i)
-      {
-        if (viewItem->m_Tags[i].contains(filterRegExp()))
+        mitk::QtPerspectiveItem* viewItem = dynamic_cast<mitk::QtPerspectiveItem*>(item);
+        if (viewItem)
         {
-          return true;
+            for (int i = 0; i < viewItem->m_Tags.size(); ++i)
+            {
+                if (viewItem->m_Tags[i].contains(filterRegExp()))
+                {
+                    return true;
+                }
+            }
         }
-      }
     }
-  }
 
     return result;
 }
@@ -200,7 +200,7 @@ void QmitkViewBrowserWidget::CreateQtPartControl( QWidget *parent )
     QList<ViewTagsDescriptor::Pointer> additions = m_Registry.GetViewTags();
     foreach (const ViewTagsDescriptor::Pointer& var, additions)
     {
-      std::cout << var->GetID().toStdString() << std::endl;
+        std::cout << var->GetID().toStdString() << std::endl;
     }
 }
 
@@ -228,7 +228,7 @@ void QmitkViewBrowserWidget::FillTreeList()
     berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
     std::vector<std::string> perspectiveExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetPerspectiveExcludeList();
 
-    QStandardItem *perspectiveRootItem = new QStandardItem("Perspectives");
+    QStandardItem *perspectiveRootItem = new QStandardItem("Workflows");
     treeRootItem->appendRow(perspectiveRootItem);
     for (unsigned int i=0; i<perspectives.size(); i++)
     {
@@ -249,6 +249,7 @@ void QmitkViewBrowserWidget::FillTreeList()
         pItem->m_Perspective = p;
         ViewTagsDescriptor::Pointer tags = m_Registry.Find(p->GetId());
         pItem->m_Tags = tags->GetTags();
+        pItem->setEditable(false);
         perspectiveRootItem->appendRow(pItem);
 
         if (currentPersp->GetId()==p->GetId())
@@ -261,7 +262,7 @@ void QmitkViewBrowserWidget::FillTreeList()
     std::sort(views.begin(), views.end(), compareViews);
 
     std::vector<std::string> viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
-    QStandardItem* viewRootItem = new QStandardItem(QIcon(),"View categories");
+    QStandardItem* viewRootItem = new QStandardItem(QIcon(),"Candies");
     treeRootItem->appendRow(viewRootItem);
 
     std::vector< QStandardItem* > categoryItems;
@@ -287,7 +288,9 @@ void QmitkViewBrowserWidget::FillTreeList()
         mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon, QString::fromStdString(v->GetLabel()));
         vItem->m_View = v;
         vItem->m_Tags = tags->GetTags();
-
+        vItem->setToolTip(v->GetDescription().c_str());
+        vItem->setEditable(false);
+        vItem->setTristate(true);
 
         if (catPath.empty())
             noCategoryItem->appendRow(vItem);

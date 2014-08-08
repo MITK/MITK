@@ -360,6 +360,7 @@ QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchA
     showNewWindowMenuItem(false),
     showClosePerspectiveMenuItem(true),
     enableViewBrowser(true),
+    showMemoryIndicator(true),
     dropTargetListener(new QmitkDefaultDropTargetListener)
 {
     productName = QCoreApplication::applicationName().toStdString();
@@ -395,13 +396,22 @@ bool QmitkExtWorkbenchWindowAdvisor::GetShowClosePerspectiveMenuItem()
     return showClosePerspectiveMenuItem;
 }
 
+void QmitkExtWorkbenchWindowAdvisor::ShowMemoryIndicator(bool show)
+{
+    showMemoryIndicator = show;
+}
 
-void QmitkExtWorkbenchWindowAdvisor::EnableViewBrowser(bool enable)
+bool QmitkExtWorkbenchWindowAdvisor::GetShowMemoryIndicator()
+{
+    return showMemoryIndicator;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::EnableCandyStore(bool enable)
 {
     enableViewBrowser = enable;
 }
 
-bool QmitkExtWorkbenchWindowAdvisor::GetEnableViewBrowser()
+bool QmitkExtWorkbenchWindowAdvisor::GetEnableCandyStore()
 {
     return enableViewBrowser;
 }
@@ -448,7 +458,7 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
 
 void QmitkExtWorkbenchWindowAdvisor::onViewBrowser()
 {
-    viewBrowser->setVisible(viewBrowserAction->isChecked());
+    candyStore->setVisible(viewBrowserAction->isChecked());
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
@@ -544,16 +554,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
         imageNavigatorAction->setToolTip("Toggle image navigator for navigating through image");
     }
 
-    // add view browser
-    viewBrowserAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&View Browser", NULL);
-    if (enableViewBrowser)
-    {
-        QObject::connect(viewBrowserAction, SIGNAL(triggered(bool)), SLOT(onViewBrowser()));
-        viewBrowserAction->setCheckable(true);
-        viewBrowserAction->setChecked(false);
-        viewBrowserAction->setToolTip("Toggle view browser");
-    }
-
     // toolbar for showing file open, undo, redo and other main actions
     QToolBar* mainActionsToolBar = new QToolBar;
     mainActionsToolBar->setObjectName("mainActionsToolBar");
@@ -582,8 +582,14 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     {
         mainActionsToolBar->addAction(imageNavigatorAction);
     }
+
     if (enableViewBrowser)
     {
+        viewBrowserAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Candy_icon.png"), "&Candy Store", NULL);
+        QObject::connect(viewBrowserAction, SIGNAL(triggered(bool)), SLOT(onViewBrowser()));
+        viewBrowserAction->setCheckable(true);
+        viewBrowserAction->setChecked(false);
+        viewBrowserAction->setToolTip("Toggle Candy Store");
         mainActionsToolBar->addAction(viewBrowserAction);
     }
     mainWindow->addToolBar(mainActionsToolBar);
@@ -767,15 +773,18 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     mainWindow->setStatusBar(qStatusBar);
 
-    viewBrowser = new QDockWidget("View Browser");
-    viewBrowser->setWidget(new QmitkViewBrowserWidget());
-    viewBrowser->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-    viewBrowser->setVisible(false);
-    mainWindow->addDockWidget(Qt::LeftDockWidgetArea, viewBrowser);
+    candyStore = new QDockWidget("Candy Store");
+    candyStore->setWidget(new QmitkViewBrowserWidget());
+    candyStore->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+    candyStore->setVisible(false);
+    candyStore->setTitleBarWidget();
+    mainWindow->addDockWidget(Qt::LeftDockWidgetArea, candyStore);
 
-    QmitkMemoryUsageIndicatorView* memoryIndicator =
-            new QmitkMemoryUsageIndicatorView();
-    qStatusBar->addPermanentWidget(memoryIndicator, 0);
+    if (showMemoryIndicator)
+    {
+        QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
+        qStatusBar->addPermanentWidget(memoryIndicator, 0);
+    }
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()

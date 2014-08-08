@@ -70,10 +70,11 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   advisor->SetPerspectiveExcludeList(perspExcludeList);
   advisor->SetViewExcludeList(viewExcludeList);
   advisor->ShowViewToolbar(false);
-  advisor->ShowPerspectiveToolbar(true);
+  advisor->ShowPerspectiveToolbar(false);
   advisor->ShowVersionInfo(false);
-  advisor->EnableViewBrowser(true);
+  advisor->EnableCandyStore(true);
   advisor->ShowMitkVersionInfo(false);
+  advisor->ShowMemoryIndicator(false);
   advisor->SetProductName("MITK Diffusion");
   advisor->SetWindowIcon(":/org.mitk.gui.qt.diffusionimagingapp/app-icon.png");
   return advisor;

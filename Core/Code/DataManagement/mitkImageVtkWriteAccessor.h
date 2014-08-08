@@ -30,7 +30,7 @@ class ImageDataItem;
  * @brief ImageVtkWriteAccessor class provides any image write access which is required by Vtk methods
  * @ingroup Data
  */
-class ImageVtkWriteAccessor : public ImageAccessorBase
+class MITK_CORE_EXPORT ImageVtkWriteAccessor : public ImageAccessorBase
 {
 
 public:

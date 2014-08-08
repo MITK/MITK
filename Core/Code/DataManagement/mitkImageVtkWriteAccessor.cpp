@@ -53,7 +53,7 @@ mitk::ImageVtkWriteAccessor::~ImageVtkWriteAccessor()
   m_Image->m_VtkReadersLock.Unlock();
 }
 
-vtkImageData*mitk::ImageVtkWriteAccessor::GetVtkImageData() const
+vtkImageData* mitk::ImageVtkWriteAccessor::GetVtkImageData() const
 {
   return m_ImageDataVtk;
 }

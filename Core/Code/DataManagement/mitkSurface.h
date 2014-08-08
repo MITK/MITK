@@ -4,7 +4,7 @@ The Medical Imaging Interaction Toolkit (MITK)
 
 Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
-All rights reserved.
+All rights reserved. 
 
 This software is distributed WITHOUT ANY WARRANTY; without
 even the implied warranty of MERCHANTABILITY or FITNESS FOR
@@ -17,8 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSurface_h
 #define mitkSurface_h
 
+#include <memory>
+#include <vector>
+
 #include "mitkBaseData.h"
 #include "itkImageRegion.h"
+#include "mitkISurfaceCutter.h"
+
+
 
 class vtkPolyData;
 
@@ -45,7 +51,8 @@ namespace mitk
     virtual const RegionType& GetRequestedRegion() const;
     unsigned int GetSizeOfPolyDataSeries() const;
     virtual vtkPolyData* GetVtkPolyData(unsigned int t = 0);
-    virtual void Graft( const DataObject* data );
+    virtual vtkSmartPointer<vtkPolyData> CutWithPlane(mitk::Point3D planePoints[4], unsigned int t = 0);
+    virtual void Graft(const DataObject* data);
     virtual bool IsEmptyTimeStep(unsigned int t) const;
     virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
@@ -73,6 +80,8 @@ namespace mitk
 
   private:
     std::vector<vtkPolyData*> m_PolyDatas;
+    std::vector<std::unique_ptr<ISurfaceCutter>> m_Cutters;
+
     mutable RegionType m_LargestPossibleRegion;
     RegionType m_RequestedRegion;
     bool m_CalculateBoundingBox;

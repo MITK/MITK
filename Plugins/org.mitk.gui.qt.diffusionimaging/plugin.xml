@@ -61,7 +61,9 @@
     <perspective id="org.mitk.perspectives.publicdiffusionimaging"
                  name="Diffusion Imaging Public"
                  class="QmitkDiffusionImagingPublicPerspective"
-                 icon="resources/reconodf.png"/>
+                 icon="resources/reconodf.png">
+      <description>This is a short information about this perspective</description>
+    </perspective>
   </extension>
 
   <extension point="org.blueberry.ui.views">

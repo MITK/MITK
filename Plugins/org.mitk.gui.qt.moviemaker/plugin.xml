@@ -13,7 +13,9 @@
     <view id="org.mitk.views.screenshotmaker"
           name="Screenshot Maker"
           class="QmitkScreenshotMaker"
-          icon="resources/screenshot_maker.png" />
+          icon="resources/screenshot_maker.png" >
+      <description>This is a short information about this perspective</description>
+    </view>
   </extension>
   <extension point="org.blueberry.ui.taglists">
     <taglist id="org.mitk.views.moviemaker">

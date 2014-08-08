@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 
 namespace berry {
-
 /**
  * \ingroup org_blueberry_ui_internal
  *
@@ -45,7 +44,6 @@ namespace berry {
  *
  */
 class PerspectiveDescriptor : public IPerspectiveDescriptor {
-
 public:
   berryObjectMacro(PerspectiveDescriptor);
 
@@ -117,6 +115,7 @@ private:
    * @see org.blueberry.ui.IPerspectiveDescriptor#getDescription()
    */
   public: std::string GetDescription() const;
+public: void SetDescription(std::string desc) {description = desc; }
 
   /**
    * Returns whether or not this perspective is fixed.
@@ -225,9 +224,7 @@ private:
    * @since 3.1
    */
   public: std::string GetFactoryClassName() const;
-
 };
-
 }
 
 #endif /*BERRYPERSPECTIVEDESCRIPTOR_H_*/

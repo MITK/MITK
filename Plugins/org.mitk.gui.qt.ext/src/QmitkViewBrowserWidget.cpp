@@ -73,6 +73,10 @@ bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
           return true;
         }
       }
+      if (viewItem->m_Description.contains(filterRegExp()))
+      {
+        return true;
+      }
     }
   }
   {
@@ -86,10 +90,13 @@ bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
           return true;
         }
       }
+      if (viewItem->m_Description.contains(filterRegExp()))
+      {
+        return true;
+      }
     }
   }
-
-    return result;
+  return result;
 }
 
 bool ClassFilterProxyModel::hasToBeDisplayed(const QModelIndex index) const
@@ -171,7 +178,6 @@ QmitkViewBrowserWidget::QmitkViewBrowserWidget( QWidget * parent, Qt::WindowFlag
 
 QmitkViewBrowserWidget::~QmitkViewBrowserWidget()
 {
-
 }
 
 void QmitkViewBrowserWidget::CreateQtPartControl( QWidget *parent )
@@ -248,6 +254,7 @@ void QmitkViewBrowserWidget::FillTreeList()
         mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(*pIcon, QString::fromStdString(p->GetLabel()));
         pItem->m_Perspective = p;
         ViewTagsDescriptor::Pointer tags = m_Registry.Find(p->GetId());
+        pItem->m_Description = QString::fromStdString(p->GetDescription());
         pItem->m_Tags = tags->GetTags();
         perspectiveRootItem->appendRow(pItem);
 
@@ -273,6 +280,7 @@ void QmitkViewBrowserWidget::FillTreeList()
     for (unsigned int i = 0; i < views.size(); ++i)
     {
         berry::IViewDescriptor::Pointer v = views[i];
+
         ViewTagsDescriptor::Pointer tags = m_Registry.Find(views[i]->GetId());
         bool skipView = false;
         for(unsigned int e=0; e<viewExcludeList.size(); e++)
@@ -289,6 +297,7 @@ void QmitkViewBrowserWidget::FillTreeList()
         QIcon* icon = static_cast<QIcon*>(v->GetImageDescriptor()->CreateImage());
         mitk::QtViewItem* vItem = new mitk::QtViewItem(*icon, QString::fromStdString(v->GetLabel()));
         vItem->m_View = v;
+        vItem->m_Description = QString::fromStdString(v->GetDescription());
         vItem->m_Tags = tags->GetTags();
 
 

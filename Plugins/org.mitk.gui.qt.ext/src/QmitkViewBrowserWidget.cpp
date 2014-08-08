@@ -56,12 +56,12 @@ public:
     }
   }
 
-  std::vector<QString> GetKeywords(std::string id)
+  std::vector<QString> GetKeywords(const std::string& id)
   {
     return m_Keywords[id];
   }
 
-  std::vector<QString> GetKeywords(std::vector<std::string> ids)
+  std::vector<QString> GetKeywords(const std::vector<std::string>& ids)
   {
     std::vector<QString> result;
     for (int i = 0; i < ids.size(); ++i)

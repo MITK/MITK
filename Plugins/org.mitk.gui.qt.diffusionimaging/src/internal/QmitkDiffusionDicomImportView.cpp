@@ -365,10 +365,14 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
       QString folderName = item->text();
 
 
-      if( has_prefix )
+      if( this->m_Controls->m_DicomLoadRecursiveCheckbox->isChecked() )
       {
 
-        std::string subdir_prefix = this->m_Prefix;
+        std::string subdir_prefix = "";
+        if( has_prefix )
+        {
+          subdir_prefix = this->m_Prefix;
+        }
 
         itksys::Directory rootdir;
         rootdir.Load( folderName.toStdString().c_str() );

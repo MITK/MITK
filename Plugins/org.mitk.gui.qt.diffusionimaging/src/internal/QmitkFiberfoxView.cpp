@@ -398,7 +398,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     if (m_MaskImageNode.IsNotNull())
     {
         mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
-        mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, parameters.m_MaskImage);
+        mitk::CastToItkImage(mitkMaskImage, parameters.m_MaskImage);
         itk::ImageDuplicator<ItkUcharImgType>::Pointer duplicator = itk::ImageDuplicator<ItkUcharImgType>::New();
         duplicator->SetInputImage(parameters.m_MaskImage);
         duplicator->Update();
@@ -419,7 +419,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     {
         mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_SelectedImage->GetData());
         itk::Image< float, 3 >::Pointer itkImg = itk::Image< float, 3 >::New();
-        CastToItkImage< itk::Image< float, 3 > >(img, itkImg);
+        CastToItkImage(img, itkImg);
 
         parameters.m_ImageRegion = itkImg->GetLargestPossibleRegion();
         parameters.m_ImageSpacing = itkImg->GetSpacing();
@@ -570,7 +570,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         mitk::DataNode::Pointer fMapNode = m_Controls->m_FrequencyMapBox->GetSelectedNode();
         mitk::Image* img = dynamic_cast<mitk::Image*>(fMapNode->GetData());
         ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
-        CastToItkImage< ItkDoubleImgType >(img, itkImg);
+        CastToItkImage(img, itkImg);
 
         if (parameters.m_ImageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
                 parameters.m_ImageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
@@ -753,7 +753,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         }
         mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
         ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
-        CastToItkImage< ItkDoubleImgType >(img, itkImg);
+        CastToItkImage(img, itkImg);
 
         double max = img->GetScalarValueMax();
         double min = img->GetScalarValueMin();
@@ -800,7 +800,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         }
         mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
         ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
-        CastToItkImage< ItkDoubleImgType >(img, itkImg);
+        CastToItkImage(img, itkImg);
 
         double max = img->GetScalarValueMax();
         double min = img->GetScalarValueMin();
@@ -845,7 +845,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         }
         mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
         ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
-        CastToItkImage< ItkDoubleImgType >(img, itkImg);
+        CastToItkImage(img, itkImg);
 
         double max = img->GetScalarValueMax();
         double min = img->GetScalarValueMin();

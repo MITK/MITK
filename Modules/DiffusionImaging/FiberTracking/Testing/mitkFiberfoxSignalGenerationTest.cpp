@@ -114,7 +114,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     mitk::Image::Pointer mitkFMap = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[18])->GetData());
     typedef itk::Image<double, 3> ItkDoubleImgType;
     ItkDoubleImgType::Pointer fMap = ItkDoubleImgType::New();
-    mitk::CastToItkImage<ItkDoubleImgType>(mitkFMap, fMap);
+    mitk::CastToItkImage(mitkFMap, fMap);
 
     FiberfoxParameters<double> parameters;
     parameters.m_DoSimulateRelaxation = true;

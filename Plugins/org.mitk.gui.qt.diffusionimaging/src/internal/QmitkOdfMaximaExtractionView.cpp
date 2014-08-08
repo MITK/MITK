@@ -394,7 +394,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
     try{
         TensorImage::Pointer img = dynamic_cast<TensorImage*>(m_TensorImageNodes.at(0)->GetData());
         ItkTensorImage::Pointer itkImage = ItkTensorImage::New();
-        CastToItkImage<ItkTensorImage>(img, itkImage);
+        CastToItkImage(img, itkImage);
         filter->SetInput(itkImage);
         geometry = img->GetGeometry();
     }
@@ -410,7 +410,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
     {
         ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
         Image::Pointer mitkMaskImg = dynamic_cast<Image*>(m_BinaryImageNodes.at(0)->GetData());
-        CastToItkImage<ItkUcharImgType>(mitkMaskImg, itkMaskImage);
+        CastToItkImage(mitkMaskImg, itkMaskImage);
         filter->SetMaskImage(itkMaskImage);
     }
 
@@ -518,7 +518,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
     {
         ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
         Image::Pointer mitkMaskImg = dynamic_cast<Image*>(m_BinaryImageNodes.at(0)->GetData());
-        CastToItkImage<ItkUcharImgType>(mitkMaskImg, itkMaskImage);
+        CastToItkImage(mitkMaskImg, itkMaskImage);
         filter->SetMaskImage(itkMaskImage);
     }
 
@@ -657,7 +657,7 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
     {
         ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
         Image::Pointer mitkMaskImg = dynamic_cast<Image*>(m_BinaryImageNodes.at(0)->GetData());
-        CastToItkImage<ItkUcharImgType>(mitkMaskImg, itkMaskImage);
+        CastToItkImage(mitkMaskImg, itkMaskImage);
         filter->SetMaskImage(itkMaskImage);
     }
 

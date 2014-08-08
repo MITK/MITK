@@ -244,14 +244,14 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     if (m_SeedRoi.IsNotNull())
     {
         ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-        mitk::CastToItkImage<ItkUCharImageType>(m_SeedRoi, mask);
+        mitk::CastToItkImage(m_SeedRoi, mask);
         filter->SetSeedImage(mask);
     }
 
     if (m_MaskImage.IsNotNull())
     {
         ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-        mitk::CastToItkImage<ItkUCharImageType>(m_MaskImage, mask);
+        mitk::CastToItkImage(m_MaskImage, mask);
         filter->SetMaskImage(mask);
     }
 

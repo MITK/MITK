@@ -90,7 +90,7 @@ void mitk::TbssImage::SetDisplayIndexForRendering(int displayIndex)
   {
     typedef itk::Image<float,3> ImgType;
     ImgType::Pointer img = ImgType::New();
-    CastToItkImage<ImgType>(this, img);
+    CastToItkImage(this, img);
 
     itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
     itw.GoToBegin();

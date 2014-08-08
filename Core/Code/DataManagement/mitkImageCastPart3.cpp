@@ -42,7 +42,7 @@ void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage,
 }
 
 template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType >
-void _CastToItkVectorImage2Access( itk::VectorImage<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+void _CastToItkImage2Access( itk::VectorImage<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
 {
   typedef itk::VectorImage<TPixel, VImageDimension> ItkInputImageType;
   if(typeid(ItkInputImageType) == typeid(ItkOutputImageType))

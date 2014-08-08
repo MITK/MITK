@@ -53,7 +53,7 @@ void mitk::TensorImage::ConstructRgbImage()
     FilterType::Pointer filter = FilterType::New();
 
     ImageType::Pointer itkvol = ImageType::New();
-    mitk::CastToItkImage<ImageType>(this, itkvol);
+    mitk::CastToItkImage(this, itkvol);
     filter->SetInput(itkvol);
     filter->Update();
 

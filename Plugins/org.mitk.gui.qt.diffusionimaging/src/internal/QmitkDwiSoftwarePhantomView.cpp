@@ -162,7 +162,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     {
         mitk::Image::Pointer mitkBinaryImg = dynamic_cast<mitk::Image*>(m_SignalRegionNodes.at(i)->GetData());
         ItkUcharImgType::Pointer signalRegion = ItkUcharImgType::New();
-        mitk::CastToItkImage<ItkUcharImgType>(mitkBinaryImg, signalRegion);
+        mitk::CastToItkImage(mitkBinaryImg, signalRegion);
         m_SignalRegions.push_back(signalRegion);
     }
 

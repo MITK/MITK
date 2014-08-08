@@ -26,25 +26,22 @@ namespace mitk
 {
 
 #ifndef DOXYGEN_SKIP
-  template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+  template <typename TPixelType, unsigned int VImageDimension>
+  void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itk::Image<TPixelType, VImageDimension> >& itkOutputImage)
   {
-    AccessFixedDimensionByItk_1(mitkImage, _CastToItkImage2Access, ItkOutputImageType::ImageDimension, itkOutputImage);
+    AccessFixedDimensionByItk_1(mitkImage, _CastToItkImage2Access, VImageDimension, itkOutputImage);
   }
 
-  template <typename ItkOutputImageType> void CastToItkVectorImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+  template <typename TPixelType, unsigned int VImageDimension>
+  void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itk::VectorImage<TPixelType, VImageDimension> >& itkOutputImage)
   {
-    AccessVectorFixedDimensionByItk_n(mitkImage, _CastToItkVectorImage2Access, ItkOutputImageType::ImageDimension, (itkOutputImage));
+    AccessVectorFixedDimensionByItk_n(mitkImage, _CastToItkImage2Access, VImageDimension, (itkOutputImage));
   }
 #endif //DOXYGEN_SKIP
 
 #define InstantiateAccessFunction_CastToItkImage(pixelType, dim) \
-template MITK_CORE_EXPORT void CastToItkImage(const mitk::Image *, itk::SmartPointer<itk::Image<pixelType,dim> >&);
+template MITK_CORE_EXPORT void CastToItkImage(const mitk::Image *, itk::SmartPointer<ImageTypeTrait<pixelType,dim>::ImageType>&);
 
-InstantiateAccessFunction(CastToItkImage)
-
-#define InstantiateAccessFunction_CastToItkVectorImage(pixelType, dim) \
-template MITK_CORE_EXPORT void CastToItkVectorImage(const mitk::Image *, itk::SmartPointer<itk::VectorImage<pixelType,dim> >&);
-
-InstantiateAccessFunction(CastToItkVectorImage)
+InstantiateAccessFunctionForFixedType(CastToItkImage, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 }

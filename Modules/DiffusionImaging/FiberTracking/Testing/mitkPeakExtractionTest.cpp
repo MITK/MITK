@@ -63,7 +63,7 @@ int mitkPeakExtractionTest(int argc, char* argv[])
 
         MITK_INFO << "Casting mask image ...";
         ItkUcharImgType::Pointer itkMask = ItkUcharImgType::New();
-        mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMask);
+        mitk::CastToItkImage(mitkMaskImage, itkMask);
         filter->SetMaskImage(itkMask);
 
         MITK_INFO << "Casting SH image ...";

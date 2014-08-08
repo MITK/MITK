@@ -252,7 +252,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     {
         mitk::TensorImage* mitkVol;
         mitkVol = static_cast<mitk::TensorImage*>(m_TensorImage->GetData());
-        mitk::CastToItkImage<TensorImageType>(mitkVol, tensorImage);
+        mitk::CastToItkImage(mitkVol, tensorImage);
         m_TensorImage->GetStringProperty("name", nodename);
     }
     else
@@ -757,7 +757,7 @@ void QmitkTensorReconstructionView::TensorsToQbi()
         typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
 
         TensorImageType::Pointer itkvol = TensorImageType::New();
-        mitk::CastToItkImage<TensorImageType>(dynamic_cast<mitk::TensorImage*>(tensorImageNode->GetData()), itkvol);
+        mitk::CastToItkImage(dynamic_cast<mitk::TensorImage*>(tensorImageNode->GetData()), itkvol);
 
         typedef itk::TensorImageToQBallImageFilter< TTensorPixelType, TTensorPixelType > FilterType;
         FilterType::Pointer filter = FilterType::New();
@@ -877,7 +877,7 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
 
 
             TensorImageType::Pointer itkvol = TensorImageType::New();
-            mitk::CastToItkImage<TensorImageType>(vol, itkvol);
+            mitk::CastToItkImage(vol, itkvol);
 
             typedef itk::TensorImageToDiffusionImageFilter<
                     TTensorPixelType, DiffusionPixelType > FilterType;

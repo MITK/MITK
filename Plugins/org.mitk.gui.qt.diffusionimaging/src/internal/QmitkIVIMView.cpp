@@ -377,7 +377,7 @@ void QmitkIVIMView::AutoThreshold()
 
     typedef itk::Image<short,3> ImgType;
     ImgType::Pointer img = ImgType::New();
-    mitk::CastToItkImage<ImgType>(dimg, img);
+    mitk::CastToItkImage(dimg, img);
 
     itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
     itw.GoToBegin();

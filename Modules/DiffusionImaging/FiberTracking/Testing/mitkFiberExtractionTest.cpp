@@ -65,7 +65,7 @@ int mitkFiberExtractionTest(int argc, char* argv[])
         mitk::Image::Pointer mitkRoiImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[6])->GetData());
         typedef itk::Image< unsigned char, 3 >    itkUCharImageType;
         itkUCharImageType::Pointer itkRoiImage = itkUCharImageType::New();
-        mitk::CastToItkImage<itkUCharImageType>(mitkRoiImage, itkRoiImage);
+        mitk::CastToItkImage(mitkRoiImage, itkRoiImage);
 
         mitk::FiberBundleX::Pointer inside = groundTruthFibs->RemoveFibersOutside(itkRoiImage, false);
         mitk::FiberBundleX::Pointer outside = groundTruthFibs->RemoveFibersOutside(itkRoiImage, true);

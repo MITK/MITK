@@ -442,6 +442,21 @@ public:
 #define AccessFloatingPixelTypeByItk_n(mitkImage, itkImageTypeFunction, va_tuple)      \
   AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ, va_tuple)
 
+/**
+ * \brief Access a vector mitk::Image by an ITK vector image with one or more parameters.
+ *
+ * See #AccessByItk_n for details.
+ *
+ * \param va_tuple A variable length tuple containing the arguments to be passed
+ *        to the access function itkImageTypeFunction, e.g. ("first", 2, THIRD).
+ * \param mitkImage The MITK input image.
+ * \param itkImageTypeFunction The templated access-function to be called.
+ *
+ * \throws mitk::AccessByItkException If mitkImage is of unsupported pixel type or dimension.
+ *
+ * \sa AccessFixedPixelTypeByItk_n
+ * \sa AccessByItk_n
+ */
 #define AccessVectorPixelTypeByItk_n(mitkImage, itkImageTypeFunction, va_tuple)      \
   AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ, va_tuple)
 
@@ -472,6 +487,29 @@ public:
 #define AccessFixedDimensionByItk_n(mitkImage, itkImageTypeFunction, dimension, va_tuple) \
   AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ, (dimension), va_tuple)
 
+/**
+ * \brief Access a vector mitk-image with known dimension by a ITK vector image with
+ *        one or more parameters.
+ *
+ * For usage, see #AccessByItk_n.
+ *
+ * \param dimension Dimension of the mitk-image. If the image has a different dimension,
+ *        a mitk::AccessByItkException exception is thrown.
+ * \param va_tuple A variable length tuple containing the arguments to be passed
+ *        to the access function itkImageTypeFunction, e.g. ("first", 2, THIRD).
+ * \param mitkImage The MITK input image.
+ * \param itkImageTypeFunction The templated access-function to be called.
+ *
+ * \throws mitk::AccessByItkException If mitkImage is of unsupported pixel type or dimension.
+ *
+ * \note If you do not know the dimension for sure, use #AccessVectorPixelTypeByItk_n.
+ *
+ * \sa AccessByItk_n
+ * \sa AccessVectorPixelTypeByItk_n
+ * \sa AccessFixedTypeByItk_n
+ *
+ * \ingroup Adaptor
+ */
 #define AccessVectorFixedDimensionByItk_n(mitkImage, itkImageTypeFunction, dimension, va_tuple) \
   AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, (dimension), va_tuple)
 

@@ -41,7 +41,7 @@ void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage,
 }
 
 template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType >
-void _CastToItkVectorImage2Access( itk::VectorImage<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+void _CastToItkImage2Access( itk::VectorImage<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
 {
   typedef itk::VectorImage<TPixel, VImageDimension> ItkInputImageType;
   if(typeid(ItkInputImageType) == typeid(ItkOutputImageType))
@@ -59,19 +59,13 @@ void _CastToItkVectorImage2Access( itk::VectorImage<TPixel, VImageDimension>* it
 
 
 #define InstantiateAccessFunction__CastToItkImage2Access(type1, type2) \
-  template MITK_CORE_EXPORT void _CastToItkImage2Access(itk::Image<MITK_PP_TUPLE_REM(2)type1>*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type2> >&);
+  template MITK_CORE_EXPORT void _CastToItkImage2Access(ImageTypeTrait<MITK_PP_TUPLE_REM(2)type1>::ImageType*, itk::SmartPointer<ImageTypeTrait<MITK_PP_TUPLE_REM(2)type2>::ImageType>&);
 
 #define InstantiateCastToItkImage2Access(r, data, dim) \
-  MITK_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl, ((_CastToItkImage2Access))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim)))
+  MITK_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl, ((_CastToItkImage2Access))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim))) \
+  MITK_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl, ((_CastToItkImage2Access))(MITK_ACCESSBYITK_VECTOR_TYPES_DIMN_SEQ(dim))(MITK_ACCESSBYITK_VECTOR_TYPES_DIMN_SEQ(dim)))
+
 
 MITK_PP_SEQ_FOR_EACH(InstantiateCastToItkImage2Access, _, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
-
-#define InstantiateAccessFunction__CastToItkVectorImage2Access(type1, type2) \
-  template MITK_CORE_EXPORT void _CastToItkVectorImage2Access(itk::VectorImage<MITK_PP_TUPLE_REM(2)type1>*, itk::SmartPointer<itk::VectorImage<MITK_PP_TUPLE_REM(2)type2> >&);
-
-#define InstantiateCastToItkVectorImage2Access(r, data, dim) \
-  MITK_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl, ((_CastToItkVectorImage2Access))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim)))
-
-MITK_PP_SEQ_FOR_EACH(InstantiateCastToItkVectorImage2Access, _, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 }

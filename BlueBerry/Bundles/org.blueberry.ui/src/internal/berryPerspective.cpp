@@ -757,6 +757,15 @@ bool Perspective::RestoreState(IMemento::Pointer memento)
   if (desc)
   {
     descriptor = desc;
+  } else
+  {
+    try
+    {
+      WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()->CreatePerspective(descriptor->GetLabel(), descriptor.Cast<berry::IPerspectiveDescriptor>());
+    } catch (...)
+    {
+      std::cout << "Perspective could not be loaded" << std::endl;
+    }
   }
 
   this->memento = memento;

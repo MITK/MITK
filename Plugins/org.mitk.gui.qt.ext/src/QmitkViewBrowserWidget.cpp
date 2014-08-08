@@ -251,8 +251,11 @@ void QmitkViewBrowserWidget::FillTreeList()
         pItem->m_Tags = tags->GetTags();
         perspectiveRootItem->appendRow(pItem);
 
-        if (currentPersp->GetId()==p->GetId())
-            currentIndex = pItem->index();
+        if (currentPersp)
+        {
+          if (currentPersp->GetId()==p->GetId())
+              currentIndex = pItem->index();
+        }
     }
 
     // get all available views
@@ -384,7 +387,9 @@ void QmitkViewBrowserWidget::AddPerspective()
     berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
     try
     {
-        perspRegistry->CreatePerspective(dialog->GetPerspectiveName().toStdString(), perspRegistry->FindPerspectiveWithId(perspRegistry->GetDefaultPerspective()));
+        berry::IPerspectiveDescriptor::Pointer perspDesc;
+        perspDesc = perspRegistry->CreatePerspective(dialog->GetPerspectiveName().toStdString(), perspRegistry->FindPerspectiveWithId(perspRegistry->GetDefaultPerspective()));
+        berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->SetPerspective(perspDesc);
     }
     catch(...)
     {
@@ -409,7 +414,8 @@ void QmitkViewBrowserWidget::ClonePerspective()
         berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
         try
         {
-            perspRegistry->ClonePerspective(dialog->GetPerspectiveName().toStdString(), dialog->GetPerspectiveName().toStdString(), m_RegisteredPerspective);
+            berry::IPerspectiveDescriptor::Pointer perspDesc = perspRegistry->ClonePerspective(dialog->GetPerspectiveName().toStdString(), dialog->GetPerspectiveName().toStdString(), m_RegisteredPerspective);
+            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->SetPerspective(perspDesc);
         }
         catch(...)
         {
@@ -436,7 +442,13 @@ void QmitkViewBrowserWidget::DeletePerspective()
         {
             berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
             perspRegistry->DeletePerspective(m_RegisteredPerspective);
+            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->RemovePerspective(m_RegisteredPerspective);
             FillTreeList();
+            if (! berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->GetPerspective())
+            {
+              berry::IPerspectiveDescriptor::Pointer persp = perspRegistry->FindPerspectiveWithId(perspRegistry->GetDefaultPerspective());
+              berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->SetPerspective(persp);
+            }
         }
     }
 }

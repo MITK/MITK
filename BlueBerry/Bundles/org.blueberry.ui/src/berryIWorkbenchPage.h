@@ -39,7 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  */
 namespace berry {
-
 /**
  * A workbench page consists of an arrangement of views and editors intended to
  * be presented together to the user in a single workbench window.
@@ -67,7 +66,6 @@ namespace berry {
  * @see IViewPart
  */
 struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, public Object {
-
   berryInterfaceMacro(IWorkbenchPage, berry);
 
   /**
@@ -208,7 +206,6 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
   static const int MATCH_ID; // = 2;
 
   ~IWorkbenchPage();
-
 
   /**
    * Activates the given part. The part will be brought to the front and given
@@ -500,6 +497,14 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
    * @return boolean <code>true</code> if part is visible
    */
   virtual bool IsPartVisible(IWorkbenchPart::Pointer part) = 0;
+
+  /**
+   * Removes the perspective specified by desc.
+   *
+   * @param desc
+   *            the perspective that will be removed
+   */
+  virtual void RemovePerspective(IPerspectiveDescriptor::Pointer desc) = 0;
 
   /**
    * Reuses the specified editor by setting its new input.
@@ -870,7 +875,6 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
    */
   virtual IWorkbenchPartReference::Pointer GetReference(IWorkbenchPart::Pointer part) = 0;
 };
-
 }  // namespace berry
 
 #endif /*BERRYIWORKBENCHPAGE_H_*/

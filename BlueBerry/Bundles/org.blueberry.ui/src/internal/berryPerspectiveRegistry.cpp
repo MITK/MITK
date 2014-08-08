@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 const std::string PerspectiveRegistry::EXT = "_persp.xml";
 const std::string PerspectiveRegistry::ID_DEF_PERSP = "PerspectiveRegistry.DEFAULT_PERSP";
 const std::string PerspectiveRegistry::PERSP = "_persp";
@@ -38,7 +37,6 @@ PerspectiveRegistry::PerspectiveRegistry()
   //this->InitializePreferenceChangeListener();
   //WorkbenchPlugin::GetDefault()->GetPreferenceStore()->AddPropertyChangeListener(
   //    preferenceListener);
-
 }
 
 void PerspectiveRegistry::AddPerspective(PerspectiveDescriptor::Pointer desc)
@@ -251,15 +249,19 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::ClonePerspective(const std:
     const std::string& label,
     IPerspectiveDescriptor::Pointer originalDescriptor)
 {
-
   // Check for invalid labels
   if (label == "" || Poco::trim(label).empty())
   {
     throw Poco::InvalidArgumentException();
   }
 
+  // Calculate ID.
+  std::string newId(label);
+  std::replace(newId.begin(), newId.end(), ' ', '_');
+  Poco::trimInPlace(newId);
+
   // Check for duplicates
-  IPerspectiveDescriptor::Pointer desc = this->FindPerspectiveWithId(id);
+  IPerspectiveDescriptor::Pointer desc = this->FindPerspectiveWithId(newId);
   if (desc != 0)
   {
     throw Poco::InvalidArgumentException();
@@ -272,7 +274,7 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::ClonePerspective(const std:
 
   // Create descriptor.
   desc
-      = new PerspectiveDescriptor(id, label, originalDescriptor.Cast<PerspectiveDescriptor>());
+      = new PerspectiveDescriptor(newId, label, originalDescriptor.Cast<PerspectiveDescriptor>());
   this->Add(desc.Cast<PerspectiveDescriptor>());
   return desc;
 }
@@ -303,7 +305,6 @@ void PerspectiveRegistry::DeleteCustomDefinition(PerspectiveDescriptor::Pointer 
    * remove the entry
    */
   //store.setToDefault(desc.getId() + PERSP);
-
 }
 
 bool PerspectiveRegistry::HasCustomDefinition(PerspectiveDescriptor::ConstPointer  /*desc*/) const
@@ -602,5 +603,4 @@ void PerspectiveRegistry::VerifyDefaultPerspective()
   // Step 3. Use application-specific default
   defaultPerspID = Workbench::GetInstance()->GetDefaultPerspectiveId();
 }
-
 }

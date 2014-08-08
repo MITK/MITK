@@ -28,7 +28,12 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
   # install OpenCV python wrapping
   if(MITK_USE_OpenCV)
     list(APPEND _python_libs "cv2${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    install(FILES "${OpenCV_DIR}/lib/cv2${CMAKE_SHARED_LIBRARY_SUFFIX}" DESTINATION bin)
+
+    if(UNIX)
+      install(FILES "${OpenCV_DIR}/lib/cv2${PYTHON_LIB_SUFFIX}" DESTINATION bin)
+    else()
+      install(FILES "${OpenCV_DIR}/lib/Release/cv2${PYTHON_LIB_SUFFIX}" DESTINATION bin)
+    endif()
 
     if(UNIX AND NOT APPLE)
       install(CODE "file(RPATH_REMOVE

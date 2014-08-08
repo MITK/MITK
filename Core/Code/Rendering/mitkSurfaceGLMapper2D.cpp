@@ -234,7 +234,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     if(worldPlaneGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
-      points[0] = worldPlaneGeometry->GetOrigin();
+      points[0] = worldGeometry->GetOrigin();
       points[1] = points[0] + worldPlaneGeometry->GetAxisVector(0);
       points[2] = points[0] + worldPlaneGeometry->GetAxisVector(1);
       points[3] = points[1] + worldPlaneGeometry->GetAxisVector(1);

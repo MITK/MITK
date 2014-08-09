@@ -43,7 +43,6 @@ class vtkPolyDataTrianglesIterator
           vtkPolyDataTrianglesIterator  // Self for CRTP       
         , CGAL_Triangle const           // Value
         , boost::forward_traversal_tag  // CategoryOrTraversal
-        , CGAL_Triangle                 // Reference
         >
 {
 public:
@@ -64,29 +63,37 @@ private:
     vtkPolyDataTrianglesIterator(vtkPolyData* data, int index)
         : data(data), cellId(index)
     {
+        _cache = convertVTKtoCGAL();
     }
 
 
     friend class boost::iterator_core_access;
     void increment() {
         ++cellId;
+        _cache = convertVTKtoCGAL();
     }
 
     // Convert triangle to CGAL from VTK
-    CGAL_Triangle dereference() const 
-    { 
+    CGAL_Triangle const& dereference() const
+    {
+        return _cache;
+    }
+
+    CGAL_Triangle convertVTKtoCGAL() const
+    {
         if (cellId < data->GetNumberOfCells()) {
             vtkCell* cell = data->GetCell(cellId);
 
-            assert(cell->GetNumberOfPoints() == 3);
+            if (cell->GetNumberOfPoints() == 3) {
+                CGAL_Point p[3];
+                for (int i = 0; i < 3; ++i) {
+                    double* pt = data->GetPoints()->GetPoint(cell->GetPointId(i));
+                    p[i] = CGAL_Point(pt[0], pt[1], pt[2]);
+                }
 
-            CGAL_Point p[3];
-            for (int i = 0; i < 3; ++i) {
-                double* pt = data->GetPoints()->GetPoint(cell->GetPointId(i));
-                p[i] = CGAL_Point(pt[0], pt[1], pt[2]);
+                // Convert triangle to CGAL
+                return CGAL_Triangle(p[0], p[1], p[2]);
             }
-                
-            return CGAL_Triangle(p[0], p[1], p[2]);
         }
         return CGAL_Triangle();
     }
@@ -98,6 +105,7 @@ private:
 
     int cellId;
     vtkPolyData* data;
+    CGAL_Triangle _cache;
 };
 
 // Definition of AABB tree types

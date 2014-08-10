@@ -39,6 +39,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class vtkImageData;
 
+namespace itk {
+template<class T> class MutexLockHolder;
+}
+
 namespace mitk {
 
 class SubImageSelector;
@@ -591,6 +595,8 @@ protected:
 
   mitkCloneMacro(Self);
 
+  typedef itk::MutexLockHolder<itk::SimpleFastMutexLock> MutexHolder;
+
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 
   int GetVolumeIndex(int t = 0, int n = 0) const;
@@ -623,6 +629,7 @@ protected:
   mutable ImageDataItemPointerArray m_Channels;
   mutable ImageDataItemPointerArray m_Volumes;
   mutable ImageDataItemPointerArray m_Slices;
+  mutable itk::SimpleFastMutexLock m_ImageDataArraysLock;
 
   unsigned int m_Dimension;
 
@@ -638,6 +645,18 @@ protected:
   StatisticsHolderPointer m_ImageStatistics;
 
 private:
+
+  ImageDataItemPointer GetSliceData_unlocked(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+  ImageDataItemPointer GetVolumeData_unlocked(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+  ImageDataItemPointer GetChannelData_unlocked(int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+
+  ImageDataItemPointer AllocateSliceData_unlocked(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+  ImageDataItemPointer AllocateVolumeData_unlocked(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+  ImageDataItemPointer AllocateChannelData_unlocked(int n, void *data, ImportMemoryManagementType importMemoryManagement) const;
+
+  bool IsSliceSet_unlocked(int s, int t, int n) const;
+  bool IsVolumeSet_unlocked(int t, int n) const;
+  bool IsChannelSet_unlocked(int n) const;
 
   /** Stores all existing ImageReadAccessors */
   mutable std::vector<ImageAccessorBase*> m_Readers;

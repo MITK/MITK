@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //VTK
 #include <vtkImageData.h>
 
+//ITK
+#include <itkMutexLockHolder.h>
+
 //Other
 #include <cmath>
 
@@ -243,6 +246,12 @@ const vtkImageData* mitk::Image::GetVtkImageData(int t, int n) const
 
 mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
+  MutexHolder lock(m_ImageDataArraysLock);
+  return GetSliceData_unlocked(s, t, n, data, importMemoryManagement);
+}
+
+mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData_unlocked(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+{
   if(IsValidSlice(s,t,n)==false) return NULL;
 
   const size_t ptypeSize = this->m_ImageDescriptor->GetChannelTypeById(n).GetSize();
@@ -250,7 +259,9 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(int s, int t, int n,
   // slice directly available?
   int pos=GetSliceIndex(s,t,n);
   if(m_Slices[pos].GetPointer()!=NULL)
+  {
     return m_Slices[pos];
+  }
 
   // is slice available as part of a volume that is available?
   ImageDataItemPointer sl, ch, vol;
@@ -287,21 +298,26 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetSliceData(int s, int t, int n,
     m_RequestedRegion.SetSize(4, 1);
     m_RequestedRegionInitialized=true;
     GetSource()->Update();
-    if(IsSliceSet(s,t,n))
+    if(IsSliceSet_unlocked(s,t,n))
       //yes: now we can call ourselves without the risk of a endless loop (see "if" above)
-      return GetSliceData(s,t,n,data,importMemoryManagement);
+      return GetSliceData_unlocked(s,t,n,data,importMemoryManagement);
     else
       return NULL;
   }
   else
   {
-    ImageDataItemPointer item = AllocateSliceData(s,t,n,data,importMemoryManagement);
+    ImageDataItemPointer item = AllocateSliceData_unlocked(s,t,n,data,importMemoryManagement);
     item->SetComplete(true);
     return item;
   }
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+{
+  MutexHolder lock(m_ImageDataArraysLock);
+  return GetVolumeData_unlocked(t, n, data, importMemoryManagement);
+}
+mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData_unlocked(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
   if(IsValidVolume(t,n)==false) return NULL;
 
@@ -341,7 +357,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
     if(m_Dimensions[2]<=1)
     {
       ImageDataItemPointer sl;
-      sl=GetSliceData(0,t,n,data,importMemoryManagement);
+      sl=GetSliceData_unlocked(0,t,n,data,importMemoryManagement);
       vol=new ImageDataItem(*sl, m_ImageDescriptor, t, 3, data, importMemoryManagement == ManageMemory);
       vol->SetComplete(true);
     }
@@ -352,7 +368,9 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
       vol=m_Volumes[pos];
       // ok, let's combine the slices!
       if(vol.GetPointer()==NULL)
+      {
         vol=new ImageDataItem( chPixelType, t, 3, m_Dimensions, NULL, true);
+      }
       vol->SetComplete(true);
       size_t size=m_OffsetTable[2]*(ptypeSize);
       for(s=0;s<m_Dimensions[2];++s)
@@ -399,15 +417,15 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
     m_RequestedRegion.SetSize(4, 1);
     m_RequestedRegionInitialized=true;
     GetSource()->Update();
-    if(IsVolumeSet(t,n))
+    if(IsVolumeSet_unlocked(t,n))
       //yes: now we can call ourselves without the risk of a endless loop (see "if" above)
-      return GetVolumeData(t,n,data,importMemoryManagement);
+      return GetVolumeData_unlocked(t,n,data,importMemoryManagement);
     else
       return NULL;
   }
   else
   {
-    ImageDataItemPointer item = AllocateVolumeData(t,n,data,importMemoryManagement);
+    ImageDataItemPointer item = AllocateVolumeData_unlocked(t,n,data,importMemoryManagement);
     item->SetComplete(true);
     return item;
   }
@@ -416,6 +434,12 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
 
 mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
+  MutexHolder lock(m_ImageDataArraysLock);
+  return GetChannelData_unlocked(n, data, importMemoryManagement);
+}
+
+mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData_unlocked(int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+{
   if(IsValidChannel(n)==false) return NULL;
   ImageDataItemPointer ch, vol;
   ch=m_Channels[n];
@@ -423,12 +447,12 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
     return ch;
 
   // let's see if all volumes are set, so that we can (could) combine them to a channel
-  if(IsChannelSet(n))
+  if(IsChannelSet_unlocked(n))
   {
     // if there is only one time frame we do not need to combine anything
     if(m_Dimensions[3]<=1)
     {
-      vol=GetVolumeData(0,n,data,importMemoryManagement);
+      vol=GetVolumeData_unlocked(0,n,data,importMemoryManagement);
       ch=new ImageDataItem(*vol, m_ImageDescriptor, 0, m_ImageDescriptor->GetNumberOfDimensions(), data, importMemoryManagement == ManageMemory);
       ch->SetComplete(true);
     }
@@ -450,7 +474,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
         ImageDataItemPointer vol;
 
         posVol=GetVolumeIndex(t,n);
-        vol=GetVolumeData(t,n,data,importMemoryManagement);
+        vol=GetVolumeData_unlocked(t,n,data,importMemoryManagement);
 
         if(vol->GetParent()!=ch)
         {
@@ -500,15 +524,15 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
     m_RequestedRegionInitialized=true;
     GetSource()->Update();
     // did it work?
-    if(IsChannelSet(n))
+    if(IsChannelSet_unlocked(n))
       //yes: now we can call ourselves without the risk of a endless loop (see "if" above)
-      return GetChannelData(n,data,importMemoryManagement);
+      return GetChannelData_unlocked(n,data,importMemoryManagement);
     else
       return NULL;
   }
   else
   {
-    ImageDataItemPointer item = AllocateChannelData(n,data,importMemoryManagement);
+    ImageDataItemPointer item = AllocateChannelData_unlocked(n,data,importMemoryManagement);
     item->SetComplete(true);
     return item;
   }
@@ -516,22 +540,40 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
 
 bool mitk::Image::IsSliceSet(int s, int t, int n) const
 {
+  MutexHolder lock(m_ImageDataArraysLock);
+  return IsSliceSet_unlocked(s, t, n);
+}
+
+bool mitk::Image::IsSliceSet_unlocked(int s, int t, int n) const
+{
   if(IsValidSlice(s,t,n)==false) return false;
 
   if(m_Slices[GetSliceIndex(s,t,n)].GetPointer()!=NULL)
+  {
     return true;
+  }
 
   ImageDataItemPointer ch, vol;
   vol=m_Volumes[GetVolumeIndex(t,n)];
   if((vol.GetPointer()!=NULL) && (vol->IsComplete()))
+  {
     return true;
+  }
   ch=m_Channels[n];
   if((ch.GetPointer()!=NULL) && (ch->IsComplete()))
+  {
     return true;
+  }
   return false;
 }
 
 bool mitk::Image::IsVolumeSet(int t, int n) const
+{
+  MutexHolder lock(m_ImageDataArraysLock);
+  return IsVolumeSet_unlocked(t, n);
+}
+
+bool mitk::Image::IsVolumeSet_unlocked(int t, int n) const
 {
   if(IsValidVolume(t,n)==false) return false;
   ImageDataItemPointer ch, vol;
@@ -549,12 +591,22 @@ bool mitk::Image::IsVolumeSet(int t, int n) const
   // let's see if all slices of the volume are set, so that we can (could) combine them to a volume
   unsigned int s;
   for(s=0;s<m_Dimensions[2];++s)
+  {
     if(m_Slices[GetSliceIndex(s,t,n)].GetPointer()==NULL)
+    {
       return false;
+    }
+  }
   return true;
 }
 
 bool mitk::Image::IsChannelSet(int n) const
+{
+  MutexHolder lock(m_ImageDataArraysLock);
+  return IsChannelSet_unlocked(n);
+}
+
+bool mitk::Image::IsChannelSet_unlocked(int n) const
 {
   if(IsValidChannel(n)==false) return false;
   ImageDataItemPointer ch, vol;
@@ -565,8 +617,12 @@ bool mitk::Image::IsChannelSet(int n) const
   // let's see if all volumes are set, so that we can (could) combine them to a channel
   unsigned int t;
   for(t=0;t<m_Dimensions[3];++t)
-    if(IsVolumeSet(t,n)==false)
+  {
+    if(IsVolumeSet_unlocked(t,n)==false)
+    {
       return false;
+    }
+  }
   return true;
 }
 
@@ -1070,6 +1126,12 @@ int mitk::Image::GetVolumeIndex(int t, int n) const
 
 mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
+  MutexHolder lock(m_ImageDataArraysLock);
+  return AllocateSliceData_unlocked(s, t, n, data, importMemoryManagement);
+}
+
+mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData_unlocked(int s, int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+{
   int pos;
   pos=GetSliceIndex(s,t,n);
 
@@ -1095,7 +1157,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData(int s, int t, i
   }
 
   // allocate new volume (instead of a single slice to keep data together!)
-  m_Volumes[GetVolumeIndex(t,n)]=vol=AllocateVolumeData(t,n,NULL,importMemoryManagement);
+  m_Volumes[GetVolumeIndex(t,n)]=vol=AllocateVolumeData_unlocked(t,n,NULL,importMemoryManagement);
   sl=new ImageDataItem(*vol, m_ImageDescriptor, t, 2, data, importMemoryManagement == ManageMemory, ((size_t) s)*m_OffsetTable[2]*(ptypeSize));
   sl->SetComplete(true);
   return m_Slices[pos]=sl;
@@ -1108,6 +1170,12 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateSliceData(int s, int t, i
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+{
+  MutexHolder lock(m_ImageDataArraysLock);
+  return AllocateVolumeData_unlocked(t, n, data, importMemoryManagement);
+}
+
+mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData_unlocked(int t, int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
   int pos;
   pos=GetVolumeIndex(t,n);
@@ -1141,6 +1209,12 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData(int t, int n, 
 }
 
 mitk::Image::ImageDataItemPointer mitk::Image::AllocateChannelData(int n, void *data, ImportMemoryManagementType importMemoryManagement) const
+{
+  MutexHolder lock(m_ImageDataArraysLock);
+  return AllocateChannelData_unlocked(n, data, importMemoryManagement);
+}
+
+mitk::Image::ImageDataItemPointer mitk::Image::AllocateChannelData_unlocked(int n, void *data, ImportMemoryManagementType importMemoryManagement) const
 {
   ImageDataItemPointer ch;
   // allocate new channel

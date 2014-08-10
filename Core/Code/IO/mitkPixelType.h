@@ -43,15 +43,16 @@ std::string PixelTypeToString()
 }
 
 
-//##Documentation
-//## @brief Class for defining the data type of pixels
-//##
-//## To obtain additional type information not provided by this class
-//## itk::ImageIOBase can be used by passing the return value of
-//## PixelType::GetItkTypeId() to itk::ImageIOBase::SetPixelTypeInfo
-//## and using the itk::ImageIOBase methods GetComponentType,
-//## GetComponentTypeAsString, GetPixelType, GetPixelTypeAsString.
-//## @ingroup Data
+/**
+ * @brief Class for defining the data type of pixels
+ *
+ * To obtain additional type information not provided by this class
+ * itk::ImageIOBase can be used by passing the return value of
+ * PixelType::GetItkTypeId() to itk::ImageIOBase::SetPixelTypeInfo
+ * and using the itk::ImageIOBase methods GetComponentType,
+ * GetComponentTypeAsString, GetPixelType, GetPixelTypeAsString.
+ * @ingroup Data
+ */
 class MITK_CORE_EXPORT PixelType
 {
 public:
@@ -177,6 +178,23 @@ PixelType MakePixelType()
                    );
 }
 
+/**
+ * \brief A helper template for compile-time checking of supported ITK image types.
+ *
+ * Unsupported image types will be marked by template specializations with
+ * missing definitions;
+ */
+template< typename ItkImageType >
+struct AssertImageTypeIsValid
+{
+};
+
+// The itk::VariableLengthVector pixel type is not supported in MITK if it is
+// used with an itk::Image (it cannot be represented as a mitk::Image object).
+// Use a itk::VectorImage instead.
+template< typename TPixelType, unsigned int VImageDimension >
+struct AssertImageTypeIsValid<itk::Image<itk::VariableLengthVector<TPixelType>, VImageDimension> >;
+
 /** \brief A template method for creating a pixel type from an ItkImageType
   *
   * For fixed size vector images ( i.e. images of type itk::FixedArray<3,float> ) also the number of components
@@ -185,6 +203,8 @@ PixelType MakePixelType()
 template< typename ItkImageType >
 PixelType MakePixelType( std::size_t numOfComponents )
 {
+  AssertImageTypeIsValid<ItkImageType>();
+
   // define new type, since the ::PixelType is used to distinguish between simple and compound types
   typedef typename ItkImageType::PixelType ImportPixelType;
 

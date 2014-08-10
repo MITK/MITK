@@ -55,19 +55,26 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   perspExcludeList.push_back("org.blueberry.perspectives.help");
 
   std::vector<std::string> viewExcludeList;
+  viewExcludeList.push_back( std::string("org.mitk.views.controlvisualizationpropertiesview") );
+  viewExcludeList.push_back( std::string("org.mitk.views.imagenavigator") );
+  viewExcludeList.push_back( std::string("org.mitk.views.datamanager") );
+  viewExcludeList.push_back( std::string("org.mitk.views.modules") );
+  viewExcludeList.push_back( std::string("org.blueberry.ui.internal.introview") );
 
   configurer->SetInitialSize(berry::Point(1000,770));
 
   QmitkExtWorkbenchWindowAdvisor* advisor = new QmitkExtWorkbenchWindowAdvisor(this, configurer);
-  advisor->ShowViewMenuItem(false);
-  advisor->ShowNewWindowMenuItem(false);
-  advisor->ShowClosePerspectiveMenuItem(false);
+  advisor->ShowViewMenuItem(true);
+  advisor->ShowNewWindowMenuItem(true);
+  advisor->ShowClosePerspectiveMenuItem(true);
   advisor->SetPerspectiveExcludeList(perspExcludeList);
   advisor->SetViewExcludeList(viewExcludeList);
   advisor->ShowViewToolbar(false);
-  advisor->ShowPerspectiveToolbar(true);
+  advisor->ShowPerspectiveToolbar(false);
   advisor->ShowVersionInfo(false);
+  advisor->EnableCandyStore(true);
   advisor->ShowMitkVersionInfo(false);
+  advisor->ShowMemoryIndicator(false);
   advisor->SetProductName("MITK Diffusion");
   advisor->SetWindowIcon(":/org.mitk.gui.qt.diffusionimagingapp/app-icon.png");
   return advisor;

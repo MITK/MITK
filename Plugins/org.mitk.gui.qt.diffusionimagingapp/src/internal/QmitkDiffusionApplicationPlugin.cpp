@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "src/internal/Perspectives/QmitkDIAppConnectomicsPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppDicomImportPerspective.h"
-#include "src/internal/Perspectives/QmitkDIAppFiberTractographyPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppIVIMPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppImageProcessingPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.h"
@@ -33,6 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppRegistrationPerspective.h"
 #include "src/internal/Perspectives/QmitkDIAppVisualizationPerspective.h"
+
+#include "src/internal/Perspectives/QmitkGibbsTractographyPerspective.h"
+#include "src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h"
+#include "src/internal/Perspectives/QmitkProbabilisticTractographyPerspective.h"
+
 
 #include <mitkVersion.h>
 #include <mitkLogMacros.h>
@@ -73,7 +77,6 @@ void QmitkDiffusionApplicationPlugin::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppConnectomicsPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppDicomImportPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppImageProcessingPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppFiberTractographyPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppIVIMPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppPreprocessingReconstructionPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppQuantificationPerspective, context)
@@ -82,6 +85,10 @@ void QmitkDiffusionApplicationPlugin::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppSyntheticDataGenerationPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppRegistrationPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppVisualizationPerspective, context)
+
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkGibbsTractographyPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkStreamlineTractographyPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkProbabilisticTractographyPerspective, context)
 
   ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();
   ctkConfigurationAdmin* configAdmin = 0;

@@ -47,6 +47,7 @@ QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   // Exclude some views from the normal view list
   std::vector<std::string> excludeViews;
   excludeViews.push_back("org.mitk.views.modules");
+  excludeViews.push_back( "org.blueberry.ui.internal.introview" );
   advisor->SetViewExcludeList(excludeViews);
 
   advisor->SetWindowIcon(":/org.mitk.gui.qt.extapplication/icon.png");

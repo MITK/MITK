@@ -23,10 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 PerspectiveRegistryReader::PerspectiveRegistryReader()
 {
-
 }
 
 void PerspectiveRegistryReader::ReadPerspectives(PerspectiveRegistry* out)
@@ -44,8 +42,13 @@ bool PerspectiveRegistryReader::ReadElement(IConfigurationElement::Pointer eleme
     {
       std::string id;
       element->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id);
+      std::vector<berry::IConfigurationElement::Pointer> childs = element->GetChildren("description");
       PerspectiveDescriptor::Pointer desc(
           new PerspectiveDescriptor(id, element));
+      if (childs.size() > 0)
+      {
+        desc->SetDescription(childs[0]->GetValue());
+      }
       registry->AddPerspective(desc);
     }
     catch (CoreException e)
@@ -58,5 +61,4 @@ bool PerspectiveRegistryReader::ReadElement(IConfigurationElement::Pointer eleme
 
   return false;
 }
-
 }

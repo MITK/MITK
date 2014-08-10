@@ -41,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QKeyEvent>
 
 namespace berry {
-
 HelpIndexWidget::HelpIndexWidget()
   : QListView(0)
 {
@@ -321,5 +320,4 @@ void HelpIndexView::linksActivated(const QMap<QString,QUrl>& links, const QStrin
     HelpPluginActivator::linkActivated(page, tc.link());
   }
 }
-
 }

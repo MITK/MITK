@@ -10,7 +10,6 @@ set(INTERNAL_CPP_FILES
   Perspectives/QmitkWelcomePerspective.cpp
   Perspectives/QmitkDIAppConnectomicsPerspective.cpp
   Perspectives/QmitkDIAppDicomImportPerspective.cpp
-  Perspectives/QmitkDIAppFiberTractographyPerspective.cpp
   Perspectives/QmitkDIAppIVIMPerspective.cpp
   Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.cpp
   Perspectives/QmitkDIAppQuantificationPerspective.cpp
@@ -20,6 +19,11 @@ set(INTERNAL_CPP_FILES
   Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
   Perspectives/QmitkDIAppRegistrationPerspective.cpp
   Perspectives/QmitkDIAppVisualizationPerspective.cpp
+
+# new perspectives
+  Perspectives/QmitkGibbsTractographyPerspective.cpp
+  Perspectives/QmitkStreamlineTractographyPerspective.cpp
+  Perspectives/QmitkProbabilisticTractographyPerspective.cpp
 )
 
 set(UI_FILES
@@ -34,7 +38,6 @@ set(MOC_H_FILES
   src/internal/Perspectives/QmitkWelcomePerspective.h
   src/internal/Perspectives/QmitkDIAppConnectomicsPerspective.h
   src/internal/Perspectives/QmitkDIAppDicomImportPerspective.h
-  src/internal/Perspectives/QmitkDIAppFiberTractographyPerspective.h
   src/internal/Perspectives/QmitkDIAppIVIMPerspective.h
   src/internal/Perspectives/QmitkDIAppPreprocessingReconstructionPerspective.h
   src/internal/Perspectives/QmitkDIAppQuantificationPerspective.h
@@ -44,6 +47,11 @@ set(MOC_H_FILES
   src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h
   src/internal/Perspectives/QmitkDIAppRegistrationPerspective.h
   src/internal/Perspectives/QmitkDIAppVisualizationPerspective.h
+
+# new perspectives
+  src/internal/Perspectives/QmitkGibbsTractographyPerspective.h
+  src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h
+  src/internal/Perspectives/QmitkProbabilisticTractographyPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES

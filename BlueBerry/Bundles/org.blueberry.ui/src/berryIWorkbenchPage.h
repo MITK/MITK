@@ -39,7 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  */
 namespace berry {
-
 /**
  * A workbench page consists of an arrangement of views and editors intended to
  * be presented together to the user in a single workbench window.
@@ -67,7 +66,6 @@ namespace berry {
  * @see IViewPart
  */
 struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, public Object {
-
   berryInterfaceMacro(IWorkbenchPage, berry);
 
   /**
@@ -208,7 +206,6 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
   static const int MATCH_ID; // = 2;
 
   ~IWorkbenchPage();
-
 
   /**
    * Activates the given part. The part will be brought to the front and given
@@ -488,6 +485,11 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
   virtual void HideView(IViewReference::Pointer view) = 0;
 
   /**
+   * Returns true if perspective with given id contains view with given id
+   */
+  virtual bool HasView(const std::string& perspectiveId, const std::string& viewId) = 0;
+
+  /**
    * Returns whether the specified part is visible.
    *
    * @param part
@@ -495,6 +497,14 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
    * @return boolean <code>true</code> if part is visible
    */
   virtual bool IsPartVisible(IWorkbenchPart::Pointer part) = 0;
+
+  /**
+   * Removes the perspective specified by desc.
+   *
+   * @param desc
+   *            the perspective that will be removed
+   */
+  virtual void RemovePerspective(IPerspectiveDescriptor::Pointer desc) = 0;
 
   /**
    * Reuses the specified editor by setting its new input.
@@ -810,6 +820,17 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
   virtual std::vector<IPerspectiveDescriptor::Pointer> GetSortedPerspectives() = 0;
 
   /**
+   * Closes current perspective. If last perspective, then entire page
+   * is closed.
+   *
+   * @param saveParts
+   *            whether the page's parts should be saved if closed
+   * @param closePage
+   *            whether the page itself should be closed if last perspective
+   */
+  virtual void CloseCurrentPerspective(bool saveParts, bool closePage) = 0;
+
+  /**
    * Closes the specified perspective in this page. If the last perspective in
    * this page is closed, then all editors are closed. Views that are not
    * shown in other perspectives are closed as well. If <code>saveParts</code>
@@ -854,7 +875,6 @@ struct BERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, 
    */
   virtual IWorkbenchPartReference::Pointer GetReference(IWorkbenchPart::Pointer part) = 0;
 };
-
 }  // namespace berry
 
 #endif /*BERRYIWORKBENCHPAGE_H_*/

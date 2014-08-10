@@ -44,21 +44,21 @@ void QmitkDIAppSyntheticDataGenerationPerspective::CreateInitialLayout(berry::IP
 
   left->AddView("org.mitk.views.fiberfoxview");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.fiberfoxview");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.fiberprocessing");
   lo = layout->GetViewLayout("org.mitk.views.fiberprocessing");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.fiberextraction");
   lo = layout->GetViewLayout("org.mitk.views.fiberextraction");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.fieldmapgenerator");
   lo = layout->GetViewLayout("org.mitk.views.fieldmapgenerator");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.segmentation");
   lo = layout->GetViewLayout("org.mitk.views.segmentation");
-  lo->SetCloseable(false);
+
 }

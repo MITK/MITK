@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 /**
  * \ingroup org_blueberry_ui
  *
@@ -49,7 +48,6 @@ namespace berry
  */
 struct BERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdaptable
 {
-
   berryInterfaceMacro(IViewDescriptor, berry);
 
   ~IViewDescriptor();
@@ -61,6 +59,9 @@ struct BERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdapt
    * @throws CoreException thrown if there is a problem creating the part
    */
   virtual IViewPart::Pointer CreateView() = 0;
+
+
+  virtual std::vector< std::string> GetKeywordReferences() const = 0;
 
   /**
    * Returns an array of strings that represent
@@ -101,7 +102,6 @@ struct BERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdapt
 
   virtual bool operator==(const Object*) const = 0;
 };
-
 }
 
 #endif /*BERRYIVIEWDESCRIPTOR_H_*/

@@ -44,17 +44,17 @@ void QmitkDIAppQuantificationPerspective::CreateInitialLayout(berry::IPageLayout
 
   left->AddView("org.mitk.views.partialvolumeanalysisview");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.partialvolumeanalysisview");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.tractbasedspatialstatistics");
   lo = layout->GetViewLayout("org.mitk.views.tractbasedspatialstatistics");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.imagestatistics");
   lo = layout->GetViewLayout("org.mitk.views.imagestatistics");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.measurement");
   lo = layout->GetViewLayout("org.mitk.views.measurement");
-  lo->SetCloseable(false);
+
 }

@@ -282,6 +282,9 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
 
     view = desc->CreateView();
 
+    if (view.IsNull())
+        return result;
+
     this->CreatePartProperties(view);
 
     // Create site

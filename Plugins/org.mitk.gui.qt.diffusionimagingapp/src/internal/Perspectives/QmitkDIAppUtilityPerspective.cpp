@@ -44,9 +44,9 @@ void QmitkDIAppUtilityPerspective::CreateInitialLayout(berry::IPageLayout::Point
 
   left->AddView("org.mitk.views.properties");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.properties");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.blueberry.views.logview");
   lo = layout->GetViewLayout("org.blueberry.views.logview");
-  lo->SetCloseable(false);
+
 }

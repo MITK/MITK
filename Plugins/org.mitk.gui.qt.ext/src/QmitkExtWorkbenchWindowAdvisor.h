@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_ext_Export.h>
 
 #include <QList>
+#include <QDockWidget>
+#include <QmitkCandyStoreWidget.h>
 
 class QAction;
 class QMenu;
@@ -70,6 +72,14 @@ public:
 
     bool GetShowClosePerspectiveMenuItem();
 
+    void EnableCandyStore(bool enable);
+
+    bool GetEnableCandyStore();
+
+    void ShowMemoryIndicator(bool show);
+
+    bool GetShowMemoryIndicator();
+
     //TODO should be removed when product support is here
     void SetProductName(const std::string& product);
     void SetWindowIcon(const std::string& wndIcon);
@@ -86,6 +96,7 @@ protected slots:
     virtual void onHelp();
     virtual void onHelpOpenHelpPerspective();
     virtual void onAbout();
+    void onCandyStore();
 
 private:
 
@@ -117,6 +128,7 @@ private:
   berry::IPerspectiveListener::Pointer titlePerspectiveListener;
   berry::IPerspectiveListener::Pointer menuPerspectiveListener;
   berry::IPartListener::Pointer imageNavigatorPartListener;
+  berry::IPartListener::Pointer CandyStorePartListener;
   berry::IPropertyChangeListener::Pointer editorPropertyListener;
   friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
@@ -138,6 +150,8 @@ private:
   bool showViewMenuItem;
   bool showNewWindowMenuItem;
   bool showClosePerspectiveMenuItem;
+  bool enableCandyStore;
+  bool showMemoryIndicator;
   std::string productName;
   std::string windowIcon;
 
@@ -160,10 +174,12 @@ private:
   QAction* undoAction;
   QAction* redoAction;
   QAction* imageNavigatorAction;
+  QAction* candyStoreAction;
   QAction* resetPerspAction;
   QAction* closePerspAction;
   QAction* openDicomEditorAction;
   QAction* openXnatEditorAction;
+  QDockWidget* candyStore;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

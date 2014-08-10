@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry
 {
-
 //class PartPane;
 //class PartPane::Sashes;
 class EditorAreaHelper;
@@ -58,7 +57,6 @@ class PartService;
  */
 class BERRY_UI WorkbenchPage: public IWorkbenchPage
 {
-
 public:
   berryObjectMacro(WorkbenchPage);
 
@@ -92,7 +90,6 @@ private:
      */
   public:
     void UpdateActivePart(IWorkbenchPart::Pointer newPart);
-
     /**
      * Updates the contributions given the new part as the topEditor.
      *
@@ -129,12 +126,10 @@ private:
      */
   private:
     void DeactivateContributions(IWorkbenchPart::Pointer part, bool remove);
-
   };
 
   class ActivationList
   {
-
   public:
 
     //List of parts in the activation order (oldest first)
@@ -149,7 +144,6 @@ private:
     WorkbenchPage* page;
 
   public:
-
     ActivationList(WorkbenchPage* page);
 
     /*
@@ -235,7 +229,6 @@ private:
      * unless 'includeActiveFastViews' is true;
      */
     SmartPointer<IWorkbenchPartReference> GetActiveReference(PartListIter start, bool editorsOnly, bool skipPartsObscuredByZoom);
-
   };
 
   /**
@@ -244,7 +237,6 @@ private:
    */
   struct PerspectiveList
   {
-
   public:
     typedef std::list<SmartPointer<Perspective> > PerspectiveListType;
     typedef PerspectiveListType::iterator iterator;
@@ -351,7 +343,6 @@ private:
      * list.
      */
     void SetActive(SmartPointer<Perspective> perspective);
-
   };
 
   IAdaptable* input;
@@ -382,6 +373,13 @@ private:
   //NavigationHistory navigationHistory = new NavigationHistory(this);
 
   IStickyViewManager::Pointer stickyViewMan;
+
+
+
+  /**
+   * Returns true if perspective with given id contains view with given id
+   */
+  bool HasView(const std::string& perspectiveId, const std::string& viewId);
 
   /**
    * If we're in the process of activating a part, this points to the new part.
@@ -538,6 +536,14 @@ private:
   void BusySetPerspective(IPerspectiveDescriptor::Pointer desc);
 
   /**
+   * Removes the perspective which match the given description.
+   *
+   * @param desc
+   *            identifies the perspective to be removed.
+   */
+  public:
+    void RemovePerspective(IPerspectiveDescriptor::Pointer desc);
+  /**
    * Shows a view.
    *
    * Assumes that a busy cursor is active.
@@ -642,6 +648,18 @@ public:
    * @see IWorkbenchPage#closePerspective(IPerspectiveDescriptor, boolean, boolean)
    */
 public:
+
+  void CloseCurrentPerspective(bool saveParts, bool closePage);
+  /**
+   * Closes current perspective. If last perspective, then entire page
+   * is closed.
+   *
+   * @param saveParts
+   *            whether the page's parts should be saved if closed
+   * @param closePage
+   *            whether the page itself should be closed if last perspective
+   */
+
   void ClosePerspective(IPerspectiveDescriptor::Pointer desc, bool saveParts,
       bool closePage);
 
@@ -1705,7 +1723,6 @@ private:
   // provides sash information for the given pane
   struct SashInfo
   {
-
     SmartPointer<LayoutPartSash> right;
 
     SmartPointer<LayoutPartSash> left;
@@ -1779,8 +1796,6 @@ private:
 
 public:
   bool IsPartVisible(IWorkbenchPartReference::Pointer reference);
-
 };
-
 }
 #endif /*BERRYWORKBENCHPAGE_H_*/

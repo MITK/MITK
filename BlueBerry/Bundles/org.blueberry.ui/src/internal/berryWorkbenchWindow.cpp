@@ -593,6 +593,41 @@ void WorkbenchWindow::CloseAllPages()
   }
 }
 
+void WorkbenchWindow::SetPerspectiveExcludeList(std::vector<std::string> v)
+{
+    perspectiveExcludeList = v;
+}
+
+std::vector<std::string> WorkbenchWindow::GetPerspectiveExcludeList()
+{
+    return perspectiveExcludeList;
+}
+
+void WorkbenchWindow::SetViewExcludeList(std::vector<std::string> v)
+{
+    viewExcludeList = v;
+}
+
+std::vector<std::string> WorkbenchWindow::GetViewExcludeList()
+{
+    return viewExcludeList;
+}
+
+IWorkbenchPage::Pointer WorkbenchWindow::GetPage(int i)
+{
+    std::list<IWorkbenchPage::Pointer> pages = pageList.GetPages();
+    std::list<IWorkbenchPage::Pointer>::iterator it;
+    int j=-1;
+    for (it = pages.begin(); it!=pages.end(); it++)
+    {
+        j++;
+        if (j==i)
+            break;
+    }
+    if (j==i)
+        return *it;
+}
+
 IWorkbenchPage::Pointer WorkbenchWindow::GetActivePage()
 {
   return pageList.GetActive();

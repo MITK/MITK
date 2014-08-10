@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkDiffusionImagingPublicPerspective::QmitkDiffusionImagingPublicPerspective()
 {
-
 }
 
 QmitkDiffusionImagingPublicPerspective::QmitkDiffusionImagingPublicPerspective(const QmitkDiffusionImagingPublicPerspective& other)
@@ -74,5 +73,4 @@ void QmitkDiffusionImagingPublicPerspective::CreateInitialLayout(berry::IPageLay
 
   //berry::IFolderLayout::Pointer right2 =
   //  layout->CreateFolder("right2", berry::IPageLayout::BOTTOM, 0.5f, "right");
-
 }

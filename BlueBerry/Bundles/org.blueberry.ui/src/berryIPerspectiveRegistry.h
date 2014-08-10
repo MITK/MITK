@@ -43,6 +43,19 @@ struct BERRY_UI IPerspectiveRegistry {
     virtual ~IPerspectiveRegistry();
 
     /**
+       * Create a new perspective.
+       *
+       * @param label
+       *            the name of the new descriptor
+       * @param originalDescriptor
+       *            the descriptor on which to base the new descriptor
+       * @return a new perspective descriptor or <code>null</code> if the
+       *         creation failed.
+       */
+      virtual IPerspectiveDescriptor::Pointer CreatePerspective(const std::string& label,
+          IPerspectiveDescriptor::Pointer originalDescriptor) = 0;
+
+    /**
      * Clones an existing perspective.
      *
      * @param id the id for the cloned perspective, which must not already be used by

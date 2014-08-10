@@ -51,6 +51,7 @@
       <complexType>
          <sequence>
             <element ref="description" minOccurs="0" maxOccurs="1"/>
+            <element ref="keywordReference" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -72,7 +73,7 @@
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  a fully qualified name of the class that implements 
+                  a fully qualified name of the class that implements
 &lt;samp&gt;berry::IPerspectiveFactory&lt;/samp&gt; interface.
                </documentation>
                <appInfo>
@@ -83,7 +84,7 @@
          <attribute name="icon" type="string">
             <annotation>
                <documentation>
-                  a relative name of the icon that will be associated 
+                  a relative name of the icon that will be associated
 with this perspective.
                </documentation>
                <appInfo>
@@ -117,18 +118,18 @@ with this perspective.
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         The following is an example of a perspective extension: 
+         The following is an example of a perspective extension:
 &lt;p&gt;
 &lt;pre&gt;
-   &lt;extension 
-        point=&quot;org.blueberry.ui.perspectives&quot;&gt; 
-        &lt;perspective 
-            id=&quot;org.blueberry.ui.resourcePerspective&quot; 
-            name=&quot;Resource&quot; 
-            class=&quot;berry::ResourcePerspective&quot; 
-            icon=&quot;resources/MyIcon.gif&quot;&gt; 
-        &lt;/perspective&gt; 
-    &lt;/extension&gt; 
+   &lt;extension
+        point=&quot;org.blueberry.ui.perspectives&quot;&gt;
+        &lt;perspective
+            id=&quot;org.blueberry.ui.resourcePerspective&quot;
+            name=&quot;Resource&quot;
+            class=&quot;berry::ResourcePerspective&quot;
+            icon=&quot;resources/MyIcon.gif&quot;&gt;
+        &lt;/perspective&gt;
+    &lt;/extension&gt;
 &lt;/pre&gt;
 &lt;/p&gt;
       </documentation>
@@ -139,15 +140,15 @@ with this perspective.
          <meta.section type="apiInfo"/>
       </appInfo>
       <documentation>
-         The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must be the 
-fully qualified name of a class that implements 
-&lt;samp&gt;berry::IPerspectiveFactory&lt;/samp&gt;. 
-The class must supply the initial layout for a 
+         The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must be the
+fully qualified name of a class that implements
+&lt;samp&gt;berry::IPerspectiveFactory&lt;/samp&gt;.
+The class must supply the initial layout for a
 perspective when asked by the workbench.
 &lt;p&gt;
-The &lt;samp&gt;plugin_customization.ini&lt;/samp&gt; file is used to define the default perspective.  The &lt;i&gt;default perspective&lt;/i&gt; is the first perspective which appears when the product is launched after install.  It is also used when the user opens a page or window with no specified perspective.  The default perspective is defined as a property within the plugin_customization.ini, as shown below.  The user may also override this perspective from the workbench perspectives preference page. 
+The &lt;samp&gt;plugin_customization.ini&lt;/samp&gt; file is used to define the default perspective.  The &lt;i&gt;default perspective&lt;/i&gt; is the first perspective which appears when the product is launched after install.  It is also used when the user opens a page or window with no specified perspective.  The default perspective is defined as a property within the plugin_customization.ini, as shown below.  The user may also override this perspective from the workbench perspectives preference page.
 &lt;pre&gt;
-    defaultPerspectiveId = org.blueberry.ui.resourcePerspective 
+    defaultPerspectiveId = org.blueberry.ui.resourcePerspective
 &lt;/pre&gt;
 The perspectives which appear in the &quot;Open Perspective&quot; menu are shortcuts for perspective selection.  This set is defined by the active perspective itself, and extensions made through the perspectiveExtensions extension point.
       </documentation>
@@ -158,8 +159,8 @@ The perspectives which appear in the &quot;Open Perspective&quot; menu are short
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
-         The workbench provides a &quot;Resource Perspective&quot;.  
-Additional perspectives may be added by plug-ins. 
+         The workbench provides a &quot;Resource Perspective&quot;.
+Additional perspectives may be added by plug-ins.
 They are selected using the &quot;Open Perspective&quot; submenu of the &quot;Window&quot; menu.
       </documentation>
    </annotation>
@@ -172,7 +173,7 @@ They are selected using the &quot;Open Perspective&quot; submenu of the &quot;Wi
          Copyright (c) 2002, 2005 IBM Corporation and others.&lt;br&gt;
 All rights reserved. This program and the accompanying materials are made
 available under the terms of the Eclipse Public License v1.0 which accompanies
-this distribution, and is available at &lt;a 
+this distribution, and is available at &lt;a
 href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
       </documentation>
    </annotation>

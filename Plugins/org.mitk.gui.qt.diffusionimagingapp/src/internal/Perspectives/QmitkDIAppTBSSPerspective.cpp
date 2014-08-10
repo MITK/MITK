@@ -44,6 +44,6 @@ void QmitkDIAppTBSSPerspective::CreateInitialLayout(berry::IPageLayout::Pointer 
 
   left->AddView("org.mitk.views.tractbasedspatialstatistics");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.tractbasedspatialstatistics");
-  lo->SetCloseable(false);
+
 
 }

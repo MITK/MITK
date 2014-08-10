@@ -437,7 +437,7 @@ public:
     delete [] tmpDimensions;
 
     this->Initialize();
-  };
+  }
 
   //##Documentation
   //## @brief Check whether slice @a s at time @a t in channel @a n is valid, i.e.,
@@ -691,47 +691,6 @@ DEPRECATED (MITK_CORE_EXPORT bool Equal( const mitk::Image* leftHandSide, const 
 */
 MITK_CORE_EXPORT bool Equal( const mitk::Image& leftHandSide, const mitk::Image& rightHandSide, ScalarType eps, bool verbose );
 
-
-
-
-//}
-//##Documentation
-//## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
-//##
-//## CastToMitkImage does not cast pixel types etc., just image data
-//## Needs "mitkImage.h" header included.
-//## If you get a compile error, try image.GetPointer();
-//## @ingroup Adaptor
-//## \sa mitkITKImageImport
-template <typename ItkOutputImageType>
-void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
-{
-  if(mitkoutputimage.IsNull())
-  {
-    mitkoutputimage = mitk::Image::New();
-  }
-  mitkoutputimage->InitializeByItk(itkimage.GetPointer());
-  mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
-}
-
-//##Documentation
-//## @brief Cast an itk::Image (with a specific type) to an mitk::Image.
-//##
-//## CastToMitkImage does not cast pixel types etc., just image data
-//## Needs "mitkImage.h" header included.
-//## If you get a compile error, try image.GetPointer();
-//## @ingroup Adaptor
-//## \sa mitkITKImageImport
-template <typename ItkOutputImageType>
-void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
-{
-  if(mitkoutputimage.IsNull())
-  {
-    mitkoutputimage = mitk::Image::New();
-  }
-  mitkoutputimage->InitializeByItk(itkimage);
-  mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
-}
 } // namespace mitk
 
 #endif /* MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2 */

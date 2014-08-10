@@ -45,14 +45,44 @@ namespace mitk
   extern void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itk::Image<TPixelType,VImageDimension> >& itkOutputImage);
 
   /**
-  * @brief Cast an mitk::Image to an itk::VectorImage with a specific type.
-  *
-  * You don't have to initialize the itk::VectorImage<..>::Pointer.
-  * @ingroup Adaptor
-  */
+   * @brief Cast an mitk::Image to an itk::VectorImage with a specific type.
+   *
+   * You don't have to initialize the itk::VectorImage<..>::Pointer.
+   * @ingroup Adaptor
+   */
   template <typename TPixelType, unsigned int VImageDimension>
   extern void MITK_CORE_EXPORT CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<itk::VectorImage<TPixelType,VImageDimension> >& itkOutputImage);
 
+  /**
+   * @brief Cast an itk::Image (with a specific type) to an mitk::Image.
+   *
+   * CastToMitkImage does not cast pixel types etc., just image data
+   * @ingroup Adaptor
+   * \sa mitkITKImageImport
+   */
+  template <typename ItkOutputImageType>
+  void CastToMitkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
+  {
+    CastToMitkImage(itkimage.GetPointer(), mitkoutputimage);
+  }
+
+  /**
+   * @brief Cast an itk::Image (with a specific type) to an mitk::Image.
+   *
+   * CastToMitkImage does not cast pixel types etc., just image data
+   * @ingroup Adaptor
+   * \sa mitkITKImageImport
+   */
+  template <typename ItkOutputImageType>
+  void CastToMitkImage(const ItkOutputImageType* itkimage, itk::SmartPointer<mitk::Image>& mitkoutputimage)
+  {
+    if(mitkoutputimage.IsNull())
+    {
+      mitkoutputimage = mitk::Image::New();
+    }
+    mitkoutputimage->InitializeByItk(itkimage);
+    mitkoutputimage->SetChannel(itkimage->GetBufferPointer());
+  }
 }
 
 #endif // of MITKIMAGECAST_H_HEADER_INCLUDED

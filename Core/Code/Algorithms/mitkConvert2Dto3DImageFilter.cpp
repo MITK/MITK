@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkImageAccessByItk.h"
-#include "mitkITKImageImport.h"
+#include "mitkImageCast.h"
 #include "mitkConvert2Dto3DImageFilter.h"
 
 mitk::Convert2Dto3DImageFilter::Convert2Dto3DImageFilter()

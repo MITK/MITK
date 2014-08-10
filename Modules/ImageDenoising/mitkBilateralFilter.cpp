@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBilateralFilter.h"
 #include <itkBilateralImageFilter.h>
 #include "mitkImageAccessByItk.h"
-#include "mitkITKImageImport.h"
+#include "mitkImageCast.h"
 
 mitk::BilateralFilter::BilateralFilter()
   : m_DomainSigma(2.0f), m_RangeSigma(50.0f), m_AutoKernel(true), m_KernelRadius(1u)

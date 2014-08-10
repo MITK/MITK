@@ -119,7 +119,6 @@ class SurfaceCutterCGALPrivate {
 public:
     SurfaceCutterCGALPrivate()
         : _tree(nullptr)
-        , _triangulatedData(nullptr)
     {
     }
 
@@ -129,22 +128,25 @@ public:
             _tree.release();
         }
 
-        // Triangulated data
-        vtkSmartPointer<vtkTriangleFilter> triangleFilter =
-            vtkSmartPointer<vtkTriangleFilter>::New();
-        triangleFilter->SetInputData(surface);
-        triangleFilter->Update();
-        _triangulatedData = triangleFilter->GetOutput();
-
         if (surface) {
-            _tree.reset(new CGAL_AABBTree(vtkPolyDataTrianglesIterator::begin(_triangulatedData), vtkPolyDataTrianglesIterator::end(_triangulatedData)));
+            // Triangulate data
+            vtkSmartPointer<vtkTriangleFilter> triangleFilter =
+                vtkSmartPointer<vtkTriangleFilter>::New();
+            triangleFilter->SetInputData(surface);
+            triangleFilter->Update();
+
+            // Note: it is ok to delete the triangulated data after the tree is build
+            // The triangles will be cached within the iterators
+
+            // Build the AABB tree
+            _tree.reset(new CGAL_AABBTree(vtkPolyDataTrianglesIterator::begin(triangleFilter->GetOutput()), vtkPolyDataTrianglesIterator::end(triangleFilter->GetOutput())));
             _tree->build();
         }
     }
 
     vtkSmartPointer<vtkPolyData> cutWithPlane(const mitk::Point3D planePoints[4]) const
     {
-        if (!_triangulatedData || !_tree) {
+        if (!_tree) {
             return vtkSmartPointer<vtkPolyData>::New();
         }
 
@@ -203,7 +205,6 @@ public:
     }
 
 private:
-    vtkSmartPointer<vtkPolyData> _triangulatedData;
     std::unique_ptr<CGAL_AABBTree> _tree;
 };
 

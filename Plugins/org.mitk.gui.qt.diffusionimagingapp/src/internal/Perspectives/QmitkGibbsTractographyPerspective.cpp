@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkDIAppTrackingEvaluationPerspective.h"
+#include "QmitkGibbsTractographyPerspective.h"
 #include "berryIViewLayout.h"
 
-void QmitkDIAppTrackingEvaluationPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
+void QmitkGibbsTractographyPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   /////////////////////////////////////////////////////
   // all di-app perspectives should have the following:
@@ -32,7 +32,7 @@ void QmitkDIAppTrackingEvaluationPerspective::CreateInitialLayout(berry::IPageLa
     false, berry::IPageLayout::BOTTOM, .15f, "org.mitk.views.datamanager");
 
   berry::IFolderLayout::Pointer left =
-    layout->CreateFolder("org.mitk.diffusionimaginginternal.leftcontrols",
+    layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols",
     berry::IPageLayout::BOTTOM, 0.1f, "org.mitk.views.controlvisualizationpropertiesview");
 
   layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator",
@@ -42,7 +42,7 @@ void QmitkDIAppTrackingEvaluationPerspective::CreateInitialLayout(berry::IPageLa
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.artificialqballevaluation");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.artificialqballevaluation");
-
+  left->AddView("org.mitk.views.tensorreconstruction");
+  left->AddView("org.mitk.views.qballreconstruction");
+  left->AddView("org.mitk.views.gibbstracking");
 }

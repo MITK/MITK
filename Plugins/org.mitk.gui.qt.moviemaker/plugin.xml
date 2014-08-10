@@ -6,7 +6,10 @@
     <view id="org.mitk.views.moviemaker"
           name="Movie Maker"
           class="QmitkMovieMaker"
-          icon="resources/icon.xpm" />
+          icon="resources/icon.xpm" >
+          <description>Take movies of your data</description>
+          <keywordReference id="org.mitk.views.moviemaker.Keyword"/>
+        </view>
   </extension>
 
   <extension point="org.blueberry.ui.views">
@@ -14,14 +17,19 @@
           name="Screenshot Maker"
           class="QmitkScreenshotMaker"
           icon="resources/screenshot_maker.png" >
-      <description>This is a short information about this perspective</description>
+      <description>Take screenshots of your data</description>
       <keywordReference id="org.mitk.views.screenshotmaker.Keyword"/>
     </view>
   </extension>
-  <extension
-   point="org.blueberry.ui.keywords">
-  <keyword
-          label="presentation tab themes"
-          id="org.mitk.views.screenshotmaker.Keyword"/>
- </extension>    
+
+  <extension point="org.blueberry.ui.keywords">
+
+  <keyword label="image" id="org.mitk.views.screenshotmaker.Keyword"/>
+  <keyword label="picture" id="org.mitk.views.screenshotmaker.Keyword"/>
+  <keyword label="screenshot" id="org.mitk.views.screenshotmaker.Keyword"/>
+
+  <keyword label="movie" id="org.mitk.views.moviemaker.Keyword"/>
+  <keyword label="clip" id="org.mitk.views.moviemaker.Keyword"/>
+
+ </extension>
 </plugin>

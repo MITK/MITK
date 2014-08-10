@@ -13,13 +13,13 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef _QMITKViewBrowserWidget_H_INCLUDED
-#define _QMITKViewBrowserWidget_H_INCLUDED
+#ifndef _QMITKCandyStoreWidget_H_INCLUDED
+#define _QMITKCandyStoreWidget_H_INCLUDED
 
 //QT headers
 #include <QWidget>
 #include <QString>
-#include "ui_QmitkViewBrowserWidgetControls.h"
+#include "ui_QmitkCandyStoreWidgetControls.h"
 
 #include <berryISelectionListener.h>
 #include <berryIPerspectiveListener.h>
@@ -37,19 +37,22 @@ class ClassFilterProxyModel;
 
 /** @brief
   */
-class QmitkViewBrowserWidget : public QWidget
+class QmitkCandyStoreWidget : public QWidget
 {
     //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
     Q_OBJECT
 
 public:
 
-    QmitkViewBrowserWidget (QWidget* parent = 0, Qt::WindowFlags f = 0);
-    virtual ~QmitkViewBrowserWidget();
+    QmitkCandyStoreWidget (QWidget* parent = 0, Qt::WindowFlags f = 0);
+    virtual ~QmitkCandyStoreWidget();
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-    void FillTreeList();
+    bool FillTreeList();
+    void UpdateTreeList(QStandardItem* item = NULL, berry::IWorkbenchPartReference* partRef=NULL, const std::string& changeId="");
+
+    berry::IPerspectiveListener::Pointer m_PerspectiveListener;
 
 public slots:
 
@@ -59,25 +62,27 @@ public slots:
     void ClonePerspective();
     void ResetPerspective();
     void DeletePerspective();
-    void ClosePerspectives();
+    void CloseAllPerspectives();
     void ClosePerspective();
+    void ExpandAll();
+    void CollapseAll();
     void FilterChanged();
 
 protected:
 
     // member variables
-    Ui::QmitkViewBrowserWidgetControls          m_Controls;
+    Ui::QmitkCandyStoreWidgetControls          m_Controls;
     QWidget*                                    m_Parent;
     QStandardItemModel*                         m_TreeModel;
     ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
     berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
     berry::IWindowListener::Pointer             m_WindowListener;
-    friend struct ViewBrowserViewListener;
+
 
 private:
 
 };
 
-#endif // _QMITKViewBrowserWidget_H_INCLUDED
+#endif // _QMITKCandyStoreWidget_H_INCLUDED
 

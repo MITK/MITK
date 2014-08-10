@@ -17,10 +17,6 @@
   </extension>
 
   <extension point="org.blueberry.ui.perspectives">
-<!--    <perspective id="org.mitk.diffusionimagingapp.perspectives.diffusionimagingapp"
-      name="Data Display"
-      class="QmitkDiffusionImagingAppPerspective"
-      icon="resources/perspectives/icon_home.png"/>-->
 
     <perspective id="org.mitk.diffusionimagingapp.perspectives.welcome"
       name="Data Display"
@@ -40,22 +36,15 @@
     <perspective id="org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction"
       name="Preprocessing and Reconstruction"
       class="QmitkDIAppPreprocessingReconstructionPerspective"
-      icon="resources/perspectives/preprocessing.png"/>
+      icon="resources/perspectives/preprocessing.png">
+      <description>Preprocessing of raw diffusion data and diffusion propagator modeling</description>
+      <keywordReference id="org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction.Keyword"/>
+     </perspective>
 
     <perspective id="org.mitk.diffusionimagingapp.perspectives.quantification"
       name="Quantification"
       class="QmitkDIAppQuantificationPerspective"
       icon="resources/perspectives/chart.png"/>
-
-<!--    <perspective id="org.mitk.diffusionimagingapp.perspectives.tbss"
-      name="TBSS"
-      class="QmitkDIAppTBSSPerspective"
-      icon="resources/perspectives/tbss.png"/>-->
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography"
-      name="Tractography"
-      class="QmitkDIAppFiberTractographyPerspective"
-      icon="resources/perspectives/tractography.png"/>
 
     <perspective id="org.mitk.diffusionimagingapp.perspectives.connectomics"
       name="Connectomics"
@@ -86,6 +75,33 @@
       name="Utilities"
       class="QmitkDIAppUtilityPerspective"
       icon="resources/perspectives/utilities.png"/>
+
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography1"
+      name="Global Gibbs tractography"
+      category="Fiber tractography"
+      class="QmitkGibbsTractographyPerspective"
+      icon="resources/perspectives/tractography.png">
+    </perspective>
+
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography2"
+      name="Deterministic streamline tractography"
+      category="Fiber tractography"
+      class="QmitkStreamlineTractographyPerspective"
+      icon="resources/perspectives/tractography.png"/>
+
+    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography3"
+    name="Probabilistic streamline tractography"
+    category="Fiber tractography"
+      class="QmitkProbabilisticTractographyPerspective"
+      icon="resources/perspectives/tractography.png"/>
+
+  </extension>
+
+
+
+  <extension point="org.blueberry.ui.keywords">
+
+  <keyword label="preprocessing" id="org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction.Keyword"/>
 
   </extension>
 

@@ -359,7 +359,8 @@ QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchA
     showViewMenuItem(true),
     showNewWindowMenuItem(false),
     showClosePerspectiveMenuItem(true),
-    enableViewBrowser(true),
+    enableCandyStore(true),
+    showMemoryIndicator(true),
     dropTargetListener(new QmitkDefaultDropTargetListener)
 {
     productName = QCoreApplication::applicationName().toStdString();
@@ -395,15 +396,24 @@ bool QmitkExtWorkbenchWindowAdvisor::GetShowClosePerspectiveMenuItem()
     return showClosePerspectiveMenuItem;
 }
 
-
-void QmitkExtWorkbenchWindowAdvisor::EnableViewBrowser(bool enable)
+void QmitkExtWorkbenchWindowAdvisor::ShowMemoryIndicator(bool show)
 {
-    enableViewBrowser = enable;
+    showMemoryIndicator = show;
 }
 
-bool QmitkExtWorkbenchWindowAdvisor::GetEnableViewBrowser()
+bool QmitkExtWorkbenchWindowAdvisor::GetShowMemoryIndicator()
 {
-    return enableViewBrowser;
+    return showMemoryIndicator;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::EnableCandyStore(bool enable)
+{
+    enableCandyStore = enable;
+}
+
+bool QmitkExtWorkbenchWindowAdvisor::GetEnableCandyStore()
+{
+    return enableCandyStore;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowNewWindowMenuItem(bool show)
@@ -446,9 +456,9 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
     windowIcon = wndIcon;
 }
 
-void QmitkExtWorkbenchWindowAdvisor::onViewBrowser()
+void QmitkExtWorkbenchWindowAdvisor::onCandyStore()
 {
-    viewBrowser->setVisible(viewBrowserAction->isChecked());
+    candyStore->setVisible(candyStoreAction->isChecked());
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
@@ -544,16 +554,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
         imageNavigatorAction->setToolTip("Toggle image navigator for navigating through image");
     }
 
-    // add view browser
-    viewBrowserAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&View Browser", NULL);
-    if (enableViewBrowser)
-    {
-        QObject::connect(viewBrowserAction, SIGNAL(triggered(bool)), SLOT(onViewBrowser()));
-        viewBrowserAction->setCheckable(true);
-        viewBrowserAction->setChecked(false);
-        viewBrowserAction->setToolTip("Toggle view browser");
-    }
-
     // toolbar for showing file open, undo, redo and other main actions
     QToolBar* mainActionsToolBar = new QToolBar;
     mainActionsToolBar->setObjectName("mainActionsToolBar");
@@ -582,9 +582,15 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     {
         mainActionsToolBar->addAction(imageNavigatorAction);
     }
-    if (enableViewBrowser)
+
+    if (enableCandyStore)
     {
-        mainActionsToolBar->addAction(viewBrowserAction);
+        candyStoreAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Candy_icon.png"), "&Candy Store", NULL);
+        QObject::connect(candyStoreAction, SIGNAL(triggered(bool)), SLOT(onCandyStore()));
+        candyStoreAction->setCheckable(true);
+        candyStoreAction->setChecked(false);
+        candyStoreAction->setToolTip("Toggle Candy Store");
+        mainActionsToolBar->addAction(candyStoreAction);
     }
     mainWindow->addToolBar(mainActionsToolBar);
 
@@ -767,15 +773,21 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     mainWindow->setStatusBar(qStatusBar);
 
-    viewBrowser = new QDockWidget("View Browser");
-    viewBrowser->setWidget(new QmitkViewBrowserWidget());
-    viewBrowser->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-    viewBrowser->setVisible(false);
-    mainWindow->addDockWidget(Qt::LeftDockWidgetArea, viewBrowser);
+//    QLabel* label = new QLabel();
+//    label->setText("<span style=\" font-size:11pt; font-weight:700; color:#000000;\"> Candy Store</span>");
+    candyStore = new QDockWidget("Candy Store");
+    candyStore->setWidget(new QmitkCandyStoreWidget());
+    candyStore->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+    candyStore->setVisible(false);
+    candyStore->setObjectName("Candy Store");
+//    candyStore->setTitleBarWidget(label);
+    mainWindow->addDockWidget(Qt::LeftDockWidgetArea, candyStore);
 
-    QmitkMemoryUsageIndicatorView* memoryIndicator =
-            new QmitkMemoryUsageIndicatorView();
-    qStatusBar->addPermanentWidget(memoryIndicator, 0);
+    if (showMemoryIndicator)
+    {
+        QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
+        qStatusBar->addPermanentWidget(memoryIndicator, 0);
+    }
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
@@ -920,23 +932,6 @@ void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
     }
     berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
     //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
-}
-
-void QmitkExtWorkbenchWindowAdvisorHack::onViewBrowser()
-{
-    // get view browser
-    berry::IViewPart::Pointer viewBrowser =
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.viewbrowser");
-    if (viewBrowser)
-    {
-        bool isVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(viewBrowser);
-        if (isVisible)
-        {
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(viewBrowser);
-            return;
-        }
-    }
-    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.viewbrowser");
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()

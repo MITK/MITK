@@ -69,6 +69,8 @@ private:
 
    IConfigurationElement::Pointer configElement;
 
+   std::vector<std::string> categoryPath;
+
   /**
    * Create a new empty descriptor.
    *
@@ -225,6 +227,13 @@ public: void SetDescription(std::string desc) {description = desc; }
    * @since 3.1
    */
   public: std::string GetFactoryClassName() const;
+
+  /**
+   * Return the category path of this descriptor
+   *
+   * @return the category path of this descriptor
+   */
+  public: std::vector<std::string> GetCategoryPath();
 };
 }
 

@@ -60,9 +60,9 @@ namespace berry {
  * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI IPerspectiveDescriptor : public Object {
-  berryInterfaceMacro(IPerspectiveDescriptor, berry);
+    berryInterfaceMacro(IPerspectiveDescriptor, berry);
 
-  virtual ~IPerspectiveDescriptor();
+    virtual ~IPerspectiveDescriptor();
 
     /**
      * Returns the description of this perspective.
@@ -105,6 +105,13 @@ struct BERRY_UI IPerspectiveDescriptor : public Object {
     * @return boolean whether this perspective is predefined by an extension
     */
     virtual bool IsPredefined() const = 0;
+
+    /**
+    * Return the category path of this descriptor
+    *
+    * @return the category path of this descriptor
+    */
+    virtual std::vector<std::string> GetCategoryPath() = 0;
 
     virtual std::vector< std::string> GetKeywordReferences() const = 0;
 };

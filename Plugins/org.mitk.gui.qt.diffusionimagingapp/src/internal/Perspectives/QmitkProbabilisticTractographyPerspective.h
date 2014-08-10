@@ -15,22 +15,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QmitkDIAppFiberTractographyPerspective_H_
-#define QmitkDIAppFiberTractographyPerspective_H_
+#ifndef QmitkProbabilisticTractographyPerspective_H_
+#define QmitkProbabilisticTractographyPerspective_H_
 
 #include <berryIPerspectiveFactory.h>
 
-class QmitkDIAppFiberTractographyPerspective : public QObject, public berry::IPerspectiveFactory
+class QmitkProbabilisticTractographyPerspective : public QObject, public berry::IPerspectiveFactory
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
 
-  QmitkDIAppFiberTractographyPerspective() {}
-  ~QmitkDIAppFiberTractographyPerspective() {}
+  QmitkProbabilisticTractographyPerspective() {}
+  ~QmitkProbabilisticTractographyPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 };
 
-#endif /* QmitkDIAppFiberTractographyPerspective_H_ */
+#endif /* QmitkProbabilisticTractographyPerspective_H_ */

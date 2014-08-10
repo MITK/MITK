@@ -201,6 +201,23 @@ ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
   return imageDescriptor;
 }
 
+std::vector<std::string> PerspectiveDescriptor::GetCategoryPath()
+{
+    std::string category;
+    categoryPath.clear();
+
+    if (configElement.IsNotNull() && configElement->GetAttribute(WorkbenchRegistryConstants::TAG_CATEGORY, category))
+    {
+      Poco::StringTokenizer stok(category, "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+      // Parse the path tokens and store them
+      for (Poco::StringTokenizer::Iterator iter = stok.begin(); iter != stok.end(); ++iter)
+      {
+        categoryPath.push_back(*iter);
+      }
+    }
+    return categoryPath;
+}
+
 std::string PerspectiveDescriptor::GetLabel() const
 {
   if (configElement == 0)

@@ -45,13 +45,13 @@ void QmitkDIAppConnectomicsPerspective::CreateInitialLayout(berry::IPageLayout::
 
   left->AddView("org.mitk.views.connectomicsstatistics");
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.connectomicsstatistics");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.connectomicsnetworkoperations");
   lo = layout->GetViewLayout("org.mitk.views.connectomicsnetworkoperations");
-  lo->SetCloseable(false);
+
 
   left->AddView("org.mitk.views.connectomicsdata");
   lo = layout->GetViewLayout("org.mitk.views.connectomicsdata");
-  lo->SetCloseable(false);
+
 }

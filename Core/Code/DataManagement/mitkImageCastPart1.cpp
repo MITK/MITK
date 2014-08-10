@@ -15,32 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkConfig.h>
-#include <mitkImageCast.h>
+#include <mitkImageCast.txx>
 #include <mitkInstantiateAccessFunctions.h>
 
-#include <itkImage.h>
-#include <itkCastImageFilter.h>
-
-namespace mitk
-{
-#ifndef DOXYGEN_SKIP
-template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType >
-void _CastToItkImage2Access(const itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
-{
-  typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
-  if(typeid(ItkInputImageType) == typeid(ItkOutputImageType))
-  {
-    itkOutputImage = const_cast<ItkOutputImageType*>(reinterpret_cast<const ItkOutputImageType*>(itkInputImage));
-    return;
-  }
-  typedef itk::CastImageFilter< ItkInputImageType, ItkOutputImageType > CastImageFilterType;
-  typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
-  castImageFilter->SetInput( itkInputImage );
-  castImageFilter->Update();
-  itkOutputImage = castImageFilter->GetOutput();
-}
-#endif //DOXYGEN_SKIP
-
+namespace mitk {
 
 #define InstantiateAccessFunction__CastToItkImage2Access(type1, type2) \
   template MITK_CORE_EXPORT void _CastToItkImage2Access(const itk::Image<MITK_PP_TUPLE_REM(2)type1>*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type2> >&);

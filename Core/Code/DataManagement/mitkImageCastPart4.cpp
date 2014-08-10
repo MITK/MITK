@@ -15,23 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include <mitkImageCast.h>
-#include <mitkImageAccessByItk.h>
-#include <itkRGBPixel.h>
-#include <itkImage.h>
-#include <itkCastImageFilter.h>
+#include <mitkImageCast.txx>
 
+#include <itkRGBPixel.h>
 #include <itkDiffusionTensor3D.h>
 
 namespace mitk
 {
-
-#ifndef DOXYGEN_SKIP
-  template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
-  {
-    AccessFixedDimensionByItk_1(mitkImage, _CastToItkImage2Access, (ItkOutputImageType::ImageDimension), itkOutputImage);
-  }
-#endif //DOXYGEN_SKIP
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
 typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;

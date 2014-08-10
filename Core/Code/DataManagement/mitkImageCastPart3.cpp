@@ -15,32 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include <mitkImageCast.h>
-#include <itkImage.h>
-#include <itkCastImageFilter.h>
+#include <mitkImageCast.txx>
+
 #include <itkRGBPixel.h>
 #include <itkVector.h>
 #include <itkDiffusionTensor3D.h>
 
 namespace mitk
 {
-#ifndef DOXYGEN_SKIP
-template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType >
-void _CastToItkImage2Access(const itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
-{
-  typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
-  if(typeid(ItkInputImageType) == typeid(ItkOutputImageType))
-  {
-    itkOutputImage = const_cast<ItkOutputImageType*>(reinterpret_cast<const ItkOutputImageType*>(itkInputImage));
-    return;
-  }
-  typedef itk::CastImageFilter< ItkInputImageType, ItkOutputImageType > CastImageFilterType;
-  typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
-  castImageFilter->SetInput( itkInputImage );
-  castImageFilter->Update();
-  itkOutputImage = castImageFilter->GetOutput();
-}
-#endif //DOXYGEN_SKIP
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
 typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;

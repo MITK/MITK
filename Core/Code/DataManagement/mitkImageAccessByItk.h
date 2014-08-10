@@ -141,9 +141,12 @@ public:
  * \endcode
  *
  * The itk::Image passed to the function/method has the same
- * data-pointer as the mitk-image. So you have full read- and write-
+ * data-pointer as the mitk-image. Depending on the const-ness of the
+ * \c mitkImage, your templated access function needs to take a const or
+ * non-const itk::Image pointer and you will get read-only or full read/write
  * access to the data vector of the mitk-image using the itk-image.
- * Call by:
+ *
+ * Example code using the access function above:
  * \code
  *   mitk::Image* inputMitkImage = ...
  *   try

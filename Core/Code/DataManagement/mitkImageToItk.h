@@ -119,6 +119,30 @@ private:
   void CheckInput(const mitk::Image* image) const;
 };
 
+/**
+ * @brief Convert a MITK image to an ITK image.
+ *
+ * This method creates a itk::Image representation for the given MITK
+ * image, referencing the MITK image memory. If the provided template
+ * arguments do not match the type of the MITK image, an exception is thrown.
+ *
+ * The MITK image is locked for read/write access as long as the returned
+ * itk::Image object exists. See ImageToItkImage(const mitk::Image*) for
+ * read-only access.
+ *
+ * @tparam TPixel The pixel type of the ITK image
+ * @tparam VDimension The image dimension of the ITK image
+ * @param mitkImage The MITK image which is to be converted to an ITK image
+ * @return An ITK image representation for the given MITK image
+ * @throws mitk::Exception if the pixel type or dimension does not match
+ *         the MITK image type or if the MITK image is already locked for
+ *         read or write access.
+ *
+ * @sa ImageToItkImage(const mitk::Image*)
+ * @sa CastToItkImage
+ *
+ * @ingroup Adaptor
+ */
 template<typename TPixel, unsigned int VDimension>
 typename itk::Image<TPixel, VDimension>::Pointer ImageToItkImage(mitk::Image* mitkImage)
 {
@@ -130,6 +154,30 @@ typename itk::Image<TPixel, VDimension>::Pointer ImageToItkImage(mitk::Image* mi
   return imagetoitk->GetOutput();
 }
 
+/**
+ * @brief Convert a MITK image to an ITK image.
+ *
+ * This method creates a itk::Image representation for the given MITK
+ * image, referencing the MITK image memory. If the provided template
+ * arguments do not match the type of the MITK image, an exception is thrown.
+ *
+ * The MITK image is locked for read access as long as the returned
+ * itk::Image object exists. See ImageToItkImage(mitk::Image*) for
+ * read and write access.
+ *
+ * @tparam TPixel The pixel type of the ITK image
+ * @tparam VDimension The image dimension of the ITK image
+ * @param mitkImage The MITK image which is to be converted to an ITK image
+ * @return An ITK image representation for the given MITK image
+ * @throws mitk::Exception if the pixel type or dimension does not match
+ *         the MITK image type or if the MITK image is already locked for
+ *         write access.
+ *
+ * @sa ImageToItkImage(mitk::Image*)
+ * @sa CastToItkImage
+ *
+ * @ingroup Adaptor
+ */
 template<typename TPixel, unsigned int VDimension>
 typename itk::Image<TPixel, VDimension>::ConstPointer ImageToItkImage(const mitk::Image* mitkImage)
 {

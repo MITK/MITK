@@ -138,7 +138,7 @@ public:
 
         if (surface) {
             _tree.reset(new CGAL_AABBTree(vtkPolyDataTrianglesIterator::begin(_triangulatedData), vtkPolyDataTrianglesIterator::end(_triangulatedData)));
-            _tree->accelerate_distance_queries();
+            _tree->build();
         }
     }
 

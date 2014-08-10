@@ -162,6 +162,7 @@ set(MODULE_CUSTOM_TESTS
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
     mitkSurfaceGLMapper2DColorTest.cpp
+    mitkSurfaceGLMapper2DCutterTest.cpp
     mitkSurfaceGLMapper2DOpacityTest.cpp
     mitkVolumeCalculatorTest.cpp
     mitkLevelWindowManagerTest.cpp

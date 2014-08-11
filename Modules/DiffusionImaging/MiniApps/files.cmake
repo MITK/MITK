@@ -27,4 +27,5 @@ set(CPP_FILES
     NetworkStatistics.cpp
     DwiDenoising.cpp
     FiberExtraction.cpp
+    FiberJoin.cpp
 )

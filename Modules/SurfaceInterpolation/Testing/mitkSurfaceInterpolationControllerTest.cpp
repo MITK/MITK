@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkIOUtil.h>
 #include <mitkSurfaceInterpolationController.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -76,14 +75,12 @@ public:
     mitk::Image::Pointer segmentation_2 = createImage(dimensions2);
 
     // Test 1
-    MITK_INFO<<"Adding: "<<segmentation_1.GetPointer();
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
     MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_1->Clone(), "Segmentation images are not equal");
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_1.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 1", m_Controller->GetNumberOfInterpolationSessions() == 1);
 
     // Test 2
-    MITK_INFO<<"Adding: "<<segmentation_2.GetPointer();
     m_Controller->SetCurrentInterpolationSession(segmentation_2);
     MITK_ASSERT_EQUAL(m_Controller->GetCurrentSegmentation(), segmentation_2->Clone(), "Segmentation images are not equal");
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_2.GetPointer());
@@ -117,9 +114,7 @@ public:
     mitk::Image::Pointer segmentation_2 = createImage(dimensions2);
 
     // Test 1
-    MITK_INFO<<"Adding: "<<segmentation_1.GetPointer();
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
-    MITK_INFO<<"Adding: "<<segmentation_2.GetPointer();
     m_Controller->SetCurrentInterpolationSession(segmentation_2);
     m_Controller->RemoveAllInterpolationSessions();
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 0", m_Controller->GetNumberOfInterpolationSessions() == 0);
@@ -134,11 +129,8 @@ public:
     unsigned int dimensions2[] = {20, 10, 30};
     mitk::Image::Pointer segmentation_2 = createImage(dimensions2);
 
-    MITK_INFO<< "NUM SESS: "<<m_Controller->GetNumberOfInterpolationSessions();
     // Test 1
-    MITK_INFO<<"Adding: "<<segmentation_1.GetPointer();
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
-    MITK_INFO<<"Adding: "<<segmentation_2.GetPointer();
     m_Controller->SetCurrentInterpolationSession(segmentation_2);
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2", m_Controller->GetNumberOfInterpolationSessions() == 2);
 
@@ -148,7 +140,6 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().GetPointer() == segmentation_2.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Current segmentation is null after another one was removed", m_Controller->GetCurrentSegmentation().IsNotNull());
 
-    MITK_INFO<<"Adding: "<<segmentation_1.GetPointer();
     m_Controller->SetCurrentInterpolationSession(segmentation_1);
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2", m_Controller->GetNumberOfInterpolationSessions() == 2);
 
@@ -161,21 +152,13 @@ public:
 
   void TestOnSegmentationDeleted()
   {
-//    m_Controller->RemoveAllInterpolationSessions();
     {
       // Create image for testing
       unsigned int dimensions1[] = {10, 10, 10};
       mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
-
-      MITK_INFO<<"Adding: "<<segmentation_1.GetPointer();
       m_Controller->SetCurrentInterpolationSession(segmentation_1);
     }
-    MITK_INFO<< "NUM SESS: "<<m_Controller->GetNumberOfInterpolationSessions();
-//    MITK_INFO<<"REF COUNT: "<<m_Controller->GetCurrentSegmentation()->GetReferenceCount();
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 0", m_Controller->GetNumberOfInterpolationSessions() == 0);
   }
-
-
 };
-
 MITK_TEST_SUITE_REGISTRATION(mitkSurfaceInterpolationController)

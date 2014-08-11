@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageToSurfaceFilter.h"
 
-//#include <tr1/unordered_map>
 
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   :m_SelectedSegmentation(0)
@@ -41,10 +40,6 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
 
   m_InterpolationResult = 0;
   m_CurrentNumberOfReducedContours = 0;
-
-//  std::tr1::unordered_map<mitk::PlaneGeometry::Pointer, mitk::Surface::Pointer> contourMap;
-//  unsigned int size = contourMap.size();
-//  MITK_INFO<<size;
 }
 
 mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
@@ -286,7 +281,6 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
     m_InterpolationResult = 0;
     m_CurrentNumberOfReducedContours = 0;
 
-    MITK_INFO<<"Adding observer for: "<<m_SelectedSegmentation;
     itk::MemberCommand<SurfaceInterpolationController>::Pointer command = itk::MemberCommand<SurfaceInterpolationController>::New();
     command->SetCallbackFunction(this, &SurfaceInterpolationController::OnSegmentationDeleted);
     m_SegmentationObserverTags.insert( std::pair<mitk::Image*, unsigned long>( m_SelectedSegmentation, m_SelectedSegmentation->AddObserver( itk::DeleteEvent(), command ) ) );
@@ -321,7 +315,6 @@ void mitk::SurfaceInterpolationController::RemoveInterpolationSession(mitk::Imag
 {
   if (segmentationImage)
   {
-//    MITK_INFO<<"Removing: "<<segmentationImage;
     if (m_SelectedSegmentation == segmentationImage)
     {
       SetSegmentationImage(NULL);
@@ -332,7 +325,6 @@ void mitk::SurfaceInterpolationController::RemoveInterpolationSession(mitk::Imag
     std::map<mitk::Image*, unsigned long>::iterator pos = m_SegmentationObserverTags.find(segmentationImage);
     if (pos != m_SegmentationObserverTags.end())
     {
-//      MITK_INFO<<"Removing observer for: "<<segmentationImage.GetPointer()<<" dataIter: "<<(*pos).first;
       segmentationImage->RemoveObserver((*pos).second);
       m_SegmentationObserverTags.erase(pos);
     }
@@ -343,12 +335,9 @@ void mitk::SurfaceInterpolationController::RemoveAllInterpolationSessions()
 {
   //Removing all observers
   std::map<mitk::Image*, unsigned long>::iterator dataIter = m_SegmentationObserverTags.begin();
-  MITK_INFO<<"[REMOVE_ALL]: "<<m_SegmentationObserverTags.size();
   while (dataIter != m_SegmentationObserverTags.end())
   {
     mitk::Image* image = (*dataIter).first;
-    MITK_INFO<<"[REMOVE_ALL]: "<<image;
-//    this->RemoveInterpolationSession((*dataIter).first);
     image->RemoveObserver((*dataIter).second);
     ++dataIter;
   }
@@ -363,24 +352,12 @@ void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Obje
   mitk::Image* tempImage = dynamic_cast<mitk::Image*>(const_cast<itk::Object*>(caller));
   if (tempImage)
   {
-//    MITK_INFO<<"Deleted: "<<tempImage;
-//    // Remove observer
-//    std::map<mitk::Image*, unsigned long>::iterator pos = m_SegmentationObserverTags.find(tempImage);
-//    if (pos != m_SegmentationObserverTags.end())
-//    {
-//      tempImage->RemoveObserver((*pos).second);
-//      m_SegmentationObserverTags.erase(pos);
-//    }
-//    RemoveInterpolationSession(tempImage);
     if (m_SelectedSegmentation == tempImage)
     {
       SetSegmentationImage(NULL);
       m_SelectedSegmentation = 0;
     }
-    size_t num_el =  m_ListOfInterpolationSessions.erase(tempImage);
-    MITK_INFO<<"deleted: "<<num_el<<" --- new size: "<<m_ListOfInterpolationSessions.size();
-//    std::map<mitk::Image*, unsigned long>::iterator pos = m_SegmentationObserverTags.find(tempImage);
-//    (*pos).first->RemoveObserver((*pos).second);
     m_SegmentationObserverTags.erase(tempImage);
+    m_ListOfInterpolationSessions.erase(tempImage);
   }
 }

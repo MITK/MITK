@@ -105,7 +105,7 @@ int FiberProcessing(int argc, char* argv[])
 
     bool copyAndJoin = false;
     if(parsedArgs.count("copyAndJoin"))
-      copyAndJoin = us::any_cast<bool>(parsedArgs["copyAndJoin"]);
+        copyAndJoin = us::any_cast<bool>(parsedArgs["copyAndJoin"]);
 
     float rotateX = 0;
     if (parsedArgs.count("rotate-x"))
@@ -177,31 +177,31 @@ int FiberProcessing(int argc, char* argv[])
 
         if (copyAndJoin == true)
         {
-          MITK_INFO << "Create copy";
-          mitk::FiberBundleX::Pointer fibCopy = fib->GetDeepCopy();
+            MITK_INFO << "Create copy";
+            mitk::FiberBundleX::Pointer fibCopy = fib->GetDeepCopy();
 
-          if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
-            MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
-            fibCopy->RotateAroundAxis(rotateX, rotateY, rotateZ);
-          }
-          if (translateX > 0 || translateY > 0 || translateZ > 0)
-            fibCopy->TranslateFibers(translateX, translateY, translateZ);
-          if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
-            fibCopy->ScaleFibers(scaleX, scaleY, scaleZ);
+            if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
+                MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
+                fibCopy->RotateAroundAxis(rotateX, rotateY, rotateZ);
+            }
+            if (translateX > 0 || translateY > 0 || translateZ > 0)
+                fibCopy->TranslateFibers(translateX, translateY, translateZ);
+            if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
+                fibCopy->ScaleFibers(scaleX, scaleY, scaleZ);
 
-          MITK_INFO << "Join copy with original";
-          fib = fib->AddBundle(fibCopy.GetPointer());
+            MITK_INFO << "Join copy with original";
+            fib = fib->AddBundle(fibCopy.GetPointer());
 
         } else {
-          if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
-            MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
-            fib->RotateAroundAxis(rotateX, rotateY, rotateZ);
-          }
-          if (translateX > 0 || translateY > 0 || translateZ > 0){
-            fib->TranslateFibers(translateX, translateY, translateZ);
-          }
-          if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
-            fib->ScaleFibers(scaleX, scaleY, scaleZ);
+            if (rotateX > 0 || rotateY > 0 || rotateZ > 0){
+                MITK_INFO << "Rotate " << rotateX << " " << rotateY << " " << rotateZ;
+                fib->RotateAroundAxis(rotateX, rotateY, rotateZ);
+            }
+            if (translateX > 0 || translateY > 0 || translateZ > 0){
+                fib->TranslateFibers(translateX, translateY, translateZ);
+            }
+            if (scaleX > 0 || scaleY > 0 || scaleZ > 0)
+                fib->ScaleFibers(scaleX, scaleY, scaleZ);
         }
 
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();

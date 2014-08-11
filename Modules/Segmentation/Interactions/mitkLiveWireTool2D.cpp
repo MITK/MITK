@@ -240,6 +240,9 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
 
+  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
+    return false;
+
   if (!positionEvent) return false;
 
   m_LastEventSender = positionEvent->GetSender();
@@ -340,6 +343,9 @@ bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
   //to start new segment and computation
 
   /* check if event can be handled */
+  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
+    return false;
+
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
 
@@ -389,6 +395,9 @@ bool mitk::LiveWireTool2D::OnAddPoint ( StateMachineAction*, InteractionEvent* i
 bool mitk::LiveWireTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   //compute LiveWire segment from last control point to current mouse position
+  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
+    return false;
+
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
 
@@ -429,6 +438,8 @@ bool mitk::LiveWireTool2D::OnCheckPoint( const InteractionEvent* interactionEven
   //Transition YES if click close to first control point
   //
 
+  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
+    return false;
 
   const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>( interactionEvent );
   if (positionEvent)
@@ -457,8 +468,15 @@ bool mitk::LiveWireTool2D::OnFinish( StateMachineAction*, InteractionEvent* inte
 {
   // finish livewire tool interaction
 
+  if (!mitk::SegTool2D::CanHandleEvent(interactionEvent))
+    return false;
+
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return false;
+
+  // Have to do that here so that the m_LastEventSender is set correctly
+  const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D());
+  mitk::SegTool2D::AddContourmarker(planeGeo);
 
   // actual timestep
   int timestep = positionEvent->GetSender()->GetTimeStep();

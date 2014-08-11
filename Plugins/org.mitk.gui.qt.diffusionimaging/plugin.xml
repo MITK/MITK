@@ -142,6 +142,12 @@
           category="Connectomics"
           class="QmitkConnectomicsStatisticsView"
           icon="resources/connectomics/QmitkConnectomicsStatisticsViewIcon_48.png" />
+          
+    <view id="org.mitk.views.randomparcellationview"
+          name="Random Parcellation View"
+          category="Connectomics"
+          class="QmitkRandomParcellationView"
+          icon="resources/connectomics/QmitkRandomParcellationIcon.png" />
 
     <view id="org.mitk.views.odfmaximaextraction"
           name="Peak Extraction"

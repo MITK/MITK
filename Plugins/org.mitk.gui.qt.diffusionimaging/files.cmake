@@ -39,6 +39,7 @@ set(INTERNAL_CPP_FILES
   Connectomics/QmitkConnectomicsNetworkOperationsView.cpp
   Connectomics/QmitkConnectomicsStatisticsView.cpp
   Connectomics/QmitkNetworkHistogramCanvas.cpp
+  Connectomics/QmitkRandomParcellationView.cpp
   QmitkDwiSoftwarePhantomView.cpp
   QmitkOdfMaximaExtractionView.cpp
   QmitkFiberfoxView.cpp
@@ -68,6 +69,7 @@ set(UI_FILES
   src/internal/Connectomics/QmitkConnectomicsDataViewControls.ui
   src/internal/Connectomics/QmitkConnectomicsNetworkOperationsViewControls.ui
   src/internal/Connectomics/QmitkConnectomicsStatisticsViewControls.ui
+  src/internal/Connectomics/QmitkRandomParcellationViewControls.ui
   src/internal/QmitkDwiSoftwarePhantomViewControls.ui
   src/internal/QmitkOdfMaximaExtractionViewControls.ui
   src/internal/QmitkFiberfoxViewControls.ui
@@ -112,6 +114,7 @@ set(MOC_H_FILES
   src/internal/Connectomics/QmitkConnectomicsNetworkOperationsView.h
   src/internal/Connectomics/QmitkConnectomicsStatisticsView.h
   src/internal/Connectomics/QmitkNetworkHistogramCanvas.h
+  src/internal/Connectomics/QmitkRandomParcellationView.h
   src/internal/QmitkDwiSoftwarePhantomView.h
   src/internal/QmitkOdfMaximaExtractionView.h
   src/internal/QmitkFiberfoxView.h
@@ -150,6 +153,7 @@ set(CACHED_RESOURCE_FILES
   resources/connectomics/QmitkConnectomicsDataViewIcon_48.png
   resources/connectomics/QmitkConnectomicsNetworkOperationsViewIcon_48.png
   resources/connectomics/QmitkConnectomicsStatisticsViewIcon_48.png
+  resources/connectomics/QmitkRandomParcellationIcon.png
   resources/arrow.png
   resources/qball_peaks.png
   resources/phantom.png

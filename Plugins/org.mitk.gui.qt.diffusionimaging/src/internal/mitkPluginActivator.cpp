@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/Connectomics/QmitkConnectomicsDataView.h"
 #include "src/internal/Connectomics/QmitkConnectomicsNetworkOperationsView.h"
 #include "src/internal/Connectomics/QmitkConnectomicsStatisticsView.h"
+#include "src/internal/Connectomics/QmitkRandomParcellationView.h"
 #include "src/internal/QmitkOdfMaximaExtractionView.h"
 #include "src/internal/QmitkFiberfoxView.h"
 #include "src/internal/QmitkFiberExtractionView.h"
@@ -77,6 +78,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFieldmapGeneratorView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionRegistrationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDenoisingView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkRandomParcellationView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

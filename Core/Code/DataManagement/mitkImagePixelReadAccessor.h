@@ -17,13 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIMAGEPIXELREADACCESSOR_H
 #define MITKIMAGEPIXELREADACCESSOR_H
 
-#include <algorithm>
-#include <itkIndex.h>
-#include <itkPoint.h>
-#include <itkSmartPointer.h>
-#include "mitkImageDataItem.h"
-#include "mitkPixelType.h"
-#include "mitkImage.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImagePixelAccessor.h"
 
@@ -31,58 +24,73 @@ namespace mitk {
 
 class Image;
 
-typedef itk::SmartPointer<mitk::Image> ImagePointer;
-
-//##Documentation
-//## @brief Gives locked and index-based read access for a particular image part.
-//## The class provides several set- and get-methods, which allow an easy pixel access.
-//## It needs to know about pixel type and dimension of its image at compile time.
-//## @tparam TPixel defines the PixelType
-//## @tparam VDimension defines the dimension for accessing data
-//## @ingroup Data
+/**
+ * @brief Gives locked and index-based read access for a particular image part.
+ * The class provides several set- and get-methods, which allow an easy pixel access.
+ * It needs to know about pixel type and dimension of its image at compile time.
+ * @tparam TPixel defines the PixelType
+ * @tparam VDimension defines the dimension for accessing data
+ * @ingroup Data
+ */
 template <class TPixel, unsigned int VDimension = 3>
 class ImagePixelReadAccessor : public ImagePixelAccessor<TPixel, VDimension>
 {
   friend class Image;
 
 public:
-   typedef ImagePixelAccessor<TPixel,VDimension> ImagePixelAccessorType;
+
+  typedef ImagePixelAccessor<TPixel,VDimension> ImagePixelAccessorType;
+  typedef itk::SmartPointer<mitk::Image> ImagePointer;
+  typedef itk::SmartPointer<const mitk::Image> ImageConstPointer;
 
   /** \brief Instantiates a mitk::ImageReadAccessor (see its doxygen page for more details)
-     *  \param Image::Pointer specifies the associated Image
-     *  \param ImageDataItem* specifies the allocated image part
-     *  \param OptionFlags properties from mitk::ImageAccessorBase::Options can be chosen and assembled with bitwise unification.
-     *  \throws mitk::Exception if the Constructor was created inappropriately
-     *  \throws mitk::MemoryIsLockedException if requested image area is exclusively locked and mitk::ImageAccessorBase::ExceptionIfLocked is set in OptionFlags
-     *
-     *   Includes a check if typeid of PixelType coincides with templated TPixel
-     *   and a check if VDimension equals to the Dimension of the Image.*/
+   *  \param Image::Pointer specifies the associated Image
+   *  \param ImageDataItem* specifies the allocated image part
+   *  \param OptionFlags properties from mitk::ImageAccessorBase::Options can be chosen and assembled with bitwise unification.
+   *  \throws mitk::Exception if the Constructor was created inappropriately
+   *  \throws mitk::MemoryIsLockedException if requested image area is exclusively locked and mitk::ImageAccessorBase::ExceptionIfLocked is set in OptionFlags
+   *
+   *   Includes a check if typeid of PixelType coincides with templated TPixel
+   *   and a check if VDimension equals to the Dimension of the Image.
+   */
+  ImagePixelReadAccessor(
+      ImageConstPointer iP,
+      const ImageDataItem* iDI = NULL,
+      int OptionFlags = ImageAccessorBase::DefaultBehavior
+      )
+    : ImagePixelAccessor<TPixel, VDimension>(iP,iDI)
+    , m_ReadAccessor(iP, iDI, OptionFlags)
+  {
+  }
+
   ImagePixelReadAccessor(
       ImagePointer iP,
-      ImageDataItem* iDI = NULL,
+      const ImageDataItem* iDI = NULL,
       int OptionFlags = ImageAccessorBase::DefaultBehavior
-      ) :
-    ImagePixelAccessor<TPixel, VDimension>(iP,iDI),
-    m_ReadAccessor(iP, iDI, OptionFlags)
+      )
+    : ImagePixelAccessor<TPixel, VDimension>(iP.GetPointer(),iDI)
+    , m_ReadAccessor(iP, iDI, OptionFlags)
   {
+  }
 
-    // Check if Dimensions are correct
-    if(ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem == NULL) {
-      if(m_ReadAccessor.m_Image->GetDimension() != VDimension)
-        mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and Image are not equal. They have to be equal if an entire image is requested";
-    }
-    else {
-      if(ImagePixelAccessor<TPixel,VDimension>::m_ImageDataItem->GetDimension() != VDimension)
-        mitkThrow() << "Invalid ImageAccessor: The Dimensions of ImageAccessor and ImageDataItem are not equal.";
-    }
+  ImagePixelReadAccessor(
+      Image* iP,
+      const ImageDataItem* iDI = NULL,
+      int OptionFlags = ImageAccessorBase::DefaultBehavior
+      )
+    : ImagePixelAccessor<TPixel, VDimension>(iP,iDI)
+    , m_ReadAccessor(mitk::Image::ConstPointer(iP), iDI, OptionFlags)
+  {
+  }
 
-    // Check if PixelType is correct
-    if(!(m_ReadAccessor.m_Image->GetPixelType() ==  mitk::MakePixelType< itk::Image<TPixel, VDimension> >()) )
-    {
-      mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
-    }
-
-
+  ImagePixelReadAccessor(
+      const Image* iP,
+      const ImageDataItem* iDI = NULL,
+      int OptionFlags = ImageAccessorBase::DefaultBehavior
+      )
+    : ImagePixelAccessor<TPixel, VDimension>(iP,iDI)
+    , m_ReadAccessor(iP, iDI, OptionFlags)
+  {
   }
 
   /** Destructor informs Image to unlock memory. */
@@ -145,9 +153,9 @@ public:
 
 
   /** \brief Gives const access to the data. */
-  virtual inline const TPixel * GetConstData()
+  inline const TPixel* GetData() const
   {
-    return (TPixel*) m_ReadAccessor.m_AddressBegin;
+    return static_cast<const TPixel*>(m_ReadAccessor.m_AddressBegin);
   }
 
 protected:

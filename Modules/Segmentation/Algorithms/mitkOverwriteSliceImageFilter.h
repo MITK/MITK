@@ -104,7 +104,7 @@ class MitkSegmentation_EXPORT OverwriteSliceImageFilter : public ImageToImageFil
     void ItkImageSwitch( itk::Image<TPixel,VImageDimension>* image );
 
     template<typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
-    void ItkImageProcessing( itk::Image<TPixel1,VImageDimension1>* itkImage1, itk::Image<TPixel2,VImageDimension2>* itkImage2 );
+    void ItkImageProcessing( const itk::Image<TPixel1,VImageDimension1>* itkImage1, itk::Image<TPixel2,VImageDimension2>* itkImage2 );
 
     std::string EventDescription( unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
 

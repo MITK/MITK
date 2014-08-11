@@ -84,7 +84,7 @@ namespace mitk {
   private:
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
+    void ItkProcessImage (const itk::Image<TPixel, VImageDimension>* inputImage);
 
 
   };

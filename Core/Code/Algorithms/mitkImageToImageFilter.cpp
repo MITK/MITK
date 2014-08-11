@@ -57,7 +57,27 @@ void mitk::ImageToImageFilter::SetInput( unsigned int index, const mitk::ImageTo
 /**
 *
 */
-const mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInput(void)
+mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInput(void)
+{
+  if (this->GetNumberOfInputs() < 1)
+  {
+    return 0;
+  }
+
+  return static_cast<mitk::ImageToImageFilter::InputImageType * >
+    (this->ProcessObject::GetInput(0) );
+}
+
+/**
+*
+*/
+mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInput(unsigned int idx)
+{
+  return static_cast< mitk::ImageToImageFilter::InputImageType * >
+    (this->ProcessObject::GetInput(idx));
+}
+
+const mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInput(void) const
 {
   if (this->GetNumberOfInputs() < 1)
   {
@@ -71,14 +91,11 @@ const mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInp
 /**
 *
 */
-const mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInput(unsigned int idx)
+const mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInput(unsigned int idx) const
 {
   return static_cast< const mitk::ImageToImageFilter::InputImageType * >
     (this->ProcessObject::GetInput(idx));
 }
-
-
-
 
 //-----------------------------------------------------------------------
 //

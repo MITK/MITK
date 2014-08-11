@@ -209,7 +209,7 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
 
   //mitkIpPicDescriptor* rawSlice = const_cast<Image*>(sliceDiff)->GetSliceData()->GetPicDescriptor(); // we promise not to change anything!
 
-  mitk::ImageReadAccessor readAccess(const_cast<Image*>(sliceDiff));
+  mitk::ImageReadAccessor readAccess(sliceDiff);
   unsigned char* rawSlice = (unsigned char*) readAccess.GetData();
   if (!rawSlice) return;
 
@@ -221,7 +221,7 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
 }
 
 template < typename DATATYPE >
-void mitk::SegmentationInterpolationController::ScanChangedSlice( itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options )
+void mitk::SegmentationInterpolationController::ScanChangedSlice( const itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options )
 {
   DATATYPE* pixelData( (DATATYPE*)options.pixelData );
 
@@ -267,7 +267,7 @@ void mitk::SegmentationInterpolationController::ScanChangedSlice( itk::Image<DAT
 
 
 template < typename TPixel, unsigned int VImageDimension >
-void mitk::SegmentationInterpolationController::ScanChangedVolume( itk::Image<TPixel, VImageDimension>* diffImage, unsigned int timeStep )
+void mitk::SegmentationInterpolationController::ScanChangedVolume( const itk::Image<TPixel, VImageDimension>* diffImage, unsigned int timeStep )
 {
   typedef itk::ImageSliceConstIteratorWithIndex< itk::Image<TPixel, VImageDimension> > IteratorType;
 
@@ -319,14 +319,14 @@ void mitk::SegmentationInterpolationController::ScanChangedVolume( itk::Image<TP
 
 
 template < typename DATATYPE >
-void mitk::SegmentationInterpolationController::ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep )
+void mitk::SegmentationInterpolationController::ScanWholeVolume( const itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep )
 {
   if (!volume) return;
   if ( timeStep >= m_SegmentationCountInSlice.size() ) return;
 
   for (unsigned int slice = 0; slice < volume->GetDimension(2); ++slice)
   {
-    DATATYPE* rawVolume = static_cast<DATATYPE*>( const_cast<Image*>(volume)->GetVolumeData(timeStep)->GetData() ); // we again promise not to change anything, we'll just count
+    DATATYPE* rawVolume = static_cast<DATATYPE*>( volume->GetVolumeData(timeStep)->GetData() ); // we again promise not to change anything, we'll just count
     //DATATYPE* rawSlice = static_cast<DATATYPE*>( volume->GetSliceData(slice)->GetData() ); // TODO THIS wouldn't work. Did I mess up with some internal mitk::Image data structure?
     DATATYPE* rawSlice = rawVolume + ( volume->GetDimension(0) * volume->GetDimension(1) * slice );
 

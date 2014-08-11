@@ -58,7 +58,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::GenerateData()
     //  - observer commands to know when the image is deleted (no further action then, perhaps even remove the operations from the undo stack)
     //
     //Image::ConstPointer input = ImageToImageFilter::GetInput(0);
-    Image::ConstPointer input3D = ImageToImageFilter::GetInput(0);
+    Image::Pointer input3D = ImageToImageFilter::GetInput(0);
 
     //Image::ConstPointer slice = m_SliceImage;
 

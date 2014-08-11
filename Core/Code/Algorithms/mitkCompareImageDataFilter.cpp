@@ -92,7 +92,7 @@ bool mitk::CompareImageDataFilter::GetResult(size_t threshold)
 }
 
 template< typename TPixel, unsigned int VImageDimension>
-void mitk::CompareImageDataFilter::EstimateValueDifference(itk::Image< TPixel, VImageDimension>* itkImage1,
+void mitk::CompareImageDataFilter::EstimateValueDifference(const itk::Image< TPixel, VImageDimension>* itkImage1,
                               const mitk::Image* referenceImage)
 {
 

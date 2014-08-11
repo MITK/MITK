@@ -33,7 +33,7 @@ namespace mitk
     }
 
     template < typename TPixel, unsigned int VImageDimension >
-    void AccessItkImage( itk::Image<TPixel, VImageDimension>* itkImage1,
+    void AccessItkImage( const itk::Image<TPixel, VImageDimension>* itkImage1,
                          PyramidalRegistrationMethod* method);
   };
 }

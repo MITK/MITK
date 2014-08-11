@@ -79,7 +79,6 @@ set(H_FILES
 
 
   IO/mitkPixelTypeTraits.h
-
 )
 
 set(CPP_FILES
@@ -161,8 +160,12 @@ set(CPP_FILES
   DataManagement/mitkImageCastPart4.cpp
   DataManagement/mitkImageDataItem.cpp
   DataManagement/mitkImageDescriptor.cpp
-  DataManagement/mitkImageVtkAccessor.cpp
+  DataManagement/mitkImageReadAccessor.cpp
   DataManagement/mitkImageStatisticsHolder.cpp
+  DataManagement/mitkImageVtkAccessor.cpp
+  DataManagement/mitkImageVtkReadAccessor.cpp
+  DataManagement/mitkImageVtkWriteAccessor.cpp
+  DataManagement/mitkImageWriteAccessor.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp
   DataManagement/mitkLine.cpp

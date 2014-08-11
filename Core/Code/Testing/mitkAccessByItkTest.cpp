@@ -180,7 +180,7 @@ public:
   }
 
   template<typename TPixel, unsigned int VDimension>
-  void AccessItkImage(itk::Image<TPixel, VDimension>*,
+  void AccessItkImage(const itk::Image<TPixel, VDimension>*,
                       EImageType param1 = Unknown, int param2 = 0, int param3 = 0)
   {
     switch (param1)

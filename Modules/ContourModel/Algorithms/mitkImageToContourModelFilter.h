@@ -63,7 +63,7 @@ namespace mitk {
     void GenerateData();
 
     template<typename TPixel, unsigned int VImageDimension>
-    void Itk2DContourExtraction (itk::Image<TPixel, VImageDimension>* sliceImage);
+    void Itk2DContourExtraction (const itk::Image<TPixel, VImageDimension>* sliceImage);
 
   private:
     const BaseGeometry* m_SliceGeometry;

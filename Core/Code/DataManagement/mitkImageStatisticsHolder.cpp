@@ -217,7 +217,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t)
     {
       timeSelector->SetTimeNr(t);
       timeSelector->UpdateLargestPossibleRegion();
-      mitk::Image* image = timeSelector->GetOutput();
+      const mitk::Image* image = timeSelector->GetOutput();
       AccessByItk_2( image, _ComputeExtremaInItkImage, this, t );
     }
   }

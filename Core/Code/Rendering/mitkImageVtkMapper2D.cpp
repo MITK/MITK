@@ -222,7 +222,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
       {
         thickSlicesNum = intProperty->GetValue();
         if(thickSlicesNum < 1) thickSlicesNum=1;
-        if(thickSlicesNum > 10) thickSlicesNum=10;
       }
     }
     else

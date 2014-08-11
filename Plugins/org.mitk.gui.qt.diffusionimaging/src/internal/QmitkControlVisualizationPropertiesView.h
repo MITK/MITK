@@ -124,6 +124,8 @@ protected slots:
 
 protected:
 
+  virtual void NodeRemoved(const mitk::DataNode* node);
+
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 

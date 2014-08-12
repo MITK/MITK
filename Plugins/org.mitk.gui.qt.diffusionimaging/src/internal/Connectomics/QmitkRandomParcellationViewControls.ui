@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>547</width>
+    <width>249</width>
     <height>517</height>
    </rect>
   </property>
@@ -58,7 +58,7 @@
       <item>
        <widget class="QSpinBox" name="spinBoxNumberNodes">
         <property name="minimum">
-         <number>1</number>
+         <number>2</number>
         </property>
         <property name="maximum">
          <number>5000</number>
@@ -95,18 +95,15 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QFormLayout" name="formLayout">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-         </property>
-         <item row="0" column="0">
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
           <widget class="QRadioButton" name="radioButtonNumberParcels">
            <property name="text">
             <string>According to the number of parcels</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item>
           <widget class="QFrame" name="frameNumberParcels">
            <property name="enabled">
             <bool>false</bool>
@@ -138,14 +135,14 @@
            </layout>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item>
           <widget class="QRadioButton" name="radioButtonSmallestParcel">
            <property name="text">
             <string>According to the size of parcels</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item>
           <widget class="QFrame" name="frameSmallestParcel">
            <property name="enabled">
             <bool>false</bool>

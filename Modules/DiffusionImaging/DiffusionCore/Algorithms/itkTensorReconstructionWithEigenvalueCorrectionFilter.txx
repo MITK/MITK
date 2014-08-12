@@ -102,13 +102,7 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   {
     diagonal[i]=dirsTimesDirsTrans[i][i];
   }
-
-  //klaus double max_diagonal = diagonal.max_value();
-
-
   // normalization: free-water method assumes that directions matrix norm 1 is equal to b=1000
-
-  //klaus directions=directions*sqrt(m_BValue/1000.0)*(1.0/sqrt(max_diagonal));
   directions=directions*sqrt(m_BValue/1000.0);
 
   //calculation of norms and storing them in vector
@@ -120,7 +114,6 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
     b_vec[i]= dirsTimesDirsTrans[i][i];
   }
 
-  std::cout << "bvec " << b_vec << std::endl;
 
   // Calculation of so called design matrix that is used to obtain expected signal.
 

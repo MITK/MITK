@@ -29,6 +29,7 @@ class mitkSurfaceInterpolationControllerTestSuite : public mitk::TestFixture
   MITK_TEST(TestRemoveInterpolationSession);
   MITK_TEST(TestOnSegmentationDeleted);
   MITK_TEST(TestAddNewContour);
+  MITK_TEST(TestRemoveContour);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -331,5 +332,57 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Contours not equal!", mitk::Equal(*(surf_3->GetVtkPolyData()), *(contour_10->GetVtkPolyData()), 0.000001, true));
   }
 
+  void TestRemoveContour()
+  {
+    // Create segmentation image
+    unsigned int dimensions1[] = {10, 10, 10};
+    mitk::Image::Pointer segmentation_1 = createImage(dimensions1);
+    mitk::Geometry3D* geo_1 = segmentation_1->GetGeometry();
+    m_Controller->SetCurrentInterpolationSession(segmentation_1);
+
+    // Create some contours
+    vtkSmartPointer<vtkRegularPolygonSource> p_source = vtkSmartPointer<vtkRegularPolygonSource>::New();
+    p_source->SetNumberOfSides(20);
+    p_source->SetCenter(4.0,4.0,4.0);
+    p_source->SetRadius(4);
+    p_source->SetNormal(0,1,0);
+    p_source->Update();
+    vtkPolyData* poly_1 = p_source->GetOutput();
+    mitk::Surface::Pointer surf_1 = mitk::Surface::New();
+    surf_1->SetVtkPolyData(poly_1);
+
+    vtkSmartPointer<vtkRegularPolygonSource> p_source_2 = vtkSmartPointer<vtkRegularPolygonSource>::New();
+    p_source_2->SetNumberOfSides(80);
+    p_source_2->SetCenter(4.0,4.0,4.0);
+    p_source_2->SetRadius(4);
+    p_source_2->SetNormal(1, 0, 0);
+    p_source_2->Update();
+    vtkPolyData* poly_2 = p_source_2->GetOutput();
+    mitk::Surface::Pointer surf_2 = mitk::Surface::New();
+    surf_2->SetVtkPolyData(poly_2);
+
+    // Create planes for contours
+    mitk::PlaneGeometry::Pointer plane_1 = createPlaneForContour(geo_1, poly_1, mitk::PlaneGeometry::Frontal);
+    mitk::PlaneGeometry::Pointer plane_2 = createPlaneForContour(geo_1, poly_2, mitk::PlaneGeometry::Sagittal);
+
+    // Add contours
+    m_Controller->AddNewContour(surf_1, plane_1);
+    m_Controller->AddNewContour(surf_2, plane_2);
+    MITK_INFO<<"[NUM CONTOURS]: "<<m_Controller->GetNumberOfContours();
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of contours!", m_Controller->GetNumberOfContours() == 2);
+
+    // Remove a contour
+    bool success = m_Controller->RemoveContour(plane_1);
+    CPPUNIT_ASSERT_MESSAGE("Remove failed - contour not removed correctly!", (m_Controller->GetNumberOfContours() == 1) && success);
+
+    // Test remove non existing contour
+    mitk::PlaneGeometry::Pointer plane_3 = plane_1->Clone();
+    mitk::Point3D origin = plane_3->GetOrigin();
+    origin += 0.5;
+    plane_3->SetOrigin(origin);
+
+    success = m_Controller->RemoveContour(plane_3);
+    CPPUNIT_ASSERT_MESSAGE("Remove failed - contour was unintentionally removed!", (m_Controller->GetNumberOfContours() == 1) && !success);
+  }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkSurfaceInterpolationController)

@@ -146,8 +146,25 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
     m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
     m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
   }
-
   this->Modified();
+}
+
+
+bool mitk::SurfaceInterpolationController::RemoveContour(mitk::PlaneGeometry *plane)
+{
+  ContourPositionPairList::iterator it = m_ListOfInterpolationSessions[m_SelectedSegmentation].begin();
+  while (it !=  m_ListOfInterpolationSessions[m_SelectedSegmentation].end())
+  {
+    ContourPositionPair pair = (*it);
+    if (PlanesEqual(plane, pair.plane, mitk::eps))
+    {
+      m_ListOfInterpolationSessions[m_SelectedSegmentation].erase(it);
+      this->ReinitializeInterpolation();
+      return true;
+    }
+    ++it;
+  }
+  return false;
 }
 
 void mitk::SurfaceInterpolationController::Interpolate()
@@ -227,11 +244,6 @@ void mitk::SurfaceInterpolationController::SetDistanceImageVolume(unsigned int d
   m_InterpolateSurfaceFilter->SetDistanceImageVolume(distImgVolume);
 }
 
-void mitk::SurfaceInterpolationController::SetSegmentationImage(Image* /*workingImage*/)
-{
-//  m_NormalsFilter->SetSegmentationBinaryImage(workingImage);
-}
-
 mitk::Image::Pointer mitk::SurfaceInterpolationController::GetCurrentSegmentation()
 {
   return m_SelectedSegmentation;
@@ -272,23 +284,16 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
   if (currentSegmentationImage.GetPointer() == m_SelectedSegmentation)
     return;
 
-  m_ReduceFilter->Reset();
-  m_NormalsFilter->Reset();
-  m_InterpolateSurfaceFilter->Reset();
-
   if (currentSegmentationImage.IsNull())
   {
     m_SelectedSegmentation = 0;
     return;
   }
-  ContourListMap::iterator it = m_ListOfInterpolationSessions.find(currentSegmentationImage.GetPointer());
 
   m_SelectedSegmentation = currentSegmentationImage.GetPointer();
 
-  itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
-  AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
-  m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
-
+  ContourListMap::iterator it = m_ListOfInterpolationSessions.find(currentSegmentationImage.GetPointer());
+  // If the session does not exist yet create a new ContourPositionPairList otherwise reinitialize the interpolation pipeline
   if (it == m_ListOfInterpolationSessions.end())
   {
     ContourPositionPairList newList;
@@ -299,26 +304,9 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
     itk::MemberCommand<SurfaceInterpolationController>::Pointer command = itk::MemberCommand<SurfaceInterpolationController>::New();
     command->SetCallbackFunction(this, &SurfaceInterpolationController::OnSegmentationDeleted);
     m_SegmentationObserverTags.insert( std::pair<mitk::Image*, unsigned long>( m_SelectedSegmentation, m_SelectedSegmentation->AddObserver( itk::DeleteEvent(), command ) ) );
-
   }
-  else
-  {
-    for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
-    {
-      m_ReduceFilter->SetInput(i, m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i).contour);
-    }
 
-    m_ReduceFilter->Update();
-
-    m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
-
-    for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
-    {
-      m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
-      m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
-    }
-  }
-  Modified();
+  this->ReinitializeInterpolation();
 }
 
 void mitk::SurfaceInterpolationController::RemoveSegmentationFromContourList(mitk::Image *segmentation)
@@ -332,7 +320,7 @@ void mitk::SurfaceInterpolationController::RemoveInterpolationSession(mitk::Imag
   {
     if (m_SelectedSegmentation == segmentationImage)
     {
-      SetSegmentationImage(NULL);
+      m_NormalsFilter->SetSegmentationBinaryImage(NULL);
       m_SelectedSegmentation = 0;
     }
     m_ListOfInterpolationSessions.erase(segmentationImage);
@@ -369,10 +357,40 @@ void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Obje
   {
     if (m_SelectedSegmentation == tempImage)
     {
-      SetSegmentationImage(NULL);
+      m_NormalsFilter->SetSegmentationBinaryImage(NULL);
       m_SelectedSegmentation = 0;
     }
     m_SegmentationObserverTags.erase(tempImage);
     m_ListOfInterpolationSessions.erase(tempImage);
   }
+}
+
+void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
+{
+  m_NormalsFilter->SetSegmentationBinaryImage(m_SelectedSegmentation);
+
+  // If session has changed reset the pipeline
+  m_ReduceFilter->Reset();
+  m_NormalsFilter->Reset();
+  m_InterpolateSurfaceFilter->Reset();
+
+  itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
+  AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
+  m_InterpolateSurfaceFilter->SetReferenceImage(itkImage.GetPointer());
+
+  for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
+  {
+    m_ReduceFilter->SetInput(i, m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i).contour);
+  }
+
+  m_ReduceFilter->Update();
+
+  m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
+
+  for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
+  {
+    m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
+    m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
+  }
+  Modified();
 }

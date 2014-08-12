@@ -1026,14 +1026,13 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
           }
         }
 
-        m_SurfaceInterpolator->SetSegmentationImage(dynamic_cast<mitk::Image*>(workingNode->GetData()));
         m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
         m_SurfaceInterpolator->SetMinSpacing(minSpacing);
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
         mitk::Image* segmentationImage = dynamic_cast<mitk::Image*>(workingNode->GetData());
         if (segmentationImage->GetDimension() == 3)
-          m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(segmentationImage);
+          m_SurfaceInterpolator->SetCurrentInterpolationSession(segmentationImage);
         else
           MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";
 

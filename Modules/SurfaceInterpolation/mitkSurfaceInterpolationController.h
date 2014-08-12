@@ -67,6 +67,15 @@ namespace mitk
     void AddNewContour (Surface::Pointer newContour, PlaneGeometry::Pointer plane);
 
     /**
+
+    /**
+     * @brief Removes the contour for a given plane for the current selected segmenation
+     * @param plane the plane for which the contour should be returned
+     * @return true if a contour was found and removed, false if no contour was found
+     */
+    bool RemoveContour (mitk::PlaneGeometry* plane);
+
+    /**
      * Interpolates the 3D surface from the given extracted contours
      */
     void Interpolate ();
@@ -90,12 +99,6 @@ namespace mitk
      * By evaluation we found out that 50.000 pixel delivers a good result
      */
     void SetDistanceImageVolume(unsigned int distImageVolume);
-
-    /**
-     * Sets the current segmentation which is used by the interpolation
-     * This is needed because the calculation of the normals needs to now wheather a normal points inside a segmentation or not
-     */
-    void SetSegmentationImage(Image* workingImage);
 
     /**
      * @brief Get the current selected segmentation for which the interpolation is performed

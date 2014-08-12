@@ -297,6 +297,11 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
     mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, plane);
     contour->DisconnectPipeline();
   }
+  else
+  {
+    // Remove contour!
+    mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(plane);
+  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryISelectionListener.h"
 #include "berryIStructuredSelection.h"
+#include <QmitkDataStorageComboBox.h>
+#include "itkImageFileReader.h"
 
 /*!
 \brief The DeformableRegistration functionality is used to perform deformable registration.
@@ -51,6 +53,10 @@ class REGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkFunction
   public:
 
     static const std::string VIEW_ID;
+
+    typedef itk::Vector< float, 3 >       VectorType;
+    typedef itk::Image< VectorType, 3 >   DeformationFieldType;
+    typedef itk::ImageFileReader< DeformationFieldType > ImageReaderType;
 
     /*!
     \brief default constructor
@@ -97,6 +103,8 @@ class REGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkFunction
     virtual void Hidden();
 
     void DataNodeHasBeenRemoved(const mitk::DataNode* node);
+
+
 
   signals:
 

@@ -95,7 +95,7 @@ public:
     // fiber subset extraction
     FiberBundleX::Pointer           ExtractFiberSubset(PlanarFigure *pf);
     std::vector<long>               ExtractFiberIdSubset(PlanarFigure* pf);
-    FiberBundleX::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint);
+    FiberBundleX::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false);
     FiberBundleX::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
 
     vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected

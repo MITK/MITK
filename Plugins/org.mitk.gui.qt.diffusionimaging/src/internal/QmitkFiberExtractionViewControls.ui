@@ -103,7 +103,16 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item row="0" column="0">
@@ -227,10 +236,19 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
-         <property name="margin">
+         <property name="leftMargin">
           <number>0</number>
          </property>
-         <item row="4" column="0">
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="5" column="0">
           <widget class="QCommandLinkButton" name="m_GenerateRoiImage">
            <property name="enabled">
             <bool>false</bool>
@@ -261,7 +279,7 @@
           </widget>
          </item>
          <item row="3" column="0">
-          <widget class="QCommandLinkButton" name="m_SubstractBundles">
+          <widget class="QCommandLinkButton" name="m_RemoveOutsideMaskButton">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -283,14 +301,14 @@
             </font>
            </property>
            <property name="toolTip">
-            <string>Returns all fibers contained in bundle X that are not contained in bundle Y (not commutative!). Select at least two fiber bundles to execute.</string>
+            <string>Remove all fiber parts outside of the mask.</string>
            </property>
            <property name="text">
-            <string>Substract</string>
+            <string>Remove Outside Mask</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <widget class="QCommandLinkButton" name="m_JoinBundles">
            <property name="enabled">
             <bool>false</bool>
@@ -317,66 +335,6 @@
            </property>
            <property name="text">
             <string>Join</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCommandLinkButton" name="m_ExtractMask">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>200</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>11</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Extract fibers starting/ending inside of the selected binary mask.</string>
-           </property>
-           <property name="text">
-            <string>Ending in Mask</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QCommandLinkButton" name="m_Extract3dButton">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>200</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>11</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Extract fibers passing through the selected binary mask.</string>
-           </property>
-           <property name="text">
-            <string>Passing Mask</string>
            </property>
           </widget>
          </item>
@@ -410,37 +368,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QCommandLinkButton" name="m_RemoveOutsideMaskButton">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>200</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>11</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Remove all fiber parts outside of the mask.</string>
-           </property>
-           <property name="text">
-            <string>Remove Outside Mask</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QCommandLinkButton" name="m_RemoveInsideMaskButton">
            <property name="enabled">
             <bool>false</bool>
@@ -467,6 +395,126 @@
            </property>
            <property name="text">
             <string>Remove Inside Mask</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCommandLinkButton" name="m_ExtractMask">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Extract fibers starting/ending inside of the selected binary mask.</string>
+           </property>
+           <property name="text">
+            <string>Ending in Mask</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QCommandLinkButton" name="m_SubstractBundles">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Returns all fibers contained in bundle X that are not contained in bundle Y (not commutative!). Select at least two fiber bundles to execute.</string>
+           </property>
+           <property name="text">
+            <string>Substract</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCommandLinkButton" name="m_Extract3dButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Extract fibers passing through the selected binary mask.</string>
+           </property>
+           <property name="text">
+            <string>Passing Mask</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QCommandLinkButton" name="m_Extract3dButton_2">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Extract fibers NOT passing through the selected binary mask.</string>
+           </property>
+           <property name="text">
+            <string>Not Passing Mask</string>
            </property>
           </widget>
          </item>
@@ -500,7 +548,16 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout_5">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item row="0" column="3">

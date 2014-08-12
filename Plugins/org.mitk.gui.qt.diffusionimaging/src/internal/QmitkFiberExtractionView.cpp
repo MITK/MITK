@@ -99,6 +99,7 @@ void QmitkFiberExtractionView::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->m_SubstractBundles, SIGNAL(clicked()), this, SLOT(SubstractBundles()) );
         connect(m_Controls->m_GenerateRoiImage, SIGNAL(clicked()), this, SLOT(GenerateRoiImage()) );
 
+        connect(m_Controls->m_Extract3dButton_2, SIGNAL(clicked()), this, SLOT(ExtractNotPassingMask()));
         connect(m_Controls->m_Extract3dButton, SIGNAL(clicked()), this, SLOT(ExtractPassingMask()));
         connect( m_Controls->m_ExtractMask, SIGNAL(clicked()), this, SLOT(ExtractEndingInMask()) );
         connect( m_Controls->doExtractFibersButton, SIGNAL(clicked()), this, SLOT(DoFiberExtraction()) );
@@ -187,6 +188,34 @@ void QmitkFiberExtractionView::ExtractEndingInMask()
         DataNode::Pointer newNode = DataNode::New();
         newNode->SetData(newFib);
         name += "_ending-in-mask";
+        newNode->SetName(name.toStdString());
+        GetDefaultDataStorage()->Add(newNode);
+        m_SelectedFB.at(i)->SetVisibility(false);
+    }
+}
+
+void QmitkFiberExtractionView::ExtractNotPassingMask()
+{
+    if (m_MaskImageNode.IsNull())
+        return;
+
+    mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        QString name(m_SelectedFB.at(i)->GetName().c_str());
+
+        itkUCharImageType::Pointer mask = itkUCharImageType::New();
+        mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
+        mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, true, true);
+        if (newFib->GetNumFibers()<=0)
+        {
+            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            continue;
+        }
+        DataNode::Pointer newNode = DataNode::New();
+        newNode->SetData(newFib);
+        name += "_not-passing-mask";
         newNode->SetName(name.toStdString());
         GetDefaultDataStorage()->Add(newNode);
         m_SelectedFB.at(i)->SetVisibility(false);
@@ -705,6 +734,7 @@ void QmitkFiberExtractionView::StdMultiWidgetNotAvailable()
 
 void QmitkFiberExtractionView::UpdateGui()
 {
+    m_Controls->m_Extract3dButton_2->setEnabled(false);
     m_Controls->m_Extract3dButton->setEnabled(false);
     m_Controls->m_ExtractMask->setEnabled(false);
     m_Controls->m_RemoveOutsideMaskButton->setEnabled(false);
@@ -744,6 +774,7 @@ void QmitkFiberExtractionView::UpdateGui()
 
         if (m_MaskImageNode.IsNotNull())
         {
+            m_Controls->m_Extract3dButton_2->setEnabled(true);
             m_Controls->m_Extract3dButton->setEnabled(true);
             m_Controls->m_ExtractMask->setEnabled(true);
             m_Controls->m_RemoveOutsideMaskButton->setEnabled(true);

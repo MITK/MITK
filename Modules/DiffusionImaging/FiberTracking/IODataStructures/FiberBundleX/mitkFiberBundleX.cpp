@@ -582,7 +582,7 @@ void mitk::FiberBundleX::GenerateFiberIds()
 
 }
 
-mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint)
+mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert)
 {
     vtkSmartPointer<vtkPolyData> polyData = m_FiberPolyData;
     if (anyPoint)
@@ -596,7 +596,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
             minSpacing = mask->GetSpacing()[2];
 
         mitk::FiberBundleX::Pointer fibCopy = this->GetDeepCopy();
-        fibCopy->ResampleFibers(minSpacing/10);
+        fibCopy->ResampleFibers(minSpacing/5);
         polyData = fibCopy->GetFiberPolyData();
     }
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -622,24 +622,56 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
         {
             if (anyPoint)
             {
-                for (int j=0; j<numPoints; j++)
+                if (!invert)
                 {
-                    double* p = points->GetPoint(j);
-
-                    itk::Point<float, 3> itkP;
-                    itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
-                    itk::Index<3> idx;
-                    mask->TransformPhysicalPointToIndex(itkP, idx);
-
-                    if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) )
+                    for (int j=0; j<numPoints; j++)
                     {
+                        double* p = points->GetPoint(j);
+
+                        itk::Point<float, 3> itkP;
+                        itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+                        itk::Index<3> idx;
+                        mask->TransformPhysicalPointToIndex(itkP, idx);
+
+                        if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) )
+                        {
+                            for (int k=0; k<numPointsOriginal; k++)
+                            {
+                                double* p = pointsOriginal->GetPoint(k);
+                                vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                                container->GetPointIds()->InsertNextId(id);
+                            }
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    bool includeFiber = true;
+                    for (int j=0; j<numPoints; j++)
+                    {
+                        double* p = points->GetPoint(j);
+
+                        itk::Point<float, 3> itkP;
+                        itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+                        itk::Index<3> idx;
+                        mask->TransformPhysicalPointToIndex(itkP, idx);
+
+                        if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) )
+                        {
+                            includeFiber = false;
+                            break;
+                        }
+                    }
+                    if (includeFiber)
+                    {
+
                         for (int k=0; k<numPointsOriginal; k++)
                         {
                             double* p = pointsOriginal->GetPoint(k);
                             vtkIdType id = vtkNewPoints->InsertNextPoint(p);
                             container->GetPointIds()->InsertNextId(id);
                         }
-                        break;
                     }
                 }
             }

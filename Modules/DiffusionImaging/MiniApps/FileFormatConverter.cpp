@@ -30,9 +30,15 @@ using namespace mitk;
 int FileFormatConverter(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Format Converter");
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setDescription("");
+    parser.setContributor("MBI");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("in", "i", ctkCommandLineParser::String, "input file", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
+    parser.addArgument("in", "i", ctkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

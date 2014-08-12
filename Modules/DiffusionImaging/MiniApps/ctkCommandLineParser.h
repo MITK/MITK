@@ -125,7 +125,11 @@ public:
         Bool = 1,
         StringList = 2,
         Int = 3,
-        Float = 4
+        Float = 4,
+        InputDirectory = 5,
+        InputFile = 6,
+        OutputDirectory = 7,
+        OutputFile = 8
     };
 
     typedef std::vector< std::string > StringContainerType;
@@ -261,7 +265,7 @@ public:
    *         does not match <code>type</code>, a <code>std::logic_error</code> is thrown.
    */
     void addArgument(const string& longarg, const string& shortarg,
-                     Type type, const string& argHelp = string(),
+                     Type type, const string& argLabel, const string& argHelp = string(),
                      const us::Any& defaultValue = us::Any(), bool optional=true,
                      bool ignoreRest = false, bool deprecated = false);
 
@@ -277,7 +281,7 @@ public:
    * @param shortarg The short argument name.
    * @param argHelp A help string describing alternatives to the deprecated argument.
    */
-    void addDeprecatedArgument(const string& longarg, const string& shortarg,
+    void addDeprecatedArgument(const string& longarg, const string& shortarg, const string& argLabel,
                                const string& argHelp);
 
     /**
@@ -414,9 +418,24 @@ public:
     */
     void setStrictModeEnabled(bool strictMode);
 
+    void GetXML();
+
+    void setTitle(std::string title);
+    void setContributor(std::string contributor);
+    void setCategory(std::string category);
+    void setDescription(std::string description);
+    void changeParameterGroup(std::string name, std::string description);
+
 private:
     class ctkInternal;
     ctkInternal * Internal;
+
+    string Title;
+    string Contributor;
+    string Category;
+    string Description;
+    string ParameterGroupName;
+    string ParameterGroupDescription;
 };
 
 #endif

@@ -334,7 +334,7 @@ void QmitkRandomParcellationView::GetRandomParcels( itk::Image<TPixel, VImageDim
   generator.SetAppropriateValues();
 
   //Get a new data node which contains the random parcellation
-  mitk::Image::Pointer mitkRandomVoxelImage = mitk::ImportItkImage( voxelImage );
+  mitk::Image::Pointer mitkRandomVoxelImage = mitk::GrabItkImageMemory( voxelImage );
   mitk::DataNode::Pointer newRandomVoxelImageNode = mitk::DataNode::New();
   newRandomVoxelImageNode->SetData(mitkRandomVoxelImage);
   newRandomVoxelImageNode->SetProperty(PROPERTYNAME.c_str(),

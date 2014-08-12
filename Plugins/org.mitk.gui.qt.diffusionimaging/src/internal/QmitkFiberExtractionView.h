@@ -81,8 +81,9 @@ protected slots:
   void JoinBundles();               ///< merge selected fiber bundles
   void SubstractBundles();          ///< subtract bundle A from bundle B. Not commutative! Defined by order of selection.
   void GenerateRoiImage();          ///< generate binary image of selected planar figures.
-  void ExtractPassingMask();                 ///< extract all fibers passing the selected surface mesh
-  void ExtractEndingInMask();               ///< extract all fibers passing the selected surface mesh
+  void ExtractPassingMask();        ///< extract all fibers passing the selected segmentation
+  void ExtractNotPassingMask();     ///< extract all fibers NOT passing the selected segmentation
+  void ExtractEndingInMask();       ///< extract all fibers passing the selected segmentation
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 

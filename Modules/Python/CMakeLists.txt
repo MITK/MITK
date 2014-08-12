@@ -9,7 +9,7 @@ if( MITK_USE_Python )
     set(OpenCV_DEP OpenCV)
   endif()
 
-  if(not APPLE)
+  if(NOT APPLE)
     set(SimpleITK_DEP SimpleITK)
   endif()
 

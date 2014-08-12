@@ -4,18 +4,24 @@ if( MITK_USE_Python )
   endif()
 
   set(OpenCV_DEP )
+  set(SimpleITK_DEP )
   if(MITK_USE_OpenCV)
     set(OpenCV_DEP OpenCV)
+  endif()
+
+  if(not APPLE)
+    set(SimpleITK_DEP SimpleITK)
   endif()
 
   MITK_CREATE_MODULE(
     DEPENDS MitkCore
     EXPORT_DEFINE MITK_PYTHON_EXPORT
-    PACKAGE_DEPENDS Qt4|QtGui CTK PythonLibs SimpleITK VTK|vtkPython+vtkWrappingPythonCore ${OpenCV_DEP}
+    PACKAGE_DEPENDS Qt4|QtGui CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets PythonLibs VTK|vtkPython+vtkWrappingPythonCore ${SimpleITK_DEP} ${OpenCV_DEP}
     INCLUDE_DIRS ${NUMPY_INCLUDE_DIR}
   )
-  configure_file(PythonPath.h.in
-    "${CMAKE_CURRENT_BINARY_DIR}/PythonPath.h" @ONLY)
+  configure_file(PythonPath.h.in "${CMAKE_CURRENT_BINARY_DIR}/PythonPath.h" @ONLY)
 
-  add_subdirectory(Testing)
+  if(NOT APPLE)
+    add_subdirectory(Testing)
+  endif()
 endif()

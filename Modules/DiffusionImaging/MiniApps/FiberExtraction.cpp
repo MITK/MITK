@@ -32,12 +32,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 int FiberExtraction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Fiber Extraction");
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setContributor("MBI");
+    parser.setDescription("");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output tractogram", us::Any(), false);
-    parser.addArgument("planfirgure1", "pf1", ctkCommandLineParser::String, "first planar figure", us::Any(), false);
-    parser.addArgument("planfirgure2", "pf2", ctkCommandLineParser::String, "second planar figure", us::Any());
-    parser.addArgument("operation", "op", ctkCommandLineParser::String, "logical operation (AND, OR, NOT)", us::Any());
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
+    parser.addArgument("planfirgure1", "pf1", ctkCommandLineParser::String, "Figure 1:", "first planar figure", us::Any(), false);
+    parser.addArgument("planfirgure2", "pf2", ctkCommandLineParser::String, "Figure 2:", "second planar figure", us::Any());
+    parser.addArgument("operation", "op", ctkCommandLineParser::String, "Operation:", "logical operation (AND, OR, NOT)", us::Any());
 
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

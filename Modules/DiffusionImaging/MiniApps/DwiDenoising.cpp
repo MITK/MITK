@@ -51,14 +51,25 @@ mitk::BaseData::Pointer LoadFile(std::string filename)
 int DwiDenoising(int argc, char* argv[])
 {
   ctkCommandLineParser parser;
+
+  parser.setTitle("DWI Denoising");
+  parser.setCategory("Preprocessing Tools");
+  parser.setContributor("MBI");
+  parser.setDescription("Denoising for diffusion weighted images using a non-local means algorithm.");
+
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (DWI)", us::Any(), false);
-  parser.addArgument("variance", "v", ctkCommandLineParser::Float, "noise variance", us::Any(), false);
-  parser.addArgument("mask", "m", ctkCommandLineParser::String, "brainmask for input image", us::Any(), true);
-  parser.addArgument("search", "s", ctkCommandLineParser::Int, "search radius", us::Any(), true);
-  parser.addArgument("compare", "c", ctkCommandLineParser::Int, "compare radius", us::Any(), true);
-  parser.addArgument("joint", "j", ctkCommandLineParser::Bool, "use joint information");
-  parser.addArgument("rician", "r", ctkCommandLineParser::Bool, "use rician adaption");
+  parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input image (DWI)", us::Any(), false);
+  parser.addArgument("variance", "v", ctkCommandLineParser::Float, "Variance:", "noise variance", us::Any(), false);
+
+  parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask:", "brainmask for input image", us::Any(), true);
+  parser.addArgument("search", "s", ctkCommandLineParser::Int, "Search radius:", "search radius", us::Any(), true);
+  parser.addArgument("compare", "c", ctkCommandLineParser::Int, "Comparison radius:", "comparison radius", us::Any(), true);
+  parser.addArgument("joint", "j", ctkCommandLineParser::Bool, "Joint information:", "use joint information");
+  parser.addArgument("rician", "r", ctkCommandLineParser::Bool, "Rician adaption:", "use rician adaption");
+
+  parser.changeParameterGroup("Output", "Output of this miniapp");
+
+  parser.addArgument("output", "o", ctkCommandLineParser::OutputFile, "Output:", "output image (DWI)", us::Any(), false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -69,8 +80,8 @@ int DwiDenoising(int argc, char* argv[])
   string maskName;
   if (parsedArgs.count("mask"))
     maskName = us::any_cast<string>(parsedArgs["mask"]);
-  string outFileName = inFileName;
-  boost::algorithm::erase_all(outFileName, ".dwi");
+  string outFileName = us::any_cast<string>(parsedArgs["output"]);
+//  boost::algorithm::erase_all(outFileName, ".dwi");
   int search = 4;
   if (parsedArgs.count("search"))
     search = us::any_cast<int>(parsedArgs["search"]);
@@ -86,7 +97,6 @@ int DwiDenoising(int argc, char* argv[])
 
   try
   {
-
 
     if( boost::algorithm::ends_with(inFileName, ".dwi"))
     {
@@ -105,7 +115,6 @@ int DwiDenoising(int argc, char* argv[])
         filter->SetInputMask(itkMask);
       }
 
-
       filter->SetUseJointInformation(joint);
       filter->SetUseRicianAdaption(rician);
       filter->SetSearchRadius(search);
@@ -119,17 +128,15 @@ int DwiDenoising(int argc, char* argv[])
       output->SetDirections(dwi->GetDirections());
       output->InitializeFromVectorImage();
 
-      std::stringstream name;
-      name << outFileName << "_NLM_" << search << "-" << compare << "-" << variance << ".dwi";
+//      std::stringstream name;
+//      name << outFileName << "_NLM_" << search << "-" << compare << "-" << variance << ".dwi";
 
-      MITK_INFO << "Writing: " << name.str();
+      MITK_INFO << "Writing: " << outFileName;
 
       mitk::NrrdDiffusionImageWriter<short>::Pointer writer = mitk::NrrdDiffusionImageWriter<short>::New();
       writer->SetInput(output);
-      writer->SetFileName(name.str());
+      writer->SetFileName(outFileName/*.str()*/);
       writer->Update();
-
-
 
       MITK_INFO << "Finish!";
     }

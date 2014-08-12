@@ -48,31 +48,37 @@ mitk::FiberBundleX::Pointer LoadFib(std::string filename)
 int FiberProcessing(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Fiber Processing");
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setDescription("");
+    parser.setContributor("MBI");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input fiber bundle (.fib)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", us::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input:", "input fiber bundle (.fib)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output:", "output fiber bundle (.fib)", us::Any(), false);
 
-    parser.addArgument("resample", "r", ctkCommandLineParser::Float, "Resample fiber with the given point distance (in mm)");
-    parser.addArgument("smooth", "s", ctkCommandLineParser::Float, "Smooth fiber with the given point distance (in mm)");
-    parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "Minimum fiber length (in mm)");
-    parser.addArgument("maxLength", "m", ctkCommandLineParser::Float, "Maximum fiber length (in mm)");
-    parser.addArgument("minCurv", "a", ctkCommandLineParser::Float, "Minimum curvature radius (in mm)");
-    parser.addArgument("mirror", "p", ctkCommandLineParser::Int, "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
+    parser.addArgument("resample", "r", ctkCommandLineParser::Float, "Resample:", "Resample fiber with the given point distance (in mm)");
+    parser.addArgument("smooth", "s", ctkCommandLineParser::Float, "Smooth:", "Smooth fiber with the given point distance (in mm)");
+    parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "Minimum length:", "Minimum fiber length (in mm)");
+    parser.addArgument("maxLength", "m", ctkCommandLineParser::Float, "Maximum length:", "Maximum fiber length (in mm)");
+    parser.addArgument("minCurv", "a", ctkCommandLineParser::Float, "Minimum curvature radius:", "Minimum curvature radius (in mm)");
+    parser.addArgument("mirror", "p", ctkCommandLineParser::Int, "Invert coordinates:", "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
 
-    parser.addArgument("copyAndJoin", "c", ctkCommandLineParser::Bool, "Create a copy of the input fiber bundle (applied after resample/smooth/minLength/maxLength/minCurv/mirror) and join copy with original (applied after rotate/scale/translate)");
+    parser.addArgument("copyAndJoin", "c", ctkCommandLineParser::Bool, "Copy & Join:", "Create a copy of the input fiber bundle (applied after resample/smooth/minLength/maxLength/minCurv/mirror) and join copy with original (applied after rotate/scale/translate)");
     //parser.addArgument("join", "j", ctkCommandLineParser::Bool, "Join the original and copied fiber bundle (applied after rotate/scale/translate)");
 
-    parser.addArgument("rotate-x", "rx", ctkCommandLineParser::Float, "Rotate around x-axis (if copy is given the copy is rotated, in deg)");
-    parser.addArgument("rotate-y", "ry", ctkCommandLineParser::Float, "Rotate around y-axis (if copy is given the copy is rotated, in deg)");
-    parser.addArgument("rotate-z", "rz", ctkCommandLineParser::Float, "Rotate around z-axis (if copy is given the copy is rotated, in deg)");
+    parser.addArgument("rotate-x", "rx", ctkCommandLineParser::Float, "Rotate x-axis:", "Rotate around x-axis (if copy is given the copy is rotated, in deg)");
+    parser.addArgument("rotate-y", "ry", ctkCommandLineParser::Float, "Rotate y-axis:", "Rotate around y-axis (if copy is given the copy is rotated, in deg)");
+    parser.addArgument("rotate-z", "rz", ctkCommandLineParser::Float, "Rotate z-axis:", "Rotate around z-axis (if copy is given the copy is rotated, in deg)");
 
-    parser.addArgument("scale-x", "sx", ctkCommandLineParser::Float, "Scale in direction of x-axis (if copy is given the copy is scaled)");
-    parser.addArgument("scale-y", "sy", ctkCommandLineParser::Float, "Scale in direction of y-axis (if copy is given the copy is scaled)");
-    parser.addArgument("scale-z", "sz", ctkCommandLineParser::Float, "Scale in direction of z-axis (if copy is given the copy is scaled)");
+    parser.addArgument("scale-x", "sx", ctkCommandLineParser::Float, "Scale x-axis:", "Scale in direction of x-axis (if copy is given the copy is scaled)");
+    parser.addArgument("scale-y", "sy", ctkCommandLineParser::Float, "Scale y-axis:", "Scale in direction of y-axis (if copy is given the copy is scaled)");
+    parser.addArgument("scale-z", "sz", ctkCommandLineParser::Float, "Scale z-axis", "Scale in direction of z-axis (if copy is given the copy is scaled)");
 
-    parser.addArgument("translate-x", "tx", ctkCommandLineParser::Float, "Translate in direction of x-axis (if copy is given the copy is translated, in mm)");
-    parser.addArgument("translate-y", "ty", ctkCommandLineParser::Float, "Translate in direction of y-axis (if copy is given the copy is translated, in mm)");
-    parser.addArgument("translate-z", "tz", ctkCommandLineParser::Float, "Translate in direction of z-axis (if copy is given the copy is translated, in mm)");
+    parser.addArgument("translate-x", "tx", ctkCommandLineParser::Float, "Translate x-axis:", "Translate in direction of x-axis (if copy is given the copy is translated, in mm)");
+    parser.addArgument("translate-y", "ty", ctkCommandLineParser::Float, "Translate y-axis:", "Translate in direction of y-axis (if copy is given the copy is translated, in mm)");
+    parser.addArgument("translate-z", "tz", ctkCommandLineParser::Float, "Translate z-axis:", "Translate in direction of z-axis (if copy is given the copy is translated, in mm)");
 
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

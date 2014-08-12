@@ -226,14 +226,19 @@ int ImageResampler( int argc, char* argv[] )
 {
   ctkCommandLineParser parser;
   parser.setArgumentPrefix("--","-");
+
+  parser.setTitle("Image Resampler");
+  parser.setCategory("Preprocessing Tools");
+  parser.setContributor("MBI");
+  parser.setDescription("");
+
   // Add command line argument names
   parser.addArgument("help", "h",ctkCommandLineParser::Bool, "Show this help text");
-  parser.addArgument("xml", "x",ctkCommandLineParser::Bool, "Print a XML description of this modules command line interface");
-  parser.addArgument("input", "i", ctkCommandLineParser::String, "Input file",us::Any(),false);
-  parser.addArgument("output", "o", ctkCommandLineParser::String, "Output folder (ending with /)",us::Any(),false);
-  parser.addArgument("spacing", "s", ctkCommandLineParser::String, "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
-  parser.addArgument("reference", "r", ctkCommandLineParser::String, "Resample using supplied reference image. Also cuts image to same dimensions");
-  parser.addArgument("sinc-int", "s", ctkCommandLineParser::Bool, "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
+  parser.addArgument("input", "i", ctkCommandLineParser::String, "Input:", "Input file",us::Any(),false);
+  parser.addArgument("output", "o", ctkCommandLineParser::String, "Output:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("spacing", "s", ctkCommandLineParser::String, "Spacing:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
+  parser.addArgument("reference", "r", ctkCommandLineParser::String, "Reference:", "Resample using supplied reference image. Also cuts image to same dimensions");
+  parser.addArgument("sinc-int", "s", ctkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
 
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

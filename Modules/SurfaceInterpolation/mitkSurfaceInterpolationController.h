@@ -67,8 +67,6 @@ namespace mitk
     void AddNewContour (Surface::Pointer newContour, PlaneGeometry::Pointer plane);
 
     /**
-
-    /**
      * @brief Removes the contour for a given plane for the current selected segmenation
      * @param plane the plane for which the contour should be returned
      * @return true if a contour was found and removed, false if no contour was found

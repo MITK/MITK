@@ -30,11 +30,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <math.h>
 
 int FiberJoin(int argc, char* argv[])
-{
+  {
     ctkCommandLineParser parser;
+
+    parser.setTitle("Fiber Join");
+    parser.setCategory("Fiber Tracking and Processing Methods");
+    parser.setContributor("MBI");
+    parser.setDescription("");
+
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::StringList, "input tractograms (.fib, vtk file format)", us::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output tractogram", us::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::StringList, "Input:", "input tractograms (.fib, vtk file format)", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)

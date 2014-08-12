@@ -254,6 +254,7 @@ public:
    * @param longarg The long argument name.
    * @param shortarg The short argument name.
    * @param type The argument type (see the list above for supported types).
+   * @param argLabel The label of this argument, when auto generated interface is used.
    * @param argHelp A help string describing the argument.
    * @param defaultValue A default value for the argument.
    * @param ignoreRest All arguments after the current one will be ignored.
@@ -418,13 +419,45 @@ public:
     */
     void setStrictModeEnabled(bool strictMode);
 
-    void GetXML();
+    /**
+     * Is used to generate an XML output for any commandline program.
+     */
+    void generateXmlOutput();
 
+    /**
+     * Is used to set the title of the auto generated interface.
+     *
+     * @param title The title of the app.
+     */
     void setTitle(std::string title);
+    /**
+     * Is used to set the contributor for the help view in the auto generated interface.
+     *
+     * @param contributor Contributor of the app.
+     */
     void setContributor(std::string contributor);
+    /**
+     * Is used to categorize the apps in the commandline module.
+     *
+     * @param category The category of the app.
+     */
     void setCategory(std::string category);
+    /**
+     * Is used as the help text in the auto generated interface.
+     *
+     * @param description A short description for the app.
+     */
     void setDescription(std::string description);
-    void changeParameterGroup(std::string name, std::string description);
+    /**
+     * Is used to group several Parameters in one groupbox in the auto generated interface.
+     * Default name is "Parameters", with the tooltip: "Groupbox containing parameters."
+     *
+     * To change the group of several arguments, call this method before the arguments are added.
+     *
+     * @param name The name of the groupbox.
+     * @param tooltip The tooltip of the groupbox.
+     */
+    void changeParameterGroup(std::string name, std::string tooltip);
 
 private:
     class ctkInternal;

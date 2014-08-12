@@ -69,7 +69,7 @@ int DwiDenoising(int argc, char* argv[])
 
   parser.changeParameterGroup("Output", "Output of this miniapp");
 
-    parser.addArgument("output", "o", ctkCommandLineParser::OutputFile, "Output:", "output image (DWI)", us::Any(), false);
+  parser.addArgument("output", "o", ctkCommandLineParser::OutputFile, "Output:", "output image (DWI)", us::Any(), false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

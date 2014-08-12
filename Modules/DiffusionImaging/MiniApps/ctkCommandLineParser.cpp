@@ -365,7 +365,7 @@ map<string, us::Any> ctkCommandLineParser::parseArguments(const StringContainerT
         if (this->Internal->Debug) { MITK_DEBUG << "Processing" << argument; }
         if (!argument.compare("--xml") || !argument.compare("-xml") || !argument.compare("--XML") || !argument.compare("-XML"))
         {
-          this->GetXML();
+          this->generateXmlOutput();
           return map<string, us::Any>();
         }
 
@@ -769,7 +769,7 @@ void ctkCommandLineParser::setStrictModeEnabled(bool strictMode)
     this->Internal->StrictMode = strictMode;
 }
 
-void ctkCommandLineParser::GetXML()
+void ctkCommandLineParser::generateXmlOutput()
 {
   std::stringstream xml;
 
@@ -874,8 +874,8 @@ void ctkCommandLineParser::setDescription(string description)
   Description = description;
 }
 
-void ctkCommandLineParser::changeParameterGroup(string name, string description)
+void ctkCommandLineParser::changeParameterGroup(string name, string tooltip)
 {
   ParameterGroupName = name;
-  ParameterGroupDescription = description;
+  ParameterGroupDescription = tooltip;
 }

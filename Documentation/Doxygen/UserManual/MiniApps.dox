@@ -65,6 +65,6 @@ $./MitkDiffusionMiniApps GibbsTracking -i test.dti -p param.gtp -o /tmp/fiber.fi
 
 \section MiniAppAvailableList Available MiniApps
 
-\li \ref DiffusionMiniApps
+\li \subpage DiffusionMiniApps
 
 */

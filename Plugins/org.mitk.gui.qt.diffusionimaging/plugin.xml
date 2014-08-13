@@ -23,12 +23,10 @@
   <keyword label="reconstruction" id="org.mitk.views.tensorreconstruction.Keyword"/>
   <keyword label="tensor" id="org.mitk.views.tensorreconstruction.Keyword"/>
   <keyword label="diffusion" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="second" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="order" id="org.mitk.views.tensorreconstruction.Keyword"/>
+  <keyword label="second order" id="org.mitk.views.tensorreconstruction.Keyword"/>
   <keyword label="propagator" id="org.mitk.views.tensorreconstruction.Keyword"/>
   <keyword label="modeling" id="org.mitk.views.tensorreconstruction.Keyword"/>
   <keyword label="DTI" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="DT" id="org.mitk.views.tensorreconstruction.Keyword"/>
 
   <keyword label="tractography" id="org.mitk.views.gibbstracking.Keyword"/>
   <keyword label="tracking" id="org.mitk.views.gibbstracking.Keyword"/>
@@ -59,6 +57,44 @@
   <keyword label="tensor" id="org.mitk.views.stochasticfibertracking.Keyword"/>
   <keyword label="dti" id="org.mitk.views.stochasticfibertracking.Keyword"/>
   <keyword label="diffusion" id="org.mitk.views.stochasticfibertracking.Keyword"/>
+
+  <keyword label="diffusion" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="signal" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="simulation" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="data" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="synthetic" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="numeric" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="ball" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="dot" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="astrosticks" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="k-space" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="acquisition" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="artifact" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="artefact" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="gibbs ringing" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="spikes" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="distortions" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="aliasing" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="noise" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="fiberfox" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="rician" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="ghost" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="fieldmap" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="generator" id="org.mitk.views.fiberfoxview.Keyword"/>
+
+  <keyword label="GFA" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="RA" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="AD" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="RD" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="MD" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="anisotropy" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="fractional" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="radial" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="axial" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="diffusivity" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="mean" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="generalized" id="org.mitk.views.diffusionquantification.Keyword"/>
+  <keyword label="derived" id="org.mitk.views.diffusionquantification.Keyword"/>
 
   </extension>
 
@@ -96,6 +132,7 @@
     category="Quantification"
     class="QmitkDiffusionQuantificationView"
     icon="resources/quantification.png">
+    <description>Calculation of tensor and Q-ball derived measures.</description>
     <keywordReference id="org.mitk.views.diffusionquantification.Keyword"/>
     </view>
 
@@ -231,6 +268,7 @@
     category="Simulated data"
     class="QmitkFiberfoxView"
     icon="resources/phantom.png">
+    <description>Diffusion weighted MRI data simulation tool.</description>
     <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
     </view>
 
@@ -239,7 +277,7 @@
     category="Simulated data"
     class="QmitkFieldmapGeneratorView"
     icon="resources/odf.png">
-    <keywordReference id="org.mitk.views.fieldmapgenerator.Keyword"/>
+    <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
     </view>
 
     <view id="org.mitk.views.diffusionregistrationview"

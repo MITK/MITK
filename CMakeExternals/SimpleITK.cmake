@@ -39,10 +39,9 @@ if(MITK_USE_SimpleITK)
           )
     endif(MITK_USE_Python)
 
-    if(MITK_USE_OpenCV)
-      list(APPEND additional_cmake_args
-           -DOpenCV_DIR:PATH=${OpenCV_DIR}
-          )
+    set(_build_shared ON)
+    if(APPLE)
+      set(_build_shared OFF)
     endif()
 
     set(SimpleITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSimpleITK.cmake)
@@ -60,6 +59,7 @@ if(MITK_USE_SimpleITK)
          ${ep_common_args}
        CMAKE_CACHE_ARGS
          ${additional_cmake_args}
+         -DBUILD_SHARED_LIBS:BOOL=${_build_shared}
          -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
          -DCMAKE_INSTALL_NAME_DIR:STRING=<INSTALL_DIR>/lib
          -DSimpleITK_BUILD_DISTRIBUTE:BOOL=ON

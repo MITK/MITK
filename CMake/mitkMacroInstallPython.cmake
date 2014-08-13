@@ -1,5 +1,14 @@
 
 macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
+  MESSAGE("==================================")
+  MESSAGE("APPNAME: " ${_INSTALL_APP_NAME})
+  MESSAGE("==================================")
+
+  set(_destination bin)
+  if(APPLE)
+    set(_destination ${_INSTALL_APP_NAME}.app/Contents/MacOS)
+  endif()
+
   if(UNIX)
     # apple and linux only supports .so as loadable extension
     set(PYTHON_LIB_SUFFIX .so)
@@ -11,11 +20,11 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
   # SimpleITK
   if(MITK_USE_SimpleITK)
     install(FILES "${SimpleITK_DIR}/Wrapping/SimpleITK.py"
-                  DESTINATION bin/Python/SimpleITK )
+                  DESTINATION ${_destination}/Python/SimpleITK )
     install(FILES "${SimpleITK_DIR}/Wrapping/__init__.py"
-                  DESTINATION bin/Python/SimpleITK )
+                  DESTINATION ${_destination}/Python/SimpleITK )
     install(FILES "${SimpleITK_DIR}/Wrapping/_SimpleITK${PYTHON_LIB_SUFFIX}"
-                  DESTINATION bin/Python/SimpleITK )
+                  DESTINATION ${_destination}/Python/SimpleITK )
     if(UNIX AND NOT APPLE)
         install(CODE "file(RPATH_REMOVE
                     FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/SimpleITK/_SimpleITK${PYTHON_LIB_SUFFIX}\")")
@@ -30,9 +39,9 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
     list(APPEND _python_libs "cv2${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
     if(UNIX)
-      install(FILES "${OpenCV_DIR}/lib/cv2${PYTHON_LIB_SUFFIX}" DESTINATION bin)
+      install(FILES "${OpenCV_DIR}/lib/cv2${PYTHON_LIB_SUFFIX}" DESTINATION ${_destination})
     else()
-      install(FILES "${OpenCV_DIR}/lib/Release/cv2${PYTHON_LIB_SUFFIX}" DESTINATION bin)
+      install(FILES "${OpenCV_DIR}/lib/Release/cv2${PYTHON_LIB_SUFFIX}" DESTINATION ${_destination})
     endif()
 
     if(UNIX AND NOT APPLE)
@@ -69,7 +78,7 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
     endif()
     get_filename_component(_filepath "${_target_lib}" PATH)
 
-    install(FILES "${_filepath}/${_target}${PYTHON_LIB_SUFFIX}" DESTINATION bin)
+    install(FILES "${_filepath}/${_target}${PYTHON_LIB_SUFFIX}" DESTINATION ${_destination})
 
     if(UNIX AND NOT APPLE )
       install(CODE "file(RPATH_REMOVE
@@ -83,7 +92,7 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
   file(GLOB_RECURSE item RELATIVE "${VTK_DIR}/Wrapping/Python/vtk" "${VTK_DIR}/Wrapping/Python/vtk/*.py")
   foreach(f ${item})
     get_filename_component(_filepath "${f}" PATH)
-    install(FILES "${VTK_DIR}/Wrapping/Python/vtk/${f}" DESTINATION bin/Python/vtk/${_filepath})
+    install(FILES "${VTK_DIR}/Wrapping/Python/vtk/${f}" DESTINATION ${_destination}/Python/vtk/${_filepath})
   endforeach()
 
   list(APPEND _python_dirs "${VTK_DIR}/lib")
@@ -94,11 +103,11 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
       list(APPEND _python_dirs "${Python_DIR}/lib")
       # install python stuff
       install(DIRECTORY "${Python_DIR}/lib/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}"
-            DESTINATION bin/Python/lib
+            DESTINATION ${_destination}/Python/lib
             USE_SOURCE_PERMISSIONS
             COMPONENT Runtime)
       install(FILES "${Python_DIR}/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}/pyconfig.h"
-              DESTINATION bin/Python/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION})
+              DESTINATION ${_destination}/Python/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION})
     else()
       list(APPEND _python_dirs "${Python_DIR}/libs")
       list(APPEND _python_dirs "${Python_DIR}/bin")
@@ -121,7 +130,7 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
     file(GLOB_RECURSE item RELATIVE "${Numpy_DIR}/numpy" "${Numpy_DIR}/numpy/*")
     foreach(f ${item})
       get_filename_component(_filepath "${f}" PATH)
-      install(FILES "${Numpy_DIR}/numpy/${f}" DESTINATION bin/Python/numpy/${_filepath})
+      install(FILES "${Numpy_DIR}/numpy/${f}" DESTINATION ${_destination}/Python/numpy/${_filepath})
     endforeach()
   endif()
 

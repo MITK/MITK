@@ -27,9 +27,13 @@
   <keyword label="image" id="org.mitk.views.screenshotmaker.Keyword"/>
   <keyword label="picture" id="org.mitk.views.screenshotmaker.Keyword"/>
   <keyword label="screenshot" id="org.mitk.views.screenshotmaker.Keyword"/>
+  <keyword label="capture" id="org.mitk.views.screenshotmaker.Keyword"/>
+  <keyword label="png bmp jpg jepg" id="org.mitk.views.screenshotmaker.Keyword"/>
 
   <keyword label="movie" id="org.mitk.views.moviemaker.Keyword"/>
   <keyword label="clip" id="org.mitk.views.moviemaker.Keyword"/>
+  <keyword label="capture" id="org.mitk.views.moviemaker.Keyword"/>
+  <keyword label="avi" id="org.mitk.views.moviemaker.Keyword"/>
 
  </extension>
 </plugin>

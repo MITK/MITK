@@ -5,7 +5,43 @@
     <view id="org.mitk.views.basicimageprocessing"
           name="BasicImageProcessing"
           class="QmitkBasicImageProcessing"
-          icon="resources/lena.xpm" />
+          icon="resources/lena.xpm" >
+      <description>Perform basic image operations like add, subtract etc..</description>
+      <keywordReference id="org.mitk.views.basicimageprocessing.ViewKeyword"/>
+    </view>
   </extension>
 
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Filter Image" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Image Arithmetic" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Denoising" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Gaussian" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Median" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Total Variation" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Morphological" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Opening" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Closing" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Dilatation" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Erosion" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Edge Detection" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Soebel Operator" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Laplacian (2. Derivation)" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Derivation" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Gradient" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Threshold" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Image Inversion" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Downsampling" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Flipping" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Resampling" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Rescaling" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Add" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Subtract" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Divide" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Multiply" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="AND" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="OR" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="XOR" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="boolean operations" />
+    <keyword id="org.mitk.views.basicimageprocessing.ViewKeyword"  label="Boolean Commands" />
+  </extension>
 </plugin>

@@ -9,6 +9,18 @@
       id="org.mitk.views.volumevisualization"
       name="Volume Visualization"
       class="QmitkVolumeVisualizationView"
-      icon="resources/icon.xpm" />
+      icon="resources/icon.xpm" >
+      <description>Configure the 3D-Visualization of images.</description>
+      <keywordReference id="org.mitk.views.volumevisualization.ViewKeyword"/>
+    </view>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.volumevisualization.ViewKeyword"  label="Visualisation" />
+    <keyword id="org.mitk.views.volumevisualization.ViewKeyword"  label="3D" />
+    <keyword id="org.mitk.views.volumevisualization.ViewKeyword"  label="Rendering" />
+    <keyword id="org.mitk.views.volumevisualization.ViewKeyword"  label="Volumevisualisation" />
+    <keyword id="org.mitk.views.volumevisualization.ViewKeyword"  label="Look-up-table" />
+    <keyword id="org.mitk.views.volumevisualization.ViewKeyword"  label="Color Colour" />
   </extension>
 </plugin>

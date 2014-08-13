@@ -5,13 +5,24 @@
     <view id="org.mitk.gui.qt.cmdlinemodules"
           name="Command Line Modules"
           class="CommandLineModulesView"
-          icon="resources/icon.xpm" />
+          icon="resources/icon.xpm" >
+      <description>Control the execution of Commandline-Tools</description>
+      <keywordReference id="org.mitk.views.cmdlinemodules.ViewKeyword"/>
+    </view>
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">
     <page id="org.mitk.gui.qt.cmdlinemodules.CommandLineModulesPreferencesPage" name="Command Line Modules" class="CommandLineModulesPreferencesPage">
       <keywordreference id="org.mitk.gui.qt.cmdlinemodules.CommandLineModulesPreferencesPageKeywords"></keywordreference>
     </page>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.cmdlinemodules.ViewKeyword"  label="CTK-Apps" />
+    <keyword id="org.mitk.views.cmdlinemodules.ViewKeyword"  label="Apps" />
+    <keyword id="org.mitk.views.cmdlinemodules.ViewKeyword"  label="Commandline" />
+    <keyword id="org.mitk.views.cmdlinemodules.ViewKeyword"  label="CMD" />
+    <keyword id="org.mitk.views.cmdlinemodules.ViewKeyword"  label="Smalltools" />
   </extension>
 
 </plugin>

@@ -5,14 +5,20 @@
     <editor id="org.mitk.editors.xnat.browser"
       name="XNAT Editor"
       class="QmitkXnatEditor"
-      icon="resources/icon.xpm"/>
+      icon="resources/icon.xpm">
+      <description>Search, browse and view the data in a XNAT-Installation</description>
+      <keywordReference id="org.mitk.views.xnat.browser.ViewKeyword"/>
+    </editor>
   </extension>
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.xnat.treebrowser"
       name="XNAT Tree Browser"
       class="QmitkXnatTreeBrowserView"
-      icon="resources/xnat_treebrowser_icon.xpm"/>
+      icon="resources/xnat_treebrowser_icon.xpm">
+      <description>Search, browse and view the data in a XNAT-Installation</description>
+      <keywordReference id="org.mitk.views.xnat.treebrowser.ViewKeyword"/>
+    </view>
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">
@@ -25,4 +31,19 @@
     <keyword id="org.mitk.gui.qt.application.XnatConnectionPreferencePageKeywords" label="xnat session connection login"></keyword>
   </extension>
 
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.xnat.treebrowser.ViewKeyword"  label="DICOM" />
+    <keyword id="org.mitk.views.xnat.treebrowser.ViewKeyword"  label="WPACS" />
+    <keyword id="org.mitk.views.xnat.treebrowser.ViewKeyword"  label="Data Source" />
+    <keyword id="org.mitk.views.xnat.treebrowser.ViewKeyword"  label="Import" />
+    <keyword id="org.mitk.views.xnat.treebrowser.ViewKeyword"  label="Data Handling" />
+    <keyword id="org.mitk.views.xnat.treebrowser.ViewKeyword"  label="Data Loading" />
+
+    <keyword id="org.mitk.views.xnat.browser.ViewKeyword"  label="DICOM" />
+    <keyword id="org.mitk.views.xnat.browser.ViewKeyword"  label="WPACS" />
+    <keyword id="org.mitk.views.xnat.browser.ViewKeyword"  label="Data Source" />
+    <keyword id="org.mitk.views.xnat.browser.ViewKeyword"  label="Import" />
+    <keyword id="org.mitk.views.xnat.browser.ViewKeyword"  label="Data Handling" />
+    <keyword id="org.mitk.views.xnat.browser.ViewKeyword"  label="Data Loading" />
+  </extension>
 </plugin>

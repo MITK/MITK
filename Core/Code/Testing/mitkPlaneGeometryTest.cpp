@@ -994,6 +994,8 @@ public:
     result = mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, backsideorigin, right, -bottom);
     if(result!=EXIT_SUCCESS)
       return result;
+
+    return EXIT_SUCCESS;
   }
 
 private:

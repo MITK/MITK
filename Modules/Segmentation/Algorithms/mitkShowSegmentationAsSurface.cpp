@@ -103,7 +103,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
 
   ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = ManualSegmentationToSurfaceFilter::New();
   surfaceFilter->SetInput( image );
-  surfaceFilter->SetThreshold( 1 ); //expects binary image with zeros and ones
+  surfaceFilter->SetThreshold( 0.5 ); //expects binary image with zeros and ones
 
   surfaceFilter->SetUseGaussianImageSmooth(smooth); // apply gaussian to thresholded image ?
   surfaceFilter->SetSmooth(smooth);

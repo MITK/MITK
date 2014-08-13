@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRotationOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkLine.h"
+#include "mitkGeometry3D.h"
+#include "mitkThinPlateSplineCurvedGeometry.h"
+#include "mitkSlicedGeometry3D.h"
 
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
@@ -36,6 +39,7 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(mitkPlaneGeometryTestWrapper);
   MITK_TEST(TestProjectPointOntoPlane);
   MITK_TEST(testPlaneGeometryCloning);
+  MITK_TEST(testInheritance);
   // Currently commented out, see See bug 15990
   // MITK_TEST(testPlaneGeometryInitializeOrder);
   //MITK_TEST(mappingTests2D);
@@ -52,6 +56,36 @@ public:
 
   void tearDown()
   {
+  }
+
+  // This test is supposed to verify inheritance behaviour, this test will fail if the behaviour changes in the future
+  void testInheritance()
+  {
+    mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
+    mitk::Geometry3D::Pointer g3d = dynamic_cast < mitk::Geometry3D* > ( plane.GetPointer() );
+    CPPUNIT_ASSERT_MESSAGE("Planegeometry should not be castable to Geometry 3D", g3d.IsNull());
+
+    mitk::BaseGeometry::Pointer base = dynamic_cast < mitk::BaseGeometry* > ( plane.GetPointer() );
+    CPPUNIT_ASSERT_MESSAGE("Planegeometry should be castable to BaseGeometry", base.IsNotNull());
+
+    base = NULL;
+    g3d = mitk::Geometry3D::New();
+    base = dynamic_cast < mitk::BaseGeometry* > ( g3d.GetPointer() );
+    CPPUNIT_ASSERT_MESSAGE("Geometry3D should be castable to BaseGeometry", base.IsNotNull());
+
+    g3d=NULL;
+    mitk::SlicedGeometry3D::Pointer sliced = mitk::SlicedGeometry3D::New();
+    g3d = dynamic_cast < mitk::Geometry3D* > ( sliced.GetPointer() );
+    CPPUNIT_ASSERT_MESSAGE("SlicedGeometry3D should not be castable to Geometry3D", g3d.IsNull());
+
+    plane=NULL;
+    mitk::ThinPlateSplineCurvedGeometry::Pointer thin = mitk::ThinPlateSplineCurvedGeometry::New();
+    plane = dynamic_cast < mitk::PlaneGeometry* > ( thin.GetPointer() );
+    CPPUNIT_ASSERT_MESSAGE("AbstractTransformGeometry should be castable to PlaneGeometry", plane.IsNotNull());
+
+    plane = mitk::PlaneGeometry::New();
+    mitk::AbstractTransformGeometry::Pointer atg = dynamic_cast < mitk::AbstractTransformGeometry* > ( plane.GetPointer() );
+    CPPUNIT_ASSERT_MESSAGE("PlaneGeometry should not be castable to AbstractTransofrmGeometry", atg.IsNull());
   }
 
   void TestCase1210()

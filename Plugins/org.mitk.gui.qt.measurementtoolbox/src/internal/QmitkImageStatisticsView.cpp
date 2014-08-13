@@ -75,11 +75,11 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   {
     m_Controls = new Ui::QmitkImageStatisticsViewControls;
     m_Controls->setupUi(parent);
-    this->CreateConnections();
+    CreateConnections();
 
     m_Controls->m_ErrorMessageLabel->hide();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-//    m_Controls->m_HistogramBinSizeSlider->setTracking(false);
+    m_Controls->m_BinSizeFrame->setVisible(false);
   }
 }
 
@@ -95,11 +95,19 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*) this->m_Controls->m_StatisticsTable, SIGNAL(cellDoubleClicked(int,int)),this, SLOT( JumpToCoordinates(int,int)) );
     connect( (QObject*) (this->m_Controls->m_barRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnBarRadioButtonSelected()));
     connect( (QObject*) (this->m_Controls->m_lineRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnLineRadioButtonSelected()));
-    connect( (QObject*) (this->m_Controls->m_HistogramBinSizeSpinbox), SIGNAL(editingFinished()), this, SLOT(OnHistogramBinSizeSliderValueChanged()));
+    connect( (QObject*) (this->m_Controls->m_HistogramBinSizeSpinbox), SIGNAL(editingFinished()), this, SLOT(OnHistogramBinSizeBoxValueChanged()));
     connect( (QObject*)(this->m_Controls->m_UseDefaultBinSizeBox), SIGNAL(clicked()),(QObject*) this, SLOT(OnDefaultBinSizeBoxChanged()) );
-
   }
+}
 
+void QmitkImageStatisticsView::OnDefaultBinSizeBoxChanged()
+{
+    if (m_CalculationThread!=NULL)
+        m_Controls->m_HistogramBinSizeSpinbox->setValue(m_CalculationThread->GetHistogramBinSize());
+    if (m_Controls->m_UseDefaultBinSizeBox->isChecked())
+        m_Controls->m_BinSizeFrame->setVisible(false);
+    else
+        m_Controls->m_BinSizeFrame->setVisible(true);
 }
 
 void QmitkImageStatisticsView::PartClosed( berry::IWorkbenchPartReference::Pointer )
@@ -650,9 +658,8 @@ void QmitkImageStatisticsView::RequestStatisticsUpdate()
     this->GetRenderWindowPart()->RequestUpdate();
 }
 
-void QmitkImageStatisticsView::OnHistogramBinSizeSliderValueChanged()
+void QmitkImageStatisticsView::OnHistogramBinSizeBoxValueChanged()
 {
-//  m_Controls->m_HistogramBinSizeLabel->setText( QString::number( m_Controls->m_HistogramBinSizeSlider->value()) );
   this->UpdateStatistics();
 }
 void QmitkImageStatisticsView::WriteStatisticsToGUI()

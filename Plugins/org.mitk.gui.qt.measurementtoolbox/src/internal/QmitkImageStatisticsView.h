@@ -82,7 +82,7 @@ public:
     void OnThreadedStatisticsCalculationEnds();
 
     /** \brief Update bin size for histogram resolution. */
-    void OnHistogramBinSizeSliderValueChanged();
+    void OnHistogramBinSizeBoxValueChanged();
 
     protected slots:
       /** \brief  Saves the histogram to the clipboard */

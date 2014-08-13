@@ -165,8 +165,9 @@ private:
 
 };
 
-/** \brief A template method for creating a pixel type.
-  */
+/**
+ * \brief A template method for creating a pixel type.
+ */
 template< typename ComponentT, typename PixelT, std::size_t numOfComponents >
 PixelType MakePixelType()
 {
@@ -195,11 +196,10 @@ struct AssertImageTypeIsValid
 template< typename TPixelType, unsigned int VImageDimension >
 struct AssertImageTypeIsValid<itk::Image<itk::VariableLengthVector<TPixelType>, VImageDimension> >;
 
-/** \brief A template method for creating a pixel type from an ItkImageType
-  *
-  * For fixed size vector images ( i.e. images of type itk::FixedArray<3,float> ) also the number of components
-  * is propagated to the constructor
-  */
+/** \brief A template method for creating a MITK pixel type na ITK image type
+ *
+ * \param numOfComponents The number of components for the pixel type of the ITK image
+ */
 template< typename ItkImageType >
 PixelType MakePixelType( std::size_t numOfComponents )
 {
@@ -224,6 +224,25 @@ PixelType MakePixelType( std::size_t numOfComponents )
          );
 }
 
+/** \brief A template method for creating a MITK pixel type from an ITK image
+ *         pixel type and dimension
+ *
+ * \param numOfComponents The number of components for the pixel type \c TPixelType
+ */
+template< typename TPixelType, unsigned int VImageDimension >
+PixelType MakePixelType( std::size_t numOfComponents )
+{
+  typedef typename ImageTypeTrait<TPixelType, VImageDimension>::ImageType ItkImageType;
+  return MakePixelType<ItkImageType>(numOfComponents);
+}
+
+/** \brief A template method for creating a MITK pixel type from an ITK image
+ *         pixel type and dimension
+ *
+ * For images where the number of components of the pixel type is determined at
+ * runtime (e.g. pixel types like itk::VariableLengthVector<short>) the
+ * MakePixelType(std::size_t) function must be used.
+ */
 template< typename ItkImageType >
 PixelType MakePixelType()
 {
@@ -242,7 +261,9 @@ PixelType MakePixelType()
   return MakePixelType<ItkImageType>(numComp);
 }
 
-
+/**
+ * \brief Create a MITK pixel type based on a itk::ImageIOBase object
+ */
 inline PixelType MakePixelType(const itk::ImageIOBase* imageIO)
 {
   return mitk::PixelType(imageIO->GetComponentType(), imageIO->GetPixelType(),

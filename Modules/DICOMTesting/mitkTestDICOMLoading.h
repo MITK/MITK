@@ -98,7 +98,7 @@ class MitkDICOMTesting_EXPORT TestDICOMLoading
     {
       std::stringstream stream(s);
       stream >> value;
-      return !stream.fail();
+      return (!stream.fail()) && (std::abs(value) <= std::numeric_limits<T>::max());
     }
 
     const char* m_PreviousCLocale;

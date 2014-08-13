@@ -47,6 +47,8 @@ if (MITK_USE_Qt5)
 elseif (MITK_USE_Qt4)
   list(APPEND _example_dirs
     QtAppExample
+    mitkdump
+    mitkdumpdir
     )
 endif()
 

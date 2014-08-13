@@ -1,0 +1,25 @@
+<?xml version="1.0" standalone=no>
+<DICOMFileReader
+  label="Image Position"
+  description="Sort images by Image Position (Patient)"
+  class="DICOMITKSeriesGDCMReader"
+  version="1"
+  fixTiltByShearing="true">
+<DICOMDatasetSorter class="DICOMTagBasedSorter" strictSorting="false" expectDistanceOne="false">
+  <Distinguishing>
+   <Tag name="SeriesInstanceUID" group="0020" element="000e"/>
+   <Tag name="SeriesDescription" group="0008" element="103e"/>
+   <Tag name="ProtocolName" group="0018" element="1030"/>
+   <Tag name="SeriesNumber" group="0020" element="0011"/>
+   <Tag name="Modality" group="0x0008" element="0x0060"/>
+   <Tag name="BodyPartExamined" group="0x0018" element="0x0015"/>
+   <Tag name="SequenceName" group="0x0018" element="0x0024"/>
+  </Distinguishing>
+  <Sorting>
+   <ImagePositionPatient/>
+   <Tag name="AcquisitionTime" group="0x0008" element="0x0032"/>
+   <Tag name="TriggerTime" group="0x0018" element="0x1060"/>
+   <Tag name="SOPInstanceUID" group="0x0008" element="0x0018"/>
+  </Sorting>
+</DICOMDatasetSorter>
+</DICOMFileReader>

@@ -1,0 +1,24 @@
+<?xml version="1.0" standalone=no>
+<DICOMFileReader
+  label="Image Time"
+  description="Sort images by Acqusition Time"
+  class="DICOMITKSeriesGDCMReader"
+  version="1"
+  fixTiltByShearing="true">
+<DICOMDatasetSorter class="DICOMTagBasedSorter">
+  <Distinguishing>
+   <Tag name="SeriesInstanceUID" group="0020" element="000e"/>
+   <Tag name="SeriesDescription" group="0008" element="103e"/>
+   <Tag name="ProtocolName" group="0018" element="1030"/>
+   <Tag name="SeriesNumber" group="0020" element="0011"/>
+   <Tag name="AcquisitionNumber" group="0x0020" element="0x0012"/>
+   <Tag name="Modality" group="0x0008" element="0x0060"/>
+   <Tag name="BodyPartExamined" group="0x0018" element="0x0015"/>
+   <Tag name="SequenceName" group="0x0018" element="0x0024"/>
+  </Distinguishing>
+  <Sorting>
+   <Tag name="AcquisitionTime" group="0x0008" element="0x0032"/>
+   <Tag name="SOPInstanceUID" group="0x0008" element="0x0018"/>
+  </Sorting>
+</DICOMDatasetSorter>
+</DICOMFileReader>

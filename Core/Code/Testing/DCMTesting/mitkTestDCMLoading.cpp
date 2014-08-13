@@ -204,7 +204,7 @@ mitk::TestDCMLoading::DumpImageInformation( const Image* image )
       result << "\n";
 
       result << "  " << "TimeBounds: ";
-      const TimeBounds timeBounds = image->GetTimeGeometry()->GetTimeBounds(0);
+      const TimeBounds timeBounds = image->GetTimeGeometry()->GetTimeBounds();
       for (unsigned int i = 0; i < 2; ++i)
           result << timeBounds[i] << " ";
       result << "\n";

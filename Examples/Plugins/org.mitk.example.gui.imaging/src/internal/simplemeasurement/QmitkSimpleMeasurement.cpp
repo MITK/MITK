@@ -290,14 +290,14 @@ void QmitkSimpleMeasurement::UpdateMeasurementList()
     newItem->setText(name);
     m_Controls->m_MeasurementList->insertItem(m_Controls->m_MeasurementList->count(), newItem);
   }
-  for (std::size_t i=0; i<m_CreatedAngles.size(); i++)
+  for (std::size_t i=0; i<m_CreatedAngles.size() && i<m_CreatedDistances.size(); i++)
   {
     QListWidgetItem *newItem = new QListWidgetItem;
     QString name = m_CreatedDistances.at(i)->GetName().c_str();
     newItem->setText(name);
     m_Controls->m_MeasurementList->insertItem(m_Controls->m_MeasurementList->count(), newItem);
   }
-  for (std::size_t i=0; i<m_CreatedPaths.size(); i++)
+  for (std::size_t i=0; i<m_CreatedPaths.size() && i<m_CreatedDistances.size(); i++)
   {
     QListWidgetItem *newItem = new QListWidgetItem;
     QString name = m_CreatedDistances.at(i)->GetName().c_str();

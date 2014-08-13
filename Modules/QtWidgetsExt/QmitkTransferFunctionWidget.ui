@@ -20,7 +20,16 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -68,7 +77,16 @@
       </sizepolicy>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -110,13 +128,13 @@ Click right mouse button to delete a point.</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>48</width>
+            <width>64</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>48</width>
+            <width>64</width>
             <height>16777215</height>
            </size>
           </property>
@@ -201,13 +219,13 @@ Click right mouse button to delete a point.</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>48</width>
+            <width>64</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>48</width>
+            <width>64</width>
             <height>16777215</height>
            </size>
           </property>
@@ -236,7 +254,16 @@ Click right mouse button to delete a point.</string>
       </sizepolicy>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -276,13 +303,13 @@ Double-click left mouse button to change color of a point.</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>48</width>
+            <width>64</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>48</width>
+            <width>64</width>
             <height>16777215</height>
            </size>
           </property>
@@ -340,7 +367,16 @@ Double-click left mouse button to change color of a point.</string>
       </sizepolicy>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -379,13 +415,13 @@ Click right mouse button to delete a point.</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>48</width>
+            <width>64</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>48</width>
+            <width>64</width>
             <height>16777215</height>
            </size>
           </property>
@@ -458,13 +494,13 @@ Click right mouse button to delete a point.</string>
           </property>
           <property name="minimumSize">
            <size>
-            <width>48</width>
+            <width>64</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>48</width>
+            <width>64</width>
             <height>16777215</height>
            </size>
           </property>

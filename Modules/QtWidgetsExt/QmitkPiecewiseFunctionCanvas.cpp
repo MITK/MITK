@@ -117,7 +117,7 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
         if (m_LineEditAvailable)
         {
           m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle)));
-          m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle)));
+          m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle), 'f', 5));
         }
       }
       else

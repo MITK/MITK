@@ -132,6 +132,7 @@ public:
   virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
   virtual vtkImageData* GetVtkImageData();
+  virtual const vtkImageData* GetVtkImageData() const;
 
 protected:
   ImageSource();

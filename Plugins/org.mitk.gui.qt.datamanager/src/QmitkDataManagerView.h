@@ -45,6 +45,7 @@ class QSignalMapper;
 class QmitkDnDFrameWidget;
 class QmitkDataStorageTreeModel;
 class QmitkDataManagerItemDelegate;
+class QmitkNumberPropertySlider;
 
 ///
 /// \ingroup org_mitk_gui_qt_datamanager_internal
@@ -80,6 +81,10 @@ public slots:
   /// In this function the the opacity slider is set to the selected nodes opacity value
   ///
   void OpacityActionChanged();
+  /// Invoked when the component action changed
+  /// In this function the the opacity slider is set to the selected nodes opacity value
+  ///
+  void ComponentActionChanged();
   ///
   /// Invoked when the color button is pressed
   ///
@@ -228,6 +233,8 @@ protected:
 
   /// A Slider widget to change the opacity of a node
   QSlider* m_OpacitySlider;
+  /// A Slider widget to change the rendered vector component of an image
+  QmitkNumberPropertySlider* m_ComponentSlider;
   /// button to change the color of a node
   QPushButton* m_ColorButton;
   /// TextureInterpolation action

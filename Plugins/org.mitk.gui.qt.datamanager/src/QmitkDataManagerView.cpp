@@ -44,6 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkIOUtil.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkCustomVariants.h>
+#include <QmitkNumberPropertySlider.h>
 #include "src/internal/QmitkNodeTableViewKeyFilter.h"
 #include "src/internal/QmitkInfoDialog.h"
 #include "src/internal/QmitkDataManagerItemDelegate.h"
@@ -304,6 +305,29 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(colorAction, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,colorAction));
 
+  m_ComponentSlider = new QmitkNumberPropertySlider;
+  m_ComponentSlider->setOrientation(Qt::Horizontal);
+  //QObject::connect( m_OpacitySlider, SIGNAL( valueChanged(int) )
+  //  , this, SLOT( OpacityChanged(int) ) );
+
+  QLabel* _ComponentLabel = new QLabel("Component: ");
+  QHBoxLayout* _ComponentWidgetLayout = new QHBoxLayout;
+  _ComponentWidgetLayout->setContentsMargins(4,4,4,4);
+  _ComponentWidgetLayout->addWidget(_ComponentLabel);
+  _ComponentWidgetLayout->addWidget(m_ComponentSlider);
+  QLabel* _ComponentValueLabel = new QLabel();
+  _ComponentWidgetLayout->addWidget(_ComponentValueLabel);
+  connect(m_ComponentSlider, SIGNAL(valueChanged(int)), _ComponentValueLabel, SLOT(setNum(int)));
+  QWidget* _ComponentWidget = new QWidget;
+  _ComponentWidget->setLayout(_ComponentWidgetLayout);
+
+  QWidgetAction* componentAction = new QWidgetAction(this);
+  componentAction->setDefaultWidget(_ComponentWidget);
+  QObject::connect( componentAction , SIGNAL( changed() )
+    , this, SLOT( ComponentActionChanged() ) );
+  imageDataNodeDescriptor->AddAction(componentAction, false);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,componentAction));
+
   m_TextureInterpolation = new QAction("Texture Interpolation", this);
   m_TextureInterpolation->setCheckable ( true );
   QObject::connect( m_TextureInterpolation, SIGNAL( changed() )
@@ -495,6 +519,33 @@ void QmitkDataManagerView::OpacityActionChanged()
     {
       m_OpacitySlider->setValue(static_cast<int>(opacity*100));
     }
+  }
+}
+
+void QmitkDataManagerView::ComponentActionChanged()
+{
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  mitk::IntProperty* componentProperty = NULL;
+  int numComponents = 0;
+  if(node)
+  {
+    componentProperty =
+        dynamic_cast<mitk::IntProperty*>(node->GetProperty("Image.Displayed Component"));
+    mitk::Image* img = dynamic_cast<mitk::Image*>(node->GetData());
+    if (img != NULL)
+    {
+      numComponents = img->GetPixelType().GetNumberOfComponents();
+    }
+  }
+  if (componentProperty && numComponents > 1)
+  {
+    m_ComponentSlider->SetProperty(componentProperty);
+    m_ComponentSlider->setMinValue(0);
+    m_ComponentSlider->setMaxValue(numComponents-1);
+  }
+  else
+  {
+    m_ComponentSlider->SetProperty(static_cast<mitk::IntProperty*>(NULL));
   }
 }
 

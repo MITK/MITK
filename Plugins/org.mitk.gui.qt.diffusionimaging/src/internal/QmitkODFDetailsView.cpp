@@ -200,7 +200,7 @@ void QmitkODFDetailsView::UpdateOdf()
 
       try
       {
-        mitk::QBallImage* qball_image = dynamic_cast< mitk::QBallImage* >( m_ImageNode->GetData() );
+        const mitk::QBallImage* qball_image = dynamic_cast< mitk::QBallImage* >( m_ImageNode->GetData() );
 
         // get access to the qball image data with explicitely allowing exceptions if memory locked
         mitk::ImageReadAccessor readAccess( qball_image, qball_image->GetVolumeData(0), mitk::ImageAccessorBase::ExceptionIfLocked );
@@ -259,7 +259,7 @@ void QmitkODFDetailsView::UpdateOdf()
       m_Controls->m_OdfBox->setVisible(false);
 
 
-      mitk::TensorImage* qball_image = dynamic_cast< mitk::TensorImage*>(m_ImageNode->GetData());
+      const mitk::TensorImage* qball_image = dynamic_cast< mitk::TensorImage*>(m_ImageNode->GetData());
 
       // pixel access block
       try

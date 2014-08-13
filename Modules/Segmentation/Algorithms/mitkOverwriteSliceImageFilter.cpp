@@ -58,7 +58,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
   //  - observer commands to know when the image is deleted (no further action then, perhaps even remove the operations from the undo stack)
   //
   Image::ConstPointer input = ImageToImageFilter::GetInput(0);
-  Image::ConstPointer input3D = input;
+  Image::Pointer input3D = ImageToImageFilter::GetInput(0);
 
   Image::ConstPointer slice = m_SliceImage;
 
@@ -176,7 +176,7 @@ void mitk::OverwriteSliceImageFilter::ItkImageSwitch( itk::Image<TPixel,VImageDi
 }
 
 template<typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
-void mitk::OverwriteSliceImageFilter::ItkImageProcessing( itk::Image<TPixel1,VImageDimension1>* inputImage, itk::Image<TPixel2,VImageDimension2>* outputImage )
+void mitk::OverwriteSliceImageFilter::ItkImageProcessing( const itk::Image<TPixel1,VImageDimension1>* inputImage, itk::Image<TPixel2,VImageDimension2>* outputImage )
 {
   typedef itk::Image<TPixel1, VImageDimension1> SliceImageType;
   typedef itk::Image<short signed int, VImageDimension1> DiffImageType;

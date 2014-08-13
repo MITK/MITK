@@ -105,7 +105,7 @@ int StreamlineTracking(int argc, char* argv[])
                 mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(inputImages.at(i))->GetData());
                 mitk::TensorImage::Pointer img = dynamic_cast<mitk::TensorImage*>(mitk::IOUtil::LoadDataNode(inputImages.at(i))->GetData());
                 ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
-                mitk::CastToItkImage<ItkTensorImage>(img, itk_dti);
+                mitk::CastToItkImage(img, itk_dti);
                 filter->SetInput(i, itk_dti);
             }
             catch(...){ MITK_INFO << "could not load: " << inputImages.at(i); }
@@ -135,14 +135,14 @@ int StreamlineTracking(int argc, char* argv[])
         if (mitkSeedImage.IsNotNull())
         {
             ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-            mitk::CastToItkImage<ItkUCharImageType>(mitkSeedImage, mask);
+            mitk::CastToItkImage(mitkSeedImage, mask);
             filter->SetSeedImage(mask);
         }
 
         if (mitkMaskImage.IsNotNull())
         {
             ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-            mitk::CastToItkImage<ItkUCharImageType>(mitkMaskImage, mask);
+            mitk::CastToItkImage(mitkMaskImage, mask);
             filter->SetMaskImage(mask);
         }
 

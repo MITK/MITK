@@ -43,15 +43,16 @@ std::string PixelTypeToString()
 }
 
 
-//##Documentation
-//## @brief Class for defining the data type of pixels
-//##
-//## To obtain additional type information not provided by this class
-//## itk::ImageIOBase can be used by passing the return value of
-//## PixelType::GetItkTypeId() to itk::ImageIOBase::SetPixelTypeInfo
-//## and using the itk::ImageIOBase methods GetComponentType,
-//## GetComponentTypeAsString, GetPixelType, GetPixelTypeAsString.
-//## @ingroup Data
+/**
+ * @brief Class for defining the data type of pixels
+ *
+ * To obtain additional type information not provided by this class
+ * itk::ImageIOBase can be used by passing the return value of
+ * PixelType::GetItkTypeId() to itk::ImageIOBase::SetPixelTypeInfo
+ * and using the itk::ImageIOBase methods GetComponentType,
+ * GetComponentTypeAsString, GetPixelType, GetPixelTypeAsString.
+ * @ingroup Data
+ */
 class MITK_CORE_EXPORT PixelType
 {
 public:
@@ -128,10 +129,13 @@ private:
   friend PixelType MakePixelType(const itk::ImageIOBase* imageIO);
 
   template< typename ComponentT, typename PixelT, std::size_t numberOfComponents >
-    friend PixelType MakePixelType();
+  friend PixelType MakePixelType();
 
   template< typename ItkImageType >
-    friend PixelType MakePixelType();
+  friend PixelType MakePixelType();
+
+  template< typename ItkImageType >
+  friend PixelType MakePixelType(size_t);
 
   PixelType( const int componentType,
              const ItkIOPixelType pixelType,
@@ -174,14 +178,33 @@ PixelType MakePixelType()
                    );
 }
 
+/**
+ * \brief A helper template for compile-time checking of supported ITK image types.
+ *
+ * Unsupported image types will be marked by template specializations with
+ * missing definitions;
+ */
+template< typename ItkImageType >
+struct AssertImageTypeIsValid
+{
+};
+
+// The itk::VariableLengthVector pixel type is not supported in MITK if it is
+// used with an itk::Image (it cannot be represented as a mitk::Image object).
+// Use a itk::VectorImage instead.
+template< typename TPixelType, unsigned int VImageDimension >
+struct AssertImageTypeIsValid<itk::Image<itk::VariableLengthVector<TPixelType>, VImageDimension> >;
+
 /** \brief A template method for creating a pixel type from an ItkImageType
   *
   * For fixed size vector images ( i.e. images of type itk::FixedArray<3,float> ) also the number of components
   * is propagated to the constructor
   */
 template< typename ItkImageType >
-PixelType MakePixelType()
+PixelType MakePixelType( std::size_t numOfComponents )
 {
+  AssertImageTypeIsValid<ItkImageType>();
+
   // define new type, since the ::PixelType is used to distinguish between simple and compound types
   typedef typename ItkImageType::PixelType ImportPixelType;
 
@@ -191,19 +214,34 @@ PixelType MakePixelType()
   // The PixelType is the same as the ComponentT for simple types
   typedef typename ItkImageType::PixelType PixelT;
 
-  // Get the length of compound type ( initialized to 1 for simple types and variable-length vector images)
-  size_t numComp = ComponentsTrait<
-    (isPrimitiveType<PixelT>::value || isVectorImage<PixelT, ComponentT>::value), ItkImageType >::Size;
-
   // call the constructor
   return PixelType(
             MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOComponentType,
             MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOPixelType,
-            sizeof(ComponentT), numComp,
+            sizeof(ComponentT), numOfComponents,
             PixelComponentTypeToString<ComponentT>(),
             PixelTypeToString<PixelT>()
          );
 }
+
+template< typename ItkImageType >
+PixelType MakePixelType()
+{
+  if( ImageTypeTrait<ItkImageType>::IsVectorImage )
+  {
+    mitkThrow() << " Variable pixel type given but the length is not specified. Use the parametric MakePixelType( size_t ) method instead.";
+  }
+
+  // Use the InternalPixelType to get "1" for the number of components in case of
+  // a itk::VectorImage
+  typedef typename ItkImageType::InternalPixelType PixelT;
+
+  const std::size_t numComp = ComponentsTrait<isPrimitiveType<PixelT>::value, ItkImageType>::Size;
+
+  // call the constructor
+  return MakePixelType<ItkImageType>(numComp);
+}
+
 
 inline PixelType MakePixelType(const itk::ImageIOBase* imageIO)
 {

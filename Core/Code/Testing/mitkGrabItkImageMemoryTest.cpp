@@ -97,7 +97,7 @@ bool Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue()
 //! [OutOfScopeCall]
 
   mitk::ImagePixelReadAccessor< TPixel, 3 > readAccessor( output );
-  const TPixel* output_data = readAccessor.GetConstData();
+  const TPixel* output_data = readAccessor.GetData();
 
   bool equal = true;
   for( unsigned int i=0; i<27; i++)

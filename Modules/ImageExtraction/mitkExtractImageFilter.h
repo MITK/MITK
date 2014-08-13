@@ -101,7 +101,7 @@ class MitkImageExtraction_EXPORT ExtractImageFilter : public ImageToImageFilter
     virtual void GenerateData();
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image );
+    void ItkImageProcessing( const itk::Image<TPixel,VImageDimension>* image );
 
     unsigned int m_SliceIndex;
     unsigned int m_SliceDimension;

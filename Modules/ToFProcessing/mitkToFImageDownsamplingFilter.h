@@ -75,7 +75,7 @@ namespace mitk
     \param VImageDimension is the image dimension (2D or 3D)
     */
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageResampling( itk::Image<TPixel,VImageDimension>* itkImage );
+    void ItkImageResampling( const itk::Image<TPixel,VImageDimension>* itkImage );
 
     double m_ResampledX;///<  length of x dimension of output image in pixels
     double m_ResampledY;///<  length of y dimension of output image in pixels

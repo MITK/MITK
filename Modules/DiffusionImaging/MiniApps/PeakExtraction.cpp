@@ -152,7 +152,7 @@ int StartPeakExtraction(int argc, char* argv[])
         {
             try{
                 itkMaskImage = ItkUcharImgType::New();
-                mitk::CastToItkImage<ItkUcharImgType>(mask, itkMaskImage);
+                mitk::CastToItkImage(mask, itkMaskImage);
                 filter->SetMaskImage(itkMaskImage);
             }
             catch(...)

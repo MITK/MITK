@@ -111,7 +111,7 @@ protected:
 
   /** ITK-like method which calls the ComparisionFilter on the two inputs of the filter */
   template< typename TPixel, unsigned int VImageDimension>
-  void EstimateValueDifference( itk::Image< TPixel, VImageDimension>* itkImage1,
+  void EstimateValueDifference( const itk::Image< TPixel, VImageDimension>* itkImage1,
                                 const mitk::Image* referenceImage);
   bool m_CompareResult;
 

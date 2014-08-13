@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 template<typename TPixel, unsigned int VImageDimension>
-void ImageRegistrationMethodAccessFunctor::AccessItkImage(itk::Image<TPixel, VImageDimension>* itkImage1,
+void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixel, VImageDimension>* itkImage1,
                                                           ImageRegistrationMethod* method)
 {
   //convert mitk masks to itk masks
@@ -67,7 +67,7 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(itk::Image<TPixel, VIm
   typedef typename itk::SingleValuedNonLinearOptimizer OptimizerType;
   // the fixed and the moving image
   typename FixedImageType::Pointer fixedImage = FixedImageType::New();
-  typename MovingImageType::Pointer movingImage = itkImage1;
+  typename MovingImageType::ConstPointer movingImage = itkImage1;
   mitk::CastToItkImage(method->m_ReferenceImage, fixedImage);
   // the metric
   MetricPointer metric = dynamic_cast<MetricType*>(method->m_Metric.GetPointer());

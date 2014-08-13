@@ -172,7 +172,7 @@ public:
         mitk::Image::Pointer mitkFMap = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode( GetTestDataFilePath("DiffusionImaging/Fiberfox/Fieldmap.nrrd") )->GetData());
         typedef itk::Image<double, 3> ItkDoubleImgType;
         ItkDoubleImgType::Pointer fMap = ItkDoubleImgType::New();
-        mitk::CastToItkImage<ItkDoubleImgType>(mitkFMap, fMap);
+        mitk::CastToItkImage(mitkFMap, fMap);
         m_Parameters.m_FrequencyMap = fMap;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/distortions2.dwi") );
     }

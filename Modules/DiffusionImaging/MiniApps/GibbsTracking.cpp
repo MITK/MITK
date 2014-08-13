@@ -133,7 +133,7 @@ int GibbsTracking(int argc, char* argv[])
             MITK_INFO << "Loading qball image ...";
             mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
             ItkQballImageType::Pointer itk_qbi = ItkQballImageType::New();
-            mitk::CastToItkImage<ItkQballImageType>(mitkQballImage, itk_qbi);
+            mitk::CastToItkImage(mitkQballImage, itk_qbi);
             gibbsTracker->SetQBallImage(itk_qbi.GetPointer());
         }
         else if( boost::algorithm::ends_with(inFileName, ".dti") )
@@ -142,7 +142,7 @@ int GibbsTracking(int argc, char* argv[])
             typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
             mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile.at(0).GetPointer());
             ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
-            mitk::CastToItkImage<ItkTensorImage>(mitkTensorImage, itk_dti);
+            mitk::CastToItkImage(mitkTensorImage, itk_dti);
             gibbsTracker->SetTensorImage(itk_dti);
         }
         else if ( boost::algorithm::ends_with(inFileName, ".nii") )
@@ -210,7 +210,7 @@ int GibbsTracking(int argc, char* argv[])
             typedef itk::Image<float,3> MaskImgType;
             mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["mask"]));
             MaskImgType::Pointer itk_mask = MaskImgType::New();
-            mitk::CastToItkImage<MaskImgType>(mitkMaskImage, itk_mask);
+            mitk::CastToItkImage(mitkMaskImage, itk_mask);
             gibbsTracker->SetMaskImage(itk_mask);
         }
 

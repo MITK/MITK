@@ -87,7 +87,7 @@ class MitkSegmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
    unsigned int m_ProgressStepSize;
 
    template<typename TPixel, unsigned int VImageDimension>
-   void Itk2DContourExtraction (itk::Image<TPixel, VImageDimension>* sliceImage);
+   void Itk2DContourExtraction (const itk::Image<TPixel, VImageDimension>* sliceImage);
 
 };//class
 

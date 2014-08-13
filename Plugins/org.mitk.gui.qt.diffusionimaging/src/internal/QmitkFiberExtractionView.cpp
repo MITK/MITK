@@ -121,7 +121,7 @@ void QmitkFiberExtractionView::DoRemoveInsideMask()
         QString name(m_SelectedFB.at(i)->GetName().c_str());
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
-        mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
+        mitk::CastToItkImage(mitkMask, mask);
         mitk::FiberBundleX::Pointer newFib = fib->RemoveFibersOutside(mask, true);
         if (newFib->GetNumFibers()<=0)
         {
@@ -149,7 +149,7 @@ void QmitkFiberExtractionView::DoRemoveOutsideMask()
         QString name(m_SelectedFB.at(i)->GetName().c_str());
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
-        mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
+        mitk::CastToItkImage(mitkMask, mask);
         mitk::FiberBundleX::Pointer newFib = fib->RemoveFibersOutside(mask);
         if (newFib->GetNumFibers()<=0)
         {
@@ -177,7 +177,7 @@ void QmitkFiberExtractionView::ExtractEndingInMask()
         QString name(m_SelectedFB.at(i)->GetName().c_str());
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
-        mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
+        mitk::CastToItkImage(mitkMask, mask);
         mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, false);
         if (newFib->GetNumFibers()<=0)
         {
@@ -234,7 +234,7 @@ void QmitkFiberExtractionView::ExtractPassingMask()
         QString name(m_SelectedFB.at(i)->GetName().c_str());
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
-        mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
+        mitk::CastToItkImage(mitkMask, mask);
         mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, true);
         if (newFib->GetNumFibers()<=0)
         {

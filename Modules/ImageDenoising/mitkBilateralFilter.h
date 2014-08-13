@@ -68,7 +68,7 @@ namespace mitk
     \brief Internal templated method calling the ITK bilteral filter. Here the actual filtering is performed.
     */
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage );
+    void ItkImageProcessing( const itk::Image<TPixel,VImageDimension>* itkImage );
 
     float m_DomainSigma; ///Sigma of the gaussian kernel. See ITK docu
     float m_RangeSigma; ///Sigma of the range mask kernel. See ITK docu

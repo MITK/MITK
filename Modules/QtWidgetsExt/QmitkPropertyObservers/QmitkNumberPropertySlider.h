@@ -16,13 +16,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkNumberPropertySliderhincludecd
 #define QmitkNumberPropertySliderhincludecd
 
-#include <mitkPropertyObserver.h>
 #include "MitkQtWidgetsExtExports.h"
-#include <mitkProperties.h>
-#include <qslider.h>
+
+#include <QSlider>
+
+#include <memory>
+
+namespace mitk {
+class IntProperty;
+class FloatProperty;
+class DoubleProperty;
+}
 
 /// @ingroup Widgets
-class MitkQtWidgetsExt_EXPORT QmitkNumberPropertySlider : public QSlider, public mitk::PropertyEditor
+class MitkQtWidgetsExt_EXPORT QmitkNumberPropertySlider : public QSlider
 {
   Q_OBJECT
   Q_PROPERTY( short decimalPlaces READ getDecimalPlaces WRITE setDecimalPlaces )
@@ -30,58 +37,36 @@ class MitkQtWidgetsExt_EXPORT QmitkNumberPropertySlider : public QSlider, public
   Q_PROPERTY( int minValue READ minValue WRITE setMinValue )
   Q_PROPERTY( int maxValue READ maxValue WRITE setMaxValue )
 
-  public:
+public:
 
-    QmitkNumberPropertySlider( mitk::IntProperty*, QWidget* parent, const char* name = 0 );
-    QmitkNumberPropertySlider( mitk::FloatProperty*, QWidget* parent, const char* name = 0 );
-    QmitkNumberPropertySlider( mitk::DoubleProperty*, QWidget* parent, const char* name = 0 );
+  QmitkNumberPropertySlider(QWidget* parent = 0);
+  virtual ~QmitkNumberPropertySlider();
 
-    virtual ~QmitkNumberPropertySlider();
+  void SetProperty(mitk::IntProperty* property);
+  void SetProperty(mitk::FloatProperty* property);
+  void SetProperty(mitk::DoubleProperty* property);
 
-    short getDecimalPlaces() const;
-    void setDecimalPlaces(short);
+  short getDecimalPlaces() const;
+  void setDecimalPlaces(short);
 
-    bool getShowPercent() const;
-    void setShowPercent(bool);
+  bool getShowPercent() const;
+  void setShowPercent(bool);
 
-    int minValue() const;
-    void setMinValue(int);
-    int maxValue() const;
-    void setMaxValue(int);
-    double doubleValue() const;
-    void setDoubleValue(double);
+  int minValue() const;
+  void setMinValue(int);
+  int maxValue() const;
+  void setMaxValue(int);
+  double doubleValue() const;
+  void setDoubleValue(double);
 
-  protected:
+protected slots:
 
-    void initialize();
+  void onValueChanged(int);
 
-    virtual void PropertyChanged();
-    virtual void PropertyRemoved();
+private:
 
-    void DisplayNumber();
-
-    union {
-      mitk::GenericProperty<int>*     m_IntProperty;
-      mitk::GenericProperty<float>*   m_FloatProperty;
-      mitk::GenericProperty<double>*  m_DoubleProperty;
-    };
-
-    const int m_DataType;
-
-    short m_DecimalPlaces;            // how many decimal places are shown
-    double m_FactorPropertyToSlider; // internal conversion factor. neccessary because slider ranges work only with ints
-    double m_FactorSliderToDisplay;  // internal conversion factor. neccessary because slider ranges work only with ints
-    bool m_ShowPercents;              // whether values are given in percent (0.5 -> 50%)
-
-  protected slots:
-
-    void onValueChanged(int);
-
-  private:
-
-    void adjustFactors(short, bool);
-
-    bool m_SelfChangeLock;
+  class Impl;
+  std::auto_ptr<Impl> d;
 };
 
 #endif

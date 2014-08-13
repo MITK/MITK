@@ -70,7 +70,7 @@ int DiffusionIndices(int argc, char* argv[])
             typedef itk::Image<OdfVectorType,3>         ItkQballImageType;
             mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
             ItkQballImageType::Pointer itk_qbi = ItkQballImageType::New();
-            mitk::CastToItkImage<ItkQballImageType>(mitkQballImage, itk_qbi);
+            mitk::CastToItkImage(mitkQballImage, itk_qbi);
 
 
             typedef itk::DiffusionQballGeneralizedFaImageFilter<float,float,QBALL_ODFSIZE> GfaFilterType;
@@ -91,7 +91,7 @@ int DiffusionIndices(int argc, char* argv[])
             typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
             mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile.at(0).GetPointer());
             ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
-            mitk::CastToItkImage<ItkTensorImage>(mitkTensorImage, itk_dti);
+            mitk::CastToItkImage(mitkTensorImage, itk_dti);
 
             typedef itk::TensorDerivedMeasurementsFilter<float> MeasurementsType;
             MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();

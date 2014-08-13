@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::BaseData::BaseData() :
-  m_RequestedRegionInitialized(false),
   m_SourceOutputIndexDuplicate(0), m_Initialized(true)
 {
   m_TimeGeometry = mitk::ProportionalTimeGeometry::New();
@@ -33,7 +32,6 @@ mitk::BaseData::BaseData() :
 
 mitk::BaseData::BaseData( const BaseData &other ):
 itk::DataObject(), mitk::OperationActor(),
-m_RequestedRegionInitialized(other.m_RequestedRegionInitialized),
 m_SourceOutputIndexDuplicate(other.m_SourceOutputIndexDuplicate),
 m_Initialized(other.m_Initialized)
 {

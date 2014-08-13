@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkMorphologicalOperations.h"
 #include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageTimeSelector.h>
 #include <itkBinaryBallStructuringElement.h>

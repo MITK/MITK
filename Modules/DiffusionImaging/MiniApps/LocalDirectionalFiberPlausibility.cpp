@@ -185,7 +185,7 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
             for (unsigned int i=0; i<maskImages.size(); i++)
             {
                 mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImages.at(i))->GetData());
-                mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
+                mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
 
                 // evaluate directions
                 EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();

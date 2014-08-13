@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageSource.h"
 
+#include "mitkImageVtkReadAccessor.h"
+#include "mitkImageVtkWriteAccessor.h"
+
 mitk::ImageSource::ImageSource()
 {
   // Create the output. We use static_cast<> here because we know the default
@@ -193,8 +196,13 @@ void mitk::ImageSource::PrepareOutputs()
 
 vtkImageData* mitk::ImageSource::GetVtkImageData()
 {
-    Update();
-    return GetOutput()->GetVtkImageData();
+  Update();
+  return GetOutput()->GetVtkImageData();
+}
+
+const vtkImageData* mitk::ImageSource::GetVtkImageData() const
+{
+  return GetOutput()->GetVtkImageData();
 }
 
 mitkBaseDataSourceGetOutputDefinitions(mitk::ImageSource)

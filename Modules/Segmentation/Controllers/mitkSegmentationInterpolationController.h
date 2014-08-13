@@ -174,13 +174,13 @@ class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::
 
     /// internal scan of a single slice
     template < typename DATATYPE >
-    void ScanChangedSlice( itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options );
+    void ScanChangedSlice( const itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options );
 
     template < typename TPixel, unsigned int VImageDimension >
-    void ScanChangedVolume( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
+    void ScanChangedVolume( const itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
 
     template < typename DATATYPE >
-    void ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep );
+    void ScanWholeVolume( const itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep );
 
     void PrintStatus();
 

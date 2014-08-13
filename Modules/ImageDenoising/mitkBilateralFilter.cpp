@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBilateralFilter.h"
 #include <itkBilateralImageFilter.h>
 #include "mitkImageAccessByItk.h"
-#include "mitkITKImageImport.h"
+#include "mitkImageCast.h"
 
 mitk::BilateralFilter::BilateralFilter()
   : m_DomainSigma(2.0f), m_RangeSigma(50.0f), m_AutoKernel(true), m_KernelRadius(1u)
@@ -57,7 +57,7 @@ void mitk::BilateralFilter::GenerateData()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::BilateralFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage )
+void mitk::BilateralFilter::ItkImageProcessing( const itk::Image<TPixel,VImageDimension>* itkImage )
 {
   //ITK Image type given from the input image
   typedef itk::Image< TPixel, VImageDimension >   ItkImageType;

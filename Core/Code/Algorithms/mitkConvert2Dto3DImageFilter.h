@@ -63,7 +63,7 @@ namespace mitk
     \brief Make a 2D image to a 3D image
     */
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkConvert2DTo3D( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Image::Pointer &mitkImage );
+    void ItkConvert2DTo3D(const itk::Image<TPixel,VImageDimension>* itkImage, mitk::Image::Pointer &mitkImage );
 
   };
 } //END mitk namespace

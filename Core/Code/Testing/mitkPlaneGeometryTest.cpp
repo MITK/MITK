@@ -33,12 +33,11 @@ static const mitk::ScalarType testEps = 1E-9; // the epsilon used in this test =
 class mitkPlaneGeometryTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPlaneGeometryTestSuite);
-  //MITK_TEST(mitkPlaneGeometryTest);
-  //MITK_TEST(TestProjectPointOntoPlane);
-  //MITK_TEST(createPlaneGeometry);
+  MITK_TEST(mitkPlaneGeometryTestWrapper);
+  MITK_TEST(TestProjectPointOntoPlane);
   MITK_TEST(testPlaneGeometryCloning);
-  //MITK_TEST(compareMatrix);
-  MITK_TEST(testPlaneGeometryInitializeOrder);
+  // Currently commented out, see See bug 15990
+  // MITK_TEST(testPlaneGeometryInitializeOrder);
   //MITK_TEST(mappingTests2D);
   MITK_TEST(TestIntersectionPoint);
   MITK_TEST(TestCase1210);
@@ -53,70 +52,6 @@ public:
 
   void tearDown()
   {
-  }
-
-  int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::Point3D& origin, const mitk::Vector3D& right, const mitk::Vector3D& bottom)
-  {
-    std::cout << "Testing mapping Map(pt2d_mm(x=widthInMM/2.3,y=heightInMM/2.5), pt3d_mm) and compare with expected: ";
-    mitk::Point2D pt2d_mm;
-    mitk::Point3D pt3d_mm, expected_pt3d_mm;
-    pt2d_mm[0] = widthInMM/2.3; pt2d_mm[1] = heightInMM/2.5;
-    expected_pt3d_mm = origin+right*(pt2d_mm[0]/right.GetNorm())+bottom*(pt2d_mm[1]/bottom.GetNorm());
-    planegeometry->Map(pt2d_mm, pt3d_mm);
-    if(mitk::Equal(pt3d_mm, expected_pt3d_mm, testEps) == false)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
-
-    std::cout << "Testing mapping Map(pt3d_mm, pt2d_mm) and compare with expected: ";
-    mitk::Point2D testpt2d_mm;
-    planegeometry->Map(pt3d_mm, testpt2d_mm);
-    std::cout << std::setprecision(12) << "Expected pt2d_mm " << pt2d_mm << std::endl;
-    std::cout << std::setprecision(12) << "Result testpt2d_mm " << testpt2d_mm << std::endl;
-    std::cout << std::setprecision(12) << "10*mitk::eps " << 10*mitk::eps << std::endl;
-    //This eps is temporarily set to 10*mitk::eps. See bug #15037 for details.
-    if(mitk::Equal(pt2d_mm, testpt2d_mm, 10*mitk::eps) == false)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
-
-    std::cout << "Testing IndexToWorld(pt2d_units, pt2d_mm) and compare with expected: ";
-    mitk::Point2D pt2d_units;
-    pt2d_units[0] = width/2.0;     pt2d_units[1] = height/2.0;
-    pt2d_mm[0]    = widthInMM/2.0; pt2d_mm[1]    = heightInMM/2.0;
-    planegeometry->IndexToWorld(pt2d_units, testpt2d_mm);
-
-    std::cout << std::setprecision(12) << "Expected pt2d_mm " << pt2d_mm << std::endl;
-    std::cout << std::setprecision(12) << "Result testpt2d_mm " << testpt2d_mm << std::endl;
-    std::cout << std::setprecision(12) << "10*mitk::eps " << 10*mitk::eps << std::endl;
-    //This eps is temporarily set to 10*mitk::eps. See bug #15037 for details.
-    if(mitk::Equal(pt2d_mm, testpt2d_mm, 10*mitk::eps) == false)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
-
-    std::cout << "Testing WorldToIndex(pt2d_mm, pt2d_units) and compare with expected: ";
-    mitk::Point2D testpt2d_units;
-    planegeometry->WorldToIndex(pt2d_mm, testpt2d_units);
-
-    std::cout << std::setprecision(12) << "Expected pt2d_units " << pt2d_units << std::endl;
-    std::cout << std::setprecision(12) << "Result testpt2d_units " << testpt2d_units << std::endl;
-    std::cout << std::setprecision(12) << "10*mitk::eps " << 10*mitk::eps << std::endl;
-    //This eps is temporarily set to 10*mitk::eps. See bug #15037 for details.
-    if(mitk::Equal(pt2d_units, testpt2d_units, 10*mitk::eps) == false)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
-
-    return EXIT_SUCCESS;
   }
 
   void TestCase1210()
@@ -246,7 +181,7 @@ public:
   *
   * See also bug #3409.
   */
-  int TestProjectPointOntoPlane()
+  void TestProjectPointOntoPlane()
   {
     mitk::PlaneGeometry::Pointer myPlaneGeometry = mitk::PlaneGeometry::New();
 
@@ -308,42 +243,7 @@ public:
         allPointsOnPlane = false;
       }
     }
-    if (!allPointsOnPlane)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    else
-    {
-      std::cout<<"[PASSED]"<<std::endl;
-      return EXIT_SUCCESS;
-    }
-  }
-
-  mitk::PlaneGeometry::Pointer  createPlaneGeometry()
-  {
-    mitk::Vector3D mySpacing;
-    mySpacing[0] = 31;
-    mySpacing[1] = 0.1;
-    mySpacing[2] = 5.4;
-    mitk::Point3D myOrigin;
-    myOrigin[0] = 8;
-    myOrigin[1] = 9;
-    myOrigin[2] = 10;
-    mitk::AffineTransform3D::Pointer myTransform = mitk::AffineTransform3D::New();
-    itk::Matrix<mitk::ScalarType, 3,3> transMatrix;
-    transMatrix.Fill(0);
-    transMatrix[0][0] = 1;
-    transMatrix[1][1] = 2;
-    transMatrix[2][2] = 4;
-
-    myTransform->SetMatrix(transMatrix);
-
-    mitk::PlaneGeometry::Pointer geometry2D = mitk::PlaneGeometry::New();
-    geometry2D->SetIndexToWorldTransform(myTransform);
-    geometry2D->SetSpacing(mySpacing);
-    geometry2D->SetOrigin(myOrigin);
-    return geometry2D;
+    CPPUNIT_ASSERT_MESSAGE("All points lie not on the same plane", allPointsOnPlane);
   }
 
   void testPlaneGeometryCloning()
@@ -368,15 +268,6 @@ public:
     }
     // direction [row] [coloum]
     MITK_TEST_OUTPUT( << "Casting a rotated 2D ITK Image to a MITK Image and check if Geometry is still same" );
-  }
-
-  bool compareMatrix(itk::Matrix<mitk::ScalarType, 3,3> left, itk::Matrix<mitk::ScalarType, 3,3> right)
-  {
-    bool equal = true;
-    for (int i = 0; i < 3; ++i)
-      for (int j = 0; j < 3; ++j)
-        equal &= mitk::Equal(left[i][j], right[i][j]);
-    return equal;
   }
 
   void testPlaneGeometryInitializeOrder()
@@ -427,7 +318,14 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Transformation of Geometry 2 match those of Geometry 3.", compareMatrix(geometry2D2->GetIndexToWorldTransform()->GetMatrix(), geometry2D3->GetIndexToWorldTransform()->GetMatrix()));
   }
 
-  int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
+  // This is a wrapper to make the old test compatible to CCP Unit without rewriting all the conditions below.
+  // The test is far from optimal anyway and should be rewritten when time permits
+  void mitkPlaneGeometryTestWrapper()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Failed general PlaneGeometryTest, see output for further details", mitkPlaneGeometryTest() == EXIT_SUCCESS);
+  }
+
+  int mitkPlaneGeometryTest()
   {
     int result;
 
@@ -1096,19 +994,107 @@ public:
     result = mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, backsideorigin, right, -bottom);
     if(result!=EXIT_SUCCESS)
       return result;
+  }
 
-    // test method mitk::PlaneGeometry::ProjectPointOntoPlane()
-    // (see also bug #3409)
-    result = TestProjectPointOntoPlane();
-    if(result!=EXIT_SUCCESS)
-      return result;
+private:
+  // helper Methods for the Tests
 
-    std::cout<<"[PASSED]"<<std::endl<<std::endl;
+  mitk::PlaneGeometry::Pointer  createPlaneGeometry()
+  {
+    mitk::Vector3D mySpacing;
+    mySpacing[0] = 31;
+    mySpacing[1] = 0.1;
+    mySpacing[2] = 5.4;
+    mitk::Point3D myOrigin;
+    myOrigin[0] = 8;
+    myOrigin[1] = 9;
+    myOrigin[2] = 10;
+    mitk::AffineTransform3D::Pointer myTransform = mitk::AffineTransform3D::New();
+    itk::Matrix<mitk::ScalarType, 3,3> transMatrix;
+    transMatrix.Fill(0);
+    transMatrix[0][0] = 1;
+    transMatrix[1][1] = 2;
+    transMatrix[2][2] = 4;
 
-    // See bug 15990
-    // MITK_TEST_CONDITION_REQUIRED ( (result = testPlaneGeometryInitializeOrder()) == EXIT_SUCCESS, "");
+    myTransform->SetMatrix(transMatrix);
 
-    std::cout<<"[TEST DONE]"<<std::endl;
+    mitk::PlaneGeometry::Pointer geometry2D = mitk::PlaneGeometry::New();
+    geometry2D->SetIndexToWorldTransform(myTransform);
+    geometry2D->SetSpacing(mySpacing);
+    geometry2D->SetOrigin(myOrigin);
+    return geometry2D;
+  }
+
+  bool compareMatrix(itk::Matrix<mitk::ScalarType, 3,3> left, itk::Matrix<mitk::ScalarType, 3,3> right)
+  {
+    bool equal = true;
+    for (int i = 0; i < 3; ++i)
+      for (int j = 0; j < 3; ++j)
+        equal &= mitk::Equal(left[i][j], right[i][j]);
+    return equal;
+  }
+
+  int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::Point3D& origin, const mitk::Vector3D& right, const mitk::Vector3D& bottom)
+  {
+    std::cout << "Testing mapping Map(pt2d_mm(x=widthInMM/2.3,y=heightInMM/2.5), pt3d_mm) and compare with expected: ";
+    mitk::Point2D pt2d_mm;
+    mitk::Point3D pt3d_mm, expected_pt3d_mm;
+    pt2d_mm[0] = widthInMM/2.3; pt2d_mm[1] = heightInMM/2.5;
+    expected_pt3d_mm = origin+right*(pt2d_mm[0]/right.GetNorm())+bottom*(pt2d_mm[1]/bottom.GetNorm());
+    planegeometry->Map(pt2d_mm, pt3d_mm);
+    if(mitk::Equal(pt3d_mm, expected_pt3d_mm, testEps) == false)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing mapping Map(pt3d_mm, pt2d_mm) and compare with expected: ";
+    mitk::Point2D testpt2d_mm;
+    planegeometry->Map(pt3d_mm, testpt2d_mm);
+    std::cout << std::setprecision(12) << "Expected pt2d_mm " << pt2d_mm << std::endl;
+    std::cout << std::setprecision(12) << "Result testpt2d_mm " << testpt2d_mm << std::endl;
+    std::cout << std::setprecision(12) << "10*mitk::eps " << 10*mitk::eps << std::endl;
+    //This eps is temporarily set to 10*mitk::eps. See bug #15037 for details.
+    if(mitk::Equal(pt2d_mm, testpt2d_mm, 10*mitk::eps) == false)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing IndexToWorld(pt2d_units, pt2d_mm) and compare with expected: ";
+    mitk::Point2D pt2d_units;
+    pt2d_units[0] = width/2.0;     pt2d_units[1] = height/2.0;
+    pt2d_mm[0]    = widthInMM/2.0; pt2d_mm[1]    = heightInMM/2.0;
+    planegeometry->IndexToWorld(pt2d_units, testpt2d_mm);
+
+    std::cout << std::setprecision(12) << "Expected pt2d_mm " << pt2d_mm << std::endl;
+    std::cout << std::setprecision(12) << "Result testpt2d_mm " << testpt2d_mm << std::endl;
+    std::cout << std::setprecision(12) << "10*mitk::eps " << 10*mitk::eps << std::endl;
+    //This eps is temporarily set to 10*mitk::eps. See bug #15037 for details.
+    if(mitk::Equal(pt2d_mm, testpt2d_mm, 10*mitk::eps) == false)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout<<"[PASSED]"<<std::endl;
+
+    std::cout << "Testing WorldToIndex(pt2d_mm, pt2d_units) and compare with expected: ";
+    mitk::Point2D testpt2d_units;
+    planegeometry->WorldToIndex(pt2d_mm, testpt2d_units);
+
+    std::cout << std::setprecision(12) << "Expected pt2d_units " << pt2d_units << std::endl;
+    std::cout << std::setprecision(12) << "Result testpt2d_units " << testpt2d_units << std::endl;
+    std::cout << std::setprecision(12) << "10*mitk::eps " << 10*mitk::eps << std::endl;
+    //This eps is temporarily set to 10*mitk::eps. See bug #15037 for details.
+    if(mitk::Equal(pt2d_units, testpt2d_units, 10*mitk::eps) == false)
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout<<"[PASSED]"<<std::endl;
+
     return EXIT_SUCCESS;
   }
 };

@@ -18,14 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDicomSeriesReader.h"
 
-#include "MitkDICOMTestingExports.h"
+#include "MitkDCMTestingExports.h"
 
 namespace mitk
 {
 
 class Image;
 
-class MitkDICOMTesting_EXPORT TestDCMLoading
+class MitkDCMTesting_EXPORT TestDCMLoading
 {
   public:
 

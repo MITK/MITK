@@ -28,7 +28,7 @@ RegisterDiffusionMiniApp(TensorReconstruction);
 \endcode
 
 Within the body of the main function the accepted arguments of the command line tool are specified via the addArgument method of the ctkCommandLineParser located in DiffusionImaging/MiniApps directory.
-The TensorReconstruction command line tool requires an input file, an output file, and optionally accepts a threshold of type integer.
+The \ref TensorReconstruction command line tool requires an input file, an output file, and optionally accepts a threshold of type integer.
 
 \code
 ctkCommandLineParser parser;
@@ -37,6 +37,19 @@ parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", 
 parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
 parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
 \endcode
+
+Following argument types are available for the addArgument method:\li String
+\li Bool
+\li StringList
+\li Int
+\li Float
+\li InputDirectory
+\li InputFile
+\li OutputDirectory
+\li OutputFile
+
+The distinction between InputFile/OutputFile and InputDirectory/OutputDirectory respectively ensures that the appropriate UI widget is chosen.
+The label string passed to the addArgument method is the label for the corresponding UI widget.
 
 After specification of allowed arguments the parser's parseArguments method is called. This method returns a mapping of long argument names and their values.
 
@@ -59,24 +72,22 @@ if (parsedArgs.count("b0Threshold"))
 
 From now on the values of the command line arguments are used in the application logic.
 
-Following argument types are available:
-\li String
-\li Bool
-\li StringList
-\li Int
-\li Float
-\li InputDirectory
-\li InputFile
-\li OutputDirectory
-\li OutputFile
+\section MiniAppCommandLineToolXMLRepresentation Retrieving XML argument description
 
-The distinction between InputFile/OutputFile and InputDirectory/OutputDirectory respectively ensures that the appropriate UI widget is chosen.
-The label string passed to the addArgument method is the label for the corresponding UI widget.
+According to the specified command line arguments, a XML representation of the arguments is generated and emitted on the console if the MiniApp command line tool is executed with argument "--xml".
 
+In order to use the XML representation for automatic user interface generation additional information has to be provided for the parser.
+Please provide category, title, description and contributor as shown in code snippet below for the \ref TensorReconstruction command line tool:
 
+\code
+parser.setCategory("Preprocessing Tools");
+parser.setTitle("Tensor Reconstruction");
+parser.setDescription("Takes a .dwi, .fsl/.fslgz file as input and saves the computed reconstructed tensor to the specified file. It also allows for a threshold to be set, to exclude low b values from the reconstruction process.");
+parser.setContributor("MBI");
+\endcode
 
-
-
+Note that in the generated UI the parameter widgets are contained in a group box. The label of such a parameter group and a description can be set via the parser's changeParameterGroup method.
+The method must be called before adding the arguments.
 
 following output will be emitted:
 <xml>

@@ -78,16 +78,10 @@ public:
 
 #define _msvc_expand_bug(macro, arg) MITK_PP_EXPAND(macro arg)
 
-#ifdef _WIN32
-#define _accessByItkImageType(pixeltype, dimension) mitk::ImageTypeTrait<pixeltype, dimension>::ImageType
-#else
-#define _accessByItkImageType(pixeltype, dimension) typename mitk::ImageTypeTrait<pixeltype, dimension>::ImageType
-#endif
-
 //-------------------------------- 0-Arg Versions --------------------------------------
 
 #define _accessByItk(itkImageTypeFunctionAndImageSeq, pixeltype, dimension)            \
-  if ( pixelType == mitk::MakePixelType<_accessByItkImageType(pixeltype, dimension)>(pixelType.GetNumberOfComponents()) && \
+  if ( pixelType == mitk::MakePixelType<pixeltype, dimension>(pixelType.GetNumberOfComponents()) && \
        MITK_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)->GetDimension() == dimension) \
   {                                                                                    \
     MITK_PP_SEQ_HEAD(itkImageTypeFunctionAndImageSeq)(mitk::ImageToItkImage<pixeltype, dimension>(MITK_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)).GetPointer()); \
@@ -111,7 +105,7 @@ public:
 //-------------------------------- n-Arg Versions --------------------------------------
 
 #define _accessByItk_n(itkImageTypeFunctionAndImageSeq, pixeltype, dimension, args)    \
-  if ( pixelType == mitk::MakePixelType<_accessByItkImageType(pixeltype, dimension)>(pixelType.GetNumberOfComponents()) && \
+  if ( pixelType == mitk::MakePixelType<pixeltype, dimension>(pixelType.GetNumberOfComponents()) && \
        MITK_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)->GetDimension() == dimension) \
   {                                                                                    \
     MITK_PP_SEQ_HEAD(itkImageTypeFunctionAndImageSeq)(mitk::ImageToItkImage<pixeltype, dimension>(MITK_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)).GetPointer(), MITK_PP_TUPLE_REM(MITK_PP_SEQ_HEAD(args))MITK_PP_SEQ_TAIL(args)); \

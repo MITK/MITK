@@ -335,14 +335,14 @@ mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference,
 
         bool old_result = result;
 
-        result &= ( fabs(refNumber - testNumber) < 0.0001 /*mitk::eps*/ );
+        result &= ( std::abs(refNumber - testNumber) < 0.0001f /*mitk::eps*/ );
         // log the token/number which causes the test to fail
         if( old_result != result)
         {
           MITK_ERROR << std::setprecision(16) << "Reference Token '" << refToken << "'" << " value " << refNumber
                      << ", test Token '" << testToken << "'" << " value " << testNumber;
 
-          MITK_ERROR << "[FALSE] - difference: " << std::setprecision(16) <<  fabs(refNumber - testNumber) << " EPS: " << mitk::eps;
+          MITK_ERROR << "[FALSE] - difference: " << std::setprecision(16) <<  std::abs(refNumber - testNumber) << " EPS: " << 0.0001f; //mitk::eps;
         }
       }
       else

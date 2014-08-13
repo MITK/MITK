@@ -63,3 +63,16 @@ void mitk::PlanarLine::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
 }
+
+ bool mitk::PlanarLine::Equals(mitk::PlanarFigure& other)
+ {
+   mitk::PlanarLine* otherLine = dynamic_cast<mitk::PlanarLine*>(&other);
+   if ( otherLine )
+   {
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

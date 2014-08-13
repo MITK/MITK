@@ -38,6 +38,8 @@ namespace mitk
 
     const unsigned int FEATURE_ID_LENGTH;
 
+    virtual bool Equals(mitk::PlanarFigure& other);
+
   protected:
     PlanarBezierCurve();
     virtual ~PlanarBezierCurve();

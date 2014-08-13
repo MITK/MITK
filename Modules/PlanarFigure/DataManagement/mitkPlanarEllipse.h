@@ -102,6 +102,8 @@ public:
       m_TreatAsCircle = active;
   }
 
+  virtual bool Equals(mitk::PlanarFigure& other);
+
   const unsigned int FEATURE_ID_MAJOR_AXIS;
   const unsigned int FEATURE_ID_MINOR_AXIS;
 

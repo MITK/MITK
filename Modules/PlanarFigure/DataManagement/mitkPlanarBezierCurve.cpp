@@ -118,3 +118,19 @@ bool mitk::PlanarBezierCurve::IsHelperToBePainted(unsigned int index)
   return index == 0 && m_ControlPoints.size() > 2;
 }
 
+bool mitk::PlanarBezierCurve::Equals(mitk::PlanarFigure& other)
+{
+  mitk::PlanarBezierCurve* otherBezierCurve = dynamic_cast<mitk::PlanarBezierCurve*>(&other);
+  if ( otherBezierCurve )
+  {
+    if( this->m_NumberOfSegments != otherBezierCurve->m_NumberOfSegments )
+      return false;
+    if( this->m_DeCasteljauPoints != otherBezierCurve->m_DeCasteljauPoints )
+      return false;
+    return Superclass::Equals(other);
+  }
+  else
+  {
+    return false;
+  }
+}

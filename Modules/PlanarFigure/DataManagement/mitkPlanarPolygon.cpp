@@ -272,3 +272,16 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const 
 
   return intersectionList;
 }
+
+ bool mitk::PlanarPolygon::Equals(mitk::PlanarFigure& other)
+ {
+   mitk::PlanarPolygon* otherPolygon = dynamic_cast<mitk::PlanarPolygon*>(&other);
+   if ( otherPolygon )
+   {
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

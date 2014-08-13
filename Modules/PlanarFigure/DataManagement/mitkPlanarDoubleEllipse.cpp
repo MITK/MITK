@@ -249,3 +249,22 @@ bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2
 
   return true;
 }
+
+ bool mitk::PlanarDoubleEllipse::Equals(mitk::PlanarFigure& other)
+ {
+   mitk::PlanarDoubleEllipse* otherDoubleEllipse = dynamic_cast<mitk::PlanarDoubleEllipse*>(&other);
+   if ( otherDoubleEllipse )
+   {
+     if( this->m_ConstrainCircle != otherDoubleEllipse->m_ConstrainCircle)
+       return false;
+     if( this->m_ConstrainThickness != otherDoubleEllipse->m_ConstrainThickness)
+       return false;
+     if( this->m_NumberOfSegments != otherDoubleEllipse->m_NumberOfSegments)
+       return false;
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

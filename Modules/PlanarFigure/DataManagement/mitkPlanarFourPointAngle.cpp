@@ -77,3 +77,16 @@ void mitk::PlanarFourPointAngle::PrintSelf( std::ostream& os, itk::Indent indent
   Superclass::PrintSelf( os, indent );
 
 }
+
+ bool mitk::PlanarFourPointAngle::Equals(mitk::PlanarFigure& other)
+ {
+   mitk::PlanarFourPointAngle* otherFourPtAngle = dynamic_cast<mitk::PlanarFourPointAngle*>(&other);
+   if ( otherFourPtAngle )
+   {
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

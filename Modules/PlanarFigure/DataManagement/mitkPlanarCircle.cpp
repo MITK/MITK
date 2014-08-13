@@ -173,3 +173,16 @@ bool mitk::PlanarCircle::SetCurrentControlPoint( const Point2D& point )
 
   return this->SetControlPoint( m_SelectedControlPoint, point, false);
 }
+
+ bool mitk::PlanarCircle::Equals(mitk::PlanarFigure& other)
+ {
+   mitk::PlanarCircle* otherCircle = dynamic_cast<mitk::PlanarCircle*>(&other);
+   if ( otherCircle )
+   {
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

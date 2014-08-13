@@ -278,3 +278,19 @@ void mitk::PlanarEllipse::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
     Superclass::PrintSelf( os, indent );
 }
+
+ bool mitk::PlanarEllipse::Equals(mitk::PlanarFigure& other)
+ {
+   mitk::PlanarEllipse* otherEllipse = dynamic_cast<mitk::PlanarEllipse*>(&other);
+   if ( otherEllipse )
+   {
+     if(this->m_TreatAsCircle != otherEllipse->m_TreatAsCircle)
+       return false;
+
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

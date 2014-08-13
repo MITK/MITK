@@ -17,9 +17,8 @@ if(MITK_USE_PCRE)
     set(PCRE_TARGET_VERSION 8.35)
     set(PCRE_DOWNLOAD_SOURCE_HASH "ed58bcbe54d3b1d59e9f5415ef45ce1c")
 
-    # follow the standard EP_PREFIX locations
-    set(pcre_binary_dir ${CMAKE_CURRENT_BINARY_DIR}/PCRE-prefix/src/PCRE-build)
-    set(pcre_source_dir ${CMAKE_CURRENT_BINARY_DIR}/PCRE-prefix/src/PCRE-src)
+    set(pcre_binary_dir ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+    set(pcre_source_dir ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src)
     set(pcre_install_dir ${CMAKE_CURRENT_BINARY_DIR}/PCRE-install)
 
     configure_file(

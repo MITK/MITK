@@ -22,7 +22,7 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
     endif()
 
     list(APPEND _python_libs "Python/SimpleITK/_SimpleITK${PYTHON_LIB_SUFFIX}")
-    list(APPEND _python_dirs "${SimpleITK_DIR}/../SimpleITK-install/lib")
+    list(APPEND _python_dirs "${SimpleITK_DIR}/lib")
   endif()
 
   # install OpenCV python wrapping

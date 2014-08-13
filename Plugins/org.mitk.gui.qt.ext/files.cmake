@@ -4,9 +4,6 @@ set(SRC_CPP_FILES
   QmitkExtFileSaveProjectAction.cpp
   QmitkOpenDicomEditorAction.cpp
   QmitkOpenXnatEditorAction.cpp
-
-  QmitkCandyStoreWidget.cpp
-  QmitkNewPerspectiveDialog.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -20,7 +17,6 @@ set(INTERNAL_CPP_FILES
 set(UI_FILES
   src/internal/QmitkAppInstancesPreferencePage.ui
   src/internal/QmitkExternalProgramsPreferencePage.ui
-  src/QmitkCandyStoreWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -35,11 +31,6 @@ set(MOC_H_FILES
   src/internal/QmitkModuleView.h
   src/QmitkOpenDicomEditorAction.h
   src/QmitkOpenXnatEditorAction.h
-
-  src/QmitkCandyStoreWidget.h
-  src/mitkQtPerspectiveItem.h
-  src/mitkQtViewItem.h
-  src/QmitkNewPerspectiveDialog.h
 )
 
 set(CACHED_RESOURCE_FILES

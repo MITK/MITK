@@ -21,7 +21,6 @@ set(INTERNAL_CPP_FILES
   QmitkDiffusionDicomImportView.cpp
   QmitkDiffusionQuantificationView.cpp
   QmitkTensorReconstructionView.cpp
-  QmitkDiffusionImagingPublicPerspective.cpp
   QmitkControlVisualizationPropertiesView.cpp
   QmitkODFDetailsView.cpp
   QmitkGibbsTrackingView.cpp
@@ -46,6 +45,14 @@ set(INTERNAL_CPP_FILES
   QmitkFieldmapGeneratorView.cpp
   QmitkDiffusionRegistrationView.cpp
   QmitkDenoisingView.cpp
+
+  Perspectives/QmitkFiberProcessingPerspective.cpp
+  Perspectives/QmitkDiffusionImagingAppPerspective.cpp
+  Perspectives/QmitkGibbsTractographyPerspective.cpp
+  Perspectives/QmitkStreamlineTractographyPerspective.cpp
+  Perspectives/QmitkProbabilisticTractographyPerspective.cpp
+  Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
+  Perspectives/QmitkDIAppIVIMPerspective.cpp
 )
 
 set(UI_FILES
@@ -88,7 +95,6 @@ set(MOC_H_FILES
   src/internal/QmitkQBallReconstructionView.h
   src/internal/QmitkPreprocessingView.h
   src/internal/QmitkDiffusionDicomImportView.h
-  src/internal/QmitkDiffusionImagingPublicPerspective.h
   src/internal/QmitkDiffusionQuantificationView.h
   src/internal/QmitkTensorReconstructionView.h
   src/internal/QmitkControlVisualizationPropertiesView.h
@@ -125,6 +131,14 @@ set(MOC_H_FILES
   src/internal/QmitkFieldmapGeneratorView.h
   src/internal/QmitkDiffusionRegistrationView.h
   src/internal/QmitkDenoisingView.h
+
+  src/internal/Perspectives/QmitkFiberProcessingPerspective.h
+  src/internal/Perspectives/QmitkDiffusionImagingAppPerspective.h
+  src/internal/Perspectives/QmitkGibbsTractographyPerspective.h
+  src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h
+  src/internal/Perspectives/QmitkProbabilisticTractographyPerspective.h
+  src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h
+  src/internal/Perspectives/QmitkDIAppIVIMPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -161,6 +175,9 @@ set(CACHED_RESOURCE_FILES
   resources/refresh.xpm
   resources/diffusionregistration.png
   resources/denoisingicon.png
+  resources/syntheticdata.png
+  resources/ivim.png
+  resources/tractography.png
  )
 
 set(QRC_FILES

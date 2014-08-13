@@ -224,7 +224,10 @@ public:
                             berry::IPerspectiveDescriptor::Pointer,
                             berry::IWorkbenchPartReference::Pointer partRef, const std::string& changeId)
     {
-        parentWidget->UpdateTreeList(NULL, partRef.GetPointer(), changeId);
+        if (changeId=="viewHide" && partRef->GetId()=="org.mitk.views.candystoreview")
+            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->RemovePerspectiveListener(parentWidget->m_PerspectiveListener);
+        else
+            parentWidget->UpdateTreeList(NULL, partRef.GetPointer(), changeId);
     }
 
 private:
@@ -234,8 +237,8 @@ private:
 struct CandyStoreWindowListener : public berry::IWindowListener
 {
     CandyStoreWindowListener(QmitkCandyStoreWidget* switcher)
-        : switcher(switcher),
-          m_Done(false)
+        : switcher(switcher)
+        , m_Done(false)
     {}
 
     virtual void WindowOpened(berry::IWorkbenchWindow::Pointer window)
@@ -302,8 +305,16 @@ QmitkCandyStoreWidget::~QmitkCandyStoreWidget()
 void QmitkCandyStoreWidget::CreateQtPartControl( QWidget *parent )
 {
     // create GUI widgets from the Qt Designer's .ui file
-    m_WindowListener = CandyStoreWindowListener::Pointer(new CandyStoreWindowListener(this));
-    berry::PlatformUI::GetWorkbench()->AddWindowListener(m_WindowListener);
+    if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNotNull())
+    {
+        m_PerspectiveListener = CandyStorePerspectiveListener::Pointer(new CandyStorePerspectiveListener(this));
+        berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->AddPerspectiveListener(m_PerspectiveListener);
+    }
+    else
+    {
+        m_WindowListener = CandyStoreWindowListener::Pointer(new CandyStoreWindowListener(this));
+        berry::PlatformUI::GetWorkbench()->AddWindowListener(m_WindowListener);
+    }
 
     m_Parent = parent;
     m_Controls.setupUi( parent );
@@ -369,13 +380,15 @@ bool QmitkCandyStoreWidget::FillTreeList()
     // active workbench window available?
     if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNull())
         return false;
+
     // active page available?
     berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
     if (page.IsNull())
         return false;
 
     // everything is fine and we can remove the window listener
-    berry::PlatformUI::GetWorkbench()->RemoveWindowListener(m_WindowListener);
+    if (m_WindowListener.IsNotNull())
+        berry::PlatformUI::GetWorkbench()->RemoveWindowListener(m_WindowListener);
 
     // initialize tree model
     m_TreeModel->clear();

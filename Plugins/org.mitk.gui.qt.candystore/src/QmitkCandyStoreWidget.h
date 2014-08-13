@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //QT headers
 #include <QWidget>
 #include <QString>
+
+#include <ctkSearchBox.h>
 #include "ui_QmitkCandyStoreWidgetControls.h"
 
 #include <berryISelectionListener.h>
@@ -52,7 +54,8 @@ public:
     bool FillTreeList();
     void UpdateTreeList(QStandardItem* item = NULL, berry::IWorkbenchPartReference* partRef=NULL, const std::string& changeId="");
 
-    berry::IPerspectiveListener::Pointer m_PerspectiveListener;
+    berry::IPerspectiveListener::Pointer    m_PerspectiveListener;
+    berry::IWindowListener::Pointer         m_WindowListener;
 
 public slots:
 
@@ -77,8 +80,6 @@ protected:
     ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
     berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
-    berry::IWindowListener::Pointer             m_WindowListener;
-
 
 private:
 

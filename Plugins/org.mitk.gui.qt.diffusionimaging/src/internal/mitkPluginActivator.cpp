@@ -18,7 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtPlugin>
 
 
-#include "src/internal/QmitkDiffusionImagingPublicPerspective.h"
+#include "src/internal/Perspectives/QmitkDiffusionImagingAppPerspective.h"
+
+#include "src/internal/Perspectives/QmitkDIAppIVIMPerspective.h"
+#include "src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h"
+#include "src/internal/Perspectives/QmitkGibbsTractographyPerspective.h"
+#include "src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h"
+#include "src/internal/Perspectives/QmitkProbabilisticTractographyPerspective.h"
+#include "src/internal/Perspectives/QmitkFiberProcessingPerspective.h"
 
 #include "src/internal/QmitkQBallReconstructionView.h"
 #include "src/internal/QmitkPreprocessingView.h"
@@ -30,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkGibbsTrackingView.h"
 #include "src/internal/QmitkStochasticFiberTrackingView.h"
 #include "src/internal/QmitkFiberProcessingView.h"
-//#include "src/internal/QmitkFiberBundleDeveloperView.h"
 #include "src/internal/QmitkPartialVolumeAnalysisView.h"
 #include "src/internal/QmitkIVIMView.h"
 #include "src/internal/QmitkTractbasedSpatialStatisticsView.h"
@@ -50,7 +56,13 @@ namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingPublicPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkGibbsTractographyPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkStreamlineTractographyPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkProbabilisticTractographyPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppSyntheticDataGenerationPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppIVIMPerspective, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberProcessingPerspective, context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkQBallReconstructionView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPreprocessingView, context)
@@ -62,7 +74,6 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkGibbsTrackingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkStochasticFiberTrackingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberProcessingView, context)
-//  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberBundleDeveloperView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPartialVolumeAnalysisView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkIVIMView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkTractbasedSpatialStatisticsView, context)

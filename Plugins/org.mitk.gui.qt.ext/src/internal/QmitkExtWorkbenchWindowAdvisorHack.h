@@ -28,6 +28,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     void onUndo();
     void onRedo();
     void onImageNavigator();
+    void onCandyStore();
     void onEditPreferences();
     void onQuit();
 

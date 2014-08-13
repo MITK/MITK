@@ -15,22 +15,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QmitkDIAppTrackingEvaluationPerspective_H_
-#define QmitkDIAppTrackingEvaluationPerspective_H_
+#ifndef org_mitk_gui_qt_candystore_Activator_h
+#define org_mitk_gui_qt_candystore_Activator_h
 
-#include <berryIPerspectiveFactory.h>
+#include <ctkPluginActivator.h>
 
-class QmitkDIAppTrackingEvaluationPerspective : public QObject, public berry::IPerspectiveFactory
+namespace mitk {
+
+class org_mitk_gui_qt_candystore_Activator :
+  public QObject, public ctkPluginActivator
 {
   Q_OBJECT
-  Q_INTERFACES(berry::IPerspectiveFactory)
+  Q_INTERFACES(ctkPluginActivator)
 
 public:
 
-  QmitkDIAppTrackingEvaluationPerspective() {}
-  ~QmitkDIAppTrackingEvaluationPerspective() {}
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
-};
+}; // org_mitk_gui_qt_candystore_Activator
 
-#endif /* QmitkDIAppTrackingEvaluationPerspective_H_ */
+}
+
+#endif // org_mitk_gui_qt_candystore_Activator_h

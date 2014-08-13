@@ -157,7 +157,7 @@ macro(_fixup_target)
     endforeach()
 
     foreach(_py_lib ${_python_libs})
-      list(APPEND PLUGINS \"\${CMAKE_INSTALL_PREFIX}/bin/\${_py_lib}\")
+      list(APPEND PLUGINS \"\${_bin_path}/\${_py_lib}\")
     endforeach()
 
     if(PLUGINS)

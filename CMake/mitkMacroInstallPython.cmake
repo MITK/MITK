@@ -1,12 +1,9 @@
 
 macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
-  MESSAGE("==================================")
-  MESSAGE("APPNAME: " ${_INSTALL_APP_NAME})
-  MESSAGE("==================================")
 
   set(_destination bin)
   if(APPLE)
-    set(_destination ${_INSTALL_APP_NAME}.app/Contents/MacOS)
+    set(_destination MitkWorkbench.app/Contents/MacOS)
   endif()
 
   if(UNIX)
@@ -36,7 +33,7 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
 
   # install OpenCV python wrapping
   if(MITK_USE_OpenCV)
-    list(APPEND _python_libs "cv2${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    list(APPEND _python_libs "cv2${PYTHON_LIB_SUFFIX}")
 
     if(UNIX)
       install(FILES "${OpenCV_DIR}/lib/cv2${PYTHON_LIB_SUFFIX}" DESTINATION ${_destination})
@@ -99,6 +96,7 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
 
   # install the python runtime from the superbuild
   if(NOT MITK_USE_SYSTEM_PYTHON)
+    #TODO: handle APPLE runtime is missing
     if(UNIX)
       list(APPEND _python_dirs "${Python_DIR}/lib")
       # install python stuff

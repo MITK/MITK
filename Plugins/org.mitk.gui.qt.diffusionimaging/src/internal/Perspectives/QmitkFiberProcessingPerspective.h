@@ -15,22 +15,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QmitkDIAppRegistrationPerspective_H_
-#define QmitkDIAppRegistrationPerspective_H_
+#ifndef QmitkFiberProcessingPerspective_H_
+#define QmitkFiberProcessingPerspective_H_
 
 #include <berryIPerspectiveFactory.h>
 
-class QmitkDIAppRegistrationPerspective : public QObject, public berry::IPerspectiveFactory
+class QmitkFiberProcessingPerspective : public QObject, public berry::IPerspectiveFactory
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
 
-  QmitkDIAppRegistrationPerspective() {}
-  ~QmitkDIAppRegistrationPerspective() {}
+  QmitkFiberProcessingPerspective();
+  QmitkFiberProcessingPerspective(const QmitkFiberProcessingPerspective& other);
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 };
 
-#endif /* QmitkDIAppRegistrationPerspective_H_ */
+#endif /* QmitkFiberProcessingPerspective_H_ */

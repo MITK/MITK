@@ -82,7 +82,7 @@ public:
     void OnThreadedStatisticsCalculationEnds();
 
     /** \brief Update bin size for histogram resolution. */
-    void OnHistogramBinSizeSliderValueChanged(int);
+    void OnHistogramBinSizeBoxValueChanged();
 
     protected slots:
       /** \brief  Saves the histogram to the clipboard */
@@ -95,6 +95,8 @@ public:
       void RequestStatisticsUpdate();
       /** \brief Jump to coordinates stored in the double clicked cell */
       void JumpToCoordinates(int row, int col);
+      /** \brief Toogle GUI elements if histogram default bin size checkbox value changed. */
+      void OnDefaultBinSizeBoxChanged();
 
 signals:
       /** \brief Method to set the data to the member and start the threaded statistics update */

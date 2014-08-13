@@ -41,8 +41,6 @@ This file contains a surface and is located in src/MITK/Modules/MitkExt/Testing/
 \li \subpage Step09Page "Step 9: A plug-in"
 \li \subpage Step10Page "Step 10: How to use Interactor and how to implement new ones"
 
-\li \subpage MiniAppCommandLineToolHowToPage "How to create a MiniApp command line tool"
-
 Enjoy MITK!
 
 */

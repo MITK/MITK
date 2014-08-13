@@ -86,9 +86,53 @@ parser.setDescription("Takes a .dwi, .fsl/.fslgz file as input and saves the com
 parser.setContributor("MBI");
 \endcode
 
-Note that in the generated UI the parameter widgets are contained in a group box. The label of such a parameter group and a description can be set via the parser's changeParameterGroup method.
+Note that in the generated UI the parameter widgets are contained in a group box. There is a default label ("Parameters") and a default description ("Groupbox containing parameters.") specified. The label of such a parameter group and the description can be set via the parser's changeParameterGroup method.
 The method must be called before adding the arguments.
 
-following output will be emitted:
-<xml>
+Running the \ref TensorReconstruction command line tool for MITK Diffusion MiniApp with argmument "--xml" ...
+\code
+./MitkDiffusionMiniApps TensorReconstruction --xml
+\endcode
+
+... will emit following XML description:
+
+\code
+<executable>
+  <category>Preprocessing Tools</category>
+  <title>Tensor Reconstruction</title>
+  <description>Takes a .dwi, .fsl/.fslgz file as input and saves the computed reconstructed tensor to the specified file. It also allows for a threshold to be set, to exclude low b values from the reconstruction process.</description>
+  <contributor>MBI</contributor>
+  <parameters>
+    <label>Parameters</label>
+    <description>Groupbox containing parameters.</description>
+    <file>
+      <name>input</name>
+      <label>Input file</label>
+      <description>input raw dwi (.dwi or .fsl/.fslgz)</description>
+      <longflag>input</longflag>
+      <flag>i</flag>
+      <channel>input</channel>
+    </file>
+    <file>
+      <name>outFile</name>
+      <label>Output file</label>
+      <description>output file</description>
+      <longflag>outFile</longflag>
+      <flag>o</flag>
+      <channel>output</channel>
+    </file>
+    <integer>
+      <name>b0Threshold</name>
+      <label>b0 threshold</label>
+      <description>baseline image intensity threshold</description>
+      <longflag>b0Threshold</longflag>
+      <flag>t</flag>
+    </integer>
+  </parameters>
+</executable>
+\endcode
+
+The generated user interface from this XML description is depicted in the following screenshot:
+\imageMacro{generated_ui_tensor_reconstruction.png, "Generated UI of TensorReconstruction command line tool", 10}
+
 */

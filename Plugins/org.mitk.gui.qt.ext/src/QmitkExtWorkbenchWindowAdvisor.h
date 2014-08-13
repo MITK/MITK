@@ -28,8 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_ext_Export.h>
 
 #include <QList>
-#include <QDockWidget>
-#include <QmitkCandyStoreWidget.h>
 
 class QAction;
 class QMenu;
@@ -72,10 +70,6 @@ public:
 
     bool GetShowClosePerspectiveMenuItem();
 
-    void EnableCandyStore(bool enable);
-
-    bool GetEnableCandyStore();
-
     void ShowMemoryIndicator(bool show);
 
     bool GetShowMemoryIndicator();
@@ -96,7 +90,6 @@ protected slots:
     virtual void onHelp();
     virtual void onHelpOpenHelpPerspective();
     virtual void onAbout();
-    void onCandyStore();
 
 private:
 
@@ -128,13 +121,14 @@ private:
   berry::IPerspectiveListener::Pointer titlePerspectiveListener;
   berry::IPerspectiveListener::Pointer menuPerspectiveListener;
   berry::IPartListener::Pointer imageNavigatorPartListener;
-  berry::IPartListener::Pointer CandyStorePartListener;
+  berry::IPartListener::Pointer candyStorePartListener;
   berry::IPropertyChangeListener::Pointer editorPropertyListener;
   friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
   friend class PerspectiveListenerForTitle;
   friend class PerspectiveListenerForMenu;
   friend class PartListenerForImageNavigator;
+  friend class PartListenerForCandyStore;
 
   berry::IEditorPart::WeakPtr lastActiveEditor;
   berry::IPerspectiveDescriptor::WeakPtr lastPerspective;
@@ -150,7 +144,7 @@ private:
   bool showViewMenuItem;
   bool showNewWindowMenuItem;
   bool showClosePerspectiveMenuItem;
-  bool enableCandyStore;
+  bool candyStoreFound;
   bool showMemoryIndicator;
   std::string productName;
   std::string windowIcon;
@@ -179,7 +173,6 @@ private:
   QAction* closePerspAction;
   QAction* openDicomEditorAction;
   QAction* openXnatEditorAction;
-  QDockWidget* candyStore;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

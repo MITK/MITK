@@ -72,7 +72,6 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   advisor->ShowViewToolbar(false);
   advisor->ShowPerspectiveToolbar(false);
   advisor->ShowVersionInfo(false);
-  advisor->EnableCandyStore(true);
   advisor->ShowMitkVersionInfo(false);
   advisor->ShowMemoryIndicator(false);
   advisor->SetProductName("MITK Diffusion");

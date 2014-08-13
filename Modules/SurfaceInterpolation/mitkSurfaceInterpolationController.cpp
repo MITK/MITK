@@ -21,6 +21,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageToSurfaceFilter.h"
 
+// TODO Use Equal of BaseGeometry instead after master merge!
+bool PlanesEqual (mitk::PlaneGeometry::Pointer leftHandSide, mitk::PlaneGeometry::Pointer rightHandSide, mitk::ScalarType eps)
+{
+  bool result = true;
+
+  //Compare spacings
+  if( !mitk::Equal( leftHandSide->GetSpacing(), rightHandSide->GetSpacing(), eps ) )
+  {
+    result = false;
+  }
+
+  //Compare Origins
+  if( !mitk::Equal( leftHandSide->GetOrigin(), rightHandSide->GetOrigin(), eps ) )
+  {
+    result = false;
+  }
+
+  //Compare Axis and Extents
+  for( unsigned int i=0; i<3; ++i)
+  {
+    if( !mitk::Equal( leftHandSide->GetAxisVector(i), rightHandSide->GetAxisVector(i), eps))
+    {
+      result =  false;
+    }
+
+    if( !mitk::Equal( leftHandSide->GetExtent(i), rightHandSide->GetExtent(i), eps) )
+    {
+      result = false;
+    }
+  }
+
+  //Compare ImageGeometry Flag
+  if( rightHandSide->GetImageGeometry() != leftHandSide->GetImageGeometry() )
+  {
+    result = false;
+  }
+
+  //Compare IndexToWorldTransform Matrix
+  if( !mitk::MatrixEqualElementWise( leftHandSide->GetIndexToWorldTransform()->GetMatrix(), rightHandSide->GetIndexToWorldTransform()->GetMatrix(), eps) )
+  {
+    result = false;
+  }
+  return result;
+}
 
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   :m_SelectedSegmentation(0)
@@ -44,16 +88,6 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
 
 mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
 {
-  ContourListMap::iterator it = m_ListOfInterpolationSessions.begin();
-  for (; it != m_ListOfInterpolationSessions.end(); it++)
-  {
-      for (unsigned int j = 0; j < m_ListOfInterpolationSessions[(*it).first].size(); ++j)
-      {
-          delete(m_ListOfInterpolationSessions[(*it).first].at(j).position);
-      }
-      m_ListOfInterpolationSessions.erase(it);
-  }
-
   //Removing all observers
   std::map<mitk::Image*, unsigned long>::iterator dataIter = m_SegmentationObserverTags.begin();
   for (; dataIter != m_SegmentationObserverTags.end(); ++dataIter )
@@ -71,53 +105,34 @@ mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetI
   {
     m_Instance = new SurfaceInterpolationController();
   }
-
   return m_Instance;
 }
 
-void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour ,RestorePlanePositionOperation* op)
+void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour, PlaneGeometry::Pointer plane)
 {
-  AffineTransform3D::Pointer transform = AffineTransform3D::New();
-  transform = op->GetTransform();
-
-  mitk::Vector3D direction = op->GetDirectionVector();
   int pos (-1);
 
   for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
   {
-      itk::Matrix<ScalarType> diffM = transform->GetMatrix()-m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i).position->GetTransform()->GetMatrix();
-      bool isSameMatrix(true);
-      for (unsigned int j = 0; j < 3; j++)
-      {
-        if (fabs(diffM[j][0]) > 0.0001 && fabs(diffM[j][1]) > 0.0001 && fabs(diffM[j][2]) > 0.0001)
-        {
-          isSameMatrix = false;
-          break;
-        }
-      }
-      itk::Vector<ScalarType> diffV = m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i).position->GetTransform()->GetOffset()-transform->GetOffset();
-      if ( isSameMatrix && m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i).position->GetPos() == op->GetPos() && (fabs(diffV[0]) < 0.0001 && fabs(diffV[1]) < 0.0001 && fabs(diffV[2]) < 0.0001) )
-      {
-        pos = i;
-        break;
-      }
-
+    mitk::PlaneGeometry::Pointer planeFromList = m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i).plane;
+    if ( PlanesEqual(plane, planeFromList, mitk::eps) )
+    {
+      pos = i;
+      break;
+    }
   }
 
   //Don't save a new empty contour
   if (pos == -1 && newContour->GetVtkPolyData()->GetNumberOfPoints() > 0)
   {
-    mitk::RestorePlanePositionOperation* newOp = new mitk::RestorePlanePositionOperation (OpRESTOREPLANEPOSITION, op->GetWidth(),
-      op->GetHeight(), op->GetSpacing(), op->GetPos(), direction, transform);
     ContourPositionPair newData;
     newData.contour = newContour;
-    newData.position = newOp;
+    newData.plane = plane;
 
     m_ReduceFilter->SetInput(m_ListOfInterpolationSessions[m_SelectedSegmentation].size(), newContour);
     m_ListOfInterpolationSessions[m_SelectedSegmentation].push_back(newData);
   }
-  //Edit a existing contour. If the contour is empty, edit it anyway so that the interpolation will always be consistent
-  else if (pos != -1)
+  else if (pos != -1 && newContour->GetVtkPolyData()->GetNumberOfPoints() > 0)
   {
     m_ListOfInterpolationSessions[m_SelectedSegmentation].at(pos).contour = newContour;
     m_ReduceFilter->SetInput(pos, newContour);
@@ -133,6 +148,23 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
   }
 
   this->Modified();
+}
+
+const mitk::Surface* mitk::SurfaceInterpolationController::GetContour(mitk::PlaneGeometry::Pointer plane)
+{
+  ContourPositionPairList contourList = m_ListOfInterpolationSessions[m_SelectedSegmentation];
+  for (unsigned int i = 0; i < contourList.size(); ++i)
+  {
+    ContourPositionPair pair = contourList.at(i);
+    if (PlanesEqual(plane, pair.plane, mitk::eps))
+      return pair.contour;
+  }
+  return 0;
+}
+
+unsigned int mitk::SurfaceInterpolationController::GetNumberOfContours()
+{
+  return m_ListOfInterpolationSessions[m_SelectedSegmentation].size();
 }
 
 void mitk::SurfaceInterpolationController::Interpolate()

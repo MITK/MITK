@@ -64,7 +64,20 @@ namespace mitk
     /**
      * Adds a new extracted contour to the list
      */
-    void AddNewContour(Surface::Pointer newContour, RestorePlanePositionOperation *op);
+    void AddNewContour (Surface::Pointer newContour, PlaneGeometry::Pointer plane);
+
+    /**
+    * @brief Returns the contour for a given plane for the current selected segmenation
+    * @param plane the plane for which the contour should be returned
+    * @return the contour as an mitk::Surface. If no contour is available for the plane NULL is returned
+    */
+    const mitk::Surface* GetContour (PlaneGeometry::Pointer plane);
+
+    /**
+    * @brief Returns the number of available contours for the current selected segmentation
+    * @return the number of contours
+    */
+    unsigned int GetNumberOfContours();
 
     /**
      * Interpolates the 3D surface from the given extracted contours
@@ -160,9 +173,11 @@ namespace mitk
 
    void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
 
+   void ReinitializeInterpolation();
+
    struct ContourPositionPair {
      Surface::Pointer contour;
-     RestorePlanePositionOperation* position;
+     mitk::PlaneGeometry::Pointer plane;
    };
 
     typedef std::vector<ContourPositionPair> ContourPositionPairList;

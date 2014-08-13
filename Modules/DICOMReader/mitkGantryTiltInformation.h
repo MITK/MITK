@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkGantryTiltInformation_h
 #define mitkGantryTiltInformation_h
 
+#include "mitkPoint.h"
 #include "mitkVector.h"
 
 namespace mitk

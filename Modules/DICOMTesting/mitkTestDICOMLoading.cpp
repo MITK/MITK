@@ -199,7 +199,8 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
 
   // geometry data
   result << "Geometry: \n";
-  Geometry3D* geometry = image->GetGeometry();
+  const TimeGeometry* timeGeometry = image->GetTimeGeometry();
+  BaseGeometry* geometry = timeGeometry->GetGeometryForTimeStep(0);
   if (geometry)
   {
     AffineTransform3D* transform = geometry->GetIndexToWorldTransform();
@@ -249,7 +250,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
       result << "\n";
 
       result << "  " << "TimeBounds: ";
-      const TimeBounds timeBounds = geometry->GetTimeBounds();
+      const TimeBounds timeBounds = timeGeometry->GetTimeBounds();
       for (unsigned int i = 0; i < 2; ++i)
           result << timeBounds[i] << " ";
       result << "\n";

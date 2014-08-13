@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestDCMLoading.h"
 
+#include "mitkImage.h"
+
 std::vector<std::string> LoadDumps(const std::string& fileName)
 {
   std::vector<std::string> separatedDumps;

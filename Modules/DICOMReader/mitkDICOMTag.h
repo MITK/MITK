@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkTag_h
 #define mitkTag_h
 
+#include "mitkPoint.h"
 #include "mitkVector.h"
 
 #include "MitkDICOMReaderExports.h"
@@ -82,7 +83,7 @@ bool DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarType
   42.7131\13.77\0.7
   \endverbatim
  */
-mitk::Point3D DICOMStringToPoint3D(const std::string& s, bool& successful);
+Point3D DICOMStringToPoint3D(const std::string& s, bool& successful);
 
 }
 

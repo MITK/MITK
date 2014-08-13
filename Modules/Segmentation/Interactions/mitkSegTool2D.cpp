@@ -292,8 +292,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
   mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*>(planeGeometry);
   if (m_3DInterpolationEnabled && contour->GetVtkPolyData()->GetNumberOfPoints() > 0 && image->GetDimension() == 3)
   {
-    this->AddContourmarker(planeGeometry);
-//    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
+    this->AddContourmarker();
     mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, plane);
     contour->DisconnectPipeline();
   }
@@ -312,12 +311,17 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
   m_3DInterpolationEnabled = enabled;
 }
 
-unsigned int mitk::SegTool2D::AddContourmarker ( const mitk::PlaneGeometry* plane)
+unsigned int mitk::SegTool2D::AddContourmarker()
 {
   us::ServiceReference<PlanePositionManagerService> serviceRef =
       us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
   PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
-  unsigned int slicePosition = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSlice()->GetPos();
+  unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetSlice()->GetPos();
+
+  // the first geometry is needed otherwise restoring the position is not working
+  const mitk::PlaneGeometry* plane = dynamic_cast<const PlaneGeometry*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
+   m_LastEventSender->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
+
   unsigned int size = service->GetNumberOfPlanePositions();
   unsigned int id = service->AddNewPlanePosition(plane, slicePosition);
 

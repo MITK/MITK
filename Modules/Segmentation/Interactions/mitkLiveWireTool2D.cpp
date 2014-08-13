@@ -475,8 +475,7 @@ bool mitk::LiveWireTool2D::OnFinish( StateMachineAction*, InteractionEvent* inte
   if (!positionEvent) return false;
 
   // Have to do that here so that the m_LastEventSender is set correctly
-  const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D());
-  mitk::SegTool2D::AddContourmarker(planeGeo);
+  mitk::SegTool2D::AddContourmarker();
 
   // actual timestep
   int timestep = positionEvent->GetSender()->GetTimeStep();

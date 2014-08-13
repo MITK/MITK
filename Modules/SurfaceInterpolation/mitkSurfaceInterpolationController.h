@@ -74,6 +74,19 @@ namespace mitk
     bool RemoveContour (mitk::PlaneGeometry* plane);
 
     /**
+    * @brief Returns the contour for a given plane for the current selected segmenation
+    * @param plane the plane for which the contour should be returned
+    * @return the contour as an mitk::Surface. If no contour is available for the plane NULL is returned
+    */
+    const mitk::Surface* GetContour (PlaneGeometry::Pointer plane);
+
+    /**
+    * @brief Returns the number of available contours for the current selected segmentation
+    * @return the number of contours
+    */
+    unsigned int GetNumberOfContours();
+
+    /**
      * Interpolates the 3D surface from the given extracted contours
      */
     void Interpolate ();

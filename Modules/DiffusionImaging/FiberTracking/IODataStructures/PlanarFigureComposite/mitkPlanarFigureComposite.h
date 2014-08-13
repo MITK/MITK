@@ -44,7 +44,7 @@ namespace mitk {
 
 
 
-  class MitkFiberTracking_EXPORT PlanarFigureComposite : public PlanarFigure
+  class MitkFiberTracking_EXPORT PlanarFigureComposite : public BaseData
   {
 
     typedef itk::VectorContainer<unsigned int, PlanarFigure::Pointer> CompositionContainer;
@@ -52,7 +52,7 @@ namespace mitk {
 
 
   public:
-    mitkClassMacro(PlanarFigureComposite, PlanarFigure);
+    mitkClassMacro(PlanarFigureComposite, BaseData);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

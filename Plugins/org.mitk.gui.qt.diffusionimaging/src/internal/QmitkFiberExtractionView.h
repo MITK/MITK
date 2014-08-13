@@ -144,7 +144,6 @@ protected:
       void InternalReorientImagePlane(
         const itk::Image< TPixel, VImageDimension > *image, mitk::BaseGeometry* planegeo3D, int additionalIndex );
 
-  void GenerateStats(); ///< generate statistics of selected fiber bundles
   void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
 
   int m_CircleCounter;                                      ///< used for data node naming
@@ -159,11 +158,10 @@ protected:
   itkUCharImageType::Pointer            m_PlanarFigureImage;
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
   mitk::DataNode::Pointer               m_MaskImageNode;
-  mitk::DataNode::Pointer               m_LastAddedPf;
 
   void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
-  void CompositeExtraction(mitk::DataNode::Pointer node, mitk::Image* image);
+  void WritePfToImage(mitk::DataNode::Pointer node, mitk::Image* image);
   mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute);
   mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib);

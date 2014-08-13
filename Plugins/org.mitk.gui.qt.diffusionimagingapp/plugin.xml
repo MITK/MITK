@@ -17,92 +17,10 @@
   </extension>
 
   <extension point="org.blueberry.ui.perspectives">
-
     <perspective id="org.mitk.diffusionimagingapp.perspectives.welcome"
       name="Data Display"
       class="QmitkWelcomePerspective"
       icon="resources/perspectives/icon_home.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.dicomimport"
-      name="DICOM Import"
-      class="QmitkDIAppDicomImportPerspective"
-      icon="resources/perspectives/dicomimport.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.ivim"
-      name="IVIM"
-      class="QmitkDIAppIVIMPerspective"
-      icon="resources/perspectives/ivim.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction"
-      name="Preprocessing and Reconstruction"
-      class="QmitkDIAppPreprocessingReconstructionPerspective"
-      icon="resources/perspectives/preprocessing.png">
-      <description>Preprocessing of raw diffusion data and diffusion propagator modeling</description>
-      <keywordReference id="org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction.Keyword"/>
-     </perspective>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.quantification"
-      name="Quantification"
-      class="QmitkDIAppQuantificationPerspective"
-      icon="resources/perspectives/chart.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.connectomics"
-      name="Connectomics"
-      class="QmitkDIAppConnectomicsPerspective"
-      icon="resources/perspectives/connectomics.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.syntheticdata"
-      name="Synthetic Data"
-      class="QmitkDIAppSyntheticDataGenerationPerspective"
-      icon="resources/perspectives/syntheticdata.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.registration"
-      name="Registration"
-      class="QmitkDIAppRegistrationPerspective"
-      icon="resources/perspectives/registration.xpm"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.imageprocessing"
-      name="Image Processing"
-      class="QmitkDIAppImageProcessingPerspective"
-      icon="resources/perspectives/imageProcessing.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.visualization"
-      name="Visualization"
-      class="QmitkDIAppVisualizationPerspective"
-      icon="resources/perspectives/eye.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.utility"
-      name="Utilities"
-      class="QmitkDIAppUtilityPerspective"
-      icon="resources/perspectives/utilities.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography1"
-      name="Global Gibbs tractography"
-      category="Fiber tractography"
-      class="QmitkGibbsTractographyPerspective"
-      icon="resources/perspectives/tractography.png">
-    </perspective>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography2"
-      name="Deterministic streamline tractography"
-      category="Fiber tractography"
-      class="QmitkStreamlineTractographyPerspective"
-      icon="resources/perspectives/tractography.png"/>
-
-    <perspective id="org.mitk.diffusionimagingapp.perspectives.tractography3"
-    name="Probabilistic streamline tractography"
-    category="Fiber tractography"
-      class="QmitkProbabilisticTractographyPerspective"
-      icon="resources/perspectives/tractography.png"/>
-
-  </extension>
-
-
-
-  <extension point="org.blueberry.ui.keywords">
-
-  <keyword label="preprocessing" id="org.mitk.diffusionimagingapp.perspectives.preprocessingreconstruction.Keyword"/>
-
   </extension>
 
 </plugin>

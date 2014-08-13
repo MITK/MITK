@@ -15,22 +15,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QmitkDIAppVisualizationPerspective_H_
-#define QmitkDIAppVisualizationPerspective_H_
+#include "org_mitk_gui_qt_candystore_Activator.h"
 
-#include <berryIPerspectiveFactory.h>
+#include <QtPlugin>
 
-class QmitkDIAppVisualizationPerspective : public QObject, public berry::IPerspectiveFactory
+#include "CandyStoreView.h"
+
+namespace mitk {
+
+void org_mitk_gui_qt_candystore_Activator::start(ctkPluginContext* context)
 {
-  Q_OBJECT
-  Q_INTERFACES(berry::IPerspectiveFactory)
+  BERRY_REGISTER_EXTENSION_CLASS(CandyStoreView, context)
+}
 
-public:
+void org_mitk_gui_qt_candystore_Activator::stop(ctkPluginContext* context)
+{
+  Q_UNUSED(context)
+}
 
-  QmitkDIAppVisualizationPerspective() {}
-  ~QmitkDIAppVisualizationPerspective() {}
+}
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
-};
-
-#endif /* QmitkDIAppVisualizationPerspective_H_ */
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_candystore, mitk::org_mitk_gui_qt_candystore_Activator)

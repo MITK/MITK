@@ -112,6 +112,9 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
+  /** \brief Automatically calculate bin size to obtain 200 bins. */
+  void SetUseDefaultBinSize(bool useDefault);
+
   /** \brief Set image from which to compute statistics. */
   void SetImage( const mitk::Image *image );
 
@@ -334,6 +337,7 @@ protected:
   int m_PlanarFigureCoordinate1;      // Second plane-axis for PlanarFigure
 
   unsigned int m_HistogramBinSize;    ///Bin size for histogram resoluion.
+  bool m_UseDefaultBinSize;
 
 };
 

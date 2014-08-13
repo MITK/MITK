@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread():QThread(),
   m_StatisticsImage(NULL), m_BinaryMask(NULL), m_PlanarFigureMask(NULL), m_TimeStep(0),
-  m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false), m_HistogramBinSize(1)
+  m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false), m_HistogramBinSize(1), m_UseDefaultBinSize(true)
 {
 }
 
@@ -49,6 +49,11 @@ void QmitkImageStatisticsCalculationThread::Initialize( mitk::Image::Pointer ima
     this->m_BinaryMask = binaryImage->Clone();
   if(planarFig.IsNotNull())
     this->m_PlanarFigureMask = planarFig->Clone();
+}
+
+void QmitkImageStatisticsCalculationThread::SetUseDefaultBinSize(bool useDefault)
+{
+    m_UseDefaultBinSize = useDefault;
 }
 
 void QmitkImageStatisticsCalculationThread::SetTimeStep( int times )
@@ -157,6 +162,7 @@ void QmitkImageStatisticsCalculationThread::run()
   calculator->SetDoIgnorePixelValue(this->m_IgnoreZeros);
   calculator->SetIgnorePixelValue(0);
   calculator->SetHistogramBinSize( m_HistogramBinSize );
+  calculator->SetUseDefaultBinSize( m_UseDefaultBinSize );
 
   for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
   {
@@ -198,4 +204,6 @@ void QmitkImageStatisticsCalculationThread::run()
       this->m_HistogramVector.push_back((HistogramType*)calculator->GetHistogram(i));
     }
   }
+
+  m_HistogramBinSize = calculator->GetHistogramBinSize();
 }

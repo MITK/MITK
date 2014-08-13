@@ -174,6 +174,9 @@ class MitkSegmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     SigmoidFilterType::Pointer m_SigmoidFilter;
     FastMarchingFilterType::Pointer m_FastMarchingFilter;
 
+  private:
+    PlaneGeometry::Pointer m_WorkingPlane;
+
 };
 
 } // namespace

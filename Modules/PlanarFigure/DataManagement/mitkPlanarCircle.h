@@ -97,7 +97,7 @@ public:
 
   virtual bool SetCurrentControlPoint( const Point2D& point );
 
-  virtual bool Equals(mitk::PlanarFigure& other);
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 protected:
   PlanarCircle();

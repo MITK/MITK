@@ -342,9 +342,9 @@ void mitk::PlanarCross::PrintSelf( std::ostream& os, itk::Indent indent) const
   Superclass::PrintSelf( os, indent );
 }
 
- bool mitk::PlanarCross::Equals(mitk::PlanarFigure& other)
+ bool mitk::PlanarCross::Equals(const mitk::PlanarFigure& other) const
  {
-   mitk::PlanarCross* otherCross = dynamic_cast<mitk::PlanarCross*>(&other);
+   const mitk::PlanarCross* otherCross = dynamic_cast<const mitk::PlanarCross*>(&other);
    if ( otherCross )
    {
      return Superclass::Equals(other);

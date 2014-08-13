@@ -273,9 +273,9 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const 
   return intersectionList;
 }
 
- bool mitk::PlanarPolygon::Equals(mitk::PlanarFigure& other)
+ bool mitk::PlanarPolygon::Equals(const mitk::PlanarFigure& other) const
  {
-   mitk::PlanarPolygon* otherPolygon = dynamic_cast<mitk::PlanarPolygon*>(&other);
+   const mitk::PlanarPolygon* otherPolygon = dynamic_cast<const mitk::PlanarPolygon*>(&other);
    if ( otherPolygon )
    {
      return Superclass::Equals(other);

@@ -62,7 +62,7 @@ public:
     return 3;
   }
 
-  virtual bool Equals(mitk::PlanarFigure& other);
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 protected:
   PlanarAngle();

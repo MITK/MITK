@@ -64,9 +64,9 @@ void mitk::PlanarLine::PrintSelf( std::ostream& os, itk::Indent indent) const
   Superclass::PrintSelf( os, indent );
 }
 
- bool mitk::PlanarLine::Equals(mitk::PlanarFigure& other)
+ bool mitk::PlanarLine::Equals(const PlanarFigure &other) const
  {
-   mitk::PlanarLine* otherLine = dynamic_cast<mitk::PlanarLine*>(&other);
+   const mitk::PlanarLine* otherLine = dynamic_cast<const mitk::PlanarLine*>(&other);
    if ( otherLine )
    {
      return Superclass::Equals(other);

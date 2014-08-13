@@ -782,9 +782,9 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
 bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
 {
   //check geometries
-  if ( this->GetGeometry2D() && other.GetGeometry2D() )
+  if ( this->GetPlaneGeometry() && other.GetPlaneGeometry() )
   {
-    if( !Equal(*(this->GetGeometry2D()), *(other.GetGeometry2D()), mitk::eps, true))
+    if( !Equal(*(this->GetPlaneGeometry()), *(other.GetPlaneGeometry()), mitk::eps, true))
     {
       return false;
     }
@@ -836,9 +836,9 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
 
         while(itLineThis != itLineEnd)
         {
-          if(itLineThis->Index != itLineOther->Index)
-            return false;
-          if(itLineThis->Point != itLineOther->Point)
+          Point2D p1 = *itLineThis;
+          Point2D p2 = *itLineOther;
+          if(p1 != p2)
             return false;
 
           ++itLineThis;

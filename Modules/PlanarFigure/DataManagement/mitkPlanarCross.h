@@ -94,7 +94,7 @@ public:
   /** \brief Returns the number of features available for this PlanarCross (1 or 2). */
   virtual unsigned int GetNumberOfFeatures() const;
 
-  virtual bool Equals(mitk::PlanarFigure& other);
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 protected:
   PlanarCross();

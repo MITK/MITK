@@ -131,9 +131,9 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
   subdivisionPoints.clear();
 }
 
- bool mitk::PlanarSubdivisionPolygon::Equals(mitk::PlanarFigure& other)
+ bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure& other) const
  {
-   mitk::PlanarSubdivisionPolygon* otherSubDivPoly = dynamic_cast<mitk::PlanarSubdivisionPolygon*>(&other);
+   const mitk::PlanarSubdivisionPolygon* otherSubDivPoly = dynamic_cast<const mitk::PlanarSubdivisionPolygon*>(&other);
    if ( otherSubDivPoly )
    {
      if ( this->m_SubdivisionRounds != otherSubDivPoly->m_SubdivisionRounds)

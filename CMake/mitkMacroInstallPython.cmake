@@ -96,31 +96,31 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
 
   # install the python runtime from the superbuild
   if(NOT MITK_USE_SYSTEM_PYTHON)
-    #TODO: handle APPLE runtime is missing
     if(UNIX)
+      set(_python_runtime_dir lib/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION})
       list(APPEND _python_dirs "${Python_DIR}/lib")
-      # install python stuff
-      install(DIRECTORY "${Python_DIR}/lib/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}"
-            DESTINATION ${_destination}/Python/lib
-            USE_SOURCE_PERMISSIONS
-            COMPONENT Runtime)
-      install(FILES "${Python_DIR}/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}/pyconfig.h"
-              DESTINATION ${_destination}/Python/include/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION})
-    else()
+    else() #WIN32
+      set(_python_runtime_dir Lib)
       list(APPEND _python_dirs "${Python_DIR}/libs")
       list(APPEND _python_dirs "${Python_DIR}/bin")
-
-      file(GLOB_RECURSE item RELATIVE "${Python_DIR}/Lib" "${Python_DIR}/Lib/*")
-      foreach(f ${item})
-        get_filename_component(_filepath "${f}" PATH)
-        install(FILES "${Python_DIR}/Lib/${f}" DESTINATION bin/Python/Lib/${_filepath})
-      endforeach()
-      file(GLOB_RECURSE item RELATIVE "${Python_DIR}/include" "${Python_DIR}/include/*")
-      foreach(f ${item})
-        get_filename_component(_filepath "${f}" PATH)
-        install(FILES "${Python_DIR}/include/${f}" DESTINATION bin/Python/include/${_filepath})
-      endforeach()
     endif()
+      # install python stuff
+      #install(DIRECTORY "${Python_DIR}/lib/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}"
+      #      DESTINATION ${_destination}/Python/lib
+      #      USE_SOURCE_PERMISSIONS
+      #      COMPONENT Runtime)
+
+    file(GLOB_RECURSE item RELATIVE "${Python_DIR}/${_python_runtime_dir}" "${Python_DIR}/${_python_runtime_dir}/*")
+    foreach(f ${item})
+      get_filename_component(_filepath "${f}" PATH)
+      install(FILES "${Python_DIR}/${_python_runtime_dir}/${f}" DESTINATION ${_destination}/Python/${_python_runtime_dir}/${_filepath})
+    endforeach()
+
+    file(GLOB_RECURSE item RELATIVE "${Python_DIR}/include" "${Python_DIR}/include/*")
+    foreach(f ${item})
+      get_filename_component(_filepath "${f}" PATH)
+      install(FILES "${Python_DIR}/include/${f}" DESTINATION ${_destination}/Python/include/${_filepath})
+    endforeach()
   endif()
 
   if(Numpy_DIR)

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // CTK XNAT Core
 #include "ctkXnatObject.h"
 #include "ctkXnatDataModel.h"
-#include "ctkXnatScanResource.h"
+#include "ctkXnatScanFolder.h"
 #include "ctkXnatFile.h"
 
 // CTK XNAT Widgets
@@ -108,7 +108,8 @@ void QmitkXnatEditor::SetInput(berry::IEditorInput::Pointer input)
   }
   else
   {
-    m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
+    // Get the XNAT Session from Activator
+    m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
 
     if(m_Session == 0)
     {
@@ -257,7 +258,7 @@ void QmitkXnatEditor::DownloadResource()
   QVariant variant = m_ListModel->data(index, Qt::UserRole);
   if ( variant.isValid() )
   {
-    ctkXnatScanResource* resource = dynamic_cast<ctkXnatScanResource*>(variant.value<ctkXnatObject*>());
+    ctkXnatScanFolder* resource = dynamic_cast<ctkXnatScanFolder*>(variant.value<ctkXnatObject*>());
     if (resource != NULL)
     {
       MITK_INFO << "Download started ...";

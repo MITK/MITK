@@ -59,7 +59,7 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)) );
 
   // Get the XNAT Session from Activator
-  m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
+  m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
 
   if(m_Session == 0) return;
 

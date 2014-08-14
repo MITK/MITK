@@ -44,6 +44,9 @@
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;https://central.xnat.org&lt;br/&gt;http://localhost/xnat&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
+     <property name="placeholderText">
+      <string>http(s)://</string>
+     </property>
     </widget>
    </item>
    <item row="0" column="5">
@@ -58,7 +61,7 @@
       <string>Standard-Port: 80</string>
      </property>
      <property name="text">
-      <string>80</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -70,7 +73,11 @@
     </widget>
    </item>
    <item row="1" column="3">
-    <widget class="QLineEdit" name="inUsername"/>
+    <widget class="QLineEdit" name="inUsername">
+     <property name="placeholderText">
+      <string>testuser</string>
+     </property>
+    </widget>
    </item>
    <item row="0" column="1">
     <widget class="QLabel" name="hostAddressLabel">
@@ -90,6 +97,9 @@
     <widget class="QLineEdit" name="inPassword">
      <property name="echoMode">
       <enum>QLineEdit::Password</enum>
+     </property>
+     <property name="placeholderText">
+      <string>testpassword</string>
      </property>
     </widget>
    </item>

@@ -238,12 +238,14 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
     Vector3D normInIndex, normal;
 
-    if ( planeGeometry != NULL ){
-      normal = planeGeometry->GetNormal();
-    }else{
-      const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
-      if(abstractGeometry != NULL)
+
+    const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
+    if(abstractGeometry != NULL)
         normal = abstractGeometry->GetPlane()->GetNormal();
+    else{
+      if ( planeGeometry != NULL ){
+        normal = planeGeometry->GetNormal();
+      }
       else
         return; //no fitting geometry set
     }

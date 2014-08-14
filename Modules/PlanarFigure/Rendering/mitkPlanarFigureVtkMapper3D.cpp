@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureVtkMapper3D.h"
 #include "mitkImage.h"
 #include "mitkPlaneGeometry.h"
+#include "mitkAbstractTransformGeometry.h"
 #include <mitkPlanarFigure.h>
 #include <vtkCellArray.h>
 #include <vtkIdList.h>
@@ -115,8 +116,9 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
     localStorage->m_LastMTime = mTime;
 
     const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*>(planarFigure->GetPlaneGeometry());
+    const AbstractTransformGeometry* abstractTransformGeometry = dynamic_cast<const AbstractTransformGeometry*>(planarFigure->GetPlaneGeometry());
 
-    if (planeGeometry == NULL)
+    if (planeGeometry == NULL && abstractTransformGeometry == NULL)
       return;
 
     size_t numPolyLines = planarFigure->GetPolyLinesSize();

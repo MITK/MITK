@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometryData.h"
 #include "mitkBaseProcess.h"
 #include <mitkProportionalTimeGeometry.h>
+#include "mitkAbstractTransformGeometry.h"
 
 mitk::PlaneGeometryData::PlaneGeometryData()
 {
@@ -34,7 +35,7 @@ void mitk::PlaneGeometryData::SetGeometry(mitk::BaseGeometry *geometry)
   else
   {
     PlaneGeometry* geometry2d = dynamic_cast<PlaneGeometry*>(geometry);
-    if(geometry2d==NULL)
+    if(geometry2d==NULL || dynamic_cast<AbstractTransformGeometry*>(geometry)!=NULL)
       itkExceptionMacro(<<"Trying to set a geometry which is not a PlaneGeometry into PlaneGeometryData.");
     SetPlaneGeometry(geometry2d);
   }

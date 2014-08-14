@@ -17,6 +17,8 @@ if(MITK_USE_OpenCV)
 
     set(additional_cmake_args
       -DBUILD_opencv_java:BOOL=OFF
+      -DBUILD_opencv_ts:BOOL=OFF
+      -DBUILD_PERF_TESTS:BOOL=OFF
     )
 
     if(MITK_USE_Python)

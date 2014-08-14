@@ -1,15 +1,15 @@
 /**
 \page MiniAppExplainPage MITK MiniApps
 
-\section MiniAppDescription What are MiniApps
+\section MiniAppExplainPageDescription What are MiniApps
 
 MiniApps are small compilations of command line tools. Each of these tools is designed to fulfill one simple task,
 e.g. resample an image or extract image statistics of a given region of interest (ROI). Several tools that relate to
-a similiar topic or research area are grouped into one MiniApp.
+a similar topic or research area are grouped into one MiniApp.
 
 They are intended to provide command line access to a variety of features of MITK, thus facilitating batched processing of data.
 
-\section MiniAppUsage Usage
+\section MiniAppExplainPageUsage Usage
 
 The MiniApps are built in a self-describing way. When calling a MiniApp without any arguments it will list
 all available sub-tools. When calling e.g. the DiffusionMiniApp it will look similarly to this:
@@ -63,7 +63,7 @@ $./MitkDiffusionMiniApps GibbsTracking -i test.dti -p param.gtp -o /tmp/fiber.fi
 \endcode
 
 
-\section MiniAppAvailableList Available MiniApps
+\section MiniAppExplainPageAvailableList Available MiniApps
 
 \li \subpage DiffusionMiniApps
 

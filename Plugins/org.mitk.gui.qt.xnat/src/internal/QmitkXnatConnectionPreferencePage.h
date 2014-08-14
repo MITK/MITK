@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIQtPreferencePage.h"
 #include <berryIPreferences.h>
 
+#include "ui_QmitkXnatConnectionPreferencePageControls.h"
+
 class QWidget;
 class QLineEdit;
 
@@ -53,15 +55,23 @@ public:
   ///
   virtual void Update();
 
+  protected slots:
+    virtual void UrlChanged();
+    virtual void DownloadPathChanged();
+
+    ///
+    /// Creates a test connection to the entered server name with the entered user information.
+    ///
+    virtual void PerformTestConnection();
+
 protected:
+
+  Ui::QmitkXnatConnectionPreferencePageControls m_Controls;
+
   QWidget* m_MainControl;
 
   berry::IPreferences::WeakPtr m_XnatConnectionPreferencesNode;
 
-  ///
-  /// Maps a label to lineedit (sorted)
-  ///
-  QMap<int, QPair<QString, QLineEdit*> > m_LineEditors;
 };
 
 #endif /* QMITKXNATCONNECTIONPREFERENCEPAGE_H_ */

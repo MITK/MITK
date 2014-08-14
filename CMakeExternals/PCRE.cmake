@@ -1,19 +1,14 @@
-
+#--------------------------------------------------------------------------
+#  PCRE (Perl Compatible Regular Expressions)
+#--------------------------------------------------------------------------
 if(MITK_USE_PCRE)
-  # Sanity checks
   if(DEFINED PCRE_DIR AND NOT EXISTS ${PCRE_DIR})
-    message(FATAL_ERROR "PCRE_DIR variable is defined but corresponds to non-existing directory")
-  endif()
-
-  # Set dependency list
-  set(proj PCRE)
-  set(${proj}_DEPENDENCIES "")
-
+      message(FATAL_ERROR "PCRE_DIR variable is defined but corresponds to non-existing directory")
+   endif()
   if(NOT PCRE_DIR)
-    #
-    #  PCRE (Perl Compatible Regular Expressions)
-    #
 
+    set(proj PCRE)
+    set(${proj}_DEPENDENCIES "")
     set(PCRE_TARGET_VERSION 8.35)
     set(PCRE_DOWNLOAD_SOURCE_HASH "ed58bcbe54d3b1d59e9f5415ef45ce1c")
 

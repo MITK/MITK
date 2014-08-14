@@ -104,11 +104,6 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
       list(APPEND _python_dirs "${Python_DIR}/libs")
       list(APPEND _python_dirs "${Python_DIR}/bin")
     endif()
-      # install python stuff
-      #install(DIRECTORY "${Python_DIR}/lib/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}"
-      #      DESTINATION ${_destination}/Python/lib
-      #      USE_SOURCE_PERMISSIONS
-      #      COMPONENT Runtime)
 
     file(GLOB_RECURSE item RELATIVE "${Python_DIR}/${_python_runtime_dir}" "${Python_DIR}/${_python_runtime_dir}/*")
     foreach(f ${item})

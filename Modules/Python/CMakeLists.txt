@@ -4,7 +4,6 @@ if( MITK_USE_Python )
   endif()
 
   set(OpenCV_DEP )
-  set(SimpleITK_DEP )
   if(MITK_USE_OpenCV)
     set(OpenCV_DEP OpenCV)
   endif()

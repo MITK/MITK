@@ -1,8 +1,4 @@
-# Set the important envirimental variables that auto-conf uses to
-# configure, mostly these are passed from the CMake
-# configuration. Others are just explicitly passed from the
-# enviroment. If there is a problem with them in the future they can
-# be addressed in CMake with the same structure.
+# Set the important envionment variables
 
 set(ENV{CC} "@CMAKE_C_COMPILER@ @CMAKE_C_COMPILER_ARG1@")
 set(ENV{CFLAGS} "@CMAKE_C_FLAGS@ @CMAKE_C_FLAGS_RELEASE@")

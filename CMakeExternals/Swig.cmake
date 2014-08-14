@@ -1,6 +1,7 @@
-
+#------------------------------------------------------------
+# SWIG (Simple Wrapper Interface Generator)
+#-----------------------------------------------------------
 if(MITK_USE_SWIG)
-  # Sanity checks
   if(DEFINED Swig_DIR AND NOT EXISTS ${Swig_DIR})
     message(FATAL_ERROR "Swig_DIR variable is defined but corresponds to non-existing directory")
   endif()

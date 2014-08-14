@@ -31,6 +31,7 @@ if(MITK_USE_SimpleITK)
          -DWRAP_TCL:BOOL=OFF
          -DWRAP_LUA:BOOL=OFF
          -DWRAP_PYTHON:BOOL=OFF
+         -DWRAP_JAVA:BOOL=OFF
         )
 
     if(MITK_USE_Python)
@@ -39,6 +40,7 @@ if(MITK_USE_SimpleITK)
           )
     endif(MITK_USE_Python)
 
+    #TODO: Installer and testing works only with static libs on MAC
     set(_build_shared ON)
     if(APPLE)
       set(_build_shared OFF)

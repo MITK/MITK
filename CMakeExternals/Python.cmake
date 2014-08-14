@@ -1,5 +1,7 @@
+#----------------------------------------------------------------------
+# Python
+#----------------------------------------------------------------------
 if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
-
     # Sanity checks
   if(DEFINED Python_DIR AND NOT EXISTS ${Python_DIR})
     message(FATAL_ERROR "Python_DIR variable is defined but corresponds to non-existing directory")

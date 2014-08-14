@@ -1,4 +1,6 @@
-
+#-----------------------------------------------------------------------------
+# Numpy
+#-----------------------------------------------------------------------------
 if( MITK_USE_Python )
 
   option(MITK_USE_NUMPY "Use the numpy python library" OFF)
@@ -104,8 +106,6 @@ if( MITK_USE_Python )
           MITK_PYTHON_BUILD_STEP(${proj} install setup.py install --prefix=${_install_dir})
          ")
 
-      #set(Numpy_URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/numpy-1.6.1.tar.gz")
-      #set(Numpy_MD5 "2bce18c08fc4fce461656f0f4dd9103e")
       set(Numpy_URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/numpy-1.4.1.tar.gz")
       set(Numpy_MD5 "5c7b5349dc3161763f7f366ceb96516b")
 

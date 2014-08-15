@@ -128,7 +128,7 @@ public:
   const TPixel & GetPixelByWorldCoordinates(mitk::Point3D position)
   {
     Index3D itkIndex;
-    m_WriteAccessor.m_Image->GetGeometry()->WorldToIndex(position, itkIndex);
+    m_WriteAccessor.GetImage()->GetGeometry()->WorldToIndex(position, itkIndex);
 
     return GetPixelByIndex( itkIndex);
   }

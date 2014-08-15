@@ -128,7 +128,7 @@ public:
   const TPixel & GetPixelByWorldCoordinates(mitk::Point3D position)
   {
     Index3D itkIndex;
-    m_ReadAccessor.m_Image->GetGeometry()->WorldToIndex(position, itkIndex);
+    m_ReadAccessor.GetImage()->GetGeometry()->WorldToIndex(position, itkIndex);
 
     return GetPixelByIndex( itkIndex);
   }
@@ -138,10 +138,10 @@ public:
   const TPixel & GetPixelByWorldCoordinates(mitk::Point3D position, unsigned int timestep)
   {
     Index3D itkIndex;
-    m_ReadAccessor.m_Image->GetGeometry()->WorldToIndex(position, itkIndex);
-    if (m_ReadAccessor.m_Image->GetTimeSteps() < timestep)
+    m_ReadAccessor.GetImage()->GetGeometry()->WorldToIndex(position, itkIndex);
+    if (m_ReadAccessor.GetImage()->GetTimeSteps() < timestep)
     {
-      timestep = m_ReadAccessor.m_Image->GetTimeSteps();
+      timestep = m_ReadAccessor.GetImage()->GetTimeSteps();
     }
     itk::Index<4> itk4Index;
     for(int i=0; i<3; ++i)

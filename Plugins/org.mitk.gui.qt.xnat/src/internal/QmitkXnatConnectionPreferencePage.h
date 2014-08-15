@@ -62,13 +62,13 @@ public:
     ///
     /// Creates a test connection to the entered server name with the entered user information.
     ///
-    virtual void PerformTestConnection();
+    virtual bool PerformTestConnection();
 
 protected:
 
   Ui::QmitkXnatConnectionPreferencePageControls m_Controls;
 
-  QWidget* m_MainControl;
+  QWidget* m_Control;
 
   berry::IPreferences::WeakPtr m_XnatConnectionPreferencesNode;
 

@@ -46,6 +46,16 @@ void QmitkXnatTreeBrowserView::SetFocus()
 
 void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
 {
+  // Get the XNAT Session from Activator
+  m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
+
+  if(m_Session == 0)
+  {
+    m_Controls.labelError->setText("Please check the Preferences of XNAT. Maybe they are not ok.");
+    m_Controls.labelError->setStyleSheet("QLabel { color: red; }");
+    return;
+  }
+
   // Create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
   m_Controls.treeView->setModel(m_TreeModel);
@@ -57,11 +67,6 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl( QWidget *parent )
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
 
   connect( m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)) );
-
-  // Get the XNAT Session from Activator
-  m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
-
-  if(m_Session == 0) return;
 
   // Fill model and show in the GUI
   m_TreeModel->addDataModel(m_Session->dataModel());

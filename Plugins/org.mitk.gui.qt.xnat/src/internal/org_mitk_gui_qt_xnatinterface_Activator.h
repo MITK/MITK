@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define org_mitk_gui_qt_xnatinterface_Activator_h
 
 #include <ctkPluginActivator.h>
-#include "QmitkXnatConnectionManager.h"
+#include "QmitkXnatSessionManager.h"
 
 namespace mitk {
 
@@ -31,7 +31,7 @@ class org_mitk_gui_qt_xnatinterface_Activator :
 
 public:
 
-  static QmitkXnatConnectionManager* GetXnatConnectionManager();
+  static QmitkXnatSessionManager* GetXnatSessionManager();
   static ctkPluginContext* GetContext();
 
   void start(ctkPluginContext* context);

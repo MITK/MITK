@@ -26,9 +26,9 @@ namespace mitk {
 
 ctkPluginContext* org_mitk_gui_qt_xnatinterface_Activator::m_Context = 0;
 
-QmitkXnatConnectionManager* org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()
+QmitkXnatSessionManager* org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()
 {
-  static QmitkXnatConnectionManager manager;
+  static QmitkXnatSessionManager manager;
   return &manager;
 }
 
@@ -49,6 +49,7 @@ void org_mitk_gui_qt_xnatinterface_Activator::start(ctkPluginContext* context)
 void org_mitk_gui_qt_xnatinterface_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
+  this->m_Context = 0;
 }
 
 }

@@ -8,12 +8,13 @@ set(INTERNAL_CPP_FILES
   QmitkXnatTreeBrowserView.cpp
   QmitkXnatObjectEditorInput.cpp
   QmitkXnatConnectionPreferencePage.cpp
-  QmitkXnatConnectionManager.cpp
+  QmitkXnatSessionManager.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkXnatEditorControls.ui
   src/internal/QmitkXnatTreeBrowserViewControls.ui
+  src/internal/QmitkXnatConnectionPreferencePageControls.ui
 )
 
 set(MOC_H_FILES

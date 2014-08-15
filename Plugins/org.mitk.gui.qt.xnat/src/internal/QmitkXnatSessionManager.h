@@ -15,24 +15,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QMITKXNATCONNECTIONMANAGER_H_
-#define QMITKXNATCONNECTIONMANAGER_H_
+#ifndef QMITKXNATSESSIONMANAGER_H_
+#define QMITKXNATSESSIONMANAGER_H_
 
 #include <berryIPreferencesService.h>
 
 #include "ctkXnatSession.h"
 #include "ctkXnatLoginProfile.h"
 
-class QmitkXnatConnectionManager
+class QmitkXnatSessionManager
 {
 
 public:
 
-  QmitkXnatConnectionManager();
-  ~QmitkXnatConnectionManager();
+  QmitkXnatSessionManager();
+  ~QmitkXnatSessionManager();
 
-  /// \brief Opens and tests a xnat session and returns it if the test was ok.
-  ctkXnatSession* GetXnatConnection();
+  /// \brief Opens a xnat session.
+  ctkXnatSession* GetXnatSession();
+
+  /// \brief Updates the xnat session.
+  void UpdateXnatSession();
 
 private:
 
@@ -41,4 +44,4 @@ private:
 
 };
 
-#endif /*QMITKXNATCONNECTIONMANAGER_H_*/
+#endif /*QMITKXNATSESSIONMANAGER_H_*/

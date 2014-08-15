@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // CTK XNAT Core
 #include "ctkXnatObject.h"
 #include "ctkXnatDataModel.h"
-#include "ctkXnatResource.h"
+#include "ctkXnatScanFolder.h"
 #include "ctkXnatFile.h"
 
 // CTK XNAT Widgets
@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QRegExp>
 #include <QModelIndex>
 #include <QDir>
+#include <QMessageBox>
 
 // MITK
 #include <mitkDataStorage.h>
@@ -108,18 +109,22 @@ void QmitkXnatEditor::SetInput(berry::IEditorInput::Pointer input)
   }
   else
   {
-    m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatConnectionManager()->GetXnatConnection();
+    // Get the XNAT Session from Activator
+    m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
 
     if(m_Session == 0)
     {
+      QMessageBox::critical(QApplication::activeWindow(), "Error",
+        "Please check the Preferences of XNAT. Maybe they are not ok.\nClose the tab 'XNAT Editor' and start it again.");
       MITK_INFO << "Please check your XNAT Connection Preferences!";
-      return;
     }
-
-    QmitkXnatObjectEditorInput::Pointer xoPtr = QmitkXnatObjectEditorInput::New( m_Session->dataModel() );
-    berry::IEditorInput::Pointer editorInput( xoPtr );
-    SetInputWithNotify(editorInput);
-    this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
+    else
+    {
+      QmitkXnatObjectEditorInput::Pointer xoPtr = QmitkXnatObjectEditorInput::New( m_Session->dataModel() );
+      berry::IEditorInput::Pointer editorInput( xoPtr );
+      SetInputWithNotify(editorInput);
+      this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
+    }
   }
 }
 
@@ -129,6 +134,8 @@ void QmitkXnatEditor::SetFocus()
 
 void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
 {
+  if(m_Session != 0) return;
+
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
   m_Controls.treeView->setModel(m_ListModel);
@@ -213,7 +220,7 @@ void QmitkXnatEditor::UpdateList()
 }
 
 void QmitkXnatEditor::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
-                               berry::ISelection::ConstPointer selection)
+                                       berry::ISelection::ConstPointer selection)
 {
   // check for null selection
   if (selection.IsNull())
@@ -222,12 +229,12 @@ void QmitkXnatEditor::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart
   }
   // exclude own selection events and check whether this kind of selection can be handled
   if (sourcepart != this &&
-      selection.Cast<const berry::IStructuredSelection>())
+    selection.Cast<const berry::IStructuredSelection>())
   {
     berry::IStructuredSelection::ConstPointer currentSelection = selection.Cast<const berry::IStructuredSelection>();
     // iterates over the selection
     for (berry::IStructuredSelection::iterator itr = currentSelection->Begin();
-         itr != currentSelection->End(); ++itr)
+      itr != currentSelection->End(); ++itr)
     {
       if (berry::SmartPointer<berry::QModelIndexObject> objectPointer = itr->Cast<berry::QModelIndexObject>())
       {
@@ -235,7 +242,8 @@ void QmitkXnatEditor::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart
         ctkXnatObject* object = objectPointer->GetQModelIndex().data(Qt::UserRole).value<ctkXnatObject*>();
 
         // if a file is selected, don't change the input and list view
-        if ( dynamic_cast<ctkXnatFile*>(object) == NULL ){
+        if ( dynamic_cast<ctkXnatFile*>(object) == NULL )
+        {
           QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( object );
           berry::IEditorInput::Pointer editorInput( oPtr );
           if ( !(editorInput == this->GetEditorInput()) )
@@ -257,7 +265,7 @@ void QmitkXnatEditor::DownloadResource()
   QVariant variant = m_ListModel->data(index, Qt::UserRole);
   if ( variant.isValid() )
   {
-    ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(variant.value<ctkXnatObject*>());
+    ctkXnatScanFolder* resource = dynamic_cast<ctkXnatScanFolder*>(variant.value<ctkXnatObject*>());
     if (resource != NULL)
     {
       MITK_INFO << "Download started ...";
@@ -341,7 +349,6 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
       UpdateList();
     }
   }
-
 }
 
 void QmitkXnatEditor::InternalFileDownload(const QModelIndex& index)

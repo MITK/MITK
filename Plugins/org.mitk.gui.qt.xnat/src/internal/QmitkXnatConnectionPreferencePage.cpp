@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkXnatConnectionPreferencePage.h"
 
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
-#include "QDialogButtonBox.h"
 
 #include "berryIPreferencesService.h"
 #include "berryPlatform.h"

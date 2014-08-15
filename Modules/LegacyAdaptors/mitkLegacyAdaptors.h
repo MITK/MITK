@@ -13,7 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef _mitkLegacyAdaptors_h
+#ifndef _mitkLegacyAdaptors_h_
 #define _mitkLegacyAdaptors_h_
 
 #include "mitkCommon.h"

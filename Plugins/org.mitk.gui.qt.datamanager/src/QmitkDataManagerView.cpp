@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNot.h"
+#include "mitkNodePredicateOr.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkEnumerationProperty.h"
 #include "mitkLookupTableProperty.h"
@@ -131,12 +132,16 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       prefs->GetBool("Place new nodes on top", true) );
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
 
+  // Prepare filters
+  m_HelperObjectFilterPredicate = mitk::NodePredicateOr::New(
+      mitk::NodePredicateProperty::New("helper object"),
+      mitk::NodePredicateProperty::New("hidden object"));
+  m_NodeWithNoDataFilterPredicate = mitk::NodePredicateData::New(0);
+
   m_FilterModel = new QmitkDataStorageFilterProxyModel();
   m_FilterModel->setSourceModel(m_NodeTreeModel);
-  m_FilterModel->SetShowHelperObjects(
-      prefs->GetBool("Show helper objects", false));
-  m_FilterModel->SetShowNodesContainingNoData(
-      prefs->GetBool("Show nodes containing no data", false));
+  m_FilterModel->AddFilterPredicate(m_HelperObjectFilterPredicate);
+  m_FilterModel->AddFilterPredicate(m_NodeWithNoDataFilterPredicate);
 
   //# Tree View (experimental)
   m_NodeTreeView = new QTreeView;
@@ -429,12 +434,26 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
   if( m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() !=  prefs->GetBool("Place new nodes on top", true) )
     m_NodeTreeModel->SetPlaceNewNodesOnTop( !m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() );
 
-  if( m_FilterModel->GetShowHelperObjectsFlag()!= prefs->GetBool("Show helper objects", false) )
-      m_FilterModel->SetShowHelperObjects(!m_FilterModel->GetShowHelperObjectsFlag());
+  bool hideHelperObjects = !prefs->GetBool("Show helper objects", false);
+  if (m_FilterModel->HasFilterPredicate(m_HelperObjectFilterPredicate) != hideHelperObjects)  {
+      if (hideHelperObjects) {
+          m_FilterModel->AddFilterPredicate(m_HelperObjectFilterPredicate);
+      }
+      else {
+          m_FilterModel->RemoveFilterPredicate(m_HelperObjectFilterPredicate);
+      }
+  }
 
-  if (m_FilterModel->GetShowNodesContainingNoDataFlag() != prefs->GetBool("Show nodes containing no data", false))
-      m_FilterModel->SetShowNodesContainingNoData(!m_FilterModel->GetShowNodesContainingNoDataFlag());
-
+  bool hideNodesWithNoData = !prefs->GetBool("Show nodes containing no data", false);
+  if (m_FilterModel->HasFilterPredicate(m_NodeWithNoDataFilterPredicate) != hideNodesWithNoData) {
+      if (hideNodesWithNoData) {
+          m_FilterModel->AddFilterPredicate(m_NodeWithNoDataFilterPredicate);
+      }
+      else {
+          m_FilterModel->RemoveFilterPredicate(m_NodeWithNoDataFilterPredicate);
+      }
+  }
+ 
   m_GlobalReinitOnNodeDelete = prefs->GetBool("Call global reinit if node is deleted", true);
 
   m_NodeTreeView->expandAll();
@@ -1016,7 +1035,7 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
       node->SetBoolProperty("selected", true);
   }
   //changing the selection does NOT require any rendering processes!
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ShowIn(const QString &editorId)
@@ -1037,3 +1056,9 @@ mitk::IRenderWindowPart* QmitkDataManagerView::OpenRenderWindowPart(bool activat
     return this->GetRenderWindowPart(QmitkAbstractView::BRING_TO_FRONT | QmitkAbstractView::OPEN);
   }
 }
+
+void QmitkDataManagerView::NodeChanged(const mitk::DataNode* node)
+{
+    m_FilterModel->invalidate();
+}
+

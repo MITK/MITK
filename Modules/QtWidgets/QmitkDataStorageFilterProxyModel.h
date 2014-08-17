@@ -22,80 +22,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDataStorage.h>
 #include <mitkNodePredicateBase.h>
-#include <mitkWeakPointer.h>
 
 #include <QSortFilterProxyModel>
 
-#include "QmitkEnums.h"
-#include "QmitkCustomVariants.h"
-
-#include <vector>
-#include <string>
-#include <QList>
+#include <set>
 
 /// \ingroup QmitkModule
 class QMITK_EXPORT QmitkDataStorageFilterProxyModel : public QSortFilterProxyModel
 {
-public:
 //# CTORS,DTOR
 public:
-    QmitkDataStorageFilterProxyModel(bool _ShowHelperObjects=false
-                            , bool _ShowNodesContainingNoData=false
-                            , QObject* parent = 0);
+    QmitkDataStorageFilterProxyModel(QObject* parent = 0);
     ~QmitkDataStorageFilterProxyModel();
 
-//# GETTER
 public:
+    ///
+    /// If the predicate pred returns true, the node will be hidden in the data manager view
+    ///
+    void AddFilterPredicate(mitk::NodePredicateBase::Pointer pred);
 
-  typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
+    ///
+    /// Remove a predicate from the list of filters. Returns true if pred was found and removed.
+    ///
+    bool RemoveFilterPredicate(mitk::NodePredicateBase::Pointer pred);
 
-  ///
-  /// Get the helper object visibility flag
-  ///
-  bool GetShowHelperObjectsFlag()
-  {
-    return m_ShowHelperObjects;
-  }
-
-  ///
-  /// Get the visibility flag for showing nodes that contain no data
-  ///
-  bool GetShowNodesContainingNoDataFlag()
-  {
-    return m_ShowNodesContainingNoData;
-  }
-
-//# SETTER
-public:
-
-  ///
-  /// Show or hide helper objects
-  ///
-  void SetShowHelperObjects(bool _ShowHelperObjects);
-
-  ///
-  /// Show or hide objects that contain no data
-  ///
-  void SetShowNodesContainingNoData(bool _ShowNodesContainingNoData);
+    ///
+    /// Check if predicate is present in the list of filtering predicates.
+    ///
+    bool HasFilterPredicate(mitk::NodePredicateBase::Pointer pred);
 
 //# 
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
-//# MISC
 protected:
-  ///
-  /// Update Tree Model according to predicates
-  ///
-    void UpdateNodeVisibility();
-
-  //# ATTRIBUTES
-protected:
-  mitk::NodePredicateBase::Pointer m_Predicate;
-  bool m_ShowHelperObjects;
-  bool m_ShowNodesContainingNoData;
-
-  NodeTagMapType  m_HelperObjectObserverTags;
+    typedef std::set<mitk::NodePredicateBase::Pointer> FilterPredicatesCollection;
+    FilterPredicatesCollection m_Predicates;
 };
 
 #endif /* QMITKDATASTORAGEFILTERPROXYMODEL_H_ */

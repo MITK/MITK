@@ -206,6 +206,10 @@ namespace mitk
       }
       refROI->ContourModelSet = contourSet;
       contourSet->SetProperty("name", mitk::StringProperty::New(refROI->Name));
+      contourSet->SetProperty("contour.color", mitk::ColorProperty::New(
+                                refROI->DisplayColor[0],
+                                refROI->DisplayColor[1],
+                                refROI->DisplayColor[2]));
       contourModelSetVector.push_back(contourSet);
 
     }

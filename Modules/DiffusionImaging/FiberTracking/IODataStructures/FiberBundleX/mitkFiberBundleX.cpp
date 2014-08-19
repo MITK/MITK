@@ -1015,46 +1015,25 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
         SetGeometry(geometry);
         return;
     }
-    float min = itk::NumericTraits<float>::NonpositiveMin();
-    float max = itk::NumericTraits<float>::max();
-    float b[] = {max, min, max, min, max, min};
+    double b[6];
+    m_FiberPolyData->GetBounds(b);
 
+    // calculate statistics
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
         vtkCell* cell = m_FiberPolyData->GetCell(i);
         int p = cell->GetNumberOfPoints();
         vtkPoints* points = cell->GetPoints();
         float length = 0;
-        for (int j=0; j<p; j++)
+        for (int j=0; j<p-1; j++)
         {
-            // calculate bounding box
             double p1[3];
             points->GetPoint(j, p1);
+            double p2[3];
+            points->GetPoint(j+1, p2);
 
-            if (p1[0]<b[0])
-                b[0]=p1[0];
-            if (p1[0]>b[1])
-                b[1]=p1[0];
-
-            if (p1[1]<b[2])
-                b[2]=p1[1];
-            if (p1[1]>b[3])
-                b[3]=p1[1];
-
-            if (p1[2]<b[4])
-                b[4]=p1[2];
-            if (p1[2]>b[5])
-                b[5]=p1[2];
-
-            // calculate statistics
-            if (j<p-1)
-            {
-                double p2[3];
-                points->GetPoint(j+1, p2);
-
-                float dist = std::sqrt((p1[0]-p2[0])*(p1[0]-p2[0])+(p1[1]-p2[1])*(p1[1]-p2[1])+(p1[2]-p2[2])*(p1[2]-p2[2]));
-                length += dist;
-            }
+            float dist = std::sqrt((p1[0]-p2[0])*(p1[0]-p2[0])+(p1[1]-p2[1])*(p1[1]-p2[1])+(p1[2]-p2[2])*(p1[2]-p2[2]));
+            length += dist;
         }
         m_FiberLengths.push_back(length);
         m_MeanFiberLength += length;
@@ -1083,12 +1062,6 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
         m_LengthStDev = 0;
     m_LengthStDev = std::sqrt(m_LengthStDev);
     m_MedianFiberLength = sortedLengths.at(m_NumFibers/2);
-
-    // provide some border margin
-    for(int i=0; i<=4; i+=2)
-        b[i] -=10;
-    for(int i=1; i<=5; i+=2)
-        b[i] +=10;
 
     mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
     geometry->SetFloatBounds(b);

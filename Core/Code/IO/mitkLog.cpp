@@ -233,7 +233,7 @@ bool mitk::LoggingBackend::CheckIfFileExists(const std::string& filename)
   return returnValue;
 }
 
-mbilog::OutputType mitk::LoggingBackend::GetOutputType()
+mbilog::OutputType mitk::LoggingBackend::GetOutputType() const
 {
   return mbilog::Console;
 }

@@ -51,7 +51,7 @@ namespace mbilog{
        */
       void SetFull(bool full);
 
-      virtual OutputType GetOutputType();
+      virtual OutputType GetOutputType() const;
 
     private:
 

@@ -56,7 +56,7 @@ enum MBILOG_DLL_API OutputType{
     /**
      * @return The type of this backend.
      */
-    virtual OutputType GetOutputType()=0;
+    virtual OutputType GetOutputType() const =0;
   };
 
 }

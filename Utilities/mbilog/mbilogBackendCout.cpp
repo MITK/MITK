@@ -44,7 +44,7 @@ void mbilog::BackendCout::ProcessMessage(const mbilog::LogMessage& l)
     FormatSmart(l);
 }
 
-mbilog::OutputType mbilog::BackendCout::GetOutputType()
+mbilog::OutputType mbilog::BackendCout::GetOutputType() const
 {
   return mbilog::Console;
 }

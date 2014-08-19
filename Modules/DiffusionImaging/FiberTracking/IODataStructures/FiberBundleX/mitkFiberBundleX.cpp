@@ -810,9 +810,8 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(BaseData* roi)
     if (roi==NULL)
         return result;
 
-    // if incoming pf is a pfc
     mitk::PlanarFigureComposite::Pointer pfc = dynamic_cast<mitk::PlanarFigureComposite*>(roi);
-    if (!pfc.IsNull())
+    if (!pfc.IsNull()) // handle composite
     {
         switch (pfc->getOperationType())
         {
@@ -865,29 +864,21 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(BaseData* roi)
             }
             break;
         }
-        default:
-            MITK_DEBUG << "we have an UNDEFINED composition... ERROR" ;
-            break;
         }
     }
-    else if ( dynamic_cast<mitk::PlanarFigure*>(roi) )
+    else if ( dynamic_cast<mitk::PlanarFigure*>(roi) )  // actual extraction
     {
         mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(roi);
-        mitk::PlaneGeometry::ConstPointer pfgeometry = planarFigure->GetPlaneGeometry();
-        const mitk::PlaneGeometry* planeGeometry = dynamic_cast<const mitk::PlaneGeometry*> (pfgeometry.GetPointer());
-        Vector3D planeNormal = planeGeometry->GetNormal();
+        Vector3D planeNormal = planarFigure->GetPlaneGeometry()->GetNormal();
         planeNormal.Normalize();
-        Point3D planeOrigin = planeGeometry->GetOrigin();
+        Point3D planeOrigin = planarFigure->GetPlaneGeometry()->GetOrigin();
 
-        std::vector<int> PointsOnPlane; // contains all pointIds which are crossing the cutting plane
-        std::vector<int> PointsInROI; // based on PointsOnPlane, all ROI relevant point IDs are stored here
-
-        /* Define cutting plane by ROI (PlanarFigure) */
+        // define cutting plane by ROI geometry (PlanarFigure)
         vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
         plane->SetOrigin(planeOrigin[0],planeOrigin[1],planeOrigin[2]);
         plane->SetNormal(planeNormal[0],planeNormal[1],planeNormal[2]);
 
-        /* get all points/fibers cutting the plane */
+        // get all fiber/plane intersection points
         vtkSmartPointer<vtkClipPolyData> clipper = vtkSmartPointer<vtkClipPolyData>::New();
         clipper->SetInputData(m_FiberIdDataSet);
         clipper->SetClipFunction(plane);
@@ -895,23 +886,27 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(BaseData* roi)
         clipper->GenerateClippedOutputOn();
         clipper->Update();
         vtkSmartPointer<vtkPolyData> clipperout = clipper->GetClippedOutput();
+        if (!clipperout->GetCellData()->HasArray(FIBER_ID_ARRAY))
+            return result;
 
-        /* ======STEP 1====== extract all points, which are crossing the plane */
-        // Scalar values describe the distance between each remaining point to the given plane. Values sorted by point index
         vtkSmartPointer<vtkDataArray> distanceList = clipperout->GetPointData()->GetScalars();
-        vtkIdType sizeOfList =  distanceList->GetNumberOfTuples();
-        PointsOnPlane.reserve(sizeOfList); // use reserve for high-performant push_back, no hidden copy procedures are processed then! size of list can be optimized by reducing allocation, but be aware of iterator and vector size
+        vtkIdType numPoints =  distanceList->GetNumberOfTuples();
 
-        for (int i=0; i<sizeOfList; ++i)
+        std::vector<int> pointsOnPlane;
+        pointsOnPlane.reserve(numPoints);
+        for (int i=0; i<numPoints; ++i)
         {
-            double *distance = distanceList->GetTuple(i);
+            double distance = distanceList->GetTuple(i)[0];
             // check if point is on plane
-            if (distance[0] >= -0.01 && distance[0] <= 0.01)
-                PointsOnPlane.push_back(i);
+            if (distance >= -0.01 && distance <= 0.01)
+                pointsOnPlane.push_back(i);
         }
+        if (pointsOnPlane.empty())
+            return result;
 
-        /* =======STEP 2===== extract ROI relevant pointIds */
-        PointsInROI.reserve(PointsOnPlane.size());
+        // get all point IDs inside the ROI
+        std::vector<int> pointsInROI;
+        pointsInROI.reserve(pointsOnPlane.size());
         mitk::PlanarCircle::Pointer circleName = mitk::PlanarCircle::New();
         mitk::PlanarPolygon::Pointer polyName = mitk::PlanarPolygon::New();
         if ( planarFigure->GetNameOfClass() == circleName->GetNameOfClass() )
@@ -923,23 +918,19 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(BaseData* roi)
             double radius = V1w.EuclideanDistanceTo(V2w);
             radius *= radius;
 
-            for (unsigned int i=0; i<PointsOnPlane.size(); i++)
+            for (unsigned int i=0; i<pointsOnPlane.size(); i++)
             {
-                double p[3]; clipperout->GetPoint(PointsOnPlane[i], p);
+                double p[3]; clipperout->GetPoint(pointsOnPlane[i], p);
                 double dist = (p[0]-V1w[0])*(p[0]-V1w[0])+(p[1]-V1w[1])*(p[1]-V1w[1])+(p[2]-V1w[2])*(p[2]-V1w[2]);
                 if( dist <= radius)
-                    PointsInROI.push_back(PointsOnPlane[i]);
+                    pointsInROI.push_back(pointsOnPlane[i]);
             }
         }
         else if ( planarFigure->GetNameOfClass() == polyName->GetNameOfClass() )
         {
             //create vtkPolygon using controlpoints from planarFigure polygon
             vtkSmartPointer<vtkPolygon> polygonVtk = vtkSmartPointer<vtkPolygon>::New();
-
-            //get the control points from pf and insert them to vtkPolygon
-            unsigned int nrCtrlPnts = planarFigure->GetNumberOfControlPoints();
-
-            for (unsigned int i=0; i<nrCtrlPnts; ++i)
+            for (unsigned int i=0; i<planarFigure->GetNumberOfControlPoints(); ++i)
             {
                 itk::Point<double,3> p = planarFigure->GetWorldControlPoint(i);
                 polygonVtk->GetPoints()->InsertNextPoint(p[0], p[1], p[2] );
@@ -947,64 +938,49 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(BaseData* roi)
             //prepare everything for using pointInPolygon function
             double n[3];
             polygonVtk->ComputeNormal(polygonVtk->GetPoints()->GetNumberOfPoints(), static_cast<double*>(polygonVtk->GetPoints()->GetData()->GetVoidPointer(0)), n);
-
             double bounds[6];
             polygonVtk->GetPoints()->GetBounds(bounds);
 
-            for (unsigned int i=0; i<PointsOnPlane.size(); i++)
+            for (unsigned int i=0; i<pointsOnPlane.size(); i++)
             {
-                double p[3]; clipperout->GetPoint(PointsOnPlane[i], p);
+                double p[3]; clipperout->GetPoint(pointsOnPlane[i], p);
                 int isInPolygon = polygonVtk->PointInPolygon(p, polygonVtk->GetPoints()->GetNumberOfPoints(), static_cast<double*>(polygonVtk->GetPoints()->GetData()->GetVoidPointer(0)), bounds, n);
                 if( isInPolygon )
-                    PointsInROI.push_back(PointsOnPlane[i]);
+                    pointsInROI.push_back(pointsOnPlane[i]);
             }
         }
-
-        MITK_DEBUG << "Step3: Identify fibers";
-        if (!clipperout->GetCellData()->HasArray(FIBER_ID_ARRAY))
-        {
-            MITK_DEBUG << "ERROR: FiberID array does not exist, no correlation between points and fiberIds possible! Make sure calling GenerateFiberIds()";
-            return result; // FibersInRoi is empty then
-        }
-        if (PointsInROI.size()<=0)
+        if (pointsInROI.empty())
             return result;
 
-        // prepare a structure where each point id is represented as an indexId. vector looks like: | pntId | fiberIdx |
-        std::vector< long > pointindexFiberMap;
+        // get the fiber IDs corresponding to all clipped points
+        std::vector< long > pointToFiberMap; // pointToFiberMap[PointID] = FiberIndex
+        pointToFiberMap.resize(clipperout->GetNumberOfPoints());
 
-        // walk through the whole subline section and create an vector sorted by point index
-        vtkCellArray *clipperlines = clipperout->GetLines();
+        vtkCellArray* clipperlines = clipperout->GetLines();
         clipperlines->InitTraversal();
-        long numOfLineCells = clipperlines->GetNumberOfCells();
-        long numofClippedPoints = clipperout->GetNumberOfPoints();
-        pointindexFiberMap.resize(numofClippedPoints);
-
-        //prepare resulting vector
-        result.reserve(PointsInROI.size());
-
-        // go through resulting "sub"lines which are stored as cells, "i" corresponds to current line id.
-        for (int i=0, ic=0 ; i<numOfLineCells; i++, ic+=3)
+        for (int i=0, ic=0 ; i<clipperlines->GetNumberOfCells(); i++, ic+=3)
         {
-            //ic is the index counter for the cells hosting the desired information, eg. 2 | 45 | 46. each cell consits of 3 items.
-            vtkIdType npts;
-            vtkIdType *pts;
-            clipperlines->GetCell(ic, npts, pts);
+            // ic is the index counter for the cells hosting the desired information. each cell consits of 3 items.
+            long fiberID = clipperout->GetCellData()->GetArray(FIBER_ID_ARRAY)->GetTuple(i)[0];
+            vtkIdType numPoints;
+            vtkIdType* pointIDs;
+            clipperlines->GetCell(ic, numPoints, pointIDs);
 
-            // go through point ids in hosting subline, "j" corresponds to current pointindex in current line i. eg. idx[0]=45; idx[1]=46
-            for (long j=0; j<npts; j++)
-                pointindexFiberMap[ pts[j] ] = clipperout->GetCellData()->GetArray(FIBER_ID_ARRAY)->GetTuple(i)[0];
+            for (long j=0; j<numPoints; j++)
+                pointToFiberMap[ pointIDs[j] ] = fiberID;
         }
 
-        // get all Points in ROI with corresponding fiberID
-        for (unsigned long k = 0; k < PointsInROI.size(); k++)
+        // get the fiber IDs corresponding to the ID of a point inside the ROI
+        result.reserve(pointsInROI.size());
+        for (unsigned long k = 0; k < pointsInROI.size(); k++)
         {
-            if (pointindexFiberMap[ PointsInROI[k] ]<=GetNumFibers() && pointindexFiberMap[ PointsInROI[k] ]>=0)
-                result.push_back(pointindexFiberMap[ PointsInROI[k] ]);
+            if (pointToFiberMap[pointsInROI[k]]<=GetNumFibers() && pointToFiberMap[pointsInROI[k]]>=0)
+                result.push_back( pointToFiberMap[pointsInROI[k]] );
             else
                 MITK_INFO << "ERROR in ExtractFiberIdSubset; impossible fiber id detected";
         }
 
-        // remove duplicates (sort first? don't think its necessary, but check if IDs are already sorted.)
+        // remove duplicates
         std::vector<long>::iterator it;
         sort(result.begin(), result.end());
         it = unique (result.begin(), result.end());

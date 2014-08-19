@@ -394,6 +394,9 @@ public:
     mitk::NavigationData::OrientationType updatedOri1(0.7, 0.5, 0.1, 0.4);
     mitk::NavigationData::OrientationType updatedOri2(0.2, 0.7, 0.6, 0.1);
 
+    updatedOri1.normalize();
+    updatedOri2.normalize();
+
     nd1->SetPosition(updatedPos1);
     nd1->SetOrientation(updatedOri1);
 
@@ -423,12 +426,11 @@ public:
     identityTransform->SetIdentity();
     mitk::AffineTransform3D::MatrixType identityMatrix = identityTransform->GetMatrix();
     mitk::AffineTransform3D::MatrixType uM1 = updatedAffineTransform1->GetMatrix();
-    CPPUNIT_ASSERT_MESSAGE( "Testing updated orientation 1", mitk::MatrixEqualElementWise(uM1,identityMatrix));
+
+    CPPUNIT_ASSERT_MESSAGE( "Testing updated orientation 1", mitk::MatrixEqualElementWise(uM1, identityMatrix));
+
     mitk::AffineTransform3D::MatrixType::InternalMatrixType uM2 = updatedAffineTransform2->GetMatrix().GetVnlMatrix();
     mitk::AffineTransform3D::MatrixType::InternalMatrixType updatedOriTransform2 = updatedOri2.rotation_matrix_transpose().transpose();
-
-    //Where the data comes from: filter -> mitkToolData -> updatedAffineTransform -> um2
-    //updatedOri -> nd1 -> filter
 
     CPPUNIT_ASSERT_MESSAGE("Testing updated orientation 2", mitk::MatrixEqualElementWise(uM2,updatedOriTransform2));
 

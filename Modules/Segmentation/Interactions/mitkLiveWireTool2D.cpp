@@ -195,6 +195,8 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
 
   // for all contours in list (currently created by tool)
   std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itWorkingContours = this->m_WorkingContours.begin();
+  std::vector<SliceInformation> sliceList;
+  sliceList.reserve(m_WorkingContours.size());
   while(itWorkingContours != this->m_WorkingContours.end() )
   {
     // if node contains data
@@ -217,7 +219,8 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
           mitk::ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, 1.0);
 
           //write back to image volume
-          this->WriteBackSegmentationResult(itWorkingContours->second, workingSlice, currentTimestep);
+          SliceInformation sliceInfo (workingSlice, itWorkingContours->second, currentTimestep);
+          sliceList.push_back(sliceInfo);
         }
       }
     }
@@ -225,6 +228,7 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
     ++itWorkingContours;
   }
 
+  this->WriteBackSegmentationResult(sliceList);
   this->ClearSegmentation();
 }
 

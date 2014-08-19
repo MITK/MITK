@@ -81,7 +81,7 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
      * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the erosion it is most
      *        likely an intersecting contour an will not be added to the SurfaceInterpolationController
      */
-    static void UpdateSurfaceInterpolation (const Image* slice, const Image* workingImage, PlaneGeometry *plane, bool detectIntersection);
+    static void UpdateSurfaceInterpolation (const Image* slice, const Image* workingImage, const PlaneGeometry *plane, bool detectIntersection);
 
     void SetShowMarkerNodes(bool);
 

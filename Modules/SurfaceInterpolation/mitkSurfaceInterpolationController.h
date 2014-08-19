@@ -61,7 +61,7 @@ namespace mitk
 
     struct ContourPositionPair {
       Surface::Pointer contour;
-      mitk::PlaneGeometry::Pointer plane;
+      mitk::PlaneGeometry::ConstPointer plane;
     };
 
     typedef std::vector<ContourPositionPair> ContourPositionPairList;
@@ -75,14 +75,14 @@ namespace mitk
      * @param plane the image plane in which the contour lies. If plane already exists the related
      *        contour will be updated
      */
-    void AddNewContour (Surface::Pointer newContour, PlaneGeometry::Pointer plane);
+    void AddNewContour (Surface::Pointer newContour, PlaneGeometry::ConstPointer plane);
 
     /**
      * @brief Removes the contour for a given plane for the current selected segmenation
      * @param plane the plane for which the contour should be returned
      * @return true if a contour was found and removed, false if no contour was found
      */
-    bool RemoveContour (mitk::PlaneGeometry* plane);
+    bool RemoveContour (const mitk::PlaneGeometry* plane);
 
     /**
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
@@ -96,7 +96,7 @@ namespace mitk
     * @param plane the plane for which the contour should be returned
     * @return the contour as an mitk::Surface. If no contour is available for the plane NULL is returned
     */
-    const mitk::Surface* GetContour (PlaneGeometry::Pointer plane);
+    const mitk::Surface* GetContour (PlaneGeometry::ConstPointer plane);
 
     /**
     * @brief Returns the number of available contours for the current selected segmentation

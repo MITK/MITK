@@ -26,6 +26,70 @@ mitk::NavigationDataReaderCSV::~NavigationDataReaderCSV()
 
 }
 
+int mitk::NavigationDataReaderCSV::getNumberOfToolsInLine(std::string line)
+{
+  std::vector<std::string> tokens=splitLine(line);
+ int size = tokens.size();
+ int NumOfTools = (size-1)/8;
+
+ if ( (size-1)%8 != 0 )
+ {
+   MITK_ERROR("mitkNavigationDataReader") << "Illegal csv-file! Unexpected number of columns found! Assuming " << NumOfTools << " tools!";
+ }
+
+ return NumOfTools ;
+}
+
+std::vector<std::string> mitk::NavigationDataReaderCSV::splitLine(std::string line)
+{
+   std::vector<std::string> elems;
+   std::stringstream ss(line);
+   std::string item;
+   while (std::getline(ss, item, ';')) {
+     elems.push_back(item);
+   }
+   return elems;
+}
+
+mitk::NavigationData::Pointer mitk::NavigationDataReaderCSV::CreateNd(std::string timestamp, std::string valid, std::string X, std::string Y, std::string Z, std::string QX, std::string QY, std::string QZ, std::string QR)
+{
+  mitk::NavigationData::Pointer result= mitk::NavigationData::New();
+
+  mitk::Point3D position;
+  mitk::Quaternion orientation;
+  bool isValid = false;
+  double time;
+
+  time = StringToDouble(timestamp);
+
+  if (valid == "1") isValid = true;
+  else isValid = false;
+
+  position[0] = StringToDouble(X);
+  position[1] = StringToDouble(Y);
+  position[2] = StringToDouble(Z);
+
+  orientation[0] = StringToDouble(QX);
+  orientation[1] = StringToDouble(QY);
+  orientation[2] = StringToDouble(QZ);
+  orientation[3] = StringToDouble(QR);
+
+  result->SetIGTTimeStamp(time);
+  result->SetDataValid(isValid);
+  result->SetPosition(position);
+  result->SetOrientation(orientation);
+  return result;
+}
+
+double mitk::NavigationDataReaderCSV::StringToDouble( const std::string& s )
+{
+  std::istringstream i(s);
+  double x;
+    if (!(i >> x))
+      return 0;
+    return x;
+}
+
 mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderCSV::Read(std::string fileName)
 {
   mitk::NavigationDataSet::Pointer returnValue = mitk::NavigationDataSet::New(1);

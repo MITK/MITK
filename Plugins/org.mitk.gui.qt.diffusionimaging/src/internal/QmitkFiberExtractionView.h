@@ -159,13 +159,16 @@ protected:
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
   mitk::DataNode::Pointer               m_MaskImageNode;
 
-  void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
+  void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer pfc, mitk::DataNode::Pointer parentNode=NULL);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
   void WritePfToImage(mitk::DataNode::Pointer node, mitk::Image* image);
   mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute);
   mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundleX::Pointer fib);
+
+  void NodeAdded( const mitk::DataNode* node );
+  void NodeRemoved(const mitk::DataNode* node);
 };
 
 

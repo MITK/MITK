@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <QStringList>
 
 #include <mitkPlanarFigure.h>
+#include <mitkPlanarFigureComposite.h>
 
 namespace mitk {
 
@@ -93,8 +94,8 @@ public:
     FiberBundleX::Pointer SubtractBundle(FiberBundleX* fib);
 
     // fiber subset extraction
-    FiberBundleX::Pointer           ExtractFiberSubset(PlanarFigure *pf);
-    std::vector<long>               ExtractFiberIdSubset(PlanarFigure* pf);
+    FiberBundleX::Pointer           ExtractFiberSubset(BaseData* roi);
+    std::vector<long>               ExtractFiberIdSubset(BaseData* roi);
     FiberBundleX::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false);
     FiberBundleX::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
 
@@ -114,11 +115,6 @@ public:
     itkGetMacro( MedianFiberLength, float )
     itkGetMacro( LengthStDev, float )
     unsigned long GetNumberOfPoints();
-
-    std::vector<int> GetPointsRoi()
-    {
-        return m_PointsRoi;
-    }
 
     // copy fiber bundle
     mitk::FiberBundleX::Pointer GetDeepCopy();
@@ -160,8 +156,6 @@ private:
     float   m_MedianFiberLength;
     float   m_LengthStDev;
     int     m_FiberSampling;
-
-    std::vector<int> m_PointsRoi; // this global variable needs to be refactored
 
     mitk::Image::Pointer m_ReferenceImage;
 

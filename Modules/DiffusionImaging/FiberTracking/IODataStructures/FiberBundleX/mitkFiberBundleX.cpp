@@ -791,12 +791,12 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::RemoveFibersOutside(ItkUcharImgT
     return newFib;
 }
 
-mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(mitk::PlanarFigure* pf)
+mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(BaseData* roi)
 {
-    if (pf==NULL)
+    if (roi==NULL || !(dynamic_cast<PlanarFigure*>(roi) || dynamic_cast<PlanarFigureComposite*>(roi)) )
         return NULL;
 
-    std::vector<long> tmp = ExtractFiberIdSubset(pf);
+    std::vector<long> tmp = ExtractFiberIdSubset(roi);
 
     if (tmp.size()<=0)
         return mitk::FiberBundleX::New();
@@ -804,124 +804,76 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(mitk::PlanarF
     return mitk::FiberBundleX::New(pTmp);
 }
 
-std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* pf)
+std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(BaseData* roi)
 {
-    MITK_DEBUG << "Extracting fibers!";
-    // vector which is returned, contains all extracted FiberIds
-    std::vector<long> FibersInROI;
+    std::vector<long> result;
+    if (roi==NULL)
+        return result;
 
-    if (pf==NULL)
-        return FibersInROI;
-
-    /* Handle type of planarfigure */
     // if incoming pf is a pfc
-    mitk::PlanarFigureComposite::Pointer pfcomp= dynamic_cast<mitk::PlanarFigureComposite*>(pf);
-    if (!pfcomp.IsNull()) {
-        // process requested boolean operation of PFC
-        switch (pfcomp->getOperationType()) {
-        case 0:
+    mitk::PlanarFigureComposite::Pointer pfc = dynamic_cast<mitk::PlanarFigureComposite*>(roi);
+    if (!pfc.IsNull())
+    {
+        switch (pfc->getOperationType())
         {
-            MITK_DEBUG << "AND PROCESSING";
-            //AND
-            //temporarly store results of the child in this vector, we need that to accumulate the
-            std::vector<long> childResults = this->ExtractFiberIdSubset(pfcomp->getChildAt(0));
-            MITK_DEBUG << "first roi got fibers in ROI: " << childResults.size();
-            MITK_DEBUG << "sorting...";
-            std::sort(childResults.begin(), childResults.end());
-            MITK_DEBUG << "sorting done";
-            std::vector<long> AND_Assamblage(childResults.size());
-            //std::vector<unsigned long> AND_Assamblage;
-            fill(AND_Assamblage.begin(), AND_Assamblage.end(), -1);
-            //AND_Assamblage.reserve(childResults.size()); //max size AND can reach anyway
-
+        case 0: // AND
+        {
+            result = this->ExtractFiberIdSubset(pfc->getChildAt(0));
             std::vector<long>::iterator it;
-            for (int i=1; i<pfcomp->getNumberOfChildren(); ++i)
+            for (int i=1; i<pfc->getNumberOfChildren(); ++i)
             {
-                std::vector<long> tmpChild = this->ExtractFiberIdSubset(pfcomp->getChildAt(i));
-                MITK_DEBUG << "ROI " << i << " has fibers in ROI: " << tmpChild.size();
-                sort(tmpChild.begin(), tmpChild.end());
+                std::vector<long> inRoi = this->ExtractFiberIdSubset(pfc->getChildAt(i));
 
-                it = std::set_intersection(childResults.begin(), childResults.end(),
-                                           tmpChild.begin(), tmpChild.end(),
-                                           AND_Assamblage.begin() );
+                std::vector<long> rest(std::min(result.size(),inRoi.size()));
+                it = std::set_intersection(result.begin(), result.end(), inRoi.begin(), inRoi.end(), rest.begin() );
+                rest.resize( it - rest.begin() );
+                result = rest;
             }
-
-            MITK_DEBUG << "resize Vector";
-            unsigned long i=0;
-            while (i < AND_Assamblage.size() && AND_Assamblage[i] != -1){ //-1 represents a placeholder in the array
-                ++i;
-            }
-            AND_Assamblage.resize(i);
-
-            MITK_DEBUG << "returning AND vector, size: " << AND_Assamblage.size();
-            return AND_Assamblage;
-            //            break;
-
+            break;
         }
-        case 1:
+        case 1: // OR
         {
-            //OR
-            std::vector<long> OR_Assamblage = this->ExtractFiberIdSubset(pfcomp->getChildAt(0));
+            result = ExtractFiberIdSubset(pfc->getChildAt(0));
             std::vector<long>::iterator it;
-            MITK_DEBUG << OR_Assamblage.size();
-
-            for (int i=1; i<pfcomp->getNumberOfChildren(); ++i) {
-                it = OR_Assamblage.end();
-                std::vector<long> tmpChild = this->ExtractFiberIdSubset(pfcomp->getChildAt(i));
-                OR_Assamblage.insert(it, tmpChild.begin(), tmpChild.end());
-                MITK_DEBUG << "ROI " << i << " has fibers in ROI: " << tmpChild.size() << " OR Assamblage: " << OR_Assamblage.size();
+            for (int i=1; i<pfc->getNumberOfChildren(); ++i)
+            {
+                it = result.end();
+                std::vector<long> inRoi = ExtractFiberIdSubset(pfc->getChildAt(i));
+                result.insert(it, inRoi.begin(), inRoi.end());
             }
 
-            sort(OR_Assamblage.begin(), OR_Assamblage.end());
-            it = unique(OR_Assamblage.begin(), OR_Assamblage.end());
-            OR_Assamblage.resize( it - OR_Assamblage.begin() );
-            MITK_DEBUG << "returning OR vector, size: " << OR_Assamblage.size();
-
-            return OR_Assamblage;
+            // remove duplicates
+            sort(result.begin(), result.end());
+            it = unique(result.begin(), result.end());
+            result.resize( it - result.begin() );
+            break;
         }
-        case 2:
+        case 2: // NOT
         {
-            //NOT
-            std::vector<long> childResults;
-            childResults.reserve(this->GetNumFibers());
-            vtkSmartPointer<vtkDataArray> idSet = m_FiberIdDataSet->GetCellData()->GetArray(FIBER_ID_ARRAY);
             for(long i=0; i<this->GetNumFibers(); i++)
-                childResults.push_back(idSet->GetTuple(i)[0]);
+                result.push_back(i);
 
-            std::sort(childResults.begin(), childResults.end());
-            std::vector<long> NOT_Assamblage(childResults.size());
-            //fill it with -1, otherwise 0 will be stored and 0 can also be an ID of fiber!
-            fill(NOT_Assamblage.begin(), NOT_Assamblage.end(), -1);
             std::vector<long>::iterator it;
-
-            for (long i=0; i<pfcomp->getNumberOfChildren(); ++i)
+            for (long i=0; i<pfc->getNumberOfChildren(); ++i)
             {
-                std::vector<long> tmpChild = ExtractFiberIdSubset(pfcomp->getChildAt(i));
-                sort(tmpChild.begin(), tmpChild.end());
+                std::vector<long> inRoi = ExtractFiberIdSubset(pfc->getChildAt(i));
 
-                it = std::set_difference(childResults.begin(), childResults.end(),
-                                         tmpChild.begin(), tmpChild.end(),
-                                         NOT_Assamblage.begin() );
-
+                std::vector<long> rest(result.size()-inRoi.size());
+                it = std::set_difference(result.begin(), result.end(), inRoi.begin(), inRoi.end(), rest.begin() );
+                rest.resize( it - rest.begin() );
+                result = rest;
             }
-
-            MITK_DEBUG << "resize Vector";
-            long i=0;
-            while (NOT_Assamblage[i] != -1){ //-1 represents a placeholder in the array
-                ++i;
-            }
-            NOT_Assamblage.resize(i);
-
-            return NOT_Assamblage;
+            break;
         }
         default:
             MITK_DEBUG << "we have an UNDEFINED composition... ERROR" ;
             break;
         }
     }
-    else
+    else if ( dynamic_cast<mitk::PlanarFigure*>(roi) )
     {
-        mitk::PlaneGeometry::ConstPointer pfgeometry = pf->GetPlaneGeometry();
+        mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(roi);
+        mitk::PlaneGeometry::ConstPointer pfgeometry = planarFigure->GetPlaneGeometry();
         const mitk::PlaneGeometry* planeGeometry = dynamic_cast<const mitk::PlaneGeometry*> (pfgeometry.GetPointer());
         Vector3D planeNormal = planeGeometry->GetNormal();
         planeNormal.Normalize();
@@ -962,11 +914,11 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
         PointsInROI.reserve(PointsOnPlane.size());
         mitk::PlanarCircle::Pointer circleName = mitk::PlanarCircle::New();
         mitk::PlanarPolygon::Pointer polyName = mitk::PlanarPolygon::New();
-        if ( pf->GetNameOfClass() == circleName->GetNameOfClass() )
+        if ( planarFigure->GetNameOfClass() == circleName->GetNameOfClass() )
         {
             //calculate circle radius
-            mitk::Point3D V1w = pf->GetWorldControlPoint(0); //centerPoint
-            mitk::Point3D V2w  = pf->GetWorldControlPoint(1); //radiusPoint
+            mitk::Point3D V1w = planarFigure->GetWorldControlPoint(0); //centerPoint
+            mitk::Point3D V2w  = planarFigure->GetWorldControlPoint(1); //radiusPoint
 
             double radius = V1w.EuclideanDistanceTo(V2w);
             radius *= radius;
@@ -979,17 +931,17 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
                     PointsInROI.push_back(PointsOnPlane[i]);
             }
         }
-        else if ( pf->GetNameOfClass() == polyName->GetNameOfClass() )
+        else if ( planarFigure->GetNameOfClass() == polyName->GetNameOfClass() )
         {
             //create vtkPolygon using controlpoints from planarFigure polygon
             vtkSmartPointer<vtkPolygon> polygonVtk = vtkSmartPointer<vtkPolygon>::New();
 
             //get the control points from pf and insert them to vtkPolygon
-            unsigned int nrCtrlPnts = pf->GetNumberOfControlPoints();
+            unsigned int nrCtrlPnts = planarFigure->GetNumberOfControlPoints();
 
             for (unsigned int i=0; i<nrCtrlPnts; ++i)
             {
-                itk::Point<double,3> p = pf->GetWorldControlPoint(i);
+                itk::Point<double,3> p = planarFigure->GetWorldControlPoint(i);
                 polygonVtk->GetPoints()->InsertNextPoint(p[0], p[1], p[2] );
             }
             //prepare everything for using pointInPolygon function
@@ -1012,10 +964,10 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
         if (!clipperout->GetCellData()->HasArray(FIBER_ID_ARRAY))
         {
             MITK_DEBUG << "ERROR: FiberID array does not exist, no correlation between points and fiberIds possible! Make sure calling GenerateFiberIds()";
-            return FibersInROI; // FibersInRoi is empty then
+            return result; // FibersInRoi is empty then
         }
         if (PointsInROI.size()<=0)
-            return FibersInROI;
+            return result;
 
         // prepare a structure where each point id is represented as an indexId. vector looks like: | pntId | fiberIdx |
         std::vector< long > pointindexFiberMap;
@@ -1028,7 +980,7 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
         pointindexFiberMap.resize(numofClippedPoints);
 
         //prepare resulting vector
-        FibersInROI.reserve(PointsInROI.size());
+        result.reserve(PointsInROI.size());
 
         // go through resulting "sub"lines which are stored as cells, "i" corresponds to current line id.
         for (int i=0, ic=0 ; i<numOfLineCells; i++, ic+=3)
@@ -1043,33 +995,23 @@ std::vector<long> mitk::FiberBundleX::ExtractFiberIdSubset(mitk::PlanarFigure* p
                 pointindexFiberMap[ pts[j] ] = clipperout->GetCellData()->GetArray(FIBER_ID_ARRAY)->GetTuple(i)[0];
         }
 
-        // get all Points in ROI with according fiberID
+        // get all Points in ROI with corresponding fiberID
         for (unsigned long k = 0; k < PointsInROI.size(); k++)
         {
             if (pointindexFiberMap[ PointsInROI[k] ]<=GetNumFibers() && pointindexFiberMap[ PointsInROI[k] ]>=0)
-                FibersInROI.push_back(pointindexFiberMap[ PointsInROI[k] ]);
+                result.push_back(pointindexFiberMap[ PointsInROI[k] ]);
             else
                 MITK_INFO << "ERROR in ExtractFiberIdSubset; impossible fiber id detected";
         }
-        m_PointsRoi = PointsInROI;
+
+        // remove duplicates (sort first? don't think its necessary, but check if IDs are already sorted.)
+        std::vector<long>::iterator it;
+        sort(result.begin(), result.end());
+        it = unique (result.begin(), result.end());
+        result.resize( it - result.begin() );
     }
 
-//    sort(FibersInROI.begin(), FibersInROI.end());
-//    bool hasDuplicats = false;
-//    for(unsigned long i=0; i<FibersInROI.size()-1; ++i)
-//    {
-//        if(FibersInROI[i] == FibersInROI[i+1])
-//            hasDuplicats = true;
-//    }
-
-//    if(hasDuplicats)
-//    {
-//        std::vector<long>::iterator it;
-//        it = unique (FibersInROI.begin(), FibersInROI.end());
-//        FibersInROI.resize( it - FibersInROI.begin() );
-//    }
-
-    return FibersInROI;
+    return result;
 }
 
 void mitk::FiberBundleX::UpdateFiberGeometry()

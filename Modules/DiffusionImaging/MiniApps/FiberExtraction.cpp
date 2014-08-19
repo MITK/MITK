@@ -73,38 +73,43 @@ int FiberExtraction(int argc, char* argv[])
         mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(inFib)->GetData());
         mitk::FiberBundleX::Pointer result;
 
-        mitk::PlanarFigure::Pointer pf1 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(pf1_path)->GetData());
+        mitk::BaseData::Pointer input1 = mitk::IOUtil::LoadDataNode(pf1_path)->GetData();
+        mitk::PlanarFigure::Pointer pf1 = dynamic_cast<mitk::PlanarFigure*>(input1.GetPointer());
 
         if (pf1.IsNotNull())
         {
+            mitk::BaseData::Pointer input2;
             mitk::PlanarFigure::Pointer pf2;
             if (!pf2_path.empty())
-                pf2 = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::LoadDataNode(pf2_path)->GetData());
+            {
+                input2 = mitk::IOUtil::LoadDataNode(pf2_path)->GetData();
+                pf2 = dynamic_cast<mitk::PlanarFigure*>(input2.GetPointer());
+            }
 
             mitk::PlanarFigureComposite::Pointer pfc = mitk::PlanarFigureComposite::New();
 
             if (operation.empty())
             {
-                result = inputTractogram->ExtractFiberSubset(pf1);
+                result = inputTractogram->ExtractFiberSubset(input1);
             }
             else if (operation=="NOT")
             {
                 pfc->setOperationType(mitk::PFCOMPOSITION_NOT_OPERATION);
-                pfc->addPlanarFigure(pf1);
+                pfc->addPlanarFigure(input1);
                 result = inputTractogram->ExtractFiberSubset(pfc);
             }
             else if (operation=="AND" && pf2.IsNotNull())
             {
                 pfc->setOperationType(mitk::PFCOMPOSITION_AND_OPERATION);
-                pfc->addPlanarFigure(pf1);
-                pfc->addPlanarFigure(pf2);
+                pfc->addPlanarFigure(input1);
+                pfc->addPlanarFigure(input2);
                 result = inputTractogram->ExtractFiberSubset(pfc);
             }
             else if (operation=="OR" && pf2.IsNotNull())
             {
                 pfc->setOperationType(mitk::PFCOMPOSITION_OR_OPERATION);
-                pfc->addPlanarFigure(pf1);
-                pfc->addPlanarFigure(pf2);
+                pfc->addPlanarFigure(input1);
+                pfc->addPlanarFigure(input2);
                 result = inputTractogram->ExtractFiberSubset(pfc);
             }
             else

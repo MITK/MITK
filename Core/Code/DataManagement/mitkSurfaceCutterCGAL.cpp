@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkCell.h>
 #include <vtkCleanPolyData.h>
+#include <vtkStripper.h>
 #include <vtkTriangleFilter.h>
 
 // Definitions of CGAL entities
@@ -199,9 +200,12 @@ public:
 
         vtkSmartPointer<vtkCleanPolyData> cleaner = vtkCleanPolyData::New();
         cleaner->SetInputData(pdOut);
-        cleaner->Update();
 
-        return cleaner->GetOutput();
+        vtkSmartPointer<vtkStripper> stripper = vtkStripper::New();
+        stripper->SetInputConnection(cleaner->GetOutputPort());
+        stripper->Update();
+
+        return stripper->GetOutput();
     }
 
 private:

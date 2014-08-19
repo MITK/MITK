@@ -127,7 +127,7 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
     */
 
-    unsigned int AddContourmarker ( const InteractionPositionEvent* );
+    unsigned int AddContourmarker ();
 
     void InteractiveSegmentationBugMessage( const std::string& message );
 

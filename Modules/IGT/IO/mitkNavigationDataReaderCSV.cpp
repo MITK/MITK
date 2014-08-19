@@ -90,16 +90,37 @@ double mitk::NavigationDataReaderCSV::StringToDouble( const std::string& s )
     return x;
 }
 
+std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataReaderCSV::parseLine(std::string line, int NumOfTools)
+{
+  std::vector<std::string> parts= splitLine(line);
+
+  //time "herausscheneiden"
+  std::string time=  parts[0];
+  //for schleife über alle weiteren element -> Substring -> aufrufen der CreateNd funktion?
+  std::vector<mitk::NavigationData::Pointer> result;
+  for (int n= 0; n=NumOfTools; n++)
+  {
+    mitk::NavigationData::Pointer nd;
+    nd = CreateNd(time, parts[n+1],parts[n+2],parts[n+3], parts[n+4], parts[n+5], parts[n+6], parts[n+7], parts[n+8]);
+    result.push_back(nd);
+  }
+  return result;
+}
+
+
 mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderCSV::Read(std::string fileName)
 {
-  mitk::NavigationDataSet::Pointer returnValue = mitk::NavigationDataSet::New(1);
-  std::vector<std::string> fileContentLineByLine = GetFileContentLineByLine(fileName);
-  for(int i=1; (i<fileContentLineByLine.size()); i++) //skip header so start at 1
-  {
-    std::vector<mitk::NavigationData::Pointer> currentDatas;
-    currentDatas.push_back(GetNavigationDataOutOfOneLine(fileContentLineByLine.at(i)));
-    returnValue->AddNavigationDatas(currentDatas);
-  }
+  std::vector<std::string> fileContent = GetFileContentLineByLine(fileName);
+  int NumOfTools = getNumberOfToolsInLine(fileContent[0]);
+
+  mitk::NavigationDataSet::Pointer returnValue = mitk::NavigationDataSet::New(NumOfTools);
+
+  for (int i = 1; i<fileContent.size(); i++ )
+    {
+      returnValue->AddNavigationDatas( parseLine( fileContent[i], NumOfTools) );
+    }
+
+
   return returnValue;
 }
 
@@ -140,76 +161,6 @@ setlocale( LC_ALL, oldLocale );
 return readData;
 }
 
-mitk::NavigationData::Pointer mitk::NavigationDataReaderCSV::GetNavigationDataOutOfOneLine(std::string line)
-{
-  mitk::NavigationData::Pointer returnValue = mitk::NavigationData::New();
-
-  /* NOT FUNCTIONAL BECAUSE IT USES QSTRING WHICH IS NOT AVAILABLE HERE
-  QString myLine = QString(line.c_str());
-
-  QStringList myLineList = myLine.split(';');
-
-  mitk::Point3D position;
-  mitk::Quaternion orientation;
-  bool valid = false;
-  double time;
-
-  if (m_Filetype =  mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSV)
-    {
-
-    if (myLineList.size() < 10)
-      {
-        MITK_ERROR << "Error: cannot read line: only found " << myLineList.size() << " fields. Last field: " << myLineList.at(myLineList.size()-1).toStdString()  ;
-        returnValue = GetEmptyNavigationData();
-        return returnValue;
-      }
-
-    time = myLineList.at(1).toDouble();
-
-    if (myLineList.at(2).toStdString() == "1") valid = true;
-
-    position[0] = myLineList.at(3).toDouble();
-    position[1] = myLineList.at(4).toDouble();
-    position[2] = myLineList.at(5).toDouble();
-
-    orientation[0] = myLineList.at(6).toDouble();
-    orientation[1] = myLineList.at(7).toDouble();
-    orientation[2] = myLineList.at(8).toDouble();
-    orientation[3] = myLineList.at(9).toDouble();
-    }
-  else
-    {
-    if (myLineList.size() < 10)
-      {
-        MITK_ERROR << "Error: cannot read line: only found " << myLineList.size() << " fields. Last field: " << myLineList.at(myLineList.size()-1).toStdString()  ;
-        returnValue = GetEmptyNavigationData();
-        return returnValue;
-      }
-
-    time = myLineList.at(1).toDouble();
-
-    //if (myLineList.at(2).toStdString() == "true")
-    //valid-flag wurde hier nicht gespeichert
-    valid = true;
-
-    position[0] = myLineList.at(3).toDouble();
-    position[1] = myLineList.at(4).toDouble();
-    position[2] = myLineList.at(5).toDouble();
-
-    orientation[0] = myLineList.at(6).toDouble();
-    orientation[1] = myLineList.at(7).toDouble();
-    orientation[2] = myLineList.at(8).toDouble();
-    orientation[3] = myLineList.at(9).toDouble();
-    }
-
-  returnValue->SetTimeStamp(time);
-  returnValue->SetDataValid(valid);
-  returnValue->SetPosition(position);
-  returnValue->SetOrientation(orientation);
-  */
-
-  return returnValue;
-}
 
 mitk::NavigationData::Pointer mitk::NavigationDataReaderCSV::GetEmptyNavigationData()
   {
@@ -222,4 +173,4 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderCSV::GetEmptyNavigationD
   emptyNd->SetOrientation(orientation);
   emptyNd->SetDataValid(false);
   return emptyNd;
-  }
+}

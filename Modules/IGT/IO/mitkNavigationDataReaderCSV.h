@@ -44,7 +44,6 @@ namespace mitk {
     virtual ~NavigationDataReaderCSV();
 
     std::vector<std::string> GetFileContentLineByLine(std::string filename);
-    mitk::NavigationData::Pointer GetNavigationDataOutOfOneLine(std::string line);
     mitk::NavigationData::Pointer GetEmptyNavigationData();
 
 
@@ -52,6 +51,8 @@ namespace mitk {
 
     std::vector<std::string> splitLine(std::string line);
 
+
+    std::vector<mitk::NavigationData::Pointer> parseLine(std::string line, int NumOfTools);
 
     mitk::NavigationData::Pointer CreateNd(std::string timestamp, std::string valid, std::string X, std::string Y, std::string Z, std::string QX, std::string QY, std::string QZ, std::string QR);
 

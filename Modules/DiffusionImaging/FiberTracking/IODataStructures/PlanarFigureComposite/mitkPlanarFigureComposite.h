@@ -35,45 +35,48 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  enum PFCompositionOperation {
+enum PFCompositionOperation {
     PFCOMPOSITION_AND_OPERATION,
     PFCOMPOSITION_OR_OPERATION,
     PFCOMPOSITION_NOT_OPERATION,
-  };
+};
 
 
 
 
-  class MitkFiberTracking_EXPORT PlanarFigureComposite : public PlanarFigure
-  {
+class MitkFiberTracking_EXPORT PlanarFigureComposite : public BaseData
+{
 
-    typedef itk::VectorContainer<unsigned int, PlanarFigure::Pointer> CompositionContainer;
+    typedef itk::VectorContainer<unsigned int, BaseData::Pointer> CompositionContainer;
     typedef itk::VectorContainer<unsigned int, mitk::DataNode::Pointer> DataNodeContainer;
 
 
-  public:
-    mitkClassMacro(PlanarFigureComposite, PlanarFigure);
+public:
+    mitkClassMacro(PlanarFigureComposite, BaseData)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
+
+    virtual void UpdateOutputInformation();
+    virtual void SetRequestedRegionToLargestPossibleRegion();
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+    virtual bool VerifyRequestedRegion();
+    virtual void SetRequestedRegion(const itk::DataObject*);
 
     // ///MUST HAVE IMPLEMENTATION//////
     bool SetControlPoint(unsigned int, const Point2D &, bool);
     unsigned int GetMinimumNumberOfControlPoints() const
     {
-      return 0;
+        return 0;
     }
-    /** \brief Circle has 2 control points per definition. */
     unsigned int GetMaximumNumberOfControlPoints() const
     {
-      return 0;
+        return 0;
     }
     // /////////////////////////
 
-
-
     int getNumberOfChildren();
-    mitk::PlanarFigure::Pointer getChildAt(int);
-    void addPlanarFigure(PlanarFigure::Pointer);
+    mitk::BaseData::Pointer getChildAt(int);
+    void addPlanarFigure(BaseData::Pointer);
 
 
     mitk::DataNode::Pointer getDataNodeAt(int);
@@ -87,13 +90,11 @@ namespace mitk {
     void setDisplayName(std::string);
     std::string getDisplayName();
 
-  protected:
+protected:
     PlanarFigureComposite();
     virtual ~PlanarFigureComposite();
 
     PlanarFigureComposite(const Self& other);
-
-    mitkCloneMacro(Self);
 
     // ///MUST HAVE IMPLEMENTATION//////
     /** \brief Generates the poly-line representation of the planar figure. */
@@ -108,21 +109,14 @@ namespace mitk {
     virtual void PrintSelf(std::ostream &, itk::Indent) const;
     // ////////////////////
 
-
-
-
-  private:
+private:
     //this vector takes planarfigures and planarfigureComosite types
     CompositionContainer::Pointer m_PFVector;
     PFCompositionOperation m_compOperation;
 
     DataNodeContainer::Pointer m_DNVector;
     std::string m_name;
-
-
-
-  };
-
+};
 }
 
 #endif

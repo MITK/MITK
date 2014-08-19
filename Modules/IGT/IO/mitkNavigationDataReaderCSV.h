@@ -44,8 +44,6 @@ namespace mitk {
     virtual ~NavigationDataReaderCSV();
 
     std::vector<std::string> GetFileContentLineByLine(std::string filename);
-    mitk::NavigationData::Pointer GetEmptyNavigationData();
-
 
     int getNumberOfToolsInLine(std::string line);
 

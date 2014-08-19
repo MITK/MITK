@@ -37,9 +37,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTException.h"
 #include "mitkIGTIOException.h"
 
-class mitkNavigationDataSetReaderWriterTestSuite : public mitk::TestFixture
+class mitkNavigationDataSetReaderWriterXMLTestSuite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkNavigationDataSetReaderWriterTestSuite);
+  CPPUNIT_TEST_SUITE(mitkNavigationDataSetReaderWriterXMLTestSuite);
   MITK_TEST(TestCompareFunction);
   MITK_TEST(TestReadWrite);
   MITK_TEST(TestSetXMLStringException);
@@ -139,4 +139,4 @@ public:
       pathWrong) );
   }
 };
-MITK_TEST_SUITE_REGISTRATION(mitkNavigationDataSetReaderWriter)
+MITK_TEST_SUITE_REGISTRATION(mitkNavigationDataSetReaderWriterXML)

@@ -160,17 +160,3 @@ setlocale( LC_ALL, oldLocale );
 
 return readData;
 }
-
-
-mitk::NavigationData::Pointer mitk::NavigationDataReaderCSV::GetEmptyNavigationData()
-  {
-  mitk::NavigationData::Pointer emptyNd = mitk::NavigationData::New();
-  mitk::NavigationData::PositionType position;
-  mitk::NavigationData::OrientationType orientation(0.0,0.0,0.0,0.0);
-  position.Fill(0.0);
-
-  emptyNd->SetPosition(position);
-  emptyNd->SetOrientation(orientation);
-  emptyNd->SetDataValid(false);
-  return emptyNd;
-}

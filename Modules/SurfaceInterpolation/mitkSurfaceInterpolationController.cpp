@@ -110,11 +110,32 @@ mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetI
 
 void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour, PlaneGeometry::Pointer plane)
 {
-  int pos (-1);
+  ContourPositionPair pair;
+  pair.contour = newContour;
+  pair.plane = plane;
+  this->AddToInterpolationPipeline(pair);
 
-  for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
+  this->Modified();
+}
+
+void mitk::SurfaceInterpolationController::AddNewContours(ContourPositionPairList newContours)
+{
+  for (unsigned int i = 0; i < newContours.size(); ++i)
   {
-    mitk::PlaneGeometry::Pointer planeFromList = m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i).plane;
+    this->AddToInterpolationPipeline(newContours.at(i));
+  }
+  this->Modified();
+}
+
+void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPositionPair pair)
+{
+  int pos (-1);
+  ContourPositionPairList currentContourList = m_ListOfInterpolationSessions[m_SelectedSegmentation];
+  mitk::PlaneGeometry* plane = pair.plane;
+  mitk::Surface* newContour = pair.contour;
+  for (unsigned int i = 0; i < currentContourList.size(); i++)
+  {
+    mitk::PlaneGeometry::Pointer planeFromList = currentContourList.at(i).plane;
     if ( PlanesEqual(plane, planeFromList, mitk::eps) )
     {
       pos = i;
@@ -125,17 +146,17 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
   //Don't save a new empty contour
   if (pos == -1 && newContour->GetVtkPolyData()->GetNumberOfPoints() > 0)
   {
-    ContourPositionPair newData;
-    newData.contour = newContour;
-    newData.plane = plane;
-
     m_ReduceFilter->SetInput(m_ListOfInterpolationSessions[m_SelectedSegmentation].size(), newContour);
-    m_ListOfInterpolationSessions[m_SelectedSegmentation].push_back(newData);
+    m_ListOfInterpolationSessions[m_SelectedSegmentation].push_back(pair);
   }
   else if (pos != -1 && newContour->GetVtkPolyData()->GetNumberOfPoints() > 0)
   {
-    m_ListOfInterpolationSessions[m_SelectedSegmentation].at(pos).contour = newContour;
+    m_ListOfInterpolationSessions[m_SelectedSegmentation].at(pos) = pair;
     m_ReduceFilter->SetInput(pos, newContour);
+  }
+  else if (newContour->GetVtkPolyData()->GetNumberOfPoints() == 0)
+  {
+    this->RemoveContour(plane);
   }
 
   m_ReduceFilter->Update();
@@ -146,7 +167,6 @@ void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer
     m_NormalsFilter->SetInput(i, m_ReduceFilter->GetOutput(i));
     m_InterpolateSurfaceFilter->SetInput(i, m_NormalsFilter->GetOutput(i));
   }
-  this->Modified();
 }
 
 bool mitk::SurfaceInterpolationController::RemoveContour(mitk::PlaneGeometry *plane)

@@ -59,10 +59,21 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
+    struct ContourPositionPair {
+      Surface::Pointer contour;
+      mitk::PlaneGeometry::Pointer plane;
+    };
+
+    typedef std::vector<ContourPositionPair> ContourPositionPairList;
+    typedef std::map<mitk::Image*, ContourPositionPairList> ContourListMap;
+
     static SurfaceInterpolationController* GetInstance();
 
     /**
-     * Adds a new extracted contour to the list
+     * @brief Adds a new extracted contour to the list
+     * @param newContour the contour to be added
+     * @param plane the image plane in which the contour lies. If plane already exists the related
+     *        contour will be updated
      */
     void AddNewContour (Surface::Pointer newContour, PlaneGeometry::Pointer plane);
 
@@ -72,6 +83,13 @@ namespace mitk
      * @return true if a contour was found and removed, false if no contour was found
      */
     bool RemoveContour (mitk::PlaneGeometry* plane);
+
+    /**
+     * @brief Adds new extracted contours to the list. If one or more contours at a given position
+     *        already exist they will be updated respectively
+     * @param newContours the list of the contours and the respective positions
+     */
+    void AddNewContours (ContourPositionPairList newContours);
 
     /**
     * @brief Returns the contour for a given plane for the current selected segmenation
@@ -176,13 +194,7 @@ namespace mitk
 
    void ReinitializeInterpolation();
 
-   struct ContourPositionPair {
-     Surface::Pointer contour;
-     mitk::PlaneGeometry::Pointer plane;
-   };
-
-    typedef std::vector<ContourPositionPair> ContourPositionPairList;
-    typedef std::map<mitk::Image*, ContourPositionPairList> ContourListMap;
+   void AddToInterpolationPipeline(ContourPositionPair pair);
 
     ContourPositionPairList::iterator m_Iterator;
 

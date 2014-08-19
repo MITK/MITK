@@ -86,6 +86,23 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
     SegTool2D(const char*); // purposely hidden
     virtual ~SegTool2D();
 
+    struct SliceInformation
+    {
+      mitk::Image::Pointer slice;
+      mitk::PlaneGeometry* plane;
+      unsigned int timestep;
+
+      SliceInformation () {}
+
+      SliceInformation (mitk::Image* slice, mitk::PlaneGeometry* plane, unsigned int timestep)
+      {
+        this->slice = slice;
+        this->plane = plane;
+        this->timestep = timestep;
+      }
+
+    };
+
     /**
     * \brief Calculates how good the data, this statemachine handles, is hit by the event.
     *
@@ -122,6 +139,8 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
 
     void WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image*, unsigned int timeStep);
 
+    void WriteBackSegmentationResult (std::vector<SliceInformation> sliceList);
+
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure.
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
@@ -134,6 +153,9 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
     unsigned int          m_LastEventSlice;
 
   private:
+
+    void WriteSliceToVolume (SliceInformation sliceInfo);
+
     //The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string     m_Contourmarkername;
 

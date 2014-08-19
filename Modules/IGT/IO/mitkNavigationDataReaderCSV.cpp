@@ -92,12 +92,12 @@ double mitk::NavigationDataReaderCSV::StringToDouble( const std::string& s )
 
 std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataReaderCSV::parseLine(std::string line, int NumOfTools)
 {
+
+  std::vector<mitk::NavigationData::Pointer> result;
+  std::string time=  parts[0];
+
   std::vector<std::string> parts= splitLine(line);
 
-  //time "herausscheneiden"
-  std::string time=  parts[0];
-  //for schleife über alle weiteren element -> Substring -> aufrufen der CreateNd funktion?
-  std::vector<mitk::NavigationData::Pointer> result;
   for (int n= 0; n=NumOfTools; n++)
   {
     mitk::NavigationData::Pointer nd;

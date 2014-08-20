@@ -64,7 +64,7 @@ public:
     return m_PiecewiseFunction->GetDataPointer()[index*2];
   }
 
-  float GetFunctionY(int index)
+  double GetFunctionY(int index)
   {
     return m_PiecewiseFunction->GetValue(m_PiecewiseFunction->GetDataPointer()[index*2]);
   }

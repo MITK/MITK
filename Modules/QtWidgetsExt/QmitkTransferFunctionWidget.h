@@ -59,11 +59,11 @@ class MitkQtWidgetsExt_EXPORT QmitkTransferFunctionWidget : public QWidget, publ
 
   public slots:
 
-    void SetXValueScalar();
-    void SetYValueScalar();
-    void SetXValueGradient();
-    void SetYValueGradient();
-    void SetXValueColor();
+    void SetXValueScalar( const QString text );
+    void SetYValueScalar( const QString text );
+    void SetXValueGradient( const QString text );
+    void SetYValueGradient( const QString text );
+    void SetXValueColor( const QString text );
 
     void OnUpdateCanvas();
     void UpdateRanges();

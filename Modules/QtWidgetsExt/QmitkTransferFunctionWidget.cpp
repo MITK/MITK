@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPlastiqueStyle>
 
 QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
-    Qt::WindowFlags f) :
+                                                         Qt::WindowFlags f) :
   QWidget(parent, f)
 {
   this->setupUi(this);
@@ -28,13 +28,13 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
 
 
   // signals and slots connections
-  connect(m_XEditScalarOpacity, SIGNAL(returnPressed()), this, SLOT(SetXValueScalar()));
-  connect(m_YEditScalarOpacity, SIGNAL(returnPressed()), this, SLOT(SetYValueScalar()));
+  connect(m_XEditScalarOpacity, SIGNAL(textEdited ( const QString & )), this, SLOT(SetXValueScalar( const QString & )));
+  connect(m_YEditScalarOpacity, SIGNAL(textEdited ( const QString & )), this, SLOT(SetYValueScalar( const QString & )));
 
-  connect(m_XEditGradientOpacity, SIGNAL(returnPressed()), this, SLOT(SetXValueGradient()));
-  connect(m_YEditGradientOpacity, SIGNAL(returnPressed()), this, SLOT(SetYValueGradient()));
+  connect(m_XEditGradientOpacity, SIGNAL(textEdited ( const QString & )), this, SLOT(SetXValueGradient( const QString & )));
+  connect(m_YEditGradientOpacity, SIGNAL(textEdited ( const QString & )), this, SLOT(SetYValueGradient( const QString & )));
 
-  connect(m_XEditColor, SIGNAL(returnPressed()), this, SLOT(SetXValueColor()));
+  connect(m_XEditColor, SIGNAL( textEdited ( const QString & ) ), this, SLOT(SetXValueColor( const QString & )));
 
   QPlastiqueStyle *sliderStyle = new QPlastiqueStyle();
 
@@ -148,7 +148,7 @@ void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode* node)
     return;
   }
 
-  turnOff:
+turnOff:
 
   m_ScalarOpacityFunctionCanvas->setEnabled(false);
   m_ScalarOpacityFunctionCanvas->SetHistogram(0);
@@ -180,34 +180,49 @@ void QmitkTransferFunctionWidget::OnUpdateCanvas()
   m_ColorTransferFunctionCanvas->update();
 }
 
-void QmitkTransferFunctionWidget::SetXValueScalar()
+void QmitkTransferFunctionWidget::SetXValueScalar( const QString text )
 {
-  m_ScalarOpacityFunctionCanvas->SetX(m_XEditScalarOpacity->text().toFloat());
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if ( !text.endsWith( "." ))
+  {
+    m_ScalarOpacityFunctionCanvas->SetX(text.toFloat());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
-void QmitkTransferFunctionWidget::SetYValueScalar()
+void QmitkTransferFunctionWidget::SetYValueScalar( const QString text )
 {
-  m_ScalarOpacityFunctionCanvas->SetY(m_YEditScalarOpacity->text().toFloat());
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if ( !text.endsWith( "." ))
+  {
+    m_ScalarOpacityFunctionCanvas->SetY(text.toFloat());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
-void QmitkTransferFunctionWidget::SetXValueGradient()
+void QmitkTransferFunctionWidget::SetXValueGradient( const QString text )
 {
-  m_GradientOpacityCanvas->SetX(m_XEditGradientOpacity->text().toFloat());
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if ( !text.endsWith( "." ))
+  {
+    m_GradientOpacityCanvas->SetX(text.toFloat());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
-void QmitkTransferFunctionWidget::SetYValueGradient()
+void QmitkTransferFunctionWidget::SetYValueGradient( const QString text )
 {
-  m_GradientOpacityCanvas->SetY(m_YEditGradientOpacity->text().toFloat());
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if ( !text.endsWith( "." ))
+  {
+    m_GradientOpacityCanvas->SetY(text.toFloat());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
-void QmitkTransferFunctionWidget::SetXValueColor()
+void QmitkTransferFunctionWidget::SetXValueColor( const QString text )
 {
-  m_ColorTransferFunctionCanvas->SetX(m_XEditColor->text().toFloat());
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if ( !text.endsWith( "." ))
+  {
+    m_ColorTransferFunctionCanvas->SetX(text.toFloat());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 

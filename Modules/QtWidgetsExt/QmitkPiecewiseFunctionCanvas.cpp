@@ -116,8 +116,12 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
         painter.setBrush(QBrush(Qt::red));
         if (m_LineEditAvailable)
         {
+          int xCursor = m_XEdit->cursorPosition();
+          int yCursor = m_YEdit->cursorPosition();
           m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle)));
-          m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle), 'f', 5));
+          m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle)));
+          m_XEdit->setCursorPosition( xCursor );
+          m_YEdit->setCursorPosition( yCursor );
         }
       }
       else

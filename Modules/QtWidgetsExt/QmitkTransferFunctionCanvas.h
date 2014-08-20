@@ -101,7 +101,7 @@ public:
   virtual void RemoveFunctionPoint(double x) = 0;
   virtual void MoveFunctionPoint(int index, std::pair<double,double> pos) = 0;
   virtual double GetFunctionX(int index) = 0;
-  virtual float GetFunctionY(int index) = 0;
+  virtual double GetFunctionY(int index) = 0;
   virtual int GetFunctionSize() = 0;
   int m_GrabbedHandle;
 

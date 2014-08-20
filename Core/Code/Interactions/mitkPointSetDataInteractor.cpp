@@ -211,22 +211,10 @@ bool mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionE
       //only then a select of a point is possible!
       if (m_PointSet->GetSize( timeStep ) > 0)
       {
-        //if (position>0)//not the first in list
-        //{
-        //  this->SelectPoint( position-1, timeStep,timeInMs);
-        //}
-        ////it was the first point in list, that was removed, so select
-        ////the last in list
-        //else
-        //{
-        //  position = m_PointSet->GetSize( timeStep ) - 1; //last in list
-        //  this->SelectPoint( position, timeStep, timeInMs );
-        //}
         this->SelectPoint( m_PointSet->Begin( timeStep )->Index(), timeStep, timeInMs );
       }
     }
     interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-
   }
   else
   {

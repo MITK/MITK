@@ -76,6 +76,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateOr.h>
 #include <itkCropImageFilter.h>
+#include <itkDiffusionTensor3DReconstructionImageFilter.h>
+#include <itkRemoveDwiChannelFilter.h>
+#include <itkExtractDwiChannelFilter.h>
 
 const std::string QmitkPreprocessingView::VIEW_ID =
         "org.mitk.views.preprocessing";
@@ -164,9 +167,63 @@ void QmitkPreprocessingView::CreateConnections()
         connect( (QObject*)(m_Controls->m_ResampleImageButton), SIGNAL(clicked()), this, SLOT(DoResampleImage()) );
         connect( (QObject*)(m_Controls->m_ResampleTypeBox), SIGNAL(currentIndexChanged(int)), this, SLOT(DoUpdateInterpolationGui(int)) );
         connect( (QObject*)(m_Controls->m_CropImageButton), SIGNAL(clicked()), this, SLOT(DoCropImage()) );
+        connect( (QObject*)(m_Controls->m_RemoveGradientButton), SIGNAL(clicked()), this, SLOT(DoRemoveGradient()) );
+        connect( (QObject*)(m_Controls->m_ExtractGradientButton), SIGNAL(clicked()), this, SLOT(DoExtractGradient()) );
+
 
         //        connect( (QObject*)(m_Controls->m_ExtractBrainMask), SIGNAL(clicked()), this, SLOT(DoExtractBrainMask()) );
     }
+}
+
+void QmitkPreprocessingView::DoRemoveGradient()
+{
+    if (m_DiffusionImage.IsNull())
+        return;
+
+    std::vector< unsigned int > channelsToRemove; channelsToRemove.push_back(m_Controls->m_RemoveGradientBox->value());
+    itk::RemoveDwiChannelFilter< short >::Pointer filter = itk::RemoveDwiChannelFilter< short >::New();
+    filter->SetInput(m_DiffusionImage->GetVectorImage());
+    filter->SetChannelIndices(channelsToRemove);
+    filter->SetDirections(m_DiffusionImage->GetDirections());
+    filter->Update();
+
+    MitkDwiType::Pointer image = MitkDwiType::New();
+    image->SetVectorImage( filter->GetOutput() );
+    image->SetReferenceBValue( m_DiffusionImage->GetReferenceBValue() );
+    image->SetDirections( filter->GetNewDirections() );
+    image->InitializeFromVectorImage();
+
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    imageNode->SetName((name+"_removedgradients").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+    mitk::RenderingManager::GetInstance()->InitializeViews( imageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkPreprocessingView::DoExtractGradient()
+{
+    if (m_DiffusionImage.IsNull())
+        return;
+
+    unsigned int channel = m_Controls->m_ExtractGradientBox->value();
+    itk::ExtractDwiChannelFilter< short >::Pointer filter = itk::ExtractDwiChannelFilter< short >::New();
+    filter->SetInput(m_DiffusionImage->GetVectorImage());
+    filter->SetChannelIndex(channel);
+    filter->Update();
+
+    mitk::Image::Pointer mitkImage = mitk::Image::New();
+    mitkImage->InitializeByItk( filter->GetOutput() );
+    mitkImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
+
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( mitkImage );
+    QString name = m_SelectedDiffusionNodes.back()->GetName().c_str();
+    imageNode->SetName((name+"_direction-"+QString::number(channel)).toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode, m_SelectedDiffusionNodes.back());
+
+    mitk::RenderingManager::GetInstance()->InitializeViews(imageNode->GetData()->GetTimeGeometry(),mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 }
 
 void QmitkPreprocessingView::DoCropImage()
@@ -801,6 +858,19 @@ void QmitkPreprocessingView::DoDwiNormalization()
     if (m_DiffusionImage.IsNull())
         return;
 
+    int b0Index = -1;
+    for (unsigned int i=0; i<m_DiffusionImage->GetNumberOfChannels(); i++)
+    {
+        GradientDirectionType g = m_DiffusionImage->GetDirections()->GetElement(i);
+        if (g.magnitude()<0.001)
+        {
+            b0Index = i;
+            break;
+        }
+    }
+    if (b0Index==-1)
+        return;
+
     typedef mitk::DiffusionImage<DiffusionPixelType>  DiffusionImageType;
     typedef itk::DwiNormilzationFilter<short>  FilterType;
 
@@ -808,13 +878,82 @@ void QmitkPreprocessingView::DoDwiNormalization()
     filter->SetInput(m_DiffusionImage->GetVectorImage());
     filter->SetGradientDirections(m_DiffusionImage->GetDirections());
 
+    UcharImageType::Pointer itkImage = NULL;
     if (m_Controls->m_NormalizationMaskBox->GetSelectedNode().IsNotNull())
     {
-        UcharImageType::Pointer itkImage = UcharImageType::New();
+        itkImage = UcharImageType::New();
         mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_NormalizationMaskBox->GetSelectedNode()->GetData()), itkImage);
         filter->SetMaskImage(itkImage);
     }
 
+    // determin normalization reference
+    //    {
+    //        itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
+    //        adcFilter->SetInput(m_DiffusionImage->GetVectorImage());
+    //        adcFilter->SetGradientDirections(m_DiffusionImage->GetDirections());
+    //        adcFilter->SetB_value(m_DiffusionImage->GetReferenceBValue());
+    //        adcFilter->Update();
+    //        ItkDoubleImageType::Pointer adcImage = adcFilter->GetOutput();
+    //        itk::ImageRegionIterator<ItkDoubleImageType> inIt(adcImage, adcImage->GetLargestPossibleRegion());
+    //        double max = 0.0030;
+    //        double ref = 0;
+    //        unsigned int count = 0;
+    //        while ( !inIt.IsAtEnd() )
+    //        {
+    //            if (itkImage.IsNotNull() && itkImage->GetPixel(inIt.GetIndex())<=0)
+    //            {
+    //                ++inIt;
+    //                continue;
+    //            }
+    //            if (inIt.Get()>max && inIt.Get()<0.004)
+    //            {
+    //                ref += m_DiffusionImage->GetVectorImage()->GetPixel(inIt.GetIndex())[b0Index];
+    //                count++;
+    //            }
+    //            ++inIt;
+    //        }
+    //        if (count>0)
+    //        {
+    //            ref /= count;
+    //            filter->SetUseGlobalReference(true);
+    //            filter->SetReference(ref);
+    //        }
+    //    }
+
+    // normalize relative to mean white matter signal intensity
+    {
+        typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
+        TensorReconstructionImageFilterType::Pointer dtFilter = TensorReconstructionImageFilterType::New();
+        dtFilter->SetGradientImage( m_DiffusionImage->GetDirections(), m_DiffusionImage->GetVectorImage() );
+        dtFilter->SetBValue(m_DiffusionImage->GetReferenceBValue());
+        dtFilter->Update();
+        itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = dtFilter->GetOutput();
+        itk::ImageRegionIterator< itk::Image< itk::DiffusionTensor3D< double >, 3 > > inIt(tensorImage, tensorImage->GetLargestPossibleRegion());
+        double ref = 0;
+        unsigned int count = 0;
+        while ( !inIt.IsAtEnd() )
+        {
+            if (itkImage.IsNotNull() && itkImage->GetPixel(inIt.GetIndex())<=0)
+            {
+                ++inIt;
+                continue;
+            }
+
+            double FA = inIt.Get().GetFractionalAnisotropy();
+            if (FA>0.4 && FA<0.99)
+            {
+                ref += m_DiffusionImage->GetVectorImage()->GetPixel(inIt.GetIndex())[b0Index];
+                count++;
+            }
+            ++inIt;
+        }
+        if (count>0)
+        {
+            ref /= count;
+            filter->SetUseGlobalReference(true);
+            filter->SetReference(ref);
+        }
+    }
     filter->Update();
 
     DiffusionImageType::Pointer image = DiffusionImageType::New();
@@ -1140,6 +1279,8 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_ModifySpacingButton->setEnabled(foundImageVolume);
     m_Controls->m_ModifyOriginButton->setEnabled(foundImageVolume);
     m_Controls->m_CropImageButton->setEnabled(foundImageVolume);
+    m_Controls->m_RemoveGradientButton->setEnabled(foundDwiVolume);
+    m_Controls->m_ExtractGradientButton->setEnabled(foundDwiVolume);
 
     // reset sampling frame to 1 and update all ealted components
     m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(1);
@@ -1196,6 +1337,8 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
         m_Controls->m_XendBox->setMaximum(m_DiffusionImage->GetGeometry()->GetExtent(0)-1);
         m_Controls->m_YendBox->setMaximum(m_DiffusionImage->GetGeometry()->GetExtent(1)-1);
         m_Controls->m_ZendBox->setMaximum(m_DiffusionImage->GetGeometry()->GetExtent(2)-1);
+        m_Controls->m_RemoveGradientBox->setMaximum(m_DiffusionImage->GetDirections()->Size()-1);
+        m_Controls->m_ExtractGradientBox->setMaximum(m_DiffusionImage->GetDirections()->Size()-1);
     }
     else if (foundImageVolume)
     {
@@ -1593,9 +1736,6 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
 
         ++itemiter;
     }
-
-
-
 }
 
 void QmitkPreprocessingView::AverageGradients()

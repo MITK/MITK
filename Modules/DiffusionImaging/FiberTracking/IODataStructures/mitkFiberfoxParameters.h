@@ -35,10 +35,16 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class FiberfoxParameters
 {
 public:
+
+    enum DiffusionDirectionMode {
+        FIBER_TANGENT_DIRECTIONS,
+        MAIN_FIBER_DIRECTIONS,
+        RANDOM_DIRECTIONS
+    };
 
     typedef itk::Image<double, 3>                           ItkDoubleImgType;
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
@@ -62,7 +68,6 @@ public:
         out.m_ImageDirection = m_ImageDirection;
         out.SetNumWeightedGradients(m_NumGradients);
         out.m_Bvalue = m_Bvalue;
-        out.m_Repetitions = m_Repetitions;
         out.m_SignalScale = m_SignalScale;
         out.m_tEcho = m_tEcho;
         out.m_tLine = m_tLine;
@@ -95,6 +100,11 @@ public:
         out.m_SignalModelString = m_SignalModelString;
         out.m_ArtifactModelString = m_ArtifactModelString;
         out.m_OutputPath = m_OutputPath;
+//        out.m_DiffusionDirectionMode = m_DiffusionDirectionMode;
+//        out.m_SignalGenerationMode = m_SignalGenerationMode;
+        out.m_SimulateKspaceAcquisition = m_SimulateKspaceAcquisition;
+
+        // TODO: copy constructor für singalmodelle und rauschen
 
         return out;
     }
@@ -106,17 +116,18 @@ public:
     itk::Matrix<double, 3, 3>           m_ImageDirection;           ///< Image rotation matrix.
 
     /** Other acquisitions parameters */
-    unsigned int                        m_Repetitions;              ///< Noise will be summed N times and afterwards averaged.
     double                              m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
     double                              m_tEcho;                    ///< Echo time TE.
     double                              m_tLine;                    ///< k-space line readout time.
     double                              m_tInhom;                   ///< T2'
-    double                              m_Bvalue;
+    double                              m_Bvalue;                   ///< Acquisition b-value
+    bool                                m_SimulateKspaceAcquisition;///<
 
     /** Signal generation */
     DiffusionModelListType              m_FiberModelList;           ///< Intra- and inter-axonal compartments.
     DiffusionModelListType              m_NonFiberModelList;        ///< Extra-axonal compartments.
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
+    DiffusionDirectionMode              m_DiffusionDirectionMode;   ///< Determines how the main diffusion direction of the signal models is selected
 
     /** Artifacts */
     unsigned int                        m_Spikes;                   ///< Number of spikes randomly appearing in the image

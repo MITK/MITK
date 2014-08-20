@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTimer>
 #include <QTime>
 #include <mitkFiberfoxParameters.h>
+#include <itkStatisticsImageFilter.h>
 
 /*!
 \brief View for fiber based diffusion software phantoms (Fiberfox). See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
@@ -197,6 +198,7 @@ protected:
     mitk::TensorModel<double> m_ZeppelinModel2;
     mitk::TensorModel<double> m_TensorModel1;
     mitk::TensorModel<double> m_TensorModel2;
+    mitk::RawShModel<double> m_PrototypeModel1;
 
     /** extra axonal compartment models */
     mitk::BallModel<double> m_BallModel1;
@@ -205,6 +207,8 @@ protected:
     mitk::AstroStickModel<double> m_AstrosticksModel2;
     mitk::DotModel<double> m_DotModel1;
     mitk::DotModel<double> m_DotModel2;
+    mitk::RawShModel<double> m_PrototypeModel3;
+    mitk::RawShModel<double> m_PrototypeModel4;
 
     QString m_ParameterFile;    ///< parameter file name
 

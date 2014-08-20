@@ -246,7 +246,21 @@ void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string im
 
   // change OpenCV image to test if the filter gets updated
   cv::Mat changedcvmatTestImage = cvmatTestImage.clone();
-  changedcvmatTestImage.at<char>(0,0) = cvmatTestImage.at<char>(0,0) != 0 ? 0 : 1;
+  std::size_t numBits = result->GetPixelType().GetBitsPerComponent();
+  if (result->GetPixelType().GetBitsPerComponent() == sizeof(char)*8)
+  {
+    changedcvmatTestImage.at<char>(0,0) = cvmatTestImage.at<char>(0,0) != 0 ? 0 : 1;
+  }
+  else if (result->GetPixelType().GetBitsPerComponent() == sizeof(float)*8)
+  {
+    changedcvmatTestImage.at<float>(0,0) = cvmatTestImage.at<float>(0,0) != 0 ? 0 : 1;
+  }
+  /*
+  if (result->GetPixelType().GetBitsPerComponent() == 3*sizeof(char))
+  {
+    changedcvmatTestImage.at<char>(0,0) = cvmatTestImage.at<char>(0,0) != 0 ? 0 : 1;
+  }
+  */
 
   toMitkConverter->SetOpenCVMat(changedcvmatTestImage);
   toMitkConverter->Update();

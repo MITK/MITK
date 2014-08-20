@@ -58,3 +58,25 @@ bool mitk::RevealBinaryTag(const gdcm::Tag tag, const gdcm::DataSet& dataset, st
     return false;
   }
 }
+
+bool mitk::RevealBinaryTagC(const gdcm::Tag tag, const gdcm::DataSet& dataset, char * target_array )
+{
+  if( dataset.FindDataElement( tag ) )
+  {
+    MITK_DEBUG << "Found tag " << tag.PrintAsPipeSeparatedString();
+
+    const gdcm::DataElement& de = dataset.GetDataElement( tag );
+
+    size_t bytesize = de.GetValue().GetLength(); //  GetLength();
+    //target_array = new char[bytesize];
+    memcpy( target_array, de.GetByteValue()->GetPointer(), bytesize);
+
+    return true;
+
+  }
+  else
+  {
+    MITK_DEBUG << "Could not find tag " << tag.PrintAsPipeSeparatedString();
+    return false;
+  }
+}

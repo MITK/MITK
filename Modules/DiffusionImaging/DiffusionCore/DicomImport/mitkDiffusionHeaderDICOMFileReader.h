@@ -109,6 +109,8 @@ protected:
  */
 bool RevealBinaryTag(const gdcm::Tag tag, const gdcm::DataSet& dataset, std::string& target);
 
+bool RevealBinaryTagC(const gdcm::Tag tag, const gdcm::DataSet& dataset, char* target_array );
+
 
 } // end namespace mitk
 

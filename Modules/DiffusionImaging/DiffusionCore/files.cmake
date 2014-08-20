@@ -15,6 +15,7 @@ set(CPP_FILES
   DicomImport/mitkDiffusionHeaderSiemensDICOMFileHelper.cpp
   DicomImport/mitkDiffusionHeaderSiemensMosaicDICOMFileReader.cpp
   DicomImport/mitkDiffusionHeaderGEDICOMFileReader.cpp
+  DicomImport/mitkDiffusionHeaderPhilipsDICOMFileReader.cpp
 
 
   # DataStructures -> DWI

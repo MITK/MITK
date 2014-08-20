@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionHeaderSiemensDICOMFileReader.h"
 #include "mitkDiffusionHeaderSiemensMosaicDICOMFileReader.h"
 #include "mitkDiffusionHeaderGEDICOMFileReader.h"
+#include "mitkDiffusionHeaderPhilipsDICOMFileReader.h"
 
 static void PerformHeaderAnalysis( mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType headers )
 {
@@ -201,9 +202,9 @@ void mitk::DiffusionDICOMFileReader
   {
     m_HeaderReader = mitk::DiffusionHeaderGEDICOMFileReader::New();
   }
-  else if( vendor.find("PHILIPS") != std::string::npos )
+  else if( vendor.find("Philips") != std::string::npos )
   {
-
+    m_HeaderReader = mitk::DiffusionHeaderPhilipsDICOMFileReader::New();
   }
   else
   {

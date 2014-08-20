@@ -31,15 +31,20 @@ class mitkToolInteractionTestSuite : public mitk::TestFixture
 
   CPPUNIT_TEST_SUITE(mitkToolInteractionTestSuite);
   /* ####### example ######
-  MITK_TEST(AddToolInteractionTest);
+
   MITK_TEST(AddToolInteraction_4D_Test);
   #########################*/
+  MITK_TEST(AddToolInteractionTest);
+  MITK_TEST(SubtractToolInteractionTest);
+  MITK_TEST(PaintToolInteractionTest);
+  MITK_TEST(WipeToolInteractionTest);
+  MITK_TEST(RegionGrowingToolInteractionTest);
   CPPUNIT_TEST_SUITE_END();
 
 
 private:
 
-  mitk::DataStorage* m_DataStorage;
+  mitk::DataStorage::Pointer m_DataStorage;
   mitk::ToolManager::Pointer m_ToolManager;
 
 public:
@@ -55,8 +60,11 @@ public:
       if(toolName.compare( currentTool->GetNameOfClass() ) == 0)
       {
         return toolId;
+
       }
+//      MITK_INFO << currentTool->GetNameOfClass();
     }
+
     return -1;
   }
 
@@ -66,6 +74,8 @@ public:
                              const std::string& interactionPattern,
                              unsigned int timestep=0)
   {
+    MITK_INFO << "TOOLNAME:::::: " << toolName;
+
     //Create test helper to initialize all necessary objects for interaction
     mitk::InteractionTestHelper interactionTestHelper(GetTestDataFilePath(interactionPattern));
 
@@ -125,6 +135,7 @@ public:
 
     mitk::Image::Pointer currentSegmentationImage = mitk::Image::New();
     currentSegmentationImage = dynamic_cast<mitk::Image*>(workingImageNode->GetData());
+//    mitk::IOUtil::SaveImage(currentSegmentationImage, "/home/petry/Documents/Records/subtract_test.nrrd");
 
     //compare reference with interaction result
     MITK_ASSERT_EQUAL(segmentationReferenceImage, currentSegmentationImage, "Reference equals interaction result." );
@@ -140,13 +151,33 @@ public:
     m_ToolManager = NULL;
   }
 
-/*############ example ###################
+/*############ example ###################*/
   void AddToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "Segmentation/ReferenceSegmentations/AddTool.nrrd", "AddContourTool", "Segmentation/InteractionPatterns/AddTool.xml");
+    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/add.nrrd", "AddContourTool", "/home/petry/Documents/Records/add.xml");
+  }
+  void SubtractToolInteractionTest()
+  {
+    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/subtract.nrrd", "SubtractContourTool", "/home/petry/Documents/Records/subtract.xml");
   }
 
+  void PaintToolInteractionTest()
+  {
+    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/paint.nrrd", "DrawPaintbrushTool", "/home/petry/Documents/Records/paint.xml");
+  }
 
+  void WipeToolInteractionTest()
+  {
+    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/wipe.nrrd", "ErasePaintbrushTool", "/home/petry/Documents/Records/wipe.xml");
+  }
+
+  void RegionGrowingToolInteractionTest()
+  {
+    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/regiongrowing.nrrd", "RegionGrowingTool", "/home/petry/Documents/Records/regiongrowing.xml");
+    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/regiongrowing_2.nrrd", "RegionGrowingTool", "/home/petry/Documents/Records/regiongrowing_2.xml");
+  }
+
+/*
   void AddToolInteraction_4D_Test()
   {
 

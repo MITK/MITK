@@ -317,7 +317,8 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside( StateMachineAction*, Intera
 
     // 3.2.1 Remember Y cursor position and initial seed point
     //m_ScreenYPositionAtStart = static_cast<int>(positionEvent->GetDisplayPosition()[1]);
-    m_LastScreenPosition = ApplicationCursor::GetInstance()->GetCursorPosition();
+    //m_LastScreenPosition = ApplicationCursor::GetInstance()->GetCursorPosition();
+    m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
     m_ScreenYDifference = 0;
 
     m_SeedPointMemoryOffset = projectedPointIn2D[1] * m_OriginalPicSlice->n[0] + projectedPointIn2D[0];
@@ -375,10 +376,12 @@ bool mitk::RegionGrowingTool::OnMouseMoved( StateMachineAction*, InteractionEven
     //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
     if (positionEvent)
     {
-      ApplicationCursor* cursor = ApplicationCursor::GetInstance();
-      if (!cursor) return false;
-      m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
-      cursor->SetCursorPosition( m_LastScreenPosition );
+      //ApplicationCursor* cursor = ApplicationCursor::GetInstance();
+      //if (!cursor) return false;
+      //m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
+      //cursor->SetCursorPosition( m_LastScreenPosition );
+
+      m_ScreenYDifference += positionEvent->GetPointerPositionOnScreen()[1] - m_LastScreenPosition[1];
 
       m_LowerThreshold = std::max<mitk::ScalarType>(0.0, m_InitialLowerThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
       m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);

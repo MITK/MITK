@@ -36,10 +36,12 @@ static const mitk::ScalarType testEps = 1E-9; // the epsilon used in this test =
 class mitkPlaneGeometryTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPlaneGeometryTestSuite);
+  MITK_TEST(TestInitializeStandardPlane);
   MITK_TEST(mitkPlaneGeometryTestWrapper);
   MITK_TEST(TestProjectPointOntoPlane);
-  MITK_TEST(testPlaneGeometryCloning);
-  MITK_TEST(testInheritance);
+  MITK_TEST(TestPlaneGeometryCloning);
+  MITK_TEST(TestInheritance);
+
   // Currently commented out, see See bug 15990
   // MITK_TEST(testPlaneGeometryInitializeOrder);
   //MITK_TEST(mappingTests2D);
@@ -58,8 +60,8 @@ public:
   {
   }
 
-  // This test is supposed to verify inheritance behaviour, this test will fail if the behaviour changes in the future
-  void testInheritance()
+  // This test verifies inheritance behaviour, this test will fail if the behaviour changes in the future
+  void TestInheritance()
   {
     mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
     mitk::Geometry3D::Pointer g3d = dynamic_cast < mitk::Geometry3D* > ( plane.GetPointer() );
@@ -280,7 +282,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("All points lie not on the same plane", allPointsOnPlane);
   }
 
-  void testPlaneGeometryCloning()
+  void TestPlaneGeometryCloning()
   {
     mitk::PlaneGeometry::Pointer geometry2D = createPlaneGeometry();
 
@@ -304,7 +306,7 @@ public:
     MITK_TEST_OUTPUT( << "Casting a rotated 2D ITK Image to a MITK Image and check if Geometry is still same" );
   }
 
-  void testPlaneGeometryInitializeOrder()
+  void TestPlaneGeometryInitializeOrder()
   {
     mitk::Vector3D mySpacing;
     mySpacing[0] = 31;
@@ -359,17 +361,41 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Failed general PlaneGeometryTest, see output for further details", mitkPlaneGeometryTest() == EXIT_SUCCESS);
   }
 
+  void TestInitializeStandardPlane()
+  {
+    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+
+    mitk::Point3D origin;
+    mitk::Vector3D right, bottom, normal;
+    mitk::ScalarType width, height;
+    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
+    width  = 100;    widthInMM  = width;
+    height = 200;    heightInMM = height;
+    thicknessInMM = 1.0;
+    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
+    mitk::FillVector3D(right,  widthInMM,          0, 0);
+    mitk::FillVector3D(bottom,         0, heightInMM, 0);
+    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
+
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: width", mitk::Equal(planegeometry->GetExtent(0),width, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: height", mitk::Equal(planegeometry->GetExtent(1),height, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: depth", mitk::Equal(planegeometry->GetExtent(2),1, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: width in mm", mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: heght in mm", mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: depth in mm", mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps) );
+
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: AxisVectorRight", mitk::Equal(planegeometry->GetAxisVector(0), right, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: AxisVectorBottom", mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: AxisVectorNormal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps) );
+  }
+
   int mitkPlaneGeometryTest()
   {
     int result;
-
-    /*
-    // the following can be used to reproduce a bug in ITK matrix inversion
-    // which was found while investigating bug #1210.
-    result = TestCase1210();
-    if(result!=EXIT_SUCCESS)
-    return result;
-    */
 
     mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
 
@@ -419,6 +445,9 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
+    //// ERLEDIGT BIS HIER!
+    // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
+
     std::cout << "Testing InitializeStandardPlane(rightVector, downVector, spacing = {1.0, 1.0, 1.5}): "<<std::endl;
     mitk::Vector3D spacing;
     thicknessInMM = 1.5;
@@ -455,6 +484,8 @@ public:
       return EXIT_FAILURE;
     }
     std::cout<<"[PASSED]"<<std::endl;
+
+    // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     std::cout << "Testing SetExtentInMM(2, ...), querying by GetExtentInMM(2): ";
     thicknessInMM = 3.5;

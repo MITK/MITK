@@ -791,25 +791,21 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   }
   else
   {
+    MITK_ERROR << "Geometry is not equal";
     return false;
   }
 
   //check isPlaced member
   if ( this->m_FigurePlaced != other.m_FigurePlaced)
   {
+    MITK_ERROR << "Is_Placed is not equal";
     return false;
   }
 
   //check closed property
   if (this->IsClosed() != other.IsClosed())
   {
-    return false;
-  }
-
-  //check control points
-  if (this->m_ControlPoints != other.m_ControlPoints)
-  {
-
+    MITK_ERROR << "Is_closed is not equal";
     return false;
   }
 
@@ -838,8 +834,13 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
         {
           Point2D p1 = *itLineThis;
           Point2D p2 = *itLineOther;
-          if(p1 != p2)
+          ScalarType delta = fabs(p1[0]-p2[0])+fabs(p1[1]-p2[1]);
+          if(delta > .001)
+          {
+            MITK_ERROR << "Poly line is not equal";
+            MITK_ERROR << p1 << "/" << p2;
             return false;
+          }
 
           ++itLineThis;
           ++itLineOther;
@@ -853,6 +854,7 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   //check features
   if (this->GetNumberOfFeatures() != other.GetNumberOfFeatures())
   {
+    MITK_ERROR << "Number of Features is Different";
     return false;
   }
   else
@@ -863,12 +865,21 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
 
     while(itThis != itEnd)
     {
-      if( itThis->Quantity != itOther->Quantity )
+      if(( itThis->Quantity - itOther->Quantity) > .001 )
+      {
+        MITK_ERROR << "Quantity is Different" << itThis->Quantity << "/" << itOther->Quantity;
         return false;
+      }
       if( itThis->Unit.compare(itOther->Unit) != 0 )
+      {
+        MITK_ERROR << "Unit is Different" << itThis->Unit << "/" << itOther->Unit;
         return false;
+      }
       if( itThis->Name.compare(itOther->Name) != 0 )
+      {
+        MITK_ERROR << "Name is Different" << itThis->Name << "/" << itOther->Name;;
         return false;
+      }
 
       ++itThis;
       ++itOther;

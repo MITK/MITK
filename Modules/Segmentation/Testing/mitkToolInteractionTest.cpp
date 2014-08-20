@@ -39,6 +39,10 @@ class mitkToolInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(PaintToolInteractionTest);
   MITK_TEST(WipeToolInteractionTest);
   MITK_TEST(RegionGrowingToolInteractionTest);
+  MITK_TEST(CorrectionToolInteractionTest);
+  MITK_TEST(EraseToolInteractionTest);
+  MITK_TEST(FillToolInteractionTest);
+
   CPPUNIT_TEST_SUITE_END();
 
 
@@ -62,7 +66,6 @@ public:
         return toolId;
 
       }
-//      MITK_INFO << currentTool->GetNameOfClass();
     }
 
     return -1;
@@ -72,10 +75,9 @@ public:
                              const std::string& referenceSegmentationImage,
                              const std::string& toolName,
                              const std::string& interactionPattern,
-                             unsigned int timestep=0)
+                             unsigned int timestep=0,
+                             const std::string& preSegmentationImagePath = std::string())
   {
-    MITK_INFO << "TOOLNAME:::::: " << toolName;
-
     //Create test helper to initialize all necessary objects for interaction
     mitk::InteractionTestHelper interactionTestHelper(GetTestDataFilePath(interactionPattern));
 
@@ -106,7 +108,15 @@ public:
     color.SetRed(1);  //but CreateEmptySegmentationNode expects a color parameter
     color.SetGreen(0);
     color.SetBlue(0);
-    workingImageNode = tool->CreateEmptySegmentationNode(patientImage, organName, color);
+    if(preSegmentationImagePath.empty())
+    {
+      workingImageNode = tool->CreateEmptySegmentationNode(patientImage, organName, color);
+    }
+    else
+    {
+      mitk::Image::Pointer preSegmentation = mitk::IOUtil::LoadImage(GetTestDataFilePath(preSegmentationImagePath));
+      workingImageNode = tool->CreateSegmentationNode(preSegmentation, organName, color);
+    }
 
     CPPUNIT_ASSERT(workingImageNode.IsNotNull());
     CPPUNIT_ASSERT(workingImageNode->GetData() != NULL);
@@ -135,7 +145,6 @@ public:
 
     mitk::Image::Pointer currentSegmentationImage = mitk::Image::New();
     currentSegmentationImage = dynamic_cast<mitk::Image*>(workingImageNode->GetData());
-//    mitk::IOUtil::SaveImage(currentSegmentationImage, "/home/petry/Documents/Records/subtract_test.nrrd");
 
     //compare reference with interaction result
     MITK_ASSERT_EQUAL(segmentationReferenceImage, currentSegmentationImage, "Reference equals interaction result." );
@@ -151,33 +160,47 @@ public:
     m_ToolManager = NULL;
   }
 
-/*############ example ###################*/
   void AddToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/add.nrrd", "AddContourTool", "/home/petry/Documents/Records/add.xml");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_AddTool.nrrd", "AddContourTool", "InteractionTestData/Interactions/SegmentationInteractor_AddTool.xml");
   }
+
   void SubtractToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/subtract.nrrd", "SubtractContourTool", "/home/petry/Documents/Records/subtract.xml");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_SubtractTool.nrrd", "SubtractContourTool", "InteractionTestData/Interactions/SegmentationInteractor_SubtractTool.xml");
   }
 
   void PaintToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/paint.nrrd", "DrawPaintbrushTool", "/home/petry/Documents/Records/paint.xml");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_PaintTool.nrrd", "DrawPaintbrushTool", "InteractionTestData/Interactions/SegmentationInteractor_PaintTool.xml");
   }
 
   void WipeToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/wipe.nrrd", "ErasePaintbrushTool", "/home/petry/Documents/Records/wipe.xml");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_WipeTool.nrrd", "ErasePaintbrushTool", "InteractionTestData/Interactions/SegmentationInteractor_WipeTool.xml");
   }
 
   void RegionGrowingToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/regiongrowing.nrrd", "RegionGrowingTool", "/home/petry/Documents/Records/regiongrowing.xml");
-    RunTestWithParameters("Pic3D.nrrd", "/home/petry/Documents/Records/regiongrowing_2.nrrd", "RegionGrowingTool", "/home/petry/Documents/Records/regiongrowing_2.xml");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_RegionGrowingTool.nrrd", "RegionGrowingTool", "InteractionTestData/Interactions/SegmentationInteractor_RegionGrowingTool.xml");
   }
 
-/*
+  void CorrectionToolInteractionTest()
+  {
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_CorrectionTool.nrrd", "CorrectorTool2D", "InteractionTestData/Interactions/SegmentationInteractor_CorrectionTool.xml");
+  }
+
+  void EraseToolInteractionTest()
+  {
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_EraseTool.nrrd", "EraseRegionTool", "InteractionTestData/Interactions/SegmentationInteractor_EraseTool.xml", 0, "InteractionTestData/ReferenceData/SegmentationInteractor_AddTool.nrrd");
+  }
+
+  void FillToolInteractionTest()
+  {
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_FillTool.nrrd", "FillRegionTool", "InteractionTestData/Interactions/SegmentationInteractor_FillTool.xml", 0, "InteractionTestData/InputData/SegmentationInteractor_FillTool_input.nrrd");
+  }
+
+/*############ example ###################
   void AddToolInteraction_4D_Test()
   {
 

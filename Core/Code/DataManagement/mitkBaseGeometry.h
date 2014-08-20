@@ -109,7 +109,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Get the origin, e.g. the upper-left corner of the plane
-    const Point3D& GetOrigin() const;
+    const Point3D GetOrigin() const;
 
     //##Documentation
     //## @brief Set the origin, i.e. the upper-left corner of the plane
@@ -119,13 +119,13 @@ namespace mitk {
     //##Documentation
     //## @brief Get the spacing (size of a pixel).
     //##
-    itkGetConstReferenceMacro(Spacing, mitk::Vector3D);
+    const mitk::Vector3D GetSpacing() const;
 
     //##Documentation
     //## @brief Set the spacing (m_Spacing).
     //##
     //##The spacing is also changed in the IndexToWorldTransform.
-    void SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
+    void SetSpacing(const mitk::Vector3D& aSpacing);
 
     //##Documentation
     //## @brief Get the origin as VnlVector
@@ -573,7 +573,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Intern functions to assure a consistent behaviour of SetSpacing.
-    void _SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
+    void _SetSpacing(const mitk::Vector3D& aSpacing);
 
   private:
     //##Documentation
@@ -593,12 +593,6 @@ namespace mitk {
     virtual void PostSetIndexToWorldTransform(mitk::AffineTransform3D* transform);
 
     virtual void PreSetSpacing(const mitk::Vector3D& aSpacing);
-
-    // ********************************** Variables **********************************
-    //##Documentation
-    //## @brief Spacing, measurement of the resolution
-    //##
-    mitk::Vector3D m_Spacing;
 
     //##Documentation
     //## @brief Index to World Transform, contains a transformation matrix to convert
@@ -624,10 +618,13 @@ namespace mitk {
 
     mutable unsigned long m_IndexToWorldTransformLastModified;
 
-    //##Documentation
-    //## @brief Origin, i.e. upper-left corner of the plane
-    //##
-    Point3D m_Origin;
+//    /**
+//     * The Spacing value is only represented as a member here to be able
+//     * to keep the old interface with return by value for GetSpacing().
+//     * It will not necessarily hold the correct value (only, when immediately before GetSpacing() method was
+//     * callsed).
+//     */
+//    mitk::Vector3D m_SpacingDoNotUse;
 
     bool m_ImageGeometry;
 

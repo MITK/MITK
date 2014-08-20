@@ -239,7 +239,7 @@ void
   this->SetDirectionVector( directionVector );
   this->SetBounds( bounds );
   this->SetPlaneGeometry( geometry2D, 0 );
-  this->SetSpacing( spacing ,true);
+  this->SetSpacing( spacing);
   this->SetEvenlySpaced();
 
   //this->SetTimeBounds( geometry2D->GetTimeBounds() );

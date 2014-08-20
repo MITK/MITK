@@ -39,7 +39,7 @@ mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
 }
 
 mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), mitk::OperationActor(), //m_TimeBounds(other.m_TimeBounds),
-  m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_Origin(other.m_Origin),
+  m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified),
   m_ImageGeometry(other.m_ImageGeometry), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
 {
   m_VtkMatrix = vtkMatrix4x4::New();
@@ -54,9 +54,10 @@ mitk::BaseGeometry::~BaseGeometry()
   m_VtkIndexToWorldTransform->Delete();
 }
 
-const mitk::Point3D& mitk::BaseGeometry::GetOrigin() const
+const mitk::Point3D mitk::BaseGeometry::GetOrigin() const
 {
-  return m_Origin;
+  mitk::Point3D origin = this->GetIndexToWorldTransform()->GetOffset();
+  return origin;
 }
 
 void mitk::BaseGeometry::SetOrigin(const Point3D & origin)
@@ -65,8 +66,7 @@ void mitk::BaseGeometry::SetOrigin(const Point3D & origin)
 
   if(origin!=GetOrigin())
   {
-    m_Origin = origin;
-    m_IndexToWorldTransform->SetOffset(m_Origin.GetVectorFromOrigin());
+    m_IndexToWorldTransform->SetOffset(origin.GetVectorFromOrigin());
     Modified();
     TransferItkToVtkTransform();
   }
@@ -81,7 +81,7 @@ void mitk::BaseGeometry::TransferItkToVtkTransform()
   m_VtkIndexToWorldTransform->Modified();
 }
 
-static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::Vector3D& spacing)
+static void CopySpacingFromTransform(const mitk::AffineTransform3D* transform, mitk::Vector3D& spacing)
 {
   mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
   vnlmatrix = transform->GetMatrix().GetVnlMatrix();
@@ -89,6 +89,13 @@ static void CopySpacingFromTransform(mitk::AffineTransform3D* transform, mitk::V
   spacing[0]=vnlmatrix.get_column(0).magnitude();
   spacing[1]=vnlmatrix.get_column(1).magnitude();
   spacing[2]=vnlmatrix.get_column(2).magnitude();
+}
+
+const mitk::Vector3D mitk::BaseGeometry::GetSpacing() const
+{
+  mitk::Vector3D spacing;
+  CopySpacingFromTransform(this->GetIndexToWorldTransform(), spacing);
+  return spacing;
 }
 
 void mitk::BaseGeometry::Initialize()
@@ -100,8 +107,6 @@ void mitk::BaseGeometry::Initialize()
     m_IndexToWorldTransform = TransformType::New();
   else
     m_IndexToWorldTransform->SetIdentity();
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
 
   m_VtkMatrix->Identity();
 
@@ -196,8 +201,6 @@ void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* trans
   PreSetIndexToWorldTransform(transform);
 
   m_IndexToWorldTransform = transform;
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
   TransferItkToVtkTransform();
   Modified();
 
@@ -221,20 +224,16 @@ bool mitk::BaseGeometry::IsValid() const
   return true;
 }
 
-void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing )
+void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing )
 {
   PreSetSpacing(aSpacing);
-  _SetSpacing(aSpacing, enforceSetSpacing);
+  _SetSpacing(aSpacing);
 }
 
 void mitk::BaseGeometry::PreSetSpacing(const mitk::Vector3D& /*aSpacing*/)
 {}
-void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing){
-  if(mitk::Equal(m_Spacing, aSpacing) == false || enforceSetSpacing)
-  {
-    assert(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0);
+void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D& aSpacing){
 
-    m_Spacing = aSpacing;
 
     AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
 
@@ -253,7 +252,7 @@ void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D& aSpacing, bool enforc
     transform->SetOffset(m_IndexToWorldTransform->GetOffset());
 
     SetIndexToWorldTransform(transform.GetPointer());
-  }
+
 }
 
 mitk::Vector3D mitk::BaseGeometry::GetAxisVector(unsigned int direction) const
@@ -528,7 +527,7 @@ void mitk::BaseGeometry::BackTransform(const mitk::Point3D &in, mitk::Point3D& o
 
 mitk::VnlVector mitk::BaseGeometry::GetOriginVnl() const
 {
-  return const_cast<Self*>(this)->m_Origin.GetVnlVector();
+  return const_cast<Self*>(this)->GetOrigin().GetVnlVector();
 }
 
 vtkLinearTransform* mitk::BaseGeometry::GetVtkTransform() const
@@ -541,8 +540,6 @@ void mitk::BaseGeometry::SetIdentity()
   mitk::ModifiedLock lock(this);
 
   m_IndexToWorldTransform->SetIdentity();
-  m_Origin.Fill(0);
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
   Modified();
   TransferItkToVtkTransform();
 }
@@ -550,8 +547,6 @@ void mitk::BaseGeometry::SetIdentity()
 void mitk::BaseGeometry::TransferVtkToItkTransform()
 {
   TransferVtkMatrixToItkTransform(m_VtkMatrix, m_IndexToWorldTransform.GetPointer());
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
   TransferItkToVtkTransform();
 }
 
@@ -560,8 +555,6 @@ void mitk::BaseGeometry::Compose( const mitk::BaseGeometry::TransformType * othe
   mitk::ModifiedLock lock(this);
 
   m_IndexToWorldTransform->Compose(other, pre);
-  CopySpacingFromTransform(m_IndexToWorldTransform, m_Spacing);
-  vtk2itk(m_IndexToWorldTransform->GetOffset(), m_Origin);
   Modified();
   TransferItkToVtkTransform();
 }
@@ -577,7 +570,7 @@ void mitk::BaseGeometry::Translate(const Vector3D & vector)
 {
   if((vector[0] != 0) || (vector[1] != 0) || (vector[2] != 0))
   {
-    this->SetOrigin(m_Origin + vector);
+    this->SetOrigin(this->GetOrigin() + vector);
   }
 }
 

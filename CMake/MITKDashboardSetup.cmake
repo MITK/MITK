@@ -5,7 +5,26 @@ list(APPEND CTEST_NOTES_FILES "${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
 #
 # Automatically determined properties
 #
-set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin...
+set(MY_OPERATING_SYSTEM )
+
+if(UNIX)
+  # Download a utility script
+  set(url "http://mitk.org/git/?p=MITK.git;a=blob_plain;f=CMake/mitkDetectOS.sh;hb=${hb}")
+  set(dest "${CTEST_SCRIPT_DIRECTORY}/mitkDetectOS.sh")
+  downloadFile("${url}" "${dest}")
+  execute_process(COMMAND sh "${dest}"
+  RESULT_VARIABLE _result OUTPUT_VARIABLE _out
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  if(NOT _result)
+    set(MY_OPERATING_SYSTEM "${_out}")
+  endif()
+endif()
+
+if(NOT MY_OPERATING_SYSTEM)
+  set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin...
+endif()
+
 site_name(CTEST_SITE)
 
 if(NOT DEFINED MITK_USE_QT)
@@ -13,10 +32,16 @@ if(NOT DEFINED MITK_USE_QT)
 endif()
 
 if(MITK_USE_QT)
-  if(QT_BINARY_DIR)
-    set(QT_QMAKE_EXECUTABLE "${QT_BINARY_DIR}/qmake")
-  else()
-    set(QT_QMAKE_EXECUTABLE "qmake")
+  if(NOT QT_QMAKE_EXECUTABLE)
+    if(QT_BINARY_DIR)
+      if(EXISTS "${QT_BINARY_DIR}/qmake")
+        set(QT_QMAKE_EXECUTABLE "${QT_BINARY_DIR}/qmake")
+      elseif(EXISTS "${QT_BINARY_DIR}/qmake-qt4")
+        set(QT_QMAKE_EXECUTABLE "${QT_BINARY_DIR}/qmake-qt4")
+      endif()
+    else()
+      set(QT_QMAKE_EXECUTABLE "qmake")
+    endif()
   endif()
 
   execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} --version
@@ -34,9 +59,9 @@ endif()
 #
 if(NOT CTEST_BUILD_NAME)
   if(MITK_USE_QT)
-     set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-Qt-${MY_QT_VERSION}-${CTEST_BUILD_CONFIGURATION}")
+     set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM} ${MY_COMPILER} Qt${MY_QT_VERSION} ${CTEST_BUILD_CONFIGURATION}")
   else()
-    set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-${CTEST_BUILD_CONFIGURATION}")
+    set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM} ${MY_COMPILER} ${CTEST_BUILD_CONFIGURATION}")
   endif()
 endif()
 set(PROJECT_BUILD_DIR "MITK-build")

@@ -138,8 +138,6 @@ void QmitkFiberProcessingView::CalculateFiberDirections()
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData(directions);
         node->SetName((name+"_vectorfield").toStdString().c_str());
-
-        node->SetName(name.toStdString().c_str());
 //        node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
         node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
         node->SetProperty("color", mitk::ColorProperty::New(1.0f, 1.0f, 1.0f));
@@ -162,7 +160,7 @@ void QmitkFiberProcessingView::CalculateFiberDirections()
     if (m_Controls->m_DirectionImagesBox->isChecked())
     {
         ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
-        for (unsigned int i=0; i<1; i++)
+        for (unsigned int i=0; i<directionImageContainer->Size(); i++)
         {
             itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
 

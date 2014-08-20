@@ -1689,7 +1689,6 @@ void mitk::FiberBundleX::CompressFibers(float error)
     unsigned long numRemovedPoints = 0;
     boost::progress_display disp(m_FiberPolyData->GetNumberOfCells());
 
-    #pragma omp parallel for
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
         ++disp;

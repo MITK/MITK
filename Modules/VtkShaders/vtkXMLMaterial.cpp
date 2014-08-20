@@ -48,12 +48,14 @@ public:
   VectorOfElements Properties;
   VectorOfShaders VertexShaders;
   VectorOfShaders FragmentShaders;
+  VectorOfShaders GeometryShaders;
   VectorOfElements Textures;
   void Initialize()
     {
     this->Properties.clear();
     this->VertexShaders.clear();
     this->FragmentShaders.clear();
+    this->GeometryShaders.clear();
     this->Textures.clear();
     }
 };
@@ -139,6 +141,9 @@ void vtkXMLMaterial::SetRootElement(vtkXMLDataElement* root)
         case vtkXMLShader::SCOPE_FRAGMENT:
           this->Internals->FragmentShaders.push_back(shader);
           break;
+        case vtkXMLShader::SCOPE_GEOMETRY:
+          this->Internals->GeometryShaders.push_back(shader);
+          break;
         default:
           vtkErrorMacro("Invalid scope for shader: " << shader->GetName());
           }
@@ -175,6 +180,11 @@ int vtkXMLMaterial::GetNumberOfVertexShaders()
 int vtkXMLMaterial::GetNumberOfFragmentShaders()
 {
   return static_cast<int>(this->Internals->FragmentShaders.size());
+}
+
+int vtkXMLMaterial::GetNumberOfGeometryShaders()
+{
+  return static_cast<int>(this->Internals->GeometryShaders.size());
 }
 
 //-----------------------------------------------------------------------------
@@ -217,6 +227,16 @@ vtkXMLShader* vtkXMLMaterial::GetFragmentShader(int id)
   return NULL;
 }
 
+
+vtkXMLShader* vtkXMLMaterial::GetGeometryShader(int id)
+{
+  if (id < this->GetNumberOfGeometryShaders())
+    {
+    return this->Internals->GeometryShaders[id].GetPointer();
+    }
+  return NULL;
+}
+
 //----------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
@@ -236,7 +256,12 @@ int vtkXMLMaterial::GetShaderStyle()
   {
     fStyle=this->GetFragmentShader()->GetStyle();
   }
-  if (vStyle!=0 && fStyle!=0 && vStyle!=fStyle)
+  int gStyle = 0;
+  if (this->GetGeometryShader())
+  {
+    gStyle=this->GetGeometryShader()->GetStyle();
+  }
+  if (vStyle!=0 && fStyle!=0 && !gStyle && vStyle!=fStyle )
   {
     vtkErrorMacro(<<"vertex shader and fragment shader style differ.");
   }

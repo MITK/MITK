@@ -64,6 +64,7 @@ public:
     return 4;
   }
 
+ virtual bool Equals(const mitk::PlanarFigure& other) const ;
 
 protected:
   PlanarFourPointAngle();

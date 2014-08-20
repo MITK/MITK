@@ -778,3 +778,107 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
 #elif _MSC_VER
 #  pragma warning (pop)
 #endif
+
+bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
+{
+  //check geometries
+  if ( this->GetPlaneGeometry() && other.GetPlaneGeometry() )
+  {
+    if( !Equal(*(this->GetPlaneGeometry()), *(other.GetPlaneGeometry()), mitk::eps, true))
+    {
+      return false;
+    }
+  }
+  else
+  {
+    return false;
+  }
+
+  //check isPlaced member
+  if ( this->m_FigurePlaced != other.m_FigurePlaced)
+  {
+    return false;
+  }
+
+  //check closed property
+  if (this->IsClosed() != other.IsClosed())
+  {
+    return false;
+  }
+
+  //check control points
+  if (this->m_ControlPoints != other.m_ControlPoints)
+  {
+
+    return false;
+  }
+
+  //check poly lines
+  if (this->m_PolyLines.size() != other.m_PolyLines.size())
+  {
+    return false;
+  }
+  else
+  {
+    std::vector<PolyLineType>::const_iterator itThis = this->m_PolyLines.begin();
+    std::vector<PolyLineType>::const_iterator itEnd = this->m_PolyLines.end();
+    std::vector<PolyLineType>::const_iterator itOther = other.m_PolyLines.begin();
+
+    while( itThis != itEnd )
+    {
+      if(itThis->size() != itOther->size())
+        return false;
+      else
+      {
+        PolyLineType::const_iterator itLineThis = itThis->begin();
+        PolyLineType::const_iterator itLineEnd = itThis->end();
+        PolyLineType::const_iterator itLineOther = itOther->begin();
+
+        while(itLineThis != itLineEnd)
+        {
+          Point2D p1 = *itLineThis;
+          Point2D p2 = *itLineOther;
+          if(p1 != p2)
+            return false;
+
+          ++itLineThis;
+          ++itLineOther;
+        }
+      }
+      ++itThis;
+      ++itOther;
+    }
+  }
+
+  //check features
+  if (this->GetNumberOfFeatures() != other.GetNumberOfFeatures())
+  {
+    return false;
+  }
+  else
+  {
+    std::vector<Feature>::const_iterator itThis = m_Features.begin();
+    std::vector<Feature>::const_iterator itEnd = m_Features.end();
+    std::vector<Feature>::const_iterator itOther = other.m_Features.begin();
+
+    while(itThis != itEnd)
+    {
+      if( itThis->Quantity != itOther->Quantity )
+        return false;
+      if( itThis->Unit.compare(itOther->Unit) != 0 )
+        return false;
+      if( itThis->Name.compare(itOther->Name) != 0 )
+        return false;
+
+      ++itThis;
+      ++itOther;
+    }
+  }
+
+  return true;
+}
+
+bool mitk::Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose )
+{
+  return leftHandSide.Equals(rightHandSide);
+}

@@ -163,6 +163,8 @@ void mitk::InteractionTestHelper::LoadInteraction()
   mitk::XML2EventParser parser(xmlStream);
   m_Events = parser.GetInteractions();
   xmlStream.close();
+    // Avoid VTK warning: Trying to delete object with non-zero reference count.
+  parser.SetReferenceCount(0);
 }
 
 

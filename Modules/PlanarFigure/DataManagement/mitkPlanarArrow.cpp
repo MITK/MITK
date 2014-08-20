@@ -105,7 +105,6 @@ void mitk::PlanarArrow::EvaluateFeaturesInternal()
   this->SetQuantity( FEATURE_ID_LENGTH, length );
 }
 
-
 void mitk::PlanarArrow::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
@@ -114,4 +113,20 @@ void mitk::PlanarArrow::PrintSelf( std::ostream& os, itk::Indent indent) const
 void mitk::PlanarArrow::SetArrowTipScaleFactor( float scale )
 {
   m_ArrowTipScaleFactor = scale;
+}
+
+bool mitk::PlanarArrow::Equals(mitk::PlanarFigure& other)
+{
+  mitk::PlanarArrow* otherArrow = dynamic_cast<mitk::PlanarArrow*>(&other);
+  if ( otherArrow )
+  {
+    if ( std::abs(this->m_ArrowTipScaleFactor - otherArrow->m_ArrowTipScaleFactor) > mitk::eps)
+      return false;
+
+    return Superclass::Equals(other);
+  }
+  else
+  {
+    return false;
+  }
 }

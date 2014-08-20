@@ -1,6 +1,9 @@
 set(SRC_CPP_FILES
   QmitkCandyStoreWidget.cpp
   QmitkNewPerspectiveDialog.cpp
+
+#  mitkQtPerspectiveItem.h
+#  mitkQtViewItem.h
 )
 
 set(INTERNAL_CPP_FILES
@@ -18,8 +21,6 @@ set(MOC_H_FILES
   src/internal/CandyStoreView.h
 
   src/QmitkCandyStoreWidget.h
-  src/mitkQtPerspectiveItem.h
-  src/mitkQtViewItem.h
   src/QmitkNewPerspectiveDialog.h
 )
 

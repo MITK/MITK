@@ -47,7 +47,6 @@ class mitkNavigationDataObjectVisualizationFilterTestSuite : public mitk::TestFi
   MITK_TEST(TestConvenienceSetTransformOrientation);
   MITK_TEST(TestUpdateOrientation);
 
-  MITK_TEST(TestDUMMY);
   CPPUNIT_TEST_SUITE_END();
 
   // Used Variables
@@ -142,27 +141,20 @@ public:
     ndDummy->SetPositionAccuracy(initialErrorDummy);
     ndDummy->SetDataValid(initialValidDummy);
     //now we have ndDummy and mitkToolDataDummy to test with
-
-    cout<<"SetUp Called"<<endl;
   }
 
   void tearDown()
   {
-    cout<<"TearDown Called"<<endl;
   }
 
   // Test functions
 
   void TestInitialize(){
-    cout<<"Init Called"<<endl;
-
     // first test: did this work?
     CPPUNIT_ASSERT_MESSAGE("Testing instantiation", myFilter.IsNotNull());
   }
 
   void TestInput(){
-    cout<<"Input Called"<<endl;
-
     //testing the input
     CPPUNIT_ASSERT_MESSAGE("Testing Set-/GetInput() input 1 without index",myFilter->GetInput() == nd1);
     CPPUNIT_ASSERT_MESSAGE("Testing Set-/GetInput() input 1", myFilter->GetInput(0) == nd1);
@@ -171,7 +163,6 @@ public:
   }
 
   void TestOutput(){
-    cout<<"Output Called"<<endl;
     //testing getting the output
     CPPUNIT_ASSERT_MESSAGE("Testing GetOutput()", output != NULL);
     CPPUNIT_ASSERT_MESSAGE("Testing GetOutput() == GetOutput()", output == myFilter->GetOutput());
@@ -179,7 +170,6 @@ public:
   }
 
   void TestRepresentationObjects(){
-    cout<<"Represent Called"<<endl;
     //setting nodes
     myFilter->SetRepresentationObject(0, mitkToolData1);
     CPPUNIT_ASSERT_MESSAGE( "Testing SetRepresentationObject()/GetRepresentationObject() node 1", myFilter->GetRepresentationObject(0) == mitkToolData1);
@@ -197,8 +187,6 @@ public:
   }
 
   void TestTransforms(){
-    cout<<"Transform Called"<<endl;
-
     myFilter->SetRepresentationObject(0, mitkToolData1);
     myFilter->SetRepresentationObject(1, mitkToolData2);
     //Process
@@ -443,11 +431,6 @@ public:
     CPPUNIT_ASSERT_MESSAGE( "Test that the second repr object is updated correctly when the first repr object is invalid",
       mitk::MatrixEqualElementWise(mitkToolData2->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix(),
       updatedOri2.rotation_matrix_transpose().transpose()));
-  }
-
-  void TestDUMMY()
-  {
-    int x = 5;
   }
 };//end class mitkNavigationDataObjectVisualizationFilterTestSuite
 

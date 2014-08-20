@@ -380,17 +380,37 @@ public:
 
     planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
 
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: width", mitk::Equal(planegeometry->GetExtent(0),width, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: height", mitk::Equal(planegeometry->GetExtent(1),height, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: depth", mitk::Equal(planegeometry->GetExtent(2),1, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: width", mitk::Equal(planegeometry->GetExtent(0),width, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: height", mitk::Equal(planegeometry->GetExtent(1),height, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: depth", mitk::Equal(planegeometry->GetExtent(2),1, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: width in mm", mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: heght in mm", mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: depth in mm", mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: width in mm", mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: heght in mm", mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: depth in mm", mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps) );
 
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: AxisVectorRight", mitk::Equal(planegeometry->GetAxisVector(0), right, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: AxisVectorBottom", mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization: AxisVectorNormal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: AxisVectorRight", mitk::Equal(planegeometry->GetAxisVector(0), right, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: AxisVectorBottom", mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: AxisVectorNormal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps) );
+
+    mitk::Vector3D spacing;
+    thicknessInMM = 1.5;
+    normal.Normalize(); normal *= thicknessInMM;
+    mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector(), &spacing);
+
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: width", mitk::Equal(planegeometry->GetExtent(0),width, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: height", mitk::Equal(planegeometry->GetExtent(1),height, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: depth", mitk::Equal(planegeometry->GetExtent(2),1, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: width in mm", mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: heght in mm", mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: depth in mm", mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps) );
+
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: AxisVectorRight", mitk::Equal(planegeometry->GetAxisVector(0), right, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: AxisVectorBottom", mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: AxisVectorNormal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps) );
+
+    ;
   }
 
   int mitkPlaneGeometryTest()
@@ -445,7 +465,6 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    //// ERLEDIGT BIS HIER!
     // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     std::cout << "Testing InitializeStandardPlane(rightVector, downVector, spacing = {1.0, 1.0, 1.5}): "<<std::endl;
@@ -485,6 +504,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
+    // BIS HIER
     // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     std::cout << "Testing SetExtentInMM(2, ...), querying by GetExtentInMM(2): ";

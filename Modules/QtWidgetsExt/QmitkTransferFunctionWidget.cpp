@@ -141,6 +141,7 @@ void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode* node)
 
       m_ScalarOpacityFunctionCanvas->SetHistogram( h );
       m_GradientOpacityCanvas->SetHistogram( h );
+      m_ColorTransferFunctionCanvas->SetHistogram( h );
     }
 
     OnUpdateCanvas();
@@ -155,6 +156,7 @@ turnOff:
   m_GradientOpacityCanvas->setEnabled(false);
   m_GradientOpacityCanvas->SetHistogram(0);
   m_ColorTransferFunctionCanvas->setEnabled(false);
+  m_ColorTransferFunctionCanvas->SetHistogram(0);
   tfpToChange = 0;
 }
 

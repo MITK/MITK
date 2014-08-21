@@ -111,8 +111,8 @@ bool mitk::DiffusionDICOMFileReader
   }
 
   // initialize the output image
-  output_image->SetDirections( directions );
   output_image->SetReferenceBValue( max_bvalue );
+  output_image->SetDirections( directions );
   if( this->m_IsMosaicData )
   {
 

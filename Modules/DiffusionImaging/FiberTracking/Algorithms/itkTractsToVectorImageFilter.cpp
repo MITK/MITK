@@ -298,7 +298,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
 
 template< class PixelType >
-typename TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsToVectorImageFilter< PixelType >::FastClustering(DirectionContainerType::Pointer inDirs, std::vector< double > lengths)
+TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsToVectorImageFilter< PixelType >::FastClustering(DirectionContainerType::Pointer inDirs, std::vector< double > lengths)
 {
     DirectionContainerType::Pointer outDirs = DirectionContainerType::New();
     if (inDirs->size()<2)

@@ -246,21 +246,9 @@ struct CvpSelListener : ISelectionListener
                             m_View->m_Controls->m_Crosshair->setEnabled(true);
                         }
 
-                        float val;
-                        node->GetFloatProperty("TubeRadius", val);
-                        m_View->m_Controls->m_TubeRadius->setValue((int)(val * 100.0));
-
-                        QString label = "Radius %1";
-                        label = label.arg(val);
-                        m_View->m_Controls->label_tuberadius->setText(label);
-
                         int width;
                         node->GetIntProperty("LineWidth", width);
                         m_View->m_Controls->m_LineWidth->setValue(width);
-
-                        label = "Width %1";
-                        label = label.arg(width);
-                        m_View->m_Controls->label_linewidth->setText(label);
 
                         float range;
                         node->GetFloatProperty("Fiber2DSliceThickness",range);
@@ -681,8 +669,6 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
         m_Controls->m_ScalingFrame->setVisible(false);
         m_Controls->m_NormalizationFrame->setVisible(false);
-        m_Controls->frame_tube->setVisible(false);
-        m_Controls->frame_wire->setVisible(false);
     }
 
     m_IsInitialized = false;
@@ -853,43 +839,30 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     {
         connect( (QObject*)(m_Controls->m_DisplayIndex), SIGNAL(valueChanged(int)), this, SLOT(DisplayIndexChanged(int)) );
         connect( (QObject*)(m_Controls->m_DisplayIndexSpinBox), SIGNAL(valueChanged(int)), this, SLOT(DisplayIndexChanged(int)) );
-
         connect( (QObject*)(m_Controls->m_TextureIntON), SIGNAL(clicked()), this, SLOT(TextIntON()) );
         connect( (QObject*)(m_Controls->m_Reinit), SIGNAL(clicked()), this, SLOT(Reinit()) );
-
         connect( (QObject*)(m_Controls->m_VisibleOdfsON_T), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_T()) );
         connect( (QObject*)(m_Controls->m_VisibleOdfsON_S), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_S()) );
         connect( (QObject*)(m_Controls->m_VisibleOdfsON_C), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_C()) );
-
         connect( (QObject*)(m_Controls->m_ShowMaxNumber), SIGNAL(editingFinished()), this, SLOT(ShowMaxNumberChanged()) );
         connect( (QObject*)(m_Controls->m_NormalizationDropdown), SIGNAL(currentIndexChanged(int)), this, SLOT(NormalizationDropdownChanged(int)) );
         connect( (QObject*)(m_Controls->m_ScalingFactor), SIGNAL(valueChanged(double)), this, SLOT(ScalingFactorChanged(double)) );
         connect( (QObject*)(m_Controls->m_AdditionalScaling), SIGNAL(currentIndexChanged(int)), this, SLOT(AdditionalScaling(int)) );
         connect( (QObject*)(m_Controls->m_IndexParam1), SIGNAL(valueChanged(double)), this, SLOT(IndexParam1Changed(double)) );
         connect( (QObject*)(m_Controls->m_IndexParam2), SIGNAL(valueChanged(double)), this, SLOT(IndexParam2Changed(double)) );
-
         connect( (QObject*)(m_Controls->m_ScalingCheckbox), SIGNAL(clicked()), this, SLOT(ScalingCheckbox()) );
-
         connect( (QObject*)(m_Controls->m_OpacitySlider), SIGNAL(spanChanged(double,double)), this, SLOT(OpacityChanged(double,double)) );
-
-        connect((QObject*) m_Controls->m_Wire, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationWire()));
-        connect((QObject*) m_Controls->m_Tube, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationTube()));
         connect((QObject*) m_Controls->m_Color, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationColor()));
         connect((QObject*) m_Controls->m_ResetColoring, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationResetColoring()));
         connect((QObject*) m_Controls->m_Focus, SIGNAL(clicked()), (QObject*) this, SLOT(PlanarFigureFocus()));
         connect((QObject*) m_Controls->m_FiberFading2D, SIGNAL(clicked()), (QObject*) this, SLOT( Fiber2DfadingEFX() ) );
         connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(sliderReleased()), (QObject*) this, SLOT( FiberSlicingThickness2D() ) );
         connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(valueChanged(int)), (QObject*) this, SLOT( FiberSlicingUpdateLabel(int) ));
-
         connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
-
         connect((QObject*) m_Controls->m_PFWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(PFWidth(int)));
         connect((QObject*) m_Controls->m_PFColor, SIGNAL(clicked()), (QObject*) this, SLOT(PFColor()));
-
         connect((QObject*) m_Controls->m_TDI, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateTdi()));
-
-        connect((QObject*) m_Controls->m_LineWidth, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(LineWidthChanged(int)));
-        connect((QObject*) m_Controls->m_TubeRadius, SIGNAL(valueChanged(int)), (QObject*) this, SLOT(TubeRadiusChanged(int)));
+        connect((QObject*) m_Controls->m_LineWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(LineWidthChanged()));
     }
 }
 
@@ -1483,11 +1456,12 @@ void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 
 void QmitkControlVisualizationPropertiesView::Fiber2DfadingEFX()
 {
-    if (m_SelectedNode)
+    if (m_SelectedNode && dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData()) )
     {
         bool currentMode;
         m_SelectedNode->GetBoolProperty("Fiber2DfadeEFX", currentMode);
         m_SelectedNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(!currentMode));
+        dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData())->RequestUpdate2D();
         mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     }
 
@@ -1495,12 +1469,15 @@ void QmitkControlVisualizationPropertiesView::Fiber2DfadingEFX()
 
 void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
 {
-    if (m_SelectedNode)
+    if (m_SelectedNode && dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData()))
     {
-
-
         float fibThickness = m_Controls->m_FiberThicknessSlider->value() * 0.1;
+        float currentThickness = 0;
+        m_SelectedNode->GetFloatProperty("Fiber2DSliceThickness", currentThickness);
+        if (fabs(fibThickness-currentThickness)<0.001)
+            return;
         m_SelectedNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(fibThickness));
+        dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData())->RequestUpdate2D();
         mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     }
 }
@@ -1511,46 +1488,6 @@ void QmitkControlVisualizationPropertiesView::FiberSlicingUpdateLabel(int value)
     label = label.arg(value * 0.1);
     m_Controls->label_range->setText(label);
     this->FiberSlicingThickness2D();
-}
-
-void QmitkControlVisualizationPropertiesView::BundleRepresentationWire()
-{
-    if(m_SelectedNode)
-    {
-        int width = m_Controls->m_LineWidth->value();
-        m_SelectedNode->SetProperty("LineWidth",mitk::IntProperty::New(width));
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(15));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(18));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(1));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(2));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(3));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(4));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(0));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-    }
-}
-
-void QmitkControlVisualizationPropertiesView::BundleRepresentationTube()
-{
-    if(m_SelectedNode)
-    {
-        float radius = m_Controls->m_TubeRadius->value() / 100.0;
-        m_SelectedNode->SetProperty("TubeRadius",mitk::FloatProperty::New(radius));
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(17));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(13));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(16));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-        m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(0));
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
-    }
 }
 
 void QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor(const itk::EventObject& /*e*/)
@@ -1570,7 +1507,6 @@ void QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor(const it
     m_SelectedNode->SetProperty("color",mitk::ColorProperty::New(color[0], color[1], color[2]));
     mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
     fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_CUSTOM);
-    m_SelectedNode->Modified();
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 }
 
@@ -1595,7 +1531,6 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationColor()
         m_SelectedNode->SetProperty("color",mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
         fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_CUSTOM);
-        m_SelectedNode->Modified();
         mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     }
 }
@@ -1614,7 +1549,6 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationResetColoring(
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
         fib->SetColorCoding(mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED);
         fib->DoColorCodingOrientationBased();
-        m_SelectedNode->Modified();
         mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
     }
 }
@@ -1873,20 +1807,20 @@ void QmitkControlVisualizationPropertiesView::GenerateTdi()
     }
 }
 
-void QmitkControlVisualizationPropertiesView::LineWidthChanged(int w)
+void QmitkControlVisualizationPropertiesView::LineWidthChanged()
 {
-    QString label = "Width %1";
-    label = label.arg(w);
-    m_Controls->label_linewidth->setText(label);
-    BundleRepresentationWire();
-}
-
-void QmitkControlVisualizationPropertiesView::TubeRadiusChanged(int r)
-{
-    QString label = "Radius %1";
-    label = label.arg(r / 100.0);
-    m_Controls->label_tuberadius->setText(label);
-    this->BundleRepresentationTube();
+    if(m_SelectedNode && dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData()))
+    {
+        int newWidth = m_Controls->m_LineWidth->value();
+        int currentWidth = 0;
+        m_SelectedNode->GetIntProperty("LineWidth", currentWidth);
+        if (currentWidth==newWidth)
+            return;
+        m_SelectedNode->SetIntProperty("LineWidth", newWidth);
+        dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData())->RequestUpdate2D();
+        dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData())->RequestUpdate3D();
+        mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+    }
 }
 
 void QmitkControlVisualizationPropertiesView::Welcome()

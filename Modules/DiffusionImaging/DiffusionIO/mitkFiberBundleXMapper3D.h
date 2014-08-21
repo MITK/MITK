@@ -44,7 +44,7 @@ class FiberBundleXMapper3D : public VtkMapper
 {
 public:
 
-    mitkClassMacro(FiberBundleXMapper3D, VtkMapper);
+    mitkClassMacro(FiberBundleXMapper3D, VtkMapper)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -77,7 +77,7 @@ public:
     };
 
     /** \brief This member holds all three LocalStorages for the 3D render window(s). */
-    mitk::LocalStorageHandler<FBXLocalStorage3D> m_LSH;
+    mitk::LocalStorageHandler<FBXLocalStorage3D> m_LocalStorageHandler;
 
 
 protected:

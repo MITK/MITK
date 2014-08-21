@@ -115,6 +115,11 @@ public:
     itkGetMacro( MeanFiberLength, float )
     itkGetMacro( MedianFiberLength, float )
     itkGetMacro( LengthStDev, float )
+    itkGetMacro( UpdateTime2D, itk::TimeStamp )
+    itkGetMacro( UpdateTime3D, itk::TimeStamp )
+    void RequestUpdate2D(){ m_UpdateTime2D.Modified(); }
+    void RequestUpdate3D(){ m_UpdateTime3D.Modified(); }
+
     unsigned long GetNumberOfPoints();
 
     // copy fiber bundle
@@ -157,6 +162,8 @@ private:
     float   m_MedianFiberLength;
     float   m_LengthStDev;
     int     m_FiberSampling;
+    itk::TimeStamp m_UpdateTime2D;
+    itk::TimeStamp m_UpdateTime3D;
 
     mitk::Image::Pointer m_ReferenceImage;
 

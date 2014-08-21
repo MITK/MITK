@@ -102,8 +102,6 @@ protected slots:
   void OnTSNumChanged(int num);
   void OnMenuAboutToShow ();
 
-  void BundleRepresentationWire();
-  void BundleRepresentationTube();
   void BundleRepresentationColor();
   void BundleRepresentationResetColoring();
   void PlanarFigureFocus();
@@ -116,8 +114,7 @@ protected slots:
   void PFWidth(int);
   void PFColor();
 
-  void LineWidthChanged(int);
-  void TubeRadiusChanged(int);
+  void LineWidthChanged();
 
   void GenerateTdi();
   void Welcome();

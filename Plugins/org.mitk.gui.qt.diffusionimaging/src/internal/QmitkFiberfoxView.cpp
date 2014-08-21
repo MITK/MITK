@@ -1935,7 +1935,7 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
 
             const int NumCoeffs = (shOrder*shOrder + shOrder + 2)/2 + shOrder;
             typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
-            typename QballFilterType::Pointer qballfilter = QballFilterType::New();
+            QballFilterType::Pointer qballfilter = QballFilterType::New();
             qballfilter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
             qballfilter->SetBValue(diffImg->GetReferenceBValue());
             qballfilter->SetLambda(0.006);

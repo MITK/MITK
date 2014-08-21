@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>639</width>
-    <height>1030</height>
+    <height>1148</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -282,6 +282,289 @@
          </property>
         </spacer>
        </item>
+       <item row="0" column="0">
+        <widget class="QFrame" name="frame_3">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>0</number>
+          </property>
+          <item row="1" column="1">
+           <widget class="QFrame" name="frame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout_2">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="m_Blur">
+               <property name="toolTip">
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
+               </property>
+               <property name="statusTip">
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
+               </property>
+               <property name="whatsThis">
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
+               </property>
+               <property name="decimals">
+                <number>6</number>
+               </property>
+               <property name="maximum">
+                <double>2.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.000100000000000</double>
+               </property>
+               <property name="value">
+                <double>0.001000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label">
+               <property name="toolTip">
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
+               </property>
+               <property name="statusTip">
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
+               </property>
+               <property name="whatsThis">
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
+               </property>
+               <property name="text">
+                <string>Merge radius</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QCommandLinkButton" name="m_MergeDwisButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Merges selected DWIs of same dimension. If several b-values are present, the resulting image will contain multiple b-shells.</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Merge selected DWIs</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCommandLinkButton" name="m_NormalizeImageValuesButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Each image value is normalized with the corresponding baseline signal value.</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Normalize image values</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QFrame" name="frame_4">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QSpinBox" name="m_targetBValueSpinBox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>Target b-value</string>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+               <property name="singleStep">
+                <number>500</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="m_ProjectionMethodBox">
+               <property name="toolTip">
+                <string>Select projection method.</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>ADC Average</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>AKC</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Bi-Exponential</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCommandLinkButton" name="m_ButtonAverageGradients">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Multiple acquistions of one gradient direction can be averaged. Due to rounding errors, similar gradients often differ in the last decimal positions. The Merge radius allows to average them by taking all directions within a certain radius into account.</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Average repetitions</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCommandLinkButton" name="m_ProjectSignalButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Project image values onto one b-shell.</string>
+            </property>
+            <property name="text">
+             <string>Project onto shell</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QFrame" name="frame_6">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_19">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>0</number>
+             </property>
+             <item row="0" column="1">
+              <widget class="QmitkDataStorageComboBox" name="m_NormalizationMaskBox">
+               <property name="toolTip">
+                <string>Select binary mask image.</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QmitkDataStorageComboBox" name="m_NormalizationReferenceBox">
+               <property name="toolTip">
+                <string>Select normalization reference.</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>White matter</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>CSF</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Voxel-wise baseline</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
@@ -496,240 +779,6 @@
               </widget>
              </item>
             </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QFrame" name="frame_3">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_11">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <property name="horizontalSpacing">
-           <number>0</number>
-          </property>
-          <item row="2" column="0">
-           <widget class="QCommandLinkButton" name="m_ProjectSignalButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="toolTip">
-             <string>Project image values onto one b-shell.</string>
-            </property>
-            <property name="text">
-             <string>Project onto shell</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QFrame" name="frame">
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QFormLayout" name="formLayout_2">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="m_Blur">
-               <property name="toolTip">
-                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
-               </property>
-               <property name="statusTip">
-                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
-               </property>
-               <property name="whatsThis">
-                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
-               </property>
-               <property name="decimals">
-                <number>6</number>
-               </property>
-               <property name="maximum">
-                <double>2.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.000100000000000</double>
-               </property>
-               <property name="value">
-                <double>0.001000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label">
-               <property name="toolTip">
-                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
-               </property>
-               <property name="statusTip">
-                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
-               </property>
-               <property name="whatsThis">
-                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
-               </property>
-               <property name="text">
-                <string>Merge radius</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCommandLinkButton" name="m_ButtonAverageGradients">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="toolTip">
-             <string>Multiple acquistions of one gradient direction can be averaged. Due to rounding errors, similar gradients often differ in the last decimal positions. The Merge radius allows to average them by taking all directions within a certain radius into account.</string>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="whatsThis">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string>Average repetitions</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QmitkDataStorageComboBox" name="m_NormalizationMaskBox">
-            <property name="toolTip">
-             <string>Select projection method.</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QFrame" name="frame_4">
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_4">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <item row="0" column="0">
-              <widget class="QSpinBox" name="m_targetBValueSpinBox">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="toolTip">
-                <string>Target b-value</string>
-               </property>
-               <property name="maximum">
-                <number>100000</number>
-               </property>
-               <property name="singleStep">
-                <number>500</number>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="m_ProjectionMethodBox">
-               <property name="toolTip">
-                <string>Select projection method.</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>ADC Average</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>AKC</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Bi-Exponential</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCommandLinkButton" name="m_NormalizeImageValuesButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="toolTip">
-             <string>Each image value is normalized with the corresponding baseline signal value.</string>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="whatsThis">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string>Normalize image values</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QCommandLinkButton" name="m_MergeDwisButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="toolTip">
-             <string>Merges selected DWIs of same dimension. If several b-values are present, the resulting image will contain multiple b-shells.</string>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="whatsThis">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string>Merge selected DWIs</string>
-            </property>
            </widget>
           </item>
          </layout>
@@ -1483,7 +1532,6 @@
   <tabstop>m_Blur</tabstop>
   <tabstop>m_targetBValueSpinBox</tabstop>
   <tabstop>m_ProjectionMethodBox</tabstop>
-  <tabstop>m_NormalizationMaskBox</tabstop>
   <tabstop>m_ResampleTypeBox</tabstop>
   <tabstop>m_ResampleDoubleX</tabstop>
   <tabstop>m_ResampleDoubleY</tabstop>

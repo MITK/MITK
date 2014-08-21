@@ -21,12 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkDiffusionHeaderDICOMFileReader.h"
+#include "mitkThreeDnTDICOMSeriesReader.h"
 
 namespace mitk
 {
 
 class MitkDiffusionCore_EXPORT DiffusionDICOMFileReader
-        : public DICOMITKSeriesGDCMReader
+        : public ThreeDnTDICOMSeriesReader
 {
 public:
 
@@ -45,9 +46,13 @@ protected:
     DiffusionDICOMFileReader();
     virtual ~DiffusionDICOMFileReader();
 
-    mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType m_RetrievedHeader;
+    bool LoadSingleOutputImage( DiffusionHeaderDICOMFileReader::DICOMHeaderListType, DICOMImageBlockDescriptor&);
 
-    mitk::DiffusionHeaderDICOMFileReader::Pointer m_HeaderReader;
+    //mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType m_RetrievedHeader;
+
+    std::vector< mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType > m_OutputHeaderContainer;
+
+   //mitk::DiffusionHeaderDICOMFileReader::Pointer headerReader;
 
     bool m_IsMosaicData;
 };

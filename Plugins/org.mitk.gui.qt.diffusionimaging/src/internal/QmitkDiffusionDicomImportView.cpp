@@ -469,14 +469,23 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
 
       gdcmReader->LoadImages();
 
-      mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(0).GetMitkImage();
-      mitk::DiffusionImage<short>::Pointer d_img = static_cast<mitk::DiffusionImage<short>*>( loaded_image.GetPointer() );
+      for( int o = 0; o < gdcmReader->GetNumberOfOutputs(); o++ )
+      {
+        mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(o).GetMitkImage();
+        mitk::DiffusionImage<short>::Pointer d_img = static_cast<mitk::DiffusionImage<short>*>( loaded_image.GetPointer() );
 
-      node=mitk::DataNode::New();
-      node->SetData( d_img );
-      GetDefaultDataStorage()->Add(node);
-      SetDwiNodeProperties(node, "ImportedData");
-      //Status(QString("Image %1 added to datastorage").arg(descr));
+        std::stringstream ss;
+        ss << "ImportedData_" << o;
+
+        node = mitk::DataNode::New();
+        node->SetData( d_img );
+
+        GetDefaultDataStorage()->Add(node);
+        SetDwiNodeProperties(node, ss.str() );
+        //Status(QString("Image %1 added to datastorage").arg(descr));
+      }
+
+
 
     }
 

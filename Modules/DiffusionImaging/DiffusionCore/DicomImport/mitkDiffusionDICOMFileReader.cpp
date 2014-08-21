@@ -58,23 +58,43 @@ mitk::DiffusionDICOMFileReader::~DiffusionDICOMFileReader()
 bool mitk::DiffusionDICOMFileReader
 ::LoadImages()
 {
+  unsigned int numberOfOutputs = this->GetNumberOfOutputs();
+  bool success = true;
+
+  for(unsigned int o = 0; o < numberOfOutputs; ++o)
+  {
+    success &= this->LoadSingleOutputImage( this->m_OutputHeaderContainer.at(o),
+                                            this->InternalGetOutput(o) );
+  }
+
+  return success;
+}
+
+bool mitk::DiffusionDICOMFileReader
+::LoadSingleOutputImage( DiffusionHeaderDICOMFileReader::DICOMHeaderListType retrievedHeader,
+                         DICOMImageBlockDescriptor& block )
+{
   // prepare data reading
   DiffusionDICOMFileReaderHelper helper;
   DiffusionDICOMFileReaderHelper::VolumeFileNamesContainer filenames;
 
-  const size_t number_of_outputs = this->GetNumberOfOutputs();
+  const DICOMImageFrameList& frames = block.GetImageFrameList();
+  int numberOfDWImages = block.GetIntProperty("timesteps", 1);
 
-  for( size_t idx = 0; idx < number_of_outputs; idx++ )
+  int numberOfFramesPerDWImage = frames.size() / numberOfDWImages;
+
+  assert( int( double((double) frames.size() / (double) numberOfDWImages)) == numberOfFramesPerDWImage );
+  for( int idx = 0; idx < numberOfDWImages; idx++ )
   {
-    DICOMImageFrameList flist = this->GetOutput(idx).GetImageFrameList();
-
     std::vector< std::string > FileNamesPerVolume;
 
-    DICOMImageFrameList::const_iterator cIt = flist.begin();
-    while( cIt != flist.end() )
+    DICOMImageFrameList::const_iterator timeStepStart = frames.begin() + idx * numberOfFramesPerDWImage;
+    DICOMImageFrameList::const_iterator timeStepEnd   = frames.begin() + (idx+1) * numberOfFramesPerDWImage;
+    for (DICOMImageFrameList::const_iterator frameIter = timeStepStart;
+        frameIter != timeStepEnd;
+        ++frameIter)
     {
-      FileNamesPerVolume.push_back( (*cIt)->Filename );
-      ++cIt;
+      FileNamesPerVolume.push_back( (*frameIter)->Filename );
     }
 
     filenames.push_back( FileNamesPerVolume );
@@ -90,18 +110,18 @@ bool mitk::DiffusionDICOMFileReader
 
 
   double max_bvalue = 0;
-  for( size_t idx = 0; idx < number_of_outputs; idx++ )
+  for( int idx = 0; idx < numberOfDWImages; idx++ )
   {
-    DiffusionImageDICOMHeaderInformation header = this->m_RetrievedHeader.at(idx);
+    DiffusionImageDICOMHeaderInformation header = retrievedHeader.at(idx);
 
     if( max_bvalue < header.b_value )
       max_bvalue = header.b_value;
   }
 
   // normalize the retrieved gradient directions according to the set b-value (maximal one)
-  for( size_t idx = 0; idx < number_of_outputs; idx++ )
+  for( int idx = 0; idx < numberOfDWImages; idx++ )
   {
-    DiffusionImageDICOMHeaderInformation header = this->m_RetrievedHeader.at(idx);
+    DiffusionImageDICOMHeaderInformation header = retrievedHeader.at(idx);
     DiffusionImageType::GradientDirectionType grad = header.g_vector;
 
     grad.normalize();
@@ -115,9 +135,8 @@ bool mitk::DiffusionDICOMFileReader
   output_image->SetDirections( directions );
   if( this->m_IsMosaicData )
   {
-
     mitk::DiffusionHeaderSiemensMosaicDICOMFileReader::Pointer mosaic_reader =
-        dynamic_cast< mitk::DiffusionHeaderSiemensMosaicDICOMFileReader* >( this->m_HeaderReader.GetPointer() );
+        mitk::DiffusionHeaderSiemensMosaicDICOMFileReader::New();
 
     // retrieve the remaining meta-information needed for mosaic reconstruction
     // it suffices to get it exemplatory from the first file in the file list
@@ -135,10 +154,10 @@ bool mitk::DiffusionDICOMFileReader
   //output_image->UpdateBValueMap();
 
   // reduce the number of outputs to 1 as we will produce a single image
-  this->SetNumberOfOutputs(1);
+  //this->SetNumberOfOutputs(1);
 
   // set the image to output
-  DICOMImageBlockDescriptor& block = this->InternalGetOutput(0);
+  //DICOMImageBlockDescriptor& block = this->InternalGetOutput(0);
   block.SetMitkImage( (mitk::Image::Pointer) output_image );
 
   return block.GetMitkImage().IsNotNull();
@@ -148,6 +167,8 @@ bool mitk::DiffusionDICOMFileReader
 void mitk::DiffusionDICOMFileReader
 ::AnalyzeInputFiles()
 {
+  this->SetGroup3DandT(true);
+
   Superclass::AnalyzeInputFiles();
 
   // collect output from superclass
@@ -158,81 +179,99 @@ void mitk::DiffusionDICOMFileReader
     MITK_ERROR << "Failed to parse input, retrieved 0 outputs from SeriesGDCMReader ";
   }
 
-  DICOMImageBlockDescriptor block_0 = this->GetOutput(0);
+  MITK_INFO("diffusion.dicomreader") << "Retrieved " << number_of_outputs << "outputs.";
 
-  MITK_INFO << "Retrieved " << number_of_outputs << "outputs.";
-
-  // collect vendor ID from the first output, first image
-  StringList inputFilename;
-  DICOMImageFrameInfo::Pointer frame_0 = block_0.GetImageFrameList().at(0);
-  inputFilename.push_back( frame_0->Filename );
-
-  gdcm::Scanner gdcmScanner;
-
-  gdcm::Tag t_vendor(0x008, 0x0070);
-  gdcm::Tag t_imagetype(0x008, 0x008);
-
-  // add DICOM Tag for vendor
-  gdcmScanner.AddTag( t_vendor );
-  // add DICOM Tag for image type
-  gdcmScanner.AddTag( t_imagetype );
-  gdcmScanner.Scan( inputFilename );
-
-  // retrieve both vendor and image type
-  std::string vendor = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_vendor );
-  std::string image_type = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_imagetype );
-  MITK_INFO << "Got vendor: " << vendor << " image type " << image_type;
-
-
-  // parse vendor tag
-  if( vendor.find("SIEMENS") != std::string::npos )
+  for( unsigned int outputidx = 0; outputidx < this->GetNumberOfOutputs(); outputidx++ )
   {
-    if( image_type.find("MOSAIC") != std::string::npos )
-    {
-      m_HeaderReader = mitk::DiffusionHeaderSiemensMosaicDICOMFileReader::New();
-      this->m_IsMosaicData = true;
-    }
-    else
-    {
-      m_HeaderReader = mitk::DiffusionHeaderSiemensDICOMFileReader::New();
-    }
+      DICOMImageBlockDescriptor block_0 = this->GetOutput(outputidx);
+
+      // collect vendor ID from the first output, first image
+      StringList inputFilename;
+      DICOMImageFrameInfo::Pointer frame_0 = block_0.GetImageFrameList().at(0);
+      inputFilename.push_back( frame_0->Filename );
+
+      gdcm::Scanner gdcmScanner;
+
+      gdcm::Tag t_vendor(0x008, 0x0070);
+      gdcm::Tag t_imagetype(0x008, 0x008);
+
+      // add DICOM Tag for vendor
+      gdcmScanner.AddTag( t_vendor );
+      // add DICOM Tag for image type
+      gdcmScanner.AddTag( t_imagetype );
+      gdcmScanner.Scan( inputFilename );
+
+      // retrieve both vendor and image type
+      std::string vendor = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_vendor );
+      std::string image_type = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_imagetype );
+      MITK_INFO("diffusion.dicomreader") << "Output " << outputidx+1 << "Got vendor: " << vendor << " image type " << image_type;
+
+       mitk::DiffusionHeaderDICOMFileReader::Pointer headerReader;
+
+      // parse vendor tag
+      if( vendor.find("SIEMENS") != std::string::npos )
+      {
+        if( image_type.find("MOSAIC") != std::string::npos )
+        {
+          headerReader = mitk::DiffusionHeaderSiemensMosaicDICOMFileReader::New();
+          this->m_IsMosaicData = true;
+        }
+        else
+        {
+          headerReader = mitk::DiffusionHeaderSiemensDICOMFileReader::New();
+        }
+
+      }
+      else if( vendor.find("GE") != std::string::npos )
+      {
+        headerReader = mitk::DiffusionHeaderGEDICOMFileReader::New();
+      }
+      else if( vendor.find("Philips") != std::string::npos )
+      {
+        headerReader = mitk::DiffusionHeaderPhilipsDICOMFileReader::New();
+      }
+      else
+      {
+        // unknown vendor
+      }
+
+      if( headerReader.IsNull() )
+      {
+        MITK_ERROR << "No header reader for given vendor. ";
+        return;
+      }
+
+      bool canread = false;
+      // iterate over the threeD+t block
+
+      int numberOfTimesteps = block_0.GetIntProperty("timesteps", 1);
+      int framesPerTimestep = block_0.GetImageFrameList().size() / numberOfTimesteps;
+
+      for( int idx = 0; idx < numberOfTimesteps; idx++ )
+      {
+        int access_idx = idx * framesPerTimestep;
+        DICOMImageFrameInfo::Pointer frame = this->GetOutput( outputidx ).GetImageFrameList().at( access_idx );
+        canread = headerReader->ReadDiffusionHeader( frame->Filename );
+      }
+
+      // collect the information
+      mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType retrievedHeader = headerReader->GetHeaderInformation();
+      m_OutputHeaderContainer.push_back( retrievedHeader );
 
   }
-  else if( vendor.find("GE") != std::string::npos )
-  {
-    m_HeaderReader = mitk::DiffusionHeaderGEDICOMFileReader::New();
-  }
-  else if( vendor.find("Philips") != std::string::npos )
-  {
-    m_HeaderReader = mitk::DiffusionHeaderPhilipsDICOMFileReader::New();
-  }
-  else
-  {
-    // unknown vendor
-  }
 
-  if( m_HeaderReader.IsNull() )
+  for( unsigned int outputidx = 0; outputidx < this->GetNumberOfOutputs(); outputidx++ )
   {
-    MITK_ERROR << "No header reader for given vendor. ";
-    return;
+    // TODO : Analyze outputs + header information, i.e. for the loading confidence
+    MITK_INFO << "----- Diffusion DICOM Analysis Report ---- ";
+
+    PerformHeaderAnalysis( this->m_OutputHeaderContainer.at( outputidx) );
+
+    MITK_INFO << "===========================================";
+
   }
 
-  bool canread = false;
-  for( size_t idx = 0; idx < number_of_outputs; idx++ )
-  {
-    DICOMImageFrameInfo::Pointer frame = this->GetOutput( idx ).GetImageFrameList().at(0);
-    canread = m_HeaderReader->ReadDiffusionHeader(frame->Filename);
-  }
 
-  // collect the information
-  m_RetrievedHeader = m_HeaderReader->GetHeaderInformation();
-
-  // TODO : Analyze outputs + header information, i.e. for the loading confidence
-  MITK_INFO << "----- Diffusion DICOM Analysis Report ---- ";
-
-  PerformHeaderAnalysis( m_RetrievedHeader );
-
-  MITK_INFO << "===========================================";
 
 }
 

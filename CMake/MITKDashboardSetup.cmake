@@ -33,15 +33,8 @@ endif()
 
 if(MITK_USE_QT)
   if(NOT QT_QMAKE_EXECUTABLE)
-    if(QT_BINARY_DIR)
-      if(EXISTS "${QT_BINARY_DIR}/qmake")
-        set(QT_QMAKE_EXECUTABLE "${QT_BINARY_DIR}/qmake")
-      elseif(EXISTS "${QT_BINARY_DIR}/qmake-qt4")
-        set(QT_QMAKE_EXECUTABLE "${QT_BINARY_DIR}/qmake-qt4")
-      endif()
-    else()
-      set(QT_QMAKE_EXECUTABLE "qmake")
-    endif()
+    find_program(QT_QMAKE_EXECUTABLE NAMES qmake qmake-qt4
+                 HINTS ${QT_BINARY_DIR})
   endif()
 
   execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} --version

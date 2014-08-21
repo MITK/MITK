@@ -1894,7 +1894,7 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
         // sample prototype signals
         if ( doSampling )
         {
-            const int shOrder = 4;
+            const int shOrder = 2;
 
             typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
             TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
@@ -1949,6 +1949,7 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
             itk::ImageRegionIterator< itk::Image< itk::DiffusionTensor3D< double >, 3 > >  it(tensorImage, tensorImage->GetLargestPossibleRegion());
             while(!it.IsAtEnd())
             {
+                bool skipPixel = false;
                 if (parameters.m_MaskImage.IsNotNull() && parameters.m_MaskImage->GetPixel(it.GetIndex())<=0)
                 {
                     ++it;
@@ -1956,11 +1957,16 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
                 }
                 for (unsigned int i=0; i<diffImg->GetDirections()->Size(); i++)
                 {
-                    if (diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i]<=0 || diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i]>diffImg->GetVectorImage()->GetPixel(it.GetIndex())[b0Index])
+                    if (diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i]!=diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i] || diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i]<=0 || diffImg->GetVectorImage()->GetPixel(it.GetIndex())[i]>diffImg->GetVectorImage()->GetPixel(it.GetIndex())[b0Index])
                     {
-                        ++it;
-                        continue;
+                        skipPixel = true;
+                        break;
                     }
+                }
+                if (skipPixel)
+                {
+                    ++it;
+                    continue;
                 }
 
                 typedef itk::DiffusionTensor3D<double>    TensorType;
@@ -1969,7 +1975,7 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
                 TensorType tensor = it.Get();
                 double FA = tensor.GetFractionalAnisotropy();
                 double ADC = adcImage->GetPixel(it.GetIndex());
-                itk::Vector< float, NumCoeffs > itkv = itkFeatureImage->GetPixel(it.GetIndex());
+                QballFilterType::CoefficientImageType::PixelType itkv = itkFeatureImage->GetPixel(it.GetIndex());
                 vnl_vector_fixed< double, NumCoeffs > coeffs;
                 for (unsigned int c=0; c<itkv.Size(); c++)
                     coeffs[c] = itkv[c]/max;

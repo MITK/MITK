@@ -46,7 +46,10 @@ int FiberDirectionExtraction(int argc, char* argv[])
     parser.addArgument("out", "o", ctkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
     parser.addArgument("mask", "m", ctkCommandLineParser::InputFile, "Mask:", "mask image");
     parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
+    parser.addArgument("peakthresh", "t", ctkCommandLineParser::Float, "Peak size threshold:", "peak size threshold relative to largest peak in voxel", 0.2, true);
     parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
+    parser.addArgument("numdirs", "d", ctkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
+    parser.addArgument("normalize", "n", ctkCommandLineParser::Bool, "Normalize:", "normalize vectors");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -58,6 +61,10 @@ int FiberDirectionExtraction(int argc, char* argv[])
     if (parsedArgs.count("mask"))
         maskImage = us::any_cast<string>(parsedArgs["mask"]);
 
+    float peakThreshold = 0.2;
+    if (parsedArgs.count("peakthresh"))
+        peakThreshold = us::any_cast<float>(parsedArgs["peakthresh"]);
+
     float angularThreshold = 25;
     if (parsedArgs.count("athresh"))
         angularThreshold = us::any_cast<float>(parsedArgs["athresh"]);
@@ -68,6 +75,13 @@ int FiberDirectionExtraction(int argc, char* argv[])
     if (parsedArgs.count("verbose"))
         verbose = us::any_cast<bool>(parsedArgs["verbose"]);
 
+    int maxNumDirs = 3;
+    if (parsedArgs.count("numdirs"))
+        maxNumDirs = us::any_cast<int>(parsedArgs["numdirs"]);
+
+    bool normalize = false;
+    if (parsedArgs.count("normalize"))
+        normalize = us::any_cast<bool>(parsedArgs["normalize"]);
 
     try
     {
@@ -85,7 +99,7 @@ int FiberDirectionExtraction(int argc, char* argv[])
             MITK_INFO << "Using mask image";
             itkMaskImage = ItkUcharImgType::New();
             mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(maskImage)->GetData());
-            mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
+            mitk::CastToItkImage<ItkUcharImgType>(mitkMaskImage, itkMaskImage);
         }
 
         // extract directions from fiber bundle
@@ -93,8 +107,10 @@ int FiberDirectionExtraction(int argc, char* argv[])
         fOdfFilter->SetFiberBundle(inputTractogram);
         fOdfFilter->SetMaskImage(itkMaskImage);
         fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
-        fOdfFilter->SetNormalizeVectors(false);
+        fOdfFilter->SetNormalizeVectors(normalize);
         fOdfFilter->SetUseWorkingCopy(false);
+        fOdfFilter->SetSizeThreshold(peakThreshold);
+        fOdfFilter->SetMaxNumDirections(maxNumDirs);
         fOdfFilter->Update();
         ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
 

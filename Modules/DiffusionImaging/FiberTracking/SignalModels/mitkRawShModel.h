@@ -43,21 +43,33 @@ public:
     PixelType SimulateMeasurement();
     ScalarType SimulateMeasurement(unsigned int dir);
 
-    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; Cart2Sph(); }
-    bool SetShCoefficients(vnl_vector< double > shCoefficients);
+    bool SetShCoefficients(vnl_vector< double > shCoefficients, ScalarType b0);
     void SetFiberDirection(GradientType fiberDirection);
-    void SetB0Signal(ScalarType signal){ m_B0Signal = signal; }
+    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
+    void SetFaRange(double min, double max){ m_FaRange.first = min; m_FaRange.second = max; }
+    void SetAdcRange(double min, double max){ m_AdcRange.first = min; m_AdcRange.second = max; }
+    void SetMaxNumKernels(unsigned int max){ m_MaxNumKernels = max; }
+    unsigned int GetNumberOfKernels();
+    std::pair< double, double > GetFaRange(){ return m_FaRange; }
+    std::pair< double, double > GetAdcRange(){ return m_AdcRange; }
+    unsigned int GetMaxNumKernels(){ return m_MaxNumKernels; }
+    void Clear();
+    vector< GradientType >          m_PrototypeMaxDirection;
 
 protected:
 
-    void Cart2Sph();
+    void Cart2Sph( GradientListType gradients );
+    void RandomModel();
 
-    vnl_vector< double >            m_ShCoefficients;
-    GradientType                    m_PrototypeMaxDirection;
+    std::pair< double, double >     m_AdcRange;
+    std::pair< double, double >     m_FaRange;
+    vector< vnl_vector< double > >  m_ShCoefficients;
+    vector< ScalarType >            m_B0Signal;
     vnl_matrix<double>              m_SphCoords;
-    int                             m_ShOrder;
-    GradientListType                m_RotatedGradientList;
-    ScalarType                      m_B0Signal;
+    unsigned int                    m_ShOrder;
+    int                             m_ModelIndex;
+    unsigned int                    m_MaxNumKernels;
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };
 
 }

@@ -1671,9 +1671,10 @@ void mitk::FiberBundleX::CompressFibers(float error)
     MITK_INFO << "Compressing fibers";
     unsigned long numRemovedPoints = 0;
     boost::progress_display disp(m_FiberPolyData->GetNumberOfCells());
+
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
-        ++disp ;
+        ++disp;
         vtkCell* cell = m_FiberPolyData->GetCell(i);
         int numPoints = cell->GetNumberOfPoints();
         vtkPoints* points = cell->GetPoints();

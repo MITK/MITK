@@ -115,6 +115,8 @@ set(H_FILES
   Algorithms/itkAdcImageFilter.h
   Algorithms/itkDwiNormilzationFilter.h
   Algorithms/itkSplitDWImageFilter.h
+  Algorithms/itkRemoveDwiChannelFilter.h
+  Algorithms/itkExtractDwiChannelFilter.h
 
   Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h
   Algorithms/mitkDiffusionImageToDiffusionImageFilter.h

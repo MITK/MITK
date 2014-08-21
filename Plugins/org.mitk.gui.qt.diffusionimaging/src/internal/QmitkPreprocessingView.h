@@ -57,6 +57,7 @@ class QmitkPreprocessingView : public QmitkFunctionality
   typedef mitk::DiffusionImage<short>                                   MitkDwiType;
   typedef itk::VectorImage< short, 3 >                                  ItkDwiType;
   typedef itk::Image< unsigned char, 3 >                                UcharImageType;
+  typedef itk::Image< double, 3 >                                       ItkDoubleImageType;
 
   QmitkPreprocessingView();
   virtual ~QmitkPreprocessingView();
@@ -97,6 +98,8 @@ protected slots:
   void DoResampleImage();
   void DoCropImage();
   void DoUpdateInterpolationGui(int i);
+  void DoRemoveGradient();
+  void DoExtractGradient();
 
 protected:
 

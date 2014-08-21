@@ -49,8 +49,8 @@ public:
     virtual PixelType SimulateMeasurement() = 0;
     virtual ScalarType SimulateMeasurement(unsigned int dir) = 0;
 
-    void SetFiberDirection(GradientType fiberDirection){ m_FiberDirection = fiberDirection; }
-    void SetGradientList(GradientListType gradientList) { m_GradientList = gradientList; }
+    virtual void SetFiberDirection(GradientType fiberDirection) = 0;
+    virtual void SetGradientList(GradientListType gradientList) = 0;
     void SetT2(double T2) { m_T2 = T2; }
     void SetVolumeFractionImage(ItkDoubleImgType::Pointer img){ m_VolumeFractionImage = img; }
 

@@ -117,7 +117,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     mitk::CastToItkImage(mitkFMap, fMap);
 
     FiberfoxParameters<double> parameters;
-    parameters.m_DoSimulateRelaxation = true;
+    parameters.m_SimulateKspaceAcquisition = true;
     parameters.m_SignalScale = 10000;
     parameters.m_ImageRegion = stickBall->GetVectorImage()->GetLargestPossibleRegion();
     parameters.m_ImageSpacing = stickBall->GetVectorImage()->GetSpacing();

@@ -26,13 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template< class ScalarType >
 mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
-    : m_Repetitions(1)
-    , m_SignalScale(100)
+    : m_SignalScale(100)
     , m_tEcho(100)
     , m_tLine(1)
     , m_tInhom(50)
     , m_Bvalue(1000)
+    , m_SimulateKspaceAcquisition(false)
     , m_AxonRadius(0)
+    , m_DiffusionDirectionMode(FIBER_TANGENT_DIRECTIONS)
     , m_Spikes(0)
     , m_SpikeAmplitude(1)
     , m_KspaceLineOffset(0)
@@ -245,7 +246,6 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_NumGradients = v1.second.get<int>("basic.numgradients");
             GenerateGradientHalfShell();
             m_Bvalue = v1.second.get<int>("basic.bvalue");
-            m_Repetitions = v1.second.get<int>("repetitions");
             m_SignalScale = v1.second.get<int>("signalScale");
             m_tEcho = v1.second.get<double>("tEcho");
             m_tLine = v1.second.get<double>("tLine");
@@ -448,7 +448,6 @@ void mitk::FiberfoxParameters< ScalarType >::PrintSelf()
     MITK_INFO << "m_ImageDirection: " << m_ImageDirection;
     MITK_INFO << "m_NumGradients: " << m_NumGradients;
     MITK_INFO << "m_Bvalue: " << m_Bvalue;
-    MITK_INFO << "m_Repetitions: " << m_Repetitions;
     MITK_INFO << "m_SignalScale: " << m_SignalScale;
     MITK_INFO << "m_tEcho: " << m_tEcho;
     MITK_INFO << "m_tLine: " << m_tLine;

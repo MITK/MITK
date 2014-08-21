@@ -12,6 +12,7 @@ set(SRC_CPP_FILES
   QmitkDotModelParametersWidget.cpp
   QmitkBallModelParametersWidget.cpp
   QmitkAstrosticksModelParametersWidget.cpp
+  QmitkPrototypeSignalParametersWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -87,6 +88,7 @@ set(UI_FILES
   src/QmitkDotModelParametersWidgetControls.ui
   src/QmitkBallModelParametersWidgetControls.ui
   src/QmitkAstrosticksModelParametersWidgetControls.ui
+  src/QmitkPrototypeSignalParametersWidgetControls.ui
   src/internal/QmitkFieldmapGeneratorViewControls.ui
   src/internal/QmitkDiffusionRegistrationViewControls.ui
   src/internal/QmitkDenoisingViewControls.ui
@@ -131,6 +133,7 @@ set(MOC_H_FILES
   src/QmitkDotModelParametersWidget.h
   src/QmitkBallModelParametersWidget.h
   src/QmitkAstrosticksModelParametersWidget.h
+  src/QmitkPrototypeSignalParametersWidget.h
   src/internal/QmitkFieldmapGeneratorView.h
   src/internal/QmitkDiffusionRegistrationView.h
   src/internal/QmitkDenoisingView.h

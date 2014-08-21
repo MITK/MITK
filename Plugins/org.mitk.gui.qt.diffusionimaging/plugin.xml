@@ -254,6 +254,14 @@
     icon="resources/connectomics/QmitkConnectomicsStatisticsViewIcon_48.png">
     <keywordReference id="org.mitk.views.connectomicsstatistics.Keyword"/>
     </view>
+          
+    <view id="org.mitk.views.randomparcellationview"
+          name="Random Parcellation View"
+          category="Connectomics"
+          class="QmitkRandomParcellationView"
+          icon="resources/connectomics/QmitkRandomParcellationIcon.png" >
+    <keywordReference id="org.mitk.views.randomparcellationview.Keyword"/>
+    </view>
 
     <view id="org.mitk.views.odfmaximaextraction"
     name="Peak Extraction"

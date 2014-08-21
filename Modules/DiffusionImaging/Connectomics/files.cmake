@@ -70,6 +70,9 @@ set(H_FILES
   Algorithms/itkConnectomicsNetworkToConnectivityMatrixImageFilter.h
   Algorithms/mitkConnectomicsStatisticsCalculator.h
   Algorithms/mitkConnectomicsNetworkConverter.h
+  Algorithms/BrainParcellation/mitkCostFunctionBase.h
+  Algorithms/BrainParcellation/mitkRandomParcellationGenerator.h
+  Algorithms/BrainParcellation/mitkRegionVoxelCounter.h
 )
 
 

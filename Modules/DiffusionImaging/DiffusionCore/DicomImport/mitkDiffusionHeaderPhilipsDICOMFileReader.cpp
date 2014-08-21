@@ -35,10 +35,10 @@ bool mitk::DiffusionHeaderPhilipsDICOMFileReader::ReadDiffusionHeader(std::strin
   gdcmReader.Read();
 
   gdcm::Tag philips_bvalue_tag( 0x2001, 0x1003 );
-  gdcm::Tag philips_gradient_direction( 0x2001, 0x1004 );
+  //gdcm::Tag philips_gradient_direction( 0x2001, 0x1004 );
 
   DiffusionImageDICOMHeaderInformation header_info;
-  std::string tagvalue_string;
+  //std::string tagvalue_string;
   //char* pEnd;
 
   // reveal b-value
@@ -52,23 +52,39 @@ bool mitk::DiffusionHeaderPhilipsDICOMFileReader::ReadDiffusionHeader(std::strin
       header_info.baseline = true;
   }
 
-  // reveal gradient direction
-  tagvalue_string.clear();
-  if( RevealBinaryTag( philips_gradient_direction, gdcmReader.GetFile().GetDataSet(), tagvalue_string) )
+  gdcm::Tag philips_new_bvalue_tag( 0x0018,0x9087 );
+  double dbvalue = 0;
+  if( RevealBinaryTagC( philips_new_bvalue_tag, gdcmReader.GetFile().GetDataSet(), (char*) &dbvalue) )
   {
-    std::stringstream ssparser( tagvalue_string );
-    std::string buffer;
+    MITK_INFO("philips.dicom.diffusion.bvalue") << dbvalue;
+  }
 
-    unsigned int idx=0;
-    while( std::getline( ssparser, buffer, '\\' ) )
+  if( header_info.baseline )
+  {
+    // no direction in unweighted images
+    header_info.g_vector.fill(0);
+  }
+  else
+  {
+    MITK_INFO("philips.dicom.diffusion.gradientdir") << "Parsing gradient direction.";
+
+    gdcm::Tag philips_gradient_direction_new( 0x0018, 0x9089 );
+    double gr_dir_arr[3] = {1,0,-1};
+
+    if( RevealBinaryTagC( philips_gradient_direction_new, gdcmReader.GetFile().GetDataSet(), (char*) &gr_dir_arr ) )
     {
-      std::istringstream substream(buffer);
-      substream >> header_info.g_vector[idx++];
+      MITK_INFO("philips.dicom.diffusion.gradient") << "(" << gr_dir_arr[0] <<"," << gr_dir_arr[1] <<"," <<gr_dir_arr[2] <<")";
+    }
+
+    header_info.g_vector.copy_in( &gr_dir_arr[0] );
+    if( header_info.g_vector.two_norm() < vnl_math::eps )
+    {
+      header_info.g_vector.fill(1);
+      header_info.isotropic = true;
     }
   }
 
   this->m_HeaderInformationList.push_back( header_info );
 
-
-  return false;
+  return true;
 }

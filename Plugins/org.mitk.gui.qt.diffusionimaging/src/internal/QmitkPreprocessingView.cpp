@@ -887,40 +887,9 @@ void QmitkPreprocessingView::DoDwiNormalization()
     }
 
     // determin normalization reference
-    //    {
-    //        itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
-    //        adcFilter->SetInput(m_DiffusionImage->GetVectorImage());
-    //        adcFilter->SetGradientDirections(m_DiffusionImage->GetDirections());
-    //        adcFilter->SetB_value(m_DiffusionImage->GetReferenceBValue());
-    //        adcFilter->Update();
-    //        ItkDoubleImageType::Pointer adcImage = adcFilter->GetOutput();
-    //        itk::ImageRegionIterator<ItkDoubleImageType> inIt(adcImage, adcImage->GetLargestPossibleRegion());
-    //        double max = 0.0030;
-    //        double ref = 0;
-    //        unsigned int count = 0;
-    //        while ( !inIt.IsAtEnd() )
-    //        {
-    //            if (itkImage.IsNotNull() && itkImage->GetPixel(inIt.GetIndex())<=0)
-    //            {
-    //                ++inIt;
-    //                continue;
-    //            }
-    //            if (inIt.Get()>max && inIt.Get()<0.004)
-    //            {
-    //                ref += m_DiffusionImage->GetVectorImage()->GetPixel(inIt.GetIndex())[b0Index];
-    //                count++;
-    //            }
-    //            ++inIt;
-    //        }
-    //        if (count>0)
-    //        {
-    //            ref /= count;
-    //            filter->SetUseGlobalReference(true);
-    //            filter->SetReference(ref);
-    //        }
-    //    }
-
-    // normalize relative to mean white matter signal intensity
+    switch(m_Controls->m_NormalizationReferenceBox->currentIndex())
+    {
+    case 0: // normalize relative to mean white matter signal intensity
     {
         typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
         TensorReconstructionImageFilterType::Pointer dtFilter = TensorReconstructionImageFilterType::New();
@@ -953,6 +922,46 @@ void QmitkPreprocessingView::DoDwiNormalization()
             filter->SetUseGlobalReference(true);
             filter->SetReference(ref);
         }
+        break;
+    }
+    case 1: // normalize relative to mean CSF signal intensity
+    {
+        itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
+        adcFilter->SetInput(m_DiffusionImage->GetVectorImage());
+        adcFilter->SetGradientDirections(m_DiffusionImage->GetDirections());
+        adcFilter->SetB_value(m_DiffusionImage->GetReferenceBValue());
+        adcFilter->Update();
+        ItkDoubleImageType::Pointer adcImage = adcFilter->GetOutput();
+        itk::ImageRegionIterator<ItkDoubleImageType> inIt(adcImage, adcImage->GetLargestPossibleRegion());
+        double max = 0.0030;
+        double ref = 0;
+        unsigned int count = 0;
+        while ( !inIt.IsAtEnd() )
+        {
+            if (itkImage.IsNotNull() && itkImage->GetPixel(inIt.GetIndex())<=0)
+            {
+                ++inIt;
+                continue;
+            }
+            if (inIt.Get()>max && inIt.Get()<0.004)
+            {
+                ref += m_DiffusionImage->GetVectorImage()->GetPixel(inIt.GetIndex())[b0Index];
+                count++;
+            }
+            ++inIt;
+        }
+        if (count>0)
+        {
+            ref /= count;
+            filter->SetUseGlobalReference(true);
+            filter->SetReference(ref);
+        }
+        break;
+    }
+    case 2:
+    {
+        filter->SetUseGlobalReference(false);
+    }
     }
     filter->Update();
 

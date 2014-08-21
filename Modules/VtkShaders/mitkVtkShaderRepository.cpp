@@ -489,7 +489,6 @@ mitk::VtkShaderRepository::UpdateShaderProgram(ShaderProgram* shaderProgram,
 
     mitkVtkShaderProgram->SetVtkShaderProgram(program);
 
-    MITK_INFO << "enabling shader ";
     mitkVtkShaderProgram->GetShaderTimestampUpdate().Modified();
   }
 

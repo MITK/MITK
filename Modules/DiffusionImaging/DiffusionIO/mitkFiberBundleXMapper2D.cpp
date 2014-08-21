@@ -100,16 +100,13 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
         node->SetIntProperty("shader.mitkShaderFiberClipping.fiberFadingON",fiberfading);
         node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberOpacity",fiberOpacity);
 
-        if ((localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) ) //was the display geometry modified? e.g. zooming, panning)
+        mitk::FiberBundleX* fiberBundle = this->GetInput();
+        if (fiberBundle==NULL)
+            return;
+
+        if ( localStorage->m_LastUpdateTime<renderer->GetDisplayGeometry()->GetMTime() || localStorage->m_LastUpdateTime<fiberBundle->GetUpdateTime2D() )
         {
             this->UpdateShaderParameter(renderer);
-        }
-
-        if ( (localStorage->m_LastUpdateTime < node->GetMTime())
-             || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
-             || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
-        {
-            //    MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
             this->GenerateDataForRenderer( renderer );
         }
 }
@@ -121,43 +118,27 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
     mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
 
     //generate according cutting planes based on the view position
-    float sliceN[3], planeOrigin[3];
+    float planeNormal[3];
+    planeNormal[0] = planeGeo->GetNormal()[0];
+    planeNormal[1] = planeGeo->GetNormal()[1];
+    planeNormal[2] = planeGeo->GetNormal()[2];
 
-    // since shader uses camera coordinates, transform origin and normal from worldcoordinates to cameracoordinates
-    planeOrigin[0] = (float) planeGeo->GetOrigin()[0];
-    planeOrigin[1] = (float) planeGeo->GetOrigin()[1];
-    planeOrigin[2] = (float) planeGeo->GetOrigin()[2];
-
-    sliceN[0] = planeGeo->GetNormal()[0];
-    sliceN[1] = planeGeo->GetNormal()[1];
-    sliceN[2] = planeGeo->GetNormal()[2];
-
-
-    float tmp1 = planeOrigin[0] * sliceN[0];
-    float tmp2 = planeOrigin[1] * sliceN[1];
-    float tmp3 = planeOrigin[2] * sliceN[2];
-    float d1 = tmp1 + tmp2 + tmp3; //attention, correct normalvector
-
-
-    float plane1[4];
-    plane1[0] = sliceN[0];
-    plane1[1] = sliceN[1];
-    plane1[2] = sliceN[2];
-    plane1[3] = d1;
+    float tmp1 = planeGeo->GetOrigin()[0] * planeNormal[0];
+    float tmp2 = planeGeo->GetOrigin()[1] * planeNormal[1];
+    float tmp3 = planeGeo->GetOrigin()[2] * planeNormal[2];
+    float thickness = tmp1 + tmp2 + tmp3; //attention, correct normalvector
 
     DataNode::Pointer node = this->GetDataNode();
-    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.w",plane1[3],renderer);
-    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.x",plane1[0],renderer);
-    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.y",plane1[1],renderer);
-    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.z",plane1[2],renderer);
+    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.w",thickness,renderer);
+    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.x",planeNormal[0],renderer);
+    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.y",planeNormal[1],renderer);
+    node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.z",planeNormal[2],renderer);
 }
 
 // vtkActors and Mappers are feeded here
 void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
     mitk::FiberBundleX* fiberBundle = this->GetInput();
-    if (fiberBundle==NULL)
-        return;
 
     //the handler of local storage gets feeded in this method with requested data for related renderwindow
     FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);

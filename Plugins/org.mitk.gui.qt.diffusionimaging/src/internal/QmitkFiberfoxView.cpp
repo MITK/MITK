@@ -1027,6 +1027,11 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.compartment1.tensor.d2", m_Controls->m_TensorWidget1->GetD2());
     parameters.put("fiberfox.image.compartment1.tensor.d3", m_Controls->m_TensorWidget1->GetD3());
     parameters.put("fiberfox.image.compartment1.tensor.t2", m_Controls->m_TensorWidget1->GetT2());
+    parameters.put("fiberfox.image.compartment1.prototype.minFA", m_Controls->m_PrototypeWidget1->GetMinFa());
+    parameters.put("fiberfox.image.compartment1.prototype.maxFA", m_Controls->m_PrototypeWidget1->GetMaxFa());
+    parameters.put("fiberfox.image.compartment1.prototype.minADC", m_Controls->m_PrototypeWidget1->GetMinAdc());
+    parameters.put("fiberfox.image.compartment1.prototype.maxADC", m_Controls->m_PrototypeWidget1->GetMaxAdc());
+    parameters.put("fiberfox.image.compartment1.prototype.numSamples", m_Controls->m_PrototypeWidget1->GetNumberOfSamples());
 
     parameters.put("fiberfox.image.compartment2.stick.d", m_Controls->m_StickWidget2->GetD());
     parameters.put("fiberfox.image.compartment2.stick.t2", m_Controls->m_StickWidget2->GetT2());
@@ -1044,6 +1049,11 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.compartment3.astrosticks.t2", m_Controls->m_AstrosticksWidget1->GetT2());
     parameters.put("fiberfox.image.compartment3.astrosticks.randomize", m_Controls->m_AstrosticksWidget1->GetRandomizeSticks());
     parameters.put("fiberfox.image.compartment3.dot.t2", m_Controls->m_DotWidget1->GetT2());
+    parameters.put("fiberfox.image.compartment3.prototype.minFA", m_Controls->m_PrototypeWidget3->GetMinFa());
+    parameters.put("fiberfox.image.compartment3.prototype.maxFA", m_Controls->m_PrototypeWidget3->GetMaxFa());
+    parameters.put("fiberfox.image.compartment3.prototype.minADC", m_Controls->m_PrototypeWidget3->GetMinAdc());
+    parameters.put("fiberfox.image.compartment3.prototype.maxADC", m_Controls->m_PrototypeWidget3->GetMaxAdc());
+    parameters.put("fiberfox.image.compartment3.prototype.numSamples", m_Controls->m_PrototypeWidget3->GetNumberOfSamples());
 
     parameters.put("fiberfox.image.compartment4.ball.d", m_Controls->m_BallWidget2->GetD());
     parameters.put("fiberfox.image.compartment4.ball.t2", m_Controls->m_BallWidget2->GetT2());
@@ -1051,6 +1061,11 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.compartment4.astrosticks.t2", m_Controls->m_AstrosticksWidget2->GetT2());
     parameters.put("fiberfox.image.compartment4.astrosticks.randomize", m_Controls->m_AstrosticksWidget2->GetRandomizeSticks());
     parameters.put("fiberfox.image.compartment4.dot.t2", m_Controls->m_DotWidget2->GetT2());
+    parameters.put("fiberfox.image.compartment4.prototype.minFA", m_Controls->m_PrototypeWidget4->GetMinFa());
+    parameters.put("fiberfox.image.compartment4.prototype.maxFA", m_Controls->m_PrototypeWidget4->GetMaxFa());
+    parameters.put("fiberfox.image.compartment4.prototype.minADC", m_Controls->m_PrototypeWidget4->GetMinAdc());
+    parameters.put("fiberfox.image.compartment4.prototype.maxADC", m_Controls->m_PrototypeWidget4->GetMaxAdc());
+    parameters.put("fiberfox.image.compartment4.prototype.numSamples", m_Controls->m_PrototypeWidget4->GetNumberOfSamples());
 
     boost::property_tree::xml_parser::write_xml(filename.toStdString(), parameters);
 }
@@ -1164,6 +1179,11 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_TensorWidget1->SetD2(v1.second.get<double>("compartment1.tensor.d2"));
             m_Controls->m_TensorWidget1->SetD3(v1.second.get<double>("compartment1.tensor.d3"));
             m_Controls->m_TensorWidget1->SetT2(v1.second.get<double>("compartment1.tensor.t2"));
+            m_Controls->m_PrototypeWidget1->SetMinFa(v1.second.get<double>("compartment1.prototype.minFA"));
+            m_Controls->m_PrototypeWidget1->SetMaxFa(v1.second.get<double>("compartment1.prototype.maxFA"));
+            m_Controls->m_PrototypeWidget1->SetMinAdc(v1.second.get<double>("compartment1.prototype.minADC"));
+            m_Controls->m_PrototypeWidget1->SetMaxAdc(v1.second.get<double>("compartment1.prototype.maxADC"));
+            m_Controls->m_PrototypeWidget1->SetNumberOfSamples(v1.second.get<double>("compartment1.prototype.numSamples"));
 
             m_Controls->m_StickWidget2->SetD(v1.second.get<double>("compartment2.stick.d"));
             m_Controls->m_StickWidget2->SetT2(v1.second.get<double>("compartment2.stick.t2"));
@@ -1181,6 +1201,11 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_AstrosticksWidget1->SetT2(v1.second.get<double>("compartment3.astrosticks.t2"));
             m_Controls->m_AstrosticksWidget1->SetRandomizeSticks(v1.second.get<bool>("compartment3.astrosticks.randomize"));
             m_Controls->m_DotWidget1->SetT2(v1.second.get<double>("compartment3.dot.t2"));
+            m_Controls->m_PrototypeWidget3->SetMinFa(v1.second.get<double>("compartment3.prototype.minFA"));
+            m_Controls->m_PrototypeWidget3->SetMaxFa(v1.second.get<double>("compartment3.prototype.maxFA"));
+            m_Controls->m_PrototypeWidget3->SetMinAdc(v1.second.get<double>("compartment3.prototype.minADC"));
+            m_Controls->m_PrototypeWidget3->SetMaxAdc(v1.second.get<double>("compartment3.prototype.maxADC"));
+            m_Controls->m_PrototypeWidget3->SetNumberOfSamples(v1.second.get<double>("compartment3.prototype.numSamples"));
 
             m_Controls->m_BallWidget2->SetD(v1.second.get<double>("compartment4.ball.d"));
             m_Controls->m_BallWidget2->SetT2(v1.second.get<double>("compartment4.ball.t2"));
@@ -1188,6 +1213,11 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_AstrosticksWidget2->SetT2(v1.second.get<double>("compartment4.astrosticks.t2"));
             m_Controls->m_AstrosticksWidget2->SetRandomizeSticks(v1.second.get<bool>("compartment4.astrosticks.randomize"));
             m_Controls->m_DotWidget2->SetT2(v1.second.get<double>("compartment4.dot.t2"));
+            m_Controls->m_PrototypeWidget4->SetMinFa(v1.second.get<double>("compartment4.prototype.minFA"));
+            m_Controls->m_PrototypeWidget4->SetMaxFa(v1.second.get<double>("compartment4.prototype.maxFA"));
+            m_Controls->m_PrototypeWidget4->SetMinAdc(v1.second.get<double>("compartment4.prototype.minADC"));
+            m_Controls->m_PrototypeWidget4->SetMaxAdc(v1.second.get<double>("compartment4.prototype.maxADC"));
+            m_Controls->m_PrototypeWidget4->SetNumberOfSamples(v1.second.get<double>("compartment4.prototype.numSamples"));
         }
     }
 }

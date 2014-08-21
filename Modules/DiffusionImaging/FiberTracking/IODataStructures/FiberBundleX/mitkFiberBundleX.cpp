@@ -55,6 +55,7 @@ mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     : m_CurrentColorCoding(NULL)
     , m_NumFibers(0)
     , m_FiberSampling(0)
+    , m_UpdateMapper3D(false)
 {
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     if (fiberPolyData != NULL)
@@ -1066,6 +1067,8 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
     mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
     geometry->SetFloatBounds(b);
     this->SetGeometry(geometry);
+
+    m_UpdateMapper3D = true;
 }
 
 std::vector<std::string> mitk::FiberBundleX::GetAvailableColorCodings()

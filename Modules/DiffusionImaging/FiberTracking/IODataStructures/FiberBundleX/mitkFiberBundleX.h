@@ -115,6 +115,8 @@ public:
     itkGetMacro( MeanFiberLength, float )
     itkGetMacro( MedianFiberLength, float )
     itkGetMacro( LengthStDev, float )
+    itkSetMacro( UpdateMapper3D, bool )
+    itkGetMacro( UpdateMapper3D, bool )
     unsigned long GetNumberOfPoints();
 
     // copy fiber bundle
@@ -157,6 +159,7 @@ private:
     float   m_MedianFiberLength;
     float   m_LengthStDev;
     int     m_FiberSampling;
+    bool    m_UpdateMapper3D;
 
     mitk::Image::Pointer m_ReferenceImage;
 

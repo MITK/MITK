@@ -54,20 +54,19 @@ const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
  */
 void mitk::FiberBundleXMapper3D::InternalGenerateData(mitk::BaseRenderer *renderer)
 {
-    mitk::FiberBundleX* FBX = dynamic_cast<mitk::FiberBundleX*> (GetDataNode()->GetData());
-    if (FBX == NULL)
+    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*> (GetDataNode()->GetData());
+    if (fiberBundle == NULL)
         return;
 
-    vtkSmartPointer<vtkPolyData> FiberData = FBX->GetFiberPolyData();
-
-    if (FiberData == NULL)
+    vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
+    if (fiberPolyData == NULL)
         return;
 
     FBXLocalStorage3D *localStorage = m_LSH.GetLocalStorage(renderer);
-    localStorage->m_FiberMapper->SetInputData(FiberData);
+    localStorage->m_FiberMapper->SetInputData(fiberPolyData);
 
-    if ( FiberData->GetPointData()->GetNumberOfArrays() > 0 )
-        localStorage->m_FiberMapper->SelectColorArray( FBX->GetCurrentColorCoding() );
+    if ( fiberPolyData->GetPointData()->GetNumberOfArrays() > 0 )
+        localStorage->m_FiberMapper->SelectColorArray( fiberBundle->GetCurrentColorCoding() );
 
     localStorage->m_FiberMapper->ScalarVisibilityOn();
     localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
@@ -84,12 +83,12 @@ void mitk::FiberBundleXMapper3D::InternalGenerateData(mitk::BaseRenderer *render
     localStorage->m_FiberActor->GetProperty()->SetLineWidth(lineWidth);
 
     // set color
-    if (FBX->GetCurrentColorCoding() != NULL){
-//        localStorage->m_FiberMapper->SelectColorArray("");
-        localStorage->m_FiberMapper->SelectColorArray(FBX->GetCurrentColorCoding());
-        MITK_DEBUG << "MapperFBX: " << FBX->GetCurrentColorCoding();
+    if (fiberBundle->GetCurrentColorCoding() != NULL){
+        //        localStorage->m_FiberMapper->SelectColorArray("");
+        localStorage->m_FiberMapper->SelectColorArray(fiberBundle->GetCurrentColorCoding());
+        MITK_DEBUG << "MapperFBX: " << fiberBundle->GetCurrentColorCoding();
 
-        if(FBX->GetCurrentColorCoding() == FBX->COLORCODING_CUSTOM) {
+        if(fiberBundle->GetCurrentColorCoding() == fiberBundle->COLORCODING_CUSTOM) {
             float temprgb[3];
             this->GetDataNode()->GetColor( temprgb, NULL );
             double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
@@ -108,8 +107,12 @@ void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
 {
     bool visible = true;
     GetDataNode()->GetVisibility(visible, renderer, "visible");
-
     if ( !visible ) return;
+
+    mitk::FiberBundleX* fiberBundle = dynamic_cast<mitk::FiberBundleX*> (GetDataNode()->GetData());
+    if (!fiberBundle->GetUpdateMapper3D())
+        return;
+    fiberBundle->SetUpdateMapper3D(false);
 
     // Calculate time step of the input data for the specified renderer (integer value)
     // this method is implemented in mitkMapper

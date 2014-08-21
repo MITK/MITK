@@ -72,53 +72,46 @@ mitk::FiberBundleX* mitk::FiberBundleXMapper2D::GetInput()
 
 void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
 {
+        bool visible = true;
+        GetDataNode()->GetVisibility(visible, renderer, "visible");
+        if ( !visible )
+            return;
 
-  bool visible = true;
-  GetDataNode()->GetVisibility(visible, renderer, "visible");
+        // Calculate time step of the input data for the specified renderer (integer value)
+        // this method is implemented in mitkMapper
+        this->CalculateTimeStep( renderer );
 
-  if ( !visible ) return;
+        //check if updates occured in the node or on the display
+        FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
+        //set renderer independent shader properties
+        const DataNode::Pointer node = this->GetDataNode();
+        float thickness = 2.0;
+        if(!this->GetDataNode()->GetPropertyValue("Fiber2DSliceThickness",thickness))
+            MITK_INFO << "FIBER2D SLICE THICKNESS PROPERTY ERROR";
 
- MITK_DEBUG << "MapperFBX 2D  update: ";
-    // Calculate time step of the input data for the specified renderer (integer value)
-    // this method is implemented in mitkMapper
-    this->CalculateTimeStep( renderer );
+        bool fiberfading = false;
+        if(!this->GetDataNode()->GetPropertyValue("Fiber2DfadeEFX",fiberfading))
+            MITK_INFO << "FIBER2D SLICE FADE EFX PROPERTY ERROR";
 
- //check if updates occured in the node or on the display
- FBXLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+        float fiberOpacity;
+        this->GetDataNode()->GetOpacity(fiberOpacity, NULL);
+        node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberThickness",thickness);
+        node->SetIntProperty("shader.mitkShaderFiberClipping.fiberFadingON",fiberfading);
+        node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberOpacity",fiberOpacity);
 
- //set renderer independent shader properties
- const DataNode::Pointer node = this->GetDataNode();
- float thickness = 2.0;
- if(!this->GetDataNode()->GetPropertyValue("Fiber2DSliceThickness",thickness))
-   MITK_INFO << "FIBER2D SLICE THICKNESS PROPERTY ERROR";
+        if ((localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) ) //was the display geometry modified? e.g. zooming, panning)
+        {
+            this->UpdateShaderParameter(renderer);
+        }
 
- bool fiberfading = false;
- if(!this->GetDataNode()->GetPropertyValue("Fiber2DfadeEFX",fiberfading))
-   MITK_INFO << "FIBER2D SLICE FADE EFX PROPERTY ERROR";
-
- float fiberOpacity;
- this->GetDataNode()->GetOpacity(fiberOpacity, NULL);
- node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberThickness",thickness);
- node->SetIntProperty("shader.mitkShaderFiberClipping.fiberFadingON",fiberfading);
- node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberOpacity",fiberOpacity);
-
- if ((localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) ) //was the display geometry modified? e.g. zooming, panning)
- {
-
-   this->UpdateShaderParameter(renderer);
-
- }
-
- if ( (localStorage->m_LastUpdateTime < node->GetMTime())
-      || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
-      || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
- {
-   //    MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
-   this->GenerateDataForRenderer( renderer );
- }
-
-
+        if ( (localStorage->m_LastUpdateTime < node->GetMTime())
+             || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
+             || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
+        {
+            //    MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
+            this->GenerateDataForRenderer( renderer );
+        }
 }
 
 void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * renderer)
@@ -130,9 +123,7 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
     //generate according cutting planes based on the view position
     float sliceN[3], planeOrigin[3];
 
-
     // since shader uses camera coordinates, transform origin and normal from worldcoordinates to cameracoordinates
-
     planeOrigin[0] = (float) planeGeo->GetOrigin()[0];
     planeOrigin[1] = (float) planeGeo->GetOrigin()[1];
     planeOrigin[2] = (float) planeGeo->GetOrigin()[2];
@@ -159,37 +150,33 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
     node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.x",plane1[0],renderer);
     node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.y",plane1[1],renderer);
     node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.z",plane1[2],renderer);
-
 }
 
-// ALL RAW DATA FOR VISUALIZATION IS GENERATED HERE.
 // vtkActors and Mappers are feeded here
 void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-    //the handler of local storage gets feeded in this method with requested data for related renderwindow
-    FBXLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+    mitk::FiberBundleX* fiberBundle = this->GetInput();
+    if (fiberBundle==NULL)
+        return;
 
-    //this procedure is depricated,
-    //not needed after initializaton anymore
+    //the handler of local storage gets feeded in this method with requested data for related renderwindow
+    FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+
     mitk::DataNode* node = this->GetDataNode();
     if ( node == NULL )
         return;
 
-    ///THIS GET INPUT
-    mitk::FiberBundleX* fbx = this->GetInput();
-
-    localStorage->m_PointMapper->ScalarVisibilityOn();
-    localStorage->m_PointMapper->SetScalarModeToUsePointFieldData();
-    localStorage->m_PointMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
+    localStorage->m_FiberMapper->ScalarVisibilityOn();
+    localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
+    localStorage->m_FiberMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
     localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
 
     // set color
-    if (fbx->GetCurrentColorCoding() != NULL){
-//        localStorage->m_PointMapper->SelectColorArray("");
-        localStorage->m_PointMapper->SelectColorArray(fbx->GetCurrentColorCoding());
-        MITK_DEBUG << "MapperFBX 2D: " << fbx->GetCurrentColorCoding();
+    if (fiberBundle->GetCurrentColorCoding() != NULL)
+    {
+        localStorage->m_FiberMapper->SelectColorArray(fiberBundle->GetCurrentColorCoding());
 
-        if(fbx->GetCurrentColorCoding() == fbx->COLORCODING_CUSTOM){
+        if(fiberBundle->GetCurrentColorCoding() == fiberBundle->COLORCODING_CUSTOM){
             float temprgb[3];
             this->GetDataNode()->GetColor( temprgb, NULL );
             double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
@@ -198,8 +185,8 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     }
     int lineWidth = 1;
     node->GetIntProperty("LineWidth",lineWidth);
-    localStorage->m_PointMapper->SetInputData(fbx->GetFiberPolyData());
-    localStorage->m_PointActor->SetMapper(localStorage->m_PointMapper);
+    localStorage->m_FiberMapper->SetInputData(fiberBundle->GetFiberPolyData());
+    localStorage->m_PointActor->SetMapper(localStorage->m_FiberMapper);
     localStorage->m_PointActor->GetProperty()->ShadingOn();
     localStorage->m_PointActor->GetProperty()->SetLineWidth(lineWidth);
 
@@ -213,14 +200,13 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
 vtkProp* mitk::FiberBundleXMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-    //MITK_INFO << "FiberBundleMapper2D GetVtkProp(renderer)";
     this->Update(renderer);
-    return m_LSH.GetLocalStorage(renderer)->m_PointActor;
+    return m_LocalStorageHandler.GetLocalStorage(renderer)->m_PointActor;
 }
 
 
 void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
-{    //add shader to datano
+{
     node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
 
     // Shaders
@@ -241,6 +227,5 @@ void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
 mitk::FiberBundleXMapper2D::FBXLocalStorage::FBXLocalStorage()
 {
     m_PointActor = vtkSmartPointer<vtkActor>::New();
-    m_PointMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-
+    m_FiberMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 }

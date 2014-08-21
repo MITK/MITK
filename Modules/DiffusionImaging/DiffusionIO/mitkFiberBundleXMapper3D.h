@@ -44,7 +44,7 @@ class FiberBundleXMapper3D : public VtkMapper
 {
 public:
 
-    mitkClassMacro(FiberBundleXMapper3D, VtkMapper);
+    mitkClassMacro(FiberBundleXMapper3D, VtkMapper)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

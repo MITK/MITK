@@ -82,25 +82,39 @@ protected:
     itk::Vector<double, 3> GetItkVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
+    void SimulateNonFiberSignal(ItkUcharImgType::IndexType index, double intraAxonalVolume, int g=-1);
+
     double RoundToNearest(double num);
     std::string GetTime();
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts. */
     DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
 
+    // input
     mitk::FiberfoxParameters<double>            m_Parameters;
-    itk::Vector<double,3>                       m_UpsampledSpacing;
-    itk::Point<double,3>                        m_UpsampledOrigin;
-    ImageRegion<3>                              m_UpsampledImageRegion;
     FiberBundleType                             m_FiberBundle;
+
+    // output
     mitk::LevelWindow                           m_LevelWindow;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;
     std::string                                 m_StatusText;
+
+    // MISC
     itk::TimeProbe                              m_TimeProbe;
     bool                                        m_UseConstantRandSeed;
-    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 
-    std::vector< DoubleDwiType::Pointer > m_CompartmentImages;
+    // signal generation
+    FiberBundleType                             m_FiberBundleWorkingCopy;   ///< we work on an upsampled version of the input bundle
+    FiberBundleType                             m_FiberBundleTransformed;   ///< transformed bundle simulating headmotion
+    itk::Vector<double,3>                       m_UpsampledSpacing;
+    itk::Point<double,3>                        m_UpsampledOrigin;
+    ImageRegion<3>                              m_UpsampledImageRegion;
+    double                                      m_VoxelVolume;
+    std::vector< DoubleDwiType::Pointer >       m_CompartmentImages;
+    ItkUcharImgType::Pointer                    m_MaskImage;
+    DoubleVectorType                            m_Rotation;
+    DoubleVectorType                            m_Translation;
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };
 }
 

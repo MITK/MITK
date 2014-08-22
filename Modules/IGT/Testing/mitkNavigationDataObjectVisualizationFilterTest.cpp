@@ -18,298 +18,420 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationData.h"
 
 #include "mitkTestingMacros.h"
+#include <mitkTestingConfig.h>
+#include <mitkTestFixture.h>
 
 #include <vtkTransform.h>
 #include <iostream>
 
 #include "mitkSurface.h"
 
-
 /**Documentation
- *  test for the class "NavigationDataObjectVisualizationFilter".
- */
-int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv*/[])
+*  test for the class "NavigationDataObjectVisualizationFilter".
+*/
+class mitkNavigationDataObjectVisualizationFilterTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("NavigationDataObjectVisualizationFilter")
+  // List of Tests
+  CPPUNIT_TEST_SUITE(mitkNavigationDataObjectVisualizationFilterTestSuite);
 
-  // let's create an object of our class
-  mitk::NavigationDataObjectVisualizationFilter::Pointer myFilter = mitk::NavigationDataObjectVisualizationFilter::New();
+  //Constructor
+  MITK_TEST(TestInitialize);
+  MITK_TEST(TestInput);
+  MITK_TEST(TestOutput);
+  MITK_TEST(TestRepresentationObjects);
+  MITK_TEST(TestTransforms);
+  MITK_TEST(TestMessWithRepresentationObjects);
+  MITK_TEST(TestThirdInput);
+  MITK_TEST(TestSetTransformPosition);
+  MITK_TEST(TestSetTransformOrientation);
+  MITK_TEST(TestConvenienceSetTransformOrientation);
+  MITK_TEST(TestUpdateOrientation);
 
-  // first test: did this work?
-  // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
-  // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(myFilter.IsNotNull(),"Testing instantiation");
+  CPPUNIT_TEST_SUITE_END();
 
-  /* create helper objects: navigation data with position as origin, zero quaternion, zero error and data valid */
+  // Used Variables
+private:
+  mitk::NavigationDataObjectVisualizationFilter::Pointer myFilter;
   mitk::NavigationData::PositionType initialPos1, initialPos2;
-  mitk::FillVector3D(initialPos1, 1.1, 2.2, 3.3);
-  mitk::FillVector3D(initialPos2, 5.0, 6.0, 7.0);
-  mitk::NavigationData::OrientationType initialOri1(0.1, 0.2, 0.3, 0.4);
-  mitk::NavigationData::OrientationType initialOri2(0.5, 0.6, 0.7, 0.8);
-  mitk::ScalarType initialError1(0.0);
-  mitk::ScalarType initialError2(5.0);
-  bool initialValid1(true);
-  bool initialValid2(true);
-
-  mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
-  nd1->SetPosition(initialPos1);
-  nd1->SetOrientation(initialOri1);
-  nd1->SetPositionAccuracy(initialError1);
-  nd1->SetDataValid(initialValid1);
-
-  mitk::NavigationData::Pointer nd2 = mitk::NavigationData::New();
-  nd2->SetPosition(initialPos2);
-  nd2->SetOrientation(initialOri2);
-  nd2->SetPositionAccuracy(initialError2);
-  nd2->SetDataValid(initialValid2);
-
-  myFilter->SetInput(nd1);
-  myFilter->SetInput(1, nd2);
-
-  //testing the input
-  MITK_TEST_CONDITION(myFilter->GetInput() == nd1, "Testing Set-/GetInput() input 1 without index");
-  MITK_TEST_CONDITION(myFilter->GetInput(0) == nd1, "Testing Set-/GetInput() input 1");
-  MITK_TEST_CONDITION(myFilter->GetInput(1) == nd2, "Testing Set-/GetInput() input 2");
-  MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 0, "Testing GetNumberOfToolRepresentations()");
-
-  //testing getting the output
-  mitk::NavigationData* output = myFilter->GetOutput();
-  MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
-  MITK_TEST_CONDITION_REQUIRED(output == myFilter->GetOutput(), "Testing GetOutput() == GetOutput()");
-  MITK_TEST_CONDITION_REQUIRED(output != myFilter->GetOutput(1), "Testing GetOutput() != GetOutput(1)");
+  mitk::NavigationData::OrientationType initialOri1;
+  mitk::NavigationData::OrientationType initialOri2;
+  mitk::ScalarType initialError1;
+  mitk::ScalarType initialError2;
+  bool initialValid1;
+  bool initialValid2;
+  mitk::NavigationData::Pointer nd1;
+  mitk::NavigationData::Pointer nd2;
 
   // Test setting BaseData
-  mitk::Surface::Pointer mitkToolData1 = mitk::Surface::New();
+  mitk::Surface::Pointer mitkToolData1 ;
 
-  mitk::Surface::Pointer mitkToolData2 = mitk::Surface::New();
+  mitk::Surface::Pointer mitkToolData2 ;
 
   //dummy for test; will not be set but used to test find
-  mitk::Surface::Pointer mitkToolDataDummy = mitk::Surface::New();
+  mitk::Surface::Pointer mitkToolDataDummy ;
   //and the Dummy NavigationData for this
+  mitk::NavigationData::OrientationType initialOriDummy;
   mitk::NavigationData::PositionType initialPosDummy;
-  mitk::FillVector3D(initialPosDummy, 8.8, 9.9, 10.10);
-  mitk::NavigationData::OrientationType initialOriDummy(1.1, 2.2, 3.3, 4.4);
-  mitk::ScalarType initialErrorDummy(10.0);
-  bool initialValidDummy(true);
-  mitk::NavigationData::Pointer ndDummy = mitk::NavigationData::New();
-  ndDummy->SetPosition(initialPosDummy);
-  ndDummy->SetOrientation(initialOriDummy);
-  ndDummy->SetPositionAccuracy(initialErrorDummy);
-  ndDummy->SetDataValid(initialValidDummy);
-  //now we have ndDummy and mitkToolDataDummy to test with
+  mitk::ScalarType initialErrorDummy;
+  bool initialValidDummy;
+  mitk::NavigationData::Pointer ndDummy ;
 
-  //setting nodes
-  myFilter->SetRepresentationObject(0, mitkToolData1);
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == mitkToolData1, "Testing SetRepresentationObject()/GetRepresentationObject() node 1");
-  MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 1, "Testing GetNumberOfToolRepresentations() after adding first tool");
-  myFilter->SetRepresentationObject(1, mitkToolData2);
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) == mitkToolData2, "Testing SetRepresentationObject() node 2");
-  MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() after adding second tool");
-  //getting nodes
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == mitkToolData1, "Testing GetRepresentationObject() node 1");
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) != mitkToolDataDummy, "Testing GetRepresentationObject() != Dummy node");
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) == mitkToolData2, "Testing GetRepresentationObject() node 2");
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) != mitkToolDataDummy, "Testing GetRepresentationObject() != Dummy node");
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(111) == NULL, "Testing GetRepresentationObject() with out of range parameter");
+  mitk::NavigationData* output;
 
-  //Process
-  myFilter->Update();
+  mitk::AffineTransform3D::Pointer affineTransform1;
+  mitk::AffineTransform3D::OutputVectorType offset1;
 
-  //now check it there are data connected to the nodes with the according orientation and offsets
-  mitk::AffineTransform3D::Pointer affineTransform1 = mitkToolData1->GetGeometry()->GetIndexToWorldTransform();
-  mitk::AffineTransform3D::OutputVectorType offset1 = affineTransform1->GetOffset();
-  MITK_TEST_CONDITION(offset1.GetVnlVector()==initialPos1.GetVnlVector(), "Testing Offset position 1");
+  mitk::AffineTransform3D::Pointer affineTransform2;
+  mitk::AffineTransform3D::OutputVectorType offset2;
+  mitk::AffineTransform3D::MatrixType::InternalMatrixType m1;
+  mitk::AffineTransform3D::MatrixType::InternalMatrixType m2;
 
-  mitk::AffineTransform3D::Pointer affineTransform2 = mitkToolData2->GetGeometry()->GetIndexToWorldTransform();
-  mitk::AffineTransform3D::OutputVectorType offset2 = affineTransform2->GetOffset();
-  MITK_TEST_CONDITION(offset2.GetVnlVector()==initialPos2.GetVnlVector(), "Testing Offset position 2");
+public:
 
-  mitk::AffineTransform3D::MatrixType::InternalMatrixType m1 = affineTransform1->GetMatrix().GetVnlMatrix();
-  MITK_TEST_OUTPUT( << "\n initOrient1="<<initialOri1<<" affineTransform1->GetVnlMatrix():\n "<< m1);
+  // Set up for variables
+  void setUp()
+  {
+    // -------------- Setup for Filter ---------------------------
 
-  mitk::AffineTransform3D::MatrixType::InternalMatrixType m2 = affineTransform2->GetMatrix().GetVnlMatrix();
-  MITK_TEST_OUTPUT( << "\n initOrient2=" << initialOri2 << " affineTransform2->GetVnlMatrix():\n " << m2);
+    /* create helper objects: navigation data with position as origin, zero quaternion, zero error and data valid */
+    myFilter = mitk::NavigationDataObjectVisualizationFilter::New();
+    mitk::FillVector3D(initialPos1, 1.1, 2.2, 3.3);
+    mitk::FillVector3D(initialPos2, 5.0, 6.0, 7.0);
+    mitk::FillVector4D(initialOri1, 0.1, 0.2, 0.3, 0.4);
+    mitk::FillVector4D(initialOri2,0.5, 0.6, 0.7, 0.8);
+    initialError1=0.0;
+    initialError2=5.0;
+    initialValid1 = true;
+    initialValid2 = true;
 
+    //Set Navigation Data
+    nd1 = mitk::NavigationData::New();
+    nd1->SetPosition(initialPos1);
+    nd1->SetOrientation(initialOri1);
+    nd1->SetPositionAccuracy(initialError1);
+    nd1->SetDataValid(initialValid1);
 
-//messing with SetRepresentationObject
-//setting nodes
-  myFilter->SetRepresentationObject(0, mitkToolData2);
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == mitkToolData2, "Twisting mitkToolData by using SetRepresentationObject() NavigationData 1 with ToolData 2");
-  MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() == 1");
-  myFilter->SetRepresentationObject(1, mitkToolData1);
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) == mitkToolData1, "Twisting mitkToolData by using SetRepresentationObject() NavigationData 2 with ToolData 1");
-  MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() == 2");
-  //getting nodes
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == mitkToolData2, "Testing switched BaseData of NavigationData 1 ");
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) != mitkToolDataDummy, "Testing GetRepresentationObject() != Dummy node");
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) == mitkToolData1, "Testing switched BaseData NavigationData 2");
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) != mitkToolDataDummy, "Testing GetRepresentationObject() != Dummy node");
+    nd2 = mitk::NavigationData::New();
+    nd2->SetPosition(initialPos2);
+    nd2->SetOrientation(initialOri2);
+    nd2->SetPositionAccuracy(initialError2);
+    nd2->SetDataValid(initialValid2);
 
-  //processing update through pipeline
-  myFilter->Update();
+    //Set Input
+    myFilter->SetInput(nd1);
+    myFilter->SetInput(1, nd2);
+    output = myFilter->GetOutput();
 
-  //now check it there are data connected to the nodes with the according orientation and offsets
-  mitk::AffineTransform3D::Pointer affineTransform1Second = mitkToolData1->GetGeometry()->GetIndexToWorldTransform();
-  MITK_TEST_CONDITION(affineTransform1 == affineTransform1Second, "Testing affineTransform1 after second update");
-  mitk::AffineTransform3D::OutputVectorType offset1Second = affineTransform1->GetOffset();
-  MITK_TEST_CONDITION(offset1 == offset1Second, "Testing offset1 after second update");
-  MITK_TEST_CONDITION(offset1Second.GetVnlVector()==offset1.GetVnlVector(), "Testing offset1 equals first update");
+    // -------------------------- Setup for TestData ----------------------
 
-  mitk::AffineTransform3D::Pointer affineTransform2Second = mitkToolData2->GetGeometry()->GetIndexToWorldTransform();
-  MITK_TEST_CONDITION(affineTransform2 == affineTransform2Second, "Testing affineTransform2 after second update");
-  mitk::AffineTransform3D::OutputVectorType offset2Second = affineTransform2->GetOffset();
-  MITK_TEST_CONDITION(offset2 == offset2Second, "Testing offset2 after second update");
-  MITK_TEST_CONDITION(offset2Second.GetVnlVector()==offset2.GetVnlVector(), "Testing offset2 equals first update");
+    // Test setting BaseData
+    mitkToolData1 = mitk::Surface::New();
+    mitkToolData2 = mitk::Surface::New();
 
-  mitk::AffineTransform3D::MatrixType::InternalMatrixType m1Second= affineTransform1Second->GetMatrix().GetVnlMatrix();
-  MITK_TEST_OUTPUT( <<"\n after second update initOrient1="<<initialOri1<<" affineTransform1->GetVnlMatrix():\n "<< m1Second);
+    //dummy for test; will not be set but used to test find
+    mitkToolDataDummy = mitk::Surface::New();
+    //and the Dummy NavigationData for this
+    mitk::FillVector3D(initialPosDummy, 8.8, 9.9, 10.10);
+    mitk::FillVector4D(initialOriDummy,1.1, 2.2, 3.3, 4.4);
+    initialErrorDummy=10.0;
+    initialValidDummy=true;
+    ndDummy = mitk::NavigationData::New();
+    ndDummy->SetPosition(initialPosDummy);
+    ndDummy->SetOrientation(initialOriDummy);
+    ndDummy->SetPositionAccuracy(initialErrorDummy);
+    ndDummy->SetDataValid(initialValidDummy);
+    //now we have ndDummy and mitkToolDataDummy to test with
+  }
 
-  mitk::AffineTransform3D::MatrixType::InternalMatrixType m2Second= affineTransform2Second->GetMatrix().GetVnlMatrix();
-  MITK_TEST_OUTPUT( << "\n after second update initOrient2="<<initialOri2<<" affineTransform2->GetVnlMatrix():\n "<< m2Second);
+  void tearDown()
+  {
+  }
 
-  //testing adding a third input
-  myFilter->SetInput(2,ndDummy);
-  MITK_TEST_CONDITION(myFilter->GetNumberOfInputs() == 3, "Adding new input and testing GetNumberOfInputs == 3");
-  MITK_TEST_CONDITION(myFilter->GetNumberOfOutputs() == 3, "testing GetNumberOfOutputs == 3");
-  MITK_TEST_CONDITION(myFilter->GetInput(2) == ndDummy, "Testing Input == newly added input");
-  MITK_TEST_CONDITION_REQUIRED(myFilter->GetOutput(2) != NULL, "Testing GetOutput(2) != NULL");
-  MITK_TEST_CONDITION_REQUIRED(myFilter->GetOutput(2) != myFilter->GetOutput(1), "Testing GetOutput(2) != GetOutput(1)");
-  myFilter->SetRepresentationObject(2, mitkToolDataDummy);
-  MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 3, "Testing GetNumberOfToolRepresentations() after adding latest tool");
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(2) == mitkToolDataDummy, "Testing Set-/GetRepresentationObject() equals was set");
+  // Test functions
 
-  //last time processing update through pipeline
-  myFilter->Update();
+  void TestInitialize(){
+    // first test: did this work?
+    CPPUNIT_ASSERT_MESSAGE("Testing instantiation", myFilter.IsNotNull());
+  }
 
-  //now check for the new values
-  mitk::AffineTransform3D::Pointer affineTransformDummy = mitkToolDataDummy->GetGeometry()->GetIndexToWorldTransform();
-  mitk::AffineTransform3D::OutputVectorType offsetDummy = affineTransformDummy->GetOffset();
-  MITK_TEST_CONDITION(offsetDummy.GetVnlVector()==initialPosDummy.GetVnlVector(), "Testing Offset latest added tool");
+  void TestInput(){
+    //testing the input
+    CPPUNIT_ASSERT_MESSAGE("Testing Set-/GetInput() input 1 without index",myFilter->GetInput() == nd1);
+    CPPUNIT_ASSERT_MESSAGE("Testing Set-/GetInput() input 1", myFilter->GetInput(0) == nd1);
+    CPPUNIT_ASSERT_MESSAGE( "Testing Set-/GetInput() input 2", myFilter->GetInput(1) == nd2);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetNumberOfToolRepresentations()", myFilter->GetNumberOfToolRepresentations() == 0);
+  }
 
-  mitk::AffineTransform3D::MatrixType::InternalMatrixType m1Latest= affineTransformDummy->GetMatrix().GetVnlMatrix();
-  MITK_TEST_OUTPUT( << "\n latest initOrient="<<initialOriDummy<<" latest affineTransform->GetVnlMatrix():\n "<< m1Latest);
+  void TestOutput(){
+    //testing getting the output
+    CPPUNIT_ASSERT_MESSAGE("Testing GetOutput()", output != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetOutput() == GetOutput()", output == myFilter->GetOutput());
+    CPPUNIT_ASSERT_MESSAGE("Testing GetOutput() != GetOutput(1)", output != myFilter->GetOutput(1));
+  }
 
-  mitk::Surface::Pointer anotherSurface = mitk::Surface::New();
-  myFilter->SetRepresentationObject(0, anotherSurface);
-  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == anotherSurface, "Overwriting BaseData index 0");
+  void TestRepresentationObjects(){
+    //setting nodes
+    myFilter->SetRepresentationObject(0, mitkToolData1);
+    CPPUNIT_ASSERT_MESSAGE( "Testing SetRepresentationObject()/GetRepresentationObject() node 1", myFilter->GetRepresentationObject(0) == mitkToolData1);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetNumberOfToolRepresentations() after adding first tool", myFilter->GetNumberOfToolRepresentations() == 1);
 
-  // test Set/GetTransformPosition()
-  myFilter->SetTransformPosition(0,true);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(0)==true,"test Set/GetTransformPosition(0,true)");
-  myFilter->SetTransformPosition(1,true);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(1)==true,"test Set/GetTransformPosition(1,true)");
-  myFilter->SetTransformPosition(2,true);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(2)==true,"test Set/GetTransformPosition(2,true)");
-  myFilter->SetTransformPosition(3,true);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(3)==true,"test Set/GetTransformPosition(3,true)");
+    myFilter->SetRepresentationObject(1, mitkToolData2);
+    CPPUNIT_ASSERT_MESSAGE( "Testing SetRepresentationObject() node 2", myFilter->GetRepresentationObject(1) == mitkToolData2);
+    CPPUNIT_ASSERT_MESSAGE( "Testing GetNumberOfToolRepresentations() after adding second tool", myFilter->GetNumberOfToolRepresentations() == 2);
+    //getting nodes
+    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() node 1", myFilter->GetRepresentationObject(0) == mitkToolData1);
+    CPPUNIT_ASSERT_MESSAGE( "Testing GetRepresentationObject() != Dummy node", myFilter->GetRepresentationObject(0) != mitkToolDataDummy);
+    CPPUNIT_ASSERT_MESSAGE( "Testing GetRepresentationObject() node 2", myFilter->GetRepresentationObject(1) == mitkToolData2);
+    CPPUNIT_ASSERT_MESSAGE( "Testing GetRepresentationObject() != Dummy node", myFilter->GetRepresentationObject(1) != mitkToolDataDummy);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() with out of range parameter", myFilter->GetRepresentationObject(111) == NULL);
+  }
 
-  myFilter->SetTransformPosition(0,false);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(0)==false,"test Set/GetTransformPosition(0,false)");
-  myFilter->SetTransformPosition(1,false);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(1)==false,"test Set/GetTransformPosition(1,false)");
-  myFilter->SetTransformPosition(2,false);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(2)==false,"test Set/GetTransformPosition(2,false)");
-  myFilter->SetTransformPosition(3,false);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(3)==false,"test Set/GetTransformPosition(3,false)");
+  void TestTransforms(){
+    myFilter->SetRepresentationObject(0, mitkToolData1);
+    myFilter->SetRepresentationObject(1, mitkToolData2);
+    //Process
+    myFilter->Update();
 
-  // test Set/GetTransformOrientation()
-  myFilter->SetTransformOrientation(0,true);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(0)==true,"test Set/GetTransformOrientation(0,true)");
-  myFilter->SetTransformOrientation(1,true);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(1)==true,"test Set/GetTransformOrientation(1,true)");
-  myFilter->SetTransformOrientation(2,true);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(2)==true,"test Set/GetTransformOrientation(2,true)");
-  myFilter->SetTransformOrientation(3,true);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(3)==true,"test Set/GetTransformOrientation(3,true)");
+    affineTransform1 = mitkToolData1->GetGeometry()->GetIndexToWorldTransform();
+    offset1 = affineTransform1->GetOffset();
+    affineTransform2 = mitkToolData2->GetGeometry()->GetIndexToWorldTransform();
+    offset2 = affineTransform2->GetOffset();
 
-  myFilter->SetTransformOrientation(0,false);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(0)==false,"test Set/GetTransformOrientation(0,false)");
-  myFilter->SetTransformOrientation(1,false);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(1)==false,"test Set/GetTransformOrientation(1,false)");
-  myFilter->SetTransformOrientation(2,false);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(2)==false,"test Set/GetTransformOrientation(2,false)");
-  myFilter->SetTransformOrientation(3,false);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(3)==false,"test Set/GetTransformOrientation(3,false)");
+    m1 = affineTransform1->GetMatrix().GetVnlMatrix();
+    m2 = affineTransform2->GetMatrix().GetVnlMatrix();
 
-  // test the convenience methods to set/getTransformOrientation/Position
-  myFilter->TransformOrientationOn(0);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(0)==true,"test TransformOrientationOn()");
-  myFilter->TransformOrientationOff(0);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(0)==false,"test TransformOrientationOff()");
-  myFilter->TransformOrientationOff(1);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(1)==false,"test TransformOrientationOff()");
-  myFilter->TransformOrientationOn(1);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(1)==true,"test TransformOrientationOn()");
-  myFilter->TransformOrientationOn(2);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(2)==true,"test TransformOrientationOn()");
-  myFilter->TransformOrientationOff(2);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(2)==false,"test TransformOrientationOff()");
-  myFilter->TransformOrientationOn(3);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(3)==true,"test TransformOrientationOn()");
-  myFilter->TransformOrientationOff(3);
-  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(3)==false,"test TransformOrientationOff()");
+    //now check it there are data connected to the nodes with the according orientation and offsets
+    CPPUNIT_ASSERT_MESSAGE("Testing Offset position 1", offset1.GetVnlVector()==initialPos1.GetVnlVector());
+    CPPUNIT_ASSERT_MESSAGE("Testing Offset position 2", offset2.GetVnlVector()==initialPos2.GetVnlVector());
 
-  myFilter->TransformPositionOn(0);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(0)==true,"test TransformPositionOn()");
-  myFilter->TransformPositionOff(0);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(0)==false,"test TransformPositionOff()");
-  myFilter->TransformPositionOff(1);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(1)==false,"test TransformPositionOff()");
-  myFilter->TransformPositionOn(1);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(1)==true,"test TransformPositionOn()");
-  myFilter->TransformPositionOn(2);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(2)==true,"test TransformPositionOn()");
-  myFilter->TransformPositionOff(2);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(2)==false,"test TransformPositionOff()");
-  myFilter->TransformPositionOn(3);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(3)==true,"test TransformPositionOn()");
-  myFilter->TransformPositionOff(3);
-  MITK_TEST_CONDITION(myFilter->GetTransformPosition(3)==false,"test TransformPositionOff()");
-  // update position and orientation
-  mitk::NavigationData::PositionType updatedPos1, updatedPos2, zero;
-  mitk::FillVector3D(updatedPos1, 3.2, 1.5, 2.8);
-  mitk::FillVector3D(updatedPos2, 4.3, 5.2, 6.0);
-  mitk::FillVector3D(zero, 0.0, 0.0, 0.0);
-  mitk::NavigationData::OrientationType updatedOri1(0.7, 0.5, 0.1, 0.4);
-  mitk::NavigationData::OrientationType updatedOri2(0.2, 0.7, 0.6, 0.1);
-  nd1->SetPosition(updatedPos1);
-  nd1->SetOrientation(updatedOri1);
-  nd2->SetPosition(updatedPos2);
-  nd2->SetOrientation(updatedOri2);
-  myFilter->SetRepresentationObject(0,mitkToolData1);
-  myFilter->SetRepresentationObject(1,mitkToolData2);
-  myFilter->TransformPositionOn(0);
-  myFilter->TransformOrientationOff(0);
-  myFilter->TransformPositionOff(1);
-  myFilter->TransformOrientationOn(1);
-  myFilter->Update();
+    MITK_TEST_OUTPUT( << "\n initOrient1="<<initialOri1<<" affineTransform1->GetVnlMatrix():\n "<< m1);
+    MITK_TEST_OUTPUT( << "\n initOrient2=" << initialOri2 << " affineTransform2->GetVnlMatrix():\n " << m2);
+  }
 
-  // test positions and orientations
-  mitk::AffineTransform3D::Pointer updatedAffineTransform1 = mitkToolData1->GetGeometry()->GetIndexToWorldTransform();
-  mitk::AffineTransform3D::OutputVectorType updatedOffset1 = updatedAffineTransform1->GetOffset();
-  MITK_TEST_CONDITION(mitk::Equal(updatedOffset1.GetVnlVector(),updatedPos1.GetVnlVector()), "Testing updated position 1");
-  mitk::AffineTransform3D::Pointer updatedAffineTransform2 = mitkToolData2->GetGeometry()->GetIndexToWorldTransform();
-  mitk::AffineTransform3D::OutputVectorType updatedOffset2 = updatedAffineTransform2->GetOffset();
-  MITK_TEST_CONDITION(mitk::Equal(updatedOffset2.GetVnlVector(),zero.GetVnlVector()), "Testing updated position 2");
+  void TestMessWithRepresentationObjects(){
+    myFilter->SetRepresentationObject(0, mitkToolData1);
+    myFilter->SetRepresentationObject(1, mitkToolData2);
+    //Process
+    myFilter->Update();
 
-  mitk::AffineTransform3D::Pointer identityTransform = mitk::AffineTransform3D::New();
-  identityTransform->SetIdentity();
-  mitk::AffineTransform3D::MatrixType identityMatrix = identityTransform->GetMatrix();
-  mitk::AffineTransform3D::MatrixType uM1 = updatedAffineTransform1->GetMatrix();
-  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(uM1,identityMatrix), "Testing updated orientation 1");
-  mitk::AffineTransform3D::MatrixType::InternalMatrixType uM2 = updatedAffineTransform2->GetMatrix().GetVnlMatrix();
-  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(uM2,updatedOri2.rotation_matrix_transpose().transpose()), "Testing updated orientation 2");
+    affineTransform1 = mitkToolData1->GetGeometry()->GetIndexToWorldTransform();
+    offset1 = affineTransform1->GetOffset();
+    affineTransform2 = mitkToolData2->GetGeometry()->GetIndexToWorldTransform();
+    offset2 = affineTransform2->GetOffset();
 
-  // Test that the second RepresentationObject is updated properly even when
-  // the first RepresentationObject is invalid
-  nd2->Modified();
-  myFilter->SetRepresentationObject(0, NULL);
-  mitkToolData2->GetGeometry()->SetIdentity();
-  myFilter->Update();
-  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(mitkToolData2->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix(),
-                                                   updatedOri2.rotation_matrix_transpose().transpose()),
-                      "Test that the second repr object is updated correctly when the first repr object is invalid");
+    m1 = affineTransform1->GetMatrix().GetVnlMatrix();
+    m2 = affineTransform2->GetMatrix().GetVnlMatrix();
 
-  // always end with this!
-  MITK_TEST_END();
-}
+    //messing with SetRepresentationObject
+    //setting nodes
+    myFilter->SetRepresentationObject(0, mitkToolData2);
+    CPPUNIT_ASSERT_MESSAGE("Twisting mitkToolData by using SetRepresentationObject() NavigationData 1 with ToolData 2", myFilter->GetRepresentationObject(0) == mitkToolData2);
+    CPPUNIT_ASSERT_MESSAGE( "Testing GetNumberOfToolRepresentations() == 1", myFilter->GetNumberOfToolRepresentations() == 2);
+
+    myFilter->SetRepresentationObject(1, mitkToolData1);
+    CPPUNIT_ASSERT_MESSAGE("Twisting mitkToolData by using SetRepresentationObject() NavigationData 2 with ToolData 1", myFilter->GetRepresentationObject(1) == mitkToolData1);
+    CPPUNIT_ASSERT_MESSAGE( "Testing GetNumberOfToolRepresentations() == 2", myFilter->GetNumberOfToolRepresentations() == 2);
+
+    //getting nodes
+    CPPUNIT_ASSERT_MESSAGE("Testing switched BaseData of NavigationData 1 ", myFilter->GetRepresentationObject(0) == mitkToolData2);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() != Dummy node", myFilter->GetRepresentationObject(0) != mitkToolDataDummy);
+    CPPUNIT_ASSERT_MESSAGE("Testing switched BaseData NavigationData 2", myFilter->GetRepresentationObject(1) == mitkToolData1);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() != Dummy node", myFilter->GetRepresentationObject(1) != mitkToolDataDummy);
+
+    //processing update through pipeline
+    myFilter->Update();
+
+    //now check it there are data connected to the nodes with the according orientation and offsets
+    mitk::AffineTransform3D::Pointer affineTransform1Second = mitkToolData1->GetGeometry()->GetIndexToWorldTransform();
+    CPPUNIT_ASSERT_MESSAGE( "Testing affineTransform1 after second update", affineTransform1 == affineTransform1Second);
+    mitk::AffineTransform3D::OutputVectorType offset1Second = affineTransform1->GetOffset();
+    CPPUNIT_ASSERT_MESSAGE( "Testing offset1 after second update", offset1 == offset1Second);
+    CPPUNIT_ASSERT_MESSAGE("Testing offset1 equals first update", offset1Second.GetVnlVector()==offset1.GetVnlVector());
+
+    mitk::AffineTransform3D::Pointer affineTransform2Second = mitkToolData2->GetGeometry()->GetIndexToWorldTransform();
+    CPPUNIT_ASSERT_MESSAGE("Testing affineTransform2 after second update", affineTransform2 == affineTransform2Second);
+    mitk::AffineTransform3D::OutputVectorType offset2Second = affineTransform2->GetOffset();
+    CPPUNIT_ASSERT_MESSAGE("Testing offset2 after second update", offset2 == offset2Second);
+    CPPUNIT_ASSERT_MESSAGE("Testing offset2 equals first update", offset2Second.GetVnlVector()==offset2.GetVnlVector());
+
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType m1Second= affineTransform1Second->GetMatrix().GetVnlMatrix();
+    MITK_TEST_OUTPUT( <<"\n after second update initOrient1="<<initialOri1<<" affineTransform1->GetVnlMatrix():\n "<< m1Second);
+
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType m2Second= affineTransform2Second->GetMatrix().GetVnlMatrix();
+    MITK_TEST_OUTPUT( << "\n after second update initOrient2="<<initialOri2<<" affineTransform2->GetVnlMatrix():\n "<< m2Second);
+  }
+
+  void TestThirdInput(){
+    myFilter->SetRepresentationObject(0, mitkToolData1);
+    myFilter->SetRepresentationObject(1, mitkToolData2);
+    //Process
+    myFilter->Update();
+
+    //testing adding a third input
+    myFilter->SetInput(2,ndDummy);
+    CPPUNIT_ASSERT_MESSAGE("Adding new input and testing GetNumberOfInputs == 3", myFilter->GetNumberOfInputs() == 3);
+    CPPUNIT_ASSERT_MESSAGE("testing GetNumberOfOutputs == 3", myFilter->GetNumberOfOutputs() == 3);
+    CPPUNIT_ASSERT_MESSAGE("Testing Input == newly added input", myFilter->GetInput(2) == ndDummy);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetOutput(2) != NULL", myFilter->GetOutput(2) != NULL);
+    CPPUNIT_ASSERT_MESSAGE( "Testing GetOutput(2) != GetOutput(1)", myFilter->GetOutput(2) != myFilter->GetOutput(1));
+    myFilter->SetRepresentationObject(2, mitkToolDataDummy);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetNumberOfToolRepresentations() after adding latest tool", myFilter->GetNumberOfToolRepresentations() == 3);
+    CPPUNIT_ASSERT_MESSAGE("Testing Set-/GetRepresentationObject() equals was set", myFilter->GetRepresentationObject(2) == mitkToolDataDummy);
+
+    //last time processing update through pipeline
+    myFilter->Update();
+
+    //now check for the new values
+    mitk::AffineTransform3D::Pointer affineTransformDummy = mitkToolDataDummy->GetGeometry()->GetIndexToWorldTransform();
+    mitk::AffineTransform3D::OutputVectorType offsetDummy = affineTransformDummy->GetOffset();
+    CPPUNIT_ASSERT_MESSAGE("Testing Offset latest added tool", offsetDummy.GetVnlVector()==initialPosDummy.GetVnlVector());
+
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType m1Latest= affineTransformDummy->GetMatrix().GetVnlMatrix();
+    MITK_TEST_OUTPUT( << "\n latest initOrient="<<initialOriDummy<<" latest affineTransform->GetVnlMatrix():\n "<< m1Latest);
+
+    mitk::Surface::Pointer anotherSurface = mitk::Surface::New();
+    myFilter->SetRepresentationObject(0, anotherSurface);
+    CPPUNIT_ASSERT_MESSAGE("Overwriting BaseData index 0", myFilter->GetRepresentationObject(0) == anotherSurface);
+  }
+
+  void TestSetTransformPosition(){
+    // test Set/GetTransformPosition()
+    myFilter->SetTransformPosition(0,true);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformPosition(0,true)", myFilter->GetTransformPosition(0)==true);
+    myFilter->SetTransformPosition(1,true);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformPosition(1,true)", myFilter->GetTransformPosition(1)==true);
+    myFilter->SetTransformPosition(2,true);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformPosition(2,true)", myFilter->GetTransformPosition(2)==true);
+    myFilter->SetTransformPosition(3,true);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformPosition(3,true)", myFilter->GetTransformPosition(3)==true);
+
+    myFilter->SetTransformPosition(0,false);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformPosition(0,false)", myFilter->GetTransformPosition(0)==false);
+    myFilter->SetTransformPosition(1,false);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformPosition(1,false)", myFilter->GetTransformPosition(1)==false);
+    myFilter->SetTransformPosition(2,false);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformPosition(2,false)", myFilter->GetTransformPosition(2)==false);
+    myFilter->SetTransformPosition(3,false);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformPosition(3,false)", myFilter->GetTransformPosition(3)==false);
+  }
+
+  void TestSetTransformOrientation(){
+    // test Set/GetTransformOrientation()
+    myFilter->SetTransformOrientation(0,true);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformOrientation(0,true)", myFilter->GetTransformOrientation(0)==true);
+    myFilter->SetTransformOrientation(1,true);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformOrientation(1,true)", myFilter->GetTransformOrientation(1)==true);
+    myFilter->SetTransformOrientation(2,true);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformOrientation(2,true)", myFilter->GetTransformOrientation(2)==true);
+    myFilter->SetTransformOrientation(3,true);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformOrientation(3,true)", myFilter->GetTransformOrientation(3)==true);
+
+    myFilter->SetTransformOrientation(0,false);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformOrientation(0,false)", myFilter->GetTransformOrientation(0)==false);
+    myFilter->SetTransformOrientation(1,false);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformOrientation(1,false)", myFilter->GetTransformOrientation(1)==false);
+    myFilter->SetTransformOrientation(2,false);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformOrientation(2,false)", myFilter->GetTransformOrientation(2)==false);
+    myFilter->SetTransformOrientation(3,false);
+    CPPUNIT_ASSERT_MESSAGE("test Set/GetTransformOrientation(3,false)", myFilter->GetTransformOrientation(3)==false);
+  }
+
+  void TestConvenienceSetTransformOrientation(){
+    // test the convenience methods to set/getTransformOrientation/Position
+    myFilter->TransformOrientationOn(0);
+    CPPUNIT_ASSERT_MESSAGE("test TransformOrientationOn()", myFilter->GetTransformOrientation(0)==true);
+    myFilter->TransformOrientationOff(0);
+    CPPUNIT_ASSERT_MESSAGE("test TransformOrientationOff()", myFilter->GetTransformOrientation(0)==false);
+    myFilter->TransformOrientationOff(1);
+    CPPUNIT_ASSERT_MESSAGE("test TransformOrientationOff()", myFilter->GetTransformOrientation(1)==false);
+    myFilter->TransformOrientationOn(1);
+    CPPUNIT_ASSERT_MESSAGE("test TransformOrientationOn()", myFilter->GetTransformOrientation(1)==true);
+    myFilter->TransformOrientationOn(2);
+    CPPUNIT_ASSERT_MESSAGE("test TransformOrientationOn()", myFilter->GetTransformOrientation(2)==true);
+    myFilter->TransformOrientationOff(2);
+    CPPUNIT_ASSERT_MESSAGE("test TransformOrientationOff()", myFilter->GetTransformOrientation(2)==false);
+    myFilter->TransformOrientationOn(3);
+    CPPUNIT_ASSERT_MESSAGE("test TransformOrientationOn()", myFilter->GetTransformOrientation(3)==true);
+    myFilter->TransformOrientationOff(3);
+    CPPUNIT_ASSERT_MESSAGE("test TransformOrientationOff()", myFilter->GetTransformOrientation(3)==false);
+
+    myFilter->TransformPositionOn(0);
+    CPPUNIT_ASSERT_MESSAGE("test TransformPositionOn()", myFilter->GetTransformPosition(0)==true);
+    myFilter->TransformPositionOff(0);
+    CPPUNIT_ASSERT_MESSAGE("test TransformPositionOff()", myFilter->GetTransformPosition(0)==false);
+    myFilter->TransformPositionOff(1);
+    CPPUNIT_ASSERT_MESSAGE("test TransformPositionOff()", myFilter->GetTransformPosition(1)==false);
+    myFilter->TransformPositionOn(1);
+    CPPUNIT_ASSERT_MESSAGE("test TransformPositionOn()", myFilter->GetTransformPosition(1)==true);
+    myFilter->TransformPositionOn(2);
+    CPPUNIT_ASSERT_MESSAGE("test TransformPositionOn()", myFilter->GetTransformPosition(2)==true);
+    myFilter->TransformPositionOff(2);
+    CPPUNIT_ASSERT_MESSAGE("test TransformPositionOff()", myFilter->GetTransformPosition(2)==false);
+    myFilter->TransformPositionOn(3);
+    CPPUNIT_ASSERT_MESSAGE("test TransformPositionOn()", myFilter->GetTransformPosition(3)==true);
+    myFilter->TransformPositionOff(3);
+    CPPUNIT_ASSERT_MESSAGE("test TransformPositionOff()", myFilter->GetTransformPosition(3)==false);
+  }
+
+  void TestUpdateOrientation(){
+    // update position and orientation
+    mitk::NavigationData::PositionType updatedPos1, updatedPos2, zero;
+    mitk::FillVector3D(updatedPos1, 3.2, 1.5, 2.8);
+    mitk::FillVector3D(updatedPos2, 4.3, 5.2, 6.0);
+    mitk::FillVector3D(zero, 0.0, 0.0, 0.0);
+    mitk::NavigationData::OrientationType updatedOri1(0.7, 0.5, 0.1, 0.4);
+    mitk::NavigationData::OrientationType updatedOri2(0.2, 0.7, 0.6, 0.1);
+
+    updatedOri1.normalize();
+    updatedOri2.normalize();
+
+    nd1->SetPosition(updatedPos1);
+    nd1->SetOrientation(updatedOri1);
+
+    nd2->SetPosition(updatedPos2);
+    nd2->SetOrientation(updatedOri2);
+
+    myFilter->SetRepresentationObject(0,mitkToolData1);
+    myFilter->SetRepresentationObject(1,mitkToolData2);
+
+    myFilter->TransformPositionOn(0);
+    myFilter->TransformOrientationOff(0);
+    myFilter->TransformPositionOff(1);
+    myFilter->TransformOrientationOn(1);
+
+    myFilter->Update();
+
+    // test positions and orientations
+    mitk::AffineTransform3D::Pointer updatedAffineTransform1 = mitkToolData1->GetGeometry()->GetIndexToWorldTransform();
+    mitk::AffineTransform3D::OutputVectorType updatedOffset1 = updatedAffineTransform1->GetOffset();
+    CPPUNIT_ASSERT_MESSAGE("Testing updated position 1", mitk::Equal(updatedOffset1.GetVnlVector(),updatedPos1.GetVnlVector()));
+
+    mitk::AffineTransform3D::Pointer updatedAffineTransform2 = mitkToolData2->GetGeometry()->GetIndexToWorldTransform();
+    mitk::AffineTransform3D::OutputVectorType updatedOffset2 = updatedAffineTransform2->GetOffset();
+    CPPUNIT_ASSERT_MESSAGE( "Testing updated position 2", mitk::Equal(updatedOffset2.GetVnlVector(),zero.GetVnlVector()));
+
+    mitk::AffineTransform3D::Pointer identityTransform = mitk::AffineTransform3D::New();
+    identityTransform->SetIdentity();
+    mitk::AffineTransform3D::MatrixType identityMatrix = identityTransform->GetMatrix();
+    mitk::AffineTransform3D::MatrixType uM1 = updatedAffineTransform1->GetMatrix();
+
+    CPPUNIT_ASSERT_MESSAGE( "Testing updated orientation 1", mitk::MatrixEqualElementWise(uM1, identityMatrix));
+
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType uM2 = updatedAffineTransform2->GetMatrix().GetVnlMatrix();
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType updatedOriTransform2 = updatedOri2.rotation_matrix_transpose().transpose();
+
+    CPPUNIT_ASSERT_MESSAGE("Testing updated orientation 2", mitk::MatrixEqualElementWise(uM2,updatedOriTransform2));
+
+    // Test that the second RepresentationObject is updated properly even when
+    // the first RepresentationObject is invalid
+    nd2->Modified();
+    myFilter->SetRepresentationObject(0, NULL);
+    mitkToolData2->GetGeometry()->SetIdentity();
+    myFilter->Update();
+    CPPUNIT_ASSERT_MESSAGE( "Test that the second repr object is updated correctly when the first repr object is invalid",
+      mitk::MatrixEqualElementWise(mitkToolData2->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix(),
+      updatedOri2.rotation_matrix_transpose().transpose()));
+  }
+};//end class mitkNavigationDataObjectVisualizationFilterTestSuite
+
+MITK_TEST_SUITE_REGISTRATION(mitkNavigationDataObjectVisualizationFilter)

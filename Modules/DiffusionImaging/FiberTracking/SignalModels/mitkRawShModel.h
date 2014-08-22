@@ -69,7 +69,6 @@ protected:
     unsigned int                    m_ShOrder;
     int                             m_ModelIndex;
     unsigned int                    m_MaxNumKernels;
-    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };
 
 }

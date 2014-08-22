@@ -818,7 +818,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             itk::ShiftScaleImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer scaler = itk::ShiftScaleImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
             scaler->SetInput(comp4VolumeImage);
             scaler->SetShift(-min);
-            scaler->SetScale(1/(max-min));
+            scaler->SetScale(1.0/(max-min));
             scaler->Update();
             comp4VolumeImage = scaler->GetOutput();
 
@@ -914,7 +914,20 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         }
         }
 
-    parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::FIBER_TANGENT_DIRECTIONS;
+    switch (m_Controls->m_DiffusionDirectionBox->currentIndex())
+    {
+    case 0:
+        parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::FIBER_TANGENT_DIRECTIONS;
+        break;
+    case 1:
+        parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::MAIN_FIBER_DIRECTIONS;
+        break;
+    case 2:
+        parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::RANDOM_DIRECTIONS;
+        break;
+    default:
+        parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::FIBER_TANGENT_DIRECTIONS;
+    }
 
     parameters.m_ResultNode->AddProperty("Fiberfox.SignalScale", IntProperty::New(parameters.m_SignalScale));
     parameters.m_ResultNode->AddProperty("Fiberfox.FiberRadius", IntProperty::New(parameters.m_AxonRadius));

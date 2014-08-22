@@ -38,7 +38,6 @@ public:
     typedef typename DiffusionSignalModel< ScalarType >::PixelType          PixelType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientType       GradientType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
-    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator          ItkRandGenType;
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
@@ -46,8 +45,6 @@ public:
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
-
-    void SetSeed(int s);    ///< set seed for random generator that creates the stick orientations
 
     void SetRandomizeSticks(bool randomize=true){ m_RandomizeSticks=randomize; } ///< Random stick configuration in each voxel
     void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
@@ -99,7 +96,6 @@ protected:
     GradientListType m_Sticks;          ///< Stick container
     unsigned int m_NumSticks;           ///< Number of sticks
     bool m_RandomizeSticks;
-    ItkRandGenType::Pointer m_RandGen;  ///< Random number generator
 };
 
 }

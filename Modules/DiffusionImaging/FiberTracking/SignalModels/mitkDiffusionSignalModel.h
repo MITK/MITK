@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVariableLengthVector.h>
 #include <itkVector.h>
 #include <itkImage.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <vnl/vnl_vector_fixed.h>
 
 namespace mitk {
@@ -44,6 +45,7 @@ public:
     typedef itk::VariableLengthVector< ScalarType > PixelType;
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;
+    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator          ItkRandGenType;
 
     /** Realizes actual signal generation. Has to be implemented in subclass. **/
     virtual PixelType SimulateMeasurement() = 0;
@@ -58,12 +60,21 @@ public:
     GradientType GetGradientDirection(int i) { return m_GradientList.at(i); }
     double GetT2() { return m_T2; }
 
+    void SetSeed(int s)     ///< set seed for random generator
+    {
+        if (m_RandGen.IsNull())
+            m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+        m_RandGen->SetSeed(s);
+    }
+
+
 protected:
 
     GradientType                m_FiberDirection;       ///< Needed to generate anisotropc signal to determin direction of anisotropy
     GradientListType            m_GradientList;         ///< Diffusion gradient direction container
     double                      m_T2;                   ///< Tissue specific relaxation time
     ItkDoubleImgType::Pointer   m_VolumeFractionImage;  ///< Tissue specific volume fraction for each voxel (only relevant for non fiber compartments)
+    ItkRandGenType::Pointer     m_RandGen;              ///< Random number generator
 };
 
 }

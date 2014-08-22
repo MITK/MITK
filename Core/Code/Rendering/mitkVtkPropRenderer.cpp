@@ -674,6 +674,33 @@ void mitk::VtkPropRenderer::InitPathTraversal()
   }
 }
 
+int mitk::VtkPropRenderer::GetNumberOfPaths()
+{
+    if (m_DataStorage.IsNull()) {
+        return 0;
+    }
+
+    int nPaths = 0;
+    DataStorage::SetOfObjects::ConstPointer objects = m_DataStorage->GetAll();
+    for (DataStorage::SetOfObjects::const_iterator iter = objects->begin(); iter != objects->end(); ++iter) {
+        Mapper* mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
+        if (mapper)
+        {
+            VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper);
+            if (vtkmapper)
+            {
+                vtkProp* prop = vtkmapper->GetVtkProp(this);
+                if (prop && prop->GetVisibility())
+                {
+                    ++nPaths;
+                }
+            }
+        }
+    }
+
+    return nPaths;
+}
+
 vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 {
   if (m_DataStorage.IsNull() )

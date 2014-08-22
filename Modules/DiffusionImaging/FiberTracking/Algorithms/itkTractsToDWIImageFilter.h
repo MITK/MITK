@@ -82,13 +82,17 @@ protected:
     itk::Vector<double, 3> GetItkVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
-    void SimulateNonFiberSignal(ItkUcharImgType::IndexType index, double intraAxonalVolume, int g=-1);
-
     double RoundToNearest(double num);
     std::string GetTime();
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts. */
     DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
+
+    /** Generate signal of non-fiber compartments. */
+    void SimulateNonFiberSignal(ItkUcharImgType::IndexType index, double intraAxonalVolume, int g=-1);
+
+    /** Move fibers to simulate headmotion */
+    void SimulateMotion(int g=-1);
 
     // input
     mitk::FiberfoxParameters<double>            m_Parameters;
@@ -102,6 +106,8 @@ protected:
     // MISC
     itk::TimeProbe                              m_TimeProbe;
     bool                                        m_UseConstantRandSeed;
+    bool                                        m_MaskImageSet;
+    ofstream                                    m_Logfile;
 
     // signal generation
     FiberBundleType                             m_FiberBundleWorkingCopy;   ///< we work on an upsampled version of the input bundle
@@ -111,7 +117,8 @@ protected:
     ImageRegion<3>                              m_UpsampledImageRegion;
     double                                      m_VoxelVolume;
     std::vector< DoubleDwiType::Pointer >       m_CompartmentImages;
-    ItkUcharImgType::Pointer                    m_MaskImage;
+    ItkUcharImgType::Pointer                    m_MaskImage;                ///< copy of mask image (changes for each motion step)
+    ItkUcharImgType::Pointer                    m_UpsampledMaskImage;       ///< helper image for motion simulation
     DoubleVectorType                            m_Rotation;
     DoubleVectorType                            m_Translation;
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;

@@ -921,9 +921,11 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         break;
     case 1:
         parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::MAIN_FIBER_DIRECTIONS;
+        MITK_INFO << "Headmotion disabled";
         break;
     case 2:
         parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::RANDOM_DIRECTIONS;
+        MITK_INFO << "Headmotion disabled";
         break;
     default:
         parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::FIBER_TANGENT_DIRECTIONS;

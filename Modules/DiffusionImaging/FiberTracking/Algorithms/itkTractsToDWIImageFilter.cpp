@@ -945,14 +945,101 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                     }
                     //                if (count>0)
                     //                    pix /= count;
-                    pix *= intraAxonalVolumeImage->GetPixel(it.GetIndex());
+                    pix *= intraAxonalVolumeImage->GetPixel(it.GetIndex())*voxelVolume;
                     m_CompartmentImages.at(c)->SetPixel(it.GetIndex(), pix);
                 }
 
-                // generate non-fiber signal
+                // get fiber volume fraction
+                double intraAxonalVolume = intraAxonalVolumeImage->GetPixel(it.GetIndex())*voxelVolume;
+                if (intraAxonalVolume>0.0001 && m_Parameters.m_DoDisablePartialVolume)  // only fiber in voxel
                 {
-                    int modelIndex = m_RandGen->GetIntegerVariate(m_Parameters.m_NonFiberModelList.size()-1);
-                    pix += (1-intraAxonalVolumeImage->GetPixel(it.GetIndex()))*m_Parameters.m_NonFiberModelList.at(modelIndex)->SimulateMeasurement();
+                    DoubleDwiType::PixelType pix = m_CompartmentImages.at(0)->GetPixel(it.GetIndex());
+                    pix *= voxelVolume/intraAxonalVolume;
+                    m_CompartmentImages.at(0)->SetPixel(it.GetIndex(), pix);
+                    m_VolumeFractions.at(0)->SetPixel(it.GetIndex(), 1);
+                    for (int i=1; i<numFiberCompartments; i++)
+                    {
+                        DoubleDwiType::PixelType pix = m_CompartmentImages.at(i)->GetPixel(it.GetIndex());
+                        pix.Fill(0.0);
+                        m_CompartmentImages.at(i)->SetPixel(it.GetIndex(), pix);
+                    }
+                }
+                else
+                {
+                    m_VolumeFractions.at(0)->SetPixel(it.GetIndex(), intraAxonalVolume/voxelVolume);
+
+                    itk::Point<double, 3> point;
+                    tempTissueMask->TransformIndexToPhysicalPoint(it.GetIndex(), point);
+
+                    if (m_Parameters.m_DoDisablePartialVolume)
+                    {
+                        int maxVolumeIndex = 0;
+                        double maxWeight = 0;
+                        for (int i=0; i<numNonFiberCompartments; i++)
+                        {
+                            double weight = 0;
+                            if (numNonFiberCompartments>1)
+                            {
+                                DoubleDwiType::IndexType newIndex;
+                                m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->TransformPhysicalPointToIndex(point, newIndex);
+                                if (!m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion().IsInside(newIndex))
+                                    continue;
+                                weight = m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetPixel(newIndex);
+                            }
+
+                            if (weight>maxWeight)
+                            {
+                                maxWeight = weight;
+                                maxVolumeIndex = i;
+                            }
+                        }
+                        DoubleDwiType::Pointer doubleDwi = m_CompartmentImages.at(maxVolumeIndex+numFiberCompartments);
+                        DoubleDwiType::PixelType pix = doubleDwi->GetPixel(it.GetIndex());
+
+                        pix += m_Parameters.m_NonFiberModelList[maxVolumeIndex]->SimulateMeasurement();
+                        doubleDwi->SetPixel(it.GetIndex(), pix);
+                        m_VolumeFractions.at(maxVolumeIndex+numFiberCompartments)->SetPixel(it.GetIndex(), 1);
+                    }
+                    else
+                    {
+                        double extraAxonalVolume = voxelVolume-intraAxonalVolume;    // non-fiber volume
+                        double interAxonalVolume = 0;
+                        if (numFiberCompartments>1)
+                            interAxonalVolume = extraAxonalVolume * intraAxonalVolume/voxelVolume;   // inter-axonal fraction of non fiber compartment scales linearly with f
+                        double other = extraAxonalVolume - interAxonalVolume;        // rest of compartment
+                        double singleinter = interAxonalVolume/(numFiberCompartments-1);
+
+                        // adjust non-fiber and intra-axonal signal
+                        for (int i=1; i<numFiberCompartments; i++)
+                        {
+                            DoubleDwiType::PixelType pix = m_CompartmentImages.at(i)->GetPixel(it.GetIndex());
+                            if (intraAxonalVolume>0)    // remove scaling by intra-axonal volume from inter-axonal compartment
+                                pix /= intraAxonalVolume;
+                            pix *= singleinter;
+                            m_CompartmentImages.at(i)->SetPixel(it.GetIndex(), pix);
+                            m_VolumeFractions.at(i)->SetPixel(it.GetIndex(), singleinter/voxelVolume);
+                        }
+
+                        for (int i=0; i<numNonFiberCompartments; i++)
+                        {
+                            double weight = 1;
+                            if (numNonFiberCompartments>1)
+                            {
+                                DoubleDwiType::IndexType newIndex;
+                                m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->TransformPhysicalPointToIndex(point, newIndex);
+                                if (!m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion().IsInside(newIndex))
+                                    continue;
+                                weight = m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetPixel(newIndex);
+                            }
+
+                            DoubleDwiType::Pointer doubleDwi = m_CompartmentImages.at(i+numFiberCompartments);
+                            DoubleDwiType::PixelType pix = doubleDwi->GetPixel(it.GetIndex());
+
+                            pix += m_Parameters.m_NonFiberModelList[i]->SimulateMeasurement()*other*weight;
+                            doubleDwi->SetPixel(it.GetIndex(), pix);
+                            m_VolumeFractions.at(i+numFiberCompartments)->SetPixel(it.GetIndex(), other/voxelVolume*weight);
+                        }
+                    }
                 }
 
             }

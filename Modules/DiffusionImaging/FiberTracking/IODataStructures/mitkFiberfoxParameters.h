@@ -128,6 +128,7 @@ public:
     DiffusionModelListType              m_NonFiberModelList;        ///< Extra-axonal compartments.
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
     DiffusionDirectionMode              m_DiffusionDirectionMode;   ///< Determines how the main diffusion direction of the signal models is selected
+    double                              m_FiberSeparationThreshold; ///< Used for random and and mein fiber deriction DiffusionDirectionMode
 
     /** Artifacts */
     unsigned int                        m_Spikes;                   ///< Number of spikes randomly appearing in the image

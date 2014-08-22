@@ -604,7 +604,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     int signalModelSeed = m_RandGen->GetIntegerVariate();
     switch (m_Parameters.m_DiffusionDirectionMode)
     {
-    case(FiberfoxParameters<>::FIBER_TANGENT_DIRECTIONS):
+    case(FiberfoxParameters<>::FIBER_TANGENT_DIRECTIONS):   // use fiber tangent directions to determine diffusion direction
     {
         m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
         m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
@@ -725,15 +725,16 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         }
         break;
     }
-    case (FiberfoxParameters<>::MAIN_FIBER_DIRECTIONS):
+    case (FiberfoxParameters<>::MAIN_FIBER_DIRECTIONS): // use main fiber directions to determine voxel-wise diffusion directions
     {
         typedef itk::Image< itk::Vector< float, 3>, 3 >                                 ItkDirectionImage3DType;
         typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >  ItkDirectionImageContainerType;
 
+        // calculate main fiber directions
         itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
         fOdfFilter->SetFiberBundle(m_FiberBundleTransformed);
         fOdfFilter->SetMaskImage(m_MaskImage);
-        fOdfFilter->SetAngularThreshold(cos(30.0*M_PI/180.0));
+        fOdfFilter->SetAngularThreshold(cos(m_Parameters.m_FiberSeparationThreshold*M_PI/180.0));
         fOdfFilter->SetNormalizeVectors(false);
         fOdfFilter->SetUseWorkingCopy(true);
         fOdfFilter->SetSizeThreshold(0);
@@ -741,6 +742,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         fOdfFilter->Update();
         ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
 
+        // allocate image storing intra-axonal volume fraction information
         ItkDoubleImgType::Pointer intraAxonalVolumeImage = ItkDoubleImgType::New();
         intraAxonalVolumeImage->SetSpacing( m_UpsampledSpacing );
         intraAxonalVolumeImage->SetOrigin( m_UpsampledOrigin );
@@ -751,6 +753,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         intraAxonalVolumeImage->Allocate();
         intraAxonalVolumeImage->FillBuffer(0);
 
+        // determine intra-axonal volume fraction using the tract density
         itk::TractDensityImageFilter< ItkDoubleImgType >::Pointer tdiFilter = itk::TractDensityImageFilter< ItkDoubleImgType >::New();
         tdiFilter->SetFiberBundle(m_FiberBundleTransformed);
         tdiFilter->SetBinaryOutput(false);
@@ -766,6 +769,12 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
         for (unsigned int g=0; g<m_Parameters.GetNumVolumes(); g++)
         {
+            // Set signal model random generator seeds to get same configuration in each voxel
+            for (int i=0; i<m_Parameters.m_FiberModelList.size(); i++)
+                m_Parameters.m_FiberModelList.at(i)->SetSeed(signalModelSeed);
+            for (int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
+                m_Parameters.m_NonFiberModelList.at(i)->SetSeed(signalModelSeed);
+
             if (m_Parameters.m_DoAddMotion && g>0)  // if fibers have moved we need a new TDI and new directions
             {
                 fOdfFilter->SetFiberBundle(m_FiberBundleTransformed);
@@ -826,6 +835,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
             SimulateMotion(g);
         }
+
+        itk::ImageFileWriter< ItkUcharImgType >::Pointer wr = itk::ImageFileWriter< ItkUcharImgType >::New();
+        wr->SetInput(fOdfFilter->GetNumDirectionsImage());
+        wr->SetFileName(mitk::IOUtil::GetTempPath()+"/NumDirections_MainFiberDirections.nrrd");
+        wr->Update();
         break;
     }
     case (FiberfoxParameters<>::RANDOM_DIRECTIONS):
@@ -839,6 +853,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         numDirectionsImage->SetRequestedRegion( m_UpsampledImageRegion );
         numDirectionsImage->Allocate();
         numDirectionsImage->FillBuffer(0);
+        double sepAngle = cos(m_Parameters.m_FiberSeparationThreshold*M_PI/180.0);
 
         m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
         m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
@@ -891,7 +906,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                         if (angle>min)
                             min = angle;
                     }
-                    if (min<0.5)
+                    if (min<sepAngle)
                     {
                         m_Parameters.m_FiberModelList.at(0)->SetFiberDirection(fib);
                         pix += m_Parameters.m_FiberModelList.at(0)->SimulateMeasurement()*fractions[i];
@@ -905,7 +920,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
                 // CSF/GM
                 {
-                    //                    int modelIndex = m_RandGen->GetIntegerVariate(m_Parameters.m_NonFiberModelList.size()-1);
                     pix += volume*m_Parameters.m_NonFiberModelList.at(0)->SimulateMeasurement();
                 }
 
@@ -916,7 +930,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
         itk::ImageFileWriter< ItkUcharImgType >::Pointer wr = itk::ImageFileWriter< ItkUcharImgType >::New();
         wr->SetInput(numDirectionsImage);
-        wr->SetFileName("/local/NumDirections.nrrd");
+        wr->SetFileName(mitk::IOUtil::GetTempPath()+"/NumDirections_RandomDirections.nrrd");
         wr->Update();
     }
     }

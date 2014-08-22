@@ -914,6 +914,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         }
         }
 
+    parameters.m_FiberSeparationThreshold = m_Controls->m_SeparationAngleBox->value();
     switch (m_Controls->m_DiffusionDirectionBox->currentIndex())
     {
     case 0:
@@ -921,11 +922,15 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         break;
     case 1:
         parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::MAIN_FIBER_DIRECTIONS;
-        MITK_INFO << "Headmotion disabled";
         break;
     case 2:
         parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::RANDOM_DIRECTIONS;
-        MITK_INFO << "Headmotion disabled";
+        parameters.m_DoAddMotion = false;
+        parameters.m_DoAddGibbsRinging = false;
+        parameters.m_KspaceLineOffset = 0.0;
+        parameters.m_FrequencyMap = NULL;
+        parameters.m_CroppingFactor = 1.0;
+        parameters.m_EddyStrength = 0;
         break;
     default:
         parameters.m_DiffusionDirectionMode = FiberfoxParameters<ScalarType>::FIBER_TANGENT_DIRECTIONS;

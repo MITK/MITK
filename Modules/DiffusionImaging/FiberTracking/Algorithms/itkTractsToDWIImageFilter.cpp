@@ -932,7 +932,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                 DoubleDwiType::PixelType pix = m_CompartmentImages.at(0)->GetPixel(it.GetIndex());
                 for (unsigned int i=0; i<directionImageContainer->Size(); i++)
                 {
-                    itk::Vector< float, 3> dir = directionImageContainer->GetElement(i)->GetPixel(it.GetIndex());
+                    itk::Vector< double, 3> dir;
+                    dir.CastFrom(directionImageContainer->GetElement(i)->GetPixel(it.GetIndex()));
                     double norm = dir.GetNorm();
                     if (norm>0.0001)
                     {

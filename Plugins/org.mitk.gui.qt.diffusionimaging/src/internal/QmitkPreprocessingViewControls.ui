@@ -396,7 +396,7 @@
              <bool>false</bool>
             </property>
             <property name="toolTip">
-             <string>Each image value is normalized with the corresponding baseline signal value.</string>
+             <string/>
             </property>
             <property name="statusTip">
              <string/>

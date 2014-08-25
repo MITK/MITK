@@ -31,7 +31,7 @@ class vtkPointData;
 class vtkCellData;
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+//#include "MitkExtExports.h"
 
 #include "vtkPolyDataAlgorithm.h"
 

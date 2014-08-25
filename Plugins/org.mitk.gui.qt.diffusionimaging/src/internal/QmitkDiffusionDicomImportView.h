@@ -72,10 +72,14 @@ protected slots:
   void DicomLoadAddFolderNames();
   void DicomLoadDeleteFolderNames();
   void DicomLoadStartLoad() ;
+  void NewDicomLoadStartLoad() ;
   void AverageClicked();
   void OutputSet();
   void OutputClear();
   void Remove();
+  void RecursiveSettingsChanged();
+  void SetPrefixButtonPushed();
+  void ResetPrefixButtonPushed();
 
 protected:
 
@@ -102,6 +106,8 @@ protected:
 
   QString m_OutputFolderName;
   bool m_OutputFolderNameSet;
+
+  std::string m_Prefix;
 
 };
 

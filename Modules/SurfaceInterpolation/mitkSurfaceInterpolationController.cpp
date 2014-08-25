@@ -386,6 +386,138 @@ void mitk::SurfaceInterpolationController::RemoveAllInterpolationSessions()
   m_ListOfInterpolationSessions.clear();
 }
 
+void mitk::SurfaceInterpolationController::ReinitializeInterpolation(mitk::Surface::Pointer contours)
+{
+  unsigned int num_Polys = contours->GetVtkPolyData()->GetNumberOfPolys();
+  MITK_INFO<<"Reinit 3D interpolation using ["<<num_Polys<<"] number of contours!";
+
+  MITK_INFO<<"----- Prepare surfaces -----";
+
+  // 1. detect coplanar contours
+  // 2. merge coplanar contours into a single surface
+  // 4. add contour to pipeline
+  // 5. create position nodes
+
+  // Sort contours
+  vtkSmartPointer<vtkCellArray> existingPolys;
+  vtkSmartPointer<vtkPoints> existingPoints;
+  existingPolys = contours->GetVtkPolyData()->GetPolys();
+  existingPoints = contours->GetVtkPolyData()->GetPoints();
+  existingPolys->InitTraversal();
+
+  vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
+
+  typedef std::pair<mitk::Vector3D, mitk::Point3D> PointNormalPair;
+  std::vector<PointNormalPair> list;
+  std::vector<vtkSmartPointer<vtkPoints> > pointsList;
+  int count (0);
+  for( existingPolys->InitTraversal(); existingPolys->GetNextCell(ids);)
+  {
+    // Get the points
+    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+    existingPoints->GetPoints(ids, points);
+    ++count;
+    pointsList.push_back(points);
+
+
+    PointNormalPair p_n;
+    double n[3];
+    vtkPolygon::ComputeNormal(points, n);
+    p_n.first = n;
+    double p1[3];
+
+    existingPoints->GetPoint(ids->GetId(0), p1);
+    p_n.second = p1;
+
+    list.push_back(p_n);
+
+    continue;
+  }
+
+  double vec[3];
+//  std::vector<std::pair<unsigned int, unsigned int> > coplanar_indices;
+
+  std::vector<PointNormalPair>::iterator outer = list.begin();
+//  for (unsigned int i = 0; i < list.size(); ++i)
+  std::vector< std::vector< vtkSmartPointer<vtkPoints> > > relatedPoints;
+  while (outer != list.end())
+  {
+    std::vector<PointNormalPair>::iterator inner = outer;
+    ++inner;
+    std::vector< vtkSmartPointer<vtkPoints> > rel;
+    std::vector< vtkSmartPointer<vtkPoints> >::iterator pointsIter = pointsList.begin();
+    rel.push_back((*pointsIter));
+    pointsIter = pointsList.erase(pointsIter);
+//    for (unsigned int j = i+1; j < list.size(); ++j)
+    while (inner != list.end())
+    {
+      vec[0] = (*outer).second[0] - (*inner).second[0];
+      vec[1] = (*outer).second[1] - (*inner).second[1];
+      vec[2] = (*outer).second[2] - (*inner).second[2];
+      double n[3];
+      n[0] = (*outer).first[0];
+      n[1] = (*outer).first[1];
+      n[2] = (*outer).first[2];
+      double dot = vtkMath::Dot(n, vec);
+
+      if (mitk::Equal(dot, 0.0, 0.001, true))
+      {
+        inner = list.erase(inner);
+        rel.push_back((*pointsIter));
+        pointsIter = pointsList.erase(pointsIter);
+      }
+      else
+      {
+        ++inner;
+        ++pointsIter;
+      }
+    }
+    relatedPoints.push_back(rel);
+    ++outer;
+  }
+
+  // Build the surfaces
+  MITK_INFO<<"NUM REL POINTS: "<<relatedPoints.size();
+  std::vector<mitk::Surface::Pointer> finalSurfaces;
+  for (unsigned int i = 0; i < relatedPoints.size(); ++i)
+  {
+    MITK_INFO<<"Size ["<<i<<"]: "<<relatedPoints.at(i).size();
+    vtkSmartPointer<vtkPolyData> contourSurface = vtkSmartPointer<vtkPolyData>::New();
+    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> polygons = vtkSmartPointer<vtkCellArray>::New();
+    unsigned int pointId (0);
+    for (unsigned int j = 0; j < relatedPoints.at(i).size(); ++j)
+    {
+      unsigned int numPoints = relatedPoints.at(i).at(j)->GetNumberOfPoints();
+      vtkSmartPointer<vtkPolygon> polygon = vtkSmartPointer<vtkPolygon>::New();
+      polygon->GetPointIds()->SetNumberOfIds(numPoints);
+      polygon->GetPoints()->SetNumberOfPoints(numPoints);
+      vtkSmartPointer<vtkPoints> currentPoints = relatedPoints.at(i).at(j);
+      for (unsigned k = 0; k < numPoints; ++k)
+      {
+        points->InsertPoint(pointId, currentPoints->GetPoint(k));
+        polygon->GetPointIds()->SetId(k, pointId);
+        ++pointId;
+      }
+      polygons->InsertNextCell(polygon);
+    }
+    contourSurface->SetPoints(points);
+    contourSurface->SetPolys(polygons);
+    contourSurface->BuildLinks();
+    mitk::Surface::Pointer surface = mitk::Surface::New();
+    surface->SetVtkPolyData(contourSurface);
+    finalSurfaces.push_back(surface);
+  }
+
+  for (unsigned int i = 0; i < finalSurfaces.size(); ++i)
+  {
+    mitk::Surface* surface = finalSurfaces.at(i);
+    ContourPositionPair contourPosPair;
+    contourPosPair.contour = surface;
+    this->AddToInterpolationPipeline(contourPosPair);
+  }
+}
+
 void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &/*event*/)
 {
   mitk::Image* tempImage = dynamic_cast<mitk::Image*>(const_cast<itk::Object*>(caller));

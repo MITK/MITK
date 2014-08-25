@@ -170,6 +170,12 @@ namespace mitk
      */
     void RemoveAllInterpolationSessions();
 
+    /**
+     * @brief Reinitializes the interpolation using the provided contour data
+     * @param contours a mitk::Surface which contains the contours as polys in the vtkPolyData
+     */
+    void ReinitializeInterpolation(mitk::Surface::Pointer contours);
+
     mitk::Image* GetImage();
 
     /**

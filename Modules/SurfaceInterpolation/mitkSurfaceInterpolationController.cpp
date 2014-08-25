@@ -233,9 +233,9 @@ void mitk::SurfaceInterpolationController::Interpolate()
 
 
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
-  for (unsigned int i = 0; i < m_ReduceFilter->GetNumberOfOutputs(); i++)
+  for (unsigned int i = 0; i < m_ListOfInterpolationSessions[m_SelectedSegmentation].size(); i++)
   {
-    polyDataAppender->AddInputData(m_ReduceFilter->GetOutput(i)->GetVtkPolyData());
+    polyDataAppender->AddInputData(m_ListOfInterpolationSessions[m_SelectedSegmentation].at(i).contour->GetVtkPolyData());
   }
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());

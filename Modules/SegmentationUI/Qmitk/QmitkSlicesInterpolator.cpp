@@ -153,7 +153,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   m_3DContourNode = mitk::DataNode::New();
   m_3DContourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
-  m_3DContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+//  m_3DContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_3DContourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
   m_3DContourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
   m_3DContourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
@@ -415,6 +415,17 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   if (m_ToolManager->GetWorkingData(0) != 0)
   {
     m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+    mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("3DContourContainer", mitk::BoolProperty::New(true));
+    mitk::DataStorage::SetOfObjects::ConstPointer contourNodes = m_DataStorage->GetDerivations( m_ToolManager->GetWorkingData(0), pred);
+    if (contourNodes->Size() != 0)
+    {
+      m_BtnReinit3DInterpolation->setEnabled(true);
+      m_3DContourNode = contourNodes->at(0);
+    }
+    else
+    {
+      m_BtnReinit3DInterpolation->setEnabled(false);
+    }
   }
   else
   {
@@ -543,11 +554,15 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
     this->Show3DInterpolationResult(true);
 
-    if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) && !m_DataStorage->Exists(m_3DContourNode))
+    if( !m_DataStorage->Exists(m_InterpolatedSurfaceNode) )
     {
-      m_DataStorage->Add(m_3DContourNode);
       m_DataStorage->Add(m_InterpolatedSurfaceNode);
     }
+    if (!m_DataStorage->Exists(m_3DContourNode))
+    {
+      m_DataStorage->Add(m_3DContourNode, workingNode);
+    }
+
   }
   else if (interpolatedSurface.IsNull())
   {

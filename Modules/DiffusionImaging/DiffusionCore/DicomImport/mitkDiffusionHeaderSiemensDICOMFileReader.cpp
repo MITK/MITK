@@ -49,6 +49,11 @@ bool mitk::DiffusionHeaderSiemensDICOMFileReader
   {
     values.b_value = value_array.at(0);
   }
+  else
+  {
+    MITK_INFO("diffusion.dicomreader.siemens") << "No b-value tag found. ";
+    return false;
+  }
 
   // search for GradientDirectionInformation if the bvalue is not null
   if( values.b_value > 0 )

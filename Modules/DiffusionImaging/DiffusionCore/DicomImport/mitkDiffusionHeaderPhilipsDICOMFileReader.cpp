@@ -51,6 +51,11 @@ bool mitk::DiffusionHeaderPhilipsDICOMFileReader::ReadDiffusionHeader(std::strin
     if( header_info.b_value == 0)
       header_info.baseline = true;
   }
+  else
+  {
+    MITK_WARN("diffusion.dicomreader.philips") << "No b-value found. Most probably no diffusion-weighted image.";
+    return false;
+  }
 
   gdcm::Tag philips_new_bvalue_tag( 0x0018,0x9087 );
   double dbvalue = 0;

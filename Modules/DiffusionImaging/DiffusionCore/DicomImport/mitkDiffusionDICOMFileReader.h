@@ -46,15 +46,13 @@ protected:
     DiffusionDICOMFileReader();
     virtual ~DiffusionDICOMFileReader();
 
-    bool LoadSingleOutputImage( DiffusionHeaderDICOMFileReader::DICOMHeaderListType, DICOMImageBlockDescriptor&);
+    bool LoadSingleOutputImage( DiffusionHeaderDICOMFileReader::DICOMHeaderListType, DICOMImageBlockDescriptor&, bool);
 
     //mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType m_RetrievedHeader;
 
     std::vector< mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType > m_OutputHeaderContainer;
-
-   //mitk::DiffusionHeaderDICOMFileReader::Pointer headerReader;
-
-    bool m_IsMosaicData;
+    std::vector< mitk::DiffusionHeaderDICOMFileReader::Pointer> m_OutputReaderContainer;
+    std::vector< bool > m_IsMosaicData;
 };
 
 }

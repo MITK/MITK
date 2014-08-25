@@ -77,12 +77,16 @@ bool mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
   const gdcm::DataSet& dataset = gdcmReader.GetFile().GetDataSet();
 
   const gdcm::Tag t_sie_diffusion( 0x0029,0x1010 );
+  const gdcm::Tag t_sie_diffusion_alt( 0x0029,0x1110 );
   std::string siemens_diffusionheader_str;
 
-  if( RevealBinaryTag( t_sie_diffusion, dataset, siemens_diffusionheader_str ) )
+  if( RevealBinaryTag( t_sie_diffusion, dataset, siemens_diffusionheader_str )
+      || RevealBinaryTag( t_sie_diffusion_alt, dataset, siemens_diffusionheader_str) )
   {
     mitk::DiffusionImageMosaicDICOMHeaderInformation header_values;
-    this->ExtractSiemensDiffusionTagInformation( siemens_diffusionheader_str, header_values );
+    // wait for success
+    if( !this->ExtractSiemensDiffusionTagInformation( siemens_diffusionheader_str, header_values ))
+      return false;
 
     mitk::SiemensDiffusionHeaderType hformat = GetHeaderType( siemens_diffusionheader_str );
     Siemens_Header_Format specs = this->m_SiemensFormatsCollection.at( hformat );

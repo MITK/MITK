@@ -47,7 +47,7 @@ static void PerformHeaderAnalysis( mitk::DiffusionHeaderDICOMFileReader::DICOMHe
 
 mitk::DiffusionDICOMFileReader::DiffusionDICOMFileReader()
 {
-  m_IsMosaicData = false;
+
 }
 
 mitk::DiffusionDICOMFileReader::~DiffusionDICOMFileReader()
@@ -64,7 +64,7 @@ bool mitk::DiffusionDICOMFileReader
   for(unsigned int o = 0; o < numberOfOutputs; ++o)
   {
     success &= this->LoadSingleOutputImage( this->m_OutputHeaderContainer.at(o),
-                                            this->InternalGetOutput(o) );
+                                            this->InternalGetOutput(o), this->m_IsMosaicData.at(o) );
   }
 
   return success;
@@ -72,7 +72,7 @@ bool mitk::DiffusionDICOMFileReader
 
 bool mitk::DiffusionDICOMFileReader
 ::LoadSingleOutputImage( DiffusionHeaderDICOMFileReader::DICOMHeaderListType retrievedHeader,
-                         DICOMImageBlockDescriptor& block )
+                         DICOMImageBlockDescriptor& block, bool is_mosaic)
 {
   // prepare data reading
   DiffusionDICOMFileReaderHelper helper;
@@ -133,7 +133,8 @@ bool mitk::DiffusionDICOMFileReader
   // initialize the output image
   output_image->SetReferenceBValue( max_bvalue );
   output_image->SetDirections( directions );
-  if( this->m_IsMosaicData )
+
+  if( is_mosaic )
   {
     mitk::DiffusionHeaderSiemensMosaicDICOMFileReader::Pointer mosaic_reader =
         mitk::DiffusionHeaderSiemensMosaicDICOMFileReader::New();
@@ -208,13 +209,16 @@ void mitk::DiffusionDICOMFileReader
 
        mitk::DiffusionHeaderDICOMFileReader::Pointer headerReader;
 
+       bool isMosaic = false;
+
       // parse vendor tag
-      if( vendor.find("SIEMENS") != std::string::npos )
+      if(    vendor.find("SIEMENS") != std::string::npos )
+          //&& image_type.find("DIFFUSION") != std::string::npos )
       {
         if( image_type.find("MOSAIC") != std::string::npos )
         {
           headerReader = mitk::DiffusionHeaderSiemensMosaicDICOMFileReader::New();
-          this->m_IsMosaicData = true;
+          isMosaic = true;
         }
         else
         {
@@ -238,7 +242,7 @@ void mitk::DiffusionDICOMFileReader
       if( headerReader.IsNull() )
       {
         MITK_ERROR << "No header reader for given vendor. ";
-        return;
+        continue;
       }
 
       bool canread = false;
@@ -254,20 +258,27 @@ void mitk::DiffusionDICOMFileReader
         canread = headerReader->ReadDiffusionHeader( frame->Filename );
       }
 
-      // collect the information
-      mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType retrievedHeader = headerReader->GetHeaderInformation();
-      m_OutputHeaderContainer.push_back( retrievedHeader );
+      if( canread )
+      {
+        // collect the information
+        mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType retrievedHeader = headerReader->GetHeaderInformation();
 
+        m_IsMosaicData.push_back(isMosaic);
+        m_OutputHeaderContainer.push_back( retrievedHeader );
+        m_OutputReaderContainer.push_back( headerReader );
+      }
   }
+
+  this->SetNumberOfOutputs( this->m_OutputHeaderContainer.size() );
 
   for( unsigned int outputidx = 0; outputidx < this->GetNumberOfOutputs(); outputidx++ )
   {
     // TODO : Analyze outputs + header information, i.e. for the loading confidence
-    MITK_INFO << "----- Diffusion DICOM Analysis Report ---- ";
+    MITK_INFO("diffusion.dicomreader") << "---- DICOM Analysis Report ----  :: Output " << outputidx+1 << " of " << this->GetNumberOfOutputs();
 
     PerformHeaderAnalysis( this->m_OutputHeaderContainer.at( outputidx) );
 
-    MITK_INFO << "===========================================";
+    MITK_INFO("diffusion.dicomreader") << "===========================================";
 
   }
 

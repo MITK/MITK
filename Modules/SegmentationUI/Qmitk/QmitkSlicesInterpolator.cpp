@@ -779,6 +779,16 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   }
 }
 
+void QmitkSlicesInterpolator::OnReinit3DInterpolation()
+{
+  mitk::Surface::Pointer contours = dynamic_cast<mitk::Surface*>(m_3DContourNode->GetData());
+  if (contours)
+    mitk::SurfaceInterpolationController::GetInstance()->ReinitializeInterpolation(contours);
+  // TODO Code in Methode packen
+  m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+  m_Watcher.setFuture(m_Future);
+}
+
 void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
 {
   try

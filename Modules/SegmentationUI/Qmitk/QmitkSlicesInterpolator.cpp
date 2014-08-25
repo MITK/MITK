@@ -99,8 +99,13 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_BtnApply3D = new QPushButton("Confirm", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
 
+  m_BtnReinit3DInterpolation = new QPushButton("Reinit Interpolation", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnReinit3DInterpolation->setEnabled(false);
+  vboxLayout->addWidget(m_BtnReinit3DInterpolation);
+
   m_ChkShowPositionNodes = new QCheckBox("Show Position Nodes", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_ChkShowPositionNodes);
+
 
   this->HideAllInterpolationControls();
 
@@ -108,6 +113,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   connect(m_BtnApply2D, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
   connect(m_BtnApplyForAllSlices2D, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
   connect(m_BtnApply3D, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
+  connect(m_BtnReinit3DInterpolation, SIGNAL(clicked()), this, SLOT(OnReinit3DInterpolation()));
   connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
   connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
 
@@ -350,6 +356,7 @@ void QmitkSlicesInterpolator::Show3DInterpolationControls(bool show)
 {
   m_BtnApply3D->setVisible(show);
   m_ChkShowPositionNodes->setVisible(show);
+  m_BtnReinit3DInterpolation->setVisible(show);
 }
 
 

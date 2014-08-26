@@ -1,4 +1,4 @@
-#! This CMake function install the python runtime with
+#! This CMake macro installs the python runtime with
 #! all python related libraries and toolkits. Py files are
 #! searched one by one with a globbing expression to generate a list used
 #! by the mac and NSIS installer.
@@ -9,7 +9,7 @@
 #!               to the installed libs.
 #! _app_bundle App bundle name in case of a Apple bundle.
 #!
-function(mitkFunctionInstallPython _python_libs _python_dirs _app_bundle)
+macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
 
   set(_destination bin)
   if(APPLE)
@@ -140,5 +140,5 @@ function(mitkFunctionInstallPython _python_libs _python_dirs _app_bundle)
 
   list(REMOVE_DUPLICATES _python_dirs)
 
-endfunction()
+endmacro()
 

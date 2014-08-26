@@ -23,7 +23,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         set(ENV{MKL} \"None\")
         ")
 
-    set(_external_python_project ${CMAKE_BINARY_DIR}/mitkExternalPythonProject.cmake)
+    set(_external_python_project ${CMAKE_BINARY_DIR}/${proj}-cmake/mitkExternalPythonProject.cmake)
     file(WRITE ${_external_python_project}
         "
         ${_numpy_env}
@@ -58,7 +58,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
          endfunction()
         ")
     # configure step
-    set(_configure_step ${CMAKE_BINARY_DIR}/${proj}_configure_step.cmake)
+    set(_configure_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_configure_step.cmake)
     file(WRITE ${_configure_step}
        "include(\"${_external_python_project}\")
         file(WRITE \"${CMAKE_BINARY_DIR}/${proj}-src/site.cfg\" \"\")
@@ -66,7 +66,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
        ")
 
     # build step
-    set(_build_step ${CMAKE_BINARY_DIR}/${proj}_build_step.cmake)
+    set(_build_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_build_step.cmake)
     file(WRITE ${_build_step}
        "include(\"${_external_python_project}\")
         MITK_PYTHON_BUILD_STEP(${proj} build setup.py build --fcompiler=none)
@@ -78,7 +78,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
     endif()
 
-    set(_install_step ${CMAKE_BINARY_DIR}/${proj}_install_step.cmake)
+    set(_install_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_install_step.cmake)
     file(WRITE ${_install_step}
        "include(\"${_external_python_project}\")
         MITK_PYTHON_BUILD_STEP(${proj} install setup.py install --prefix=${_install_dir})
@@ -101,11 +101,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         ${${proj}_DEPENDENCIES}
     )
 
-    if(WIN32)
-      set(Numpy_DIR ${_install_dir}/Lib/site-packages)
-    else()
-      set(Numpy_DIR ${_install_dir}/lib/python2.7/site-packages)
-    endif()
+    set(Numpy_DIR ${MITK_PYTHON_SITE_DIR}/numpy)
+
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()

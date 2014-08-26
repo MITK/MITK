@@ -38,32 +38,27 @@ if(MITK_USE_SWIG)
       set(BISON_FLAGS "" CACHE STRING "Flags used by bison")
       mark_as_advanced( BISON_FLAGS)
 
-
-      # follow the standard EP_PREFIX locations
-      set(swig_binary_dir ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src)
-      set(swig_source_dir ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src)
-      set(swig_install_dir ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
-
-      # configure step
-      configure_file(
-        ${MITK_SOURCE_DIR}/CMakeExternals/swig_configure_step.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/swig_configure_step.cmake
-        @ONLY)
-      set(swig_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/swig_configure_step.cmake)
-
-      ExternalProject_add(Swig
+      ExternalProject_add(${proj}
         URL https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/swig-${SWIG_TARGET_VERSION}.tar.gz
         URL_MD5 "62f9b0d010cef36a13a010dc530d0d41"
-        SOURCE_DIR ${swig_source_dir}
-        INSTALL_DIR ${swig_install_dir}
+        SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src
+        BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build
+        INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
         PREFIX ${proj}-cmake
-        BUILD_IN_SOURCE 1
-        CONFIGURE_COMMAND ${swig_CONFIGURE_COMMAND}
+        CONFIGURE_COMMAND CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
+                          LDFLAGS=${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE}
+                          CXX=${CMAKE_CXX_COMPILER}${CMAKE_CXX_COMPILER_ARG1}
+                          YACC=${BISON_EXECUTABLE}
+                          <SOURCE_DIR>/./configure
+                            --prefix=<INSTALL_DIR>
+                            --with-pcre-prefix=${PCRE_DIR}
+                            --without-octave
+                            --with-python=${PYTHON_EXECUTABLE}
         DEPENDS ${Swig_DEPENDENCIES}
         )
 
-      set(SWIG_DIR ${swig_install_dir}/share/swig/${SWIG_TARGET_VERSION})
-      set(SWIG_EXECUTABLE ${swig_install_dir}/bin/swig)
+      set(SWIG_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/share/swig/${SWIG_TARGET_VERSION})
+      set(SWIG_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/bin/swig)
 
     endif()
   endif(NOT SWIG_DIR)

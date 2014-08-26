@@ -1,6 +1,7 @@
 if( MITK_USE_Python )
   if(NOT MITK_USE_SYSTEM_PYTHON)
     add_definitions( -DUSE_MITK_BUILTIN_PYTHON )
+    set(NUMPY_INCLUDE_DIR "${Numpy_DIR}/numpy/core/include")
   endif()
 
   set(OpenCV_DEP )

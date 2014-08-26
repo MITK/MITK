@@ -1,4 +1,14 @@
-
+#! This CMake function install the python runtime with
+#! all python related libraries and toolkits. Py files are
+#! searched one by one with a globbing expression to generate a list used
+#! by the mac and NSIS installer.
+#!
+#! params:
+#!  _python_libs Returns a list of the installed libraries. Used to fixup the bundle.
+#!  _python_dirs Returns a list with the directories containig the dependencies
+#!               to the installed libs.
+#! _app_bundle App bundle name in case of a Apple bundle.
+#!
 function(mitkFunctionInstallPython _python_libs _python_dirs _app_bundle)
 
   set(_destination bin)

@@ -12,27 +12,24 @@ if(MITK_USE_PCRE)
     set(PCRE_TARGET_VERSION 8.35)
     set(PCRE_DOWNLOAD_SOURCE_HASH "ed58bcbe54d3b1d59e9f5415ef45ce1c")
 
-    set(pcre_binary_dir ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
-    set(pcre_source_dir ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src)
-    set(pcre_install_dir ${CMAKE_CURRENT_BINARY_DIR}/PCRE-install)
-
-    configure_file(
-      ${MITK_SOURCE_DIR}/CMakeExternals/pcre_configure_step.cmake.in
-      ${CMAKE_CURRENT_BINARY_DIR}/pcre_configure_step.cmake
-      @ONLY)
-
-    set ( pcre_CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/pcre_configure_step.cmake )
-
     ExternalProject_add(${proj}
       URL http://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=${PCRE_DOWNLOAD_SOURCE_HASH}&name=pcre-${PCRE_TARGET_VERSION}.tar.gz
       URL_MD5 "${PCRE_DOWNLOAD_SOURCE_HASH}"
-      SOURCE_DIR ${pcre_source_dir}
-      BINARY_DIR ${pcre_binary_dir}
-      INSTALL_DIR ${pcre_install_dir}
+      SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src
+      BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build
+      INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
       PREFIX ${proj}-cmake
-      CONFIGURE_COMMAND ${pcre_CONFIGURE_COMMAND}
+      CONFIGURE_COMMAND CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
+                        LDFLAGS=${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE}
+                        CXX=${CMAKE_CXX_COMPILER}${CMAKE_CXX_COMPILER_ARG1}
+                        <SOURCE_DIR>/./configure
+                        --prefix=<INSTALL_DIR>
+                        --disable-shared
       DEPENDS "${${proj}_DEPENDENCIES}"
       )
+
+    set(PCRE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
+
   else()
     mitkMacroEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
   endif()

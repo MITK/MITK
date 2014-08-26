@@ -47,7 +47,7 @@ macro(_fixup_target)
   set(_python_dirs )
   if(MITK_USE_Python)
     include(mitkFunctionInstallPython)
-    mitkFunctionInstallPython(_python_libs _python_dirs ${_bundle_dest_dir})
+    mitkFunctionInstallPython(_python_libs _python_dirs "${_bundle_dest_dir}")
   endif()
 
   mitkFunctionGetLibrarySearchPaths(_search_paths ${intermediate_dir})

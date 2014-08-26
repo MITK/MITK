@@ -130,10 +130,10 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
     # Numpy is always build in an own runtime
     if(Numpy_DIR)
       # glob through all files, NSIS can't use directories
-      file(GLOB_RECURSE item RELATIVE "${Numpy_DIR}/numpy" "${Numpy_DIR}/numpy/*")
+      file(GLOB_RECURSE item RELATIVE "${Numpy_DIR}" "${Numpy_DIR}/*")
       foreach(f ${item})
         get_filename_component(_filepath "${f}" PATH)
-        install(FILES "${Numpy_DIR}/numpy/${f}" DESTINATION ${_destination}/Python/numpy/${_filepath})
+        install(FILES "${Numpy_DIR}/${f}" DESTINATION ${_destination}/Python/numpy/${_filepath})
       endforeach()
     endif()
   endif()

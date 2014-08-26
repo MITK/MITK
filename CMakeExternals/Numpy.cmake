@@ -12,6 +12,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     set(${proj}_DEPENDENCIES Python)
     set(Numpy_DEPENDS ${proj})
 
+    # setup build environment and disable fortran, blas and lapack
     set(_numpy_env
         "
         set(ENV{F77} \"\")
@@ -21,12 +22,6 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         set(ENV{BLAS} \"None\")
         set(ENV{LAPACK} \"None\")
         set(ENV{MKL} \"None\")
-        ")
-
-    set(_external_python_project ${CMAKE_BINARY_DIR}/${proj}-cmake/mitkExternalPythonProject.cmake)
-    file(WRITE ${_external_python_project}
-        "
-        ${_numpy_env}
         set(ENV{VS_UNICODE_OUTPUT} \"\")
         set(ENV{CC} \"${CMAKE_C_COMPILER} ${CMAKE_C_COMPILER_ARG1}\")
         set(ENV{CFLAGS} \"${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}\")
@@ -34,42 +29,24 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         set(ENV{CXXFLAGS} \"${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}\")
         set(ENV{LDFLAGS} \"${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE}\")
 
-        function(MITK_PYTHON_BUILD_STEP proj step)
-           set(_command \${ARGN})
-
-           message(\"Running \${proj} \${step}:${PYTHON_EXECUTABLE} \${_command}\")
-
-           execute_process(
-              COMMAND ${PYTHON_EXECUTABLE} \${_command}
-              WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/\${proj}-src
-              RESULT_VARIABLE result
-              OUTPUT_VARIABLE output
-              ERROR_VARIABLE error
-           )
-           set(output_file \"${CMAKE_BINARY_DIR}/\${proj}_\${step}_step_output.txt\")
-           file(WRITE \${output_file} \${output})
-
-           set(error_file \"${CMAKE_BINARY_DIR}/\${proj}_\${step}_step_error.txt\")
-           file(WRITE \${error_file} \${error})
-
-           if(NOT \${result} EQUAL 0)
-             message(FATAL_ERROR \"Error in: \${proj}: \${error}\")
-           endif()
-         endfunction()
         ")
-    # configure step
+
+    set(_numpy_build_step ${MITK_SOURCE_DIR}/CMake/mitkFunctionExternalPythonBuildStep.cmake)
+
     set(_configure_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_configure_step.cmake)
     file(WRITE ${_configure_step}
-       "include(\"${_external_python_project}\")
+       "${_numpy_env}
+        include(\"${_numpy_build_step}\")
         file(WRITE \"${CMAKE_BINARY_DIR}/${proj}-src/site.cfg\" \"\")
-        MITK_PYTHON_BUILD_STEP(${proj} configure setup.py config)
+        mitkFunctionExternalPythonBuildStep(${proj} configure ${PYTHON_EXECUTABLE} \"${CMAKE_BINARY_DIR}\" setup.py config)
        ")
 
     # build step
     set(_build_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_build_step.cmake)
     file(WRITE ${_build_step}
-       "include(\"${_external_python_project}\")
-        MITK_PYTHON_BUILD_STEP(${proj} build setup.py build --fcompiler=none)
+       "${_numpy_env}
+        include(\"${_numpy_build_step}\")
+        mitkFunctionExternalPythonBuildStep(${proj} build ${PYTHON_EXECUTABLE} \"${CMAKE_BINARY_DIR}\" setup.py build --fcompiler=none)
        ")
 
     # install step
@@ -80,8 +57,9 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
 
     set(_install_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_install_step.cmake)
     file(WRITE ${_install_step}
-       "include(\"${_external_python_project}\")
-        MITK_PYTHON_BUILD_STEP(${proj} install setup.py install --prefix=${_install_dir})
+       "${_numpy_env}
+        include(\"${_numpy_build_step}\")
+        mitkFunctionExternalPythonBuildStep(${proj} install ${PYTHON_EXECUTABLE} \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=${_install_dir})
        ")
 
     set(Numpy_URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/numpy-1.4.1.tar.gz")

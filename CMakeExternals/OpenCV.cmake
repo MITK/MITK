@@ -37,14 +37,9 @@ if(MITK_USE_OpenCV)
          #-DPYTHON_DEBUG_LIBRARIES=${PYTHON_DEBUG_LIBRARIES}
           )
       if(NOT MITK_USE_SYSTEM_PYTHON)
-        list(APPEND proj_DEPENDENCIES Python)
+        list(APPEND proj_DEPENDENCIES Python Numpy)
         # export python home
         set(ENV{PYTHONHOME} "${Python_DIR}")
-      endif()
-      # use the numpy build within mitk
-      if(MITK_USE_NUMPY)
-        list(APPEND proj_DEPENDENCIES Numpy)
-        )
       endif()
     else()
       list(APPEND additional_cmake_args

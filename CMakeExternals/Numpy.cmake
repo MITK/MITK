@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # Numpy
 #-----------------------------------------------------------------------------
-if( NOT MITK_USE_SYSTEM_PYTHON )
+if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
   # Sanity checks
   if(DEFINED Numpy_DIR AND NOT EXISTS ${Numpy_DIR})
     message(FATAL_ERROR "Numpy_DIR variable is defined but corresponds to non-existing directory")
@@ -73,18 +73,9 @@ if( NOT MITK_USE_SYSTEM_PYTHON )
        ")
 
     # install step
-    set(NUMPY_CMAKE_INSTALL_DIR )
-    if(NOT MITK_USE_SYSTEM_PYTHON)
-      set(_install_dir ${Python_BUILD_DIR})
-      if(WIN32)
-        STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
-      endif()
-    else()
-      set(NUMPY_CMAKE_INSTALL_DIR INSTALL_DIR ${CMAKE_BINARY_DIR}/${proj}-install)
-      set(_install_dir "${CMAKE_BINARY_DIR}/${proj}-install")
-      if(WIN32)
-        STRING(REPLACE "/" "\\\\" _install_dir ${CMAKE_BINARY_DIR}/${proj}-install)
-      endif()
+    set(_install_dir ${Python_BUILD_DIR})
+    if(WIN32)
+      STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
     endif()
 
     set(_install_step ${CMAKE_BINARY_DIR}/${proj}_install_step.cmake)
@@ -102,7 +93,6 @@ if( NOT MITK_USE_SYSTEM_PYTHON )
       SOURCE_DIR ${proj}-src
       PREFIX ${proj}-cmake
       BUILD_IN_SOURCE 1
-      ${NUMPY_CMAKE_INSTALL_DIR}
       CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${_configure_step}
       BUILD_COMMAND   ${CMAKE_COMMAND} -P ${_build_step}
       INSTALL_COMMAND ${CMAKE_COMMAND} -P ${_install_step}

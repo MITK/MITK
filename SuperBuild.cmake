@@ -359,22 +359,15 @@ if(MITK_USE_Python)
        -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
        -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
        -DMITK_USE_SYSTEM_PYTHON:BOOL=${MITK_USE_SYSTEM_PYTHON}
-       -DPYTHON_LIBRARY_NAME:STRING=${PYTHON_LIBRARY_NAME}
        -DMITK_BUILD_org.mitk.gui.qt.python:BOOL=ON
       )
 
   if( NOT MITK_USE_SYSTEM_PYTHON )
     list(APPEND mitk_optional_cache_args
+          # Folders are needed to create an installer
           -DPython_DIR:PATH=${Python_DIR}
-          -DPYTHON_MAJOR_VERSION:STRING=${PYTHON_MAJOR_VERSION}
-          -DPYTHON_MINOR_VERSION:STRING=${PYTHON_MINOR_VERSION}
-        )
-  endif()
-
-  if(MITK_USE_NUMPY)
-    list(APPEND mitk_optional_cache_args
-         -DNumpy_DIR:PATH=${Numpy_DIR}
-         -DNUMPY_INCLUDE_DIR:PATH=${NUMPY_INCLUDE_DIR}
+          -DNumpy_DIR:PATH=${Numpy_DIR}
+          -DPYTHON_LIBRARY_NAME:STRING=${PYTHON_LIBRARY_NAME}
         )
   endif()
 endif()

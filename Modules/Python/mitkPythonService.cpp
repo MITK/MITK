@@ -54,6 +54,7 @@ mitk::PythonService::PythonService()
   {
     try
     {
+//TODO a better way to do this
 #ifndef WIN32
       dlopen(PYTHON_LIBRARY_NAME, RTLD_NOW | RTLD_NOLOAD | RTLD_GLOBAL);
 #endif

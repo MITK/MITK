@@ -44,8 +44,6 @@ if(MITK_USE_OpenCV)
       # use the numpy build within mitk
       if(MITK_USE_NUMPY)
         list(APPEND proj_DEPENDENCIES Numpy)
-        list(APPEND additional_cmake_args
-             -DPYTHON_NUMPY_INCLUDE_DIR:PATH=${NUMPY_INCLUDE_DIR}
         )
       endif()
     else()

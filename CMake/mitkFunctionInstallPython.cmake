@@ -1,9 +1,9 @@
 
-macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
+function(mitkFunctionInstallPython _python_libs _python_dirs _app_bundle)
 
   set(_destination bin)
   if(APPLE)
-    set(_destination MitkWorkbench.app/Contents/MacOS)
+    set(_destination ${_app_bundle})
   endif()
 
   if(UNIX)
@@ -97,7 +97,7 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
   # install the python runtime from the superbuild
   if(NOT MITK_USE_SYSTEM_PYTHON)
     if(UNIX)
-      set(_python_runtime_dir lib/python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION})
+      set(_python_runtime_dir lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
       list(APPEND _python_dirs "${Python_DIR}/lib")
     else() #WIN32
       set(_python_runtime_dir Lib)
@@ -116,18 +116,19 @@ macro(MITK_INSTALL_PYTHON _python_libs _python_dirs)
       get_filename_component(_filepath "${f}" PATH)
       install(FILES "${Python_DIR}/include/${f}" DESTINATION ${_destination}/Python/include/${_filepath})
     endforeach()
-  endif()
 
-  if(Numpy_DIR)
-    # glob through all files, NSIS can't use directories
-    file(GLOB_RECURSE item RELATIVE "${Numpy_DIR}/numpy" "${Numpy_DIR}/numpy/*")
-    foreach(f ${item})
-      get_filename_component(_filepath "${f}" PATH)
-      install(FILES "${Numpy_DIR}/numpy/${f}" DESTINATION ${_destination}/Python/numpy/${_filepath})
-    endforeach()
+    # Numpy is always build in an own runtime
+    if(Numpy_DIR)
+      # glob through all files, NSIS can't use directories
+      file(GLOB_RECURSE item RELATIVE "${Numpy_DIR}/numpy" "${Numpy_DIR}/numpy/*")
+      foreach(f ${item})
+        get_filename_component(_filepath "${f}" PATH)
+        install(FILES "${Numpy_DIR}/numpy/${f}" DESTINATION ${_destination}/Python/numpy/${_filepath})
+      endforeach()
+    endif()
   endif()
 
   list(REMOVE_DUPLICATES _python_dirs)
 
-endmacro()
+endfunction()
 

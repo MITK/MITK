@@ -170,13 +170,16 @@ namespace mitk {
 
     // ********************************** Transformations Set/Get **********************************
 
-    // a bit of a misuse, but we want only doxygen to see the following:
-#ifdef DOXYGEN_SKIP
     //##Documentation
     //## @brief Get the transformation used to convert from index
     //## to world coordinates
-    itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
-#endif
+    mitk::AffineTransform3D* GetIndexToWorldTransform();
+
+    //##Documentation
+    //## @brief Get the transformation used to convert from index
+    //## to world coordinates
+    mitk::AffineTransform3D*  const GetIndexToWorldTransform() const;
+
     //## @brief Set the transformation used to convert from index
     //## to world coordinates. The spacing of the new transform is
     //## copied to m_spacing.
@@ -188,10 +191,6 @@ namespace mitk {
     //## the new transform is copied to m_spacing.
     //## \sa SetIndexToWorldTransform
     virtual void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
-
-    //## Get the IndexToWorldTransform
-    itkGetConstObjectMacro(IndexToWorldTransform, AffineTransform3D);
-    itkGetObjectMacro(IndexToWorldTransform, AffineTransform3D);
 
     //## Get the Vtk Matrix which describes the transform.
     vtkMatrix4x4* GetVtkMatrix();
@@ -551,17 +550,7 @@ namespace mitk {
     //## @brief Deprecated
     void BackTransform(const mitk::Point3D& at, const mitk::Vector3D& in, mitk::Vector3D& out) const;
 
-    //##Documentation
-    //## @brief Copy the ITK transform
-    //## (m_IndexToWorldTransform) to the VTK transform
-    //## \sa SetIndexToWorldTransform
-    void TransferItkToVtkTransform();
 
-    //##Documentation
-    //## @brief Copy the VTK transform
-    //## to the ITK transform (m_IndexToWorldTransform)
-    //## \sa SetIndexToWorldTransform
-    void TransferVtkToItkTransform();
 
     static const std::string GetTransformAsString( TransformType* transformType );
 
@@ -571,11 +560,12 @@ namespace mitk {
 
     bool IsIndexToWorldTransformNull() const;
 
-    //##Documentation
-    //## @brief Intern functions to assure a consistent behaviour of SetSpacing.
-    void _SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
   private:
+
+    class GeometryTransfrom;
+    GeometryTransfrom* m_GeometryTransform;
+
     //##Documentation
     //## @brief Pre- and Post-functions are empty in BaseGeometry
     //##
@@ -594,19 +584,13 @@ namespace mitk {
 
     virtual void PreSetSpacing(const mitk::Vector3D& aSpacing);
 
-    //##Documentation
-    //## @brief Index to World Transform, contains a transformation matrix to convert
-    //## points from indes coordinates to world coordinates (mm). The Spacing is included in this variable.
-    AffineTransform3D::Pointer m_IndexToWorldTransform;
 
     //##Documentation
     //## @brief Bounding Box, which is axes-parallel in intrinsic coordinates
     //## (often integer indices of pixels)
     BoundingBoxPointer m_BoundingBox;
 
-    vtkMatrixToLinearTransform* m_VtkIndexToWorldTransform;
 
-    vtkMatrix4x4* m_VtkMatrix;
 
     unsigned int m_FrameOfReferenceID;
 

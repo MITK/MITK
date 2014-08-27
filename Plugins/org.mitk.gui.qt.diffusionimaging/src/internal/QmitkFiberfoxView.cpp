@@ -822,10 +822,10 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             scaler->Update();
             comp4VolumeImage = scaler->GetOutput();
 
-            itk::ImageFileWriter< ItkDoubleImgType >::Pointer wr = itk::ImageFileWriter< ItkDoubleImgType >::New();
-            wr->SetInput(comp4VolumeImage);
-            wr->SetFileName("/local/comp4.nrrd");
-            wr->Update();
+//            itk::ImageFileWriter< ItkDoubleImgType >::Pointer wr = itk::ImageFileWriter< ItkDoubleImgType >::New();
+//            wr->SetInput(comp4VolumeImage);
+//            wr->SetFileName("/local/comp4.nrrd");
+//            wr->Update();
 
 //            if (max>1 || min<0) // are volume fractions between 0 and 1?
 //            {

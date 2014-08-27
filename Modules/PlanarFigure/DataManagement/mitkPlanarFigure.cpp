@@ -877,7 +877,7 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
       }
       if( itThis->Name.compare(itOther->Name) != 0 )
       {
-        MITK_ERROR << "Name is Different" << itThis->Name << "/" << itOther->Name;;
+        MITK_ERROR << "Name of Measure is Different " << itThis->Name << "/ " << itOther->Name;;
         return false;
       }
 

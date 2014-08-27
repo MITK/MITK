@@ -92,11 +92,11 @@ double mitk::NavigationDataReaderCSV::StringToDouble( const std::string& s )
 
 std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataReaderCSV::parseLine(std::string line, int NumOfTools)
 {
-
+  std::vector<std::string> parts= splitLine(line);
   std::vector<mitk::NavigationData::Pointer> result;
   std::string time=  parts[0];
 
-  std::vector<std::string> parts= splitLine(line);
+
 
   for (int n= 0; n=NumOfTools; n++)
   {

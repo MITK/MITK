@@ -218,19 +218,14 @@ void mitk::SurfaceInterpolationController::Interpolate()
     */
   //mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
 
-  // update the filter and get teh resulting distance-image
-  m_InterpolateSurfaceFilter->Update();
-  Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
-
   // create a surface from the distance-image
   mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
-  imageToSurfaceFilter->SetInput( distanceImage );
+  imageToSurfaceFilter->SetInput( m_InterpolateSurfaceFilter->GetOutput() );
   imageToSurfaceFilter->SetThreshold( 0 );
   imageToSurfaceFilter->SetSmooth(true);
   imageToSurfaceFilter->SetSmoothIteration(20);
   imageToSurfaceFilter->Update();
   m_InterpolationResult = imageToSurfaceFilter->GetOutput();
-
 
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
   for (unsigned int i = 0; i < m_ReduceFilter->GetNumberOfOutputs(); i++)

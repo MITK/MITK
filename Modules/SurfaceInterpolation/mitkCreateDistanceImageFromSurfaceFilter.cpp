@@ -356,9 +356,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   DistanceImageType::IndexType _size;
   _size.Fill(-1);
   _size += sizeOfRegion;
-  double center [3] = {_size[0]/2.0, _size[1]/2.0, _size[2]/2.0};
-  MITK_INFO<<"Size: ["<<_size[0]<<","<<_size[1]<<","<<_size[2]<<"] Center: ["<<center[0]<<","<<center[1]<<","<<center[2]<<"]";
-
 
   //Set every pixel inside the surface to -10 except the edge point (so that the received surface is closed)
   while (!imgRegionIterator.IsAtEnd()) {

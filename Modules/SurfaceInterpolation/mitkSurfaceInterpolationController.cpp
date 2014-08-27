@@ -21,49 +21,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageToSurfaceFilter.h"
 
-// TODO Use Equal of BaseGeometry instead after master merge!
-bool PlanesEqual (mitk::PlaneGeometry::ConstPointer leftHandSide, mitk::PlaneGeometry::ConstPointer rightHandSide, mitk::ScalarType eps)
+bool ContoursCoplanar(mitk::SurfaceInterpolationController::ContourPositionInformation leftHandSide, mitk::SurfaceInterpolationController::ContourPositionInformation rightHandSide)
 {
-  bool result = true;
+  double vec[3];
+  vec[0] = leftHandSide.contourPoint[0] - rightHandSide.contourPoint[0];
+  vec[1] = leftHandSide.contourPoint[1] - rightHandSide.contourPoint[1];
+  vec[2] = leftHandSide.contourPoint[2] - rightHandSide.contourPoint[2];
+  double n[3];
+  n[0] = rightHandSide.contourNormal[0];
+  n[1] = rightHandSide.contourNormal[1];
+  n[2] = rightHandSide.contourNormal[2];
+  double dot = vtkMath::Dot(n, vec);
 
-  //Compare spacings
-  if( !mitk::Equal( leftHandSide->GetSpacing(), rightHandSide->GetSpacing(), eps ) )
-  {
-    result = false;
-  }
+  double n2[3];
+  n2[0] = leftHandSide.contourNormal[0];
+  n2[1] = leftHandSide.contourNormal[1];
+  n2[2] = leftHandSide.contourNormal[2];
 
-  //Compare Origins
-  if( !mitk::Equal( leftHandSide->GetOrigin(), rightHandSide->GetOrigin(), eps ) )
-  {
-    result = false;
-  }
+  // The normals of both contours have to be parallel but not of the same orientation
+  double lengthLHS = leftHandSide.contourNormal.GetNorm();
+  double lengthRHS = rightHandSide.contourNormal.GetNorm();
+  double dot2 = vtkMath::Dot(n, n2);
 
-  //Compare Axis and Extents
-  for( unsigned int i=0; i<3; ++i)
-  {
-    if( !mitk::Equal( leftHandSide->GetAxisVector(i), rightHandSide->GetAxisVector(i), eps))
-    {
-      result =  false;
-    }
+  if (mitk::Equal(dot, 0.0, 0.001) && mitk::Equal(fabs(lengthLHS*lengthRHS), fabs(dot2), 0.001))
+    return true;
+  else
+    return false;
+}
 
-    if( !mitk::Equal( leftHandSide->GetExtent(i), rightHandSide->GetExtent(i), eps) )
-    {
-      result = false;
-    }
-  }
-
-  //Compare ImageGeometry Flag
-  if( rightHandSide->GetImageGeometry() != leftHandSide->GetImageGeometry() )
-  {
-    result = false;
-  }
-
-  //Compare IndexToWorldTransform Matrix
-  if( !mitk::MatrixEqualElementWise( leftHandSide->GetIndexToWorldTransform()->GetMatrix(), rightHandSide->GetIndexToWorldTransform()->GetMatrix(), eps) )
-  {
-    result = false;
-  }
-  return result;
+mitk::SurfaceInterpolationController::ContourPositionInformation CreateContourPositionInformation(mitk::Surface::Pointer contour)
+{
+  mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo;
+  contourInfo.contour = contour;
+  double n[3];
+  double p[3];
+  contour->GetVtkPolyData()->GetPoints()->GetPoint(0, p);
+  vtkPolygon::ComputeNormal(contour->GetVtkPolyData()->GetPoints(), n);
+  contourInfo.contourNormal = n;
+  contourInfo.contourPoint = p;
+  return contourInfo;
 }
 
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
@@ -108,35 +104,33 @@ mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetI
   return m_Instance;
 }
 
-void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour, PlaneGeometry::ConstPointer plane)
+void mitk::SurfaceInterpolationController::AddNewContour (mitk::Surface::Pointer newContour)
 {
-  ContourPositionPair pair;
-  pair.contour = newContour;
-  pair.plane = plane;
-  this->AddToInterpolationPipeline(pair);
+  ContourPositionInformation contourInfo = CreateContourPositionInformation(newContour);
+  this->AddToInterpolationPipeline(contourInfo);
 
   this->Modified();
 }
 
-void mitk::SurfaceInterpolationController::AddNewContours(ContourPositionPairList newContours)
+void mitk::SurfaceInterpolationController::AddNewContours(std::vector<mitk::Surface::Pointer> newContours)
 {
   for (unsigned int i = 0; i < newContours.size(); ++i)
   {
-    this->AddToInterpolationPipeline(newContours.at(i));
+    ContourPositionInformation contourInfo = CreateContourPositionInformation(newContours.at(i));
+    this->AddToInterpolationPipeline(contourInfo);
   }
   this->Modified();
 }
 
-void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPositionPair pair)
+void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPositionInformation contourInfo)
 {
   int pos (-1);
-  ContourPositionPairList currentContourList = m_ListOfInterpolationSessions[m_SelectedSegmentation];
-  const mitk::PlaneGeometry* plane = pair.plane;
-  mitk::Surface* newContour = pair.contour;
+  ContourPositionInformationList currentContourList = m_ListOfInterpolationSessions[m_SelectedSegmentation];
+  mitk::Surface* newContour = contourInfo.contour;
   for (unsigned int i = 0; i < currentContourList.size(); i++)
   {
-    mitk::PlaneGeometry::ConstPointer planeFromList = currentContourList.at(i).plane;
-    if ( PlanesEqual(plane, planeFromList, mitk::eps) )
+    ContourPositionInformation contourFromList = currentContourList.at(i);
+    if (ContoursCoplanar(contourInfo, contourFromList))
     {
       pos = i;
       break;
@@ -147,16 +141,16 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
   if (pos == -1 && newContour->GetVtkPolyData()->GetNumberOfPoints() > 0)
   {
     m_ReduceFilter->SetInput(m_ListOfInterpolationSessions[m_SelectedSegmentation].size(), newContour);
-    m_ListOfInterpolationSessions[m_SelectedSegmentation].push_back(pair);
+    m_ListOfInterpolationSessions[m_SelectedSegmentation].push_back(contourInfo);
   }
   else if (pos != -1 && newContour->GetVtkPolyData()->GetNumberOfPoints() > 0)
   {
-    m_ListOfInterpolationSessions[m_SelectedSegmentation].at(pos) = pair;
+    m_ListOfInterpolationSessions[m_SelectedSegmentation].at(pos) = contourInfo;
     m_ReduceFilter->SetInput(pos, newContour);
   }
   else if (newContour->GetVtkPolyData()->GetNumberOfPoints() == 0)
   {
-    this->RemoveContour(plane);
+    this->RemoveContour(contourInfo);
   }
 
   m_ReduceFilter->Update();
@@ -169,13 +163,13 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
   }
 }
 
-bool mitk::SurfaceInterpolationController::RemoveContour(const mitk::PlaneGeometry *plane)
+bool mitk::SurfaceInterpolationController::RemoveContour(ContourPositionInformation contourInfo)
 {
-  ContourPositionPairList::iterator it = m_ListOfInterpolationSessions[m_SelectedSegmentation].begin();
+  ContourPositionInformationList::iterator it = m_ListOfInterpolationSessions[m_SelectedSegmentation].begin();
   while (it !=  m_ListOfInterpolationSessions[m_SelectedSegmentation].end())
   {
-    ContourPositionPair pair = (*it);
-    if (PlanesEqual(plane, pair.plane, mitk::eps))
+    ContourPositionInformation currentContour = (*it);
+    if (ContoursCoplanar(currentContour, contourInfo))
     {
       m_ListOfInterpolationSessions[m_SelectedSegmentation].erase(it);
       this->ReinitializeInterpolation();
@@ -186,14 +180,14 @@ bool mitk::SurfaceInterpolationController::RemoveContour(const mitk::PlaneGeomet
   return false;
 }
 
-const mitk::Surface* mitk::SurfaceInterpolationController::GetContour(mitk::PlaneGeometry::ConstPointer plane)
+const mitk::Surface* mitk::SurfaceInterpolationController::GetContour(ContourPositionInformation contourInfo)
 {
-  ContourPositionPairList contourList = m_ListOfInterpolationSessions[m_SelectedSegmentation];
+  ContourPositionInformationList contourList = m_ListOfInterpolationSessions[m_SelectedSegmentation];
   for (unsigned int i = 0; i < contourList.size(); ++i)
   {
-    ContourPositionPair pair = contourList.at(i);
-    if (PlanesEqual(plane, pair.plane, mitk::eps))
-      return pair.contour;
+    ContourPositionInformation currentContour = contourList.at(i);
+    if (ContoursCoplanar(contourInfo, currentContour))
+      return currentContour.contour;
   }
   return 0;
 }
@@ -332,8 +326,8 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
   // If the session does not exist yet create a new ContourPositionPairList otherwise reinitialize the interpolation pipeline
   if (it == m_ListOfInterpolationSessions.end())
   {
-    ContourPositionPairList newList;
-    m_ListOfInterpolationSessions.insert(std::pair<mitk::Image*, ContourPositionPairList>(m_SelectedSegmentation, newList));
+    ContourPositionInformationList newList;
+    m_ListOfInterpolationSessions.insert(std::pair<mitk::Image*, ContourPositionInformationList>(m_SelectedSegmentation, newList));
     m_InterpolationResult = 0;
     m_CurrentNumberOfReducedContours = 0;
 
@@ -388,17 +382,12 @@ void mitk::SurfaceInterpolationController::RemoveAllInterpolationSessions()
 
 void mitk::SurfaceInterpolationController::ReinitializeInterpolation(mitk::Surface::Pointer contours)
 {
-  unsigned int num_Polys = contours->GetVtkPolyData()->GetNumberOfPolys();
-  MITK_INFO<<"Reinit 3D interpolation using ["<<num_Polys<<"] number of contours!";
-
-  MITK_INFO<<"----- Prepare surfaces -----";
-
   // 1. detect coplanar contours
   // 2. merge coplanar contours into a single surface
   // 4. add contour to pipeline
   // 5. create position nodes
 
-  // Sort contours
+  // Split the surface into separate polygons
   vtkSmartPointer<vtkCellArray> existingPolys;
   vtkSmartPointer<vtkPoints> existingPoints;
   existingPolys = contours->GetVtkPolyData()->GetPolys();
@@ -408,7 +397,7 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation(mitk::Surfa
   vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
 
   typedef std::pair<mitk::Vector3D, mitk::Point3D> PointNormalPair;
-  std::vector<PointNormalPair> list;
+  std::vector<ContourPositionInformation> list;
   std::vector<vtkSmartPointer<vtkPoints> > pointsList;
   int count (0);
   for( existingPolys->InitTraversal(); existingPolys->GetNextCell(ids);)
@@ -424,43 +413,33 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation(mitk::Surfa
     double n[3];
     vtkPolygon::ComputeNormal(points, n);
     p_n.first = n;
-    double p1[3];
+    double p[3];
 
-    existingPoints->GetPoint(ids->GetId(0), p1);
-    p_n.second = p1;
+    existingPoints->GetPoint(ids->GetId(0), p);
+    p_n.second = p;
 
-    list.push_back(p_n);
-
+    ContourPositionInformation p_info;
+    p_info.contourNormal = n;
+    p_info.contourPoint = p;
+    list.push_back(p_info);
     continue;
   }
 
-  double vec[3];
-//  std::vector<std::pair<unsigned int, unsigned int> > coplanar_indices;
-
-  std::vector<PointNormalPair>::iterator outer = list.begin();
-//  for (unsigned int i = 0; i < list.size(); ++i)
+  // Detect and sort coplanar polygons
+  std::vector<ContourPositionInformation>::iterator outer = list.begin();
   std::vector< std::vector< vtkSmartPointer<vtkPoints> > > relatedPoints;
   while (outer != list.end())
   {
-    std::vector<PointNormalPair>::iterator inner = outer;
+    std::vector<ContourPositionInformation>::iterator inner = outer;
     ++inner;
     std::vector< vtkSmartPointer<vtkPoints> > rel;
     std::vector< vtkSmartPointer<vtkPoints> >::iterator pointsIter = pointsList.begin();
     rel.push_back((*pointsIter));
     pointsIter = pointsList.erase(pointsIter);
-//    for (unsigned int j = i+1; j < list.size(); ++j)
+
     while (inner != list.end())
     {
-      vec[0] = (*outer).second[0] - (*inner).second[0];
-      vec[1] = (*outer).second[1] - (*inner).second[1];
-      vec[2] = (*outer).second[2] - (*inner).second[2];
-      double n[3];
-      n[0] = (*outer).first[0];
-      n[1] = (*outer).first[1];
-      n[2] = (*outer).first[2];
-      double dot = vtkMath::Dot(n, vec);
-
-      if (mitk::Equal(dot, 0.0, 0.001, true))
+      if(ContoursCoplanar((*outer),(*inner)))
       {
         inner = list.erase(inner);
         rel.push_back((*pointsIter));
@@ -476,12 +455,10 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation(mitk::Surfa
     ++outer;
   }
 
-  // Build the surfaces
-  MITK_INFO<<"NUM REL POINTS: "<<relatedPoints.size();
+  // Build the separate surfaces again
   std::vector<mitk::Surface::Pointer> finalSurfaces;
   for (unsigned int i = 0; i < relatedPoints.size(); ++i)
   {
-    MITK_INFO<<"Size ["<<i<<"]: "<<relatedPoints.at(i).size();
     vtkSmartPointer<vtkPolyData> contourSurface = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> polygons = vtkSmartPointer<vtkCellArray>::New();
@@ -509,13 +486,7 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation(mitk::Surfa
     finalSurfaces.push_back(surface);
   }
 
-  for (unsigned int i = 0; i < finalSurfaces.size(); ++i)
-  {
-    mitk::Surface* surface = finalSurfaces.at(i);
-    ContourPositionPair contourPosPair;
-    contourPosPair.contour = surface;
-    this->AddToInterpolationPipeline(contourPosPair);
-  }
+  this->AddNewContours(finalSurfaces);
 }
 
 void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &/*event*/)

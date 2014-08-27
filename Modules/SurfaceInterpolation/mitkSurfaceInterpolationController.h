@@ -59,13 +59,14 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    struct ContourPositionPair {
+    struct ContourPositionInformation {
       Surface::Pointer contour;
-      mitk::PlaneGeometry::ConstPointer plane;
+      Vector3D contourNormal;
+      Point3D contourPoint;
     };
 
-    typedef std::vector<ContourPositionPair> ContourPositionPairList;
-    typedef std::map<mitk::Image*, ContourPositionPairList> ContourListMap;
+    typedef std::vector<ContourPositionInformation> ContourPositionInformationList;
+    typedef std::map<mitk::Image*, ContourPositionInformationList> ContourListMap;
 
     static SurfaceInterpolationController* GetInstance();
 
@@ -75,28 +76,28 @@ namespace mitk
      * @param plane the image plane in which the contour lies. If plane already exists the related
      *        contour will be updated
      */
-    void AddNewContour (Surface::Pointer newContour, PlaneGeometry::ConstPointer plane);
+    void AddNewContour (Surface::Pointer newContour);
 
     /**
      * @brief Removes the contour for a given plane for the current selected segmenation
-     * @param plane the plane for which the contour should be returned
+     * @param contourInfo the contour which should be returned
      * @return true if a contour was found and removed, false if no contour was found
      */
-    bool RemoveContour (const mitk::PlaneGeometry* plane);
+    bool RemoveContour (ContourPositionInformation contourInfo);
 
     /**
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
      *        already exist they will be updated respectively
-     * @param newContours the list of the contours and the respective positions
+     * @param newContours the list of the contours
      */
-    void AddNewContours (ContourPositionPairList newContours);
+    void AddNewContours (std::vector<Surface::Pointer> newContours);
 
     /**
     * @brief Returns the contour for a given plane for the current selected segmenation
     * @param plane the plane for which the contour should be returned
     * @return the contour as an mitk::Surface. If no contour is available for the plane NULL is returned
     */
-    const mitk::Surface* GetContour (PlaneGeometry::ConstPointer plane);
+    const mitk::Surface* GetContour (ContourPositionInformation contourInfo);
 
     /**
     * @brief Returns the number of available contours for the current selected segmentation
@@ -200,9 +201,7 @@ namespace mitk
 
    void ReinitializeInterpolation();
 
-   void AddToInterpolationPipeline(ContourPositionPair pair);
-
-    ContourPositionPairList::iterator m_Iterator;
+   void AddToInterpolationPipeline(ContourPositionInformation contourInfo);
 
     ReduceContourSetFilter::Pointer m_ReduceFilter;
     ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;

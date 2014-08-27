@@ -159,7 +159,10 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation (const Image* slice, const Imag
     if (contour->GetVtkPolyData()->GetNumberOfPoints() == 0)
     {
       // Remove contour!
-      mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(plane);
+      mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo;
+      contourInfo.contourNormal = plane->GetNormal();
+      contourInfo.contourPoint = plane->GetOrigin();
+      mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(contourInfo);
       return;
     }
   }
@@ -170,13 +173,16 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation (const Image* slice, const Imag
 
   if (contour->GetVtkPolyData()->GetNumberOfPoints() != 0 && workingImage->GetDimension() == 3)
   {
-    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, plane);
+    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour );
     contour->DisconnectPipeline();
   }
   else
   {
     // Remove contour!
-    mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(plane);
+    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo;
+    contourInfo.contourNormal = plane->GetNormal();
+    contourInfo.contourPoint = plane->GetOrigin();
+    mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(contourInfo);
   }
 }
 
@@ -284,7 +290,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
 
 void mitk::SegTool2D::WriteBackSegmentationResult(std::vector<mitk::SegTool2D::SliceInformation> sliceList)
 {
-  mitk::SurfaceInterpolationController::ContourPositionPairList contourList;
+  std::vector<mitk::Surface::Pointer> contourList;
   contourList.reserve(sliceList.size());
   ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
 
@@ -304,10 +310,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult(std::vector<mitk::SegTool2D::S
       mitk::Surface::Pointer contour = contourExtractor->GetOutput();
       contour->DisconnectPipeline();
 
-      mitk::SurfaceInterpolationController::ContourPositionPair pair;
-      pair.contour = contour;
-      pair.plane = currentSliceInfo.plane;;
-      contourList.push_back(pair);
+      contourList.push_back(contour);
     }
   }
   mitk::SurfaceInterpolationController::GetInstance()->AddNewContours(contourList);

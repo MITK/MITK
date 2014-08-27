@@ -100,7 +100,6 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   vboxLayout->addWidget(m_BtnApply3D);
 
   m_BtnReinit3DInterpolation = new QPushButton("Reinit Interpolation", m_GroupBoxEnableExclusiveInterpolationMode);
-  m_BtnReinit3DInterpolation->setEnabled(false);
   vboxLayout->addWidget(m_BtnReinit3DInterpolation);
 
   m_ChkShowPositionNodes = new QCheckBox("Show Position Nodes", m_GroupBoxEnableExclusiveInterpolationMode);
@@ -415,17 +414,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   if (m_ToolManager->GetWorkingData(0) != 0)
   {
     m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
-    mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("3DContourContainer", mitk::BoolProperty::New(true));
-    mitk::DataStorage::SetOfObjects::ConstPointer contourNodes = m_DataStorage->GetDerivations( m_ToolManager->GetWorkingData(0), pred);
-    if (contourNodes->Size() != 0)
-    {
-      m_BtnReinit3DInterpolation->setEnabled(true);
-      m_3DContourNode = contourNodes->at(0);
-    }
-    else
-    {
-      m_BtnReinit3DInterpolation->setEnabled(false);
-    }
+    m_BtnReinit3DInterpolation->setEnabled(true);
   }
   else
   {
@@ -436,6 +425,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     m_3DContourNode->SetData(NULL);
     this->GetDataStorage()->Remove(m_InterpolatedSurfaceNode);
     m_InterpolatedSurfaceNode->SetData(NULL);
+    m_BtnReinit3DInterpolation->setEnabled(false);
     return;
   }
   //Updating the current selected segmentation for the 3D interpolation
@@ -461,9 +451,8 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::Even
   mitk::SliceNavigationController* slicer = dynamic_cast<mitk::SliceNavigationController*>(sender);
   Q_ASSERT(slicer);
 
-  m_TimeStep[slicer]/* = event.GetPos()*/;
+  m_TimeStep[slicer];
 
-  //TODO Macht das hier wirklich Sinn????
   if (m_LastSNC == slicer)
   {
     slicer->SendSlice();//will trigger a new interpolation
@@ -573,6 +562,8 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
       this->Show3DInterpolationResult(false);
     }
   }
+
+  m_BtnReinit3DInterpolation->setEnabled(true);
 
   foreach (mitk::SliceNavigationController* slicer, m_ControllerToTimeObserverTag.keys())
   {
@@ -781,12 +772,24 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
 void QmitkSlicesInterpolator::OnReinit3DInterpolation()
 {
+  mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("3DContourContainer", mitk::BoolProperty::New(true));
+  mitk::DataStorage::SetOfObjects::ConstPointer contourNodes = m_DataStorage->GetDerivations( m_ToolManager->GetWorkingData(0), pred);
+  if (contourNodes->Size() != 0)
+  {
+    m_3DContourNode = contourNodes->at(0);
+  }
+  else
+  {
+    QMessageBox errorInfo;
+    errorInfo.setWindowTitle("Reinitialize surface interpolation");
+    errorInfo.setIcon(QMessageBox::Information);
+    errorInfo.setText("No contours available for the selected segmentation!");
+    errorInfo.exec();
+  }
   mitk::Surface::Pointer contours = dynamic_cast<mitk::Surface*>(m_3DContourNode->GetData());
   if (contours)
     mitk::SurfaceInterpolationController::GetInstance()->ReinitializeInterpolation(contours);
-  // TODO Code in Methode packen
-  m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
-  m_Watcher.setFuture(m_Future);
+  m_BtnReinit3DInterpolation->setEnabled(false);
 }
 
 void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)

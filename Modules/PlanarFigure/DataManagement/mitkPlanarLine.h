@@ -61,6 +61,7 @@ public:
     return 2;
   }
 
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 protected:
   PlanarLine();

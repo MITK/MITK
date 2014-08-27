@@ -42,6 +42,7 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestPlaneGeometryCloning);
   MITK_TEST(TestInheritance);
   MITK_TEST(TestSetExtendInMM);
+  MITK_TEST(TestRotate);
 
   // Currently commented out, see See bug 15990
   // MITK_TEST(testPlaneGeometryInitializeOrder);
@@ -449,6 +450,100 @@ public:
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
   }
 
+  void TestRotate()
+  {
+    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+
+    mitk::Point3D origin;
+    mitk::Vector3D right, bottom, normal;
+    mitk::ScalarType width, height;
+    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
+    width  = 100;    widthInMM  = width;
+    height = 200;    heightInMM = height;
+    thicknessInMM = 1;
+    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
+    mitk::FillVector3D(right,  widthInMM,          0, 0);
+    mitk::FillVector3D(bottom,         0, heightInMM, 0);
+    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
+
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+
+    std::cout << "Changing the IndexToWorldTransform to a rotated version by SetIndexToWorldTransform() (keep origin): "<<std::endl;
+    mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
+    vnlmatrix = planegeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
+    mitk::VnlVector axis(3);
+    mitk::FillVector3D(axis, 1.0, 1.0, 1.0); axis.normalize();
+    vnl_quaternion<mitk::ScalarType> rotation(axis, 0.223);
+    vnlmatrix = rotation.rotation_matrix_transpose()*vnlmatrix;
+    mitk::Matrix3D matrix;
+    matrix = vnlmatrix;
+    transform->SetMatrix(matrix);
+    transform->SetOffset(planegeometry->GetIndexToWorldTransform()->GetOffset());
+
+    right.SetVnlVector( rotation.rotation_matrix_transpose()*right.GetVnlVector() );
+    bottom.SetVnlVector(rotation.rotation_matrix_transpose()*bottom.GetVnlVector());
+    normal.SetVnlVector(rotation.rotation_matrix_transpose()*normal.GetVnlVector());
+    planegeometry->SetIndexToWorldTransform(transform);
+
+    //The origin changed,because m_Origin=m_IndexToWorldTransform->GetOffset()+GetAxisVector(2)*0.5
+    //and the AxisVector changes due to the rotation. In other words: the rotation was done around
+    //the corner of the box, not around the planes origin. Now change it to a rotation around
+    //the origin, simply by re-setting the origin to the original one:
+    planegeometry->SetOrigin(origin);
+    mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
+
+    CPPUNIT_ASSERT_MESSAGE("Testing whether SetIndexToWorldTransform kept origin: ", mitk::Equal(planegeometry->GetOrigin(), origin, testEps) );
+
+    mitk::Point2D point; point[0] = 4; point[1] = 3;
+    mitk::Point2D dummy;
+    planegeometry->WorldToIndex(point, dummy);
+    planegeometry->IndexToWorld(dummy, dummy);
+    CPPUNIT_ASSERT_MESSAGE("Testing consistancy of index and world coordinates.", dummy == point);
+
+    CPPUNIT_ASSERT_MESSAGE("Testing width of rotated version: ", mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing height of rotated version: ", mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing thickness of rotated version: ", mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of rotated version: right ", mitk::Equal(planegeometry->GetAxisVector(0), right, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of rotated version: bottom", mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of rotated version: normal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
+      mitk::Equal(planegeometry->GetAxisVector(0).GetNorm(),planegeometry->GetExtentInMM(0), testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
+      mitk::Equal(planegeometry->GetAxisVector(1).GetNorm(),planegeometry->GetExtentInMM(1), testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
+      mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2), testEps));
+
+    mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
+
+    width  *= 2;
+    height *= 3;
+    planegeometry->SetSizeInUnits(width, height);
+    CPPUNIT_ASSERT_MESSAGE("Testing SetSizeInUnits() of rotated version: ", mitk::Equal(planegeometry->GetExtent(0),width, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing SetSizeInUnits() of rotated version: ", mitk::Equal(planegeometry->GetExtent(1),height, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing SetSizeInUnits() of rotated version: ", mitk::Equal(planegeometry->GetExtent(2),1, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing width (in mm) of version with changed size in units: ", mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing height (in mm) of version with changed size in units: ", mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing thickness (in mm) of version with changed size in units: ", mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of version with changed size in units: right ", mitk::Equal(planegeometry->GetAxisVector(0), right, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of version with changed size in units: bottom", mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of version with changed size in units: normal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
+      mitk::Equal(planegeometry->GetAxisVector(0).GetNorm(),planegeometry->GetExtentInMM(0), testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
+      mitk::Equal(planegeometry->GetAxisVector(1).GetNorm(),planegeometry->GetExtentInMM(1), testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
+      mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2), testEps));
+
+    mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
+  }
+
   int mitkPlaneGeometryTest()
   {
     mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
@@ -578,7 +673,6 @@ public:
 
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
 
-    // BIS HIER
     // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     std::cout << "Changing the IndexToWorldTransform to a rotated version by SetIndexToWorldTransform() (keep origin): "<<std::endl;
@@ -698,6 +792,9 @@ public:
     std::cout<<"[PASSED]"<<std::endl;
 
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
+
+    // BIS HIER
+    // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     std::cout << "Testing Clone(): ";
     mitk::PlaneGeometry::Pointer clonedplanegeometry = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());

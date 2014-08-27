@@ -224,15 +224,19 @@ bool mitk::BaseGeometry::IsValid() const
   return true;
 }
 
-void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing )
+
+
+void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing )
 {
   PreSetSpacing(aSpacing);
-  _SetSpacing(aSpacing);
+  _SetSpacing(aSpacing, enforceSetSpacing);
 }
 
-void mitk::BaseGeometry::PreSetSpacing(const mitk::Vector3D& /*aSpacing*/)
-{}
-void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D& aSpacing){
+
+void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing){
+  if(mitk::Equal(this->GetSpacing(), aSpacing) == false || enforceSetSpacing)
+  {
+    assert(aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0);
 
 
     AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
@@ -252,8 +256,13 @@ void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D& aSpacing){
     transform->SetOffset(m_IndexToWorldTransform->GetOffset());
 
     SetIndexToWorldTransform(transform.GetPointer());
-
+  }
 }
+
+
+void mitk::BaseGeometry::PreSetSpacing(const mitk::Vector3D& /*aSpacing*/)
+{}
+
 
 mitk::Vector3D mitk::BaseGeometry::GetAxisVector(unsigned int direction) const
 {

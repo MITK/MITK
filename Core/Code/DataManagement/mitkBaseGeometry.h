@@ -125,7 +125,7 @@ namespace mitk {
     //## @brief Set the spacing (m_Spacing).
     //##
     //##The spacing is also changed in the IndexToWorldTransform.
-    void SetSpacing(const mitk::Vector3D& aSpacing);
+    void SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
     //##Documentation
     //## @brief Get the origin as VnlVector
@@ -573,7 +573,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Intern functions to assure a consistent behaviour of SetSpacing.
-    void _SetSpacing(const mitk::Vector3D& aSpacing);
+    void _SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
   private:
     //##Documentation

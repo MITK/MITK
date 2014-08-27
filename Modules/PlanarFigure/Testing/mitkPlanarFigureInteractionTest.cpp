@@ -79,9 +79,7 @@ public:
 
 
     //Load a bounding image
-    //mitk::Image::Pointer testImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
-
-    mitk::Image::Pointer testImage = mitk::IOUtil::LoadImage("/home/cweber/SSD-Data/Test/0011.dcm");
+    mitk::Image::Pointer testImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("InteractionTestData/InputData/scaledSingleSlice.nrrd"));
 
     mitk::DataNode::Pointer dn = mitk::DataNode::New();
     dn->SetData(testImage);

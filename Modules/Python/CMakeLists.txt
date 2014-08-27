@@ -4,8 +4,6 @@ if( MITK_USE_Python )
     set(NUMPY_INCLUDE_DIR "${Numpy_DIR}/core/include")
   endif()
 
-  MESSAGE("numpy: " ${Numpy_DIR})
-
   set(OpenCV_DEP )
   if(MITK_USE_OpenCV)
     set(OpenCV_DEP OpenCV)

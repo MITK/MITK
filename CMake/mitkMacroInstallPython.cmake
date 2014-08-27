@@ -11,6 +11,7 @@
 #!
 macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
 
+  # set the destination bundle
   set(_destination bin)
   if(APPLE)
     set(_destination ${_app_bundle})
@@ -29,6 +30,10 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
     install(FILES "${SimpleITK_DIR}/Wrapping/SimpleITK.py"
                   DESTINATION ${_destination}/Python/SimpleITK )
     install(FILES "${SimpleITK_DIR}/Wrapping/__init__.py"
+                  DESTINATION ${_destination}/Python/SimpleITK )
+    install(FILES "${SimpleITK_DIR}/Wrapping/SimpleITK.pyc"
+                  DESTINATION ${_destination}/Python/SimpleITK )
+    install(FILES "${SimpleITK_DIR}/Wrapping/__init__.pyc"
                   DESTINATION ${_destination}/Python/SimpleITK )
     install(FILES "${SimpleITK_DIR}/Wrapping/_SimpleITK${PYTHON_LIB_SUFFIX}"
                   DESTINATION ${_destination}/Python/SimpleITK )
@@ -96,7 +101,7 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
 
   # install vtk python. This folder contains all *.py files for VTK module loading.
   # glob through all files, NSIS can't use directories
-  file(GLOB_RECURSE item RELATIVE "${VTK_DIR}/Wrapping/Python/vtk" "${VTK_DIR}/Wrapping/Python/vtk/*.py")
+  file(GLOB_RECURSE item RELATIVE "${VTK_DIR}/Wrapping/Python/vtk" "${VTK_DIR}/Wrapping/Python/vtk/*.py*")
   foreach(f ${item})
     get_filename_component(_filepath "${f}" PATH)
     install(FILES "${VTK_DIR}/Wrapping/Python/vtk/${f}" DESTINATION ${_destination}/Python/vtk/${_filepath})
@@ -126,19 +131,8 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
       get_filename_component(_filepath "${f}" PATH)
       install(FILES "${Python_DIR}/include/${f}" DESTINATION ${_destination}/Python/include/${_filepath})
     endforeach()
-
-    # Numpy is always build in an own runtime
-    if(Numpy_DIR)
-      # glob through all files, NSIS can't use directories
-      file(GLOB_RECURSE item RELATIVE "${Numpy_DIR}" "${Numpy_DIR}/*")
-      foreach(f ${item})
-        get_filename_component(_filepath "${f}" PATH)
-        install(FILES "${Numpy_DIR}/${f}" DESTINATION ${_destination}/Python/numpy/${_filepath})
-      endforeach()
-    endif()
   endif()
 
   list(REMOVE_DUPLICATES _python_dirs)
-
-endmacro()
+endMacro()
 

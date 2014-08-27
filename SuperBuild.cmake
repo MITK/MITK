@@ -368,7 +368,6 @@ if(MITK_USE_Python)
           -DPython_DIR:PATH=${Python_DIR}
           -DNumpy_DIR:PATH=${Numpy_DIR}
           -DPYTHON_LIBRARY_NAME:STRING=${PYTHON_LIBRARY_NAME}
-          -DMITK_PYTHON_SITE_DIR:PATH=${MITK_PYTHON_SITE_DIR}
         )
   endif()
 endif()

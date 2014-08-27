@@ -50,7 +50,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
        ")
 
     # install step
-    set(_install_dir ${Python_BUILD_DIR})
+    set(_install_dir ${Python_DIR})
     if(WIN32)
       STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
     endif()

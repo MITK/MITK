@@ -5,7 +5,7 @@
 #endif
 
 #define PYTHONPATH_COMMAND "import sys\n"\
-"sys.path.append('@Numpy_DIR@')\n"\
+"sys.path.append('@MITK_PYTHON_SITE_DIR@')\n"\
 "sys.path.append('@SimpleITK_DIR@/bin')\n"\
 "sys.path.append('@SimpleITK_DIR@/lib')\n"\
 "sys.path.append('@SimpleITK_DIR@/Wrapping')\n"\

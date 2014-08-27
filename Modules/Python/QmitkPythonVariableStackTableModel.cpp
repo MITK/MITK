@@ -109,7 +109,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
               }
               else
               {
-                MITK_ERROR << "ITK Python wrapping not available. Skipping export for image " << node->GetName();
+                MITK_ERROR << "SimpleITK Python wrapping not available. Skipping export for image " << node->GetName();
               }
             }
           }

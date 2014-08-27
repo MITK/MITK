@@ -424,10 +424,7 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   }
 
   mitkImage->Initialize(pixelType, py_data->nd, dimensions);
-
-  // copy data
-  mitk::ImageWriteAccessor iwa(mitkImage);
-  memcpy( iwa.GetData(), py_data->data, sz);
+  mitkImage->SetChannel(py_data->data);
 
   ds = (double*)py_spacing->data;
   spacing[0] = ds[0];

@@ -415,8 +415,6 @@ public:
 
   int mitkPlaneGeometryTest()
   {
-    int result;
-
     mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
 
     mitk::Point3D origin;
@@ -543,9 +541,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    result = mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
-    if(result!=EXIT_SUCCESS)
-      return result;
+    mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
 
     std::cout << "Changing the IndexToWorldTransform to a rotated version by SetIndexToWorldTransform() (keep origin): "<<std::endl;
     mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
@@ -618,9 +614,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    result = mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
-    if(result!=EXIT_SUCCESS)
-      return result;
+    mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
 
     std::cout << "Testing SetSizeInUnits() of rotated version: "<<std::endl;
     width  *= 2;
@@ -665,9 +659,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    result = mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
-    if(result!=EXIT_SUCCESS)
-      return result;
+    mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
 
     std::cout << "Testing Clone(): ";
     mitk::PlaneGeometry::Pointer clonedplanegeometry = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
@@ -713,9 +705,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    result = mappingTests2D(clonedplanegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
-    if(result!=EXIT_SUCCESS)
-      return result;
+    mappingTests2D(clonedplanegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
 
     // Clone, move, rotate and test for 'IsParallel' and 'IsOnPlane'
     std::cout << "Testing Clone(): ";
@@ -853,9 +843,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    result = mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
-    if(result!=EXIT_SUCCESS)
-      return result;
+    mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
 
     mitk::Vector3D newright, newbottom, newnormal;
     mitk::ScalarType newthicknessInMM;
@@ -900,9 +888,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    result = mappingTests2D(planegeometry, width, 1, widthInMM, thicknessInMM, origin, newright, newbottom);
-    if(result!=EXIT_SUCCESS)
-      return result;
+    mappingTests2D(planegeometry, width, 1, widthInMM, thicknessInMM, origin, newright, newbottom);
 
     std::cout << "Changing plane to in-plane unit spacing using SetSizeInUnits: " <<std::endl;
     planegeometry->SetSizeInUnits(planegeometry->GetExtentInMM(0), planegeometry->GetExtentInMM(1));
@@ -939,9 +925,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    result = mappingTests2D(planegeometry, widthInMM, thicknessInMM, widthInMM, thicknessInMM, origin, newright, newbottom);
-    if(result!=EXIT_SUCCESS)
-      return result;
+    mappingTests2D(planegeometry, widthInMM, thicknessInMM, widthInMM, thicknessInMM, origin, newright, newbottom);
 
     std::cout << "Changing plane to unit spacing also in normal direction using SetExtentInMM(2, 1.0): " <<std::endl;
     planegeometry->SetExtentInMM(2, 1.0);
@@ -979,9 +963,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    result = mappingTests2D(planegeometry, widthInMM, thicknessInMM, widthInMM, thicknessInMM, origin, newright, newbottom);
-    if(result!=EXIT_SUCCESS)
-      return result;
+    mappingTests2D(planegeometry, widthInMM, thicknessInMM, widthInMM, thicknessInMM, origin, newright, newbottom);
 
     std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Sagittal, zPosition = 0, frontside=true): " <<std::endl;
     planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Sagittal);
@@ -1023,9 +1005,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    result = mappingTests2D(planegeometry, height, 1, heightInMM, thicknessInMM, origin, newright, newbottom);
-    if(result!=EXIT_SUCCESS)
-      return result;
+    mappingTests2D(planegeometry, height, 1, heightInMM, thicknessInMM, origin, newright, newbottom);
 
     //set origin back to the one of the axial slice:
     origin = clonedplanegeometry->GetOrigin();
@@ -1076,9 +1056,7 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    result = mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, backsideorigin, right, -bottom);
-    if(result!=EXIT_SUCCESS)
-      return result;
+    mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, backsideorigin, right, -bottom);
 
     return EXIT_SUCCESS;
   }
@@ -1121,7 +1099,10 @@ private:
     return equal;
   }
 
-  int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::Point3D& origin, const mitk::Vector3D& right, const mitk::Vector3D& bottom)
+  /**
+  * This function tests for correct rendering and is called several times during the other tests
+  **/
+  void mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::Point3D& origin, const mitk::Vector3D& right, const mitk::Vector3D& bottom)
   {
     std::cout << "Testing mapping Map(pt2d_mm(x=widthInMM/2.3,y=heightInMM/2.5), pt3d_mm) and compare with expected: ";
     mitk::Point2D pt2d_mm;
@@ -1129,12 +1110,7 @@ private:
     pt2d_mm[0] = widthInMM/2.3; pt2d_mm[1] = heightInMM/2.5;
     expected_pt3d_mm = origin+right*(pt2d_mm[0]/right.GetNorm())+bottom*(pt2d_mm[1]/bottom.GetNorm());
     planegeometry->Map(pt2d_mm, pt3d_mm);
-    if(mitk::Equal(pt3d_mm, expected_pt3d_mm, testEps) == false)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
+    CPPUNIT_ASSERT_MESSAGE("Testing mapping Map(pt2d_mm(x=widthInMM/2.3,y=heightInMM/2.5), pt3d_mm) and compare with expected", mitk::Equal(pt3d_mm, expected_pt3d_mm, testEps));
 
     std::cout << "Testing mapping Map(pt3d_mm, pt2d_mm) and compare with expected: ";
     mitk::Point2D testpt2d_mm;
@@ -1143,29 +1119,18 @@ private:
     std::cout << std::setprecision(12) << "Result testpt2d_mm " << testpt2d_mm << std::endl;
     std::cout << std::setprecision(12) << "10*mitk::eps " << 10*mitk::eps << std::endl;
     //This eps is temporarily set to 10*mitk::eps. See bug #15037 for details.
-    if(mitk::Equal(pt2d_mm, testpt2d_mm, 10*mitk::eps) == false)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
+    CPPUNIT_ASSERT_MESSAGE("Testing mapping Map(pt3d_mm, pt2d_mm) and compare with expected", mitk::Equal(pt2d_mm, testpt2d_mm, 10*mitk::eps));
 
     std::cout << "Testing IndexToWorld(pt2d_units, pt2d_mm) and compare with expected: ";
     mitk::Point2D pt2d_units;
     pt2d_units[0] = width/2.0;     pt2d_units[1] = height/2.0;
     pt2d_mm[0]    = widthInMM/2.0; pt2d_mm[1]    = heightInMM/2.0;
     planegeometry->IndexToWorld(pt2d_units, testpt2d_mm);
-
     std::cout << std::setprecision(12) << "Expected pt2d_mm " << pt2d_mm << std::endl;
     std::cout << std::setprecision(12) << "Result testpt2d_mm " << testpt2d_mm << std::endl;
     std::cout << std::setprecision(12) << "10*mitk::eps " << 10*mitk::eps << std::endl;
     //This eps is temporarily set to 10*mitk::eps. See bug #15037 for details.
-    if(mitk::Equal(pt2d_mm, testpt2d_mm, 10*mitk::eps) == false)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
+    CPPUNIT_ASSERT_MESSAGE("Testing IndexToWorld(pt2d_units, pt2d_mm) and compare with expected: ", mitk::Equal(pt2d_mm, testpt2d_mm, 10*mitk::eps));
 
     std::cout << "Testing WorldToIndex(pt2d_mm, pt2d_units) and compare with expected: ";
     mitk::Point2D testpt2d_units;
@@ -1175,14 +1140,7 @@ private:
     std::cout << std::setprecision(12) << "Result testpt2d_units " << testpt2d_units << std::endl;
     std::cout << std::setprecision(12) << "10*mitk::eps " << 10*mitk::eps << std::endl;
     //This eps is temporarily set to 10*mitk::eps. See bug #15037 for details.
-    if(mitk::Equal(pt2d_units, testpt2d_units, 10*mitk::eps) == false)
-    {
-      std::cout<<"[FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
-    std::cout<<"[PASSED]"<<std::endl;
-
-    return EXIT_SUCCESS;
+    CPPUNIT_ASSERT_MESSAGE("Testing WorldToIndex(pt2d_mm, pt2d_units) and compare with expected:", mitk::Equal(pt2d_units, testpt2d_units, 10*mitk::eps));
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkPlaneGeometry)

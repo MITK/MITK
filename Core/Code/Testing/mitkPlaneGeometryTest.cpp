@@ -41,6 +41,7 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestProjectPointOntoPlane);
   MITK_TEST(TestPlaneGeometryCloning);
   MITK_TEST(TestInheritance);
+  MITK_TEST(TestSetExtendInMM);
 
   // Currently commented out, see See bug 15990
   // MITK_TEST(testPlaneGeometryInitializeOrder);
@@ -413,6 +414,41 @@ public:
     ;
   }
 
+  void TestSetExtendInMM()
+  {
+    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+
+    mitk::Point3D origin;
+    mitk::Vector3D right, bottom, normal;
+    mitk::ScalarType width, height;
+    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
+    width  = 100;    widthInMM  = width;
+    height = 200;    heightInMM = height;
+    thicknessInMM = 3.5;
+    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
+    mitk::FillVector3D(right,  widthInMM,          0, 0);
+    mitk::FillVector3D(bottom,         0, heightInMM, 0);
+    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
+
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+
+    normal.Normalize();
+    normal *= thicknessInMM;
+    planegeometry->SetExtentInMM(2, thicknessInMM);
+    CPPUNIT_ASSERT_MESSAGE("Testing SetExtentInMM(2, ...), querying by GetExtentInMM(2): ", mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing SetExtentInMM(2, ...), querying by GetAxisVector(2) and comparing to normal: ", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
+
+    planegeometry->SetOrigin(origin);
+    CPPUNIT_ASSERT_MESSAGE("Testing SetOrigin", mitk::Equal(planegeometry->GetOrigin(), origin, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() after SetOrigin: Right",  mitk::Equal(planegeometry->GetAxisVector(0), right,  testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() after SetOrigin: Bottom", mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() after SetOrigin: Normal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps) );
+
+    mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
+  }
+
   int mitkPlaneGeometryTest()
   {
     mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
@@ -502,7 +538,6 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    // BIS HIER
     // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     std::cout << "Testing SetExtentInMM(2, ...), querying by GetExtentInMM(2): ";
@@ -542,6 +577,9 @@ public:
     std::cout<<"[PASSED]"<<std::endl;
 
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
+
+    // BIS HIER
+    // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     std::cout << "Changing the IndexToWorldTransform to a rotated version by SetIndexToWorldTransform() (keep origin): "<<std::endl;
     mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
@@ -1100,7 +1138,7 @@ private:
   }
 
   /**
-  * This function tests for correct rendering and is called several times during the other tests
+  * This function tests for correct mapping and is called several times from other tests
   **/
   void mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::Point3D& origin, const mitk::Vector3D& right, const mitk::Vector3D& bottom)
   {

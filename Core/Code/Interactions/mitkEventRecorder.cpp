@@ -99,7 +99,6 @@ mitk::EventRecorder::~EventRecorder()
 
 void mitk::EventRecorder::Notify(mitk::InteractionEvent *interactionEvent, bool /*isHandled*/)
 {
-  std::cout << EventFactory::EventToXML(interactionEvent) << "\n";
   if (m_FileStream.is_open())
     m_FileStream << EventFactory::EventToXML(interactionEvent) << "\n";
 }

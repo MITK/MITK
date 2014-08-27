@@ -8,7 +8,6 @@ set(MODULE_TESTS
   mitkOverwriteSliceFilterObliquePlaneTest.cpp
 #  mitkToolManagerTest.cpp
   mitkToolManagerProviderTest.cpp
-  mitkToolInteractionTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow

@@ -57,7 +57,9 @@ class MitkSegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     void OnSegmentationRegionAccept();
 
-    void OnItemSelectionChanged();
+    void OnRegionSelectionChanged();
+
+    void OnRegionSpinboxChanged(int);
 
     void OnVolumePreviewChecked(int);
 

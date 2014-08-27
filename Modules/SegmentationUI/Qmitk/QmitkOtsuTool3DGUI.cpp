@@ -34,7 +34,8 @@ m_NumberOfRegions(0)
 
   connect( m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSpinboxValueAccept()));
   connect(m_Controls.m_selectionListWidget, SIGNAL(itemSelectionChanged()),
-          this, SLOT(OnItemSelectionChanged()));
+          this, SLOT(OnRegionSelectionChanged()));
+  connect( m_Controls.m_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(OnRegionSpinboxChanged(int)) );
   connect( m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
   connect(m_Controls.advancedSettingsButton, SIGNAL(toggled(bool)), this, SLOT(OnAdvancedSettingsButtonToggled(bool)));
@@ -47,7 +48,14 @@ QmitkOtsuTool3DGUI::~QmitkOtsuTool3DGUI()
 
 }
 
-void QmitkOtsuTool3DGUI::OnItemSelectionChanged()
+void QmitkOtsuTool3DGUI::OnRegionSpinboxChanged(int numberOfRegions)
+{
+  //we have to change to minimum number of histogram bins accordingly
+  int curBinValue = m_Controls.m_BinsSpinBox->value();
+  if (curBinValue<numberOfRegions) m_Controls.m_BinsSpinBox->setValue(numberOfRegions);
+}
+
+void QmitkOtsuTool3DGUI::OnRegionSelectionChanged()
 {
   m_SelectedItems = m_Controls.m_selectionListWidget->selectedItems();
 

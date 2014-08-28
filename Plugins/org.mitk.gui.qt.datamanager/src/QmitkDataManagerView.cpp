@@ -129,10 +129,12 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeModel->setParent( parent );
   m_NodeTreeModel->SetPlaceNewNodesOnTop(
       prefs->GetBool("Place new nodes on top", true) );
+  /*
   m_NodeTreeModel->SetShowHelperObjects(
     prefs->GetBool("Show helper objects", false) );
   m_NodeTreeModel->SetShowNodesContainingNoData(
     prefs->GetBool("Show nodes containing no data", false) );
+  */
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
 
   //# Tree View (experimental)
@@ -449,11 +451,13 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
   if( m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() !=  prefs->GetBool("Place new nodes on top", true) )
     m_NodeTreeModel->SetPlaceNewNodesOnTop( !m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() );
 
+  /*
   if( m_NodeTreeModel->GetShowHelperObjectsFlag()!= prefs->GetBool("Show helper objects", false) )
     m_NodeTreeModel->SetShowHelperObjects( !m_NodeTreeModel->GetShowHelperObjectsFlag() );
 
   if( m_NodeTreeModel->GetShowNodesContainingNoDataFlag()!= prefs->GetBool("Show nodes containing no data", false) )
     m_NodeTreeModel->SetShowNodesContainingNoData( !m_NodeTreeModel->GetShowNodesContainingNoDataFlag() );
+    */
 
   m_GlobalReinitOnNodeDelete = prefs->GetBool("Call global reinit if node is deleted", true);
 

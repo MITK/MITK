@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_deformableclippingplane The Clipping Plane
 
-\imageMacro{QmitkClippingPlane_Icon.png,"Icon of the Clipping Plane Plugin",10.00}
+\imageMacro{QmitkClippingPlane_Icon.png,"Icon of the Clipping Plane Plugin",5.00}
 
 \tableofcontents
 
@@ -9,7 +9,7 @@
 
 The <b>Clipping Plane view</b> allows you to create clipping planes and calculate the volumina of the devided parts.
 
-\imageMacro{QmitkClippingPlane_Overview.png,"Clipping Plane perspective with segmentation and two clipping planes",16.00}
+\imageMacro{QmitkClippingPlane_Overview.png,"Clipping Plane view with segmentation and two clipping planes",16.00}
 
 \section org_mitk_views_clippingPlaneTechnicalIssue Technical Issue
 
@@ -17,7 +17,7 @@ To use the Update Volumina function your image should be binary.
 
 \section org_mitk_views_clippingPlaneManualImageSelection Image Selection
 
-The Clipping Plane perspective makes use of the Data Manager view to give you an overview of all images, segmentations and clipping planes.
+The Clipping Plane view makes use of the Data Manager view to give you an overview of all images, segmentations and clipping planes.
 
 \imageMacro{QmitkClippingPlane_DataManager.png,"Data Manager is used for selecting the current clipping plane. The reference plane is selected in the drop down box of the control area.",8.00}
 

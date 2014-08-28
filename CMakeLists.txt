@@ -220,9 +220,13 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
                 )
 
 if(MITK_USE_Python)
-  option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" ON)
+  option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)
   # SimpleITK is required when python is enabled
   set(MITK_USE_SimpleITK ON CACHE BOOL "Use the SimpleITK library" FORCE)
+  if(MITK_USE_SYSTEM_PYTHON)
+    FIND_PACKAGE(PythonLibs REQUIRED)
+    FIND_PACKAGE(PythonInterp REQUIRED)
+  endif()
 endif()
 
 #TODO is there a better place for this options
@@ -404,11 +408,6 @@ endif()
 #*****************************************************************************
 #****************************  END OF SUPERBUILD  ****************************
 #*****************************************************************************
-
-if(MITK_USE_Python)
-  FIND_PACKAGE(PythonLibs REQUIRED)
-  FIND_PACKAGE(PythonInterp REQUIRED)
-endif()
 
 #-----------------------------------------------------------------------------
 # CMake function(s) and macro(s)

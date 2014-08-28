@@ -361,13 +361,11 @@ if(MITK_USE_Python)
        -DMITK_USE_SYSTEM_PYTHON:BOOL=${MITK_USE_SYSTEM_PYTHON}
        -DMITK_BUILD_org.mitk.gui.qt.python:BOOL=ON
       )
-
   if( NOT MITK_USE_SYSTEM_PYTHON )
     list(APPEND mitk_optional_cache_args
           # Folders are needed to create an installer
           -DPython_DIR:PATH=${Python_DIR}
           -DNumpy_DIR:PATH=${Numpy_DIR}
-          -DPYTHON_LIBRARY_NAME:STRING=${PYTHON_LIBRARY_NAME}
         )
   endif()
 endif()

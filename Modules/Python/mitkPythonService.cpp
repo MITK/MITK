@@ -56,7 +56,7 @@ mitk::PythonService::PythonService()
     {
 //TODO a better way to do this
 #ifndef WIN32
-      dlopen(PYTHON_LIBRARY_NAME, RTLD_NOW | RTLD_NOLOAD | RTLD_GLOBAL);
+      dlopen("libpython2.7.so", RTLD_NOW | RTLD_NOLOAD | RTLD_GLOBAL);
 #endif
 
       std::string programPath = mitk::IOUtil::GetProgramPath();
@@ -69,9 +69,10 @@ mitk::PythonService::PythonService()
         pythonCommand.append( QString("import sys\n") );
         pythonCommand.append( QString("sys.path.append('')\n") );
         pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
-        pythonCommand.append( QString("sys.path.append('%1/Python')\n").arg(programPath.c_str()) );
-        pythonCommand.append( QString("sys.path.append('%1/Python/SimpleITK')").arg(programPath.c_str()) );
-        // set python home if own runtime is deployed
+        pythonCommand.append( QString("sys.path.append('%1/Python')").arg(programPath.c_str()) );
+#ifndef USE_MITK_BUILTIN_PYTHON
+        pythonCommand.append( QString("\nsys.path.append('%1/Python/SimpleITK')").arg(programPath.c_str()) );
+#endif
       } else {
         pythonCommand.append(PYTHONPATH_COMMAND);
       }
@@ -90,7 +91,6 @@ mitk::PythonService::PythonService()
         pythonHome.append(PYTHONHOME);
 
       if(pHome) delete[] pHome;
-
       pHome = new char[pythonHome.toStdString().length() + 1];
 
       strcpy(pHome,pythonHome.toStdString().c_str());

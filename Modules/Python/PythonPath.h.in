@@ -17,5 +17,3 @@
 "sys.path.append('@OpenCV_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')"
 
 #define PYTHONHOME "@Python_DIR@"
-
-#define PYTHON_LIBRARY_NAME "@PYTHON_LIBRARY_NAME@"

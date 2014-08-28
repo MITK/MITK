@@ -164,9 +164,6 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       set(PYTHON_EXECUTABLE "${CMAKE_BINARY_DIR}/${proj}-build/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
     endif()
 
-    # get the name of the library
-    get_filename_component(PYTHON_LIBRARY_NAME "${PYTHON_LIBRARY}" NAME)
-
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()

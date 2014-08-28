@@ -20,31 +20,12 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
   if(UNIX)
     # apple and linux only supports .so as loadable extension
     set(PYTHON_LIB_SUFFIX .so)
+    set(_python_runtime_dir lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
   else(WIN32)
     # windows only supports pyd as loadable extension
     set(PYTHON_LIB_SUFFIX .pyd)
+    set(_python_runtime_dir Lib)
   endif()
-
-  # SimpleITK
-  #if(MITK_USE_SimpleITK)
-  #  install(FILES "${SimpleITK_DIR}/Wrapping/SimpleITK.py"
-  #                DESTINATION ${_destination}/Python/SimpleITK )
-  #  install(FILES "${SimpleITK_DIR}/Wrapping/__init__.py"
-  #                DESTINATION ${_destination}/Python/SimpleITK )
-  #  install(FILES "${SimpleITK_DIR}/Wrapping/SimpleITK.pyc"
-  #                DESTINATION ${_destination}/Python/SimpleITK )
-  #  install(FILES "${SimpleITK_DIR}/Wrapping/__init__.pyc"
-  #                DESTINATION ${_destination}/Python/SimpleITK )
-  #  install(FILES "${SimpleITK_DIR}/Wrapping/_SimpleITK${PYTHON_LIB_SUFFIX}"
-  #                DESTINATION ${_destination}/Python/SimpleITK )
-  #  if(UNIX AND NOT APPLE)
-  #      install(CODE "file(RPATH_REMOVE
-  #                  FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/SimpleITK/_SimpleITK${PYTHON_LIB_SUFFIX}\")")
-  #  endif()
-
-  #  list(APPEND _python_libs "Python/SimpleITK/_SimpleITK${PYTHON_LIB_SUFFIX}")
-  #  list(APPEND _python_dirs "${SimpleITK_DIR}/lib")
-  #endif()
 
   # install OpenCV python wrapping
   if(MITK_USE_OpenCV)
@@ -113,10 +94,8 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
   # install the python runtime from the superbuild
   if(NOT MITK_USE_SYSTEM_PYTHON)
     if(UNIX)
-      set(_python_runtime_dir lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
       list(APPEND _python_dirs "${Python_DIR}/lib")
     else() #WIN32
-      set(_python_runtime_dir Lib)
       list(APPEND _python_dirs "${Python_DIR}/libs")
       list(APPEND _python_dirs "${Python_DIR}/bin")
     endif()
@@ -143,8 +122,31 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
       endif()
     endforeach()
   else()
-    #TODO
-    MESSAGE("deploy SimpleITK egg into installer")
+    MESSAGE("===============================================================================")
+    # Deploy the SimpleITK egg into the MITK installer
+    set(_sitk_userbase_install ${SimpleITK_DIR}/Wrapping/PythonPackage/${_python_runtime_dir}/site-packages)
+
+    # install everything in the userbase into Python/SimpleITK
+    file(GLOB_RECURSE item RELATIVE "${_sitk_userbase_install}" "${_sitk_userbase_install}/*")
+    foreach(f ${item})
+      MESSAGE("ITEM:" ${f})
+      get_filename_component(_filepath "${f}" PATH)
+      install(FILES "${_sitk_userbase_install}/${f}" DESTINATION ${_destination}/Python/SimpleITK/${_filepath})
+      MESSAGE("source: " ${_sitk_userbase_install}/${f})
+      MESSAGE("dest: " ${_destination}/Python/SimpleITK/${_filepath})
+    endforeach()
+
+    # find and add the _SimpleITK library to the dependencies
+    file(GLOB_RECURSE item RELATIVE "${_sitk_userbase_install}" "${_sitk_userbase_install}/_SimpleITK${PYTHON_LIB_SUFFIX}")
+    foreach(f ${item})
+      list(APPEND _python_libs "Python/SimpleITK/${f}")
+      MESSAGE("lib:" ${f})
+      if(UNIX AND NOT APPLE)
+          install(CODE "file(RPATH_REMOVE
+          FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/SimpleITK/${f}\")")
+      endif()
+    endforeach()
+    MESSAGE("===============================================================================")
   endif()
 
   list(REMOVE_DUPLICATES _python_dirs)

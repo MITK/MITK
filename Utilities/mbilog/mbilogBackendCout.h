@@ -51,6 +51,8 @@ namespace mbilog{
        */
       void SetFull(bool full);
 
+      virtual OutputType GetOutputType() const;
+
     private:
 
       /** \brief The formatting mode of this backend. True is full/long message formatting mode. False is short/smart

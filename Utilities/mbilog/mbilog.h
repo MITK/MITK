@@ -48,6 +48,20 @@ namespace mbilog {
     */
   void MBILOG_DLL_API DistributeToBackends(LogMessage &l);
 
+
+  /**
+   * Enable the output of a backend.
+   **/
+  void MBILOG_DLL_API EnableBackends(OutputType type);
+  /**
+   * Disable the output of a backend.
+   **/
+  void MBILOG_DLL_API DisableBackends(OutputType type);
+  /**
+   * Checks wether the output of this backend is enabled.
+   **/
+  bool MBILOG_DLL_API IsBackendEnabled(OutputType type);
+
   /**
    * \brief An object of this class simulates a std::cout stream. This means messages can be added by
    *        using the bit shift operator (<<). Should only be used by the macros defined in the file mbilog.h

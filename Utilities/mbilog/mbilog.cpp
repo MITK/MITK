@@ -15,10 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <list>
+#include <set>
 
 #include "mbilog.h"
 
 static std::list<mbilog::BackendBase*> backends;
+static std::set<mbilog::OutputType> disabledBackendTypes;
 
 
 namespace mbilog {
@@ -63,7 +65,25 @@ void mbilog::DistributeToBackends(mbilog::LogMessage &l)
   //iterate through all registered images and call the ProcessMessage() methods of the backends
   std::list<mbilog::BackendBase*>::iterator i;
   for(i = backends.begin(); i != backends.end(); i++)
-    (*i)->ProcessMessage(l);
+  {
+    if (IsBackendEnabled((*i)->GetOutputType()))
+      (*i)->ProcessMessage(l);
+  }
+}
+
+void mbilog::EnableBackends(OutputType type)
+{
+  disabledBackendTypes.erase(type);
+}
+
+void mbilog::DisableBackends(OutputType type)
+{
+  disabledBackendTypes.insert(type);
+}
+
+bool mbilog::IsBackendEnabled(OutputType type)
+{
+  return disabledBackendTypes.find(type) == disabledBackendTypes.end();
 }
 
 

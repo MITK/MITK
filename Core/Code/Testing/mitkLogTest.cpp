@@ -24,6 +24,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 /** Documentation
+ *
+ * @brief this class provides an accessible BackendCout to determine whether this backend was
+ * used to process a message or not.
+ * It is needed for the disable / enable backend test.
+ */
+class TestBackendCout : public mbilog::BackendCout
+{
+public:
+  TestBackendCout()
+  {
+    m_Called = false;
+    mbilog::BackendCout();
+  }
+
+  void ProcessMessage(const mbilog::LogMessage &l)
+  {
+    m_Called = true;
+    mbilog::BackendCout::ProcessMessage(l);
+  }
+
+  bool WasCalled()
+{
+  return m_Called;
+}
+
+private:
+
+  bool m_Called;
+};
+/** Documentation
   *
   * @brief Objects of this class can start an internal thread by calling the Start() method.
   *        The thread is then logging messages until the method Stop() is called. The class
@@ -262,6 +292,22 @@ static void  TestDefaultBackend()
     //not possible now, because we cannot unregister the mitk logging backend in the moment. If such a method is added to mbilog utility one may add this test.
     }
 
+static void TestEnableDisableBackends()
+{
+  TestBackendCout myCoutBackend = TestBackendCout();
+  mbilog::RegisterBackend(&myCoutBackend);
+
+  mbilog::DisableBackends(mbilog::Console);
+  MITK_INFO << "There should be no output!";
+  bool success = !myCoutBackend.WasCalled();
+
+  mbilog::EnableBackends(mbilog::Console);
+  MITK_INFO << "Now there should be an output.";
+  success &= myCoutBackend.WasCalled();
+
+  mbilog::UnregisterBackend(&myCoutBackend);
+  MITK_TEST_CONDITION_REQUIRED(success, "Test disable / enable logging backends.")
+}
 
 };
 
@@ -279,8 +325,11 @@ int mitkLogTest(int /* argc */, char* /*argv*/[])
   mitkLogTestClass::TestAddAndRemoveBackends();
   mitkLogTestClass::TestThreadSaveLog( false ); // false = to console
   mitkLogTestClass::TestThreadSaveLog( true );  // true = to file
+  mitkLogTestClass::TestEnableDisableBackends();
   // TODO actually test file somehow?
 
   // always end with this!
   MITK_TEST_END()
 }
+
+

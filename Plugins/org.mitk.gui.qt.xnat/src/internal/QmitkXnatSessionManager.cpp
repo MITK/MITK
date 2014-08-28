@@ -32,20 +32,7 @@ QmitkXnatSessionManager::QmitkXnatSessionManager() :
   m_PreferencesService = berry::Platform::GetServiceRegistry().
     GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
-  berry::IPreferences::Pointer nodeConnectionPref = prefService->GetSystemPreferences()->Node("/XnatConnection");
-
-  QUrl url(QString::fromStdString(nodeConnectionPref->Get("Server Address", "")));
-  url.setPort(QString::fromStdString(nodeConnectionPref->Get("Port", "")).toInt());
-
-  ctkXnatLoginProfile profile;
-  profile.setName("Default");
-  profile.setServerUrl(url);
-  profile.setUserName(QString::fromStdString(nodeConnectionPref->Get("Username", "")));
-  profile.setPassword(QString::fromStdString(nodeConnectionPref->Get("Password", "")));
-  profile.setDefault(true);
-
-  m_Session = new ctkXnatSession(profile);
+  UpdateXnatSession();
 }
 
 QmitkXnatSessionManager::~QmitkXnatSessionManager()
@@ -74,7 +61,10 @@ ctkXnatSession* QmitkXnatSessionManager::GetXnatSession()
 
 void QmitkXnatSessionManager::UpdateXnatSession()
 {
-  m_Session->deleteLater();
+  if(m_Session != 0)
+  {
+    m_Session->deleteLater();
+  }
 
   berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
   berry::IPreferences::Pointer nodeConnectionPref = prefService->GetSystemPreferences()->Node("/XnatConnection");

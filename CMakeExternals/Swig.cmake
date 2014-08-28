@@ -45,11 +45,10 @@ if(MITK_USE_SWIG)
         BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build
         INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
         PREFIX ${proj}-cmake
-        CONFIGURE_COMMAND CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
+        CONFIGURE_COMMAND <SOURCE_DIR>/./configure
+                          CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
                           LDFLAGS=${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE}
                           CXX=${CMAKE_CXX_COMPILER}${CMAKE_CXX_COMPILER_ARG1}
-                          YACC=${BISON_EXECUTABLE}
-                          <SOURCE_DIR>/./configure
                             --prefix=<INSTALL_DIR>
                             --with-pcre-prefix=${PCRE_DIR}
                             --without-octave

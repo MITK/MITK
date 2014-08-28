@@ -53,7 +53,7 @@ public:
 
 //#
 protected:
-    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
 
 protected:
     typedef std::set<mitk::NodePredicateBase::Pointer> FilterPredicatesCollection;

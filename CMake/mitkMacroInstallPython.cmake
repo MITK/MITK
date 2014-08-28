@@ -26,25 +26,25 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
   endif()
 
   # SimpleITK
-  if(MITK_USE_SimpleITK)
-    install(FILES "${SimpleITK_DIR}/Wrapping/SimpleITK.py"
-                  DESTINATION ${_destination}/Python/SimpleITK )
-    install(FILES "${SimpleITK_DIR}/Wrapping/__init__.py"
-                  DESTINATION ${_destination}/Python/SimpleITK )
-    install(FILES "${SimpleITK_DIR}/Wrapping/SimpleITK.pyc"
-                  DESTINATION ${_destination}/Python/SimpleITK )
-    install(FILES "${SimpleITK_DIR}/Wrapping/__init__.pyc"
-                  DESTINATION ${_destination}/Python/SimpleITK )
-    install(FILES "${SimpleITK_DIR}/Wrapping/_SimpleITK${PYTHON_LIB_SUFFIX}"
-                  DESTINATION ${_destination}/Python/SimpleITK )
-    if(UNIX AND NOT APPLE)
-        install(CODE "file(RPATH_REMOVE
-                    FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/SimpleITK/_SimpleITK${PYTHON_LIB_SUFFIX}\")")
-    endif()
+  #if(MITK_USE_SimpleITK)
+  #  install(FILES "${SimpleITK_DIR}/Wrapping/SimpleITK.py"
+  #                DESTINATION ${_destination}/Python/SimpleITK )
+  #  install(FILES "${SimpleITK_DIR}/Wrapping/__init__.py"
+  #                DESTINATION ${_destination}/Python/SimpleITK )
+  #  install(FILES "${SimpleITK_DIR}/Wrapping/SimpleITK.pyc"
+  #                DESTINATION ${_destination}/Python/SimpleITK )
+  #  install(FILES "${SimpleITK_DIR}/Wrapping/__init__.pyc"
+  #                DESTINATION ${_destination}/Python/SimpleITK )
+  #  install(FILES "${SimpleITK_DIR}/Wrapping/_SimpleITK${PYTHON_LIB_SUFFIX}"
+  #                DESTINATION ${_destination}/Python/SimpleITK )
+  #  if(UNIX AND NOT APPLE)
+  #      install(CODE "file(RPATH_REMOVE
+  #                  FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/SimpleITK/_SimpleITK${PYTHON_LIB_SUFFIX}\")")
+  #  endif()
 
-    list(APPEND _python_libs "Python/SimpleITK/_SimpleITK${PYTHON_LIB_SUFFIX}")
-    list(APPEND _python_dirs "${SimpleITK_DIR}/lib")
-  endif()
+  #  list(APPEND _python_libs "Python/SimpleITK/_SimpleITK${PYTHON_LIB_SUFFIX}")
+  #  list(APPEND _python_dirs "${SimpleITK_DIR}/lib")
+  #endif()
 
   # install OpenCV python wrapping
   if(MITK_USE_OpenCV)
@@ -99,7 +99,8 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
     list(APPEND _python_libs "${_target}${PYTHON_LIB_SUFFIX}")
   endforeach()
 
-  # install vtk python. This folder contains all *.py files for VTK module loading.
+  # install vtk python. This folder contains all *.py and
+  # *.pyc files for VTK module loading.
   # glob through all files, NSIS can't use directories
   file(GLOB_RECURSE item RELATIVE "${VTK_DIR}/Wrapping/Python/vtk" "${VTK_DIR}/Wrapping/Python/vtk/*.py*")
   foreach(f ${item})
@@ -131,6 +132,19 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
       get_filename_component(_filepath "${f}" PATH)
       install(FILES "${Python_DIR}/include/${f}" DESTINATION ${_destination}/Python/include/${_filepath})
     endforeach()
+
+    # add simple itk python wrapping file to the dependency list
+    file(GLOB_RECURSE item RELATIVE "${Python_DIR}/${_python_runtime_dir}" "${Python_DIR}/${_python_runtime_dir}/_SimpleITK${PYTHON_LIB_SUFFIX}")
+    foreach(f ${item})
+      list(APPEND _python_libs "Python/${_python_runtime_dir}/${f}")
+      if(UNIX AND NOT APPLE)
+          install(CODE "file(RPATH_REMOVE
+                      FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/${_python_runtime_dir}/${f}\")")
+      endif()
+    endforeach()
+  else()
+    #TODO
+    MESSAGE("deploy SimpleITK egg into installer")
   endif()
 
   list(REMOVE_DUPLICATES _python_dirs)

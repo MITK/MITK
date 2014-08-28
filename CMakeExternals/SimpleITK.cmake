@@ -59,7 +59,8 @@ if(MITK_USE_SimpleITK)
        PATCH_COMMAND ${SimpleITK_PATCH_COMMAND}
        CMAKE_ARGS
          ${ep_common_args}
-       CMAKE_CACHE_ARGS
+         -DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON
+      CMAKE_CACHE_ARGS
          ${additional_cmake_args}
          -DBUILD_SHARED_LIBS:BOOL=${_build_shared}
          -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
@@ -81,6 +82,23 @@ if(MITK_USE_SimpleITK)
       )
 
     set(SimpleITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+
+    set(_sitk_setup_py ${SimpleITK_DIR}/Wrapping/PythonPackage/setup.py)
+    # Build python distribution with easy install. If a own runtime is used
+    # embedd the egg into the site-package folder of the runtime
+    if(NOT MITK_USE_SYSTEM_PYTHON)
+      ExternalProject_Add_Step(${proj} python_install_step
+        COMMAND ${PYTHON_EXECUTABLE} ${_sitk_setup_py} install --prefix=${Python_DIR}
+        DEPENDEES build
+      )
+    # Build egg into dist folder and deploy it later into installer
+    # https://pythonhosted.org/setuptools/easy_install.html#use-the-user-option-and-customize-pythonuserbase
+    else()
+      ExternalProject_Add_Step(${proj} python_install_step
+        COMMAND PYTHONUSERBASE=${SimpleITK_DIR}/Wrapping ${PYTHON_EXECUTABLE} ${_sitk_setup_py} install --user
+        DEPENDEES build
+      )
+    endif()
 
   else()
 

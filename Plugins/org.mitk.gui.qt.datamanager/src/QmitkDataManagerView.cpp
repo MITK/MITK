@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNot.h"
+#include "mitkNodePredicateOr.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkEnumerationProperty.h"
 #include "mitkLookupTableProperty.h"
@@ -40,10 +41,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 //## Qmitk
 #include <QmitkDnDFrameWidget.h>
-#include <QmitkDataStorageTableModel.h>
 #include <QmitkIOUtil.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkCustomVariants.h>
+#include <QmitkDataStorageFilterProxyModel.h>
 #include <QmitkNumberPropertySlider.h>
 #include "src/internal/QmitkNodeTableViewKeyFilter.h"
 #include "src/internal/QmitkInfoDialog.h"
@@ -82,6 +83,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QColor>
 #include <QColorDialog>
 #include <QSizePolicy>
+#include <QSortFilterProxyModel>
 #include <QSignalMapper>
 
 #include "mitkDataNodeObject.h"
@@ -129,13 +131,18 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeModel->setParent( parent );
   m_NodeTreeModel->SetPlaceNewNodesOnTop(
       prefs->GetBool("Place new nodes on top", true) );
-  /*
-  m_NodeTreeModel->SetShowHelperObjects(
-    prefs->GetBool("Show helper objects", false) );
-  m_NodeTreeModel->SetShowNodesContainingNoData(
-    prefs->GetBool("Show nodes containing no data", false) );
-  */
+
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
+  // Prepare filters
+  m_HelperObjectFilterPredicate = mitk::NodePredicateOr::New(
+  mitk::NodePredicateProperty::New("helper object"),
+  mitk::NodePredicateProperty::New("hidden object"));
+  m_NodeWithNoDataFilterPredicate = mitk::NodePredicateData::New(0);
+
+  m_FilterModel = new QmitkDataStorageFilterProxyModel();
+  //m_FilterModel->setSourceModel(m_NodeTreeModel);
+  m_FilterModel->AddFilterPredicate(m_HelperObjectFilterPredicate);
+  m_FilterModel->AddFilterPredicate(m_NodeWithNoDataFilterPredicate);
 
   //# Tree View (experimental)
   m_NodeTreeView = new QTreeView;
@@ -451,13 +458,31 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
   if( m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() !=  prefs->GetBool("Place new nodes on top", true) )
     m_NodeTreeModel->SetPlaceNewNodesOnTop( !m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() );
 
-  /*
-  if( m_NodeTreeModel->GetShowHelperObjectsFlag()!= prefs->GetBool("Show helper objects", false) )
-    m_NodeTreeModel->SetShowHelperObjects( !m_NodeTreeModel->GetShowHelperObjectsFlag() );
+  bool hideHelperObjects = !prefs->GetBool("Show helper objects", false);
+  if (m_FilterModel->HasFilterPredicate(m_HelperObjectFilterPredicate) != hideHelperObjects)
+  {
+    if (hideHelperObjects)
+    {
+        m_FilterModel->AddFilterPredicate(m_HelperObjectFilterPredicate);
+    }
+    else
+    {
+        m_FilterModel->RemoveFilterPredicate(m_HelperObjectFilterPredicate);
+    }
+  }
+  bool hideNodesWithNoData = !prefs->GetBool("Show nodes containing no data", false);
 
-  if( m_NodeTreeModel->GetShowNodesContainingNoDataFlag()!= prefs->GetBool("Show nodes containing no data", false) )
-    m_NodeTreeModel->SetShowNodesContainingNoData( !m_NodeTreeModel->GetShowNodesContainingNoDataFlag() );
-    */
+  if (m_FilterModel->HasFilterPredicate(m_NodeWithNoDataFilterPredicate) != hideNodesWithNoData)
+  {
+    if (hideNodesWithNoData)
+    {
+        m_FilterModel->AddFilterPredicate(m_NodeWithNoDataFilterPredicate);
+    }
+    else
+    {
+        m_FilterModel->RemoveFilterPredicate(m_NodeWithNoDataFilterPredicate);
+    }
+  }
 
   m_GlobalReinitOnNodeDelete = prefs->GetBool("Call global reinit if node is deleted", true);
 
@@ -942,6 +967,11 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataNode* pare
   }
 
   QApplication::restoreOverrideCursor();
+}
+
+void QmitkDataManagerView::NodeChanged(const mitk::DataNode* node)
+{
+    m_FilterModel->invalidate();
 }
 
 QItemSelectionModel *QmitkDataManagerView::GetDataNodeSelectionModel() const

@@ -66,12 +66,12 @@ mitk::PythonService::PythonService()
       // we have an installer or development environment
       if ( programmDir.exists() ) {
         // runtime directory used in installers
-        pythonCommand.append( QString("import sys\n") );
+        pythonCommand.append( QString("import site, sys\n") );
         pythonCommand.append( QString("sys.path.append('')\n") );
         pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
         pythonCommand.append( QString("sys.path.append('%1/Python')").arg(programPath.c_str()) );
 #ifndef USE_MITK_BUILTIN_PYTHON
-        pythonCommand.append( QString("\nsys.path.append('%1/Python/SimpleITK')").arg(programPath.c_str()) );
+        pythonCommand.append( QString("\nsite.addsitedir('%1/Python/SimpleITK')").arg(programPath.c_str()) );
 #endif
       } else {
         pythonCommand.append(PYTHONPATH_COMMAND);

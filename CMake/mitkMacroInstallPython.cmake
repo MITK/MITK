@@ -11,6 +11,10 @@
 #!
 macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
 
+  # find package sets the python version numbers
+  find_package(PythonLibs REQUIRED)
+  find_package(PythonInterp REQUIRED)
+
   # set the destination bundle
   set(_destination bin)
   if(APPLE)
@@ -122,31 +126,25 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
       endif()
     endforeach()
   else()
-    MESSAGE("===============================================================================")
     # Deploy the SimpleITK egg into the MITK installer
     set(_sitk_userbase_install ${SimpleITK_DIR}/Wrapping/PythonPackage/${_python_runtime_dir}/site-packages)
 
     # install everything in the userbase into Python/SimpleITK
     file(GLOB_RECURSE item RELATIVE "${_sitk_userbase_install}" "${_sitk_userbase_install}/*")
     foreach(f ${item})
-      MESSAGE("ITEM:" ${f})
       get_filename_component(_filepath "${f}" PATH)
       install(FILES "${_sitk_userbase_install}/${f}" DESTINATION ${_destination}/Python/SimpleITK/${_filepath})
-      MESSAGE("source: " ${_sitk_userbase_install}/${f})
-      MESSAGE("dest: " ${_destination}/Python/SimpleITK/${_filepath})
     endforeach()
 
     # find and add the _SimpleITK library to the dependencies
     file(GLOB_RECURSE item RELATIVE "${_sitk_userbase_install}" "${_sitk_userbase_install}/_SimpleITK${PYTHON_LIB_SUFFIX}")
     foreach(f ${item})
       list(APPEND _python_libs "Python/SimpleITK/${f}")
-      MESSAGE("lib:" ${f})
       if(UNIX AND NOT APPLE)
           install(CODE "file(RPATH_REMOVE
           FILE \"\${CMAKE_INSTALL_PREFIX}/bin/Python/SimpleITK/${f}\")")
       endif()
     endforeach()
-    MESSAGE("===============================================================================")
   endif()
 
   list(REMOVE_DUPLICATES _python_dirs)

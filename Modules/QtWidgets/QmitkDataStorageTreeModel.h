@@ -46,15 +46,12 @@ public:
 public:
   QmitkDataStorageTreeModel(mitk::DataStorage* _DataStorage
                             , bool _PlaceNewNodesOnTop=false
-                            , bool _ShowHelperObjects=false
-                            , bool _ShowNodesContainingNoData=false
                             , QObject* parent = 0);
   ~QmitkDataStorageTreeModel();
 
 //# GETTER
 public:
 
-  typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
   ///
   /// Get node at a specific model index.
   /// This function is used to get a node from a QModelIndex
@@ -75,22 +72,6 @@ public:
   bool GetPlaceNewNodesOnTopFlag()
   {
     return m_PlaceNewNodesOnTop;
-  }
-
-  ///
-  /// Get the helper object visibility flag
-  ///
-  bool GetShowHelperObjectsFlag()
-  {
-    return m_ShowHelperObjects;
-  }
-
-  ///
-  /// Get the visibility flag for showing nodes that contain no data
-  ///
-  bool GetShowNodesContainingNoDataFlag()
-  {
-    return m_ShowNodesContainingNoData;
   }
 
   ///
@@ -151,21 +132,6 @@ public:
   /// \return an index for the given datatreenode in the tree. If the node is not found
   ///
   QModelIndex GetIndex(const mitk::DataNode*) const;
-
-  ///
-  /// Show or hide helper objects
-  ///
-  void SetShowHelperObjects(bool _ShowHelperObjects);
-
-  ///
-  /// Show or hide objects that contain no data
-  ///
-  void SetShowNodesContainingNoData(bool _ShowNodesContainingNoData);
-
-  ///
-  /// Update the visibility of data nodes according to the preference settings
-  ///
-  void UpdateNodeVisibility();
 
 //# MISC
 protected:
@@ -266,7 +232,7 @@ protected:
   ///
   void TreeToNodeSet(TreeItem* parent, QList<mitk::DataNode::Pointer> &vec) const;
   ///
-  /// Update Tree Model according to predicates
+  /// Update Tree Model 
   ///
   void Update();
 
@@ -275,11 +241,7 @@ protected:
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::Pointer m_Predicate;
   bool m_PlaceNewNodesOnTop;
-  bool m_ShowHelperObjects;
-  bool m_ShowNodesContainingNoData;
   TreeItem* m_Root;
-
-  NodeTagMapType  m_HelperObjectObserverTags;
 
 private:
   void AddNodeInternal(const mitk::DataNode*);

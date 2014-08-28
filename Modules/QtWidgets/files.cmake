@@ -28,6 +28,7 @@ QmitkServiceListWidget.cpp
 QmitkSliderLevelWindowWidget.cpp
 QmitkStdMultiWidget.cpp
 QmitkMouseModeSwitcher.cpp
+QmitkDataStorageFilterProxyModel.cpp
 )
 
 set(MOC_H_FILES

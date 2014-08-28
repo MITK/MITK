@@ -45,7 +45,7 @@ private:
 
     typedef itk::Statistics::Histogram<MeasurementType> HistogramType;
 
-    HistogramType::Pointer m_UGHistogram;
+    HistogramType::ConstPointer m_UGHistogram;
 
     //UnstructuredGridHistogram::Pointer m_UGHistogram;
 

@@ -52,11 +52,11 @@ namespace mbilog {
   /**
    * Enable the output of a backend.
    **/
-  bool MBILOG_DLL_API EnableBackends(OutputType type);
+  void MBILOG_DLL_API EnableBackends(OutputType type);
   /**
    * Disable the output of a backend.
    **/
-  bool MBILOG_DLL_API DisableBackends(OutputType type);
+  void MBILOG_DLL_API DisableBackends(OutputType type);
   /**
    * Checks wether the output of this backend is enabled.
    **/
@@ -234,9 +234,6 @@ namespace mbilog {
 #define MBI_WARN mbilog::PseudoStream(mbilog::Warn,__FILE__,__LINE__,__FUNCTION__)
 #define MBI_ERROR mbilog::PseudoStream(mbilog::Error,__FILE__,__LINE__,__FUNCTION__)
 #define MBI_FATAL mbilog::PseudoStream(mbilog::Fatal,__FILE__,__LINE__,__FUNCTION__)
-
-#define MBILOG_DISABLE_BACKENDS(type) static bool disabled = mbilog::DisableBackends(type);
-#define MBILOG_ENABLE_BACKENDS(type) static bool enabled = mbilog::EnableBackends(type);
 
 /** \brief Macro for the debug messages. The messages are disabled if the cmake variable MBILOG_ENABLE_DEBUG is false. */
 #ifdef MBILOG_ENABLE_DEBUG

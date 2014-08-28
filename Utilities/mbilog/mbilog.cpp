@@ -71,12 +71,12 @@ void mbilog::DistributeToBackends(mbilog::LogMessage &l)
   }
 }
 
-bool mbilog::EnableBackends(OutputType type)
+void mbilog::EnableBackends(OutputType type)
 {
   disabledBackendTypes.erase(type);
 }
 
-bool mbilog::DisableBackends(OutputType type)
+void mbilog::DisableBackends(OutputType type)
 {
   disabledBackendTypes.insert(type);
 }

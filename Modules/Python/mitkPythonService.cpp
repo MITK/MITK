@@ -56,7 +56,11 @@ mitk::PythonService::PythonService()
     {
 //TODO a better way to do this
 #ifndef WIN32
-      dlopen("libpython2.7.so", RTLD_NOW | RTLD_NOLOAD | RTLD_GLOBAL);
+      dlerror();
+      if(dlopen("libpython2.7.so", RTLD_NOW | RTLD_GLOBAL) == 0 )
+      {
+        mitkThrow() << "Python runtime could not be loaded: " << dlerror();
+      }
 #endif
 
       std::string programPath = mitk::IOUtil::GetProgramPath();

@@ -9,12 +9,14 @@
 #!               to the installed libs.
 #! _app_bundle App bundle name in case of a Apple bundle.
 #!
-macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
+function(mitkFunctionInstallPython _python_libs_out _python_dirs_out _app_bundle)
 
   # find package sets the python version numbers
   find_package(PythonLibs REQUIRED)
   find_package(PythonInterp REQUIRED)
 
+  set(_python_libs )
+  set(_python_dirs )
   # set the destination bundle
   set(_destination bin)
   if(APPLE)
@@ -147,5 +149,8 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
   endif()
 
   list(REMOVE_DUPLICATES _python_dirs)
-endMacro()
+
+  set(${_python_libs_out} ${_python_libs} PARENT_SCOPE)
+  set(${_python_dirs_out} ${_python_dirs} PARENT_SCOPE)
+endfunction()
 

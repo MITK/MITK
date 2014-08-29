@@ -226,14 +226,9 @@ if(MITK_USE_Python)
   if(MITK_USE_SYSTEM_PYTHON)
     FIND_PACKAGE(PythonLibs REQUIRED)
     FIND_PACKAGE(PythonInterp REQUIRED)
-  endif()
-endif()
-
-#TODO is there a better place for this options
-if(MITK_USE_SimpleITK)
-  set(MITK_USE_SWIG 1)
-  if(UNIX)
-    set(MITK_USE_PCRE 1)
+  else()
+    FIND_PACKAGE(PythonLibs)
+    FIND_PACKAGE(PythonInterp)
   endif()
 endif()
 

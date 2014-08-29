@@ -9,7 +9,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
 
   if(NOT DEFINED Python_DIR)
     set(proj Python)
-    set(proj_DEPENDENCIES )
+    set(proj_DEPENDENCIES ZLIB)
     set(Python_DEPENDS ${proj})
 
     set(MITK_PYTHON_MAJOR_VERSION 2)
@@ -110,14 +110,15 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DBUILTIN_TKINTER:BOOL=ON
         -DBUILTIN_UNICODEDATA:BOOL=ON
         -DBUILTIN_WINREG:BOOL=ON
-        -DBUILTIN_ZLIB:BOOL=ON
+        -DBUILTIN_ZLIB:BOOL=OFF
+        -DUSE_SYSTEM_ZLIB:BOOL=ON
         )
 
     # CMake build environment for python from:
     # https://github.com/davidsansome/python-cmake-buildsystem
     ExternalProject_Add(${proj}
-      URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/python-cmake-buildsystem.tar.gz"
-      URL_MD5 "171090922892acdaf1a155e22765d72d"
+      URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/python-cmake-buildsystem-47845c55.tar.gz"
+      URL_MD5 "6e49d1ed93a5a0fff7621430c163d2d1"
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       PREFIX ${proj}-cmake
       BINARY_DIR ${proj}-build
@@ -131,8 +132,10 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         #-DBUILD_TESTING:BOOL=OFF
         -DBUILD_SHARED:BOOL=ON
         -DBUILD_STATIC:BOOL=OFF
-        -DUSE_SYSTEM_LIBRARIES:BOOL=ON
+        -DUSE_SYSTEM_LIBRARIES:BOOL=OFF
         ${additional_cmake_cache_args}
+        -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
+        -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
       DEPENDS
         Python-src ${${proj}_DEPENDENCIES}
     )

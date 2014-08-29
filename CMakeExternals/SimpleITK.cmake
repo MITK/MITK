@@ -58,7 +58,6 @@ if(MITK_USE_SimpleITK)
     ExternalProject_Add(${proj}
        URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/SimpleITK-0.8.0.tar.gz"
        URL_MD5 "d98f2e5442228e324ef62111febc7446"
-       #GIT_TAG "493f15f5cfc620413d0aa7bb705ffe6d038a41b5"
        SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
        BINARY_DIR ${proj}-build
        PREFIX ${proj}-cmake

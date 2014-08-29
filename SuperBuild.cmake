@@ -70,6 +70,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(external_projects
+  ZLIB
   Python
   Numpy
   tinyxml
@@ -117,6 +118,17 @@ endif()
 
 if(MITK_USE_SOFA)
   set(MITK_USE_GLUT 1)
+endif()
+
+if(NOT MITK_USE_SYSTEM_PYTHON)
+  set(MITK_USE_ZLIB 1)
+endif()
+
+if(MITK_USE_SimpleITK OR MITK_USE_Python)
+  set(MITK_USE_SWIG 1)
+  if(UNIX)
+    set(MITK_USE_PCRE 1)
+  endif()
 endif()
 
 # A list of "nice" external projects, playing well together with CMake

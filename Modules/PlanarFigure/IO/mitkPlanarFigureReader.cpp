@@ -259,6 +259,16 @@ void mitk::PlanarFigureReader::GenerateData()
     // without messing up the interaction (PF-Interactor needs this property.
     planarFigure->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
 
+    // Which features (length or circumference etc) a figure has is decided by whether it is closed or not
+    // the function SetClosed has to be called in case of PlanarPolygons to ensure they hold the correct feature
+    PlanarPolygon* planarPolygon = dynamic_cast<PlanarPolygon*> (planarFigure.GetPointer());
+    if (planarPolygon != NULL)
+    {
+      bool isClosed = false;
+      planarFigure->GetPropertyList()->GetBoolProperty( "closed", isClosed);
+      planarPolygon->SetClosed(isClosed);
+    }
+
 
     // Read geometry of containing plane
     TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");

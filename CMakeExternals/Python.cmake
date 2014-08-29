@@ -113,7 +113,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DBUILTIN_ZLIB:BOOL=ON
         )
 
-    # CMake build environment for python
+    # CMake build environment for python from:
+    # https://github.com/davidsansome/python-cmake-buildsystem
     ExternalProject_Add(${proj}
       URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/python-cmake-buildsystem.tar.gz"
       URL_MD5 "171090922892acdaf1a155e22765d72d"

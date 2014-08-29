@@ -24,10 +24,12 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
   if(UNIX)
     # apple and linux only supports .so as loadable extension
     set(PYTHON_LIB_SUFFIX .so)
+    set(_py_include_postfix python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/)
     set(_python_runtime_dir lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
   else(WIN32)
     # windows only supports pyd as loadable extension
     set(PYTHON_LIB_SUFFIX .pyd)
+    set(_py_include_postfix )
     set(_python_runtime_dir Lib)
   endif()
 
@@ -110,13 +112,10 @@ macro(mitkMacroInstallPython _python_libs _python_dirs _app_bundle)
       install(FILES "${Python_DIR}/${_python_runtime_dir}/${f}" DESTINATION ${_destination}/Python/${_python_runtime_dir}/${_filepath})
     endforeach()
 
-    file(GLOB_RECURSE item RELATIVE "${Python_DIR}/include" "${Python_DIR}/include/*")
-    foreach(f ${item})
-      get_filename_component(_filepath "${f}" PATH)
-      install(FILES "${Python_DIR}/include/${f}" DESTINATION ${_destination}/Python/include/${_filepath})
-    endforeach()
+    # config will by read out at runtime
+    install(FILES "${Python_DIR}/include/${_py_include_postfix}pyconfig.h" DESTINATION ${_destination}/Python/include/${_py_include_postfix})
 
-    # add simple itk python wrapping file to the dependency list
+    # add simple itk python wrapping file to the dependency list to resolve linked libraries
     file(GLOB_RECURSE item RELATIVE "${Python_DIR}/${_python_runtime_dir}" "${Python_DIR}/${_python_runtime_dir}/_SimpleITK${PYTHON_LIB_SUFFIX}")
     foreach(f ${item})
       list(APPEND _python_libs "Python/${_python_runtime_dir}/${f}")

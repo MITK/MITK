@@ -9,7 +9,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
 
   if(NOT DEFINED Python_DIR)
     set(proj Python)
-    set(proj_DEPENDENCIES ZLIB)
+    set(Python_DEPENDENCIES ZLIB Python-src)
     set(Python_DEPENDS ${proj})
 
     set(MITK_PYTHON_MAJOR_VERSION 2)
@@ -137,7 +137,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
         -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
       DEPENDS
-        Python-src ${${proj}_DEPENDENCIES}
+        ${Python_DEPENDENCIES}
     )
 
     set(Python_DIR "${CMAKE_BINARY_DIR}/${proj}-install")

@@ -13,30 +13,9 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include <mitkImage.h>
-#include <mitkSurface.h>
-#include <mitkIOUtil.h>
-#include <mitkTestingMacros.h>
-#include <mitkTestFixture.h>
-
-#include <usModuleContext.h>
-#include <usGetModuleContext.h>
-#include <usServiceReference.h>
-#include <usModuleRegistry.h>
-#include <usModule.h>
-#include <usServiceReference.h>
-#include <mitkPythonService.h>
-#include <mitkIPythonService.h>
-#include <vtkPolyData.h>
-#include <QmitkPythonSnippets.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
-
-#include <vtkSmartPointer.h>
-// vtk cone sample snippet
-#include <vtkConeSource.h>
-// vtk decimate pro snippet
-#include <vtkDecimatePro.h>
+#include <mitkCommonPythonTest.h>
 
 #include "SimpleITK.h"
 
@@ -171,49 +150,15 @@ mitk::Image::Pointer mitk::SimpleItkToMitkImage( sitk::Image& sitkImage )
 }
 
 
-class mitkPythonWrappingTestSuite : public mitk::TestFixture
+class mitkSimpleItkPythonTestSuite : public mitk::CommonPythonTestSuite
 {
-  CPPUNIT_TEST_SUITE(mitkPythonWrappingTestSuite);
+  CPPUNIT_TEST_SUITE(mitkSimpleItkPythonTestSuite);
   MITK_TEST(testSimpleItkImageTransfer);
-  MITK_TEST(testCVImageTransfer);
-  MITK_TEST(testSurfaceTransfer);
-  MITK_TEST(testVtkCreateConePythonSnippet);
-  MITK_TEST(testVtkDecimateProPythonSnippet);
   MITK_TEST(testSimpleITKMedianFilterSnippet);
-  MITK_TEST(testOpenCVMedianFilter);
   CPPUNIT_TEST_SUITE_END();
 
-private:
-    mitk::PythonService* m_PythonService;
-    mitk::Image::Pointer m_Image;
-    mitk::Image::Pointer m_Image2D;
-    mitk::Surface::Pointer m_Surface;
-    QMap<QString, QString> m_Snippets;
 
 public:
-
-  void setUp()
-  {
-    //get the context of the python module
-    us::Module* module = us::ModuleRegistry::GetModule("MitkPython");
-    us::ModuleContext* context = module->GetModuleContext();
-    //get the service which is generated in the PythonModuleActivator
-    us::ServiceReference<mitk::IPythonService> serviceRef = context->GetServiceReference<mitk::IPythonService>();
-    m_PythonService = dynamic_cast<mitk::PythonService*>( context->GetService(serviceRef) );
-
-    m_Image = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
-    m_Image2D = mitk::IOUtil::LoadImage(GetTestDataFilePath("Png2D-bw.png"));
-    m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("binary.stl"));
-
-    QmitkPythonSnippets::LoadStringMap(QmitkPythonSnippets::DEFAULT_SNIPPET_FILE,m_Snippets);
-  }
-
-  void tearDown()
-  {
-    m_Image = NULL;
-    m_Image2D = NULL;
-    m_Surface = NULL;
-  }
 
   void testSimpleItkImageTransfer()
   {
@@ -230,79 +175,6 @@ public:
                             mitk::Equal(*pythonImage.GetPointer(),*m_Image.GetPointer(), mitk::eps,true) );
   }
 
-  void testCVImageTransfer()
-  {
-    std::string varName("mitkImage");
-    CPPUNIT_ASSERT_MESSAGE ( "Is OpenCV Python Wrapping available?",
-          m_PythonService->IsOpenCvPythonWrappingAvailable() == true );
-
-    CPPUNIT_ASSERT_MESSAGE( "Valid image copied to python import should return true.",
-          m_PythonService->CopyToPythonAsCvImage( m_Image2D, varName) == true );
-
-    mitk::Image::Pointer pythonImage = m_PythonService->CopyCvImageFromPython(varName);
-
-    // todo pixeltypes do not match, cv is changing it
-    //CPPUNIT_ASSERT_MESSAGE( "Compare if images are equal after transfer.",
-    //                        mitk::Equal(pythonImage,m_Image2D) );
-  }
-
-  void testSurfaceTransfer()
-  {
-    std::string varName("mitkSurface");
-    CPPUNIT_ASSERT_MESSAGE ( "Is VTK Python Wrapping available?", m_PythonService->IsVtkPythonWrappingAvailable() == true );
-
-    CPPUNIT_ASSERT_MESSAGE( "Valid surface copied to python import should return true.",
-          m_PythonService->CopyToPythonAsVtkPolyData( m_Surface, varName) == true );
-
-    mitk::Surface::Pointer pythonSurface = m_PythonService->CopyVtkPolyDataFromPython(varName);
-
-    CPPUNIT_ASSERT_MESSAGE( "Compare if surfaces are equal after transfer.", mitk::Equal(*pythonSurface.GetPointer(),*m_Surface.GetPointer(),mitk::eps,true) );
-  }
-
-  void testVtkCreateConePythonSnippet()
-  {
-    // cone in cpp
-    mitk::Surface::Pointer mitkSurface = mitk::Surface::New();
-    vtkSmartPointer<vtkConeSource> coneSrc = vtkSmartPointer<vtkConeSource>::New();
-    coneSrc->SetResolution(60);
-    coneSrc->SetCenter(-2,0,0);
-    coneSrc->Update();
-    mitkSurface->SetVtkPolyData(coneSrc->GetOutput());
-
-    // run python code
-    CPPUNIT_ASSERT_MESSAGE ( "Is VTK Python Wrapping available?", m_PythonService->IsVtkPythonWrappingAvailable() == true );
-
-    m_PythonService->Execute( m_Snippets["vtk: create cone"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
-    CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
-
-    mitk::Surface::Pointer pythonSurface = m_PythonService->CopyVtkPolyDataFromPython("cone");
-
-    CPPUNIT_ASSERT_MESSAGE( "Compare if cones are equal.", mitk::Equal(*pythonSurface.GetPointer(), *mitkSurface.GetPointer(), mitk::eps,true) );
-  }
-
-  void testVtkDecimateProPythonSnippet()
-  {
-    // decimate pro in cpp
-    mitk::Surface::Pointer mitkSurface = mitk::Surface::New();
-    vtkSmartPointer<vtkDecimatePro> deci = vtkSmartPointer<vtkDecimatePro>::New();
-    deci->SetInputData(m_Surface->GetVtkPolyData());
-    deci->SetTargetReduction(0.9);
-    deci->PreserveTopologyOn();
-    deci->Update();
-    mitkSurface->SetVtkPolyData(deci->GetOutput());
-
-    // decimate pro in python
-    CPPUNIT_ASSERT_MESSAGE ( "Is VTK Python Wrapping available?", m_PythonService->IsVtkPythonWrappingAvailable() == true );
-
-    CPPUNIT_ASSERT_MESSAGE( "Valid surface copied to python import should return true.", m_PythonService->CopyToPythonAsVtkPolyData( m_Surface, "mitkSurface") == true );
-
-    m_PythonService->Execute( m_Snippets["vtk.vtkDecimatePro"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
-    CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
-
-    mitk::Surface::Pointer pythonSurface = m_PythonService->CopyVtkPolyDataFromPython("mitkSurface_new");
-
-    CPPUNIT_ASSERT_MESSAGE( "Compare if surfaces are equal.", mitk::Equal(*pythonSurface.GetPointer(), *mitkSurface.GetPointer(), mitk::eps,true) );
-  }
 
   void testSimpleITKMedianFilterSnippet()
   {
@@ -324,19 +196,6 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE( "Compare if images are equal.", mitk::Equal(*pythonImage.GetPointer(), *mitkImage.GetPointer(),mitk::eps,true) );
   }
-
-  //TODO opencv median filter, add cpp test code
-  void testOpenCVMedianFilter()
-  {
-    // simple itk median filter in python
-    CPPUNIT_ASSERT_MESSAGE ( "Is OpenCV Python Wrapping available?", m_PythonService->IsOpenCvPythonWrappingAvailable() == true );
-
-    CPPUNIT_ASSERT_MESSAGE( "Valid image copied to python import should return true.", m_PythonService->CopyToPythonAsCvImage(m_Image2D, "mitkImage") == true );
-
-    m_PythonService->Execute( m_Snippets["opencv median filter"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
-
-    CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
-  }
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkPythonWrapping)
+MITK_TEST_SUITE_REGISTRATION(mitkSimpleItkPython)

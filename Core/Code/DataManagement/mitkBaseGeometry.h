@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkScalableAffineTransform.h"
 #include <itkIndex.h>
 
+#include <vtkTransform.h>
+
 class vtkMatrix4x4;
 class vtkMatrixToLinearTransform;
 class vtkLinearTransform;
@@ -560,6 +562,8 @@ namespace mitk {
 
     bool IsIndexToWorldTransformNull() const;
 
+    void SetVtkMatrixDeepCopy(vtkTransform *vtktransform);
+
 
   private:
 
@@ -601,14 +605,6 @@ namespace mitk {
     mutable TransformType::Pointer m_InvertedTransform;
 
     mutable unsigned long m_IndexToWorldTransformLastModified;
-
-//    /**
-//     * The Spacing value is only represented as a member here to be able
-//     * to keep the old interface with return by value for GetSpacing().
-//     * It will not necessarily hold the correct value (only, when immediately before GetSpacing() method was
-//     * callsed).
-//     */
-//    mitk::Vector3D m_SpacingDoNotUse;
 
     bool m_ImageGeometry;
 

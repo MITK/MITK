@@ -337,7 +337,7 @@ public:
 
     mitk::AffineTransform3D::Pointer testTransfrom = dummy->GetIndexToWorldTransform();
 
-    mitk::Vector3D modifiedPoint = anotherPoint * 2;
+    mitk::Vector3D modifiedPoint = anotherPoint.GetVectorFromOrigin() * 2.;
 
     testTransfrom->SetOffset(modifiedPoint);
 

@@ -26,7 +26,7 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class BallModel : public DiffusionSignalModel< ScalarType >
 {
 public:
@@ -44,6 +44,7 @@ public:
     ScalarType SimulateMeasurement(unsigned int dir);
 
     void SetDiffusivity(ScalarType D) { m_Diffusivity = D; }
+    ScalarType GetDiffusivity() { return m_Diffusivity; }
     void SetBvalue(ScalarType bValue) { m_BValue = bValue; }
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }

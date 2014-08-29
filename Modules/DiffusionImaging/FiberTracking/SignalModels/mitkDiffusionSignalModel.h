@@ -31,7 +31,7 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class DiffusionSignalModel
 {
 public:
@@ -67,6 +67,7 @@ public:
         m_RandGen->SetSeed(s);
     }
 
+    unsigned int                m_CompartmentId;        ///< GUI flag. Which compartment is this model assigned to?
 
 protected:
 

@@ -106,6 +106,22 @@ QmitkFiberfoxView::QmitkFiberfoxView()
     connect(&m_Thread, SIGNAL(finished()), this, SLOT(AfterThread()));
     connect(&m_Thread, SIGNAL(terminated()), this, SLOT(AfterThread()));
     m_SimulationTimer = new QTimer(this);
+
+    m_StickModel1.m_CompartmentId = 1;
+    m_StickModel2.m_CompartmentId = 2;
+    m_TensorModel1.m_CompartmentId = 1;
+    m_TensorModel2.m_CompartmentId = 2;
+    m_ZeppelinModel1.m_CompartmentId = 1;
+    m_ZeppelinModel2.m_CompartmentId = 2;
+    m_BallModel1.m_CompartmentId = 3;
+    m_BallModel2.m_CompartmentId = 4;
+    m_AstrosticksModel1.m_CompartmentId = 3;
+    m_AstrosticksModel2.m_CompartmentId = 4;
+    m_DotModel1.m_CompartmentId = 3;
+    m_DotModel2.m_CompartmentId = 4;
+    m_PrototypeModel1.m_CompartmentId = 1;
+    m_PrototypeModel3.m_CompartmentId = 3;
+    m_PrototypeModel4.m_CompartmentId = 4;
 }
 
 void QmitkFiberfoxView::KillThread()
@@ -403,6 +419,8 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
 {
     FiberfoxParameters< ScalarType > parameters;
     parameters.m_OutputPath = "";
+    parameters.m_FiberGenerationParameters.m_AdvancedOptions = m_Controls->m_AdvancedOptionsBox->isChecked();
+    parameters.m_AdvancedOptions = m_Controls->m_AdvancedOptionsBox_2->isChecked();
 
     string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
     if (outputPath.compare("-")!=0)
@@ -468,6 +486,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_ArtifactModelString += "_RELAX";
 
     // N/2 ghosts
+    parameters.m_DoAddGhosts = m_Controls->m_AddGhosts->isChecked();
     if (m_Controls->m_AddGhosts->isChecked())
     {
         parameters.m_SimulateKspaceAcquisition = true;
@@ -479,6 +498,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_KspaceLineOffset = 0;
 
     // Aliasing
+    parameters.m_DoAddAliasing = m_Controls->m_AddAliasing->isChecked();
     if (m_Controls->m_AddAliasing->isChecked())
     {
         parameters.m_SimulateKspaceAcquisition = true;
@@ -488,6 +508,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     // Spikes
+    parameters.m_DoAddSpikes = m_Controls->m_AddSpikes->isChecked();
     if (m_Controls->m_AddSpikes->isChecked())
     {
         parameters.m_SimulateKspaceAcquisition = true;
@@ -508,6 +529,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     // add distortions
+    parameters.m_DoAddDistortions = m_Controls->m_AddDistortions->isChecked();
     if (m_Controls->m_AddDistortions->isChecked() && m_Controls->m_FrequencyMapBox->GetSelectedNode().IsNotNull())
     {
         mitk::DataNode::Pointer fMapNode = m_Controls->m_FrequencyMapBox->GetSelectedNode();
@@ -530,6 +552,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     parameters.m_EddyStrength = 0;
+    parameters.m_DoAddEddyCurrents = m_Controls->m_AddEddy->isChecked();
     if (m_Controls->m_AddEddy->isChecked())
     {
         parameters.m_EddyStrength = m_Controls->m_EddyGradientStrength->value();
@@ -575,6 +598,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     // Noise
+    parameters.m_DoAddNoise = m_Controls->m_AddNoise->isChecked();
     if (m_Controls->m_AddNoise->isChecked())
     {
         double noiseVariance = m_Controls->m_NoiseLevel->value();
@@ -787,6 +811,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp4VolumeFraction->GetSelectedNode();
         if (volumeNode.IsNull())
         {
+            QMessageBox::information( NULL, "Information", "No volume fraction image selected! Second extra-axonal compartment has been disabled for this simultation.");
             MITK_WARN << "No volume fraction image selected! Second extra-axonal compartment has been disabled.";
         }
         else
@@ -822,20 +847,20 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             scaler->Update();
             comp4VolumeImage = scaler->GetOutput();
 
-//            itk::ImageFileWriter< ItkDoubleImgType >::Pointer wr = itk::ImageFileWriter< ItkDoubleImgType >::New();
-//            wr->SetInput(comp4VolumeImage);
-//            wr->SetFileName("/local/comp4.nrrd");
-//            wr->Update();
+            //            itk::ImageFileWriter< ItkDoubleImgType >::Pointer wr = itk::ImageFileWriter< ItkDoubleImgType >::New();
+            //            wr->SetInput(comp4VolumeImage);
+            //            wr->SetFileName("/local/comp4.nrrd");
+            //            wr->Update();
 
-//            if (max>1 || min<0) // are volume fractions between 0 and 1?
-//            {
-//                itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::New();
-//                rescaler->SetInput(0, comp4VolumeImage);
-//                rescaler->SetOutputMaximum(1);
-//                rescaler->SetOutputMinimum(0);
-//                rescaler->Update();
-//                comp4VolumeImage = rescaler->GetOutput();
-//            }
+            //            if (max>1 || min<0) // are volume fractions between 0 and 1?
+            //            {
+            //                itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::New();
+            //                rescaler->SetInput(0, comp4VolumeImage);
+            //                rescaler->SetOutputMaximum(1);
+            //                rescaler->SetOutputMinimum(0);
+            //                rescaler->Update();
+            //                comp4VolumeImage = rescaler->GetOutput();
+            //            }
 
             itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
             inverter->SetMaximum(1.0);
@@ -946,12 +971,33 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     parameters.m_ResultNode->AddProperty("Fiberfox.Relaxation", BoolProperty::New(parameters.m_DoSimulateRelaxation));
     parameters.m_ResultNode->AddProperty("binary", BoolProperty::New(false));
 
+    parameters.m_FiberGenerationParameters.m_RealTimeFibers = m_Controls->m_RealTimeFibers->isChecked();
+    parameters.m_FiberGenerationParameters.m_AdvancedOptions = m_Controls->m_AdvancedOptionsBox->isChecked();
+    parameters.m_FiberGenerationParameters.m_Distribution = m_Controls->m_DistributionBox->currentIndex();
+    parameters.m_FiberGenerationParameters.m_Variance = m_Controls->m_VarianceBox->value();
+    parameters.m_FiberGenerationParameters.m_FiberDensity = m_Controls->m_FiberDensityBox->value();
+    parameters.m_FiberGenerationParameters.m_IncludeFiducials = m_Controls->m_IncludeFiducials->isChecked();
+    parameters.m_FiberGenerationParameters.m_ConstantRadius = m_Controls->m_ConstantRadiusBox->isChecked();
+    parameters.m_FiberGenerationParameters.m_Sampling = m_Controls->m_FiberSamplingBox->value();
+    parameters.m_FiberGenerationParameters.m_Tension = m_Controls->m_TensionBox->value();
+    parameters.m_FiberGenerationParameters.m_Continuity = m_Controls->m_ContinuityBox->value();
+    parameters.m_FiberGenerationParameters.m_Bias = m_Controls->m_BiasBox->value();
+    parameters.m_FiberGenerationParameters.m_Rotation[0] = m_Controls->m_XrotBox->value();
+    parameters.m_FiberGenerationParameters.m_Rotation[1] = m_Controls->m_YrotBox->value();
+    parameters.m_FiberGenerationParameters.m_Rotation[2] = m_Controls->m_ZrotBox->value();
+    parameters.m_FiberGenerationParameters.m_Translation[0] = m_Controls->m_XtransBox->value();
+    parameters.m_FiberGenerationParameters.m_Translation[1] = m_Controls->m_YtransBox->value();
+    parameters.m_FiberGenerationParameters.m_Translation[2] = m_Controls->m_ZtransBox->value();
+    parameters.m_FiberGenerationParameters.m_Scale[0] = m_Controls->m_XscaleBox->value();
+    parameters.m_FiberGenerationParameters.m_Scale[1] = m_Controls->m_YscaleBox->value();
+    parameters.m_FiberGenerationParameters.m_Scale[2] = m_Controls->m_ZscaleBox->value();
+
     return parameters;
 }
 
 void QmitkFiberfoxView::SaveParameters()
 {
-    FiberfoxParameters<double> ffParamaters = UpdateImageParameters<double>();
+    FiberfoxParameters<> ffParamaters = UpdateImageParameters<double>();
 
     QString filename = QFileDialog::getSaveFileName(
                 0,
@@ -959,135 +1005,8 @@ void QmitkFiberfoxView::SaveParameters()
                 m_ParameterFile,
                 tr("Fiberfox Parameters (*.ffp)") );
 
-    if(filename.isEmpty() || filename.isNull())
-        return;
-    if(!filename.endsWith(".ffp"))
-        filename += ".ffp";
-
+    ffParamaters.SaveParameters(filename.toStdString());
     m_ParameterFile = filename;
-
-    boost::property_tree::ptree parameters;
-
-    // fiber generation parameters
-    parameters.put("fiberfox.fibers.realtime", m_Controls->m_RealTimeFibers->isChecked());
-    parameters.put("fiberfox.fibers.showadvanced", m_Controls->m_AdvancedOptionsBox->isChecked());
-    parameters.put("fiberfox.fibers.distribution", m_Controls->m_DistributionBox->currentIndex());
-    parameters.put("fiberfox.fibers.variance", m_Controls->m_VarianceBox->value());
-    parameters.put("fiberfox.fibers.density", m_Controls->m_FiberDensityBox->value());
-    parameters.put("fiberfox.fibers.spline.sampling", m_Controls->m_FiberSamplingBox->value());
-    parameters.put("fiberfox.fibers.spline.tension", m_Controls->m_TensionBox->value());
-    parameters.put("fiberfox.fibers.spline.continuity", m_Controls->m_ContinuityBox->value());
-    parameters.put("fiberfox.fibers.spline.bias", m_Controls->m_BiasBox->value());
-    parameters.put("fiberfox.fibers.constantradius", m_Controls->m_ConstantRadiusBox->isChecked());
-    parameters.put("fiberfox.fibers.rotation.x", m_Controls->m_XrotBox->value());
-    parameters.put("fiberfox.fibers.rotation.y", m_Controls->m_YrotBox->value());
-    parameters.put("fiberfox.fibers.rotation.z", m_Controls->m_ZrotBox->value());
-    parameters.put("fiberfox.fibers.translation.x", m_Controls->m_XtransBox->value());
-    parameters.put("fiberfox.fibers.translation.y", m_Controls->m_YtransBox->value());
-    parameters.put("fiberfox.fibers.translation.z", m_Controls->m_ZtransBox->value());
-    parameters.put("fiberfox.fibers.scale.x", m_Controls->m_XscaleBox->value());
-    parameters.put("fiberfox.fibers.scale.y", m_Controls->m_YscaleBox->value());
-    parameters.put("fiberfox.fibers.scale.z", m_Controls->m_ZscaleBox->value());
-    parameters.put("fiberfox.fibers.includeFiducials", m_Controls->m_IncludeFiducials->isChecked());
-    parameters.put("fiberfox.fibers.includeFiducials", m_Controls->m_IncludeFiducials->isChecked());
-
-    // image generation parameters
-    parameters.put("fiberfox.image.basic.size.x", ffParamaters.m_ImageRegion.GetSize(0));
-    parameters.put("fiberfox.image.basic.size.y", ffParamaters.m_ImageRegion.GetSize(1));
-    parameters.put("fiberfox.image.basic.size.z", ffParamaters.m_ImageRegion.GetSize(2));
-    parameters.put("fiberfox.image.basic.spacing.x", ffParamaters.m_ImageSpacing[0]);
-    parameters.put("fiberfox.image.basic.spacing.y", ffParamaters.m_ImageSpacing[1]);
-    parameters.put("fiberfox.image.basic.spacing.z", ffParamaters.m_ImageSpacing[2]);
-    parameters.put("fiberfox.image.basic.numgradients", ffParamaters.GetNumWeightedVolumes());
-    parameters.put("fiberfox.image.basic.bvalue", ffParamaters.m_Bvalue);
-    parameters.put("fiberfox.image.showadvanced", m_Controls->m_AdvancedOptionsBox_2->isChecked());
-    parameters.put("fiberfox.image.signalScale", ffParamaters.m_SignalScale);
-    parameters.put("fiberfox.image.tEcho", ffParamaters.m_tEcho);
-    parameters.put("fiberfox.image.tLine", m_Controls->m_LineReadoutTimeBox->value());
-    parameters.put("fiberfox.image.tInhom", ffParamaters.m_tInhom);
-    parameters.put("fiberfox.image.axonRadius", ffParamaters.m_AxonRadius);
-    parameters.put("fiberfox.image.doSimulateRelaxation", ffParamaters.m_DoSimulateRelaxation);
-    parameters.put("fiberfox.image.doDisablePartialVolume", ffParamaters.m_DoDisablePartialVolume);
-    parameters.put("fiberfox.image.outputvolumefractions", m_Controls->m_VolumeFractionsBox->isChecked());
-
-    parameters.put("fiberfox.image.artifacts.addnoise", m_Controls->m_AddNoise->isChecked());
-    parameters.put("fiberfox.image.artifacts.noisedistribution", m_Controls->m_NoiseDistributionBox->currentIndex());
-    parameters.put("fiberfox.image.artifacts.noisevariance", m_Controls->m_NoiseLevel->value());
-    parameters.put("fiberfox.image.artifacts.addghost", m_Controls->m_AddGhosts->isChecked());
-    parameters.put("fiberfox.image.artifacts.kspaceLineOffset", m_Controls->m_kOffsetBox->value());
-    parameters.put("fiberfox.image.artifacts.distortions", m_Controls->m_AddDistortions->isChecked());
-    parameters.put("fiberfox.image.artifacts.addeddy", m_Controls->m_AddEddy->isChecked());
-    parameters.put("fiberfox.image.artifacts.eddyStrength", m_Controls->m_EddyGradientStrength->value());
-    parameters.put("fiberfox.image.artifacts.addringing", m_Controls->m_AddGibbsRinging->isChecked());
-    parameters.put("fiberfox.image.artifacts.addspikes", m_Controls->m_AddSpikes->isChecked());
-    parameters.put("fiberfox.image.artifacts.spikesnum", m_Controls->m_SpikeNumBox->value());
-    parameters.put("fiberfox.image.artifacts.spikesscale", m_Controls->m_SpikeScaleBox->value());
-    parameters.put("fiberfox.image.artifacts.addaliasing", m_Controls->m_AddAliasing->isChecked());
-    parameters.put("fiberfox.image.artifacts.aliasingfactor", m_Controls->m_WrapBox->value());
-    parameters.put("fiberfox.image.artifacts.doAddMotion", m_Controls->m_AddMotion->isChecked());
-    parameters.put("fiberfox.image.artifacts.randomMotion", m_Controls->m_RandomMotion->isChecked());
-    parameters.put("fiberfox.image.artifacts.translation0", m_Controls->m_MaxTranslationBoxX->value());
-    parameters.put("fiberfox.image.artifacts.translation1", m_Controls->m_MaxTranslationBoxY->value());
-    parameters.put("fiberfox.image.artifacts.translation2", m_Controls->m_MaxTranslationBoxZ->value());
-    parameters.put("fiberfox.image.artifacts.rotation0", m_Controls->m_MaxRotationBoxX->value());
-    parameters.put("fiberfox.image.artifacts.rotation1", m_Controls->m_MaxRotationBoxY->value());
-    parameters.put("fiberfox.image.artifacts.rotation2", m_Controls->m_MaxRotationBoxZ->value());
-
-    parameters.put("fiberfox.image.compartment1.index", m_Controls->m_Compartment1Box->currentIndex());
-    parameters.put("fiberfox.image.compartment2.index", m_Controls->m_Compartment2Box->currentIndex());
-    parameters.put("fiberfox.image.compartment3.index", m_Controls->m_Compartment3Box->currentIndex());
-    parameters.put("fiberfox.image.compartment4.index", m_Controls->m_Compartment4Box->currentIndex());
-
-    parameters.put("fiberfox.image.compartment1.stick.d", m_Controls->m_StickWidget1->GetD());
-    parameters.put("fiberfox.image.compartment1.stick.t2", m_Controls->m_StickWidget1->GetT2());
-    parameters.put("fiberfox.image.compartment1.zeppelin.d1", m_Controls->m_ZeppelinWidget1->GetD1());
-    parameters.put("fiberfox.image.compartment1.zeppelin.d2", m_Controls->m_ZeppelinWidget1->GetD2());
-    parameters.put("fiberfox.image.compartment1.zeppelin.t2", m_Controls->m_ZeppelinWidget1->GetT2());
-    parameters.put("fiberfox.image.compartment1.tensor.d1", m_Controls->m_TensorWidget1->GetD1());
-    parameters.put("fiberfox.image.compartment1.tensor.d2", m_Controls->m_TensorWidget1->GetD2());
-    parameters.put("fiberfox.image.compartment1.tensor.d3", m_Controls->m_TensorWidget1->GetD3());
-    parameters.put("fiberfox.image.compartment1.tensor.t2", m_Controls->m_TensorWidget1->GetT2());
-    parameters.put("fiberfox.image.compartment1.prototype.minFA", m_Controls->m_PrototypeWidget1->GetMinFa());
-    parameters.put("fiberfox.image.compartment1.prototype.maxFA", m_Controls->m_PrototypeWidget1->GetMaxFa());
-    parameters.put("fiberfox.image.compartment1.prototype.minADC", m_Controls->m_PrototypeWidget1->GetMinAdc());
-    parameters.put("fiberfox.image.compartment1.prototype.maxADC", m_Controls->m_PrototypeWidget1->GetMaxAdc());
-    parameters.put("fiberfox.image.compartment1.prototype.numSamples", m_Controls->m_PrototypeWidget1->GetNumberOfSamples());
-
-    parameters.put("fiberfox.image.compartment2.stick.d", m_Controls->m_StickWidget2->GetD());
-    parameters.put("fiberfox.image.compartment2.stick.t2", m_Controls->m_StickWidget2->GetT2());
-    parameters.put("fiberfox.image.compartment2.zeppelin.d1", m_Controls->m_ZeppelinWidget2->GetD1());
-    parameters.put("fiberfox.image.compartment2.zeppelin.d2", m_Controls->m_ZeppelinWidget2->GetD2());
-    parameters.put("fiberfox.image.compartment2.zeppelin.t2", m_Controls->m_ZeppelinWidget2->GetT2());
-    parameters.put("fiberfox.image.compartment2.tensor.d1", m_Controls->m_TensorWidget2->GetD1());
-    parameters.put("fiberfox.image.compartment2.tensor.d2", m_Controls->m_TensorWidget2->GetD2());
-    parameters.put("fiberfox.image.compartment2.tensor.d3", m_Controls->m_TensorWidget2->GetD3());
-    parameters.put("fiberfox.image.compartment2.tensor.t2", m_Controls->m_TensorWidget2->GetT2());
-
-    parameters.put("fiberfox.image.compartment3.ball.d", m_Controls->m_BallWidget1->GetD());
-    parameters.put("fiberfox.image.compartment3.ball.t2", m_Controls->m_BallWidget1->GetT2());
-    parameters.put("fiberfox.image.compartment3.astrosticks.d", m_Controls->m_AstrosticksWidget1->GetD());
-    parameters.put("fiberfox.image.compartment3.astrosticks.t2", m_Controls->m_AstrosticksWidget1->GetT2());
-    parameters.put("fiberfox.image.compartment3.astrosticks.randomize", m_Controls->m_AstrosticksWidget1->GetRandomizeSticks());
-    parameters.put("fiberfox.image.compartment3.dot.t2", m_Controls->m_DotWidget1->GetT2());
-    parameters.put("fiberfox.image.compartment3.prototype.minFA", m_Controls->m_PrototypeWidget3->GetMinFa());
-    parameters.put("fiberfox.image.compartment3.prototype.maxFA", m_Controls->m_PrototypeWidget3->GetMaxFa());
-    parameters.put("fiberfox.image.compartment3.prototype.minADC", m_Controls->m_PrototypeWidget3->GetMinAdc());
-    parameters.put("fiberfox.image.compartment3.prototype.maxADC", m_Controls->m_PrototypeWidget3->GetMaxAdc());
-    parameters.put("fiberfox.image.compartment3.prototype.numSamples", m_Controls->m_PrototypeWidget3->GetNumberOfSamples());
-
-    parameters.put("fiberfox.image.compartment4.ball.d", m_Controls->m_BallWidget2->GetD());
-    parameters.put("fiberfox.image.compartment4.ball.t2", m_Controls->m_BallWidget2->GetT2());
-    parameters.put("fiberfox.image.compartment4.astrosticks.d", m_Controls->m_AstrosticksWidget2->GetD());
-    parameters.put("fiberfox.image.compartment4.astrosticks.t2", m_Controls->m_AstrosticksWidget2->GetT2());
-    parameters.put("fiberfox.image.compartment4.astrosticks.randomize", m_Controls->m_AstrosticksWidget2->GetRandomizeSticks());
-    parameters.put("fiberfox.image.compartment4.dot.t2", m_Controls->m_DotWidget2->GetT2());
-    parameters.put("fiberfox.image.compartment4.prototype.minFA", m_Controls->m_PrototypeWidget4->GetMinFa());
-    parameters.put("fiberfox.image.compartment4.prototype.maxFA", m_Controls->m_PrototypeWidget4->GetMaxFa());
-    parameters.put("fiberfox.image.compartment4.prototype.minADC", m_Controls->m_PrototypeWidget4->GetMinAdc());
-    parameters.put("fiberfox.image.compartment4.prototype.maxADC", m_Controls->m_PrototypeWidget4->GetMaxAdc());
-    parameters.put("fiberfox.image.compartment4.prototype.numSamples", m_Controls->m_PrototypeWidget4->GetNumberOfSamples());
-
-    boost::property_tree::xml_parser::write_xml(filename.toStdString(), parameters);
 }
 
 void QmitkFiberfoxView::LoadParameters()
@@ -1098,146 +1017,231 @@ void QmitkFiberfoxView::LoadParameters()
 
     m_ParameterFile = filename;
 
-    boost::property_tree::ptree parameters;
-    boost::property_tree::xml_parser::read_xml(filename.toStdString(), parameters);
+    FiberfoxParameters<> ffParamaters;
+    ffParamaters.LoadParameters(filename.toStdString());
 
-    BOOST_FOREACH( boost::property_tree::ptree::value_type const& v1, parameters.get_child("fiberfox") )
+    m_Controls->m_RealTimeFibers->setChecked(ffParamaters.m_FiberGenerationParameters.m_RealTimeFibers);
+    m_Controls->m_AdvancedOptionsBox->setChecked(ffParamaters.m_FiberGenerationParameters.m_AdvancedOptions);
+    m_Controls->m_DistributionBox->setCurrentIndex(ffParamaters.m_FiberGenerationParameters.m_Distribution);
+    m_Controls->m_VarianceBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Variance);
+    m_Controls->m_FiberDensityBox->setValue(ffParamaters.m_FiberGenerationParameters.m_FiberDensity);
+    m_Controls->m_IncludeFiducials->setChecked(ffParamaters.m_FiberGenerationParameters.m_IncludeFiducials);
+    m_Controls->m_ConstantRadiusBox->setChecked(ffParamaters.m_FiberGenerationParameters.m_ConstantRadius);
+    m_Controls->m_FiberSamplingBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Sampling);
+    m_Controls->m_TensionBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Tension);
+    m_Controls->m_ContinuityBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Continuity);
+    m_Controls->m_BiasBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Bias);
+    m_Controls->m_XrotBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Rotation[0]);
+    m_Controls->m_YrotBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Rotation[1]);
+    m_Controls->m_ZrotBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Rotation[2]);
+    m_Controls->m_XtransBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Translation[0]);
+    m_Controls->m_YtransBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Translation[1]);
+    m_Controls->m_ZtransBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Translation[2]);
+    m_Controls->m_XscaleBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Scale[0]);
+    m_Controls->m_YscaleBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Scale[1]);
+    m_Controls->m_ZscaleBox->setValue(ffParamaters.m_FiberGenerationParameters.m_Scale[2]);
+
+    // image generation parameters
+    m_Controls->m_SizeX->setValue(ffParamaters.m_ImageRegion.GetSize(0));
+    m_Controls->m_SizeY->setValue(ffParamaters.m_ImageRegion.GetSize(1));
+    m_Controls->m_SizeZ->setValue(ffParamaters.m_ImageRegion.GetSize(2));
+    m_Controls->m_SpacingX->setValue(ffParamaters.m_ImageSpacing[0]);
+    m_Controls->m_SpacingY->setValue(ffParamaters.m_ImageSpacing[1]);
+    m_Controls->m_SpacingZ->setValue(ffParamaters.m_ImageSpacing[2]);
+    m_Controls->m_NumGradientsBox->setValue(ffParamaters.GetNumWeightedVolumes());
+    m_Controls->m_BvalueBox->setValue(ffParamaters.m_Bvalue);
+    m_Controls->m_AdvancedOptionsBox_2->setChecked(ffParamaters.m_AdvancedOptions);
+    m_Controls->m_SignalScaleBox->setValue(ffParamaters.m_SignalScale);
+    m_Controls->m_TEbox->setValue(ffParamaters.m_tEcho);
+    m_Controls->m_LineReadoutTimeBox->setValue(ffParamaters.m_tLine);
+    m_Controls->m_T2starBox->setValue(ffParamaters.m_tInhom);
+    m_Controls->m_FiberRadius->setValue(ffParamaters.m_AxonRadius);
+    m_Controls->m_RelaxationBox->setChecked(ffParamaters.m_DoSimulateRelaxation);
+    m_Controls->m_EnforcePureFiberVoxelsBox->setChecked(ffParamaters.m_DoDisablePartialVolume);
+    m_Controls->m_VolumeFractionsBox->setChecked(ffParamaters.m_OutputVolumeFractions);
+
+    if (ffParamaters.m_NoiseModel!=NULL)
     {
-        if( v1.first == "fibers" )
-        {
-            m_Controls->m_RealTimeFibers->setChecked(v1.second.get<bool>("realtime"));
-            m_Controls->m_AdvancedOptionsBox->setChecked(v1.second.get<bool>("showadvanced"));
-            m_Controls->m_DistributionBox->setCurrentIndex(v1.second.get<int>("distribution"));
-            m_Controls->m_VarianceBox->setValue(v1.second.get<double>("variance"));
-            m_Controls->m_FiberDensityBox->setValue(v1.second.get<int>("density"));
-            m_Controls->m_IncludeFiducials->setChecked(v1.second.get<bool>("includeFiducials"));
-            m_Controls->m_ConstantRadiusBox->setChecked(v1.second.get<bool>("constantradius"));
+        m_Controls->m_AddNoise->setChecked(ffParamaters.m_DoAddNoise);
+        if (dynamic_cast<mitk::RicianNoiseModel<double>*>(ffParamaters.m_NoiseModel))
+            m_Controls->m_NoiseDistributionBox->setCurrentIndex(0);
+        else if (dynamic_cast<mitk::ChiSquareNoiseModel<double>*>(ffParamaters.m_NoiseModel))
+            m_Controls->m_NoiseDistributionBox->setCurrentIndex(1);
+        m_Controls->m_NoiseLevel->setValue(ffParamaters.m_NoiseModel->GetNoiseVariance());
+    }
+    else
+        m_Controls->m_AddNoise->setChecked(false);
 
-            BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second )
+    m_Controls->m_AddGhosts->setChecked(ffParamaters.m_DoAddGhosts);
+    m_Controls->m_kOffsetBox->setValue(ffParamaters.m_KspaceLineOffset);
+    m_Controls->m_AddAliasing->setChecked(ffParamaters.m_DoAddAliasing);
+    m_Controls->m_WrapBox->setValue(100*(1-ffParamaters.m_CroppingFactor));
+    m_Controls->m_AddDistortions->setChecked(ffParamaters.m_DoAddDistortions);
+    m_Controls->m_AddSpikes->setChecked(ffParamaters.m_DoAddSpikes);
+    m_Controls->m_SpikeNumBox->setValue(ffParamaters.m_Spikes);
+    m_Controls->m_SpikeScaleBox->setValue(ffParamaters.m_SpikeAmplitude);
+    m_Controls->m_AddEddy->setChecked(ffParamaters.m_DoAddEddyCurrents);
+    m_Controls->m_EddyGradientStrength->setValue(ffParamaters.m_EddyStrength);
+    m_Controls->m_AddGibbsRinging->setChecked(ffParamaters.m_DoAddGibbsRinging);
+    m_Controls->m_AddMotion->setChecked(ffParamaters.m_DoAddMotion);
+    m_Controls->m_RandomMotion->setChecked(ffParamaters.m_DoRandomizeMotion);
+    m_Controls->m_MaxTranslationBoxX->setValue(ffParamaters.m_Translation[0]);
+    m_Controls->m_MaxTranslationBoxY->setValue(ffParamaters.m_Translation[1]);
+    m_Controls->m_MaxTranslationBoxZ->setValue(ffParamaters.m_Translation[2]);
+    m_Controls->m_MaxRotationBoxX->setValue(ffParamaters.m_Rotation[0]);
+    m_Controls->m_MaxRotationBoxY->setValue(ffParamaters.m_Rotation[1]);
+    m_Controls->m_MaxRotationBoxZ->setValue(ffParamaters.m_Rotation[2]);
+    m_Controls->m_DiffusionDirectionBox->setCurrentIndex(ffParamaters.m_DiffusionDirectionMode);
+    m_Controls->m_SeparationAngleBox->setValue(ffParamaters.m_FiberSeparationThreshold);
+
+    m_Controls->m_Compartment1Box->setCurrentIndex(0);
+    m_Controls->m_Compartment2Box->setCurrentIndex(0);
+    m_Controls->m_Compartment3Box->setCurrentIndex(0);
+    m_Controls->m_Compartment4Box->setCurrentIndex(0);
+
+    for (unsigned int i=0; i<ffParamaters.m_FiberModelList.size()+ffParamaters.m_NonFiberModelList.size(); i++)
+    {
+        mitk::DiffusionSignalModel<ScalarType>* signalModel = NULL;
+        if (i<ffParamaters.m_FiberModelList.size())
+            signalModel = ffParamaters.m_FiberModelList.at(i);
+        else
+            signalModel = ffParamaters.m_NonFiberModelList.at(i-ffParamaters.m_FiberModelList.size());
+
+        switch (signalModel->m_CompartmentId)
+        {
+        case 1:
+        {
+            if (dynamic_cast<mitk::StickModel<>*>(signalModel))
             {
-                if( v2.first == "spline" )
-                {
-                    m_Controls->m_FiberSamplingBox->setValue(v2.second.get<double>("sampling"));
-                    m_Controls->m_TensionBox->setValue(v2.second.get<double>("tension"));
-                    m_Controls->m_ContinuityBox->setValue(v2.second.get<double>("continuity"));
-                    m_Controls->m_BiasBox->setValue(v2.second.get<double>("bias"));
-                }
-                if( v2.first == "rotation" )
-                {
-                    m_Controls->m_XrotBox->setValue(v2.second.get<double>("x"));
-                    m_Controls->m_YrotBox->setValue(v2.second.get<double>("y"));
-                    m_Controls->m_ZrotBox->setValue(v2.second.get<double>("z"));
-                }
-                if( v2.first == "translation" )
-                {
-                    m_Controls->m_XtransBox->setValue(v2.second.get<double>("x"));
-                    m_Controls->m_YtransBox->setValue(v2.second.get<double>("y"));
-                    m_Controls->m_ZtransBox->setValue(v2.second.get<double>("z"));
-                }
-                if( v2.first == "scale" )
-                {
-                    m_Controls->m_XscaleBox->setValue(v2.second.get<double>("x"));
-                    m_Controls->m_YscaleBox->setValue(v2.second.get<double>("y"));
-                    m_Controls->m_ZscaleBox->setValue(v2.second.get<double>("z"));
-                }
+                mitk::StickModel<>* model = dynamic_cast<mitk::StickModel<>*>(signalModel);
+                m_Controls->m_StickWidget1->SetT2(model->GetT2());
+                m_Controls->m_StickWidget1->SetD(model->GetDiffusivity());
+                m_Controls->m_Compartment1Box->setCurrentIndex(0);
+                break;
             }
+            else if (dynamic_cast<mitk::TensorModel<>*>(signalModel))
+            {
+                mitk::TensorModel<>* model = dynamic_cast<mitk::TensorModel<>*>(signalModel);
+                m_Controls->m_TensorWidget1->SetT2(model->GetT2());
+                m_Controls->m_TensorWidget1->SetD1(model->GetDiffusivity1());
+                m_Controls->m_TensorWidget1->SetD2(model->GetDiffusivity1());
+                m_Controls->m_TensorWidget1->SetD3(model->GetDiffusivity1());
+                m_Controls->m_Compartment1Box->setCurrentIndex(2);
+                break;
+            }
+            else if (dynamic_cast<mitk::RawShModel<>*>(signalModel))
+            {
+                mitk::RawShModel<>* model = dynamic_cast<mitk::RawShModel<>*>(signalModel);
+                m_Controls->m_PrototypeWidget1->SetNumberOfSamples(model->GetMaxNumKernels());
+                m_Controls->m_PrototypeWidget1->SetMinFa(model->GetFaRange().first);
+                m_Controls->m_PrototypeWidget1->SetMaxFa(model->GetFaRange().second);
+                m_Controls->m_PrototypeWidget1->SetMinAdc(model->GetAdcRange().first);
+                m_Controls->m_PrototypeWidget1->SetMaxAdc(model->GetAdcRange().second);
+                m_Controls->m_Compartment1Box->setCurrentIndex(3);
+                break;
+            }
+            break;
         }
-        if( v1.first == "image" )
+        case 2:
         {
-            m_Controls->m_SizeX->setValue(v1.second.get<int>("basic.size.x"));
-            m_Controls->m_SizeY->setValue(v1.second.get<int>("basic.size.y"));
-            m_Controls->m_SizeZ->setValue(v1.second.get<int>("basic.size.z"));
-            m_Controls->m_SpacingX->setValue(v1.second.get<double>("basic.spacing.x"));
-            m_Controls->m_SpacingY->setValue(v1.second.get<double>("basic.spacing.y"));
-            m_Controls->m_SpacingZ->setValue(v1.second.get<double>("basic.spacing.z"));
-            m_Controls->m_NumGradientsBox->setValue(v1.second.get<int>("basic.numgradients"));
-            m_Controls->m_BvalueBox->setValue(v1.second.get<int>("basic.bvalue"));
-            m_Controls->m_AdvancedOptionsBox_2->setChecked(v1.second.get<bool>("showadvanced"));
-            m_Controls->m_SignalScaleBox->setValue(v1.second.get<int>("signalScale"));
-            m_Controls->m_TEbox->setValue(v1.second.get<double>("tEcho"));
-            m_Controls->m_LineReadoutTimeBox->setValue(v1.second.get<double>("tLine"));
-            m_Controls->m_T2starBox->setValue(v1.second.get<double>("tInhom"));
-            m_Controls->m_FiberRadius->setValue(v1.second.get<double>("axonRadius"));
-            m_Controls->m_RelaxationBox->setChecked(v1.second.get<bool>("doSimulateRelaxation"));
-            m_Controls->m_EnforcePureFiberVoxelsBox->setChecked(v1.second.get<bool>("doDisablePartialVolume"));
-            m_Controls->m_VolumeFractionsBox->setChecked(v1.second.get<bool>("outputvolumefractions"));
-
-            m_Controls->m_AddNoise->setChecked(v1.second.get<bool>("artifacts.addnoise"));
-            m_Controls->m_NoiseDistributionBox->setCurrentIndex(v1.second.get<int>("artifacts.noisedistribution"));
-            m_Controls->m_NoiseLevel->setValue(v1.second.get<double>("artifacts.noisevariance"));
-            m_Controls->m_AddGhosts->setChecked(v1.second.get<bool>("artifacts.addghost"));
-            m_Controls->m_kOffsetBox->setValue(v1.second.get<double>("artifacts.kspaceLineOffset"));
-            m_Controls->m_AddAliasing->setChecked(v1.second.get<bool>("artifacts.addaliasing"));
-            m_Controls->m_WrapBox->setValue(v1.second.get<double>("artifacts.aliasingfactor"));
-            m_Controls->m_AddDistortions->setChecked(v1.second.get<bool>("artifacts.distortions"));
-            m_Controls->m_AddSpikes->setChecked(v1.second.get<bool>("artifacts.addspikes"));
-            m_Controls->m_SpikeNumBox->setValue(v1.second.get<int>("artifacts.spikesnum"));
-            m_Controls->m_SpikeScaleBox->setValue(v1.second.get<double>("artifacts.spikesscale"));
-            m_Controls->m_AddEddy->setChecked(v1.second.get<bool>("artifacts.addeddy"));
-            m_Controls->m_EddyGradientStrength->setValue(v1.second.get<double>("artifacts.eddyStrength"));
-            m_Controls->m_AddGibbsRinging->setChecked(v1.second.get<bool>("artifacts.addringing"));
-            m_Controls->m_AddMotion->setChecked(v1.second.get<bool>("artifacts.doAddMotion"));
-            m_Controls->m_RandomMotion->setChecked(v1.second.get<bool>("artifacts.randomMotion"));
-            m_Controls->m_MaxTranslationBoxX->setValue(v1.second.get<double>("artifacts.translation0"));
-            m_Controls->m_MaxTranslationBoxY->setValue(v1.second.get<double>("artifacts.translation1"));
-            m_Controls->m_MaxTranslationBoxZ->setValue(v1.second.get<double>("artifacts.translation2"));
-            m_Controls->m_MaxRotationBoxX->setValue(v1.second.get<double>("artifacts.rotation0"));
-            m_Controls->m_MaxRotationBoxY->setValue(v1.second.get<double>("artifacts.rotation1"));
-            m_Controls->m_MaxRotationBoxZ->setValue(v1.second.get<double>("artifacts.rotation2"));
-
-            m_Controls->m_Compartment1Box->setCurrentIndex(v1.second.get<int>("compartment1.index"));
-            m_Controls->m_Compartment2Box->setCurrentIndex(v1.second.get<int>("compartment2.index"));
-            m_Controls->m_Compartment3Box->setCurrentIndex(v1.second.get<int>("compartment3.index"));
-            m_Controls->m_Compartment4Box->setCurrentIndex(v1.second.get<int>("compartment4.index"));
-
-            m_Controls->m_StickWidget1->SetD(v1.second.get<double>("compartment1.stick.d"));
-            m_Controls->m_StickWidget1->SetT2(v1.second.get<double>("compartment1.stick.t2"));
-            m_Controls->m_ZeppelinWidget1->SetD1(v1.second.get<double>("compartment1.zeppelin.d1"));
-            m_Controls->m_ZeppelinWidget1->SetD2(v1.second.get<double>("compartment1.zeppelin.d2"));
-            m_Controls->m_ZeppelinWidget1->SetT2(v1.second.get<double>("compartment1.zeppelin.t2"));
-            m_Controls->m_TensorWidget1->SetD1(v1.second.get<double>("compartment1.tensor.d1"));
-            m_Controls->m_TensorWidget1->SetD2(v1.second.get<double>("compartment1.tensor.d2"));
-            m_Controls->m_TensorWidget1->SetD3(v1.second.get<double>("compartment1.tensor.d3"));
-            m_Controls->m_TensorWidget1->SetT2(v1.second.get<double>("compartment1.tensor.t2"));
-            m_Controls->m_PrototypeWidget1->SetMinFa(v1.second.get<double>("compartment1.prototype.minFA"));
-            m_Controls->m_PrototypeWidget1->SetMaxFa(v1.second.get<double>("compartment1.prototype.maxFA"));
-            m_Controls->m_PrototypeWidget1->SetMinAdc(v1.second.get<double>("compartment1.prototype.minADC"));
-            m_Controls->m_PrototypeWidget1->SetMaxAdc(v1.second.get<double>("compartment1.prototype.maxADC"));
-            m_Controls->m_PrototypeWidget1->SetNumberOfSamples(v1.second.get<double>("compartment1.prototype.numSamples"));
-
-            m_Controls->m_StickWidget2->SetD(v1.second.get<double>("compartment2.stick.d"));
-            m_Controls->m_StickWidget2->SetT2(v1.second.get<double>("compartment2.stick.t2"));
-            m_Controls->m_ZeppelinWidget2->SetD1(v1.second.get<double>("compartment2.zeppelin.d1"));
-            m_Controls->m_ZeppelinWidget2->SetD2(v1.second.get<double>("compartment2.zeppelin.d2"));
-            m_Controls->m_ZeppelinWidget2->SetT2(v1.second.get<double>("compartment2.zeppelin.t2"));
-            m_Controls->m_TensorWidget2->SetD1(v1.second.get<double>("compartment2.tensor.d1"));
-            m_Controls->m_TensorWidget2->SetD2(v1.second.get<double>("compartment2.tensor.d2"));
-            m_Controls->m_TensorWidget2->SetD3(v1.second.get<double>("compartment2.tensor.d3"));
-            m_Controls->m_TensorWidget2->SetT2(v1.second.get<double>("compartment2.tensor.t2"));
-
-            m_Controls->m_BallWidget1->SetD(v1.second.get<double>("compartment3.ball.d"));
-            m_Controls->m_BallWidget1->SetT2(v1.second.get<double>("compartment3.ball.t2"));
-            m_Controls->m_AstrosticksWidget1->SetD(v1.second.get<double>("compartment3.astrosticks.d"));
-            m_Controls->m_AstrosticksWidget1->SetT2(v1.second.get<double>("compartment3.astrosticks.t2"));
-            m_Controls->m_AstrosticksWidget1->SetRandomizeSticks(v1.second.get<bool>("compartment3.astrosticks.randomize"));
-            m_Controls->m_DotWidget1->SetT2(v1.second.get<double>("compartment3.dot.t2"));
-            m_Controls->m_PrototypeWidget3->SetMinFa(v1.second.get<double>("compartment3.prototype.minFA"));
-            m_Controls->m_PrototypeWidget3->SetMaxFa(v1.second.get<double>("compartment3.prototype.maxFA"));
-            m_Controls->m_PrototypeWidget3->SetMinAdc(v1.second.get<double>("compartment3.prototype.minADC"));
-            m_Controls->m_PrototypeWidget3->SetMaxAdc(v1.second.get<double>("compartment3.prototype.maxADC"));
-            m_Controls->m_PrototypeWidget3->SetNumberOfSamples(v1.second.get<double>("compartment3.prototype.numSamples"));
-
-            m_Controls->m_BallWidget2->SetD(v1.second.get<double>("compartment4.ball.d"));
-            m_Controls->m_BallWidget2->SetT2(v1.second.get<double>("compartment4.ball.t2"));
-            m_Controls->m_AstrosticksWidget2->SetD(v1.second.get<double>("compartment4.astrosticks.d"));
-            m_Controls->m_AstrosticksWidget2->SetT2(v1.second.get<double>("compartment4.astrosticks.t2"));
-            m_Controls->m_AstrosticksWidget2->SetRandomizeSticks(v1.second.get<bool>("compartment4.astrosticks.randomize"));
-            m_Controls->m_DotWidget2->SetT2(v1.second.get<double>("compartment4.dot.t2"));
-            m_Controls->m_PrototypeWidget4->SetMinFa(v1.second.get<double>("compartment4.prototype.minFA"));
-            m_Controls->m_PrototypeWidget4->SetMaxFa(v1.second.get<double>("compartment4.prototype.maxFA"));
-            m_Controls->m_PrototypeWidget4->SetMinAdc(v1.second.get<double>("compartment4.prototype.minADC"));
-            m_Controls->m_PrototypeWidget4->SetMaxAdc(v1.second.get<double>("compartment4.prototype.maxADC"));
-            m_Controls->m_PrototypeWidget4->SetNumberOfSamples(v1.second.get<double>("compartment4.prototype.numSamples"));
+            if (dynamic_cast<mitk::StickModel<>*>(signalModel))
+            {
+                mitk::StickModel<>* model = dynamic_cast<mitk::StickModel<>*>(signalModel);
+                m_Controls->m_StickWidget2->SetT2(model->GetT2());
+                m_Controls->m_StickWidget2->SetD(model->GetDiffusivity());
+                m_Controls->m_Compartment2Box->setCurrentIndex(1);
+                break;
+            }
+            else if (dynamic_cast<mitk::TensorModel<>*>(signalModel))
+            {
+                mitk::TensorModel<>* model = dynamic_cast<mitk::TensorModel<>*>(signalModel);
+                m_Controls->m_TensorWidget2->SetT2(model->GetT2());
+                m_Controls->m_TensorWidget2->SetD1(model->GetDiffusivity1());
+                m_Controls->m_TensorWidget2->SetD2(model->GetDiffusivity1());
+                m_Controls->m_TensorWidget2->SetD3(model->GetDiffusivity1());
+                m_Controls->m_Compartment2Box->setCurrentIndex(3);
+                break;
+            }
+            break;
+        }
+        case 3:
+        {
+            if (dynamic_cast<mitk::BallModel<>*>(signalModel))
+            {
+                mitk::BallModel<>* model = dynamic_cast<mitk::BallModel<>*>(signalModel);
+                m_Controls->m_BallWidget1->SetT2(model->GetT2());
+                m_Controls->m_BallWidget1->SetD(model->GetDiffusivity());
+                m_Controls->m_Compartment3Box->setCurrentIndex(0);
+                break;
+            }
+            else if (dynamic_cast<mitk::AstroStickModel<>*>(signalModel))
+            {
+                mitk::AstroStickModel<>* model = dynamic_cast<mitk::AstroStickModel<>*>(signalModel);
+                m_Controls->m_AstrosticksWidget1->SetT2(model->GetT2());
+                m_Controls->m_AstrosticksWidget1->SetD(model->GetDiffusivity());
+                m_Controls->m_AstrosticksWidget1->SetRandomizeSticks(model->GetRandomizeSticks());
+                m_Controls->m_Compartment3Box->setCurrentIndex(1);
+                break;
+            }
+            else if (dynamic_cast<mitk::DotModel<>*>(signalModel))
+            {
+                mitk::DotModel<>* model = dynamic_cast<mitk::DotModel<>*>(signalModel);
+                m_Controls->m_DotWidget1->SetT2(model->GetT2());
+                m_Controls->m_Compartment3Box->setCurrentIndex(2);
+                break;
+            }
+            else if (dynamic_cast<mitk::RawShModel<>*>(signalModel))
+            {
+                mitk::RawShModel<>* model = dynamic_cast<mitk::RawShModel<>*>(signalModel);
+                m_Controls->m_PrototypeWidget3->SetNumberOfSamples(model->GetMaxNumKernels());
+                m_Controls->m_PrototypeWidget3->SetMinFa(model->GetFaRange().first);
+                m_Controls->m_PrototypeWidget3->SetMaxFa(model->GetFaRange().second);
+                m_Controls->m_PrototypeWidget3->SetMinAdc(model->GetAdcRange().first);
+                m_Controls->m_PrototypeWidget3->SetMaxAdc(model->GetAdcRange().second);
+                m_Controls->m_Compartment3Box->setCurrentIndex(3);
+                break;
+            }
+            break;
+        }
+        case 4:
+        {
+            if (dynamic_cast<mitk::BallModel<>*>(signalModel))
+            {
+                mitk::BallModel<>* model = dynamic_cast<mitk::BallModel<>*>(signalModel);
+                m_Controls->m_BallWidget2->SetT2(model->GetT2());
+                m_Controls->m_BallWidget2->SetD(model->GetDiffusivity());
+                m_Controls->m_Compartment4Box->setCurrentIndex(1);
+                break;
+            }
+            else if (dynamic_cast<mitk::AstroStickModel<>*>(signalModel))
+            {
+                mitk::AstroStickModel<>* model = dynamic_cast<mitk::AstroStickModel<>*>(signalModel);
+                m_Controls->m_AstrosticksWidget2->SetT2(model->GetT2());
+                m_Controls->m_AstrosticksWidget2->SetD(model->GetDiffusivity());
+                m_Controls->m_AstrosticksWidget2->SetRandomizeSticks(model->GetRandomizeSticks());
+                m_Controls->m_Compartment4Box->setCurrentIndex(2);
+                break;
+            }
+            else if (dynamic_cast<mitk::DotModel<>*>(signalModel))
+            {
+                mitk::DotModel<>* model = dynamic_cast<mitk::DotModel<>*>(signalModel);
+                m_Controls->m_DotWidget2->SetT2(model->GetT2());
+                m_Controls->m_Compartment4Box->setCurrentIndex(3);
+                break;
+            }
+            else if (dynamic_cast<mitk::RawShModel<>*>(signalModel))
+            {
+                mitk::RawShModel<>* model = dynamic_cast<mitk::RawShModel<>*>(signalModel);
+                m_Controls->m_PrototypeWidget4->SetNumberOfSamples(model->GetMaxNumKernels());
+                m_Controls->m_PrototypeWidget4->SetMinFa(model->GetFaRange().first);
+                m_Controls->m_PrototypeWidget4->SetMaxFa(model->GetFaRange().second);
+                m_Controls->m_PrototypeWidget4->SetMinAdc(model->GetAdcRange().first);
+                m_Controls->m_PrototypeWidget4->SetMaxAdc(model->GetAdcRange().second);
+                m_Controls->m_Compartment4Box->setCurrentIndex(4);
+                break;
+            }
+            break;
+        }
         }
     }
 }

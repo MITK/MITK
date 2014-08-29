@@ -27,7 +27,7 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class TensorModel : public DiffusionSignalModel< ScalarType >
 {
 public:
@@ -48,6 +48,9 @@ public:
     void SetDiffusivity1(ScalarType d1){ m_KernelTensorMatrix[0][0] = d1; }
     void SetDiffusivity2(ScalarType d2){ m_KernelTensorMatrix[1][1] = d2; }
     void SetDiffusivity3(ScalarType d3){ m_KernelTensorMatrix[2][2] = d3; }
+    ScalarType GetDiffusivity1() { return m_KernelTensorMatrix[0][0]; }
+    ScalarType GetDiffusivity2() { return m_KernelTensorMatrix[1][1]; }
+    ScalarType GetDiffusivity3() { return m_KernelTensorMatrix[2][2]; }
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }

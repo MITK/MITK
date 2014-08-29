@@ -62,6 +62,8 @@ public:
     {
         FiberfoxParameters< OutType > out;
 
+//        out.m_FiberGenerationParameters = m_FiberGenerationParameters;
+
         out.m_ImageRegion = m_ImageRegion;
         out.m_ImageSpacing = m_ImageSpacing;
         out.m_ImageOrigin = m_ImageOrigin;
@@ -100,14 +102,33 @@ public:
         out.m_SignalModelString = m_SignalModelString;
         out.m_ArtifactModelString = m_ArtifactModelString;
         out.m_OutputPath = m_OutputPath;
-//        out.m_DiffusionDirectionMode = m_DiffusionDirectionMode;
-//        out.m_SignalGenerationMode = m_SignalGenerationMode;
+        //        out.m_DiffusionDirectionMode = m_DiffusionDirectionMode;
+        //        out.m_SignalGenerationMode = m_SignalGenerationMode;
         out.m_SimulateKspaceAcquisition = m_SimulateKspaceAcquisition;
 
         // TODO: copy constructor für singalmodelle und rauschen
 
         return out;
     }
+
+    /** Fiber generation */
+    struct FiberGenerationParameters
+    {
+        bool            m_RealTimeFibers;
+        bool            m_AdvancedOptions;
+        int             m_Distribution;
+        double          m_Variance;
+        unsigned int    m_FiberDensity;
+        double          m_Sampling;
+        double          m_Tension;
+        double          m_Continuity;
+        double          m_Bias;
+        bool            m_ConstantRadius;
+        mitk::Vector3D  m_Rotation;
+        mitk::Vector3D  m_Translation;
+        mitk::Vector3D  m_Scale;
+        bool            m_IncludeFiducials;
+    } m_FiberGenerationParameters;
 
     /** Output image specifications */
     itk::ImageRegion<3>                 m_ImageRegion;              ///< Image size.
@@ -137,8 +158,15 @@ public:
     double                              m_EddyStrength;             ///< Strength of eddy current induced gradients in mT/m.
     double                              m_Tau;                      ///< Eddy current decay constant (in ms)
     double                              m_CroppingFactor;           ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
+
+    bool                                m_DoAddNoise;
+    bool                                m_DoAddGhosts;
+    bool                                m_DoAddAliasing;
+    bool                                m_DoAddSpikes;
+    bool                                m_DoAddEddyCurrents;
     bool                                m_DoAddGibbsRinging;        ///< Add Gibbs ringing artifact
     bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects
+    bool                                m_DoAddDistortions;         ///< Add magnetic field distortions
     bool                                m_DoDisablePartialVolume;   ///< Disable partial volume effects. Each voxel is either all fiber or all non-fiber.
     bool                                m_DoAddMotion;              ///< Enable motion artifacts.
     bool                                m_DoRandomizeMotion;        ///< Toggles between random and linear motion.
@@ -150,12 +178,15 @@ public:
 
     /** Output parameters (only relevant in GUI application) */
     mitk::DataNode::Pointer             m_ResultNode;               ///< Stores resulting image.
-    mitk::DataNode::Pointer             m_ParentNode;               ///< Parent node or result node.
+    mitk::DataNode::Pointer             m_ParentNode;               ///< Parent node of result node.
     string                              m_SignalModelString;        ///< Appendet to the name of the result node
     string                              m_ArtifactModelString;      ///< Appendet to the name of the result node
     string                              m_OutputPath;               ///< Image is automatically saved to the specified folder after simulation is finished.
+    bool                                m_OutputVolumeFractions;
+    bool                                m_AdvancedOptions;
 
     void PrintSelf();                           ///< Print parameters to stdout.
+    void SaveParameters(string filename);       ///< Save image generation parameters to .ffp file.
     void LoadParameters(string filename);       ///< Load image generation parameters from .ffp file.
     void GenerateGradientHalfShell();           ///< Generates half shell of gradient directions (with m_NumGradients non-zero directions)
 
@@ -175,8 +206,8 @@ public:
 
 protected:
 
-    unsigned int                        m_NumBaseline;          ///< Number of non-diffusion-weighted image volumes.
     unsigned int                        m_NumGradients;         ///< Number of diffusion-weighted image volumes.
+    unsigned int                        m_NumBaseline;          ///< Number of non-diffusion-weighted image volumes.
     GradientListType                    m_GradientDirections;   ///< Total number of image volumes.
 
 };

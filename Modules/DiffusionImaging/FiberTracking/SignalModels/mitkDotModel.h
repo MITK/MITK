@@ -26,7 +26,7 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class DotModel : public DiffusionSignalModel< ScalarType >
 {
 public:

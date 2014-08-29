@@ -26,7 +26,7 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class StickModel : public DiffusionSignalModel< ScalarType >
 {
 public:
@@ -44,6 +44,7 @@ public:
 
     void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
     void SetDiffusivity(ScalarType diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
+    ScalarType GetDiffusivity() { return m_Diffusivity; }
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }

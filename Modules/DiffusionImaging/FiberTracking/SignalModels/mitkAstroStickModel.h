@@ -27,7 +27,7 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class AstroStickModel : public DiffusionSignalModel< ScalarType >
 {
 public:
@@ -49,6 +49,9 @@ public:
     void SetRandomizeSticks(bool randomize=true){ m_RandomizeSticks=randomize; } ///< Random stick configuration in each voxel
     void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
     void SetDiffusivity(ScalarType diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
+    ScalarType GetDiffusivity() { return m_Diffusivity; }
+    bool GetRandomizeSticks() { return m_RandomizeSticks; }
+
     void SetNumSticks(unsigned int order)
     {
         vnl_matrix<double> sticks;

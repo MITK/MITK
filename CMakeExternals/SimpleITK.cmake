@@ -86,11 +86,17 @@ if(MITK_USE_SimpleITK)
     set(SimpleITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
 
     if( MITK_USE_Python )
+      # PythonDir needs to be fixed for the python interpreter by
+      # changing dir delimiter for Windows
+      set(_install_dir ${Python_DIR})
+      if(WIN32)
+        STRING(REPLACE "/" "\\\\" _install_dir ${Python_DIR})
+      endif()
       # Build python distribution with easy install. If a own runtime is used
       # embedd the egg into the site-package folder of the runtime
       if(NOT MITK_USE_SYSTEM_PYTHON)
         ExternalProject_Add_Step(${proj} sitk_python_install_step
-          COMMAND ${PYTHON_EXECUTABLE} setup.py install --prefix=${Python_DIR}
+          COMMAND ${PYTHON_EXECUTABLE} setup.py install --prefix=${_install_dir}
           DEPENDEES build
           WORKING_DIRECTORY ${SimpleITK_DIR}/Wrapping/PythonPackage
         )

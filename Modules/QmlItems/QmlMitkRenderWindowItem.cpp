@@ -56,7 +56,7 @@
 #include "mitkInteractionKeyEvent.h"
 #include "mitkMouseWheelEvent.h"
 #include "mitkInternalEvent.h"
-#include "mitkGeometry2DDataMapper2D.h"
+#include "mitkPlaneGeometryDataMapper2D.h"
 
 #include "QmlMitkBigRenderLock.h"
 
@@ -136,7 +136,7 @@ void QmlMitkRenderWindowItem::init()
     planeNode->SetProperty("visible", mitk::BoolProperty::New(true) );
     planeNode->SetProperty("helper object", mitk::BoolProperty::New(true) );
 
-    mitk::Geometry2DDataMapper2D::Pointer mapper = mitk::Geometry2DDataMapper2D::New();
+    mitk::PlaneGeometryDataMapper2D::Pointer mapper = mitk::PlaneGeometryDataMapper2D::New();
     mapper->SetDatastorageAndGeometryBaseNode( m_DataStorage, m_PlaneNodeParent );
     planeNode->SetMapper( mitk::BaseRenderer::Standard2D, mapper );
 

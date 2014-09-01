@@ -28,73 +28,73 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template< class ScalarType >
 mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
-    : m_SignalScale(100)
-    , m_tEcho(100)
-    , m_tLine(1)
-    , m_tInhom(50)
-    , m_Bvalue(1000)
-    , m_SimulateKspaceAcquisition(false)
-    , m_AxonRadius(0)
-    , m_DiffusionDirectionMode(FIBER_TANGENT_DIRECTIONS)
-    , m_FiberSeparationThreshold(30)
-    , m_Spikes(0)
-    , m_SpikeAmplitude(1)
-    , m_KspaceLineOffset(0)
-    , m_EddyStrength(0)
-    , m_Tau(70)
-    , m_CroppingFactor(1)
-    , m_DoAddNoise(false)
-    , m_DoAddGhosts(false)
-    , m_DoAddAliasing(false)
-    , m_DoAddSpikes(false)
-    , m_DoAddEddyCurrents(false)
-    , m_DoAddGibbsRinging(false)
-    , m_DoSimulateRelaxation(true)
-    , m_DoAddDistortions(false)
-    , m_DoDisablePartialVolume(false)
-    , m_DoAddMotion(false)
-    , m_DoRandomizeMotion(true)
-    , m_NoiseModel(NULL)
-    , m_FrequencyMap(NULL)
-    , m_MaskImage(NULL)
-    , m_ResultNode(mitk::DataNode::New())
-    , m_ParentNode(NULL)
-    , m_SignalModelString("")
-    , m_ArtifactModelString("")
-    , m_OutputPath("")
+    : m_NoiseModel(NULL)
     , m_NumGradients(6)
     , m_NumBaseline(1)
 {
-    m_FiberGenerationParameters.m_RealTimeFibers = true;
-    m_FiberGenerationParameters.m_AdvancedOptions = false;
-    m_FiberGenerationParameters.m_Distribution = 0;
-    m_FiberGenerationParameters.m_Variance = 100;
-    m_FiberGenerationParameters.m_FiberDensity = 100;
-    m_FiberGenerationParameters.m_Sampling = 1;
-    m_FiberGenerationParameters.m_Tension = 0;
-    m_FiberGenerationParameters.m_Continuity = 0;
-    m_FiberGenerationParameters.m_Bias = 0;
-    m_FiberGenerationParameters.m_ConstantRadius = false;
-    m_FiberGenerationParameters.m_Rotation[0] = 0;
-    m_FiberGenerationParameters.m_Rotation[1] = 0;
-    m_FiberGenerationParameters.m_Rotation[2] = 0;
-    m_FiberGenerationParameters.m_Translation[0] = 0;
-    m_FiberGenerationParameters.m_Translation[1] = 0;
-    m_FiberGenerationParameters.m_Translation[2] = 0;
-    m_FiberGenerationParameters.m_Scale[0] = 1;
-    m_FiberGenerationParameters.m_Scale[1] = 1;
-    m_FiberGenerationParameters.m_Scale[2] = 1;
-    m_FiberGenerationParameters.m_IncludeFiducials = true;
+    m_FiberGen.m_RealTimeFibers = true;
+    m_FiberGen.m_AdvancedOptions = false;
+    m_FiberGen.m_Distribution = 0;
+    m_FiberGen.m_Variance = 100;
+    m_FiberGen.m_FiberDensity = 100;
+    m_FiberGen.m_Sampling = 1;
+    m_FiberGen.m_Tension = 0;
+    m_FiberGen.m_Continuity = 0;
+    m_FiberGen.m_Bias = 0;
+    m_FiberGen.m_ConstantRadius = false;
+    m_FiberGen.m_Rotation[0] = 0;
+    m_FiberGen.m_Rotation[1] = 0;
+    m_FiberGen.m_Rotation[2] = 0;
+    m_FiberGen.m_Translation[0] = 0;
+    m_FiberGen.m_Translation[1] = 0;
+    m_FiberGen.m_Translation[2] = 0;
+    m_FiberGen.m_Scale[0] = 1;
+    m_FiberGen.m_Scale[1] = 1;
+    m_FiberGen.m_Scale[2] = 1;
+    m_FiberGen.m_IncludeFiducials = true;
 
-    m_ImageDirection.SetIdentity();
-    m_ImageOrigin.Fill(0.0);
-    m_ImageRegion.SetSize(0, 11);
-    m_ImageRegion.SetSize(1, 11);
-    m_ImageRegion.SetSize(2, 3);
-    m_ImageSpacing.Fill(2.0);
+    m_SignalGen.m_ImageDirection.SetIdentity();
+    m_SignalGen.m_ImageOrigin.Fill(0.0);
+    m_SignalGen.m_ImageRegion.SetSize(0, 11);
+    m_SignalGen.m_ImageRegion.SetSize(1, 11);
+    m_SignalGen.m_ImageRegion.SetSize(2, 3);
+    m_SignalGen.m_ImageSpacing.Fill(2.0);
+    m_SignalGen.m_Translation.Fill(0.0);
+    m_SignalGen.m_Rotation.Fill(0.0);
+    m_SignalGen.m_FrequencyMap = NULL;
+    m_SignalGen.m_MaskImage = NULL;
+    m_SignalGen.m_SignalScale = 100;
+    m_SignalGen.m_tEcho = 100;
+    m_SignalGen.m_tLine = 1;
+    m_SignalGen.m_tInhom = 50;
+    m_SignalGen.m_Bvalue = 1000;
+    m_SignalGen.m_SimulateKspaceAcquisition = false;
+    m_SignalGen.m_AxonRadius = 0;
+    m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
+    m_SignalGen.m_FiberSeparationThreshold = 30;
+    m_SignalGen.m_Spikes = 0;
+    m_SignalGen.m_SpikeAmplitude = 1;
+    m_SignalGen.m_KspaceLineOffset = 0;
+    m_SignalGen.m_EddyStrength = 0;
+    m_SignalGen.m_Tau = 70;
+    m_SignalGen.m_CroppingFactor = 1;
+    m_SignalGen.m_DoAddNoise = false;
+    m_SignalGen.m_DoAddGhosts = false;
+    m_SignalGen.m_DoAddAliasing = false;
+    m_SignalGen.m_DoAddSpikes = false;
+    m_SignalGen.m_DoAddEddyCurrents = false;
+    m_SignalGen.m_DoAddGibbsRinging = false;
+    m_SignalGen.m_DoSimulateRelaxation = true;
+    m_SignalGen.m_DoAddDistortions = false;
+    m_SignalGen.m_DoDisablePartialVolume = false;
+    m_SignalGen.m_DoAddMotion = false;
+    m_SignalGen.m_DoRandomizeMotion = true;
 
-    m_Translation.Fill(0.0);
-    m_Rotation.Fill(0.0);
+    m_Misc.m_ResultNode = mitk::DataNode::New();
+    m_Misc.m_ParentNode = NULL;
+    m_Misc.m_SignalModelString = "";
+    m_Misc.m_ArtifactModelString = "";
+    m_Misc.m_OutputPath = "";
 
     GenerateGradientHalfShell();
 }
@@ -263,87 +263,87 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
     boost::property_tree::ptree parameters;
 
     // fiber generation parameters
-    parameters.put("fiberfox.fibers.realtime", m_FiberGenerationParameters.m_RealTimeFibers);
-    parameters.put("fiberfox.fibers.showadvanced", m_FiberGenerationParameters.m_AdvancedOptions);
-    parameters.put("fiberfox.fibers.distribution", m_FiberGenerationParameters.m_Distribution);
-    parameters.put("fiberfox.fibers.variance", m_FiberGenerationParameters.m_Variance);
-    parameters.put("fiberfox.fibers.density", m_FiberGenerationParameters.m_FiberDensity);
-    parameters.put("fiberfox.fibers.spline.sampling", m_FiberGenerationParameters.m_Sampling);
-    parameters.put("fiberfox.fibers.spline.tension", m_FiberGenerationParameters.m_Tension);
-    parameters.put("fiberfox.fibers.spline.continuity", m_FiberGenerationParameters.m_Continuity);
-    parameters.put("fiberfox.fibers.spline.bias", m_FiberGenerationParameters.m_Bias);
-    parameters.put("fiberfox.fibers.constantradius", m_FiberGenerationParameters.m_ConstantRadius);
-    parameters.put("fiberfox.fibers.rotation.x", m_FiberGenerationParameters.m_Rotation[0]);
-    parameters.put("fiberfox.fibers.rotation.y", m_FiberGenerationParameters.m_Rotation[1]);
-    parameters.put("fiberfox.fibers.rotation.z", m_FiberGenerationParameters.m_Rotation[2]);
-    parameters.put("fiberfox.fibers.translation.x", m_FiberGenerationParameters.m_Translation[0]);
-    parameters.put("fiberfox.fibers.translation.y", m_FiberGenerationParameters.m_Translation[1]);
-    parameters.put("fiberfox.fibers.translation.z", m_FiberGenerationParameters.m_Translation[2]);
-    parameters.put("fiberfox.fibers.scale.x", m_FiberGenerationParameters.m_Scale[0]);
-    parameters.put("fiberfox.fibers.scale.y", m_FiberGenerationParameters.m_Scale[1]);
-    parameters.put("fiberfox.fibers.scale.z", m_FiberGenerationParameters.m_Scale[2]);
-    parameters.put("fiberfox.fibers.includeFiducials", m_FiberGenerationParameters.m_IncludeFiducials);
+    parameters.put("fiberfox.fibers.realtime", m_FiberGen.m_RealTimeFibers);
+    parameters.put("fiberfox.fibers.showadvanced", m_FiberGen.m_AdvancedOptions);
+    parameters.put("fiberfox.fibers.distribution", m_FiberGen.m_Distribution);
+    parameters.put("fiberfox.fibers.variance", m_FiberGen.m_Variance);
+    parameters.put("fiberfox.fibers.density", m_FiberGen.m_FiberDensity);
+    parameters.put("fiberfox.fibers.spline.sampling", m_FiberGen.m_Sampling);
+    parameters.put("fiberfox.fibers.spline.tension", m_FiberGen.m_Tension);
+    parameters.put("fiberfox.fibers.spline.continuity", m_FiberGen.m_Continuity);
+    parameters.put("fiberfox.fibers.spline.bias", m_FiberGen.m_Bias);
+    parameters.put("fiberfox.fibers.constantradius", m_FiberGen.m_ConstantRadius);
+    parameters.put("fiberfox.fibers.rotation.x", m_FiberGen.m_Rotation[0]);
+    parameters.put("fiberfox.fibers.rotation.y", m_FiberGen.m_Rotation[1]);
+    parameters.put("fiberfox.fibers.rotation.z", m_FiberGen.m_Rotation[2]);
+    parameters.put("fiberfox.fibers.translation.x", m_FiberGen.m_Translation[0]);
+    parameters.put("fiberfox.fibers.translation.y", m_FiberGen.m_Translation[1]);
+    parameters.put("fiberfox.fibers.translation.z", m_FiberGen.m_Translation[2]);
+    parameters.put("fiberfox.fibers.scale.x", m_FiberGen.m_Scale[0]);
+    parameters.put("fiberfox.fibers.scale.y", m_FiberGen.m_Scale[1]);
+    parameters.put("fiberfox.fibers.scale.z", m_FiberGen.m_Scale[2]);
+    parameters.put("fiberfox.fibers.includeFiducials", m_FiberGen.m_IncludeFiducials);
 
     // image generation parameters
-    parameters.put("fiberfox.image.basic.size.x", m_ImageRegion.GetSize(0));
-    parameters.put("fiberfox.image.basic.size.y", m_ImageRegion.GetSize(1));
-    parameters.put("fiberfox.image.basic.size.z", m_ImageRegion.GetSize(2));
-    parameters.put("fiberfox.image.basic.spacing.x", m_ImageSpacing[0]);
-    parameters.put("fiberfox.image.basic.spacing.y", m_ImageSpacing[1]);
-    parameters.put("fiberfox.image.basic.spacing.z", m_ImageSpacing[2]);
-    parameters.put("fiberfox.image.basic.origin.x", m_ImageOrigin[0]);
-    parameters.put("fiberfox.image.basic.origin.y", m_ImageOrigin[1]);
-    parameters.put("fiberfox.image.basic.origin.z", m_ImageOrigin[2]);
-    parameters.put("fiberfox.image.basic.direction.1", m_ImageDirection[0][0]);
-    parameters.put("fiberfox.image.basic.direction.2", m_ImageDirection[0][1]);
-    parameters.put("fiberfox.image.basic.direction.3", m_ImageDirection[0][2]);
-    parameters.put("fiberfox.image.basic.direction.4", m_ImageDirection[1][0]);
-    parameters.put("fiberfox.image.basic.direction.5", m_ImageDirection[1][1]);
-    parameters.put("fiberfox.image.basic.direction.6", m_ImageDirection[1][2]);
-    parameters.put("fiberfox.image.basic.direction.7", m_ImageDirection[2][0]);
-    parameters.put("fiberfox.image.basic.direction.8", m_ImageDirection[2][1]);
-    parameters.put("fiberfox.image.basic.direction.9", m_ImageDirection[2][2]);
+    parameters.put("fiberfox.image.basic.size.x", m_SignalGen.m_ImageRegion.GetSize(0));
+    parameters.put("fiberfox.image.basic.size.y", m_SignalGen.m_ImageRegion.GetSize(1));
+    parameters.put("fiberfox.image.basic.size.z", m_SignalGen.m_ImageRegion.GetSize(2));
+    parameters.put("fiberfox.image.basic.spacing.x", m_SignalGen.m_ImageSpacing[0]);
+    parameters.put("fiberfox.image.basic.spacing.y", m_SignalGen.m_ImageSpacing[1]);
+    parameters.put("fiberfox.image.basic.spacing.z", m_SignalGen.m_ImageSpacing[2]);
+    parameters.put("fiberfox.image.basic.origin.x", m_SignalGen.m_ImageOrigin[0]);
+    parameters.put("fiberfox.image.basic.origin.y", m_SignalGen.m_ImageOrigin[1]);
+    parameters.put("fiberfox.image.basic.origin.z", m_SignalGen.m_ImageOrigin[2]);
+    parameters.put("fiberfox.image.basic.direction.1", m_SignalGen.m_ImageDirection[0][0]);
+    parameters.put("fiberfox.image.basic.direction.2", m_SignalGen.m_ImageDirection[0][1]);
+    parameters.put("fiberfox.image.basic.direction.3", m_SignalGen.m_ImageDirection[0][2]);
+    parameters.put("fiberfox.image.basic.direction.4", m_SignalGen.m_ImageDirection[1][0]);
+    parameters.put("fiberfox.image.basic.direction.5", m_SignalGen.m_ImageDirection[1][1]);
+    parameters.put("fiberfox.image.basic.direction.6", m_SignalGen.m_ImageDirection[1][2]);
+    parameters.put("fiberfox.image.basic.direction.7", m_SignalGen.m_ImageDirection[2][0]);
+    parameters.put("fiberfox.image.basic.direction.8", m_SignalGen.m_ImageDirection[2][1]);
+    parameters.put("fiberfox.image.basic.direction.9", m_SignalGen.m_ImageDirection[2][2]);
 
-    parameters.put("fiberfox.image.signalScale", m_SignalScale);
-    parameters.put("fiberfox.image.tEcho", m_tEcho);
-    parameters.put("fiberfox.image.tLine", m_tLine);
-    parameters.put("fiberfox.image.tInhom", m_tInhom);
-    parameters.put("fiberfox.image.bvalue", m_Bvalue);
-    parameters.put("fiberfox.image.simulatekspace", m_SimulateKspaceAcquisition);
+    parameters.put("fiberfox.image.signalScale", m_SignalGen.m_SignalScale);
+    parameters.put("fiberfox.image.tEcho", m_SignalGen.m_tEcho);
+    parameters.put("fiberfox.image.tLine", m_SignalGen.m_tLine);
+    parameters.put("fiberfox.image.tInhom", m_SignalGen.m_tInhom);
+    parameters.put("fiberfox.image.bvalue", m_SignalGen.m_Bvalue);
+    parameters.put("fiberfox.image.simulatekspace", m_SignalGen.m_SimulateKspaceAcquisition);
 
-    parameters.put("fiberfox.image.axonRadius", m_AxonRadius);
-    parameters.put("fiberfox.image.diffusiondirectionmode", m_DiffusionDirectionMode);
-    parameters.put("fiberfox.image.fiberseparationthreshold", m_FiberSeparationThreshold);
+    parameters.put("fiberfox.image.axonRadius", m_SignalGen.m_AxonRadius);
+    parameters.put("fiberfox.image.diffusiondirectionmode", m_SignalGen.m_DiffusionDirectionMode);
+    parameters.put("fiberfox.image.fiberseparationthreshold", m_SignalGen.m_FiberSeparationThreshold);
 
-    parameters.put("fiberfox.image.artifacts.addnoise", m_DoAddNoise);
-    parameters.put("fiberfox.image.artifacts.addghosts", m_DoAddGhosts);
-    parameters.put("fiberfox.image.artifacts.addaliasing", m_DoAddAliasing);
-    parameters.put("fiberfox.image.artifacts.addspikes", m_DoAddSpikes);
-    parameters.put("fiberfox.image.artifacts.addeddycurrents", m_DoAddEddyCurrents);
-    parameters.put("fiberfox.image.artifacts.spikesnum", m_Spikes);
-    parameters.put("fiberfox.image.artifacts.spikesscale", m_SpikeAmplitude);
-    parameters.put("fiberfox.image.artifacts.kspaceLineOffset", m_KspaceLineOffset);
-    parameters.put("fiberfox.image.artifacts.eddyStrength", m_EddyStrength);
-    parameters.put("fiberfox.image.artifacts.eddyTau", m_Tau);
-    parameters.put("fiberfox.image.artifacts.aliasingfactor", m_CroppingFactor);
-    parameters.put("fiberfox.image.artifacts.addringing", m_DoAddGibbsRinging);
-    parameters.put("fiberfox.image.doSimulateRelaxation", m_DoSimulateRelaxation);
-    parameters.put("fiberfox.image.doDisablePartialVolume", m_DoDisablePartialVolume);
-    parameters.put("fiberfox.image.artifacts.doAddMotion", m_DoAddMotion);
-    parameters.put("fiberfox.image.artifacts.randomMotion", m_DoRandomizeMotion);
-    parameters.put("fiberfox.image.artifacts.doAddDistortions", m_DoAddDistortions);
-    parameters.put("fiberfox.image.artifacts.translation0", m_Translation[0]);
-    parameters.put("fiberfox.image.artifacts.translation1", m_Translation[1]);
-    parameters.put("fiberfox.image.artifacts.translation2", m_Translation[2]);
-    parameters.put("fiberfox.image.artifacts.rotation0", m_Rotation[0]);
-    parameters.put("fiberfox.image.artifacts.rotation1", m_Rotation[1]);
-    parameters.put("fiberfox.image.artifacts.rotation2", m_Rotation[2]);
+    parameters.put("fiberfox.image.artifacts.addnoise", m_SignalGen.m_DoAddNoise);
+    parameters.put("fiberfox.image.artifacts.addghosts", m_SignalGen.m_DoAddGhosts);
+    parameters.put("fiberfox.image.artifacts.addaliasing", m_SignalGen.m_DoAddAliasing);
+    parameters.put("fiberfox.image.artifacts.addspikes", m_SignalGen.m_DoAddSpikes);
+    parameters.put("fiberfox.image.artifacts.addeddycurrents", m_SignalGen.m_DoAddEddyCurrents);
+    parameters.put("fiberfox.image.artifacts.spikesnum", m_SignalGen.m_Spikes);
+    parameters.put("fiberfox.image.artifacts.spikesscale", m_SignalGen.m_SpikeAmplitude);
+    parameters.put("fiberfox.image.artifacts.kspaceLineOffset", m_SignalGen.m_KspaceLineOffset);
+    parameters.put("fiberfox.image.artifacts.eddyStrength", m_SignalGen.m_EddyStrength);
+    parameters.put("fiberfox.image.artifacts.eddyTau", m_SignalGen.m_Tau);
+    parameters.put("fiberfox.image.artifacts.aliasingfactor", m_SignalGen.m_CroppingFactor);
+    parameters.put("fiberfox.image.artifacts.addringing", m_SignalGen.m_DoAddGibbsRinging);
+    parameters.put("fiberfox.image.doSimulateRelaxation", m_SignalGen.m_DoSimulateRelaxation);
+    parameters.put("fiberfox.image.doDisablePartialVolume", m_SignalGen.m_DoDisablePartialVolume);
+    parameters.put("fiberfox.image.artifacts.doAddMotion", m_SignalGen.m_DoAddMotion);
+    parameters.put("fiberfox.image.artifacts.randomMotion", m_SignalGen.m_DoRandomizeMotion);
+    parameters.put("fiberfox.image.artifacts.doAddDistortions", m_SignalGen.m_DoAddDistortions);
+    parameters.put("fiberfox.image.artifacts.translation0", m_SignalGen.m_Translation[0]);
+    parameters.put("fiberfox.image.artifacts.translation1", m_SignalGen.m_Translation[1]);
+    parameters.put("fiberfox.image.artifacts.translation2", m_SignalGen.m_Translation[2]);
+    parameters.put("fiberfox.image.artifacts.rotation0", m_SignalGen.m_Rotation[0]);
+    parameters.put("fiberfox.image.artifacts.rotation1", m_SignalGen.m_Rotation[1]);
+    parameters.put("fiberfox.image.artifacts.rotation2", m_SignalGen.m_Rotation[2]);
 
-    parameters.put("fiberfox.image.signalmodelstring", m_SignalModelString);
-    parameters.put("fiberfox.image.artifactmodelstring", m_ArtifactModelString);
-    parameters.put("fiberfox.image.outpath", m_OutputPath);
-    parameters.put("fiberfox.image.outputvolumefractions", m_OutputVolumeFractions);
-    parameters.put("fiberfox.image.showadvanced", m_AdvancedOptions);
+    parameters.put("fiberfox.image.signalmodelstring", m_Misc.m_SignalModelString);
+    parameters.put("fiberfox.image.artifactmodelstring", m_Misc.m_ArtifactModelString);
+    parameters.put("fiberfox.image.outpath", m_Misc.m_OutputPath);
+    parameters.put("fiberfox.image.outputvolumefractions", m_Misc.m_OutputVolumeFractions);
+    parameters.put("fiberfox.image.showadvanced", m_Misc.m_AdvancedOptions);
     parameters.put("fiberfox.image.basic.numgradients", m_NumGradients);
 
     if (m_NoiseModel!=NULL)
@@ -435,102 +435,102 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
     {
         if( v1.first == "fibers" )
         {
-            m_FiberGenerationParameters.m_RealTimeFibers = v1.second.get<bool>("realtime", m_FiberGenerationParameters.m_RealTimeFibers);
-            m_FiberGenerationParameters.m_AdvancedOptions = v1.second.get<bool>("showadvanced", m_FiberGenerationParameters.m_AdvancedOptions);
-            m_FiberGenerationParameters.m_Distribution = v1.second.get<int>("distribution", m_FiberGenerationParameters.m_Distribution);
-            m_FiberGenerationParameters.m_Variance = v1.second.get<double>("variance", m_FiberGenerationParameters.m_Variance);
-            m_FiberGenerationParameters.m_FiberDensity = v1.second.get<unsigned int>("density", m_FiberGenerationParameters.m_FiberDensity);
-            m_FiberGenerationParameters.m_Sampling = v1.second.get<double>("spline.sampling", m_FiberGenerationParameters.m_Sampling);
-            m_FiberGenerationParameters.m_Tension = v1.second.get<double>("spline.tension", m_FiberGenerationParameters.m_Tension);
-            m_FiberGenerationParameters.m_Continuity = v1.second.get<double>("spline.continuity", m_FiberGenerationParameters.m_Continuity);
-            m_FiberGenerationParameters.m_Bias = v1.second.get<double>("spline.bias", m_FiberGenerationParameters.m_Bias);
-            m_FiberGenerationParameters.m_ConstantRadius = v1.second.get<bool>("constantradius", m_FiberGenerationParameters.m_ConstantRadius);
-            m_FiberGenerationParameters.m_Rotation[0] = v1.second.get<double>("rotation.x", m_FiberGenerationParameters.m_Rotation[0]);
-            m_FiberGenerationParameters.m_Rotation[1] = v1.second.get<double>("rotation.y", m_FiberGenerationParameters.m_Rotation[1]);
-            m_FiberGenerationParameters.m_Rotation[2] = v1.second.get<double>("rotation.z", m_FiberGenerationParameters.m_Rotation[2]);
-            m_FiberGenerationParameters.m_Translation[0] = v1.second.get<double>("translation.x", m_FiberGenerationParameters.m_Translation[0]);
-            m_FiberGenerationParameters.m_Translation[1] = v1.second.get<double>("translation.y", m_FiberGenerationParameters.m_Translation[1]);
-            m_FiberGenerationParameters.m_Translation[2] = v1.second.get<double>("translation.z", m_FiberGenerationParameters.m_Translation[2]);
-            m_FiberGenerationParameters.m_Scale[0] = v1.second.get<double>("scale.x", m_FiberGenerationParameters.m_Scale[0]);
-            m_FiberGenerationParameters.m_Scale[1] = v1.second.get<double>("scale.y", m_FiberGenerationParameters.m_Scale[1]);
-            m_FiberGenerationParameters.m_Scale[2] = v1.second.get<double>("scale.z", m_FiberGenerationParameters.m_Scale[2]);
-            m_FiberGenerationParameters.m_IncludeFiducials = v1.second.get<bool>("includeFiducials", m_FiberGenerationParameters.m_IncludeFiducials);
+            m_FiberGen.m_RealTimeFibers = v1.second.get<bool>("realtime", m_FiberGen.m_RealTimeFibers);
+            m_FiberGen.m_AdvancedOptions = v1.second.get<bool>("showadvanced", m_FiberGen.m_AdvancedOptions);
+            m_FiberGen.m_Distribution = v1.second.get<int>("distribution", m_FiberGen.m_Distribution);
+            m_FiberGen.m_Variance = v1.second.get<double>("variance", m_FiberGen.m_Variance);
+            m_FiberGen.m_FiberDensity = v1.second.get<unsigned int>("density", m_FiberGen.m_FiberDensity);
+            m_FiberGen.m_Sampling = v1.second.get<double>("spline.sampling", m_FiberGen.m_Sampling);
+            m_FiberGen.m_Tension = v1.second.get<double>("spline.tension", m_FiberGen.m_Tension);
+            m_FiberGen.m_Continuity = v1.second.get<double>("spline.continuity", m_FiberGen.m_Continuity);
+            m_FiberGen.m_Bias = v1.second.get<double>("spline.bias", m_FiberGen.m_Bias);
+            m_FiberGen.m_ConstantRadius = v1.second.get<bool>("constantradius", m_FiberGen.m_ConstantRadius);
+            m_FiberGen.m_Rotation[0] = v1.second.get<double>("rotation.x", m_FiberGen.m_Rotation[0]);
+            m_FiberGen.m_Rotation[1] = v1.second.get<double>("rotation.y", m_FiberGen.m_Rotation[1]);
+            m_FiberGen.m_Rotation[2] = v1.second.get<double>("rotation.z", m_FiberGen.m_Rotation[2]);
+            m_FiberGen.m_Translation[0] = v1.second.get<double>("translation.x", m_FiberGen.m_Translation[0]);
+            m_FiberGen.m_Translation[1] = v1.second.get<double>("translation.y", m_FiberGen.m_Translation[1]);
+            m_FiberGen.m_Translation[2] = v1.second.get<double>("translation.z", m_FiberGen.m_Translation[2]);
+            m_FiberGen.m_Scale[0] = v1.second.get<double>("scale.x", m_FiberGen.m_Scale[0]);
+            m_FiberGen.m_Scale[1] = v1.second.get<double>("scale.y", m_FiberGen.m_Scale[1]);
+            m_FiberGen.m_Scale[2] = v1.second.get<double>("scale.z", m_FiberGen.m_Scale[2]);
+            m_FiberGen.m_IncludeFiducials = v1.second.get<bool>("includeFiducials", m_FiberGen.m_IncludeFiducials);
         }
         else if ( v1.first == "image" )
         {
-            m_ImageRegion.SetSize(0, v1.second.get<int>("basic.size.x", m_ImageRegion.GetSize(0)));
-            m_ImageRegion.SetSize(1, v1.second.get<int>("basic.size.y", m_ImageRegion.GetSize(1)));
-            m_ImageRegion.SetSize(2, v1.second.get<int>("basic.size.z", m_ImageRegion.GetSize(2)));
-            m_ImageSpacing[0] = v1.second.get<double>("basic.spacing.x", m_ImageSpacing[0]);
-            m_ImageSpacing[1] = v1.second.get<double>("basic.spacing.y", m_ImageSpacing[1]);
-            m_ImageSpacing[2] = v1.second.get<double>("basic.spacing.z", m_ImageSpacing[2]);
-            m_ImageOrigin[0] = v1.second.get<double>("basic.origin.x", m_ImageOrigin[0]);
-            m_ImageOrigin[1] = v1.second.get<double>("basic.origin.y", m_ImageOrigin[1]);
-            m_ImageOrigin[2] = v1.second.get<double>("basic.origin.z", m_ImageOrigin[2]);
-            m_ImageDirection[0][0] = v1.second.get<double>("basic.direction.1", m_ImageDirection[0][0]);
-            m_ImageDirection[0][1] = v1.second.get<double>("basic.direction.2", m_ImageDirection[0][1]);
-            m_ImageDirection[0][2] = v1.second.get<double>("basic.direction.3", m_ImageDirection[0][2]);
-            m_ImageDirection[1][0] = v1.second.get<double>("basic.direction.4", m_ImageDirection[1][0]);
-            m_ImageDirection[1][1] = v1.second.get<double>("basic.direction.5", m_ImageDirection[1][1]);
-            m_ImageDirection[1][2] = v1.second.get<double>("basic.direction.6", m_ImageDirection[1][2]);
-            m_ImageDirection[2][0] = v1.second.get<double>("basic.direction.7", m_ImageDirection[2][0]);
-            m_ImageDirection[2][1] = v1.second.get<double>("basic.direction.8", m_ImageDirection[2][1]);
-            m_ImageDirection[2][2] = v1.second.get<double>("basic.direction.9", m_ImageDirection[2][2]);
+           m_SignalGen.m_ImageRegion.SetSize(0, v1.second.get<int>("basic.size.x",m_SignalGen.m_ImageRegion.GetSize(0)));
+           m_SignalGen.m_ImageRegion.SetSize(1, v1.second.get<int>("basic.size.y",m_SignalGen.m_ImageRegion.GetSize(1)));
+           m_SignalGen.m_ImageRegion.SetSize(2, v1.second.get<int>("basic.size.z",m_SignalGen.m_ImageRegion.GetSize(2)));
+           m_SignalGen.m_ImageSpacing[0] = v1.second.get<double>("basic.spacing.x",m_SignalGen.m_ImageSpacing[0]);
+           m_SignalGen.m_ImageSpacing[1] = v1.second.get<double>("basic.spacing.y",m_SignalGen.m_ImageSpacing[1]);
+           m_SignalGen.m_ImageSpacing[2] = v1.second.get<double>("basic.spacing.z",m_SignalGen.m_ImageSpacing[2]);
+           m_SignalGen.m_ImageOrigin[0] = v1.second.get<double>("basic.origin.x",m_SignalGen.m_ImageOrigin[0]);
+           m_SignalGen.m_ImageOrigin[1] = v1.second.get<double>("basic.origin.y",m_SignalGen.m_ImageOrigin[1]);
+           m_SignalGen.m_ImageOrigin[2] = v1.second.get<double>("basic.origin.z",m_SignalGen.m_ImageOrigin[2]);
+           m_SignalGen.m_ImageDirection[0][0] = v1.second.get<double>("basic.direction.1",m_SignalGen.m_ImageDirection[0][0]);
+           m_SignalGen.m_ImageDirection[0][1] = v1.second.get<double>("basic.direction.2",m_SignalGen.m_ImageDirection[0][1]);
+           m_SignalGen.m_ImageDirection[0][2] = v1.second.get<double>("basic.direction.3",m_SignalGen.m_ImageDirection[0][2]);
+           m_SignalGen.m_ImageDirection[1][0] = v1.second.get<double>("basic.direction.4",m_SignalGen.m_ImageDirection[1][0]);
+           m_SignalGen.m_ImageDirection[1][1] = v1.second.get<double>("basic.direction.5",m_SignalGen.m_ImageDirection[1][1]);
+           m_SignalGen.m_ImageDirection[1][2] = v1.second.get<double>("basic.direction.6",m_SignalGen.m_ImageDirection[1][2]);
+           m_SignalGen.m_ImageDirection[2][0] = v1.second.get<double>("basic.direction.7",m_SignalGen.m_ImageDirection[2][0]);
+           m_SignalGen.m_ImageDirection[2][1] = v1.second.get<double>("basic.direction.8",m_SignalGen.m_ImageDirection[2][1]);
+           m_SignalGen.m_ImageDirection[2][2] = v1.second.get<double>("basic.direction.9",m_SignalGen.m_ImageDirection[2][2]);
 
-            m_SignalScale = v1.second.get<double>("signalScale", m_SignalScale);
-            m_tEcho = v1.second.get<double>("tEcho", m_tEcho);
-            m_tLine = v1.second.get<double>("tLine", m_tLine);
-            m_tInhom = v1.second.get<double>("tInhom", m_tInhom);
-            m_Bvalue = v1.second.get<double>("bvalue", m_Bvalue);
-            m_SimulateKspaceAcquisition = v1.second.get<bool>("simulatekspace", m_SimulateKspaceAcquisition);
+            m_SignalGen.m_SignalScale = v1.second.get<double>("signalScale", m_SignalGen.m_SignalScale);
+            m_SignalGen.m_tEcho = v1.second.get<double>("tEcho", m_SignalGen.m_tEcho);
+            m_SignalGen.m_tLine = v1.second.get<double>("tLine", m_SignalGen.m_tLine);
+            m_SignalGen.m_tInhom = v1.second.get<double>("tInhom", m_SignalGen.m_tInhom);
+            m_SignalGen.m_Bvalue = v1.second.get<double>("bvalue", m_SignalGen.m_Bvalue);
+            m_SignalGen.m_SimulateKspaceAcquisition = v1.second.get<bool>("simulatekspace", m_SignalGen.m_SimulateKspaceAcquisition);
 
-            m_AxonRadius = v1.second.get<double>("axonRadius", m_AxonRadius);
+            m_SignalGen.m_AxonRadius = v1.second.get<double>("axonRadius", m_SignalGen.m_AxonRadius);
             int mode = v1.second.get<int>("diffusiondirectionmode", 0);
             switch (mode)
             {
             case 0:
-                m_DiffusionDirectionMode = FIBER_TANGENT_DIRECTIONS;
+                m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
                 break;
             case 1:
-                m_DiffusionDirectionMode = MAIN_FIBER_DIRECTIONS;
+                m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::MAIN_FIBER_DIRECTIONS;
                 break;
             case 2:
-                m_DiffusionDirectionMode = RANDOM_DIRECTIONS;
+                m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::RANDOM_DIRECTIONS;
                 break;
             default:
-                m_DiffusionDirectionMode = FIBER_TANGENT_DIRECTIONS;
+                m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
             }
-            m_FiberSeparationThreshold = v1.second.get<double>("fiberseparationthreshold", m_FiberSeparationThreshold);
+            m_SignalGen.m_FiberSeparationThreshold = v1.second.get<double>("fiberseparationthreshold", m_SignalGen.m_FiberSeparationThreshold);
 
-            m_DoAddNoise = v1.second.get<bool>("artifacts.addnoise", m_DoAddNoise);
-            m_DoAddGhosts = v1.second.get<bool>("artifacts.addghosts", m_DoAddGhosts);
-            m_DoAddAliasing = v1.second.get<bool>("artifacts.addaliasing", m_DoAddAliasing);
-            m_DoAddSpikes = v1.second.get<bool>("artifacts.addspikes", m_DoAddSpikes);
-            m_DoAddEddyCurrents = v1.second.get<bool>("artifacts.addeddycurrents", m_DoAddEddyCurrents);
-            m_Spikes = v1.second.get<unsigned int>("artifacts.spikesnum", m_Spikes);
-            m_SpikeAmplitude = v1.second.get<double>("artifacts.spikesscale", m_SpikeAmplitude);
-            m_KspaceLineOffset = v1.second.get<double>("artifacts.kspaceLineOffset", m_KspaceLineOffset);
-            m_EddyStrength = v1.second.get<double>("artifacts.eddyStrength", m_EddyStrength);
-            m_Tau = v1.second.get<double>("artifacts.eddyTau", m_Tau);
-            m_CroppingFactor = v1.second.get<double>("artifacts.aliasingfactor", m_CroppingFactor);
-            m_DoAddGibbsRinging = v1.second.get<bool>("artifacts.addringing", m_DoAddGibbsRinging);
-            m_DoSimulateRelaxation = v1.second.get<bool>("doSimulateRelaxation", m_DoSimulateRelaxation);
-            m_DoDisablePartialVolume = v1.second.get<bool>("doDisablePartialVolume", m_DoDisablePartialVolume);
-            m_DoAddMotion = v1.second.get<bool>("artifacts.doAddMotion", m_DoAddMotion);
-            m_DoRandomizeMotion = v1.second.get<bool>("artifacts.randomMotion", m_DoRandomizeMotion);
-            m_DoAddDistortions = v1.second.get<bool>("artifacts.doAddDistortions", m_DoAddDistortions);
-            m_Translation[0] = v1.second.get<double>("artifacts.translation0", m_Translation[0]);
-            m_Translation[1] = v1.second.get<double>("artifacts.translation1", m_Translation[1]);
-            m_Translation[2] = v1.second.get<double>("artifacts.translation2", m_Translation[2]);
-            m_Rotation[0] = v1.second.get<double>("artifacts.rotation0", m_Rotation[0]);
-            m_Rotation[1] = v1.second.get<double>("artifacts.rotation1", m_Rotation[1]);
-            m_Rotation[2] = v1.second.get<double>("artifacts.rotation2", m_Rotation[2]);
+            m_SignalGen.m_DoAddNoise = v1.second.get<bool>("artifacts.addnoise", m_SignalGen.m_DoAddNoise);
+            m_SignalGen.m_DoAddGhosts = v1.second.get<bool>("artifacts.addghosts", m_SignalGen.m_DoAddGhosts);
+            m_SignalGen.m_DoAddAliasing = v1.second.get<bool>("artifacts.addaliasing", m_SignalGen.m_DoAddAliasing);
+            m_SignalGen.m_DoAddSpikes = v1.second.get<bool>("artifacts.addspikes", m_SignalGen.m_DoAddSpikes);
+            m_SignalGen.m_DoAddEddyCurrents = v1.second.get<bool>("artifacts.addeddycurrents", m_SignalGen.m_DoAddEddyCurrents);
+            m_SignalGen.m_Spikes = v1.second.get<unsigned int>("artifacts.spikesnum", m_SignalGen.m_Spikes);
+            m_SignalGen.m_SpikeAmplitude = v1.second.get<double>("artifacts.spikesscale", m_SignalGen.m_SpikeAmplitude);
+            m_SignalGen.m_KspaceLineOffset = v1.second.get<double>("artifacts.kspaceLineOffset", m_SignalGen.m_KspaceLineOffset);
+            m_SignalGen.m_EddyStrength = v1.second.get<double>("artifacts.eddyStrength", m_SignalGen.m_EddyStrength);
+            m_SignalGen.m_Tau = v1.second.get<double>("artifacts.eddyTau", m_SignalGen.m_Tau);
+            m_SignalGen.m_CroppingFactor = v1.second.get<double>("artifacts.aliasingfactor", m_SignalGen.m_CroppingFactor);
+            m_SignalGen.m_DoAddGibbsRinging = v1.second.get<bool>("artifacts.addringing", m_SignalGen.m_DoAddGibbsRinging);
+            m_SignalGen.m_DoSimulateRelaxation = v1.second.get<bool>("doSimulateRelaxation", m_SignalGen.m_DoSimulateRelaxation);
+            m_SignalGen.m_DoDisablePartialVolume = v1.second.get<bool>("doDisablePartialVolume", m_SignalGen.m_DoDisablePartialVolume);
+            m_SignalGen.m_DoAddMotion = v1.second.get<bool>("artifacts.doAddMotion", m_SignalGen.m_DoAddMotion);
+            m_SignalGen.m_DoRandomizeMotion = v1.second.get<bool>("artifacts.randomMotion", m_SignalGen.m_DoRandomizeMotion);
+            m_SignalGen.m_DoAddDistortions = v1.second.get<bool>("artifacts.doAddDistortions", m_SignalGen.m_DoAddDistortions);
+            m_SignalGen.m_Translation[0] = v1.second.get<double>("artifacts.translation0", m_SignalGen.m_Translation[0]);
+            m_SignalGen.m_Translation[1] = v1.second.get<double>("artifacts.translation1", m_SignalGen.m_Translation[1]);
+            m_SignalGen.m_Translation[2] = v1.second.get<double>("artifacts.translation2", m_SignalGen.m_Translation[2]);
+            m_SignalGen.m_Rotation[0] = v1.second.get<double>("artifacts.rotation0", m_SignalGen.m_Rotation[0]);
+            m_SignalGen.m_Rotation[1] = v1.second.get<double>("artifacts.rotation1", m_SignalGen.m_Rotation[1]);
+            m_SignalGen.m_Rotation[2] = v1.second.get<double>("artifacts.rotation2", m_SignalGen.m_Rotation[2]);
 
-            m_SignalModelString = v1.second.get<string>("signalmodelstring", m_SignalModelString);
-            m_ArtifactModelString = v1.second.get<string>("artifactmodelstring", m_ArtifactModelString);
-            m_OutputPath = v1.second.get<string>("outpath", m_OutputPath);
-            m_OutputVolumeFractions = v1.second.get<bool>("outputvolumefractions", m_OutputVolumeFractions);
-            m_AdvancedOptions = v1.second.get<bool>("showadvanced", m_AdvancedOptions);
+            m_Misc.m_SignalModelString = v1.second.get<string>("signalmodelstring", m_Misc.m_SignalModelString);
+            m_Misc.m_ArtifactModelString = v1.second.get<string>("artifactmodelstring", m_Misc.m_ArtifactModelString);
+            m_Misc.m_OutputPath = v1.second.get<string>("outpath", m_Misc.m_OutputPath);
+            m_Misc.m_OutputVolumeFractions = v1.second.get<bool>("outputvolumefractions", m_Misc.m_OutputVolumeFractions);
+            m_Misc.m_AdvancedOptions = v1.second.get<bool>("showadvanced", m_Misc.m_AdvancedOptions);
             m_NumGradients = v1.second.get<unsigned int>("numgradients", m_NumGradients);
             GenerateGradientHalfShell();
 

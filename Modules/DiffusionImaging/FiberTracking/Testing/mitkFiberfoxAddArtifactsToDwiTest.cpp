@@ -63,11 +63,11 @@ public:
 
         // parameter setup
         m_Parameters = FiberfoxParameters<short>();
-        m_Parameters.m_ImageRegion = m_InputDwi->GetVectorImage()->GetLargestPossibleRegion();
-        m_Parameters.m_ImageSpacing = m_InputDwi->GetVectorImage()->GetSpacing();
-        m_Parameters.m_ImageOrigin = m_InputDwi->GetVectorImage()->GetOrigin();
-        m_Parameters.m_ImageDirection = m_InputDwi->GetVectorImage()->GetDirection();
-        m_Parameters.m_Bvalue = m_InputDwi->GetReferenceBValue();
+        m_Parameters.m_SignalGen.m_ImageRegion = m_InputDwi->GetVectorImage()->GetLargestPossibleRegion();
+        m_Parameters.m_SignalGen.m_ImageSpacing = m_InputDwi->GetVectorImage()->GetSpacing();
+        m_Parameters.m_SignalGen.m_ImageOrigin = m_InputDwi->GetVectorImage()->GetOrigin();
+        m_Parameters.m_SignalGen.m_ImageDirection = m_InputDwi->GetVectorImage()->GetDirection();
+        m_Parameters.m_SignalGen.m_Bvalue = m_InputDwi->GetReferenceBValue();
         m_Parameters.SetGradienDirections(m_InputDwi->GetDirections());
     }
 
@@ -106,8 +106,8 @@ public:
 
         mitk::DiffusionImage<short>::Pointer testImage = mitk::DiffusionImage<short>::New();
         testImage->SetVectorImage( artifactsToDwiFilter->GetOutput() );
-        testImage->SetReferenceBValue(m_Parameters.m_Bvalue);
-        testImage->SetDirections(m_Parameters.GetGradientDirections());
+        testImage->SetReferenceBValue( m_Parameters.m_SignalGen.m_Bvalue);
+        testImage->SetDirections( m_Parameters.GetGradientDirections());
         testImage->InitializeFromVectorImage();
 
         if (refImage.IsNotNull())
@@ -118,32 +118,32 @@ public:
 
     void Spikes()
     {
-        m_Parameters.m_Spikes = 5;
-        m_Parameters.m_SpikeAmplitude = 1;
+        m_Parameters.m_SignalGen.m_Spikes = 5;
+        m_Parameters.m_SignalGen.m_SpikeAmplitude = 1;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/spikes2.dwi") );
     }
 
     void GibbsRinging()
     {
-        m_Parameters.m_DoAddGibbsRinging = true;
+        m_Parameters.m_SignalGen.m_DoAddGibbsRinging = true;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/gibbsringing2.dwi") );
     }
 
     void Ghost()
     {
-        m_Parameters.m_KspaceLineOffset = 0.25;
+        m_Parameters.m_SignalGen.m_KspaceLineOffset = 0.25;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/ghost2.dwi") );
     }
 
     void Aliasing()
     {
-        m_Parameters.m_CroppingFactor = 0.4;
+        m_Parameters.m_SignalGen.m_CroppingFactor = 0.4;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/aliasing2.dwi") );
     }
 
     void Eddy()
     {
-        m_Parameters.m_EddyStrength = 0.05;
+        m_Parameters.m_SignalGen.m_EddyStrength = 0.05;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/eddy2.dwi") );
     }
 
@@ -154,7 +154,7 @@ public:
         ricianNoiseModel->SetSeed(0);
         m_Parameters.m_NoiseModel = ricianNoiseModel;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/riciannoise2.dwi") );
-        delete m_Parameters.m_NoiseModel;
+        delete  m_Parameters.m_NoiseModel;
     }
 
     void ChiSquareNoise()
@@ -164,7 +164,7 @@ public:
         chiSquareNoiseModel->SetSeed(0);
         m_Parameters.m_NoiseModel = chiSquareNoiseModel;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/chisquarenoise2.dwi") );
-        delete m_Parameters.m_NoiseModel;
+        delete  m_Parameters.m_NoiseModel;
     }
 
     void Distortions()
@@ -173,7 +173,7 @@ public:
         typedef itk::Image<double, 3> ItkDoubleImgType;
         ItkDoubleImgType::Pointer fMap = ItkDoubleImgType::New();
         mitk::CastToItkImage(mitkFMap, fMap);
-        m_Parameters.m_FrequencyMap = fMap;
+        m_Parameters.m_SignalGen.m_FrequencyMap = fMap;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/distortions2.dwi") );
     }
 };

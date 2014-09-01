@@ -65,7 +65,7 @@ void StartSimulation(FiberfoxParameters<double> parameters, FiberBundleX::Pointe
 
     mitk::DiffusionImage<short>::Pointer testImage = mitk::DiffusionImage<short>::New();
     testImage->SetVectorImage( tractsToDwiFilter->GetOutput() );
-    testImage->SetReferenceBValue(parameters.m_Bvalue);
+    testImage->SetReferenceBValue(parameters.m_SignalGen.m_Bvalue);
     testImage->SetDirections(parameters.GetGradientDirections());
     testImage->InitializeFromVectorImage();
 
@@ -117,25 +117,25 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     mitk::CastToItkImage(mitkFMap, fMap);
 
     FiberfoxParameters<double> parameters;
-    parameters.m_SimulateKspaceAcquisition = true;
-    parameters.m_SignalScale = 10000;
-    parameters.m_ImageRegion = stickBall->GetVectorImage()->GetLargestPossibleRegion();
-    parameters.m_ImageSpacing = stickBall->GetVectorImage()->GetSpacing();
-    parameters.m_ImageOrigin = stickBall->GetVectorImage()->GetOrigin();
-    parameters.m_ImageDirection = stickBall->GetVectorImage()->GetDirection();
-    parameters.m_Bvalue = stickBall->GetReferenceBValue();
+    parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
+    parameters.m_SignalGen.m_SignalScale = 10000;
+    parameters.m_SignalGen.m_ImageRegion = stickBall->GetVectorImage()->GetLargestPossibleRegion();
+    parameters.m_SignalGen.m_ImageSpacing = stickBall->GetVectorImage()->GetSpacing();
+    parameters.m_SignalGen.m_ImageOrigin = stickBall->GetVectorImage()->GetOrigin();
+    parameters.m_SignalGen.m_ImageDirection = stickBall->GetVectorImage()->GetDirection();
+    parameters.m_SignalGen.m_Bvalue = stickBall->GetReferenceBValue();
     parameters.SetGradienDirections(stickBall->GetDirections());
 
     // intra and inter axonal compartments
     mitk::StickModel<double> stickModel;
-    stickModel.SetBvalue(parameters.m_Bvalue);
+    stickModel.SetBvalue(parameters.m_SignalGen.m_Bvalue);
     stickModel.SetT2(110);
     stickModel.SetDiffusivity(0.001);
     stickModel.SetGradientList(parameters.GetGradientDirections());
 
     mitk::TensorModel<double> tensorModel;
     tensorModel.SetT2(110);
-    stickModel.SetBvalue(parameters.m_Bvalue);
+    stickModel.SetBvalue(parameters.m_SignalGen.m_Bvalue);
     tensorModel.SetDiffusivity1(0.001);
     tensorModel.SetDiffusivity2(0.00025);
     tensorModel.SetDiffusivity3(0.00025);
@@ -144,13 +144,13 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     // extra axonal compartment models
     mitk::BallModel<double> ballModel;
     ballModel.SetT2(80);
-    ballModel.SetBvalue(parameters.m_Bvalue);
+    ballModel.SetBvalue(parameters.m_SignalGen.m_Bvalue);
     ballModel.SetDiffusivity(0.001);
     ballModel.SetGradientList(parameters.GetGradientDirections());
 
     mitk::AstroStickModel<double> astrosticksModel;
     astrosticksModel.SetT2(80);
-    astrosticksModel.SetBvalue(parameters.m_Bvalue);
+    astrosticksModel.SetBvalue(parameters.m_SignalGen.m_Bvalue);
     astrosticksModel.SetDiffusivity(0.001);
     astrosticksModel.SetRandomizeSticks(true);
     astrosticksModel.SetSeed(0);
@@ -210,48 +210,48 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
         parameters.m_FiberModelList.push_back(&stickModel);
         parameters.m_NonFiberModelList.clear();
         parameters.m_NonFiberModelList.push_back(&ballModel);
-        parameters.m_DoAddGibbsRinging = true;
+        parameters.m_SignalGen.m_DoAddGibbsRinging = true;
         StartSimulation(parameters, fiberBundle, gibbsringing, argv[8]);
 
         // Ghost
-        parameters.m_DoAddGibbsRinging = false;
-        parameters.m_KspaceLineOffset = 0.25;
+        parameters.m_SignalGen.m_DoAddGibbsRinging = false;
+        parameters.m_SignalGen.m_KspaceLineOffset = 0.25;
         StartSimulation(parameters, fiberBundle, ghost, argv[9]);
 
         // Aliasing
-        parameters.m_KspaceLineOffset = 0;
-        parameters.m_CroppingFactor = 0.4;
-        parameters.m_SignalScale = 1000;
+        parameters.m_SignalGen.m_KspaceLineOffset = 0;
+        parameters.m_SignalGen.m_CroppingFactor = 0.4;
+        parameters.m_SignalGen.m_SignalScale = 1000;
         StartSimulation(parameters, fiberBundle, aliasing, argv[10]);
 
         // Eddy currents
-        parameters.m_CroppingFactor = 1;
-        parameters.m_SignalScale = 10000;
-        parameters.m_EddyStrength = 0.05;
+        parameters.m_SignalGen.m_CroppingFactor = 1;
+        parameters.m_SignalGen.m_SignalScale = 10000;
+        parameters.m_SignalGen.m_EddyStrength = 0.05;
         StartSimulation(parameters, fiberBundle, eddy, argv[11]);
 
         // Motion (linear)
-        parameters.m_EddyStrength = 0.0;
-        parameters.m_DoAddMotion = true;
-        parameters.m_DoRandomizeMotion = false;
-        parameters.m_Translation[1] = 10;
-        parameters.m_Rotation[2] = 90;
+        parameters.m_SignalGen.m_EddyStrength = 0.0;
+        parameters.m_SignalGen.m_DoAddMotion = true;
+        parameters.m_SignalGen.m_DoRandomizeMotion = false;
+        parameters.m_SignalGen.m_Translation[1] = 10;
+        parameters.m_SignalGen.m_Rotation[2] = 90;
         StartSimulation(parameters, fiberBundle, linearmotion, argv[12]);
 
         // Motion (random)
-        parameters.m_DoRandomizeMotion = true;
-        parameters.m_Translation[1] = 5;
-        parameters.m_Rotation[2] = 45;
+        parameters.m_SignalGen.m_DoRandomizeMotion = true;
+        parameters.m_SignalGen.m_Translation[1] = 5;
+        parameters.m_SignalGen.m_Rotation[2] = 45;
         StartSimulation(parameters, fiberBundle, randommotion, argv[13]);
 
         // Spikes
-        parameters.m_DoAddMotion = false;
-        parameters.m_Spikes = 5;
-        parameters.m_SpikeAmplitude = 1;
+        parameters.m_SignalGen.m_DoAddMotion = false;
+        parameters.m_SignalGen.m_Spikes = 5;
+        parameters.m_SignalGen.m_SpikeAmplitude = 1;
         StartSimulation(parameters, fiberBundle, spikes, argv[14]);
 
         // Rician noise
-        parameters.m_Spikes = 0;
+        parameters.m_SignalGen.m_Spikes = 0;
         parameters.m_NoiseModel = ricianNoiseModel;
         StartSimulation(parameters, fiberBundle, riciannoise, argv[15]);
         delete parameters.m_NoiseModel;
@@ -263,7 +263,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
 
         // Distortions
         parameters.m_NoiseModel = NULL;
-        parameters.m_FrequencyMap = fMap;
+        parameters.m_SignalGen.m_FrequencyMap = fMap;
         StartSimulation(parameters, fiberBundle, distortions, argv[17]);
     }
     catch (std::exception &e)

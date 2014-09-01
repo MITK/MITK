@@ -81,8 +81,11 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   m_InterpolateSurfaceFilter = CreateDistanceImageFromSurfaceFilter::New();
 
   m_ReduceFilter->SetUseProgressBar(false);
-  m_NormalsFilter->SetUseProgressBar(false);
-  m_InterpolateSurfaceFilter->SetUseProgressBar(false);
+//  m_ReduceFilter->SetProgressStepSize(1);
+  m_NormalsFilter->SetUseProgressBar(true);
+  m_NormalsFilter->SetProgressStepSize(1);
+  m_InterpolateSurfaceFilter->SetUseProgressBar(true);
+  m_InterpolateSurfaceFilter->SetProgressStepSize(7);
 
   m_Contours = Surface::New();
 
@@ -218,10 +221,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   }
 
   //Setting up progress bar
-   /*
-    * Removed due to bug 12441. ProgressBar messes around with Qt event queue which is fatal for segmentation
-    */
-  //mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
 
   // create a surface from the distance-image
   mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
@@ -241,10 +241,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
 
   //Last progress step
-  /*
-   * Removed due to bug 12441. ProgressBar messes around with Qt event queue which is fatal for segmentation
-   */
-  //mitk::ProgressBar::GetInstance()->Progress(8);
+  mitk::ProgressBar::GetInstance()->Progress(2);
 
   m_InterpolationResult->DisconnectPipeline();
 }

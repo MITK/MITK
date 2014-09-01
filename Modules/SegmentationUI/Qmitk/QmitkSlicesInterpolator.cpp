@@ -769,6 +769,19 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     segmentationNode->SetData(s2iFilter->GetOutput());
     m_CmbInterpolation->setCurrentIndex(0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::DataNode::Pointer segSurface = mitk::DataNode::New();
+    float rgb[3];
+    segmentationNode->GetColor(rgb);
+    segSurface->SetColor(rgb);
+    segSurface->SetData(m_InterpolatedSurfaceNode->GetData());
+    std::stringstream stream;
+    stream << segmentationNode->GetName();
+    stream << "_";
+    stream << "3D-interpolation";
+    segSurface->SetName(stream.str());
+    segSurface->SetProperty( "opacity", mitk::FloatProperty::New(0.7) );
+    segSurface->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
+    m_DataStorage->Add(segSurface, segmentationNode);
     this->Show3DInterpolationResult(false);
   }
 }

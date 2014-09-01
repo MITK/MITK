@@ -241,7 +241,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
 
   //Last progress step
-  mitk::ProgressBar::GetInstance()->Progress(2);
+  mitk::ProgressBar::GetInstance()->Progress(20);
 
   m_InterpolationResult->DisconnectPipeline();
 }

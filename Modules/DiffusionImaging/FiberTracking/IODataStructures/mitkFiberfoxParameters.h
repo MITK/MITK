@@ -50,10 +50,13 @@ struct FiberGenerationParameters
 };
 
 /** Signal generation */
-struct SignalGenerationParameters
+class SignalGenerationParameters
 {
+public:
     typedef itk::Image<double, 3>                   ItkDoubleImgType;
     typedef itk::Image<unsigned char, 3>            ItkUcharImgType;
+    typedef itk::Vector<double,3>                   GradientType;
+    typedef std::vector<GradientType>               GradientListType;
 
     enum DiffusionDirectionMode {
         FIBER_TANGENT_DIRECTIONS,
@@ -86,7 +89,6 @@ struct SignalGenerationParameters
     double                              m_EddyStrength;             ///< Strength of eddy current induced gradients in mT/m.
     double                              m_Tau;                      ///< Eddy current decay constant (in ms)
     double                              m_CroppingFactor;           ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
-
     ItkDoubleImgType::Pointer           m_FrequencyMap;             ///< If != NULL, distortions are added to the image using this frequency map.
     ItkUcharImgType::Pointer            m_MaskImage;                ///< Signal is only genrated inside of the mask image.
 
@@ -104,6 +106,28 @@ struct SignalGenerationParameters
     bool                                m_DoRandomizeMotion;        ///< Toggles between random and linear motion.
     itk::Vector<double,3>               m_Translation;              ///< Maximum translational motion.
     itk::Vector<double,3>               m_Rotation;                 ///< Maximum rotational motion.
+
+    inline void GenerateGradientHalfShell();                        ///< Generates half shell of gradient directions (with m_NumGradients non-zero directions)
+
+    inline std::vector< int > GetBaselineIndices();
+    inline unsigned int GetFirstBaselineIndex();
+    inline bool IsBaselineIndex(unsigned int idx);
+
+    inline unsigned int GetNumWeightedVolumes();                    ///< Get number of diffusion-weighted image volumes
+    inline unsigned int GetNumBaselineVolumes();                    ///< Get number of non-diffusion-weighted image volumes
+    inline unsigned int GetNumVolumes();                            ///< Get number of baseline and diffusion-weighted image volumes
+    inline GradientListType GetGradientDirections();                ///< Return gradient direction container
+    inline GradientType GetGradientDirection(unsigned int i);
+
+    inline void SetNumWeightedVolumes(int numGradients);            ///< Automaticall calls GenerateGradientHalfShell() afterwards.
+    inline void SetGradienDirections(GradientListType gradientList);
+    inline void SetGradienDirections(mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer gradientList);
+
+protected:
+
+    unsigned int                        m_NumGradients;             ///< Number of diffusion-weighted image volumes.
+    unsigned int                        m_NumBaseline;              ///< Number of non-diffusion-weighted image volumes.
+    GradientListType                    m_GradientDirections;       ///< Total number of image volumes.
 };
 
 /** GUI persistence, input, output, ... */
@@ -127,13 +151,11 @@ class FiberfoxParameters
 {
 public:
 
-    typedef itk::Image<double, 3>                   ItkDoubleImgType;
-    typedef itk::Image<unsigned char, 3>            ItkUcharImgType;
-    typedef DiffusionSignalModel<ScalarType>        DiffusionModelType;
-    typedef std::vector< DiffusionModelType* >      DiffusionModelListType;
-    typedef typename DiffusionModelType::GradientListType    GradientListType;
-    typedef typename DiffusionModelType::GradientType        GradientType;
-    typedef DiffusionNoiseModel<ScalarType>         NoiseModelType;
+    typedef itk::Image<double, 3>                           ItkDoubleImgType;
+    typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
+    typedef DiffusionSignalModel<ScalarType>                DiffusionModelType;
+    typedef std::vector< DiffusionModelType* >              DiffusionModelListType;
+    typedef DiffusionNoiseModel<ScalarType>                 NoiseModelType;
 
     FiberfoxParameters();
     ~FiberfoxParameters();
@@ -147,8 +169,6 @@ public:
         out.m_SignalGen = m_SignalGen;
         out.m_Misc = m_Misc;
 
-        out.SetNumWeightedGradients(m_NumGradients);
-
         if (m_NoiseModel!=NULL)
         {
             if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel))
@@ -158,7 +178,41 @@ public:
             out.m_NoiseModel->SetNoiseVariance(m_NoiseModel->GetNoiseVariance());
         }
 
-        // TODO: copy constructor für singalmodelle, gradienten
+        // TODO: copy signal models
+//        for (int i=0; i<m_FiberModelList.size()+m_NonFiberModelList.size(); i++)
+//        {
+//            mitk::DiffusionSignalModel<OutType>* outModel = NULL;
+//            mitk::DiffusionSignalModel<ScalarType>* signalModel = NULL;
+//            if (i<m_FiberModelList.size())
+//                signalModel = m_FiberModelList.at(i);
+//            else
+//                signalModel = m_NonFiberModelList.at(i-m_FiberModelList.size());
+
+//            if (dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel))
+//            {
+//                outModel = new mitk::StickModel<OutType>();
+//            }
+//            else  if (dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel))
+//            {
+//                outModel = new mitk::TensorModel<OutType>();
+//            }
+//            else  if (dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel))
+//            {
+//                outModel = new mitk::RawShModel<OutType>();
+//            }
+//            else  if (dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel))
+//            {
+//                outModel = new mitk::BallModel<OutType>();
+//            }
+//            else  if (dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel))
+//            {
+//                outModel = new mitk::AstroStickModel<OutType>();
+//            }
+//            else  if (dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel))
+//            {
+//                outModel = new mitk::DotModel<OutType>();
+//            }
+//        }
 
         return out;
     }
@@ -175,28 +229,6 @@ public:
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(string filename);       ///< Save image generation parameters to .ffp file.
     void LoadParameters(string filename);       ///< Load image generation parameters from .ffp file.
-    void GenerateGradientHalfShell();           ///< Generates half shell of gradient directions (with m_NumGradients non-zero directions)
-
-    std::vector< int > GetBaselineIndices();
-    unsigned int GetFirstBaselineIndex();
-    bool IsBaselineIndex(unsigned int idx);
-
-    unsigned int GetNumWeightedVolumes();
-    unsigned int GetNumBaselineVolumes();
-    unsigned int GetNumVolumes();
-    GradientListType GetGradientDirections();
-    GradientType GetGradientDirection(unsigned int i);
-
-    void SetNumWeightedGradients(int numGradients); ///< Automaticall calls GenerateGradientHalfShell() afterwards.
-    void SetGradienDirections(GradientListType gradientList);
-    void SetGradienDirections(mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer gradientList);
-
-protected:
-
-    unsigned int                        m_NumGradients;         ///< Number of diffusion-weighted image volumes.
-    unsigned int                        m_NumBaseline;          ///< Number of non-diffusion-weighted image volumes.
-    GradientListType                    m_GradientDirections;   ///< Total number of image volumes.
-
 };
 }
 

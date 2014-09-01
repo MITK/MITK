@@ -175,7 +175,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
             idft->SetParameters(m_Parameters);
             idft->SetZ((double)z-(double)images.at(0)->GetLargestPossibleRegion().GetSize(2)/2.0);
-            idft->SetDiffusionGradientDirection(m_Parameters.GetGradientDirection(g));
+            idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
             idft->SetFrequencyMapSlice(fMapSlice);
             idft->SetOutSize(outSize);
             int numSpikes = 0;
@@ -241,7 +241,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     if (m_Parameters.m_NonFiberModelList.empty())
         itkExceptionMacro("No diffusion model for non-fiber compartments defined!");
 
-    int baselineIndex = m_Parameters.GetFirstBaselineIndex();
+    int baselineIndex = m_Parameters.m_SignalGen.GetFirstBaselineIndex();
     if (baselineIndex<0)
         itkExceptionMacro("No baseline index found!");
 
@@ -263,10 +263,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     outImage->SetLargestPossibleRegion( croppedRegion );
     outImage->SetBufferedRegion( croppedRegion );
     outImage->SetRequestedRegion( croppedRegion );
-    outImage->SetVectorLength( m_Parameters.GetNumVolumes() );
+    outImage->SetVectorLength( m_Parameters.m_SignalGen.GetNumVolumes() );
     outImage->Allocate();
     typename OutputImageType::PixelType temp;
-    temp.SetSize(m_Parameters.GetNumVolumes());
+    temp.SetSize(m_Parameters.m_SignalGen.GetNumVolumes());
     temp.Fill(0.0);
     outImage->FillBuffer(temp);
 
@@ -324,10 +324,10 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         doubleDwi->SetLargestPossibleRegion( m_UpsampledImageRegion );
         doubleDwi->SetBufferedRegion( m_UpsampledImageRegion );
         doubleDwi->SetRequestedRegion( m_UpsampledImageRegion );
-        doubleDwi->SetVectorLength( m_Parameters.GetNumVolumes() );
+        doubleDwi->SetVectorLength( m_Parameters.m_SignalGen.GetNumVolumes() );
         doubleDwi->Allocate();
         DoubleDwiType::PixelType pix;
-        pix.SetSize(m_Parameters.GetNumVolumes());
+        pix.SetSize(m_Parameters.m_SignalGen.GetNumVolumes());
         pix.Fill(0.0);
         doubleDwi->FillBuffer(pix);
         m_CompartmentImages.push_back(doubleDwi);
@@ -559,13 +559,13 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     m_StatusText += "\n"+this->GetTime()+" > Generating " + boost::lexical_cast<std::string>(numFiberCompartments+numNonFiberCompartments) + "-compartment diffusion-weighted signal.\n";
     int numFibers = m_FiberBundle->GetNumFibers();
-    boost::progress_display disp(numFibers*m_Parameters.GetNumVolumes());
+    boost::progress_display disp(numFibers*m_Parameters.m_SignalGen.GetNumVolumes());
 
 
     // get transform for motion artifacts
     m_FiberBundleTransformed = m_FiberBundleWorkingCopy;
-    m_Rotation = m_Parameters.m_SignalGen.m_Rotation/m_Parameters.GetNumVolumes();
-    m_Translation = m_Parameters.m_SignalGen.m_Translation/m_Parameters.GetNumVolumes();
+    m_Rotation = m_Parameters.m_SignalGen.m_Rotation/m_Parameters.m_SignalGen.GetNumVolumes();
+    m_Translation = m_Parameters.m_SignalGen.m_Translation/m_Parameters.m_SignalGen.GetNumVolumes();
 
     // creat image to hold transformed mask (motion artifact)
     m_MaskImage = ItkUcharImgType::New();
@@ -609,7 +609,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
         m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
 
-        for (unsigned int g=0; g<m_Parameters.GetNumVolumes(); g++)
+        for (unsigned int g=0; g<m_Parameters.m_SignalGen.GetNumVolumes(); g++)
         {
             // Set signal model random generator seeds to get same configuration in each voxel
             for (int i=0; i<m_Parameters.m_FiberModelList.size(); i++)
@@ -765,9 +765,9 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
         m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
         m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
-        boost::progress_display disp(m_MaskImage->GetLargestPossibleRegion().GetNumberOfPixels()*m_Parameters.GetNumVolumes());
+        boost::progress_display disp(m_MaskImage->GetLargestPossibleRegion().GetNumberOfPixels()*m_Parameters.m_SignalGen.GetNumVolumes());
 
-        for (unsigned int g=0; g<m_Parameters.GetNumVolumes(); g++)
+        for (unsigned int g=0; g<m_Parameters.m_SignalGen.GetNumVolumes(); g++)
         {
             // Set signal model random generator seeds to get same configuration in each voxel
             for (int i=0; i<m_Parameters.m_FiberModelList.size(); i++)
@@ -1001,7 +1001,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     unsigned int window = 0;
     unsigned int min = itk::NumericTraits<unsigned int>::max();
     ImageRegionIterator<OutputImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
-    DoubleDwiType::PixelType signal; signal.SetSize(m_Parameters.GetNumVolumes());
+    DoubleDwiType::PixelType signal; signal.SetSize(m_Parameters.m_SignalGen.GetNumVolumes());
     boost::progress_display disp2(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
 
     m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
@@ -1035,9 +1035,9 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             else
                 signal[i] = ceil(signal[i]-0.5);
 
-            if ( (!m_Parameters.IsBaselineIndex(i) || signal.Size()==1) && signal[i]>window)
+            if ( (!m_Parameters.m_SignalGen.IsBaselineIndex(i) || signal.Size()==1) && signal[i]>window)
                 window = signal[i];
-            if ( (!m_Parameters.IsBaselineIndex(i) || signal.Size()==1) && signal[i]<min)
+            if ( (!m_Parameters.m_SignalGen.IsBaselineIndex(i) || signal.Size()==1) && signal[i]<min)
                 min = signal[i];
         }
         it4.Set(signal);
@@ -1057,7 +1057,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
 {
-    if (m_Parameters.m_SignalGen.m_DoAddMotion && g<m_Parameters.GetNumVolumes()-1)
+    if (m_Parameters.m_SignalGen.m_DoAddMotion && g<m_Parameters.m_SignalGen.GetNumVolumes()-1)
     {
         if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
         {

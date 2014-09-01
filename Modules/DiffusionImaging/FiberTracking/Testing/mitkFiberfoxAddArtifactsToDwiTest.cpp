@@ -68,7 +68,7 @@ public:
         m_Parameters.m_SignalGen.m_ImageOrigin = m_InputDwi->GetVectorImage()->GetOrigin();
         m_Parameters.m_SignalGen.m_ImageDirection = m_InputDwi->GetVectorImage()->GetDirection();
         m_Parameters.m_SignalGen.m_Bvalue = m_InputDwi->GetReferenceBValue();
-        m_Parameters.SetGradienDirections(m_InputDwi->GetDirections());
+        m_Parameters.m_SignalGen.SetGradienDirections(m_InputDwi->GetDirections());
     }
 
     bool CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >* dwi2)
@@ -107,7 +107,7 @@ public:
         mitk::DiffusionImage<short>::Pointer testImage = mitk::DiffusionImage<short>::New();
         testImage->SetVectorImage( artifactsToDwiFilter->GetOutput() );
         testImage->SetReferenceBValue( m_Parameters.m_SignalGen.m_Bvalue);
-        testImage->SetDirections( m_Parameters.GetGradientDirections());
+        testImage->SetDirections( m_Parameters.m_SignalGen.GetGradientDirections());
         testImage->InitializeFromVectorImage();
 
         if (refImage.IsNotNull())

@@ -66,7 +66,7 @@ void StartSimulation(FiberfoxParameters<double> parameters, FiberBundleX::Pointe
     mitk::DiffusionImage<short>::Pointer testImage = mitk::DiffusionImage<short>::New();
     testImage->SetVectorImage( tractsToDwiFilter->GetOutput() );
     testImage->SetReferenceBValue(parameters.m_SignalGen.m_Bvalue);
-    testImage->SetDirections(parameters.GetGradientDirections());
+    testImage->SetDirections(parameters.m_SignalGen.GetGradientDirections());
     testImage->InitializeFromVectorImage();
 
     if (refImage.IsNotNull())
@@ -124,14 +124,14 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     parameters.m_SignalGen.m_ImageOrigin = stickBall->GetVectorImage()->GetOrigin();
     parameters.m_SignalGen.m_ImageDirection = stickBall->GetVectorImage()->GetDirection();
     parameters.m_SignalGen.m_Bvalue = stickBall->GetReferenceBValue();
-    parameters.SetGradienDirections(stickBall->GetDirections());
+    parameters.m_SignalGen.SetGradienDirections(stickBall->GetDirections());
 
     // intra and inter axonal compartments
     mitk::StickModel<double> stickModel;
     stickModel.SetBvalue(parameters.m_SignalGen.m_Bvalue);
     stickModel.SetT2(110);
     stickModel.SetDiffusivity(0.001);
-    stickModel.SetGradientList(parameters.GetGradientDirections());
+    stickModel.SetGradientList(parameters.m_SignalGen.GetGradientDirections());
 
     mitk::TensorModel<double> tensorModel;
     tensorModel.SetT2(110);
@@ -139,14 +139,14 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     tensorModel.SetDiffusivity1(0.001);
     tensorModel.SetDiffusivity2(0.00025);
     tensorModel.SetDiffusivity3(0.00025);
-    tensorModel.SetGradientList(parameters.GetGradientDirections());
+    tensorModel.SetGradientList(parameters.m_SignalGen.GetGradientDirections());
 
     // extra axonal compartment models
     mitk::BallModel<double> ballModel;
     ballModel.SetT2(80);
     ballModel.SetBvalue(parameters.m_SignalGen.m_Bvalue);
     ballModel.SetDiffusivity(0.001);
-    ballModel.SetGradientList(parameters.GetGradientDirections());
+    ballModel.SetGradientList(parameters.m_SignalGen.GetGradientDirections());
 
     mitk::AstroStickModel<double> astrosticksModel;
     astrosticksModel.SetT2(80);
@@ -154,11 +154,11 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     astrosticksModel.SetDiffusivity(0.001);
     astrosticksModel.SetRandomizeSticks(true);
     astrosticksModel.SetSeed(0);
-    astrosticksModel.SetGradientList(parameters.GetGradientDirections());
+    astrosticksModel.SetGradientList(parameters.m_SignalGen.GetGradientDirections());
 
     mitk::DotModel<double> dotModel;
     dotModel.SetT2(80);
-    dotModel.SetGradientList(parameters.GetGradientDirections());
+    dotModel.SetGradientList(parameters.m_SignalGen.GetGradientDirections());
 
     // noise models
     mitk::RicianNoiseModel<double>* ricianNoiseModel = new mitk::RicianNoiseModel<double>();

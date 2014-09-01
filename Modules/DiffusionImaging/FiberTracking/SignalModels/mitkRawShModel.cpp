@@ -113,7 +113,7 @@ void RawShModel< ScalarType >::SetFiberDirection(GradientType fiberDirection)
 }
 
 template< class ScalarType >
-bool RawShModel< ScalarType >::SetShCoefficients(vnl_vector< double > shCoefficients, ScalarType b0 )
+bool RawShModel< ScalarType >::SetShCoefficients(vnl_vector< double > shCoefficients, double b0 )
 {
     m_ShOrder = 2;
     while ( (m_ShOrder*m_ShOrder + m_ShOrder + 2)/2 + m_ShOrder <= shCoefficients.size() )

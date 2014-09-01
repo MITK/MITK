@@ -44,13 +44,13 @@ public:
     PixelType SimulateMeasurement();
     ScalarType SimulateMeasurement(unsigned int dir);
 
-    void SetBvalue(ScalarType bValue) { m_BValue = bValue; }
-    void SetDiffusivity1(ScalarType d1){ m_KernelTensorMatrix[0][0] = d1; }
-    void SetDiffusivity2(ScalarType d2){ m_KernelTensorMatrix[1][1] = d2; }
-    void SetDiffusivity3(ScalarType d3){ m_KernelTensorMatrix[2][2] = d3; }
-    ScalarType GetDiffusivity1() { return m_KernelTensorMatrix[0][0]; }
-    ScalarType GetDiffusivity2() { return m_KernelTensorMatrix[1][1]; }
-    ScalarType GetDiffusivity3() { return m_KernelTensorMatrix[2][2]; }
+    void SetBvalue(double bValue) { m_BValue = bValue; }
+    void SetDiffusivity1(double d1){ m_KernelTensorMatrix[0][0] = d1; }
+    void SetDiffusivity2(double d2){ m_KernelTensorMatrix[1][1] = d2; }
+    void SetDiffusivity3(double d3){ m_KernelTensorMatrix[2][2] = d3; }
+    double GetDiffusivity1() { return m_KernelTensorMatrix[0][0]; }
+    double GetDiffusivity2() { return m_KernelTensorMatrix[1][1]; }
+    double GetDiffusivity3() { return m_KernelTensorMatrix[2][2]; }
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
@@ -60,8 +60,8 @@ protected:
     /** Calculates tensor matrix from FA and ADC **/
     void UpdateKernelTensor();
     GradientType                        m_KernelDirection;      ///< Direction of the kernel tensors principal eigenvector
-    vnl_matrix_fixed<ScalarType, 3, 3>  m_KernelTensorMatrix;   ///< 3x3 matrix containing the kernel tensor values
-    ScalarType                          m_BValue;               ///< b-value used to generate the artificial signal
+    vnl_matrix_fixed<double, 3, 3>      m_KernelTensorMatrix;   ///< 3x3 matrix containing the kernel tensor values
+    double                              m_BValue;               ///< b-value used to generate the artificial signal
 };
 
 }

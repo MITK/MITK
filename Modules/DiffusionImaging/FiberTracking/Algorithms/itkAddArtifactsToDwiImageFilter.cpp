@@ -229,7 +229,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 idft->SetParameters(doubleParam);
                 idft->SetCompartmentImages(compartmentSlices);
                 idft->SetFrequencyMapSlice(fMapSlice);
-                idft->SetDiffusionGradientDirection( m_Parameters.GetGradientDirection(g));
+                idft->SetDiffusionGradientDirection( m_Parameters.m_SignalGen.GetGradientDirection(g));
                 idft->SetZ((double)z-(double)inputRegion.GetSize(2)/2.0);
                 idft->SetOutSize(outSize);
                 int numSpikes = 0;

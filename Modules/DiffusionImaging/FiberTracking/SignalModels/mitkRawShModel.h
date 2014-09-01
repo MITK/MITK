@@ -43,7 +43,7 @@ public:
     PixelType SimulateMeasurement();
     ScalarType SimulateMeasurement(unsigned int dir);
 
-    bool SetShCoefficients(vnl_vector< double > shCoefficients, ScalarType b0);
+    bool SetShCoefficients(vnl_vector< double > shCoefficients, double b0);
     void SetFiberDirection(GradientType fiberDirection);
     void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
     void SetFaRange(double min, double max){ m_FaRange.first = min; m_FaRange.second = max; }
@@ -64,7 +64,7 @@ protected:
     std::pair< double, double >     m_AdcRange;
     std::pair< double, double >     m_FaRange;
     vector< vnl_vector< double > >  m_ShCoefficients;
-    vector< ScalarType >            m_B0Signal;
+    vector< double >                m_B0Signal;
     vnl_matrix<double>              m_SphCoords;
     unsigned int                    m_ShOrder;
     int                             m_ModelIndex;

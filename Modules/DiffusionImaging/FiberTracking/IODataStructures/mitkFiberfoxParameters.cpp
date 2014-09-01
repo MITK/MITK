@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <itkImageFileWriter.h>
+#include <itkImageFileReader.h>
+
 #include <mitkStickModel.h>
 #include <mitkTensorModel.h>
 #include <mitkAstroStickModel.h>
@@ -29,8 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 template< class ScalarType >
 mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
     : m_NoiseModel(NULL)
-    , m_NumGradients(6)
-    , m_NumBaseline(1)
 {
     m_FiberGen.m_RealTimeFibers = true;
     m_FiberGen.m_AdvancedOptions = false;
@@ -89,14 +90,13 @@ mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
     m_SignalGen.m_DoDisablePartialVolume = false;
     m_SignalGen.m_DoAddMotion = false;
     m_SignalGen.m_DoRandomizeMotion = true;
+    m_SignalGen.SetNumWeightedVolumes(6);
 
     m_Misc.m_ResultNode = mitk::DataNode::New();
     m_Misc.m_ParentNode = NULL;
     m_Misc.m_SignalModelString = "";
     m_Misc.m_ArtifactModelString = "";
     m_Misc.m_OutputPath = "";
-
-    GenerateGradientHalfShell();
 }
 
 template< class ScalarType >
@@ -106,8 +106,7 @@ mitk::FiberfoxParameters< ScalarType >::~FiberfoxParameters()
     //        delete m_NoiseModel;
 }
 
-template< class ScalarType >
-void mitk::FiberfoxParameters< ScalarType >::GenerateGradientHalfShell()
+void mitk::SignalGenerationParameters::GenerateGradientHalfShell()
 {
     int NPoints = 2*m_NumGradients;
     m_GradientDirections.clear();
@@ -136,7 +135,6 @@ void mitk::FiberfoxParameters< ScalarType >::GenerateGradientHalfShell()
         {
             phi(i) = (phi(i-1) + C /
                       sqrt(NPoints*(1-(-1.0+2.0*i/(NPoints-1.0))*(-1.0+2.0*i/(NPoints-1.0)))));
-            // % (2*DIST_m_GradientDirections_PI);
         }
     }
 
@@ -151,8 +149,7 @@ void mitk::FiberfoxParameters< ScalarType >::GenerateGradientHalfShell()
     }
 }
 
-template< class ScalarType >
-std::vector< int > mitk::FiberfoxParameters< ScalarType >::GetBaselineIndices()
+std::vector< int > mitk::SignalGenerationParameters::GetBaselineIndices()
 {
     std::vector< int > result;
     for( unsigned int i=0; i<this->m_GradientDirections.size(); i++)
@@ -161,8 +158,7 @@ std::vector< int > mitk::FiberfoxParameters< ScalarType >::GetBaselineIndices()
     return result;
 }
 
-template< class ScalarType >
-unsigned int mitk::FiberfoxParameters< ScalarType >::GetFirstBaselineIndex()
+unsigned int mitk::SignalGenerationParameters::GetFirstBaselineIndex()
 {
     for( unsigned int i=0; i<this->m_GradientDirections.size(); i++)
         if (m_GradientDirections.at(i).GetNorm()<0.0001)
@@ -170,53 +166,45 @@ unsigned int mitk::FiberfoxParameters< ScalarType >::GetFirstBaselineIndex()
     return -1;
 }
 
-template< class ScalarType >
-bool mitk::FiberfoxParameters< ScalarType >::IsBaselineIndex(unsigned int idx)
+bool mitk::SignalGenerationParameters::IsBaselineIndex(unsigned int idx)
 {
     if (m_GradientDirections.size()>idx && m_GradientDirections.at(idx).GetNorm()<0.0001)
         return true;
     return false;
 }
 
-template< class ScalarType >
-unsigned int mitk::FiberfoxParameters< ScalarType >::GetNumWeightedVolumes()
+unsigned int mitk::SignalGenerationParameters::GetNumWeightedVolumes()
 {
     return m_NumGradients;
 }
 
-template< class ScalarType >
-unsigned int mitk::FiberfoxParameters< ScalarType >::GetNumBaselineVolumes()
+unsigned int mitk::SignalGenerationParameters::GetNumBaselineVolumes()
 {
     return m_NumBaseline;
 }
 
-template< class ScalarType >
-unsigned int mitk::FiberfoxParameters< ScalarType >::GetNumVolumes()
+unsigned int mitk::SignalGenerationParameters::GetNumVolumes()
 {
     return m_GradientDirections.size();
 }
 
-template< class ScalarType >
-typename mitk::FiberfoxParameters< ScalarType >::GradientListType mitk::FiberfoxParameters< ScalarType >::GetGradientDirections()
+typename mitk::SignalGenerationParameters::GradientListType mitk::SignalGenerationParameters::GetGradientDirections()
 {
     return m_GradientDirections;
 }
 
-template< class ScalarType >
-typename mitk::FiberfoxParameters< ScalarType >::GradientType mitk::FiberfoxParameters< ScalarType >::GetGradientDirection(unsigned int i)
+mitk::SignalGenerationParameters::GradientType mitk::SignalGenerationParameters::GetGradientDirection(unsigned int i)
 {
     return m_GradientDirections.at(i);
 }
 
-template< class ScalarType >
-void mitk::FiberfoxParameters< ScalarType >::SetNumWeightedGradients(int numGradients)
+void mitk::SignalGenerationParameters::SetNumWeightedVolumes(int numGradients)
 {
     m_NumGradients = numGradients;
     GenerateGradientHalfShell();
 }
 
-template< class ScalarType >
-void mitk::FiberfoxParameters< ScalarType >::SetGradienDirections(GradientListType gradientList)
+void mitk::SignalGenerationParameters::SetGradienDirections(GradientListType gradientList)
 {
     m_GradientDirections = gradientList;
     m_NumGradients = 0;
@@ -230,8 +218,7 @@ void mitk::FiberfoxParameters< ScalarType >::SetGradienDirections(GradientListTy
     }
 }
 
-template< class ScalarType >
-void mitk::FiberfoxParameters< ScalarType >::SetGradienDirections(mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer gradientList)
+void mitk::SignalGenerationParameters::SetGradienDirections(mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer gradientList)
 {
     m_NumGradients = 0;
     m_NumBaseline = 0;
@@ -344,7 +331,7 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
     parameters.put("fiberfox.image.outpath", m_Misc.m_OutputPath);
     parameters.put("fiberfox.image.outputvolumefractions", m_Misc.m_OutputVolumeFractions);
     parameters.put("fiberfox.image.showadvanced", m_Misc.m_AdvancedOptions);
-    parameters.put("fiberfox.image.basic.numgradients", m_NumGradients);
+    parameters.put("fiberfox.image.basic.numgradients", m_SignalGen.GetNumWeightedVolumes());
 
     if (m_NoiseModel!=NULL)
     {
@@ -410,11 +397,54 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
             mitk::DotModel<ScalarType>* model = dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel);
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".dot.t2", model->GetT2());
         }
-        parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".ID", signalModel->m_CompartmentId);
+
+        if (signalModel!=NULL)
+        {
+            parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".ID", signalModel->m_CompartmentId);
+
+//            if (signalModel->GetVolumeFractionImage().IsNotNull())
+//            {
+//                try{
+//                    itk::ImageFileWriter<ItkDoubleImgType>::Pointer writer = itk::ImageFileWriter<ItkDoubleImgType>::New();
+//                    writer->SetFileName(filename+"_VOLUME"+boost::lexical_cast<string>(signalModel->m_CompartmentId)+".nrrd");
+//                    writer->SetInput(signalModel->GetVolumeFractionImage());
+//                    writer->Update();
+//                    MITK_INFO << "Volume fraction image for compartment "+boost::lexical_cast<string>(signalModel->m_CompartmentId)+" saved.";
+//                }
+//                catch(...)
+//                {
+//                }
+//            }
+        }
     }
 
     boost::property_tree::xml_writer_settings<char> writerSettings(' ', 2);
     boost::property_tree::xml_parser::write_xml(filename, parameters, std::locale(), writerSettings);
+
+//    if (m_SignalGen.m_DoAddDistortions)
+//    {
+//        try{
+//            itk::ImageFileWriter<ItkDoubleImgType>::Pointer writer = itk::ImageFileWriter<ItkDoubleImgType>::New();
+//            writer->SetFileName(filename+"_FMAP.nrrd");
+//            writer->SetInput(m_SignalGen.m_FrequencyMap);
+//            writer->Update();
+//        }
+//        catch(...)
+//        {
+//            MITK_INFO << "No frequency map saved.";
+//        }
+//    }
+
+//    try{
+//        itk::ImageFileWriter<ItkUcharImgType>::Pointer writer = itk::ImageFileWriter<ItkUcharImgType>::New();
+//        writer->SetFileName(filename+"_MASK.nrrd");
+//        writer->SetInput(m_SignalGen.m_MaskImage);
+//        writer->Update();
+//    }
+//    catch(...)
+//    {
+//        MITK_INFO << "No mask image saved.";
+//    }
 }
 
 template< class ScalarType >
@@ -458,24 +488,24 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
         }
         else if ( v1.first == "image" )
         {
-           m_SignalGen.m_ImageRegion.SetSize(0, v1.second.get<int>("basic.size.x",m_SignalGen.m_ImageRegion.GetSize(0)));
-           m_SignalGen.m_ImageRegion.SetSize(1, v1.second.get<int>("basic.size.y",m_SignalGen.m_ImageRegion.GetSize(1)));
-           m_SignalGen.m_ImageRegion.SetSize(2, v1.second.get<int>("basic.size.z",m_SignalGen.m_ImageRegion.GetSize(2)));
-           m_SignalGen.m_ImageSpacing[0] = v1.second.get<double>("basic.spacing.x",m_SignalGen.m_ImageSpacing[0]);
-           m_SignalGen.m_ImageSpacing[1] = v1.second.get<double>("basic.spacing.y",m_SignalGen.m_ImageSpacing[1]);
-           m_SignalGen.m_ImageSpacing[2] = v1.second.get<double>("basic.spacing.z",m_SignalGen.m_ImageSpacing[2]);
-           m_SignalGen.m_ImageOrigin[0] = v1.second.get<double>("basic.origin.x",m_SignalGen.m_ImageOrigin[0]);
-           m_SignalGen.m_ImageOrigin[1] = v1.second.get<double>("basic.origin.y",m_SignalGen.m_ImageOrigin[1]);
-           m_SignalGen.m_ImageOrigin[2] = v1.second.get<double>("basic.origin.z",m_SignalGen.m_ImageOrigin[2]);
-           m_SignalGen.m_ImageDirection[0][0] = v1.second.get<double>("basic.direction.1",m_SignalGen.m_ImageDirection[0][0]);
-           m_SignalGen.m_ImageDirection[0][1] = v1.second.get<double>("basic.direction.2",m_SignalGen.m_ImageDirection[0][1]);
-           m_SignalGen.m_ImageDirection[0][2] = v1.second.get<double>("basic.direction.3",m_SignalGen.m_ImageDirection[0][2]);
-           m_SignalGen.m_ImageDirection[1][0] = v1.second.get<double>("basic.direction.4",m_SignalGen.m_ImageDirection[1][0]);
-           m_SignalGen.m_ImageDirection[1][1] = v1.second.get<double>("basic.direction.5",m_SignalGen.m_ImageDirection[1][1]);
-           m_SignalGen.m_ImageDirection[1][2] = v1.second.get<double>("basic.direction.6",m_SignalGen.m_ImageDirection[1][2]);
-           m_SignalGen.m_ImageDirection[2][0] = v1.second.get<double>("basic.direction.7",m_SignalGen.m_ImageDirection[2][0]);
-           m_SignalGen.m_ImageDirection[2][1] = v1.second.get<double>("basic.direction.8",m_SignalGen.m_ImageDirection[2][1]);
-           m_SignalGen.m_ImageDirection[2][2] = v1.second.get<double>("basic.direction.9",m_SignalGen.m_ImageDirection[2][2]);
+            m_SignalGen.m_ImageRegion.SetSize(0, v1.second.get<int>("basic.size.x",m_SignalGen.m_ImageRegion.GetSize(0)));
+            m_SignalGen.m_ImageRegion.SetSize(1, v1.second.get<int>("basic.size.y",m_SignalGen.m_ImageRegion.GetSize(1)));
+            m_SignalGen.m_ImageRegion.SetSize(2, v1.second.get<int>("basic.size.z",m_SignalGen.m_ImageRegion.GetSize(2)));
+            m_SignalGen.m_ImageSpacing[0] = v1.second.get<double>("basic.spacing.x",m_SignalGen.m_ImageSpacing[0]);
+            m_SignalGen.m_ImageSpacing[1] = v1.second.get<double>("basic.spacing.y",m_SignalGen.m_ImageSpacing[1]);
+            m_SignalGen.m_ImageSpacing[2] = v1.second.get<double>("basic.spacing.z",m_SignalGen.m_ImageSpacing[2]);
+            m_SignalGen.m_ImageOrigin[0] = v1.second.get<double>("basic.origin.x",m_SignalGen.m_ImageOrigin[0]);
+            m_SignalGen.m_ImageOrigin[1] = v1.second.get<double>("basic.origin.y",m_SignalGen.m_ImageOrigin[1]);
+            m_SignalGen.m_ImageOrigin[2] = v1.second.get<double>("basic.origin.z",m_SignalGen.m_ImageOrigin[2]);
+            m_SignalGen.m_ImageDirection[0][0] = v1.second.get<double>("basic.direction.1",m_SignalGen.m_ImageDirection[0][0]);
+            m_SignalGen.m_ImageDirection[0][1] = v1.second.get<double>("basic.direction.2",m_SignalGen.m_ImageDirection[0][1]);
+            m_SignalGen.m_ImageDirection[0][2] = v1.second.get<double>("basic.direction.3",m_SignalGen.m_ImageDirection[0][2]);
+            m_SignalGen.m_ImageDirection[1][0] = v1.second.get<double>("basic.direction.4",m_SignalGen.m_ImageDirection[1][0]);
+            m_SignalGen.m_ImageDirection[1][1] = v1.second.get<double>("basic.direction.5",m_SignalGen.m_ImageDirection[1][1]);
+            m_SignalGen.m_ImageDirection[1][2] = v1.second.get<double>("basic.direction.6",m_SignalGen.m_ImageDirection[1][2]);
+            m_SignalGen.m_ImageDirection[2][0] = v1.second.get<double>("basic.direction.7",m_SignalGen.m_ImageDirection[2][0]);
+            m_SignalGen.m_ImageDirection[2][1] = v1.second.get<double>("basic.direction.8",m_SignalGen.m_ImageDirection[2][1]);
+            m_SignalGen.m_ImageDirection[2][2] = v1.second.get<double>("basic.direction.9",m_SignalGen.m_ImageDirection[2][2]);
 
             m_SignalGen.m_SignalScale = v1.second.get<double>("signalScale", m_SignalGen.m_SignalScale);
             m_SignalGen.m_tEcho = v1.second.get<double>("tEcho", m_SignalGen.m_tEcho);
@@ -531,8 +561,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_Misc.m_OutputPath = v1.second.get<string>("outpath", m_Misc.m_OutputPath);
             m_Misc.m_OutputVolumeFractions = v1.second.get<bool>("outputvolumefractions", m_Misc.m_OutputVolumeFractions);
             m_Misc.m_AdvancedOptions = v1.second.get<bool>("showadvanced", m_Misc.m_AdvancedOptions);
-            m_NumGradients = v1.second.get<unsigned int>("numgradients", m_NumGradients);
-            GenerateGradientHalfShell();
+            m_SignalGen.SetNumWeightedVolumes(v1.second.get<unsigned int>("numgradients", m_SignalGen.GetNumWeightedVolumes()));
 
             try
             {
@@ -556,6 +585,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 
             BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second.get_child("compartments") )
             {
+                mitk::DiffusionSignalModel<ScalarType>* signalModel = NULL;
                 try // stick model
                 {
                     mitk::StickModel<ScalarType>* model = new mitk::StickModel<ScalarType>();
@@ -566,6 +596,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                         m_FiberModelList.push_back(model);
                     else if (v2.second.get<string>("type")=="non-fiber")
                         m_NonFiberModelList.push_back(model);
+                    signalModel = model;
                 }
                 catch (...) { }
 
@@ -581,6 +612,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                         m_FiberModelList.push_back(model);
                     else if (v2.second.get<string>("type")=="non-fiber")
                         m_NonFiberModelList.push_back(model);
+                    signalModel = model;
                 }
                 catch (...) { }
 
@@ -594,6 +626,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                         m_FiberModelList.push_back(model);
                     else if (v2.second.get<string>("type")=="non-fiber")
                         m_NonFiberModelList.push_back(model);
+                    signalModel = model;
                 }
                 catch (...) { }
 
@@ -608,6 +641,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                         m_FiberModelList.push_back(model);
                     else if (v2.second.get<string>("type")=="non-fiber")
                         m_NonFiberModelList.push_back(model);
+                    signalModel = model;
                 }
                 catch (...) { }
 
@@ -620,6 +654,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                         m_FiberModelList.push_back(model);
                     else if (v2.second.get<string>("type")=="non-fiber")
                         m_NonFiberModelList.push_back(model);
+                    signalModel = model;
                 }
                 catch (...) { }
 
@@ -634,11 +669,50 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                         m_FiberModelList.push_back(model);
                     else if (v2.second.get<string>("type")=="non-fiber")
                         m_NonFiberModelList.push_back(model);
+                    signalModel = model;
                 }
                 catch (...) { }
+
+//                if (signalModel!=NULL)
+//                {
+//                    try{
+//                        itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
+//                        reader->SetFileName(filename+"_VOLUME"+v2.second.get<string>("ID")+".nrrd");
+//                        reader->Update();
+//                        signalModel->SetVolumeFractionImage(reader->GetOutput());
+//                    }
+//                    catch(...)
+//                    {
+//                    }
+//                }
             }
         }
     }
+
+//    if (m_SignalGen.m_DoAddDistortions)
+//    {
+//        try{
+//            itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
+//            reader->SetFileName(filename+"_FMAP.nrrd");
+//            reader->Update();
+//            m_SignalGen.m_FrequencyMap = reader->GetOutput();
+//        }
+//        catch(...)
+//        {
+//            MITK_INFO << "No frequency map saved.";
+//        }
+//    }
+
+//    try{
+//        itk::ImageFileReader<ItkUcharImgType>::Pointer reader = itk::ImageFileReader<ItkUcharImgType>::New();
+//        reader->SetFileName(filename+"_MASK.nrrd");
+//        reader->Update();
+//        m_SignalGen.m_MaskImage = reader->GetOutput();
+//    }
+//    catch(...)
+//    {
+//        MITK_INFO << "No mask image saved.";
+//    }
 }
 
 template< class ScalarType >

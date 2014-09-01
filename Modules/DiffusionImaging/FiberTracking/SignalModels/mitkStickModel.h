@@ -42,17 +42,17 @@ public:
     PixelType SimulateMeasurement();
     ScalarType SimulateMeasurement(unsigned int dir);
 
-    void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
-    void SetDiffusivity(ScalarType diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
-    ScalarType GetDiffusivity() { return m_Diffusivity; }
+    void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
+    void SetDiffusivity(double diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
+    double GetDiffusivity() { return m_Diffusivity; }
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
 
 protected:
 
-    ScalarType   m_Diffusivity;  ///< Scalar diffusion constant
-    ScalarType   m_BValue;       ///< b-value used to generate the artificial signal
+    double   m_Diffusivity;  ///< Scalar diffusion constant
+    double   m_BValue;       ///< b-value used to generate the artificial signal
 };
 
 }

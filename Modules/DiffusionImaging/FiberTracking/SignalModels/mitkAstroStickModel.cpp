@@ -29,7 +29,7 @@ AstroStickModel< ScalarType >::AstroStickModel()
     this->m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
     this->m_RandGen->SetSeed();
 
-    vnl_matrix_fixed<ScalarType,3,42>* sticks = itk::PointShell<42, vnl_matrix_fixed<ScalarType, 3, 42> >::DistributePointShell();
+    vnl_matrix_fixed<double,3,42>* sticks = itk::PointShell<42, vnl_matrix_fixed<double, 3, 42> >::DistributePointShell();
     for (unsigned int i=0; i<m_NumSticks; i++)
     {
         GradientType stick;

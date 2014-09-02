@@ -5,6 +5,7 @@ SET(CPP_FILES
   DataStructures/mitkIsoDoseLevelCollections.cpp
   DataStructures/mitkIsoDoseLevelSetProperty.cpp
   DataStructures/mitkIsoDoseLevelVectorProperty.cpp
+  Rendering/mitkDoseImageVtkMapper2D.cpp
 )
 
 set(H_FILES
@@ -15,6 +16,7 @@ set(H_FILES
   DataStructures/mitkIsoDoseLevelVectorProperty.h
   DataStructures/mitkDoseValueType.h
   DataStructures/mitkRTConstants.h
+  Rendering/mitkDoseImageVtkMapper2D.h
 )
 
 set(TPP_FILES

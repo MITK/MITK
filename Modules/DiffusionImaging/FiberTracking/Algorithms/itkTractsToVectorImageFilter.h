@@ -64,6 +64,7 @@ public:
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)          ///< number of directions per voxel
     itkGetMacro( OutputFiberBundle, FiberBundleX::Pointer)              ///< vector field for visualization purposes
     itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer) ///< output directions
+    itkSetMacro( CreateDirectionImages, bool)
 
     void GenerateData();
 
@@ -91,6 +92,7 @@ protected:
     bool                                m_UseWorkingCopy;                   ///< do not modify input fiber bundle but work on copy
     unsigned long                       m_MaxNumDirections;                 ///< if more directions per voxel are extracted, only the largest are kept
     float                               m_SizeThreshold;
+    bool                                m_CreateDirectionImages;
 
     // output datastructures
     ContainerType::Pointer                  m_ClusteredDirectionsContainer; ///< contains direction vectors for each voxel

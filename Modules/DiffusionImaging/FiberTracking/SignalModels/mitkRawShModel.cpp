@@ -29,8 +29,8 @@ RawShModel< ScalarType >::RawShModel()
     , m_ModelIndex(-1)
     , m_MaxNumKernels(1000)
 {
-    m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
-    m_RandGen->SetSeed();
+    this->m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+    this->m_RandGen->SetSeed();
     m_AdcRange.first = 0;
     m_AdcRange.second = 0.004;
     m_FaRange.first = 0;
@@ -54,7 +54,7 @@ void RawShModel< ScalarType >::Clear()
 template< class ScalarType >
 void RawShModel< ScalarType >::RandomModel()
 {
-    m_ModelIndex = m_RandGen->GetIntegerVariate(m_B0Signal.size()-1);
+    m_ModelIndex = this->m_RandGen->GetIntegerVariate(m_B0Signal.size()-1);
 }
 
 template< class ScalarType >
@@ -113,7 +113,7 @@ void RawShModel< ScalarType >::SetFiberDirection(GradientType fiberDirection)
 }
 
 template< class ScalarType >
-bool RawShModel< ScalarType >::SetShCoefficients(vnl_vector< double > shCoefficients, ScalarType b0 )
+bool RawShModel< ScalarType >::SetShCoefficients(vnl_vector< double > shCoefficients, double b0 )
 {
     m_ShOrder = 2;
     while ( (m_ShOrder*m_ShOrder + m_ShOrder + 2)/2 + m_ShOrder <= shCoefficients.size() )

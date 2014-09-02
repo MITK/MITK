@@ -26,12 +26,21 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class DotModel : public DiffusionSignalModel< ScalarType >
 {
 public:
 
     DotModel();
+    template< class OtherType >DotModel(DotModel<OtherType>* model)
+    {
+        this->m_CompartmentId = model->m_CompartmentId;
+        this->m_T2 = model->GetT2();
+        this->m_FiberDirection = model->GetFiberDirection();
+        this->m_GradientList = model->GetGradientList();
+        this->m_VolumeFractionImage = model->GetVolumeFractionImage();
+        this->m_RandGen = model->GetRandomGenerator();
+    }
     ~DotModel();
 
     typedef typename DiffusionSignalModel< ScalarType >::PixelType      PixelType;

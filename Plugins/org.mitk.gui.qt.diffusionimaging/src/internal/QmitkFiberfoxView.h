@@ -191,25 +191,6 @@ protected:
     vector< mitk::DataNode::Pointer >                   m_SelectedImages;
     mitk::DataNode::Pointer                             m_MaskImageNode;
 
-    /** intra and inter axonal compartments */
-    mitk::StickModel<double> m_StickModel1;
-    mitk::StickModel<double> m_StickModel2;
-    mitk::TensorModel<double> m_ZeppelinModel1;
-    mitk::TensorModel<double> m_ZeppelinModel2;
-    mitk::TensorModel<double> m_TensorModel1;
-    mitk::TensorModel<double> m_TensorModel2;
-    mitk::RawShModel<double> m_PrototypeModel1;
-
-    /** extra axonal compartment models */
-    mitk::BallModel<double> m_BallModel1;
-    mitk::BallModel<double> m_BallModel2;
-    mitk::AstroStickModel<double> m_AstrosticksModel1;
-    mitk::AstroStickModel<double> m_AstrosticksModel2;
-    mitk::DotModel<double> m_DotModel1;
-    mitk::DotModel<double> m_DotModel2;
-    mitk::RawShModel<double> m_PrototypeModel3;
-    mitk::RawShModel<double> m_PrototypeModel4;
-
     QString m_ParameterFile;    ///< parameter file name
 
     // GUI thread

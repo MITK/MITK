@@ -52,13 +52,20 @@ public:
     virtual ScalarType SimulateMeasurement(unsigned int dir) = 0;
 
     virtual void SetFiberDirection(GradientType fiberDirection) = 0;
-    virtual void SetGradientList(GradientListType gradientList) = 0;
-    void SetT2(double T2) { m_T2 = T2; }
-    void SetVolumeFractionImage(ItkDoubleImgType::Pointer img){ m_VolumeFractionImage = img; }
+    GradientType GetFiberDirection(){ return m_FiberDirection; }
 
-    ItkDoubleImgType::Pointer GetVolumeFractionImage(){ return m_VolumeFractionImage; }
+    virtual void SetGradientList(GradientListType gradientList) = 0;
+    GradientListType GetGradientList(){ return m_GradientList; }
     GradientType GetGradientDirection(int i) { return m_GradientList.at(i); }
+
+    void SetT2(double T2) { m_T2 = T2; }
     double GetT2() { return m_T2; }
+
+    void SetVolumeFractionImage(ItkDoubleImgType::Pointer img){ m_VolumeFractionImage = img; }
+    ItkDoubleImgType::Pointer GetVolumeFractionImage(){ return m_VolumeFractionImage; }
+
+    void SetRandomGenerator(ItkRandGenType::Pointer randgen){ m_RandGen = randgen; }
+    ItkRandGenType::Pointer GetRandomGenerator(){ return m_RandGen; }
 
     void SetSeed(int s)     ///< set seed for random generator
     {

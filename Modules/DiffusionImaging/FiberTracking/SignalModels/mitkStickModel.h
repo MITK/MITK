@@ -32,6 +32,18 @@ class StickModel : public DiffusionSignalModel< ScalarType >
 public:
 
     StickModel();
+    template< class OtherType >StickModel(StickModel<OtherType>* model)
+    {
+        this->m_CompartmentId = model->m_CompartmentId;
+        this->m_T2 = model->GetT2();
+        this->m_FiberDirection = model->GetFiberDirection();
+        this->m_GradientList = model->GetGradientList();
+        this->m_VolumeFractionImage = model->GetVolumeFractionImage();
+        this->m_RandGen = model->GetRandomGenerator();
+
+        this->m_BValue = model->GetBvalue();
+        this->m_Diffusivity = model->GetDiffusivity();
+    }
     ~StickModel();
 
     typedef typename DiffusionSignalModel< ScalarType >::PixelType      PixelType;
@@ -43,6 +55,7 @@ public:
     ScalarType SimulateMeasurement(unsigned int dir);
 
     void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
+    double GetBvalue() { return m_BValue; }
     void SetDiffusivity(double diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
     double GetDiffusivity() { return m_Diffusivity; }
 

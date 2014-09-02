@@ -33,6 +33,19 @@ class TensorModel : public DiffusionSignalModel< ScalarType >
 public:
 
     TensorModel();
+    template< class OtherType >TensorModel(TensorModel<OtherType>* model)
+    {
+        this->m_CompartmentId = model->m_CompartmentId;
+        this->m_T2 = model->GetT2();
+        this->m_FiberDirection = model->GetFiberDirection();
+        this->m_GradientList = model->GetGradientList();
+        this->m_VolumeFractionImage = model->GetVolumeFractionImage();
+        this->m_RandGen = model->GetRandomGenerator();
+
+        this->m_BValue = model->GetBvalue();
+        this->m_KernelDirection = model->GetKernelDirection();
+        this->m_KernelTensorMatrix = model->GetKernelTensorMatrix();
+    }
     ~TensorModel();
 
     typedef typename DiffusionSignalModel< ScalarType >::PixelType      PixelType;
@@ -44,7 +57,8 @@ public:
     PixelType SimulateMeasurement();
     ScalarType SimulateMeasurement(unsigned int dir);
 
-    void SetBvalue(double bValue) { m_BValue = bValue; }
+    void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
+    double GetBvalue() { return m_BValue; }
     void SetDiffusivity1(double d1){ m_KernelTensorMatrix[0][0] = d1; }
     void SetDiffusivity2(double d2){ m_KernelTensorMatrix[1][1] = d2; }
     void SetDiffusivity3(double d3){ m_KernelTensorMatrix[2][2] = d3; }
@@ -54,6 +68,8 @@ public:
 
     void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
+    GradientType GetKernelDirection(){ return m_KernelDirection; }
+    vnl_matrix_fixed<double, 3, 3> GetKernelTensorMatrix(){ return m_KernelTensorMatrix; }
 
 protected:
 

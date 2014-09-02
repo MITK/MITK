@@ -403,8 +403,8 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
 {
     FiberfoxParameters< ScalarType > parameters;
     parameters.m_Misc.m_OutputPath = "";
-    parameters.m_FiberGen.m_AdvancedOptions = m_Controls->m_AdvancedOptionsBox->isChecked();
-    parameters.m_Misc.m_AdvancedOptions = m_Controls->m_AdvancedOptionsBox_2->isChecked();
+    parameters.m_Misc.m_CheckAdvancedFiberOptionsBox = m_Controls->m_AdvancedOptionsBox->isChecked();
+    parameters.m_Misc.m_CheckAdvancedSignalOptionsBox = m_Controls->m_AdvancedOptionsBox_2->isChecked();
 
     string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
     if (outputPath.compare("-")!=0)
@@ -470,7 +470,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_Misc.m_ArtifactModelString += "_RELAX";
 
     // N/2 ghosts
-    parameters.m_SignalGen.m_DoAddGhosts = m_Controls->m_AddGhosts->isChecked();
+    parameters.m_Misc.m_CheckAddGhostsBox = m_Controls->m_AddGhosts->isChecked();
     if (m_Controls->m_AddGhosts->isChecked())
     {
         parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
@@ -482,7 +482,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_SignalGen.m_KspaceLineOffset = 0;
 
     // Aliasing
-    parameters.m_SignalGen.m_DoAddAliasing = m_Controls->m_AddAliasing->isChecked();
+    parameters.m_Misc.m_CheckAddAliasingBox = m_Controls->m_AddAliasing->isChecked();
     if (m_Controls->m_AddAliasing->isChecked())
     {
         parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
@@ -492,7 +492,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     // Spikes
-    parameters.m_SignalGen.m_DoAddSpikes = m_Controls->m_AddSpikes->isChecked();
+    parameters.m_Misc.m_CheckAddSpikesBox = m_Controls->m_AddSpikes->isChecked();
     if (m_Controls->m_AddSpikes->isChecked())
     {
         parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
@@ -513,7 +513,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     // add distortions
-    parameters.m_SignalGen.m_DoAddDistortions = m_Controls->m_AddDistortions->isChecked();
+    parameters.m_Misc.m_CheckAddDistortionsBox = m_Controls->m_AddDistortions->isChecked();
     if (m_Controls->m_AddDistortions->isChecked() && m_Controls->m_FrequencyMapBox->GetSelectedNode().IsNotNull())
     {
         mitk::DataNode::Pointer fMapNode = m_Controls->m_FrequencyMapBox->GetSelectedNode();
@@ -544,7 +544,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     parameters.m_SignalGen.m_EddyStrength = 0;
-    parameters.m_SignalGen.m_DoAddEddyCurrents = m_Controls->m_AddEddy->isChecked();
+    parameters.m_Misc.m_CheckAddEddyCurrentsBox = m_Controls->m_AddEddy->isChecked();
     if (m_Controls->m_AddEddy->isChecked())
     {
         parameters.m_SignalGen.m_EddyStrength = m_Controls->m_EddyGradientStrength->value();
@@ -590,7 +590,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     // Noise
-    parameters.m_SignalGen.m_DoAddNoise = m_Controls->m_AddNoise->isChecked();
+    parameters.m_Misc.m_CheckAddNoiseBox = m_Controls->m_AddNoise->isChecked();
     if (m_Controls->m_AddNoise->isChecked())
     {
         double noiseVariance = m_Controls->m_NoiseLevel->value();
@@ -1015,13 +1015,24 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Relaxation", BoolProperty::New(parameters.m_SignalGen.m_DoSimulateRelaxation));
     parameters.m_Misc.m_ResultNode->AddProperty("binary", BoolProperty::New(false));
 
-    parameters.m_FiberGen.m_RealTimeFibers = m_Controls->m_RealTimeFibers->isChecked();
-    parameters.m_FiberGen.m_AdvancedOptions = m_Controls->m_AdvancedOptionsBox->isChecked();
-    parameters.m_FiberGen.m_Distribution = m_Controls->m_DistributionBox->currentIndex();
+    parameters.m_Misc.m_CheckRealTimeFibersBox = m_Controls->m_RealTimeFibers->isChecked();
+    parameters.m_Misc.m_CheckAdvancedFiberOptionsBox = m_Controls->m_AdvancedOptionsBox->isChecked();
+    parameters.m_Misc.m_CheckIncludeFiducialsBox = m_Controls->m_IncludeFiducials->isChecked();
+    parameters.m_Misc.m_CheckConstantRadiusBox = m_Controls->m_ConstantRadiusBox->isChecked();
+
+    switch(m_Controls->m_DistributionBox->currentIndex())
+    {
+    case 0:
+        parameters.m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
+        break;
+    case 1:
+        parameters.m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_GAUSSIAN;
+        break;
+    default:
+        parameters.m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
+    }
     parameters.m_FiberGen.m_Variance = m_Controls->m_VarianceBox->value();
-    parameters.m_FiberGen.m_FiberDensity = m_Controls->m_FiberDensityBox->value();
-    parameters.m_FiberGen.m_IncludeFiducials = m_Controls->m_IncludeFiducials->isChecked();
-    parameters.m_FiberGen.m_ConstantRadius = m_Controls->m_ConstantRadiusBox->isChecked();
+    parameters.m_FiberGen.m_Density = m_Controls->m_FiberDensityBox->value();
     parameters.m_FiberGen.m_Sampling = m_Controls->m_FiberSamplingBox->value();
     parameters.m_FiberGen.m_Tension = m_Controls->m_TensionBox->value();
     parameters.m_FiberGen.m_Continuity = m_Controls->m_ContinuityBox->value();
@@ -1064,13 +1075,14 @@ void QmitkFiberfoxView::LoadParameters()
     FiberfoxParameters<> parameters;
     parameters.LoadParameters(filename.toStdString());
 
-    m_Controls->m_RealTimeFibers->setChecked(parameters.m_FiberGen.m_RealTimeFibers);
-    m_Controls->m_AdvancedOptionsBox->setChecked(parameters.m_FiberGen.m_AdvancedOptions);
+    m_Controls->m_RealTimeFibers->setChecked(parameters.m_Misc.m_CheckRealTimeFibersBox);
+    m_Controls->m_AdvancedOptionsBox->setChecked(parameters.m_Misc.m_CheckAdvancedFiberOptionsBox);
+    m_Controls->m_IncludeFiducials->setChecked(parameters.m_Misc.m_CheckIncludeFiducialsBox);
+    m_Controls->m_ConstantRadiusBox->setChecked(parameters.m_Misc.m_CheckConstantRadiusBox);
+
     m_Controls->m_DistributionBox->setCurrentIndex(parameters.m_FiberGen.m_Distribution);
     m_Controls->m_VarianceBox->setValue(parameters.m_FiberGen.m_Variance);
-    m_Controls->m_FiberDensityBox->setValue(parameters.m_FiberGen.m_FiberDensity);
-    m_Controls->m_IncludeFiducials->setChecked(parameters.m_FiberGen.m_IncludeFiducials);
-    m_Controls->m_ConstantRadiusBox->setChecked(parameters.m_FiberGen.m_ConstantRadius);
+    m_Controls->m_FiberDensityBox->setValue(parameters.m_FiberGen.m_Density);
     m_Controls->m_FiberSamplingBox->setValue(parameters.m_FiberGen.m_Sampling);
     m_Controls->m_TensionBox->setValue(parameters.m_FiberGen.m_Tension);
     m_Controls->m_ContinuityBox->setValue(parameters.m_FiberGen.m_Continuity);
@@ -1094,7 +1106,6 @@ void QmitkFiberfoxView::LoadParameters()
     m_Controls->m_SpacingZ->setValue(parameters.m_SignalGen.m_ImageSpacing[2]);
     m_Controls->m_NumGradientsBox->setValue(parameters.m_SignalGen.GetNumWeightedVolumes());
     m_Controls->m_BvalueBox->setValue(parameters.m_SignalGen.m_Bvalue);
-    m_Controls->m_AdvancedOptionsBox_2->setChecked(parameters.m_Misc.m_AdvancedOptions);
     m_Controls->m_SignalScaleBox->setValue(parameters.m_SignalGen.m_SignalScale);
     m_Controls->m_TEbox->setValue(parameters.m_SignalGen.m_tEcho);
     m_Controls->m_LineReadoutTimeBox->setValue(parameters.m_SignalGen.m_tLine);
@@ -1102,11 +1113,10 @@ void QmitkFiberfoxView::LoadParameters()
     m_Controls->m_FiberRadius->setValue(parameters.m_SignalGen.m_AxonRadius);
     m_Controls->m_RelaxationBox->setChecked(parameters.m_SignalGen.m_DoSimulateRelaxation);
     m_Controls->m_EnforcePureFiberVoxelsBox->setChecked(parameters.m_SignalGen.m_DoDisablePartialVolume);
-    m_Controls->m_VolumeFractionsBox->setChecked(parameters.m_Misc.m_OutputVolumeFractions);
 
     if (parameters.m_NoiseModel!=NULL)
     {
-        m_Controls->m_AddNoise->setChecked(parameters.m_SignalGen.m_DoAddNoise);
+        m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_CheckAddNoiseBox);
         if (dynamic_cast<mitk::RicianNoiseModel<double>*>(parameters.m_NoiseModel))
             m_Controls->m_NoiseDistributionBox->setCurrentIndex(0);
         else if (dynamic_cast<mitk::ChiSquareNoiseModel<double>*>(parameters.m_NoiseModel))
@@ -1116,15 +1126,18 @@ void QmitkFiberfoxView::LoadParameters()
     else
         m_Controls->m_AddNoise->setChecked(false);
 
-    m_Controls->m_AddGhosts->setChecked(parameters.m_SignalGen.m_DoAddGhosts);
+    m_Controls->m_VolumeFractionsBox->setChecked(parameters.m_Misc.m_CheckOutputVolumeFractionsBox);
+    m_Controls->m_AdvancedOptionsBox_2->setChecked(parameters.m_Misc.m_CheckAdvancedSignalOptionsBox);
+    m_Controls->m_AddGhosts->setChecked(parameters.m_Misc.m_CheckAddGhostsBox);
+    m_Controls->m_AddAliasing->setChecked(parameters.m_Misc.m_CheckAddAliasingBox);
+    m_Controls->m_AddDistortions->setChecked(parameters.m_Misc.m_CheckAddDistortionsBox);
+    m_Controls->m_AddSpikes->setChecked(parameters.m_Misc.m_CheckAddSpikesBox);
+    m_Controls->m_AddEddy->setChecked(parameters.m_Misc.m_CheckAddEddyCurrentsBox);
+
     m_Controls->m_kOffsetBox->setValue(parameters.m_SignalGen.m_KspaceLineOffset);
-    m_Controls->m_AddAliasing->setChecked(parameters.m_SignalGen.m_DoAddAliasing);
     m_Controls->m_WrapBox->setValue(100*(1-parameters.m_SignalGen.m_CroppingFactor));
-    m_Controls->m_AddDistortions->setChecked(parameters.m_SignalGen.m_DoAddDistortions);
-    m_Controls->m_AddSpikes->setChecked(parameters.m_SignalGen.m_DoAddSpikes);
     m_Controls->m_SpikeNumBox->setValue(parameters.m_SignalGen.m_Spikes);
     m_Controls->m_SpikeScaleBox->setValue(parameters.m_SignalGen.m_SpikeAmplitude);
-    m_Controls->m_AddEddy->setChecked(parameters.m_SignalGen.m_DoAddEddyCurrents);
     m_Controls->m_EddyGradientStrength->setValue(parameters.m_SignalGen.m_EddyStrength);
     m_Controls->m_AddGibbsRinging->setChecked(parameters.m_SignalGen.m_DoAddGibbsRinging);
     m_Controls->m_AddMotion->setChecked(parameters.m_SignalGen.m_DoAddMotion);
@@ -1808,8 +1821,8 @@ void QmitkFiberfoxView::GenerateFibers()
             return;
     }
 
-    vector< vector< mitk::PlanarEllipse::Pointer > > fiducials;
-    vector< vector< unsigned int > > fliplist;
+    FiberfoxParameters<double> parameters = UpdateImageParameters<double>();
+
     for (unsigned int i=0; i<m_SelectedBundles.size(); i++)
     {
         mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundles.at(i));
@@ -1862,8 +1875,8 @@ void QmitkFiberfoxView::GenerateFibers()
         }
         if (fib.size()>1)
         {
-            fiducials.push_back(fib);
-            fliplist.push_back(flip);
+            parameters.m_FiberGen.m_Fiducials.push_back(fib);
+            parameters.m_FiberGen.m_FlipList.push_back(flip);
         }
         else if (fib.size()>0)
             m_SelectedBundles.at(i)->SetData( mitk::FiberBundleX::New() );
@@ -1872,24 +1885,7 @@ void QmitkFiberfoxView::GenerateFibers()
     }
 
     itk::FibersFromPlanarFiguresFilter::Pointer filter = itk::FibersFromPlanarFiguresFilter::New();
-    filter->SetFiducials(fiducials);
-    filter->SetFlipList(fliplist);
-
-    switch(m_Controls->m_DistributionBox->currentIndex()){
-    case 0:
-        filter->SetFiberDistribution(itk::FibersFromPlanarFiguresFilter::DISTRIBUTE_UNIFORM);
-        break;
-    case 1:
-        filter->SetFiberDistribution(itk::FibersFromPlanarFiguresFilter::DISTRIBUTE_GAUSSIAN);
-        filter->SetVariance(m_Controls->m_VarianceBox->value());
-        break;
-    }
-
-    filter->SetDensity(m_Controls->m_FiberDensityBox->value());
-    filter->SetTension(m_Controls->m_TensionBox->value());
-    filter->SetContinuity(m_Controls->m_ContinuityBox->value());
-    filter->SetBias(m_Controls->m_BiasBox->value());
-    filter->SetFiberSampling(m_Controls->m_FiberSamplingBox->value());
+    filter->SetParameters(parameters.m_FiberGen);
     filter->Update();
     vector< mitk::FiberBundleX::Pointer > fiberBundles = filter->GetFiberBundles();
 

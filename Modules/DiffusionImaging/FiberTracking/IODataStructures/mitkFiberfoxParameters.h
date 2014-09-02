@@ -39,7 +39,7 @@ using namespace std;
 namespace mitk {
 
 /** Signal generation */
-class MitkFiberTracking_EXPORT SignalGenerationParameters
+class SignalGenerationParameters
 {
 public:
     typedef itk::Image<double, 3>                   ItkDoubleImgType;
@@ -54,15 +54,14 @@ public:
     };
 
     SignalGenerationParameters()
-        : m_FrequencyMap(NULL)
-        , m_MaskImage(NULL)
-        , m_SignalScale(100)
+        : m_SignalScale(100)
         , m_tEcho(100)
         , m_tLine(1)
         , m_tInhom(50)
         , m_Bvalue(1000)
         , m_SimulateKspaceAcquisition(false)
         , m_AxonRadius(0)
+        , m_DoDisablePartialVolume(false)
         , m_DiffusionDirectionMode(SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS)
         , m_FiberSeparationThreshold(30)
         , m_Spikes(0)
@@ -73,9 +72,10 @@ public:
         , m_CroppingFactor(1)
         , m_DoAddGibbsRinging(false)
         , m_DoSimulateRelaxation(true)
-        , m_DoDisablePartialVolume(false)
         , m_DoAddMotion(false)
         , m_DoRandomizeMotion(true)
+        , m_FrequencyMap(NULL)
+        , m_MaskImage(NULL)
     {
         m_ImageRegion.SetSize(0, 12);
         m_ImageRegion.SetSize(1, 12);
@@ -144,7 +144,7 @@ protected:
 };
 
 /** Fiber generation */
-class MitkFiberTracking_EXPORT FiberGenerationParameters
+class FiberGenerationParameters
 {
 public:
 
@@ -185,7 +185,7 @@ public:
 };
 
 /** GUI persistence, input, output, ... */
-class MitkFiberTracking_EXPORT MiscFiberfoxParameters
+class MiscFiberfoxParameters
 {
 public:
     MiscFiberfoxParameters()
@@ -236,7 +236,7 @@ public:
   *
   */
 template< class ScalarType = double >
-class MitkFiberTracking_EXPORT FiberfoxParameters
+class FiberfoxParameters
 {
 public:
 

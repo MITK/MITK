@@ -123,4 +123,6 @@ protected:
   QLabel*                m_TimeStepFaderLabel;
   mitk::DataStorage::Pointer m_DataStorage;
 };
+
 #endif
+

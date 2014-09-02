@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //Basedata Test
 #include <mitkRenderWindowFrame.h>
 #include <mitkGeometryData.h>
-#include <mitkGeometry2DData.h>
+#include <mitkPlaneGeometryData.h>
 #include <mitkGradientBackground.h>
 #include <mitkManufacturerLogo.h>
 #include <mitkPointSet.h>
@@ -35,20 +35,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 
 //Mapper Test
-#include <mitkGeometry2DDataMapper2D.h>
-#include <mitkGeometry2DDataMapper2D.h>
+#include <mitkPlaneGeometryDataMapper2D.h>
+#include <mitkPlaneGeometryDataMapper2D.h>
 #include <mitkImageVtkMapper2D.h>
 #include <mitkSurfaceGLMapper2D.h>
 
-#include <mitkGeometry2DDataVtkMapper3D.h>
+#include <mitkPlaneGeometryDataVtkMapper3D.h>
 #include <mitkPointSetVtkMapper3D.h>
 #include <mitkPointSetVtkMapper2D.h>
 #include <mitkSurfaceVtkMapper3D.h>
 #include <mitkVolumeDataVtkMapper3D.h>
 
 //Interactors
-#include <mitkAffineInteractor.h>
-#include <mitkPointSetInteractor.h>
+#include <mitkPointSetDataInteractor.h>
 
 //Propertylist Test
 
@@ -82,9 +81,9 @@ static void TestDataSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a GeometryData object was set correctly" )
 
-  baseData = mitk::Geometry2DData::New();
+  baseData = mitk::PlaneGeometryData::New();
   dataNode->SetData(baseData);
-  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a Geometry2DData object was set correctly" )
+  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a PlaneGeometryData object was set correctly" )
 
   baseData = mitk::GradientBackground::New();
   dataNode->SetData(baseData);
@@ -117,9 +116,9 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetMapper(0,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(0), "Testing if a NULL pointer was set correctly" )
 
-  mapper = mitk::Geometry2DDataMapper2D::New();
+  mapper = mitk::PlaneGeometryDataMapper2D::New();
   dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a Geometry2DDataMapper2D was set correctly" )
+  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a PlaneGeometryDataMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::ImageVtkMapper2D::New();
@@ -137,9 +136,9 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a SurfaceGLMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
-  mapper = mitk::Geometry2DDataVtkMapper3D::New();
+  mapper = mitk::PlaneGeometryDataVtkMapper3D::New();
   dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a Geometry2DDataVtkMapper3D was set correctly" )
+  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a PlaneGeometryDataVtkMapper3D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::PointSetVtkMapper3D::New();
@@ -167,19 +166,19 @@ static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
 {
 
   //this method tests the SetInteractor() and GetInteractor methods
-  //the Interactor base class calls the DataNode->SetInteractor method
+  //the DataInteractor base class calls the DataNode->SetInteractor method
 
-  mitk::Interactor::Pointer interactor;
+  mitk::DataInteractor::Pointer interactor;
 
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a NULL pointer was set correctly (Interactor)" )
+  MITK_TEST_CONDITION( interactor == dataNode->GetDataInteractor(), "Testing if a NULL pointer was set correctly (DataInteractor)" )
 
-  interactor = mitk::AffineInteractor::New("AffineInteractions click to select", dataNode);
-  dataNode->EnableInteractor();
-  dataNode->DisableInteractor();
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a AffineInteractor was set correctly" )
+  interactor = mitk::PointSetDataInteractor::New();
+  interactor->SetDataNode(dataNode);
+  MITK_TEST_CONDITION( interactor == dataNode->GetDataInteractor(), "Testing if a PointSetDataInteractor was set correctly" )
 
-  interactor = mitk::PointSetInteractor::New("AffineInteractions click to select", dataNode);
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a PointSetInteractor was set correctly" )
+  interactor = mitk::PointSetDataInteractor::New();
+  dataNode->SetDataInteractor(interactor);
+  MITK_TEST_CONDITION( interactor == dataNode->GetDataInteractor(), "Testing if a PointSetDataInteractor was set correctly" )
 }
 static void TestPropertyList(mitk::DataNode::Pointer dataNode)
 {

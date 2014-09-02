@@ -98,7 +98,6 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
 
 void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-
   const mitk::DataNode* node=GetDataNode();
   if( node == NULL )
     return;
@@ -127,15 +126,13 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
     //
     // get the world time
     //
-    const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
-    assert( worldGeometry != NULL );
-    ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+    ScalarType time = renderer->GetTime();
 
     //
     // convert the world time in time steps of the input object
     //
     int timeStep=0;
-    if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
+    if ( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
       timeStep = inputTimeGeometry->TimePointToTimeStep( time );
     if ( inputTimeGeometry->IsValidTimeStep( timeStep ) == false )
     {
@@ -467,7 +464,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
               Vector2D vec2d = pt2d-lastPt2d;
               makePerpendicularVector2D(vec2d, vec2d);
 
-              Vector2D pos2d = (lastPt2d.GetVectorFromOrigin()+pt2d)*0.5+vec2d*text2dDistance;
+              Vector2D pos2d = (lastPt2d.GetVectorFromOrigin()+pt2d.GetVectorFromOrigin())*0.5+vec2d*text2dDistance;
 
               mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
               OpenGLrenderer->WriteSimpleText(buffer.str(), pos2d[0], pos2d[1]);

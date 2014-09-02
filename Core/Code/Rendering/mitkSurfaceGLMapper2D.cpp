@@ -167,13 +167,10 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   //
   // get the world time
   //
-  Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  assert( worldGeometry.IsNotNull() );
-
-  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
+  ScalarType time =renderer->GetTime();
   int timestep=0;
 
-  if( time > ScalarTypeNumericTraits::NonpositiveMin() )
+  if( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
     timestep = inputTimeGeometry->TimePointToTimeStep( time );
 
  // int timestep = this->GetTimestep();
@@ -184,8 +181,6 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
   if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 ))
     return;
-
-  PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(worldGeometry.GetPointer());
 
   //apply color and opacity read from the PropertyList
   this->ApplyAllProperties(renderer);
@@ -232,16 +227,18 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }
 
     vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(timestep);
-    if(worldPlaneGeometry.IsNotNull())
+    PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
+    assert( worldGeometry.IsNotNull() );
+    if (worldGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
-      point=worldPlaneGeometry->GetOrigin();
-      normal=worldPlaneGeometry->GetNormal(); normal.Normalize();
+      point=worldGeometry->GetOrigin();
+      normal=worldGeometry->GetNormal(); normal.Normalize();
       m_Plane->SetTransform((vtkAbstractTransform*)NULL);
     }
     else
     {
-      AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldGeometry2D());
+      AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldPlaneGeometry());
       if(worldAbstractGeometry.IsNotNull())
       {
         AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeGeometry()->GetGeometryForTimeStep(0).GetPointer());
@@ -301,7 +298,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 }
 
 void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData* contour,
-                                       const Geometry2D* worldGeometry,
+                                       const PlaneGeometry* worldGeometry,
                                        const DisplayGeometry* displayGeometry,
                                        vtkLinearTransform * vtktransform,
                                        vtkLookupTable *lut,
@@ -526,7 +523,6 @@ void mitk::SurfaceGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 
     node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
     node->GetFloatProperty( "back normal lenth (px)", m_BackNormalLengthInPixels, renderer );
-
   }
   else
   {
@@ -538,7 +534,5 @@ void mitk::SurfaceGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 
     node->GetFloatProperty( "back normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
     node->GetFloatProperty( "front normal lenth (px)", m_BackNormalLengthInPixels, renderer );
-
   }
 }
-

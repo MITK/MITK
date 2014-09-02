@@ -98,7 +98,7 @@ mitk::USProbe::Pointer mitk::USTelemedProbesControls::GetSelectedProbe()
       ". Maximum possible index is " << m_ProbesSet.size()-1 << ".";
   }
 
-  return m_ProbesSet.at(m_SelectedProbeIndex);
+  return m_ProbesSet.at(m_SelectedProbeIndex).GetPointer();
 }
 
 unsigned int mitk::USTelemedProbesControls::GetProbesCount() const

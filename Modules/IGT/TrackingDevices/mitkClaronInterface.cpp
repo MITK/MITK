@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <MTC.h>
 #include <math.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 mitk::ClaronInterface::ClaronInterface()
 {
@@ -215,7 +215,7 @@ std::vector<double> mitk::ClaronInterface::GetTipQuaternions(claronToolHandle c)
   claronQuaternion[1] = Quarternions[2];
   claronQuaternion[2] = Quarternions[3];
 
-  // Here we have to make a -90°-turn around the Y-axis because of a bug of the
+  // Here we have to make a -90ï¿½-turn around the Y-axis because of a bug of the
   // MTC-library.
   mitk::Quaternion minusNinetyDegreeY;
   minusNinetyDegreeY[3] = sqrt(2.0)/2.0;
@@ -251,7 +251,7 @@ std::vector<double> mitk::ClaronInterface::GetQuaternions(claronToolHandle c)
   claronQuaternion[1] = Quarternions[2];
   claronQuaternion[2] = Quarternions[3];
 
-  // Here we have to make a -90°-turn around the Y-axis because of a bug of the
+  // Here we have to make a -90ï¿½-turn around the Y-axis because of a bug of the
   // MTC-library.
   mitk::Quaternion minusNinetyDegreeY;
   minusNinetyDegreeY[3] = sqrt(2.0)/2.0;

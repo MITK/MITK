@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInteractionConst.h>
 #include <mitkPointSet.h>
 #include <mitkRenderingManager.h>
-#include <mitkVector.h> // for PointDataType
+#include <mitkNumericTypes.h> // for PointDataType
 #include <mitkProperties.h>
 
 

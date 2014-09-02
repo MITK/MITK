@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 //##Documentation
-//## @brief Data class only having a Geometry3D but not containing
+//## @brief Data class only having a BaseGeometry but not containing
 //## any specific data.
 //##
 //## Only implements pipeline methods which are abstract in BaseData.

@@ -127,5 +127,3 @@ void QmitkStandardViews::hotspotClicked(const QString& s)
   }
 }
 
-
-

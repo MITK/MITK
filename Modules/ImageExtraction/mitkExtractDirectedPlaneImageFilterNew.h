@@ -23,8 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkITKImageImport.h"
 
 namespace mitk {
-
-/**
+  /**
   \deprecated This class is deprecated. Use mitk::ExtractSliceFilter instead.
   \sa ExtractSliceFilter
 
@@ -45,53 +44,55 @@ namespace mitk {
   desired timestep at which the slice shall be extracted, otherwise the lowest given timestep is selected by default.
 
   The special feature of this filter is, that the planes of the input image can be rotated in any way. To assure a proper extraction you have to
-  set the currentWorldGeometry2D with you can obtain from the BaseRenderer, respectively the positionEvent send by the renderer.
+  set the currentWorldPlaneGeometry with you can obtain from the BaseRenderer, respectively the positionEvent send by the renderer.
 
   The output will not be set if there was a problem with the input image
 
   $Author: fetzer $
-*/
-class MitkImageExtraction_EXPORT ExtractDirectedPlaneImageFilterNew : public ImageToImageFilter
-{
-
-public:
+  */
+  class MitkImageExtraction_EXPORT ExtractDirectedPlaneImageFilterNew : public ImageToImageFilter
+  {
+  public:
 
     mitkClassMacro(ExtractDirectedPlaneImageFilterNew, ImageToImageFilter);
     itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      itkCloneMacro(Self)
 
-    /**
+      /**
       \brief Set macro for the current worldgeometry
 
       \a Parameter The current wordgeometry that describes the position (rotation, translation)
-         of the plane (and therefore the slice to be extracted) in our 3D(+t) image
+      of the plane (and therefore the slice to be extracted) in our 3D(+t) image
+      */
+      itkSetMacro(CurrentWorldPlaneGeometry, BaseGeometry* );
+    /**
+    * \deprecatedSince{2014_06} Please use SetCurrentWorldPlaneGeometry
     */
-    itkSetMacro(CurrentWorldGeometry2D, Geometry3D* );
+    DEPRECATED(void SetCurrentWorldGeometry2D(BaseGeometry* geo)){SetCurrentWorldPlaneGeometry(geo);};
 
-    itkSetMacro(ImageGeometry, Geometry3D* );
+      itkSetMacro(ImageGeometry, BaseGeometry* );
 
     /**
-      \brief Set macro for the current timestep
+    \brief Set macro for the current timestep
 
-      \a Parameter The timestep of the image from which the slice shall be extracted
+    \a Parameter The timestep of the image from which the slice shall be extracted
     */
     itkSetMacro(ActualInputTimestep, int);
 
-protected:
+  protected:
     ExtractDirectedPlaneImageFilterNew();
     virtual ~ExtractDirectedPlaneImageFilterNew();
     virtual void GenerateData();
     virtual void GenerateOutputInformation();
 
-private:
-    const Geometry3D* m_CurrentWorldGeometry2D;
-    const Geometry3D* m_ImageGeometry;
+  private:
+    const BaseGeometry* m_CurrentWorldPlaneGeometry;
+    const BaseGeometry* m_ImageGeometry;
     int m_ActualInputTimestep;
 
     template<typename TPixel, unsigned int VImageDimension>
     void ItkSliceExtraction (itk::Image<TPixel, VImageDimension>* inputImage);
-};
-
+  };
 }//namespace
 
 #endif

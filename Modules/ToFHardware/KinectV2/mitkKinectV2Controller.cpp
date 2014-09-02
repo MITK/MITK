@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkFloatArray.h>
 #include <vtkPointData.h>
+#include <vtkMath.h>
+
+#include <mitkVector.h>
 
 //Taken from official Microsoft SDK samples. Should never be public or part of the class,
 //because it is just for cleaning up.
@@ -66,6 +69,9 @@ namespace mitk
     CameraSpacePoint* m_CameraCoordinates; ///< 3D world coordinate points of the Kinect V2 SDK
     ColorSpacePoint* m_ColorPoints;///< Texture coordinates of the Kinect V2 SDK
     vtkSmartPointer<vtkPolyData> m_PolyData;///< Conversion of m_CameraCoordinates to vtkPolyData
+
+    double m_TriangulationThreshold; ///< Threshold to cut off vertices from triangulation
+    bool m_GenerateTriangularMesh; ///< Apply triangulation or not
   };
 
   KinectV2Controller::KinectV2ControllerPrivate::KinectV2ControllerPrivate():
@@ -82,7 +88,9 @@ namespace mitk
     m_DepthBufferSize(sizeof(float)*512*424),
     m_CameraCoordinates(NULL),
     m_ColorPoints(NULL),
-    m_PolyData(NULL)
+    m_PolyData(NULL),
+    m_TriangulationThreshold(0.0),
+    m_GenerateTriangularMesh(false)
   {
     // create heap storage for color pixel data in RGBX format
     m_pColorRGBX = new RGBQUAD[m_RGBCaptureWidth * m_RGBCaptureHeight];
@@ -187,7 +195,7 @@ namespace mitk
     //Acquire lastest frame updates the camera and for
     //unknown reasons I cannot use it here in UpdateCamera()
     //without resulting in random crashes of the app.
-   return true;
+    return true;
   }
 
   void KinectV2Controller::GetDistances(float* distances)
@@ -441,39 +449,152 @@ namespace mitk
         d->m_pCoordinateMapper->MapDepthFrameToCameraSpace(pointCount, pDepthBuffer, pointCount, d->m_CameraCoordinates);
         vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
         vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
+        vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
+
+        const double meterfactor = 1000.0;
+
         vtkSmartPointer<vtkFloatArray> textureCoordinates = vtkSmartPointer<vtkFloatArray>::New();
+        vtkSmartPointer<vtkIdList> vertexIdList = vtkSmartPointer<vtkIdList>::New();
+        vertexIdList->Allocate(pointCount);
+        vertexIdList->SetNumberOfIds(pointCount);
+        for(unsigned int i = 0; i < pointCount; ++i)
+        {
+          vertexIdList->SetId(i, 0);
+        }
+
+        std::vector<bool> isPointValid;
+        isPointValid.resize(pointCount);
+        //Allocate the object once else it would automatically allocate new memory
+        //for every vertex and perform a copy which is expensive.
+        vertexIdList->Allocate(pointCount);
+        vertexIdList->SetNumberOfIds(pointCount);
         textureCoordinates->SetNumberOfComponents(2);
         textureCoordinates->Allocate(pointCount);
 
         d->m_pCoordinateMapper->MapDepthFrameToColorSpace(pointCount, pDepthBuffer, pointCount, d->m_ColorPoints);
 
-        for(int i = 0; i < d->m_DepthCaptureHeight*d->m_DepthCaptureWidth; ++i)
+        for(int j = 0; j < d->m_DepthCaptureHeight; ++j)
         {
-          vtkIdType id = points->InsertNextPoint(d->m_CameraCoordinates[i].X, d->m_CameraCoordinates[i].Y, d->m_CameraCoordinates[i].Z);
-          vertices->InsertNextCell(1);
-          vertices->InsertCellPoint(id);
-          distances[i] = static_cast<float>(*pDepthBuffer);
-          amplitudes[i] = static_cast<float>(*pInfraRedBuffer);
-          ++pDepthBuffer;
-          ++pInfraRedBuffer;
-
-          ColorSpacePoint colorPoint = d->m_ColorPoints[i];
-          // retrieve the depth to color mapping for the current depth pixel
-          int colorInDepthX = (int)(floor(colorPoint.X + 0.5));
-          int colorInDepthY = (int)(floor(colorPoint.Y + 0.5));
-
-          float xNorm = static_cast<float>(colorInDepthX)/d->m_RGBCaptureWidth;
-          float yNorm = static_cast<float>(colorInDepthY)/d->m_RGBCaptureHeight;
-
-          // make sure the depth pixel maps to a valid point in color space
-          if ( colorInDepthX >= 0 && colorInDepthX < d->m_RGBCaptureWidth && colorInDepthY >= 0 && colorInDepthY < d->m_RGBCaptureHeight )
+          for(int i = 0; i < d->m_DepthCaptureWidth; ++i)
           {
-            textureCoordinates->InsertTuple2(id, xNorm, yNorm);
+            unsigned int pixelID = i+j*d->m_DepthCaptureWidth;
+            unsigned int inverseid = (d->m_DepthCaptureWidth - i - 1) + j*d->m_DepthCaptureWidth;
+
+            distances[inverseid] = static_cast<float>(*pDepthBuffer);
+            amplitudes[inverseid] = static_cast<float>(*pInfraRedBuffer);
+            ++pDepthBuffer;
+            ++pInfraRedBuffer;
+
+            if (d->m_CameraCoordinates[pixelID].Z<=mitk::eps)
+            {
+              isPointValid[pixelID] = false;
+            }
+            else
+            {
+              isPointValid[pixelID] = true;
+
+              //VTK would insert empty points into the polydata if we use
+              //points->InsertPoint(pixelID, cartesianCoordinates.GetDataPointer()).
+              //If we use points->InsertNextPoint(...) instead, the ID's do not
+              //correspond to the image pixel ID's. Thus, we have to save them
+              //in the vertexIdList.
+              //Kinect SDK delivers world coordinates in meters, so we have to
+              //convert to mm for MITK.
+              vertexIdList->SetId(pixelID, points->InsertNextPoint(-d->m_CameraCoordinates[pixelID].X*meterfactor, -d->m_CameraCoordinates[pixelID].Y*meterfactor, d->m_CameraCoordinates[pixelID].Z*meterfactor));
+
+              if (d->m_GenerateTriangularMesh)
+              {
+                if((i >= 1) && (j >= 1))
+                {
+                  //This little piece of art explains the ID's:
+                  //
+                  // P(x_1y_1)---P(xy_1)
+                  // |           |
+                  // |           |
+                  // |           |
+                  // P(x_1y)-----P(xy)
+                  //
+                  //We can only start triangulation if we are at vertex (1,1),
+                  //because we need the other 3 vertices near this one.
+                  //To go one pixel line back in the image array, we have to
+                  //subtract 1x xDimension.
+                  vtkIdType xy = pixelID;
+                  vtkIdType x_1y = pixelID-1;
+                  vtkIdType xy_1 = pixelID-d->m_DepthCaptureWidth;
+                  vtkIdType x_1y_1 = xy_1-1;
+
+                  //Find the corresponding vertex ID's in the saved vertexIdList:
+                  vtkIdType xyV = vertexIdList->GetId(xy);
+                  vtkIdType x_1yV = vertexIdList->GetId(x_1y);
+                  vtkIdType xy_1V = vertexIdList->GetId(xy_1);
+                  vtkIdType x_1y_1V = vertexIdList->GetId(x_1y_1);
+
+                  if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
+                  {
+                    double pointXY[3], pointX_1Y[3], pointXY_1[3], pointX_1Y_1[3];
+
+                    points->GetPoint(xyV, pointXY);
+                    points->GetPoint(x_1yV, pointX_1Y);
+                    points->GetPoint(xy_1V, pointXY_1);
+                    points->GetPoint(x_1y_1V, pointX_1Y_1);
+
+
+                    if( (mitk::Equal(d->m_TriangulationThreshold, 0.0)) || ((vtkMath::Distance2BetweenPoints(pointXY, pointX_1Y) <= d->m_TriangulationThreshold)
+                      && (vtkMath::Distance2BetweenPoints(pointXY, pointXY_1) <= d->m_TriangulationThreshold)
+                      && (vtkMath::Distance2BetweenPoints(pointX_1Y, pointX_1Y_1) <= d->m_TriangulationThreshold)
+                      && (vtkMath::Distance2BetweenPoints(pointXY_1, pointX_1Y_1) <= d->m_TriangulationThreshold)))
+                    {
+                      polys->InsertNextCell(3);
+                      polys->InsertCellPoint(x_1yV);
+                      polys->InsertCellPoint(xyV);
+                      polys->InsertCellPoint(x_1y_1V);
+
+                      polys->InsertNextCell(3);
+                      polys->InsertCellPoint(x_1y_1V);
+                      polys->InsertCellPoint(xyV);
+                      polys->InsertCellPoint(xy_1V);
+                    }
+                    else
+                    {
+                      //We dont want triangulation, but we want to keep the vertex
+                      vertices->InsertNextCell(1);
+                      vertices->InsertCellPoint(xyV);
+                    }
+                  }
+                }
+              }
+              else
+              {
+                //We dont want triangulation, we only want vertices
+                vertices->InsertNextCell(1);
+                vertices->InsertCellPoint(vertexIdList->GetId(pixelID));
+              }
+
+              ColorSpacePoint colorPoint = d->m_ColorPoints[pixelID];
+              // retrieve the depth to color mapping for the current depth pixel
+              int colorInDepthX = (int)(floor(colorPoint.X + 0.5));
+              int colorInDepthY = (int)(floor(colorPoint.Y + 0.5));
+
+              float xNorm = -static_cast<float>(colorInDepthX)/d->m_RGBCaptureWidth;
+              float yNorm = static_cast<float>(colorInDepthY)/d->m_RGBCaptureHeight;
+
+              // make sure the depth pixel maps to a valid point in color space
+              if ( colorInDepthX >= 0 && colorInDepthX < d->m_RGBCaptureWidth && colorInDepthY >= 0 && colorInDepthY < d->m_RGBCaptureHeight )
+              {
+                textureCoordinates->InsertTuple2(vertexIdList->GetId(pixelID), xNorm, yNorm);
+              }
+              else
+              {
+                textureCoordinates->InsertTuple2(vertexIdList->GetId(pixelID), 0, 0);
+              }
+            }
           }
         }
+
         d->m_PolyData = vtkSmartPointer<vtkPolyData>::New();
         d->m_PolyData->SetPoints(points);
         d->m_PolyData->SetVerts(vertices);
+        d->m_PolyData->SetPolys(polys);
         d->m_PolyData->GetPointData()->SetTCoords(textureCoordinates);
       }
       else
@@ -505,13 +626,19 @@ namespace mitk
         }
         if (SUCCEEDED(hr))
         {
-          for(int i = 0; i < d->m_RGBBufferSize; i+=3)
+          for(int j = 0; j < d->m_RGBCaptureHeight; ++j)
           {
-            //convert from BGR to RGB
-            rgb[i+0] = pColorBuffer->rgbRed;
-            rgb[i+1] = pColorBuffer->rgbGreen;
-            rgb[i+2] = pColorBuffer->rgbBlue;
-            ++pColorBuffer;
+            for(int i = 0; i < d->m_RGBCaptureWidth; ++i)
+            {
+              //the buffer has the size of 3*ResolutionX/Y (one for each color value)
+              //thats why die id is multiplied by 3.
+              unsigned int id = ((d->m_RGBCaptureWidth - i - 1) + j*d->m_RGBCaptureWidth)*3;
+              //convert from BGR to RGB
+              rgb[id+0] = pColorBuffer->rgbRed;
+              rgb[id+1] = pColorBuffer->rgbGreen;
+              rgb[id+2] = pColorBuffer->rgbBlue;
+              ++pColorBuffer;
+            }
           }
         }
       }
@@ -620,5 +747,15 @@ namespace mitk
   vtkSmartPointer<vtkPolyData> KinectV2Controller::GetVtkPolyData()
   {
     return d->m_PolyData;
+  }
+
+  void KinectV2Controller::SetGenerateTriangularMesh(bool flag)
+  {
+    d->m_GenerateTriangularMesh = flag;
+  }
+
+  void KinectV2Controller::SetTriangulationThreshold(double triangulationThreshold)
+  {
+    this->d->m_TriangulationThreshold = triangulationThreshold * triangulationThreshold;
   }
 }

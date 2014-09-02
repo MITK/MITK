@@ -152,7 +152,7 @@ Further, you should open the MyProject.sln solution file (for Visual Studio) or 
 
 The same applies for the MyProject-superbuild/MITK-superbuild directory. This directory contains the MITK superbuild, nested inside your project's superbuild. If you want to change %CMake options for MITK, use the MyProject-superbuild/MITK-superbuild/MITK-build build directory.
 
-\image html HowToNewProject-MyProjectLayout.png "Layout of MyProject"
+\imageMacro{HowToNewProject-MyProjectLayout.png,"Layout of MyProject",4.02}
 
 \subsubsection HowToNewProjectPackaging Packaging
 

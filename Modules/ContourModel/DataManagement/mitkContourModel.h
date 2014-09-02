@@ -390,12 +390,12 @@ namespace mitk
     /**
     \brief Get the updated geometry with recomputed bounds.
     */
-    virtual const mitk::Geometry3D* GetUpdatedGeometry (int t=0);
+    virtual const mitk::BaseGeometry* GetUpdatedGeometry (int t=0);
 
     /**
-    \brief Get the Geometry3D for timestep t.
+    \brief Get the BaseGeometry for timestep t.
     */
-    virtual mitk::Geometry3D* GetGeometry (int t=0) const;
+    virtual mitk::BaseGeometry* GetGeometry (int t=0) const;
 
     /**
     \brief Inherit from base data - no region support available for contourModel objects.

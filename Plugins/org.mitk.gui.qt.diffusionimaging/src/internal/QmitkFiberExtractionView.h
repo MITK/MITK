@@ -141,7 +141,7 @@ protected:
 
   template < typename TPixel, unsigned int VImageDimension >
       void InternalReorientImagePlane(
-          const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* planegeo3D, int additionalIndex );
+        const itk::Image< TPixel, VImageDimension > *image, mitk::BaseGeometry* planegeo3D, int additionalIndex );
 
   void GenerateStats(); ///< generate statistics of selected fiber bundles
   void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection

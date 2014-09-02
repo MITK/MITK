@@ -96,12 +96,19 @@ void ToFCameraMITKPlayerController::CleanUp()
   this->m_IntensityArray = NULL;
   delete[] this->m_RGBArray;
   this->m_RGBArray = NULL;
+
+  this->m_DistanceImageFileName = "";
+  this->m_AmplitudeImageFileName = "";
+  this->m_IntensityImageFileName = "";
+  this->m_RGBImageFileName = "";
 }
 
 bool ToFCameraMITKPlayerController::OpenCameraConnection()
 {
   if(!this->m_ConnectionCheck)
   {
+    // reset the image status before connection
+    m_ImageStatus = std::vector<bool>(4,true);
     try
     {
       if (this->m_DistanceImageFileName.empty() &&

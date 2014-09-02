@@ -134,7 +134,7 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
     // Find the diffusion image
     mitk::DiffusionImage<DiffusionPixelType>* diffImage;
     mitk::DataNode::Pointer correctNode;
-    mitk::Geometry3D* geometry;
+    mitk::BaseGeometry* geometry;
 
     if (m_DiffusionImage.IsNotNull())
     {
@@ -289,7 +289,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
     QString newname;
     newname = newname.append(nodename.c_str());
-    newname = newname.append("_dwi");
+    newname = newname.append("_DWI");
     node->SetName(newname.toAscii());
 
 
@@ -521,7 +521,6 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
 {
     try
     {
-        itk::TimeProbe clock;
         int nrFiles = inImages->size();
         if (!nrFiles) return;
 
@@ -531,7 +530,6 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
         mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
         mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
-        std::vector<mitk::DataNode::Pointer> nodes;
         while ( itemiter != itemiterend ) // for all items
         {
 
@@ -542,10 +540,8 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
 
             std::string nodename;
             (*itemiter)->GetStringProperty("name", nodename);
-            ++itemiter;
 
             // TENSOR RECONSTRUCTION
-            clock.Start();
             MITK_INFO << "Tensor reconstruction with correction for negative eigenvalues";
             mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Tensor reconstruction for %s", nodename.c_str()).toAscii());
 
@@ -601,36 +597,12 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
             image->SetVolume( outputTensorImg->GetBufferPointer() );
             mitk::DataNode::Pointer node=mitk::DataNode::New();
             node->SetData( image );
-
-            QString newname;
-            newname = newname.append(nodename.c_str());
-            newname = newname.append("_dti_corrected");
-
-            SetDefaultNodeProperties(node, newname.toStdString());
-            nodes.push_back(node);
-
-            // Corrected diffusion image
-//            typedef itk::VectorImage<short, 3>  ImageType;
-//            ImageType::Pointer correctedVols = reconFilter->GetVectorImage();
-//            DiffusionImageType::Pointer correctedDiffusion = DiffusionImageType::New();
-//            correctedDiffusion->SetVectorImage(correctedVols);
-//            correctedDiffusion->SetDirections(vols->GetDirections());
-//            correctedDiffusion->SetB_Value(vols->GetB_Value());
-//            correctedDiffusion->InitializeFromVectorImage();
-//            mitk::DataNode::Pointer diffNode = mitk::DataNode::New();
-//            diffNode->SetData( correctedDiffusion );
-//            QString diffname;
-//            diffname = diffname.append(nodename.c_str());
-//            diffname = diffname.append("corrDiff");
-//            SetDefaultNodeProperties(diffNode, diffname.toStdString());
-//            nodes.push_back(diffNode);
+            SetDefaultNodeProperties(node, nodename+"_EigenvalueCorrected_DT");
+            GetDefaultDataStorage()->Add(node, *itemiter);
 
             mitk::ProgressBar::GetInstance()->Progress();
+            ++itemiter;
         }
-
-        std::vector<mitk::DataNode::Pointer>::iterator nodeIt;
-        for(nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
-            GetDefaultDataStorage()->Add(*nodeIt);
 
         mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
         m_MultiWidget->RequestUpdate();
@@ -657,7 +629,6 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
         mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
         mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
-        std::vector<mitk::DataNode::Pointer> nodes;
         while ( itemiter != itemiterend ) // for all items
         {
 
@@ -667,7 +638,6 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
 
             std::string nodename;
             (*itemiter)->GetStringProperty("name", nodename);
-            ++itemiter;
 
             // TENSOR RECONSTRUCTION
             clock.Start();
@@ -737,24 +707,14 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
             image->SetVolume( tensorReconstructionFilter->GetOutput()->GetBufferPointer() );
             mitk::DataNode::Pointer node=mitk::DataNode::New();
             node->SetData( image );
-
-            QString newname;
-            newname = newname.append(nodename.c_str());
-            newname = newname.append("_dti");
-
-            SetDefaultNodeProperties(node, newname.toStdString());
-            nodes.push_back(node);
-
+            SetDefaultNodeProperties(node, nodename+"_WeightedLinearLeastSquares_DT");
+            GetDefaultDataStorage()->Add(node, *itemiter);
             mitk::ProgressBar::GetInstance()->Progress();
+            ++itemiter;
         }
-
-        std::vector<mitk::DataNode::Pointer>::iterator nodeIt;
-        for(nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
-            GetDefaultDataStorage()->Add(*nodeIt);
 
         mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
         m_MultiWidget->RequestUpdate();
-
     }
     catch (itk::ExceptionObject &ex)
     {
@@ -813,11 +773,8 @@ void QmitkTensorReconstructionView::TensorsToQbi()
         image->SetVolume( outimg->GetBufferPointer() );
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData( image );
-        QString newname;
-        newname = newname.append(tensorImageNode->GetName().c_str());
-        newname = newname.append("_qbi");
-        node->SetName(newname.toAscii());
-        GetDefaultDataStorage()->Add(node);
+        node->SetName(tensorImageNode->GetName()+"_Qball");
+        GetDefaultDataStorage()->Add(node, tensorImageNode);
     }
 }
 
@@ -905,7 +862,6 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
         mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() );
         mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() );
 
-        std::vector<mitk::DataNode::Pointer> nodes;
         while ( itemiter != itemiterend ) // for all items
         {
 
@@ -914,8 +870,6 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
 
             mitk::TensorImage* vol =
                     static_cast<mitk::TensorImage*>((*itemiter)->GetData());
-
-            ++itemiter;
 
             typedef float                                       TTensorPixelType;
             typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
@@ -991,23 +945,14 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
             image->InitializeFromVectorImage();
             mitk::DataNode::Pointer node=mitk::DataNode::New();
             node->SetData( image );
-
             mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
-
-            QString newname;
-            newname = newname.append(nodename.c_str());
-            newname = newname.append("_dwi");
-            node->SetName(newname.toAscii());
-
-            nodes.push_back(node);
+            node->SetName(nodename+"_DWI");
+            GetDefaultDataStorage()->Add(node, *itemiter);
 
             mitk::ProgressBar::GetInstance()->Progress();
-
+            ++itemiter;
         }
 
-        std::vector<mitk::DataNode::Pointer>::iterator nodeIt;
-        for(nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
-            GetDefaultDataStorage()->Add(*nodeIt);
 
         mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
         m_MultiWidget->RequestUpdate();

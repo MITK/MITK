@@ -5,7 +5,7 @@ This view provides the user interface for the Gibbs Tracking algorithm, a global
 
 \tableofcontents
 
-\image html gibbstrackingview.png The Gibbs Tracking View
+\imageMacro{gibbstrackingview.png,"The Gibbs Tracking View",2}
 
 \section QmitkGibbsTrackingUserManualInputData Input Data
 
@@ -17,7 +17,7 @@ Optional Input:
 
 \section QmitkGibbsTrackingUserManualParameters Q-Ball Reconstruction
 
-\li Number of iterations: More iterations causes the algorithm to be more stable but also to take longer to finish the tracking. Rcommended: 10⁷-10⁹ iterations.
+\li Number of iterations: More iterations causes the algorithm to be more stable but also to take longer to finish the tracking. Recommended: 10^7  to 10^8 iterations.
 \li Particle length/width/weight controlling the contribution of each particle to the model M
 \li Start and end temperature controlling how fast the process reaches a stable state. (usually no change needed)
 \li Weighting between the internal (affinity of the model to long and straigt fibers) and external energy (affinity of the model towards the data). (usually no change needed).
@@ -25,7 +25,7 @@ Optional Input:
 
 The automatic selection of parameters for the particle length/width and weight are determined directly from the input image using information about the image spacing and GFA.
 
-\image html gibbstrackingviewadvanced.png Advanced Tracking Parameters
+\imageMacro{gibbstrackingviewadvanced.png,"Advanced Tracking Parameters",10.08}
 
 \section QmitkGibbsTrackingUserManualTrackingSurveillance Surveilance of the tracking process
 

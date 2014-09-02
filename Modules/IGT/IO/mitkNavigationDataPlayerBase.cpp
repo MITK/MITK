@@ -16,19 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataPlayerBase.h"
 
+// include for exceptions
+#include "mitkIGTException.h"
 
-mitk::NavigationDataPlayerBase::NavigationDataPlayerBase() : m_StreamValid(true), m_ErrorMessage("")
+mitk::NavigationDataPlayerBase::NavigationDataPlayerBase()
+  : m_Repeat(false)
 {
-  m_Name ="Navigation Data Player Source";
+  this->SetName("Navigation Data Player Source");
 }
 
 mitk::NavigationDataPlayerBase::~NavigationDataPlayerBase()
 {
 }
-
-
-
-
 
 void mitk::NavigationDataPlayerBase::UpdateOutputInformation()
 {
@@ -36,83 +35,76 @@ void mitk::NavigationDataPlayerBase::UpdateOutputInformation()
   Superclass::UpdateOutputInformation();
 }
 
-
-
-mitk::NavigationData::Pointer mitk::NavigationDataPlayerBase::ReadNavigationData(TiXmlElement* elem)
+bool mitk::NavigationDataPlayerBase::IsAtEnd()
 {
-  if (elem == NULL) {mitkThrow() << "Error: Element is NULL!";}
+  return m_NavigationDataSetIterator == m_NavigationDataSet->End();
+}
 
-  mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
+void mitk::NavigationDataPlayerBase::SetNavigationDataSet(NavigationDataSet::Pointer navigationDataSet)
+{
+  m_NavigationDataSet = navigationDataSet;
+  m_NavigationDataSetIterator = navigationDataSet->Begin();
 
-  mitk::NavigationData::PositionType position;
-  mitk::NavigationData::OrientationType orientation(0.0,0.0,0.0,0.0);
-  mitk::NavigationData::TimeStampType timestamp = -1;
-  mitk::NavigationData::CovarianceMatrixType matrix;
+  this->InitPlayer();
+}
 
-  bool hasPosition = true;
-  bool hasOrientation = true;
-  bool dataValid = false;
+unsigned int mitk::NavigationDataPlayerBase::GetNumberOfSnapshots()
+{
+  return m_NavigationDataSet.IsNull() ? 0 : m_NavigationDataSet->Size();
+}
 
-  position.Fill(0.0);
-  matrix.SetIdentity();
+unsigned int mitk::NavigationDataPlayerBase::GetCurrentSnapshotNumber()
+{
+  return m_NavigationDataSet.IsNull() ? 0 : m_NavigationDataSetIterator - m_NavigationDataSet->Begin();
+}
 
-  elem->QueryDoubleAttribute("Time",&timestamp);
-  if (timestamp == -1)
+void mitk::NavigationDataPlayerBase::InitPlayer()
+{
+  if ( m_NavigationDataSet.IsNull() )
   {
-    return NULL;  //the calling method should check the return value if it is valid/not NULL
+    mitkThrowException(mitk::IGTException)
+      << "NavigationDataSet has to be set before initializing player.";
   }
 
-  elem->QueryDoubleAttribute("X", &position[0]);
-  elem->QueryDoubleAttribute("Y", &position[1]);
-  elem->QueryDoubleAttribute("Z", &position[2]);
+  if (GetNumberOfOutputs() == 0)
+  {
+    int requiredOutputs = m_NavigationDataSet->GetNumberOfTools();
+    this->SetNumberOfRequiredOutputs(requiredOutputs);
 
-  elem->QueryDoubleAttribute("QX", &orientation[0]);
-  elem->QueryDoubleAttribute("QY", &orientation[1]);
-  elem->QueryDoubleAttribute("QZ", &orientation[2]);
-  elem->QueryDoubleAttribute("QR", &orientation[3]);
+    for (unsigned int n = this->GetNumberOfOutputs(); n < requiredOutputs; ++n)
+    {
+      DataObjectPointer newOutput = this->MakeOutput(n);
+      this->SetNthOutput(n, newOutput);
+      this->Modified();
+    }
+  }
+  else if (GetNumberOfOutputs() != m_NavigationDataSet->GetNumberOfTools())
+  {
+    mitkThrowException(mitk::IGTException)
+      << "Number of tools cannot be changed in existing player. Please create "
+      << "a new player, if the NavigationDataSet has another number of tools now.";
+  }
 
-  elem->QueryDoubleAttribute("C00", &matrix[0][0]);
-  elem->QueryDoubleAttribute("C01", &matrix[0][1]);
-  elem->QueryDoubleAttribute("C02", &matrix[0][2]);
-  elem->QueryDoubleAttribute("C03", &matrix[0][3]);
-  elem->QueryDoubleAttribute("C04", &matrix[0][4]);
-  elem->QueryDoubleAttribute("C05", &matrix[0][5]);
-  elem->QueryDoubleAttribute("C10", &matrix[1][0]);
-  elem->QueryDoubleAttribute("C11", &matrix[1][1]);
-  elem->QueryDoubleAttribute("C12", &matrix[1][2]);
-  elem->QueryDoubleAttribute("C13", &matrix[1][3]);
-  elem->QueryDoubleAttribute("C14", &matrix[1][4]);
-  elem->QueryDoubleAttribute("C15", &matrix[1][5]);
+  this->Modified();
+  this->GenerateData();
+}
 
-  int tmpval = 0;
-  elem->QueryIntAttribute("Valid", &tmpval);
-  if (tmpval == 0)
-    dataValid = false;
-  else
-    dataValid = true;
+void mitk::NavigationDataPlayerBase::GraftEmptyOutput()
+{
+  for (unsigned int index = 0; index < m_NavigationDataSet->GetNumberOfTools(); index++)
+  {
+    mitk::NavigationData* output = this->GetOutput(index);
+    assert(output);
 
-  tmpval = 0;
-  elem->QueryIntAttribute("hO", &tmpval);
-  if (tmpval == 0)
-    hasOrientation = false;
-  else
-    hasOrientation = true;
+    mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
+    mitk::NavigationData::PositionType position;
+    mitk::NavigationData::OrientationType orientation(0.0,0.0,0.0,0.0);
+    position.Fill(0.0);
 
-  tmpval = 0;
-  elem->QueryIntAttribute("hP", &tmpval);
-  if (tmpval == 0)
-    hasPosition = false;
-  else
-    hasPosition = true;
+    nd->SetPosition(position);
+    nd->SetOrientation(orientation);
+    nd->SetDataValid(false);
 
-  nd->SetIGTTimeStamp(timestamp);
-  nd->SetPosition(position);
-  nd->SetOrientation(orientation);
-  nd->SetCovErrorMatrix(matrix);
-  nd->SetDataValid(dataValid);
-  nd->SetHasOrientation(hasOrientation);
-  nd->SetHasPosition(hasPosition);
-
-
-  return nd;
+    output->Graft(nd);
+  }
 }

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkPointSet.h"
+#include "mitkPlaneGeometry.h"
 
 //vtk includes
 #include <vtkActor.h>
@@ -261,8 +262,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   mitk::Point3D lastP = point;          // last visited point (predecessor in point set of "point")
   mitk::Vector3D vec;                   // p - lastP
   mitk::Vector3D lastVec;               // lastP - point before lastP
-  vec.Fill(0);
-  lastVec.Fill(0);
+  vec.Fill(0.0);
+  lastVec.Fill(0.0);
 
   mitk::Point3D projected_p = point;     // p projected on viewplane
 
@@ -273,7 +274,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   mitk::Point2D preLastPt2d = pt2d ;     // projected_p in display coordinates before lastPt2
 
   mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
-  const mitk::Geometry2D* geo2D = renderer->GetCurrentWorldGeometry2D();
+  const mitk::PlaneGeometry* geo2D = renderer->GetCurrentWorldPlaneGeometry();
 
   vtkLinearTransform* dataNodeTransform = input->GetGeometry()->GetVtkTransform();
 
@@ -402,7 +403,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
           // compute desired display position of text
           Vector2D vec2d = pt2d-lastPt2d;
           makePerpendicularVector2D(vec2d, vec2d); // text is rendered within text2dDistance perpendicular to current line
-          Vector2D pos2d = (lastPt2d.GetVectorFromOrigin() + pt2d ) * 0.5 + vec2d * text2dDistance;
+          Vector2D pos2d = (lastPt2d.GetVectorFromOrigin() + pt2d.GetVectorFromOrigin() ) * 0.5 + vec2d * text2dDistance;
 
           ls->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
 

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkUSUIExports.h"
 #include "ui_QmitkUSNewVideoDeviceWidgetControls.h"
 #include "mitkUSVideoDevice.h"
-#include "mitkUSImageMetadata.h"
 
 //QT headers
 #include <QWidget>
@@ -84,7 +83,7 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     */
     void OnDeviceTypeSelection();
 
-
+    void OnOpenFileButtonClicked();
 
 
 
@@ -96,11 +95,6 @@ class MitkUSUI_EXPORT QmitkUSNewVideoDeviceWidget :public QWidget
     \brief Constructs a ListItem from the given device for display in the list of active devices
     */
     QListWidgetItem* ConstructItemFromDevice(mitk::USDevice::Pointer device);
-
-    /*
-    \brief Initializes the Widget's ListItems with the given Metadata Object.
-    */
-    void InitFields(mitk::USImageMetadata::Pointer);
 
     /*
     \brief Displays whether this widget is active or not. It gets activated by either sending a Signal to

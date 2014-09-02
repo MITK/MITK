@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-const std::string mitk::PropertyListsXmlFileReaderAndWriter::PROPERTY_LIST_ID_ELEMENT_NAME("Name");
-
 bool PropertyListsXmlFileReaderAndWriter::PropertyFromXmlElem(std::string& name, mitk::BaseProperty::Pointer& prop, TiXmlElement* elem) const
 {
     if(!elem)
@@ -119,31 +117,31 @@ bool PropertyListsXmlFileReaderAndWriter::PropertyToXmlElem(const std::string& n
 
     if( (boolProp = dynamic_cast<const BoolProperty*>( prop  ) ) )
     {
-        elem->SetAttribute("name", name);
+        elem->SetAttribute(GetPropertyListIdElementName(), name);
         elem->SetAttribute("value", boolProp->GetValue()? 1: 0);
         elem->SetAttribute("type", "BoolProperty");
     }
     else if( (stringProp = dynamic_cast<const StringProperty*>( prop  ) ) )
     {
-        elem->SetAttribute("name", name);
+        elem->SetAttribute(GetPropertyListIdElementName(), name);
         elem->SetAttribute("value", stringProp->GetValue());
         elem->SetAttribute("type", "StringProperty");
     }
     else if( (intProp = dynamic_cast<const IntProperty*>( prop ) ) )
     {
-        elem->SetAttribute("name", name);
+        elem->SetAttribute(GetPropertyListIdElementName(), name);
         elem->SetAttribute("value", intProp->GetValue());
         elem->SetAttribute("type", "IntProperty");
     }
     else if( (doubleProp = dynamic_cast<const DoubleProperty*>( prop  ) ) )
     {
-        elem->SetAttribute("name", name);
+        elem->SetAttribute(GetPropertyListIdElementName(), name);
         elem->SetDoubleAttribute("value", doubleProp->GetValue());
         elem->SetAttribute("type", "DoubleProperty");
     }
     else if( (floatProp = dynamic_cast<const FloatProperty*>( prop ) ) )
     {
-        elem->SetAttribute("name", name);
+        elem->SetAttribute(GetPropertyListIdElementName(), name);
         elem->SetDoubleAttribute("value", static_cast<float>( floatProp->GetValue() ) );
         elem->SetAttribute("type", "FloatProperty");
     }
@@ -171,7 +169,7 @@ bool PropertyListsXmlFileReaderAndWriter::WriteLists( const std::string& fileNam
         const std::string& id = (*it).first;
         const PropertyList* propList = (*it).second;
         TiXmlElement* propertyListElem = new TiXmlElement( "PropertyList" );
-        propertyListElem->SetAttribute(PROPERTY_LIST_ID_ELEMENT_NAME, id);
+        propertyListElem->SetAttribute(GetPropertyListIdElementName(), id);
 
         const std::map< std::string, BaseProperty::Pointer>* propMap = propList->GetMap();
         std::map< std::string, BaseProperty::Pointer>::const_iterator propMapIt = propMap->begin();
@@ -215,7 +213,7 @@ bool PropertyListsXmlFileReaderAndWriter::ReadLists( const std::string& fileName
     while(elem)
     {
         std::string propListId;
-        opRead = elem->QueryStringAttribute( PROPERTY_LIST_ID_ELEMENT_NAME.c_str(), &propListId ) == TIXML_SUCCESS;
+        opRead = elem->QueryStringAttribute( GetPropertyListIdElementName(), &propListId ) == TIXML_SUCCESS;
         if( !opRead )
             break;
 
@@ -251,6 +249,11 @@ PropertyListsXmlFileReaderAndWriter::PropertyListsXmlFileReaderAndWriter()
 PropertyListsXmlFileReaderAndWriter::~PropertyListsXmlFileReaderAndWriter()
 {
 
+}
+
+const char* PropertyListsXmlFileReaderAndWriter::GetPropertyListIdElementName()
+{
+  return "name";
 }
 
 }

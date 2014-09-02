@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
@@ -56,7 +56,7 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  itkGetMacro(Pos, unsigned int);
+  itkGetConstMacro(Pos, unsigned int);
 
   virtual void SetPos(unsigned int pos)
   {
@@ -78,22 +78,22 @@ public:
     }
   }
 
-  itkGetMacro(Steps, unsigned int);
+  itkGetConstMacro(Steps, unsigned int);
   itkSetMacro(Steps, unsigned int);
 
-  itkGetMacro(AutoRepeat, bool);
+  itkGetConstMacro(AutoRepeat, bool);
   itkSetMacro(AutoRepeat, bool);
   itkBooleanMacro(AutoRepeat);
 
   /** Causes the stepper to shift direction when the boundary is reached */
   itkSetMacro(PingPong, bool);
-  itkGetMacro(PingPong, bool);
+  itkGetConstMacro(PingPong, bool);
   itkBooleanMacro(PingPong);
 
   /** If set to true, the Next() decreases the stepper and Previous()
    * decreases it */
   itkSetMacro(InverseDirection, bool);
-  itkGetMacro(InverseDirection, bool);
+  itkGetConstMacro(InverseDirection, bool);
   itkBooleanMacro(InverseDirection);
 
   void SetRange( ScalarType min, ScalarType max );

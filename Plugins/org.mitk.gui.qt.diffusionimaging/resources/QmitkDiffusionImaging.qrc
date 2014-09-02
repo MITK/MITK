@@ -58,5 +58,6 @@
         <file>general_icons/help.ico</file>
         <file>general_icons/pencil.ico</file>
         <file>general_icons/edit.ico</file>
+        <file>denoisingicon.png</file>
     </qresource>
 </RCC>

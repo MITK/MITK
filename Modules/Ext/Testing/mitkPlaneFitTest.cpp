@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkPlaneFit.h>
 #include <mitkPointSet.h>
-#include <mitkGeometry2D.h>
-#include <mitkVector.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkNumericTypes.h>
 #include <mitkGeometryData.h>
 #include <fstream>
 
@@ -27,7 +27,8 @@ int mitkPlaneFitTest(int, char*[] )
 
   mitk::PlaneFit::Pointer PlaneFit = mitk::PlaneFit::New();
   mitk::PointSet::Pointer PointSet = mitk::PointSet::New();
-  mitk::Geometry3D::Pointer Geometry3D = mitk::Geometry3D::New();
+  mitk::PlaneGeometry::Pointer planeGeo= mitk::PlaneGeometry::New();
+  mitk::BaseGeometry::Pointer BaseGeometry = dynamic_cast<mitk::PlaneGeometry*>(planeGeo.GetPointer());
 
   mitk::Point3D Point;
 
@@ -80,8 +81,8 @@ int mitkPlaneFitTest(int, char*[] )
 
   //Test PlaneGeometry
   std::cout << "  Test PlaneGeometry: ";
-  mitk::Geometry2D* Geometry2D = dynamic_cast<mitk::Geometry2D*>( PlaneFit->GetOutput()->GetGeometry());
-  if( Geometry2D )
+  mitk::PlaneGeometry* PlaneGeometry = dynamic_cast<mitk::PlaneGeometry*>( PlaneFit->GetOutput()->GetGeometry());
+  if( PlaneGeometry )
   {
     std::cout<<"[PASSED]"<<std::endl;
   }

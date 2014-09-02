@@ -87,6 +87,22 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
  //check if updates occured in the node or on the display
  FBXLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
+ //set renderer independent shader properties
+ const DataNode::Pointer node = this->GetDataNode();
+ float thickness = 2.0;
+ if(!this->GetDataNode()->GetPropertyValue("Fiber2DSliceThickness",thickness))
+   MITK_INFO << "FIBER2D SLICE THICKNESS PROPERTY ERROR";
+
+ bool fiberfading = false;
+ if(!this->GetDataNode()->GetPropertyValue("Fiber2DfadeEFX",fiberfading))
+   MITK_INFO << "FIBER2D SLICE FADE EFX PROPERTY ERROR";
+
+ float fiberOpacity;
+ this->GetDataNode()->GetOpacity(fiberOpacity, NULL);
+ node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberThickness",thickness);
+ node->SetIntProperty("shader.mitkShaderFiberClipping.fiberFadingON",fiberfading);
+ node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberOpacity",fiberOpacity);
+
  if ((localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) ) //was the display geometry modified? e.g. zooming, panning)
  {
 
@@ -94,14 +110,13 @@ void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
 
  }
 
- const DataNode *node = this->GetDataNode();
-    if ( (localStorage->m_LastUpdateTime < node->GetMTime())
-         || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
-         || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
-    {
-        //    MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
-        this->GenerateDataForRenderer( renderer );
-    }
+ if ( (localStorage->m_LastUpdateTime < node->GetMTime())
+      || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
+      || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
+ {
+   //    MITK_INFO << "UPDATE NEEDED FOR _ " << renderer->GetName();
+   this->GenerateDataForRenderer( renderer );
+ }
 
 
 }
@@ -139,28 +154,11 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
     plane1[2] = sliceN[2];
     plane1[3] = d1;
 
-    float thickness = 2.0;
-    if(!this->GetDataNode()->GetPropertyValue("Fiber2DSliceThickness",thickness))
-        MITK_INFO << "FIBER2D SLICE THICKNESS PROPERTY ERROR";
-
-
-    bool fiberfading = false;
-    if(!this->GetDataNode()->GetPropertyValue("Fiber2DfadeEFX",fiberfading))
-        MITK_INFO << "FIBER2D SLICE FADE EFX PROPERTY ERROR";
-
-    // set Opacity
-    float fiberOpacity;
-    this->GetDataNode()->GetOpacity(fiberOpacity, NULL);
-
     DataNode::Pointer node = this->GetDataNode();
     node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.w",plane1[3],renderer);
     node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.x",plane1[0],renderer);
     node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.y",plane1[1],renderer);
     node->SetFloatProperty("shader.mitkShaderFiberClipping.slicingPlane.z",plane1[2],renderer);
-    node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberThickness",thickness,renderer);
-    node->SetIntProperty("shader.mitkShaderFiberClipping.fiberFadingON",fiberfading,renderer);
-    node->SetFloatProperty("shader.mitkShaderFiberClipping.fiberOpacity",fiberOpacity,renderer);
-
 
 }
 

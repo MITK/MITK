@@ -63,7 +63,7 @@ namespace mitk{
     void SetupPreviewNodeFor(mitk::DataNode* nodeToProceed);
     void UpdatePreview();
     template < typename TPixel, unsigned int VImageDimension >
-    void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint );
+    void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint );
 
     bool OnMouseReleased( StateMachineAction*, InteractionEvent*  );
 

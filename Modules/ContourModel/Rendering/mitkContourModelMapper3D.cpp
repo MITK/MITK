@@ -111,8 +111,8 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
     || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime())
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
     || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {

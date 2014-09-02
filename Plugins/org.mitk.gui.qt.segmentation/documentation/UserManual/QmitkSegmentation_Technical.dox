@@ -51,7 +51,7 @@ tool or the interpolation mechanism changed something.
 The above blocks correspond to a number of classes. Here is an overview of all
 related classes with their responsibilities and relations:
 
-\image html QmitkSegmentation_InteractiveSegmentationClasses.png
+\imageMacro{QmitkSegmentation_InteractiveSegmentationClasses.png,"",16.00}
 
 <ol>
 <li> <b>Management of images</b>: mitk::ToolManager has a set of reference

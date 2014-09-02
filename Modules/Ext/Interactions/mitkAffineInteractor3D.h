@@ -103,9 +103,9 @@ private:
   Point2D m_CurrentPickedDisplayPoint;
   double m_CurrentPickedPointWorld[4];
 
-  Geometry3D::Pointer m_Geometry;
+  BaseGeometry::Pointer m_Geometry;
 
-  Geometry3D::Pointer m_OriginalGeometry;
+  BaseGeometry::Pointer m_OriginalGeometry;
 
   Vector3D m_ObjectNormal;
 

@@ -27,10 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSControlInterfaceBMode.h"
 #include "mitkUSControlInterfaceDoppler.h"
 
+#include <algorithm>
+
 //TempIncludes
 #include <tinyxml.h>
 
 const std::string mitk::USCombinedModality::DeviceClassIdentifier = "org.mitk.modules.us.USCombinedModality";
+const char* mitk::USCombinedModality::DefaultProbeIdentifier = "default";
+const char* mitk::USCombinedModality::ProbeAndDepthSeperator = "_";
 
 mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer, std::string model)
   : mitk::USDevice(manufacturer, model), m_UltrasoundDevice(usDevice), m_TrackingDevice(trackingDevice),
@@ -122,24 +126,27 @@ void mitk::USCombinedModality::UnregisterOnService()
 
 mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration()
 {
-  std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
-  if (calibrationKey.empty())
-  {
-    MITK_WARN("USCombinedModality")("USDevice")
-        << "Could not get a key for the calibration.";
-    return 0;
-  }
+  return this->GetCalibration(this->GetCurrentDepthValue(), this->GetIdentifierForCurrentProbe());
+}
+
+mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration(std::string depth)
+{
+  return this->GetCalibration(depth, this->GetIdentifierForCurrentProbe());
+}
+
+mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration(std::string depth, std::string probe)
+{
+  // make sure that there is no '/' which would cause problems for TinyXML
+  std::replace(probe.begin(), probe.end(), '/', '-');
+
+  // create identifier for calibration from probe and depth
+  std::string calibrationKey = probe + mitk::USCombinedModality::ProbeAndDepthSeperator + depth;
 
   // find calibration for combination of probe identifier and depth
   std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
     = m_Calibrations.find(calibrationKey);
 
-  if (calibrationIterator == m_Calibrations.end())
-  {
-    MITK_WARN("USCombinedModality")("USDevice")
-        << "No calibration found for selected probe and depth.";
-    return 0;
-  }
+  if (calibrationIterator == m_Calibrations.end()) { return 0; }
 
   return calibrationIterator->second;
 }
@@ -160,13 +167,27 @@ void mitk::USCombinedModality::SetCalibration (mitk::AffineTransform3D::Pointer 
   }
 
   m_Calibrations[calibrationKey] = calibration;
+}
 
-  m_Metadata->SetDeviceIsCalibrated(true);
+bool mitk::USCombinedModality::RemoveCalibration()
+{
+  return this->RemoveCalibration(this->GetCurrentDepthValue(), this->GetIdentifierForCurrentProbe());
+}
 
-  if (m_ServiceRegistration != 0)
-  {
-    this->UpdateServiceProperty(mitk::USImageMetadata::PROP_DEV_ISCALIBRATED, true);
-  }
+bool mitk::USCombinedModality::RemoveCalibration(std::string depth)
+{
+  return this->RemoveCalibration(depth, this->GetIdentifierForCurrentProbe());
+}
+
+bool mitk::USCombinedModality::RemoveCalibration(std::string depth, std::string probe)
+{
+  // make sure that there is no '/' which would cause problems for TinyXML
+  std::replace(probe.begin(), probe.end(), '/', '-');
+
+  // create identifier for calibration from probe and depth
+  std::string calibrationKey = probe + mitk::USCombinedModality::ProbeAndDepthSeperator + depth;
+
+  return m_Calibrations.erase(calibrationKey) > 0;
 }
 
 void mitk::USCombinedModality::SetNumberOfSmoothingValues(unsigned int numberOfSmoothingValues)
@@ -322,6 +343,11 @@ bool mitk::USCombinedModality::GetIsCalibratedForCurrentStatus()
   return m_Calibrations.find(this->GetIdentifierForCurrentCalibration()) != m_Calibrations.end();
 }
 
+bool mitk::USCombinedModality::GetContainsAtLeastOneCalibration()
+{
+  return ! m_Calibrations.empty();
+}
+
 void mitk::USCombinedModality::GenerateData()
 {
   // update ultrasound image source and get current output then
@@ -390,7 +416,8 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
   // Sanitize Input
   if (xmlString == "")
   {
-    MITK_WARN << "Empty string passed to Deserialize() method of CombinedModality. Aborting...";
+    MITK_ERROR << "Empty string passed to Deserialize() method of CombinedModality. Aborting...";
+    mitkThrow() << "Empty string passed to Deserialize() method of CombinedModality. Aborting...";
     return;
   }
   // Clear previous calibrations if necessary
@@ -400,13 +427,15 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
   TiXmlDocument doc;
   if(!doc.Parse(xmlString.c_str()))
   {
-    MITK_WARN << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
+    MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
+    mitkThrow() << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
     return;
   }
   TiXmlElement* root = doc.FirstChildElement();
   if(root == NULL)
   {
-    MITK_WARN << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
+    MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
+    mitkThrow() << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
     return;
   }
   // Read Calibrations
@@ -442,21 +471,41 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
 
 std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
 {
-  us::ServiceProperties::const_iterator probeIt = m_ServiceProperties.find(
+  return this->GetIdentifierForCurrentProbe()
+    + mitk::USCombinedModality::ProbeAndDepthSeperator
+    + this->GetCurrentDepthValue();
+}
+
+std::string mitk::USCombinedModality::GetIdentifierForCurrentProbe()
+{
+  us::ServiceProperties usdeviceProperties = m_UltrasoundDevice->GetServiceProperties();
+
+  us::ServiceProperties::const_iterator probeIt = usdeviceProperties.find(
         mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED);
 
   // get probe identifier from control interface for probes
-  std::string probeName = "default";
-  if (probeIt != m_ServiceProperties.end())
+  std::string probeName = mitk::USCombinedModality::DefaultProbeIdentifier;
+  if (probeIt != usdeviceProperties.end())
   {
     probeName = (probeIt->second).ToString();
   }
 
+  // make sure that there is no '/' which would cause problems for TinyXML
+  std::replace(probeName.begin(), probeName.end(), '/', '-');
+
+  return probeName;
+}
+
+std::string mitk::USCombinedModality::GetCurrentDepthValue()
+{
+  us::ServiceProperties usdeviceProperties = m_UltrasoundDevice->GetServiceProperties();
+
   // get string for depth value from the micro service properties
   std::string depth;
-  us::ServiceProperties::iterator depthIterator = m_ServiceProperties.find(
-        mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH);
-  if (depthIterator != m_ServiceProperties.end())
+  us::ServiceProperties::iterator depthIterator = usdeviceProperties.find(
+    mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH);
+
+  if (depthIterator != usdeviceProperties.end())
   {
     depth = depthIterator->second.ToString();
   }
@@ -465,7 +514,7 @@ std::string mitk::USCombinedModality::GetIdentifierForCurrentCalibration()
     depth = "0";
   }
 
-  return probeName + depth;
+  return depth;
 }
 
 void mitk::USCombinedModality::RebuildFilterPipeline()

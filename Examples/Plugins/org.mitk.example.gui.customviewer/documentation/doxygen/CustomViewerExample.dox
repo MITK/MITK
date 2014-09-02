@@ -27,9 +27,9 @@ Spoken in BlueBerry terms, the following features are provided:
 
 The custom viewer itself consists of two perspectives, i.e. a viewer perspective and a DICOM perspective. As part of the viewer perspective, an instance of QmitkDataManagerView allows for data selection. Visualization of the selected data is then provided by a simple render window view. According data can either be directly loaded from file or be imported as DICOM data. DICOM import functionality is accessible from the DICOM perspective incorporating the QmitkDicomExternalDataWidget. The GUI-appearance is customized using Qt-Stylesheets in order to give the application a non-native look and feel. This is further emphasized by a Tab-Widget-like presentation of the perspectives using a modified perspective bar based on a QTabBar. In addition to an absence of menu-, tool- and status-bars, simplicity is accentuated by a proper view and perspective design, i.e. the editor area being invisible and views being fixated. The following images depict the viewer- and DICOM-perspectives of the custom viewer.
 
-\image html ViewerPerspective.png "Viewer perspective of the Custom Viewer."
+\imageMacro{ViewerPerspective.png,"Viewer perspective of the Custom Viewer.",16.00}
 
-\image html DicomPerspective.png "Dicom perspective of the Custom Viewer."
+\imageMacro{DicomPerspective.png,"Dicom perspective of the Custom Viewer.",16.00}
 
 Go to the previous page \ref BlueBerryExampleCustomViewer. Or proceed to the next page \ref ViewerPluginCreation.
 
@@ -41,7 +41,7 @@ To make an example application startable by the BlueBerry example launcher, we h
 
 The resulting plugin folder for our custom viewer application consists of several subfolders and files:
 
-\image html CustomViewerDirectory.png "The directory structure for the CustomViewer plugin."
+\imageMacro{CustomViewerDirectory.png,"The directory structure for the CustomViewer plugin.",16.00}
 
 We can see a documentation and resources folder, a source folder containing all source files, some cmake-related files and a plugin.xml file for the BlueBerry related plugin extension and extension-point declarations.
 
@@ -79,11 +79,11 @@ During plugin-start, we register our plugin classes given the ctkPluginContext b
 
 In order to connect our application and its perspectives to the BlueBerry components we have to declare the according extension-point-contributions inside the plugin.xml file. As can be seen in the image below, our application and its perspectives contribute to the org.blueberry.osgi.applications and org.blueberry.ui.perspectives extension points respectively.
 
-\image html plugin_xml_0.png "Extension point contributions of our initial custom viewer application"
+\imageMacro{plugin_xml_0.png,"Extension point contributions of our initial custom viewer application",16.00}
 
 When we start the BlueBerryExampleLauncher (either directly or via the provided batch files), we can now choose our bulk application (among others present), and a window is presented showing our empty initial perspective.
 
-\image html MinimalApplicationWindow.png "Our first application window showing one single perspective"
+\imageMacro{MinimalApplicationWindow.png,"Our first application window showing one single perspective",16.00}
 
 Go to the previous page \ref Introduction. Or proceed to the next page \ref MainWindowLayout.
 
@@ -151,7 +151,7 @@ For our purposes, we want to place the QtPerspectiveSwitcherTabBar and the View-
 
 The OpenFile-Button and the QtPerspectiveSwitcherTabBar will be laid out together in a HBoxLayout called PerspectivesLayer. The PerspectivesLayer will be vertically arranged with the PageComposite widget in a VBoxLayout called CentralWidgetLayout. This CentralWidgetLayout will be assigned a QWidget being set the CentralWidget of our MainWindow. Caveat: we need to call the activate- and update-Methods of our CentralWidgetLayout; otherweise the widgets will not be laid out properly. See Bug-1654 for further details. See our bulk custom viewer application depicted below.
 
-\image html BulkApplicationWindow.png "Our bulk application showing two empty perspectives managed with a tab-bar based perspectives bar"
+\imageMacro{BulkApplicationWindow.png,"Our bulk application showing two empty perspectives managed with a tab-bar based perspectives bar",16.00}
 
 Go to the previous page \ref ViewerPluginCreation. Or proceed to the next page \ref AddFunctionality.
 
@@ -227,9 +227,9 @@ Having a look back to the QmitkDicomExternalDataWidget, while there is already a
 
 The following images show the Dicom import functionality.
 
-\image html dicomImportFiles.png "The DICOM file import dialog"
-\image html dataTree.png "Imported DICOM data shown in the tree view"
-\image html DICOMimported.png "Imported DICOM data presented in the render window view"
+\imageMacro{dicomImportFiles.png,"The DICOM file import dialog",16.00}
+\imageMacro{dataTree.png,"Imported DICOM data shown in the tree view",16.00}
+\imageMacro{DICOMimported.png,"Imported DICOM data presented in the render window view",16.00}
 
 Now we implement the file open slot already defined earlier (see \ref MainWindowLayout). While it appears that we could simply assign a QmitkFileOpenAction to a QToolButton, this is not possible due to the fact, that by default, the WorkbenchUtil::LoadFiles() method invoked by the QmitkFileOpenAction awaits an editor to be present in the current application. To prevent the method from throwing an exception, we made a workaround by giving the LoadFiles() method an additional parameter that determines whether an editor is to be opened or not:
 
@@ -245,8 +245,8 @@ In it, a dialog is opened that asks for the user for a number of files to open. 
 
 Before we can examine the loaded data, we have to manually invoke a reinit on it. The render window concept in mitk is actually undergoing some work, where this inconvenience will also be adressed. The images below show the resulting file opening functionality.
 
-\image html OpenFileDialog.png "The open file dialog"
-\image html FileOpened.png "Opened file shown in the render window view"
+\imageMacro{OpenFileDialog.png,"The open file dialog",16.00}
+\imageMacro{FileOpened.png,"Opened file shown in the render window view",16.00}
 
 Go to the previous page \ref MainWindowLayout. Or proceed to the next page \ref GUICustomization.
 
@@ -275,7 +275,7 @@ Before we start customization we will first provide some customization convenien
 By integrating an update style button to the Application's main window and connecting this button with the previously defined slot, we can now button-push-update the style on runtime. This will of course
 only work for stylesheets which are referenced from the local file system.
 
-\image html StyledMainWindow0.png "The unstyled Main Window"
+\imageMacro{StyledMainWindow0.png,"The unstyled Main Window",16.00}
 
 First we might want to change the background color style by setting the background color of the QWidget#CentralWidget to a linear gradient from light to dark blue:
 
@@ -287,7 +287,7 @@ Then, we give the page composite control widget a slight grey border (except for
 
 The image below depicts the style changes.
 
-\image html StyledMainWindow2.png "Background-color changed Central and Composite Control Widgets"
+\imageMacro{StyledMainWindow2.png,"Background-color changed Central and Composite Control Widgets",16.00}
 
 Concerning the tab-widget style, four states have to be customized: QtPerspectiveSwitcherTabBar::tab (the tab in general), QtPerspectiveSwitcherTabBar::tab:selected (when tab is selected), QtPerspectiveSwitcherTabBar::tab:selected:hover (when tab is selected and the mouse is hovering above), QtPerspectiveSwitcherTabBar::tab:!selected:hover (respectively).
 
@@ -301,8 +301,8 @@ Finally, we customize the Push- and Tool-Buttons in a similar way:
 
 The resulting style-customized main window is shown below (the style update button removed).
 
-\image html StyledMainWindow_final1.png "The final version of our Custom Viewer (viewer perspective)."
-\image html StyledMainWindow_final2.png "The final version of our Custom Viewer (DICOM perspective)."
+\imageMacro{StyledMainWindow_final1.png,"The final version of our Custom Viewer (viewer perspective).",16.00}
+\imageMacro{StyledMainWindow_final2.png,"The final version of our Custom Viewer (DICOM perspective).",16.00}
 
 Proceed to the previous page \ref AddFunctionality.
 */

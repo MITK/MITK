@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkFloatingPointSpanSlider.h"
 #include <QObject>
 
-//#include <mitkCommon.h>
-
 QmitkFloatingPointSpanSlider::QmitkFloatingPointSpanSlider(QWidget *parent)
   : QxtSpanSlider(parent), m_LowerValue(0), m_UpperValue(1000),
     m_Minimum(0), m_Maximum(1000), offset(0.0), factor(1.0), m_IntMode(false)
@@ -79,7 +77,6 @@ void QmitkFloatingPointSpanSlider::setUpperValue(double upper)
 
 void QmitkFloatingPointSpanSlider::setSpan(double lower, double upper)
 {
-  //MITK_INFO << "QmitkFloatingPointSpanSlider new span: " << lower << " - " << upper;
   m_LowerValue = lower;
   m_UpperValue = upper;
   if (m_IntMode)
@@ -109,7 +106,6 @@ double QmitkFloatingPointSpanSlider::minimum() const
 
 void QmitkFloatingPointSpanSlider::setMaximum(double max)
 {
-  //MITK_INFO << "QmitkFloatingPointSpanSlider new max: " << max;
   if (m_IntMode)
   {
     this->QxtSpanSlider::setMaximum(max);
@@ -137,7 +133,6 @@ void QmitkFloatingPointSpanSlider::setMaximum(double max)
 
 void QmitkFloatingPointSpanSlider::setMinimum(double min)
 {
-  //MITK_INFO << "QmitkFloatingPointSpanSlider new min: " << min;
   if (m_IntMode)
   {
     this->QxtSpanSlider::setMinimum(min);
@@ -232,8 +227,6 @@ void QmitkFloatingPointSpanSlider::scaleSliderToInt()
   factor = range ? 1000.0 / range : 0;
   offset = -m_Minimum;
 
-  //MITK_INFO << "New offset: " << offset << ", scale: " << factor;
-
   m_LowerValue = scaleValue(tmpLower);
   m_UpperValue = scaleValue(tmpUpper);
 }
@@ -241,13 +234,12 @@ void QmitkFloatingPointSpanSlider::scaleSliderToInt()
 int QmitkFloatingPointSpanSlider::scaleValue(double val)
 {
   int scaled = factor ? (offset + val)*factor : 0;
-  //MITK_INFO << "Scaling " << val << " (double) ==> " << scaled << " (int)";
   return scaled;
 }
 
 double QmitkFloatingPointSpanSlider::unscaleValue(int val)
 {
   double unscaled = factor ? static_cast<double>(val)/factor - offset : 0;
-  //MITK_INFO << "Unscaling " << val << " (int) ==> " << unscaled << " (double)";
   return unscaled;
 }
+

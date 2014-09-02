@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define SLICESSWIVELLER_H_HEADER_INCLUDED
 
 #include <mitkSlicesCoordinator.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -39,7 +39,7 @@ namespace mitk {
  * The SlicesSwiveller class adds the possibility of slice rotation to the
  * "normal" behaviour of SliceNavigationControllers. This additional class
  * is needed, because one has to be aware of several "visible slices"
- * (selected Geometry2Ds of some SliceNavigationControllers) in order to
+ * (selected PlaneGeometries of some SliceNavigationControllers) in order to
  * choose between rotation and slice selection.
  *
  * Rotation is achieved by modifying (rotating) the generated

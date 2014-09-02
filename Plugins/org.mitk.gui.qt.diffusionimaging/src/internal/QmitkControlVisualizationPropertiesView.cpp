@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGlobalInteraction.h"
 #include "usModuleRegistry.h"
 
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 #include "berryIWorkbenchWindow.h"
 #include "berryIWorkbenchPage.h"
@@ -97,7 +97,7 @@ static bool DetermineAffectedImageSlice( const mitk::Image* image, const mitk::P
   }
 
   // determine slice number in image
-  mitk::Geometry3D* imageGeometry = image->GetGeometry(0);
+  mitk::BaseGeometry* imageGeometry = image->GetGeometry(0);
   mitk::Point3D testPoint = imageGeometry->GetCenter();
   mitk::Point3D projectedPoint;
   plane->Project( testPoint, projectedPoint );
@@ -264,9 +264,15 @@ struct CvpSelListener : ISelectionListener
 
             float range;
             node->GetFloatProperty("Fiber2DSliceThickness",range);
-            label = "Range %1";
-            label = label.arg(range*0.1);
-            m_View->m_Controls->label_range->setText(label);
+            mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
+            mitk::BaseGeometry::Pointer geo = fib->GetGeometry();
+            mitk::ScalarType max = geo->GetExtentInMM(0);
+            max = std::max(max, geo->GetExtentInMM(1));
+            max = std::max(max, geo->GetExtentInMM(2));
+
+            m_View->m_Controls->m_FiberThicknessSlider->setMaximum(max * 10);
+
+            m_View->m_Controls->m_FiberThicknessSlider->setValue(range * 10);
 
           }
 
@@ -1467,10 +1473,10 @@ void QmitkControlVisualizationPropertiesView::FiberSlicingThickness2D()
 
 void QmitkControlVisualizationPropertiesView::FiberSlicingUpdateLabel(int value)
 {
-  QString label = "Range %1";
+  QString label = "Range %1 mm";
   label = label.arg(value * 0.1);
   m_Controls->label_range->setText(label);
-
+  this->FiberSlicingThickness2D();
 }
 
 void QmitkControlVisualizationPropertiesView::BundleRepresentationWire()

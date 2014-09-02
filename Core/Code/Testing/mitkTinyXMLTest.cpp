@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 #include <tinyxml.h>
 #include <string>

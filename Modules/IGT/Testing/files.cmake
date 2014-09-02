@@ -7,11 +7,14 @@ set(MODULE_TESTS
    # no test is forgotten after it was commented out. If there is no bug for your current problem, please add a new one and
    # mark it as critical.
 
-   ################## DISABLED TESTS #################################################
-   # mitkNavigationToolStorageDeserializerTest.cpp # disabled because of bug 17303
-   # mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # disabled because of bug 17181
+   ################## ON THE FENCE TESTS #################################################
+   # none
 
-   ################# RUNNING TESTS ###################################################
+   ################## DISABLED TESTS #####################################################
+   # mitkNavigationToolStorageDeserializerTest.cpp # This test was disabled because of bug 17303.
+   # mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # This test was disabled because of bug 17181.
+
+   ################# RUNNING TESTS #######################################################
    mitkCameraVisualizationTest.cpp
    mitkClaronInterfaceTest.cpp
    mitkClaronToolTest.cpp
@@ -20,10 +23,12 @@ set(MODULE_TESTS
    mitkNavigationDataDisplacementFilterTest.cpp
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp
+   mitkNavigationDataSetTest.cpp
    mitkNavigationDataTest.cpp
    mitkNavigationDataRecorderTest.cpp
    mitkNavigationDataReferenceTransformFilterTest.cpp
    mitkNavigationDataSequentialPlayerTest.cpp
+   mitkNavigationDataSetReaderWriterTest.cpp
    mitkNavigationDataSourceTest.cpp
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
@@ -37,7 +42,8 @@ set(MODULE_TESTS
    mitkTrackingDeviceTest.cpp
    mitkTrackingToolTest.cpp
    mitkVirtualTrackingDeviceTest.cpp
-   mitkNavigationDataPlayerTest.cpp # see bug 11636 (extend this test by microservices)
+  #  mitkNavigationDataPlayerTest.cpp # random fails see bug 16485.
+  #  We decided to won't fix because of complete restructuring via bug 15959.
    mitkTrackingDeviceSourceTest.cpp
    mitkTrackingDeviceSourceConfiguratorTest.cpp
    mitkNavigationDataEvaluationFilterTest.cpp

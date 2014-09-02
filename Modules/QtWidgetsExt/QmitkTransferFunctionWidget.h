@@ -82,4 +82,6 @@ class MitkQtWidgetsExt_EXPORT QmitkTransferFunctionWidget : public QWidget, publ
     mitk::SimpleHistogramCache histogramCache;
 
 };
+
 #endif
+

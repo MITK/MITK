@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkNavigationDataSequentialPlayerControlWidget</class>
+ <widget class="QWidget" name="QmitkNavigationDataSequentialPlayerControlWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>407</width>
+    <height>106</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="sampleLabel">
+       <property name="text">
+        <string>Sample</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLCDNumber" name="sampleLCDNumber">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(60,60,60)</string>
+       </property>
+       <property name="numDigits">
+        <number>10</number>
+       </property>
+       <property name="segmentStyle">
+        <enum>QLCDNumber::Outline</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Update Inverval</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="updateIntervalSpinBox">
+       <property name="suffix">
+        <string> ms</string>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+       <property name="singleStep">
+        <number>20</number>
+       </property>
+       <property name="value">
+        <number>40</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QSlider" name="samplePositionHorizontalSlider">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="m_PlayerButtonsLayout">
+     <item>
+      <widget class="QPushButton" name="restartPushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Restart from beginning</string>
+       </property>
+       <property name="text">
+        <string>Restart</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/IGTUI.qrc">
+         <normaloff>:/IGTUI/firstframe.png</normaloff>:/IGTUI/firstframe.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="playPushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Play at normal speed</string>
+       </property>
+       <property name="text">
+        <string>Play</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/IGTUI.qrc">
+         <normaloff>:/IGTUI/play.png</normaloff>
+         <activeon>:/IGTUI/pause.png</activeon>:/IGTUI/play.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stopPushButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Stop playing</string>
+       </property>
+       <property name="text">
+        <string>Stop</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/IGTUI.qrc">
+         <normaloff>:/IGTUI/stop.png</normaloff>:/IGTUI/stop.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../resources/IGTUI.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>updateIntervalSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>QmitkNavigationDataSequentialPlayerControlWidget</receiver>
+   <slot>OnUpdateIntervalChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>349</x>
+     <y>16</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>203</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>restartPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkNavigationDataSequentialPlayerControlWidget</receiver>
+   <slot>OnRestart()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>69</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>203</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>playPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkNavigationDataSequentialPlayerControlWidget</receiver>
+   <slot>OnPlayPause()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>203</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>203</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stopPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkNavigationDataSequentialPlayerControlWidget</receiver>
+   <slot>OnStop()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>336</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>203</x>
+     <y>47</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>OnUpdateIntervalChanged(int)</slot>
+  <slot>OnRestart()</slot>
+  <slot>OnPlayPause()</slot>
+  <slot>OnStop()</slot>
+ </slots>
+</ui>

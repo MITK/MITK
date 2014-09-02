@@ -26,7 +26,7 @@ So a separation of the definition of a sequence in interaction and its implement
 interactive application.
 To be able to do that, we implemented the concept of state machines with several classes: States, Transitions and Actions define the interaction pattern. The state machine itself adds the handling of events, that are sent to it.
 
-\image html statemachine.jpg
+\imageMacro{statemachine.jpg,"",10}
 
 \subsubsection InteractionPage_ExampleA Example A: 
 A deterministic Mealy state machine has always one current state (here state 1). If an event 1 is sent to the state machine, it searches in its current state for a transition that waits for event 1 (here transition 1). The state machine finds transition 1, changes the current state to state2, as the transition points to it and executes actions 1 and 2. Now state 2 is the current state. The state machine receives an event 2 and searches for an according transition. Transition 2 waits for event 2, and since the transition leads to state 2 the current state is not changed. Action 3 and 4 are executed. Now Event 3 gets send to the state machine but the state machine can't find an according transition in state 2. Only transition 2 , that waits for event 2 and transition 4, that waits for event 4 are defined in that state. So the state machine ignores the event and doesn't change the state or execute an action. Now the state machine receives an event 4 and finds transition 3. So now the current state changes from state 2 to state 1 and actions 5 and 1 are executed.
@@ -39,7 +39,7 @@ See mitk::StateMachine, mitk::State, mitk::Event, mitk::Action, mitk::Transition
 \subsection InteractionPage_GuardState Guard States
 Guard States are a special kind of states. The action, that is executed after the state is set as current state, sends a new event to the state machine, which leads out of the guard state. So the state machine will only stay in a guard state for a short time. This kind of state is used to check different conditions, e.g. if an Object is picked or whether a set of points will be full after the addition of one point.
 
-\image html statemachine_guard.jpg
+\imageMacro{statemachine_guard.jpg,"",10}
 
 \subsubsection InteractionPage_ExampleB Example B: 
 Event 1 is sent to the state machine. This leads the current state from state 1 into state check. The action 1 is executed. This action checks a condition and puts the result into a new event, that is sent and handled by the same (this) state machine. E.g. is the object picked with the received mouse-coordinate? The event, that is generated, will be Yes or No. In case of event No, the state machine sets the current state back to state 1 and executes action 2. In case of event Yes, the state machine changes the state from state check into state 2 and executes action 3, which e.g. can select said object.

@@ -8,83 +8,87 @@ namespace mitk{
 
 Geometries are used to describe the geometrical properties of data objects in space and time.\n
 To use the geometry classes in the right way you have to understand the three different coordinate types present in MITK:\n\n
-\image html CoordinateTypes.png
+\imageMacro{CoordinateTypes.png,"",16}
 <center><b>The different coordinate types\n\n</b></center>\n
-	-# World coordinates:
-		- World coordinates are describing the actual spacial position of all MITK objects regarding a global coordinate system, normally specified by the imaging modality 
-		- World coordinates are represented by  mitk::Point3D objects.
-		- The geometry defines the offset, orientation, and scale of the considered data objects in reference to the world coordinate systems.
-		- World coordinates are always measured in mm
-		- If you are dealing with an image geometry, the origin of an image is pointing to the CENTER of the bottom-left-back voxel.\n 
-		- If you are NOT dealing with an image geometry (no defined discrete Voxels), the origin is pointing to the bottom-left-back CORNER
-		- Index coordinates can be converted to world coordinates by calling Geometry3D::IndexToWorld()\n\n
+  -# World coordinates:
+    - World coordinates are describing the actual spacial position of all MITK objects regarding a global coordinate system, normally specified by the imaging modality
+    - World coordinates are represented by  mitk::Point3D objects.
+    - The geometry defines the offset, orientation, and scale of the considered data objects in reference to the world coordinate systems.
+    - World coordinates are always measured in mm
+    - If you are dealing with an image geometry, the origin of an image is pointing to the CENTER of the bottom-left-back voxel.\n
+    - If you are NOT dealing with an image geometry (no defined discrete Voxels), the origin is pointing to the bottom-left-back CORNER
+    - Index coordinates can be converted to world coordinates by calling BaseGeometry::IndexToWorld()\n\n
 
-\image html worldcoordinateSystem.png
+\imageMacro{worldcoordinateSystem.png,"",12}
 <center><b>Corner-based coordinates\n\n</b></center>
-\image html WorldcoordinateSystemCenterBased.png
+\imageMacro{WorldcoordinateSystemCenterBased.png,"",12}
 <center><b>Center-based image-coordinates\n\n</b></center>\n
-	-# Continuous index coordinates:
-		- Dividing world coordinates through the pixel spacing and simultanously taking the offset into account leads to continuous index coordinates inside your dataobject.\n
-		  So continuous coordinates can be float values!
-		- Continuous index coordinates are represented by  mitk::Point3D objects.
-		- They can be obtained by calling Geometry3D::WorldToIndex(), where &pt_mm is a point in worldcoordinates.\n 		
-	-# Index coordinate system:
-		- Index coordinates are discrete values that address voxels of a data object explicitly.
-		- Index coordinates are represented by  mitk::Index3D objects.
-		- Basically they are continuous index coordinates which are rounded from half integer up.
-		- E.g. (0,0) specifies the very first pixel of a 2D image, (0,1) the pixel of the next column in the same row
-		- If you have world coordinates, they can be converted to discrete index coordinates by calling
-          Geometry3D::WorldToIndex()\n\n  
+  -# Continuous index coordinates:
+    - Dividing world coordinates through the pixel spacing and simultanously taking the offset into account leads to continuous index coordinates inside your dataobject.\n
+      So continuous coordinates can be float values!
+    - Continuous index coordinates are represented by  mitk::Point3D objects.
+    - They can be obtained by calling BaseGeometry::WorldToIndex(), where &pt_mm is a point in worldcoordinates.\n
+  -# Index coordinate system:
+    - Index coordinates are discrete values that address voxels of a data object explicitly.
+		- Index coordinates are represented by  itk::Index<3> objects.
+    - Basically they are continuous index coordinates which are rounded from half integer up.
+    - E.g. (0,0) specifies the very first pixel of a 2D image, (0,1) the pixel of the next column in the same row
+    - If you have world coordinates, they can be converted to discrete index coordinates by calling
+          BaseGeometry::WorldToIndex()\n\n
 
 \section GeometryOverviewPage_PointsAndVector Difference between Points and Vectors
 
-Like ITK, MITK differenciate between points and vectors. A point defines a position in a coordinate system while a 
+Like ITK, MITK differenciate between points and vectors. A point defines a position in a coordinate system while a
 vector is the distance between two points. Therefore points and vectors behave different if a coordinate transformation
-is applied. An offest in a coordinate transformation will affect a transformed point but not a vector. 
+is applied. An offest in a coordinate transformation will affect a transformed point but not a vector.
 
 An Example:\n
-If two systems are given, which differ by a offset of (1,0,0). The point A(2,2,2) in system one will correspont to point A'(3,2,2) in the second system. 
+If two systems are given, which differ by a offset of (1,0,0). The point A(2,2,2) in system one will correspont to point A'(3,2,2) in the second system.
 But a vector a(2,2,2) will correspond to the vector a'(2,2,2). 
 
-          
+
 \section GeometryOverviewPage_Concept The Geometry Concept
 
-As the superclass of all MITK geometries Geometry3D holds:
-	- a spacial bounding box which is axes-parallel in index coordinates (often discrete indices of pixels), to be accessed by Geometry3D::GetBoundingBox()
-	- a time related bounding box which holds the temporal validity of the considered data object in milliseconds (start and end time), to be accessed by Geometry3D::GetTimeBounds().\n 
-	  The default for 3D geometries is minus infinity to plus infinity, meaning the object is always displayed independent of displayed time in MITK.
-	- position information in form of a Euclidean transform in respect to world coordinates (i.e. a linear transformation matrix and offset) to convert (discrete or continuous) index coordinates to world coordinates and vice versa,\n
-       to be accessed by Geometry3D::GetIndexToWorldTransform()\n
-	   See also: \ref GeometryOverviewPage_Introduction "Introduction to Geometries"
-	- Many other properties (e.g. origin, extent, ...) which can be found in the \ref Geometry3D "class documentation"
-	- <b> VERY IMPORTANT:</b>\n A flag called <i>isImageGeometry</i>, which indicates whether the coordinates are center-based or not!\n 
-	  See also: \ref GeometryOverviewPage_Introduction "Introduction to Geometries" and \ref GeometryOverviewPage_Putting_Together "IMPORTANT: Putting it together for an Image"\n\n	
+As the superclass of all MITK geometries BaseGeometry holds:
+  - a spacial bounding box which is axes-parallel in index coordinates (often discrete indices of pixels), to be accessed by BaseGeometry::GetBoundingBox()
+  - a time related bounding box which holds the temporal validity of the considered data object in milliseconds (start and end time), to be accessed by BaseGeometry::GetTimeBounds().\n
+    The default for 3D geometries is minus infinity to plus infinity, meaning the object is always displayed independent of displayed time in MITK.
+  - position information in form of a Euclidean transform in respect to world coordinates (i.e. a linear transformation matrix and offset) to convert (discrete or continuous) index coordinates to world coordinates and vice versa,\n
+       to be accessed by BaseGeometry::GetIndexToWorldTransform()\n
+     See also: \ref GeometryOverviewPage_Introduction "Introduction to Geometries"
+  - Many other properties (e.g. origin, extent, ...) which can be found in the \ref BaseGeometry "class documentation"
+  - <b> VERY IMPORTANT:</b>\n A flag called <i>isImageGeometry</i>, which indicates whether the coordinates are center-based or not!\n
+    See also: \ref GeometryOverviewPage_Introduction "Introduction to Geometries" and \ref GeometryOverviewPage_Putting_Together "IMPORTANT: Putting it together for an Image"\n\n
 
 
-Every data object (sub-)class of BaseData has a TimeGeometry which is accessed by BaseData::GetTimeGeometry(). This TimeGeometry holds one or more Geometry3D objects which describes the object at specific time points, e.g. provides conversion between world and index coordinates and contains bounding boxes covering the area in which the data are placed. There is the possibility of using different implementations of the abstract TimeGeometry class which may differ in how the time steps are saved and the times are calculated.
+Every data object (sub-)class of BaseData has a TimeGeometry which is accessed by BaseData::GetTimeGeometry(). This TimeGeometry holds one or more BaseGeometry objects which describes the object at specific time points, e.g. provides conversion between world and index coordinates and contains bounding boxes covering the area in which the data are placed. There is the possibility of using different implementations of the abstract TimeGeometry class which may differ in how the time steps are saved and the times are calculated.
 
-There are two ways to represent a time, either by a TimePointType or a TimeStepType. The first is similar to the continous index coordinates and defines a Time Point in milliseconds from timepoint zero. The second type is similar to index coordinates. These are discrete values which specify the number of the current time step going from 0 to GetNumberOfTimeSteps(). The conversion between a time point and a time step is done by calling the method TimeGeometry::TimeStepToTimePoint() or TimeGeometry::TimePointToTimeStep(). Note that the duration of a time step may differ from object to object, so in general it is better to calculate the corresponding time steps by using time points. Also the distance of the time steps does not need to be equidistant over time, it depends on the used TimeGeometry implementation. 
+There are two ways to represent a time, either by a TimePointType or a TimeStepType. The first is similar to the continous index coordinates and defines a Time Point in milliseconds from timepoint zero. The second type is similar to index coordinates. These are discrete values which specify the number of the current time step going from 0 to GetNumberOfTimeSteps(). The conversion between a time point and a time step is done by calling the method TimeGeometry::TimeStepToTimePoint() or TimeGeometry::TimePointToTimeStep(). Note that the duration of a time step may differ from object to object, so in general it is better to calculate the corresponding time steps by using time points. Also the distance of the time steps does not need to be equidistant over time, it depends on the used TimeGeometry implementation.
 
-Each TimeGeometry has a bounding box covering the whole area in which the corresponding object is situated during all time steps. This bounding box may be accessed by calling TimeGeometry::GetBoundingBoxInWorld() and is always in world coordinates. The bounding box is calculated from all time steps, to manually start this calculation process call TimeGeometry::Update().  The bounding box is not updated if the getter is called. 
+Each TimeGeometry has a bounding box covering the whole area in which the corresponding object is situated during all time steps. This bounding box may be accessed by calling TimeGeometry::GetBoundingBoxInWorld() and is always in world coordinates. The bounding box is calculated from all time steps, to manually start this calculation process call TimeGeometry::Update().  The bounding box is not updated if the getter is called.
 
-The TimeGeometry does not provide a transformation of world coordinates into image coordinates since each time step may has a different transformation. If a conversion between image and world is needed, the Geometry3D for a specific time step or time point must be fetched either by TimeGeometry::GetGeometryForTimeStep() or TimeGeometry::GetGeometryForTimePoint() and then the conversion is calculated by using this geometry. 
+The TimeGeometry does not provide a transformation of world coordinates into image coordinates since each time step may has a different transformation. If a conversion between image and world is needed, the BaseGeometry for a specific time step or time point must be fetched either by TimeGeometry::GetGeometryForTimeStep() or TimeGeometry::GetGeometryForTimePoint() and then the conversion is calculated by using this geometry.
 
-The TimeGeometry class is an abstract class therefore it is not possible to instantiate it. instead a derived class must be used. Currently the only class that can be chosen is ProportionalTimeGeometry() which assumes that the time steps are ordered equidistant. To initialize an object with given geometries call ProportionalTimeGeometry::Initialize() with an existing Geometry3D and the number of time steps. The given geometries will be copied and not referenced!
+The TimeGeometry class is an abstract class therefore it is not possible to instantiate it. Instead a derived class must be used. Currently the only class that can be chosen is ProportionalTimeGeometry() which assumes that the time steps are ordered equidistant. To initialize an object with given geometries call ProportionalTimeGeometry::Initialize() with an existing BaseGeometry and the number of time steps. The given geometries will be copied and not referenced!
 
-SlicedGeometry3D is a sub-class of Geometry3D, which describes data objects consisting of slices, e.g., objects of type Image (or SlicedData, which is the super-class of Image). 
+Also, the BaseGeometry is an abstract class and derived classes must be used. The most simple implementation, i.e. the one to one implementation of the BaseGeometry class, is the class Geometry3D.
+
+SlicedGeometry3D is a sub-class of BaseGeometry, which describes data objects consisting of slices, e.g., objects of type Image (or SlicedData, which is the super-class of Image).
 Therefore, Image::GetTimeGeometry() will contain a list of SlicedGeometry3D instances. There is a special method SlicedData::GetSlicedGeometry(t) which directly returns\n
 a SlicedGeometry3D to avoid the need of casting.
 
-The class SlicedGeometry3D contains a list of Geometry2D objects describing the slices in the image.We have here spatial steps from 0 to GetSlices(). 
-SlicedGeometry3D::InitializeEvenlySpaced (Geometry2D *geometry2D, unsigned int slices) initializes a stack of slices with the same thickness, one starting at the position where the previous one ends.
+The class SlicedGeometry3D contains a list of PlaneGeometry objects describing the slices in the image.We have here spatial steps from 0 to GetSlices().
+SlicedGeometry3D::InitializeEvenlySpaced (PlaneGeometry *planeGeometry, unsigned int slices) initializes a stack of slices with the same thickness, one starting at the position where the previous one ends.
 
-Geometry2D provides methods for working with 2D manifolds (i.e., simply spoken, an object that can be described using a 2D coordinate-system) in 3D space.\n
-For example it allows mapping of a 3D point on the 2D manifold using Geometry2D::Map(). A subclass of Geometry2D called PlaneGeometry, explicitly describes a 2D rectangular plane.\n
-Another important subclass of Geometry2D is the DisplayGeometry which describes the geometry of the display (the monitor screen). Basically it represents a rectangular view on a 2D world geometry\n
+PlaneGeometry provides methods for working with 2D manifolds (i.e., simply spoken, an object that can be described using a 2D coordinate-system) in 3D space.\n
+For example it allows mapping of a 3D point on the 2D manifold using PlaneGeometry::Map(). \n
+An important subclass of PlaneGeometry is the DisplayGeometry which describes the geometry of the display (the monitor screen). Basically it represents a rectangular view on a 2D world geometry.\n
 The DisplayGeometry converts between screen and world coordinates, processes input events (e.g. mouse click) and provides methods for zooming and panning.\n
-\image html DisplayGeometry.png
+
+\imageMacro{DisplayGeometry.png,"",9}
+
 <center><b>Display Geometry\n\n</b></center>
-Finally there is the AbstractTransformGeometry which describes a 2D manifold in 3D space, defined by a vtkAbstractTransform. It is a abstract superclass for arbitrary user defined geometries\n
+Finally there is the AbstractTransformGeometry which describes a 2D manifold in 3D space, defined by a vtkAbstractTransform. It is a abstract superclass for arbitrary user defined geometries.\n
 An example is the ThinPlateSplineCurvedGeometry.\n
 
 \subsection GeometryOverviewPage_Putting_Together IMPORTANT: Putting it together for an Image
@@ -95,38 +99,38 @@ The definition of the position of the corners of an image is different than the 
 
 As mentioned in the previous section, world coordinates of data objects (e.g. surfaces ) usually specify the bottom left back corner of an object.
 
-In contrast to that a geometry of an Image is center-based, which means that the world coordinates of a voxel belonging to an image points to the center of that voxel. 
+In contrast to that a geometry of an Image is center-based, which means that the world coordinates of a voxel belonging to an image points to the center of that voxel.
 E.g:
 
-\image html PixelCenterBased.png
+\imageMacro{PixelCenterBased.png,"",6}
 <center><b>Center-based voxel\n\n</b></center>
 
 If the origin of e.g. a surface lies at (15,10,0) in world coordinates, the origin`s world coordinates for an image are internally calculated like the following:
 
-										<center>(15-0.5*X-Spacing\n
-										 10-0.5*Y-Spacing\n
-										   0-0.5*Z-Spacing)\n</center>
-										  
+                    <center>(15-0.5*X-Spacing\n
+                     10-0.5*Y-Spacing\n
+                       0-0.5*Z-Spacing)\n</center>
+
 If the image`s spacing is (x,y,z)=(1,1,3) then the corner coordinates are (14.5,9.5,-1.5).
 
-<b>If your geometry describes an image, the member variable <i>isImageGeometry</i> must be changed to true. This variable indicates also if your geometry is center-based or not.\n 
+<b>If your geometry describes an image, the member variable <i>isImageGeometry</i> must be changed to true. This variable indicates also if your geometry is center-based or not.\n
 The change can be done in two ways:\n
-	-#	You are sure that your origin is already center-based. Whether because you adjusted it manually or you copied it from another image.\n
-	    In that case, you can call the function <i>setImageGeometry(true)</i> or <i>imageGeometryOn()</i> to set the bool variable to true.
- 	-#	You created a new geometry, did not manually adjust the origin to be center-based and have the bool value isImageGeometry set to false (default).\n 
- 	    In that case, call the function  <i>ChangeImageGeometryConsideringOriginOffset(true)</i>. It will adjust your origin automatically and set the bool flag to true.\n
+  -#  You are sure that your origin is already center-based. Whether because you adjusted it manually or you copied it from another image.\n
+      In that case, you can call the function <i>setImageGeometry(true)</i> or <i>imageGeometryOn()</i> to set the bool variable to true.
+   -#  You created a new geometry, did not manually adjust the origin to be center-based and have the bool value isImageGeometry set to false (default).\n
+       In that case, call the function  <i>ChangeImageGeometryConsideringOriginOffset(true)</i>. It will adjust your origin automatically and set the bool flag to true.\n
 
 If you experience displaced contours, figures or other stuff, it is an indicator that you have not considered the origin offset mentioned above.</b>\n\n
 
-An image has a TimeGeometry, which contains one or more SlicedGeometry3D instances (one for each time step), all of which contain one or more instances of (sub-classes of) Geometry2D (usually PlaneGeometry).\n
-As a reminder: Geometry instances referring to images need a slightly different definition of corners, see Geometry3D::SetImageGeometry. This is usualy automatically called by Image.\n\n
+An image has a TimeGeometry, which contains one or more SlicedGeometry3D instances (one for each time step), all of which contain one or more instances of (sub-classes of) PlaneGeometry.\n
+As a reminder: Geometry instances referring to images need a slightly different definition of corners, see BaseGeometry::SetImageGeometry. This is usualy automatically called by Image.\n\n
 
 \section GeometryOverviewPage_Connection Connection between MITK, ITK and VTK Geometries
-\image html ITK_VTK_MITK_Geometries.png
+\imageMacro{ITK_VTK_MITK_Geometries.png,"",10}
 \n\n
-	- VTK transformation for rendering
-	- ITK transformation for calculations
-	- Both automatically updated when one is changed\n
+  - VTK transformation for rendering
+  - ITK transformation for calculations
+  - Both automatically updated when one is changed\n
 Attention:<b>Not</b> automatically updated when changed hardcoded. Example: geometry->GetVtkMatrix()->Rotate(....)
 */
 }

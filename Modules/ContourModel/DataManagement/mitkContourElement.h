@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include <MitkContourModelExports.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 
 //#include <ANN/ANN.h>
 

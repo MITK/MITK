@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkLevelWindow.h"
+#include "mitkImage.h"
 #include "mitkImageSliceSelector.h"
 #include "mitkImageStatisticsHolder.h"
 

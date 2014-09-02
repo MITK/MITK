@@ -9,7 +9,7 @@ The source code of the examples can be found in mitk/Examples/Plugins/
 Run the examples by executing startBlueBerryExampleLauncher_release.bat
 (or startBlueBerryExampleLauncher_debug.bat depending on the configured build type).
 
-\image html BlueBerryExampleLauncherDialog.png
+\imageMacro{BlueBerryExampleLauncherDialog.png,"",14.14}
 
 All examples can be found among the shown list.
 

@@ -226,7 +226,7 @@ void QmitkFiberExtractionView::GenerateRoiImage(){
     if (m_SelectedPF.empty())
         return;
 
-    mitk::Geometry3D::Pointer geometry;
+    mitk::BaseGeometry::Pointer geometry;
     if (!m_SelectedFB.empty())
     {
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.front()->GetData());
@@ -297,7 +297,7 @@ void QmitkFiberExtractionView::CompositeExtraction(mitk::DataNode::Pointer node,
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-void QmitkFiberExtractionView::InternalReorientImagePlane( const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* planegeo3D, int additionalIndex )
+void QmitkFiberExtractionView::InternalReorientImagePlane( const itk::Image< TPixel, VImageDimension > *image, mitk::BaseGeometry* planegeo3D, int additionalIndex )
 {
 
     MITK_DEBUG << "InternalReorientImagePlane() start";
@@ -322,8 +322,8 @@ void QmitkFiberExtractionView::InternalReorientImagePlane( const itk::Image< TPi
 
     // Size
     typename ResamplerType::SizeType size;
-    size[0] = planegeo->GetParametricExtentInMM(0) / spacing[0];
-    size[1] = planegeo->GetParametricExtentInMM(1) / spacing[1];
+    size[0] = planegeo->GetExtentInMM(0) / spacing[0];
+    size[1] = planegeo->GetExtentInMM(1) / spacing[1];
     size[2] = 1;
     resampler->SetSize( size );
 
@@ -431,7 +431,7 @@ void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image
     // in z-direction, creates a 3D object which is cut by the the plane z=0)
     const Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
     const PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
-    const Geometry3D *imageGeometry3D = m_InternalImage->GetGeometry( 0 );
+    const BaseGeometry *imageGeometry3D = m_InternalImage->GetGeometry( 0 );
 
     vtkPolyData *polyline = vtkPolyData::New();
     polyline->Allocate( 1, 1 );
@@ -644,9 +644,9 @@ void QmitkFiberExtractionView::InternalCalculateMaskFromPlanarFigure( itk::Image
 
     Image::Pointer tmpImage2 = Image::New();
     tmpImage2->InitializeByItk(m_PlanarFigureImage.GetPointer());
-    const Geometry3D *pfImageGeometry3D = tmpImage2->GetGeometry( 0 );
+    const BaseGeometry *pfImageGeometry3D = tmpImage2->GetGeometry( 0 );
 
-    const Geometry3D *intImageGeometry3D = tmpImage->GetGeometry( 0 );
+    const BaseGeometry *intImageGeometry3D = tmpImage->GetGeometry( 0 );
 
     typedef itk::ImageRegionIteratorWithIndex<itkUCharImageType> IteratorType;
     IteratorType imageIterator (m_InternalImageMask3D, m_InternalImageMask3D->GetRequestedRegion());

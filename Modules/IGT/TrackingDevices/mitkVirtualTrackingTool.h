@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkInternalTrackingTool.h>
 #include <MitkIGTExports.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <itkFastMutexLock.h>
 #include <mitkItkNonUniformBSpline.h>
 
@@ -42,6 +42,7 @@ namespace mitk {
   public:
     mitkClassMacro(VirtualTrackingTool, InternalTrackingTool);
     friend class VirtualTrackingDevice;
+    itkFactorylessNewMacro(Self)
     typedef itk::NonUniformBSpline<3> SplineType; ///< spline type used for tool path interpolation
 
     itkGetMacro(SplineLength, mitk::ScalarType);
@@ -54,7 +55,6 @@ namespace mitk {
 
 
   protected:
-    itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     VirtualTrackingTool();
     virtual ~VirtualTrackingTool();

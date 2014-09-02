@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C
 #define LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C
 
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include <MitkCoreExports.h>
 
 namespace mitk {
@@ -148,7 +148,7 @@ public:
   /**!
   * \brief sets level/window to the min/max greyvalues of the given Image
   */
-  void SetAuto(const mitk::Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
+  void SetAuto(const Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
 
   /**
    * If a level window is set to fixed, the set and get methods won't accept

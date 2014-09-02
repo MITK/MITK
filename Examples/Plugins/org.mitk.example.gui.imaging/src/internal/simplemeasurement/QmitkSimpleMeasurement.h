@@ -20,18 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include <mitkIZombieViewPart.h>
 
-#include <mitkWeakPointer.h>
-
+#include "mitkDataNode.h"
+#include "mitkPointSetDataInteractor.h"
 #include "ui_QmitkSimpleMeasurementControls.h"
 
 namespace Ui {
 class QmitkSimpleMeasurementControls;
 }
-
-namespace mitk {
-class PointSetInteractor;
-}
-
 
 /**
  * \brief SimpleMeasurement
@@ -44,7 +39,6 @@ class QmitkSimpleMeasurement : public QmitkAbstractView, public mitk::IZombieVie
   Q_OBJECT
 
 public:
-
   QmitkSimpleMeasurement();
   virtual ~QmitkSimpleMeasurement();
 
@@ -83,12 +77,12 @@ private:
   /*
    * Interactor for performing the simplemeasurements.
    */
-  mitk::WeakPointer<mitk::PointSetInteractor> m_PointSetInteractor;
+  mitk::PointSetDataInteractor::Pointer m_PointSetInteractor;
 
   /*
    * Interactor for performing the simplemeasurements.
    */
-  mitk::WeakPointer<mitk::DataNode> m_SelectedPointSetNode;
+  mitk::DataNode::Pointer m_SelectedPointSetNode;
 
   /** @brief
    *  Node representing the PointSets which were created by this application.

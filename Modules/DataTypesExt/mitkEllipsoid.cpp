@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkEllipsoid.h"
 #include "vtkLinearTransform.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "vtkSphereSource.h"
 
 

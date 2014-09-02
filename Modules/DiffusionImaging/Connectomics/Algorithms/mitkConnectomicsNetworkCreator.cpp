@@ -132,7 +132,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
   //m_ConNetwork->PruneUnconnectedSingleNodes();
 
   // provide network with geometry
-  m_ConNetwork->SetGeometry( dynamic_cast<mitk::Geometry3D*>(m_Segmentation->GetGeometry()->Clone().GetPointer()) );
+  m_ConNetwork->SetGeometry( dynamic_cast<mitk::BaseGeometry*>(m_Segmentation->GetGeometry()->Clone().GetPointer()) );
   m_ConNetwork->UpdateBounds();
   m_ConNetwork->SetIsModified( true );
 
@@ -230,7 +230,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
   {// Note: .fib image tracts are safed using index coordinates
     mitk::Point3D firstElementFiberCoord, lastElementFiberCoord;
     mitk::Point3D firstElementSegCoord, lastElementSegCoord;
-    mitk::Index3D firstElementSegIndex, lastElementSegIndex;
+    itk::Index<3> firstElementSegIndex, lastElementSegIndex;
 
     if( singleTract->front().Size() != 3 )
     {
@@ -280,7 +280,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
   {// Note: .fib image tracts are safed using index coordinates
     mitk::Point3D firstElementFiberCoord, lastElementFiberCoord;
     mitk::Point3D firstElementSegCoord, lastElementSegCoord;
-    mitk::Index3D firstElementSegIndex, lastElementSegIndex;
+    itk::Index<3> firstElementSegIndex, lastElementSegIndex;
 
     if( singleTract->front().Size() != 3 )
     {
@@ -326,7 +326,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
 
       // label and coordinate temp storage
       int tempLabel( firstLabel );
-      mitk::Index3D tempIndex = firstElementSegIndex;
+      itk::Index<3> tempIndex = firstElementSegIndex;
 
       LinearExtensionUntilGreyMatter( indexVectorOfPointsToUse, singleTract, tempLabel, tempIndex );
 
@@ -345,7 +345,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
 
       // label and coordinate temp storage
       int tempLabel( lastLabel );
-      mitk::Index3D tempIndex = lastElementSegIndex;
+      itk::Index<3> tempIndex = lastElementSegIndex;
 
       LinearExtensionUntilGreyMatter( indexVectorOfPointsToUse, singleTract, tempLabel, tempIndex );
 
@@ -356,7 +356,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
     {
       // label and coordinate temp storage
       int tempLabel( firstLabel );
-      mitk::Index3D tempIndex = firstElementSegIndex;
+      itk::Index<3> tempIndex = firstElementSegIndex;
 
       RetractionUntilBrainMatter( true, singleTract, tempLabel, tempIndex );
 
@@ -369,7 +369,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
     {
       // label and coordinate temp storage
       int tempLabel( lastLabel );
-      mitk::Index3D tempIndex = lastElementSegIndex;
+      itk::Index<3> tempIndex = lastElementSegIndex;
 
       RetractionUntilBrainMatter( false, singleTract, tempLabel, tempIndex );
 
@@ -399,7 +399,7 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
    {// Note: .fib image tracts are safed using index coordinates
     mitk::Point3D firstElementFiberCoord, lastElementFiberCoord;
     mitk::Point3D firstElementSegCoord, lastElementSegCoord;
-    mitk::Index3D firstElementSegIndex, lastElementSegIndex;
+    itk::Index<3> firstElementSegIndex, lastElementSegIndex;
 
     if( singleTract->front().Size() != 3 )
     {
@@ -508,7 +508,7 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
   std::vector<int> & indexVectorOfPointsToUse,
   TractType::Pointer singleTract,
   int & label,
-  mitk::Index3D & mitkIndex )
+  itk::Index<3> & mitkIndex )
 {
   if( indexVectorOfPointsToUse.size() > singleTract->Size() )
   {
@@ -581,7 +581,7 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
     }
 
     // follow line until first non white matter label
-    mitk::Index3D tempIndex;
+    itk::Index<3> tempIndex;
     int tempLabel( label );
 
     bool keepOn( true );
@@ -630,7 +630,7 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
 }
 
 void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractFront, TractType::Pointer singleTract,
-                                                                  int & label, mitk::Index3D & mitkIndex )
+                                                                  int & label, itk::Index<3> & mitkIndex )
 {
   int retractionStartIndex( singleTract->Size() - 1 );
   int retractionStepIndexSize( -1 );
@@ -684,7 +684,7 @@ void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractF
     length = std::sqrt( sum );
 
     // retract
-    mitk::Index3D tempIndex;
+    itk::Index<3> tempIndex;
     int tempLabel( label );
 
     for( int parameter( 0 ) ; parameter < length ; parameter++ )
@@ -832,7 +832,7 @@ std::vector< double >  mitk::ConnectomicsNetworkCreator::GetCenterOfMass( int la
   return m_LabelsToCoordinatesMap.find( label )->second;
 }
 
-void mitk::ConnectomicsNetworkCreator::CreateNewNode( int label, mitk::Index3D index, bool useCoM )
+void mitk::ConnectomicsNetworkCreator::CreateNewNode( int label, itk::Index<3> index, bool useCoM )
 {
   // Only create node if it does not exist yet
 

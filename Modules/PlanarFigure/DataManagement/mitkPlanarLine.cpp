@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarLine.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 
 mitk::PlanarLine::PlanarLine()
@@ -37,10 +37,9 @@ mitk::PlanarLine::~PlanarLine()
 void mitk::PlanarLine::GeneratePolyLine()
 {
   this->ClearPolyLines();
-  // TODO: start line at specified start point...
-  // Generate poly-line
-  this->AppendPointToPolyLine( 0 , mitk::PlanarFigure::PolyLineElement( this->GetControlPoint(0), 0) );
-  this->AppendPointToPolyLine( 0 , mitk::PlanarFigure::PolyLineElement( this->GetControlPoint(1), 0) );
+
+  this->AppendPointToPolyLine(0, this->GetControlPoint(0));
+  this->AppendPointToPolyLine(0, this->GetControlPoint(1));
 }
 
 void mitk::PlanarLine::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)

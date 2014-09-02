@@ -32,7 +32,7 @@ class vtkStripper;
 namespace mitk {
 
 class BaseRenderer;
-class Geometry2D;
+class PlaneGeometry;
 class DisplayGeometry;
 
 /**
@@ -112,7 +112,7 @@ public:
    * \brief Generate OpenGL primitives for the VTK contour held in contour.
    */
   void PaintCells(BaseRenderer* renderer, vtkPolyData* contour,
-                  const Geometry2D* worldGeometry,
+                  const PlaneGeometry* worldGeometry,
                   const DisplayGeometry* displayGeometry,
                   vtkLinearTransform* vtktransform,
                   vtkLookupTable* lut = NULL,

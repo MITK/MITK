@@ -206,8 +206,11 @@ void QmitkToFUtilView::OnToFCameraConnected()
     m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
   }
 
-  // initialize measurement widget
-  m_Controls->m_ToFMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
+  if ( this->GetRenderWindowPart() )
+    // initialize measurement widget
+    m_Controls->m_ToFMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
+  else
+    MITK_WARN << "No StdMultiWidget available!!! MeasurementWidget will not work.";
 
   this->m_RealTimeClock = mitk::RealTimeClock::New();
   this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
@@ -245,6 +248,16 @@ void QmitkToFUtilView::ResetGUIToDefault()
 
 void QmitkToFUtilView::OnToFCameraDisconnected()
 {
+  this->GetDataStorage()->Remove(m_DistanceImageNode);
+  if(m_RGBImageNode)
+    this->GetDataStorage()->Remove(m_RGBImageNode);
+  if(m_AmplitudeImageNode)
+    this->GetDataStorage()->Remove(m_AmplitudeImageNode);
+  if(m_IntensityImageNode)
+    this->GetDataStorage()->Remove(m_IntensityImageNode);
+  if(m_SurfaceNode)
+    this->GetDataStorage()->Remove(m_SurfaceNode);
+
   m_Controls->m_ToFRecorderWidget->OnStop();
   m_Controls->m_ToFRecorderWidget->setEnabled(false);
   m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
@@ -300,18 +313,6 @@ void QmitkToFUtilView::OnToFCameraStarted()
     // initial update of image grabber
     this->m_ToFImageGrabber->Update();
 
-    this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
-    this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
-    this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
-
-    // initial update of composite filter
-    this->m_ToFCompositeFilter->Update();
-    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput();
-    this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
-
-    std::string rgbFileName;
-    m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
-
     bool hasRGBImage = false;
     m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasRGBImage",hasRGBImage);
 
@@ -321,6 +322,19 @@ void QmitkToFUtilView::OnToFCameraStarted()
     bool hasAmplitudeImage = false;
     m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasAmplitudeImage",hasAmplitudeImage);
 
+    this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
+    if(hasAmplitudeImage)
+      this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
+    if(hasIntensityImage)
+      this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
+
+    // initial update of composite filter
+    this->m_ToFCompositeFilter->Update();
+    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput();
+    this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
+
+    std::string rgbFileName;
+    m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
 
     if(hasRGBImage || (rgbFileName!=""))
     {
@@ -430,7 +444,6 @@ void QmitkToFUtilView::OnChangeCoronalWindowOutput(int index)
 
 mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName, mitk::BaseData* data )
 {
-
   mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode(nodeName);
   if (node.IsNull())
   {

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include <mitkInteractor.h>
 #include "mitkPointSetInteractor.h"
 #include <mitkBaseRenderer.h>
@@ -35,7 +35,13 @@ namespace mitk
    * Points can be added, removed and moved.
    * \ingroup Interaction
    */
-  class MitkExt_EXPORT DisplayPointSetInteractor : public PointSetInteractor
+
+  /**
+  * \deprecatedSince{2014_03} mitk::DisplayPointSetInteractor is deprecated. Needs to be updated to the new interaction-framework.
+  * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+  */
+
+  class DEPRECATED() MitkExt_EXPORT DisplayPointSetInteractor : public PointSetInteractor
   {
   public:
     mitkClassMacro(DisplayPointSetInteractor, PointSetInteractor);

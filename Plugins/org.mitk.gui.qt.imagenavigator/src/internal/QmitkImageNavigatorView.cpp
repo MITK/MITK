@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTimeGeometry.h>
 
 #include <berryConstants.h>
-
+#include <mitkPlaneGeometry.h>
 
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
@@ -276,7 +276,7 @@ void QmitkImageNavigatorView::SetStepSize(int axis)
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry3D();
+    mitk::BaseGeometry::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry3D();
 
     if (geometry.IsNotNull())
     {
@@ -340,7 +340,7 @@ void QmitkImageNavigatorView::OnRefetch()
 {
   if (m_IRenderWindowPart)
   {
-    mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry3D();
+    mitk::BaseGeometry::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry3D();
     mitk::TimeGeometry::ConstPointer timeGeometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldTimeGeometry();
 
     if (geometry.IsNull() && timeGeometry.IsNotNull())

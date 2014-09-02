@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestDICOMLoading.h"
 #include "mitkTestingMacros.h"
+#include "mitkImage.h"
 
 int mitkDICOMTestingSanityTest(int argc, char** const argv)
 {

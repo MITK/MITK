@@ -73,6 +73,8 @@ public:
     */
   virtual void OnDeviceSet();
 
+  virtual void Initialize();
+
 protected:
   void BlockSignalAndSetValue(QSpinBox* target, int value);
 

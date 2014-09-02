@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkJSWebPage::QmitkJSWebPage(QObject *parent) : QWebPage(parent)
 {
 }
+
 QmitkJSWebPage::~QmitkJSWebPage()
 {
 }
@@ -27,3 +28,4 @@ bool QmitkJSWebPage::shouldInterruptJavaScript()
 {
   return false;
 }
+

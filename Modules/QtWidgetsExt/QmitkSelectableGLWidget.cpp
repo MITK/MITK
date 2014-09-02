@@ -20,13 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWheelEvent>
 
 QmitkSelectableGLWidget::QmitkSelectableGLWidget(QWidget* parent)
-  : QWidget(parent)
+  : QWidget(parent),
+    m_Ui(new Ui::QmitkSelectableGLWidget)
 {
-  setupUi(this);
+  m_Ui->setupUi(this);
   QLayout *hlayout;
-  hlayout=layout();
+  hlayout=m_Ui->hboxLayout;
   hlayout->setMargin(3);
-  //hlayout->setAutoAdd(true);
 
   QString rendererName("Renderer::");
   rendererName += objectName();
@@ -50,6 +50,11 @@ QmitkSelectableGLWidget::QmitkSelectableGLWidget(QWidget* parent)
   m_RenderWindow = new QmitkRenderWindow(this, composedName,m_Renderer);
 
   hlayout->addWidget(m_RenderWindow);
+}
+
+QmitkSelectableGLWidget::~QmitkSelectableGLWidget()
+{
+  delete m_Ui;
 }
 
 mitk::VtkPropRenderer* QmitkSelectableGLWidget::GetRenderer()

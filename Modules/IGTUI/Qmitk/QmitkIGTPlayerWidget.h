@@ -64,12 +64,12 @@ public:
   /*!
   \brief Sets the real time player for this player widget
   */
-  void SetRealTimePlayer(mitk::NavigationDataPlayer::Pointer player);
+  //void SetRealTimePlayer(mitk::NavigationDataPlayer::Pointer player);
 
    /*!
   \brief Sets the sequential player for this player widget
   */
-  void SetSequentialPlayer(mitk::NavigationDataSequentialPlayer::Pointer player);
+  //void SetSequentialPlayer(mitk::NavigationDataSequentialPlayer::Pointer player);
 
   /*!
   \brief Returns the playing timer of this widget
@@ -197,13 +197,9 @@ signals:
     */
     void OnStopPlaying();
     /*!
-    \brief Updates the input filename
-    */
-    void SetInputFileName(const QString& inputFileName);
-    /*!
     \brief Opens file open dialog for searching the input file
     */
-    void OnSelectPressed();
+    void OnOpenFileButtonPressed();
     /*!
     \brief Stops the playback
     */
@@ -231,9 +227,6 @@ protected:
 
   /// \brief Creation of the connections
   virtual void CreateConnections();
-
-  /// \brief Creation of the Qt control
-  virtual void CreateQtPartControl(QWidget *parent);
 
   /*!
   \brief Checks if an imput file with the set filename exists

@@ -42,7 +42,7 @@ public:
     update();
   }
 
-  void AddFunctionPoint(double x,double /*val*/)
+  void AddFunctionPoint(double x, double)
   {
     m_ColorTransferFunction->AddRGBPoint(x,m_ColorTransferFunction->GetRedValue(x),m_ColorTransferFunction->GetGreenValue(x),m_ColorTransferFunction->GetBlueValue(x));
   }
@@ -114,4 +114,6 @@ protected:
   QString m_Title;
 
 };
+
 #endif
+

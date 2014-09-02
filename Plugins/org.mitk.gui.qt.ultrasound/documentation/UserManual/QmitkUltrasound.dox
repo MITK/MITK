@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_ultrasound The Ultrasound Plugin
 
-\image html QmitkUltrasound_Icon.png "Icon of Ultrasound"
+\imageMacro{QmitkUltrasound_Icon.png,"Icon of the Ultrasound Plugin",2.12}
 
 \tableofcontents
 
@@ -27,12 +27,12 @@ We have made good experiences with epiphan Grabbers and currently recommend the 
 
 To configure an ultrasound device, connect the ultrasound device to the grabber and the grabber to the computer. Start the ultrasound device and open the ultrasound plugin. The devicemanager will open.
 
-\image html QmitkUltrasound_DeviceManagement.png "MITK Screenshot with the devicemanager activated"
+\imageMacro{QmitkUltrasound_DeviceManagement.png,"MITK Screenshot with the devicemanager activated",7.54}
 
 Any currently configured devices are listed in the box, which accordingly is empty now.
 Click "New Device".
 
-\image html QmitkUltrasound_NewVideoDevice.png "The 'New Device' form"
+\imageMacro{QmitkUltrasound_NewVideoDevice.png,"The 'New Device' form",7.62}
 
 In the appearing form, enter descriptive data on your device in the corresponding fields.
 Manufacturer and model will be used to display the device in MITK.
@@ -46,7 +46,7 @@ Only uncheck this box if you require color.
 
 Click Add Device to save your changes.
 
-\image html QmitkUltrasound_DeviceManagement2.png "Devicemanager with configured device"
+\imageMacro{QmitkUltrasound_DeviceManagement2.png,"Devicemanager with configured device",7.64}
 
 \section org_mitk_gui_qt_ultrasoundActivateConnect Activation and Connection
 
@@ -58,7 +58,7 @@ Click the device, then click "Activate Device". The device is now activated and 
 
 Click the "US-Imaging Tab"
 
-\image html QmitkUltrasound_Imaging.png "US Imaging Tab"
+\imageMacro{QmitkUltrasound_Imaging.png,"US Imaging Tab",7.60}
 
 Select the device and click "Start Viewing". The US-Image should appear.
 You can adjust the cropping parameters to reduce the acquired image size which will further increase speed and remove unnecessary information.

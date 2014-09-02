@@ -155,7 +155,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::Geometry3D::Pointer mitk::NodeDisplacementFilter::TransformToGeometry(mitk::AffineTransform3D::Pointer transform){
   mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
   g3d->SetIndexToWorldTransform(transform);
-  g3d->TransferItkToVtkTransform(); // update VTK Transform for rendering too
+  //g3d->TransferItkToVtkTransform(); // update VTK Transform for rendering too //Included in SetIndexToWorldTransform
   g3d->Modified();
   return g3d;
 }

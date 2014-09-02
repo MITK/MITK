@@ -143,7 +143,7 @@ public:
   /** Returns a const reference to the pixel at given world coordinate - works only with three-dimensional ImageAccessor */
   const TPixel & GetPixelByWorldCoordinates(mitk::Point3D position)
   {
-    Index3D itkIndex;
+    itk::Index<3> itkIndex;
     m_WriteAccessor.m_Image->GetGeometry()->WorldToIndex(position, itkIndex);
 
     return GetPixelByIndex( itkIndex);

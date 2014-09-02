@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 
 mitk::ExtractDirectedPlaneImageFilterNew::ExtractDirectedPlaneImageFilterNew()
-:m_CurrentWorldGeometry2D(NULL),
-m_ActualInputTimestep(-1)
+:m_CurrentWorldPlaneGeometry(NULL),
+m_ActualInputTimestep(0)
 {
   MITK_WARN << "Class ExtractDirectedPlaneImageFilterNew is deprecated! Use ExtractSliceFilter instead.";
 }
@@ -33,7 +33,6 @@ mitk::ExtractDirectedPlaneImageFilterNew::~ExtractDirectedPlaneImageFilterNew()
 }
 
 void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
-
     mitk::Image::ConstPointer inputImage = ImageToImageFilter::GetInput(0);
 
     if ( !inputImage )
@@ -46,15 +45,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
     m_ImageGeometry = inputImage->GetGeometry();
 
     //If no timestep is set, the lowest given will be selected
-    const mitk::TimeGeometry* inputTimeGeometry = this->GetInput()->GetTimeGeometry();
-    if ( m_ActualInputTimestep == -1)
-    {
-        ScalarType time = m_CurrentWorldGeometry2D->GetTimeBounds()[0];
-        if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
-        {
-            m_ActualInputTimestep = inputTimeGeometry->TimePointToTimeStep( time );
-        }
-    }
+    //const mitk::TimeGeometry* inputTimeGeometry = this->GetInput()->GetTimeGeometry();
 
     if ( inputImage->GetDimension() > 4 || inputImage->GetDimension() < 2)
     {
@@ -78,14 +69,13 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
         return;
     }
 
-    if ( !m_CurrentWorldGeometry2D )
+    if ( !m_CurrentWorldPlaneGeometry )
     {
-        MITK_ERROR<< "mitk::ExtractDirectedPlaneImageFilterNew::GenerateData has no CurrentWorldGeometry2D set" << std::endl;
+        MITK_ERROR<< "mitk::ExtractDirectedPlaneImageFilterNew::GenerateData has no CurrentWorldPlaneGeometry set" << std::endl;
         return;
     }
 
     AccessFixedDimensionByItk( inputImage, ItkSliceExtraction, 3 );
-
 }//Generate Data
 
 
@@ -117,9 +107,9 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     start[0] = 0;
     start[1] = 0;
 
-    Point3D origin = m_CurrentWorldGeometry2D->GetOrigin();
-    Vector3D right = m_CurrentWorldGeometry2D->GetAxisVector(0);
-    Vector3D bottom = m_CurrentWorldGeometry2D->GetAxisVector(1);
+    Point3D origin = m_CurrentWorldPlaneGeometry->GetOrigin();
+    Vector3D right = m_CurrentWorldPlaneGeometry->GetAxisVector(0);
+    Vector3D bottom = m_CurrentWorldPlaneGeometry->GetAxisVector(1);
 
     //Calculation the sample-spacing, i.e the half of the smallest spacing existing in the original image
     Vector3D newPixelSpacing = m_ImageGeometry->GetSpacing();
@@ -143,8 +133,8 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     //Calculating the size of the sampled slice
     typename SliceImageType::SizeType size;
     Vector2D extentInMM;
-    extentInMM[0] = m_CurrentWorldGeometry2D->GetExtentInMM(0);
-    extentInMM[1] = m_CurrentWorldGeometry2D->GetExtentInMM(1);
+    extentInMM[0] = m_CurrentWorldPlaneGeometry->GetExtentInMM(0);
+    extentInMM[1] = m_CurrentWorldPlaneGeometry->GetExtentInMM(1);
 
     //The maximum extent is the lenght of the diagonal of the considered plane
     double maxExtent = sqrt(extentInMM[0]*extentInMM[0]+extentInMM[1]*extentInMM[1]);
@@ -176,11 +166,11 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     origin[2] -= xTranlation*right[2]+yTranlation*bottom[2];
 
     //Putting it together for the new geometry
-    mitk::Geometry3D::Pointer newSliceGeometryTest = dynamic_cast<Geometry3D*>(m_CurrentWorldGeometry2D->Clone().GetPointer());
+    mitk::BaseGeometry::Pointer newSliceGeometryTest = dynamic_cast<BaseGeometry*>(m_CurrentWorldPlaneGeometry->Clone().GetPointer());
     newSliceGeometryTest->ChangeImageGeometryConsideringOriginOffset(true);
 
     //Workaround because of BUG (#6505)
-    newSliceGeometryTest->GetIndexToWorldTransform()->SetMatrix(m_CurrentWorldGeometry2D->GetIndexToWorldTransform()->GetMatrix());
+    newSliceGeometryTest->GetIndexToWorldTransform()->SetMatrix(m_CurrentWorldPlaneGeometry->GetIndexToWorldTransform()->GetMatrix());
     //Workaround end
 
     newSliceGeometryTest->SetOrigin(origin);
@@ -222,9 +212,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
 
         if ( m_ImageGeometry->IsIndexInside( inputIndex ))
         {
-
             resultSlice->SetPixel( sliceIterator.GetIndex(), inputImage->GetPixel(inputIndex) );
-
         }
         else
         {

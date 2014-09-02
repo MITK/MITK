@@ -154,5 +154,5 @@ void QmitkPiecewiseFunctionCanvas::MoveFunctionPoint(int index,
 {
   RemoveFunctionPoint(GetFunctionX(index));
   AddFunctionPoint(pos.first, pos.second);
-  //std::cout<<" AddFunctionPoint x: "<<pos.first<<" AddFunctionPoint y: "<<pos.second<<std::endl;
 }
+

@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManager.h"
 #include "mitkProperties.h"
-#include <mitkInteractionConst.h>
-#include "mitkGlobalInteraction.h"
 
 // us
 #include <usModule.h>
@@ -49,7 +47,10 @@ mitk::PickingTool::PickingTool()
   m_PointSetNode->GetPropertyList()->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_PointSet = mitk::PointSet::New();
   m_PointSetNode->SetData(m_PointSet);
-  m_SeedPointInteractor = mitk::PointSetInteractor::New("singlepointinteractor", m_PointSetNode);
+  m_SeedPointInteractor = mitk::SinglePointDataInteractor::New();
+  m_SeedPointInteractor->LoadStateMachine("PointSet.xml");
+  m_SeedPointInteractor->SetEventConfig("PointSetConfig.xml");
+  m_SeedPointInteractor->SetDataNode(m_PointSetNode);
 
   //Watch for point added or modified
   itk::SimpleMemberCommand<PickingTool>::Pointer pointAddedCommand = itk::SimpleMemberCommand<PickingTool>::New();
@@ -96,7 +97,6 @@ void mitk::PickingTool::Activated()
   //add to datastorage and enable interaction
   if (!GetDataStorage()->Exists(m_PointSetNode))
     GetDataStorage()->Add(m_PointSetNode, GetWorkingData());
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointInteractor);
 
   // now add result to data tree
   GetDataStorage()->Add( m_ResultNode, this->GetWorkingData() );
@@ -104,14 +104,8 @@ void mitk::PickingTool::Activated()
 
 void mitk::PickingTool::Deactivated()
 {
-  if (m_PointSet->GetPointSet()->GetNumberOfPoints() != 0)
-  {
-    mitk::Point3D point = m_PointSet->GetPoint(0);
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, point, 0);
-    m_PointSet->ExecuteOperation(doOp);
-  }
+   m_PointSet->Clear();
   //remove from data storage and disable interaction
-  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
   GetDataStorage()->Remove(m_PointSetNode);
   GetDataStorage()->Remove( m_ResultNode);
 }
@@ -167,7 +161,7 @@ void mitk::PickingTool::OnPointAdded()
 
 
   template<typename TPixel, unsigned int VImageDimension>
-  void mitk::PickingTool::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint)
+  void mitk::PickingTool::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint)
   {
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
     typedef typename InputImageType::IndexType IndexType;

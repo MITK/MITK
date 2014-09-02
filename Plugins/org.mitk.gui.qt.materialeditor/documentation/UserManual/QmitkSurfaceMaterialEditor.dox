@@ -1,10 +1,10 @@
 /**
 \page org_surfacematerialeditor The Surface Material Editor
 
-\image html QmitkSurfaceMaterialEditor_Icon.png "Icon of the Module"
+\imageMacro{QmitkSurfaceMaterialEditor_Icon.png,"Icon of the Surface Material Editor",2.00}
 
 The Surface Material Editor shows the properties of the selected data that are relevant for the selected shader. These properties can be filtered to find a specific property. The preview window shows the representation of a neutral 3D object with the currently selected settings.
 
-\image html QmitkSurfaceMaterialEditor_Gui.png "The Surface Material Editor"
+\imageMacro{QmitkSurfaceMaterialEditor_Gui.png,"The Surface Material Editor",10.92}
 
 */

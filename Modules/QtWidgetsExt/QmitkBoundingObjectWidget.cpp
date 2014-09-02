@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGlobalInteraction.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkLine.h>
+#include <mitkPlaneGeometry.h>
 
 #include <QPushButton>
 #include <QCheckBox>
@@ -31,16 +32,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 #include <QInputDialog>
 
-#include "btnCube.xpm"
-#include "btnCylinder.xpm"
-#include "btnEllipsoid.xpm"
-#include "btnPyramid.xpm"
-
-
 QmitkBoundingObjectWidget::QmitkBoundingObjectWidget (QWidget* parent, Qt::WindowFlags f ):QWidget( parent, f ),
 m_DataStorage(NULL),
 m_lastSelectedItem(NULL),
-m_lastAffineObserver(NULL),
+m_lastAffineObserver(0),
 m_ItemNodeMap(),
 m_BoundingObjectCounter(1)
 {
@@ -53,10 +48,10 @@ m_BoundingObjectCounter(1)
   boList << tr("add") << tr("cube") << tr("cone") << tr("ellipse") << tr("cylinder");
   m_addComboBox = new QComboBox();
   m_addComboBox->addItems(boList);
-  m_addComboBox->setItemIcon(1, QIcon(btnCube_xpm));
-  m_addComboBox->setItemIcon(2, QIcon(btnPyramid_xpm));
-  m_addComboBox->setItemIcon(3, QIcon(btnEllipsoid_xpm));
-  m_addComboBox->setItemIcon(4, QIcon(btnCylinder_xpm));
+  m_addComboBox->setItemIcon(1, QIcon(":/QmitkWidgetsExt/btnCube.xpm"));
+  m_addComboBox->setItemIcon(2, QIcon(":/QmitkWidgetsExt/btnPyramid.xpm"));
+  m_addComboBox->setItemIcon(3, QIcon(":/QmitkWidgetsExt/btnEllipsoid.xpm"));
+  m_addComboBox->setItemIcon(4, QIcon(":/QmitkWidgetsExt/btnCylinder.xpm"));
 
   buttonLayout->addWidget(m_addComboBox);
 
@@ -88,8 +83,6 @@ m_BoundingObjectCounter(1)
 
   connect( m_addComboBox , SIGNAL(currentIndexChanged(int)), this, SLOT(CreateBoundingObject(int)) );
   connect( m_TreeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(SelectionChanged()) );
-  /*connect( m_SaveButton, SIGNAL(clicked()), this, SLOT(OnSaveButtonClicked()) );
-  connect( m_LoadButton, SIGNAL(clicked()), this, SLOT(OnLoadButtonClicked()) );*/
   connect( m_DelButton, SIGNAL(clicked()), this, SLOT(OnDelButtonClicked()) );
 
   connect(m_TreeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(OnItemDoubleClicked(QTreeWidgetItem*, int)) );
@@ -326,16 +319,6 @@ mitk::DataStorage* QmitkBoundingObjectWidget::GetDataStorage()
   return m_DataStorage;
 }
 
-//void QmitkBoundingObjectWidget::OnSaveButtonClicked()
-//{
-//
-//}
-//
-//void QmitkBoundingObjectWidget::OnLoadButtonClicked()
-//{
-//
-//}
-
 void QmitkBoundingObjectWidget::OnDelButtonClicked()
 {
   RemoveItem();
@@ -462,7 +445,7 @@ mitk::DataNode::Pointer QmitkBoundingObjectWidget::GetSelectedBoundingObjectNode
   return node;
 }
 
-void QmitkBoundingObjectWidget::OnBoundingObjectModified(const itk::EventObject& e)
+void QmitkBoundingObjectWidget::OnBoundingObjectModified(const itk::EventObject&)
 {
   emit BoundingObjectsChanged();
 }

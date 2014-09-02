@@ -56,8 +56,6 @@ signals:
 protected slots:
     void CreateBoundingObject(int type);
     void OnDelButtonClicked();
- /*   void OnLoadButtonClicked();
-    void OnSaveButtonClicked();*/
     void SelectionChanged();
     void OnItemDoubleClicked(QTreeWidgetItem* item, int col);
     void OnItemDataChanged(QTreeWidgetItem* item, int col);

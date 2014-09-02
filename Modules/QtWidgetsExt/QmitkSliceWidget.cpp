@@ -17,18 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSliceWidget.h"
 #include "QmitkStepperAdapter.h"
 #include "mitkNodePredicateDataType.h"
-
+#include "mitkImage.h"
 #include <mitkProportionalTimeGeometry.h>
-
-
-//#include "QmitkRenderWindow.h"
-//
-//#include "mitkSliceNavigationController.h"
-//#include "QmitkLevelWindowWidget.h"
-//
-//#include <vtkRenderer.h>
-//#include "mitkRenderingManager.h"
-
 #include <QMenu>
 #include <QMouseEvent>
 
@@ -70,7 +60,6 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name,
       "navigation");
 
   SetLevelWindowEnabled(true);
-
 }
 
 mitk::VtkPropRenderer* QmitkSliceWidget::GetRenderer()
@@ -122,18 +111,6 @@ void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node)
   SetData(node, m_View);
 }
 
-//void QmitkSliceWidget::AddData( mitk::DataNode::Pointer node)
-//{
-//  if ( m_DataTree.IsNull() )
-//  {
-//    m_DataTree = mitk::DataTree::New();
-//  }
-//  mitk::DataTreePreOrderIterator it(m_DataTree);
-//  it.Add( node );
-//  SetData(&it, m_View);
-//}
-
-
 void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node,
     mitk::SliceNavigationController::ViewDirection view)
 {
@@ -172,49 +149,31 @@ void QmitkSliceWidget::InitWidget(
     controller->SetViewDirection(mitk::SliceNavigationController::Sagittal);
   }
 
-  int currentPos = 0;
-  if (m_RenderWindow->GetSliceNavigationController())
-  {
-    currentPos = controller->GetSlice()->GetPos();
-  }
-
   if (m_SlicedGeometry.IsNull())
   {
     return;
   }
 
-  // compute bounding box with respect to first images geometry
-  const mitk::BoundingBox::BoundsArrayType imageBounds =
-      m_SlicedGeometry->GetBoundingBox()->GetBounds();
 
-  //  mitk::SlicedGeometry3D::Pointer correctGeometry = m_SlicedGeometry.GetPointer();
-  mitk::Geometry3D::Pointer
-      geometry =
-          static_cast<mitk::Geometry3D*> (m_SlicedGeometry->Clone().GetPointer());
+  mitk::BaseGeometry::Pointer geometry =
+          static_cast<mitk::BaseGeometry*> (m_SlicedGeometry->Clone().GetPointer());
 
   const mitk::BoundingBox::Pointer boundingbox =
-      m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
+    m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
+
   if (boundingbox->GetPoints()->Size() > 0)
   {
-    ////geometry = mitk::Geometry3D::New();
-    ////geometry->Initialize();
-    //geometry->SetBounds(boundingbox->GetBounds());
-    //geometry->SetSpacing(correctGeometry->GetSpacing());
-
     //let's see if we have data with a limited live-span ...
     mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(
         GetRenderer(), NULL);
 
-    if (timebounds[1] < mitk::ScalarTypeNumericTraits::max())
-    {
-      mitk::ScalarType duration = timebounds[1] - timebounds[0];
-
-      timebounds[1] = timebounds[0] + 1.0f;
-      geometry->SetTimeBounds(timebounds);
-    }
-
     mitk::ProportionalTimeGeometry::Pointer timeGeometry = mitk::ProportionalTimeGeometry::New();
-    timeGeometry->Initialize(geometry,1);
+    timeGeometry->Initialize(geometry, 1);
+
+    {
+      timeGeometry->SetFirstTimePoint(timebounds[0]);
+      timeGeometry->SetStepDuration(1.0);
+    }
 
     if (const_cast<mitk::BoundingBox*> (timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2()
         >= mitk::eps)
@@ -227,11 +186,6 @@ void QmitkSliceWidget::InitWidget(
   GetRenderer()->GetDisplayGeometry()->Fit();
   mitk::RenderingManager::GetInstance()->RequestUpdate(
       GetRenderer()->GetRenderWindow());
-  //int w=vtkObject::GetGlobalWarningDisplay();
-  //vtkObject::GlobalWarningDisplayOff();
-  //vtkRenderer * vtkrenderer = ((mitk::OpenGLRenderer*)(GetRenderer()))->GetVtkRenderer();
-  //if(vtkrenderer!=NULL) vtkrenderer->ResetCamera();
-  //vtkObject::SetGlobalWarningDisplay(w);
 }
 
 void QmitkSliceWidget::UpdateGL()

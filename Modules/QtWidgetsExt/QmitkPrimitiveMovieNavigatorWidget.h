@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QTimer>
 
-class MitkQtWidgetsExt_EXPORT QmitkPrimitiveMovieNavigatorWidget : public QWidget//, public Ui::QmitkPrimitiveMovieNavigator
+class MitkQtWidgetsExt_EXPORT QmitkPrimitiveMovieNavigatorWidget : public QWidget
 {
     Q_OBJECT
 
@@ -52,4 +52,5 @@ private slots:
 
 };
 
-#endif /* QMITKPRIMITIVEMOVIENAVIGATORWIDGET_H_ */
+#endif
+

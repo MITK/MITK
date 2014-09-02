@@ -77,6 +77,6 @@ MITK_CREATE_MODULE_TESTS()
 
 That's it! Enjoy your new module! After following these steps, it should look something like this:
 
-\image html NewModule.png "Your shiny new module!"
+\imageMacro{NewModule.png,"Your shiny new module!",6}
 
 */

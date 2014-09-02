@@ -135,13 +135,13 @@ namespace mitk
     It will try extend in the direction of the points in the vector so a vector {B,C} will result in
     extending from C in the direction C-B */
     void LinearExtensionUntilGreyMatter( std::vector<int> & indexVectorOfPointsToUse, TractType::Pointer singleTract,
-      int & label, mitk::Index3D & mitkIndex );
+      int & label, itk::Index<3> & mitkIndex );
 
     /** Retract fiber until the first brain matter label is hit
 
     The bool parameter controls whether the front or the end is retracted */
     void RetractionUntilBrainMatter( bool retractFront, TractType::Pointer singleTract,
-      int & label, mitk::Index3D & mitkIndex );
+      int & label, itk::Index<3> & mitkIndex );
 
     /** \brief Get the location of the center of mass for a specific label
      * This can throw an exception if the label is not found.
@@ -156,7 +156,7 @@ namespace mitk
      * A new node will be created, using the label and either the supplied coordinates
      * or the center of mass coordinates, depending on the supplied bool.
      */
-    void CreateNewNode( int label, mitk::Index3D, bool useIndex );
+    void CreateNewNode( int label, itk::Index<3>, bool useIndex );
 
     ///////// Mapping strategies //////////
 

@@ -80,16 +80,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   }
 
   // Get the target timestep; if none is set, use the lowest given.
-  unsigned int timestep = 0;
-  if ( ! m_TargetTimestep )
-  {
-    ScalarType time = m_WorldGeometry->GetTimeBounds()[0];
-    if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
-    {
-      timestep = inputTimeGeometry->TimePointToTimeStep( time );
-    }
-  }
-  else timestep = m_TargetTimestep;
+  unsigned int timestep = m_TargetTimestep;
 
   if ( inputTimeGeometry->IsValidTimeStep( timestep ) == false )
   {
@@ -133,7 +124,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   assert( input->GetTimeGeometry() == inputTimeGeometry );
 
   // take transform of input image into account
-  Geometry3D* inputGeometry = inputTimeGeometry->GetGeometryForTimeStep( timestep );
+  BaseGeometry* inputGeometry = inputTimeGeometry->GetGeometryForTimeStep( timestep );
   if ( inputGeometry == NULL )
   {
     itkWarningMacro(<<"There is no Geometry3D at given timestep "<<timestep);
@@ -207,7 +198,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     m_Reslicer->SetResliceTransform(
       inputGeometry->GetVtkTransform()->GetLinearInverse() );
 
-    // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D)
+    // Set background level to TRANSLUCENT (see PlaneGeometryDataVtkMapper3D)
     m_Reslicer->SetBackgroundLevel( -32768 );
 
     // Check if a reference geometry does exist (as would usually be the case for
@@ -263,7 +254,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     m_Reslicer->SetResliceTransform( composedResliceTransform );
 
     // Set background level to BLACK instead of translucent, to avoid
-    // boundary artifacts (see Geometry2DDataVtkMapper3D)
+    // boundary artifacts (see PlaneGeometryDataVtkMapper3D)
     m_Reslicer->SetBackgroundLevel( -1023 );
     composedResliceTransform->Delete();
   }
@@ -373,7 +364,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateOutputInformation()
 
 
 bool mitk::ExtractDirectedPlaneImageFilter
-::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
+::CalculateClippedPlaneBounds( const BaseGeometry *boundingGeometry,
                 const PlaneGeometry *planeGeometry, double *bounds )
 {
   // Clip the plane with the bounding geometry. To do so, the corner points
@@ -453,7 +444,7 @@ bool mitk::ExtractDirectedPlaneImageFilter
   {
     // The resulting bounds must be adjusted by the plane spacing, since we
     // we have so far dealt with index coordinates
-    const float *planeSpacing = planeGeometry->GetFloatSpacing();
+    const mitk::Vector3D planeSpacing = planeGeometry->GetSpacing();
     bounds[0] *= planeSpacing[0];
     bounds[1] *= planeSpacing[0];
     bounds[2] *= planeSpacing[1];

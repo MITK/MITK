@@ -118,4 +118,5 @@ protected:
 
 };
 
-#endif /*QMITKSLIDERNAVIGATORWIDGET_H_*/
+#endif
+

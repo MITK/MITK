@@ -7,7 +7,7 @@
 
 #include <QTimer>
 
-#include "QmlMitkExports.h"
+#include "MitkQmlItemsExports.h"
 
 /**
   \brief QML replacement for QmitkRenderWindow.
@@ -17,7 +17,7 @@
 
   \warning Subject to change.
 */
-class QmlMitk_EXPORT QmlMitkRenderWindowItem : public QVTKQuickItem, public mitk::RenderWindowBase
+class MitkQmlItems_EXPORT QmlMitkRenderWindowItem : public QVTKQuickItem, public mitk::RenderWindowBase
 {
     Q_OBJECT
 

@@ -64,7 +64,7 @@ mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 
 mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 {
-  //The 3D RW Mapper (Geometry2DDataVtkMapper3D) is listening to this event,
+  //The 3D RW Mapper (PlaneGeometryDataVtkMapper3D) is listening to this event,
   //in order to delete the images from the 3D RW.
   this->InvokeEvent( itk::DeleteEvent() );
 }
@@ -129,7 +129,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   }
 
   //check if there is a valid worldGeometry
-  const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
   if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->HasReferenceGeometry() ))
   {
     return;
@@ -209,7 +209,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // Thick slices parameters
   if( input->GetPixelType().GetNumberOfComponents() == 1 ) // for now only single component are allowed
   {
-    DataNode *dn=renderer->GetCurrentWorldGeometry2DNode();
+    DataNode *dn=renderer->GetCurrentWorldPlaneGeometryNode();
     if(dn)
     {
       ResliceMethodProperty *resliceMethodEnumProperty=0;
@@ -544,7 +544,7 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
   else
   {
     //all other image types can make use of the rendering mode
-    int renderingMode = mitk::RenderingModeProperty::LEVELWINDOW_COLOR;
+    int renderingMode = mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR;
     mitk::RenderingModeProperty::Pointer mode = dynamic_cast<mitk::RenderingModeProperty*>(this->GetDataNode()->GetProperty( "Image Rendering.Mode", renderer ));
     if(mode.IsNotNull())
     {
@@ -552,11 +552,6 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
     }
     switch(renderingMode)
     {
-    case mitk::RenderingModeProperty::LEVELWINDOW_COLOR:
-      MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_Color";
-      localStorage->m_LevelWindowFilter->SetLookupTable( localStorage->m_DefaultLookupTable );
-      this->ApplyLevelWindow( renderer );
-      break;
     case mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR:
       MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_LookupTable_Color";
       this->ApplyLookuptable( renderer );
@@ -576,7 +571,9 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
       this->ApplyColorTransferFunction( renderer );
       break;
     default:
-      MITK_ERROR << "No valid 'Image Rendering.Mode' set";
+      MITK_ERROR << "No valid 'Image Rendering.Mode' set. Using LOOKUPTABLE_LEVELWINDOW_COLOR instead.";
+      this->ApplyLookuptable( renderer );
+      this->ApplyLevelWindow( renderer );
       break;
     }
   }
@@ -656,8 +653,8 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
        || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
-       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
+       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
+       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime())
        || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
        || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {
@@ -691,6 +688,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
 
   // Set default grayscale look-up table
   mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+  mitkLut->SetType(mitk::LookupTable::GRAYSCALE);
   mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
   mitkLutProp->SetLookupTable(mitkLut);
   node->SetProperty("LookupTable", mitkLutProp);
@@ -707,15 +705,6 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       node->SetProperty("LookupTable", mitkLutProp);
     }
     // Otherwise do nothing - the default grayscale look-up table has already been set
-    /*
-    else
-      if ( photometricInterpretation.find("MONOCHROME2") != std::string::npos ) // meaning: display MINIMUM pixels as BLACK
-      {
-        // apply default LUT (black to white)
-        node->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ), renderer );
-      }
-    // PALETTE interpretation should be handled ok by RGB loading
-    */
   }
 
   bool isBinaryImage(false);
@@ -1002,7 +991,7 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)
   }
 }
 
-bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
+bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage( const PlaneGeometry* renderingGeometry, SlicedGeometry3D* imageGeometry )
 {
   // if either one of the two geometries is NULL we return true
   // for safety reasons
@@ -1067,11 +1056,8 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   mitkLUT->SetType(mitk::LookupTable::LEGACY_BINARY);
   m_BinaryLookupTable = mitkLUT->GetVtkLookupTable();
 
-  // add a default rainbow lookup table for color mapping
-  m_ColorLookupTable->SetRampToLinear();
-  m_ColorLookupTable->SetHueRange(0.6667, 0.0);
-  m_ColorLookupTable->SetTableRange(0.0, 20.0);
-  m_ColorLookupTable->Build();
+  mitkLUT->SetType(mitk::LookupTable::LEGACY_RAINBOW_COLOR);
+  m_ColorLookupTable = mitkLUT->GetVtkLookupTable();
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();

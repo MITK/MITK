@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::RenderingModeProperty::RenderingModeProperty( )
 {
   this->AddRenderingModes();
-  this->SetValue( LEVELWINDOW_COLOR );
+  this->SetValue( LOOKUPTABLE_LEVELWINDOW_COLOR );
 }
 
 mitk::RenderingModeProperty::RenderingModeProperty( const IdType& value )
@@ -52,7 +52,6 @@ int mitk::RenderingModeProperty::GetRenderingMode()
 
 void mitk::RenderingModeProperty::AddRenderingModes()
 {
-  AddEnum( "LevelWindow_Color", LEVELWINDOW_COLOR );
   AddEnum( "LookupTable_LevelWindow_Color", LOOKUPTABLE_LEVELWINDOW_COLOR );
   AddEnum( "ColorTransferFunction_LevelWindow_Color", COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR );
   AddEnum( "LookupTable_Color", LOOKUPTABLE_COLOR );

@@ -150,4 +150,6 @@ protected:
   QLabel*                m_TimeStepFaderLabel;
 
 };
+
 #endif
+

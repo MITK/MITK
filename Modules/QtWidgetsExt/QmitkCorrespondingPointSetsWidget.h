@@ -13,6 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #ifndef QmitkCorrespondingPointSetsWidget_H
 #define QmitkCorrespondingPointSetsWidget_H
 
@@ -56,8 +57,6 @@ See LICENSE.txt or http://www.mitk.org for details.
  * assign a QmitkStdMultiWidget and a mitk::DataStorage
  * to the widget (via SetMultiWidget and SetDataStorage).
  */
-
-
 class MitkQtWidgetsExt_EXPORT QmitkCorrespondingPointSetsWidget : public QWidget
 {
     Q_OBJECT
@@ -88,8 +87,6 @@ public:
 
     /// sets the qt property which activates/deactivates the button bar below the table
     void QTPropSetButtonBarEnabled(bool showBB);
-
-signals:
 
 protected slots:
 
@@ -130,3 +127,4 @@ protected:
 };
 
 #endif
+

@@ -30,7 +30,9 @@ public:
 
   static std::string GetSerializedReference()
   {
-    return "<calibrations>\n<default0 M00=\"1.1234\" M01=\"1.2234\" M02=\"1.3234\" M10=\"1.4234\" M11=\"1.5234\" M12=\"1.6234\" M20=\"1.7234\" M21=\"1.8234\" M22=\"1.9234\" T0=\"2.1234\" T1=\"2.2234\" T2=\"2.3234\" />\n</calibrations>\n";
+
+    return std::string("<calibrations>\n<") + mitk::USCombinedModality::DefaultProbeIdentifier + mitk::USCombinedModality::ProbeAndDepthSeperator
+                       + "0 M00=\"1.1234\" M01=\"1.2234\" M02=\"1.3234\" M10=\"1.4234\" M11=\"1.5234\" M12=\"1.6234\" M20=\"1.7234\" M21=\"1.8234\" M22=\"1.9234\" T0=\"2.1234\" T1=\"2.2234\" T2=\"2.3234\" />\n</calibrations>\n";
   }
 
   static bool CompareDoubles (double A, double B)
@@ -116,6 +118,10 @@ public:
     if (! CompareDoubles(offset[2], 2.3234)) identical = false;
 
     MITK_TEST_CONDITION_REQUIRED(identical, "Testing if deserialized calibration is identical to serialized one...");
+
+    // test if invalid strings cause exceptions
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception, modality->DeserializeCalibration("invalid-string"));
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception, modality->DeserializeCalibration("<xml><test></xml>", false));
   }
 
   static void TestFilterPipeline()

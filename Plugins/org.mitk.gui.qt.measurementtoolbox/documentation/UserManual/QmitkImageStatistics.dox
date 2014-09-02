@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_imagestatistics The Image Statistics View
 
-\image html QmitkMeasurementToolbox_ImageStatisticsIcon.png "Icon of the View"
+\imageMacro{QmitkMeasurementToolbox_ImageStatisticsIcon.png,"Icon of the Image Statistics View",2.00}
 
 \section QmitkImageStatisticsUserManualSummary Summary
 
@@ -24,7 +24,7 @@ Manual sections:
 
 This view provides an easy interface to quickly compute some features of a whole image or a region of interest.
 
-\image html QmitkMeasurementToolbox_Interface.png "The interface"
+\imageMacro{QmitkMeasurementToolbox_Interface.png,"The interface",9.10}
 
 \section QmitkImageStatisticsUserManualUsage Usage
 

@@ -45,25 +45,6 @@ if(MITK_USE_Qt4)
   list(APPEND qt_project_args
        -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE} )
 endif()
-if(MITK_USE_Qt5)
-  find_program(QT_QMAKE_EXECUTABLE qmake)
-  if(NOT QT_QMAKE_EXECUTABLE)
-    message(FATAL_ERROR "Qt qmake executable not found.")
-  endif()
-  execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_VERSION
-                  OUTPUT_VARIABLE _qt_version
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  set(_qt_version_minimum "5.0.0")
-  if(_qt_version VERSION_LESS _qt_version_minimum)
-    message(SEND_ERROR "Qt version ${_qt_version} too old. At least Qt ${_qt_version_minimum} is required")
-  endif()
-  execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_PREFIX
-                  OUTPUT_VARIABLE _qt_install_prefix
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  file(TO_CMAKE_PATH "${_qt_install_prefix}" _qt_install_prefix)
-  list(APPEND qt_project_args
-       -DCMAKE_PREFIX_PATH:PATH=${_qt_install_prefix})
-endif()
 
 #-----------------------------------------------------------------------------
 # ExternalProjects
@@ -91,9 +72,9 @@ set(external_projects
   )
 
 # Qxt supports Qt5. We need to also support it in QxtCMakeLists.txt
-if(MITK_USE_Qt4)
+#if(MITK_USE_Qt4)
   list(APPEND external_projects Qxt)
-endif()
+#endif()
 
 # These are "hard" dependencies and always set to ON
 set(MITK_USE_tinyxml 1)
@@ -106,10 +87,10 @@ set(MITK_USE_VTK 1)
 # Semi-hard dependencies, enabled by user-controlled variables
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 if(MITK_USE_QT)
-  if(MITK_USE_Qt4)
-    set(MITK_USE_Qwt 1)
+  set(MITK_USE_Qwt 1)
+  #if(MITK_USE_Qt4)
     set(MITK_USE_Qxt 1) #TODO: Check how Qxt builds with Qt 5
-  endif()
+  #endif()
 endif()
 
 if(MITK_USE_SOFA)
@@ -136,6 +117,13 @@ if(MITK_USE_Boost)
     set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
   endif()
 endif()
+
+# Setup file for setting custom ctest vars
+configure_file(
+  CMake/SuperbuildCTestCustom.cmake.in
+  ${MITK_BINARY_DIR}/CTestCustom.cmake
+  @ONLY
+)
 
 if(BUILD_TESTING)
   set(EXTERNAL_MITK_DATA_DIR "${MITK_DATA_DIR}" CACHE PATH "Path to the MITK data directory")
@@ -191,6 +179,7 @@ endif()
 set(ep_common_args
   -DBUILD_TESTING:BOOL=${ep_build_testing}
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
+  -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
   -DBUILD_SHARED_LIBS:BOOL=ON
   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}

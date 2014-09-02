@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk
 #include <mitkImagePixelReadAccessor.h>
+#include <mitkImage.h>
 
 // Qt
 #include <QInputDialog>
@@ -405,12 +406,12 @@ void QmitkTbssSkeletonizationView::AddToDataStorage(mitk::Image* img, std::strin
 }
 
 
-Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(mitk::Image::Pointer image)
+Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(itk::SmartPointer<mitk::Image> image)
 {
 
   Float4DImageType::Pointer output = Float4DImageType::New();
 
-  mitk::Geometry3D* geo = image->GetGeometry();
+  mitk::BaseGeometry* geo = image->GetGeometry();
   mitk::Vector3D mitkSpacing = geo->GetSpacing();
   mitk::Point3D mitkOrigin = geo->GetOrigin();
 

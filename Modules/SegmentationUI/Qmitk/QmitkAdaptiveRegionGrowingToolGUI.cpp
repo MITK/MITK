@@ -197,7 +197,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
       // Initializing the region by the area around the seedpoint
       m_SeedPointValueMean = 0;
 
-      mitk::Index3D currentIndex, runningIndex;
+      itk::Index<3> currentIndex, runningIndex;
       mitk::ScalarType pixelValues[125];
       unsigned int pos (0);
 
@@ -351,7 +351,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint)
+void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::BaseGeometry* imageGeometry, mitk::PointSet::PointType seedPoint)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
   typedef typename InputImageType::IndexType IndexType;

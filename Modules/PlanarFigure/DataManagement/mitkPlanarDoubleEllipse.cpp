@@ -137,7 +137,7 @@ void mitk::PlanarDoubleEllipse::GeneratePolyLine()
     point[0] = centerPoint[0] + vector[0];
     point[1] = centerPoint[1] + vector[1];
 
-    this->AppendPointToPolyLine(0, PolyLineElement(point, 0));
+    this->AppendPointToPolyLine(0, point);
 
     vector[0] = innerMajorRadius * cosAngle;
     vector[1] = innerMinorRadius * sinAngle;
@@ -146,7 +146,7 @@ void mitk::PlanarDoubleEllipse::GeneratePolyLine()
     point[0] = centerPoint[0] + vector[0];
     point[1] = centerPoint[1] + vector[1];
 
-    this->AppendPointToPolyLine(1, PolyLineElement(point, 0));
+    this->AppendPointToPolyLine(1, point);
   }
 }
 

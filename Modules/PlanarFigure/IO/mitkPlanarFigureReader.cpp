@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometry.h"
 #include "mitkPlanarEllipse.h"
 #include "mitkPlanarDoubleEllipse.h"
+#include "mitkPlanarBezierCurve.h"
 
 #include "mitkBasePropertySerializer.h"
 
@@ -180,6 +181,10 @@ void mitk::PlanarFigureReader::GenerateData()
     {
       planarFigure = mitk::PlanarDoubleEllipse::New();
     }
+    else if (type == "PlanarBezierCurve")
+    {
+      planarFigure = mitk::PlanarBezierCurve::New();
+    }
     else
     {
       // unknown type
@@ -252,7 +257,7 @@ void mitk::PlanarFigureReader::GenerateData()
         // Extract and set plane transform parameters
         DoubleList transformList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "transformParam" ), "param", 12 );
 
-        typedef mitk::Geometry3D::TransformType TransformType;
+        typedef mitk::BaseGeometry::TransformType TransformType;
         TransformType::ParametersType parameters;
         parameters.SetSize( 12 );
 
@@ -265,7 +270,7 @@ void mitk::PlanarFigureReader::GenerateData()
           parameters.SetElement( i, *it );
         }
 
-        typedef mitk::Geometry3D::TransformType TransformType;
+        typedef mitk::BaseGeometry::TransformType TransformType;
         TransformType::Pointer affineGeometry = TransformType::New();
         affineGeometry->SetParameters( parameters );
         planeGeo->SetIndexToWorldTransform( affineGeometry );
@@ -274,7 +279,7 @@ void mitk::PlanarFigureReader::GenerateData()
         // Extract and set plane bounds
         DoubleList boundsList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "boundsParam" ), "bound", 6 );
 
-        typedef mitk::Geometry3D::BoundsArrayType BoundsArrayType;
+        typedef mitk::BaseGeometry::BoundsArrayType BoundsArrayType;
 
         BoundsArrayType bounds;
         for ( it = boundsList.begin(), i = 0;
@@ -293,7 +298,7 @@ void mitk::PlanarFigureReader::GenerateData()
 
         Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
         planeGeo->SetOrigin( origin );
-        planarFigure->SetGeometry2D(planeGeo);
+        planarFigure->SetPlaneGeometry(planeGeo);
       }
       catch (...)
       {

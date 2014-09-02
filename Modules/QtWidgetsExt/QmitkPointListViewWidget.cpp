@@ -105,13 +105,13 @@ QmitkStdMultiWidget* QmitkPointListViewWidget::GetMultiWidget() const
   return m_MultiWidget;
 }
 
-void QmitkPointListViewWidget::OnPointSetChanged( const itk::Object* /*obj*/ )
+void QmitkPointListViewWidget::OnPointSetChanged(const itk::Object*)
 {
   if(!m_SelfCall)
     this->Update();
 }
 
-void QmitkPointListViewWidget::OnPointSetDeleted( const itk::Object* /*obj*/ )
+void QmitkPointListViewWidget::OnPointSetDeleted(const itk::Object*)
 {
   this->SetPointSet(0);
   this->Update();
@@ -124,80 +124,10 @@ void QmitkPointListViewWidget::OnItemDoubleClicked(QListWidgetItem * item)
   _EditPointDialog.exec();
 }
 
-void QmitkPointListViewWidget::OnCurrentRowChanged( int /*currentRow*/ )
+void QmitkPointListViewWidget::OnCurrentRowChanged(int)
 {
   this->Update(true);
 }
-
-/*
-void QmitkPointListViewWidget::OnPointSetSelectionChanged()
-{
-  if (m_SelfCall)
-    return;
-
-
-  const mitk::PointSet* pointSet = m_PointListModel->GetPointSet();
-  if (pointSet == NULL)
-    return;
-
-  // update this view's selection status as a result to changes in the point set data structure
-  m_SelfCall = true;
-  int timeStep = m_PointListModel->GetTimeStep();
-
-  if ( pointSet->GetNumberOfSelected( timeStep ) > 1 )
-  {
-    /// @TODO use logging as soon as available
-    std::cerr << "Point set has multiple selected points. This view is not designed for more than one selected point." << std::endl;
-  }
-
-  int selectedIndex = pointSet->SearchSelectedPoint( timeStep );
-  if (selectedIndex == -1) // no selected point is found
-  {
-    m_SelfCall = false;
-    return;
-  }
-  QModelIndex index;
-  bool modelIndexOkay = m_PointListModel->GetModelIndexForPointID(selectedIndex, index);
-  if (modelIndexOkay == true)
-    QListWidget::selectionModel()->select( m_PointListModel->index( selectedIndex ), QItemSelectionModel::SelectCurrent );
-
-  emit PointSelectionChanged();
-  m_SelfCall = false;
-}
-
-
-void QmitkPointListViewWidget::OnListViewSelectionChanged(const QItemSelection& selected, const QItemSelection&  *deselected*)
-{
-  if (m_SelfCall || m_PointSet.IsNull())
-    return;
-
-  // (take care that this widget doesn't react to self-induced changes by setting m_SelfCall)
-  m_SelfCall = true;
-
-  // update selection of all points in pointset: select the one(s) that are selected in the view, deselect all others
-  QModelIndexList selectedIndexes = selected.indexes();
-  for (mitk::PointSet::PointsContainer::Iterator it = m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->Begin()
-    ; it != m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->End()
-    ; ++it)
-  {
-    QModelIndex index;
-    m_PointListModel->GetModelIndexForPointID(it->Index(), index);
-    if (selectedIndexes.indexOf(index) != -1) // index is found in the selected indices list
-    {
-      m_PointSet->SetSelectInfo(it->Index(), true, m_PointListModel->GetTimeStep());
-      if ( m_MultiWidget != NULL)
-        m_MultiWidget->MoveCrossToPosition(m_PointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep()));
-
-    }
-    else
-      pointSet->SetSelectInfo(it->Index(), false, m_PointListModel->GetTimeStep());
-  }
-  m_SelfCall = false;
-  emit PointSelectionChanged();
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-*/
 
 void QmitkPointListViewWidget::keyPressEvent( QKeyEvent * e )
 {
@@ -223,7 +153,7 @@ void QmitkPointListViewWidget::keyPressEvent( QKeyEvent * e )
 
 void QmitkPointListViewWidget::MoveSelectedPointUp()
 {
-  if (m_PointSet == NULL)
+  if (m_PointSet.IsNull())
     return;
 
   mitk::PointSet::PointIdentifier selectedID;
@@ -236,7 +166,7 @@ void QmitkPointListViewWidget::MoveSelectedPointUp()
 
 void QmitkPointListViewWidget::MoveSelectedPointDown()
 {
-  if (m_PointSet == NULL)
+  if (m_PointSet.IsNull())
     return;
 
   mitk::PointSet::PointIdentifier selectedID;
@@ -249,7 +179,7 @@ void QmitkPointListViewWidget::MoveSelectedPointDown()
 
 void QmitkPointListViewWidget::RemoveSelectedPoint()
 {
-  if (m_PointSet == NULL)
+  if (m_PointSet.IsNull())
     return;
 
   mitk::PointSet::PointIdentifier selectedID;
@@ -323,3 +253,4 @@ void QmitkPointListViewWidget::Update(bool currentRowChanged)
   }
   m_SelfCall = false;
 }
+

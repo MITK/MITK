@@ -1,0 +1,46 @@
+<RCC>
+  <qresource prefix="/QtWidgetsExt">
+    <file>btnAddPointSet.png</file>
+    <file>btnClear.xpm</file>
+    <file>btnCube.xpm</file>
+    <file>btnCylinder.xpm</file>
+    <file>btnDown.xpm</file>
+    <file>btnEllipsoid.xpm</file>
+    <file>btnLoad.xpm</file>
+    <file>btnMoveDown.png</file>
+    <file>btnMoveUp.png</file>
+    <file>btnPyramid.xpm</file>
+    <file>btnRemovePoint.png</file>
+    <file>btnSave.xpm</file>
+    <file>btnSetPoints.png</file>
+    <file>btnSetPoints.xpm</file>
+    <file>btnSetPointsManually.xpm</file>
+    <file>btnSetSeedPoint.xpm</file>
+    <file>btnSwapSets.png</file>
+    <file>btnUp.xpm</file>
+    <file>cross.png</file>
+    <file>d3.v2.js</file>
+    <file>Histogram.css</file>
+    <file>Histogram.html</file>
+    <file>Histogram.js</file>
+    <file>icon_seedpoint.png</file>
+    <file>Logo_mbiATdkfz_gross.png</file>
+    <file>Logo_mbiATdkfz_small.png</file>
+    <file>logo_mint-medical.png</file>
+    <file>ModuleView.png</file>
+    <file>QmitkStandardViewsDialogBar.xpm</file>
+    <file>PlanarAngle_48.png</file>
+    <file>PlanarBezierCurve_48.png</file>
+    <file>PlanarCircle_48.png</file>
+    <file>PlanarDoubleEllipse_48.png</file>
+    <file>PlanarEllipse_48.png</file>
+    <file>PlanarFourPointAngle_48.png</file>
+    <file>PlanarLine_48.png</file>
+    <file>PlanarPath_48.png</file>
+    <file>PlanarPolygon_48.png</file>
+    <file>PlanarRectangle_48.png</file>
+    <file>PlanarSubdivisionPolygon_48.png</file>
+    <file>play.xpm</file>
+    <file>stop.xpm</file>
+  </qresource>
+</RCC>

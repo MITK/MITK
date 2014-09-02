@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_pointsetinteraction The Point Set Interaction View
 
-\image html QmitkPointSetInteraction_Icon.png "Icon of the View"
+\imageMacro{QmitkPointSetInteraction_Icon.png,"Icon of the Point Set Interaction View",2.00}
 
 Available sections:
   - \ref QmitkPointSetInteractionUserManualOverview
@@ -11,7 +11,7 @@ Available sections:
 
 This functionality allows you to define multiple sets of points, to fill them with points and to save them in so called PointSets.
 
-\image html QmitkPointSetInteraction_Screenshot.png "MITK with the QmitkPointSetInteraction functionality"
+\imageMacro{QmitkPointSetInteraction_Screenshot.png,"MITK with the QmitkPointSetInteraction functionality",16.00}
 
 This document will tell you how to use this functionality, but it is assumed that you already know how to navigate through the slices of an image using the
 four window view. Please read the application manual for more information.
@@ -22,11 +22,11 @@ First of all you have to select a PointSet to use this functionality. Therefore,
 If there are currently no point sets in the data tree, you have to first add a new point set to the data tree. This is done by clicking the "Add pointset..."
 button.
 
-\image html QmitkPointSetInteraction_AddPointSet.png "The Add pointset... dialog"
+\imageMacro{QmitkPointSetInteraction_AddPointSet.png,"The Add pointset... dialog",8.64}
 
 In the pop-up dialog, you have to specify a name for the new point set. This is also the node for the new data tree item.
 
-\image html QmitkPointSetInteraction_CurrentPointSetArea.png "The Current pointset area"
+\imageMacro{QmitkPointSetInteraction_CurrentPointSetArea.png,"The Current pointset area",6.52}
 
 The "Current pointset" area contains a list of points. Within this area, all points for the current point set node are listed.
 To set points you have to toggle the "Set Points"  button, the leftmost of the four buttons on the bottom of the view.

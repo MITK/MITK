@@ -50,7 +50,6 @@ TPDPixelType>
     , m_MaxEigenvalue(0.0)
 {
     this->SetNumberOfRequiredInputs( 1 );
-    this->SetNumberOfOutputs(1);
 }
 
 template< class TTensorPixelType,

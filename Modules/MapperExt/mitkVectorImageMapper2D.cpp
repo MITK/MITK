@@ -83,8 +83,8 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     return ;
 
 
-  mitk::PlaneGeometry::Pointer worldPlaneGeometry2D = dynamic_cast< mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>( renderer->GetCurrentWorldGeometry2D() ) );
-  assert( worldPlaneGeometry2D.IsNotNull() );
+  mitk::PlaneGeometry::Pointer worldPlanePlaneGeometry = dynamic_cast< mitk::PlaneGeometry*>( const_cast<mitk::PlaneGeometry*>( renderer->GetCurrentWorldPlaneGeometry() ) );
+  assert( worldPlanePlaneGeometry.IsNotNull() );
 
   vtkImageData* vtkImage = input->GetVtkImageData( this->GetCurrentTimeStep( input, renderer ) );
 
@@ -94,7 +94,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
   //
   Point3D point;
   Vector3D normal;
-  Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
+  PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
   PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
 
   if ( worldPlaneGeometry.IsNotNull() )
@@ -365,7 +365,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     trafo->GetScale(myscale);
     trafo->Scale(1/myscale[0],1/myscale[1],1/myscale[2]);
 
-    this->PaintCells( glyphGenerator->GetOutput(), renderer->GetCurrentWorldGeometry2D(), renderer->GetDisplayGeometry(), trafo, renderer, NULL/*vtkLut*/, color, lwidth, spacing );
+    this->PaintCells( glyphGenerator->GetOutput(), renderer->GetCurrentWorldPlaneGeometry(), renderer->GetDisplayGeometry(), trafo, renderer, NULL/*vtkLut*/, color, lwidth, spacing );
 
     vectorMagnitudes->Delete();
     glyphSource->Delete();
@@ -385,9 +385,8 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
 
 
 
-void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, mitk::BaseRenderer*  /*renderer*/, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing )
+void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const PlaneGeometry* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, mitk::BaseRenderer*  /*renderer*/, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing )
 {
-
   vtkPoints * points = glyphs->GetPoints();
   vtkPointData * vpointdata = glyphs->GetPointData();
   vtkDataArray* vpointscalars = vpointdata->GetArray("vectorMagnitudes");
@@ -473,9 +472,6 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2
         //std::cout <<  idList->GetId( pointNr )<< ": " << p2d[0]<< " "<< p2d[1] << std::endl;
         //draw the line
         glVertex2f( p2d[ 0 ], p2d[ 1 ] );
-
-
-
       }
       glEnd ();
     }
@@ -519,15 +515,12 @@ int mitk::VectorImageMapper2D::GetCurrentTimeStep( mitk::BaseData* data, mitk::B
   //
   // get the world time
   //
-  Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  assert( worldGeometry.IsNotNull() );
-  ScalarType time = worldGeometry->GetTimeBounds() [ 0 ];
-
+  ScalarType time = renderer->GetTime();
   //
   // convert the world time to time steps of the input object
   //
   int timestep = 0;
-  if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
+  if ( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
     timestep = dataTimeGeometry->TimePointToTimeStep( time );
   if ( dataTimeGeometry->IsValidTimeStep( timestep ) == false )
   {

@@ -265,3 +265,4 @@ void QmitkSliderNavigatorWidget::SetInverseDirection(bool inverseDirection)
 {
   m_InverseDirection = inverseDirection;
 }
+

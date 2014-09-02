@@ -77,8 +77,11 @@ AdcImageFilter< TInPixelType, TOutPixelType>
             GradientDirectionType g = m_GradientDirections->GetElement(i);
             if (g.magnitude()<0.001)
             {
-                S0 += pix[i];
-                c++;
+                if (pix[i]>0)
+                {
+                    S0 += pix[i];
+                    c++;
+                }
             }
         }
         if (c>0)
@@ -97,8 +100,13 @@ AdcImageFilter< TInPixelType, TOutPixelType>
                     if (b>0)
                     {
                         double S = pix[i];
-                        outval -= std::log(S/S0)/b;
-                        c++;
+                        if (S>0 && S0>0)
+                        {
+                            outval -= std::log(S/S0)/b;
+                            c++;
+                        }
+                        else
+                            MITK_WARN << "Signal is zero in direction " << i << " at position " << git.GetIndex() << " --> skipping measurement";
                     }
                 }
             }

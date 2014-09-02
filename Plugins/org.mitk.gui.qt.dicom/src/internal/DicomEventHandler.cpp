@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkServiceReference.h>
 #include <mitkRenderingManager.h>
 #include <QVector>
-
+#include "mitkImage.h"
 
 DicomEventHandler::DicomEventHandler()
 {

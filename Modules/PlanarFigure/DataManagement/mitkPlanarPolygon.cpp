@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarPolygon.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
 // stl related includes
@@ -67,12 +67,8 @@ void mitk::PlanarPolygon::GeneratePolyLine()
 {
   this->ClearPolyLines();
 
-  for ( ControlPointListType::size_type i=0; i<m_ControlPoints.size(); i++ )
-  {
-    Point2D pnt = m_ControlPoints.at( i );
-    PolyLineElement elem(pnt,i);
-    this->AppendPointToPolyLine( 0, elem );
-  }
+  for (ControlPointListType::size_type i = 0; i < m_ControlPoints.size(); ++i)
+    this->AppendPointToPolyLine(0, this->GetControlPoint(i));
 }
 
 void mitk::PlanarPolygon::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
@@ -86,27 +82,21 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   double circumference = 0.0;
   unsigned int i,j;
 
-  ControlPointListType polyLinePoints;
-  polyLinePoints.clear();
-  PolyLineType::iterator iter;
-  for( iter = m_PolyLines[0].begin(); iter != m_PolyLines[0].end(); ++iter )
-  {
-    polyLinePoints.push_back((*iter).Point);
-  }
+  PolyLineType polyLine = m_PolyLines[0];
 
-  if(polyLinePoints.empty())
+  if(polyLine.empty())
     return;
 
-  for ( i = 0; i <(polyLinePoints.size()-1); ++i )
+  for ( i = 0; i <(polyLine.size()-1); ++i )
   {
-    circumference += polyLinePoints[i].EuclideanDistanceTo(
-      polyLinePoints[i + 1] );
+    circumference += static_cast<Point2D>(polyLine[i]).EuclideanDistanceTo(
+      static_cast<Point2D>(polyLine[i + 1]) );
   }
 
   if ( this->IsClosed() )
   {
-    circumference += polyLinePoints[i].EuclideanDistanceTo(
-      polyLinePoints.front() );
+    circumference += static_cast<Point2D>(polyLine[i]).EuclideanDistanceTo(
+      static_cast<Point2D>(polyLine.front()) );
   }
 
   this->SetQuantity( FEATURE_ID_CIRCUMFERENCE, circumference );
@@ -116,31 +106,31 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   double area       = 0.0;
   bool intersection = false;
 
-  if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
+  if ( this->IsClosed() && (this->GetPlaneGeometry() != NULL) )
   {
     // does PlanarPolygon overlap/intersect itself?
-    unsigned int numberOfPoints = polyLinePoints.size();
+    unsigned int numberOfPoints = polyLine.size();
     if( numberOfPoints >= 4)
     {
       for ( i = 0; i < (numberOfPoints - 1); ++i )
       {
         // line 1
-        Point2D p0 = polyLinePoints[i];
-        Point2D p1 = polyLinePoints[i + 1];
+        Point2D p0 = polyLine[i];
+        Point2D p1 = polyLine[i + 1];
 
         // check for intersection with all other lines
         for (j = i+1; j < (numberOfPoints - 1); ++j )
         {
-          Point2D p2 = polyLinePoints[j];
-          Point2D p3 = polyLinePoints[j + 1];
+          Point2D p2 = polyLine[j];
+          Point2D p3 = polyLine[j + 1];
           intersection = CheckForLineIntersection(p0,p1,p2,p3);
           if (intersection) break;
         }
         if (intersection) break; // only because the inner loop might have changed "intersection"
 
         // last line from p_x to p_0
-        Point2D p2 = polyLinePoints.front();
-        Point2D p3 = polyLinePoints.back();
+        Point2D p2 = polyLine.front();
+        Point2D p3 = polyLine.back();
 
         intersection = CheckForLineIntersection(p0,p1,p2,p3);
         if (intersection) break;
@@ -148,10 +138,10 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
    }
 
     // calculate area
-    for ( i = 0; i < polyLinePoints.size(); ++i )
+    for ( i = 0; i < polyLine.size(); ++i )
     {
-      Point2D p0 = polyLinePoints[i];
-      Point2D p1 = polyLinePoints[ (i + 1) % polyLinePoints.size() ];
+      Point2D p0 = polyLine[i];
+      Point2D p1 = polyLine[ (i + 1) % polyLine.size() ];
 
       area += p0[0] * p1[1] - p1[0] * p0[1];
     }
@@ -252,7 +242,7 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const 
   PolyLineType::iterator iter;
   for( iter = tempList.begin(); iter != tempList.end(); ++iter )
   {
-    polyLinePoints.push_back((*iter).Point);
+    polyLinePoints.push_back(*iter);
   }
 
   for ( ControlPointListType::size_type i=0; i<polyLinePoints.size()-1; i++ )

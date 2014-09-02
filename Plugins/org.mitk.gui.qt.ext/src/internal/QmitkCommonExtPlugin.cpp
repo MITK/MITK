@@ -16,9 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCommonExtPlugin.h"
 
-#include <QmitkExtRegisterClasses.h>
+#include <QtWidgetsExtRegisterClasses.h>
 
 #include "QmitkAppInstancesPreferencePage.h"
+#include "QmitkExternalProgramsPreferencePage.h"
 #include "QmitkInputDevicesPrefPage.h"
 
 #include "QmitkModuleView.h"
@@ -47,9 +48,10 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 {
   this->_context = context;
 
-  QmitkExtRegisterClasses();
+  QtWidgetsExtRegisterClasses();
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAppInstancesPreferencePage, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkExternalProgramsPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkInputDevicesPrefPage, context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkModuleView, context)

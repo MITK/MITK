@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkExtrudedContour.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "mitkBaseProcess.h"
 #include "mitkProportionalTimeGeometry.h"
 
@@ -291,8 +291,8 @@ void mitk::ExtrudedContour::BuildGeometry()
   mitk::Point2D pt2d;
   mitk::Point3D pt3d;
   mitk::Point2D min, max;
-  min.Fill(ScalarTypeNumericTraits::max());
-  max.Fill(ScalarTypeNumericTraits::min());
+  min.Fill(itk::NumericTraits<mitk::ScalarType>::max());
+  max.Fill(itk::NumericTraits<mitk::ScalarType>::min());
   xProj[2]=0.0;
   for(i=0, ccur=cstart; i<numPts; ++i, ccur+=cstep)
   {
@@ -331,7 +331,7 @@ void mitk::ExtrudedContour::BuildGeometry()
   // Part III: initialize geometry
   if(m_ClippingGeometry.IsNotNull())
   {
-    ScalarType min_dist=ScalarTypeNumericTraits::max(), max_dist=ScalarTypeNumericTraits::min(), dist;
+    ScalarType min_dist=itk::NumericTraits<mitk::ScalarType>::max(), max_dist=itk::NumericTraits<mitk::ScalarType>::min(), dist;
     unsigned char i;
     for(i=0; i<8; ++i)
     {
@@ -349,11 +349,10 @@ void mitk::ExtrudedContour::BuildGeometry()
 
   itk2vtk(origin, m_Origin);
 
-  mitk::Geometry3D::Pointer g3d = GetGeometry( 0 );
+  mitk::BaseGeometry::Pointer g3d = GetGeometry( 0 );
   assert( g3d.IsNotNull() );
   g3d->SetBounds(bounds);
   g3d->SetIndexToWorldTransform(m_ProjectionPlane->GetIndexToWorldTransform());
-  g3d->TransferItkToVtkTransform();
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(g3d,1);

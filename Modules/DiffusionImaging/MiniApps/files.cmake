@@ -3,6 +3,7 @@ set(CPP_FILES
     MiniAppManager.cpp
 
     BatchedFolderRegistration.cpp
+    DicomFolderDump.cpp
     FileFormatConverter.cpp
     TensorReconstruction.cpp
     TensorDerivedMapsExtraction.cpp

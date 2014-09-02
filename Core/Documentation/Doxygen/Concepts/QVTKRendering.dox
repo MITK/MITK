@@ -8,7 +8,7 @@ The MITK rendering pipeline is derived from the VTK rendering pipeline.
 
 \section QVTKRendering_Pipeline_VTK VTK Rendering Pipeline
 
-\image html RenderingOverviewVTK.png "Rendering in VTK"
+\imageMacro{RenderingOverviewVTK.png,"Rendering in VTK",12}
 
 In VTK, the vtkRenderWindow coordinates the rendering process. Several vtkRenderers may be associated to one vtkRenderWindow.
 All visible objects, which can exist in a rendered scene (2D and 3D scene), inherit from vtkProp (or any subclass e.g. vtkActor).
@@ -26,7 +26,7 @@ This process is tightly connected to VTK, which makes it straight forward and si
 
 The main classes of the MITK rendering process can be illustrated like this:
 
-\image html qVtkRenderingClassOverview.png "Rendering in MITK"
+\imageMacro{qVtkRenderingClassOverview.png,"Rendering in MITK",16}
 
 A render request to the vtkRenderWindow does not only update the VTK pipeline, but also the MITK pipeline. However, the mitk::RenderingManager still coordinates the rendering update behavior.
 Update requests should be sent to the RenderingManager, which then, if needed, will request an update of the overall vtkRenderWindow. The vtkRenderWindow then starts to call the Render() function of all vtkRenderers, which are associated to the vtkRenderWindow. Currently, MITK uses specific vtkRenderers (outside the standard MITK rendering pipeline) for purposes, like displaying a gradient background (mitk::GradientBackground), displaying video sources (QmitkVideoBackround and mitk::VideoSource), or displaying a (department) logo (mitk::ManufacturerLogo), etc..
@@ -36,11 +36,11 @@ The vtkRenderer calls four different functions in vtkMitkRenderProp, namely Rend
 Then, depending on the mapper type (OpenGL- or VTK-based), OpenGL is enabled or disabled. In the case of OpenGL rendering, the Paint()-method of each individual mapper is called. If the mapper is VTK-based, the four function calls are forwarded to mitk::VtkMapper and within these methods the corresponding VtkProp is evaluated.
 Both strategies are illustrated in the sequence diagrams below:
 
-\image html qVtkRenderingSequenceVTK.png "Sequence diagram for MITK VTK rendering"
+\imageMacro{qVtkRenderingSequenceVTK.png,"Sequence diagram for MITK VTK rendering",16}
 
 In MITK, VTK-based mapper are more common and we recommend on implementing VTK-based mappers. However, MITK supports OpenGL-based mappers as well.
 
-\image html qVtkRenderingSequenceGL.png "Sequence diagram for MITK OpenGL rendering"
+\imageMacro{qVtkRenderingSequenceGL.png,"Sequence diagram for MITK OpenGL rendering",16}
 
 
 \section QVTKRendering_Mapper MITK Mapper Architecture
@@ -48,7 +48,7 @@ In MITK, VTK-based mapper are more common and we recommend on implementing VTK-b
 Mappers are used to transform the input data in tangible primitives, such as surfaces, points, lines, etc. The base class of all mappers is mitk::Mapper. The mapper hierarchy reflects the two possible ways to render in MITK: Subclasses of mitk::Mapper control the creation of rendering primitives
 that interface to the graphics library (e.g. via OpenGL, vtk). The mapper architecture is illustrated in the following UML diagram:
 
-\image html qVtkRenderingMapper.jpg "Mapper architecture"
+\imageMacro{qVtkRenderingMapper.jpg,"Mapper architecture",16}
 
 mitk::Mapper::Update() calls the time step of the input data for the specified renderer and checks whether the time step is valid and calls method mitk::Mapper::GenerateDataForRenderer(), which is reimplemented in the individual mappers and should be used to generate primitives.
 mitk::Mapper::SetDefaultProperties() should be used to define mapper-specific properties.

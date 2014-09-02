@@ -3,6 +3,6 @@
 
 This view provides detailed information about the orentation distribution function at the current crosshair position (if a Tensor/Q-Ball image is selected). A visualization of the ODF as well as statistical information are displayed.
 
-\image html odfdetails.png The Gibbs Tracking View
+\imageMacro{odfdetails.png,"The Gibbs Tracking View",10.01}
 
 */

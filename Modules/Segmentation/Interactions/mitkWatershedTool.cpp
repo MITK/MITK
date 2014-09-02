@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsHolder.h"
 #include "mitkToolCommand.h"
 #include "mitkProgressBar.h"
+#include "mitkImage.h"
 
 #include <usModule.h>
 #include <usModuleResource.h>
@@ -101,7 +102,7 @@ void mitk::WatershedTool::DoIt()
 
   try {
     // create and run itk filter pipeline
-    AccessFixedDimensionByItk_1(input.GetPointer(),ITKWatershed,3,output);
+    AccessByItk_1(input.GetPointer(),ITKWatershed,output);
 
     // create a new datanode for output
     mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
@@ -192,7 +193,7 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
   watershed->Update();
 
   // then make sure, that the output has the desired pixel type
-  typedef itk::CastImageFilter<typename WatershedFilter::OutputImageType, itk::Image<Tool::DefaultSegmentationDataType,3> > CastFilter;
+  typedef itk::CastImageFilter<typename WatershedFilter::OutputImageType, itk::Image<Tool::DefaultSegmentationDataType,VImageDimension> > CastFilter;
   typename CastFilter::Pointer cast = CastFilter::New();
   cast->SetInput(watershed->GetOutput());
 

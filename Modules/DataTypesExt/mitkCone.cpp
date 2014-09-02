@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCone.h"
 #include "vtkLinearTransform.h"
-#include "mitkVector.h"
+#include "mitkNumericTypes.h"
 #include "vtkConeSource.h"
 
 mitk::Cone::Cone()

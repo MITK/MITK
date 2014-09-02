@@ -69,9 +69,9 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
   MITK_TEST_CONDITION( planarPolygon->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = iter->Point;
+  const mitk::Point2D& pp0 = *iter;
   ++iter;
-  const mitk::Point2D& pp1 = iter->Point;
+  const mitk::Point2D& pp1 = *iter;
   MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
     || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
 
@@ -136,7 +136,7 @@ int mitkPlanarPolygonTest(int /* argc */, char* /*argv*/[])
   // **************************************************************************
   // 1. Instantiation and basic tests, including feature evaluation
   mitk::PlanarPolygon::Pointer planarPolygon = mitk::PlanarPolygon::New();
-  planarPolygon->SetGeometry2D( planeGeometry );
+  planarPolygon->SetPlaneGeometry( planeGeometry );
 
   // first test: did this work?
   MITK_TEST_CONDITION_REQUIRED( planarPolygon.IsNotNull(), "Testing instantiation" );

@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
 #include <itkMergeDiffusionImagesFilter.h>
 #include <itkDwiGradientLengthCorrectionFilter.h>
+#include <itkDwiNormilzationFilter.h>
 
 // Multishell includes
 #include <itkRadialMultishellToSingleshellImageFilter.h>
@@ -127,7 +128,35 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
     connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
     connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
+    connect( (QObject*)(m_Controls->m_NormalizeImageValuesButton), SIGNAL(clicked()), this, SLOT(DoDwiNormalization()) );
   }
+}
+
+void QmitkPreprocessingView::DoDwiNormalization()
+{
+    if (m_DiffusionImage.IsNull())
+      return;
+
+    typedef mitk::DiffusionImage<DiffusionPixelType>  DiffusionImageType;
+    typedef itk::DwiNormilzationFilter<short>  FilterType;
+
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetInput(m_DiffusionImage->GetVectorImage());
+    filter->SetGradientDirections(m_DiffusionImage->GetDirections());
+    filter->Update();
+
+    DiffusionImageType::Pointer image = DiffusionImageType::New();
+    image->SetVectorImage( filter->GetOutput() );
+    image->SetReferenceBValue( m_DiffusionImage->GetReferenceBValue() );
+    image->SetDirections( m_DiffusionImage->GetDirections() );
+    image->InitializeFromVectorImage();
+
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData( image );
+    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+
+    imageNode->SetName((name+"_normalized").toStdString().c_str());
+    GetDefaultDataStorage()->Add(imageNode);
 }
 
 void QmitkPreprocessingView::DoLengthCorrection()
@@ -440,6 +469,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
   m_Controls->m_targetBValueSpinBox->setEnabled(foundDwiVolume);
   m_Controls->m_OutputRMSErrorImage->setEnabled(foundDwiVolume);
+  m_Controls->m_NormalizeImageValuesButton->setEnabled(foundDwiVolume);
 
   // reset sampling frame to 1 and update all ealted components
   m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(1);
@@ -549,7 +579,7 @@ void QmitkPreprocessingView::DoShowGradientDirections()
   BValueMap bValMap =  m_DiffusionImage->GetBValueMap();
 
   GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();
-  mitk::Geometry3D::Pointer geometry = m_DiffusionImage->GetGeometry();
+  mitk::BaseGeometry::Pointer geometry = m_DiffusionImage->GetGeometry();
   int shellCount = 1;
   for(BValueMapIterator it = bValMap.begin(); it!=bValMap.end(); ++it)
   {
@@ -824,8 +854,15 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
 
     GetDefaultDataStorage()->Add(node);
 
+    /*A reinitialization is needed to access the time channels via the ImageNavigationController
+    The Global-Geometry can not recognize the time channel without a re-init.
+    (for a new selection in datamanger a automatically updated of the Global-Geometry should be done - if it contains the time channel)*/
+    mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeGeometry(),mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+
     ++itemiter;
   }
+
+
 
 }
 

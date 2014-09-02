@@ -55,7 +55,7 @@ public:
 
     nodeDisplacementFilter->Modified();
     nodeDisplacementFilter->Update();
-    MITK_TEST_CONDITION(mitk::Equal(surface->GetGeometry(), node->GetData()->GetGeometry(), mitk::eps, true),
+    MITK_TEST_CONDITION(mitk::Equal(*(surface->GetGeometry()), *(node->GetData()->GetGeometry()), mitk::eps, true),
                         "Geometry must not have changed as the reference point is still at the same position.")
 
     mitk::NavigationData::PositionType movedPos;
@@ -66,7 +66,7 @@ public:
     nodeDisplacementFilter->Update();
 
     surface->GetGeometry()->SetOrigin(surface->GetGeometry()->GetOrigin()+(movedPos-initialPos));
-    MITK_TEST_CONDITION(mitk::Equal(surface->GetGeometry(), node->GetData()->GetGeometry(), mitk::eps, true),
+    MITK_TEST_CONDITION(mitk::Equal(*(surface->GetGeometry()), *(node->GetData()->GetGeometry()), mitk::eps, true),
                         "Node must have moved accordingly to the reference node.")
 
 
@@ -87,7 +87,7 @@ public:
     nodeDisplacementFilter->Modified();
     nodeDisplacementFilter->Update();
 
-    MITK_TEST_CONDITION(mitk::Equal(navigationDataTransform, node2->GetData()->GetGeometry()->GetIndexToWorldTransform(), mitk::eps, true),
+    MITK_TEST_CONDITION(mitk::Equal(*navigationDataTransform, *(node2->GetData()->GetGeometry()->GetIndexToWorldTransform()), mitk::eps, true),
                         "Rotation of the node must be the same as the rotation of the navigation data.")
   }
 };

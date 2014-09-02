@@ -32,7 +32,6 @@ class MitkQtWidgetsExt_EXPORT QmitkNumberPropertyEditor : public QSpinBox, publi
 
   public:
 
-    //QmitkNumberPropertyEditor( mitk::GenericProperty<short>*, QWidget* parent, const char* name = 0 );
     QmitkNumberPropertyEditor( mitk::IntProperty*, QWidget* parent );
     QmitkNumberPropertyEditor( mitk::FloatProperty*, QWidget* parent );
     QmitkNumberPropertyEditor( mitk::DoubleProperty*, QWidget* parent );
@@ -65,7 +64,6 @@ class MitkQtWidgetsExt_EXPORT QmitkNumberPropertyEditor : public QSpinBox, publi
     void DisplayNumber();
 
     union {
-      //mitk::GenericProperty<short>*   m_ShortProperty;
       mitk::GenericProperty<int>*     m_IntProperty;
       mitk::GenericProperty<float>*   m_FloatProperty;
       mitk::GenericProperty<double>*  m_DoubleProperty;

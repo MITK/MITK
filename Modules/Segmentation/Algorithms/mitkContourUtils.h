@@ -52,7 +52,7 @@ class MitkSegmentation_EXPORT ContourUtils : public itk::Object
 
             \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);
+    ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);
 
 
     /**

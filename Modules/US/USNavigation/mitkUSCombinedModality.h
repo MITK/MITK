@@ -46,6 +46,8 @@ namespace mitk {
   {
   public:
     static const std::string DeviceClassIdentifier;
+    static const char*       DefaultProbeIdentifier;
+    static const char*       ProbeAndDepthSeperator;
 
     mitkClassMacro(USCombinedModality, USDevice);
     mitkNewMacro4Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, std::string, std::string);
@@ -56,11 +58,28 @@ namespace mitk {
     itkSetMacro(TrackingDevice, itk::SmartPointer<NavigationDataSource>);
 
     /**
-    * \brief Getter for calibration data of the currently active probe and depth.
+    * \brief Getter for calibration data of the currently active depth and probe.
     *
     * \return Transformation for calibration or null if no calibration is available.
     */
     AffineTransform3D::Pointer GetCalibration();
+
+    /**
+     * \brief Getter for calibration data of the given depth and the currently active probe.
+     *
+     * \param depth depth of the b mode ultrasound image for which the calibration should be returned
+     * \return Transformation for calibration or null if no calibration is available.
+     */
+    AffineTransform3D::Pointer GetCalibration(std::string depth);
+
+    /**
+     * \brief Getter for calibration data of the given depth and probe.
+     *
+     * \param depth depth of the b mode ultrasound image for which the calibration should be returned
+     * \param probe probe of the ultrasound device for which the calibration should be returned
+     * \return Transformation for calibration or null if no calibration is available.
+     */
+    AffineTransform3D::Pointer GetCalibration(std::string depth, std::string probe);
 
     /**
     * \brief Sets a transformation as calibration data.
@@ -68,6 +87,29 @@ namespace mitk {
     * zoom factor. It also marks the device as calibrated.
     */
     void SetCalibration(AffineTransform3D::Pointer calibration);
+
+    /**
+     * \brief Removes the calibration data of the currently active depth and probe.
+     * \return true on success, false if there was no calibration
+     */
+    bool RemoveCalibration();
+
+    /**
+     * \brief Removes the calibration data of the given depth and the currently active probe.
+     *
+     * \param depth depth of the b mode ultrasound image for which the calibration should be removed
+     * \return true on success, false if there was no calibration
+     */
+    bool RemoveCalibration(std::string depth);
+
+    /**
+     * \brief Removes the calibration data of the given depth and probe.
+     *
+     * \param depth depth of the b mode ultrasound image for which the calibration should be removed
+     * \param probe probe of the ultrasound device for which the calibration should be removed
+     * \return true on success, false if there was no calibration
+     */
+    bool RemoveCalibration(std::string depth, std::string probe);
 
     /**
     * \brief Returns the Class of the Device.
@@ -107,6 +149,11 @@ namespace mitk {
     bool GetIsCalibratedForCurrentStatus();
 
     /**
+     * \return true if a calibration was loaded for at least one probe and depth
+     */
+    bool GetContainsAtLeastOneCalibration();
+
+    /**
     * \brief Remove this device from the micro service.
     * This method is public for mitk::USCombinedModality, because this devices
     * can be completly removed. This is not possible for API devices, which
@@ -127,6 +174,8 @@ namespace mitk {
     * If the bool flag is true, all prior calibrations will be deleted.
     * If the flag is set to false, prior calibrations will be retained, but overwritten
     * if one of equal name is present.
+    *
+    * \throws mitk::Exception if the given string could not be parsed correctly.
     */
     void DeserializeCalibration(const std::string &xmlString, bool clearPreviousCalibrations = true);
 
@@ -175,6 +224,8 @@ namespace mitk {
     void GenerateData();
 
     std::string GetIdentifierForCurrentCalibration();
+    std::string GetIdentifierForCurrentProbe();
+    std::string GetCurrentDepthValue();
 
     void RebuildFilterPipeline();
 

@@ -15,11 +15,11 @@ In the real world, a pipeline connects a source of some kind with a consumer of 
 
 The analogy to real pipelines falls a little short in one point: A physical pipeline would never process it's contents, while in software development a pipeline usually does (this is why they are often dubbed filters as well). One might ask why one shouldn't just implement the processing logic in the consumer onject itself, since it onviously knows best what to do with it's data. The two main reasons for this are reusability and flexibility. Say, one wants to display a bone segmentation from a CT-image. Let's also assume for the sake of this introduction, that this is a simple task. One could build a monolithic class that solves the problem. Or one builds a pipeline between the displaying class and the source. We know that bones are very bright in a CT Scan, so we use a treshold filter, and then a segmentation Filter to solve the problem.
 
-\image html pipelining_example_ct.png
+\imageMacro{pipelining_example_ct.png,"",10}
 
 Now let's further assume that after successfully selling this new technology to a large firm, we plan to do the same with ultrasound imaging technology. The brithness relations in Ultrasound images are basically the same, but ultrasound images are very noisy, and the contrast is significantly lower. Since we used pipelining, this is no problem: We don't need to change our old segmentation class - we just plug two new filters in front of the pipeline:
 
-\image html pipelining_example_us.png
+\imageMacro{pipelining_example_us.png,"",16}
 
 This may seem trivial, but when working with several input streams from many different devices that themselves stem from many different vendors, pipelining can save the day when it comes to broad range support of different specifications.
 
@@ -34,13 +34,13 @@ This may seem trivial, but when working with several input streams from many dif
 
 The flow of data inside a pipeline is triggered by only one function call to the consumer, which is Update(). Each part of the pipeline then triggers the Update() method of it's antecessor. Finally, the source creates a new batch of data using it's own GenerateData() method, and notifies its successor that new data is available. The pipeline can then start to process the data until the finished data batch is available as an output of the last Filter.
 
-\image html pipelining_update.png
+\imageMacro{pipelining_update.png,"",12}
 
 \subsection PipelineingConceptPage_Hierarchy     The Pipeline Hierarchy
 
 Tha base class for all parts of the pipeline except the consumer (which can be of any class) is mitk::Baseprocess. This class introduces the ability to process data, has an output and may have an input as well. You will however rarly work with this class directly.
 
-\image html pipelining_hierarchy.png
+\imageMacro{pipelining_hierarchy.png,"",16}
 
 Several source classes extend BaseProcess. Depending on the type of data they deliver, these are ImageSource, PointSetSource and SurfaceSource. All of these mark the start of a pipeline.
 

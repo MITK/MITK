@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include <cv.h>
 #include <mitkCommon.h>
-#include <mitkVector.h>
+#include <mitkNumericTypes.h>
 #include <mitkNavigationData.h>
 #include <tinyxml.h>
 #include <sstream>

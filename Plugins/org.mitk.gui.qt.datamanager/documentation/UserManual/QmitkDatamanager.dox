@@ -2,7 +2,7 @@
 
 \page org_mitk_views_datamanager The DataManager
 
-\image html QmitkDatamanager_Icon.png "Icon of the Module"
+\imageMacro{QmitkDatamanager_Icon.png,"Icon of the Data Manager",2.00}
 
 \tableofcontents
 
@@ -12,7 +12,7 @@ The Datamanager is the central componenent to manage medical data like images, s
 After loading one or more data into the Datamanager the data are shown in the four-view window, the so called Standard View.
 The user can now start working on the data by just clicking  into the standard view or by using the MITK-modules such as "Segmentation" or "Basic Image Processing".
 
-\image html QmitkDatamanager_Overview.png "How MITK looks when started"
+\imageMacro{QmitkDatamanager_Overview.png,"How MITK looks when started",16.00}
 
 
 \section QmitkDataManagerLoading Loading Data
@@ -39,7 +39,7 @@ Data-Elements can also be sorted hierarchically as a parent-child-relation.
 For example after using the Segmentation-Module on Data-Element1 the result is created as Data-Element2, which is a child of Data-Element1 (see Screenshot1).
 The order can be changed by drag and drop.
 
-\image html QmitkDatamanager_ParentChild.png "Screenshot1"
+\imageMacro{QmitkDatamanager_ParentChild.png,"Screenshot1",9.61}
 
 The listed Data-Elements are shown in the standard view.
 Here the user can scale or rotate the medical objects or he can change the cutting planes of the object by just using the mouse inside this view.
@@ -78,8 +78,8 @@ There are different types of representations how to show the Data-Element inside
 <li> Global reinit updates all windows to contain all the current data. Reinit updates a single data item fits the windows to contain this data item.
 </ul>
 
-\image html QmitkDatamanager_ImageProperties.png "Screenshot2: Properties for images"
-\image html QmitkDatamanager_SurfaceProperties.png "Screenshot3: Properties for surfaces"
+\imageMacro{QmitkDatamanager_ImageProperties.png,"Screenshot2: Properties for images",10.56}
+\imageMacro{QmitkDatamanager_SurfaceProperties.png,"Screenshot3: Properties for surfaces",11.01}
 
 
 \subsection QmitkDataManagerPropertiesPreferences Preferences
@@ -87,12 +87,12 @@ There are different types of representations how to show the Data-Element inside
 For the datamanager there are already some default hotkeys like the del-key for deleting a Data-Element. The whole list is seen in Screenshot4.
 From here the Hotkeys can also be changed. The preference page is found in "Window"->"Preferences".
 
-\image html QmitkDatamanager_Preferences.png "Screenshot4"
+\imageMacro{QmitkDatamanager_Preferences.png,"Screenshot4",16.00}
 
 \section QmitkDataManagerPropertyList Property List
 
 The Property List displays all the properties the currently selected Data-Element has. Which properties these are depends on the Data-Element. Examples are opacity, shader, visibility. These properties can be changed by clicking on the appropriate field in the "value" column.
 
-\image html QmitkDatamanager_PropertyList.png "Screenshot5: Property List"
+\imageMacro{QmitkDatamanager_PropertyList.png,"Screenshot5: Property List",7.85}
 
 */

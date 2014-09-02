@@ -35,8 +35,14 @@ namespace itk {
 template< class TPixelType >
 NonLocalMeansDenoisingFilter< TPixelType >
 ::NonLocalMeansDenoisingFilter()
+  : m_SearchRadius(4),
+    m_ComparisonRadius(1),
+    m_UseJointInformation(false),
+    m_UseRicianAdaption(false),
+    m_Variance(1),
+    m_Mask(NULL)
 {
-  this->SetNumberOfRequiredInputs( 2 );
+  this->SetNumberOfRequiredInputs( 1 );
 }
 
 template< class TPixelType >
@@ -44,96 +50,73 @@ void
 NonLocalMeansDenoisingFilter< TPixelType >
 ::BeforeThreadedGenerateData()
 {
-  typename OutputImageType::Pointer outputImage =
-          static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
-  typename OutputImageType::PixelType px;
-  px.SetSize(1);
-  px.SetElement(0,0);
-  outputImage->FillBuffer(px);
 
-  typename InputImageType::Pointer inImage = static_cast< InputImageType* >(this->ProcessObject::GetInput(0));
-  typename MaskImageType::Pointer mask = static_cast< MaskImageType* >(this->ProcessObject::GetInput(1));
-  int size = inImage->GetVectorLength();
-  m_Deviations.SetSize(size);
-  typename ImageExtractorType::Pointer extractor = ImageExtractorType::New();
-  extractor->SetInput(inImage);
+  MITK_INFO << "SearchRadius: " << m_SearchRadius;
+  MITK_INFO << "ComparisonRadius: " << m_ComparisonRadius;
+  MITK_INFO << "Noisevariance: " << m_Variance;
+  MITK_INFO << "Use Rician Adaption: " << std::boolalpha << m_UseRicianAdaption;
+  MITK_INFO << "Use Joint Information: " << std::boolalpha << m_UseJointInformation;
 
-  // calculate max value of mask, for correct inversion
-  typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
-  statisticsFilter->SetInput(mask);
-  statisticsFilter->Update();
 
-  // invert mask, to mask the backround
-  typename InvertImageFilterType::Pointer inverter = InvertImageFilterType::New();
-  inverter->SetInput(mask);
-  inverter->SetMaximum(statisticsFilter->GetMaximum());
-  inverter->Update();
-
-  // make sure inverted mask has same origin is the brainmask
-  typename ChangeInformationType::Pointer changeMaskFilter = ChangeInformationType::New();
-  changeMaskFilter->ChangeOriginOn();
-  changeMaskFilter->SetInput(inverter->GetOutput());
-  changeMaskFilter->SetOutputOrigin(mask->GetOrigin());
-  changeMaskFilter->Update();
-  typename MaskImageType::Pointer invertedMask = changeMaskFilter->GetOutput();
-  typename MaskImageType::PointType imageOrigin = inImage->GetOrigin();
-  typename MaskImageType::PointType maskOrigin = invertedMask->GetOrigin();
-  long offset[3];
-
-  typedef itk::ContinuousIndex<double, 3> ContinousIndexType;
-  ContinousIndexType maskOriginContinousIndex, imageOriginContinousIndex;
-
-  inImage->TransformPhysicalPointToContinuousIndex(maskOrigin, maskOriginContinousIndex);
-  inImage->TransformPhysicalPointToContinuousIndex(imageOrigin, imageOriginContinousIndex);
-
-  // make sure there is no misalignment between mask and image
-  for ( unsigned int i = 0; i < 3; ++i )
+  typename InputImageType::Pointer inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
+  if (m_Mask.IsNull())
   {
-    double misalignment = maskOriginContinousIndex[i] - floor( maskOriginContinousIndex[i] + 0.5 );
-    if ( fabs( misalignment ) > mitk::eps )
+    // If no mask is used generate a mask of the complete image
+
+    m_Mask = MaskImageType::New();
+    m_Mask->SetRegions(inputImagePointer->GetLargestPossibleRegion());
+    m_Mask->Allocate();
+    m_Mask->FillBuffer(1);
+  }
+  else
+  {
+    // Calculation of the smallest masked region
+
+    typename OutputImageType::Pointer outputImage =
+            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+    ImageRegionIterator< OutputImageType > oit(outputImage, inputImagePointer->GetLargestPossibleRegion());
+    oit.GoToBegin();
+    ImageRegionIterator< MaskImageType > mit(m_Mask, m_Mask->GetLargestPossibleRegion());
+    mit.GoToBegin();
+    typename MaskImageType::IndexType minIndex;
+    typename MaskImageType::IndexType maxIndex;
+    minIndex.Fill(10000);
+    maxIndex.Fill(0);
+    typename OutputImageType::PixelType outpix;
+    outpix.SetSize(inputImagePointer->GetVectorLength());
+    outpix.Fill(0);
+    while (!mit.IsAtEnd())
     {
-        itkExceptionMacro( << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << misalignment << ")" );
+
+      if (mit.Get())
+      {
+        // calculation of the start & end index of the smallest masked region
+        minIndex[0] = minIndex[0] < mit.GetIndex()[0] ? minIndex[0] : mit.GetIndex()[0];
+        minIndex[1] = minIndex[1] < mit.GetIndex()[1] ? minIndex[1] : mit.GetIndex()[1];
+        minIndex[2] = minIndex[2] < mit.GetIndex()[2] ? minIndex[2] : mit.GetIndex()[2];
+
+        maxIndex[0] = maxIndex[0] > mit.GetIndex()[0] ? maxIndex[0] : mit.GetIndex()[0];
+        maxIndex[1] = maxIndex[1] > mit.GetIndex()[1] ? maxIndex[1] : mit.GetIndex()[1];
+        maxIndex[2] = maxIndex[2] > mit.GetIndex()[2] ? maxIndex[2] : mit.GetIndex()[2];
+      }
+      else
+      {
+        oit.Set(outpix);
+      }
+      ++mit;
+      ++oit;
     }
 
-    double indexCoordDistance = maskOriginContinousIndex[i] - imageOriginContinousIndex[i];
-    offset[i] = (int) indexCoordDistance + inImage->GetBufferedRegion().GetIndex()[i];
-  }
 
-  // calculate for each channel the stddev
-  for ( int i = 0; i < size; ++i)
-  {
-    /// extract channel i of the input
-    extractor->SetIndex(i);
-    extractor->Update();
+    // calculation of the masked region
+    typename OutputImageType::SizeType size;
+    size[0] = maxIndex[0] - minIndex[0] + 1;
+    size[1] = maxIndex[1] - minIndex[1] + 1;
+    size[2] = maxIndex[2] - minIndex[2] + 1;
 
-    // adapt mask to the image
-    typename ChangeInformationType::Pointer adaptMaskFilter;
-    adaptMaskFilter = ChangeInformationType::New();
-    adaptMaskFilter->ChangeOriginOn();
-    adaptMaskFilter->ChangeRegionOn();
-    adaptMaskFilter->SetInput( invertedMask );
-    adaptMaskFilter->SetOutputOrigin( extractor->GetOutput()->GetOrigin() /*image->GetOrigin()*/ );
-    adaptMaskFilter->SetOutputOffset( offset );
-    adaptMaskFilter->Update();
+    typename OutputImageType::RegionType region (minIndex, size);
 
-    // extract backround as the ROI
-    typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput();
-    typename ExtractImageFilterType::Pointer extractImageFilter = ExtractImageFilterType::New();
-    extractImageFilter->SetInput( extractor->GetOutput() );
-    extractImageFilter->SetExtractionRegion( adaptedMaskImage->GetBufferedRegion() );
-    extractImageFilter->Update();
-
-    // calculate statistics of ROI
-    typename MaskImageType::Pointer adaptedImage = extractImageFilter->GetOutput();
-    typename LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
-    labelStatisticsFilter->SetInput(adaptedImage);
-    labelStatisticsFilter->SetLabelInput(adaptedMaskImage);
-    labelStatisticsFilter->UseHistogramsOff();
-    labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
-    labelStatisticsFilter->Update();
-
-    // save the stddev of each channel
-    m_Deviations.SetElement(i, labelStatisticsFilter->GetSigma(1));
+    outputImage->SetRequestedRegion(region);
   }
 
   m_CurrentVoxelCount = 0;
@@ -144,6 +127,8 @@ void
 NonLocalMeansDenoisingFilter< TPixelType >
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
+
+
   // initialize iterators
   typename OutputImageType::Pointer outputImage =
           static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
@@ -151,158 +136,240 @@ NonLocalMeansDenoisingFilter< TPixelType >
   ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
   oit.GoToBegin();
 
+  ImageRegionIterator< MaskImageType > mit(m_Mask, outputRegionForThread);
+  mit.GoToBegin();
+
+
+
   typedef ImageRegionIteratorWithIndex <InputImageType> InputIteratorType;
   typename InputImageType::Pointer inputImagePointer = NULL;
   inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
   InputIteratorType git(inputImagePointer, outputRegionForThread );
-  InputIteratorType njit(inputImagePointer, outputRegionForThread );
-  InputIteratorType niit(inputImagePointer, outputRegionForThread );
-  InputIteratorType hit(inputImagePointer, outputRegionForThread);
   git.GoToBegin();
 
   // iterate over complete image region
   while( !git.IsAtEnd() )
   {
-
-
     typename OutputImageType::PixelType outpix;
     outpix.SetSize (inputImagePointer->GetVectorLength());
 
-    for (int i = 0; i < (int)inputImagePointer->GetVectorLength(); ++i)
+    if (mit.Get() != 0 && !this->GetAbortGenerateData())
     {
-      double Z = 0;
-      double sumj = 0;
-      double w = 0;
-      double deviation = m_Deviations.GetElement(i);
-      std::vector<double> wj;
-      std::vector<double> p;
-
-      for (int x = git.GetIndex().GetElement(0) - m_SearchRadius; x <= git.GetIndex().GetElement(0) + m_SearchRadius; ++x)
+      if(!m_UseJointInformation)
       {
-        for (int y = git.GetIndex().GetElement(1) - m_SearchRadius; y <= git.GetIndex().GetElement(1) + m_SearchRadius; ++y)
+        for (int i = 0; i < (int)inputImagePointer->GetVectorLength(); ++i)
         {
-          for (int z = git.GetIndex().GetElement(2) - m_SearchRadius; z <= git.GetIndex().GetElement(2) + m_SearchRadius; ++z)
+          double summw = 0;
+          double sumj = 0;
+          double w = 0;
+          std::vector<double> wj;
+          std::vector<double> p;
+          typename InputIteratorType::IndexType index;
+          index = git.GetIndex();
+
+          for (int x = index.GetElement(0) - m_SearchRadius; x <= index.GetElement(0) + m_SearchRadius; ++x)
           {
-            typename InputIteratorType::IndexType idx;
-            idx.SetElement(0, x);
-            idx.SetElement(1, y);
-            idx.SetElement(2, z);
-            if (inputImagePointer->GetLargestPossibleRegion().IsInside(idx))
+            for (int y = index.GetElement(1) - m_SearchRadius; y <= index.GetElement(1) + m_SearchRadius; ++y)
             {
-              hit.SetIndex(idx);
-              TPixelType pixelJ = hit.Get()[i];
-              double sumk = 0;
-              double size = 0;
-              for (int xi = git.GetIndex().GetElement(0) - m_ComparisonRadius, xj = hit.GetIndex().GetElement(0) - m_ComparisonRadius; xi <= git.GetIndex().GetElement(0) + m_ComparisonRadius; ++xi, ++xj)
+              for (int z = index.GetElement(2) - m_SearchRadius; z <= index.GetElement(2) + m_SearchRadius; ++z)
               {
-                for (int yi = git.GetIndex().GetElement(1) - m_ComparisonRadius, yj = hit.GetIndex().GetElement(1) - m_ComparisonRadius; yi <= git.GetIndex().GetElement(1) + m_ComparisonRadius; ++yi, ++yj)
+                typename InputIteratorType::IndexType indexV;
+                indexV.SetElement(0, x);
+                indexV.SetElement(1, y);
+                indexV.SetElement(2, z);
+                if (inputImagePointer->GetLargestPossibleRegion().IsInside(indexV))
                 {
-                  for (int zi = git.GetIndex().GetElement(2) - m_ComparisonRadius, zj = hit.GetIndex().GetElement(2) - m_ComparisonRadius; zi <= git.GetIndex().GetElement(2) + m_ComparisonRadius; ++zi, ++zj)
+                  TPixelType pixelJ = inputImagePointer->GetPixel(indexV)[i];
+                  double sumk = 0;
+                  double size = 0;
+                  for (int xi = index.GetElement(0) - m_ComparisonRadius, xj = x - m_ComparisonRadius; xi <= index.GetElement(0) + m_ComparisonRadius; ++xi, ++xj)
                   {
-                    typename InputIteratorType::IndexType indexI, indexJ;
-                    indexI.SetElement(0, xi);
-                    indexI.SetElement(1, yi);
-                    indexI.SetElement(2, zi);
-                    indexJ.SetElement(0, xj);
-                    indexJ.SetElement(1, yj);
-                    indexJ.SetElement(2, zj);
-                    // Count amount of used neighbors
-                    if (inputImagePointer->GetLargestPossibleRegion().IsInside(indexI) && inputImagePointer->GetLargestPossibleRegion().IsInside(indexJ))
+                    for (int yi = index.GetElement(1) - m_ComparisonRadius, yj = y - m_ComparisonRadius; yi <= index.GetElement(1) + m_ComparisonRadius; ++yi, ++yj)
                     {
-                      if (m_UseJointInformation)
+                      for (int zi = index.GetElement(2) - m_ComparisonRadius, zj = z - m_ComparisonRadius; zi <= index.GetElement(2) + m_ComparisonRadius; ++zi, ++zj)
                       {
-                        for (int d = i - m_ChannelRadius; d <= i + m_ChannelRadius; ++d)
+                        typename InputIteratorType::IndexType indexI, indexJ;
+                        indexI.SetElement(0, xi);
+                        indexI.SetElement(1, yi);
+                        indexI.SetElement(2, zi);
+                        indexJ.SetElement(0, xj);
+                        indexJ.SetElement(1, yj);
+                        indexJ.SetElement(2, zj);
+
+
+                        // Compare neighborhoods ni & nj
+                        if (inputImagePointer->GetLargestPossibleRegion().IsInside(indexI) && inputImagePointer->GetLargestPossibleRegion().IsInside(indexJ))
                         {
-                          if (d >= 0 && d < (int)inputImagePointer->GetVectorLength())
-                          {
-                            size++;
-                          }
+                          int diff = inputImagePointer->GetPixel(indexI)[i] - inputImagePointer->GetPixel(indexJ)[i];
+                          sumk += (double)(diff*diff);
+                          ++size;
                         }
                       }
-                      else
+                    }
+                  }
+                  // weight all neighborhoods
+                  w = std::exp( - sumk / size / m_Variance);
+                  wj.push_back(w);
+                  if (m_UseRicianAdaption)
+                  {
+                    p.push_back((double)(pixelJ*pixelJ));
+                  }
+                  else
+                  {
+                    p.push_back((double)(pixelJ));
+                  }
+                  summw += w;
+                }
+              }
+            }
+          }
+          for (unsigned int n = 0; n < wj.size(); ++n)
+          {
+            sumj += (wj[n]/summw) * p[n];
+          }
+          if (m_UseRicianAdaption)
+          {
+            sumj -=2 * m_Variance;
+          }
+
+          if (sumj < 0)
+          {
+            sumj = 0;
+          }
+
+          TPixelType outval;
+          if (m_UseRicianAdaption)
+          {
+            outval = std::floor(std::sqrt(sumj) + 0.5);
+          }
+          else
+          {
+            outval = std::floor(sumj + 0.5);
+          }
+          outpix.SetElement(i, outval);
+        }
+      }
+
+      else
+      {
+        // same procedure for vektoranalysis
+
+        double Z = 0;
+        itk::VariableLengthVector<double> sumj;
+        sumj.SetSize(inputImagePointer->GetVectorLength());
+        sumj.Fill(0.0);
+        double w = 0;
+        std::vector<double> wj;
+        std::vector<itk::VariableLengthVector <double> > p;
+        typename InputIteratorType::IndexType index;
+        index = git.GetIndex();
+
+        for (int x = index.GetElement(0) - m_SearchRadius; x <= index.GetElement(0) + m_SearchRadius; ++x)
+        {
+          for (int y = index.GetElement(1) - m_SearchRadius; y <= index.GetElement(1) + m_SearchRadius; ++y)
+          {
+            for (int z = index.GetElement(2) - m_SearchRadius; z <= index.GetElement(2) + m_SearchRadius; ++z)
+            {
+              typename InputIteratorType::IndexType indexV;
+              indexV.SetElement(0, x);
+              indexV.SetElement(1, y);
+              indexV.SetElement(2, z);
+              if (inputImagePointer->GetLargestPossibleRegion().IsInside(indexV))
+              {
+                typename InputImageType::PixelType pixelJ = inputImagePointer->GetPixel(indexV);
+                double sumk = 0;
+                double size = 0;
+                for (int xi = index.GetElement(0) - m_ComparisonRadius, xj = x - m_ComparisonRadius; xi <= index.GetElement(0) + m_ComparisonRadius; ++xi, ++xj)
+                {
+                  for (int yi = index.GetElement(1) - m_ComparisonRadius, yj = y - m_ComparisonRadius; yi <= index.GetElement(1) + m_ComparisonRadius; ++yi, ++yj)
+                  {
+                    for (int zi = index.GetElement(2) - m_ComparisonRadius, zj = z - m_ComparisonRadius; zi <= index.GetElement(2) + m_ComparisonRadius; ++zi, ++zj)
+                    {
+                      typename InputIteratorType::IndexType indexI, indexJ;
+                      indexI.SetElement(0, xi);
+                      indexI.SetElement(1, yi);
+                      indexI.SetElement(2, zi);
+                      indexJ.SetElement(0, xj);
+                      indexJ.SetElement(1, yj);
+                      indexJ.SetElement(2, zj);
+                      // Compare neighborhoods ni & nj
+                      if (inputImagePointer->GetLargestPossibleRegion().IsInside(indexI) && inputImagePointer->GetLargestPossibleRegion().IsInside(indexJ))
                       {
-                        size++;
+                        typename InputImageType::PixelType diff = inputImagePointer->GetPixel(indexI) - inputImagePointer->GetPixel(indexJ);
+                        sumk += (double)(diff.GetSquaredNorm());
+                        ++size;
                       }
                     }
                   }
                 }
-              }
-              for (int xi = git.GetIndex().GetElement(0) - m_ComparisonRadius, xj = hit.GetIndex().GetElement(0) - m_ComparisonRadius; xi <= git.GetIndex().GetElement(0) + m_ComparisonRadius; ++xi, ++xj)
-              {
-                for (int yi = git.GetIndex().GetElement(1) - m_ComparisonRadius, yj = hit.GetIndex().GetElement(1) - m_ComparisonRadius; yi <= git.GetIndex().GetElement(1) + m_ComparisonRadius; ++yi, ++yj)
+                // weight all neighborhoods
+                size *= inputImagePointer->GetVectorLength() + 1;
+                w = std::exp( - (sumk / size) / m_Variance);
+                wj.push_back(w);
+                if (m_UseRicianAdaption)
                 {
-                  for (int zi = git.GetIndex().GetElement(2) - m_ComparisonRadius, zj = hit.GetIndex().GetElement(2) - m_ComparisonRadius; zi <= git.GetIndex().GetElement(2) + m_ComparisonRadius; ++zi, ++zj)
+                  itk::VariableLengthVector <double> m;
+                  m.SetSize(inputImagePointer->GetVectorLength());
+                  for (unsigned int i = 0; i < inputImagePointer->GetVectorLength(); ++i)
                   {
-                    typename InputIteratorType::IndexType indexI, indexJ;
-                    indexI.SetElement(0, xi);
-                    indexI.SetElement(1, yi);
-                    indexI.SetElement(2, zi);
-                    indexJ.SetElement(0, xj);
-                    indexJ.SetElement(1, yj);
-                    indexJ.SetElement(2, zj);
-                    // Compare neighborhoods ni & nj
-                    if (inputImagePointer->GetLargestPossibleRegion().IsInside(indexI) && inputImagePointer->GetLargestPossibleRegion().IsInside(indexJ))
-                    {
-                      niit.SetIndex(indexI);
-                      njit.SetIndex(indexJ);
-                      if (m_UseJointInformation)
-                      {
-                        // if filter should use joint information. A 4d Neighborhood including surrounding channels is used.
-                        for (int d = i - m_ChannelRadius; d <= i + m_ChannelRadius; ++d)
-                        {
-                          if (d >= 0 && d < (int)inputImagePointer->GetVectorLength())
-                          {
-                            int diff = niit.Get()[d] - njit.Get()[d];
-                            sumk += (double)(diff*diff);
-                          }
-                        }
-                      }
-                      else
-                      {
-                        int diff = niit.Get()[i] - njit.Get()[i];
-                        sumk += (double)(diff*diff);
-                      }
-                    }
+                    double sp = (double)(pixelJ.GetElement(i) * pixelJ.GetElement(i));
+                    m.SetElement(i,sp);
                   }
+                  p.push_back(m);
                 }
+                else
+                  ++size;
+                {
+                  p.push_back(pixelJ);
+                }
+                Z += w;
               }
-              // weight all neighborhoods
-              w = std::exp( - (std::sqrt((sumk / size)) / (deviation * deviation)));
-              wj.push_back(w);
-              p.push_back((double)(pixelJ*pixelJ));
-              Z += w;
             }
           }
         }
-      }
-      for (unsigned int n = 0; n < wj.size(); ++n)
-      {
-        sumj += (wj[n]/Z) * p[n];
-      }
-      double df = sumj - (2 * deviation * deviation);
-      if (df < 0)
-      {
-        df = 0;
-      }
+        for (unsigned int n = 0; n < wj.size(); ++n)
+        {
+          sumj = sumj + ((wj[n]/Z) * p[n]);
+        }
+        if (m_UseRicianAdaption)
+        {
+          sumj = sumj - (2 * m_Variance);
+        }
 
-      TPixelType outval = std::floor(std::sqrt(df) + 0.5);
-      outpix.SetElement(i, outval);
+        for (unsigned int i = 0; i < inputImagePointer->GetVectorLength(); ++i)
+        {
+          double a = sumj.GetElement(i);
+          if (a < 0)
+          {
+            a = 0;
+          }
+          TPixelType outval;
+          if (m_UseRicianAdaption)
+          {
+            outval = std::floor(std::sqrt(a) + 0.5);
+          }
+          else
+          {
+            outval = std::floor(a + 0.5);
+          }
+          outpix.SetElement(i, outval);
+        }
+      }
+    }
+    else
+    {
+      outpix.Fill(0);
     }
 
     oit.Set(outpix);
     ++oit;
     ++m_CurrentVoxelCount;
     ++git;
+    ++mit;
   }
 
   MITK_INFO << "One Thread finished calculation";
-}
-
-template< class TPixelType >
-void NonLocalMeansDenoisingFilter< TPixelType >::PrintSelf(std::ostream& os, Indent indent) const
-{
-  Superclass::PrintSelf(os,indent);
 }
 
 template< class TPixelType >
@@ -312,9 +379,9 @@ void NonLocalMeansDenoisingFilter< TPixelType >::SetInputImage(const InputImageT
 }
 
 template< class TPixelType >
-void NonLocalMeansDenoisingFilter< TPixelType >::SetInputMask(const MaskImageType* mask)
+void NonLocalMeansDenoisingFilter< TPixelType >::SetInputMask(MaskImageType* mask)
 {
-  this->SetNthInput(1, const_cast< MaskImageType* >(mask));
+  m_Mask = mask;
 }
 }
 

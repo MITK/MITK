@@ -31,7 +31,7 @@ The following sequence diagram gives an exemplary overview of the process from c
 This diagram assumes the usage of the Qt framework, but also shows that the interaction concept itself is implemented independent of any specific
 graphical user interface toolkit.
 
-\image html event_handling.png
+\imageMacro{event_handling.png,"",16}
 <ol>
   <li>a user event is triggered and send to MITK
   <li>this layer serves as an adapter from the GUI toolkit (here Qt) events to MITK internal events (later referred to as \link mitk::InteractionEvent InteractionEvents\endlink).
@@ -123,11 +123,12 @@ One DataInteractor can be re-used for different tasks by simply exchanging the s
 
 \subsubsection DataInteractionPage_DefinitionStateMachine Definition of a State Machine
 
-The definition is made up out of three components.
+The definition is made up out of four components.
 <ul>
     <li> States - represent the current status of the interaction
     <li> Transitions - describe the events needed to change from one state to another
-    <li> Actions - are executed, when a transition is taken
+    <li> Conditions - are executed, before a transition is taken 
+    <li> Actions - are executed, when a transition is taken and conditions for that transition have passed
 </ul>
 
 Each state machine needs exactly one designated start state into which the state machine is set in the beginning.
@@ -138,6 +139,7 @@ An example of a state machine describing the interaction of example 2 looks like
 <statemachine>
     <state name="StartState" startstate="true" >
         <transition event_class="MousePressEvent" event_variant="MousePress" target="StartState">
+            <condition name="CheckPoint"/>
             <action name="AddPoint"/>
         </transition>
         <transition event_class="InternalEvent" event_variant="PointsMatch" target="ClosedContour">

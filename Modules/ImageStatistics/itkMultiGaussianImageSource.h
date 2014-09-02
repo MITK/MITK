@@ -253,14 +253,14 @@ public:
   /** Set the number of gaussian function. */
   virtual void SetNumberOfGausssians( unsigned int );
   /** Set/Get the radius of the sphere. */
-  virtual const RadiusType GetRadius() const;
+  virtual RadiusType GetRadius() const;
   virtual void  SetRadius( RadiusType  radius );
   /** Get the maximal mean value in a sphere over all possible spheres with midpoint in the image. */
   virtual const OutputImagePixelType GetMaxMeanValue() const;
   /** Get the index of the midpoint of a sphere with the maximal mean value.*/
   virtual const IndexType GetSphereMidpoint() const;
   /** Calculates the value of the multigaussian function at a Point given by its coordinates [x, y, z]. */
-  virtual const double MultiGaussianFunctionValueAtPoint(double , double, double);
+  virtual double MultiGaussianFunctionValueAtPoint(double , double, double);
   /** Adds a multigaussian defined by the parameter: CenterX, CenterY, CenterZ, SigmaX, SigmaY, SigmaZ, Altitude.
    All parameters should have the same size, which determinates the number of the gaussian added. */
   virtual void AddGaussian( VectorType centerX, VectorType centerY, VectorType centerZ, VectorType sigmaX, VectorType sigmaY, VectorType sigmaZ, VectorType altitude);

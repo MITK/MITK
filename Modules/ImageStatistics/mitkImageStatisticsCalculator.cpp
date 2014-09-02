@@ -1076,9 +1076,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   // Calculate histogram
   unsigned int numberOfBins = 200;
   if (m_UseDefaultBinSize)
-      m_HistogramBinSize = std::ceil( (statistics.Max - statistics.Min + 1)/numberOfBins );
+      m_HistogramBinSize = std::ceil( (statistics.GetMax() - statistics.GetMin() + 1)/numberOfBins );
   else
-    numberOfBins = std::floor( ( (statistics.Max - statistics.Min + 1) / m_HistogramBinSize) + 0.5 );
+    numberOfBins = std::floor( ( (statistics.GetMax() - statistics.GetMin() + 1) / m_HistogramBinSize) + 0.5 );
 
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );
@@ -1318,9 +1318,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       // restrict image to mask area for min/max index calculation
       typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
       typename MaskImageFilterType::Pointer masker = MaskImageFilterType::New();
-      bool isMinAndMaxSameValue = (statistics.Min == statistics.Max);
+      bool isMinAndMaxSameValue = (statistics.GetMin() == statistics.GetMax());
       // bug 17962: following is a workaround for the case when min and max are the same, we can probably find a nicer way here
-      double outsideValue = (isMinAndMaxSameValue ? (statistics.Max/2) : (statistics.Min+statistics.Max)/2);
+      double outsideValue = (isMinAndMaxSameValue ? (statistics.GetMax()/2) : (statistics.GetMin()+statistics.GetMax())/2);
       masker->SetOutsideValue( outsideValue );
       masker->SetInput1(adaptedImage);
       masker->SetInput2(adaptedMaskImage);

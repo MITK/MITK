@@ -227,34 +227,18 @@ public:
     mitkSetGetConstMacro(MaxIndex, vnl_vector<int>)
     mitkSetGetConstMacro(HotspotIndex, vnl_vector<int>)
 
-  public:
-
-    // this section is all deprecated. Get/Set methods should be used
-
-    // \deprecated Public member Label is deprecated. Use get-/set-functions instead
-    DEPRECATED(unsigned int Label);
-    // \deprecated Public member N is deprecated. Use get-/set-functions instead
-    DEPRECATED(unsigned int N);
-    // \deprecated Public member Min is deprecated. Use get-/set-functions instead
-    DEPRECATED(double Min);
-    // \deprecated Public member Max is deprecated. Use get-/set-functions instead
-    DEPRECATED(double Max);
-    // \deprecated Public member Mean is deprecated. Use get-/set-functions instead
-    DEPRECATED(double Mean);
-    // \deprecated Public member Median is deprecated. Use get-/set-functions instead
-    DEPRECATED(double Median);
-    // \deprecated Public member Variance is deprecated. Use get-/set-functions instead
-    DEPRECATED(double Variance);
-    // \deprecated Public member Sigma is deprecated. Use get-/set-functions instead
-    DEPRECATED(double Sigma);
-    // \deprecated Public member RMS is deprecated. Use get-/set-functions instead
-    DEPRECATED(double RMS);
-    // \deprecated Public member MinIndex is deprecated. Use get-/set-functions instead
-    DEPRECATED(vnl_vector<int> MinIndex);
-    // \deprecated Public member MaxIndex is deprecated. Use get-/set-functions instead
-    DEPRECATED(vnl_vector<int> MaxIndex);
-
   private:
+   unsigned int Label;
+   unsigned int N;
+   double Min;
+   double Max;
+   double Mean;
+   double Median;
+   double Variance;
+   double Sigma;
+   double RMS;
+   vnl_vector<int> MinIndex;
+   vnl_vector<int> MaxIndex;
 
    Statistics* m_HotspotStatistics;
 
@@ -314,7 +298,7 @@ public:
 
   /** \brief Get bin size for histogram resolution.*/
   unsigned int GetHistogramBinSize();
-  
+
   /** \brief Sets the radius for the hotspot */
   void SetHotspotRadiusInMM (double hotspotRadiusInMM);
 

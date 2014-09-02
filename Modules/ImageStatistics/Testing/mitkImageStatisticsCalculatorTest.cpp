@@ -387,13 +387,13 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatistics( mitk::Image::Pointer 
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(const mitk::ImageStatisticsCalculator::Statistics& stats,
                                                               double testMean, double testSD)
 {
-  int tmpMean = stats.Mean * 100;
+  int tmpMean = stats.GetMean() * 100;
   double calculatedMean = tmpMean / 100.0;
   MITK_TEST_CONDITION( calculatedMean == testMean,
                        "Calculated mean grayvalue '" << calculatedMean <<
                        "'  is equal to the desired value '" << testMean << "'" );
 
-  int tmpSD = stats.Sigma * 100;
+  int tmpSD = stats.GetSigma() * 100;
   double calculatedSD = tmpSD / 100.0;
   MITK_TEST_CONDITION( calculatedSD == testSD,
                        "Calculated grayvalue sd '" << calculatedSD <<

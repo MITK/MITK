@@ -322,7 +322,7 @@ struct mitkImageStatisticsHotspotTestClass
       result.m_MinIndexZ.set_size(result.m_NumberOfLabels);
       result.m_Label.set_size(result.m_NumberOfLabels);
 
-      for(int i = 0; i < rois.size(); ++i)
+      for(unsigned int i = 0; i < rois.size(); ++i)
       {
         result.m_MaxIndexX[i] = GetIntegerAttribute(rois[i], "maximumIndexX");
         result.m_MinIndexX[i] = GetIntegerAttribute(rois[i], "minimumIndexX");
@@ -358,7 +358,7 @@ struct mitkImageStatisticsHotspotTestClass
       result.m_HotspotIndexY.set_size(statistics.size());
       result.m_HotspotIndexZ.set_size(statistics.size());
 
-      for(int i = 0; i < statistics.size(); ++i)
+      for(unsigned int i = 0; i < statistics.size(); ++i)
       {
         result.m_HotspotMin[i] = GetDoubleAttribute(statistics[i], "minimum");
         result.m_HotspotMax[i] = GetDoubleAttribute(statistics[i], "maximum");
@@ -376,13 +376,13 @@ struct mitkImageStatisticsHotspotTestClass
         result.m_HotspotIndexY[i] = GetIntegerAttribute(statistics[i], "hotspotIndexY");
         result.m_HotspotIndexZ[i] = GetIntegerAttribute(statistics[i], "hotspotIndexZ");
       }
-
-      return result;
     }
     catch (std::exception& e)
     {
       MITK_TEST_CONDITION_REQUIRED(false, "Reading test parameters from XML file. Error message: " << e.what());
     }
+
+    return result;
   }
 
   /**
@@ -423,7 +423,7 @@ struct mitkImageStatisticsHotspotTestClass
 
     ImageType::SpacingType spacing;
 
-    for(int i = 0; i < Dimension; ++i)
+    for(unsigned int i = 0; i < Dimension; ++i)
       spacing[i] = testParameters.m_Spacing[i];
 
     gaussianGenerator->SetSize( size );
@@ -467,7 +467,7 @@ struct mitkImageStatisticsHotspotTestClass
       (testParameters.m_MaxIndexY[label] > testParameters.m_MinIndexY[label] && testParameters.m_MinIndexY[label] >= 0) &&
       (testParameters.m_MaxIndexZ[label] > testParameters.m_MinIndexZ[label] && testParameters.m_MinIndexZ[label] >= 0))
     {
-      for(int i = 0; i < Dimension; ++i)
+      for(unsigned int i = 0; i < Dimension; ++i)
       {
         start[i] = 0;
         spacing[i] = testParameters.m_Spacing[i];
@@ -493,7 +493,7 @@ struct mitkImageStatisticsHotspotTestClass
         maskIt.Set(0);
       }
 
-      for(int i = 0; i < testParameters.m_NumberOfLabels; ++i)
+      for(unsigned int i = 0; i < testParameters.m_NumberOfLabels; ++i)
       {
 
         for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)
@@ -607,7 +607,7 @@ int mitkImageStatisticsHotspotTest(int argc, char* argv[])
       mitk::Image::Pointer image = mitkImageStatisticsHotspotTestClass::BuildTestImage(parameters);
       MITK_TEST_CONDITION_REQUIRED( image.IsNotNull(), "Generate test image" );
 
-      for(int label = 0; label < parameters.m_NumberOfLabels; ++label)
+      for(unsigned int label = 0; label < parameters.m_NumberOfLabels; ++label)
       {
         mitk::ImageStatisticsCalculator::Statistics statistics = mitkImageStatisticsHotspotTestClass::CalculateStatistics(image, parameters, label);
 

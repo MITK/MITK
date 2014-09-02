@@ -229,7 +229,7 @@ namespace itk
   }
   //-----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
-  const typename MultiGaussianImageSource< TOutputImage >::RadiusType
+  typename MultiGaussianImageSource< TOutputImage >::RadiusType
     MultiGaussianImageSource< TOutputImage >
     ::GetRadius() const
   {
@@ -481,16 +481,16 @@ namespace itk
 
       // size is in index coordinate -> multiply by the spacing -> global coordinate of the image boundary
       // yz Plane
-      bool yzPlaneAtOriginCrossXSection      = xMin <= m_Origin[0] && xMax >= m_Origin[0];
-      bool yzPlaneAtImageBorderCrossXSection = xMin <= m_Size[0] * m_Spacing[0] && xMax >= m_Size[0] * m_Spacing[0];
+//      bool yzPlaneAtOriginCrossXSection      = xMin <= m_Origin[0] && xMax >= m_Origin[0];
+//      bool yzPlaneAtImageBorderCrossXSection = xMin <= m_Size[0] * m_Spacing[0] && xMax >= m_Size[0] * m_Spacing[0];
       bool yzPlaneNotCrossYSection           = xMin >= m_Origin[0] && xMax <= m_Size[0] * m_Spacing[0];
       // xz Plane
-      bool xzPlaneAtOriginCrossYSection      = yMin <= m_Origin[1] && yMax >= m_Origin[1];
-      bool xzPlaneAtImageBorderCrossYSection = yMin <= m_Size[1] * m_Spacing[1]   && yMax >= m_Size[1] * m_Spacing[1];
+//      bool xzPlaneAtOriginCrossYSection      = yMin <= m_Origin[1] && yMax >= m_Origin[1];
+//      bool xzPlaneAtImageBorderCrossYSection = yMin <= m_Size[1] * m_Spacing[1]   && yMax >= m_Size[1] * m_Spacing[1];
       bool xzPlaneNotCrossYSection           = yMin >= m_Origin[1] && yMax <= m_Size[1] * m_Spacing[1];
       // xy Plane
-      bool xyPlaneAtOriginCrossZSection      = zMin <= m_Origin[2] && zMax >= m_Origin[2];
-      bool xyPlaneAtImageBorderCrossZSection = zMin <= m_Size[2] * m_Spacing[2]   && zMax >= m_Size[2] * m_Spacing[2];
+//      bool xyPlaneAtOriginCrossZSection      = zMin <= m_Origin[2] && zMax >= m_Origin[2];
+//      bool xyPlaneAtImageBorderCrossZSection = zMin <= m_Size[2] * m_Spacing[2]   && zMax >= m_Size[2] * m_Spacing[2];
       bool xyPlaneNotCrossZSection           = zMin >= m_Origin[2] && zMax <= m_Size[2] * m_Spacing[2];
 
       if( yzPlaneNotCrossYSection && xzPlaneNotCrossYSection && xyPlaneNotCrossZSection)
@@ -608,9 +608,9 @@ namespace itk
     m_MeanValue = 0.0;
     double meanValueTemp;
     PointType midpoint;
-    typename MapContainerPoints::ElementIdentifier cuboidNumber = m_Midpoints.Size();
-   // SetNormalDistributionValues();
-    double radius;
+    //typename MapContainerPoints::ElementIdentifier cuboidNumber = m_Midpoints.Size();
+    // SetNormalDistributionValues();
+    //double radius;
     //double xMin, xMax, yMin, yMax, zMin, zMax;
 
     m_WriteMPS = 1;
@@ -693,13 +693,13 @@ namespace itk
 
   //----------------------------------------------------------------------------------------------------------------------
   template< class TOutputImage >
-  const double
+  double
     MultiGaussianImageSource< TOutputImage >
     ::MultiGaussianFunctionValueAtPoint(double x, double y, double z)
   {
     //this claculate the mean value in the voxel
     //integrate over the voxel with midpoint [x, y, z]
-    double summand0, summand1, summand2, power, value = 0.0, factor;
+    double summand0, summand1, summand2/*, power*/, value = 0.0, factor;
     double xMin, xMax, yMin, yMax, zMin, zMax, mean;
     mean = 0.0;
     // the for-loop represent  the sum of the gaussian function
@@ -840,7 +840,7 @@ namespace itk
     domPointSetFile -> AddChildAtBegin(domPointSet);
 
 
-    int cap = m_Midpoints.Size();
+    unsigned int cap = m_Midpoints.Size();
     for(unsigned int  iter = 0 ; iter < cap; ++iter)
     {
       domPoint =  itk::DOMNode::New();
@@ -904,18 +904,19 @@ namespace itk
     MultiGaussianImageSource< TOutputImage >::OutputImagePixelType value;
     m_MaxValueInSphere = std::numeric_limits<OutputImagePixelType>::min();
     m_MinValueInSphere = std::numeric_limits<OutputImagePixelType>::max();
-    int radInt;
+    unsigned int radInt, sizeRegion;
     OutputImageRegionType  cuboidRegion;
     IndexType indexR;
     SizeType sizeR;
-    int indexRegion, sizeRegion;
+    int indexRegion, originAsIndex;
     for( unsigned int i = 0; i < 3; ++i )
     {
       radInt = static_cast<int>(m_Radius/m_Spacing[i]);
       indexRegion =  m_SphereMidpoint[i] - radInt;
-      if( m_Origin[i] > indexRegion )
+      originAsIndex = static_cast<int>(m_Origin[i]/m_Spacing[i]);
+      if( originAsIndex > indexRegion )
       {
-        indexR.SetElement(i, m_Origin[i] );
+        indexR.SetElement(i, originAsIndex );
       }
       else
       {
@@ -923,7 +924,8 @@ namespace itk
       }
 
       sizeRegion = 2 *radInt + 1;
-      if(indexR[i] + sizeRegion > m_Size[i])
+      int sizeOutputImage = m_Size[i];
+      if( (indexR[i] + sizeRegion) > (originAsIndex + sizeOutputImage) )
       {
         std::cout << "Not the entire sphere is in the image!" << std::endl;
         sizeR.SetElement(i,  m_Size[i] - indexRegion );
@@ -932,7 +934,6 @@ namespace itk
       {
         sizeR.SetElement(i,  sizeRegion );
       }
-
     }
     cuboidRegion.SetIndex(indexR);
     cuboidRegion.SetSize(sizeR);
@@ -969,10 +970,14 @@ namespace itk
     MultiGaussianImageSource< TOutputImage >
     ::IsInImage(IndexType index)
   {
-    bool isInImage = 0;
-    if(index[0] >= m_Origin[0] && index[0] <= m_Size[0] && index[1] >= m_Origin[1] && index[1] <= m_Size[1] && index[2] >= m_Origin[2] && index[2] <= m_Size[2])
+    bool isInImage = true;
+    int originAsIndex;
+    for( unsigned int i = 0; i < 3; ++i )
     {
-      isInImage = 1;
+      originAsIndex = static_cast<int>(m_Origin[i]/m_Spacing[i]);
+      int sizeOfOutputImage = m_Size[i];
+      if( index[i] < originAsIndex || index[i] > (originAsIndex + sizeOfOutputImage) )
+        return false;
     }
     return isInImage;
   }

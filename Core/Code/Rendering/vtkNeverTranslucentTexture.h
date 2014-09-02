@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 /* NOT exported, this is a 2D image mapper helper */
 
-class vtkNeverTranslucentTexture : public vtkOpenGLTexture
+class MITK_CORE_EXPORT vtkNeverTranslucentTexture : public vtkOpenGLTexture
 {
 public:
 

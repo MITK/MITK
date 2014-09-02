@@ -6,6 +6,7 @@ set(CPP_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
   IODataStructures/FiberBundleX/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
+  IODataStructures/mitkFiberfoxNoTemplateParameters.cpp
 
   # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
@@ -27,6 +28,7 @@ set(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
   IODataStructures/FiberBundleX/mitkTrackvis.h
   IODataStructures/mitkFiberfoxParameters.h
+  IODataStructures/mitkFiberfoxNoTemplateParameters.h
 
   # Algorithms
   Algorithms/itkTractDensityImageFilter.h

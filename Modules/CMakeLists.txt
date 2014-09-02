@@ -52,6 +52,7 @@ set(module_dirs
     Persistence
     IGTUI
     VtkShaders
+    XNAT
 )
 
 if(MITK_ENABLE_PIC_READER)

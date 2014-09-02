@@ -45,7 +45,7 @@ ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir)
     ScalarType bVal = g.GetNorm(); bVal *= bVal;
 
     if (bVal>0.0001)
-        signal = exp( -m_BValue * bVal * m_Diffusivity );
+        signal = std::exp( -m_BValue * bVal * m_Diffusivity );
     else
         signal = 1;
 
@@ -64,7 +64,7 @@ typename BallModel< ScalarType >::PixelType BallModel< ScalarType >::SimulateMea
         ScalarType bVal = g.GetNorm(); bVal *= bVal;
 
         if (bVal>0.0001)
-            signal[i] = exp( -m_BValue * bVal * m_Diffusivity );
+            signal[i] = std::exp( -m_BValue * bVal * m_Diffusivity );
         else
             signal[i] = 1;
     }

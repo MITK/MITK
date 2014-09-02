@@ -70,7 +70,7 @@ ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
                 dot = GetRandomDirection()*g;
             else
                 dot = m_Sticks[j]*g;
-            signal += exp( b*bVal*dot*dot );
+            signal += std::exp( b*bVal*dot*dot );
         }
         signal /= m_NumSticks;
     }
@@ -115,7 +115,7 @@ typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >:
                     dot = GetRandomDirection()*g;
                 else
                     dot = m_Sticks[j]*g;
-                signal[i] += exp( b*bVal*dot*dot );
+                signal[i] += std::exp( b*bVal*dot*dot );
             }
             signal[i] /= m_NumSticks;
         }

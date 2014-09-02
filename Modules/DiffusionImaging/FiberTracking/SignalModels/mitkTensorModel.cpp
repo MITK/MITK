@@ -74,7 +74,7 @@ ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 
         // check for corrupted tensor and generate signal
         if (D>=0)
-            signal = exp ( -m_BValue * bVal * D );
+            signal = std::exp ( -m_BValue * bVal * D );
     }
     else
         signal = 1;
@@ -119,7 +119,7 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
 
             // check for corrupted tensor and generate signal
             if (D>=0)
-                signal[i] = exp ( -m_BValue * bVal * D );
+                signal[i] = std::exp ( -m_BValue * bVal * D );
         }
         else
             signal[i] = 1;

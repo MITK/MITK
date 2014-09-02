@@ -29,7 +29,11 @@ namespace mitk
   //##Documentation
   //## @brief Interaction for mitk::Mesh: Connect existing points to lines
   //## @ingroup Interaction
-  class MitkExt_EXPORT ConnectPointsInteractor : public Interactor
+  /**
+  * \deprecatedSince{2014_03} mitk::ConnectPointsInteractor is deprecated. Needs to be updated to the new interaction-framework.
+  * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+  */
+  class DEPRECATED() MitkExt_EXPORT ConnectPointsInteractor : public Interactor
   {
   public:
     mitkClassMacro(ConnectPointsInteractor, Interactor);

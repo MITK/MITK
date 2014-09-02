@@ -113,7 +113,7 @@ set(H_FILES
   Algorithms/itkResampleDwiImageFilter.h
   Algorithms/itkDwiGradientLengthCorrectionFilter.h
   Algorithms/itkAdcImageFilter.h
-
+  Algorithms/itkDwiNormilzationFilter.h
   Algorithms/itkSplitDWImageFilter.h
 
   Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h

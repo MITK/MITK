@@ -65,6 +65,7 @@ bool ToFCameraMITKPlayerDevice::DisconnectCamera()
   if (ok)
   {
     m_CameraConnected = false;
+    m_PropertyList->Clear();
   }
   return ok;
 }

@@ -120,6 +120,28 @@ if(NOT DEFINED MITK_DOXYGEN_DOT_NUM_THREADS)
   set(MITK_DOXYGEN_DOT_NUM_THREADS 0)
 endif()
 
+# parse which plug-in documentation to activate
+set(USERS_GUIDE_PLUGINS )
+if( MITK_BUILD_ALL_PLUGINS )
+ list(APPEND USERS_GUIDE_PLUGINS ${MITK_SOURCE_DIR}/Plugins/xXREPLACEXx )
+else()
+ foreach(mitk_plugin ${plugin_symbolic_names})
+  if( MITK_BUILD_${mitk_plugin} )
+   # we want each line to end in " \" and each directory be on a separate line
+   list(APPEND USERS_GUIDE_PLUGINS ${MITK_SOURCE_DIR}/Plugins/${mitk_plugin}/xXREPLACEXx)
+  endif()
+ endforeach()
+endif()
+
+if( MITK_BUILD_EXAMPLES )
+ list(APPEND USERS_GUIDE_PLUGINS ${MITK_SOURCE_DIR}/Examples/Plugins/xXREPLACEXx )
+endif()
+
+set(temp_plugin_list )
+
+string(REGEX REPLACE ";" " \\n" temp_plugin_list ${USERS_GUIDE_PLUGINS} )
+string(REGEX REPLACE "xXREPLACEXx" " \\\\ " USERS_GUIDE_PLUGINS ${temp_plugin_list} )
+
 # create output directories for the guides
 file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Users_Guide/)
 file(MAKE_DIRECTORY ${MITK_DOXYGEN_OUTPUT_DIR}/Guides/Developers_Guide/)

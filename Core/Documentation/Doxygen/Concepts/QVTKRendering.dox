@@ -8,7 +8,7 @@ The MITK rendering pipeline is derived from the VTK rendering pipeline.
 
 \section QVTKRendering_Pipeline_VTK VTK Rendering Pipeline
 
-\imageMacro{RenderingOverviewVTK.png,"Rendering in VTK",16}
+\imageMacro{RenderingOverviewVTK.png,"Rendering in VTK",12}
 
 In VTK, the vtkRenderWindow coordinates the rendering process. Several vtkRenderers may be associated to one vtkRenderWindow.
 All visible objects, which can exist in a rendered scene (2D and 3D scene), inherit from vtkProp (or any subclass e.g. vtkActor).

@@ -149,6 +149,11 @@ namespace mitk {
     bool GetIsCalibratedForCurrentStatus();
 
     /**
+     * \return true if a calibration was loaded for at least one probe and depth
+     */
+    bool GetContainsAtLeastOneCalibration();
+
+    /**
     * \brief Remove this device from the micro service.
     * This method is public for mitk::USCombinedModality, because this devices
     * can be completly removed. This is not possible for API devices, which

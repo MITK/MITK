@@ -15,20 +15,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
-#define MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
+#ifndef _MITK_DOSE_VALUE_TYPE_H_
+#define _MITK_DOSE_VALUE_TYPE_H_
 
-#include <mitkNavigationDataSet.h>
+namespace mitk
+{
 
-namespace mitk {
-  class MitkIGT_EXPORT NavigationDataSetWriterCSV
-  {
-  public:
-     NavigationDataSetWriterCSV();
-    ~NavigationDataSetWriterCSV();
+/**
+  \brief Represents absolute dose values (in Gy).
+*/
+typedef double DoseValueAbs;
 
-    virtual void Write (std::string path, mitk::NavigationDataSet::Pointer );
-  };
-}
+/**
+\brief Represents relative dose values (in %).
+*/
+typedef double DoseValueRel;
 
-#endif // MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
+
+} // namespace mitk
+
+#endif //_MITK_DOSE_VALUE_TYPE_H_

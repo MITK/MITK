@@ -264,13 +264,13 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
     // number formatting)
     QString clipboard( "Mean \t StdDev \t RMS \t Max \t Min \t N \t V (mm³)\n" );
     clipboard = clipboard.append( "%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7" )
-      .arg( statistics[t].Mean, 0, 'f', 10 )
-      .arg( statistics[t].Sigma, 0, 'f', 10 )
-      .arg( statistics[t].RMS, 0, 'f', 10 )
-      .arg( statistics[t].Max, 0, 'f', 10 )
-      .arg( statistics[t].Min, 0, 'f', 10 )
-      .arg( statistics[t].N )
-        .arg( m_Controls->m_StatisticsTable->item( 0, 6 )->text().toDouble(), 0, 'f', 10 );
+      .arg( statistics.GetMean(), 0, 'f', 10 )
+      .arg( statistics.GetSigma(), 0, 'f', 10 )
+      .arg( statistics.GetRMS(), 0, 'f', 10 )
+      .arg( statistics.GetMax(), 0, 'f', 10 )
+      .arg( statistics.GetMin(), 0, 'f', 10 )
+      .arg( statistics.GetN() )
+      .arg( m_Controls->m_StatisticsTable->item( 0, 6 )->text().toDouble(), 0, 'f', 10 );
 
     QApplication::clipboard()->setText(
       clipboard, QClipboard::Clipboard );
@@ -773,14 +773,14 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     if (s[t].MaxIndex.size()==3)
     {
       mitk::Point3D index, max, min;
-      index[0] = s[t].MaxIndex[0];
-      index[1] = s[t].MaxIndex[1];
-      index[2] = s[t].MaxIndex[2];
+      index[0] = s[t].GetMaxIndex()[0];
+      index[1] = s[t].GetMaxIndex()[1];
+      index[2] = s[t].GetMaxIndex()[2];
       m_SelectedImage->GetGeometry()->IndexToWorld(index, max);
       this->m_WorldMaxList.push_back(max);
-      index[0] = s[t].MinIndex[0];
-      index[1] = s[t].MinIndex[1];
-      index[2] = s[t].MinIndex[2];
+      index[0] = s[t].GetMinIndex()[0];
+      index[1] = s[t].GetMinIndex()[1];
+      index[2] = s[t].GetMinIndex()[2];
       m_SelectedImage->GetGeometry()->IndexToWorld(index, min);
       this->m_WorldMinList.push_back(min);
     }
@@ -793,43 +793,43 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
       decimals = 5;
 
     this->m_Controls->m_StatisticsTable->setItem( 0, t, new QTableWidgetItem(
-      QString("%1").arg(s[t].Mean, 0, 'f', decimals) ) );
+      QString("%1").arg(s[t].GetMean(), 0, 'f', decimals) ) );
     this->m_Controls->m_StatisticsTable->setItem( 1, t, new QTableWidgetItem(
-      QString("%1").arg(s[t].Sigma, 0, 'f', decimals) ) );
+      QString("%1").arg(s[t].GetSigma(), 0, 'f', decimals) ) );
 
     this->m_Controls->m_StatisticsTable->setItem( 2, t, new QTableWidgetItem(
-      QString("%1").arg(s[t].RMS, 0, 'f', decimals) ) );
+      QString("%1").arg(s[t].GetRMS(), 0, 'f', decimals) ) );
 
     QString max; max.append(QString("%1").arg(s[t].Max, 0, 'f', decimals));
     max += " (";
-    for (int i=0; i<s[t].MaxIndex.size(); i++)
+    for (int i=0; i<s[t].GetMaxIndex().size(); i++)
     {
-      max += QString::number(s[t].MaxIndex[i]);
-      if (i<s[t].MaxIndex.size()-1)
+      max += QString::number(s[t].GetMaxIndex()[i]);
+      if (i<s[t].GetMaxIndex().size()-1)
         max += ",";
     }
     max += ")";
     this->m_Controls->m_StatisticsTable->setItem( 3, t, new QTableWidgetItem( max ) );
 
-    QString min; min.append(QString("%1").arg(s[t].Min, 0, 'f', decimals));
+    QString min; min.append(QString("%1").arg(s[t].GetMin(), 0, 'f', decimals));
     min += " (";
-    for (int i=0; i<s[t].MinIndex.size(); i++)
+    for (int i=0; i<s[t].GetMinIndex().size(); i++)
     {
-      min += QString::number(s[t].MinIndex[i]);
-      if (i<s[t].MinIndex.size()-1)
+      min += QString::number(s[t].GetMinIndex()[i]);
+      if (i<s[t].GetMinIndex().size()-1)
         min += ",";
     }
     min += ")";
     this->m_Controls->m_StatisticsTable->setItem( 4, t, new QTableWidgetItem( min ) );
 
     this->m_Controls->m_StatisticsTable->setItem( 5, t, new QTableWidgetItem(
-      QString("%1").arg(s[t].N) ) );
+      QString("%1").arg(s[t].GetN()) ) );
 
     const mitk::BaseGeometry *geometry = image->GetGeometry();
     if ( geometry != NULL )
     {
       const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
-      double volume = spacing[0] * spacing[1] * spacing[2] * (double) s[t].N;
+      double volume = spacing[0] * spacing[1] * spacing[2] * (double) s[t].GetN();
       this->m_Controls->m_StatisticsTable->setItem( 6, t, new QTableWidgetItem(
         QString("%1").arg(volume, 0, 'f', decimals) ) );
     }
@@ -857,6 +857,44 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   mitk::SliceNavigationController::GeometryTimeEvent timeEvent(this->m_SelectedImage->GetTimeGeometry(),
     timestep);
   this->OnTimeChanged(timeEvent);
+
+  QString hotspotMean; hotspotMean.append(QString("%1").arg(s[t].GetHotspotMean(), 0, 'f', decimals));
+    hotspotMean += " (";
+    for (int i=0; i<s[t].GetHotspotIndex().size(); i++)
+    {
+        hotspotMean += QString::number(s[t].GetHotspotIndex()[i]);
+        if (i<s[t].GetHotspotIndex().size()-1)
+            hotspotMean += ",";
+    }
+    hotspotMean += ")";
+
+  this->m_Controls->m_StatisticsTable->setItem( 7, t, new QTableWidgetItem( hotspotMean ) );
+
+
+  QString hotspotMax; hotspotMax.append(QString("%1").arg(s[t].GetHotspotMax(), 0, 'f', decimals));
+    hotspotMax += " (";
+    for (int i=0; i<s[t].GetHotspotMaxIndex().size(); i++)
+    {
+        hotspotMax += QString::number(s[t].GetHotspotMaxIndex()[i]);
+        if (i<s[t].GetHotspotMaxIndex().size()-1)
+            hotspotMax += ",";
+    }
+    hotspotMax += ")";
+
+  this->m_Controls->m_StatisticsTable->setItem( 8, t, new QTableWidgetItem( hotspotMax ) );
+
+
+  QString hotspotMin; hotspotMin.append(QString("%1").arg(s[t].GetHotspotMin(), 0, 'f', decimals));
+    hotspotMin += " (";
+    for (int i=0; i<s[t].GetHotspotMinIndex().size(); i++)
+    {
+        hotspotMin += QString::number(s[t].GetHotspotMinIndex()[i]);
+        if (i<s[t].GetHotspotMinIndex().size()-1)
+            hotspotMin += ",";
+    }
+    hotspotMin += ")";
+
+  this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem( hotspotMin ) );
 }
 
 void QmitkImageStatisticsView::InvalidateStatisticsTableView()

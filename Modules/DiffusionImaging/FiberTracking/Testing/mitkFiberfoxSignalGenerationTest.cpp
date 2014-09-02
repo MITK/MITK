@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleX.h>
 #include <itkTractsToDWIImageFilter.h>
 #include <mitkFiberfoxParameters.h>
+#include <mitkFiberfoxNoTemplateParameters.h>
 #include <mitkFiberBundleXReader.h>
 #include <mitkStickModel.h>
 #include <mitkTensorModel.h>

@@ -86,8 +86,9 @@ bool QmitkXnatEditor::IsSaveAsAllowed() const
 
 void QmitkXnatEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
 {
-  this->SetInput(input);
   this->SetSite(site);
+  berry::QtEditorPart::SetInput(input);
+  this->SetInput(input);
 }
 
 void QmitkXnatEditor::DoSave()
@@ -100,31 +101,11 @@ void QmitkXnatEditor::DoSaveAs()
 
 void QmitkXnatEditor::SetInput(berry::IEditorInput::Pointer input)
 {
-  // If the input is not a QmitkXnatObjectEditorInput the semi global xnat session will be loaded.
   QmitkXnatObjectEditorInput::Pointer oPtr = input.Cast<QmitkXnatObjectEditorInput>();
   if(oPtr.IsNotNull())
   {
-    SetInputWithNotify(oPtr);
+    berry::QtEditorPart::SetInput(oPtr);
     this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
-  }
-  else
-  {
-    // Get the XNAT Session from Activator
-    m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
-
-    if(m_Session == 0)
-    {
-      QMessageBox::critical(QApplication::activeWindow(), "Error",
-        "Please check the Preferences of XNAT. Maybe they are not ok.\nClose the tab 'XNAT Editor' and start it again.");
-      MITK_INFO << "Please check your XNAT Connection Preferences!";
-    }
-    else
-    {
-      QmitkXnatObjectEditorInput::Pointer xoPtr = QmitkXnatObjectEditorInput::New( m_Session->dataModel() );
-      berry::IEditorInput::Pointer editorInput( xoPtr );
-      SetInputWithNotify(editorInput);
-      this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
-    }
   }
 }
 
@@ -134,11 +115,8 @@ void QmitkXnatEditor::SetFocus()
 
 void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
 {
-  if(m_Session != 0) return;
-
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  m_Controls.treeView->setModel(m_ListModel);
 
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
 
@@ -165,7 +143,15 @@ void QmitkXnatEditor::CreateQtPartControl( QWidget *parent )
     QLayoutItem* child = m_Controls.breadcrumbDescriptionLayout->itemAt(i);
     child->widget()->setVisible(false);
   }
-  UpdateList();
+  QmitkXnatObjectEditorInput::Pointer oPtr = GetEditorInput().Cast<QmitkXnatObjectEditorInput>();
+  if(oPtr.IsNotNull())
+  {
+    UpdateList();
+  }
+  else
+  {
+    UpdateSession();
+  }
 }
 
 void QmitkXnatEditor::UpdateList()
@@ -176,6 +162,8 @@ void QmitkXnatEditor::UpdateList()
   ctkXnatObject* inputObject = xoPtr->GetXnatObject();
   if( inputObject == NULL )
     return;
+
+  m_Controls.treeView->setModel(m_ListModel);
   m_ListModel->setRootObject( inputObject );
   m_Controls.treeView->reset();
 
@@ -211,12 +199,13 @@ void QmitkXnatEditor::UpdateList()
     {
       parent = inputObject;
     }
-    // make breadcrumb button
+    // create breadcrumb button
     QPushButton* breadcrumbButton = dynamic_cast<QPushButton*>(child->widget());
     breadcrumbButton->setText(parent->id());
     parent = parent->parent();
     i--;
   }
+  m_Controls.buttonDataModel->setText("root");
 }
 
 void QmitkXnatEditor::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
@@ -308,7 +297,7 @@ void QmitkXnatEditor::ToHigherLevel()
   }
   QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( parent );
   berry::IEditorInput::Pointer editorInput( oPtr );
-  SetInput(editorInput);
+  this->SetInput(editorInput);
   UpdateList();
 }
 
@@ -342,7 +331,7 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
       // Updates the root item
       QmitkXnatObjectEditorInput::Pointer oPtr = QmitkXnatObjectEditorInput::New( child );
       berry::IEditorInput::Pointer editorInput( oPtr );
-      SetInput(editorInput);
+      this->SetInput(editorInput);
 
       this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
 
@@ -450,4 +439,44 @@ void QmitkXnatEditor::OnResourceButtonClicked()
   {
     ToHigherLevel();
   }
+}
+
+void QmitkXnatEditor::UpdateSession()
+{
+  GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener);
+
+  if(m_Session != 0 && m_Session->isOpen())
+  {
+    m_ListModel->setRootObject(NULL);
+    m_Controls.treeView->reset();
+  }
+
+  // Get the XNAT Session from Activator
+  m_Session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->GetXnatSession();
+
+  if(m_Session != NULL)
+  {
+    m_Controls.labelInfo->setText("Current Position:");
+    m_Controls.labelInfo->setStyleSheet("QLabel { color: black; }");
+    m_Controls.buttonDownloadFile->setEnabled(true);
+    m_Controls.buttonDownloadResource->setEnabled(true);
+
+    connect( this->m_Session, SIGNAL(aboutToBeClosed()), this, SLOT(UpdateSession()) );
+
+    // Fill model and show in the GUI
+    QmitkXnatObjectEditorInput::Pointer xoPtr = QmitkXnatObjectEditorInput::New( m_Session->dataModel() );
+    berry::IEditorInput::Pointer editorInput( xoPtr );
+    this->SetInput(editorInput);
+    this->GetEditorInput().Cast<QmitkXnatObjectEditorInput>()->GetXnatObject()->fetch();
+    UpdateList();
+  }
+  else
+  {
+    m_Controls.labelInfo->setText("Please check the Preferences of the XNAT Connection.\nMaybe they are not ok. Close and reopen the tab.");
+    m_Controls.labelInfo->setStyleSheet("QLabel { color: red; }");
+    m_Controls.buttonDownloadFile->setEnabled(false);
+    m_Controls.buttonDownloadResource->setEnabled(false);
+  }
+
+  GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
 }

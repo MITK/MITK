@@ -97,6 +97,9 @@ public:
     void OnSessionButtonClicked();
     void OnResourceButtonClicked();
 
+    /// \brief Updates the ctkXnatSession and the user interface
+    void UpdateSession();
+
 protected:
 
   virtual void SetFocus();

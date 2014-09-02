@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsCalculator.h"
 #include "itkMultiGaussianImageSource.h"
 #include "mitkTestingMacros.h"
+#include "mitkImageCast.h"
 
 #include <itkImageRegionIterator.h>
 

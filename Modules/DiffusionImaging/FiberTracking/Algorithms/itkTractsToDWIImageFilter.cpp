@@ -558,6 +558,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     maxVolume = 0;
 
     m_StatusText += "\n"+this->GetTime()+" > Generating " + boost::lexical_cast<std::string>(numFiberCompartments+numNonFiberCompartments) + "-compartment diffusion-weighted signal.\n";
+    MITK_INFO << "Generating " << numFiberCompartments+numNonFiberCompartments << "-compartment diffusion-weighted signal.";
     int numFibers = m_FiberBundle->GetNumFibers();
     boost::progress_display disp(numFibers*m_Parameters.m_SignalGen.GetNumVolumes());
 

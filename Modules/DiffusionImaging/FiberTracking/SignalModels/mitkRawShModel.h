@@ -80,6 +80,9 @@ public:
     unsigned int GetShOrder(){ return m_ShOrder; }
     int GetModelIndex(){ return m_ModelIndex; }
 
+    double GetBaselineSignal(int index){ return m_B0Signal.at(index); }
+    vnl_vector< double > GetCoefficients(int index){ return m_ShCoefficients.at(index); }
+
 protected:
 
     void Cart2Sph( GradientListType gradients );

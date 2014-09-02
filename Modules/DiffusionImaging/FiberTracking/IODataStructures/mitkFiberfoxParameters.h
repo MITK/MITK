@@ -39,7 +39,7 @@ using namespace std;
 namespace mitk {
 
 /** Signal generation */
-class SignalGenerationParameters
+class MitkFiberTracking_EXPORT SignalGenerationParameters
 {
 public:
     typedef itk::Image<double, 3>                   ItkDoubleImgType;
@@ -144,7 +144,7 @@ protected:
 };
 
 /** Fiber generation */
-class FiberGenerationParameters
+class MitkFiberTracking_EXPORT FiberGenerationParameters
 {
 public:
 
@@ -185,7 +185,7 @@ public:
 };
 
 /** GUI persistence, input, output, ... */
-class MiscFiberfoxParameters
+class MitkFiberTracking_EXPORT MiscFiberfoxParameters
 {
 public:
     MiscFiberfoxParameters()
@@ -236,7 +236,7 @@ public:
   *
   */
 template< class ScalarType = double >
-class FiberfoxParameters
+class MitkFiberTracking_EXPORT FiberfoxParameters
 {
 public:
 

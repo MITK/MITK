@@ -118,7 +118,7 @@ unsigned int mitk::SignalGenerationParameters::GetNumVolumes()
     return m_GradientDirections.size();
 }
 
-typename mitk::SignalGenerationParameters::GradientListType mitk::SignalGenerationParameters::GetGradientDirections()
+mitk::SignalGenerationParameters::GradientListType mitk::SignalGenerationParameters::GetGradientDirections()
 {
     return m_GradientDirections;
 }
@@ -217,6 +217,13 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
     parameters.put("fiberfox.image.basic.direction.8", m_SignalGen.m_ImageDirection[2][1]);
     parameters.put("fiberfox.image.basic.direction.9", m_SignalGen.m_ImageDirection[2][2]);
     parameters.put("fiberfox.image.basic.numgradients", m_SignalGen.GetNumWeightedVolumes());
+    for( unsigned int i=0; i<this->m_SignalGen.GetNumVolumes(); i++)
+    {
+        parameters.put("fiberfox.image.gradients."+boost::lexical_cast<string>(i)+".x", m_SignalGen.GetGradientDirection(i)[0]);
+        parameters.put("fiberfox.image.gradients."+boost::lexical_cast<string>(i)+".y", m_SignalGen.GetGradientDirection(i)[1]);
+        parameters.put("fiberfox.image.gradients."+boost::lexical_cast<string>(i)+".z", m_SignalGen.GetGradientDirection(i)[2]);
+    }
+
     parameters.put("fiberfox.image.signalScale", m_SignalGen.m_SignalScale);
     parameters.put("fiberfox.image.tEcho", m_SignalGen.m_tEcho);
     parameters.put("fiberfox.image.tLine", m_SignalGen.m_tLine);
@@ -329,49 +336,45 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
         {
             parameters.put("fiberfox.image.compartments."+boost::lexical_cast<string>(i)+".ID", signalModel->m_CompartmentId);
 
-//            if (signalModel->GetVolumeFractionImage().IsNotNull())
-//            {
-//                try{
-//                    itk::ImageFileWriter<ItkDoubleImgType>::Pointer writer = itk::ImageFileWriter<ItkDoubleImgType>::New();
-//                    writer->SetFileName(filename+"_VOLUME"+boost::lexical_cast<string>(signalModel->m_CompartmentId)+".nrrd");
-//                    writer->SetInput(signalModel->GetVolumeFractionImage());
-//                    writer->Update();
-//                    MITK_INFO << "Volume fraction image for compartment "+boost::lexical_cast<string>(signalModel->m_CompartmentId)+" saved.";
-//                }
-//                catch(...)
-//                {
-//                }
-//            }
+            if (signalModel->GetVolumeFractionImage().IsNotNull())
+            {
+                try{
+                    itk::ImageFileWriter<ItkDoubleImgType>::Pointer writer = itk::ImageFileWriter<ItkDoubleImgType>::New();
+                    writer->SetFileName(filename+"_VOLUME"+boost::lexical_cast<string>(signalModel->m_CompartmentId)+".nrrd");
+                    writer->SetInput(signalModel->GetVolumeFractionImage());
+                    writer->Update();
+                    MITK_INFO << "Volume fraction image for compartment "+boost::lexical_cast<string>(signalModel->m_CompartmentId)+" saved.";
+                }
+                catch(...)
+                {
+                }
+            }
         }
     }
 
     boost::property_tree::xml_writer_settings<char> writerSettings(' ', 2);
     boost::property_tree::xml_parser::write_xml(filename, parameters, std::locale(), writerSettings);
 
-//    if (m_SignalGen.m_DoAddDistortions)
-//    {
-//        try{
-//            itk::ImageFileWriter<ItkDoubleImgType>::Pointer writer = itk::ImageFileWriter<ItkDoubleImgType>::New();
-//            writer->SetFileName(filename+"_FMAP.nrrd");
-//            writer->SetInput(m_SignalGen.m_FrequencyMap);
-//            writer->Update();
-//        }
-//        catch(...)
-//        {
-//            MITK_INFO << "No frequency map saved.";
-//        }
-//    }
-
-//    try{
-//        itk::ImageFileWriter<ItkUcharImgType>::Pointer writer = itk::ImageFileWriter<ItkUcharImgType>::New();
-//        writer->SetFileName(filename+"_MASK.nrrd");
-//        writer->SetInput(m_SignalGen.m_MaskImage);
-//        writer->Update();
-//    }
-//    catch(...)
-//    {
-//        MITK_INFO << "No mask image saved.";
-//    }
+    try{
+        itk::ImageFileWriter<ItkDoubleImgType>::Pointer writer = itk::ImageFileWriter<ItkDoubleImgType>::New();
+        writer->SetFileName(filename+"_FMAP.nrrd");
+        writer->SetInput(m_SignalGen.m_FrequencyMap);
+        writer->Update();
+    }
+    catch(...)
+    {
+        MITK_INFO << "No frequency map saved.";
+    }
+    try{
+        itk::ImageFileWriter<ItkUcharImgType>::Pointer writer = itk::ImageFileWriter<ItkUcharImgType>::New();
+        writer->SetFileName(filename+"_MASK.nrrd");
+        writer->SetInput(m_SignalGen.m_MaskImage);
+        writer->Update();
+    }
+    catch(...)
+    {
+        MITK_INFO << "No mask image saved.";
+    }
 }
 
 template< class ScalarType >
@@ -497,7 +500,17 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_SignalGen.m_Rotation[0] = v1.second.get<double>("artifacts.rotation0", m_SignalGen.m_Rotation[0]);
             m_SignalGen.m_Rotation[1] = v1.second.get<double>("artifacts.rotation1", m_SignalGen.m_Rotation[1]);
             m_SignalGen.m_Rotation[2] = v1.second.get<double>("artifacts.rotation2", m_SignalGen.m_Rotation[2]);
-            m_SignalGen.SetNumWeightedVolumes(v1.second.get<unsigned int>("numgradients", m_SignalGen.GetNumWeightedVolumes()));
+//            m_SignalGen.SetNumWeightedVolumes(v1.second.get<unsigned int>("numgradients", m_SignalGen.GetNumWeightedVolumes()));
+            SignalGenerationParameters::GradientListType gradients;
+            BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second.get_child("gradients") )
+            {
+                SignalGenerationParameters::GradientType g;
+                g[0] = v2.second.get<double>("x");
+                g[1] = v2.second.get<double>("y");
+                g[2] = v2.second.get<double>("z");
+                gradients.push_back(g);
+            }
+            m_SignalGen.SetGradienDirections(gradients);
 
             try
             {
@@ -517,7 +530,6 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 }
             }
             catch(...){ }
-
 
             BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second.get_child("compartments") )
             {
@@ -609,46 +621,44 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
                 }
                 catch (...) { }
 
-//                if (signalModel!=NULL)
-//                {
-//                    try{
-//                        itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
-//                        reader->SetFileName(filename+"_VOLUME"+v2.second.get<string>("ID")+".nrrd");
-//                        reader->Update();
-//                        signalModel->SetVolumeFractionImage(reader->GetOutput());
-//                    }
-//                    catch(...)
-//                    {
-//                    }
-//                }
+                if (signalModel!=NULL)
+                {
+                    signalModel->SetGradientList(gradients);
+                    try{
+                        itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
+                        reader->SetFileName(filename+"_VOLUME"+v2.second.get<string>("ID")+".nrrd");
+                        reader->Update();
+                        signalModel->SetVolumeFractionImage(reader->GetOutput());
+                    }
+                    catch(...)
+                    {
+                    }
+                }
             }
         }
     }
 
-//    if (m_SignalGen.m_DoAddDistortions)
-//    {
-//        try{
-//            itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
-//            reader->SetFileName(filename+"_FMAP.nrrd");
-//            reader->Update();
-//            m_SignalGen.m_FrequencyMap = reader->GetOutput();
-//        }
-//        catch(...)
-//        {
-//            MITK_INFO << "No frequency map saved.";
-//        }
-//    }
+    try{
+        itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
+        reader->SetFileName(filename+"_FMAP.nrrd");
+        reader->Update();
+        m_SignalGen.m_FrequencyMap = reader->GetOutput();
+    }
+    catch(...)
+    {
+        MITK_INFO << "No frequency map saved.";
+    }
 
-//    try{
-//        itk::ImageFileReader<ItkUcharImgType>::Pointer reader = itk::ImageFileReader<ItkUcharImgType>::New();
-//        reader->SetFileName(filename+"_MASK.nrrd");
-//        reader->Update();
-//        m_SignalGen.m_MaskImage = reader->GetOutput();
-//    }
-//    catch(...)
-//    {
-//        MITK_INFO << "No mask image saved.";
-//    }
+    try{
+        itk::ImageFileReader<ItkUcharImgType>::Pointer reader = itk::ImageFileReader<ItkUcharImgType>::New();
+        reader->SetFileName(filename+"_MASK.nrrd");
+        reader->Update();
+        m_SignalGen.m_MaskImage = reader->GetOutput();
+    }
+    catch(...)
+    {
+        MITK_INFO << "No mask image saved.";
+    }
 }
 
 template< class ScalarType >

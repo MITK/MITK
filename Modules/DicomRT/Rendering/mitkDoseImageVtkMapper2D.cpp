@@ -829,9 +829,9 @@ vtkSmartPointer<vtkPolyData> mitk::DoseImageVtkMapper2D::CreateOutlinePolyData(m
   colors->SetName("Colors");
 
   float pref;
-  this->GetDataNode()->GetFloatProperty(mitk::rt::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+  this->GetDataNode()->GetFloatProperty(mitk::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
 
-  mitk::IsoDoseLevelSetProperty::Pointer propIsoSet = dynamic_cast<mitk::IsoDoseLevelSetProperty* >(GetDataNode()->GetProperty(mitk::rt::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str()));
+  mitk::IsoDoseLevelSetProperty::Pointer propIsoSet = dynamic_cast<mitk::IsoDoseLevelSetProperty* >(GetDataNode()->GetProperty(mitk::Constants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str()));
   mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = propIsoSet->GetValue();
 
   for(mitk::IsoDoseLevelSet::ConstIterator doseIT = isoDoseLevelSet->Begin(); doseIT!=isoDoseLevelSet->End();++doseIT)

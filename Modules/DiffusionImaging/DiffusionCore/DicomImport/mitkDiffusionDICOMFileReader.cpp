@@ -205,15 +205,15 @@ void mitk::DiffusionDICOMFileReader
       // retrieve both vendor and image type
       std::string vendor = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_vendor );
       std::string image_type = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_imagetype );
-      MITK_INFO("diffusion.dicomreader") << "Output " << outputidx+1 << "Got vendor: " << vendor << " image type " << image_type;
+      MITK_INFO("diffusion.dicomreader") << "Output " << outputidx+1 << "  Got vendor: " << vendor << " image type " << image_type;
 
        mitk::DiffusionHeaderDICOMFileReader::Pointer headerReader;
 
        bool isMosaic = false;
 
       // parse vendor tag
-      if(    vendor.find("SIEMENS") != std::string::npos )
-          //&& image_type.find("DIFFUSION") != std::string::npos )
+      if(    vendor.find("SIEMENS") != std::string::npos
+          && image_type.find("DIFFUSION") != std::string::npos )
       {
         if( image_type.find("MOSAIC") != std::string::npos )
         {

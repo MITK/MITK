@@ -167,10 +167,10 @@ int DICOMLoader(int argc, char* argv[])
 {
   ctkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("inputdir", "i", ctkCommandLineParser::String, "input directory containing dicom files", us::Any(), false);
-  parser.addArgument("output", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
-  parser.addArgument("dwprefix", "p", ctkCommandLineParser::String, "prefix for subfolders search rootdir is specified by the 'inputdir' argument value", us::Any(), true);
-  parser.addArgument("dryrun", "-s", ctkCommandLineParser::Bool, "do not read, only look for input files ", us::Any(), true );
+  parser.addArgument("inputdir", "i", ctkCommandLineParser::String, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
+  parser.addArgument("output", "o", ctkCommandLineParser::String, "Output File Name", "output file", us::Any(), false);
+  parser.addArgument("dwprefix", "p", ctkCommandLineParser::String, "Recursive Scan Prefix", "prefix for subfolders search rootdir is specified by the 'inputdir' argument value", us::Any(), true);
+  parser.addArgument("dryrun", "-s", ctkCommandLineParser::Bool, "Dry run","do not read, only look for input files ", us::Any(), true );
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)

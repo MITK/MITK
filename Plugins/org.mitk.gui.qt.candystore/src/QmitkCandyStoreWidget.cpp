@@ -549,10 +549,10 @@ bool QmitkCandyStoreWidget::FillTreeList()
 void QmitkCandyStoreWidget::FilterChanged()
 {
     QString filterString = m_Controls.lineEdit->text();
-    if (filterString.size() > 0 )
-        m_Controls.m_PluginTreeView->expandAll();
-    else
-        m_Controls.m_PluginTreeView->collapseAll();
+//    if (filterString.size() > 0 )
+    m_Controls.m_PluginTreeView->expandAll();
+//    else
+//        m_Controls.m_PluginTreeView->collapseAll();
     //    QRegExp::PatternSyntax syntax = QRegExp::RegExp;
 
     Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive;

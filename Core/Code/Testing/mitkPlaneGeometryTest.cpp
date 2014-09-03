@@ -43,6 +43,7 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestInheritance);
   MITK_TEST(TestSetExtendInMM);
   MITK_TEST(TestRotate);
+  MITK_TEST(testCloneSimple);
 
   // Currently commented out, see See bug 15990
   // MITK_TEST(testPlaneGeometryInitializeOrder);
@@ -468,6 +469,7 @@ public:
     mitk::FillVector3D(normal,         0,          0, thicknessInMM);
 
     planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+    planegeometry->SetOrigin(origin);
 
     std::cout << "Changing the IndexToWorldTransform to a rotated version by SetIndexToWorldTransform() (keep origin): "<<std::endl;
     mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
@@ -542,6 +544,46 @@ public:
       mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2), testEps));
 
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
+  }
+
+  void testCloneSimple()
+  {
+    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+
+    mitk::Point3D origin;
+    mitk::Vector3D right, bottom, normal;
+    mitk::ScalarType width, height;
+    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
+    width  = 100;    widthInMM  = width;
+    height = 200;    heightInMM = height;
+    thicknessInMM = 1;
+    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
+    mitk::FillVector3D(right,  widthInMM,          0, 0);
+    mitk::FillVector3D(bottom,         0, heightInMM, 0);
+    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
+
+    planegeometry->SetOrigin(origin);
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+
+    mitk::PlaneGeometry::Pointer clonedplanegeometry = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
+    // Cave: Statement below is negated!
+    CPPUNIT_ASSERT_MESSAGE("Testing Clone(): ", ! ((clonedplanegeometry.IsNull()) || (clonedplanegeometry->GetReferenceCount()!=1)));
+    CPPUNIT_ASSERT_MESSAGE("Testing origin of cloned version: ", mitk::Equal(clonedplanegeometry->GetOrigin(), origin, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing width (in units) of cloned version: ", mitk::Equal(clonedplanegeometry->GetExtent(0),width, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing height (in units) of cloned version: ", mitk::Equal(clonedplanegeometry->GetExtent(1),height, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing extent (in units) of cloned version: ", mitk::Equal(clonedplanegeometry->GetExtent(2),1, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing width (in mm) of cloned version: ", mitk::Equal(clonedplanegeometry->GetExtentInMM(0), widthInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing height (in mm) of cloned version: ", mitk::Equal(clonedplanegeometry->GetExtentInMM(1), heightInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing thickness (in mm) of cloned version: ", mitk::Equal(clonedplanegeometry->GetExtentInMM(2), thicknessInMM, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of cloned version: right", mitk::Equal(clonedplanegeometry->GetAxisVector(0), right, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of cloned version: bottom", mitk::Equal(clonedplanegeometry->GetAxisVector(1), bottom, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of cloned version: normal", mitk::Equal(clonedplanegeometry->GetAxisVector(2), normal, testEps));
+
+    mappingTests2D(clonedplanegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
   }
 
   int mitkPlaneGeometryTest()
@@ -793,7 +835,6 @@ public:
 
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
 
-    // BIS HIER
     // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     std::cout << "Testing Clone(): ";
@@ -841,6 +882,9 @@ public:
     std::cout<<"[PASSED]"<<std::endl;
 
     mappingTests2D(clonedplanegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
+
+    // BIS HIER
+    // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     // Clone, move, rotate and test for 'IsParallel' and 'IsOnPlane'
     std::cout << "Testing Clone(): ";

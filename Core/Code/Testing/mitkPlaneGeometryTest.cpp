@@ -45,6 +45,7 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestRotate);
   MITK_TEST(testCloneSimple);
   MITK_TEST(testPlaneComparison);
+  MITK_TEST(testAxialInitialization);
   MITK_TEST(wrapper);
 
   // Currently commented out, see See bug 15990
@@ -589,6 +590,65 @@ public:
   }
 
   void wrapper(){
+    //CPPUNIT_ASSERT(testAxialInitialization() == 0);
+  }
+
+  void testAxialInitialization()
+  {
+    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+
+    mitk::Point3D origin;
+    mitk::Vector3D right, bottom, normal;
+    mitk::ScalarType width, height;
+    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
+    width  = 100;    widthInMM  = width;
+    height = 200;    heightInMM = height;
+    thicknessInMM = 1;
+    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
+    mitk::FillVector3D(right,  widthInMM,          0, 0);
+    mitk::FillVector3D(bottom,         0, heightInMM, 0);
+    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
+
+    planegeometry->SetOrigin(origin);
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+
+    mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
+
+    // Clone, move, rotate and test for 'IsParallel' and 'IsOnPlane'
+    mitk::PlaneGeometry::Pointer clonedplanegeometry = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
+
+    CPPUNIT_ASSERT_MESSAGE("Testing Clone(): ", ! ((clonedplanegeometry.IsNull()) || (clonedplanegeometry->GetReferenceCount()!=1)) );
+
+    std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition = 0, frontside=true): " <<std::endl;
+    planegeometry->InitializeStandardPlane(clonedplanegeometry);
+
+    CPPUNIT_ASSERT_MESSAGE("Testing origin of axially initialized version: ", mitk::Equal(planegeometry->GetOrigin(), origin));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of axially initialized version: ", mitk::Equal(planegeometry->GetCornerPoint(0), cornerpoint0));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing width (in units) of axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ",
+      mitk::Equal(planegeometry->GetExtent(0), width, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing height (in units) of axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ",
+      mitk::Equal(planegeometry->GetExtent(1), height, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing thickness (in units) of axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ",
+      mitk::Equal(planegeometry->GetExtent(2), 1, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing width (in mm) of axially initialized version: ",
+      mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing height  (in mm) of axially initialized version: ",
+      mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing thickness (in mm) of axially initialized version: ",
+      mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM, testEps));
+
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of axially initialized version: ",
+      mitk::Equal(planegeometry->GetAxisVector(0), right, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of axially initialized version: ",
+      mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of axially initialized version: ",
+      mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
+
+    mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
   }
 
   void testPlaneComparison()
@@ -1046,7 +1106,6 @@ public:
     }
     std::cout<<"[PASSED]"<<std::endl;
 
-    // BIS HIER
     // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition = 0, frontside=true): " <<std::endl;
@@ -1093,6 +1152,9 @@ public:
     std::cout<<"[PASSED]"<<std::endl;
 
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
+
+    // BIS HIER
+    // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     mitk::Vector3D newright, newbottom, newnormal;
     mitk::ScalarType newthicknessInMM;

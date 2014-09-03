@@ -256,7 +256,7 @@ static itk::Index<2> GetFirstPoint(const mitk::CorrectorAlgorithm::TSegData &seg
       }
     }
   }
-  throw(std::exception("No initial starting point found"));
+  mitkThrow() << "No Starting point is found next to the curve.";
 }
 
 static int FillRegion(const itk::Index<2> startIndex, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic, int fillColor, int eraseColor)
@@ -325,34 +325,41 @@ static void OverwriteImage(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer sour
 
 bool  mitk::CorrectorAlgorithm::ModifySegment(const TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic)
 {
-  typedef itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer ItkImagePointerType;
-  // Find the current ColorMode:
-  ColorSegment(segment, pic, m_FillColor, m_EraseColor);
-
-    // Kein erster Punkt
-      // Erster Punkt finden
-  ItkImagePointerType firstSideImage = CloneImage(pic);
-  itk::Index<2> firstPoint = GetFirstPoint(segment,  firstSideImage, m_FillColor);
-  int firstSidePixel = FillRegion(firstPoint, firstSideImage, m_FillColor, m_EraseColor);
-
-  ItkImagePointerType secondSideImage = CloneImage(pic);
-  // TODO  Problem: Was ist wenn keine Zweite Seite vorhanden?
   try
   {
-    itk::Index<2> secondPoint = GetFirstPoint(segment, firstSideImage, m_FillColor);
-    int secondSidePixel = FillRegion(secondPoint, secondSideImage, m_FillColor, m_EraseColor);
+    typedef itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer ItkImagePointerType;
+    // Find the current ColorMode:
+    ColorSegment(segment, pic, m_FillColor, m_EraseColor);
 
-    if (firstSidePixel < secondSidePixel)
+      // Kein erster Punkt
+        // Erster Punkt finden
+    ItkImagePointerType firstSideImage = CloneImage(pic);
+    itk::Index<2> firstPoint = GetFirstPoint(segment,  firstSideImage, m_FillColor);
+    int firstSidePixel = FillRegion(firstPoint, firstSideImage, m_FillColor, m_EraseColor);
+
+    ItkImagePointerType secondSideImage = CloneImage(pic);
+    // TODO  Problem: Was ist wenn keine Zweite Seite vorhanden?
+    try
     {
-      OverwriteImage(firstSideImage, pic);
-    } else
-    {
-      OverwriteImage(secondSideImage, pic);
+      itk::Index<2> secondPoint = GetFirstPoint(segment, firstSideImage, m_FillColor);
+      int secondSidePixel = FillRegion(secondPoint, secondSideImage, m_FillColor, m_EraseColor);
+
+      if (firstSidePixel < secondSidePixel)
+      {
+        OverwriteImage(firstSideImage, pic);
+      } else
+      {
+        OverwriteImage(secondSideImage, pic);
+      }
     }
+    catch (mitk::Exception e)
+    {
+      e.what();
+    }
+    return true;
   }
-  catch (std::exception e)
+  catch(...)
   {
-    e.what();
+    return false;
   }
-  return true;
 }

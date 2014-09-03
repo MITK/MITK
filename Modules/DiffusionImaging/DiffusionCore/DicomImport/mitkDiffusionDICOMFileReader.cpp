@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionHeaderGEDICOMFileReader.h"
 #include "mitkDiffusionHeaderPhilipsDICOMFileReader.h"
 
+#include "mitkStringProperty.h"
+
 static void PerformHeaderAnalysis( mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType headers )
 {
   unsigned int images = headers.size();
@@ -152,13 +154,7 @@ bool mitk::DiffusionDICOMFileReader
     output_image->SetVectorImage( helper.LoadToVector<short, 3>( filenames ) );
   }
   output_image->InitializeFromVectorImage();
-  //output_image->UpdateBValueMap();
-
-  // reduce the number of outputs to 1 as we will produce a single image
-  //this->SetNumberOfOutputs(1);
-
-  // set the image to output
-  //DICOMImageBlockDescriptor& block = this->InternalGetOutput(0);
+  output_image->SetProperty("diffusion.dicom.importname", mitk::StringProperty::New( helper.GetOutputName(filenames) ) );
   block.SetMitkImage( (mitk::Image::Pointer) output_image );
 
   return block.GetMitkImage().IsNotNull();

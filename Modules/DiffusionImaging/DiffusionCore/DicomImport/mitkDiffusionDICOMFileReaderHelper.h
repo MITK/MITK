@@ -32,7 +32,34 @@ public:
 
   typedef std::vector< StringContainer > VolumeFileNamesContainer;
 
+  std::string GetOutputName(const VolumeFileNamesContainer& filenames)
+  {
+    typedef itk::Image< short, 3> InputImageType;
+    typedef itk::ImageSeriesReader< InputImageType > SeriesReaderType;
 
+    SeriesReaderType::Pointer probe_reader = SeriesReaderType::New();
+    probe_reader->SetFileNames( filenames.at(0) );
+    probe_reader->GenerateOutputInformation();
+    probe_reader->Update();
+
+    std::string seriesDescTag, seriesNumberTag, patientName;
+    SeriesReaderType::DictionaryArrayRawPointer inputDict = probe_reader->GetMetaDataDictionaryArray();
+
+    if( ! itk::ExposeMetaData< std::string > ( *(*inputDict)[0], "0008|103e", seriesDescTag ) )
+      seriesDescTag = "UNSeries";
+
+    if( ! itk::ExposeMetaData< std::string > ( *(*inputDict)[0], "0020|0011", seriesNumberTag ) )
+      seriesNumberTag = "00000";
+
+    if( ! itk::ExposeMetaData< std::string > ( *(*inputDict)[0], "0010|0010", patientName ) )
+      patientName = "UnknownName";
+
+    std::stringstream ss;
+    ss << seriesDescTag << "_" << seriesNumberTag << "_" << patientName;
+
+    return ss.str();
+
+  }
 
   template< typename PixelType, unsigned int VecImageDimension>
   typename itk::VectorImage< PixelType, VecImageDimension >::Pointer LoadToVector(

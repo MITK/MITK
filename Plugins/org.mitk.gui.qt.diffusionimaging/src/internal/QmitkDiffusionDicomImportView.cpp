@@ -479,9 +479,13 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
 
         node = mitk::DataNode::New();
         node->SetData( d_img );
+        std::string outname;
+        d_img->GetPropertyList()->GetStringProperty("diffusion.dicom.importname", outname );
+
+        node->SetName( outname.c_str() );
 
         GetDefaultDataStorage()->Add(node);
-        SetDwiNodeProperties(node, ss.str() );
+        //SetDwiNodeProperties(node, ss.str() );
         //Status(QString("Image %1 added to datastorage").arg(descr));
       }
 

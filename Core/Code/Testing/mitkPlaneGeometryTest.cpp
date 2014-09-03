@@ -44,6 +44,8 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestSetExtendInMM);
   MITK_TEST(TestRotate);
   MITK_TEST(testCloneSimple);
+  MITK_TEST(testPlaneComparison);
+  MITK_TEST(wrapper);
 
   // Currently commented out, see See bug 15990
   // MITK_TEST(testPlaneGeometryInitializeOrder);
@@ -586,6 +588,72 @@ public:
     mappingTests2D(clonedplanegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
   }
 
+  void wrapper(){
+  }
+
+  void testPlaneComparison()
+  {
+    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+
+    mitk::Point3D origin;
+    mitk::Vector3D right, bottom, normal;
+    mitk::ScalarType width, height;
+    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
+    width  = 100;    widthInMM  = width;
+    height = 200;    heightInMM = height;
+    thicknessInMM = 1;
+    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
+    mitk::FillVector3D(right,  widthInMM,          0, 0);
+    mitk::FillVector3D(bottom,         0, heightInMM, 0);
+    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
+
+    planegeometry->SetOrigin(origin);
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+
+    // Clone, move, rotate and test for 'IsParallel' and 'IsOnPlane'
+    mitk::PlaneGeometry::Pointer clonedplanegeometry2 = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
+
+    CPPUNIT_ASSERT_MESSAGE("Testing Clone(): ", ! ((clonedplanegeometry2.IsNull()) || (clonedplanegeometry2->GetReferenceCount()!=1)) );
+    CPPUNIT_ASSERT_MESSAGE("Testing wheter original and clone are at the same position", clonedplanegeometry2->IsOnPlane(planegeometry.GetPointer()));
+    CPPUNIT_ASSERT_MESSAGE(" Asserting that origin is on the plane cloned plane:", clonedplanegeometry2->IsOnPlane(origin));
+
+    mitk::VnlVector newaxis(3);
+    mitk::FillVector3D(newaxis, 1.0, 1.0, 1.0); newaxis.normalize();
+    vnl_quaternion<mitk::ScalarType> rotation2(newaxis, 0.0);
+
+    mitk::Vector3D clonednormal = clonedplanegeometry2->GetNormal();
+    mitk::Point3D clonedorigin = clonedplanegeometry2->GetOrigin();
+
+    mitk::RotationOperation* planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 180.0 );
+
+    clonedplanegeometry2->ExecuteOperation( planerot );
+    CPPUNIT_ASSERT_MESSAGE(" Asserting that a flipped plane is still on the original plane: ", clonedplanegeometry2->IsOnPlane(planegeometry.GetPointer()));
+
+    clonedorigin += clonednormal;
+    clonedplanegeometry2->SetOrigin( clonedorigin );
+
+    CPPUNIT_ASSERT_MESSAGE("Testing if the translated (cloned, flipped) plane is parallel to its origin plane: ", clonedplanegeometry2->IsParallel(planegeometry));
+    delete planerot;
+
+    planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 0.5 );
+    clonedplanegeometry2->ExecuteOperation( planerot );
+
+    CPPUNIT_ASSERT_MESSAGE("Testing if a non-paralell plane gets recognized as not paralell  [rotation +0.5 degree] : ", ! clonedplanegeometry2->IsParallel(planegeometry));
+    delete planerot;
+
+    planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), -1.0 );
+    clonedplanegeometry2->ExecuteOperation( planerot );
+
+    CPPUNIT_ASSERT_MESSAGE("Testing if a non-paralell plane gets recognized as not paralell  [rotation -0.5 degree] : ", ! clonedplanegeometry2->IsParallel(planegeometry));
+    delete planerot;
+
+    planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 360.5 );
+    clonedplanegeometry2->ExecuteOperation( planerot );
+
+    CPPUNIT_ASSERT_MESSAGE("Testing if a non-paralell plane gets recognized as paralell  [rotation 360 degree] : ", clonedplanegeometry2->IsParallel(planegeometry));
+  }
+
   int mitkPlaneGeometryTest()
   {
     mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
@@ -883,7 +951,6 @@ public:
 
     mappingTests2D(clonedplanegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
 
-    // BIS HIER
     // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     // Clone, move, rotate and test for 'IsParallel' and 'IsOnPlane'
@@ -978,6 +1045,9 @@ public:
       return EXIT_FAILURE;
     }
     std::cout<<"[PASSED]"<<std::endl;
+
+    // BIS HIER
+    // TODO Hier trennen? --------------------------------------------------------------------------------------------------------------------------------------
 
     std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition = 0, frontside=true): " <<std::endl;
     planegeometry->InitializeStandardPlane(clonedplanegeometry);

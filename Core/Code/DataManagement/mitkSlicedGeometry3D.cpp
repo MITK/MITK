@@ -557,7 +557,7 @@ void
     }
   }
 
-  BaseGeometry::SetSpacing(aSpacing); //xxxxxxxxxxx hier war vorher _SetSpacing -> Keine Endlosschleife?! sonst: m_Geometry
+  BaseGeometry::_SetSpacing(aSpacing);
 
   mitk::PlaneGeometry::Pointer firstGeometry;
 

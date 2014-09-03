@@ -27,8 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkQuaternionRigidTransform.h>
 #include "itkScalableAffineTransform.h"
 #include <itkIndex.h>
+#include <mitkAffineTransform3D.h>
 
 #include <vtkTransform.h>
+#include <mitkGeometryTransformHolder.h>
 
 class vtkMatrix4x4;
 class vtkMatrixToLinearTransform;
@@ -102,7 +104,7 @@ namespace mitk {
 
     // ********************************** TypeDef **********************************
 
-    typedef itk::ScalableAffineTransform<ScalarType, 3>    TransformType;
+    typedef GeometryTransformHolder::TransformType         TransformType;
     typedef itk::BoundingBox<unsigned long, 3, ScalarType> BoundingBoxType;
     typedef BoundingBoxType::BoundsArrayType               BoundsArrayType;
     typedef BoundingBoxType::Pointer                       BoundingBoxPointer;
@@ -180,7 +182,7 @@ namespace mitk {
     //##Documentation
     //## @brief Get the transformation used to convert from index
     //## to world coordinates
-    mitk::AffineTransform3D*  const GetIndexToWorldTransform() const;
+    const mitk::AffineTransform3D*   GetIndexToWorldTransform() const;
 
     //## @brief Set the transformation used to convert from index
     //## to world coordinates. The spacing of the new transform is
@@ -220,7 +222,7 @@ namespace mitk {
     //## transformation consists of first applying self to the source,
     //## followed by other.
     //## This method also changes m_spacing.
-    void Compose( const BaseGeometry::TransformType * other, bool pre = 0 );
+    void Compose( const TransformType * other, bool pre = 0 );
 
     //##Documentation
     //## @brief Compose new IndexToWorldTransform with a given vtkMatrix4x4.
@@ -564,11 +566,11 @@ namespace mitk {
 
     void SetVtkMatrixDeepCopy(vtkTransform *vtktransform);
 
+    void _SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
 
   private:
 
-    class GeometryTransfrom;
-    GeometryTransfrom* m_GeometryTransform;
+    GeometryTransformHolder* m_GeometryTransform;
 
     //##Documentation
     //## @brief Pre- and Post-functions are empty in BaseGeometry

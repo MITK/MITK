@@ -45,7 +45,7 @@ public:
   {
     std::deque<mitk::ContourModelSet::Pointer> contourModelVectorCorrect;
     std::deque<mitk::ContourModelSet::Pointer> contourModelVectorCorrectSequ;
-    std::deque<mitk::ContourModelSet::Pointer> contourModelVectorTest;
+    std::deque<mitk::DataNode::Pointer> contourModelVectorTest;
     std::deque<mitk::ContourModelSet::Pointer> contourModelVectorTestDel;
 
     LoadData(contourModelVectorCorrect);
@@ -56,8 +56,8 @@ public:
      //saved so we have reference for the comparison
      for(unsigned int i=0; i<contourModelVectorTest.size();++i)
      {
-       if(contourModelVectorTest.at(i)->GetSize()>0){
-         contourModelVectorTestDel.push_back(contourModelVectorTest.at(i));
+       if(dynamic_cast<mitk::ContourModelSet*>(contourModelVectorTest.at(i)->GetData())->GetSize()>0){
+         contourModelVectorTestDel.push_back(dynamic_cast<mitk::ContourModelSet*>(contourModelVectorTest.at(i)->GetData()));
        }
      }
 

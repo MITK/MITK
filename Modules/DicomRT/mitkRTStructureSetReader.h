@@ -53,7 +53,7 @@ namespace mitk
     mitkClassMacro( RTStructureSetReader, itk::Object );
     itkNewMacro( Self );
 
-    ContourModelSetVector ReadStructureSet(DcmDataset* dataset);
+    ContourModelSetVector ReadStructureSet(const char* filepath);
 
   protected:
     std::vector<RoiEntry> ROISequenceVector;

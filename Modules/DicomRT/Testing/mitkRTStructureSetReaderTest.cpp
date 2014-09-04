@@ -50,11 +50,7 @@ public:
 
     LoadData(contourModelVectorCorrect);
 
-    DcmFileFormat file;
-    file.loadFile(GetTestDataFilePath("RT/StructureSet/RS.dcm").c_str(), EXS_Unknown);
-    DcmDataset *dataset = file.getDataset();
-
-     contourModelVectorTest = m_rtStructureReader->ReadStructureSet(dataset);
+     contourModelVectorTest = m_rtStructureReader->ReadStructureSet(GetTestDataFilePath("RT/StructureSet/RS.dcm").c_str());
 
      //Deleting all empty contourmodelsets - empty contourmodelsets cant be
      //saved so we have reference for the comparison

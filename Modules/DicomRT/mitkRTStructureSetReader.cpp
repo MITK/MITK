@@ -84,8 +84,18 @@ namespace mitk
   }
 
   std::deque<mitk::ContourModelSet::Pointer> RTStructureSetReader::
-        ReadStructureSet(DcmDataset* dataset)
+        ReadStructureSet(const char* filepath)
   {
+    DcmFileFormat file;
+    OFCondition output = file.loadFile(filepath, EXS_Unknown);
+    if(output.bad())
+    {
+      MITK_ERROR << "Cant read the file" << endl;
+    }
+    DcmDataset *dataset = file.getDataset();
+
+
+
     ContourModelSetVector contourModelSetVector;
 
     DRTStructureSetIOD structureSetObject;

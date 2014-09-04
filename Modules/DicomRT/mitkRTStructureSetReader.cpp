@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRTStructureSetReader.h"
 #include <mitkIOUtil.h>
 
+#include <mitkBaseRenderer.h>
+
 namespace mitk
 {
   RTStructureSetReader::RTStructureSetReader(){}
@@ -83,8 +85,7 @@ namespace mitk
     return NULL;
   }
 
-  std::deque<mitk::ContourModelSet::Pointer> RTStructureSetReader::
-        ReadStructureSet(const char* filepath)
+  RTStructureSetReader::ContourModelSetNodes RTStructureSetReader::ReadStructureSet(const char* filepath)
   {
     DcmFileFormat file;
     OFCondition output = file.loadFile(filepath, EXS_Unknown);
@@ -103,7 +104,7 @@ namespace mitk
     if(!outp.good())
     {
       MITK_ERROR << "Error reading the file" << endl;
-      std::deque<mitk::ContourModelSet::Pointer> x;
+      RTStructureSetReader::ContourModelSetNodes x;
       return x;
     }
     DRTStructureSetROISequence &roiSequence =
@@ -111,7 +112,7 @@ namespace mitk
     if(!roiSequence.gotoFirstItem().good())
     {
       MITK_ERROR << "Error reading the structure sequence" << endl;
-      std::deque<mitk::ContourModelSet::Pointer> x;
+      RTStructureSetReader::ContourModelSetNodes x;
       return x;
     }
     do{
@@ -144,7 +145,7 @@ namespace mitk
     if(!roiContourSeqObject.gotoFirstItem().good())
     {
       MITK_ERROR << "Error reading the contour sequence" << endl;
-      std::deque<mitk::ContourModelSet::Pointer> x;
+      RTStructureSetReader::ContourModelSetNodes x;
       return x;
     }
     do
@@ -225,6 +226,22 @@ namespace mitk
     }
     while(roiContourSeqObject.gotoNextItem().good());
 
-    return contourModelSetVector;
+    std::deque<mitk::DataNode::Pointer> nodes;
+
+    for(int i=0; i<contourModelSetVector.size();i++)
+    {
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
+      node->SetData(contourModelSetVector.at(i));
+      node->SetProperty("name", contourModelSetVector.at(i)->GetProperty("name"));
+      node->SetProperty("color",contourModelSetVector.at(i)->GetProperty("contour.color"));
+      node->SetProperty("contour.color",contourModelSetVector.at(i)->GetProperty("contour.color"));
+      node->SetVisibility(true, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+      node->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
+      node->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
+      node->SetVisibility(true, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+      nodes.push_back(node);
+    }
+
+    return nodes;
   }
 }

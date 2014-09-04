@@ -26,11 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "dcmtk/dcmrt/drtstrct.h"
 
+#include <mitkDataNode.h>
+
 namespace mitk
 {
   class MitkDicomRT_EXPORT RTStructureSetReader: public itk::Object
   {
     typedef std::deque<mitk::ContourModelSet::Pointer> ContourModelSetVector;
+    typedef std::deque<mitk::DataNode::Pointer> ContourModelSetNodes;
 
     class RoiEntry
     {
@@ -53,7 +56,7 @@ namespace mitk
     mitkClassMacro( RTStructureSetReader, itk::Object );
     itkNewMacro( Self );
 
-    ContourModelSetVector ReadStructureSet(const char* filepath);
+    ContourModelSetNodes ReadStructureSet(const char* filepath);
 
   protected:
     std::vector<RoiEntry> ROISequenceVector;

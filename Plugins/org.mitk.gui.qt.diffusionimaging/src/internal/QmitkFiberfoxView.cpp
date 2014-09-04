@@ -1060,6 +1060,78 @@ void QmitkFiberfoxView::SaveParameters()
                 m_ParameterFile,
                 tr("Fiberfox Parameters (*.ffp)") );
 
+    bool ok = true;
+    bool first = true;
+    bool dosampling = false;
+    mitk::DiffusionImage<short>::Pointer diffImg;
+    itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = NULL;
+    const int shOrder = 2;
+    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
+    QballFilterType::CoefficientImageType::Pointer itkFeatureImage = NULL;
+    ItkDoubleImgType::Pointer adcImage = NULL;
+
+    for (unsigned int i=0; i<ffParamaters.m_FiberModelList.size()+ffParamaters.m_NonFiberModelList.size(); i++)
+    {
+        mitk::RawShModel<>* model = NULL;
+        if (i<ffParamaters.m_FiberModelList.size())
+            model = dynamic_cast<  mitk::RawShModel<>* >(ffParamaters.m_FiberModelList.at(i));
+        else
+            model = dynamic_cast<  mitk::RawShModel<>* >(ffParamaters.m_NonFiberModelList.at(i-ffParamaters.m_FiberModelList.size()));
+
+        if (model!=0 && model->GetNumberOfKernels()<=0)
+        {
+            if (first==true)
+            {
+                if (QMessageBox::question(NULL, "Prototype signal sampling", "Do you want to sample prototype signals from the selected diffusion-weighted imag and save them?",QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)
+                    dosampling = true;
+
+                first = false;
+                if (dosampling && m_SelectedDWI.IsNull())
+                {
+                    QMessageBox::information(NULL, "Parameter file not saved", "No diffusion-weighted image selected to sample signal from.");
+                    return;
+                }
+                else if (dosampling)
+                {
+                    diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
+
+                    typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
+                    TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
+                    filter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
+                    filter->SetBValue(diffImg->GetReferenceBValue());
+                    filter->Update();
+                    tensorImage = filter->GetOutput();
+
+                    const int NumCoeffs = (shOrder*shOrder + shOrder + 2)/2 + shOrder;
+                    QballFilterType::Pointer qballfilter = QballFilterType::New();
+                    qballfilter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
+                    qballfilter->SetBValue(diffImg->GetReferenceBValue());
+                    qballfilter->SetLambda(0.006);
+                    qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
+                    qballfilter->Update();
+                    itkFeatureImage = qballfilter->GetCoefficientImage();
+
+                    itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
+                    adcFilter->SetInput(diffImg->GetVectorImage());
+                    adcFilter->SetGradientDirections(diffImg->GetDirections());
+                    adcFilter->SetB_value(diffImg->GetReferenceBValue());
+                    adcFilter->Update();
+                    adcImage = adcFilter->GetOutput();
+                }
+            }
+
+            if (dosampling && m_SelectedDWI.IsNotNull())
+            {
+                ok = model->SampleKernels(diffImg, ffParamaters.m_SignalGen.m_MaskImage, tensorImage, itkFeatureImage, adcImage);
+                if (!ok)
+                {
+                    QMessageBox::information( NULL, "Parameter file not saved", "No valid prototype signals could be sampled.");
+                    return;
+                }
+            }
+        }
+    }
+
     ffParamaters.SaveParameters(filename.toStdString());
     m_ParameterFile = filename;
 }
@@ -1975,56 +2047,56 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
     parameters.m_Misc.m_ParentNode = fiberNode;
     if (m_SelectedDWI.IsNotNull())
     {
-        mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
-
-        bool doSampling = false;
+        bool first = true;
         bool ok = true;
-        for (unsigned int i=0; i<parameters.m_FiberModelList.size(); i++)
-            if ( dynamic_cast< RawShModel<double>* >(parameters.m_FiberModelList[i]) )
+        mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
+        itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = NULL;
+        const int shOrder = 2;
+        typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
+        QballFilterType::CoefficientImageType::Pointer itkFeatureImage = NULL;
+        ItkDoubleImgType::Pointer adcImage = NULL;
+
+        for (unsigned int i=0; i<parameters.m_FiberModelList.size()+parameters.m_NonFiberModelList.size(); i++)
+        {
+            mitk::RawShModel<>* model = NULL;
+            if (i<parameters.m_FiberModelList.size())
+                model = dynamic_cast<  mitk::RawShModel<>* >(parameters.m_FiberModelList.at(i));
+            else
+                model = dynamic_cast<  mitk::RawShModel<>* >(parameters.m_NonFiberModelList.at(i-parameters.m_FiberModelList.size()));
+
+            if (model!=0 && model->GetNumberOfKernels()<=0)
             {
-                doSampling = true;
-                RawShModel<double>* model = dynamic_cast< RawShModel<double>* >(parameters.m_FiberModelList[i]);
-                if (ok==true)
-                    ok = model->SampleKernels(diffImg, parameters.m_SignalGen.m_MaskImage);
+                if (first==true)
+                {
+                    typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
+                    TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
+                    filter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
+                    filter->SetBValue(diffImg->GetReferenceBValue());
+                    filter->Update();
+                    tensorImage = filter->GetOutput();
+
+                    const int NumCoeffs = (shOrder*shOrder + shOrder + 2)/2 + shOrder;
+                    QballFilterType::Pointer qballfilter = QballFilterType::New();
+                    qballfilter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
+                    qballfilter->SetBValue(diffImg->GetReferenceBValue());
+                    qballfilter->SetLambda(0.006);
+                    qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
+                    qballfilter->Update();
+                    itkFeatureImage = qballfilter->GetCoefficientImage();
+
+                    itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
+                    adcFilter->SetInput(diffImg->GetVectorImage());
+                    adcFilter->SetGradientDirections(diffImg->GetDirections());
+                    adcFilter->SetB_value(diffImg->GetReferenceBValue());
+                    adcFilter->Update();
+                    adcImage = adcFilter->GetOutput();
+                }
+                ok = model->SampleKernels(diffImg, parameters.m_SignalGen.m_MaskImage, tensorImage, itkFeatureImage, adcImage);
+                if (!ok)
+                    break;
             }
-        for (unsigned int i=0; i<parameters.m_NonFiberModelList.size(); i++)
-            if ( dynamic_cast< RawShModel<double>* >(parameters.m_NonFiberModelList[i]) )
-            {
-                doSampling = true;
-                RawShModel<double>* model = dynamic_cast< RawShModel<double>* >(parameters.m_NonFiberModelList[i]);
-                if (ok==true)
-                    ok = model->SampleKernels(diffImg, parameters.m_SignalGen.m_MaskImage);
-            }
+        }
 
-//        // sample prototype signals
-//        if ( doSampling )
-//        {
-//            const int shOrder = 2;
-
-//            typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
-//            TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
-//            filter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
-//            filter->SetBValue(diffImg->GetReferenceBValue());
-//            filter->Update();
-//            itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = filter->GetOutput();
-
-//            const int NumCoeffs = (shOrder*shOrder + shOrder + 2)/2 + shOrder;
-//            typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,shOrder,QBALL_ODFSIZE> QballFilterType;
-//            QballFilterType::Pointer qballfilter = QballFilterType::New();
-//            qballfilter->SetGradientImage( diffImg->GetDirections(), diffImg->GetVectorImage() );
-//            qballfilter->SetBValue(diffImg->GetReferenceBValue());
-//            qballfilter->SetLambda(0.006);
-//            qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
-//            qballfilter->Update();
-//            QballFilterType::CoefficientImageType::Pointer itkFeatureImage = qballfilter->GetCoefficientImage();
-
-//            itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
-//            adcFilter->SetInput(diffImg->GetVectorImage());
-//            adcFilter->SetGradientDirections(diffImg->GetDirections());
-//            adcFilter->SetB_value(diffImg->GetReferenceBValue());
-//            adcFilter->Update();
-//            ItkDoubleImgType::Pointer adcImage = adcFilter->GetOutput();
-//        }
         if (!ok)
         {
             QMessageBox::information( NULL, "Simulation cancelled", "No valid prototype signals could be sampled.");

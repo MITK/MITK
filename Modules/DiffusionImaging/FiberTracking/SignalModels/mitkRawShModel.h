@@ -86,7 +86,7 @@ public:
     int GetModelIndex(){ return m_ModelIndex; }
 
     double GetBaselineSignal(int index){ return m_B0Signal.at(index); }
-    vnl_vector< double > GetCoefficients(int index){ return m_ShCoefficients.at(index); }
+    vnl_vector< double > GetCoefficients(int listIndex){ return m_ShCoefficients.at(listIndex); }
 
     bool SampleKernels(DiffusionImage<short>::Pointer diffImg, ItkUcharImageType::Pointer maskImage, TensorImageType::Pointer tensorImage=NULL, QballFilterType::CoefficientImageType::Pointer coeffImage=NULL, ItkDoubleImageType::Pointer adcImage=NULL);
 

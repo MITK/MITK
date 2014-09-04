@@ -138,7 +138,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       else if(modality.compare("RTSTRUCT",Qt::CaseInsensitive) == 0)
       {
         mitk::RTStructureSetReader::Pointer structreader = mitk::RTStructureSetReader::New();
-        std::deque<mitk::ContourModelSet::Pointer> modelVector = structreader->ReadStructureSet(listOfFilesForSeries.at(0).toStdString().c_str());
+        std::deque<mitk::DataNode::Pointer> modelVector = structreader->ReadStructureSet(listOfFilesForSeries.at(0).toStdString().c_str());
 
         if(modelVector.empty())
         {
@@ -152,13 +152,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
           for(int i=0; i<modelVector.size();i++)
           {
-            mitk::DataNode::Pointer x = mitk::DataNode::New();
-            x->SetData(modelVector.at(i));
-            x->SetProperty("name", modelVector.at(i)->GetProperty("name"));
-            x->SetProperty("color",modelVector.at(i)->GetProperty("contour.color"));
-            x->SetProperty("contour.color",modelVector.at(i)->GetProperty("contour.color"));
-            x->SetVisibility(true);
-            dataStorage->Add(x);
+            dataStorage->Add(modelVector.at(i));
           }
           mitk::TimeGeometry::Pointer geometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
           mitk::RenderingManager::GetInstance()->InitializeViews(geometry);

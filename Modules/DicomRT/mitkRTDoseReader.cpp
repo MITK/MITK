@@ -34,8 +34,16 @@ namespace mitk
   RTDoseReader::~RTDoseReader(){}
 
   mitk::DataNode::Pointer RTDoseReader::
-      LoadRTDose(DcmDataset* dataset, const char* filename)
+      LoadRTDose(const char* filename)
   {
+    DcmFileFormat fileformat;
+    OFCondition outp = fileformat.loadFile(filename, EXS_Unknown);
+    if(outp.bad())
+    {
+      MITK_ERROR << "Cant read the file" << endl;
+    }
+    DcmDataset *dataset = fileformat.getDataset();
+
     std::string name = filename;
     itk::FilenamesContainer file;
     file.push_back(name);

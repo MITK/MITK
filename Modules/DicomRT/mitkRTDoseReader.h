@@ -65,7 +65,7 @@ namespace mitk
      * relative to a PrescriptionDose definied in the RT-Plan. If there is no
      * RT-Plan file PrescriptionDose is set to 80% of the maximum dose.
      */
-    mitk::DataNode::Pointer LoadRTDose(DcmDataset* dataset, const char* filename);
+    mitk::DataNode::Pointer LoadRTDose(const char* filename);
 
     /**
     * Virtual destructor.

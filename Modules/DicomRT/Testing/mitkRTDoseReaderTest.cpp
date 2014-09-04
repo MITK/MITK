@@ -42,11 +42,7 @@ public:
   {
     mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("RT/Dose/RT_Dose.nrrd"));
 
-    DcmFileFormat file;
-    file.loadFile(GetTestDataFilePath("RT/Dose/Dose.dcm").c_str(), EXS_Unknown);
-    DcmDataset *dataset = file.getDataset();
-
-    mitk::DataNode::Pointer node = m_rtDoseReader->LoadRTDose(dataset,GetTestDataFilePath("RT/Dose/Dose.dcm").c_str());
+    mitk::DataNode::Pointer node = m_rtDoseReader->LoadRTDose(GetTestDataFilePath("RT/Dose/Dose.dcm").c_str());
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
     MITK_ASSERT_EQUAL(refImage, image, "referece-Image and image should be equal");

@@ -1149,7 +1149,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
 
   // check if 4D image and use filter on correct time step
   int time = ((QmitkSliderNavigatorWidget*)m_Controls->sliceNavigatorTime)->GetPos();
-  if(time>=0)
+  if(newImage1->GetDimension() > 3)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
 
@@ -1274,8 +1274,6 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       resampleFilter->SetInterpolator( nn_interpolator );
       resampleFilter->SetDefaultPixelValue( 0 );
 
-      ImageType::Pointer resampledImage = resampleFilter->GetOutput()->Clone();
-
       try
       {
         resampleFilter->UpdateLargestPossibleRegion();
@@ -1285,6 +1283,8 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
         MITK_WARN << "Updating resampling filter failed. ";
         MITK_WARN << "REASON: " << e.what();
       }
+
+      ImageType::Pointer resampledImage = resampleFilter->GetOutput();
 
       newImage1 = mitk::ImportItkImage( resampledImage )->Clone();
       nameAddition = "_Resampled";

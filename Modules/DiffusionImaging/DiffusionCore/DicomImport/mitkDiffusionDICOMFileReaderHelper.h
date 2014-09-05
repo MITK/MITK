@@ -177,7 +177,7 @@ public:
     typename MosaicImageType::RegionType mosaic_lpr = mosaic_probe->GetOutput()->GetLargestPossibleRegion();
     MITK_INFO << " == MOSAIC: " << mosaic_lpr;
 
-    itk::ImageBase<3>::SizeValueType images_per_row = ceil( sqrt( mosaicInfo.nimages ) );
+    itk::ImageBase<3>::SizeValueType images_per_row = ceil( sqrt( (float) mosaicInfo.nimages ) );
 
     itk::ImageBase<3>::RegionType requestedRegion;
     requestedRegion.SetSize( 0, mosaic_lpr.GetSize()[0]/images_per_row);

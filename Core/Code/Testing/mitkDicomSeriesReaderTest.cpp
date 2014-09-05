@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDicomSeriesReader.h"
 #include "mitkProperties.h"
-
+#include "mitkImage.h"
 
 static std::map<std::string, std::map<gdcm::Tag, std::string> > GetTagInformationFromFile(mitk::DicomSeriesReader::StringContainer files)
 {

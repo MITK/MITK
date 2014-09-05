@@ -56,8 +56,13 @@ mitk::PythonService::PythonService()
     {
 //TODO a better way to do this
 #ifndef WIN32
+#if defined (__APPLE__) || defined(MACOSX)
+  const char* library = "libpython2.7.dylib";
+#else
+  const char* library = "libpython2.7.so";
+#endif
       dlerror();
-      if(dlopen("libpython2.7.so", RTLD_NOW | RTLD_GLOBAL) == 0 )
+      if(dlopen(library, RTLD_NOW | RTLD_GLOBAL) == 0 )
       {
         mitkThrow() << "Python runtime could not be loaded: " << dlerror();
       }

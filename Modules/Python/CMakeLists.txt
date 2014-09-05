@@ -10,7 +10,7 @@ if( MITK_USE_Python )
 
   # workaround until testing has a package depends
   set(SimpleITK_DEP )
-  if(BUILD_TESTING)
+  if(BUILD_TESTING AND NOT APPLE)
     set(SimpleITK_DEP SimpleITK)
   endif()
 
@@ -22,5 +22,7 @@ if( MITK_USE_Python )
   )
   configure_file(PythonPath.h.in "${CMAKE_CURRENT_BINARY_DIR}/PythonPath.h" @ONLY)
 
-  add_subdirectory(Testing)
+  if(NOT APPLE)
+    add_subdirectory(Testing)
+  endif()
 endif()

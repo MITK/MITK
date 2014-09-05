@@ -208,8 +208,8 @@ void mitk::DiffusionDICOMFileReader
        bool isMosaic = false;
 
       // parse vendor tag
-      if(    vendor.find("SIEMENS") != std::string::npos
-          && image_type.find("DIFFUSION") != std::string::npos )
+      if(    vendor.find("SIEMENS") != std::string::npos )
+          //&& image_type.find("DIFFUSION") != std::string::npos )
       {
         if( image_type.find("MOSAIC") != std::string::npos )
         {

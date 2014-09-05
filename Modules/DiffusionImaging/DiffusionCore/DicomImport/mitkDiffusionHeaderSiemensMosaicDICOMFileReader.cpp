@@ -18,6 +18,9 @@ mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
 void mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
 ::RetrieveMosaicInformation(std::string filename)
 {
+  // retrieve also mosaic information
+  this->ReadDiffusionHeader( filename );
+
   gdcm::Reader gdcmReader;
   gdcmReader.SetFileName( filename.c_str() );
 
@@ -60,7 +63,6 @@ void mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
       substream >> this->m_MosaicDescriptor.origin[idx++];
     }
   }
-
 
 }
 

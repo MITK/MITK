@@ -150,7 +150,7 @@ public:
   template< typename PixelType, unsigned int VecImageDimension>
   typename itk::VectorImage< PixelType, VecImageDimension >::Pointer LoadMosaicToVector(
       const VolumeFileNamesContainer& filenames,
-      MosaicDescriptor mosaicInfo )
+      const MosaicDescriptor& mosaicInfo )
   {
     typedef itk::Image< PixelType, 3> MosaicImageType;
     typedef itk::ImageFileReader< MosaicImageType > SingleImageReaderType;
@@ -186,12 +186,25 @@ public:
 
     typename VectorImageType::Pointer output_image = VectorImageType::New();
     output_image->SetNumberOfComponentsPerPixel( filenames.size() );
+
+    typename VectorImageType::DirectionType dmatrix;
+    dmatrix.SetIdentity();
+
+    std::vector<double> dirx = mosaic_probe->GetImageIO()->GetDirection(0);
+    std::vector<double> diry = mosaic_probe->GetImageIO()->GetDirection(1);
+    std::vector<double> dirz = mosaic_probe->GetImageIO()->GetDirection(2);
+
+    dmatrix.GetVnlMatrix().set_column( 0,  &dirx[0] );
+    dmatrix.GetVnlMatrix().set_column( 1,  &diry[0] );
+    dmatrix.GetVnlMatrix().set_column( 2,  &dirz[0] );
+
+
     /*
      FIXME!!! The struct currently does not provide the geometry information
               the loading works as required*/
     output_image->SetSpacing( mosaicInfo.spacing );
-    output_image->SetOrigin( mosaicInfo.origin );
-    //output_image->SetDirection( mosaicInfo.direction );*/
+    output_image->SetOrigin( mosaic_probe->GetOutput()->GetOrigin() );
+    output_image->SetDirection( dmatrix );
     output_image->SetLargestPossibleRegion( requestedRegion );
     output_image->SetBufferedRegion( requestedRegion );
     output_image->Allocate();

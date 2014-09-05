@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_RawShModel_H
 
 #include <mitkDiffusionSignalModel.h>
+#include <mitkDiffusionImage.h>
+#include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
 
 namespace mitk {
 
@@ -52,6 +54,10 @@ public:
     }
     ~RawShModel();
 
+    typedef itk::Image< double, 3 >                                         ItkDoubleImageType;
+    typedef itk::Image< unsigned char, 3 >                                  ItkUcharImageType;
+    typedef itk::Image< itk::DiffusionTensor3D< double >, 3 >               TensorImageType;
+    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,2,QBALL_ODFSIZE> QballFilterType;
     typedef typename DiffusionSignalModel< ScalarType >::PixelType          PixelType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientType       GradientType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
@@ -72,7 +78,6 @@ public:
     std::pair< double, double > GetAdcRange(){ return m_AdcRange; }
     unsigned int GetMaxNumKernels(){ return m_MaxNumKernels; }
     void Clear();
-    std::vector< GradientType >         m_PrototypeMaxDirection;
 
     std::vector< vnl_vector< double > > GetShCoefficients(){ return m_ShCoefficients; }
     std::vector< double > GetB0Signals(){ return m_B0Signal; }
@@ -81,18 +86,21 @@ public:
     int GetModelIndex(){ return m_ModelIndex; }
 
     double GetBaselineSignal(int index){ return m_B0Signal.at(index); }
-    vnl_vector< double > GetCoefficients(int index){ return m_ShCoefficients.at(index); }
+    vnl_vector< double > GetCoefficients(int listIndex){ return m_ShCoefficients.at(listIndex); }
+
+    bool SampleKernels(DiffusionImage<short>::Pointer diffImg, ItkUcharImageType::Pointer maskImage, TensorImageType::Pointer tensorImage=NULL, QballFilterType::CoefficientImageType::Pointer coeffImage=NULL, ItkDoubleImageType::Pointer adcImage=NULL);
 
 protected:
 
     void Cart2Sph( GradientListType gradients );
     void RandomModel();
 
-    std::pair< double, double >         m_AdcRange;
-    std::pair< double, double >         m_FaRange;
     std::vector< vnl_vector< double > > m_ShCoefficients;
     std::vector< double >               m_B0Signal;
+    std::vector< GradientType >         m_PrototypeMaxDirection;
     vnl_matrix<double>                  m_SphCoords;
+    std::pair< double, double >         m_AdcRange;
+    std::pair< double, double >         m_FaRange;
     unsigned int                        m_ShOrder;
     int                                 m_ModelIndex;
     unsigned int                        m_MaxNumKernels;

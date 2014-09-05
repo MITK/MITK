@@ -143,6 +143,7 @@ set(MODULE_TESTSURFACES
 
 set(MODULE_CUSTOM_TESTS
     mitkDataStorageTest.cpp
+    mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
     mitkDataNodeTest.cpp
     mitkEventMapperTest.cpp

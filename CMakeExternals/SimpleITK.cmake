@@ -28,6 +28,8 @@ if(MITK_USE_SimpleITK)
          -DWRAP_LUA:BOOL=OFF
          -DWRAP_PYTHON:BOOL=OFF
          -DWRAP_JAVA:BOOL=OFF
+         -DWRAP_RUBY:BOOL=OFF
+         -DWRAP_R:BOOL=OFF
         )
 
     if(MITK_USE_Python)
@@ -41,10 +43,6 @@ if(MITK_USE_SimpleITK)
       if(NOT MITK_USE_SYSTEM_PYTHON)
         list(APPEND proj_DEPENDENCIES Python)
       endif()
-    else(MITK_USE_Python)
-      list(APPEND additional_cmake_args
-           -DWRAP_PYTHON:BOOL=OFF
-          )
     endif()
 
     #TODO: Installer and testing works only with static libs on MAC

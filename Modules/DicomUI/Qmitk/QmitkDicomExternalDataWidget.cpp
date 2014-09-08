@@ -120,7 +120,6 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
     if(!filesForSeries.isEmpty())
     {
       QString modality = m_ExternalDatabase->fileValue(filesForSeries.at(0),"0008,0060");
-      MITK_INFO << "Item:" << modality.toStdString() << endl;
       eventProperty.insert("Modality", modality);
     }
     emit SignalDicomToDataManager(eventProperty);

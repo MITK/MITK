@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //Qmitk headers
-#include "QmitkCandyStoreWidget.h"
+#include "QmitkViewNavigatorWidget.h"
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -173,11 +173,11 @@ bool ClassFilterProxyModel::hasToBeDisplayed(const QModelIndex index) const
     return result;
 }
 
-class CandyStorePerspectiveListener: public berry::IPerspectiveListener
+class ViewNavigatorPerspectiveListener: public berry::IPerspectiveListener
 {
 public:
 
-    CandyStorePerspectiveListener(QmitkCandyStoreWidget* p) :
+    ViewNavigatorPerspectiveListener(QmitkViewNavigatorWidget* p) :
         parentWidget(p)
     {
     }
@@ -224,19 +224,19 @@ public:
                             berry::IPerspectiveDescriptor::Pointer,
                             berry::IWorkbenchPartReference::Pointer partRef, const std::string& changeId)
     {
-        if (changeId=="viewHide" && partRef->GetId()=="org.mitk.views.candystoreview")
+        if (changeId=="viewHide" && partRef->GetId()=="org.mitk.views.viewnavigatorview")
             berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->RemovePerspectiveListener(parentWidget->m_PerspectiveListener);
         else
             parentWidget->UpdateTreeList(NULL, partRef.GetPointer(), changeId);
     }
 
 private:
-    QmitkCandyStoreWidget* parentWidget;
+    QmitkViewNavigatorWidget* parentWidget;
 };
 
-struct CandyStoreWindowListener : public berry::IWindowListener
+struct ViewNavigatorWindowListener : public berry::IWindowListener
 {
-    CandyStoreWindowListener(QmitkCandyStoreWidget* switcher)
+    ViewNavigatorWindowListener(QmitkViewNavigatorWidget* switcher)
         : switcher(switcher)
         , m_Done(false)
     {}
@@ -248,7 +248,7 @@ struct CandyStoreWindowListener : public berry::IWindowListener
         if ( switcher->FillTreeList() )
         {
             m_Done = true;
-            switcher->m_PerspectiveListener = CandyStorePerspectiveListener::Pointer(new CandyStorePerspectiveListener(switcher));
+            switcher->m_PerspectiveListener = ViewNavigatorPerspectiveListener::Pointer(new ViewNavigatorPerspectiveListener(switcher));
             window->AddPerspectiveListener(switcher->m_PerspectiveListener);
         }
     }
@@ -260,13 +260,13 @@ struct CandyStoreWindowListener : public berry::IWindowListener
         if ( switcher->FillTreeList() )
         {
             m_Done = true;
-            switcher->m_PerspectiveListener = CandyStorePerspectiveListener::Pointer(new CandyStorePerspectiveListener(switcher));
+            switcher->m_PerspectiveListener = ViewNavigatorPerspectiveListener::Pointer(new ViewNavigatorPerspectiveListener(switcher));
             window->AddPerspectiveListener(switcher->m_PerspectiveListener);
         }
     }
 
 private:
-    QmitkCandyStoreWidget* switcher;
+    QmitkViewNavigatorWidget* switcher;
     bool m_Done;
 };
 
@@ -291,28 +291,28 @@ bool compareQStandardItems(QStandardItem* a, QStandardItem* b)
     return a->text().compare(b->text()) < 0;
 }
 
-QmitkCandyStoreWidget::QmitkCandyStoreWidget( QWidget * parent, Qt::WindowFlags )
+QmitkViewNavigatorWidget::QmitkViewNavigatorWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
     this->CreateQtPartControl(this);
 }
 
-QmitkCandyStoreWidget::~QmitkCandyStoreWidget()
+QmitkViewNavigatorWidget::~QmitkViewNavigatorWidget()
 {
 
 }
 
-void QmitkCandyStoreWidget::CreateQtPartControl( QWidget *parent )
+void QmitkViewNavigatorWidget::CreateQtPartControl( QWidget *parent )
 {
     // create GUI widgets from the Qt Designer's .ui file
     if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNotNull())
     {
-        m_PerspectiveListener = CandyStorePerspectiveListener::Pointer(new CandyStorePerspectiveListener(this));
+        m_PerspectiveListener = ViewNavigatorPerspectiveListener::Pointer(new ViewNavigatorPerspectiveListener(this));
         berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->AddPerspectiveListener(m_PerspectiveListener);
     }
     else
     {
-        m_WindowListener = CandyStoreWindowListener::Pointer(new CandyStoreWindowListener(this));
+        m_WindowListener = ViewNavigatorWindowListener::Pointer(new ViewNavigatorWindowListener(this));
         berry::PlatformUI::GetWorkbench()->AddWindowListener(m_WindowListener);
     }
 
@@ -334,7 +334,7 @@ void QmitkCandyStoreWidget::CreateQtPartControl( QWidget *parent )
     FillTreeList();
 }
 
-void QmitkCandyStoreWidget::UpdateTreeList(QStandardItem* root, berry::IWorkbenchPartReference *partRef, const std::string &changeId)
+void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkbenchPartReference *partRef, const std::string &changeId)
 {
     berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
     if (page.IsNull())
@@ -375,7 +375,7 @@ void QmitkCandyStoreWidget::UpdateTreeList(QStandardItem* root, berry::IWorkbenc
     }
 }
 
-bool QmitkCandyStoreWidget::FillTreeList()
+bool QmitkViewNavigatorWidget::FillTreeList()
 {
     // active workbench window available?
     if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNull())
@@ -546,7 +546,7 @@ bool QmitkCandyStoreWidget::FillTreeList()
     return true;
 }
 
-void QmitkCandyStoreWidget::FilterChanged()
+void QmitkViewNavigatorWidget::FilterChanged()
 {
     QString filterString = m_Controls.lineEdit->text();
     if (filterString.size() > 0 )
@@ -562,7 +562,7 @@ void QmitkCandyStoreWidget::FilterChanged()
     m_FilterProxyModel->setFilterRegExp(regExp);
 }
 
-void QmitkCandyStoreWidget::ItemClicked(const QModelIndex &index)
+void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)
 {
     QStandardItem* item = m_TreeModel->itemFromIndex(m_FilterProxyModel->mapToSource(index));
 
@@ -597,7 +597,7 @@ void QmitkCandyStoreWidget::ItemClicked(const QModelIndex &index)
     }
 }
 
-void QmitkCandyStoreWidget::AddPerspective()
+void QmitkViewNavigatorWidget::AddPerspective()
 {
     QmitkNewPerspectiveDialog* dialog = new QmitkNewPerspectiveDialog( m_Parent );
 
@@ -619,7 +619,7 @@ void QmitkCandyStoreWidget::AddPerspective()
     FillTreeList();
 }
 
-void QmitkCandyStoreWidget::ClonePerspective()
+void QmitkViewNavigatorWidget::ClonePerspective()
 {
     if (m_RegisteredPerspective.IsNotNull())
     {
@@ -646,13 +646,13 @@ void QmitkCandyStoreWidget::ClonePerspective()
     }
 }
 
-void QmitkCandyStoreWidget::ResetPerspective()
+void QmitkViewNavigatorWidget::ResetPerspective()
 {
     if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to reset the curent perspective?", QMessageBox::Yes|QMessageBox::No).exec())
         berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
-void QmitkCandyStoreWidget::DeletePerspective()
+void QmitkViewNavigatorWidget::DeletePerspective()
 {
     if (m_RegisteredPerspective.IsNotNull())
     {
@@ -674,7 +674,7 @@ void QmitkCandyStoreWidget::DeletePerspective()
     }
 }
 
-void QmitkCandyStoreWidget::ClosePerspective()
+void QmitkViewNavigatorWidget::ClosePerspective()
 {
     if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to close the curent perspective?", QMessageBox::Yes|QMessageBox::No).exec())
     {
@@ -689,7 +689,7 @@ void QmitkCandyStoreWidget::ClosePerspective()
     }
 }
 
-void QmitkCandyStoreWidget::CloseAllPerspectives()
+void QmitkViewNavigatorWidget::CloseAllPerspectives()
 {
     if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to close all perspectives?", QMessageBox::Yes|QMessageBox::No).exec())
     {
@@ -701,17 +701,17 @@ void QmitkCandyStoreWidget::CloseAllPerspectives()
     }
 }
 
-void QmitkCandyStoreWidget::ExpandAll()
+void QmitkViewNavigatorWidget::ExpandAll()
 {
     m_Controls.m_PluginTreeView->expandAll();
 }
 
-void QmitkCandyStoreWidget::CollapseAll()
+void QmitkViewNavigatorWidget::CollapseAll()
 {
     m_Controls.m_PluginTreeView->collapseAll();
 }
 
-void QmitkCandyStoreWidget::CustomMenuRequested(QPoint pos)
+void QmitkViewNavigatorWidget::CustomMenuRequested(QPoint pos)
 {
     QModelIndex index = m_Controls.m_PluginTreeView->indexAt(pos);
     QStandardItem* item = m_TreeModel->itemFromIndex(m_FilterProxyModel->mapToSource(index));

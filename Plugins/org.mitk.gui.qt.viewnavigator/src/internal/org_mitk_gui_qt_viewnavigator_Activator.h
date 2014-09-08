@@ -15,14 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef org_mitk_gui_qt_candystore_Activator_h
-#define org_mitk_gui_qt_candystore_Activator_h
+#ifndef org_mitk_gui_qt_viewnavigator_Activator_h
+#define org_mitk_gui_qt_viewnavigator_Activator_h
 
 #include <ctkPluginActivator.h>
 
 namespace mitk {
 
-class org_mitk_gui_qt_candystore_Activator :
+class org_mitk_gui_qt_viewnavigator_Activator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT
@@ -33,8 +33,8 @@ public:
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
-}; // org_mitk_gui_qt_candystore_Activator
+}; // org_mitk_gui_qt_viewnavigator_Activator
 
 }
 
-#endif // org_mitk_gui_qt_candystore_Activator_h
+#endif // org_mitk_gui_qt_viewnavigator_Activator_h

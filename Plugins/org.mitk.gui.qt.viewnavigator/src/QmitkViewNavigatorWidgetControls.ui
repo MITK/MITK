@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkCandyStoreWidgetControls</class>
- <widget class="QWidget" name="QmitkCandyStoreWidgetControls">
+ <class>QmitkViewNavigatorWidgetControls</class>
+ <widget class="QWidget" name="QmitkViewNavigatorWidgetControls">
   <property name="geometry">
    <rect>
     <x>0</x>

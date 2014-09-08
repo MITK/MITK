@@ -220,15 +220,20 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
                 )
 
 if(MITK_USE_Python)
-  option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)
-  # SimpleITK is required when python is enabled
-  set(MITK_USE_SimpleITK ON CACHE BOOL "Use the SimpleITK library" FORCE)
-  if(MITK_USE_SYSTEM_PYTHON)
-    FIND_PACKAGE(PythonLibs REQUIRED)
-    FIND_PACKAGE(PythonInterp REQUIRED)
-  else()
-    FIND_PACKAGE(PythonLibs)
-    FIND_PACKAGE(PythonInterp)
+  if(APPLE)
+    message(WARNING "Python wrapping is unsuported on mac OSX!")
+    set(MITK_USE_Python OFF CACHE BOOL "Use Python wrapping in MITK" FORCE)
+  else
+    option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)
+    # SimpleITK is required when python is enabled
+    set(MITK_USE_SimpleITK ON CACHE BOOL "Use the SimpleITK library" FORCE)
+    if(MITK_USE_SYSTEM_PYTHON)
+      FIND_PACKAGE(PythonLibs REQUIRED)
+      FIND_PACKAGE(PythonInterp REQUIRED)
+    else()
+      FIND_PACKAGE(PythonLibs)
+      FIND_PACKAGE(PythonInterp)
+    endif()
   endif()
 endif()
 

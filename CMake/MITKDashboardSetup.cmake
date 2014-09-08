@@ -118,6 +118,10 @@ if(NOT DEFINED MITK_BUILD_EXAMPLES)
   set(MITK_BUILD_EXAMPLES TRUE)
 endif()
 
+if(NOT DEFINED MITK_USE_Python)
+  set(MITK_USE_Python TRUE)
+endif()
+
 if(NOT BUILD_DiffusionMiniApps)
   set(BUILD_DiffusionMiniApps TRUE)
 endif()

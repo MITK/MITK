@@ -22,7 +22,5 @@ if( MITK_USE_Python )
   )
   configure_file(PythonPath.h.in "${CMAKE_CURRENT_BINARY_DIR}/PythonPath.h" @ONLY)
 
-  if(NOT APPLE)
-    add_subdirectory(Testing)
-  endif()
+  add_subdirectory(Testing)
 endif()

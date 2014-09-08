@@ -15,25 +15,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef CandyStoreView_h
-#define CandyStoreView_h
+#ifndef ViewNavigatorView_h
+#define ViewNavigatorView_h
 
 #include <berryISelectionListener.h>
 #include <QmitkAbstractView.h>
-#include <QmitkCandyStoreWidget.h>
+#include <QmitkViewNavigatorWidget.h>
 
-#include "ui_CandyStoreViewControls.h"
+#include "ui_ViewNavigatorViewControls.h"
 
 
 /**
-  \brief CandyStoreView
+  \brief ViewNavigatorView
 
   \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
-class CandyStoreView : public QmitkAbstractView
+class ViewNavigatorView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -57,8 +57,8 @@ class CandyStoreView : public QmitkAbstractView
     virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes );
 
-    Ui::CandyStoreViewControls m_Controls;
+    Ui::ViewNavigatorViewControls m_Controls;
 
 };
 
-#endif // CandyStoreView_h
+#endif // ViewNavigatorView_h

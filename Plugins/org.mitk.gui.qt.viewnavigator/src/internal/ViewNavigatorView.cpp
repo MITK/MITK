@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 // Qmitk
-#include "CandyStoreView.h"
+#include "ViewNavigatorView.h"
 
 // Qt
 #include <QMessageBox>
@@ -28,14 +28,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk image
 #include <mitkImage.h>
 
-const std::string CandyStoreView::VIEW_ID = "org.mitk.views.candystoreview";
+const std::string ViewNavigatorView::VIEW_ID = "org.mitk.views.viewnavigatorview";
 
-void CandyStoreView::SetFocus()
+void ViewNavigatorView::SetFocus()
 {
 
 }
 
-void CandyStoreView::CreateQtPartControl( QWidget *parent )
+void ViewNavigatorView::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
@@ -43,14 +43,14 @@ void CandyStoreView::CreateQtPartControl( QWidget *parent )
 
 
 //  candyStore = new QDockWidget("Candy Store");
-//  candyStore->setWidget(new QmitkCandyStoreWidget());
+//  candyStore->setWidget(new QmitkViewNavigatorWidget());
 //  candyStore->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
 //  candyStore->setVisible(false);
 //  candyStore->setObjectName("Candy Store");
 //  mainWindow->addDockWidget(Qt::LeftDockWidgetArea, candyStore);
 }
 
-void CandyStoreView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
+void ViewNavigatorView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                              const QList<mitk::DataNode::Pointer>& nodes )
 {
 

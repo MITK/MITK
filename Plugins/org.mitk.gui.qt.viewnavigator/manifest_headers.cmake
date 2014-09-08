@@ -1,4 +1,4 @@
-set(Plugin-Name "Candy Store")
+set(Plugin-Name "View Navigator")
 set(Plugin-Version "0.1")
 set(Plugin-Vendor "DKFZ, Medical and Biological Informatics")
 set(Plugin-ContactAddress "")

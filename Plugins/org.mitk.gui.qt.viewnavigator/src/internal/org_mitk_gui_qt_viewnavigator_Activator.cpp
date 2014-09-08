@@ -15,24 +15,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "org_mitk_gui_qt_candystore_Activator.h"
+#include "org_mitk_gui_qt_viewnavigator_Activator.h"
 
 #include <QtPlugin>
 
-#include "CandyStoreView.h"
+#include "ViewNavigatorView.h"
 
 namespace mitk {
 
-void org_mitk_gui_qt_candystore_Activator::start(ctkPluginContext* context)
+void org_mitk_gui_qt_viewnavigator_Activator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(CandyStoreView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(ViewNavigatorView, context)
 }
 
-void org_mitk_gui_qt_candystore_Activator::stop(ctkPluginContext* context)
+void org_mitk_gui_qt_viewnavigator_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_candystore, mitk::org_mitk_gui_qt_candystore_Activator)
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_viewnavigator, mitk::org_mitk_gui_qt_viewnavigator_Activator)

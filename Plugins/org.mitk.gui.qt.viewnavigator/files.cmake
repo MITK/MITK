@@ -1,5 +1,5 @@
 set(SRC_CPP_FILES
-  QmitkCandyStoreWidget.cpp
+  QmitkViewNavigatorWidget.cpp
   QmitkNewPerspectiveDialog.cpp
 
 #  mitkQtPerspectiveItem.h
@@ -7,20 +7,20 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  org_mitk_gui_qt_candystore_Activator.cpp
-  CandyStoreView.cpp
+  org_mitk_gui_qt_viewnavigator_Activator.cpp
+  ViewNavigatorView.cpp
 )
 
 set(UI_FILES
-  src/internal/CandyStoreViewControls.ui
-  src/QmitkCandyStoreWidgetControls.ui
+  src/internal/ViewNavigatorViewControls.ui
+  src/QmitkViewNavigatorWidgetControls.ui
 )
 
 set(MOC_H_FILES
-  src/internal/org_mitk_gui_qt_candystore_Activator.h
-  src/internal/CandyStoreView.h
+  src/internal/org_mitk_gui_qt_viewnavigator_Activator.h
+  src/internal/ViewNavigatorView.h
 
-  src/QmitkCandyStoreWidget.h
+  src/QmitkViewNavigatorWidget.h
   src/QmitkNewPerspectiveDialog.h
 )
 
@@ -30,7 +30,6 @@ set(MOC_H_FILES
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
   resources/icon.xpm
-  resources/Candy_icon.png
   plugin.xml
 )
 

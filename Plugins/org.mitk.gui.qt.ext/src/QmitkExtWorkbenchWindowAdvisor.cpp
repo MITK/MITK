@@ -138,12 +138,12 @@ private:
 
 };
 
-class PartListenerForCandyStore: public berry::IPartListener
+class PartListenerForViewNavigator: public berry::IPartListener
 {
 public:
 
-    PartListenerForCandyStore(QAction* act) :
-        candyStoreAction(act)
+    PartListenerForViewNavigator(QAction* act) :
+        viewNavigatorAction(act)
     {
     }
 
@@ -155,38 +155,38 @@ public:
 
     void PartOpened(berry::IWorkbenchPartReference::Pointer ref)
     {
-        if (ref->GetId()=="org.mitk.views.candystoreview")
+        if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
-            candyStoreAction->setChecked(true);
+            viewNavigatorAction->setChecked(true);
         }
     }
 
     void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
     {
-        if (ref->GetId()=="org.mitk.views.candystoreview")
+        if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
-            candyStoreAction->setChecked(false);
+            viewNavigatorAction->setChecked(false);
         }
     }
 
     void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
     {
-        if (ref->GetId()=="org.mitk.views.candystoreview")
+        if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
-            candyStoreAction->setChecked(true);
+            viewNavigatorAction->setChecked(true);
         }
     }
 
     void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
     {
-        if (ref->GetId()=="org.mitk.views.candystoreview")
+        if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
-            candyStoreAction->setChecked(false);
+            viewNavigatorAction->setChecked(false);
         }
     }
 
 private:
-    QAction* candyStoreAction;
+    QAction* viewNavigatorAction;
 
 };
 
@@ -302,7 +302,7 @@ public:
             windowAdvisor->undoAction->setEnabled(true);
             windowAdvisor->redoAction->setEnabled(true);
             windowAdvisor->imageNavigatorAction->setEnabled(true);
-            windowAdvisor->candyStoreAction->setEnabled(true);
+            windowAdvisor->viewNavigatorAction->setEnabled(true);
             windowAdvisor->resetPerspAction->setEnabled(true);
             if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
             {
@@ -347,7 +347,7 @@ public:
             windowAdvisor->undoAction->setEnabled(false);
             windowAdvisor->redoAction->setEnabled(false);
             windowAdvisor->imageNavigatorAction->setEnabled(false);
-            windowAdvisor->candyStoreAction->setEnabled(false);
+            windowAdvisor->viewNavigatorAction->setEnabled(false);
             windowAdvisor->resetPerspAction->setEnabled(false);
             if( windowAdvisor->GetShowClosePerspectiveMenuItem() )
             {
@@ -413,12 +413,12 @@ QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchA
     showViewMenuItem(true),
     showNewWindowMenuItem(false),
     showClosePerspectiveMenuItem(true),
-    candyStoreFound(false),
+    viewNavigatorFound(false),
     showMemoryIndicator(true),
     dropTargetListener(new QmitkDefaultDropTargetListener)
 {
     productName = QCoreApplication::applicationName().toStdString();
-    viewExcludeList.push_back("org.mitk.views.candystoreview");
+    viewExcludeList.push_back("org.mitk.views.viewnavigatorview");
 }
 
 berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
@@ -594,26 +594,26 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
         imageNavigatorAction->setToolTip("Toggle image navigator for navigating through image");
     }
 
-    candyStoreAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Candy_icon.png"), "&Candy Store", NULL);
-    candyStoreFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.candystoreview");
-    if (candyStoreFound)
+    viewNavigatorAction = new QAction("&View Navigator", NULL);
+    viewNavigatorFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.viewnavigatorview");
+    if (viewNavigatorFound)
     {
-        QObject::connect(candyStoreAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onCandyStore()));
-        candyStoreAction->setCheckable(true);
+        QObject::connect(viewNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onViewNavigator()));
+        viewNavigatorAction->setCheckable(true);
 
-        // add part listener for candy store
-        candyStorePartListener = new PartListenerForCandyStore(candyStoreAction);
-        window->GetPartService()->AddPartListener(candyStorePartListener);
-        berry::IViewPart::Pointer candystoreview =
-                window->GetActivePage()->FindView("org.mitk.views.candystoreview");
-        candyStoreAction->setChecked(false);
-        if (candystoreview)
+        // add part listener for view navigator
+        viewNavigatorPartListener = new PartListenerForViewNavigator(viewNavigatorAction);
+        window->GetPartService()->AddPartListener(viewNavigatorPartListener);
+        berry::IViewPart::Pointer viewnavigatorview =
+                window->GetActivePage()->FindView("org.mitk.views.viewnavigatorview");
+        viewNavigatorAction->setChecked(false);
+        if (viewnavigatorview)
         {
-            bool isCandyStoreVisible = window->GetActivePage()->IsPartVisible(candystoreview);
-            if (isCandyStoreVisible)
-                candyStoreAction->setChecked(true);
+            bool isViewNavigatorVisible = window->GetActivePage()->IsPartVisible(viewnavigatorview);
+            if (isViewNavigatorVisible)
+                viewNavigatorAction->setChecked(true);
         }
-        candyStoreAction->setToolTip("Toggle Candy Store");
+        viewNavigatorAction->setToolTip("Toggle View Navigator");
     }
 
     // toolbar for showing file open, undo, redo and other main actions
@@ -644,8 +644,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     {
         mainActionsToolBar->addAction(imageNavigatorAction);
     }
-    if (candyStoreFound)
-        mainActionsToolBar->addAction(candyStoreAction);
+    if (viewNavigatorFound)
+        mainActionsToolBar->addAction(viewNavigatorAction);
 
     mainWindow->addToolBar(mainActionsToolBar);
 
@@ -750,7 +750,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
             continue;
         if ((*iter)->GetId() == "org.mitk.views.imagenavigator")
             continue;
-        if ((*iter)->GetId() == "org.mitk.views.candystoreview")
+        if ((*iter)->GetId() == "org.mitk.views.viewnavigatorview")
             continue;
 
         std::pair<std::string, berry::IViewDescriptor::Pointer> p(
@@ -974,21 +974,21 @@ void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
     //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
-void QmitkExtWorkbenchWindowAdvisorHack::onCandyStore()
+void QmitkExtWorkbenchWindowAdvisorHack::onViewNavigator()
 {
-    // get candystoreView
-    berry::IViewPart::Pointer candystoreView =
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.candystoreview");
-    if (candystoreView)
+    // get viewnavigatorView
+    berry::IViewPart::Pointer viewnavigatorView =
+            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.viewnavigatorview");
+    if (viewnavigatorView)
     {
-        bool iscandystoreVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(candystoreView);
-        if (iscandystoreVisible)
+        bool isviewnavigatorVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(viewnavigatorView);
+        if (isviewnavigatorVisible)
         {
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(candystoreView);
+            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(viewnavigatorView);
             return;
         }
     }
-    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.candystoreview");
+    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.viewnavigatorview");
     //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 

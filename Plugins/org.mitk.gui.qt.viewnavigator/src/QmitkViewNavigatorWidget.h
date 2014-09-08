@@ -13,15 +13,15 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef _QMITKCandyStoreWidget_H_INCLUDED
-#define _QMITKCandyStoreWidget_H_INCLUDED
+#ifndef _QMITKViewNavigatorWidget_H_INCLUDED
+#define _QMITKViewNavigatorWidget_H_INCLUDED
 
 //QT headers
 #include <QWidget>
 #include <QString>
 
 #include <ctkSearchBox.h>
-#include "ui_QmitkCandyStoreWidgetControls.h"
+#include "ui_QmitkViewNavigatorWidgetControls.h"
 
 #include <berryISelectionListener.h>
 #include <berryIPerspectiveListener.h>
@@ -39,15 +39,15 @@ class ClassFilterProxyModel;
 
 /** @brief
   */
-class QmitkCandyStoreWidget : public QWidget
+class QmitkViewNavigatorWidget : public QWidget
 {
     //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
     Q_OBJECT
 
 public:
 
-    QmitkCandyStoreWidget (QWidget* parent = 0, Qt::WindowFlags f = 0);
-    virtual ~QmitkCandyStoreWidget();
+    QmitkViewNavigatorWidget (QWidget* parent = 0, Qt::WindowFlags f = 0);
+    virtual ~QmitkViewNavigatorWidget();
 
     virtual void CreateQtPartControl(QWidget *parent);
 
@@ -74,7 +74,7 @@ public slots:
 protected:
 
     // member variables
-    Ui::QmitkCandyStoreWidgetControls          m_Controls;
+    Ui::QmitkViewNavigatorWidgetControls          m_Controls;
     QWidget*                                    m_Parent;
     QStandardItemModel*                         m_TreeModel;
     ClassFilterProxyModel*                      m_FilterProxyModel;
@@ -85,5 +85,5 @@ private:
 
 };
 
-#endif // _QMITKCandyStoreWidget_H_INCLUDED
+#endif // _QMITKViewNavigatorWidget_H_INCLUDED
 

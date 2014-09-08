@@ -34,13 +34,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkCmdLineModuleManager.h>
 #include <ctkCmdLineModuleFrontend.h>
 #include <ctkCmdLineModuleDescription.h>
-#include <ctkCmdLineModuleParameter.h>
 #include <ctkCollapsibleGroupBox.h>
 
 // MITK
 #include <mitkIOUtil.h>
 #include <mitkDataStorage.h>
-#include <mitkDataNode.h>
+#include <mitkExceptionMacro.h>
 #include <QmitkCustomVariants.h>
 #include "QmitkCmdLineModuleGui.h"
 
@@ -540,62 +539,21 @@ void QmitkCmdLineModuleProgressWidget::Run()
       mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
       if (image != NULL)
       {
-        QString name = this->GetValidNodeName(QString::fromStdString(node->GetName()));
-        int pid = QCoreApplication::applicationPid();
-        int randomInt = qrand() % 1000000;
+        QString errorMessage;
+        QString fileName = this->SaveTemporaryImage(parameter, node, errorMessage);
 
-        QString fileNameBase = m_TemporaryDirectoryName + "/" + name + QString::number(pid) + "_" + QString::number(randomInt);
-        QString fileName = "";
-        bool writeSucess = false;
-
-        // Try to save the image using one of the specified "fileExtensions" or
-        // .nii if none have been specified.
-        if (parameter.fileExtensions().isEmpty())
+        if(fileName.size() == 0)
         {
-          fileName = fileNameBase + ".nii";
-          try
-          {
-            if (mitk::IOUtil::SaveBaseData( image, fileName.toStdString() ))
-            {
-              writeSucess = true;
-            }
-          }
-          catch(const std::exception&){}
-        }
-        else
-        {
-          foreach (QString extension, parameter.fileExtensions())
-          {
-            fileName = fileNameBase + "." + extension;
-            try
-            {
-              if (mitk::IOUtil::SaveBaseData( image, fileName.toStdString() ))
-              {
-                writeSucess = true;
-                break;
-              }
-            }
-            catch(const std::exception&)
-            {}
-          }
-        }
-
-        if(!writeSucess)
-        {
-          QStringList extensions = parameter.fileExtensions();
-          if (extensions.isEmpty())
-          {
-            extensions.push_back("nii");
-          }
-          QMessageBox::warning(this, "Saving temporary input file failed",
-                               QString("Unsupported file formats: ") + extensions.join(", "));
+          QMessageBox::warning(this, "Saving temporary file failed", errorMessage);
           return;
         }
+
         m_TemporaryFileNames.push_back(fileName);
         m_ModuleFrontEnd->setValue(parameterName, fileName);
 
         message = "Saved " + fileName;
         this->PublishMessage(message);
+
       } // end if image
     } // end if node
   } // end foreach input image
@@ -634,4 +592,69 @@ void QmitkCmdLineModuleProgressWidget::Run()
 
   // Give some immediate indication that we are running.
   m_UI->m_ProgressTitle->setText(description.title() + ": running");
+}
+
+
+//-----------------------------------------------------------------------------
+QString QmitkCmdLineModuleProgressWidget::SaveTemporaryImage(ctkCmdLineModuleParameter &parameter, mitk::DataNode::Pointer node, QString& errorMessage)
+{
+  // Don't call this if node is null or node is not an image.
+  assert(node.GetPointer());
+  mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+  assert(image);
+
+  QString fileName;
+  QString returnFileName;
+  QString intermediateError;
+  QString intermediateErrors;
+
+  QString name = this->GetValidNodeName(QString::fromStdString(node->GetName()));
+  int pid = QCoreApplication::applicationPid();
+  int randomInt = qrand() % 1000000;
+
+  QString fileNameBase = m_TemporaryDirectoryName + "/" + name + QString::number(pid) + "_" + QString::number(randomInt);
+
+  // If no file extensions are specified, we default to .nii
+  QStringList fileExts = parameter.fileExtensions();
+  if (fileExts.isEmpty())
+  {
+    fileExts.push_back(".nii");
+  }
+
+  // Try each extension until we get a good one.
+  foreach (QString extension, fileExts)
+  {
+    // File extensions may or may not include the leading dot, so add one if necessary.
+    if (!extension.startsWith("."))
+    {
+      extension.prepend(".");
+    }
+    fileName = fileNameBase + extension;
+
+    try
+    {
+      if (mitk::IOUtil::SaveBaseData( image, fileName.toStdString() ))
+      {
+        returnFileName = fileName;
+        break;
+      }
+      else
+      {
+        intermediateError = QObject::tr("Tried %1, failed to save image:\n%2\n").arg(extension).arg(fileName);
+      }
+    }
+    catch(const mitk::Exception &e)
+    {
+      intermediateError = QObject::tr("Tried %1, caught MITK Exception:\nDescription: %2\nFilename: %3\nLine: %4\n")
+                          .arg(extension).arg(e.GetDescription()).arg(e.GetFile()).arg(e.GetLine());
+    }
+    catch(const std::exception& e)
+    {
+      intermediateError = QObject::tr("Tried %1, caught exception:\nDescription: %2\n")
+                          .arg(extension).arg(e.what());
+    }
+    intermediateErrors += intermediateError;
+  }
+  errorMessage = intermediateErrors;
+  return returnFileName;
 }

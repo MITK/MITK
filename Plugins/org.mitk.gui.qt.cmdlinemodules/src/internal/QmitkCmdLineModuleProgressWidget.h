@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QTimer>
 
+#include <ctkCmdLineModuleParameter.h>
+#include <mitkDataNode.h>
+
 class QVBoxLayout;
 class QmitkCmdLineModuleGui;
 class ctkCmdLineModuleManager;
@@ -135,6 +138,20 @@ private:
    * \brief Loads any data listed in m_OutputDataToLoad into the m_DataStorage.
    */
   void LoadOutputData();
+
+  /**
+   * \brief Saves temporary image to file.
+   * \param[in] node non-NULL pointer to node containing a non-NULL mitk::Image.
+   * \param[out] errorMessage which if not empty means an error occurred.
+   * \return QString file name that was successfully saved to.
+   *
+   * If the returned file name is empty, check errorMessage.
+   * If the returned file name is not-empty, there could still be data in the errorMessage.
+   * It could be that this method tried n file extensions, before finding a successful one.
+   * In this case, the returned file name is the successful one, and the errorMessage contains
+   * error messages of all the failed attempts.
+   */
+  QString SaveTemporaryImage(ctkCmdLineModuleParameter& parameter, mitk::DataNode::Pointer node, QString& errorMessage);
 
   /**
    * \brief Utility method to look up the title from the description.

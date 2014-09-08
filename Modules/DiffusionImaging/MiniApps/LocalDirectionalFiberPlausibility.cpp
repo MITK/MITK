@@ -52,6 +52,7 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
     parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
     parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
     parser.addArgument("ignore", "n", ctkCommandLineParser::Bool, "Ignore:", "don't increase error for missing or too many directions");
+    parser.addArgument("fileID", "id", ctkCommandLineParser::String, "ID:", "optional ID field");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -77,6 +78,11 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
     bool ignore = false;
     if (parsedArgs.count("ignore"))
         ignore = us::any_cast<bool>(parsedArgs["ignore"]);
+
+    string fileID = "";
+    if (parsedArgs.count("fileID"))
+        fileID = us::any_cast<string>(parsedArgs["fileID"]);
+
 
     try
     {
@@ -210,10 +216,15 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
                     writer->Update();
                 }
 
+                string maskFileName = itksys::SystemTools::GetFilenameWithoutExtension(maskImages.at(i));
+                unsigned found = maskFileName.find_last_of("_");
+
                 string sens = itksys::SystemTools::GetFilenameWithoutExtension(itksys::SystemTools::GetFilenameName(fibFile));
+                if (!fileID.empty())
+                    sens = fileID;
                 sens.append(",");
 
-                sens.append(itksys::SystemTools::GetFilenameWithoutExtension(itksys::SystemTools::GetFilenameName(maskImages.at(i))));
+                sens.append(maskFileName.substr(found+1));
                 sens.append(",");
 
                 sens.append(boost::lexical_cast<string>(evaluationFilter->GetMeanAngularError()));
@@ -259,9 +270,8 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
             }
 
             string sens = itksys::SystemTools::GetFilenameWithoutExtension(itksys::SystemTools::GetFilenameName(fibFile));
-            sens.append(",");
-
-            sens.append("FULL");
+            if (!fileID.empty())
+                sens = fileID;
             sens.append(",");
 
             sens.append(boost::lexical_cast<string>(evaluationFilter->GetMeanAngularError()));

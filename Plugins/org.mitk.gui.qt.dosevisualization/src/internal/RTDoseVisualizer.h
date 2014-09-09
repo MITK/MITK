@@ -75,8 +75,6 @@ public:
 
   protected slots:
 
-    void OnConvertButtonClicked();
-
     void OnAddFreeValueClicked();
 
     void OnRemoveFreeValueClicked();
@@ -104,8 +102,6 @@ public:
     void UpdateFreeIsoLineColor(mitk::IsoDoseLevel* level);
 
 protected:
-
-  void InitScrolling();
 
   virtual void CreateQtPartControl(QWidget *parent);
 

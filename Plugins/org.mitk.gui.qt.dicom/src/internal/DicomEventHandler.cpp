@@ -192,7 +192,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
           mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
           dataStorage->Add(doseImageNode);
-          dataStorage->Add(doseOutlineNode);
+          dataStorage->Add(doseOutlineNode, doseImageNode);
 
           //set the dose mapper for outline drawing; the colorwash is realized by the imagevtkmapper2D
           mitk::DoseImageVtkMapper2D::Pointer contourMapper = mitk::DoseImageVtkMapper2D::New();

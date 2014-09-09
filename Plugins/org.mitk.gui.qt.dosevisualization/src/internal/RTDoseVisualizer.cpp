@@ -175,6 +175,7 @@ void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
   connect(m_Controls.isoLevelSetView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnShowContextMenuIsoSet(const QPoint&)));
   connect(m_Controls.comboPresets, SIGNAL(currentIndexChanged ( const QString&)), this, SLOT(OnCurrentPresetChanged(const QString&)));
   connect(m_Controls.btnUsePrescribedDose, SIGNAL(clicked()), this, SLOT(OnUsePrescribedDoseClicked()));
+  connect(m_Controls.isoLevelSetView->model(), SIGNAL( modelReset()), this, SLOT(OnDataChangedInIsoLevelSetView()));
 
   ctkServiceReference ref = mitk::org_mitk_gui_qt_dosevisualization_Activator::GetContext()->getServiceReference<ctkEventAdmin>();
 
@@ -210,40 +211,22 @@ void RTDoseVisualizer::OnReferenceDoseChanged(double value)
       if (this->m_selectedNode.IsNotNull())
       {
         this->m_selectedNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), value);
+        //ATM the IsoDoseContours have an own (helper) node which is a child of dose node; Will be fixed with the doseMapper refactoring
+        mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(m_selectedNode);
+        mitk::DataStorage::SetOfObjects::const_iterator iterChildNodes = childNodes->begin();
+
+        while (iterChildNodes != childNodes->end())
+        {
+          (*iterChildNodes)->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), value);
+          ++iterChildNodes;
+        }
       }
     }
     if (this->m_selectedNode.IsNotNull())
     {
-      mitk::TransferFunction::ControlPoints scalarOpacityPoints;
-      scalarOpacityPoints.push_back( std::make_pair(0, 1 ) );
-      vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-      mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = this->m_Presets[this->m_selectedPresetName];
-      for(mitk::IsoDoseLevelSet::ConstIterator setIT = isoDoseLevelSet->Begin(); setIT != isoDoseLevelSet->End(); ++setIT)
-      {
-        float *hsv = new float[3];
-        vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
-        if(setIT->GetVisibleColorWash()){
-          cCalc->RGBToHSV(setIT->GetColor()[0],setIT->GetColor()[1],setIT->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
-          transferFunction->AddHSVPoint(setIT->GetDoseValue()*value,hsv[0],hsv[1],hsv[2],1.0,1.0);
-        }
-        else
-        {
-          scalarOpacityPoints.push_back( std::make_pair(setIT->GetDoseValue()*value, 1 ) );
-        }
-      }
-      mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
-      mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
-      mitkTransFunc->SetColorTransferFunction(transferFunction);
-      mitkTransFunc->SetScalarOpacityPoints(scalarOpacityPoints);
-      mitkTransFuncProp->SetValue(mitkTransFunc);
+      this->UpdateColorWashTransferFunction();
+      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 
-      mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-      renderingMode->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
-
-      m_selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
-      m_selectedNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -299,6 +282,15 @@ void RTDoseVisualizer::OnRemoveFreeValueClicked()
 void RTDoseVisualizer::OnUsePrescribedDoseClicked()
 {
   m_Controls.spinReferenceDose->setValue(this->m_PrescribedDose_Data);
+}
+
+void RTDoseVisualizer::OnDataChangedInIsoLevelSetView()
+{
+  //colorwash visibility changed, update the colorwash
+  this->UpdateColorWashTransferFunction();
+
+  //Global Reinit if visibility of colorwash or isodoselevel changed
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 }
 
 
@@ -498,6 +490,46 @@ mitk::DataNode::Pointer RTDoseVisualizer::UpdatePolyData(int num, double min, do
   return isolineNode;
 }
 
+void RTDoseVisualizer::UpdateColorWashTransferFunction()
+{
+  //Generating the Colorwash
+  vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+
+  mitk::IsoDoseLevelSetProperty::Pointer propIsoSet = dynamic_cast<mitk::IsoDoseLevelSetProperty* >(m_selectedNode->GetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str()));
+  mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = propIsoSet->GetValue();
+
+  float referenceDose;
+  m_selectedNode->GetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),referenceDose);
+  mitk::TransferFunction::ControlPoints scalarOpacityPoints;
+  scalarOpacityPoints.push_back( std::make_pair(0, 1 ) );
+  //Backgroud
+  transferFunction->AddHSVPoint(((isoDoseLevelSet->Begin())->GetDoseValue()*referenceDose)-0.001,0,0,0,1.0,1.0);
+
+  for(mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = isoDoseLevelSet->Begin(); itIsoDoseLevel != isoDoseLevelSet->End(); ++itIsoDoseLevel)
+  {
+    float *hsv = new float[3];
+    //used for transfer rgb to hsv
+    vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
+
+    if(itIsoDoseLevel->GetVisibleColorWash())
+    {
+      cCalc->RGBToHSV(itIsoDoseLevel->GetColor()[0],itIsoDoseLevel->GetColor()[1],itIsoDoseLevel->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
+      transferFunction->AddHSVPoint(itIsoDoseLevel->GetDoseValue()*referenceDose,hsv[0],hsv[1],hsv[2],1.0,1.0);
+    }
+    else
+    {
+      scalarOpacityPoints.push_back( std::make_pair(itIsoDoseLevel->GetDoseValue()*referenceDose, 1 ) );
+    }
+  }
+
+  mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
+  mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
+  mitkTransFunc->SetColorTransferFunction(transferFunction);
+  mitkTransFunc->SetScalarOpacityPoints(scalarOpacityPoints);
+  mitkTransFuncProp->SetValue(mitkTransFunc);
+  m_selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
+}
+
 void RTDoseVisualizer::UpdateStdIsolines()
 {
   bool isDoseNode = false;
@@ -588,6 +620,7 @@ void RTDoseVisualizer::UpdateBySelectedNode()
   m_Controls.groupFreeValues->setEnabled(m_selectedNode.IsNotNull());
   m_Controls.checkGlobalVisColorWash->setEnabled(m_selectedNode.IsNotNull());
   m_Controls.checkGlobalVisIsoLine->setEnabled(m_selectedNode.IsNotNull());
+  m_Controls.isoLevelSetView->setEnabled(m_selectedNode.IsNotNull());
 
 
   if(m_selectedNode.IsNull())
@@ -760,6 +793,15 @@ void RTDoseVisualizer::ActualizeReferenceDoseForAllDoseDataNodes()
     for(mitk::DataStorage::SetOfObjects::const_iterator pos = nodes->begin(); pos != nodes->end(); ++pos)
     {
       (*pos)->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), value);
+      //ATM the IsoDoseContours have an own (helper) node which is a child of dose node; Will be fixed with the doseMapper refactoring
+      mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(*pos);
+      mitk::DataStorage::SetOfObjects::const_iterator iterChildNodes = childNodes->begin();
+
+      while (iterChildNodes != childNodes->end())
+      {
+        (*iterChildNodes)->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), value);
+        ++iterChildNodes;
+      }
     }
   }
 }

@@ -81,6 +81,8 @@ public:
 
     void OnUsePrescribedDoseClicked();
 
+    void OnDataChangedInIsoLevelSetView();
+
     void OnAbsDoseToggled(bool);
 
     void OnGlobalVisColorWashToggled(bool);
@@ -110,6 +112,9 @@ protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes );
+
+  /** Update the transfer funtion property for the color wash*/
+  void UpdateColorWashTransferFunction();
 
   /** Method updates the list widget according to the current m_freeIsoValues.*/
   void UpdateFreeIsoValues();

@@ -15,41 +15,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "org_mitk_gui_qt_rt_dosevisualization_Activator.h"
+#include "org_mitk_gui_qt_dosevisualization_Activator.h"
 
 #include <QtPlugin>
 
 #include "RTDoseVisualizer.h"
 #include "RTUIPreferencePage.h"
 #include "DoseVisualizationPreferencePage.h"
-#include "LoadingRTView.h"
 
 namespace mitk {
 
-  ctkPluginContext* org_mitk_gui_qt_rt_dosevisualization_Activator::m_Context = NULL;
+  ctkPluginContext* org_mitk_gui_qt_dosevisualization_Activator::m_Context = NULL;
 
-  void org_mitk_gui_qt_rt_dosevisualization_Activator::start(ctkPluginContext* context)
+  void org_mitk_gui_qt_dosevisualization_Activator::start(ctkPluginContext* context)
   {
     BERRY_REGISTER_EXTENSION_CLASS(RTDoseVisualizer, context);
     BERRY_REGISTER_EXTENSION_CLASS(RTUIPreferencePage, context)
     BERRY_REGISTER_EXTENSION_CLASS(DoseVisualizationPreferencePage, context)
-    BERRY_REGISTER_EXTENSION_CLASS(LoadingRTView, context)
 
       m_Context = context;
   }
 
-  void org_mitk_gui_qt_rt_dosevisualization_Activator::stop(ctkPluginContext* context)
+  void org_mitk_gui_qt_dosevisualization_Activator::stop(ctkPluginContext* context)
   {
     Q_UNUSED(context);
 
     m_Context = NULL;
   }
 
-  ctkPluginContext* org_mitk_gui_qt_rt_dosevisualization_Activator::GetContext()
+  ctkPluginContext* org_mitk_gui_qt_dosevisualization_Activator::GetContext()
   {
     return m_Context;
   }
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_rt_dosevisualization, mitk::org_mitk_gui_qt_rt_dosevisualization_Activator)
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_dosevisualization, mitk::org_mitk_gui_qt_dosevisualization_Activator)

@@ -106,7 +106,7 @@ protected:
 
   berry::IPreferences::Pointer m_DoseVisNode;
 
-  typedef mitk::rt::PresetMapType PresetMapType;
+  typedef mitk::PresetMapType PresetMapType;
   PresetMapType m_Presets;
   std::string m_selectedPresetName;
 

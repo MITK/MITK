@@ -27,8 +27,6 @@ class ctkPluginContext;
 
 namespace mitk
 {
-  namespace rt
-  {
     typedef std::map<std::string, mitk::IsoDoseLevelSet::Pointer> PresetMapType;
 
     /** Stores the given preset map in the application preferences. */
@@ -67,8 +65,6 @@ namespace mitk
 
     void SignalReferenceDoseChange(bool globalSync, mitk::DoseValueAbs value, ctkPluginContext* context);
     void SignalPresetMapChange(ctkPluginContext* context);
-
-  }
 }
 
 #endif

@@ -27,19 +27,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkPluginContext.h>
 #include <service/event/ctkEventAdmin.h>
 
-void mitk::rt::StorePresetsMap(const PresetMapType& presetMap)
+void mitk::StorePresetsMap(const PresetMapType& presetMap)
 {
   berry::IPreferencesService::Pointer prefService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  berry::IPreferences::Pointer doseVisNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
-  berry::IPreferences::Pointer presetsNode = doseVisNode->Node(mitk::rt::UIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
+  berry::IPreferences::Pointer doseVisNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
+  berry::IPreferences::Pointer presetsNode = doseVisNode->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
 
   presetsNode->RemoveNode();
   doseVisNode->Flush();
 
   //new empty preset node
-  presetsNode = doseVisNode->Node(mitk::rt::UIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
+  presetsNode = doseVisNode->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
 
   //store map in new node
   for (PresetMapType::const_iterator pos = presetMap.begin(); pos != presetMap.end(); ++pos)
@@ -55,12 +55,12 @@ void mitk::rt::StorePresetsMap(const PresetMapType& presetMap)
 
       berry::IPreferences::Pointer levelNode = aPresetNode->Node(stream.str());
 
-      levelNode->PutDouble(mitk::rt::UIConstants::ISO_LEVEL_DOSE_VALUE_ID,levelPos->GetDoseValue());
-      levelNode->PutFloat(mitk::rt::UIConstants::ISO_LEVEL_COLOR_RED_ID,levelPos->GetColor().GetRed());
-      levelNode->PutFloat(mitk::rt::UIConstants::ISO_LEVEL_COLOR_GREEN_ID,levelPos->GetColor().GetGreen());
-      levelNode->PutFloat(mitk::rt::UIConstants::ISO_LEVEL_COLOR_BLUE_ID,levelPos->GetColor().GetBlue());
-      levelNode->PutBool(mitk::rt::UIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID,levelPos->GetVisibleIsoLine());
-      levelNode->PutBool(mitk::rt::UIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID,levelPos->GetVisibleColorWash());
+      levelNode->PutDouble(mitk::RTUIConstants::ISO_LEVEL_DOSE_VALUE_ID,levelPos->GetDoseValue());
+      levelNode->PutFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_RED_ID,levelPos->GetColor().GetRed());
+      levelNode->PutFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_GREEN_ID,levelPos->GetColor().GetGreen());
+      levelNode->PutFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_BLUE_ID,levelPos->GetColor().GetBlue());
+      levelNode->PutBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID,levelPos->GetVisibleIsoLine());
+      levelNode->PutBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID,levelPos->GetVisibleColorWash());
       levelNode->Flush();
     }
 
@@ -70,12 +70,12 @@ void mitk::rt::StorePresetsMap(const PresetMapType& presetMap)
   presetsNode->Flush();
 }
 
-mitk::rt::PresetMapType mitk::rt::LoadPresetsMap()
+mitk::PresetMapType mitk::LoadPresetsMap()
 {
   berry::IPreferencesService::Pointer prefService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  berry::IPreferences::Pointer presetsNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
+  berry::IPreferences::Pointer presetsNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
 
   typedef std::vector<std::string> NamesType;
   NamesType names = presetsNode->ChildrenNames();
@@ -104,14 +104,14 @@ mitk::rt::PresetMapType mitk::rt::LoadPresetsMap()
 
       mitk::IsoDoseLevel::Pointer isoLevel = mitk::IsoDoseLevel::New();
 
-      isoLevel->SetDoseValue(levelNode->GetDouble(mitk::rt::UIConstants::ISO_LEVEL_DOSE_VALUE_ID,0.0));
+      isoLevel->SetDoseValue(levelNode->GetDouble(mitk::RTUIConstants::ISO_LEVEL_DOSE_VALUE_ID,0.0));
       mitk::IsoDoseLevel::ColorType color;
-      color.SetRed(levelNode->GetFloat(mitk::rt::UIConstants::ISO_LEVEL_COLOR_RED_ID,1.0));
-      color.SetGreen(levelNode->GetFloat(mitk::rt::UIConstants::ISO_LEVEL_COLOR_GREEN_ID,1.0));
-      color.SetBlue(levelNode->GetFloat(mitk::rt::UIConstants::ISO_LEVEL_COLOR_BLUE_ID,1.0));
+      color.SetRed(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_RED_ID,1.0));
+      color.SetGreen(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_GREEN_ID,1.0));
+      color.SetBlue(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_BLUE_ID,1.0));
       isoLevel->SetColor(color);
-      isoLevel->SetVisibleIsoLine(levelNode->GetBool(mitk::rt::UIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID,true));
-      isoLevel->SetVisibleColorWash(levelNode->GetBool(mitk::rt::UIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID,true));
+      isoLevel->SetVisibleIsoLine(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID,true));
+      isoLevel->SetVisibleColorWash(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID,true));
 
       levelSet->SetIsoDoseLevel(isoLevel);
     }
@@ -121,40 +121,40 @@ mitk::rt::PresetMapType mitk::rt::LoadPresetsMap()
 
   if (presetMap.size() == 0)
   { //if there are no presets use fallback and store it.
-    presetMap = mitk::rt::GenerateDefaultPresetsMap();
+    presetMap = mitk::GenerateDefaultPresetsMap();
     StorePresetsMap(presetMap);
   }
 
   return presetMap;
 }
 
-mitk::rt::PresetMapType mitk::rt::GenerateDefaultPresetsMap()
+mitk::PresetMapType mitk::GenerateDefaultPresetsMap()
 {
-  mitk::rt::PresetMapType result;
+  mitk::PresetMapType result;
 
-  result.insert(std::make_pair(std::string("Virtuos"), mitk::rt::GeneratIsoLevels_Virtuos()));
+  result.insert(std::make_pair(std::string("Virtuos"), mitk::GeneratIsoLevels_Virtuos()));
   return result;
 }
 
-std::string mitk::rt::GetSelectedPresetName()
+std::string mitk::GetSelectedPresetName()
 {
   berry::IPreferencesService::Pointer prefService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
+  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
 
-  std::string result = prefNode->Get(mitk::rt::UIConstants::SELECTED_ISO_PRESET_ID, "");
+  std::string result = prefNode->Get(mitk::RTUIConstants::SELECTED_ISO_PRESET_ID, "");
 
   return result;
 }
 
-void mitk::rt::SetSelectedPresetName(const std::string& presetName)
+void mitk::SetSelectedPresetName(const std::string& presetName)
 {
   berry::IPreferencesService::Pointer prefService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
-  berry::IPreferences::Pointer presetsNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
+  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
+  berry::IPreferences::Pointer presetsNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
 
   typedef std::vector<std::string> NamesType;
   NamesType presetNames = presetsNode->ChildrenNames();
@@ -166,60 +166,60 @@ void mitk::rt::SetSelectedPresetName(const std::string& presetName)
     mitkThrow()<< "Error. Tried to set invalid selected preset name. Preset name does not exist in the defined presets. Preset name: "<<presetName;
   }
 
-  prefNode->Put(mitk::rt::UIConstants::SELECTED_ISO_PRESET_ID,presetName);
+  prefNode->Put(mitk::RTUIConstants::SELECTED_ISO_PRESET_ID,presetName);
 }
 
-bool mitk::rt::GetReferenceDoseValue(mitk::DoseValueAbs& value)
+bool mitk::GetReferenceDoseValue(mitk::DoseValueAbs& value)
 {
   berry::IPreferencesService::Pointer prefService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
+  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
 
-  bool result = prefNode->GetBool(mitk::rt::UIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, true);
-  value = prefNode->GetDouble(mitk::rt::UIConstants::REFERENCE_DOSE_ID, mitk::rt::UIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
+  bool result = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, true);
+  value = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
 
   return result;
 }
 
-void mitk::rt::SetReferenceDoseValue(bool globalSync, mitk::DoseValueAbs value)
+void mitk::SetReferenceDoseValue(bool globalSync, mitk::DoseValueAbs value)
 {
   berry::IPreferencesService::Pointer prefService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
+  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
 
-  prefNode->PutBool(mitk::rt::UIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, globalSync);
+  prefNode->PutBool(mitk::RTUIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, globalSync);
   if (value >= 0)
   {
-    prefNode->PutDouble(mitk::rt::UIConstants::REFERENCE_DOSE_ID, value);
+    prefNode->PutDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, value);
   }
 }
 
 
-bool mitk::rt::GetDoseDisplayAbsolute()
+bool mitk::GetDoseDisplayAbsolute()
 {
   berry::IPreferencesService::Pointer prefService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
+  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
 
-  bool result = prefNode->GetBool(mitk::rt::UIConstants::DOSE_DISPLAY_ABSOLUTE_ID, false);
+  bool result = prefNode->GetBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID, false);
 
   return result;
 }
 
-void mitk::rt::SetDoseDisplayAbsolute(bool isAbsolute)
+void mitk::SetDoseDisplayAbsolute(bool isAbsolute)
 {
   berry::IPreferencesService::Pointer prefService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
+  berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
 
-  prefNode->PutBool(mitk::rt::UIConstants::DOSE_DISPLAY_ABSOLUTE_ID, isAbsolute);
+  prefNode->PutBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID, isAbsolute);
 }
 
-void mitk::rt::SignalReferenceDoseChange(bool globalSync, mitk::DoseValueAbs value, ctkPluginContext* context)
+void mitk::SignalReferenceDoseChange(bool globalSync, mitk::DoseValueAbs value, ctkPluginContext* context)
 {
   ctkServiceReference ref = context->getServiceReference<ctkEventAdmin>();
   if (ref)
@@ -228,18 +228,18 @@ void mitk::rt::SignalReferenceDoseChange(bool globalSync, mitk::DoseValueAbs val
     ctkProperties props;
     props["value"] = value;
     props["globalSync"] = globalSync;
-    ctkEvent presetMapChangedEvent(mitk::rt::CTKEventConstants::TOPIC_REFERENCE_DOSE_CHANGED.c_str());
+    ctkEvent presetMapChangedEvent(mitk::RTCTKEventConstants::TOPIC_REFERENCE_DOSE_CHANGED.c_str());
     eventAdmin->sendEvent(presetMapChangedEvent);
   }
 }
 
-void mitk::rt::SignalPresetMapChange(ctkPluginContext* context)
+void mitk::SignalPresetMapChange(ctkPluginContext* context)
 {
   ctkServiceReference ref = context->getServiceReference<ctkEventAdmin>();
   if (ref)
   {
     ctkEventAdmin* eventAdmin = context->getService<ctkEventAdmin>(ref);
-    ctkEvent presetMapChangedEvent(mitk::rt::CTKEventConstants::TOPIC_ISO_DOSE_LEVEL_PRESETS_CHANGED.c_str());
+    ctkEvent presetMapChangedEvent(mitk::RTCTKEventConstants::TOPIC_ISO_DOSE_LEVEL_PRESETS_CHANGED.c_str());
     eventAdmin->sendEvent(presetMapChangedEvent);
   }
 }

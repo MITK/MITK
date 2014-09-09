@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIsoLevelsGenerator.h"
 
-#include "org_mitk_gui_qt_rt_dosevisualization_Activator.h"
+#include "org_mitk_gui_qt_dosevisualization_Activator.h"
 
 DoseVisualizationPreferencePage::DoseVisualizationPreferencePage()
   : m_MainControl(0), m_Controls(0), m_referenceDoseChanged(false), m_presetMapChanged(false)
@@ -61,7 +61,7 @@ void DoseVisualizationPreferencePage::CreateQtControl(QWidget* parent)
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  m_DoseVisNode = prefService->GetSystemPreferences()->Node(mitk::rt::UIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
+  m_DoseVisNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
 
   m_MainControl = new QWidget(parent);
   m_Controls = new Ui::DoseVisualizationPreferencePageControls;
@@ -101,17 +101,17 @@ QWidget* DoseVisualizationPreferencePage::GetQtControl() const
 
 bool DoseVisualizationPreferencePage::PerformOk()
 {
-  m_DoseVisNode->PutBool(mitk::rt::UIConstants::DOSE_DISPLAY_ABSOLUTE_ID,m_Controls->radioAbsDose->isChecked());
-  m_DoseVisNode->PutBool(mitk::rt::UIConstants::GLOBAL_VISIBILITY_COLORWASH_ID,m_Controls->checkGlobalVisColorWash->isChecked());
-  m_DoseVisNode->PutBool(mitk::rt::UIConstants::GLOBAL_VISIBILITY_ISOLINES_ID,m_Controls->checkGlobalVisIsoLine->isChecked());
-  m_DoseVisNode->PutDouble(mitk::rt::UIConstants::REFERENCE_DOSE_ID,m_Controls->spinReferenceDose->value());
-  m_DoseVisNode->PutBool(mitk::rt::UIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, m_Controls->checkGlobalSync->isChecked());
+  m_DoseVisNode->PutBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID,m_Controls->radioAbsDose->isChecked());
+  m_DoseVisNode->PutBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID,m_Controls->checkGlobalVisColorWash->isChecked());
+  m_DoseVisNode->PutBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID,m_Controls->checkGlobalVisIsoLine->isChecked());
+  m_DoseVisNode->PutDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID,m_Controls->spinReferenceDose->value());
+  m_DoseVisNode->PutBool(mitk::RTUIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, m_Controls->checkGlobalSync->isChecked());
 
-  mitk::rt::StorePresetsMap(this->m_Presets);
+  mitk::StorePresetsMap(this->m_Presets);
 
   if (this->m_Presets.find(this->m_selectedPresetName)==this->m_Presets.end())
   { //the preset currently selected in the application is not available any more. Change it to a valid one.
-    mitk::rt::SetSelectedPresetName(this->m_Presets.begin()->first);
+    mitk::SetSelectedPresetName(this->m_Presets.begin()->first);
   }
 
   if (this->m_LevelSetModel->isModified())
@@ -121,12 +121,12 @@ bool DoseVisualizationPreferencePage::PerformOk()
 
   if (m_referenceDoseChanged)
   {
-    mitk::rt::SignalReferenceDoseChange(m_Controls->checkGlobalSync->isChecked(), m_Controls->spinReferenceDose->value(), mitk::org_mitk_gui_qt_rt_dosevisualization_Activator::GetContext());
+    mitk::SignalReferenceDoseChange(m_Controls->checkGlobalSync->isChecked(), m_Controls->spinReferenceDose->value(), mitk::org_mitk_gui_qt_dosevisualization_Activator::GetContext());
   }
 
   if (m_presetMapChanged)
   {
-    mitk::rt::SignalPresetMapChange(mitk::org_mitk_gui_qt_rt_dosevisualization_Activator::GetContext());
+    mitk::SignalPresetMapChange(mitk::org_mitk_gui_qt_dosevisualization_Activator::GetContext());
   }
 
   return true;
@@ -138,20 +138,20 @@ void DoseVisualizationPreferencePage::PerformCancel()
 
 void DoseVisualizationPreferencePage::Update()
 {
-  m_Controls->checkGlobalVisColorWash->setChecked(m_DoseVisNode->GetBool(mitk::rt::UIConstants::GLOBAL_VISIBILITY_COLORWASH_ID, true));
-  m_Controls->checkGlobalVisIsoLine->setChecked(m_DoseVisNode->GetBool(mitk::rt::UIConstants::GLOBAL_VISIBILITY_ISOLINES_ID, true));
-  m_Controls->radioAbsDose->setChecked(m_DoseVisNode->GetBool(mitk::rt::UIConstants::DOSE_DISPLAY_ABSOLUTE_ID, true));
-  m_Controls->radioRelDose->setChecked(!(m_DoseVisNode->GetBool(mitk::rt::UIConstants::DOSE_DISPLAY_ABSOLUTE_ID, false)));
-  m_Controls->spinReferenceDose->setValue(m_DoseVisNode->GetDouble(mitk::rt::UIConstants::REFERENCE_DOSE_ID, mitk::rt::UIConstants::DEFAULT_REFERENCE_DOSE_VALUE));
-  m_Controls->checkGlobalSync->setChecked(m_DoseVisNode->GetBool(mitk::rt::UIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, true));
+  m_Controls->checkGlobalVisColorWash->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID, true));
+  m_Controls->checkGlobalVisIsoLine->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID, true));
+  m_Controls->radioAbsDose->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID, true));
+  m_Controls->radioRelDose->setChecked(!(m_DoseVisNode->GetBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID, false)));
+  m_Controls->spinReferenceDose->setValue(m_DoseVisNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE));
+  m_Controls->checkGlobalSync->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, true));
 
   m_referenceDoseChanged = false;
   m_presetMapChanged = false;
 
 
-  berry::IPreferences::Pointer presetsNode = m_DoseVisNode->Node(mitk::rt::UIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
-  this->m_Presets = mitk::rt::LoadPresetsMap();
-  this->m_selectedPresetName = mitk::rt::GetSelectedPresetName();
+  berry::IPreferences::Pointer presetsNode = m_DoseVisNode->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
+  this->m_Presets = mitk::LoadPresetsMap();
+  this->m_selectedPresetName = mitk::GetSelectedPresetName();
   UpdatePresetsWidgets();
 }
 
@@ -307,7 +307,7 @@ void DoseVisualizationPreferencePage::OnAddPresetClicked(bool checked)
     done = uniqueName && validName;
   }
 
-  mitk::IsoDoseLevelSet::Pointer newSet = mitk::rt::GeneratIsoLevels_Virtuos();
+  mitk::IsoDoseLevelSet::Pointer newSet = mitk::GeneratIsoLevels_Virtuos();
   m_Presets.insert(std::make_pair(name.toStdString(),newSet));
 
   m_presetMapChanged = true;
@@ -343,7 +343,7 @@ void DoseVisualizationPreferencePage::OnResetPresetClicked(bool checked)
 
   if (ret == QMessageBox::Yes)
   {
-    mitk::IsoDoseLevelSet::Pointer newSet = mitk::rt::GeneratIsoLevels_Virtuos();
+    mitk::IsoDoseLevelSet::Pointer newSet = mitk::GeneratIsoLevels_Virtuos();
     m_Presets.clear();
     m_Presets.insert(std::make_pair("Virtuos",newSet));
 

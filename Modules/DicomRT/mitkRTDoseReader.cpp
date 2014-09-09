@@ -81,9 +81,9 @@ namespace mitk
     double prescripeDose = this->GetMaxDoseValue(dataset);
 
     originalNode->SetName("RT Dose");
-    originalNode->SetFloatProperty(mitk::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
-    originalNode->SetFloatProperty(mitk::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
-    originalNode->SetBoolProperty(mitk::Constants::DOSE_PROPERTY_NAME.c_str(),true);
+    originalNode->SetFloatProperty(mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
+    originalNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
+    originalNode->SetBoolProperty(mitk::RTConstants::DOSE_PROPERTY_NAME.c_str(),true);
     return originalNode;
   }
 

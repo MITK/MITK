@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include <mitkDataNodeFactory.h>
 
-#include <mitkDicomRTReader.h>
-
 #include "ui_RTDoseVisualizerControls.h"
 
 #include <mitkIsoDoseLevelCollections.h>
@@ -184,7 +182,7 @@ protected:
   * current iso preset. It held as own member because visibility
   * settings may differ.*/
   mitk::IsoDoseLevelSet::Pointer m_selectedNodeIsoSet;
-  mitk::rt::PresetMapType m_Presets;
+  mitk::PresetMapType m_Presets;
   std::string m_selectedPresetName;
 
   mitk::DataNode::Pointer m_FreeIsoline;

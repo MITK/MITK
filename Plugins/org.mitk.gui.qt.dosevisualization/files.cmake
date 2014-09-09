@@ -2,27 +2,24 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  org_mitk_gui_qt_rt_dosevisualization_Activator.cpp
+  org_mitk_gui_qt_dosevisualization_Activator.cpp
   RTDoseVisualizer.cpp
   RTUIPreferencePage.cpp
   DoseVisualizationPreferencePage.cpp
   mitkDoseVisPreferenceHelper.cpp
-  LoadingRTView.cpp
 )
 
 set(UI_FILES
   src/internal/RTDoseVisualizerControls.ui
   src/internal/DoseVisualizationPreferencePageControls.ui
   src/internal/RTUIPreferencePageControls.ui
-  src/internal/LoadingRTViewControls.ui
 )
 
 set(MOC_H_FILES
-  src/internal/org_mitk_gui_qt_rt_dosevisualization_Activator.h
+  src/internal/org_mitk_gui_qt_dosevisualization_Activator.h
   src/internal/RTDoseVisualizer.h
   src/internal/RTUIPreferencePage.h
   src/internal/DoseVisualizationPreferencePage.h
-  src/internal/LoadingRTView.h
 )
 
 # list of resource files which can be used by the plug-in

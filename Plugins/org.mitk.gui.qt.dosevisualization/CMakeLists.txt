@@ -1,4 +1,4 @@
-project(org_mitk_gui_qt_rt_dosevisualization)
+project(org_mitk_gui_qt_dosevisualization)
 
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE RTDOSEVISUALIZATION_EXPORT

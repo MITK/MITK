@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-struct MitkDicomRT_EXPORT Constants
+struct MitkDicomRT_EXPORT RTConstants
 {
   /**
       * Name of the property that indicates if a data/node is a dose.

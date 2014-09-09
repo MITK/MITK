@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionDICOMFileReader.h"
 #include "mitkDICOMTagBasedSorter.h"
 #include "mitkDICOMSortByTag.h"
+#include "mitkSortByImagePositionPatient.h"
 
 #include "gdcmDirectory.h"
 #include "gdcmScanner.h"
@@ -442,16 +443,17 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
       tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
       tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0037) ); // Image Orientation (Patient) // TODO add tolerance parameter (l. 1572 of original code)
       // TODO handle as real vectors! cluster with configurable errors!
-      //tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x000e) ); // Series Instance UID
+      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x000e) ); // Series Instance UID
       tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0018, 0x0050) ); // Slice Thickness
       tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0008) ); // Number of Frames
-      tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
+      //tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
 
       // gdcmReader->AddSortingElement( tagSorter );
       //mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
 
       mitk::DICOMSortCriterion::ConstPointer sorting =
-          mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
+        mitk::SortByImagePositionPatient::New(  // Image Position (Patient)
+          //mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
              mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), // aqcuisition number
                 mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
                    mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), // trigger time
@@ -460,12 +462,24 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
                   ).GetPointer()
                 ).GetPointer()
              ).GetPointer()
-          ).GetPointer();
+        // ).GetPointer()
+        ).GetPointer();
       tagSorter->SetSortCriterion( sorting );
 
       gdcmReader->AddSortingElement( tagSorter );
       gdcmReader->SetInputFiles( complete_list );
-      gdcmReader->AnalyzeInputFiles();
+      try
+      {
+        gdcmReader->AnalyzeInputFiles();
+      }
+      catch( const itk::ExceptionObject &e)
+      {
+        MITK_ERROR << "Failed to analyze data. " << e.what();
+      }
+      catch( const std::exception &se)
+      {
+        MITK_ERROR << "Std Exception " << se.what();
+      }
 
       gdcmReader->LoadImages();
 

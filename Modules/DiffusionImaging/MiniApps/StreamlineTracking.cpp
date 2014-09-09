@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int StreamlineTracking(int argc, char* argv[])
 {
+    MITK_INFO << "StreamlineTracking";
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", ctkCommandLineParser::StringList, "Input image", "input tensor image (.dti)", us::Any(), false);
@@ -181,7 +182,6 @@ int StreamlineTracking(int argc, char* argv[])
         MITK_INFO << "ERROR!?!";
         return EXIT_FAILURE;
     }
-    MITK_INFO << "DONE";
     return EXIT_SUCCESS;
 }
 RegisterDiffusionMiniApp(StreamlineTracking);

@@ -103,6 +103,7 @@ static void ExtractMapsAndSave(mitk::TensorImage::Pointer tensorImage, std::stri
 int TensorDerivedMapsExtraction(int argc, char* argv[])
 {
 
+    MITK_INFO << "TensorDerivedMapsExtraction";
   ctkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("help", "h", ctkCommandLineParser::String, "Help", "Show this help text");

@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int LocalDirectionalFiberPlausibility(int argc, char* argv[])
 {
+    MITK_INFO << "LocalDirectionalFiberPlausibility";
     ctkCommandLineParser parser;
 
     parser.setTitle("Local Directional Fiber Plausibility");
@@ -159,7 +160,6 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
                 outfilename.append(boost::lexical_cast<string>(i));
                 outfilename.append(".nrrd");
 
-                MITK_INFO << "writing " << outfilename;
                 writer->SetFileName(outfilename.c_str());
                 writer->SetInput(itkImg);
                 writer->Update();
@@ -174,7 +174,6 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
                 string outfilename = outRoot;
                 outfilename.append("_NUM_DIRECTIONS.nrrd");
 
-                MITK_INFO << "writing " << outfilename;
                 writer->SetFileName(outfilename.c_str());
                 writer->SetInput(numDirImage);
                 writer->Update();
@@ -210,7 +209,6 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
                     string outfilename = outRoot;
                     outfilename.append("_ERROR_IMAGE.nrrd");
 
-                    MITK_INFO << "writing " << outfilename;
                     writer->SetFileName(outfilename.c_str());
                     writer->SetInput(angularErrorImage);
                     writer->Update();
@@ -263,7 +261,6 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
                 string outfilename = outRoot;
                 outfilename.append("_ERROR_IMAGE.nrrd");
 
-                MITK_INFO << "writing " << outfilename;
                 writer->SetFileName(outfilename.c_str());
                 writer->SetInput(angularErrorImage);
                 writer->Update();
@@ -291,8 +288,6 @@ int LocalDirectionalFiberPlausibility(int argc, char* argv[])
             file << sens;
         }
         file.close();
-
-        MITK_INFO << "DONE";
     }
     catch (itk::ExceptionObject e)
     {

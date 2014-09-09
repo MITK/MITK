@@ -34,6 +34,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     MultishellMethods.cpp
     Fiberfox.cpp
     ExportShImage.cpp
+    ImportShImage.cpp
     NetworkCreation.cpp
     NetworkStatistics.cpp
     DwiDenoising.cpp

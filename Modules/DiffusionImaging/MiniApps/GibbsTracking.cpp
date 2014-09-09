@@ -86,6 +86,7 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
 
 int GibbsTracking(int argc, char* argv[])
 {
+    MITK_INFO << "GibbsTracking";
     ctkCommandLineParser parser;
 
     parser.setTitle("Gibbs Tracking");

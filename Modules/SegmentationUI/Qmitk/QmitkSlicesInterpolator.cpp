@@ -907,16 +907,13 @@ void QmitkSlicesInterpolator::ChangeSurfaceColor()
 {
   float currentColor[3];
   m_InterpolatedSurfaceNode->GetColor(currentColor);
-  MITK_INFO<<"Current color: "<<currentColor[0]<<", "<<currentColor[1]<<", "<<currentColor[2];
 
-  if( currentColor[2] == /*yellow*/SURFACE_COLOR_RGB[2])
+  if( currentColor[2] == SURFACE_COLOR_RGB[2])
   {
-    MITK_INFO<<"Changing white";
     m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(1.0f,1.0f,1.0f));
   }
   else
   {
-    MITK_INFO<<"Changing green";
     m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(SURFACE_COLOR_RGB));
   }
   m_InterpolatedSurfaceNode->Update();

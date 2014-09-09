@@ -223,7 +223,7 @@ if(MITK_USE_Python)
   if(APPLE)
     message(WARNING "Python wrapping is unsuported on mac OSX!")
     set(MITK_USE_Python OFF CACHE BOOL "Use Python wrapping in MITK" FORCE)
-  else
+  else()
     option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)
     # SimpleITK is required when python is enabled
     set(MITK_USE_SimpleITK ON CACHE BOOL "Use the SimpleITK library" FORCE)

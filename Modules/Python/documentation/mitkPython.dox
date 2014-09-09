@@ -21,12 +21,12 @@ The following build options are available:
 \subsection ssec1 MITK_USE_Python 
 MITK_USE_Python enables the python wrapping in MITK. When the option is activated
 the build of the additional dependency SimpleITK is also enabled. The default behaviour is to download and build
-Python 2.7.3 with numpy and em,bedd it into MITK.To use an own custom runtime see MITK_USE_SYSTEM_PYTHON.
+Python 2.7.3 with numpy and embed it into MITK.To use an own custom runtime see MITK_USE_SYSTEM_PYTHON.
 
 \subsection ssec2 MITK_USE_SYSTEM_PYTHON
-If MITK_USE_SYSTEM_PYTHON is activated the python runtime from the system is used.
+This option is deactivated by default. If MITK_USE_SYSTEM_PYTHON is activated the python runtime from the system is used.
 The user can also specify it's own runtime by modifing the variables added by the
-FindPythonLib.cmake script. <strong>Note:</strong> A Python runtime with numpy is needed for the MITK Python wrapping.
+FindPythonLib.cmake script. <strong>Note:</strong> A Python runtime with numpy is needed to use the MITK Python wrapping.
 
 \section sec3 Suported Data Types
 The following data types in MITK are supported in the MITK Python Wrapping:
@@ -44,6 +44,6 @@ can also be transferred as an OpenCV image to python.
 \subsection ssec5 Surface
 Surfaces within mitk can be transferred as a vtkPolyData Object to Python.
 The surfaces are fully memory mapped. When changing a python wrapped surface 
-in python, the original object is also modified on the C++ side of MITK.
+the original object is also modified on the C++ side of MITK.
 
  */

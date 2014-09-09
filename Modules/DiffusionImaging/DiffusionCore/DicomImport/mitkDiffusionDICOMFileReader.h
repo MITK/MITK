@@ -42,6 +42,11 @@ public:
 
   virtual bool CanHandleFile(const std::string &filename);
 
+  void SetResolveMosaic( bool flag )
+  {
+    m_ResolveMosaic = flag;
+  }
+
 protected:
     DiffusionDICOMFileReader();
     virtual ~DiffusionDICOMFileReader();
@@ -53,6 +58,8 @@ protected:
     std::vector< mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType > m_OutputHeaderContainer;
     std::vector< mitk::DiffusionHeaderDICOMFileReader::Pointer> m_OutputReaderContainer;
     std::vector< bool > m_IsMosaicData;
+
+    bool m_ResolveMosaic;
 };
 
 }

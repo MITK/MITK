@@ -19,7 +19,10 @@ void mitk::DiffusionHeaderSiemensMosaicDICOMFileReader
 ::RetrieveMosaicInformation(std::string filename)
 {
   // retrieve also mosaic information
-  this->ReadDiffusionHeader( filename );
+  if( !this->ReadDiffusionHeader( filename ) )
+  {
+    MITK_ERROR << "Using MOSAIC Reader for non-mosaic files ";
+  }
 
   gdcm::Reader gdcmReader;
   gdcmReader.SetFileName( filename.c_str() );

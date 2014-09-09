@@ -343,6 +343,13 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="m_SplitMosaicCheckBox">
+        <property name="text">
+         <string>Split Mosaic </string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

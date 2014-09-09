@@ -466,6 +466,8 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
         ).GetPointer();
       tagSorter->SetSortCriterion( sorting );
 
+      // mosaic
+      gdcmReader->SetResolveMosaic( this->m_Controls->m_SplitMosaicCheckBox->isChecked() );
       gdcmReader->AddSortingElement( tagSorter );
       gdcmReader->SetInputFiles( complete_list );
       try

@@ -320,12 +320,11 @@ void mitk::DoseImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
   //get the number of scalar components to distinguish between different image types
   int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();
-  //get the binary property
-  bool binary = false;
-  bool binaryOutline = false;
-  datanode->GetBoolProperty( "binary", binary, renderer );
-  datanode->GetBoolProperty( "outline binary", binaryOutline, renderer );
-  if(binaryOutline) //contour rendering
+  //get the showIsoLines property
+  bool showIsoLines = false;
+  datanode->GetBoolProperty( "dose.showIsoLines", showIsoLines, renderer );
+
+  if(showIsoLines) //contour rendering
   {
     //generate contours/outlines
     localStorage->m_OutlinePolyData = CreateOutlinePolyData(renderer);
@@ -344,6 +343,12 @@ void mitk::DoseImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
       localStorage->m_Actor->GetProperty()->SetLineWidth( binaryOutlineWidth );
     }
+  }
+  else
+  {
+    localStorage->m_ReslicedImage = NULL;
+    localStorage->m_Mapper->SetInputData( localStorage->m_EmptyPolyData );
+    return;
   }
 
   this->ApplyOpacity( renderer );
@@ -381,7 +386,7 @@ void mitk::DoseImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
   vtkActor* contourShadowActor = dynamic_cast<vtkActor*> (localStorage->m_Actors->GetParts()->GetItemAsObject(0));
 
-  if(binaryOutline) //connect the mapper with the polyData which contains the lines
+  if(showIsoLines) //connect the mapper with the polyData which contains the lines
   {
     //We need the contour for the binary outline property as actor
     localStorage->m_Mapper->SetInputData(localStorage->m_OutlinePolyData);

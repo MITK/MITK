@@ -167,6 +167,8 @@ int vtkMitkThickSlicesFilterTest(int argc, char** const argv)
   thickSliceFilter->Update();
   vtkMitkThickSlicesFilterTestHelper::EvaluateResult( 6, thickSliceFilter->GetOutput(), "Mean" );
 
+  thickSliceFilter->Delete();
+
   MITK_TEST_END()
 }
 

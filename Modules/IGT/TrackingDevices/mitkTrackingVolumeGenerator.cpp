@@ -70,7 +70,10 @@ void mitk::TrackingVolumeGenerator::GenerateData()
   }
   if (filename.compare("") == 0) // empty String means no model, return empty output
   {
-    output->SetVtkPolyData(vtkPolyData::New()); //initialize with empty poly data (otherwise old surfaces may be returned) => so an empty surface is returned
+    // initialize with empty poly data (otherwise old surfaces may be returned) => so an empty surface is returned
+    vtkPolyData *emptyPolyData = vtkPolyData::New();
+    output->SetVtkPolyData(emptyPolyData);
+    emptyPolyData->Delete();
     return;
   }
 

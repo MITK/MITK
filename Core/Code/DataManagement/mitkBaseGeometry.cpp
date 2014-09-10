@@ -268,9 +268,7 @@ double mitk::BaseGeometry::GetDiagonalLength2() const
   return diagonalvector.GetSquaredNorm();
 }
 
-//##Documentation
-//## @brief Get the length of the diagonal of the bounding-box in mm
-//##
+
 double mitk::BaseGeometry::GetDiagonalLength() const
 {
   return sqrt(GetDiagonalLength2());
@@ -434,36 +432,13 @@ void mitk::BaseGeometry::BackTransform(const mitk::Vector3D& in, mitk::Vector3D&
 
 void mitk::BaseGeometry::BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const
 {
-  mitk::Point3D temp;
+  mitk::Vector3D tempIn, tempOut;
   const TransformType::OffsetType& offset = this->GetIndexToWorldTransform()->GetOffset();
+  tempIn = in.GetVectorFromOrigin() - offset;
 
-  temp = in - offset;
+  BackTransform(tempIn, tempOut);
 
-
-  // Get WorldToIndex transform
-  if (m_IndexToWorldTransformLastModified != this->GetIndexToWorldTransform()->GetMTime())
-  {
-    if (!m_InvertedTransform)
-    {
-      m_InvertedTransform = TransformType::New();
-    }
-    if (!this->GetIndexToWorldTransform()->GetInverse( m_InvertedTransform.GetPointer() ))
-    {
-      itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
-    }
-    m_IndexToWorldTransformLastModified = this->GetIndexToWorldTransform()->GetMTime();
-  }
-
-  // Check for valid matrix inversion
-  const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
-  if(inverse.GetVnlMatrix().has_nans())
-  {
-    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
-      << this->GetIndexToWorldTransform()->GetMatrix() << "Suggested inverted matrix is:" << std::endl
-      << inverse );
-  }
-
-  out = inverse * temp;
+  out = tempOut;
 
 }
 

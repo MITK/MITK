@@ -96,7 +96,6 @@ namespace mitk {
   void GeometryTransformHolder::TransferVtkToItkTransform()
   {
     TransferVtkMatrixToItkTransform(m_VtkMatrix, m_IndexToWorldTransform.GetPointer());
-    TransferItkToVtkTransform(); //xxxxxxxxxxxx ich bin mir sher sicher, dass man das nicht braucht!!!!
   }
 
   //##Documentation

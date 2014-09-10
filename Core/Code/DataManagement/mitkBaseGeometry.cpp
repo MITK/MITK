@@ -31,15 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometryTransformHolder.h"
 
 
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------
-// -------------------------- BaseGeometry ------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------------------------------------------
-
 mitk::BaseGeometry::BaseGeometry(): Superclass(), mitk::OperationActor(),
   m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0), m_ImageGeometry(false), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
 {
-  m_GeometryTransform = new GeometryTransformHolder(); //wie geht das mit Macro??
+  m_GeometryTransform = new GeometryTransformHolder();
   Initialize();
 }
 
@@ -47,13 +42,13 @@ mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), mitk:
   m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified),
   m_ImageGeometry(other.m_ImageGeometry), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
 {
-  m_GeometryTransform = new GeometryTransformHolder(*other.GetGeometryTransformHolder()); // TODO SW: call BaseGeometry() constructor instead of this code duplication?
+  m_GeometryTransform = new GeometryTransformHolder(*other.GetGeometryTransformHolder());
   other.InitializeGeometry(this);
 }
 
 mitk::BaseGeometry::~BaseGeometry()
 {
-  delete m_GeometryTransform;//Macro?! ->Delete();
+  delete m_GeometryTransform;
 }
 
 void mitk::BaseGeometry::SetVtkMatrixDeepCopy(vtkTransform *vtktransform)
@@ -123,8 +118,7 @@ void
   mitk::BaseGeometry::InitializeGeometry(BaseGeometry* newGeometry) const
 {
   newGeometry->SetBounds(m_BoundingBox->GetBounds());
-  // we have to create a new transform!!
-  //newGeometry->SetTimeBounds(m_TimeBounds);
+
   newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
 
   newGeometry->InitializeGeometryTransformHolder(this);
@@ -136,7 +130,6 @@ void
 
 void mitk::BaseGeometry::InitializeGeometryTransformHolder(const BaseGeometry* otherGeometry)
 {
-  //this = neue Geo, die werte von other bekommen soll.
   this->m_GeometryTransform->Initialize(otherGeometry->GetGeometryTransformHolder());
 }
 
@@ -213,15 +206,13 @@ void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D& aSpacing, bool enforc
   m_GeometryTransform->SetSpacing(aSpacing, enforceSetSpacing);
 }
 
-
-
 void mitk::BaseGeometry::PreSetSpacing(const mitk::Vector3D& /*aSpacing*/)
 {}
 
 mitk::Vector3D mitk::BaseGeometry::GetAxisVector(unsigned int direction) const
 {
   Vector3D frontToBack;
-  frontToBack.SetVnlVector(m_GeometryTransform->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction));
+  frontToBack.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction));
   frontToBack *= GetExtent(direction);
   return frontToBack;
 }
@@ -268,7 +259,7 @@ bool mitk::BaseGeometry::Is2DConvertable()
 mitk::Point3D mitk::BaseGeometry::GetCenter() const
 {
   assert(m_BoundingBox.IsNotNull());
-  return m_GeometryTransform->GetIndexToWorldTransform()->TransformPoint(m_BoundingBox->GetCenter());
+  return this->GetIndexToWorldTransform()->TransformPoint(m_BoundingBox->GetCenter());
 }
 
 double mitk::BaseGeometry::GetDiagonalLength2() const
@@ -338,7 +329,7 @@ mitk::Point3D mitk::BaseGeometry::GetCornerPoint(bool xFront, bool yFront, bool 
 
 mitk::ScalarType mitk::BaseGeometry::GetExtentInMM(int direction) const
 {
-  return m_GeometryTransform->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction);
+  return this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction);
 }
 
 void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
@@ -417,7 +408,10 @@ void mitk::BaseGeometry::BackTransform(const mitk::Vector3D& in, mitk::Vector3D&
   // Get WorldToIndex transform
   if (m_IndexToWorldTransformLastModified != this->GetIndexToWorldTransform()->GetMTime())
   {
-    m_InvertedTransform = TransformType::New();
+    if (!m_InvertedTransform)
+    {
+      m_InvertedTransform = TransformType::New();
+    }
     if (!this->GetIndexToWorldTransform()->GetInverse( m_InvertedTransform.GetPointer() ))
     {
       itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
@@ -433,6 +427,7 @@ void mitk::BaseGeometry::BackTransform(const mitk::Vector3D& in, mitk::Vector3D&
       << this->GetIndexToWorldTransform()->GetMatrix() << "Suggested inverted matrix is:" << std::endl
       << inverse );
   }
+
 
   // Transform vector
   for (unsigned int i = 0; i < 3; i++)
@@ -460,7 +455,10 @@ void mitk::BaseGeometry::BackTransform(const mitk::Point3D &in, mitk::Point3D& o
   // Get WorldToIndex transform
   if (m_IndexToWorldTransformLastModified != this->GetIndexToWorldTransform()->GetMTime())
   {
-    m_InvertedTransform = TransformType::New();
+    if (!m_InvertedTransform)
+    {
+      m_InvertedTransform = TransformType::New();
+    }
     if (!this->GetIndexToWorldTransform()->GetInverse( m_InvertedTransform.GetPointer() ))
     {
       itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );

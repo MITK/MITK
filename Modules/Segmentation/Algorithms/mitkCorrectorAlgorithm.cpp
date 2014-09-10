@@ -93,7 +93,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
   temporarySlice->SetTimeGeometry(originalGeometry);
 }
 
-void mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic)
+bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic)
 {
 /*!
 Some documentation (not by the original author)
@@ -123,22 +123,25 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
 
   ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice( m_WorkingImage, m_Contour, true, false );
 
+  bool firstPointIsFillingColor = false;
+
   if (projectedContour.IsNull() ||
     projectedContour->GetNumberOfVertices() < 2 )
   {
-    return;
+    return false;
   }
 
   // Read the first point of the contour
   ContourModel::VertexIterator contourIter = projectedContour->Begin();
   if (contourIter == projectedContour->End())
-    return;
+    return false;
   itk::Index<2> previousIndex;
   previousIndex[0] = (*contourIter)->Coordinates[0];
   previousIndex[1] = (*contourIter)->Coordinates[1];
   ++contourIter;
 
   int currentColor = ( pic->GetPixel(previousIndex) == m_FillColor);
+  firstPointIsFillingColor = currentColor;
   TSegData currentSegment;
   int countOfSegments = 1;
 
@@ -159,7 +162,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     double deltaX = slopeX / length;
     double deltaY = slopeY / length;
 
-    for (double i = 0; i < length; i+=1)
+    for (double i = 0; i <= length && length > 0; i+=1)
     {
       itk::Index<2> temporaryIndex;
       temporaryIndex[0] = previousIndex[0] + deltaX * i;
@@ -186,27 +189,19 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   }
 
   // Check if only on Segment
-  if (firstSegment)
+  if (firstSegment && currentSegment.points.size() > 0)
   {
-    itk::Index<2> firstPoint = currentSegment.points.front();
-    itk::Index<2> lastPoint = currentSegment.points.back();
-
-    double slopeX = firstPoint[0] - lastPoint[0];
-    double slopeY = firstPoint[1] - lastPoint[1];
-    double length = std::sqrt(slopeX * slopeX + slopeY * slopeY);
-    double deltaX = slopeX / length;
-    double deltaY = slopeY / length;
-
-    for (double i = 0; i < length; i+=1)
-    {
-      itk::Index<2> temporaryIndex;
-      temporaryIndex[0] = lastPoint[0] + deltaX * i;
-      temporaryIndex[1] = lastPoint[1] + deltaY * i;
-      currentSegment.points.push_back(temporaryIndex);
-    }
-    ModifySegment(currentSegment, pic);
-    // Fill this segment as usual
+      ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice( m_WorkingImage, m_Contour, true, false );
+      projectedContour->Close();
+      if (firstPointIsFillingColor)
+      {
+        ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_EraseColor);
+      } else
+      {
+        ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_FillColor);
+      }
   }
+  return true;
 }
 
 static void ColorSegment(const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic, int fillColor, int eraseColor)
@@ -329,15 +324,15 @@ bool  mitk::CorrectorAlgorithm::ModifySegment(const TSegData &segment, itk::Imag
   {
     typedef itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer ItkImagePointerType;
     // Find the current ColorMode:
-    ColorSegment(segment, pic, m_FillColor, m_EraseColor);
 
       // Kein erster Punkt
         // Erster Punkt finden
     ItkImagePointerType firstSideImage = CloneImage(pic);
+    ColorSegment(segment, firstSideImage, m_FillColor, m_EraseColor);
+    ItkImagePointerType secondSideImage = CloneImage(firstSideImage);
     itk::Index<2> firstPoint = GetFirstPoint(segment,  firstSideImage, m_FillColor);
     int firstSidePixel = FillRegion(firstPoint, firstSideImage, m_FillColor, m_EraseColor);
 
-    ItkImagePointerType secondSideImage = CloneImage(pic);
     // TODO  Problem: Was ist wenn keine Zweite Seite vorhanden?
     try
     {

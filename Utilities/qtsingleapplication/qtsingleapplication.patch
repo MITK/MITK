@@ -53,6 +53,28 @@ index 1b533b1..07374d9 100644
  
  protected Q_SLOTS:
      void receiveConnection();
+diff --git a/Utilities/qtsingleapplication/qtlockedfile_win.cpp b/Utilities/qtsingleapplication/qtlockedfile_win.cpp
+index 5e21262..a44620b 100644
+--- a/Utilities/qtsingleapplication/qtlockedfile_win.cpp
++++ b/Utilities/qtsingleapplication/qtlockedfile_win.cpp
+@@ -63,7 +63,7 @@ Qt::HANDLE QtLockedFile::getMutexHandle(int idx, bool doCreate)
+ 
+     Qt::HANDLE mutex;
+     if (doCreate) {
+-        QT_WA( { mutex = CreateMutexW(NULL, FALSE, (TCHAR*)mname.utf16()); },
++        QT_WA( { mutex = CreateMutexW(NULL, FALSE, reinterpret_cast<LPCWSTR>(mname.utf16())); },
+                { mutex = CreateMutexA(NULL, FALSE, mname.toLocal8Bit().constData()); } );
+         if (!mutex) {
+             qErrnoWarning("QtLockedFile::lock(): CreateMutex failed");
+@@ -71,7 +71,7 @@ Qt::HANDLE QtLockedFile::getMutexHandle(int idx, bool doCreate)
+         }
+     }
+     else {
+-        QT_WA( { mutex = OpenMutexW(SYNCHRONIZE | MUTEX_MODIFY_STATE, FALSE, (TCHAR*)mname.utf16()); },
++        QT_WA( { mutex = OpenMutexW(SYNCHRONIZE | MUTEX_MODIFY_STATE, FALSE, reinterpret_cast<LPCWSTR>(mname.utf16())); },
+                { mutex = OpenMutexA(SYNCHRONIZE | MUTEX_MODIFY_STATE, FALSE, mname.toLocal8Bit().constData()); } );
+         if (!mutex) {
+             if (GetLastError() != ERROR_FILE_NOT_FOUND)
 diff --git a/Utilities/qtsingleapplication/qtsingleapplication.cpp b/Utilities/qtsingleapplication/qtsingleapplication.cpp
 index d0fb15d..b2f2058 100644
 --- a/Utilities/qtsingleapplication/qtsingleapplication.cpp

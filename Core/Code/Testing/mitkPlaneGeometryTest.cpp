@@ -58,7 +58,6 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
 private:
   // private test members that are initialized by setUp()
   mitk::PlaneGeometry::Pointer planegeometry;
-
   mitk::Point3D origin;
   mitk::Vector3D right, bottom, normal;
   mitk::ScalarType width, height;
@@ -69,7 +68,6 @@ public:
   void setUp()
   {
     planegeometry = mitk::PlaneGeometry::New();
-
     width  = 100;    widthInMM  = width;
     height = 200;    heightInMM = height;
     thicknessInMM = 1.0;
@@ -409,7 +407,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: depth", mitk::Equal(planegeometry->GetExtent(2),1, testEps));
 
     CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: width in mm", mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: heght in mm", mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: height in mm", mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps) );
     CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: depth in mm", mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps) );
 
     CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: AxisVectorRight", mitk::Equal(planegeometry->GetAxisVector(0), right, testEps) );

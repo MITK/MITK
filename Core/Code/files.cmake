@@ -390,7 +390,8 @@ set(CPP_FILES
   Rendering/mitkTextOverlay3D.cpp
   Rendering/mitkLabelOverlay3D.cpp
   Rendering/mitkOverlay2DLayouter.cpp
-  Rendering/mitkScaleLegendOverlay
+  Rendering/mitkScaleLegendOverlay.cpp
+  Rendering/mitkLogoOverlay.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h

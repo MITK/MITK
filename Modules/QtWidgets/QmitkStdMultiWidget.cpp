@@ -413,7 +413,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(),renderer4);
   mitk::Overlay::Bounds bounds = m_LogoRendering->GetBoundsOnDisplay(renderer4);
   bounds.Size[0] = bounds.Size[1] = 0.12;
-  bounds.Position[0] = 0.8;
+  bounds.Position[0] = 0.02;
   bounds.Position[1] = 0.02;
   m_LogoRendering->SetBoundsOnDisplay(renderer4,bounds);
 

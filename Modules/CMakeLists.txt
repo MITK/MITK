@@ -24,6 +24,7 @@ set(module_dirs
     PlanarFigureSegmentation
     OpenViewCore
     QmlItems
+    Overlays
     QtWidgets
     QtWidgetsExt
     SegmentationUI
@@ -38,7 +39,7 @@ set(module_dirs
     DeformableRegistrationUI
     OpenCL
     OpenCVVideoSupport
-    Overlays
+    QtOverlays
     InputDevices
     ToFHardware
     ToFProcessing

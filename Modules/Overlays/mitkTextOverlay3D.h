@@ -14,30 +14,37 @@
 
   ===================================================================*/
 
-#ifndef LOGOOVERLAY_H
-#define LOGOOVERLAY_H
+#ifndef TextOverlay3D_H
+#define TextOverlay3D_H
 
-#include <mitkVtkOverlay.h>
+#include <mitkVtkOverlay3D.h>
 #include <mitkLocalStorageHandler.h>
-#include <vtkSmartPointer.h>
-#include "MitkCoreExports.h"
+#include "MitkOverlaysExports.h"
 
-class vtkLogoRepresentation;
-class vtkImageData;
-class vtkImageReader2Factory;
+class vtkFollower;
+class vtkVectorText;
+class vtkTextActor3D;
 
 namespace mitk {
 
-/** \brief Displays text on the renderwindow */
-class MITK_CORE_EXPORT LogoOverlay : public mitk::VtkOverlay {
+/** \brief Displays at 3D position, always facing the camera */
+class MitkOverlays_EXPORT TextOverlay3D : public mitk::VtkOverlay3D {
 public:
 
+  /** \brief Internal class holding the mapper, actor, etc. for each of the render windows */
+  /**
+     * To render the Overlay on transveral, coronal, and sagittal, the update method
+     * is called for each renderwindow. For performance reasons, the corresponding data
+     * for each view is saved in the internal helper class LocalStorage.
+     * This allows rendering n views with just 1 mitkOverlay using n vtkMapper.
+     * */
   class LocalStorage : public mitk::Overlay::BaseLocalStorage
   {
   public:
     /** \brief Actor of a 2D render window. */
-    vtkSmartPointer<vtkImageData> m_LogoImage;
-    vtkSmartPointer<vtkLogoRepresentation> m_LogoRep;
+    vtkSmartPointer<vtkFollower> m_follower;
+
+    vtkSmartPointer<vtkVectorText> m_textSource;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
@@ -46,46 +53,38 @@ public:
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */
     ~LocalStorage();
+
   };
 
-  mitkClassMacro(LogoOverlay, mitk::VtkOverlay);
+  mitkClassMacro(TextOverlay3D, mitk::VtkOverlay3D);
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
-
-  virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const;
-  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds);
-  vtkSmartPointer<vtkImageReader2Factory> m_readerFactory;
-
-  void SetLogoImagePath(std::string text);
-  std::string GetLogoImagePath() const;
 
 protected:
 
   /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
   mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-  virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const;
+  virtual vtkProp* GetVtkProp(BaseRenderer *renderer) const;
   void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
 
   /** \brief explicit constructor which disallows implicit conversions */
-  explicit LogoOverlay();
+  explicit TextOverlay3D();
 
   /** \brief virtual destructor in order to derive from this class */
-  virtual ~LogoOverlay();
-
-  vtkImageData* CreateMbiLogo();
+  virtual ~TextOverlay3D();
 
 private:
 
   /** \brief copy constructor */
-  LogoOverlay( const LogoOverlay &);
+  TextOverlay3D( const TextOverlay3D &);
 
   /** \brief assignment operator */
-  LogoOverlay &operator=(const LogoOverlay &);
+  TextOverlay3D &operator=(const TextOverlay3D &);
 
 };
 
 } // namespace mitk
-#endif // LOGOOVERLAY_H
+#endif // TextOverlay3D_H
 
 

@@ -92,6 +92,10 @@ mitk::ImageReadAccessor::~ImageReadAccessor()
 
     m_Image->m_ReadWriteLock.Unlock();
   }
+  else
+  {
+    delete m_WaitLock;
+  }
 }
 
 const mitk::Image* mitk::ImageReadAccessor::GetImage() const

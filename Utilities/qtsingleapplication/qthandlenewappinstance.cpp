@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "qthandlenewappinstance.h"
 
 #include "qtsingleapplication.h"
+
+#if QT_VERSION < 0x050000
+
 #include <QDir>
 #include <stdlib.h> // mkdtemp
 #ifdef Q_OS_UNIX
@@ -69,6 +72,32 @@ bool createTemporaryDir(QString& path)
 
   return success;
 }
+
+#else
+
+#include <QTemporaryDir>
+
+bool createTemporaryDir(QString& path)
+{
+  QString baseName = QCoreApplication::applicationName();
+  if (baseName.isEmpty())
+  {
+    baseName = QLatin1String("mitk_temp");
+  }
+
+  QString templateName = QDir::tempPath() + QLatin1Char('/') + baseName + QLatin1String("-XXXXXX");
+  QTemporaryDir tmpDir(templateName);
+  tmpDir.setAutoRemove(false);
+
+  if (tmpDir.isValid())
+  {
+    path = tmpDir.path();
+    return true;
+  }
+  return false;
+}
+
+#endif
 
 QString handleNewAppInstance(QtSingleApplication* singleApp, int argc, char** argv, const QString& newInstanceArg)
 {

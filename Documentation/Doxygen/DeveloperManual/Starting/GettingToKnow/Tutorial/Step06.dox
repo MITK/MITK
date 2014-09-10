@@ -4,14 +4,14 @@
 
 The source is now split among several files:
 
-\li \ref Step6.cpp "Step6.cpp" 
-\li \ref Step6.h "Step6.h" 
+\li \ref Step6.cpp "Step6.cpp"
+\li \ref Step6.h "Step6.h"
 \li \ref Step6RegionGrowing.txx "Step6RegionGrowing.txx"
 \li \ref Step6RegionGrowing1.cpp "Step6RegionGrowing1.cpp"
 \li \ref Step6RegionGrowing2.cpp "Step6RegionGrowing2.cpp"
 \li \ref Step6main.cpp "Step6main.cpp"
 \li Path to files used in this step: \n
-.../bin/CMakeExternals/Source/MITK-Data/Pic3D.nrrd (image) 
+http://mitk.org/download/tutorial-data/Pic3D.nrrd (image)
 
 
 In this step the program is enhanced by the possibility to start a region-grower at interactively added points.

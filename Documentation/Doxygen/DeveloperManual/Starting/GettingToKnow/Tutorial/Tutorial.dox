@@ -20,14 +20,14 @@ This tutorial will give you an introduction to developing with MITK.
 We will start with configuring MITK to compile the tutorial, continue to show how to
 display and do basic interaction with images, and finally show how to build a plug-in and add new interactions.
 
-The source code of the examples can be found in mitk/QApplications/Tutorial/ \n
+The source code of the examples can be found in Examples/Tutorial/ \n
 Two data files are used to execute the example code.
 
 \li Pic3D.nrrd \n
-This file contains an image and is located in bin/CMakeExternals/Source/MITK-Data/Pic3D.nrrd.
+This file contains an image and can be downloaded from http://mitk.org/download/tutorial-data/Pic3D.nrrd .
 
 \li lungs.vtk \n
-This file contains a surface and is located in src/MITK/Modules/MitkExt/Testing/Data/lungs.vtk.
+This file contains a surface and can be downloaded from http://mitk.org/download/tutorial-data/lungs.vtk .
 
 \li \subpage Step00Page "Step 0: Getting started"
 \li \subpage Step01Page "Step 1: Displaying an image"

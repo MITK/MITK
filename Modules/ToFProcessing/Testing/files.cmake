@@ -1,7 +1,7 @@
 set(MODULE_TESTS
   mitkToFDistanceImageToPointSetFilterTest.cpp
   mitkToFDistanceImageToSurfaceFilterTest.cpp
-  #mitkToFCompositeFilterTest.cpp
+  mitkToFCompositeFilterTest.cpp
   mitkToFProcessingCommonTest.cpp
 )
 

@@ -225,8 +225,7 @@ void RTDoseVisualizer::OnReferenceDoseChanged(double value)
     if (this->m_selectedNode.IsNotNull())
     {
       this->UpdateColorWashTransferFunction();
-      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
-
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
@@ -289,10 +288,19 @@ void RTDoseVisualizer::OnDataChangedInIsoLevelSetView()
   //colorwash visibility changed, update the colorwash
   this->UpdateColorWashTransferFunction();
 
-  //Global Reinit if visibility of colorwash or isodoselevel changed
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
-}
+  //Hack: This is a dirty hack to reinit the isodose contour node. Only if the node (or property) has changed the rendering process register the RequestUpdateAll
+  //Only way to render the isoline by changes without a global reinit
+  mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(m_selectedNode);
+  mitk::DataStorage::SetOfObjects::const_iterator iterChildNodes = childNodes->begin();
+  while (iterChildNodes != childNodes->end())
+  {
+    (*iterChildNodes)->Modified();
+    ++iterChildNodes;
+  }
 
+  // Reinit if visibility of colorwash or isodoselevel changed
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
 
 void RTDoseVisualizer::OnShowContextMenuIsoSet(const QPoint& pos)
 {
@@ -416,7 +424,7 @@ void RTDoseVisualizer::OnGlobalVisColorWashToggled(bool showColorWash)
       renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
     m_selectedNode->SetProperty("Image Rendering.Mode", renderingMode);
 
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -433,7 +441,7 @@ void RTDoseVisualizer::OnGlobalVisIsoLineToggled(bool showIsoLines)
       (*iterChildNodes)->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsoLines);
       ++iterChildNodes;
     }
-    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

@@ -471,7 +471,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     std::sort(viewDescriptors.begin(), viewDescriptors.end(), compareViews);
 
     std::vector<std::string> viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
-    QStandardItem* viewRootItem = new QStandardItem(QIcon(),"Candies");
+    QStandardItem* viewRootItem = new QStandardItem(QIcon(),"Views");
     viewRootItem->setEditable(false);
     treeRootItem->appendRow(viewRootItem);
 

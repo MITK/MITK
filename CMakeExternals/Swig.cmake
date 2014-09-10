@@ -18,7 +18,7 @@ if(MITK_USE_SWIG)
 
       # swig.exe available as pre-built binary on Windows:
       ExternalProject_Add(Swig
-        URL https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/swigwin-${SWIG_TARGET_VERSION}.zip
+        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swigwin-${SWIG_TARGET_VERSION}.zip
         URL_MD5 "3f18de4fc09ab9abb0d3be37c11fbc8f"
         SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/swigwin-${SWIG_TARGET_VERSION}
         CONFIGURE_COMMAND ""
@@ -39,7 +39,7 @@ if(MITK_USE_SWIG)
       mark_as_advanced( BISON_FLAGS)
 
       ExternalProject_add(${proj}
-        URL https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/swig-${SWIG_TARGET_VERSION}.tar.gz
+        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swig-${SWIG_TARGET_VERSION}.tar.gz
         URL_MD5 "62f9b0d010cef36a13a010dc530d0d41"
         SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src
         BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build

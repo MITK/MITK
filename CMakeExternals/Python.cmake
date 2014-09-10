@@ -26,7 +26,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
 
     # download the source code
     ExternalProject_Add(Python-src
-      URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/${PYTHON_SOURCE_PACKAGE}.tgz"
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/${PYTHON_SOURCE_PACKAGE}.tgz"
       URL_MD5  "2cf641732ac23b18d139be077bd906cd"
       PREFIX   ${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}-cmake
       SOURCE_DIR  "${PYTHON_SOURCE_DIR}"
@@ -117,7 +117,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     # CMake build environment for python from:
     # https://github.com/davidsansome/python-cmake-buildsystem
     ExternalProject_Add(${proj}
-      URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/python-cmake-buildsystem-47845c55.tar.gz"
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/python-cmake-buildsystem-47845c55.tar.gz
       URL_MD5 "6e49d1ed93a5a0fff7621430c163d2d1"
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       PREFIX ${proj}-cmake

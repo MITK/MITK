@@ -62,7 +62,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         mitkFunctionExternalPythonBuildStep(${proj} install ${PYTHON_EXECUTABLE} \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=${_install_dir})
        ")
 
-    set(Numpy_URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/numpy-1.4.1.tar.gz")
+    set(Numpy_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/numpy-1.4.1.tar.gz)
     set(Numpy_MD5 "5c7b5349dc3161763f7f366ceb96516b")
 
     ExternalProject_Add(${proj}

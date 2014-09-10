@@ -10,7 +10,7 @@ if(MITK_USE_ZLIB)
     # Using the ZLIB from CTK:
     # https://github.com/commontk/zlib
     ExternalProject_Add(${proj}
-      URL "https://dl.dropboxusercontent.com/u/8367205/ExternalProjects/zlib-66a75305.tar.gz"
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/zlib-66a75305.tar.gz
       URL_MD5 "4c3f572b487ae7947fd88ec363533bc5"
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build

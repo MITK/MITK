@@ -47,7 +47,7 @@ mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other): Superclass(), mitk:
   m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified),
   m_ImageGeometry(other.m_ImageGeometry), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
 {
-  m_GeometryTransform = new GeometryTransformHolder(); // TODO SW: call BaseGeometry() constructor instead of this code duplication?
+  m_GeometryTransform = new GeometryTransformHolder(*other.GetGeometryTransformHolder()); // TODO SW: call BaseGeometry() constructor instead of this code duplication?
   other.InitializeGeometry(this);
 }
 
@@ -127,16 +127,19 @@ void
   //newGeometry->SetTimeBounds(m_TimeBounds);
   newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
 
-  if(m_GeometryTransform->GetIndexToWorldTransform())
-  {
-    TransformType::Pointer indexToWorldTransform = m_GeometryTransform->GetIndexToWorldTransform()->Clone();
-    newGeometry->SetIndexToWorldTransform(indexToWorldTransform);
-  }
+  newGeometry->InitializeGeometryTransformHolder(this);
 
   newGeometry->m_ImageGeometry = m_ImageGeometry;
 
   this->PostInitializeGeometry(newGeometry);
 }
+
+void mitk::BaseGeometry::InitializeGeometryTransformHolder(const BaseGeometry* otherGeometry)
+{
+  //this = neue Geo, die werte von other bekommen soll.
+  this->m_GeometryTransform->Initialize(otherGeometry->GetGeometryTransformHolder());
+}
+
 void mitk::BaseGeometry::PostInitialize()
 {
 }
@@ -843,6 +846,13 @@ const mitk::AffineTransform3D*   mitk::BaseGeometry::GetIndexToWorldTransform() 
   return m_GeometryTransform->GetIndexToWorldTransform();
 }
 
+
+const mitk::GeometryTransformHolder*
+mitk::BaseGeometry::GetGeometryTransformHolder() const
+{
+  return m_GeometryTransform;
+}
+
 bool mitk::Equal( const mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose )
 {
   if(( leftHandSide == NULL) || ( rightHandSide == NULL ))
@@ -986,3 +996,4 @@ bool mitk::Equal(const mitk::BaseGeometry::TransformType& leftHandSide, const mi
   }
   return true;
 }
+

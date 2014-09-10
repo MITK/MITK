@@ -58,6 +58,7 @@ public:
 
   void Initialize();
 
+  void Initialize(const GeometryTransformHolder* other);
 
 
   //##Documentation

@@ -524,6 +524,8 @@ namespace mitk {
     itkSetMacro(ImageGeometry, bool);
     itkBooleanMacro(ImageGeometry);
 
+    const GeometryTransformHolder* GetGeometryTransformHolder() const;
+
   protected:
 
     // ********************************** Constructor **********************************
@@ -590,6 +592,8 @@ namespace mitk {
 
     virtual void PreSetSpacing(const mitk::Vector3D& aSpacing);
 
+
+    void InitializeGeometryTransformHolder(const BaseGeometry* otherGeometry);
 
     //##Documentation
     //## @brief Bounding Box, which is axes-parallel in intrinsic coordinates

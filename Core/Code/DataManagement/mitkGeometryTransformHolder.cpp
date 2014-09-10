@@ -43,10 +43,13 @@ namespace mitk {
     m_VtkIndexToWorldTransform = vtkMatrixToLinearTransform::New();
     m_VtkIndexToWorldTransform->SetInput(m_VtkMatrix);
   }
+
   GeometryTransformHolder::GeometryTransformHolder(const GeometryTransformHolder& other)
   {
     m_VtkMatrix = vtkMatrix4x4::New();
     m_VtkIndexToWorldTransform = vtkMatrixToLinearTransform::New();
+    m_VtkIndexToWorldTransform->SetInput(m_VtkMatrix);
+    this->Initialize(&other);
   }
 
   GeometryTransformHolder::~GeometryTransformHolder()
@@ -63,6 +66,18 @@ namespace mitk {
       m_IndexToWorldTransform->SetIdentity();
 
     m_VtkMatrix->Identity();
+  }
+
+
+  void GeometryTransformHolder::Initialize(const GeometryTransformHolder* other)
+  {
+    Initialize();
+
+    if(other->GetIndexToWorldTransform())
+    {
+      TransformType::Pointer indexToWorldTransform = other->GetIndexToWorldTransform()->Clone();
+      this->SetIndexToWorldTransform(indexToWorldTransform);
+    }
   }
 
   //##Documentation
@@ -224,3 +239,4 @@ namespace mitk {
   }
 
 }
+

@@ -32,14 +32,7 @@ namespace mitk
  * and whether areas should be added to or subtracted from the segmentation shape.
  *
  * This class has two outputs:
- *   \li a difference image from GetDifferenceImage()
  *   \li the modified input image from GetOutput()
- *
- * The difference image is an image of the same dimensions as the input. Each pixel has
- * one of three values -1, 0, +1 meaning
- *   \li <b>-1</b> this pixel was foreground in the input image and should be removed from the segmentation
- *   \li <b>0</b> this pixel needs no change
- *   \li <b>+1</b> this pixel was background in the input image and should be added to the segmentation
  *
  * The output image is a combination of the original input with the generated difference image.
  *

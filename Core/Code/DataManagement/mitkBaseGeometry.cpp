@@ -428,29 +428,17 @@ void mitk::BaseGeometry::BackTransform(const mitk::Vector3D& in, mitk::Vector3D&
       << inverse );
   }
 
+  out = inverse * in;
 
-  // Transform vector
-  for (unsigned int i = 0; i < 3; i++)
-  {
-    out[i] = 0.0;
-    for (unsigned int j = 0; j < 3; j++)
-    {
-      out[i] += inverse[i][j]*in[j];
-    }
-  }
 }
 
 void mitk::BaseGeometry::BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const
 {
-  ScalarType temp[3];
-  unsigned int i, j;
+  mitk::Point3D temp;
   const TransformType::OffsetType& offset = this->GetIndexToWorldTransform()->GetOffset();
 
-  // Remove offset
-  for (j = 0; j < 3; j++)
-  {
-    temp[j] = in[j] - offset[j];
-  }
+  temp = in - offset;
+
 
   // Get WorldToIndex transform
   if (m_IndexToWorldTransformLastModified != this->GetIndexToWorldTransform()->GetMTime())
@@ -475,15 +463,8 @@ void mitk::BaseGeometry::BackTransform(const mitk::Point3D &in, mitk::Point3D& o
       << inverse );
   }
 
-  // Transform point
-  for (i = 0; i < 3; i++)
-  {
-    out[i] = 0.0;
-    for (j = 0; j < 3; j++)
-    {
-      out[i] += inverse[i][j]*temp[j];
-    }
-  }
+  out = inverse * temp;
+
 }
 
 mitk::VnlVector mitk::BaseGeometry::GetOriginVnl() const

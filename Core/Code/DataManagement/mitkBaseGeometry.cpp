@@ -671,6 +671,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
       vtkMatrix4x4* matrix = vtkMatrix4x4::New();
       TransferItkTransformToVtkMatrix(dynamic_cast<mitk::RestorePlanePositionOperation*>(operation)->GetTransform().GetPointer(), matrix);
       vtktransform->SetMatrix(matrix);
+      matrix->Delete();
       break;
     }
   case OpAPPLYTRANSFORMMATRIX:

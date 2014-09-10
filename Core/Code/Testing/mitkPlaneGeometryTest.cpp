@@ -55,10 +55,31 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
 
   CPPUNIT_TEST_SUITE_END();
 
+private:
+  // private test members that are initialized by setUp()
+  mitk::PlaneGeometry::Pointer planegeometry;
+
+  mitk::Point3D origin;
+  mitk::Vector3D right, bottom, normal;
+  mitk::ScalarType width, height;
+  mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
 public:
 
   void setUp()
   {
+    planegeometry = mitk::PlaneGeometry::New();
+
+    width  = 100;    widthInMM  = width;
+    height = 200;    heightInMM = height;
+    thicknessInMM = 1.0;
+    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
+    mitk::FillVector3D(right,  widthInMM,          0, 0);
+    mitk::FillVector3D(bottom,         0, heightInMM, 0);
+    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
+
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+    planegeometry->SetOrigin(origin);
   }
 
   void tearDown()
@@ -95,6 +116,8 @@ public:
     CPPUNIT_ASSERT_MESSAGE("PlaneGeometry should not be castable to AbstractTransofrmGeometry", atg.IsNull());
   }
 
+  // See bug 1210
+  // Test does not use standard Parameters
   void TestCase1210()
   {
     mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
@@ -155,6 +178,7 @@ public:
   * we test a position where the distance between the correspoinding points is < 0 and another position where the distance is > 0.
   *
   */
+  // Test does not use standard Parameters
   void TestIntersectionPoint()
   {
     //init plane with its parameter
@@ -222,6 +246,7 @@ public:
   *
   * See also bug #3409.
   */
+  // Test does not use standard Parameters
   void TestProjectPointOntoPlane()
   {
     mitk::PlaneGeometry::Pointer myPlaneGeometry = mitk::PlaneGeometry::New();
@@ -361,23 +386,6 @@ public:
 
   void TestInitializeStandardPlane()
   {
-    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-
-    mitk::Point3D origin;
-    mitk::Vector3D right, bottom, normal;
-    mitk::ScalarType width, height;
-    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
-
-    width  = 100;    widthInMM  = width;
-    height = 200;    heightInMM = height;
-    thicknessInMM = 1.0;
-    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
-    mitk::FillVector3D(right,  widthInMM,          0, 0);
-    mitk::FillVector3D(bottom,         0, heightInMM, 0);
-    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
-
-    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
-
     CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: width", mitk::Equal(planegeometry->GetExtent(0),width, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: height", mitk::Equal(planegeometry->GetExtent(1),height, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: depth", mitk::Equal(planegeometry->GetExtent(2),1, testEps));
@@ -413,23 +421,6 @@ public:
 
   void TestSetExtendInMM()
   {
-    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-
-    mitk::Point3D origin;
-    mitk::Vector3D right, bottom, normal;
-    mitk::ScalarType width, height;
-    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
-
-    width  = 100;    widthInMM  = width;
-    height = 200;    heightInMM = height;
-    thicknessInMM = 3.5;
-    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
-    mitk::FillVector3D(right,  widthInMM,          0, 0);
-    mitk::FillVector3D(bottom,         0, heightInMM, 0);
-    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
-
-    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
-
     normal.Normalize();
     normal *= thicknessInMM;
     planegeometry->SetExtentInMM(2, thicknessInMM);
@@ -448,25 +439,7 @@ public:
 
   void TestRotate()
   {
-    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-
-    mitk::Point3D origin;
-    mitk::Vector3D right, bottom, normal;
-    mitk::ScalarType width, height;
-    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
-
-    width  = 100;    widthInMM  = width;
-    height = 200;    heightInMM = height;
-    thicknessInMM = 1;
-    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
-    mitk::FillVector3D(right,  widthInMM,          0, 0);
-    mitk::FillVector3D(bottom,         0, heightInMM, 0);
-    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
-
-    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
-    planegeometry->SetOrigin(origin);
-
-    std::cout << "Changing the IndexToWorldTransform to a rotated version by SetIndexToWorldTransform() (keep origin): "<<std::endl;
+    // Changing the IndexToWorldTransform to a rotated version by SetIndexToWorldTransform() (keep origin):
     mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
     mitk::AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
     vnlmatrix = planegeometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
@@ -543,24 +516,6 @@ public:
 
   void TestClone()
   {
-    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-
-    mitk::Point3D origin;
-    mitk::Vector3D right, bottom, normal;
-    mitk::ScalarType width, height;
-    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
-
-    width  = 100;    widthInMM  = width;
-    height = 200;    heightInMM = height;
-    thicknessInMM = 1;
-    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
-    mitk::FillVector3D(right,  widthInMM,          0, 0);
-    mitk::FillVector3D(bottom,         0, heightInMM, 0);
-    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
-
-    planegeometry->SetOrigin(origin);
-    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
-
     mitk::PlaneGeometry::Pointer clonedplanegeometry = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
     // Cave: Statement below is negated!
     CPPUNIT_ASSERT_MESSAGE("Testing Clone(): ", ! ((clonedplanegeometry.IsNull()) || (clonedplanegeometry->GetReferenceCount()!=1)));
@@ -583,24 +538,6 @@ public:
 
   void TestSaggitalInitialization()
   {
-    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-
-    mitk::Point3D origin;
-    mitk::Vector3D right, bottom, normal;
-    mitk::ScalarType width, height;
-    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
-
-    width  = 100;    widthInMM  = width;
-    height = 200;    heightInMM = height;
-    thicknessInMM = 1;
-    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
-    mitk::FillVector3D(right,  widthInMM,          0, 0);
-    mitk::FillVector3D(bottom,         0, heightInMM, 0);
-    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
-
-    planegeometry->SetOrigin(origin);
-    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
-
     mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
 
     mitk::PlaneGeometry::Pointer clonedplanegeometry = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
@@ -668,24 +605,6 @@ public:
 
   void TestFrontalInitialization()
   {
-    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-
-    mitk::Point3D origin;
-    mitk::Vector3D right, bottom, normal;
-    mitk::ScalarType width, height;
-    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
-
-    width  = 100;    widthInMM  = width;
-    height = 200;    heightInMM = height;
-    thicknessInMM = 1;
-    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
-    mitk::FillVector3D(right,  widthInMM,          0, 0);
-    mitk::FillVector3D(bottom,         0, heightInMM, 0);
-    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
-
-    planegeometry->SetOrigin(origin);
-    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
-
     mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
 
     mitk::PlaneGeometry::Pointer clonedplanegeometry = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
@@ -761,24 +680,6 @@ public:
 
   void TestAxialInitialization()
   {
-    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-
-    mitk::Point3D origin;
-    mitk::Vector3D right, bottom, normal;
-    mitk::ScalarType width, height;
-    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
-
-    width  = 100;    widthInMM  = width;
-    height = 200;    heightInMM = height;
-    thicknessInMM = 1;
-    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
-    mitk::FillVector3D(right,  widthInMM,          0, 0);
-    mitk::FillVector3D(bottom,         0, heightInMM, 0);
-    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
-
-    planegeometry->SetOrigin(origin);
-    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
-
     mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
 
     // Clone, move, rotate and test for 'IsParallel' and 'IsOnPlane'
@@ -819,24 +720,6 @@ public:
 
   void TestPlaneComparison()
   {
-    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-
-    mitk::Point3D origin;
-    mitk::Vector3D right, bottom, normal;
-    mitk::ScalarType width, height;
-    mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
-
-    width  = 100;    widthInMM  = width;
-    height = 200;    heightInMM = height;
-    thicknessInMM = 1;
-    mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
-    mitk::FillVector3D(right,  widthInMM,          0, 0);
-    mitk::FillVector3D(bottom,         0, heightInMM, 0);
-    mitk::FillVector3D(normal,         0,          0, thicknessInMM);
-
-    planegeometry->SetOrigin(origin);
-    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
-
     // Clone, move, rotate and test for 'IsParallel' and 'IsOnPlane'
     mitk::PlaneGeometry::Pointer clonedplanegeometry2 = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
 

@@ -14,24 +14,21 @@ if(MITK_USE_CTK)
       list(APPEND _qtplugin_install_destinations bin/plugins/designer)
     endif()
 
+    set(_ctk_qt_plugin_folder_release)
+    set(_ctk_qt_plugin_folder_debug)
     if(NOT CMAKE_CFG_INTDIR STREQUAL ".")
-      set(_matching_pattern_release FILES_MATCHING PATTERN "*Release*")
-      set(_matching_pattern_debug FILES_MATCHING PATTERN "*Debug*")
-    else()
-      set(_matching_pattern_release )
-      set(_matching_pattern_debug )
+      set(_ctk_qt_plugin_folder_release "Release/")
+      set(_ctk_qt_plugin_folder_debug "Debug/")
     endif()
 
     foreach(_qtplugin_install_dir ${_qtplugin_install_destinations})
-      install(DIRECTORY "${CTK_QTDESIGNERPLUGINS_DIR}/designer/"
+      install(DIRECTORY "${CTK_QTDESIGNERPLUGINS_DIR}/designer/${_ctk_qt_plugin_folder_release}"
               DESTINATION ${_qtplugin_install_dir}
               CONFIGURATIONS Release
-              ${_matching_pattern_release}
               )
-      install(DIRECTORY "${CTK_QTDESIGNERPLUGINS_DIR}/designer/"
+      install(DIRECTORY "${CTK_QTDESIGNERPLUGINS_DIR}/designer/${_ctk_qt_plugin_folder_debug}"
               DESTINATION ${_qtplugin_install_dir}
               CONFIGURATIONS Debug
-              ${_matching_pattern_debug}
               )
     endforeach()
   endif()

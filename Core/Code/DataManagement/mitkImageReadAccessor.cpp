@@ -27,7 +27,15 @@ mitk::ImageReadAccessor::ImageReadAccessor(
 {
   if(!(OptionFlags & ImageAccessorBase::IgnoreLock))
   {
-    OrganizeReadAccess();
+    try
+    {
+      OrganizeReadAccess();
+    }
+    catch (...)
+    {
+      delete m_WaitLock;
+      throw;
+    }
   }
 }
 
@@ -40,7 +48,15 @@ mitk::ImageReadAccessor::ImageReadAccessor(
 {
   if(!(OptionFlags & ImageAccessorBase::IgnoreLock))
   {
-    OrganizeReadAccess();
+    try
+    {
+      OrganizeReadAccess();
+    }
+    catch (...)
+    {
+      delete m_WaitLock;
+      throw;
+    }
   }
 }
 

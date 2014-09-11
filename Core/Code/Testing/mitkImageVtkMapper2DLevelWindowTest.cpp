@@ -38,6 +38,7 @@ int mitkImageVtkMapper2DLevelWindowTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(loadedPreset == true, "Testing if level window preset could be loaded");
   double level = levelWindowPreset->getLevel("Blood");
   double window = levelWindowPreset->getWindow("Blood");
+  levelWindowPreset->Delete();
   //apply level window to all images
   renderingHelper.SetImageProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(level, window)) );
   //for now this test renders Sagittal

@@ -151,7 +151,7 @@ private:
    * In this case, the returned file name is the successful one, and the errorMessage contains
    * error messages of all the failed attempts.
    */
-  QString SaveTemporaryImage(ctkCmdLineModuleParameter& parameter, mitk::DataNode::Pointer node, QString& errorMessage);
+  QString SaveTemporaryImage(const ctkCmdLineModuleParameter& parameter, mitk::DataNode::ConstPointer node, QString& errorMessage) const;
 
   /**
    * \brief Utility method to look up the title from the description.
@@ -170,7 +170,7 @@ private:
    *
    * Inspired by <a href="http://www.boost.org/doc/libs/1_43_0/libs/filesystem/doc/portability_guide.htm">boost recommendations</a>.
    */
-  QString GetValidNodeName(const QString& nodeName);
+  QString GetValidNodeName(const QString& nodeName) const;
 
   /**
    * \brief This must be injected before the Widget is used.

@@ -144,7 +144,7 @@ QString QmitkCmdLineModuleProgressWidget::GetFullName() const
 
 
 //-----------------------------------------------------------------------------
-QString QmitkCmdLineModuleProgressWidget::GetValidNodeName(const QString& nodeName)
+QString QmitkCmdLineModuleProgressWidget::GetValidNodeName(const QString& nodeName) const
 {
   QString outputName = nodeName;
 
@@ -540,9 +540,9 @@ void QmitkCmdLineModuleProgressWidget::Run()
       if (image != NULL)
       {
         QString errorMessage;
-        QString fileName = this->SaveTemporaryImage(parameter, node, errorMessage);
+        QString fileName = this->SaveTemporaryImage(parameter, node.GetPointer(), errorMessage);
 
-        if(fileName.size() == 0)
+        if(fileName.isEmpty())
         {
           QMessageBox::warning(this, "Saving temporary file failed", errorMessage);
           return;
@@ -596,7 +596,7 @@ void QmitkCmdLineModuleProgressWidget::Run()
 
 
 //-----------------------------------------------------------------------------
-QString QmitkCmdLineModuleProgressWidget::SaveTemporaryImage(ctkCmdLineModuleParameter &parameter, mitk::DataNode::Pointer node, QString& errorMessage)
+QString QmitkCmdLineModuleProgressWidget::SaveTemporaryImage(const ctkCmdLineModuleParameter &parameter, mitk::DataNode::ConstPointer node, QString& errorMessage) const
 {
   // Don't call this if node is null or node is not an image.
   assert(node.GetPointer());

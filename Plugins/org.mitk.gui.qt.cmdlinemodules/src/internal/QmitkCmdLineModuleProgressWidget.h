@@ -18,11 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWidget>
 #include <QTimer>
+#include <QList>
 
 #include <ctkCmdLineModuleParameter.h>
 #include <mitkDataNode.h>
 
 class QVBoxLayout;
+class QTemporaryFile;
 class QmitkCmdLineModuleGui;
 class ctkCmdLineModuleManager;
 class ctkCmdLineModuleFutureWatcher;
@@ -63,12 +65,6 @@ public:
    * after construction, before using the widget.
    */
   void SetDataStorage(mitk::DataStorage* dataStorage);
-
-  /**
-   * \brief Sets the Temporary Directory on this widget, and must be called
-   * immediately after construction, before using the widget.
-   */
-  void SetTemporaryDirectory(const QString& directoryName);
 
   /**
    * \brief Sets the Output Directory on this widget, and must be called
@@ -143,15 +139,14 @@ private:
    * \brief Saves temporary image to file.
    * \param[in] node non-NULL pointer to node containing a non-NULL mitk::Image.
    * \param[out] errorMessage which if not empty means an error occurred.
-   * \return QString file name that was successfully saved to.
+   * \return QTemporaryFile temporary file that the caller is responsible for deleting.
    *
-   * If the returned file name is empty, check errorMessage.
-   * If the returned file name is not-empty, there could still be data in the errorMessage.
+   * If the returned QTemporaryFile is NULL, check errorMessage.
+   * If the returned QTemporaryFile is not-NULL, there could still be data in the errorMessage.
    * It could be that this method tried n file extensions, before finding a successful one.
-   * In this case, the returned file name is the successful one, and the errorMessage contains
-   * error messages of all the failed attempts.
+   * In this case, the returned QTemporaryFile is the successful one, and the errorMessage contains error messages of all the failed attempts.
    */
-  QString SaveTemporaryImage(const ctkCmdLineModuleParameter& parameter, mitk::DataNode::ConstPointer node, QString& errorMessage) const;
+  QTemporaryFile* SaveTemporaryImage(const ctkCmdLineModuleParameter& parameter, mitk::DataNode::ConstPointer node, QString& errorMessage) const;
 
   /**
    * \brief Utility method to look up the title from the description.
@@ -181,11 +176,6 @@ private:
    * \brief This must be injected before the Widget is used.
    */
   mitk::DataStorage *m_DataStorage;
-
-  /**
-   * \brief This must be injected before the Widget is used.
-   */
-  QString m_TemporaryDirectoryName;
 
   /**
    * \brief This must be injected before the Widget is used.
@@ -223,7 +213,7 @@ private:
    * launching a command line app, and then must be cleared up when the command line
    * app successfully finishes.
    */
-  QStringList m_TemporaryFileNames;
+  QList<QTemporaryFile*> m_TemporaryFiles;
 
   /**
    * \brief We store a list of output images, so that on successful completion of

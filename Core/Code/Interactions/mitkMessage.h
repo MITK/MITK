@@ -399,6 +399,7 @@ class MessageBase
     {
       MessageBase tmp(o);
       std::swap(tmp.m_Listeners, this->m_Listeners);
+      return *this;
     }
 
     void AddListener( const AbstractDelegate& delegate ) const

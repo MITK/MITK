@@ -38,8 +38,8 @@ int mitkImageVtkMapper2DOpacityTransferFunctionTest(int argc, char* argv[])
   //define some controlpoints for a scalaropacity
   mitk::TransferFunction::ControlPoints scalarOpacityPoints;
   scalarOpacityPoints.push_back( std::make_pair( 255, 0 ) );
-  scalarOpacityPoints.push_back( std::make_pair( 0, 0.3 ) );
-  scalarOpacityPoints.push_back( std::make_pair( 127, 1.0 ) );
+  scalarOpacityPoints.push_back( std::make_pair( 0, 0.1 ) );
+  scalarOpacityPoints.push_back( std::make_pair( 127, 0.3 ) );
 
   //define an arbitrary colortransferfunction
   vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
@@ -65,7 +65,7 @@ int mitkImageVtkMapper2DOpacityTransferFunctionTest(int argc, char* argv[])
   //use this to generate a reference screenshot or save the file:
   if(false)
   {
-    renderingHelper.SaveReferenceScreenShot("/home/riecker/output2.png");
+    renderingHelper.SaveReferenceScreenShot("/tmp/output3.png");
   }
 
   MITK_TEST_END();

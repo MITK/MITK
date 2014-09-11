@@ -425,7 +425,6 @@ void CommandLineModulesView::OnRunButtonPressed()
     QmitkCmdLineModuleProgressWidget *widget = new QmitkCmdLineModuleProgressWidget(m_Controls->m_RunningWidgets);
     widget->SetDataStorage(this->GetDataStorage());
     widget->SetManager(m_ModuleManager);
-    widget->SetTemporaryDirectory(m_TemporaryDirectoryName);
     widget->SetOutputDirectory(m_OutputDirectoryName);
 
     // 2. Create a new front end.

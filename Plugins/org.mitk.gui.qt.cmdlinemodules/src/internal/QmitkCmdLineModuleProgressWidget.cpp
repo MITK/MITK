@@ -49,7 +49,6 @@ QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *pare
   : QWidget(parent)
 , m_ModuleManager(NULL)
 , m_DataStorage(NULL)
-, m_TemporaryDirectoryName("")
 , m_UI(new Ui::QmitkCmdLineModuleProgressWidget)
 , m_Layout(NULL)
 , m_ModuleFrontEnd(NULL)
@@ -102,13 +101,6 @@ void QmitkCmdLineModuleProgressWidget::SetManager(ctkCmdLineModuleManager* manag
 void QmitkCmdLineModuleProgressWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   this->m_DataStorage = dataStorage;
-}
-
-
-//-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetTemporaryDirectory(const QString& directoryName)
-{
-  this->m_TemporaryDirectoryName = directoryName;
 }
 
 
@@ -381,20 +373,18 @@ void QmitkCmdLineModuleProgressWidget::ClearUpTemporaryFiles()
   QString message;
   QString fileName;
 
-  foreach (fileName, m_TemporaryFileNames)
+  foreach (QTemporaryFile* file, m_TemporaryFiles)
   {
-    QFile file(fileName);
-    if (file.exists())
-    {
-      message = QObject::tr("removing %1").arg(fileName);
-      this->PublishMessage(message);
+    assert(file != NULL);
 
-      bool success = file.remove();
+    fileName = file->fileName();
+    message = QObject::tr("removing %1").arg(fileName);
+    this->PublishMessage(message);
 
-      message = QObject::tr("removed %1, successfully=%2").arg(fileName).arg(success);
-      this->PublishMessage(message);
-    }
+    delete file;
   }
+
+  m_TemporaryFiles.clear();
 }
 
 
@@ -540,18 +530,18 @@ void QmitkCmdLineModuleProgressWidget::Run()
       if (image != NULL)
       {
         QString errorMessage;
-        QString fileName = this->SaveTemporaryImage(parameter, node.GetPointer(), errorMessage);
+        QTemporaryFile* tempFile = this->SaveTemporaryImage(parameter, node.GetPointer(), errorMessage);
 
-        if(fileName.isEmpty())
+        if(tempFile == NULL)
         {
           QMessageBox::warning(this, "Saving temporary file failed", errorMessage);
           return;
         }
 
-        m_TemporaryFileNames.push_back(fileName);
-        m_ModuleFrontEnd->setValue(parameterName, fileName);
+        m_TemporaryFiles.push_back(tempFile);
+        m_ModuleFrontEnd->setValue(parameterName, tempFile->fileName());
 
-        message = "Saved " + fileName;
+        message = "Saved " + tempFile->fileName();
         this->PublishMessage(message);
 
       } // end if image
@@ -596,23 +586,19 @@ void QmitkCmdLineModuleProgressWidget::Run()
 
 
 //-----------------------------------------------------------------------------
-QString QmitkCmdLineModuleProgressWidget::SaveTemporaryImage(const ctkCmdLineModuleParameter &parameter, mitk::DataNode::ConstPointer node, QString& errorMessage) const
+QTemporaryFile* QmitkCmdLineModuleProgressWidget::SaveTemporaryImage(const ctkCmdLineModuleParameter &parameter, mitk::DataNode::ConstPointer node, QString& errorMessage) const
 {
   // Don't call this if node is null or node is not an image.
   assert(node.GetPointer());
   mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
   assert(image);
 
-  QString fileName;
-  QString returnFileName;
   QString intermediateError;
   QString intermediateErrors;
 
+  QTemporaryFile *returnedFile = NULL;
   QString name = this->GetValidNodeName(QString::fromStdString(node->GetName()));
-  int pid = QCoreApplication::applicationPid();
-  int randomInt = qrand() % 1000000;
-
-  QString fileNameBase = m_TemporaryDirectoryName + "/" + name + QString::number(pid) + "_" + QString::number(randomInt);
+  QString fileNameTemplate = name + "_XXXXXX";
 
   // If no file extensions are specified, we default to .nii
   QStringList fileExts = parameter.fileExtensions();
@@ -629,18 +615,27 @@ QString QmitkCmdLineModuleProgressWidget::SaveTemporaryImage(const ctkCmdLineMod
     {
       extension.prepend(".");
     }
-    fileName = fileNameBase + extension;
+    fileNameTemplate = fileNameTemplate + extension;
 
     try
     {
-      if (mitk::IOUtil::SaveBaseData( image, fileName.toStdString() ))
+      QTemporaryFile *tempFile = new QTemporaryFile(QDir::tempPath() + QDir::separator() + fileNameTemplate);
+      if (tempFile->open())
       {
-        returnFileName = fileName;
-        break;
+        tempFile->close();
+        if (mitk::IOUtil::SaveBaseData( image, tempFile->fileName().toStdString() ))
+        {
+          returnedFile = tempFile;
+          break;
+        }
+        else
+        {
+          intermediateError = QObject::tr("Tried %1, failed to save image:\n%2\n").arg(extension).arg(tempFile->fileName());
+        }
       }
       else
       {
-        intermediateError = QObject::tr("Tried %1, failed to save image:\n%2\n").arg(extension).arg(fileName);
+        intermediateError = QObject::tr("Tried %1, failed to open file:\n%2\n").arg(extension).arg(tempFile->fileName());
       }
     }
     catch(const mitk::Exception &e)
@@ -656,5 +651,5 @@ QString QmitkCmdLineModuleProgressWidget::SaveTemporaryImage(const ctkCmdLineMod
     intermediateErrors += intermediateError;
   }
   errorMessage = intermediateErrors;
-  return returnFileName;
+  return returnedFile;
 }

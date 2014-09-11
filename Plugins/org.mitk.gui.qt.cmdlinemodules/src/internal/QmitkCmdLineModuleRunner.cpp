@@ -13,7 +13,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkCmdLineModuleProgressWidget.h"
+#include "QmitkCmdLineModuleRunner.h"
 #include "ui_QmitkCmdLineModuleProgressWidget.h"
 
 // Qt
@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 //-----------------------------------------------------------------------------
-QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *parent)
+QmitkCmdLineModuleRunner::QmitkCmdLineModuleRunner(QWidget *parent)
   : QWidget(parent)
 , m_ModuleManager(NULL)
 , m_DataStorage(NULL)
@@ -77,7 +77,7 @@ QmitkCmdLineModuleProgressWidget::QmitkCmdLineModuleProgressWidget(QWidget *pare
 
 
 //-----------------------------------------------------------------------------
-QmitkCmdLineModuleProgressWidget::~QmitkCmdLineModuleProgressWidget()
+QmitkCmdLineModuleRunner::~QmitkCmdLineModuleRunner()
 {
   if (m_ModuleFrontEnd != NULL)
   {
@@ -91,28 +91,28 @@ QmitkCmdLineModuleProgressWidget::~QmitkCmdLineModuleProgressWidget()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetManager(ctkCmdLineModuleManager* manager)
+void QmitkCmdLineModuleRunner::SetManager(ctkCmdLineModuleManager* manager)
 {
   this->m_ModuleManager = manager;
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkCmdLineModuleRunner::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   this->m_DataStorage = dataStorage;
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetOutputDirectory(const QString& directoryName)
+void QmitkCmdLineModuleRunner::SetOutputDirectory(const QString& directoryName)
 {
   this->m_OutputDirectoryName = directoryName;
 }
 
 
 //-----------------------------------------------------------------------------
-QString QmitkCmdLineModuleProgressWidget::GetTitle()
+QString QmitkCmdLineModuleRunner::GetTitle()
 {
   assert(m_ModuleFrontEnd);
 
@@ -124,7 +124,7 @@ QString QmitkCmdLineModuleProgressWidget::GetTitle()
 
 
 //-----------------------------------------------------------------------------
-QString QmitkCmdLineModuleProgressWidget::GetFullName() const
+QString QmitkCmdLineModuleRunner::GetFullName() const
 {
   assert(m_ModuleFrontEnd);
 
@@ -136,7 +136,7 @@ QString QmitkCmdLineModuleProgressWidget::GetFullName() const
 
 
 //-----------------------------------------------------------------------------
-QString QmitkCmdLineModuleProgressWidget::GetValidNodeName(const QString& nodeName) const
+QString QmitkCmdLineModuleRunner::GetValidNodeName(const QString& nodeName) const
 {
   QString outputName = nodeName;
 
@@ -170,7 +170,7 @@ QString QmitkCmdLineModuleProgressWidget::GetValidNodeName(const QString& nodeNa
 
 
 //-----------------------------------------------------------------------------
-bool QmitkCmdLineModuleProgressWidget::IsStarted() const
+bool QmitkCmdLineModuleRunner::IsStarted() const
 {
   bool isStarted = false;
   if (m_FutureWatcher != NULL && m_FutureWatcher->isStarted())
@@ -181,7 +181,7 @@ bool QmitkCmdLineModuleProgressWidget::IsStarted() const
 }
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnCheckModulePaused()
+void QmitkCmdLineModuleRunner::OnCheckModulePaused()
 {
   if (!this->IsStarted())
   {
@@ -206,7 +206,7 @@ void QmitkCmdLineModuleProgressWidget::OnCheckModulePaused()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnPauseButtonToggled(bool toggled)
+void QmitkCmdLineModuleRunner::OnPauseButtonToggled(bool toggled)
 {
   this->m_FutureWatcher->setPaused(toggled);
 
@@ -222,14 +222,14 @@ void QmitkCmdLineModuleProgressWidget::OnPauseButtonToggled(bool toggled)
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnRemoveButtonClicked()
+void QmitkCmdLineModuleRunner::OnRemoveButtonClicked()
 {
   this->deleteLater();
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleStarted()
+void QmitkCmdLineModuleRunner::OnModuleStarted()
 {
   this->m_UI->m_ProgressBar->setMaximum(0);
 
@@ -241,7 +241,7 @@ void QmitkCmdLineModuleProgressWidget::OnModuleStarted()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleCanceled()
+void QmitkCmdLineModuleRunner::OnModuleCanceled()
 {
   QString message = "cancelling.";
   this->PublishMessage(message);
@@ -261,7 +261,7 @@ void QmitkCmdLineModuleProgressWidget::OnModuleCanceled()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleFinished()
+void QmitkCmdLineModuleRunner::OnModuleFinished()
 {
   this->m_UI->m_PauseButton->setEnabled(false);
   this->m_UI->m_PauseButton->setChecked(false);
@@ -304,14 +304,14 @@ void QmitkCmdLineModuleProgressWidget::OnModuleFinished()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleResumed()
+void QmitkCmdLineModuleRunner::OnModuleResumed()
 {
   this->m_UI->m_PauseButton->setChecked(false);
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleProgressRangeChanged(int progressMin, int progressMax)
+void QmitkCmdLineModuleRunner::OnModuleProgressRangeChanged(int progressMin, int progressMax)
 {
   this->m_UI->m_ProgressBar->setMinimum(progressMin);
   this->m_UI->m_ProgressBar->setMaximum(progressMax);
@@ -319,21 +319,21 @@ void QmitkCmdLineModuleProgressWidget::OnModuleProgressRangeChanged(int progress
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleProgressTextChanged(const QString& progressText)
+void QmitkCmdLineModuleRunner::OnModuleProgressTextChanged(const QString& progressText)
 {
   this->m_UI->m_Console->appendPlainText(progressText);
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnModuleProgressValueChanged(int progressValue)
+void QmitkCmdLineModuleRunner::OnModuleProgressValueChanged(int progressValue)
 {
   this->m_UI->m_ProgressBar->setValue(progressValue);
 }
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnOutputDataReady()
+void QmitkCmdLineModuleRunner::OnOutputDataReady()
 {
   m_OutputCount++;
   this->PublishByteArray(this->m_FutureWatcher->readPendingOutputData());
@@ -341,7 +341,7 @@ void QmitkCmdLineModuleProgressWidget::OnOutputDataReady()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::OnErrorDataReady()
+void QmitkCmdLineModuleRunner::OnErrorDataReady()
 {
   m_ErrorCount++;
   this->PublishByteArray(this->m_FutureWatcher->readPendingErrorData());
@@ -349,7 +349,7 @@ void QmitkCmdLineModuleProgressWidget::OnErrorDataReady()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::PublishMessage(const QString& message)
+void QmitkCmdLineModuleRunner::PublishMessage(const QString& message)
 {
   QString prefix = ""; // Can put additional prefix here if needed.
   QString outputMessage = prefix + message;
@@ -360,7 +360,7 @@ void QmitkCmdLineModuleProgressWidget::PublishMessage(const QString& message)
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::PublishByteArray(const QByteArray& array)
+void QmitkCmdLineModuleRunner::PublishByteArray(const QByteArray& array)
 {
   QString message = array.data();
   this->PublishMessage(message);
@@ -368,7 +368,7 @@ void QmitkCmdLineModuleProgressWidget::PublishByteArray(const QByteArray& array)
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::ClearUpTemporaryFiles()
+void QmitkCmdLineModuleRunner::ClearUpTemporaryFiles()
 {
   QString message;
   QString fileName;
@@ -389,7 +389,7 @@ void QmitkCmdLineModuleProgressWidget::ClearUpTemporaryFiles()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::LoadOutputData()
+void QmitkCmdLineModuleRunner::LoadOutputData()
 {
   assert(m_DataStorage);
 
@@ -415,7 +415,7 @@ void QmitkCmdLineModuleProgressWidget::LoadOutputData()
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::SetFrontend(QmitkCmdLineModuleGui* frontEnd)
+void QmitkCmdLineModuleRunner::SetFrontend(QmitkCmdLineModuleGui* frontEnd)
 {
   assert(frontEnd);
   assert(m_ModuleManager);
@@ -438,7 +438,7 @@ void QmitkCmdLineModuleProgressWidget::SetFrontend(QmitkCmdLineModuleGui* frontE
 
 
 //-----------------------------------------------------------------------------
-void QmitkCmdLineModuleProgressWidget::Run()
+void QmitkCmdLineModuleRunner::Run()
 {
   assert(m_ModuleManager);
   assert(m_DataStorage);
@@ -477,12 +477,12 @@ void QmitkCmdLineModuleProgressWidget::Run()
 
     if (applicationDir == outputDir)
     {
-      qDebug() << "QmitkCmdLineModuleProgressWidget::Run(), output folder = application folder, so will swap to defaultOutputDir, specified in CLI module preferences";
+      qDebug() << "QmitkCmdLineModuleRunner::Run(), output folder = application folder, so will swap to defaultOutputDir, specified in CLI module preferences";
 
       QFileInfo newOutputFileInfo(m_OutputDirectoryName, outputFileInfo.fileName());
       QString newOutputFileAbsolutePath = newOutputFileInfo.absoluteFilePath();
 
-      qDebug() << "QmitkCmdLineModuleProgressWidget::Run(), swapping " << outputFileName << " to " << newOutputFileAbsolutePath;
+      qDebug() << "QmitkCmdLineModuleRunner::Run(), swapping " << outputFileName << " to " << newOutputFileAbsolutePath;
 
       QMessageBox msgBox;
         msgBox.setText("The output directory is the same as the application installation directory");
@@ -586,7 +586,7 @@ void QmitkCmdLineModuleProgressWidget::Run()
 
 
 //-----------------------------------------------------------------------------
-QTemporaryFile* QmitkCmdLineModuleProgressWidget::SaveTemporaryImage(const ctkCmdLineModuleParameter &parameter, mitk::DataNode::ConstPointer node, QString& errorMessage) const
+QTemporaryFile* QmitkCmdLineModuleRunner::SaveTemporaryImage(const ctkCmdLineModuleParameter &parameter, mitk::DataNode::ConstPointer node, QString& errorMessage) const
 {
   // Don't call this if node is null or node is not an image.
   assert(node.GetPointer());

@@ -214,6 +214,11 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw mitkIm
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-TransferFunctionRGBImage640x480REF.png #corresponding reference screenshot
 )
 
+mitkAddCustomModuleTest(mitkImageVtkMapper2DOpacityTransferFunctionTest_Png2D-bw mitkImageVtkMapper2DOpacityTransferFunctionTest
+                        ${MITK_DATA_DIR}/Png2D-bw.png
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-OpacityTransferFunctionRGBImage640x480REF.png #corresponding reference screenshot
+)
+
 mitkAddCustomModuleTest(mitkSurfaceGLMapper2DColorTest_RedBall mitkSurfaceGLMapper2DColorTest
                         ${MITK_DATA_DIR}/ball.stl
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/ballColorRed640x480REF.png #corresponding reference screenshot

@@ -159,6 +159,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
     mitkImageVtkMapper2DTransferFunctionTest.cpp
+    mitkImageVtkMapper2DOpacityTransferFunctionTest.cpp
     mitkImageVtkMapper2DLookupTableTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp

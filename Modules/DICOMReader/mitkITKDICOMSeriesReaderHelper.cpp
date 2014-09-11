@@ -28,37 +28,7 @@ mitk::ITKDICOMSeriesReaderHelper
 {
   MITK_DEBUG << "ITKDICOMSeriesReaderHelper::CanHandleFile " << filename;
   itk::GDCMImageIO::Pointer tester = itk::GDCMImageIO::New();
-  if ( tester->CanReadFile(filename.c_str()) )
-  {
-    tester->SetFileName( filename.c_str() );
-    tester->ReadImageInformation();
-
-    std::string numberOfFrames;
-    if (tester->GetValueFromTag("0028|0008", numberOfFrames))
-    {
-      std::istringstream converter(numberOfFrames);
-      int i;
-      if (converter >> i)
-      {
-        MITK_DEBUG << "Number of Frames for " << filename << ": " << numberOfFrames;
-        return (i <= 1); // cannot handle multi-frame
-      }
-      else
-      {
-        return true; // we assume single-frame
-      }
-    }
-    else
-    {
-      MITK_DEBUG << "No Number of Frames tag for " << filename;
-      // friendly old single-frame file
-      return true;
-    }
-  }
-
-  MITK_DEBUG << "GDCMImageIO found: No DICOM in " << filename;
-  // does not seem to be DICOM
-  return false;
+  return tester->CanReadFile(filename.c_str());
 }
 
 mitk::Image::Pointer
